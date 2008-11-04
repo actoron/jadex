@@ -17,7 +17,7 @@
   	<repository>
   		<id>project</id>
   		<name>Maven Project Repository</name>
-  		<url>file:///./lib</url>
+  		<url>file:///${basedir}/lib</url>
   	</repository>
   </repositories>
   <build>
