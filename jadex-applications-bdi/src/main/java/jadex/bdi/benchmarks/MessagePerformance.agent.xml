@@ -1,0 +1,127 @@
+<!--
+	<H3>Test messaging perfomance.</H3>
+	
+	Sends/receives a number of messages and prints out the time it takes.
+	<hr>
+	1000 messages (p4-3000, JVM 1.5).
+	<table>
+		<tr><td></td>        <td>Standalone(nsmt)</td><td>Jade(http)</td></tr>
+		<tr><td>platform</td><td>1400ms</td>          <td>2000</td></tr>
+		<tr><td>host</td>    <td>7000ms</td>          <td>8400</td></tr>
+		<tr><td>network</td> <td>5000ms</td>          <td>6000</td></tr>
+	</table>
+	
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="MessagePerformance"
+	package="jadex.bdi.benchmarks">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="msg_cnt" class="int" exported="true">
+			<fact>1000</fact>
+		</belief>
+
+		<belief name="receiver" class="IAgentIdentifier" exported="true">
+			<fact>$scope.getAgentIdentifier()</fact>
+		</belief>
+
+		<belief name="starttime" class="long"></belief>
+
+		<belief name="sent" class="int"/>
+
+		<belief name="received" class="int">
+			<fact>0</fact>
+		</belief>
+
+		<belief name="gui" class="MessageGui">
+			<fact>new MessageGui($scope.getExternalAccess())</fact>
+		</belief>
+	</beliefs>
+	
+	<plans>
+		<!-- The test plan sends a specified amount messages. -->
+		<plan name="send_plan">
+			<body class="MessageSenderPlan" />
+		</plan>
+		
+		<!-- The test plan receives a specified amount messages. -->
+		<plan name="receive_plan">
+			<body class="MessageReceiverPlan" />
+			<trigger>
+				<messageevent ref="inform"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- This message is echoed or sent to itself, and therefore also received. -->
+		<messageevent name="inform" type="fipa" direction="send_receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+	</events>
+
+	<properties>
+        <!-- <property name="debugging">true</property> -->
+        <property name="logging.level">Level.FINE</property>
+        <property name="logging.useParentHandlers">true</property>
+    </properties>
+
+	<configurations>
+
+		<configuration name="local">
+			<beliefs>
+				<initialbelief ref="receiver">
+					<fact>$scope.getAgentIdentifier()</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="send_plan"/>
+			</plans>
+		</configuration>
+<!-- 
+		<configuration name="remote(alex)">
+			<beliefs>
+				<initialbelief ref="receiver">
+					<fact>new jadex.adapter.base.fipa.AgentIdentifier("Echo@alex", new String[]{"nio-mtp://vsisstaff0:5678"})</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="send_plan"/>
+			</plans>
+		</configuration>
+		
+		<configuration name="remote(horst-nio)">
+			<beliefs>
+				<initialbelief ref="receiver">
+					<fact>new jadex.adapter.base.fipa.AgentIdentifier("Echo@horst", new String[]{"nio-mtp://vsisstaff3:8888"})</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="send_plan"/>
+			</plans>
+		</configuration>
+		
+		<configuration name="remote(horst-tcp)">
+			<beliefs>
+				<initialbelief ref="receiver">
+					<fact>new jadex.adapter.base.fipa.AgentIdentifier("Echo@horst", new String[]{"tcp-mtp://vsisstaff3:8888"})</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="send_plan"/>
+			</plans>
+		</configuration>
+-->		
+	</configurations>
+</agent>
+

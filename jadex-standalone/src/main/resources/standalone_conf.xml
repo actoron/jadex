@@ -1,0 +1,145 @@
+<!--
+  Standalone platform properties.
+-->
+<properties xmlns="http://jadex.sourceforge.net/jadexconf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
+	                    http://jadex.sourceforge.net/configuration.xsd"
+	name="standalone_conf">
+	
+	<properties type="platform_standalone" name="lars">
+		<property type="platformname">lars</property>
+		<property type="platform_shutdown_time">1000</property>
+		<property type="welcome">false</property>
+		<property type="autoshutdown">true</property>
+		<!-- Message types. -->
+		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
+		
+		<!-- Kernels. -->
+		<propertiesref ref="kernel_v2"/>
+<!-- 	<propertiesref ref="kernel_v1"/> -->
+		
+		<!-- Platform services. -->
+		<properties type="services">
+			<!-- Library service. -->
+			<!-- <property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService()</property> -->
+			<property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService(
+				new java.net.URL[]
+				{
+					new java.net.URL("file:///./jadex_v2/bdi/applib/classes"),
+					new java.net.URL("file:///./jadex_v2/bdi/applications/classes")
+				})
+			</property>
+			
+			<!-- AMS service. -->
+			<property type="jadex.adapter.base.fipa.IAMS" name="ams_service">new jadex.adapter.standalone.ams.AMS($platform)</property> 
+			
+			<!-- DF service. -->
+			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
+			
+			<!-- Message service. -->
+			<property type="jadex.adapter.base.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
+				new jadex.adapter.standalone.transport.ITransport[]
+				{
+					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),
+					new jadex.adapter.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
+					new jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
+				})
+			</property>
+			
+			<!-- Clock service. -->
+			<property type="jadex.bridge.IClockService" name="clock_service">
+				new jadex.adapter.base.clock.SystemClock("system_clock", 1,
+					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+//				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
+//					System.currentTimeMillis(), 100)
+			</property>
+
+			<!-- Simulation service. -->
+			<property type="jadex.adapter.base.ISimulationService" name="simulation_service">
+				new jadex.adapter.standalone.SimulationService($platform)
+			</property>
+		
+			<!-- Execution service. -->
+			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
+				new jadex.adapter.base.execution.AsyncExecutionService(
+					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+			</property>
+		</properties>
+		
+		<!-- Agents. -->
+  		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
+		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
+ 		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
+	</properties>
+	
+	<properties type="platform_jade" name="lars">
+	</properties>
+	
+	<properties type="kernel" id="kernel_v2">
+		<property type="agent_factory">new jadex.bdi.interpreter.JadexAgentFactory(jadex.commons.SUtil.createHashMap(
+			new String[]{"messagetype_fipa", "planexecutor_standard", "standard.timeout", "tooladapter.introspector"},
+			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
+			new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname)),
+			new java.lang.Long(10000),
+			jadex.tools.introspector.IntrospectorAdapter.class
+			}), $platform)
+			</property>
+	</properties>
+	
+	<!-- <properties type="kernel" id="kernel_v1">
+		<!- - V1 Factory / JiBX Model loader - ->
+		<!- - <property type="agent_factory">new jadex.runtime.impl.JadexAgentFactory($props)</property> - ->
+		<property type="agent_factory">new jadex.runtime.impl.JadexAgentFactory(jadex.commons.SUtil.createHashMap(
+			new String[]{"model_checking", "model_caching", "model_cache_autorefresh", "messagetype_fipa", "parser_factory"},
+			new Object[]{false, true, true, new jadex.adapter.base.fipa.FIPAMessageType(), new jadex.parser.javaccimpl.Parser(null)}
+			))</property>
+	</properties> -->
+	
+	<!--  <properties type="kernel" name="kernel_v1">
+		<!- - V1 Factory / JiBX Model loader - ->
+		<property type="agentfactory">new jadex.runtime.impl.JadexAgentFactory($props)</property>
+		<property type="model_checking">true</property>
+		<property type="model_caching">true</property>
+		<property type="model_cache_autorefresh">true</property>
+		<property type="messagetype" name="fipa">new jadex.adapter.fipa.FIPAMessageType()</property>
+		<properties type="parser">
+			<property type="parser_factory">new jadex.parser.javaccimpl.Parser($props)</property>
+			<property type="javacc_plan_reloading">false</property>
+		</properties>
+		<property name="janino_write_cache"></property>
+		<property name="janino_read_cache"></property>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+		<property name="logging.useParentHandlers">true</property>
+		<property name="logging.level.exceptions">java.util.logging.Level.SEVERE</property>
+		<!- - Max millis for one plan step, 0 for unlimited. - ->
+		<property name="max_planstep_time">0</property>
+		<!- - Limitations for message settings. - ->
+		<!- - Max number of stored and open outgoing messages, 0 for unlimited. - ->
+		<property name="storedmessages.size">0</property>
+		<!- - The standard timeout setting (default for protocols and agent termination). - ->
+		<property name="standard.timeout">10000</property>
+		<!- - The termination timeout (if null, standard.timeout will be used). - ->
+		<property name="termination.timeout">null</property>
+		<!- - Plan executors. - ->
+		<property name="planexecutor.standard">new jadex.runtime.JavaStandardPlanExecutor($agent)</property>
+		<property name="planexecutor.mobile">new jadex.runtime.JavaMobilePlanExecutor()</property>
+		<!- - Tool adapters - ->
+		<property name="tooladapter.introspector">new jadex.tools.introspector.IntrospectorAdapter($agent)</property>
+		<property name="tooladapter.tracer">new jadex.tools.tracer.TracerAdapter($agent)</property>
+		<!- - <property name="tooladapter.logger">new jadex.tools.logger.LoggerAdapter($agent)</property> - ->
+		<!- - Content codecs - ->
+		<property name="contentcodec.java_xml">new jadex.adapter.base.JavaXMLContentCodec()</property>
+		<property name="contentcodec.nuggets_xml">new jadex.adapter.base.NuggetsXMLContentCodec()</property>
+	</properties>
+-->
+<!-- 
+	<properties name="kernel_v2">
+		<property name="agentfactory">new jadex.bdi.interpreter.JadexAgentFactory($props)</property>
+		<property type="messagetype" name="fipa">new jadex.adapter.fipa.FIPAMessageType()</property>
+		<!- - Plan executors. - ->
+		<property name="planexecutor.standard">new jadex.bdi.runtime.JavaStandardPlanExecutor($agent)</property>
+	</properties>
+ -->	
+ 
+</properties>

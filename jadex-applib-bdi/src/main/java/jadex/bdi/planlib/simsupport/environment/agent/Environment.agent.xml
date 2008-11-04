@@ -1,0 +1,102 @@
+<!--
+	<H3>The AMS agent.</H3>
+	The agent management system. It is actually represented by
+	the AMS class. This agent allows the agent-oriented access
+	(per message) to the AMS.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Environment"
+	package="jadex.bdi.planlib.simsupport.environment.agent">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>jadex.adapter.base.clock.*</import>
+		<import>jadex.bdi.planlib.simsupport.environment.*</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+	</imports>
+
+	<capabilities>
+	</capabilities>
+
+	<beliefs>
+		<!-- Shape of the Environment -->
+		<belief name="shape" class="Integer" exported="true">
+			<fact>new Integer(ISimulationEngine.EUCLIDEAN_SHAPE)</fact>
+		</belief>
+		
+		<!-- Name of the environment -->
+		<belief name="environment_name" class="String" exported="true">
+			<fact>"Simulation"</fact>
+		</belief>
+		
+		<!-- The time coefficient. -->
+		<belief name="time_coefficient" class="IVector1" exported="true">
+			<fact>new Vector1Double(0.001)</fact>
+		</belief>
+		
+		<!-- Displayed size of the environment -->
+		<belief name="area_size" class="IVector2" exported="true">
+			<fact>new Vector2Double(1.0)</fact>
+		</belief>
+		
+		<!-- Background layers used for the display -->
+		<belief name="background_layers" class="List" exported="true">
+			<fact>new ArrayList()</fact>
+		</belief>
+		
+		<!-- Clock Service used by the environment -->
+		<belief name="clock_service" class="jadex.bridge.IClockService" exported="true">
+			<fact>new SimulationTickClock($beliefbase.environment_name, 0, 1)</fact>
+		</belief>
+		
+		<!-- Simulation time stamp of the last simulation step -->
+		<belief name="sim_time" class="Long"/>
+		
+		<!-- Current time -->
+		<!-- <belief name="time" class="long">
+        	<fact evaluationmode="dynamic">$beliefbase.clock_service.getTime()</fact>
+    	</belief> -->
+    	
+		<belief name="simulation_engine" class="ISimulationEngine"/>
+	</beliefs>
+
+	<goals>
+		<performgoal name="update_environment" retry="true" retrydelay="0" exclude="never">
+			<!-- <maintaincondition>
+				?st_rbelief = (belief (element_has_model ?st_mbelief) (belief_has_fact ?sim_time))
+				?st_mbelief = (mbelief (element_has_name "sim_time"))
+				?t_rbelief = (belief (element_has_model ?t_mbelief) (belief_has_fact ?sim_time))
+				?t_mbelief = (mbelief (element_has_name "time"))
+			</maintaincondition> -->
+		</performgoal>
+	</goals>
+
+	<plans>
+		<!-- Initialization Plan. -->
+    	<plan name="initialization">
+      		<body class="InitializeEnvironmentPlan"/>
+    	</plan>
+    	
+    	<plan name="update_environment_plan">
+			<body class="UpdateEnvironmentPlan"/>
+			<trigger>
+				<goal ref="update_environment"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+    	  	<plans>
+        		<initialplan ref="initialization"/>
+      		</plans>
+   	 	</configuration>
+	</configurations>
+
+</agent>

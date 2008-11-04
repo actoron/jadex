@@ -1,0 +1,95 @@
+
+	<!--
+		The messaging capability can be used to send/receive im/email/(sms).
+	-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	package="jadex.bdi.planlib.messaging" name="Messaging">
+	
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+	
+	<beliefs>
+		<belief name="emailaccount" class="EmailAccount" exported="true" />
+	
+		<belief name="icqaccount" class="ICQAccount" exported="true" />
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="send_sms" exported="true">
+			<parameter name="content" class="String"></parameter>
+			<parameterset name="receivers" class="String"></parameterset>
+		</achievegoal>
+	
+		<achievegoal name="send_im" exported="true">
+			<parameter name="account" class="ICQAccount">
+				<value>$beliefbase.icqaccount</value>
+			</parameter>
+			<parameter name="content" class="String"></parameter>
+			<parameterset name="receivers" class="String"></parameterset>
+		</achievegoal>
+		
+		<achievegoal name="send_email" exported="true">
+			<parameter name="account" class="EmailAccount">
+				<value>$beliefbase.emailaccount</value>
+			</parameter>
+			<parameter name="content" class="String" optional="true" />
+			<parameter name="subject" class="String" optional="true" />
+			<parameterset name="receivers" class="String" />
+			<parameterset name="ccs" class="String" optional="true" />
+			<parameterset name="bccs" class="String" optional="true" />
+			<parameterset name="attachments" class="Object"
+				optional="true" />
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<plan name="send_email_plan">
+			<parameter name="account" class="EmailAccount">
+				<goalmapping ref="send_email.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_email.content" />
+			</parameter>
+			<parameter name="subject" class="String">
+				<goalmapping ref="send_email.subject" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_email.receivers" />
+			</parameterset>
+			<parameterset name="ccs" class="String">
+				<goalmapping ref="send_email.ccs" />
+			</parameterset>
+			<parameterset name="bccs" class="String">
+				<goalmapping ref="send_email.bccs" />
+			</parameterset>
+			<parameterset name="attachments" class="Object">
+				<goalmapping ref="send_email.attachments" />
+			</parameterset>
+			<body class="SendEmailPlan" />
+			<trigger>
+				<goal ref="send_email" />
+			</trigger>
+		</plan>
+		
+		<plan name="send_im_plan">
+			<parameter name="account" class="ICQAccount">
+				<goalmapping ref="send_im.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_im.content" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_im.receivers" />
+			</parameterset>
+			<body class="SendIMPlan" />
+			<trigger>
+				<goal ref="send_im" />
+			</trigger>
+		</plan>
+	</plans>
+	
+</capability>

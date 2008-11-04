@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+	<H3>Check usage of end elements in capabilities</H3>
+	Part of EndState test.
+ -->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="EndStateWorker"
+	package="jadex.bdi.testcases.misc">
+	
+	<imports>
+		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+	
+	<goals>
+		<achievegoal name="endgoal" exported="true">
+			<parameter name="content" class="String">
+				<value>"capability end goal"</value>
+			</parameter>
+		</achievegoal>
+	</goals>
+		
+	<events>
+		<internalevent name="endevent" exported="true">
+			<parameter name="content" class="String">
+				<value>"capability end internal event"</value>
+			</parameter>
+		</internalevent>
+		<messageevent name="endmsg" type="fipa" direction="send_receive" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String" direction="fixed">
+				<value>"capability end message event"</value>
+			</parameter>
+			<parameterset name="receivers" class="IAgentIdentifier">
+				<value>$scope.getAgentIdentifier()</value>
+			</parameterset>
+		</messageevent>
+	</events>
+	
+</capability>

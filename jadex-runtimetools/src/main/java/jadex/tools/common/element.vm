@@ -1,0 +1,71 @@
+#macro(element)
+
+	#set($elem = $recursion.get("$depth"))
+
+	#*
+	#if($depth>0)
+		#set($bor = "0")
+		#set($fs = "+1")
+	#else
+		#set($bor = "1")
+		#set($fs = "+1")
+	#end
+	*#
+
+	<TABLE class="element" border="0" cellspacing="0" cellpadding="0">
+		#if($elem.get("class")||$elem.get("name"))
+		<TR>
+			#set($clazz = "")
+			#set($name = "")
+			#set($clazz = $elem.get("class"))
+			#set($name = $elem.get("name"))
+			<TD class="title" align="left" colspan="2">
+				<TABLE class="cell" border="0" cellspacing="0" cellpadding="0"><TR><TD>
+					$clazz $name
+				</TD></TR></TABLE>
+			</TD>
+		</TR>
+		#end
+		#foreach($attribute in $elem.keySet())
+			#if(!$attribute.equals("class") && !$attribute.equals("name") && !$attribute.equals("isencodeablepresentation") && !$attribute.equals("id")  && !$attribute.equals("ChangeEvent.type"))
+				<TR>
+					<TD class="attribute">
+						<TABLE class="cell" border="0" cellspacing="0" cellpadding="0"><TR><TD>
+							$attribute
+						</TD></TR></TABLE>
+					</TD>
+					#set($innerelem = $elem.get($attribute))
+					#if($sreflect.instanceOf($innerelem, "java.util.Map") && $innerelem.get("isencodeablepresentation").equals("true"))
+						<TD class="complex">
+							#set($depth = $depth + 1)
+							<!-- $!recursion.put("$depth", $innerelem.clone()) -->
+							#element()
+							#set($depth = $depth - 1)
+							#set($elem = $recursion.get("$depth"))
+						</TD>
+					#else
+						<TD class="value">
+							<TABLE class="cell" border="0" cellspacing="0" cellpadding="0"><TR><TD>
+								$!elem.get($attribute)
+							</TD></TR></TABLE>
+						</TD>
+					#end
+				</TR>
+			#end
+		#end
+	</TABLE>
+#end
+
+<HTML>
+	<HEAD>
+	</HEAD>
+
+	<BODY>
+		<TABLE border="0" cellspacing="0" cellpadding="0"><TR><TD class="complex">
+			#set($depth = 0)
+			$!recursion.put("0", $element)
+			#element()
+		</TD></TR></TABLE>
+		<P>
+	</BODY>
+</HTML>

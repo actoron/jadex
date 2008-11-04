@@ -1,0 +1,74 @@
+<!--
+  <h3>Test center capability</h3>
+
+  The Test center capability is the generic functionality
+  for a test center. Only the abstract testcases belief set
+  has to be provided from an actual test center agent.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	package="jadex.tools.testcenter"
+	name="TestCenter">
+
+		<imports>
+			<import>jadex.adapter.base.fipa.*</import>
+			<import>jadex.bdi.planlib.test.*</import>
+		</imports>
+
+		<capabilities>
+			<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+		</capabilities>
+
+		<beliefs>
+			<belief name="timeout" class="long" exported="true">
+				<fact>20000L</fact>
+			</belief>
+		</beliefs>
+
+		<goals>
+			<performgoal name="perform_test" exported="true">
+				<parameter name="testcase" class="Testcase" direction="inout" />
+				<parameter name="classloader" class="ClassLoader" optional="true" />
+			</performgoal>
+			<achievegoalref name="ams_create_agent">
+				<concrete ref="amscap.ams_create_agent"/>
+			</achievegoalref>
+			<achievegoalref name="ams_start_agent">
+				<concrete ref="amscap.ams_start_agent"/>
+			</achievegoalref>
+			<achievegoalref name="ams_destroy_agent">
+				<concrete ref="amscap.ams_destroy_agent"/>
+			</achievegoalref>
+		</goals>
+
+		<plans>
+			<plan name="perform_test_plan">
+				<parameter name="testcase" class="Testcase">
+					<goalmapping ref="perform_test.testcase"/>
+				</parameter>
+				<parameter name="classloader" class="ClassLoader">
+					<goalmapping ref="perform_test.classloader"/>
+				</parameter>
+				<body class="PerformTestPlan" />
+				<trigger>
+					<goal ref="perform_test"/>
+				</trigger>
+			</plan>
+		</plans>
+
+		<events>
+			<!--  The inform reports message event. -->
+			<messageevent name="inform_reports" type="fipa" exported="true" direction="receive">
+				<parameter name="performative" class="String" direction="fixed">
+					<value>SFipa.INFORM</value>
+				</parameter>
+				<parameter name="language" class="String" direction="fixed">
+					<value>SFipa.NUGGETS_XML</value>
+				 </parameter>
+				 <match>$content instanceof jadex.bdi.planlib.test.Testcase</match>
+			</messageevent>
+		</events>
+
+</capability>

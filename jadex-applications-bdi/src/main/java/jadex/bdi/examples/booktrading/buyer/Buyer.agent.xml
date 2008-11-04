@@ -1,0 +1,187 @@
+<!--
+	<H3>The buyer agent that purchases books for its user.</H3>
+
+	The buyer agent comes with a user interface in which the
+	human user can enter its purchase book orders consisting of
+	a title, start price, price limit and a deadline. The agent
+	subsequently tries to buy the book and changes the price
+	according to the deadline.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	   name="Buyer" package="jadex.bdi.examples.booktrading.buyer">
+
+	<imports>
+		<import>jadex.bdi.examples.booktrading.common.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>java.util.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.bridge.IClockService</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="procap" file="jadex.bdi.planlib.protocols.contractnet.ContractNet"/>
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefset name="orders" class="Order" evaluationmode="push">
+			<facts language="clips">
+				// select $g.getParameter("order").getValue()
+				// from IGoal $g in $goalbase.getGoals("purchase_book")
+				
+				?mgoal = (mgoal (element_has_name "purchase_book"))
+				$?ret = (collect 
+					?order = (jadex.bdi.examples.booktrading.common.Order)
+					?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
+					?rgoal = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
+				)
+			</facts>
+		</beliefset>
+		
+		<!-- <belief name="time" class="long" updaterate="1000">
+			<fact>$scope.getTime()</fact>
+		</belief> -->
+		
+		<beliefset name="initial_orders" class="Order" exported="true"/>
+		
+		<beliefset name="negotiation_reports" class="NegotiationReport"/>
+		
+		<belief name="gui" class="jadex.bdi.planlib.GuiCreator"/>
+	</beliefs>
+
+	<goals>
+		<!--  Initiate negotiation rounds every 10 secs. -->
+		<achievegoal name="purchase_book" recur="true" recurdelay="10000">
+			<parameter name="order" class="Order">
+				<!-- <bindingoptions>$beliefbase.initial_orders</bindingoptions> -->
+				<value>?order</value>
+			</parameter>
+			<!-- <unique/> -->
+			<creationcondition>
+				// $beliefbase.initial_orders!=null
+				?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?x ?order $?y))
+				?order = (jadex.bdi.examples.booktrading.common.Order (state "open"))
+				?mbelset = (mbeliefset (element_has_name "initial_orders"))
+				(not
+					(and
+						?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
+						?rgoal = (goal (parameterelement_has_parameters contains ?rparam) (element_has_model ?mgoal))
+						?mgoal = (mgoal (element_has_name "purchase_book"))
+					)
+				)
+				//?rbelief = (belief (belief_has_fact $?orders))
+				//?mbelset = (mbelief (element_has_name "initial_orders"))
+			</creationcondition>
+			<dropcondition>
+				// $beliefbase.time > $goal.order.getDeadline().getTime()
+				
+				// ?rbelief = (belief (belief_has_fact ?time))
+				// ?mbelief = (mbelief (element_has_name "time"))
+				// ?rparam = (parameter (parameter_has_name "order"))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				// ?order = (jadex.bdi.examples.booktrading.common.Order (getDeadline() ?deadline))
+				// (test (?time &gt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction "java.util.Date" "getTime" ?deadline)))
+			
+				?order = (jadex.bdi.examples.booktrading.common.Order (state "failed"))
+				?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
+				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			</dropcondition>
+			<targetcondition>
+				// Order.DONE.equals($goal.order.getState())
+				?rparam =(parameter (parameter_has_name "order") (parameter_has_value ?order)) 
+				?order = (jadex.bdi.examples.booktrading.common.Order (state "done"))
+				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			</targetcondition>
+		</achievegoal>
+		
+		<achievegoalref name="df_search">
+			<concrete ref="dfcap.df_search"/>
+		</achievegoalref>
+		
+		<achievegoalref name="cnp_initiate">
+			<concrete ref="procap.cnp_initiate"/>
+		</achievegoalref>
+		
+		<querygoalref name="cnp_evaluate_proposals">
+			<concrete ref="procap.cnp_evaluate_proposals"/>
+		</querygoalref>
+	</goals>
+
+	<plans>
+		<plan name="purchase_book_plan">
+			<parameter name="order" class="Order">
+				<goalmapping ref="purchase_book.order"/>
+			</parameter>
+			<body class="PurchaseBookPlan" />
+			<trigger>
+				<goal ref="purchase_book"/>
+			</trigger>
+		</plan>
+		
+		<plan name="evaluate_proposals_plan">
+			<parameter name="cfp" class="Object">
+				<goalmapping ref="cnp_evaluate_proposals.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object" optional="true">
+				<goalmapping ref="cnp_evaluate_proposals.cfp_info"/>
+			</parameter>
+			<parameterset name="proposals" class="Object">
+				<goalmapping ref="cnp_evaluate_proposals.proposals"/>
+			</parameterset>
+			<parameterset name="history" class="NegotiationRecord" optional="true">
+				<goalmapping ref="cnp_evaluate_proposals.history"/>
+			</parameterset>
+			<parameterset name="acceptables" class="Object" direction="out">
+				<goalmapping ref="cnp_evaluate_proposals.acceptables"/>
+			</parameterset>
+			<body class="EvaluateProposalsPlan" />
+			<trigger>
+				<goal ref="cnp_evaluate_proposals"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<expressions>
+		<expression name="search_reports">
+			select NegotiationReport $nr from $beliefbase.negotiation_reports
+			where $nr.getOrder().equals($order)
+			order by $nr.getTime()
+			<parameter name="$order" class="Order"/>
+		</expression>
+	</expressions>
+
+	<properties>
+		<property name="service_seller">
+			<!-- SFipa.createAgentDescription(null, SFipa.createServiceDescription(null, "service_seller", null)) -->
+			((IDF)$scope.getPlatform().getService(IDF.class))
+				.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class))
+					.createDFServiceDescription(null, "service_seller", null))
+		</property>
+		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			 <beliefs>
+				 <initialbelief ref="gui">
+					<fact>new jadex.bdi.planlib.GuiCreator(Gui.class, new Class[]{jadex.bdi.runtime.IExternalAccess.class, boolean.class}, 
+						new Object[]{$scope.getExternalAccess(), Boolean.TRUE})</fact>
+				</initialbelief> 
+			</beliefs>
+			<!-- <goals>
+				<initialgoal ref="purchase_book">
+					<parameter ref="order">
+						<value>new Order("All about agents", new java.util.Date($scope.getTime()+60000),
+							75, 110, true, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+					</parameter>
+				</initialgoal>
+			</goals> -->
+		</configuration>
+	</configurations>
+
+</agent>

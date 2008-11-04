@@ -1,0 +1,216 @@
+<!--
+	<H3>Basic wander, flee and eat behaviour for preys.</H3>
+
+	Three goal types are supported:<br>
+	- Running away from hunters (maintain keep alone).<br>
+	- Eating food if discovered (achieve eat_food).<br>
+	- Searching for food (perform wander around).
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="BasicBehaviour"
+	package="jadex.bdi.examples.hunterprey.creature.preys.basicbehaviour">
+
+	<imports>
+		<import>jadex.bdi.examples.hunterprey.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey.creature.actsense.Creature"/>
+	</capabilities>
+
+	<beliefs>
+
+		<!-- The creature -->
+		<beliefref name="my_self" exported="true">
+			<concrete ref="actsensecap.my_self"/>
+		</beliefref>
+
+		<!-- The current vision. -->
+		<beliefref name="vision" exported="true">
+			<concrete ref="actsensecap.vision"/>
+		</beliefref>
+
+		<!-- The known hunters. -->
+		<beliefsetref name="hunters" exported="true">
+			<concrete ref="actsensecap.hunters" />
+		</beliefsetref>
+
+		<!-- The know obstacles. -->
+		<beliefsetref name="obstacles" exported="true">
+			<concrete ref="actsensecap.obstacles"/>
+		</beliefsetref>
+
+		<!-- The know food. -->
+		<beliefsetref name="food" exported="true">
+			<concrete ref="actsensecap.food"/>
+		</beliefsetref>
+
+		<!-- Private beliefs -->
+
+		<!-- Is the prey in danger. - ->
+		<belief name="is_indanger" class="boolean" evaluationmode="push">
+			<fact language="clips">
+				// $beliefbase.vision!=null &amp;&amp;
+				// (select $object
+ 				// from $beliefbase.vision.getObjects()
+				// where $object instanceof Hunter).size()>0
+				
+				?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
+				?mbel_vision	= (mbelief (element_has_name "vision"))
+				?hunter	= (jadex.bdi.examples.hunterprey.Hunter)
+				?vision	= (jadex.bdi.examples.hunterprey.Vision (objects contains ?hunter))
+			</fact>
+		</belief>-->
+
+		<!-- Forbidden food. -->
+		<beliefset name="forbidden_food" class="Food"/>
+
+		<!-- Configuration belief stating if eating is allowed. -->
+		<belief name="eating_allowed" class="boolean">
+			<fact>true</fact>
+		</belief>
+
+	</beliefs>
+
+	<goals>
+		<maintaingoal name="keep_alone" exclude="never">
+			<deliberation>
+				<inhibits ref="eat_food" inhibit="when_in_process"/>
+				<inhibits ref="wander_around" inhibit="when_in_process" />
+			</deliberation>
+			<maintaincondition>
+				// !$beliefbase.is_indanger
+				(not
+					(and
+						?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
+						?mbel_vision	= (mbelief (element_has_name "vision"))
+						?hunter	= (jadex.bdi.examples.hunterprey.Hunter)
+						?vision	= (jadex.bdi.examples.hunterprey.Vision (objects contains ?hunter))
+					)
+				)
+			</maintaincondition>
+		</maintaingoal>
+
+		<achievegoal name="eat_food">
+			<parameter name="$food" class="Food">
+				<!-- <bindingoptions>$beliefbase.food</bindingoptions> -->
+			</parameter>
+			<!-- <unique/> -->
+			<creationcondition>
+ 				// $beliefbase.eating_allowed &amp;&amp;
+ 				// !$beliefbase.getBeliefSet("forbidden_food").containsFact($food)
+
+				?rbel_eating_allowed	= (belief (element_has_model ?mbel_eating_allowed) (belief_has_fact true))
+				?mbel_eating_allowed	= (mbelief (element_has_name "eating_allowed"))
+
+				?rbelset_food	= (beliefset (element_has_model ?mbelset_food) (beliefset_has_facts $?x ?food $?y))
+				?mbelset_food	= (mbeliefset (element_has_name "food"))
+
+				?rbelset_forbidden_food	= (beliefset (element_has_model ?mbelset_forbidden_food) (beliefset_has_facts excludes ?food))
+				?mbelset_forbidden_food	= (mbeliefset (element_has_name "forbidden_food"))
+			</creationcondition>
+			<deliberation>
+				<inhibits ref="wander_around"/>
+				<inhibits ref="eat_food">
+					$beliefbase.my_self.getDistance($goal.$food)
+					&lt; $beliefbase.my_self.getDistance($ref.$food)
+				</inhibits>
+			</deliberation>
+		</achievegoal>
+
+		<performgoal name="wander_around" retry="true" exclude="never">
+		</performgoal>
+
+		<achievegoal name="goto_location">
+			<parameter name="location" class="Location"/>
+		</achievegoal>
+
+		<achievegoalref name="move">
+			<concrete ref="actsensecap.move"/>
+		</achievegoalref>
+
+		<achievegoalref name="eat">
+			<concrete ref="actsensecap.eat"/>
+		</achievegoalref>
+
+	</goals>
+
+	<!-- The plans. -->
+	<plans>
+
+		<!-- Wander around plan. -->
+		<plan name="gotoloc">
+			<parameter name="location" class="Location">
+ 				<goalmapping ref="goto_location.location"/>
+			</parameter>
+			<body class="GotoLocationPlan"/>
+			<trigger>
+				<goal ref="goto_location"/>
+			</trigger>
+		</plan>
+
+		<!-- Wander around plan. -->
+		<plan name="wander">
+			<body class="WanderAroundPlan"/>
+			<trigger>
+				<goal ref="wander_around"/>
+			</trigger>
+		</plan>
+
+		<!-- Dumb move plan. -->
+		<plan name="escape">
+			<body class="EscapePreyPlan"/>
+			<trigger>
+				<goal ref="keep_alone"/>
+			</trigger>
+		</plan>
+
+		<!-- Dumb move plan. -->
+		<plan name="eatfood">
+			<parameter name="food" class="Food">
+ 				<goalmapping ref="eat_food.$food"/>
+			</parameter>
+			<body class="EatFoodPlan"/>
+			<trigger>
+				<goal ref="eat_food"></goal>
+			</trigger>
+		</plan>
+
+		<plan name="removeforbiddenfood">
+			<body class="RemoveForbiddenFoodPlan"/>
+			<trigger>
+				<factchanged ref="vision"/>
+			</trigger>
+		</plan>
+
+	</plans>
+
+	<properties>
+		<!--<property name="logging.level">Level.FINE</property>-->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="flee">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>false</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal name="escapegoal" ref="keep_alone"/>
+			</goals>
+		</configuration>
+		<configuration name="wander_flee_eat">
+			<goals>
+				<initialgoal name="wandergoal" ref="wander_around"/>
+				<initialgoal name="escapegoal" ref="keep_alone"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</capability>
+

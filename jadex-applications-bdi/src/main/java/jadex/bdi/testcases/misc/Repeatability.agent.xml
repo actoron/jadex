@@ -1,0 +1,168 @@
+<!--
+	<H3>Test the repeatability of agent execution.</H3>
+	The repeatability test checks if triggered conditions
+	are executed in the expected order.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Repeatability"
+	package="jadex.bdi.testcases.misc">
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+		<belief name="a" class="String"/>
+		<belief name="b" class="String"/>
+		<beliefset name="c" class="String"/>
+		<beliefset name="d" class="String"/>
+		<belief name="cnt" class="int"/>
+	</beliefs>
+
+	<plans>
+		<plan name="test">
+			<body class="RepeatabilityPlan"/>
+		</plan>
+		<plan name="trigger1">
+			<parameter name="number" class="int">
+				<value>1</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"First beliefchange trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factchanged ref="a"/>
+			</trigger>
+		</plan>
+		<plan name="trigger2">
+			<parameter name="number" class="int">
+				<value>2</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"Second beliefchange trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factchanged ref="b"/>
+			</trigger>
+		</plan>
+		<plan name="trigger3">
+			<parameter name="number" class="int">
+				<value>3</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"First factadded trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factadded ref="c"/>
+			</trigger>
+		</plan>
+		<plan name="trigger4">
+			<parameter name="number" class="int">
+				<value>4</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"Second factadded trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factadded ref="d"/>
+			</trigger>
+		</plan>
+		<plan name="trigger5">
+			<parameter name="number" class="int">
+				<value>5</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"First belief condition trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<condition>
+					// "test".equals($beliefbase.a)
+					
+					?rbel_a	= (belief (element_has_model ?mbel_a) (belief_has_fact "test"))
+					?mbel_a	= (mbelief (element_has_name "a"))
+				</condition>
+			</trigger>
+		</plan>
+		<plan name="trigger6">
+			<parameter name="number" class="int">
+				<value>6</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"Second belief condition trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<condition>
+					// "test".equals($beliefbase.b)
+					
+					?rbel_b	= (belief (element_has_model ?mbel_b) (belief_has_fact "test"))
+					?mbel_b	= (mbelief (element_has_name "b"))
+				</condition>
+			</trigger>
+		</plan>
+		<plan name="trigger7">
+			<parameter name="number" class="int">
+				<value>7</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"First beliefset condition trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<condition>
+					// $beliefbase.c.length>0 &amp;&amp; "test".equals($beliefbase.c[0])
+					
+					?rbelset_c	= (beliefset (element_has_model ?mbelset_c) (beliefset_has_facts contains "test"))
+					?mbelset_c	= (mbeliefset (element_has_name "c"))
+				</condition>
+			</trigger>
+		</plan>
+		<plan name="trigger8">
+			<parameter name="number" class="int">
+				<value>8</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"Second beliefset condition trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<condition>
+					// $beliefbase.d.length>0 &amp;&amp; "test".equals($beliefbase.d[0])
+					
+					?rbelset_d	= (beliefset (element_has_model ?mbelset_d) (beliefset_has_facts contains "test"))
+					?mbelset_d	= (mbeliefset (element_has_name "d"))
+				</condition>
+			</trigger>
+		</plan>
+
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>8</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

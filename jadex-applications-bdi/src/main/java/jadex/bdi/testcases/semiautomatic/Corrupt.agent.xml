@@ -1,0 +1,16 @@
+<!--
+	<H3>Agent with corrupt ADF.</H3>
+
+	Tests if corrupt are correctly managed.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Corrupt"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<corrupt>
+	</corrupt>
+
+</agent>

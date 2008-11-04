@@ -1,0 +1,49 @@
+<!--
+	The conversation center sender agent allows to send/receive messages.
+-->
+
+<agent 	xmlns="http://jadex.sourceforge.net/jadex"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+					        http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="FipaMessageSender"
+	package="jadex.tools.convcenter">
+
+	<capabilities>
+		<capability name="ams" file="jadex.bdi.planlib.ams.AMS"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="gui" class="FipaMessageGui">
+			<fact>new FipaMessageGui($agent.getExternalAccess())</fact>
+		</belief>
+
+		<belief name="receiver" class="String">
+			<fact>(String)$args[0]</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<!-- Used to find other agents. -->
+		<achievegoalref name="ams_search_agents">
+			<concrete ref="ams.ams_search_agents"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<plan name="receiver">
+			<body>new FipaReceivePlan($beliefbase.gui.getConversationPanel())</body>
+			<trigger>
+				<messageevent ref="fipamsg"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<messageevent name="fipamsg" type="fipa">
+			<!-- Force string performatives. -->
+			<parameter name="performative" class="String" direction="inout"/>
+		</messageevent>
+	</events>
+
+</agent>

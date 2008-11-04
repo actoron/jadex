@@ -1,0 +1,53 @@
+<!--
+	<H3>Test the sync result listener.</H3>
+	
+	Executes a plan that waits for sync results.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="SyncResultListener"
+	package="jadex.bdi.testcases.plans">
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+
+		<belief name="listener" class="Object"/>
+	</beliefs>
+
+	<plans>
+		<plan name="tester">
+			<body class="SyncResultListenerTestPlan"/>
+		</plan>
+		<plan name="trigger">
+			<body class="SyncResultListenerTriggerPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>1</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="tester"/>
+				<initialplan ref="trigger"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

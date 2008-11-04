@@ -1,0 +1,107 @@
+<!--
+	<H3>Perform tests.</H3>
+
+	The test center agent has the purpose to
+	perform tests and collect the results.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="TestCenter"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcentercap" file="jadex.bdi.planlib.test.TestCenter"/>
+	</capabilities>
+
+	<properties>
+        <!--<property name="debugging">true</property>-->
+        <property name="logging.level">java.util.logging.Level.INFO</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="perform_tests">
+					<parameterset ref="testcases">
+						<value>new Testcase("jadex.bdi.testcases.misc.NoPackage")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.BeliefTrigger")</value>
+						<value>new Testcase("jadex.bdi.testcases.events.ProtocolInitiator")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.WaitForBeliefSet")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanTermination")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.Serialization")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.GUICloser")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.WaitFor")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.DFTest")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.BeliefSetChanges")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanPriorities")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanCondition")</value>
+						<value>new Testcase("jadex.bdi.testcases.events.SendAndWait")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.OuterAbstractGoal")</value>
+						<value>new Testcase("jadex.bdi.testcases.capabilities.DynamicCapability")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.MaintainGoalContext")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.QueryGoal")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.GoalConditions")</value>
+						<value>new Testcase("jadex.bdi.testcases.events.MessageMatching")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.Precondition")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.WaitForBelief")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.GoalBindings")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.InnerAbstractGoal")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.DFMobile")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.AMSTest")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanAbort")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.ParameterProtection")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.Evaluationmodes")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.GoalInhibition")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanContext")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.PropagateChanges")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.InlinePlan")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.Array")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanFail")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanMetaLevelReasoning")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.TriggerBySuspension")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.BeanChanges")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.DynamicModelCreation")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.InitialGoalRef")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.WaitqueueTest")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.SubgoalHandlingMobile")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.ParameterSet")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.UpdatingBelief")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.Leaker")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.MicroPlanStepExecution")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.Candy")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.InitialTransaction")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PingBinding")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.UniqueGoal")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.BeliefChanges")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.SubgoalHandling")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.TimeoutException")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.AtomicException")</value>
+						<value>new Testcase("jadex.bdi.testcases.events.SendAndWaitMobile")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.Expression")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.BeliefSetContains")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanParameters")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.MultiplePlanTriggers")</value>
+						<value>new Testcase("jadex.bdi.testcases.events.InitialEvent")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.AchieveGoal")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.InitialBelief")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.MLRRetry")</value>
+						<value>new Testcase("jadex.bdi.testcases.beliefs.DynamicBelief")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.GoalRecur")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.PlanPassedFailed")</value>
+						<value>new Testcase("jadex.bdi.testcases.goals.GoalRegressionTest")</value>
+						<value>new Testcase("jadex.bdi.testcases.plans.Countdown")</value>
+					</parameterset>
+				</initialgoal>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

@@ -1,0 +1,183 @@
+<!--
+	<H3>Alarmclock that notifies on alarm.</H3>
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Alarmclock"
+	package="jadex.bdi.examples.alarmclock">
+
+	<imports>
+		<import>java.net.URL</import>
+		<import>java.util.*</import>
+		<import>jadex.bridge.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- The filename of the alarmclock settings. -->
+		<belief name="settingsfile" class="String" exported="true">
+			<fact>"./alarmclock_settings.ser"</fact>
+		</belief>
+		<belief name="settings" class="Settings">
+			<fact>Settings.loadSettings($beliefbase.settingsfile, $scope.getExternalAccess())</fact>
+		</belief>
+
+		<beliefset name="alarms" class="Alarm">
+			<facts>((Settings)$beliefbase.getBelief("settings").getFact()).getAlarms()</facts>
+		</beliefset>
+
+		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
+			<fact>new jadex.bdi.planlib.GuiCreator(ClockFrame.class, new Class[]{jadex.bdi.runtime.IExternalAccess.class}, 
+				new Object[]{$scope.getExternalAccess()})</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="alarm" exclude="when_failed">
+			<parameter name="alarm" class="Alarm">
+				<!--  <bindingoptions>$beliefbase.alarms</bindingoptions> -->
+				<value>?alarm</value>
+			</parameter>
+			<!-- <unique/> -->
+			<creationcondition>
+				// alarm.isActive()
+				?alarm = (jadex.bdi.examples.alarmclock.Alarm (active true) (alarmtime != -2))
+				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
+				?mbeliefset = (mbeliefset (element_has_name "alarms"))
+				(not
+					(and
+						?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+						?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+					)
+				)
+			</creationcondition>
+			<contextcondition>
+				// $goal.alarm.isActive()
+				?alarm = (jadex.bdi.examples.alarmclock.Alarm (active true))
+				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			</contextcondition>
+			<dropcondition>
+				// !$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
+				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				(not
+					(and
+						?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
+						?mbeliefset = (mbeliefset (element_has_name "alarms"))
+					)
+				)
+			</dropcondition>
+			<targetcondition>
+				// $goal.alarm.getAlarmtime()==Alarm.NO_ALARM
+				?alarm = (jadex.bdi.examples.alarmclock.Alarm (alarmtime -2))
+				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			</targetcondition>
+		</achievegoal>
+
+		<performgoal name="notify">
+			<parameter name="alarm" class="Alarm"/>
+		</performgoal>
+
+		<performgoal name="play_song">
+			<parameter name="song" class="URL"/>
+		</performgoal>
+
+		<achievegoalref name="ams_shutdown_platform">
+			<concrete ref="amscap.ams_shutdown_platform"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<plan name="alarm_plan">
+			<parameter name="alarm" class="Alarm">
+				<goalmapping ref="alarm.alarm"/>
+			</parameter>
+			<body class="AlarmPlan" />
+			<trigger>
+				<goal ref="alarm"/>
+			</trigger>
+		</plan>
+
+		<plan name="play_song_plan">
+			<parameter name="song" class="URL">
+				<value>
+					$goal.getType().equals("notify")?
+					((Alarm)$goal.getParameter("alarm").getValue()).getFilenameUrl()
+					: $goal.getParameter("song").getValue()
+				</value>
+			</parameter>
+			<parameter name="finished" class="boolean"/>
+			<body class="PlaySongPlan" />
+			<trigger>
+				<goal ref="notify"/>
+				<goal ref="play_song"/>
+			</trigger>
+		</plan>
+
+		<plan name="beep_plan">
+			<parameter name="alarm" class="Alarm">
+				<goalmapping ref="notify.alarm"/>
+			</parameter>
+			<body class="BeepPlan" />
+			<trigger>
+				<goal ref="notify"/>
+			</trigger>
+		</plan>
+
+		<plan name="sync_settings_alarms">
+			<body class="SyncSettingsAlarmsPlan" />
+			<trigger>
+				<factadded ref="alarms"/>
+				<factremoved ref="alarms"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.INFO</property>
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbeliefset ref="alarms">
+					<!-- todo: call setAlarmtime() on alarms? -->
+					<facts>
+						((Settings)$beliefbase.settings).getAlarms().length!=0?
+						((Settings)$beliefbase.settings).getAlarms():
+						//jadex.commons.SUtil.joinArrays(((Settings)$beliefbase.settings).getAlarms(),
+						new Alarm[]{new Alarm(Alarm.ONCE, new Time(new Date($scope.getTime()+10000)),
+							"jadex/bdi/examples/alarmclock/alarm.wav", "Built-in start alarm", true, (IClockService)$scope.getPlatform().getService(IClockService.class)),
+						new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
+							"jadex/bdi/examples/alarmclock/alarm.wav", "Chimes", true, (IClockService)$scope.getPlatform().getService(IClockService.class)),
+						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
+							"jadex/bdi/examples/alarmclock/alarm.wav", "Chimes quartely", true, (IClockService)$scope.getPlatform().getService(IClockService.class))}//)
+					
+					</facts>
+					<!--<fact>
+						new Alarm(Alarm.ONCE,
+						new Time(new Date($agent.getTime()+10000)),
+						"jadex/examples/alarmclock/alarm.mp3", "Built-in start alarm", true)
+					</fact>
+					<fact>
+						new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
+						"jadex/examples/alarmclock/alarm.mp3", "Chimes", true)
+					</fact>
+					<fact>
+						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
+						"jadex/examples/alarmclock/alarm.mp3", "Chimes quartely", true)
+					</fact>-->
+				</initialbeliefset>
+			</beliefs>
+		</configuration>
+	</configurations>
+</agent>

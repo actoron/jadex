@@ -1,0 +1,133 @@
+<!--
+  The Test capability is responsible for tracking
+  test results and publishes results either to a
+  test center or on console.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	package="jadex.bdi.planlib.test"
+	name="Test">
+
+	<imports>
+		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.adapter.base.fipa.SFipa</import>
+	</imports>
+
+	<beliefs>
+		<!-- The number of testcases. -->
+		<belief name="testcase_cnt" class="int" exported="true">
+			<fact>1</fact>
+		</belief>
+
+		<!-- Default timeout is never. -->
+		<belief name="timeout" class="long" exported="true">
+			<fact>0L</fact>
+			<!-- <fact>20000</fact> -->
+		</belief>
+
+		<!-- The test center identifier (null when the agent was not started from the test center). -->
+		<belief name="testcenter" class="IAgentIdentifier" exported="true"/>
+
+		<!-- Keep the agent alive after their tests have been performed. -->
+		<belief name="keepalive" class="boolean" exported="true">
+			<fact>false</fact>
+		</belief>
+
+		<!-- The off flag. -->
+		<belief name="off" class="boolean">
+			<fact>false</fact>
+		</belief>
+
+		<!-- The start time. -->
+		<belief name="starttime" class="long">
+			<fact>$scope.getTime()</fact>
+		</belief>
+
+		<!-- The indicator for a timeout (when no time left and reports incomplete). -->
+		<belief name="timeout_failure" class="boolean" updaterate="1000">
+			<fact>((Long)$beliefbase.getBelief("timeout").getFact()).longValue()>0 
+				&amp;&amp; ((Long)$beliefbase.getBelief("starttime").getFact()).longValue()
+					+((Long)$beliefbase.getBelief("timeout").getFact()).longValue() &lt;= $scope.getTime()
+				&amp;&amp; ((Integer)$beliefbase.getBelief("testcase_cnt").getFact()).intValue()
+					!=$beliefbase.getBeliefSet("reports").getFacts().length</fact>
+		</belief>
+
+		<!-- The testcase reports. -->
+		<beliefset name="reports" class="TestReport" exported="true"/>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="tests_finished">
+			<creationcondition>
+				// $beliefbase.testcase_cnt==$beliefbase.reports.length
+				
+				?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
+				?mbel_off = (mbelief (element_has_name "off"))
+				?rbel_rep = (beliefset (element_has_model ?mbel_rep) (beliefset_has_facts $?reports))
+				?mbel_rep = (mbeliefset (element_has_name "reports"))
+				?rbel_cnt = (belief (element_has_model ?mbel_cnt) (belief_has_fact == (jadex.rules.rulesystem.rules.functions.Length $?reports)))
+				?mbel_cnt = (mbelief (element_has_name "testcase_cnt"))
+			</creationcondition>		
+		</achievegoal>
+		<achievegoal name="test_timeout">
+			<creationcondition>
+				// $beliefbase.timeout_failure
+				
+				?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
+				?mbel_off = (mbelief (element_has_name "off"))
+				?rbel_tof = (belief (element_has_model ?mbel_tof) (belief_has_fact true))
+				?mbel_tof = (mbelief (element_has_name "timeout_failure"))
+			</creationcondition>		
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Send results to test center. -->
+		<plan name="send_reports">
+			<body class="SendReportsPlan" />
+			<trigger>
+				<goal ref="tests_finished"/>
+				<goal ref="test_timeout"/>
+			</trigger>
+			<precondition>$beliefbase.getBelief("testcenter").getFact()!=null</precondition>
+		</plan>
+
+		<!-- Print results to console. -->
+		<plan name="print_reports">
+			<body class="PrintReportsPlan" />
+			<trigger>
+				<goal ref="tests_finished"/>
+				<goal ref="test_timeout"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!--  The inform reports message event. -->
+		<messageevent name="inform_reports" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="reply_with" class="String">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+		</messageevent>
+	</events>
+
+	<configurations>
+		<configuration name="default" />
+		<configuration name="off">
+			<beliefs>
+				<initialbelief ref="off">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</capability>

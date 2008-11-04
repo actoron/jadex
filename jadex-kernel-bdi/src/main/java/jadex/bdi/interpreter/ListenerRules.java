@@ -1,0 +1,526 @@
+package jadex.bdi.interpreter;
+
+import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IBeliefListener;
+import jadex.bdi.runtime.IBeliefSetListener;
+import jadex.bdi.runtime.IGoalListener;
+import jadex.bdi.runtime.IInternalEventListener;
+import jadex.bdi.runtime.IMessageEventListener;
+import jadex.bdi.runtime.IPlanListener;
+import jadex.bdi.runtime.impl.AgentFlyweight;
+import jadex.bdi.runtime.impl.BeliefFlyweight;
+import jadex.bdi.runtime.impl.BeliefSetFlyweight;
+import jadex.bdi.runtime.impl.GoalFlyweight;
+import jadex.bdi.runtime.impl.InternalEventFlyweight;
+import jadex.bdi.runtime.impl.MessageEventFlyweight;
+import jadex.bdi.runtime.impl.PlanFlyweight;
+import jadex.rules.rulesystem.IAction;
+import jadex.rules.rulesystem.ICondition;
+import jadex.rules.rulesystem.IVariableAssignments;
+import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.IConstraint;
+import jadex.rules.rulesystem.rules.IOperator;
+import jadex.rules.rulesystem.rules.IPriorityEvaluator;
+import jadex.rules.rulesystem.rules.LiteralConstraint;
+import jadex.rules.rulesystem.rules.ObjectCondition;
+import jadex.rules.rulesystem.rules.OrConstraint;
+import jadex.rules.rulesystem.rules.Rule;
+import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.state.IOAVState;
+
+
+/**
+ *  Static helper class for agent/goal/etc listener rules and actions.
+ *  
+ *  Listener aspects are implemented directly via a state listener on the IOAVState.
+ */
+public class ListenerRules
+{
+	//-------- rule methods --------
+
+	/**
+	 *  Create a rule to notify agent listeners, when an agent is terminating.
+	 */
+	protected static Rule createAgentTerminationListenerRule()
+	{
+		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		IConstraint terminating = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING);
+		IConstraint terminated = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED);
+		cecon.addConstraint(new OrConstraint(new IConstraint[]{terminating, terminated}));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, ragent));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, 
+			ragent, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object ragent = assignments.getVariableValue("?ragent");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				
+				IAgentListener lis	= (IAgentListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(new AgentFlyweight(state, ragent), ce);
+				
+				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
+				if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(cetype))
+					lis.agentTerminating(ae);
+				else //if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(cetype))
+					lis.agentTerminated(ae);
+			}
+		};
+		
+		Rule listener_termination = new Rule("listener_termination", new AndCondition(new ICondition[]{cecon, liscon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_termination;
+	}
+	
+	/**
+	 *  Create a rule to notify belief listeners, when a belief has changed.
+	 */
+	protected static Rule createBeliefChangedListenerRule()
+	{
+		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rbelief));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, 
+			rbelief, IOperator.CONTAINS));
+		
+		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rbelief	= assignments.getVariableValue("?rbelief");
+				
+				IBeliefListener lis	= (IBeliefListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(BeliefFlyweight.getBeliefFlyweight(state, rcapa, rbelief), ce);
+				
+				lis.beliefChanged(ae);
+			}
+		};
+		
+		Rule listener_belief_changed = new Rule("listener_belief_changed", new AndCondition(new ICondition[]{cecon, liscon, capacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_belief_changed;
+	}
+	
+	/**
+	 *  Create a rule to notify belief listeners, when a fact is added.
+	 * /
+	protected static Rule createBeliefSetFactAddedListenerRule()
+	{
+		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rbeliefset));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, 
+			rbeliefset, IOperator.CONTAINS));
+		
+		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
+				
+				IBeliefSetListener lis	= (IBeliefSetListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(new BeliefSetFlyweight(state, rcapa, rbeliefset), ce);
+				
+				lis.factAdded(ae);
+			}
+		};
+		
+		Rule listener_factadded = new Rule("listener_fact_added", new AndCondition(new ICondition[]{cecon, liscon, capacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_factadded;
+	}*/
+	
+	/**
+	 *  Create a rule to notify belief listeners, when a fact is removed.
+	 * /
+	protected static Rule createBeliefSetFactRemovedListenerRule()
+	{
+		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rbeliefset));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, 
+			rbeliefset, IOperator.CONTAINS));
+		
+		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
+				
+				IBeliefSetListener lis	= (IBeliefSetListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(new BeliefSetFlyweight(state, rcapa, rbeliefset), ce);
+				
+				lis.factAdded(ae);
+			}
+		};
+		
+		Rule listener_removed = new Rule("listener_fact_removed", new AndCondition(new ICondition[]{cecon, liscon, capacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_removed;
+	}*/
+	
+	/**
+	 *  Create a rule to notify belief listeners, when a fact is removed.
+	 */
+	protected static Rule createBeliefSetListenerRule()
+	{
+		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		IConstraint add = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED);
+		IConstraint rem = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED);
+		cecon.addConstraint(new OrConstraint(new IConstraint[]{add, rem}));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rbeliefset));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, 
+			rbeliefset, IOperator.CONTAINS));
+		
+		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
+				Object le	= assignments.getVariableValue("?listenerentry");
+			
+//				System.out.println("XXXXXXXXXXXXXXXXXXXXXXX "+ce+" "+rbeliefset+" "+state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_element)+" "
+//					+state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
+									
+				IBeliefSetListener lis	= (IBeliefSetListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(BeliefSetFlyweight.getBeliefSetFlyweight(state, rcapa, rbeliefset), ce);
+				
+				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
+				if(OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(cetype))
+					lis.factAdded(ae);
+				else if(OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(cetype))
+					lis.factRemoved(ae);
+				else //if(OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(cetype))
+					lis.factChanged(ae);
+			}
+		};
+		
+		Rule listener_beliefset = new Rule("listener_beliefset", new AndCondition(new ICondition[]{cecon, liscon, capacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_beliefset;
+	}
+	
+	/**
+	 *  Create a rule to internal event listeners.
+	 */
+	protected static Rule createInternalEventListenerRule()
+	{
+		Variable revent = new Variable("?revent", OAVBDIRuntimeModel.internalevent_type);
+		Variable mevent = new Variable("?mevent", OAVBDIMetaModel.internalevent_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+//		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+//		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, revent));
+		
+		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.internalevent_type);
+		eventcon.addConstraint(new BoundConstraint(null, revent));
+		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mevent));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+//		IConstraint relme = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, mevent, IOperator.CONTAINS);
+//		IConstraint relre = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, revent, IOperator.CONTAINS);
+//		liscon.addConstraint(new OrConstraint(new IConstraint[]{relme, relre}));
+		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, mevent, IOperator.CONTAINS));
+		
+//		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+//		capacon.addConstraint(new BoundConstraint(null, rcapa));
+//		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, revent));
+//		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+//		
+//		ObjectCondition mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+//		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+//		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_internalevents, mevent, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+//				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object revent = assignments.getVariableValue("?revent");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
+				
+				IInternalEventListener lis	= (IInternalEventListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalFlyweight(state, rcapa, revent), ce);
+				
+				lis.internalEventOccurred(ae);
+			}
+		};
+		
+		Rule listener_event = new Rule("listener_internaleventoccurred", new AndCondition(new ICondition[]{cecon, eventcon, liscon}), //, capacon, mcapacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_event;
+	}
+	
+	/**
+	 *  Create a rule to message event listeners.
+	 */
+	protected static Rule createMessageEventListenerRule()
+	{
+		Variable revent = new Variable("?revent", OAVBDIRuntimeModel.messageevent_type);
+		Variable mevent = new Variable("?mevent", OAVBDIMetaModel.messageevent_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+//		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+//		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		IConstraint msgrec = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED);
+		IConstraint msgsent = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT);
+		cecon.addConstraint(new OrConstraint(new IConstraint[]{msgrec, msgsent}));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, revent));
+		
+		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.messageevent_type);
+		eventcon.addConstraint(new BoundConstraint(null, revent));
+		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mevent));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		IConstraint relme = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, mevent, IOperator.CONTAINS);
+		IConstraint relre = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, revent, IOperator.CONTAINS);
+		liscon.addConstraint(new OrConstraint(new IConstraint[]{relme, relre}));
+		
+//		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+//		capacon.addConstraint(new BoundConstraint(null, rcapa));
+//		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+//		
+//		ObjectCondition mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+//		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+//		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_messageevents, mevent, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+//				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object revent = assignments.getVariableValue("?revent");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
+
+				IMessageEventListener lis	= (IMessageEventListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageFlyweight(state, rcapa, revent), ce);
+				
+				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
+				if(OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(cetype))
+					lis.messageEventReceived(ae);
+				else
+					lis.messageEventSent(ae);
+			}
+		};
+		
+		Rule listener_message = new Rule("listener_messageevent", new AndCondition(new ICondition[]{cecon, eventcon, liscon}),// , capacon, mcapacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_message;
+	}
+	
+	/**
+	 *  Create a rule to goal listeners.
+	 */
+	protected static Rule createGoalListenerRule()
+	{
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+//		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+//		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		IConstraint msgrec = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED);
+		IConstraint msgsent = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED);
+		cecon.addConstraint(new OrConstraint(new IConstraint[]{msgrec, msgsent}));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rgoal));
+		
+		ObjectCondition goalcon = new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		IConstraint relme = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, mgoal, IOperator.CONTAINS);
+		IConstraint relre = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, rgoal, IOperator.CONTAINS);
+		liscon.addConstraint(new OrConstraint(new IConstraint[]{relme, relre}));
+		
+//		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+//		capacon.addConstraint(new BoundConstraint(null, rcapa));
+//		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+//		
+//		ObjectCondition mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+//		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+//		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, mgoal, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+//				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object rgoal = assignments.getVariableValue("?rgoal");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
+				
+				IGoalListener lis	= (IGoalListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal), ce);
+				
+				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
+				if(OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(cetype))
+					lis.goalAdded(ae);
+				else
+					lis.goalFinished(ae);
+			}
+		};
+		
+		Rule listener_goal = new Rule("listener_goal", new AndCondition(new ICondition[]{cecon, goalcon, liscon}), //, capacon, mcapacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_goal;
+	}
+	
+	/**
+	 *  Create a rule to plan listeners.
+	 */
+	protected static Rule createPlanListenerRule()
+	{
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);
+		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
+//		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+//		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
+		
+		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		cecon.addConstraint(new BoundConstraint(null, ce));
+		IConstraint msgrec = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED);
+		IConstraint msgsent = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED);
+		cecon.addConstraint(new OrConstraint(new IConstraint[]{msgrec, msgsent}));
+		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rplan));
+		
+		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		eventcon.addConstraint(new BoundConstraint(null, rplan));
+		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mplan));
+		
+		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
+		liscon.addConstraint(new BoundConstraint(null, listenerentry));
+		IConstraint relme = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, mplan, IOperator.CONTAINS);
+		IConstraint relre = new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, rplan, IOperator.CONTAINS);
+		liscon.addConstraint(new OrConstraint(new IConstraint[]{relme, relre}));
+		
+//		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+//		capacon.addConstraint(new BoundConstraint(null, rcapa));
+//		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+//		
+//		ObjectCondition mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+//		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+//		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, mgoal, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+//				Object rcapa = assignments.getVariableValue("?rcapa");
+				Object rplan = assignments.getVariableValue("?rplan");
+				Object le	= assignments.getVariableValue("?listenerentry");
+				Object ce = assignments.getVariableValue("?ce");
+				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
+				
+				IPlanListener lis	= (IPlanListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				AgentEvent	ae	= new AgentEvent(PlanFlyweight.getPlanFlyweight(state, rcapa, rplan), ce);
+				
+				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
+				if(OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(cetype))
+					lis.planAdded(ae);
+				else
+					lis.planFinished(ae);
+			}
+		};
+		
+		Rule listener_plan = new Rule("listener_plan", new AndCondition(new ICondition[]{cecon, eventcon, liscon}), //, capacon, mcapacon}),
+			action, IPriorityEvaluator.PRIORITY_1);
+		return listener_plan;
+	}
+}

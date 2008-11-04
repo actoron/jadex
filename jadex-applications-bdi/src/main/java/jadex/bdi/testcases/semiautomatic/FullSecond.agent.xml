@@ -1,0 +1,48 @@
+<!--
+	<H3>Test for Timer Conditions</H3>
+	This agent uses the modulo operator
+	to trigger a condition.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="FullSecond"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<beliefs>
+		<belief name="timer" class="long" updaterate="1000">
+			<fact>($scope.getTime()/1000*1000)%5000</fact>
+		</belief>
+	</beliefs>
+	
+	<plans>
+		<plan name="condition_plan">
+			<body class="ConditionPlan"/>
+		</plan>
+	</plans>
+	
+	<expressions>
+		<condition name="five_seconds">
+			//$beliefbase.timer%5000==0
+			?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 0))
+			?mbelief = (mbelief (element_has_name "timer"))
+		</condition>
+	</expressions>
+	
+	<properties>
+		<property name="debugging">true</property>
+		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
+		<!-- <property name="logging.useParentHandlers">true</property> -->
+	</properties>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="condition_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

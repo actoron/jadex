@@ -1,0 +1,53 @@
+<!--
+	<H3>Shutdown an agent platform.</H3>
+
+	Shutdowns an agent platform by contacting
+	the AMS which is stored in the ams belief.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="ShutdownPlatform"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.bridge.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"></capability>
+	</capabilities>
+
+	<beliefs>
+		<belief name="ams" class="IAgentIdentifier">
+			<!-- <fact>SFipa.AMS</fact> -->
+			<fact>((IAMS)$scope.getPlatform().getService(IAMS.class)).createAgentIdentifier("ams@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
+			<!--<fact>new AgentIdentifier("ams@vsisstaff0:1099/JADE", new String[]{"http://134.100.11.200:7778/acc"})</fact>-->
+		</belief>
+	</beliefs>
+	
+	<plans>
+		<plan name="tester_plan">
+			<body class="ShutdownTesterPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<!-- <goals>
+				<initialgoal ref="ams_shutdown_platform">
+					<parameter ref="ams">
+						<value>$beliefbase.ams</value>
+					</parameter>
+				</initialgoal>
+			</goals> -->
+			<plans>
+				<initialplan ref="tester_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

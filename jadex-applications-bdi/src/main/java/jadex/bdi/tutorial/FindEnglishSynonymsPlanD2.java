@@ -1,0 +1,81 @@
+package jadex.bdi.tutorial;
+
+import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.runtime.IExpression;
+import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdi.runtime.Plan;
+
+import java.util.List;
+import java.util.StringTokenizer;
+
+/**
+ *  Find english synonyms for a word.
+ */
+public class FindEnglishSynonymsPlanD2 extends Plan
+{
+	//-------- attributes --------
+
+	/** Query the tuples for a word. */
+	protected IExpression	querytranslate;
+
+	/** Query to find synonyms. */
+	protected IExpression	queryfind;
+
+
+	//-------- constructors --------
+
+	/**
+	 *  Create a new plan.
+	 */
+	public FindEnglishSynonymsPlanD2()
+	{
+		getLogger().info("Created: "+this);
+
+		// Create precompiled queries.
+		String	translate	= "select one $wordpair.get(1) "
+			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+			+"where $wordpair.get(0).equals($eword)";
+
+		String	find	= "select $wordpair.get(0) "
+			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
+
+		this.querytranslate	= createExpression(translate, new String[]{"$eword"}, new Class[]{String.class});
+		this.queryfind	= createExpression(find, new String[]{"$gword", "$eword"}
+			, new Class[]{String.class, String.class});
+	}
+
+	//-------- methods --------
+
+	/**
+	 *  The plan body.
+	 */
+	public void body()
+	{
+		IMessageEvent me = (IMessageEvent)getReason();
+		String reply, cont;
+		StringTokenizer stok = new StringTokenizer((String)me.getParameter(SFipa.CONTENT).getValue(), " ");
+
+		if(stok.countTokens()==3)
+		{
+			stok.nextToken();
+			stok.nextToken();
+			String eword = stok.nextToken();
+			String gword = (String)querytranslate.execute("$eword", eword);
+//			queryfind.setParameter("$gword", gword);
+//			queryfind.setParameter("$eword", eword);
+			List syns = (List)queryfind.execute(new String[]{"$gword, $eword"},  new Object[]{gword, eword});
+			getLogger().info("Synonyms for eword: "+syns);
+			reply	= "transcap.inform";
+			cont	= "Synonyms for "+eword+" : "+syns;
+		}
+		else
+		{
+			reply	= "transcap.failure";
+			cont	= "Request format not correct.";
+		}
+		IMessageEvent re = getEventbase().createReply(me, reply);
+		re.getParameter(SFipa.CONTENT).setValue(cont);
+		sendMessage(re);
+	}
+}

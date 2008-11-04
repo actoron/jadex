@@ -1,0 +1,162 @@
+<!--
+	<H3>The AMS agent.</H3>
+	The agent management system. It is actually represented by
+	the AMS class. This agent allows the agent-oriented access
+	(per message) to the AMS.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="AMS"
+	package="jadex.bdi.amsagent">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.bdi.runtime.IFilter</import>
+	</imports>
+
+	<capabilities>
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="rp_filter">
+			<concrete ref="procap.rp_filter"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoalref name="ams_create_agent">
+ 			<concrete ref="amscap.ams_create_agent"/>
+		</achievegoalref>
+
+		<achievegoalref name="ams_destroy_agent">
+			<concrete ref="amscap.ams_destroy_agent"/>
+		</achievegoalref>
+
+		<achievegoalref name="ams_search_agents">
+			<concrete ref="amscap.ams_search_agents"/>
+		</achievegoalref>
+		
+		<achievegoalref name="ams_shutdown_platform">
+ 			<concrete ref="amscap.ams_shutdown_platform"/>
+		</achievegoalref>
+
+		<achievegoalref name="rp_execute_request">
+			<concrete ref="procap.rp_execute_request"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<plan name="create_agent_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="AMSCreateAgentPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof AMSCreateAgent</match>
+				</goal>
+			</trigger>
+		</plan>
+
+		<plan name="destroy_agent_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="AMSDestroyAgentPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof AMSDestroyAgent</match>
+				</goal>
+			</trigger>
+		</plan>
+
+		<plan name="suspend_agent_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="AMSSuspendAgentPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof AMSSuspendAgent</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<plan name="resume_agent_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="AMSResumeAgentPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof AMSResumeAgent</match>
+				</goal>
+			</trigger>
+		</plan>
+
+		<plan name="search_agents_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="AMSSearchAgentsPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof AMSSearchAgents</match>
+				</goal>
+			</trigger>
+		</plan>
+
+		<plan name="shutdown_platform_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="AMSShutdownPlatformPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof AMSShutdownPlatform</match>
+				</goal>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<capabilities>
+				<initialcapability ref="amscap" configuration="agentlist"/>
+			</capabilities>
+			<beliefs>
+				<initialbelief ref="rp_filter">
+					<fact>IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</agent>

@@ -1,0 +1,110 @@
+<!--
+	<H3>Test if goal suspension can trigger a plan.</H3>
+
+	The suspension of the initial goal triggers the test plan.
+	<br>The initial goal is an achieve goal associated with
+	an increment plan that increments
+	every second the belief count. The achieve
+	goal succeeds when it has count till 10.
+	It will be suspended when it is 5.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="TriggerBySuspension"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bdi.planlib.test.TestReport</import>
+		<import>jadex.bdi.runtime.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports">
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+		<belief name="count"  class="int">
+			<fact>0</fact>
+		</belief>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="cnt" retry="true" exclude="never">
+			<contextcondition>
+				// $beliefbase.count!=5
+				?rbel = (belief (element_has_model ?mbel) (belief_has_fact != 5))
+				?mbel = (mbelief (element_has_name "count"))
+			</contextcondition>
+			<targetcondition>
+ 				// $beliefbase.count==10
+ 				?rbel = (belief (element_has_model ?mbel) (belief_has_fact 10))
+				?mbel = (mbelief (element_has_name "count"))
+ 			</targetcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+        <plan name="increment">
+			<parameter name="beliefname">
+				<value>"count"</value>
+			</parameter>
+			<parameter name="rate">
+				<value>100</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<goal ref="cnt"/>
+			</trigger>
+		</plan>
+		
+		<plan name="test">
+			<parameter name="$g" class="IGoal">
+				<value>?rgoal</value>
+				<!-- <bindingoptions>
+					select IGoal $g from $goalbase.getGoals()
+					where OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED.equals($g.getLifecycleState())
+				</bindingoptions> -->
+			</parameter>
+			<parameter name="report" class="TestReport">
+				<value>new TestReport("test_trigger", "Test if goal suspension can trigger a plan.", true, null)</value>
+			</parameter>
+			<body class="StoreReportPlan"/>
+			<trigger>
+				<condition>
+					// true
+					?rgoal = (goal (element_has_model ?mgoal) (goal_has_lifecyclestate "suspended"))
+					?mgoal = (mgoal (element_has_name "cnt"))
+				</condition>
+			</trigger>
+			<!-- Hack!!! Triggers more than once. -->
+			<contextcondition>
+				// $beliefbase.reports.length &lt; 1
+				?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?reports &amp; :(&lt; (jadex.rules.rulesystem.rules.functions.Length $?reports) 1)))
+				?mbelset = (mbeliefset (element_has_name "reports"))
+			</contextcondition>
+		</plan>
+	</plans>
+	
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="cnt"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

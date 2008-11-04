@@ -1,0 +1,2206 @@
+package jadex.bdi.interpreter;
+
+import jadex.bdi.runtime.BDIFailureException;
+import jadex.bdi.runtime.GoalFailureException;
+import jadex.bdi.runtime.IPlanExecutor;
+import jadex.bdi.runtime.TimeoutException;
+import jadex.bdi.runtime.impl.GoalFlyweight;
+import jadex.bdi.runtime.impl.InternalEventFlyweight;
+import jadex.bdi.runtime.impl.InterpreterTimedObject;
+import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
+import jadex.bdi.runtime.impl.MessageEventFlyweight;
+import jadex.bridge.IClockService;
+import jadex.bridge.ITimer;
+import jadex.rules.rulesystem.IAction;
+import jadex.rules.rulesystem.ICondition;
+import jadex.rules.rulesystem.IVariableAssignments;
+import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.FunctionCall;
+import jadex.rules.rulesystem.rules.IConstraint;
+import jadex.rules.rulesystem.rules.IOperator;
+import jadex.rules.rulesystem.rules.IPriorityEvaluator;
+import jadex.rules.rulesystem.rules.LiteralConstraint;
+import jadex.rules.rulesystem.rules.LiteralReturnValueConstraint;
+import jadex.rules.rulesystem.rules.NotCondition;
+import jadex.rules.rulesystem.rules.ObjectCondition;
+import jadex.rules.rulesystem.rules.OrConstraint;
+import jadex.rules.rulesystem.rules.Rule;
+import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ *  Static helper class for plan rules and actions.
+ *  
+ *  Plan rules are responsible for:
+ *  - create a plan body (when lifecycle state = new 
+ *  	and processing state = ready -> create plan body)
+ *  - execute body code (when lifecycle state = body 
+ *  	and processing state = ready -> execute body code)
+ *  - execute passed code (when lifecycle state = passed 
+ *  	and processing state = ready -> execute passed code)
+ *  - execute failed code (when lifecycle state = failed 
+ *  	and processing state = ready -> execute failed code)
+ *  - execute aborted code (when lifecycle state = aborted 
+ *  	and processing state = ready -> execute aborted code)
+ *  
+ *  - continue plan processing when subgoal finished -> set processing state = ready 
+ *  
+ *  - removing a plan (when processing state = fishied -> copyback parameters)
+ *  
+ *  - abort a plan (when lifecycle state = aborted -> abort subgoals)
+ */
+public class PlanRules
+{
+	//-------- helper methods --------
+	
+	/**
+	 *  Adopt a plan.
+	 *  Adds the plan to the state (planbase).
+	 *  @param state	The state
+	 *  @param rcapa	The capability.
+	 *  @param rgoal	The goal.
+	 */
+	public static void adoptPlan(IOAVState state, Object rcapa, Object rplan)
+	{
+//		System.out.println("adoptPlan: Setting plan to ready: "
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+", "+rplan);
+		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_plans, rplan);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+		
+//		Object	reason	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason);
+//		if(reason!=null && state.getType(reason).isSubtype(OAVBDIRuntimeModel.goal_type))
+//		{
+//			state.addAttributeValue(reason, OAVBDIRuntimeModel.goal_has_plans, rplan);
+//		}
+	}
+	
+	/**
+	 *  Instantiate a plan.
+	 *  @param state	The state
+	 *  @param rcap	The capability.
+	 *  @param mplan	The plan model.
+	 *  @param cplan	The plan configuration (if any).
+	 *  @param preparams From outside supplied parameter values.
+	 *  @return The plan instance.
+	 */
+	public static Object instantiatePlan(IOAVState state, Object rcap, Object mplan, Object cplan, Object reason, Collection preparams, Map bindings, OAVBDIFetcher fetcher)
+	{
+		Object	rplan	= state.createObject(OAVBDIRuntimeModel.plan_type);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model, mplan);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason, reason);
+//		state.addAttributeValue(rcap, OAVBDIRuntimeModel.capability_has_plans, rplan);
+//		System.out.println("instantiatePlan: Setting plan to ready: "
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+", "+rplan);
+		
+		if(fetcher==null)
+			fetcher = new OAVBDIFetcher(state, rcap);
+		if(reason!=null)
+		{
+			if(state.getType(reason).isSubtype(OAVBDIRuntimeModel.goal_type))
+			{
+				fetcher.setRGoal(reason);
+			}
+			else if(state.getType(reason).isSubtype(OAVBDIRuntimeModel.changeevent_type))
+			{
+				String	type	= (String)state.getAttributeValue(reason, OAVBDIRuntimeModel.changeevent_has_type);
+				Object	value	= state.getAttributeValue(reason, OAVBDIRuntimeModel.changeevent_has_value);
+				fetcher.setValue(OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ? "$addedfact" :
+					OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type) ? "$removedfact" : "$changedfact", value);
+			}
+		}
+		fetcher.setRPlan(rplan);		
+		
+		// The preparams are already created and filled with values from EventProcessingRules.createMPlanCandidate().
+		Set	doneparams	= new HashSet();	// Remember, which parameters are already set.
+		if(preparams!=null)
+		{
+			for(Iterator it=preparams.iterator(); it.hasNext(); )
+			{
+				Object preparam = it.next();
+				state.addAttributeValue(rplan, OAVBDIRuntimeModel.parameterelement_has_parameters, preparam);
+				doneparams.add(state.getAttributeValue(preparam, OAVBDIRuntimeModel.parameter_has_name));
+			}
+		}
+		
+		// Init goal mapping parameters
+		// todo: this code is not finished
+		// - must allow multiple goal mapping specifications -> metamodel
+		// - add support for other mappings, internal event, message event
+		Collection coll = state.getAttributeValues(mplan, OAVBDIMetaModel.parameterelement_has_parameters);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				Object mparam = it.next();
+				
+				String	paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_goalmapping);
+				if(paramref!=null)
+				{
+					int pidx = paramref.lastIndexOf('.');
+					String paramname = paramref.substring(pidx+1);
+					generateParameterMapping(state, rplan, mparam, paramname, reason);
+					continue;
+				}
+				
+				paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_messageeventmapping);
+				if(paramref!=null)
+				{
+					int pidx = paramref.lastIndexOf('.');
+					String paramname = paramref.substring(pidx+1);
+					generateParameterMapping(state, rplan, mparam, paramname, reason);
+					continue;
+				}
+
+				paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_internaleventmapping);
+				if(paramref!=null)
+				{
+					int pidx = paramref.lastIndexOf('.');
+					String paramname = paramref.substring(pidx+1);
+					generateParameterMapping(state, rplan, mparam, paramname, reason);
+					continue;
+				}
+			}
+		}
+		
+		coll = state.getAttributeValues(mplan, OAVBDIMetaModel.parameterelement_has_parametersets);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				Object mparamset = it.next();
+				String	paramref	= (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.planparameterset_has_goalmapping);
+				if(paramref!=null)
+				{
+					int pidx = paramref.lastIndexOf('.');
+					String paramname = paramref.substring(pidx+1);
+					generateParameterSetMapping(state, rplan, mparamset, paramname, reason);
+					continue;
+				}
+				
+				paramref	= (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.planparameterset_has_messageeventmapping);
+				if(paramref!=null)
+				{
+					int pidx = paramref.lastIndexOf('.');
+					String paramname = paramref.substring(pidx+1);
+					generateParameterSetMapping(state, rplan, mparamset, paramname, reason);
+					continue;
+				}
+				
+				paramref	= (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.planparameterset_has_internaleventmapping);
+				if(paramref!=null)
+				{
+					int pidx = paramref.lastIndexOf('.');
+					String paramname = paramref.substring(pidx+1);
+					generateParameterSetMapping(state, rplan, mparamset, paramname, reason);
+					continue;
+				}
+			}
+		}
+		
+		// Bindings for plans are done with EventprocessingRules.createMPlanCandidate or via CREATION_ACTION
+		AgentRules.initParameters(state, rplan, cplan, fetcher, fetcher, doneparams, bindings);
+		
+		// Initialize waitqueue (if defined in model).
+		Object	wqtrigger	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_waitqueue);
+		if(wqtrigger!=null)
+		{
+			Object	wqwa	= state.createObject(OAVBDIRuntimeModel.waitabstraction_type);
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa);
+			
+			coll	= state.getAttributeValues(wqtrigger, OAVBDIMetaModel.trigger_has_factaddeds);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					String	ref	= (String)it.next();
+					Object[]	scope	= AgentRules.resolveCapability(ref, OAVBDIMetaModel.beliefset_type, rcap, state);
+					Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+					Object	mbelset	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
+					Object	rbelset	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);
+					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rbelset);
+					BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
+				}
+			}
+
+			coll	= state.getAttributeValues(wqtrigger, OAVBDIMetaModel.trigger_has_factremoveds);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					String	ref	= (String)it.next();
+					Object[]	scope	= AgentRules.resolveCapability(ref, OAVBDIMetaModel.beliefset_type, rcap, state);
+					Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+					Object	mbelset	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
+					Object	rbelset	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);
+					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbelset);
+					BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
+				}
+			}
+			
+			coll	= state.getAttributeValues(wqtrigger, OAVBDIMetaModel.trigger_has_factchangeds);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					String	ref	= (String)it.next();
+					// Hack!!! belief or beliefset???
+					Object[]	scope	= AgentRules.resolveCapability(ref, null, rcap, state);
+					Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+					Object	mbelset	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
+					if(mbelset!=null)
+					{
+						Object	rbelset	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);
+						state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbelset);
+						BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
+					}
+					else
+					{
+						Object	mbel	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0]);
+						Object	rbel	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel);
+						state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbel);
+						BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbel);
+					}
+				}
+			}
+
+			coll	= state.getAttributeValues(wqtrigger, OAVBDIMetaModel.trigger_has_goalfinisheds);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					Object	triggerref	= it.next();
+					Object	match	= state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_match);
+					if(match!=null)
+						throw new RuntimeException("Match expression not (yet) supported for waitqueues.");
+					String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
+					Object[]	scope	= AgentRules.resolveCapability(ref, OAVBDIMetaModel.goal_type, rcap, state);
+					Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+					Object	mgoal	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_goals, scope[0]);
+					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal);
+					BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(mgoal);
+				}
+			}
+			
+			coll	= state.getAttributeValues(wqtrigger, OAVBDIMetaModel.trigger_has_internalevents);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					Object	triggerref	= it.next();
+					Object	match	= state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_match);
+					if(match!=null)
+						throw new RuntimeException("Match expression not (yet) supported for waitqueues.");
+					String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
+					Object[]	scope	= AgentRules.resolveCapability(ref, OAVBDIMetaModel.internalevent_type, rcap, state);
+					Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+					Object	mevent	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0]);
+					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, mevent);
+				}
+			}
+			
+			coll	= state.getAttributeValues(wqtrigger, OAVBDIMetaModel.trigger_has_messageevents);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					Object	triggerref	= it.next();
+					Object	match	= state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_match);
+					if(match!=null)
+						throw new RuntimeException("Match expression not (yet) supported for waitqueues.");
+					String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
+					Object[]	scope	= AgentRules.resolveCapability(ref, OAVBDIMetaModel.messageevent_type, rcap, state);
+					Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+					Object	mevent	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_messageevents, scope[0]);
+					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mevent);
+				}
+			}
+			
+		}
+		
+//		System.out.println("instantiating plan: "+mplan);
+		
+		return rplan;
+	}
+	
+	/**
+	 *  Abort a plan.
+	 */
+	public static void abortPlan(IOAVState state, Object rcapa, Object rplan)
+	{
+//		System.out.println("abortPlan: Setting plan to ready: "
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+", "+rplan);
+		String ps = (String)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
+
+		if(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY.equals(ps))
+		{
+//			System.out.println("abort body: "+rplan);
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_GOALCLEANUP);
+		
+			endPlanPart(state, rcapa, rplan);
+		}
+		else // if(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW.equals(ps))
+		{
+//			System.out.println("abort new: "+rplan);
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
+		}
+	}
+
+	/**
+	 *  End a part (i.e. body/passed/failed/aborted) of a plan.
+	 *  Cleanup wait abstraction and timers and drop all subgoals.
+	 */
+	public static void endPlanPart(IOAVState state, Object rcapa, Object rplan)
+	{
+		// Cleanup wait abstraction and wait queue
+		cleanupPlanWait(state, rcapa, rplan, true);
+		
+		// Drop subgoals
+		Collection	subgoals	= state.getAttributeValues(rplan, OAVBDIRuntimeModel.plan_has_subgoals);
+//		System.out.println("Aborting: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
+//			rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+		if(subgoals!=null)
+		{
+			for(Iterator it=subgoals.iterator(); it.hasNext(); )
+			{
+				Object	subgoal	= it.next();
+				Object gs = state.getAttributeValue(subgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate);
+				
+				if(!OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPING.equals(gs) 
+					&& !OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED.equals(gs))
+				{
+					GoalLifecycleRules.dropGoal(state, subgoal);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Create new parameter and copy value.
+	 */
+	protected static void generateParameterMapping(IOAVState state, Object rplan, Object mparam, String oname, Object reason)
+	{
+		// Create a new rparameter
+		String pname = (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
+		Class clazz = (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
+		
+		// Determine the value from rgoal.parameter
+		Object roparam = state.getAttributeValue(reason, OAVBDIRuntimeModel.parameterelement_has_parameters, oname);
+		Object roval = null;
+		if(roparam!=null)
+			roval = state.getAttributeValue(roparam, OAVBDIRuntimeModel.parameter_has_value);
+		
+		BeliefRules.createParameter(state, pname, roval, clazz, rplan);
+	}
+	
+	/**
+	 *  Create new parameter set and copy values.
+	 */
+	protected static void generateParameterSetMapping(IOAVState state, Object rplan, Object mparamset, String oname, Object reason)
+	{
+		// Create a new rparameterset
+		String psname = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.modelelement_has_name);
+		Class clazz = (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
+		
+		// Determine the value from rgoal.parameterset
+		Object roparamset = state.getAttributeValue(reason, OAVBDIRuntimeModel.parameterelement_has_parametersets, oname);
+		Collection rovals = null;
+		if(roparamset!=null)
+			rovals = state.getAttributeValues(roparamset, OAVBDIRuntimeModel.parameterset_has_values);
+		
+		BeliefRules.createParameterSet(state, psname, rovals, clazz, rplan);
+	}
+	
+	//-------- rule methods --------	
+	
+	/**
+	 *  Create the plan execution rule.
+	 * /
+	protected static Rule createPlanBodyRule()
+	{
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, new Variable("?rplan", OAVBDIRuntimeModel.plan_type)));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
+			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW));
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, new Variable("?rcapa", OAVBDIRuntimeModel.capability_type)));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
+			new Variable("?rplan", OAVBDIRuntimeModel.plan_type), IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+//				System.out.println("new plan body creation rule triggered");
+				
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+				
+				try
+				{
+					// todo: get plan executor for capability
+					BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+					interpreter.getPlanExecutor(rplan).createPlanBody(interpreter, rcapa, rplan); // Hack
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//					System.out.println("New body: "+rplan+" "+body);
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY);
+				}
+				catch(Exception e)
+				{
+					if(!(e instanceof BDIFailureException))
+						e.printStackTrace();
+				}
+			}
+		};
+		
+		Rule	executeplan	= new Rule("plan_createbody", new AndCondition(new ICondition[]{plancon, capcon}), action);
+		return executeplan;
+	}*/
+	
+	/**
+	 *  Create the plan execution rule.
+	 */
+	protected static Rule createPlanBodyExecutionRule()
+	{
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, new Variable("?rplan", OAVBDIRuntimeModel.plan_type)));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
+		plancon.addConstraint(new OrConstraint(new IConstraint[]{
+			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW),
+			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY)
+		}));
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, new Variable("?rcapa", OAVBDIRuntimeModel.capability_type)));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
+			new Variable("?rplan", OAVBDIRuntimeModel.plan_type), IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{					
+//				System.out.println("plan body execution rule triggered");
+				
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				boolean interrupted = false;
+
+				try
+				{
+					ip.setCurrentPlan(rplan);
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+
+					// On first plan step create body.
+					if(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate)))
+					{
+						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY);
+					}
+//					System.out.println("Body: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
+//						rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+					
+					// todo: get plan executor for capability
+					// todo: can cause nullpointer when killAgent is called
+					interrupted = ip.getPlanExecutor(rplan).executePlanStep(ip, rcapa, rplan); // Hack
+				}
+				catch(Exception e)
+				{
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, e);
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					//System.out.println(cap.getAgent().getName()+": Exception while executing: "+this);
+					//e.printStackTrace();
+					
+					// Log user-level exception (i.e. not BDI exceptions).
+					if(!(e instanceof BDIFailureException))
+					{
+//						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//							": Exception while executing: "+rplan+"\n"+sw);
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+							": Exception while executing: "+rplan+"\n"+sw);
+					}
+					else
+					{
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+								": Exception while executing: "+rplan+"\n"+sw);
+					}
+				}
+				ip.setCurrentPlan(null);
+				
+				if(interrupted)
+				{
+//					System.out.println("createPlanBodyExecutionRule: Setting plan to ready: "
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+", "+rplan);
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+			}
+		};
+		
+		Rule	executeplan	= new Rule("plan_executebody", new AndCondition(new ICondition[]{plancon, capcon}), action);
+		return executeplan;
+	}
+	
+	/**
+	 *  Create the plan execution rule.
+	 */
+	protected static Rule createPlanPassedExecutionRule()
+	{
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, new Variable("?rplan", OAVBDIRuntimeModel.plan_type)));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
+			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED));
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, new Variable("?rcapa", OAVBDIRuntimeModel.capability_type)));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
+			new Variable("?rplan", OAVBDIRuntimeModel.plan_type), IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+//				System.out.println("Passed: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
+//					rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+				
+				boolean interrupted = false;
+				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				ip.setCurrentPlan(rplan);
+				try
+				{
+					// todo: get plan executor for capability
+					// todo: can cause nullpointer when killAgent is called
+					interrupted = ip.getPlanExecutor(rplan).executePassedStep(ip, rplan); // Hack
+				}
+				catch(Exception e)
+				{
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, e);
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					//System.out.println(cap.getAgent().getName()+": Exception while executing: "+this);
+					//e.printStackTrace();
+					
+					// Log user-level exception (i.e. not BDI exceptions).
+					if(!(e instanceof BDIFailureException))
+					{
+//						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//							": Exception while executing: "+rplan+"\n"+sw);
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+							": Exception while executing: "+rplan+"\n"+sw);
+					}
+					else
+					{
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+								": Exception while executing: "+rplan+"\n"+sw);
+					}
+				}
+				ip.setCurrentPlan(null);
+				
+				if(interrupted)
+				{
+//					System.out.println("createPlanPassedExecutionRule: Setting plan to ready: "
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+", "+rplan);
+					assert !OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED
+						.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate));
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+			}
+		};
+		
+		Rule	executeplan	= new Rule("plan_executepassed", new AndCondition(new ICondition[]{plancon, capcon}), action);
+		return executeplan;
+	}
+	
+	/**
+	 *  Create the plan execution rule.
+	 */
+	protected static Rule createPlanFailedExecutionRule()
+	{
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
+			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
+			rplan, IOperator.CONTAINS));
+
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+//				System.out.println("Passed: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
+//					rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+				
+				boolean interrupted = false;
+				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				ip.setCurrentPlan(rplan);
+				try
+				{
+					// todo: get plan executor for capability
+					// todo: can cause nullpointer when killAgent is called
+					interrupted = ip.getPlanExecutor(rplan).executeFailedStep(ip, rplan); // Hack
+				}
+				catch(Exception e)
+				{
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, e);
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					//System.out.println(cap.getAgent().getName()+": Exception while executing: "+this);
+					//e.printStackTrace();
+					
+					// Log user-level exception (i.e. not BDI exceptions).
+					if(!(e instanceof BDIFailureException))
+					{
+//						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//							": Exception while executing: "+rplan+"\n"+sw);
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+							": Exception while executing: "+rplan+"\n"+sw);
+					}
+					else
+					{
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+								": Exception while executing: "+rplan+"\n"+sw);
+					}
+				}
+				ip.setCurrentPlan(null);
+				
+				if(interrupted)
+				{
+//					System.out.println("createPlanFailedExecutionRule: Setting plan to ready: "
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+", "+rplan);
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+			}
+		};
+		
+		Rule	executeplan	= new Rule("plan_executefailed", new AndCondition(new ICondition[]{plancon, capcon}), action);
+		return executeplan;
+	}
+
+	/**
+	 *  Create the plan execution rule.
+	 */
+	protected static Rule createPlanAbortedExecutionRule()
+	{
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, new Variable("?rplan", OAVBDIRuntimeModel.plan_type)));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
+			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED));
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, new Variable("?rcapa", OAVBDIRuntimeModel.capability_type)));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
+			new Variable("?rplan", OAVBDIRuntimeModel.plan_type), IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+
+//				System.out.println("Aborted: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
+//					rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+				
+				boolean interrupted = false;
+				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				ip.setCurrentPlan(rplan);
+				try
+				{
+					// todo: get plan executor for capability
+					// todo: can cause nullpointer when killAgent is called
+					interrupted = ip.getPlanExecutor(rplan).executeAbortedStep(ip, rplan); // Hack
+				}
+				catch(Exception e)
+				{
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, e);
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					//System.out.println(cap.getAgent().getName()+": Exception while executing: "+this);
+					//e.printStackTrace();
+					
+					// Log user-level exception (i.e. not BDI exceptions).
+					if(!(e instanceof BDIFailureException))
+					{
+//						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//							": Exception while executing: "+rplan+"\n"+sw);
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+							": Exception while executing: "+rplan+"\n"+sw);
+					}
+					else
+					{
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+								": Exception while executing: "+rplan+"\n"+sw);
+					}
+				}
+				ip.setCurrentPlan(null);
+				
+				if(interrupted)
+				{
+//					System.out.println("createPlanAbortedExecutionRule: Setting plan to ready: "
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+", "+rplan);
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+			}
+		};
+		
+		Rule	executeplan	= new Rule("plan_executeaborted", new AndCondition(new ICondition[]{plancon, capcon}), action);
+		return executeplan;
+	}
+	
+	/**
+	 *  Reactivate a plan when goal cleanup is finished.
+	 */
+	protected static Rule createPlanInstanceCleanupFinishedRule()
+	{
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_subgoals, null));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate,
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_GOALCLEANUP));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+			}
+		};
+		
+		Rule	planinstance_goalcleanupfinished	= new Rule("planinstance_goalcleanupfinished", plancon, action);
+		return planinstance_goalcleanupfinished;
+	}
+	
+	
+	/**
+	 *  Reactivate a plan when the goal it waits for is finished.
+	 */
+	protected static Rule createPlanInstanceGoalFinishedRule()
+	{
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true);
+		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true);
+		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate,
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
+
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoals));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoals));
+		
+		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED));
+		IConstraint	co1	= new BoundConstraint(null, rgoals, IOperator.CONTAINS);
+		IConstraint	co2	= new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoals, IOperator.CONTAINS);
+		goalcon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+				Object	rgoal	= assignments.getVariableValue("?rgoal");
+//				System.out.println("createPlanInstanceGoalFinishedRule: Setting plan to ready: "
+//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//						+", "+rplan);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
+				cleanupPlanWait(state, rcapa, rplan, false);
+				
+				// If dispatched from waitqueue, remove from waitqueue
+				Collection	wqelements	= state.getAttributeValues(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements);
+				if(wqelements!=null && wqelements.contains(rgoal))
+				{
+					state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rgoal);
+					// plan should be already contained in rgoal.goal_has_finisheddispatchedplans
+				}
+				
+				// If not previously dispatched to waitqueue, remember plan in goal, to avoid multiple dispatching of finished event.
+				else
+				{
+					state.addAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_finisheddispatchedplans, rplan);					
+				}
+
+//				System.out.println("Subgoal finished: "+rplan+" "+state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model)+" "+
+//					state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+			}
+		};
+		
+		Rule	subgoal_finished	= new Rule("planinstance_goalfinished", new AndCondition(new ICondition[]{plancon, capcon, wacon, goalcon}), action);
+		return subgoal_finished;
+	}
+	
+	
+	/**
+	 *  Add a goal to the waitqueue of a plan when the goal it waits for is finished.
+	 */
+	protected static Rule createPlanWaitqueueGoalFinishedRule()
+	{
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
+		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true);
+		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true);
+		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable wa2 = new Variable("?wa2", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wa));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa2));
+		
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoals));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoals));
+		
+		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finisheddispatchedplans, rplan, IOperator.EXCLUDES));
+		IConstraint	co1	= new BoundConstraint(null, rgoals, IOperator.CONTAINS);
+		IConstraint	co2	= new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoals, IOperator.CONTAINS);
+		goalcon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
+	
+		ObjectCondition	wacon2 = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon2.addConstraint(new BoundConstraint(null, wa2));
+		IConstraint co1a = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal, IOperator.CONTAINS);
+		IConstraint co2a = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal, IOperator.CONTAINS);
+		wacon2.addConstraint(new OrConstraint(new IConstraint[]{co1a, co2a}));
+
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rgoal	= assignments.getVariableValue("?rgoal");
+				state.addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rgoal);
+				state.addAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_finisheddispatchedplans, rplan);
+
+//				System.out.println("planwaitqueue_goalfinished: "+rgoal+", "+rplan);
+			}
+		};
+		
+		Rule	planwaitqueue_goalfinished	= new Rule("planwaitqueue_goalfinished",
+			new AndCondition(new ICondition[]{plancon, wacon, goalcon, new NotCondition(wacon2)}),
+			action, IPriorityEvaluator.PRIORITY_1);	// Hack!!! works, because goal will still be referenced in change event
+		return planwaitqueue_goalfinished;
+	}
+	
+	/**
+	 *  Create the plan instance maintain goal finished rule.
+	 */
+	protected static Rule createPlanInstanceMaintainGoalFinishedRule()
+	{
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.maintaingoal_type);
+		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.maintaingoal_type);
+		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
+
+		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS, IOperator.NOTEQUAL));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		IConstraint co1 = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal, IOperator.CONTAINS);
+		IConstraint co2 = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal, IOperator.CONTAINS);
+		wacon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
+		
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate,
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+				Object	rgoal	= assignments.getVariableValue("?rgoal");
+//				System.out.println("createPlanInstanceMaintainGoalFinishedRule: Setting plan to ready: "
+//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//						+", "+rplan);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
+				cleanupPlanWait(state, rcapa, rplan, false);
+//				System.out.println("Maintaingoal finished: "+rplan+" "+state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model)+" "+
+//					state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+			}
+		};
+		
+		Rule maintain_subgoal_finished = new Rule("planinstance_maintaingoalfinished", new AndCondition(new ICondition[]{mgoalcon, goalcon, wacon, plancon, capcon}), action);
+		return maintain_subgoal_finished;
+	}
+	
+	/**
+	 *  Create the plan removal rule.
+	 *  Removes a plan from its capability, when execution has finished.
+	 */
+	protected static Rule createPlanRemovalRule()
+	{
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_subgoals, null));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+				OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED));
+		
+		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
+			rplan, IOperator.CONTAINS));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rplan	= assignments.getVariableValue("?rplan");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
+				Object	reason	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason);
+
+//				System.out.println("Removing plan: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
+//					rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+
+				
+				if(reason!=null && state.getType(reason).isSubtype(OAVBDIRuntimeModel.goal_type))
+				{
+					// APL handling only required if goal is not finished (e.g. due to target condition)
+					if(OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS.equals(state.getAttributeValue(reason, OAVBDIRuntimeModel.goal_has_processingstate)))
+					{
+						Object mgoal = state.getAttributeValue(reason, OAVBDIRuntimeModel.element_has_model);
+						String exclude = (String)state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_exclude);
+						
+						Object mcand = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_plancandidate);
+						if(mcand!=null)
+						{
+							// Add mplancandidate to tried candidates if reason is goal.
+							if(OAVBDIMetaModel.EXCLUDE_WHEN_TRIED.equals(exclude))
+							{
+								state.addAttributeValue(reason, OAVBDIRuntimeModel.goal_has_triedmplans, mcand);
+							}
+							else 
+							{
+								String planstate = (String)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate);
+								if(OAVBDIMetaModel.EXCLUDE_WHEN_FAILED.equals(exclude) 
+									&& OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED.equals(planstate))
+								{
+									state.addAttributeValue(reason, OAVBDIRuntimeModel.goal_has_triedmplans, mcand);
+								}
+								else if(OAVBDIMetaModel.EXCLUDE_WHEN_SUCCEEDED.equals(exclude) 
+									&& OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED.equals(planstate))
+								{
+									state.addAttributeValue(reason, OAVBDIRuntimeModel.goal_has_triedmplans, mcand);
+								}
+							}
+						}
+						
+						// Remove candidate from APL if exclude mode demands this.
+						Object apl = state.getAttributeValue(reason, OAVBDIRuntimeModel.processableelement_has_apl);
+						if(apl!=null)
+						{
+							String planstate = (String)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate);
+							if(OAVBDIMetaModel.EXCLUDE_WHEN_TRIED.equals(exclude) 
+								|| (OAVBDIMetaModel.EXCLUDE_WHEN_FAILED.equals(exclude) 
+								&& OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED.equals(planstate))
+								|| (OAVBDIMetaModel.EXCLUDE_WHEN_SUCCEEDED.equals(exclude) 
+								&& OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED.equals(planstate)))
+							{
+								if(mcand!=null)
+								{
+									state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_plancandidates, mcand);
+									state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_plancandidate, null);
+								}
+								else
+								{
+									Object rcand = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_planinstancecandidate);
+									if(rcand!=null)
+									{
+										state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates, rcand);
+										state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_planinstancecandidate, null);
+									}
+									else
+									{
+										Object wcand = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate);
+										assert wcand!=null;
+										state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, rcand);
+										state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate, null);
+									}
+								}
+							}
+							
+							// Clear apl if empty
+							Collection pcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
+							Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
+							Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
+							if(pcs==null && pics==null && wqcs==null)
+							{
+//								System.out.println("Set null apl: "+rpe+" "+apl);
+								state.setAttributeValue(reason, OAVBDIRuntimeModel.processableelement_has_apl, null);
+							}
+						}
+					}
+
+					// Add finished plan to goal.
+					if(OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS.equals(state.getAttributeValue(reason, OAVBDIRuntimeModel.goal_has_processingstate)))
+						state.addAttributeValue(reason, OAVBDIRuntimeModel.goal_has_finishedplans, rplan);
+					
+					// Copy back parameters to goal (if any).
+					// todo: this code is not finished
+					// - must allow multiple goal mapping specifications -> metamodel
+					Object	mplan	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
+					Collection coll = state.getAttributeValues(mplan, OAVBDIMetaModel.parameterelement_has_parameters);
+					Object mreason = state.getAttributeValue(reason, OAVBDIRuntimeModel.element_has_model);
+					if(coll!=null)
+					{
+						for(Iterator it=coll.iterator(); it.hasNext(); )
+						{
+							Object mparam = it.next();
+							String paramref = (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_goalmapping);
+							String dir = (String)state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_direction);
+							if(paramref!=null && (OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir)||OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir)))
+							{
+								int pidx = paramref.lastIndexOf('.');
+								String paramname = paramref.substring(pidx+1);
+								
+								// Determine the value from rplan parameter
+								String pname = (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
+								Object rparam = state.getAttributeValue(rplan, 
+									OAVBDIRuntimeModel.parameterelement_has_parameters, pname);
+								if(rparam!=null)
+								{
+									// Get/create goal parameter
+									Object roparam = state.getAttributeValue(reason, 
+										OAVBDIRuntimeModel.parameterelement_has_parameters, paramname);
+									if(roparam==null)
+									{
+										Object mgoalparam = state.getAttributeValue(mreason, OAVBDIMetaModel.parameterelement_has_parameters, paramname);
+										Class clazz = (Class)state.getAttributeValue(mgoalparam, OAVBDIMetaModel.typedelement_has_class);
+										roparam = BeliefRules.createParameter(state, paramname, null, clazz, reason);
+									}								
+
+									Object roval = state.getAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_value);
+									BeliefRules.setParameterValue(state, roparam, roval);
+								}
+							}
+						}
+					}
+					
+					coll = state.getAttributeValues(mplan, OAVBDIMetaModel.parameterelement_has_parametersets);
+					if(coll!=null)
+					{
+						for(Iterator it=coll.iterator(); it.hasNext(); )
+						{
+							// Todo: multiple mappings
+							Object mparamset = it.next();
+							String paramref = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.planparameterset_has_goalmapping);
+							String dir = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.parameterset_has_direction);
+							if(paramref!=null && (OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir)||OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir)))
+							{
+								int pidx = paramref.lastIndexOf('.');
+								String paramname = paramref.substring(pidx+1);
+								
+								// Determine the value from rplan parameter
+								String pname = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.modelelement_has_name);
+								Object rparamset = state.getAttributeValue(rplan, 
+									OAVBDIRuntimeModel.parameterelement_has_parametersets, pname);
+								if(rparamset!=null)
+								{
+									// Get/create goal parameter
+									Object roparamset = state.getAttributeValue(reason, 
+										OAVBDIRuntimeModel.parameterelement_has_parametersets, paramname);
+									if(roparamset==null)
+									{
+										Object mgoalparamset = state.getAttributeValue(mreason, OAVBDIMetaModel.parameterelement_has_parametersets, paramname);
+										Class clazz = (Class)state.getAttributeValue(mgoalparamset, OAVBDIMetaModel.typedelement_has_class);
+										roparamset = BeliefRules.createParameter(state, paramname, null, clazz, reason);
+								
+									}
+									else
+									{
+										Collection oldvals = state.getAttributeValues(roparamset, OAVBDIRuntimeModel.parameterset_has_values);
+										if(oldvals!=null)
+										{
+											Object[]	avals	= oldvals.toArray();
+											for(int i=0; i<avals.length; i++)
+												BeliefRules.removeParameterSetValue(state, roparamset, avals[i]);
+										}
+									}
+
+									Collection newvals = state.getAttributeValues(rparamset, OAVBDIRuntimeModel.parameterset_has_values);
+									if(newvals!=null)
+									{
+										for(Iterator it2=newvals.iterator(); it2.hasNext(); )
+										{
+											BeliefRules.addParameterSetValue(state, roparamset, it2.next());
+										}
+									}
+								}
+							}
+						}
+					}
+
+				}
+
+				// Required to remove registered reply message events from capability.
+				cleanupPlanWait(state, rcapa, rplan, true);
+
+				// Todo: Hack!!! Fix garbage collection in state.
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason, null);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_plancandidate, null);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_planinstancecandidate, null);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate, null);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, null);
+				
+				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_plans, rplan);
+//				System.out.println("Plan removed: "+rplan+", "+wqes);
+			}
+		};
+		
+		Rule	plan_removal	= new Rule("plan_removal", new AndCondition(new ICondition[]{plancon, capacon}), action);
+		return plan_removal;
+	}
+
+	/**
+	 *  Rule to abort a plan when the corresponding goal was deactivated.
+	 */
+	protected static Rule createPlanInstanceAbortRule()
+	{
+		Variable	rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	goalcon	= new ObjectCondition(rgoal.getType());
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS, IOperator.NOTEQUAL));
+
+		ObjectCondition	plancon	= new ObjectCondition(rplan.getType());
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new OrConstraint(
+			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW),
+			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY)));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_reason, rgoal));
+
+		ObjectCondition	capcon	= new ObjectCondition(rcapa.getType());
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+		
+		Rule	abort_plan	= new Rule("planinstance_abort", new AndCondition(new ICondition[]{goalcon, plancon, capcon}), PLAN_ABORT);
+		return abort_plan;
+	}
+	
+	/**
+	 *  Create the plan creation rule.
+	 *  @param usercond	The ADF part of the target condition.
+	 *  @param ptname	The plan type name (e.g. "walk").
+	 */
+	protected static Rule createPlanCreationUserRule(ICondition usercond, String ptname)
+	{
+		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);
+		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+			
+		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
+		ragentcon.addConstraint(new BoundConstraint(null, ragent));
+		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE));
+		
+		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
+		mplancon.addConstraint(new BoundConstraint(null, mplan));
+		mplancon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, ptname));
+		
+		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
+		
+		ObjectCondition	rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
+		rcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+		
+		Rule plan_creation = new Rule(ptname+"_creation", new AndCondition(
+			new ICondition[]{ragentcon, mplancon, mcapacon, rcapacon, usercond}), PLAN_CREATION);
+		return plan_creation;
+	}
+	
+	/**
+	 *  Trigger plan creation on fact changed event.
+	 */
+	protected static Rule createPlanInstanceFactChangedTriggerRule()
+	{
+		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		rplancon.addConstraint(new BoundConstraint(null, rplan));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+
+		ObjectCondition	capcon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+			
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rtels));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+		
+		Rule plan_factwait = new Rule("planinstancetrigger_factchanged",
+			new AndCondition(new ICondition[]{rplancon, capcon, wacon, changecon}),
+			PLAN_CHANGEWAIT, IPriorityEvaluator.PRIORITY_1);
+		return plan_factwait;
+	}		
+	
+	/**
+	 *  Trigger plan creation on fact added event.
+	 */
+	protected static Rule createPlanInstanceFactAddedTriggerRule()
+	{
+		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+			
+		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		rplancon.addConstraint(new BoundConstraint(null, rplan));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+
+		ObjectCondition	capcon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rtels));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+		
+		Rule plan_factwait = new Rule("planinstancetrigger_factadded",
+			new AndCondition(new ICondition[]{rplancon, capcon, wacon, changecon}),
+			PLAN_CHANGEWAIT, IPriorityEvaluator.PRIORITY_1);
+		return plan_factwait;
+	}
+
+	/**
+	 *  Trigger plan creation on fact removed event.
+	 */
+	protected static Rule createPlanInstanceFactRemovedTriggerRule()
+	{
+		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		rplancon.addConstraint(new BoundConstraint(null, rplan));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+
+		ObjectCondition	capcon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+			
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rtels));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+		
+		Rule plan_factwait = new Rule("planinstancetrigger_factremoved",
+			new AndCondition(new ICondition[]{rplancon, capcon, wacon, changecon}),
+			PLAN_CHANGEWAIT, IPriorityEvaluator.PRIORITY_1);
+		return plan_factwait;
+	}	
+	
+	/**
+	 *  Add event to waitqueue of running plan on fact added event.
+	 */
+	protected static Rule createPlanWaitqueueFactAddedTriggerRule()
+	{
+		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+			
+		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		rplancon.addConstraint(new BoundConstraint(null, rplan));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+
+		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
+		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rtels));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rtel, IOperator.CONTAINS));
+		
+		Rule factadded_planwaitqueuetrigger = new Rule("planwaitqueuetrigger_factadded",
+			new AndCondition(new ICondition[]{rplancon, wqwacon, changecon, new NotCondition(wacon)}),
+			PLAN_CHANGEWAITQUEUE, IPriorityEvaluator.PRIORITY_1);
+		return factadded_planwaitqueuetrigger;
+	}	
+	
+	
+	/**
+	 *  Add event to waitqueue of running plan on fact added event.
+	 */
+	protected static Rule createPlanWaitqueueFactRemovedTriggerRule()
+	{
+		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+			
+		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		rplancon.addConstraint(new BoundConstraint(null, rplan));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+
+		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
+		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rtels));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rtel, IOperator.CONTAINS));
+		
+		Rule factremoved_planwaitqueuetrigger = new Rule("planwaitqueuetrigger_factremoved",
+			new AndCondition(new ICondition[]{rplancon, wqwacon, changecon, new NotCondition(wacon)}),
+			PLAN_CHANGEWAITQUEUE, IPriorityEvaluator.PRIORITY_1);
+		return factremoved_planwaitqueuetrigger;
+	}	
+	
+	
+	/**
+	 *  Add event to waitqueue of running plan on fact added event.
+	 */
+	protected static Rule createPlanWaitqueueFactChangedTriggerRule()
+	{
+		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+			
+		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		rplancon.addConstraint(new BoundConstraint(null, rplan));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+
+		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
+		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rtels));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rtel, IOperator.CONTAINS));
+		
+		Rule factchanged_planwaitqueuetrigger = new Rule("planwaitqueuetrigger_factchanged",
+			new AndCondition(new ICondition[]{rplancon, wqwacon, changecon, new NotCondition(wacon)}),
+			PLAN_CHANGEWAITQUEUE, IPriorityEvaluator.PRIORITY_1);
+		return factchanged_planwaitqueuetrigger;
+	}	
+
+	/**
+	 *  Trigger plan continuation on external condition.
+	 */
+	protected static Rule createPlanInstanceExternalConditionTriggerRule()
+	{
+		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable cond	= new Variable("?cond", OAVBDIRuntimeModel.java_externalcondition_type);
+		Variable wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+			
+		ObjectCondition	rplancon = new ObjectCondition(rplan.getType());
+		rplancon.addConstraint(new BoundConstraint(null, rplan));
+		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+
+		ObjectCondition	capcon = new ObjectCondition(rcapa.getType());
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+
+		ObjectCondition	condcon = new ObjectCondition(cond.getType());
+		condcon.addConstraint(new BoundConstraint(null, cond));
+		condcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.java_externalcondition_type.getAttributeType("true"), Boolean.TRUE));
+
+		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+		wacon.addConstraint(new BoundConstraint(null, wa));
+		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_externalconditions, cond, IOperator.CONTAINS));
+		
+		Rule plan_wait = new Rule("planinstancetrigger_externalcondition",
+			new AndCondition(new ICondition[]{rplancon, capcon, condcon, wacon}),
+			PLAN_EXTERNALCONDITIONWAIT);
+		return plan_wait;
+	}	
+	
+	/**
+	 *  Trigger plan creation on fact changed event.
+	 */
+	protected static Rule createPlanFactChangedTriggerRule()
+	{
+		Variable	mplan	= new Variable("?mplan", OAVBDIMetaModel.plan_type);
+		Variable	trigger	= new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);
+		Variable	ref	= new Variable("?ref", OAVJavaType.java_string_type);
+		Variable	mcapa	= new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
+		Variable	rtargetcapa	= new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+			
+		ObjectCondition	mtricon = new ObjectCondition(OAVBDIMetaModel.plantrigger_type);
+		mtricon.addConstraint(new BoundConstraint(null, trigger));
+		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_factchangeds, Arrays.asList(new Variable[]
+		{
+			new Variable("$?x", OAVJavaType.java_string_type, true),
+			ref,
+			new Variable("$?y", OAVJavaType.java_string_type, true),
+		}), IOperator.EQUAL));
+
+		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
+		mplancon.addConstraint(new BoundConstraint(null, mplan));
+		mplancon.addConstraint(new BoundConstraint(OAVBDIMetaModel.plan_has_trigger, trigger));
+
+		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+
+		ObjectCondition	rtelcon	= new ObjectCondition(OAVBDIRuntimeModel.typedelement_type);
+		rtelcon.addConstraint(new BoundConstraint(null, rtel));
+
+		ObjectCondition	targetcapcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		targetcapcon.addConstraint(new BoundConstraint(null, rtargetcapa));
+		targetcapcon.addConstraint(new OrConstraint(new IConstraint[]
+		{
+			new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rtel, IOperator.CONTAINS),
+			new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rtel, IOperator.CONTAINS)
+		}));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
+		changecon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rtel, rtargetcapa})));
+		
+		Rule plan_creation = new Rule("plantrigger_factchanged",
+			new AndCondition(new ICondition[]{mtricon, mplancon, mcapacon, capcon, rtelcon, targetcapcon, changecon}),
+			PLAN_CHANGECREATION, IPriorityEvaluator.PRIORITY_1);
+		return plan_creation;
+	}
+	
+	
+	/**
+	 *  Trigger plan creation on fact added event.
+	 */
+	protected static Rule createPlanFactAddedTriggerRule()
+	{
+		Variable	mplan	= new Variable("?mplan", OAVBDIMetaModel.plan_type);
+		Variable	trigger	= new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);
+		Variable	ref	= new Variable("?ref", OAVJavaType.java_string_type);
+		Variable	mcapa	= new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
+		Variable	rtargetcapa	= new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+			
+		ObjectCondition	mtricon = new ObjectCondition(OAVBDIMetaModel.plantrigger_type);
+		mtricon.addConstraint(new BoundConstraint(null, trigger));
+		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_factaddeds, Arrays.asList(new Variable[]
+		{
+			new Variable("$?x", OAVJavaType.java_string_type, true),
+			ref,
+			new Variable("$?y", OAVJavaType.java_string_type, true),
+		}), IOperator.EQUAL));
+
+		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
+		mplancon.addConstraint(new BoundConstraint(null, mplan));
+		mplancon.addConstraint(new BoundConstraint(OAVBDIMetaModel.plan_has_trigger, trigger));
+
+		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+
+		ObjectCondition	rtelcon	= new ObjectCondition(OAVBDIRuntimeModel.beliefset_type);
+		rtelcon.addConstraint(new BoundConstraint(null, rtel));
+
+		ObjectCondition	targetcapcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		targetcapcon.addConstraint(new BoundConstraint(null, rtargetcapa));
+		targetcapcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rtel, IOperator.CONTAINS));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
+		changecon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rtel, rtargetcapa})));
+		
+		Rule plan_creation = new Rule("plantrigger_factadded",
+			new AndCondition(new ICondition[]{mtricon, mplancon, mcapacon, capcon, rtelcon, targetcapcon, changecon}),
+			PLAN_CHANGECREATION, IPriorityEvaluator.PRIORITY_1);
+		return plan_creation;
+	}
+	
+	/**
+	 *  Trigger plan creation on fact removed event.
+	 */
+	protected static Rule createPlanFactRemovedTriggerRule()
+	{
+		Variable	mplan	= new Variable("?mplan", OAVBDIMetaModel.plan_type);
+		Variable	trigger	= new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);
+		Variable	ref	= new Variable("?ref", OAVJavaType.java_string_type);
+		Variable	mcapa	= new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
+		Variable	rtargetcapa	= new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
+		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+			
+		ObjectCondition	mtricon = new ObjectCondition(OAVBDIMetaModel.plantrigger_type);
+		mtricon.addConstraint(new BoundConstraint(null, trigger));
+		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_factremoveds, Arrays.asList(new Variable[]
+		{
+				new Variable("$?x", OAVJavaType.java_string_type, true),
+				ref,
+				new Variable("$?y", OAVJavaType.java_string_type, true),
+		}), IOperator.EQUAL));
+
+		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
+		mplancon.addConstraint(new BoundConstraint(null, mplan));
+		mplancon.addConstraint(new BoundConstraint(OAVBDIMetaModel.plan_has_trigger, trigger));
+
+		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+
+		ObjectCondition	rtelcon	= new ObjectCondition(OAVBDIRuntimeModel.beliefset_type);
+		rtelcon.addConstraint(new BoundConstraint(null, rtel));
+
+		ObjectCondition	targetcapcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		targetcapcon.addConstraint(new BoundConstraint(null, rtargetcapa));
+		targetcapcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rtel, IOperator.CONTAINS));
+
+		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
+		changecon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rtel, rtargetcapa})));
+		
+		Rule plan_creation = new Rule("plantrigger_factremoved",
+			new AndCondition(new ICondition[]{mtricon, mplancon, mcapacon, capcon, rtelcon, targetcapcon, changecon}),
+			PLAN_CHANGECREATION, IPriorityEvaluator.PRIORITY_1);
+		return plan_creation;
+	}
+	
+	/**
+	 *  Trigger plan creation on goal finished event.
+	 */
+	protected static Rule createPlanGoalFinishedTriggerRule()
+	{
+		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);
+		Variable trigger = new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);
+		Variable refelem = new Variable("?refelem", OAVBDIMetaModel.triggerreference_type);
+		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
+		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable rtel = new Variable("?rtel", OAVBDIRuntimeModel.element_type);
+		Variable rtargetcapa	= new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
+		Variable change = new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
+			
+		ObjectCondition	mtricon = new ObjectCondition(OAVBDIMetaModel.plantrigger_type);
+		mtricon.addConstraint(new BoundConstraint(null, trigger));
+		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_goalfinisheds, Arrays.asList(new Variable[]
+		{
+			new Variable("$?x", OAVJavaType.java_string_type, true),
+			refelem,
+			new Variable("$?y", OAVJavaType.java_string_type, true),
+		}), IOperator.EQUAL));
+
+		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
+		trcon.addConstraint(new BoundConstraint(null, refelem));
+		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
+		
+		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
+		mplancon.addConstraint(new BoundConstraint(null, mplan));
+		mplancon.addConstraint(new BoundConstraint(OAVBDIMetaModel.plan_has_trigger, trigger));
+
+		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
+		
+		ObjectCondition	capcon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+
+		ObjectCondition	changecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
+		changecon.addConstraint(new BoundConstraint(null, change));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
+		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_scope, rtargetcapa));
+		changecon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rtel, rtargetcapa})));
+		
+		Rule plan_goalfini = new Rule("plantrigger_goalfinished",
+			new AndCondition(new ICondition[]{mtricon, trcon, mplancon, mcapacon, capcon, changecon}),
+			PLAN_CHANGECREATION, IPriorityEvaluator.PRIORITY_1);
+		return plan_goalfini;
+	}
+	
+	/**
+	 *  Create the plan context invalid rule.
+	 *  @param usercond	The ADF part of the target condition.
+	 *  @param ptname	The plan type name (e.g. "walk").
+	 */
+	protected static Rule createPlanContextInvalidUserRule(ICondition usercond, String ptname)
+	{
+		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
+		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
+		mplancon.addConstraint(new BoundConstraint(null, mplan));
+		mplancon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, ptname));
+		
+		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+		plancon.addConstraint(new BoundConstraint(null, rplan));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mplan));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
+		
+		Rule plancontext_invalid = new Rule(ptname+"_context", new AndCondition(new ICondition[]{mplancon, plancon, 
+			capcon, new NotCondition(usercond)}), PLAN_ABORT);
+		
+		return plancontext_invalid;
+	}	
+	
+	/**
+	 *  Create a new plan.
+	 */
+	protected static IAction PLAN_CREATION = new IAction()
+	{
+		public void execute(IOAVState state, IVariableAssignments assignments)
+		{
+//			System.out.println("Plan creation triggered.");
+			Object rcapa = assignments.getVariableValue("?rcapa");
+			Object mplan = assignments.getVariableValue("?mplan");
+			
+			// Create fetcher with binding values.
+			OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rcapa);
+			String[] varnames = assignments.getVariableNames();
+			for(int i=0; i<varnames.length; i++)
+			{
+				fetcher.setValue(varnames[i], assignments.getVariableValue(varnames[i]));
+			}
+			
+			// Create plans according to binding possibilities.
+			List bindings = AgentRules.calculateBindingElements(state, mplan, null, fetcher);
+			if(bindings!=null)
+			{
+				for(int i=0; i<bindings.size(); i++)
+				{
+					Object rplan = PlanRules.instantiatePlan(state, rcapa, mplan, null, null, null, (Map)bindings.get(i), fetcher);
+					PlanRules.adoptPlan(state, rcapa, rplan);	
+				}
+			}
+			else
+			{
+				Object rplan = PlanRules.instantiatePlan(state, rcapa, mplan, null, null, null, null, fetcher);
+				PlanRules.adoptPlan(state, rcapa, rplan);	
+			}
+		}
+	};
+	
+	/**
+	 *  Create a plan in reaction to a change event.
+	 */
+	protected static IAction PLAN_CHANGECREATION = new IAction()
+	{
+		public void execute(IOAVState state, IVariableAssignments assignments)
+		{
+//			System.out.println("Plan creation triggered.");
+			Object rcapa = assignments.getVariableValue("?rcapa");
+			Object mplan = assignments.getVariableValue("?mplan");
+			Object change = assignments.getVariableValue("?change");
+			
+			// Create fetcher with binding values.
+			OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rcapa);
+			String[] varnames = assignments.getVariableNames();
+			for(int i=0; i<varnames.length; i++)
+			{
+				fetcher.setValue(varnames[i], assignments.getVariableValue(varnames[i]));
+			}
+			
+			// Create plans according to binding possibilities.
+			List bindings = AgentRules.calculateBindingElements(state, mplan, null, fetcher);
+			if(bindings!=null)
+			{
+				for(int i=0; i<bindings.size(); i++)
+				{
+					Object rplan = PlanRules.instantiatePlan(state, rcapa, mplan, null, change, null, (Map)bindings.get(i), fetcher);
+					PlanRules.adoptPlan(state, rcapa, rplan);	
+				}
+			}
+			else
+			{
+				Object rplan = PlanRules.instantiatePlan(state, rcapa, mplan, null, change, null, null, fetcher);
+				PlanRules.adoptPlan(state, rcapa, rplan);	
+			}
+		}
+	};
+	
+	/**
+	 *  Reschedule a plan after change event
+	 */
+	protected static IAction PLAN_CHANGEWAIT = new IAction()
+	{
+		public void execute(IOAVState state, IVariableAssignments assignments)
+		{
+			Object	rplan	= assignments.getVariableValue("?rplan");
+			Object	rcapa	= assignments.getVariableValue("?rcapa");
+			Object	change	= assignments.getVariableValue("?change");
+			
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, change);
+			cleanupPlanWait(state, rcapa, rplan, false);
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//			System.out.println("PLAN_CHANGEWAIT: Setting plan to ready: "
+//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//					+", "+rplan);
+		}
+	};
+	
+	/**
+	 *  Add a collected event to the waitqueue
+	 */
+	protected static IAction PLAN_CHANGEWAITQUEUE = new IAction()
+	{
+		public void execute(IOAVState state, IVariableAssignments assignments)
+		{
+			Object	rplan	= assignments.getVariableValue("?rplan");
+			Object	change	= assignments.getVariableValue("?change");
+			
+			EventProcessingRules.scheduleWaitqueueCandidate(state, change, rplan);
+		}
+	};
+	
+	/**
+	 *  Set an plan context to invalid.
+	 */
+	protected static IAction PLAN_ABORT	= new IAction()
+	{
+		public void execute(IOAVState state, IVariableAssignments assignments)
+		{
+			Object	rplan	= assignments.getVariableValue("?rplan");
+			Object	rcapa	= assignments.getVariableValue("?rcapa");
+//			System.out.println("Aborting: "+rplan);
+			abortPlan(state, rcapa, rplan);
+		}
+	};
+
+	
+	/**
+	 *  Reschedule a plan after external condition becomes true
+	 */
+	protected static IAction PLAN_EXTERNALCONDITIONWAIT = new IAction()
+	{
+		public void execute(IOAVState state, IVariableAssignments assignments)
+		{
+			Object	rplan	= assignments.getVariableValue("?rplan");
+			Object	rcapa	= assignments.getVariableValue("?rcapa");
+			
+			cleanupPlanWait(state, rcapa, rplan, false);
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+
+//			System.out.println("PLAN_EXTERNALCONDITIONWAIT: Setting plan to ready: "
+//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//					+", "+rplan);
+			
+//			System.out.println("Plan reactivated from external condition: "+rplan);
+		}
+	};
+	
+	//-------- helper methods for waiting --------
+
+	/**
+	 *  Wait for a wait abstraction.
+	 *  @param waitabstraction.
+	 *  @return The dispatched element.
+	 */
+	public static Object waitForWaitAbstraction(Object wa, long timeout, IOAVState state, Object rcapa, Object rplan)
+	{
+		Object[] ret = initializeWait(wa, timeout, state, rcapa, rplan);
+		
+		if(ret[0]==null)
+		{
+			doWait(state, rplan);
+			ret[0] = afterWait(wa, (boolean[])ret[1], state, rcapa, rplan);
+		}
+		return ret[0];
+	}
+	
+	/**
+	 *  Initialize the wait by
+	 *  a) check if one of goals is already finished.
+	 *  b) set the waitabstraction for the plan.
+	 *  c) set the timer.
+	 */
+	public static Object[] initializeWait(final Object wa, long timeout, final IOAVState state, final Object rcapa, final Object rplan)
+	{	
+		Object ret = null;
+
+		assert state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction)==null;
+		
+		if(wa!=null)
+		{
+			Collection rgoals = state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goals);
+			if(rgoals!=null)
+			{
+				for(Iterator it=rgoals.iterator(); it.hasNext(); )
+				{
+					Object rgoal = it.next();
+					if(OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED.equals(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate)))
+					{
+						// Remove waitabstraction from state, as it isn't used.
+						state.dropObject(wa);
+
+						if(OAVBDIRuntimeModel.GOALPROCESSINGSTATE_FAILED.equals(
+								state.getAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_processingstate)))
+						{
+							throw new GoalFailureException("Goal failed: "+rgoal);
+						}
+						// Todo: Hack!!! wrong scope of goal
+						ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);							
+					}
+				}
+			}
+		}
+				
+		final boolean[] to = new boolean[1];
+		if(ret==null)
+		{
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction, wa);
+
+			if(timeout>-1)
+			{
+	//			final long start = System.currentTimeMillis();
+				// todo: what happens when timer is immediately due?! can this lead to problems?
+				// timer runs on other thread.
+				final	ITimer[]	thetimer	= new ITimer[1];
+				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
+				{
+					public boolean isValid()
+					{
+						return state.containsObject(rplan)
+							&& thetimer[0].equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer))
+							&& super.isValid();
+					}
+						
+					public void run()
+					{	
+//						System.out.println("Timer occurred: "+start);
+
+						to[0] = true;
+						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+							OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//						System.out.println("initializeWait: Setting plan to ready: "
+//								+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//								+", "+rplan);
+						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
+						cleanupPlanWait(state, rcapa, rplan, false);
+						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
+						BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+					}
+				}));
+				
+				thetimer[0]	= timer;
+	//			System.out.println("Timer created: "+start);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
+			}
+		}
+		
+		return new Object[]{ret, to};
+	}
+		
+	/**
+	 *  Do the waiting, i.e. set the external caller thread to sleep mode.
+	 */
+	public static void doWait(IOAVState state, Object rplan)
+	{
+		IPlanExecutor exe = BDIInterpreter.getInterpreter(state).getPlanExecutor(rplan);
+		exe.eventWaitFor(BDIInterpreter.getInterpreter(state), rplan);
+	}
+	
+	/**
+	 *  Perform the cleanup operations after a wait.
+	 *  Mainly removes the wait abstraction and generates the result.
+	 */
+	public static Object afterWait(Object wa, boolean[] to, IOAVState state, Object rcapa, Object rplan)
+	{
+		Object ret = null;
+		
+		if(to[0])
+		{
+			if(wa!=null)
+				throw new TimeoutException();
+		}
+
+		Object de = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement);
+		if(de!=null)
+		{
+			OAVObjectType type = state.getType(de);
+			if(OAVBDIRuntimeModel.goal_type.equals(type))
+			{
+				// When goal is not succeeded (or idle for maintaingoals) throw exception.
+				if(!OAVBDIRuntimeModel.GOALPROCESSINGSTATE_SUCCEEDED.equals(
+					state.getAttributeValue(de, OAVBDIRuntimeModel.goal_has_processingstate)))
+				{
+					Object	mgoal	= state.getAttributeValue(de, OAVBDIRuntimeModel.element_has_model);
+					if(!state.getType(mgoal).isSubtype(OAVBDIMetaModel.maintaingoal_type)
+						|| !OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE.equals(
+							state.getAttributeValue(de, OAVBDIRuntimeModel.goal_has_processingstate)))
+					{
+						throw new GoalFailureException("Goal failed: "+de);
+					}
+				}
+				// Todo: Hack!!! wrong scope
+				ret = GoalFlyweight.getGoalFlyweight(state, rcapa, de);
+			}
+			else if(OAVBDIRuntimeModel.internalevent_type.equals(type))
+			{
+				// Todo: Hack!!! wrong scope
+				ret = InternalEventFlyweight.getInternalFlyweight(state, rcapa, de);
+			}
+			else if(OAVBDIRuntimeModel.messageevent_type.equals(type))
+			{
+				// Todo: Hack!!! wrong scope
+				ret = MessageEventFlyweight.getMessageFlyweight(state, rcapa, de);
+			}
+		}
+		
+		return ret;
+	}
+
+	
+	/**
+	 *  Cleanup plan wait abstraction, waitqueue and wait timer.
+	 *  @param rplan	The plan to clean up.
+	 *  @param cleanwq	Flag indicating if waitqueue should be cleaned.
+	 */
+	protected static void	cleanupPlanWait(IOAVState state, Object rcapa, Object rplan, boolean cleanwq)
+	{
+		Object	wa	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction);
+		if(wa!=null)
+		{
+			cleanupWaitAbstraction(state, rcapa, wa);
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction, null);
+		}
+		ITimer	timer	= (ITimer)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer);
+		if(timer!=null)
+		{
+			try{timer.cancel();}catch(Exception e){} // ThreadPool could have been already shutted down
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
+		}
+
+		if(cleanwq)
+		{
+			Object	wqwa	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction);
+			if(wqwa!=null)
+			{
+				cleanupWaitAbstraction(state, rcapa, wqwa);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, null);
+			}
+			Collection	coll	= state.getAttributeValues(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements);
+			if(coll!=null)
+			{
+				Object[]	wqes	= coll.toArray();
+				for(int i=0; i<wqes.length; i++)
+				{
+					state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, wqes[i]);
+				}
+			}
+		}
+	}
+
+	/**
+	 *  Cleanup a wait abstraction, i.e. remove sent message events from capability
+	 *  and observed elements from event reificator.
+	 */
+	protected static void cleanupWaitAbstraction(IOAVState state, Object rcapa, Object wa)
+	{
+		Collection	coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_messageevents);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				MessageEventRules.deregisterMessageEvent(state, it.next(), rcapa);
+			}
+		}
+		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+			}
+		}
+		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+			}
+		}
+		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+			}
+		}
+		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+			}
+		}
+		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goals);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+			}
+		}
+	}
+}

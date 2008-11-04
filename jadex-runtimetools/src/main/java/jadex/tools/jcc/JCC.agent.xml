@@ -1,0 +1,190 @@
+<!--
+	<H3>The control center agent</H3>
+
+	Main platform administration user interface.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="JCC" package="jadex.tools.jcc">
+
+   <imports>
+      <import>jadex.adapter.base.fipa.*</import>
+   </imports>
+
+	<capabilities>
+		<capability name="ams" file="jadex.bdi.planlib.ams.AMS" />
+		<capability name="df" file="jadex.bdi.planlib.df.DF" />
+		<!--  <capability name="toolcap" file="jadex.tools.common.Tool" />-->
+		<!-- <capability name="loggercap" file="jadex.tools.logger.Logger"/> -->
+		<capability name="testcentercap" file="jadex.tools.testcenter.TestCenter"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="jcc" class="ControlCenter" />
+
+		<belief name="plugins" class="String" />
+
+		<beliefsetref name="agents">
+			<concrete ref="ams.agents"/>
+		</beliefsetref>
+
+		<beliefref name="testcase_timeout">
+			<concrete ref="testcentercap.timeout"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoalref name="ams_create_agent">
+			<concrete ref="ams.ams_create_agent" />
+		</achievegoalref>
+
+		<achievegoalref name="ams_destroy_agent">
+			<concrete ref="ams.ams_destroy_agent" />
+		</achievegoalref>
+		
+		<achievegoalref name="ams_suspend_agent">
+			<concrete ref="ams.ams_suspend_agent" />
+		</achievegoalref>
+		
+		<achievegoalref name="ams_resume_agent">
+			<concrete ref="ams.ams_resume_agent" />
+		</achievegoalref>
+
+		<achievegoalref name="ams_shutdown_platform">
+			<concrete ref="ams.ams_shutdown_platform" />
+		</achievegoalref>
+
+		<achievegoalref name="ams_search_agents">
+			<concrete ref="ams.ams_search_agents" />
+		</achievegoalref>
+      
+        <achievegoalref name="df_register">
+            <concrete ref="df.df_register"/>
+        </achievegoalref>
+        
+        <achievegoalref name="df_deregister">
+            <concrete ref="df.df_deregister"/>
+        </achievegoalref>
+        
+        <achievegoalref name="df_search">
+            <concrete ref="df.df_search"/>
+        </achievegoalref>
+      
+		<!-- <performgoalref name="manage_tool">
+			<concrete ref="toolcap.manage_tool" />
+		</performgoalref>
+
+		<achievegoalref name="tool_request">
+			<concrete ref="toolcap.tool_request" />
+		</achievegoalref> -->
+		
+		<!-- <achievegoalref name="logger_tool_request">
+			<concrete ref="loggercap.tool_request" />
+		</achievegoalref>
+		
+		<performgoalref name="logger_manage_tool">
+			<concrete ref="loggercap.manage_tool" />
+		</performgoalref> -->
+
+		<performgoalref name="perform_test">
+			<concrete ref="testcentercap.perform_test"/>
+		</performgoalref>
+	</goals>
+
+	<plans>
+		<plan name="agent_list_update">
+			<body class="AgentListUpdatePlan" />
+			<trigger>
+				<factchanged ref="agents"/>
+				<factadded ref="agents"/>
+				<factremoved ref="agents"/>
+			</trigger>
+		</plan>
+
+		<plan name="receiver">
+			<body class="MailPlan" />
+			<trigger>
+				<messageevent ref="fipamsg" />
+				<messageevent ref="agent_inform"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<messageevent name="fipamsg" type="fipa" />
+
+		<!-- Message to issue a request to an observed agent. -->
+		<messageevent name="tool_request" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>"request"</value>
+			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"jadex.tools"</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+			</parameter>
+		</messageevent>
+		
+		<!-- Message to issue a log request to an agent. -->
+		<!-- <messageevent name="logger_tool_request" type="fipa" 	direction="send">
+			<parameter name="performative" class="String" 		direction="fixed">
+				<value>"request"</value>
+			</parameter>
+			<parameter name="ontology" class="String" 			direction="fixed">
+				<value>"jadex.tools.logger"</value>
+			</parameter>
+			<parameter name="language" class="String" 			direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+			</parameter>
+		</messageevent> -->
+		
+      <messageevent name="agent_inform" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>"inform"</value>
+			</parameter>
+            <parameter name="ontology" class="String" direction="fixed">
+                <value>"jadex.tools"</value>
+            </parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+			</parameter>
+		</messageevent> 
+
+	</events>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
+<!--		<property name="debugging">true</property>-->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<capabilities>
+				<initialcapability ref="ams" configuration="agentlist"/>
+			</capabilities>
+			<beliefs>
+				<initialbelief ref="jcc">
+					<fact>new ControlCenter($scope.getExternalAccess())</fact>
+				</initialbelief>
+				<initialbelief ref="plugins">
+					<fact>
+						"jadex.tools.starter.StarterPlugin"
+						+" jadex.tools.dfbrowser.DFBrowserPlugin"
+						+" jadex.tools.convcenter.ConversationPlugin"
+						+" jadex.tools.comanalyzer.ComanalyzerPlugin"
+						+" jadex.tools.testcenter.TestCenterPlugin"
+					//	+" jadex.tools.jadexdoc.JadexdocPlugin"
+						+" jadex.tools.simcenter.SimCenterPlugin"
+						+" jadex.tools.introspector.IntrospectorPlugin"
+						+" jadex.tools.ruleprofiler.RuleProfilerPlugin"
+						+" jadex.tools.libtool.LibraryPlugin"
+					</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</agent>

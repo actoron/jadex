@@ -1,0 +1,121 @@
+<!--
+	<H3>Test the English Auction Protocol.</H3>
+	Protocol Test Agent.
+	Tests the english auction protocol.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="EAInitiator"
+	package="jadex.bdi.testcases.planlib">
+
+	<imports>
+		<import>java.util.logging.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+		<capability name="eacap" file="jadex.bdi.planlib.protocols.englishauction.EnglishAuction"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+		<belief name="acceptplan_invoked" class="Integer">
+			<fact>0</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="test">
+			<body class="EATestPlan"/>
+		</plan>
+		
+		<plan name="decide_iteration_plan">
+			<parameter name="cfp" class="Object" direction="out">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object" direction="inout">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp_info"/>
+			</parameter>
+			<parameterset name="history" class="Object">
+				<goalmapping ref="eacap.ea_decide_iteration.history"/>
+			</parameterset>
+			<body class="EADecideIterationPlan"/>
+			<trigger>
+				<goal ref="eacap.ea_decide_iteration"/>
+			</trigger>
+			<precondition>$goal.getParameter("cfp_info").getValue()==null</precondition>
+			<!-- <precondition>$plan.cfp_info==null</precondition> -->
+		</plan>
+		
+		<plan name="decide_iteration_gen_plan">
+			<parameter name="cfp" class="Object" direction="out">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object" direction="inout">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp_info"/>
+			</parameter>
+			<parameterset name="history" class="Object">
+				<goalmapping ref="eacap.ea_decide_iteration.history"/>
+			</parameterset>
+			<body class="EADecideIterationGenPlan"/>
+			<trigger>
+				<goal ref="eacap.ea_decide_iteration"/>
+			</trigger>
+			<precondition>$goal.getParameter("cfp_info").getValue()!=null</precondition>
+			<!-- <precondition>$plan.cfp_info!=null</precondition> -->
+		</plan>
+		
+		<plan name="decide_acceptance_plan">
+			<parameter name="auction_description" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.auction_description"/>
+			</parameter>
+			<parameter name="cfp" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.cfp_info"/>
+			</parameter>
+			<parameter name="winner" class="jadex.bridge.IAgentIdentifier">
+				<goalmapping ref="eacap.ea_decide_acceptance.winner"/>
+			</parameter>
+			<parameter name="accept" class="Boolean" direction="out">
+				<goalmapping ref="eacap.ea_decide_acceptance.accept"/>
+			</parameter>
+			<parameterset name="history" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.history"/>
+			</parameterset>
+			<body class="EADecideAcceptancePlan"/>
+			<trigger>
+				<goal ref="eacap.ea_decide_acceptance"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+ 		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
+ 		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>3</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

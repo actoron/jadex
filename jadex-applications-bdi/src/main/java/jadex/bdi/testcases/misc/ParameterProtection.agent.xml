@@ -1,0 +1,106 @@
+<!--
+	<H3>Test the protection of parameter directions</H3>.
+
+	Parameters can have an optional direction attribute, which
+	can have the values "in", "out" or "inout". The default direction
+	is "in". According to the direction the access to parameters
+	is guarded by the system.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="ParameterProtection"
+	package="jadex.bdi.testcases.misc">
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="test_goal">
+			<parameter name="param_in" class="String" direction="in">
+				<value>"param_in_value"</value>
+			</parameter>
+			<parameter name="param_inout" class="String" direction="inout">
+				<value>"param_inout_value"</value>
+			</parameter>
+			<parameter name="param_out" class="String" direction="out">
+				<value>"param_out_value"</value>
+			</parameter>
+
+			<parameterset name="paramset_in" class="String" direction="in">
+				<value>"paramset_in_value1"</value>
+				<value>"paramset_in_value2"</value>
+			</parameterset>
+			<parameterset name="paramset_inout" class="String" direction="inout">
+				<values>new String[]{"paramset_inout_value1", "paramset_inout_value2"}</values>
+			</parameterset>
+			<parameterset name="paramset_out" class="String" direction="out">
+				<value>"paramset_out_value1"</value>
+				<value>"paramset_out_value2"</value>
+			</parameterset>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="test_plan">
+			<body class="ParameterProtectionPlan"/>
+		</plan>
+	</plans>
+
+	<events>
+		<internalevent name="test_event">
+			<parameter name="param_in" class="String" direction="in">
+				<value>"param_in_value"</value>
+			</parameter>
+			<parameter name="param_inout" class="String" direction="inout">
+				<value>"param_inout_value"</value>
+			</parameter>
+			<parameter name="param_out" class="String" direction="out">
+				<value>"param_out_value"</value>
+			</parameter>
+
+			<parameterset name="paramset_in" class="String" direction="in">
+				<values>new String[]{"paramset_in_value1", "paramset_in_value2"}</values>
+			</parameterset>
+			<parameterset name="paramset_inout" class="String" direction="inout">
+				<value>"paramset_inout_value1"</value>
+				<value>"paramset_inout_value2"</value>
+			</parameterset>
+			<parameterset name="paramset_out" class="String" direction="out">
+				<values>new String[]{"paramset_out_value1", "paramset_out_value2"}</values>
+			</parameterset>
+		</internalevent>
+	</events>
+
+<!--	<properties>
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<property name="debugging">true</property>
+	</properties>
+-->
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>30</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

@@ -1,0 +1,58 @@
+<!--
+	<H3>An observer agent allows to view an environment.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-0.96.xsd"
+	name="RemoteObserver"
+	package="jadex.examples.hunterprey.environment">
+
+	<imports>
+		<import>jadex.examples.hunterprey.*</import>
+		<import>jadex.runtime.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="actsensecap" file="jadex/examples/hunterprey/creature/actsense/Creature.capability.xml"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- The creature -->
+		<belief name="my_self" class="Creature">
+			<assignto ref="actsensecap.my_self"/>
+			<fact>
+				new Observer($agent.getName(), $agent.getAgentIdentifier(), new Location(0,0))
+ 			</fact>
+		</belief>
+
+		<!-- The current vision. -->
+		<beliefref name="vision">
+			 <concrete ref="actsensecap.vision"/>
+		</beliefref>
+
+		<!-- The df to search for the environment. -->
+		<belief name="df" class="jadex.bridge.IAgentIdentifier">
+			<assignto ref="actsensecap.df"/>
+			<fact>
+				new AgentIdentifier("df@alex",
+					new String[]{"nio-mtp://vsisstaff0:2102"})
+			</fact>
+		</belief>
+
+		<!-- The location of the highscore. -->
+		<belief name="highscore" class="String">
+			<fact>"http://134.100.11.53:80/jade/highscore.dmp"</fact>
+		</belief>
+		
+		<!-- The gui. -->
+		<belief name="gui" class="ObserverGui">
+			<fact>new ObserverGui($agent.getExternalAccess())</fact>
+		</belief>
+	</beliefs>
+
+</agent>
+

@@ -1,0 +1,33 @@
+<!--
+	<H3>Pong Agent for answering pong requests.</H3>
+
+	Reacts on "pong" query-ref and sends back inform "alaaf".
+	Customizes the ping capability by changing the belief
+	values that are used as ping_content and ping_answer text.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Pong"
+	package="jadex.bdi.examples">
+
+	<capabilities>
+		<capability name="ping" file="jadex.bdi.planlib.ping.Ping"/>
+	</capabilities>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="ping_content">
+					<fact>"pong"</fact>
+				</initialbelief>
+				<initialbelief ref="ping_answer">
+					<fact>"alaaf"</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</agent>

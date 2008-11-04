@@ -1,0 +1,164 @@
+BLACKJACK
+--------------
+
+Blackjack ist ein Kartenspiel mit maximal 7 Spielern und einem Kartengeber (Dealer),
+gespielt wird mit sechs 52er-Decks.
+Man spielt gegen den Dealer, das Ziel ist es, diesen zu schlagen indem man eine bessere 
+Punktzahl als der Dealer erzielt. Dabei ist die höchste erreichbare Punktzahl 21.
+Die Kartenwerte von 2 bis 10 zählen im Spiel analog ihrem Kartenwert. 
+Die Bilder König, Dame und Bube zählen 10. Das Ass zählt je nach Spielsituation entweder 11 oder 1.
+
+Jeder Spieler erhält initial zwei Karten, die offen gelegt werden. 
+Der Geber erhält nur eine offene Karte, weitere Karten darf er erst ziehen, wenn kein
+Spieler weitere Karten haben möchte.
+
+Sind die Karten verteilt, muss der Spieler entscheiden, wie er weiterspielt.
+Hierzu zählt er zuerst einmal die Werte der beiden vor ihm liegenden Karten zusammen
+und entscheidet dann, ob ihm die erreichten Punkte genuegen um gegen den Geber zu gewinnen oder 
+ob er noch eine Karte nehmen sollte.
+
+Die Spieler können bei jedem Punktestand bis 21 Punkten noch Karten nehmen. 
+Anders der Geber, dieser muss noch eine Karte nehmen, wenn er 16 oder weniger Punkte hat. 
+Er darf keine Karte mehr nehmen, wenn er 17 oder mehr Punkte hat.
+Haben Geber und Spieler gleich viele Punkte, gewinnt und verliert keiner von beiden.
+
+Das allerhöchste Blatt im Blackjack bildet ein Ass und eine Karte mit Wert 10. 
+Diese Kombination gibt dem Spiel seinen Namen und ist nicht zu schlagen.
+Ein Blackjack besteht immer aus nur zwei Karten. Erzielt man 21 Punkte mit mehr als 2 Karten, 
+ist dies kein Blackjack mehr und diesem unterlegen. Der Gewinn, wenn ein Spieler einen Blackjack 
+hat beträgt 1:1.5, also das eineinhalbfache des Spielereinsatzes.
+
+Spielablauf
+Nachdem man die ersten beiden Karten erhalten hat (die bekommt man in jedem Fall), 
+gibt es grundsätzlich folgende Möglichkeiten:
+
+*	der Wert der ersten beiden Karten ist so gut, dass man keine Karte mehr nimmt (stand).
+*	der Wert der ersten beiden Karten ist so, dass man noch weitere Karten nimmt (hit).
+	Das geht natürlich nur so lange man nicht über 21 Punkte kommt. 
+
+Extra-Regeln
+*	der Wert der ersten beiden Karten ist gleich. 
+	Man hat die Möglichkeit zu splitten.
+*	der Wert der ersten beiden Karten ist so erfolgversprechend, 
+	dass man den Einsatz verdoppelt (doubling).
+*	der Wert der ersten Karte des Gebers ist so gut, dass man Angst hat er könnte einen 
+	Blackjack bekommen. Dagegen kann man sich versichern (insurance).
+	
+Zu modellieren:
+
+* Kartenspiel mit 6 * 52 Karten
+  - 6 * 13 * Karo  (2,3,4,5,6,7,8,9,10,Bube,Dame,König,Ass)
+  - 6 * 13 * Herz  (2,3,4,5,6,7,8,9,10,Bube,Dame,König,Ass)
+  - 6 * 13 * Pik   (2,3,4,5,6,7,8,9,10,Bube,Dame,König,Ass)
+  - 6 * 13 * Kreuz (2,3,4,5,6,7,8,9,10,Bube,Dame,König,Ass)
+
+* Einen Kartengeber
+* max. 7 Spieler
+  - mit jeweiligem Konto (für Spieleinsatz und Gewinngutschrift)
+  - mit unterschiedlicher Spielstrategie (risikobereitschaft)
+
+* Ablauf
+  - Der Geber eröffnet ein Spiel
+  - max. 7 Spieler können sich diesem Spiel anschliessen
+  - jeder Spieler setzt seinen Spieleinsatz ( n*5  Taler | 1 < n <= 100)
+    - an jeden Spieler wird reihum 1 Karte offen ausgeteilt
+    - Der Geber erhält 1 offene Karte
+    - an jeden Spieler wird reihum eine zweite Karte offen ausgeteilt
+      - jeder Spieler entscheidet reihum, ob er weitere Karten haben will, 
+        solange bis er entweder mehr als 21 Punkte hat (Einsatz verloren)
+        oder bis er keine weiteren Karten mehr möchte.
+        Dann kann der nächste Spieler weitere Karten ziehen.
+      - Haben alle Spieler ihre gewünschten Karten bekommen, zieht der Geber offen eine Karte.
+      - Der Geber zieht solange weiter, bis er mehr als 16 Punkte hat.
+        - Der Ausgang des Spiels und damit der Gewinn und Verlust an Talern für jeden einzelnen
+          Spieler wird errechnet und dem jeweiligen Spieler-Konto gutgeschrieben oder belastet.
+          
+* Protokolle
+
+Player					Dealer
+--------------------------------------------
+join ?		-->		
+			<--			reject|welcome
+
+		  	<--			start
+make bet  -money->
+		  <-cards-		deal two cards per player
+
+		  <-card--		tell dealer-card
+			
+			<--			want more cards ?
+yes|no		-->
+		  <-card--		if (yes) give card
+
+		  <-cards--		if (all players finished) tell dealer-cards
+		  <-money-		if (player wins) give money
+
+* Events, auf die der Player-Agent reagieren soll
+- join 				=> initialisiere agentGoal
+- start				=> setze Taler, internes Money-Event auslösen, um den Kontostand zu erneuern
+					                bet-Message an Dealer verschicken, um dem Dealer die Taler zu ueberweisen
+- cards				=> errechne neue Kartenwerte, entscheide ob weitere Karte genommen werden soll
+- wantMoreCards		=> dem Dealer antworten, ob eine weitere Karte genommen werden soll
+- dealerCards		=> Beliefbase aktualisieren, hat man das Spiel gewonnen ? An neuem Spiel teilnehmen ?
+- money 			=> Kontostand erneuern (Taler abziehen, falls internes Event, 
+					                        Taler hinzufügen, falls externes Event)
+
+* Events, auf die der Dealer-Agent reagieren soll
+- join				=> kann der Spieler noch mitspielen ? => join-Message an Spieler schicken, 
+					   ggf. internes Start-Event auslösen, wenn genuegend Mitspieler da sind
+- start(intern)		=> Karten mischen und auf externe bet-Messages warten
+- bet				=> Karten austeilen (card-Message, dealerCard-Message und 
+					   wantMoreCards-Message an Spieler schicken)
+- wantMoreCards		=> Fall Spieler JA in dieser Nachricht mitschickt, dann weitere Karte austeilen 
+					   (getCard-Message an Spieler schicken)
+					   Falls alle Spieler ein NEIN in dieser Nachricht mitschicken, 
+					   dann internes finish-Event auslösen
+- finish(intern)	=> Dealer zieht eine weitere Karte, dealerCard-Message an Spieler schicken, Spiel auswerten und 
+					   ggf. Gewinne an die Spieler ausschütten (money-Messages verschicken)
+
+* Plans
+- join		=> irgendwie das join-Prozedere für Spieler und Dealer in einem Plan zusammenfassen
+- start 	=> irgendwie das start-Prozedere für Spieler und Dealer in einem Plan zusammenfassen
+- bet		=> bet-Message an Dealer schicken (nur Spieler)
+- account	=> Kontostand aktualisieren (nur Spieler)
+- drawcard	=> PRS, sollen weitere Karten gezogen werden (nur Spieler), 
+			   bzw. feste Karten-Zieh-Regel fuer Dealer anwenden
+- result	=> Spielstand am Spielende auswerten, Dealer verschickt evtl. money-Messages
+
+* goal		
+=> Spiel gewinnen oder möglichst wenig Taler verlieren, 
+   evtl. unter Berücksichtigung der eigenen Risikobereitschaft
+               
+* beliefs
+- eigene Karten
+- Karten des Dealers
+- eigenes Guthaben
+- eigener Einsatz
+- Ueberlegen ob weitere Karten gezogen werden sollen (belief zum globalen Austausch der Info zwischen den Plänen)
+- Risikobereitschaft
+- Player (nur im Dealer)
+
+* desires
+- weitere Karten aufnehmen
+- Einsatz verdoppeln
+- Splitten
+- Insurance kaufen
+
+* intentions
+- Gewinnfunktion maximieren (unter Beruecksichtigung der jeweiligen risikobereitschaft)
+
+* Ontologie
+- Namen und Werte der Spielkarten
+- Regeln ?
+
+----------------------------------------
+Probleme:
+* Beim Einlesen eines ADF werden Fehler (falsche Klassennamen oder fehlende Klassen)
+nicht angezeigt
+
+* Beim Beenden von Blackjack ueber rootFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+wird die gesamte Plattform runtergefahren
+
+* Wie kann man alle Events abfangen
+
+* Wie werden Stimuli abgefangen ???

@@ -1,0 +1,90 @@
+<!--
+	<H3>The AMS agent.</H3>
+	The agent management system. It is actually represented by
+	the AMS class. This agent allows the agent-oriented access
+	(per message) to the AMS.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="SimObserver"
+	package="jadex.bdi.planlib.simsupport.observer.agent">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>jadex.bdi.planlib.simsupport.environment.*</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+		<import>jadex.bdi.planlib.simsupport.common.graphics.IViewport</import>
+	</imports>
+
+	<capabilities>
+	</capabilities>
+
+	<beliefs>
+		<!-- Name of the environment -->
+		<belief name="environment_name" class="String" exported="true">
+			<fact>null</fact>
+		</belief>
+		
+		<!-- Preservation of area aspect ratio in the window -->
+		<belief name="preserve_aspect_ratio" class="Boolean" exported="true">
+			<fact>new Boolean(true)</fact>
+		</belief>
+		
+		<!-- Force the use of Java2D -->
+		<belief name="force_java2d" class="Boolean" exported="true">
+			<fact>new Boolean(false)</fact>
+		</belief>
+		
+		<belief name="viewport" class="IViewport"/>
+		
+		<belief name="drawables" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
+		
+		<belief name="prelayers" class="List">
+			<fact>new ArrayList()</fact>
+		</belief>
+		
+		<belief name="postlayers" class="List">
+			<fact>new ArrayList()</fact>
+		</belief>
+    	
+		<belief name="local_simulation_engine" class="ISimulationEngine"/>
+	</beliefs>
+
+	<goals>
+		<performgoal name="simobs_update_display" retry="true" retrydelay="16" exclude="never">
+		</performgoal>
+	</goals>
+
+	<plans>
+		<!-- Initialization Plan. -->
+    	<plan name="initialization">
+      		<body class="InitializeObserverPlan"/>
+    	</plan>
+    	
+    	<plan name="update_display_locally_plan">
+			<body class="LocalUpdateDisplayPlan"/>
+			<trigger>
+				<goal ref="simobs_update_display"/>
+			</trigger>
+			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
+		</plan>
+		
+		
+	</plans>
+
+	<properties>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+    	  	<plans>
+        		<initialplan ref="initialization"/>
+      		</plans>
+   	 	</configuration>
+	</configurations>
+
+</agent>

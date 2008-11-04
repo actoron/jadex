@@ -1,0 +1,36 @@
+<!--
+	<H3>Test Error Messages</H3>
+	Agent perfoming some illegal actions to test
+	if useful error messages are generated.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="ErrorMessages"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<goals>
+		<achievegoal name="testgoal"/>
+	</goals>
+	
+	<plans>
+		<plan name="error_plan">
+			<body class="ErrorPlan"/>
+		</plan>
+	</plans>
+  
+    <properties>
+        <property name="logging.level">java.util.logging.Level.INFO</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="error_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

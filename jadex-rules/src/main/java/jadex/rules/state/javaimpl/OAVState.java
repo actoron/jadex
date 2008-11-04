@@ -1,0 +1,2153 @@
+package jadex.rules.state.javaimpl;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple;
+import jadex.commons.concurrent.ISynchronizator;
+import jadex.rules.profiler.IProfiler;
+import jadex.rules.profiler.NoProfiler;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVTypeModel;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ *  An object holding the agent state as
+ *  OAV triples (object, attribute, value).
+ */
+public class OAVState	implements IOAVState
+{
+	// #ifndef MIDP
+	//-------- constants --------
+	
+	/** The argument types for property change listener adding/removal (cached for speed). */
+	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
+	
+	// #endif
+	
+	//-------- attributes --------
+	
+	/** The type models. */
+	protected OAVTypeModel tmodel;
+	
+	/** The root objects (will not be cleaned up when usages==0). */
+	protected Set rootobjects;
+	
+	/** The objects table. */
+	protected Map objects;
+	
+	/** The deleted objects (only available in event notifications). */
+	protected Map deletedobjects;
+	
+	/** The object types (object -> type). */
+	protected Map types;
+	
+	/** The id generator. */
+	protected IOAVIdGenerator generator;
+	
+	/** The flag to disable type checking. */
+	protected boolean nocheck;
+	
+	/** The usages of object ids (object id -> usages[map] (objectusage -> cnt)). */
+	protected Map objectusages;
+	
+	/** The external usages of object ids (object id -> cnt).
+	 *  Externally referenced objects can be read, even after they are removed from the state due to garbage collection.
+	 *  Writing (and therefore resurrecting) is not supported. */
+	protected Map externalusages;
+	
+	/** The Java beans property change listeners. */
+	protected Map pcls;
+	
+	/** The OAV event handler. */
+	protected OAVEventHandler	eventhandler;
+	
+	/**	List of substates (if any). */
+	protected IOAVState[]	substates;
+	
+	/** The synchronizator (if any). */
+	protected ISynchronizator synchronizator;
+	
+	// #ifndef MIDP
+	/** The profiler. */
+	// Hack???
+	protected IProfiler	profiler	= new NoProfiler();
+	// #endif
+	
+	/** Counter for number of registered bean listeners. */
+	protected int beanlistenercnt;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new empty OAV state representation.
+	 */
+	public OAVState(OAVTypeModel tmodel)
+	{
+		this.tmodel = tmodel;
+		this.objects	= new LinkedHashMap();
+//		this.objects	= new CheckedMap(new LinkedHashMap());
+		this.deletedobjects	= new LinkedHashMap();
+		this.types = new LinkedHashMap();
+//		this.generator = new OAVNameIdGenerator();
+		this.generator = new OAVDebugIdGenerator();
+//		this.generator = new OAVLongIdGenerator();
+//		this.generator = new OAVObjectIdGenerator();
+		this.objectusages = new LinkedHashMap();
+		this.externalusages = new LinkedHashMap();
+		// Cannot be identity hashmap because Java objects might only be equal.
+		this.objectusages = new IdentityHashMap();
+//		this.rootobjects = new IdentityHashSet(); ???
+		this.rootobjects = new LinkedHashSet();
+		this.eventhandler	= new OAVEventHandler(); 
+//		this.nocheck = true;
+//		new Thread(new Runnable()
+//		{
+//			public void run()
+//			{
+//				int old_dsize	= 0;
+//				int old_esize	= 0;
+//				int old_osize	= 0;
+//				int old_ousize	= 0;
+//				int old_psize	= 0;
+//				int old_rsize	= 0;
+//				int old_tsize	= 0;
+//
+//				while(true)
+//				{
+//					try
+//					{
+//						Thread.sleep(10000);
+//					}
+//					catch(InterruptedException e)
+//					{
+//					}
+//					
+//					int dsize	= deletedobjects.size();
+//					int esize	= externalusages.size();
+//					int osize	= objects.size();
+//					int ousize	= objectusages.size();
+//					int psize	= pcls!=null ? pcls.size() : 0;
+//					int rsize	= rootobjects.size();
+//					int tsize	= types.size();
+//					
+//					if(dsize>old_dsize)
+//						System.out.println("dsize@"+OAVState.this.hashCode()+": "+dsize);
+//					if(esize>old_esize)
+//						System.out.println("esize@"+OAVState.this.hashCode()+": "+esize);
+//					if(osize>old_osize)
+//						System.out.println("osize@"+OAVState.this.hashCode()+": "+osize);
+//					if(ousize>old_ousize)
+//						System.out.println("ousize@"+OAVState.this.hashCode()+": "+ousize);
+//					if(psize>old_psize)
+//						System.out.println("psize@"+OAVState.this.hashCode()+": "+psize);
+//					if(rsize>old_rsize)
+//						System.out.println("rsize@"+OAVState.this.hashCode()+": "+rsize);
+//					if(tsize>old_tsize)
+//						System.out.println("tsize@"+OAVState.this.hashCode()+": "+tsize);
+//						
+//					// Calculate number of objects per type.
+//					// Run on synchronizator to avoid concurrent modification.
+//					Runnable	cmd	= new Runnable()
+//					{
+//						public void run()
+//						{
+//							// Sum up occurrences of types.
+//							final Map	cnts	= new HashMap();
+//							for(Iterator it=types.values().iterator(); it.hasNext(); )
+//							{
+//								Object	type	= it.next();
+//								Integer	cnt	= (Integer)cnts.get(type);
+//								if(cnt!=null)
+//									cnt	= new Integer(cnt.intValue()+1);
+//								else
+//									cnt	= new Integer(1);
+//								cnts.put(type, cnt);
+//							}
+//							
+//							// Sort types by number.
+//							Map	sorted	= new TreeMap(new Comparator()
+//							{
+//								public int compare(Object t2, Object t1)
+//								{
+//									int ret	= ((Integer)cnts.get(t1)).intValue() - ((Integer)cnts.get(t2)).intValue();
+//									if(ret==0 && t1!=t2)
+//										ret	= t1.hashCode() - t2.hashCode();
+//									return ret;
+//								}
+//							});
+//							sorted.putAll(cnts);
+//							
+//							System.out.println("objects@"+OAVState.this.hashCode()+": "+sorted);
+//							
+//						}
+//					};
+//					if(synchronizator!=null)
+//						synchronizator.invokeLater(cmd);
+//					else
+//						cmd.run();
+//					
+//					old_dsize	= Math.max(old_dsize, dsize);
+//					old_esize	= Math.max(old_esize, esize);
+//					old_osize	= Math.max(old_osize, osize);
+//					old_ousize	= Math.max(old_ousize, ousize);
+//					old_psize	= Math.max(old_psize, psize);
+//					old_rsize	= Math.max(old_rsize, rsize);
+//					old_tsize	= Math.max(old_tsize, tsize);
+//				}
+//			}
+//		}).start();
+	}
+	
+	/**
+	 *  Dispose the state.
+	 */
+	public void dispose()
+	{
+		Object[]	roots	= rootobjects.toArray();
+		for(int i=0; i<roots.length; i++)
+			dropObject(roots[i]);
+		
+		assert nocheck || beanlistenercnt == 0: beanlistenercnt;
+	}
+
+	//-------- type management --------
+	
+	/**
+	 *  Get the type model.
+	 *  @return The type model.
+	 */
+	public OAVTypeModel getTypeModel()
+	{
+		return tmodel;
+	}
+	
+	//-------- object management --------
+	
+	/**
+	 *  Create an object.
+	 *  Creates an object identifier that can be used
+	 *  to store/retrieve attribute values.
+	 *  May reuse old object identifiers for performance.
+	 *  @return An object identifier.
+	 */
+	public Object	createObject(OAVObjectType type)
+	{
+		return createObject(type, false);
+	}
+	
+	/**
+	 *  Create a root object. A root object will not be automatically
+	 *  garbage collected when no references point to this object
+	 *  any longer.
+	 *  Creates an object identifier that can be used
+	 *  to store/retrieve attribute values.
+	 *  May reuse old object identifiers for performance.
+	 *  @return An object identifier.
+	 */
+	public Object	createRootObject(OAVObjectType type)
+	{
+		return createObject(type, true);
+	}
+	
+	/**
+	 *  Impl of root/non-root object creation.	
+	 */
+	protected Object	createObject(OAVObjectType type, boolean root) 
+	{
+		// #ifndef MIDP
+		assert nocheck || checkTypeDefined(type);
+		// #endif
+		
+		Object	ret	= generator.createId(this, type);
+		objects.put(ret, new LinkedHashMap());
+	
+		types.put(ret, type);
+//		System.out.println("Created object of type: "+type);
+		
+		eventhandler.objectAdded(ret, type, root);
+		
+		if(root)
+			this.rootobjects.add(ret);
+
+		return ret;
+	}
+
+	/**
+	 *  Drop an object from the state.
+	 *  Recursively removes the object and all connected objects that are not
+	 *  referenced elsewhere.
+	 *  @param object	The identifier of the object to remove. 
+	 */
+	public void	dropObject(Object object)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObject(object);
+		// #endif
+		
+		// Remove object from rootobjects
+		rootobjects.remove(object);
+		
+		// Remove this object from all places where it is referenced
+		Map refs = getObjectUsages(object);
+		if(refs!=null)
+		{
+			OAVObjectUsage[]	usages = (OAVObjectUsage[])refs.keySet().toArray(new OAVObjectUsage[refs.keySet().size()]);
+			for(int u=0; u<usages.length; u++)
+			{
+				Object id = usages[u].getObject();
+				OAVAttributeType attr = usages[u].getAttribute();
+				if(attr.getMultiplicity().equals(OAVAttributeType.NONE))
+				{
+					setAttributeValue(id, attr, null);
+				}
+				else
+				{
+					int cnt = ((Integer)refs.get(usages[u])).intValue();
+					for(int i=0; i<cnt; i++)
+						removeAttributeValue(id, attr, object);
+				}
+//				refs.remove(usage);	// Removed in set/remove AttributeValue
+			}
+		}
+		else
+		{
+			internalDropObject(object, null, false);	// Required for root objects and other unreferenced objects.
+		}
+	}
+	
+	/**
+	 *  Add a Java object as root object.
+	 *  @param object The Java object.
+	 */
+	public void addJavaRootObject(Object object)
+	{
+		// #ifndef MIDP
+		assert nocheck || !rootobjects.contains(object);
+		// #endif
+		
+		this.objects.put(object, object);
+		this.rootobjects.add(object);
+		OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
+		
+		if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
+			registerValue(java_type, object);
+		
+		eventhandler.objectAdded(object, java_type, true);
+	}
+	
+	/**
+	 *  Drop a Java object from root objects.
+	 *  @param object The Java object.
+	 */
+	public void removeJavaRootObject(Object object)
+	{
+		// #ifndef MIDP
+		assert nocheck || rootobjects.contains(object);
+		// #endif
+		
+		this.objects.remove(object);
+		this.rootobjects.remove(object);
+		OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
+		
+		if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
+			deregisterValue(java_type, object);
+		
+		eventhandler.objectRemoved(object, java_type);
+	}
+	
+	/**
+	 *  Internal drop method for avoiding cycles in to be dropped
+	 *  objects during a recursive drop operation.
+	 *  @param object	The object to be dropped.
+	 *  @param dropset	A set of already dropped objects (to avoid infinite recursion).
+	 *  @param keepalive	A flag indicating that at least one object in the path is externally referenced
+	 *    (object usages will not be removed, but set to external).
+	 */
+	protected void internalDropObject(Object object, Set dropset, boolean keepalive)
+	{
+//		System.out.println("internalDropObject: "+object+", "+dropset);
+		
+		if(dropset==null)
+			dropset	= new HashSet();
+		dropset.add(object);
+		
+		// Use new variable because original value is needed below.
+		keepalive	= keepalive || externalusages.get(object)!=null;
+
+		// Remove all used object references
+		Map	content	= (Map)objects.get(object);
+		for(Iterator it=content.keySet().iterator(); it.hasNext(); )
+		{
+			OAVAttributeType attribute = (OAVAttributeType)it.next();
+			Object value = content.get(attribute);
+			if(value!=null)
+			{
+				if(attribute.getMultiplicity().equals(OAVAttributeType.NONE))
+				{
+					removeObjectUsage(object, attribute, value, dropset, keepalive);
+				}
+				else
+				{
+					if(value instanceof Map)
+					{
+						Map	values	= (Map)value;
+						for(Iterator vit = values.keySet().iterator(); vit.hasNext();)
+						{
+							Object key = vit.next();
+							Object	value1	= values.get(key);
+							removeObjectUsage(object, attribute, key, dropset, keepalive);
+							removeObjectUsage(object, attribute, value1, dropset, keepalive);
+						}
+					}
+					else
+					{
+						for(Iterator vit = ((Collection)value).iterator(); vit.hasNext();)
+						{
+							Object value1 = vit.next();
+							removeObjectUsage(object, attribute, value1, dropset, keepalive);
+						}
+					}
+				}
+			}
+		}
+		
+		// Delete object only, when there are no direct or indirect external references.
+		if(!keepalive)
+		{
+			removeObject(object);
+		}
+
+		//System.out.print("Removing: "+object+" "+types);
+		
+		// Notify listeners about removed object before removing references
+		eventhandler.objectRemoved(object, (OAVObjectType)types.get(object));
+	}
+
+	/**
+	 *  Ultimately remove an object, when there are no more external or internal references.
+	 */
+	protected void removeObject(Object object)
+	{
+		// Remove the object itself (needs to be done before removing its references to avoid recursion)
+		Map content	= (Map)objects.remove(object);
+		if(content==null)
+			throw new RuntimeException("Object not found: "+object);
+		deletedobjects.put(object, content);
+		assert getObjectUsages(object)==null || getObjectUsages(object).isEmpty() : getObjectUsages(object);
+		assert externalusages.get(object)==null : externalusages.get(object);
+		objectusages.remove(object);
+		// type will be removed in notifyEventListeners()
+	}
+	
+	/**
+	 *  Clone an object in the state (deep copy).
+	 *  @param object	The handle to the object to be cloned.
+	 *  @param targetstate	The target state in which the clone should be created.
+	 *  @return  The identifier of the newly created clone.
+	 * /
+	public Object	cloneObject(Object object, IOAVState targetstate)
+	{
+		Map	handles	= new HashMap();
+		List todo	= new LinkedList();
+		Map todoafter = new HashMap();
+		if(rootobjects.contains(object))
+			handles.put(object, targetstate.createRootObject(getType(object)));
+		else
+			handles.put(object, targetstate.createObject(getType(object)));
+		todo.add(object);
+		
+		while(!todo.isEmpty())
+		{
+			Object	obj	= todo.remove(0);
+			Object	newobj	= handles.get(obj);
+			Map	content	= (Map)objects.get(obj);
+			if(content!=null)
+			{
+				for(Iterator it=content.keySet().iterator(); it.hasNext(); )
+				{
+					// Clone single-valued attribute.
+					OAVAttributeType	attr	= (OAVAttributeType)it.next();
+					if(OAVAttributeType.NONE.equals(attr.getMultiplicity()))
+					{
+						Object	oldval	= content.get(attr);
+	
+						if(oldval==null || attr.getType() instanceof OAVJavaType)
+						{
+							// Todo: clone Java values also?
+							targetstate.setAttributeValue(newobj, attr, oldval);
+						}
+						else
+						{
+							Object	newval	= getClonedOAVObject(targetstate, handles, todo, oldval);
+							targetstate.setAttributeValue(newobj, attr, newval);
+						}
+					}
+					
+					// Clone multi-valued attribute.
+					else 
+					{
+						Collection coll = null;
+						Object	tmp	= content.get(attr);
+						
+						if(tmp instanceof Collection)
+						{
+							coll = (Collection)tmp;
+							if(attr.getType() instanceof OAVJavaType)
+							{
+								// Todo: clone Java values also?
+								for(Iterator it2=coll.iterator(); it2.hasNext(); )
+									targetstate.addAttributeValue(newobj, attr, it2.next());
+							}
+							else
+							{
+								for(Iterator it2=coll.iterator(); it2.hasNext(); )
+								{
+									Object	newval	= getClonedOAVObject(targetstate, handles, todo, it2.next());
+									targetstate.addAttributeValue(newobj, attr, newval);
+								}
+							}
+						}
+						
+						else if(tmp instanceof Map)
+						{
+							Map map = (Map)tmp;
+							for(Iterator it2=map.keySet().iterator(); it2.hasNext(); )
+							{
+								Object oldval = map.get(it2.next());
+								Object newval = getClonedOAVObject(targetstate, handles, todo, oldval);
+								
+								// if object is not read defer adding
+								if(todo.contains(oldval))
+								{
+									List mapadds = (List)todoafter.get(oldval);
+									if(mapadds==null)
+									{
+										mapadds = new ArrayList();
+										todoafter.put(oldval, mapadds);
+									}
+									mapadds.add(new Object[]{newobj, attr});
+								}
+								else
+								{
+									targetstate.addAttributeValue(newobj, attr, newval);
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			// Handle deferred mapadds after object is fully cloned
+			List mapadds = (List)todoafter.get(obj);
+			if(mapadds!=null)
+			{
+				for(int i=0; i<mapadds.size(); i++)
+				{
+					Object[] mapadd = (Object[])mapadds.get(i);
+					targetstate.addAttributeValue(mapadd[0], (OAVAttributeType)mapadd[1], handles.get(obj));
+				}
+			}
+		}
+		
+		return handles.get(object);
+	}*/
+	
+	/**
+	 *  Get or create a clone of an oav object.
+	 *  @param targetstate The target state.
+	 *  @param handles The handles.
+	 *  @param todo The todo list.
+	 *  @param oldval The old object.
+	 * /
+	protected Object getClonedOAVObject(IOAVState targetstate, Map handles, List todo, Object oldval)
+	{
+		Object	newval	=  handles.get(oldval);
+		if(newval==null)
+		{
+			if(rootobjects.contains(oldval))
+				newval	= targetstate.createRootObject(getType(oldval));
+			else
+				newval = targetstate.createObject(getType(oldval));
+			handles.put(oldval, newval);
+			todo.add(oldval);
+		}
+		return newval;
+	}*/
+
+	/**
+	 *  Test if the state contains a specific object.
+	 *  @param id The object id.
+	 *  @return True, if contained.
+	 */
+	public boolean containsObject(Object id)
+	{
+		boolean	ret	= objects.containsKey(id);
+		
+		if(ret)
+		{
+			// Object is only contained when currently used
+			// or newly created before any usage (usages==null).
+			// I.e. objects, which are only externally used are not contained.
+			if(!rootobjects.contains(id))
+			{
+				Map	usages	= getObjectUsages(id);
+				ret	= usages==null || !usages.isEmpty();
+			}
+		}
+		else
+		{
+			// Allow event listeners to access objects that have just been deleted.
+			if(eventhandler.notifying)
+				ret = deletedobjects.containsKey(id);
+			
+			// Check containment in substates.
+			if(!ret && substates!=null)
+				for(int i=0; !ret && i<substates.length; i++)
+					ret	= substates[i].containsObject(id);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the type of an object.
+	 *  @return The type of an object.
+	 */
+	public OAVObjectType getType(Object id)
+	{
+		if(id==null)
+			throw new NullPointerException();
+		
+		OAVObjectType ret=null;
+		if(generator.isId(id))
+		{
+			ret = (OAVObjectType)types.get(id);
+			if(ret==null && substates!=null)
+			{
+				for(int i=0; ret==null && i<substates.length; i++)
+				{
+					if(substates[i].containsObject(id))
+					{
+						ret	= substates[i].getType(id);
+					}
+				}
+			}
+		}
+		else
+		{
+			ret = tmodel.getJavaType(id.getClass());
+		}
+
+		if(ret==null)
+		{
+			throw new RuntimeException("Object has no type: "+id);
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get all objects in the state.
+	 */
+	public Iterator	getObjects()
+	{
+		Iterator ret;
+		if(!eventhandler.notifying)
+		{
+			ret = objects.keySet().iterator();
+		}
+		else
+		{
+			ret = new Iterator()
+			{
+				Iterator it1 = objects.keySet().iterator();
+				Iterator it2 = deletedobjects.keySet().iterator();
+				
+				public boolean hasNext()
+				{
+					return it1.hasNext() || it2.hasNext();
+				}
+				
+				public Object next()
+				{
+					Object ret = null;
+					if(it1.hasNext())
+					{
+						ret = it1.next();
+					}
+					else if(it2.hasNext())
+					{
+						ret = it2.next();
+					}
+					else
+					{
+						throw new RuntimeException("No next element.");
+					}
+					return ret;
+				}
+				
+				public void remove()
+				{
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get all objects in the state.
+	 */
+	public Iterator	getDeepObjects()
+	{
+		if(substates==null)
+		{
+			return getObjects();
+		}
+		else
+		{
+			Set	states	= new HashSet();
+			List	statelist	= new ArrayList();
+			states.add(this);
+			statelist.add(this);
+			for(int i=0; i<statelist.size(); i++)
+			{
+				IOAVState[]	subs	= ((IOAVState)statelist.get(i)).getSubstates();
+				for(int j=0; subs!=null && j<subs.length; j++)
+				{
+					if(!states.contains(subs[j]))
+					{
+						states.add(subs[j]);
+						statelist.add(subs[j]);
+					}
+				}
+			}
+			final Iterator	istates	= states.iterator();
+			
+			return new Iterator()
+			{
+				Iterator	iterator	= ((IOAVState)istates.next()).getObjects();
+				
+				public boolean hasNext()
+				{
+					boolean	ret	= iterator.hasNext();
+					if(!ret && istates.hasNext())
+					{
+						iterator	= ((IOAVState)istates.next()).getObjects();
+						ret	= hasNext();
+					}
+					return ret;
+				}
+				
+				public Object next()
+				{
+					if(!iterator.hasNext() && istates.hasNext())
+					{
+						iterator	= ((IOAVState)istates.next()).getObjects();
+						return next();
+					}
+					else
+					{
+						// Throws exception in last iterator when no more elements available.
+						return iterator.next(); 
+					}
+				}
+				
+				// #ifndef MIDP
+				public void remove()
+				{
+					throw new UnsupportedOperationException("Remove not supported.");
+				}
+				// #endif
+			};
+		}
+	}
+	
+	/**
+	 *  Get the root objects of the state.
+	 */
+	public Iterator	getRootObjects()
+	{
+		return rootobjects.iterator();
+	}
+	
+	/**
+	 *  Get the number of objects in the state.
+	 *  Optional operation used for debugging only.
+	 */
+	public int	getSize()
+	{
+		int	ret;
+		
+		if(!eventhandler.notifying)
+			ret = objects.size();
+		else
+			ret = objects.size()+deletedobjects.size();
+		
+		if(substates!=null)
+			for(int i=0; i<substates.length; i++)
+				ret	+= substates[i].getSize();
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all unreferenced objects.
+	 *  @return All unreferenced objects of the state.
+	 */
+	public Collection getUnreferencedObjects()
+	{
+		Set	unreferenced	= new HashSet(); 
+		for(Iterator it=objects.keySet().iterator(); it.hasNext();)
+		{
+			Object id = it.next();
+			if(!rootobjects.contains(id) && !isReachable(id, new HashSet()))
+			{
+//				System.out.println("Found orphan: "+id);
+				unreferenced.add(id);
+			}
+		}
+		
+		/*//Todo: support check for substates.
+		if(substates!=null)
+		{
+			for(int i=0; i<substates.length; i++)
+				unreferenced.addAll(substates[i].getUnreferencedObjects());
+		}
+		*/
+		
+		return unreferenced;
+	}
+
+	/**
+	 *  Test if an object can be reached from some root or external object.
+	 *  @param	id	The object
+	 *  @param	tested	The objects already traversed (to avoid endless loops). 
+	 */
+	protected boolean	isReachable(Object id, Set tested)
+	{
+		tested.add(id);
+		boolean	ret	= rootobjects.contains(id) || externalusages.containsKey(id);
+		if(!ret)
+		{
+			Map	usages	= getObjectUsages(id);
+			if(usages!=null)
+			{
+				for(Iterator it=usages.keySet().iterator(); !ret && it.hasNext(); )
+				{
+					Object	ref	= it.next();
+					
+					// Internal reference -> recursively check reachability 
+					if(ref instanceof OAVObjectUsage)
+					{
+						OAVObjectUsage	usage	= (OAVObjectUsage)ref;
+						if(!tested.contains(usage.getObject()))
+							ret	= isReachable(usage.getObject(), tested);
+					}
+
+					// External reference -> reachability is true 
+					else
+					{
+						ret	= true;
+					}
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Find a cycle in a given set of objects.
+	 */
+	public List	findCycle(Collection objects)
+	{
+		List	cycle	= null;
+		Set	checked	= new HashSet();
+		
+		// Find cycles starting from each object.
+		for(Iterator it=objects.iterator(); cycle==null && it.hasNext(); )
+		{
+			Object	object	= it.next();
+
+			// Do not check again, if object was already in subgraph of other object.
+			if(!checked.contains(object))
+			{
+				Map	edges	= new HashMap();	// Back references.
+				edges.put(object, object);	// Root object of subgraph has no back reference. Cyclic edge simplifies algorithm, when cycle.length==1.
+	
+				// Iteratively check all objects connected to the current object.
+				List	subgraph	= new ArrayList();
+				subgraph.add(object);
+				checked.add(object);
+				for(int i=0; cycle==null && i<subgraph.size(); i++)
+				{
+					Map	theobject	= getObject(subgraph.get(i));
+					for(Iterator keys=theobject.keySet().iterator(); cycle==null && keys.hasNext(); )
+					{
+						OAVAttributeType	attr	= (OAVAttributeType)keys.next();
+						Object	value	= theobject.get(attr);
+						if(value instanceof Collection)
+						{
+							for(Iterator refs=((Collection)value).iterator(); cycle==null && refs.hasNext(); )
+								cycle = findCycleForValue(objects, checked, edges, subgraph, subgraph.get(i), refs.next(), attr);
+						}
+						else if(value instanceof Map)
+						{
+							for(Iterator refs=((Map)value).values().iterator(); cycle==null && refs.hasNext(); )
+								cycle = findCycleForValue(objects, checked, edges, subgraph, subgraph.get(i), refs.next(), attr);
+							for(Iterator refs=((Map)value).keySet().iterator(); cycle==null && refs.hasNext(); )
+								cycle = findCycleForValue(objects, checked, edges, subgraph, subgraph.get(i), refs.next(), attr);
+						}						
+						else
+						{
+							cycle = findCycleForValue(objects, checked, edges, subgraph, subgraph.get(i), value, attr);
+						}
+					}
+				}
+			}
+		}
+		
+		return cycle;
+	}
+
+	/**
+	 *  Step for one edge of the find cycle algorithm.
+	 *  @param current	The current node (object).
+	 *  @param next	The next node (object).
+	 */
+	protected List findCycleForValue(Collection objects, Set checked, Map edges, List subgraph, Object current, Object next, OAVAttributeType attr)
+	{
+		List	cycle	= null;
+		if(edges.containsKey(next))
+		{
+			// Cycle found.
+			edges.put(next, current);
+			edges.put(new Tuple(next, current), attr);
+			cycle	= new LinkedList();
+			Object	node	= current;
+			cycle.add(node);
+			do
+			{
+				Object	node1	= edges.get(node);
+				attr	= (OAVAttributeType)edges.get(new Tuple(node, node1));
+				// prepend for expected ordering 'node, attr, ref'.
+				cycle.add(0, attr.getName());
+				cycle.add(0, node1);
+				node	= node1;
+			}
+			while(node!=current);	// Use do-while to include node twice (for readability).
+		}
+		else if(objects.contains(next) && !checked.contains(next))
+		{
+			// Add back reference and continue search from next node.
+			edges.put(next, current);
+			edges.put(new Tuple(next, current), attr);
+			subgraph.add(next);
+			checked.add(next);
+		}
+		return cycle;
+	}
+	
+	/**
+	 *  Get those objects referencing a given object.
+	 */
+	public Collection getReferencingObjects(Object value)
+	{
+		Collection	ret	= null;
+		Map	usages	= getObjectUsages(value);
+		if(usages!=null)
+		{
+			ret	= new ArrayList();
+			for(Iterator it=usages.keySet().iterator(); it.hasNext(); )
+			{
+				Object ref	= it.next();
+				ret.add(((OAVObjectUsage)ref).getObject());
+			}
+		}
+		
+		Integer	extcnt	= (Integer)externalusages.get(value);
+		if(extcnt!=null)
+		{
+			if(ret==null)
+				ret	= new ArrayList();
+			if(extcnt.intValue()>1)
+				ret.add("<"+extcnt+" external usages>");
+			else
+				ret.add("<external usage>");
+		}
+		
+		if(ret==null)
+		{
+			ret	= Collections.EMPTY_SET;
+		}
+		return ret;
+	}
+
+	//--------- attribute management --------
+	
+	/**
+	 *  Get an attribute value of an object.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @return	The value (basic, object id or java object).
+	 */
+	public Object	getAttributeValue(Object object, OAVAttributeType attribute)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObjectRead(object) : object;
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, OAVAttributeType.NONE);
+		// #endif
+		
+		Object	ret	= null;
+		
+		if(substates==null || objects.containsKey(object)
+			|| (eventhandler.notifying && deletedobjects.containsKey(object)))
+		{
+			Map theobject = getObject(object);
+			
+			ret = theobject.get(attribute);
+			if(ret==null && !theobject.containsKey(attribute))
+				ret = attribute.getDefaultValue();
+		}
+		else
+		{
+			boolean	found	= false;
+			for(int i=0; !found && i<substates.length; i++)
+			{
+				if(substates[i].containsObject(object))
+				{
+					ret	= substates[i].getAttributeValue(object, attribute);
+					found	= true;
+				}
+			}
+			
+			if(!found)
+				throw new IllegalArgumentException("Object "+object+" does not exist.");
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Set an attribute of an object to the given value.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @param value	The value (basic, object id or java object).
+	 */
+	public void	setAttributeValue(Object object, OAVAttributeType attribute, Object value)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObject(object): object+" "+attribute+" "+value;
+		assert nocheck || checkValidStateValue(value);
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, OAVAttributeType.NONE);
+		assert nocheck || checkValueCompatibility(object, attribute, value);
+		// #endif
+		
+		Map theobject = getObject(object);
+		Object oldvalue = theobject.put(attribute, value);
+
+		// Notification before removal in order to be capable to save the oldvalue reference.
+		if(!SUtil.equals(oldvalue, value))
+			eventhandler.objectModified(object, getType(object), attribute, oldvalue, value);
+		
+		// When not value type, track usages of object.
+		if(oldvalue!=value)
+		{
+			removeObjectUsage(object, attribute, oldvalue, null, false);
+			addObjectUsage(object, attribute, value);
+		}
+	}
+	
+	/**
+	 *  Get the values of an attribute of an object.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @return	The values (basic, object ids or java objects).
+	 */
+	public Collection getAttributeValues(Object object, OAVAttributeType attribute)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObjectRead(object);
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, 
+			OAVAttributeType.MULTIPLICITIES_MULT);
+		// #endif
+		
+		Collection	ret	= null;
+		
+		if(substates==null || objects.containsKey(object)
+			|| (eventhandler.notifying && deletedobjects.containsKey(object)))
+		{
+			Map theobject = getObject(object);
+			
+			Object	val	= theobject.get(attribute);
+			if(val==null && !theobject.containsKey(attribute))
+				val = attribute.getDefaultValue();
+			
+			ret	= (val instanceof Map)? ((Map)val).values(): (Collection)val;
+		}
+		else
+		{
+			boolean	found	= false;
+			for(int i=0; !found && i<substates.length; i++)
+			{
+				if(substates[i].containsObject(object))
+				{
+					ret	= substates[i].getAttributeValues(object, attribute);
+					found	= true;
+				}
+			}
+			
+			if(!found)
+				throw new IllegalArgumentException("Object "+object+" does not exist.");
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get an attribute value of an object. Method only applicable for
+	 *  map attribute type.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @param key	The key. 
+	 *  @return	The value (basic, object id or java object).
+	 */
+	public Object getAttributeValue(Object object, OAVAttributeType attribute, Object key)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObjectRead(object);
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, 
+			OAVAttributeType.MULTIPLICITIES_MAPS);
+		// #endif
+		
+		Object	ret	= null;
+		
+		if(substates==null || objects.containsKey(object) 
+			|| (eventhandler.notifying && deletedobjects.containsKey(object)))
+		{
+			Map theobject = getObject(object);
+			
+			Map map	= (Map)theobject.get(attribute);
+			
+			// todo: enable check again by adding containsKey(key) method to state
+//			if(map==null || !map.containsKey(key))
+//				throw new RuntimeException("Key not available in map: "+key+" "+map);
+			
+			ret	= map==null? null: map.get(key);
+		}
+		else
+		{
+			boolean	found	= false;
+			for(int i=0; !found && i<substates.length; i++)
+			{
+				if(substates[i].containsObject(object))
+				{
+					ret	= substates[i].getAttributeValue(object, attribute, key);
+					found	= true;
+				}
+			}
+			
+			if(!found)
+				throw new IllegalArgumentException("Object "+object+" does not exist.");
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if a key is contained in the map attribute.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @param key	The key. 
+	 *  @return	True if key is available.
+	 */
+	public boolean containsKey(Object object, OAVAttributeType attribute, Object key)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObjectRead(object);
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, 
+			OAVAttributeType.MULTIPLICITIES_MAPS);
+		// #endif
+		
+		boolean	ret	= false;
+		
+		if(substates==null || objects.containsKey(object) 
+			|| (eventhandler.notifying && deletedobjects.containsKey(object)))
+		{
+			Map theobject = getObject(object);
+			
+			Map map	= (Map)theobject.get(attribute);
+			
+			ret	= map==null? false: map.containsKey(key);
+		}
+		else
+		{
+			boolean	found	= false;
+			for(int i=0; !found && i<substates.length; i++)
+			{
+				if(substates[i].containsObject(object))
+				{
+					ret	= substates[i].containsKey(object, attribute, key);
+					found	= true;
+				}
+			}
+			
+			if(!found)
+				throw new IllegalArgumentException("Object "+object+" does not exist.");
+		}
+		
+		return ret;
+	}
+
+	
+	/**
+	 *  Remove all values of an attribute of an object.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 * /
+	public void removeAllAttributeValues(Object object, OAVAttributeType attribute)
+	{
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, true);
+		assert nocheck || checkValidStateObject(object);
+		
+		Map theobject = getObject(object);
+		Collection coll = (Collection)theobject.get(attribute);
+		
+		if(coll!=null)
+		{
+			Object[] vals = coll.toArray();
+			for(int i=0; i<vals.length; i++)
+				removeAttributeValue(object, attribute, vals[i]);
+		}		
+	}*/
+	
+	/**
+	 *  Add an attribute of an object to the given value.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @param value	The value (basic, object id or java object).
+	 */
+	public void	addAttributeValue(Object object, OAVAttributeType attribute, Object value)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObject(object);
+		assert nocheck || checkValidStateValue(value) : value;
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, OAVAttributeType.MULTIPLICITIES_MULT);
+		assert nocheck || checkValueCompatibility(object, attribute, value);
+		// #endif
+		
+		Map theobject = getObject(object);
+		Object tmp = theobject.get(attribute);
+		
+		if(tmp == null)
+		{
+			String mult = attribute.getMultiplicity();
+			if(OAVAttributeType.LIST.equals(mult))
+				tmp = new ArrayList();
+			else if(OAVAttributeType.SET.equals(mult))
+				tmp = new LinkedHashSet();
+			else if(OAVAttributeType.QUEUE.equals(mult))
+				tmp = new LinkedList();
+			else if(OAVAttributeType.MAP.equals(mult))
+				tmp = new HashMap();
+			else if(OAVAttributeType.ORDEREDMAP.equals(mult))
+				tmp = new LinkedHashMap();
+			if(tmp==null)
+				throw new RuntimeException("Attribute has unknown multiplicity type: "+mult);
+			theobject.put(attribute, tmp);
+		}
+
+		if(tmp instanceof Collection)
+		{
+			Collection coll = (Collection)tmp;
+			if(!coll.add(value))
+				throw new RuntimeException("Could not add value: "+value);
+		}
+		else if(tmp instanceof Map)
+		{
+			Map map = (Map)tmp;
+			OAVAttributeType keyattr = attribute.getIndexAttribute();
+			if(keyattr==null)
+				throw new RuntimeException("Index attribute not specified: "+attribute);
+			Object key = getAttributeValue(value, keyattr);
+			if(key==null)
+				throw new RuntimeException("Null key not allowed: "+attribute);	
+			map.put(key, value);
+			
+			addObjectUsage(object, attribute, key);
+		}
+		
+		addObjectUsage(object, attribute, value);
+		
+		eventhandler.objectModified(object, getType(object), attribute, null, value);
+	}
+	
+	/**
+	 *  Add an attribute of an object to the given value.
+	 *  This method is specific for map attributes.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @param key	The key.
+	 *  @param value	The value (basic, object id or java object).
+	 * /
+	public void	putAttributeValue(Object object, OAVAttributeType attribute, Object key, Object value)
+	{
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, OAVAttributeType.MULTIPLICITIES_MAP);
+		assert nocheck || checkValueCompatibility(object, attribute, value);
+		
+		Map theobject = getObject(object);
+		Map map = (Map)theobject.get(attribute);
+		if(map==null)
+		{
+			String mult = attribute.getMultiplicity();
+			if(OAVAttributeType.MAP.equals(mult))
+				map = new HashMap();
+			if(map==null)
+				throw new RuntimeException("Attribute has unknown multiplicity type: "+mult);
+			theobject.put(attribute, map);
+		}
+		
+		// todo: what about a replacement, notify listeners?
+		map.put(key, value);
+//			throw new RuntimeException("Could not add value: "+value);
+		
+		if(isNonValue(attribute, value))
+		{
+			addObjectUsage(object, attribute, value);
+		}
+		
+		eventhandler.objectModified(object, getType(object), attribute, null, value);
+	}*/
+	
+	/**
+	 *  Remove an attribute of an object to the given value.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @param value	The value (basic, object id or java object).
+	 */
+	public void	removeAttributeValue(Object object, OAVAttributeType attribute, Object value)
+	{
+		// #ifndef MIDP
+		assert nocheck || checkValidStateObject(object);
+		assert nocheck || checkValidStateValue(value);
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, 
+			OAVAttributeType.MULTIPLICITIES_MULT);
+		// #endif
+		
+		Map theobject = getObject(object);
+		Object tmp = theobject.get(attribute);
+		if(tmp==null)
+			throw new RuntimeException("Value not contained in attribute: "
+				+object+" "+attribute+" "+value);
+		
+		if(tmp instanceof Collection)
+		{
+			Collection coll = (Collection)tmp;
+
+			// Replace value with real value stored in collection
+			for(Iterator it=coll.iterator(); it.hasNext(); )
+			{
+				Object	next	= it.next();
+				if(SUtil.equals(next, value))
+				{
+					value	= next;
+					break;
+				}
+			}
+
+			if(!coll.remove(value))
+				throw new RuntimeException("Value not contained in attribute: "
+					+object+" "+attribute+" "+value);
+			if(coll.isEmpty())
+				theobject.remove(attribute);
+			
+			// Event handler notification must be before cleanup in order to be able
+			// to save the object within another reference.
+			eventhandler.objectModified(object, getType(object), attribute, value, null);
+			
+			removeObjectUsage(object, attribute, value, null, false);
+		}
+		else if(tmp instanceof Map)
+		{
+			// Value is here key!
+			Map map = (Map)tmp;
+			Object key = value;
+			
+			// Replace value with real value stored in map
+			value = map.remove(value);
+			if(value==null)
+				throw new RuntimeException("Value not contained in attribute: "
+					+object+" "+attribute+" "+value);
+		
+			// Event handler notification must be before cleanup in order to be able
+			// to save the object within another reference.
+			eventhandler.objectModified(object, getType(object), attribute, value, null);
+			
+			removeObjectUsage(object, attribute, key, null, false);
+			removeObjectUsage(object, attribute, value, null, false);
+		}
+	}
+	
+	/**
+	 *  Remove an attribute of an object to the given value.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @param value	The value (basic, object id or java object).
+	 * /
+	public void	removeAttributeValue(Object object, OAVAttributeType attribute, Object value)
+	{
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, true);
+		
+		Map theobject = getObject(object);
+		Collection coll = (Collection)theobject.get(attribute);
+		if(coll==null)
+			throw new RuntimeException("Value not contained in attribute: "
+				+object+" "+attribute+" "+value);
+			
+		if(!coll.remove(value))
+			throw new RuntimeException("Value not contained in attribute: "
+				+object+" "+attribute+" "+value);
+		if(coll.isEmpty())
+			theobject.remove(attribute);
+		
+		if(isNonValue(attribute, value))
+		{
+			removeObjectUsage(object, attribute, value, null);
+		}
+		
+		eventhandler.objectModified(object, getType(object), attribute, value, null);
+	}*/
+	
+	//-------- state observers --------
+	
+	/**
+	 *  Add a new state listener.
+	 *  @param listener The state listener.
+	 *  @param bunch True, for adding a bunch listener.
+	 */
+	public void addStateListener(IOAVStateListener listener, boolean bunch)
+	{
+		if(listener==null)
+			throw new RuntimeException("Listener must not null.");
+		eventhandler.addStateListener(listener, bunch);
+	}
+	
+	/**
+	 *  Remove a state listener.
+	 *  @param listener The state listener.
+	 */
+	public void removeStateListener(IOAVStateListener listener)
+	{
+		if(listener==null)
+			throw new RuntimeException("Listener must not null.");
+		eventhandler.removeStateListener(listener);
+	}
+	
+	/**
+	 *  Throw collected events and notify the listeners.
+	 */
+	public void notifyEventListeners()
+	{
+		eventhandler.notifyEventListeners();
+		for(Iterator it=deletedobjects.keySet().iterator(); it.hasNext(); )
+			types.remove(it.next());
+
+		deletedobjects.clear();
+	}
+	
+	// #ifndef MIDP
+	/**
+	 *  Get the profiler.
+	 */
+	// Hack!!! Make accessible from somewhere else?
+	public IProfiler getProfiler()
+	{
+		return profiler;
+	}
+	
+	/**
+	 *  Set the profiler.
+	 */
+	// Hack!!! Make accessible from somewhere else?
+	public void setProfiler(IProfiler profiler)
+	{
+		this.profiler	= profiler;
+	}
+	// #endif
+
+	/**
+	 *  Expunge stale objects.
+	 */
+	public void expungeStaleObjects()
+	{
+		// nop? gc?
+	}
+	
+	/**
+	 *  Run the garbage collection for deleting unreferenced objects.
+	 */
+//	public void gc()
+//	{
+//		// Perform gc in two passes, otherwise objects table changes during search.
+//		Set	unreferenced	= new HashSet(); 
+//		for(Iterator it=objects.keySet().iterator(); it.hasNext();)
+//		{
+//			Object id = it.next();
+//			if(!rootobjects.contains(id) && getObjectUsages(id)==null)
+//			{
+////				System.out.println("Removing unprotected object with no references: "+id);
+//				unreferenced.add(id);
+//			}
+//		}
+//		
+//		for(Iterator it=unreferenced.iterator(); it.hasNext();)
+//		{
+//			Object id = it.next();
+//			if(containsObject(id))
+//				dropObject(id);
+//		}
+//	}
+	
+	/**
+	 *  Set the synchronizator.
+	 *  The optional synchronizator is used to synchronize
+	 *  external modifications to the state (e.g. from bean changes).
+	 *  The synchronizator should only be set once, before
+	 *  the state is used.
+	 */
+	public void	setSynchronizator(ISynchronizator synchronizator)
+	{
+		if(this.synchronizator!=null)
+			throw new RuntimeException("Synchronizator can be set only once.");
+		this.synchronizator	= synchronizator;
+	}
+		
+	/**
+	 *  Get the synchronizator (if any).
+	 *  The synchronizator (if available) can be used to synchronize
+	 *  access to the state with internal and external modifications.
+	 */
+	public ISynchronizator	getSynchronizator()
+	{
+		return this.synchronizator;
+	}
+
+	/**
+	 *  Add an external usage of a state object. This prevents
+	 *  the oav object of being garbage collected as long
+	 *  as external references are present.
+	 *  @param id The oav object id.
+	 *  @param external The user object.
+	 */
+	public void addExternalObjectUsage(Object id, Object external)
+	{
+		// Get the usages of the oav object
+		Integer cnt = (Integer)externalusages.get(id);
+		if(cnt==null)
+			cnt = new Integer(1);
+		else
+			cnt = new Integer(cnt.intValue()+1);
+		externalusages.put(id, cnt);
+		
+//		if(id.toString().indexOf("waitabstraction")!=-1)
+//		{
+//			System.err.println("Add ex: "+id/*+" "+external*/+" "+cnt);
+//			Thread.dumpStack();
+//		}
+	}
+	
+	/**
+	 *  Remove an external usage of a state object. This allows
+	 *  the oav object of being garbage collected when no
+	 *  further external references and no internal references
+	 *  are present.
+	 *  @param id The oav object id.
+	 *  @param external The state external object.
+	 */
+	public void removeExternalObjectUsage(Object id, Object external)
+	{
+		Integer cnt = (Integer)externalusages.get(id);
+		if(cnt==null)
+			throw new RuntimeException("Reference not found: "+id);
+	
+//		if(id.toString().indexOf("plan_5")!=-1)
+//			System.err.println("Remove ex: "+id/*+" "+external*/+" "+cnt);
+
+		if(cnt.intValue()==1)
+		{
+			externalusages.remove(id);
+
+			// Delete object, when there are no internal references.
+			Map	iusages	= getObjectUsages(id);
+			if(objects.containsKey(id) && !rootobjects.contains(id) && (iusages==null || iusages.isEmpty()))
+			{
+//					System.err.println("Garbage collecting unreferenced object: "+id);
+//					Thread.dumpStack();
+				
+				// Remove pseudo external references from contained objects, when original object once was referenced
+				if(iusages!=null)
+				{
+					Map	content	= (Map)objects.get(id);
+					for(Iterator it=content.keySet().iterator(); it.hasNext(); )
+					{
+						OAVAttributeType attribute = (OAVAttributeType)it.next();
+						Object value = content.get(attribute);
+						if(value!=null)
+						{
+							if(attribute.getMultiplicity().equals(OAVAttributeType.NONE))
+							{
+								if(generator.isId(value) && isManaged(value))
+									removeExternalObjectUsage(value, this);
+							}
+							else
+							{
+								if(value instanceof Map)
+								{
+									Map	values	= (Map)value;
+									for(Iterator vit = values.keySet().iterator(); vit.hasNext();)
+									{
+										Object key = vit.next();
+										Object	value1	= values.get(key);
+										if(generator.isId(key) && isManaged(key))
+											removeExternalObjectUsage(key, this);
+										if(generator.isId(value1) && isManaged(value1))
+											removeExternalObjectUsage(value1, this);
+									}
+								}
+								else
+								{
+									for(Iterator vit = ((Collection)value).iterator(); vit.hasNext();)
+									{
+										Object value1 = vit.next();
+										if(generator.isId(value1) && isManaged(value1))
+											removeExternalObjectUsage(value1, this);
+									}
+								}
+							}
+						}
+					}
+					removeObject(id);
+				}
+				
+				// Remove object as if it was a normal reference
+				else
+				{
+					internalDropObject(id, null, false);
+				}
+
+//					System.err.println("Garbage collected unreferenced object: "+id);
+			}
+		}
+		else
+		{
+			externalusages.put(id, new Integer(cnt.intValue()-1));
+		}
+	}
+	
+	/**
+	 *  Get the string representation of the object.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		StringBuffer ret = new StringBuffer();
+		ret.append("State(");
+		
+		ret.append("types=");
+		ret.append(tmodel);
+		
+		ret.append(", number of objects=");
+		ret.append(objects.size());
+
+		ret.append(", number of rootobjects=");
+		ret.append(rootobjects.size());
+		
+		// #ifndef MIDP
+//		ret.append(", rootobjects=");
+//		ret.append(rootobjects);
+//		
+//		ret.append(", all objects=");
+//		ret.append(objects);
+		// #endif
+		
+		if(substates!=null)
+		{
+			ret.append(", substates=");
+			ret.append(SUtil.arrayToString(substates));
+		}
+
+		ret.append(")");
+		
+		return ret.toString();
+	}
+	
+	//-------- internal helper classes -------- 
+	
+	/**
+	 *  Get an object map for its id.
+	 *  @param id The id.
+	 *  @return The object map.
+	 */
+	protected Map getObject(Object id)
+	{
+		Map	ret	= (Map)objects.get(id);
+		
+		if(ret==null && eventhandler.notifying && deletedobjects.containsKey(id))
+			ret = (Map)deletedobjects.get(id);
+		
+		if(ret==null)
+			throw new IllegalArgumentException("Object "+id+" does not exist.");
+		return ret;
+	}
+	
+	/**
+	 *  Check if it is allowed to set or add an attribute value.
+	 *  For this purpose it is checked if the value is either
+	 *  a) a ObjectId -> type check via OAVObjectType
+	 *  b) a normal Java object -> type check via OAVJavaType
+	 *  Additionally multiplicity is checked.
+	 *  @throws RuntimeException if value is not allowed.
+	 */
+	protected boolean checkValueCompatibility(Object object, 
+		OAVAttributeType attribute, Object value)
+	{
+		if(value!=null)
+		{
+			OAVObjectType	atype	= attribute.getType();
+			if(atype instanceof OAVJavaType)
+			{
+				if(!tmodel.getJavaType(value.getClass()).isSubtype(atype))
+					throw new RuntimeException("Value not of suitable type: "+object+" "+attribute+" "+value);
+			}
+			else if(!getType(value).isSubtype(atype))
+			{
+				throw new RuntimeException("Value not of suitable type: "+object+" "+attribute+" "+value);
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 *  Ensure that a type has an attribute.
+	 *  @param object The object.
+	 *  @param attribute The attribute.
+	 *  @throws RuntimeException if value is not allowed.
+	 */
+	protected boolean checkTypeHasAttribute(Object object, OAVAttributeType attribute)
+	{
+		if(attribute==null)
+			throw new IllegalArgumentException("Attribute must not null.");
+		
+		OAVObjectType	type	= attribute.getObjectType() instanceof OAVJavaType
+			? tmodel.getJavaType(object.getClass())	: getType(object);
+		OAVAttributeType attr	= type.getAttributeType(attribute.getName());
+		if(!attribute.equals(attr))
+			throw new RuntimeException("Attribute must belong to object type: "+attribute+", "+type);
+		
+		return true;
+	}
+	
+	/**
+	 *  Ensure that multiplicity is ok.
+	 *  @param object The object.
+	 *  @param attribute The attribute.
+	 *  @param multiplicity The multiplicity.
+	 *  @throws RuntimeException if value is not allowed.
+	 */
+	protected boolean checkMultiplicity(Object object, OAVAttributeType attribute, Set allowedmults)
+	{
+		if(attribute==null)
+			throw new IllegalArgumentException("Attribute must not null.");
+		if(!allowedmults.contains(attribute.getMultiplicity()))
+			throw new RuntimeException("Multiplicity violation: "+object+" "+attribute
+				+" "+allowedmults+" "+attribute.getMultiplicity());
+
+		return true;
+	}
+	
+	/**
+	 *  Ensure that multiplicity is ok.
+	 *  @param object The object.
+	 *  @param attribute The attribute.
+	 *  @param multiplicity The multiplicity.
+	 *  @throws RuntimeException if value is not allowed.
+	 */
+	protected boolean checkMultiplicity(Object object, OAVAttributeType attribute, String allowedmult)
+	{
+		if(attribute==null)
+			throw new IllegalArgumentException("Attribute must not null.");
+		if(!allowedmult.equals(attribute.getMultiplicity()))
+			throw new RuntimeException("Multiplicity violation: "+object+" "+attribute
+				+" "+allowedmult+" "+attribute.getMultiplicity());
+
+		return true;
+	}
+	
+	/**
+	 *  Test if a type is defined in one of the models.
+	 *  @param type The type.
+	 *  @return True, if is defined.
+	 */
+	protected boolean checkTypeDefined(OAVObjectType type)
+	{
+		if(type==null)
+			throw new IllegalArgumentException("Type must not null.");
+		if(type instanceof OAVJavaType)
+			throw new IllegalArgumentException("Type must not be Java type: "+type);
+		
+		if(tmodel==null)
+			throw new RuntimeException("Type model undefined for state: "+this);
+		if(!tmodel.contains(type))
+			throw new RuntimeException("Type undefined: "+type);
+		
+		return true;
+	}
+	
+	/**
+	 *  Test if the object is a valid state object.
+	 *  @param object The object.
+	 *  @return True, if valid.
+	 */
+	protected boolean checkValidStateObject(Object object)
+	{
+		return containsObject(object);
+	}
+	
+	/**
+	 *  Test if reading the object is allowed.
+	 *  Reading is allowed on removed objects as long as there are external references.
+	 *  @param object The object.
+	 *  @return True, if valid.
+	 */
+	protected boolean checkValidStateObjectRead(Object object)
+	{
+		return checkValidStateObject(object) || externalusages.get(object)!=null;
+	}
+	
+	/**
+	 *  Test if the object is a valid state value, meaning
+	 *  that is either a state object or a java value.
+	 *  @param value The value.
+	 *  @return True, if valid.
+	 */
+	protected boolean checkValidStateValue(Object value)
+	{
+		// No state object (i.e. Java object) or object in state.
+		return !generator.isId(value) || checkValidStateObject(value);
+	}
+	
+	/**
+	 *  Add an object usage. For creation this method can be called with (id, null, null).
+	 *  For each occurrence of an object in a multi attribute a separate reference is added.
+	 *  @param whichid The object that references the object.
+	 *  @param whichattr The attribute which references the object.
+	 *  @param value The value (id of the referenced object).
+	 */
+	protected void addObjectUsage(Object whichid, OAVAttributeType whichattr, Object value)
+	{
+		if(isManaged(value))
+		{
+//			System.out.println("Creating reference: "+whichid+" "+whichattr.getName()+" "+value);
+
+			// Set would be better
+			Map usages = (Map)objectusages.get(value);
+			boolean	newobject	= usages==null;
+			if(newobject)
+			{
+				usages = new HashMap();
+				objectusages.put(value, usages);
+			}
+		
+			// Add a new reference for (objectid, attribute)
+			OAVObjectUsage ref = new OAVObjectUsage(whichid, whichattr);
+			Integer cnt = (Integer)usages.get(ref);
+			if(cnt!=null && whichattr.getMultiplicity().equals(OAVAttributeType.NONE))
+				throw new RuntimeException("Object already there: "+value+" "+whichid+" "+whichattr);
+			if(cnt==null)
+				cnt = new Integer(1);
+			else
+				cnt = new Integer(cnt.intValue()+1);
+			usages.put(ref, cnt);
+
+			if(newobject && !rootobjects.contains(value))
+			{
+				// When it is a Java object, it is not created in state,
+				// so we have to notify object addition to listeners on first usage.
+			
+//				if(whichattr.getType() instanceof OAVJavaType)
+				if(types.get(value)==null)
+				{
+//					System.out.println("Creating reference: "+whichid+" "+whichattr.getName()+" "+value);
+					OAVJavaType	java_type = tmodel.getJavaType(value.getClass());
+					
+					if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
+						registerValue(java_type, value);
+					
+					eventhandler.objectAdded(value, java_type, false);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Remove an object usage.
+	 *  @param whichid The object that references the object.
+	 *  @param whichattr The attribute which references the object.
+	 *  @param value The object id/value to remove.
+	 *  @param dropset	Already dropped objects in recursive drop (or null if none).
+	 *  @param keepalive	A flag indicating that at least one object in the path is externally referenced
+	 *    (all contained unused objects are set to externally referenced, too).
+	 */
+	protected void removeObjectUsage(Object whichid, OAVAttributeType whichattr, Object value, Set dropset, boolean keepalive)
+	{
+		if(isManaged(value))
+		{
+//			System.err.println("Removing reference: "+whichid+" "+whichattr.getName()+" "+value);
+
+			// Increase external usage counter, if source object is externally referenced.
+			if(keepalive && generator.isId(value))
+				addExternalObjectUsage(value, this);
+
+			Map usages = getObjectUsages(value);
+			if(usages==null)
+				throw new RuntimeException("Reference not found: "+whichid+" "+whichattr.getName()+" "+value);
+			OAVObjectUsage ref = new OAVObjectUsage(whichid, whichattr);
+			Integer cnt = (Integer)usages.get(ref);
+			if(cnt==null)
+				throw new RuntimeException("Reference not found: "+whichid+" "+whichattr.getName()+" "+value);
+		
+			if(cnt.intValue()==1)
+				usages.remove(ref);
+			else
+				usages.put(ref, new Integer(cnt.intValue()-1));
+			
+			// If this was the last reference to the object and it is 
+			// not a root object clean it up
+			if(usages.size()==0)
+			{
+				if(objects.containsKey(value) && !rootobjects.contains(value) && (dropset==null || !dropset.contains(value)))
+				{
+//					System.out.println("Garbage collecting unreferenced object: "+value);
+//					Thread.dumpStack();
+					internalDropObject(value, dropset, keepalive);
+				}
+				
+				// When it is a Java object, it is not dropped from state,
+				// so we have to notify object removal to listeners on last usage.
+				else if(whichattr.getType() instanceof OAVJavaType)
+				{
+//					System.out.println("Removing reference: "+whichid+" "+whichattr.getName()+" "+value);
+					OAVJavaType	java_type	= tmodel.getJavaType(value.getClass());
+					
+					if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
+						deregisterValue(java_type, value);
+					
+					objectusages.remove(value);
+					
+					eventhandler.objectRemoved(value, java_type);
+				}
+			}
+		}
+	}	
+	
+	
+	/**
+	 *  Check if a value is managed by the state.
+	 *  Returns true for attribute values which are directly contained oav objects
+	 *  or mutable java objects, e.g. not simple values such as strings or intergers. 
+	 */
+	protected boolean	isManaged(Object value)
+	{
+		// Value is a directly contained object or java bean/object (i.e. not basic value)
+		return value!=null &&
+			(objects.containsKey(value)
+			|| !generator.isId(value) && !tmodel.getJavaType(value.getClass()).getKind().equals(OAVJavaType.KIND_VALUE)); 
+	}
+	
+	/**
+	 *  Get all object usages.
+	 *  @return The usages for an object.
+	 */
+	protected Map getObjectUsages(Object id)
+	{
+		return (Map)objectusages.get(id);
+	}
+	
+//	private static int[] cnt	= new int[1];
+	
+	/**  
+	 *  Register a value for observation.
+	 *  If its an expression then add the action,
+	 *  if its a bean then add the property listener.
+	 */
+	protected void	registerValue(final OAVJavaType type, Object value)
+	{
+		// #ifndef MIDP
+		if(value!=null)
+		{
+			if(pcls==null)
+				pcls = new IdentityHashMap(); // values may change, therefore identity hash map
+			PropertyChangeListener pcl = (PropertyChangeListener)pcls.get(value);
+			
+			if(pcl==null)
+			{
+				pcl = new PropertyChangeListener()
+				{
+					public void propertyChange(final PropertyChangeEvent evt)
+					{
+						if(synchronizator!=null)
+						{
+							synchronizator.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									try
+									{
+										OAVAttributeType attr = type.getAttributeType(evt.getPropertyName());
+										eventhandler.beanModified(evt.getSource(), type, attr, evt.getOldValue(), evt.getNewValue());
+									}
+									catch(Exception e)
+									{
+										// Todo: use customizsble logger supplied from external.
+										e.printStackTrace();
+									}
+								}
+							});
+						}
+						else
+						{
+							try
+							{
+								OAVAttributeType attr = type.getAttributeType(evt.getPropertyName());
+								eventhandler.beanModified(evt.getSource(), type, attr, evt.getOldValue(), evt.getNewValue());
+							}
+							catch(Exception e)
+							{
+								// Todo: use customizsble logger supplied from external.
+								e.printStackTrace();
+							}
+						}
+					}
+				};
+				pcls.put(value, pcl);
+			}
+			
+			// Invoke addPropertyChangeListener on value
+			try
+			{
+				// Do not use Class.getMethod (slow).
+				Method	meth	= SReflect.getMethod(value.getClass(),
+					"addPropertyChangeListener", PCL);
+				if(meth!=null)
+					meth.invoke(value, new Object[]{pcl});
+				
+				assert nocheck || ++beanlistenercnt==beanlistenercnt;
+//				System.out.println("Registered on: "+value);
+			}
+			catch(IllegalAccessException e){}
+			catch(InvocationTargetException e){}
+		}
+		// #endif
+	}
+
+	/**
+	 *  Deregister a value for observation.
+	 *  If its an expression then clear the action,
+	 *  if its a bean then remove the property listener.
+	 */
+	protected void	deregisterValue(OAVJavaType type, Object value)
+	{
+		// #ifndef MIDP
+		if(value!=null)
+		{
+//			synchronized(cnt)
+//			{
+//				cnt[0]--;
+//			}
+//			System.out.println("deregister ("+cnt[0]+"): "+value);
+			// Stop listening for bean events.
+			try
+			{
+				if(pcls!=null)
+				{
+					PropertyChangeListener pcl = (PropertyChangeListener)pcls.remove(value);
+					if(pcl!=null)
+					{
+//						System.out.println("Deregister; "+type+" "+value);
+						// Do not use Class.getMethod (slow).
+						Method	meth	= SReflect.getMethod(value.getClass(),
+							"removePropertyChangeListener", PCL);
+						if(meth!=null)
+							meth.invoke(value, new Object[]{pcl});
+						
+						assert nocheck || --beanlistenercnt==beanlistenercnt;
+					}
+				}
+			}
+			catch(IllegalAccessException e){}
+			catch(InvocationTargetException e){}
+		}
+		// #endif
+	}
+	
+	//-------- nested states --------
+	
+	/**
+	 *  Add a substate.
+	 *  Read accesses will be transparently mapped to substates.
+	 *  Write accesses to substates need not be supported and
+	 *  may generate UnsupportedOperationException.
+	 */
+	public void addSubstate(IOAVState substate)
+	{
+		if(substates==null)
+		{
+			substates	= new IOAVState[]{substate};
+		}
+		else
+		{
+			IOAVState[]	tmp	= new IOAVState[substates.length+1];
+			System.arraycopy(substates, 0, tmp, 0, substates.length);
+			substates	= tmp;
+			substates[substates.length-1]	= substate;
+		}
+	}
+	
+	/**
+	 *  Get the substates.
+	 */
+	public IOAVState[] getSubstates()
+	{
+		return substates;
+	}
+}

@@ -1,0 +1,526 @@
+<!--
+	<H3>The blackjack dealer controls the game.</H3>
+	
+	The dealer registers itself at the DirectoryFacilitator
+	and waits for player agents to join the table.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	   name="Dealer"
+	   package="jadex.bdi.examples.blackjack.dealer">
+
+	<imports>
+		<import>jadex.bdi.examples.blackjack.*</import>
+		<import>jadex.bdi.examples.blackjack.gui.*</import>
+		<import>java.util.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>java.util.logging.*</import>
+		<import>java.util.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- this capability provides easy access to "out-of-the-box"-plans
+			 allowing - for example - to register at the DF. -->
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
+	</capabilities>
+	
+	<!-- 
+	     These are the dealers beliefs. None of these beliefs should be edited in the ADF 
+	     because all beliefs are initialised by the plans during the game or have 
+	     expedient start-up values (like the three beliefs below).
+	-->
+	<beliefs>
+		<!-- The card set used to play the game. -->
+		<belief name="cardset" class="CardSet" />
+		
+		<!-- The number of seconds to wait for answers from players. -->
+		<belief name="playerwaitmillis" class="long">
+			<fact>(Integer)$propertybase.getProperty("standard.timeout")</fact>
+		</belief>
+
+		<!-- The time to wait between rounds.
+			 Can be adjusted in the GUI. -->
+		<belief name="restartdelay" class="int">
+			<fact>3</fact>
+		</belief>
+
+		<!-- The number of seconds to wait before drawing a card.
+			 Can be adjusted in the GUI. -->
+		<belief name="stepdelay" class="int">
+			<fact>1</fact>
+		</belief>
+
+		<!-- When set to true, each step in the game must be manually
+			 issued in the GUI. -->
+		<belief name="singleStepMode" class="boolean">
+			<fact>false</fact>
+		</belief>
+		
+		<!-- The self representation of the dealer. -->
+		<belief name="myself" class="Dealer">
+			<fact>new Dealer()</fact>
+		</belief>
+
+		<!-- The players. -->
+		<beliefset name="players" class="Player"/>
+
+		<!-- The history of played games. -->
+		<belief name="statistics" class="GameStatistics">
+			<fact>new GameStatistics()</fact>
+		</belief>
+
+		<belief name="gamestate" class="GameState">
+			<fact>new GameState($beliefbase.myself, null)</fact>
+		</belief>
+		
+		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
+			<fact>new jadex.bdi.planlib.GuiCreator(DealerFrame.class, new Class[]{Dealer.class, jadex.bdi.runtime.IExternalAccess.class}, 
+				new Object[]{$beliefbase.myself, $scope.getExternalAccess()})</fact>
+		</belief>
+
+		<!--
+			It's possible that a few different manager (possibly from remote Players) 
+			want to track their players during the game, therefor a beliefset containing 
+			all manager-AIDs is needed.
+		 -->
+		<beliefset name="tracker" class="jadex.bridge.IAgentIdentifier"/>
+
+	</beliefs>
+	
+	<!-- 
+	     The dealer has only one initial goal: registering a 
+	     dealing-service at the DF and renew this registration 
+	     every 10 seconds.
+	-->
+	<goals>
+		<!-- Main goal to play a game. -->
+		<performgoal name="play_game" exclude="never">
+			<contextcondition>
+				// $beliefbase.players.length > 0
+				?rbeliefset = (beliefset (beliefset_has_facts $?facts) (element_has_model ?mbeliefset))
+				?mbeliefset = (mbeliefset (element_has_name "players"))
+				(test (> (jadex.rules.rulesystem.rules.functions.Length $?facts) 0))
+			</contextcondition>
+		</performgoal>
+
+		<!-- Goal to play with a single player (in the context of a larger game). -->
+		<performgoal name="play_with_player">
+			<parameter name="player" class="Player"/>
+		</performgoal>
+
+		<!-- Used for registering the dealer at the df. -->
+		<achievegoalref name="df_register">
+			<concrete ref="dfcap.df_register"/>
+		</achievegoalref>
+		<!-- Used for deregistering the dealer at the df. -->
+		<achievegoalref name="df_deregister">
+			<concrete ref="dfcap.df_deregister"/>
+		</achievegoalref>
+	</goals>
+	
+	<!-- 
+	     These are all the plans, the dealer will execute during a game.
+	     There is one plan for every major task. Have a look into the
+	     plan-classes to get a detailed insight in whats going on there.
+	-->
+	<plans>
+		<!-- Register a player. -->
+		<plan name="register_plan">
+			<body class="DealerRegisterPlayerPlan" />
+			<trigger>
+				<messageevent ref="request_join" />
+			</trigger>
+		</plan>
+
+		<!-- Play a game. -->
+		<plan name="play_game_plan">
+			<body class="DealerGameRoundMasterPlan" />
+			<trigger>
+				<goal ref="play_game"/>
+			</trigger>
+		</plan>
+
+		<!-- Play a game with a single player. -->
+		<plan name="play_with_player_plan">
+			<parameter name="player" class="Player">
+ 				<goalmapping ref="play_with_player.player"/>
+			</parameter>
+			<body class="DealerGameRoundPlayerPlan" />
+			<trigger>
+				<goal ref="play_with_player"/>
+			</trigger>
+<!--			<contextcondition>
+				$beliefbase.getBeliefSet("players").containsFact($plan.player)
+				&amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
+			</contextcondition>-->
+			<contextcondition>
+				// $beliefbase.getBeliefSet("players").containsFact($plan.player)
+				// &amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
+			
+				?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle"))
+				?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player))
+				?rplan = (plan (parameterelement_has_parameters contains ?rparam))
+			</contextcondition>
+		</plan>
+
+		<plan name="propagate_game_state_plan">
+			<body class="PropagateGameStatePlan" />
+			<trigger>
+				<factchanged ref="myself"/>
+				<factadded ref="players"/>
+				<factremoved ref="players"/>
+				<factchanged ref="players"/>
+			</trigger>
+			<!-- not possible because game must always be updated. -->
+			<!--<precondition>$beliefbase.players.length>0</precondition>-->
+		</plan>
+	</plans>
+	
+	<!-- events -->
+	<events>
+
+		<!-- Event to trigger a step. -->
+		<internalevent name="step"/>
+		
+		<!-- player messages -->
+		<!-- Player request to join the game. -->
+		<messageevent name="request_join" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+ 			<match>$content instanceof RequestJoin</match>
+		</messageevent>
+
+		<!-- A player wants to draw another card. -->
+		<messageevent name="request_draw" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+ 			<match>$content instanceof RequestDraw</match>
+		</messageevent>
+
+		<!-- A player makes a bet. -->
+		<messageevent name="request_bet" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+			<!--<parameter name="reply_with" class="String" direction="inout">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>-->
+			<parameter name="conversation_id" class="String" direction="inout">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+			<match>$content instanceof RequestBet</match>
+		</messageevent>
+
+
+		<messageevent name="refuse_bet" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REFUSE</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+ 			<match>$content instanceof RequestBet</match>
+		</messageevent>
+
+		<!-- A player has finished its game (i.e. doesn't want to draw any more cards). -->
+		<messageevent name="request_finished" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+ 			<match>$content instanceof RequestFinished</match>
+		</messageevent>
+
+		<!-- todo: manager messages -->
+
+		<!-- The manager is shutting down the BlackJack application. -->
+		<messageevent name="inform_shutdown" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("manager:shutDown")</match>
+		</messageevent>
+		<!-- The manager registers as tracker on game settings. -->
+		<messageevent name="query_tracking" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.QUERY_REF</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("manager:registerAsTracker")</match>
+		</messageevent>
+
+		<!-- sent messages -->
+
+		<!-- inform a player about a the game result -->
+		<messageevent name="inform_action_done" direction="send_receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+ 			<match>$content instanceof Done</match>
+		</messageevent>
+
+		<!-- inform a player about a the game result -->
+		<messageevent name="refuse_action" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REFUSE</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+		</messageevent>
+
+		<!-- inform tracker about playing players -->
+		<messageevent name="inform_tracker" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String" direction="in" />
+		</messageevent>
+
+		<messageevent name="inform_game_state" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>BlackjackOntology.ONTOLOGY_NAME</value>
+ 			</parameter>
+			<parameter name="conversation_id" class="String" direction="inout">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+			<match>$content instanceof GameState</match>
+		</messageevent>
+
+	</events>
+
+	<expressions>
+
+		<!-- The player that gets the next card (if any). -->
+		<expression name="turnplayer">
+			select one Player $p from $beliefbase.players
+			where $p.getState().equals(Player.STATE_PLAYING)
+			order by $p.getCards().length
+		</expression>
+		
+		<!-- Check if it is the dealer's turn. -->
+		<!--  <condition name="dealers_turn">
+			// The dealer may draw its initial card when all players have two cards.
+			// $beliefbase.myself.getCards().length==0 &amp;&amp;
+			// (select one Player $p from $beliefbase.players
+			// where !$p.getState().equals(Player.STATE_IDLE) &amp;&amp; $p.getCards().length!=2)
+			// == null
+
+			// The dealer may draw more cards, when all players are either idle or finished.
+			// || (select one Player $p from $beliefbase.players
+			// where !$p.getState().equals(Player.STATE_IDLE) &amp;&amp; !$p.getState().equals(Player.STATE_FINISHED))
+			// == null
+			
+			// ?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
+			// ?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
+			// ?mbelief = (mbelief (element_has_name "myself"))
+			// (not
+			// 	(and
+			// 		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
+			//		?rbeliefset = (beliefset (belief_has_facts contains ?player) (element_has_model ?mbeliefset))
+			//		?mbeliefset = (mbeliefset (element_has_name "players"))
+			//	)
+			// )
+			// ||
+			// (not
+			//	(and
+			//		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
+			//		?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
+			//		?mbeliefset = (mbeliefset (element_has_name "players"))
+			//	)
+			//)
+			
+			(not
+				(and
+					(not
+						(and
+							?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
+							?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
+							?mbelief = (mbelief (element_has_name "myself"))
+							(not
+								(and
+									?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
+									?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
+									?mbeliefset = (mbeliefset (element_has_name "players"))
+								)
+							)
+						)
+					)
+				
+					?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
+					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
+					?mbeliefset = (mbeliefset (element_has_name "players"))
+				)
+			)
+		</condition>-->
+		
+		<!-- Check if it is the dealer's first turn. -->
+		<condition name="dealers_first_turn">
+			?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
+			?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
+			?mbelief = (mbelief (element_has_name "myself"))
+			(not
+				(and
+			 		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
+					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
+					?mbeliefset = (mbeliefset (element_has_name "players"))
+				)
+			)
+		</condition>
+		
+		<!-- Check if it is the dealer's first turn. -->
+		<condition name="dealers_second_turn">
+			(not
+				(and
+					?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
+					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
+					?mbeliefset = (mbeliefset (element_has_name "players"))
+				)
+			)
+		</condition>
+
+		<!-- Check if it is the $player's turn. -->
+		<condition name="players_turn">
+			// All players must be idle, playing, or finished.
+			// (select one Player $p from $beliefbase.players
+			// where !$p.getState().equals(Player.STATE_IDLE)
+			// &amp;&amp; !$p.getState().equals(Player.STATE_PLAYING)
+			// &amp;&amp; !$p.getState().equals(Player.STATE_FINISHED))
+			// == null
+
+			// And this player must be the first with the least number of cards.
+			// Hack !!! Assume "one" selects players in order.
+			// &amp;&amp; (select one Player $p from $beliefbase.players
+			// where $p.getState().equals(Player.STATE_PLAYING)
+			// &amp;&amp; $p.getCards().length&lt;=$player.getCards().length
+ 			// order by $p.getCards().length)
+			// == $player
+			// <parameter name="$player" class="Player"/>
+			
+			(not
+				(and
+					?p = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "playing") (playingstate != "finished"))
+					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
+					?mbeliefset = (mbeliefset (element_has_name "players"))
+				)
+			)
+			
+			?player = (jadex.bdi.examples.blackjack.Player (playingstate "playing") (cardCnt ?cardcnt))
+			?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player)) 
+			?rplan = (plan (parameterelement_has_parameters contains ?rparam))
+			
+			(not
+				(and
+					?p = (jadex.bdi.examples.blackjack.Player (playingstate "playing") (cardCnt ?cc&amp;:(&lt; ?cc ?cardcnt)))
+					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
+					?mbeliefset = (mbeliefset (element_has_name "players"))
+				)
+			)
+		</condition>
+
+		<!-- Check if the dealer has drawn its first card. -->
+		<condition name="dealer_card">
+			// $beliefbase.myself.getCards().length==1
+			
+			?player = (jadex.bdi.examples.blackjack.Player (cardCnt 1))
+			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
+			?mbelief = (mbelief (element_has_name "myself"))
+		</condition>
+
+		<!-- Check if the dealer has finished drawing cards. -->
+		<condition name="dealer_finished">
+			// $beliefbase.myself.getState().equals(Player.STATE_FINISHED)
+			// || $beliefbase.myself.getState().equals(Player.STATE_IDLE)
+			
+			?player = (jadex.bdi.examples.blackjack.Player (playingstate "idle" | "finished"))
+			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
+			?mbelief = (mbelief (element_has_name "myself"))
+		</condition>
+
+	</expressions>
+	
+	<properties>
+		<!--  logging-properties, needed to debug the application.
+ 	     Start the Jadex-Logging-Agent to see whats going on behind the scenes -->
+		<!-- <property name="logging.level">Level.INFO</property> -->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<!-- <beliefs>
+				<initialbelief ref="gui">
+					<fact>new DealerFrame($beliefbase.myself, $scope.getExternalAccess())</fact>
+				</initialbelief>
+			</beliefs> -->
+			<goals>
+				<!-- Register the dealer at the df on startup. -->
+				<initialgoal ref="df_register">
+					<!-- The services to register. -->
+					<parameter ref="description">
+						<value>
+							<!-- This is the agent-description for the dealer. With this description
+							     the dealers is registered at the directory facilitator.
+							     Note, that the dealer only offers one service, that is 'dealing'
+							     (see service description below).	-->
+							<!-- SFipa.createAgentDescription(null,
+								SFipa.createServiceDescription("dealing", "blackjack", "University of Hamburg"))-->
+							((IDF)$scope.getPlatform().getService(IDF.class))
+								.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class))
+								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
+	
+						</value>
+					</parameter>
+				</initialgoal>				
+				<initialgoal ref="play_game"/>
+				<endgoal ref="df_deregister"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

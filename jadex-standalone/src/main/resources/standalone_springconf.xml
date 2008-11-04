@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean name="platformName" class="java.lang.String">
+		<constructor-arg type="java.lang.String"><value>lars</value></constructor-arg>
+	</bean>
+
+	<bean id="platform" class="jadex.adapter.standalone.SpringPlatform">
+		
+		<property name="platformName" ref="platformName">
+		</property>
+		
+		<property name="shutdownTime">
+			<value type="long">10000</value>
+		</property>
+		
+		<property name="messageTypes">
+			<map>
+				<entry>
+					<key><value>fipa</value></key>
+					<bean class="jadex.adapter.base.fipa.FIPAMessageType"/>
+				</entry>
+			</map>
+		</property>
+		
+		<property name="agentFactories">
+			<list value-type="jadex.bridge.IJadexAgentFactory">
+				<bean id="kernel_v2_factory" class="jadex.bdi.interpreter.JadexAgentFactory">
+					<constructor-arg>
+						<map>
+							<entry>
+								<key>
+									<value>messagetype_fipa</value>
+								</key>
+								<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
+							</entry>
+							<entry>
+								<key>
+									<value>planexecutor_standard</value>
+								</key>
+								<bean class="jadex.bdi.runtime.JavaStandardPlanExecutor">
+									<constructor-arg>
+										<bean class="jadex.commons.concurrent.ThreadPoolFactory" factory-method="getThreadPool">
+											<constructor-arg ref="platformName"/>
+										</bean>
+									</constructor-arg>
+								</bean>
+							</entry>
+							<entry>
+								<key>
+									<value>standard.timeout</value>
+								</key>
+								<value type="long">10000</value>
+							</entry>
+							<entry>
+								<key>
+									<value>tooladapter.introspector</value>
+								</key>
+								<value type="java.lang.Class">jadex.tools.introspector.IntrospectorAdapter</value>
+							</entry>
+						</map>
+					</constructor-arg>
+					<constructor-arg ref="platform"/>
+				</bean>
+				
+				<!-- <bean id="kernel_v1_factory" class="jadex.runtime.impl.JadexAgentFactory">
+					<constructor-arg>
+						<map>
+							<entry>
+								<key>
+									<value>model_checking</value>
+								</key>
+								<value type="boolean">false</value>
+							</entry>
+							<entry>
+								<key>
+									<value>model_caching</value>
+								</key>
+								<value type="boolean">true</value>
+							</entry>
+							<entry>
+								<key>
+									<value>model_cache_autorefresh</value>
+								</key>
+								<value type="boolean">true</value>
+							</entry>
+							<entry>
+								<key>
+									<value>messagetype_fipa</value>
+								</key>
+								<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
+							</entry>
+							<entry>
+								<key>
+									<value>parser_factory</value>
+								</key>
+								<bean class="jadex.parser.javaccimpl.Parser">
+									<constructor-arg type="java.util.Map">
+										<null/>
+									</constructor-arg>
+								</bean>
+							</entry>
+						</map>
+					</constructor-arg>
+				</bean> -->
+			</list>
+		</property>
+
+		<property name="services">
+			<map>
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.bridge.ILibraryService</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">library_service</value>
+							</key>
+							<bean class="jadex.adapter.base.libraryservice.LibraryService"></bean>
+						</entry>
+					</map>
+				</entry>
+			
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.adapter.base.fipa.IAMS</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">ams_service</value>
+							</key>
+							<bean class="jadex.adapter.standalone.ams.AMS">
+								<constructor-arg ref="platform"/>
+							</bean>
+						</entry>
+					</map>
+				</entry>
+				
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.adapter.base.fipa.IDF</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">df_service</value>
+							</key>
+							<bean class="jadex.adapter.standalone.df.DF">
+								<constructor-arg ref="platform"/>
+							</bean>
+						</entry>
+					</map>
+				</entry>
+				
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.adapter.base.IMessageService</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">message_service</value>
+							</key>
+							<bean class="jadex.adapter.standalone.MessageService">
+								<constructor-arg ref="platform"/>
+								<constructor-arg>
+									<list value-type="jadex.adapter.standalone.transport.ITransport">
+										<bean class="jadex.adapter.standalone.transport.localmtp.LocalTransport">
+											<constructor-arg ref="platform"/>
+										</bean>
+										<bean class="jadex.adapter.standalone.transport.tcpmtp.TCPTransport">
+											<constructor-arg ref="platform"/>
+											<constructor-arg type="int" value="9876"/>
+										</bean>
+										<bean class="jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport">
+											<constructor-arg ref="platform"/>
+											<constructor-arg type="int" value="8765"/>
+										</bean>
+									</list>
+								</constructor-arg>
+							</bean>
+						</entry>
+					</map>
+				</entry>
+				
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.bridge.IClockService</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">clock_service</value>
+							</key>
+							<bean class="jadex.adapter.base.clock.SystemClock">
+								<constructor-arg type="java.lang.String" value="system_clock"/>
+								<constructor-arg type="long" value="1"/>
+								<constructor-arg type="jadex.commons.concurrent.IThreadPool">
+									<bean class="jadex.commons.concurrent.ThreadPoolFactory" factory-method="getThreadPool">
+										<constructor-arg ref="platformName"/>
+									</bean>
+								</constructor-arg>
+							</bean>
+						</entry>
+					</map>
+				</entry>
+				
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.adapter.base.ISimulationService</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">simulation_service</value>
+							</key>
+							<bean class="jadex.adapter.standalone.SimulationService">
+								<constructor-arg ref="platform"/>
+							</bean>
+						</entry>
+					</map>
+				</entry>
+				
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.adapter.base.execution.IExecutionService</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">execution_service</value>
+							</key>
+							<bean class="jadex.adapter.base.execution.SyncExecutionService">
+								<constructor-arg type="jadex.commons.concurrent.IThreadPool">
+									<bean class="jadex.commons.concurrent.ThreadPoolFactory" factory-method="getThreadPool">
+										<constructor-arg ref="platformName"/>
+									</bean>
+								</constructor-arg>
+							</bean>
+						</entry>
+					</map>
+				</entry>
+			
+			</map>
+		</property>
+		
+		<property name="daemonAgents">
+			<map>
+				<entry>
+					<key><value>AMS</value></key>
+					<value type="java.lang.String">jadex/bdi/amsagent/AMS.agent.xml</value>
+				</entry>
+				<entry>
+					<key><value>DF</value></key>
+					<value type="java.lang.String">jadex/bdi/dfagent/DF.agent.xml</value>
+				</entry>
+			</map>
+		</property>
+		
+		<property name="agents">
+			<map>
+				<entry>
+					<key><value>JCC</value></key>
+					<value type="java.lang.String">jadex/tools/jcc/JCC.agent.xml</value>
+				</entry>
+			</map>
+		</property>
+		
+	</bean>
+	
+</beans>

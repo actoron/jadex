@@ -1,0 +1,273 @@
+<!--
+	The df capability has all necessay plans, beliefs and goals for all
+	activities concerned with df functionality.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	package="jadex.bdi.planlib.df"
+	name="DF">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- Timeout for messages. -->
+		<belief name="timeout" class="long"/>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="df_register" exported="true">
+			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="leasetime" class="Long" optional="true"/>
+			<parameter name="result" class="IDFAgentDescription" direction="out"/>
+		</achievegoal>
+
+		<achievegoal name="df_modify" exported="true">
+			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="leasetime" class="Long" optional="true"/>
+			<parameter name="result" class="IDFAgentDescription" direction="out"/>
+		</achievegoal>
+
+		<maintaingoal name="df_keep_registered" recurdelay="60000" exported="true">
+			<!-- Will contain the actually registered agent description. -->
+			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="leasetime" class="Long" optional="true">
+				<!--<value>20000</value>-->
+			</parameter>
+			<parameter name="buffertime" class="long">
+				<value>3000L</value>
+			</parameter>
+			<parameter name="current_time"  class="long" updaterate="1000">
+				<value>$scope.getTime()</value>
+			</parameter>
+			<parameter name="result" class="IDFAgentDescription" direction="out"/>
+			<maintaincondition>
+				<!--($goal.result instanceof AgentDescription) Janino bug.-->
+				// ($goal.result != null)
+				// &amp;&amp;
+				// ($goal.result.getLeaseTime() == null?
+ 				// true: $goal.result.getLeaseTime().getTime()
+				// - $goal.current_time - $goal.buffertime &gt; 0)
+				
+				// ?rgoal is already bound
+				?param_result	= (parameter (parameter_has_name "result") (parameter_has_value ?result))
+				?param_curtime	= (parameter (parameter_has_name "current_time") (parameter_has_value ?curtime))
+				?param_buftime	= (parameter (parameter_has_name "buffertime") (parameter_has_value ?buftime))
+				?rgoal	= (goal (parameterelement_has_parameters contains ?param_result)
+								(parameterelement_has_parameters contains ?param_curtime)
+								(parameterelement_has_parameters contains ?param_buftime))
+				?result	= (jadex.adapter.base.fipa.IDFAgentDescription (leaseTime ?leasedate)
+					((jadex.rules.rulesystem.rules.functions.MethodCallFunction "java.util.Date" "getTime" ?leasedate) ?leastime))
+				(test (> (jadex.rules.rulesystem.rules.functions.Sub ?leastime ?curtime ?buftime) 0))
+			</maintaincondition>
+		</maintaingoal>
+
+		<achievegoal name="df_deregister" exported="true">
+			<!-- The agent description to deregister. Null for deregistering the
+				agent description of the dispatching agent. -->
+			<parameter name="description" class="IDFAgentDescription" optional="true"/>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+		</achievegoal>
+
+		<achievegoal name="df_search" exported="true">
+			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="constraints" class="ISearchConstraints" optional="true"/>
+			<parameterset name="result" class="IDFAgentDescription" direction="out"/>
+		</achievegoal>
+		
+		<achievegoalref name="rp_initiate">
+			<concrete ref="procap.rp_initiate"/>
+		</achievegoalref>
+	</goals>
+	
+	<plans>
+		<plan name="local_register">
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_register.description"/>
+ 				<goalmapping ref="df_keep_registered.description"/>
+			</parameter>
+			<parameter name="result" class="IDFAgentDescription" direction="out">
+ 				<goalmapping ref="df_register.result"/>
+ 				<goalmapping ref="df_keep_registered.result"/>
+			</parameter>
+			<parameter name="leasetime" class="Long">
+ 				<goalmapping ref="df_register.leasetime"/>
+ 				<goalmapping ref="df_keep_registered.leasetime"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_register.df"/>
+ 				<goalmapping ref="df_keep_registered.df"/>
+			</parameter>
+			<body class="DFLocalRegisterPlan" />
+			<trigger>
+				<goal ref="df_register"/>
+				<goal ref="df_keep_registered"/>
+			</trigger>
+			<precondition>$goal.df==null</precondition>
+		</plan>
+		<plan name="local_modify" priority="1"> <!-- higher priority to precede register plan -->
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_modify.description"/>
+ 				<goalmapping ref="df_keep_registered.description"/>
+			</parameter>
+			<parameter name="result" class="IDFAgentDescription" direction="out">
+ 				<goalmapping ref="df_modify.result"/>
+ 				<goalmapping ref="df_keep_registered.result"/>
+			</parameter>
+			<parameter name="leasetime" class="Long">
+ 				<goalmapping ref="df_modify.leasetime"/>
+ 				<goalmapping ref="df_keep_registered.leasetime"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_modify.df"/>
+ 				<goalmapping ref="df_keep_registered.df"/>
+			</parameter>
+			<body class="DFLocalModifyPlan" />
+			<trigger>
+				<goal ref="df_modify"/>
+				<goal ref="df_keep_registered"/>
+			</trigger>
+			<precondition>$goal.df==null</precondition>
+		</plan>
+		<plan name="local_deregister">
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_deregister.description"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_deregister.df"/>
+			</parameter>
+			<body class="DFLocalDeregisterPlan" />
+			<trigger>
+				<goal ref="df_deregister"/>
+			</trigger>
+			<precondition>$goal.df==null</precondition>
+		</plan>
+		<plan name="local_search">
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_search.description"/>
+			</parameter>
+			<parameter name="constraints" class="ISearchConstraints">
+ 				<goalmapping ref="df_search.constraints"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_search.df"/>
+			</parameter>
+			<parameterset name="result" class="IDFAgentDescription" direction="out">
+ 				<goalmapping ref="df_search.result"/>
+			</parameterset>
+			<body class="DFLocalSearchPlan" />
+			<trigger>
+				<goal ref="df_search"/>
+			</trigger>
+			<precondition>$goal.df==null</precondition>
+		</plan>
+
+		<!-- remote plans -->
+
+		<plan name="remote_register">
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_register.description"/>
+ 				<goalmapping ref="df_keep_registered.description"/>
+			</parameter>
+			<parameter name="result" class="IDFAgentDescription" direction="out">
+ 				<goalmapping ref="df_register.result"/>
+ 				<goalmapping ref="df_keep_registered.result"/>
+			</parameter>
+			<parameter name="leasetime" class="Long">
+ 				<goalmapping ref="df_register.leasetime"/>
+ 				<goalmapping ref="df_keep_registered.leasetime"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_register.df"/>
+ 				<goalmapping ref="df_keep_registered.df"/>
+			</parameter>
+			<body class="DFRemoteRegisterPlan" />
+			<trigger>
+				<goal ref="df_register"/>
+				<goal ref="df_keep_registered"/>
+			</trigger>
+			<precondition>$goal.df!=null</precondition>
+		</plan>
+		<plan name="remote_modify" priority="1"> <!-- higher priority to precede register plan -->
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_modify.description"/>
+ 				<goalmapping ref="df_keep_registered.description"/>
+			</parameter>
+			<parameter name="result" class="IDFAgentDescription" direction="out">
+ 				<goalmapping ref="df_modify.result"/>
+ 				<goalmapping ref="df_keep_registered.result"/>
+			</parameter>
+			<parameter name="leasetime" class="Long">
+ 				<goalmapping ref="df_modify.leasetime"/>
+ 				<goalmapping ref="df_keep_registered.leasetime"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_modify.df"/>
+ 				<goalmapping ref="df_keep_registered.df"/>
+			</parameter>
+			<body class="DFRemoteModifyPlan" />
+			<trigger>
+				<goal ref="df_modify"/>
+ 				<goal ref="df_keep_registered"/>
+			</trigger>
+			<precondition>$goal.df!=null</precondition>
+		</plan>
+		<plan name="remote_deregister">
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_deregister.description"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_deregister.df"/>
+			</parameter>
+			<body class="DFRemoteDeregisterPlan" />
+			<trigger>
+				<goal ref="df_deregister"/>
+			</trigger>
+			<precondition>$goal.df!=null</precondition>
+		</plan>
+		<plan name="remote_search">
+			<parameter name="description" class="IDFAgentDescription">
+ 				<goalmapping ref="df_search.description"/>
+			</parameter>
+			<parameter name="constraints" class="ISearchConstraints">
+ 				<goalmapping ref="df_search.constraints"/>
+			</parameter>
+			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+ 				<goalmapping ref="df_search.df"/>
+			</parameter>
+			<parameterset name="result" class="IDFAgentDescription" direction="out">
+ 				<goalmapping ref="df_search.result"/>
+			</parameterset>
+			<body class="DFRemoteSearchPlan" />
+			<trigger>
+				<goal ref="df_search"/>
+			</trigger>
+			<precondition>$goal.df!=null</precondition>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="timeout">
+<!-- 					<fact>(Integer)$propertybase.getProperty("standard.timeout")</fact> -->
+					<fact>20000</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+		<configuration name="without_timeouts">
+		</configuration>
+	</configurations>
+
+</capability>

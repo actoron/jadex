@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The Cleaner Agent.</H3>
+
+	The agent mainly has 3 top-level goals:<br>
+	- Searching for waste (perform lookforwaste).<br>
+	- Cleaning up waste (achieve cleanup).<br>
+	- Keep the battery loaded (maintain battery loaded).<br><br>
+
+	To achieve this goals it uses various
+	subgoals for decomposition of the overall
+	tasks.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Cleaner"
+	package="jadex.bdi.examples.cleanerworld2.cleaner">
+	
+	<imports>
+		<import>java.util.*</import>
+		<import>jadex.adapter.base.clock.*</import>
+		<import>jadex.bdi.planlib.simsupport.environment.*</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+	</imports>
+	
+	<capabilities>
+    	<capability name="simcap" file="jadex.bdi.planlib.simsupport.simcap.SimAgent"/>
+	</capabilities>
+	
+	<beliefs>
+		<!-- Name of the simulation environment -->
+		<belief name="environment_name" class="String">
+			<fact>new String("CleanerWorld2")</fact>
+		</belief>
+		<!-- The simulation object representing the cleaner -->
+    	<belief name="simobject_id" class="Integer">
+      		<fact>null</fact>
+    	</belief>
+  	</beliefs>
+	
+	<goals>
+	    <achievegoalref name="sim_create_object">
+        	<concrete ref="simcap.sim_create_object"/>
+    	</achievegoalref>
+    	
+    	<achievegoalref name="sim_set_destination">
+    		<concrete ref="simcap.sim_set_destination"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_get_random_position">
+    		<concrete ref="simcap.sim_get_random_position"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_connect_environment">
+    		<concrete ref="simcap.sim_connect_environment"/>
+		</achievegoalref>
+  	</goals>
+  	
+  	<plans>
+    	<!-- Initialization Plan. -->
+    	<plan name="initialization">
+      		<body class="InitializeCleanerPlan"/>
+    	</plan>
+    </plans>
+    
+    <events>
+    	<!-- Destination reached event. -->
+    	<internaleventref name="simobj_dest_reached">
+    		<concrete ref="simcap.simobj_dest_reached"/>
+    	</internaleventref>
+	</events>
+    
+  	<configurations>
+    	<configuration name="default">
+      		<plans>
+        		<initialplan ref="initialization"/>
+      		</plans>
+    	</configuration>
+  	</configurations>
+</agent>

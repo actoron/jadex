@@ -1,0 +1,97 @@
+<!--
+	<H3>Agent for testing agent callbacks.</H3>
+
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Callback"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+		<belief name="bel" class="int">
+			<fact>0</fact>
+		</belief>
+		<beliefset name="belset" class="int"/>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="goal">
+			<creationcondition>
+				//$beliefbase.bel==2
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
+				?mbelief = (mbelief (element_has_name "bel"))
+			</creationcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="callback_plan">
+			<body class="CallbackPlan"/>
+		</plan>
+		
+		<plan name="plan">
+			<parameter name="value" class="Object">
+				<value>"Some result"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<condition>
+					// $beliefbase.bel==4
+					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 4))
+					?mbelief = (mbelief (element_has_name "bel"))
+				</condition>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<events>
+		<internalevent name="internal_event"/>
+		
+		<messageevent name="message_event" type="fipa" direction="send_receive">
+			<parameter name="reply_with" class="String">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+		</messageevent>
+	</events>
+	
+	<!-- <expressions>
+		<condition name="condition">$beliefbase.bel==5</condition>
+	</expressions> -->
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>15</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="callback_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

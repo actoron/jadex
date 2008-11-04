@@ -1,0 +1,49 @@
+<!--
+	<H3>The pinging agent pings another agent.</H3>
+
+	Send ping requests in certain intervals.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-0.96.xsd"
+	name="Pinging"
+	package="jadex.examples.ping">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.bridge.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="ping" file="jadex.bdi.planlib.ping.Ping"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="ping_receiver" class="IAgentIdentifier" exported="true">
+			<fact>
+				((IAMS)$scope.getPlatform().getService(IAMS.class))
+					.createAgentIdentifier("Ping", true)
+			</fact>
+		</belief>
+	</beliefs>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="ping.pinging">
+					<parameter ref="receiver">
+						<value>
+							$beliefbase.ping_receiver
+							// ((IAMS)$scope.getPlatform().getService(IAMS.class))
+							// .createAgentIdentifier("Ping", true)
+						</value>
+					</parameter>
+				</initialgoal>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

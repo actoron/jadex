@@ -1,0 +1,5 @@
+This is a dummy package for Java SE to simplify
+Java SE/MIDP development with the same source tree.
+The Java ME CLDC/MIDP version of this package
+contains replacement classes such as Map, List, etc.
+(see extensions/adapters/midp) 

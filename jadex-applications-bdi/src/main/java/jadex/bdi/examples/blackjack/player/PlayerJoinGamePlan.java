@@ -1,0 +1,71 @@
+package jadex.bdi.examples.blackjack.player;
+
+import jadex.adapter.base.fipa.Done;
+import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.examples.blackjack.Player;
+import jadex.bdi.examples.blackjack.RequestJoin;
+import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdi.runtime.Plan;
+import jadex.bridge.IAgentIdentifier;
+
+/**
+ *  Find a dealer and join the game.
+ */
+public class PlayerJoinGamePlan extends Plan
+{
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new plan.
+	 */
+	public PlayerJoinGamePlan()
+	{		
+		getLogger().info("created: " + this);
+	}
+
+	//-------- methods --------
+	
+	/**
+	 *  First the player searches a dealer, then sends a join-request to this
+	 *  dealer.
+	 */
+	public void body()
+	{
+		// Search for dealer.
+		IAgentIdentifier	dealer	= (IAgentIdentifier)getBeliefbase().getBelief("dealer").getFact();
+
+		Player	me	= (Player)getBeliefbase().getBelief("myself").getFact();
+
+		// create the join-message
+		IMessageEvent	msg	= createMessageEvent("request_join");
+		msg.getParameterSet(SFipa.RECEIVERS).addValue(dealer);
+		RequestJoin rj = new RequestJoin();
+		rj.setPlayer(me);
+		//msg.setContent("join:" + getAgentName() + ":" + me.getStrategyName() + ":" + me.getAccount() + ":" + Player.color2Hex(me.getColor()));
+		msg.getParameter(SFipa.CONTENT).setValue(rj);
+
+		getLogger().info("sending join-message");
+		
+		// send the join-message and wait for a response
+		IMessageEvent	reply	= sendMessageAndWait(msg, 10000);
+
+		// evaluate content of the reply-message
+		Object content = reply.getParameter(SFipa.CONTENT).getValue();
+		if(content instanceof Done)
+		{
+			getLogger().info("request was accepted, timeout is: " + content);
+			getBeliefbase().getBelief("timeout").setFact(
+				new Integer(((RequestJoin)((Done)content).getAction()).getTimeout()));
+			getBeliefbase().getBelief("dealer").setFact(dealer);
+		}
+	}
+
+	/**
+	 *  Called when something went wrong (e.g. timeout).
+	 */
+	public void	failed()
+	{
+		// Remove dealer fact.
+		getBeliefbase().getBelief("dealer").setFact(null);
+	}
+}

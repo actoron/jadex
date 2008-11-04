@@ -1,0 +1,236 @@
+package jadex.rules.rulesystem.rete.nodes;
+
+import jadex.rules.profiler.IProfiler;
+import jadex.rules.rulesystem.AbstractAgenda;
+import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
+import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
+
+import java.util.Set;
+
+/**
+ *  A not node lets tuples (from left side) pass,
+ *  when there is no match from the right side.
+ */
+public class NotNode extends AbstractBetaNode
+{
+	//-------- attributes --------
+	
+	/** Flag to temporarily delay propagation of tuples. */
+	protected boolean	delay;	
+
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new not node.
+	 */
+	public NotNode(IConstraintEvaluator[] evaluators, ConstraintIndexer[] indexers)
+	{
+		super(evaluators, indexers);
+	}
+	
+	//-------- tuple consumer interface (left) --------
+	
+	/**
+	 *  Send a tuple to this node.
+	 *  @param tuple The tuple.
+	 */
+	public void addTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		state.getProfiler().start(IProfiler.TYPE_NODE, this);
+		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
+
+		// Use super implementation to update matches, but don't propagate
+		this.delay	= true;
+		super.addTuple(left, state, mem, agenda);
+		this.delay	= false;
+		
+		// When no mapping exists, tuple can be propagated.
+		NotMemory	nomem	= (NotMemory)mem.getNodeMemory(this);
+		if(nomem.getMappings(left).isEmpty())
+		{
+			nomem.addResultTuple(left);
+			ITupleConsumerNode[] tcs = tconsumers;
+			for(int j=0; tcs!=null && j<tcs.length; j++)
+				tcs[j].addTuple(left, state, mem, agenda);
+		}
+
+		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
+		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+	
+	/**
+	 *  Remove a tuple from this node.
+	 *  @param tuple The tuple.
+	 */
+	public void removeTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		//System.out.println("Remove tuple called: "+this+" "+left);
+		state.getProfiler().start(IProfiler.TYPE_NODE, this);
+		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
+
+		// Remove tuple from indexed memories
+		// todo: what if value of object has already changed!
+		if(indexers!=null)
+		{
+			BetaMemory bmem = (BetaMemory)mem.getNodeMemory(this);
+			for(int i=0; i<indexers.length; i++)
+			{
+				indexers[i].removeTuple(left, bmem);
+			}
+		}
+
+		if(mem.hasNodeMemory(this))
+		{
+			// When no mapping exists, tuple will be retracted.
+			NotMemory	nomem	= (NotMemory)mem.getNodeMemory(this);
+			if(nomem.removeResultTuple(left))
+			{
+				ITupleConsumerNode[] tcs = tconsumers;
+				for(int j=0; tcs!=null && j<tcs.length; j++)
+					tcs[j].removeTuple(left, state, mem, agenda);
+			}
+		
+			nomem.removeMappings(left);
+		}
+
+		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
+		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+	
+	/**
+	 *  Modify a tuple in this node.
+	 *  @param left The tuple.
+	 */
+	public void modifyTuple(Tuple left, int tupleindex, OAVAttributeType type,
+		Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		if(!getRelevantAttributes().contains(type))
+			return;
+
+		state.getProfiler().start(IProfiler.TYPE_NODE, this);
+		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEMODIFIED);
+
+		// Use super implementation to update matches, but don't propagate
+		this.delay	= true;
+		super.modifyTuple(left, tupleindex, type, oldvalue, newvalue, state, mem, agenda);
+		this.delay	= false;
+
+		boolean	oldprop	= mem.hasNodeMemory(this)
+			&& ((NotMemory)mem.getNodeMemory(this)).getResultMemory().contains(left);
+		if(isAffected(type))
+		{
+			// Left tuple is propagated, when no right element matches.
+			boolean	newprop	= !mem.hasNodeMemory(this)
+				|| ((NotMemory)mem.getNodeMemory(this)).getMappings(left).isEmpty();
+
+			// When now no mapping exists, tuple is now propagated.
+			if(newprop && !oldprop)
+			{
+				((NotMemory)mem.getNodeMemory(this)).addResultTuple(left);
+				ITupleConsumerNode[] tcs = tconsumers;
+				for(int j=0; tcs!=null && j<tcs.length; j++)
+					tcs[j].addTuple(left, state, mem, agenda);
+			}
+	
+			// When now a mapping exists, tuple is retracted.
+			else if(!newprop && oldprop)
+			{
+				((NotMemory)mem.getNodeMemory(this)).removeResultTuple(left);
+				ITupleConsumerNode[] tcs = tconsumers;
+				for(int j=0; tcs!=null && j<tcs.length; j++)
+					tcs[j].removeTuple(left, state, mem, agenda);
+			}
+	
+			// When modified already propagated tuple, propagate modification.
+			else if(newprop)
+			{
+				ITupleConsumerNode[] tcs = tconsumers;
+				for(int j=0; tcs!=null && j<tcs.length; j++)
+					tcs[j].modifyTuple(left, tupleindex, type, oldvalue, newvalue, state, mem, agenda);
+			}
+		}
+			
+		// When not affected but previously propagated, propagate modify call.
+		else if(oldprop)
+		{
+			ITupleConsumerNode[] tcs = tconsumers;
+			for(int j=0; tcs!=null && j<tcs.length; j++)
+				tcs[j].modifyTuple(left, tupleindex, type, oldvalue, newvalue, state, mem, agenda);
+		}
+
+		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEMODIFIED);
+		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+
+	//-------- template methods --------
+	
+	/**
+	 *  Add a match to the node memory and propagate if necessary.
+	 */
+	protected void addMatch(Tuple left, Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		NotMemory nomem = (NotMemory)mem.getNodeMemory(this);
+		nomem.addMapping(left, right);
+		if(!delay && nomem.removeResultTuple(left))
+		{
+			ITupleConsumerNode[] tcs = tconsumers;
+			for(int j=0; tcs!=null && j<tcs.length; j++)
+				tcs[j].removeTuple(left, state, mem, agenda);
+		}
+	}
+
+	/**
+	 *  Remove a match from the node memory and propagate if necessary.
+	 */
+	protected void removeMatch(Tuple left, Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		if(mem.hasNodeMemory(this))
+		{
+			NotMemory nomem = (NotMemory)mem.getNodeMemory(this);
+			boolean	removed	= nomem.removeMapping(left, right);
+			if(removed && !delay && (nomem.getMappings(left)==null || nomem.getMappings(left).isEmpty()))
+			{
+				nomem.addResultTuple(left);
+				ITupleConsumerNode[] tcs = tconsumers;
+				for(int j=0; tcs!=null && j<tcs.length; j++)
+					tcs[j].addTuple(left, state, mem, agenda);
+			}
+		}
+	}
+
+	/**
+	 *  Propagate a change of a tuple in the result memory.
+	 */
+	protected void propagateModification(Tuple left, Object right, int tupleindex, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		// Nothing to do...
+	}
+
+
+	/**
+	 *  Check if a match is contained.
+	 */
+	protected boolean isMatchContained(Tuple left, Object right, ReteMemory mem)
+	{
+		boolean	ret	= false;
+		if(mem.hasNodeMemory(this))
+		{
+			NotMemory	nomem	= (NotMemory)mem.getNodeMemory(this);
+			Set	mappings	= nomem.getMappings(left);
+			ret	= mappings!=null && mappings.contains(right);
+		}
+		return ret;
+	}
+
+	/**
+	 *  Create the node memory.
+	 *  @return The node memory.
+	 */
+	public Object createNodeMemory()
+	{
+		return new NotMemory(this);
+	}
+}

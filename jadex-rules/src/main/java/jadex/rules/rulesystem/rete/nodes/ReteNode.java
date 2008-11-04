@@ -1,0 +1,508 @@
+package jadex.rules.rulesystem.rete.nodes;
+
+import jadex.rules.profiler.IProfiler;
+import jadex.rules.rulesystem.AbstractAgenda;
+import jadex.rules.rulesystem.IRule;
+import jadex.rules.rulesystem.rete.builder.ReteBuilder;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVObjectType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ *  ReteNode implementation of the IConditionSystem.
+ */
+public class ReteNode extends AbstractNode implements IObjectSourceNode
+{
+	//-------- attributes --------
+	
+	/** The type nodes. */
+	protected Map typenodes;
+	
+	/** Matching nodes for each (sub)type (cached for speed). */
+	protected Map typenodesets;
+	
+	/** The initial fact node (if any). */
+	protected InitialFactNode	initialfact;
+	
+	/** The terminal nodes (IRule -> Node). */
+	protected Map terminalnodes;
+	
+	/** The rete builder. */
+	protected ReteBuilder builder;
+	
+	/** The set of relevant attributes. */
+	protected Set relevants;
+	
+	/** Do a consistency check after each state change (requires asserts). */
+	protected boolean	check;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new rete system.
+	 *  @param state The state.
+	 */
+	public ReteNode()
+	{
+		this.typenodes = new LinkedHashMap();		
+		this.terminalnodes = new LinkedHashMap();
+
+		// The typenode mapping  for each object type is dynamically created on first access. hack???
+		this.typenodesets = Collections.synchronizedMap(new LinkedHashMap());
+	}
+
+	//-------- methods --------
+
+	/**
+	 *  Tell the condition system about a
+	 *  new object in the state.
+	 *  @param object The new object.
+	 */
+	public void addObject(Object id, OAVObjectType type, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+//		System.out.println("Value added: "+id+" "+type);
+		state.getProfiler().start(IProfiler.TYPE_NODE, this);
+		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
+		
+		Set	tns	= getTypeNodes(type);
+		
+		if(tns!=null)
+		{
+			for(Iterator it=tns.iterator(); it.hasNext(); )
+				((AlphaNode)it.next()).addObject(id, state, mem, agenda);
+			
+			assert !check || checkConsistency(mem);
+		}
+//		else
+//			System.out.println("No typenode(s) available for: "+type);
+
+		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
+		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+		
+	/**
+	 *  Tell the condition system about a
+	 *  removed object in the state.
+	 *  @param object The removed object.
+	 */
+	public void removeObject(Object id, OAVObjectType type, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		state.getProfiler().start(IProfiler.TYPE_NODE, this);
+		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
+
+		Set	tns	= getTypeNodes(type);
+		
+		if(tns!=null)
+		{
+			for(Iterator it=tns.iterator(); it.hasNext(); )
+				((AlphaNode)it.next()).removeObject(id, state, mem, agenda);
+			
+			assert !check || checkConsistency(mem);
+		}
+//		else
+//			System.out.println("No typenode(s) available for: "+type);
+		
+		//assert !mem.contains(id);
+//		System.out.println("Value removed: "+id+" "+type);
+
+		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
+		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+	
+	/**
+	 *  Tell the condition system about a
+	 *  new object in the state.
+	 *  @param object The new object.
+	 */
+	public void modifyObject(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, 
+		Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+//		System.out.println("Value set: "+id+" "+type+" "+value);
+		state.getProfiler().start(IProfiler.TYPE_NODE, this);
+		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
+		
+		if(getRelevantAttributes().contains(attr))
+		{
+			Set	tns	= getTypeNodes(type);
+			
+			if(tns!=null)
+			{
+				for(Iterator it=tns.iterator(); it.hasNext(); )
+				{
+					TypeNode	tn	= (TypeNode)it.next();
+					tn.modifyObject(id, attr, oldvalue, newvalue, state, mem, agenda);
+					// old code for modified object
+					//tn.removeObject(id, state, mem, agenda);
+					//tn.addObject(id, state, mem, agenda);
+				}
+			
+				assert !check || checkConsistency(mem);
+			}
+			//else
+//				System.out.println("No typenode(s) available for: "+value);
+		}
+
+		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
+		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+		
+	/**
+	 *  Add a rule to the network.
+	 *  @param rule The rule to add.
+	 */
+	public void addRule(IRule rule)
+	{
+		if(builder==null)
+			builder = new ReteBuilder();
+		builder.addRule(this, rule);
+	}
+	
+	/**
+	 *  Remove a rule from the network.
+	 *  @param rule The rule to remove.
+	 */
+	public void removeRule(IRule rule)
+	{
+		if(builder==null)
+			builder = new ReteBuilder();
+		builder.removeRule(this, rule);
+	}
+	
+	/**
+	 *  Set the terminal node for a rule.
+	 *  @param rule The rule.
+	 *  @param node The node.
+	 */
+	public void putTerminalNode(TerminalNode node)
+	{
+		terminalnodes.put(node.getRule(), node);
+	}
+	
+	/**
+	 *  Set the terminal node for a rule.
+	 *  @param rule The rule.
+	 *  @param node The node.
+	 */
+	public TerminalNode getTerminalNode(IRule rule)
+	{
+		return (TerminalNode)terminalnodes.get(rule);
+	}
+	
+	/**
+	 *  Get the number of nodes in the network.
+	 *  @return The number of nodes.
+	 */
+	public int getNodeCount()
+	{
+		List ret = new ArrayList();
+		ret.add(this);
+		
+		for(int i=0; i<ret.size(); i++)
+		{
+			INode node = (INode)ret.get(i);
+			if(node instanceof IObjectSourceNode)
+			{
+				IObjectConsumerNode[] consumers = ((IObjectSourceNode)node).getObjectConsumers();
+				for(int j=0; j<consumers.length; j++)
+				{
+					if(!ret.contains(consumers[j]))
+						ret.add(consumers[j]);
+				}
+			}
+			if(node instanceof ITupleSourceNode)
+			{
+				ITupleConsumerNode[] consumers = ((ITupleSourceNode)node).getTupleConsumers();
+				for(int j=0; j<consumers.length; j++)
+				{
+					if(!ret.contains(consumers[j]))
+						ret.add(consumers[j]);
+				}
+			}
+		}
+		
+		return ret.size();
+	}
+	
+	//-------- object source node --------
+	
+	/**
+	 *  Add an object consumer node.
+	 *  @param node A new consumer node.
+	 */
+	public void addObjectConsumer(IObjectConsumerNode node)
+	{
+		if(node instanceof TypeNode)
+		{
+			if(typenodes.put(((TypeNode)node).getObjectType(), node)!=null)
+				throw new RuntimeException("Type node already present in network: "+node);
+		}
+		else if(node instanceof InitialFactNode)
+		{
+			if(initialfact!=null)
+				throw new RuntimeException("Initial fact node already present in network: "+node);
+			initialfact	= (InitialFactNode)node;
+		}
+		else
+		{
+			throw new RuntimeException("Rete node only allows type or initial fact node children: "+node);
+		}
+		
+		relevants	= null;	// Will be recalculated on next access;
+	}
+	
+	/**
+	 *  Remove an object consumer.
+	 *  @param node The consumer node.
+	 */
+	public void removeObjectConsumer(IObjectConsumerNode node)
+	{
+		typenodes.remove(((TypeNode)node).getObjectType());
+	}
+	
+	/**
+	 *  Get the memory for this node.
+	 *  @return The memory.
+	 */
+	public Collection getNodeMemory(ReteMemory mem)
+	{
+		return mem.hasNodeMemory(this) ? (Collection)mem.getNodeMemory(this) : null;
+	}
+	
+	/**
+	 *  Get all object consumer nodes.
+	 *  @return All object consumer nodes.
+	 */
+	public IObjectConsumerNode[] getObjectConsumers()
+	{
+		Collection	vals	= typenodes.values();
+		IObjectConsumerNode[]	ret	= (IObjectConsumerNode[])vals.toArray(new IObjectConsumerNode[vals.size()+(initialfact!=null?1:0)]);
+		if(initialfact!=null)
+			ret[ret.length-1]	= initialfact;
+		return ret;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get the node for a type.
+	 *  @param type The type.
+	 *  @return The type node (if any).
+	 */
+	public TypeNode getTypeNode(OAVObjectType type)
+	{
+		return (TypeNode)typenodes.get(type);
+	}
+	
+	/**
+	 *  Get the initial fact node (if any).
+	 */
+	public InitialFactNode getInitialFactNode()
+	{
+		return initialfact;
+	}
+
+	/**
+	 *  Create the node memory.
+	 *  @return The node memory.
+	 */
+	public Object createNodeMemory()
+	{
+		return null;
+	}
+
+	/**
+	 *  Get the set of relevant attribute types.
+	 */
+	public Set	getRelevantAttributes()
+	{
+		if(relevants==null)
+		{
+			synchronized(this) 
+			{
+				if(relevants==null)
+				{
+					relevants	= new HashSet();
+					for(Iterator it=typenodes.values().iterator(); it.hasNext(); )
+					{
+						relevants.addAll(((INode)it.next()).getRelevantAttributes());
+					}
+				}
+			}
+		}
+		return relevants;
+	}
+	
+	/**
+	 *  Get the builder.
+	 *  @return The rete builder.
+	 */
+	public ReteBuilder getBuilder()
+	{
+		return builder;
+	}
+
+	//-------- helper methods --------
+	
+	/**
+	 *  Get the set of matching type nodes for a (sub)type.
+	 *  @param type The object type.
+	 *  @return The set of type nodes for that object type.
+	 */
+	protected Set	getTypeNodes(OAVObjectType type)
+	{
+		Set	ret	= (Set)typenodesets.get(type);
+		if(ret==null)
+		{
+			synchronized(this)
+			{
+				ret	= (Set)typenodesets.get(type);
+				if(ret==null)
+				{
+					ret	= new HashSet();
+					for(Iterator it=typenodes.values().iterator(); it.hasNext(); )
+					{
+						TypeNode	tnode	= (TypeNode)it.next();
+						if(type.isSubtype(tnode.getObjectType()))
+							ret.add(tnode);
+					}
+					typenodesets.put(type, ret);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	//-------- cloneable --------
+	
+	/**
+	 *  Do clone makes a deep clone without regarding cycles.
+	 *  @param clone The clone.
+	 */
+	protected void doClone(Object theclone)
+	{
+		ReteNode clone = (ReteNode)theclone;
+		
+		// Deep clone type nodes
+		clone.typenodes = new LinkedHashMap();
+		for(Iterator it=typenodes.keySet().iterator(); it.hasNext(); )
+		{
+			OAVObjectType type = (OAVObjectType)it.next();
+			clone.typenodes.put(type, getTypeNode(type).clone());
+		}
+		
+		// Update typenodesets
+		clone.typenodesets = new LinkedHashMap();
+		for(Iterator it=typenodesets.keySet().iterator(); it.hasNext(); )
+		{
+			OAVObjectType type = (OAVObjectType)it.next();
+			Set oldtns = getTypeNodes(type);
+			if(oldtns!=null)
+			{
+				Set newtns = new HashSet();
+				for(Iterator it2=oldtns.iterator(); it.hasNext(); )
+				{
+					INode oldtn = (INode)it2.next();
+					newtns.add(oldtn.clone());
+				}
+				clone.typenodesets.put(type, newtns);
+			}
+		}
+			
+		// Deep clone initial fact node
+		if(initialfact!=null)
+			clone.initialfact = (InitialFactNode)initialfact.clone();
+	
+		// Refresh terminal nodes
+		// Searches the whole net and if a terminal node is found
+		// it is added to the terminalnodes map.
+		clone.terminalnodes = new HashMap();
+		List nodes = new ArrayList();
+		nodes.addAll(clone.typenodes.values());
+		for(int i=0; i<nodes.size(); i++)
+		{
+			Object node = nodes.get(i);
+			if(node instanceof IObjectSourceNode)
+			{
+				IObjectSourceNode osn = (IObjectSourceNode)node;
+				IObjectConsumerNode[] cons = osn.getObjectConsumers();
+				for(int j=0; j<cons.length; j++)
+				{
+					if(!nodes.contains(cons[j]))
+						nodes.add(cons[j]);
+				}
+			}
+			if(node instanceof ITupleSourceNode)
+			{
+				ITupleSourceNode tsn = (ITupleSourceNode)node;
+				ITupleConsumerNode[] cons = tsn.getTupleConsumers();
+				for(int j=0; j<cons.length; j++)
+				{
+					if(!nodes.contains(cons[j]))
+						nodes.add(cons[j]);
+				}
+			}
+			
+			if(node instanceof TerminalNode)
+				clone.putTerminalNode((TerminalNode)((TerminalNode)node).clone());
+		}
+		
+		// Keep same stateless rete builder
+		
+		// Shallow copy the relevant attributes
+		if(relevants!=null)
+			clone.relevants = (Set)((HashSet)relevants).clone();
+	}
+	
+	//-------- checking --------
+	
+	protected int	changecnt;
+	protected List	checked	= new ArrayList();
+	
+	/**
+	 *  Check consistency of Rete network/memory.
+	 *  For debugging. Only performs some simple
+	 *  checks and does not assure complete consistency.
+	 */
+	protected boolean	checkConsistency(ReteMemory mem)
+	{
+		boolean	consistent	= true;
+		
+		// Iterate through all node.
+		List	nodes	= new ArrayList();
+		nodes.add(this);
+		while(consistent && !nodes.isEmpty())
+		{
+			INode	node	= (INode)nodes.remove(nodes.size()-1);
+			if(node instanceof ITupleSourceNode)
+			{
+				INode[]	subnodes	= ((ITupleSourceNode)node).getTupleConsumers();
+				for(int i=0; i<subnodes.length; i++)
+					nodes.add(subnodes[i]);
+			}
+			if(node instanceof IObjectSourceNode)
+			{
+				INode[]	subnodes	= ((IObjectSourceNode)node).getObjectConsumers();
+				for(int i=0; i<subnodes.length; i++)
+					nodes.add(subnodes[i]);
+			}
+
+			node.checkNodeConsistency(mem);
+		}
+		
+		changecnt++;
+		checked.clear();
+		
+		return consistent;
+	}
+}

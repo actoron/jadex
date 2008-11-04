@@ -1,0 +1,109 @@
+<!--
+	<H3>Test an achieve goal with context condition for goal suspension.</H3>
+
+	This agent has an achieve goal associated with
+	an increment plan that increments
+	every second the belief count. The achieve
+	goal succeeds when it has count till 5.
+
+	The achieve goal has a context condition that
+	directly maps to the state of the belief <mycontext>.
+	Setting this belief to false (with the BDI-Viewer)
+	results in the achieve goal suspension.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="AchieveGoal"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>java.util.logging.Level</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+		
+		<belief name="count"  class="int">
+			<fact>0</fact>
+		</belief>
+		<belief name="mycontext"  class="boolean">
+			<fact>true</fact>
+		</belief>
+		<belief name="myfailure"  class="boolean">
+			<fact>false</fact>
+		</belief>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="testgoal" retry="true" exclude="never">
+			<contextcondition>
+ 				// $beliefbase.mycontext
+
+				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
+				?mbel	= (mbelief (element_has_name "mycontext"))
+ 			</contextcondition>
+			<targetcondition>
+ 				// $beliefbase.count==5
+
+				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
+				?mbel	= (mbelief (element_has_name "count"))
+ 			</targetcondition>
+			<!-- <failurecondition>
+ 				// $beliefbase.myfailure
+
+				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
+				?mbel	= (mbelief (element_has_name "myfailure"))
+ 			</failurecondition> -->
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="testplan">
+			<body class="GenerateGoalPlan"/>
+		</plan>
+		
+        <plan name="increment">
+			<parameter name="beliefname">
+				<value>"count"</value>
+			</parameter>
+			<parameter name="value">
+				<value>1</value>
+			</parameter>
+			<parameter name="rate">
+				<value>100</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<goal ref="testgoal"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- <property name="logging.level">Level.INFO</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="testplan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

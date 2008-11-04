@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+	<H3>Register in initial state and deregister in end state.</H3>
+	Part of EndState test.
+ -->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="EndStateDeregister"
+	package="jadex.bdi.testcases.misc">
+	
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+	
+	<capabilities>
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
+	</capabilities>
+	
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="dfcap.df_register">
+					<parameter ref="description">
+						<value>
+							((IDF)$scope.getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+								.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+									.createDFServiceDescription("endstate_testservice", "endstate_testservice", "EndStateDeregister"))
+						</value>
+					</parameter>
+				</initialgoal>
+				<endgoal ref="dfcap.df_deregister"/>
+			</goals>
+		</configuration>
+	</configurations>
+	
+</agent>

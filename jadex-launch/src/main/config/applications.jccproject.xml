@@ -1,0 +1,581 @@
+<?xml version="1.0" ?>
+<properties>
+	<property type="perspective">Starter</property>
+	<properties type="window">
+		<property type="width">768</property>
+		<property type="height">614</property>
+		<property type="x">256</property>
+		<property type="y">205</property>
+		<property type="extendedState">0</property>
+		<property type="console_on">false</property>
+		<property type="jccexit">shutdown</property>
+	</properties>
+	<properties type="Starter">
+		<property type="leftsplit.location">300</property>
+		<property type="mainsplit.location">228</property>
+		<properties type="mpanel">
+			<property type="rootnode"><![CDATA[<n:root xmlns:n="nuggets_xml_encoder"  xmlns:r="reference_ids" xmlns="jadex.tools.common.modeltree">
+<jadex.tools.starter.RootNodeFunctionality n:id="2"/>
+<java.io.File n:id="5" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes"/>
+<jadex.tools.starter.DirNodeFunctionality n:id="6"/>
+<java.io.File n:id="9" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex"/>
+<jadex.tools.starter.DirNodeFunctionality n:id="a"/>
+<java.io.File n:id="d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi"/>
+<java.io.File n:id="10" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\benchmarks"/>
+<java.io.File n:id="13" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\benchmarks\\AgentCreation.agent.xml"/>
+<jadex.tools.starter.FileNodeFunctionality n:id="14"/>
+<FileNode n:id="12" valid="true" r:file="13" r:nodeFunctionality="14" r:parent="f" lastmodified="1224772329921" checked="true"/>
+<java.io.File n:id="16" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\benchmarks\\MessagePerformance.agent.xml"/>
+<FileNode n:id="15" valid="true" r:file="16" r:nodeFunctionality="14" r:parent="f" lastmodified="1222332933593" checked="true"/>
+<java.util.ArrayList n:id="11">12 15</java.util.ArrayList>
+<DirNode n:id="f" valid="true" r:file="10" r:nodeFunctionality="a" r:parent="c" lastmodified="1225802820296" r:children="11" checked="true"/>
+<java.io.File n:id="18" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples"/>
+<java.io.File n:id="1b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\alarmclock"/>
+<java.io.File n:id="1e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\alarmclock\\images"/>
+<DirNode n:id="1d" valid="true" r:file="1e" r:nodeFunctionality="a" r:parent="1a" lastmodified="1225802815734" checked="true"/>
+<java.io.File n:id="20" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\alarmclock\\Alarmclock.agent.xml"/>
+<FileNode n:id="1f" valid="true" r:file="20" r:nodeFunctionality="14" r:parent="1a" lastmodified="1224512850625" checked="true"/>
+<java.util.ArrayList n:id="1c">1d 1f</java.util.ArrayList>
+<DirNode n:id="1a" valid="true" r:file="1b" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802820156" r:children="1c" checked="true"/>
+<java.io.File n:id="22" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack"/>
+<java.io.File n:id="25" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\dealer"/>
+<java.io.File n:id="28" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\dealer\\Dealer.agent.xml"/>
+<FileNode n:id="27" valid="true" r:file="28" r:nodeFunctionality="14" r:parent="24" lastmodified="1224512849234" checked="true"/>
+<java.util.ArrayList n:id="26">27</java.util.ArrayList>
+<DirNode n:id="24" valid="true" r:file="25" r:nodeFunctionality="a" r:parent="21" lastmodified="1225802819687" r:children="26" checked="true"/>
+<java.io.File n:id="2a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\gui"/>
+<java.io.File n:id="2d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\gui\\images"/>
+<DirNode n:id="2c" valid="true" r:file="2d" r:nodeFunctionality="a" r:parent="29" lastmodified="1225802815562" checked="true"/>
+<java.util.ArrayList n:id="2b">2c</java.util.ArrayList>
+<DirNode n:id="29" valid="true" r:file="2a" r:nodeFunctionality="a" r:parent="21" lastmodified="1225802819562" r:children="2b" checked="true"/>
+<java.io.File n:id="2f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\manager"/>
+<java.io.File n:id="32" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\manager\\Manager.agent.xml"/>
+<FileNode n:id="31" valid="true" r:file="32" r:nodeFunctionality="14" r:parent="2e" lastmodified="1224512849843" checked="true"/>
+<java.util.ArrayList n:id="30">31</java.util.ArrayList>
+<DirNode n:id="2e" valid="true" r:file="2f" r:nodeFunctionality="a" r:parent="21" lastmodified="1225802819468" r:children="30" checked="true"/>
+<java.io.File n:id="34" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\ontology"/>
+<DirNode n:id="33" valid="true" r:file="34" r:nodeFunctionality="a" r:parent="21" lastmodified="1225802814140" checked="true"/>
+<java.io.File n:id="36" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\player"/>
+<java.io.File n:id="39" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\player\\strategies"/>
+<DirNode n:id="38" valid="true" r:file="39" r:nodeFunctionality="a" r:parent="35" lastmodified="1225802819234" checked="true"/>
+<java.io.File n:id="3b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blackjack\\player\\Player.agent.xml"/>
+<FileNode n:id="3a" valid="true" r:file="3b" r:nodeFunctionality="14" r:parent="35" lastmodified="1224512849531" checked="true"/>
+<java.util.ArrayList n:id="37">38 3a</java.util.ArrayList>
+<DirNode n:id="35" valid="true" r:file="36" r:nodeFunctionality="a" r:parent="21" lastmodified="1225802819359" r:children="37" checked="true"/>
+<java.util.ArrayList n:id="23">24 29 2e 33 35</java.util.ArrayList>
+<DirNode n:id="21" valid="true" r:file="22" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802819796" r:children="23" checked="true"/>
+<java.io.File n:id="3d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blocksworld"/>
+<java.io.File n:id="40" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\blocksworld\\BlocksworldOAV.agent.xml"/>
+<FileNode n:id="3f" valid="true" r:file="40" r:nodeFunctionality="14" r:parent="3c" lastmodified="1224512846250" checked="true"/>
+<java.util.ArrayList n:id="3e">3f</java.util.ArrayList>
+<DirNode n:id="3c" valid="true" r:file="3d" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802819187" r:children="3e" checked="true"/>
+<java.io.File n:id="42" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading"/>
+<java.io.File n:id="45" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading\\buyer"/>
+<java.io.File n:id="48" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading\\buyer\\Buyer.agent.xml"/>
+<FileNode n:id="47" valid="true" r:file="48" r:nodeFunctionality="14" r:parent="44" lastmodified="1224512847359" checked="true"/>
+<java.util.ArrayList n:id="46">47</java.util.ArrayList>
+<DirNode n:id="44" valid="true" r:file="45" r:nodeFunctionality="a" r:parent="41" lastmodified="1225802819031" r:children="46" checked="true"/>
+<java.io.File n:id="4a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading\\common"/>
+<DirNode n:id="49" valid="true" r:file="4a" r:nodeFunctionality="a" r:parent="41" lastmodified="1225802819000" checked="true"/>
+<java.io.File n:id="4c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading\\manager"/>
+<java.io.File n:id="4f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading\\manager\\Manager.agent.xml"/>
+<FileNode n:id="4e" valid="true" r:file="4f" r:nodeFunctionality="14" r:parent="4b" lastmodified="1221125912609" checked="true"/>
+<java.util.ArrayList n:id="4d">4e</java.util.ArrayList>
+<DirNode n:id="4b" valid="true" r:file="4c" r:nodeFunctionality="a" r:parent="41" lastmodified="1225802813734" r:children="4d" checked="true"/>
+<java.io.File n:id="51" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading\\seller"/>
+<java.io.File n:id="54" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\booktrading\\seller\\Seller.agent.xml"/>
+<FileNode n:id="53" valid="true" r:file="54" r:nodeFunctionality="14" r:parent="50" lastmodified="1224512847687" checked="true"/>
+<java.util.ArrayList n:id="52">53</java.util.ArrayList>
+<DirNode n:id="50" valid="true" r:file="51" r:nodeFunctionality="a" r:parent="41" lastmodified="1225802818812" r:children="52" checked="true"/>
+<java.util.ArrayList n:id="43">44 49 4b 50</java.util.ArrayList>
+<DirNode n:id="41" valid="true" r:file="42" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802813781" r:children="43" checked="true"/>
+<java.io.File n:id="56" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld"/>
+<java.io.File n:id="59" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\cleaner"/>
+<java.io.File n:id="5c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\cleaner\\Cleaner.agent.xml"/>
+<FileNode n:id="5b" valid="true" r:file="5c" r:nodeFunctionality="14" r:parent="58" lastmodified="1224512845843" checked="true"/>
+<java.io.File n:id="5e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\cleaner\\CleanerLocal.agent.xml"/>
+<FileNode n:id="5d" valid="true" r:file="5e" r:nodeFunctionality="14" r:parent="58" lastmodified="1224512845593" checked="true"/>
+<java.util.ArrayList n:id="5a">5b 5d</java.util.ArrayList>
+<DirNode n:id="58" valid="true" r:file="59" r:nodeFunctionality="a" r:parent="55" lastmodified="1225802818687" r:children="5a" checked="true"/>
+<java.io.File n:id="60" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\environment"/>
+<java.io.File n:id="63" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\environment\\Environment.agent.xml"/>
+<FileNode n:id="62" valid="true" r:file="63" r:nodeFunctionality="14" r:parent="5f" lastmodified="1224512845109" checked="true"/>
+<java.io.File n:id="65" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\environment\\EnvironmentLocal.agent.xml"/>
+<FileNode n:id="64" valid="true" r:file="65" r:nodeFunctionality="14" r:parent="5f" lastmodified="1224512845171" checked="true"/>
+<java.util.ArrayList n:id="61">62 64</java.util.ArrayList>
+<DirNode n:id="5f" valid="true" r:file="60" r:nodeFunctionality="a" r:parent="55" lastmodified="1225802818468" r:children="61" checked="true"/>
+<java.io.File n:id="67" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\images"/>
+<DirNode n:id="66" valid="true" r:file="67" r:nodeFunctionality="a" r:parent="55" lastmodified="1225802813546" checked="true"/>
+<java.io.File n:id="69" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\manager"/>
+<java.io.File n:id="6c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\manager\\Manager.agent.xml"/>
+<FileNode n:id="6b" valid="true" r:file="6c" r:nodeFunctionality="14" r:parent="68" lastmodified="1222332930468" checked="true"/>
+<java.io.File n:id="6e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\manager\\ManagerLocal.agent.xml"/>
+<FileNode n:id="6d" valid="true" r:file="6e" r:nodeFunctionality="14" r:parent="68" lastmodified="1222332930421" checked="true"/>
+<java.util.ArrayList n:id="6a">6b 6d</java.util.ArrayList>
+<DirNode n:id="68" valid="true" r:file="69" r:nodeFunctionality="a" r:parent="55" lastmodified="1225802813359" r:children="6a" checked="true"/>
+<java.util.ArrayList n:id="57">58 5f 66 68</java.util.ArrayList>
+<DirNode n:id="55" valid="true" r:file="56" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802818796" r:children="57" checked="true"/>
+<java.io.File n:id="70" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld2"/>
+<java.io.File n:id="73" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld2\\cleaner"/>
+<java.io.File n:id="76" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld2\\cleaner\\Cleaner.agent.xml"/>
+<FileNode n:id="75" valid="true" r:file="76" r:nodeFunctionality="14" r:parent="72" lastmodified="1225799876890" checked="true"/>
+<java.util.ArrayList n:id="74">75</java.util.ArrayList>
+<DirNode n:id="72" valid="true" r:file="73" r:nodeFunctionality="a" r:parent="6f" lastmodified="1225802818328" r:children="74" checked="true"/>
+<java.io.File n:id="78" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld2\\images"/>
+<DirNode n:id="77" valid="true" r:file="78" r:nodeFunctionality="a" r:parent="6f" lastmodified="1225802813250" checked="true"/>
+<java.io.File n:id="7a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld2\\manager"/>
+<java.io.File n:id="7d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld2\\manager\\Manager.agent.xml"/>
+<FileNode n:id="7c" valid="true" r:file="7d" r:nodeFunctionality="14" r:parent="79" lastmodified="1225799877359" checked="true"/>
+<java.util.ArrayList n:id="7b">7c</java.util.ArrayList>
+<DirNode n:id="79" valid="true" r:file="7a" r:nodeFunctionality="a" r:parent="6f" lastmodified="1225802818328" r:children="7b" checked="true"/>
+<java.util.ArrayList n:id="71">72 77 79</java.util.ArrayList>
+<DirNode n:id="6f" valid="true" r:file="70" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802813265" r:children="71" checked="true"/>
+<java.io.File n:id="7f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\garbagecollector"/>
+<java.io.File n:id="82" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\garbagecollector\\images"/>
+<DirNode n:id="81" valid="true" r:file="82" r:nodeFunctionality="a" r:parent="7e" lastmodified="1225802813000" checked="true"/>
+<java.io.File n:id="84" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\garbagecollector\\Environment.agent.xml"/>
+<FileNode n:id="83" valid="true" r:file="84" r:nodeFunctionality="14" r:parent="7e" lastmodified="1224512846937" checked="true"/>
+<java.io.File n:id="86" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\garbagecollector\\GarbageBurner.agent.xml"/>
+<FileNode n:id="85" valid="true" r:file="86" r:nodeFunctionality="14" r:parent="7e" lastmodified="1221040696250" checked="true"/>
+<java.io.File n:id="88" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\garbagecollector\\GarbageCollector.agent.xml"/>
+<FileNode n:id="87" valid="true" r:file="88" r:nodeFunctionality="14" r:parent="7e" lastmodified="1222352555609" checked="true"/>
+<java.io.File n:id="8a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\garbagecollector\\Manager.agent.xml"/>
+<FileNode n:id="89" valid="true" r:file="8a" r:nodeFunctionality="14" r:parent="7e" lastmodified="1222352555734" checked="true"/>
+<java.util.ArrayList n:id="80">81 83 85 87 89</java.util.ArrayList>
+<DirNode n:id="7e" valid="true" r:file="7f" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802818312" r:children="80" checked="true"/>
+<java.io.File n:id="8c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\helloworld"/>
+<java.io.File n:id="8f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\helloworld\\GoodbyeWorld.agent.xml"/>
+<FileNode n:id="8e" valid="true" r:file="8f" r:nodeFunctionality="14" r:parent="8b" lastmodified="1221122767062" checked="true"/>
+<java.io.File n:id="91" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\helloworld\\HelloWorld.agent.xml"/>
+<FileNode n:id="90" valid="true" r:file="91" r:nodeFunctionality="14" r:parent="8b" lastmodified="1221122766890" checked="true"/>
+<java.util.ArrayList n:id="8d">8e 90</java.util.ArrayList>
+<DirNode n:id="8b" valid="true" r:file="8c" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802818218" r:children="8d" checked="true"/>
+<java.io.File n:id="93" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey"/>
+<java.io.File n:id="96" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature"/>
+<java.io.File n:id="99" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\actsense"/>
+<java.io.File n:id="9c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\actsense\\Creature.capability.xml"/>
+<FileNode n:id="9b" valid="true" r:file="9c" r:nodeFunctionality="14" r:parent="98" lastmodified="1221232223234" checked="true"/>
+<java.util.ArrayList n:id="9a">9b</java.util.ArrayList>
+<DirNode n:id="98" valid="true" r:file="99" r:nodeFunctionality="a" r:parent="95" lastmodified="1225802818046" r:children="9a" checked="true"/>
+<java.io.File n:id="9e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\hunters"/>
+<java.io.File n:id="a1" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\hunters\\dumbhunter"/>
+<java.io.File n:id="a4" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\hunters\\dumbhunter\\DumbHunter.agent.xml"/>
+<FileNode n:id="a3" valid="true" r:file="a4" r:nodeFunctionality="14" r:parent="a0" lastmodified="1221235594703" checked="true"/>
+<java.util.ArrayList n:id="a2">a3</java.util.ArrayList>
+<DirNode n:id="a0" valid="true" r:file="a1" r:nodeFunctionality="a" r:parent="9d" lastmodified="1225802818015" r:children="a2" checked="true"/>
+<java.io.File n:id="a6" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\hunters\\ldahunter"/>
+<java.io.File n:id="a9" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\hunters\\ldahunter\\potentialfield"/>
+<DirNode n:id="a8" valid="true" r:file="a9" r:nodeFunctionality="a" r:parent="a5" lastmodified="1225802817984" checked="true"/>
+<java.io.File n:id="ab" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\hunters\\ldahunter\\LAHunter.agent.xml"/>
+<FileNode n:id="aa" valid="true" r:file="ab" r:nodeFunctionality="14" r:parent="a5" lastmodified="1221235662687" checked="true"/>
+<java.util.ArrayList n:id="a7">a8 aa</java.util.ArrayList>
+<DirNode n:id="a5" valid="true" r:file="a6" r:nodeFunctionality="a" r:parent="9d" lastmodified="1225802818000" r:children="a7" checked="true"/>
+<java.util.ArrayList n:id="9f">a0 a5</java.util.ArrayList>
+<DirNode n:id="9d" valid="true" r:file="9e" r:nodeFunctionality="a" r:parent="95" lastmodified="1225802812687" r:children="9f" checked="true"/>
+<java.io.File n:id="ad" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys"/>
+<java.io.File n:id="b0" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\basicbehaviour"/>
+<java.io.File n:id="b3" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\basicbehaviour\\BasicBehaviour.capability.xml"/>
+<FileNode n:id="b2" valid="true" r:file="b3" r:nodeFunctionality="14" r:parent="af" lastmodified="1221234672359" checked="true"/>
+<java.util.ArrayList n:id="b1">b2</java.util.ArrayList>
+<DirNode n:id="af" valid="true" r:file="b0" r:nodeFunctionality="a" r:parent="ac" lastmodified="1225802817906" r:children="b1" checked="true"/>
+<java.io.File n:id="b5" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\cleverprey"/>
+<java.io.File n:id="b8" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\cleverprey\\CleverPrey.agent.xml"/>
+<FileNode n:id="b7" valid="true" r:file="b8" r:nodeFunctionality="14" r:parent="b4" lastmodified="1221234823125" checked="true"/>
+<java.util.ArrayList n:id="b6">b7</java.util.ArrayList>
+<DirNode n:id="b4" valid="true" r:file="b5" r:nodeFunctionality="a" r:parent="ac" lastmodified="1225802812500" r:children="b6" checked="true"/>
+<java.io.File n:id="ba" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\dumbprey"/>
+<java.io.File n:id="bd" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\dumbprey\\DumbPrey.agent.xml"/>
+<FileNode n:id="bc" valid="true" r:file="bd" r:nodeFunctionality="14" r:parent="b9" lastmodified="1221235006968" checked="true"/>
+<java.util.ArrayList n:id="bb">bc</java.util.ArrayList>
+<DirNode n:id="b9" valid="true" r:file="ba" r:nodeFunctionality="a" r:parent="ac" lastmodified="1225802817859" r:children="bb" checked="true"/>
+<java.io.File n:id="bf" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\lazyprey"/>
+<java.io.File n:id="c2" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\creature\\preys\\lazyprey\\LazyPrey.agent.xml"/>
+<FileNode n:id="c1" valid="true" r:file="c2" r:nodeFunctionality="14" r:parent="be" lastmodified="1221231296015" checked="true"/>
+<java.util.ArrayList n:id="c0">c1</java.util.ArrayList>
+<DirNode n:id="be" valid="true" r:file="bf" r:nodeFunctionality="a" r:parent="ac" lastmodified="1225802812390" r:children="c0" checked="true"/>
+<java.util.ArrayList n:id="ae">af b4 b9 be</java.util.ArrayList>
+<DirNode n:id="ac" valid="true" r:file="ad" r:nodeFunctionality="a" r:parent="95" lastmodified="1225802812515" r:children="ae" checked="true"/>
+<java.util.ArrayList n:id="97">98 9d ac</java.util.ArrayList>
+<DirNode n:id="95" valid="true" r:file="96" r:nodeFunctionality="a" r:parent="92" lastmodified="1225802812750" r:children="97" checked="true"/>
+<java.io.File n:id="c4" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\environment"/>
+<java.io.File n:id="c7" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\environment\\Environment.agent.xml"/>
+<FileNode n:id="c6" valid="true" r:file="c7" r:nodeFunctionality="14" r:parent="c3" lastmodified="1221233390062" checked="true"/>
+<java.io.File n:id="c9" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\environment\\Observer.agent.xml"/>
+<FileNode n:id="c8" valid="false" r:file="c9" r:nodeFunctionality="14" r:parent="c3" lastmodified="1213802990281" checked="true"/>
+<java.io.File n:id="cb" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\environment\\RemoteObserver.agent.xml"/>
+<FileNode n:id="ca" valid="false" r:file="cb" r:nodeFunctionality="14" r:parent="c3" lastmodified="1213802990265" checked="true"/>
+<java.util.ArrayList n:id="c5">c6 c8 ca</java.util.ArrayList>
+<DirNode n:id="c3" valid="false" r:file="c4" r:nodeFunctionality="a" r:parent="92" lastmodified="1225802817859" r:children="c5" checked="true"/>
+<java.io.File n:id="cd" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\images"/>
+<DirNode n:id="cc" valid="true" r:file="cd" r:nodeFunctionality="a" r:parent="92" lastmodified="1225802812234" checked="true"/>
+<java.io.File n:id="cf" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\manager"/>
+<java.io.File n:id="d2" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\hunterprey\\manager\\Manager.agent.xml"/>
+<FileNode n:id="d1" valid="true" r:file="d2" r:nodeFunctionality="14" r:parent="ce" lastmodified="1221229270906" checked="true"/>
+<java.util.ArrayList n:id="d0">d1</java.util.ArrayList>
+<DirNode n:id="ce" valid="true" r:file="cf" r:nodeFunctionality="a" r:parent="92" lastmodified="1225802812109" r:children="d0" checked="true"/>
+<java.util.ArrayList n:id="94">95 c3 cc ce</java.util.ArrayList>
+<DirNode n:id="92" valid="false" r:file="93" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802818187" r:children="94" checked="true"/>
+<java.io.File n:id="d4" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld"/>
+<java.io.File n:id="d7" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\carrier"/>
+<java.io.File n:id="da" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\carrier\\Carry.agent.xml"/>
+<FileNode n:id="d9" valid="true" r:file="da" r:nodeFunctionality="14" r:parent="d6" lastmodified="1219329711171" checked="true"/>
+<java.util.ArrayList n:id="d8">d9</java.util.ArrayList>
+<DirNode n:id="d6" valid="true" r:file="d7" r:nodeFunctionality="a" r:parent="d3" lastmodified="1225802817671" r:children="d8" checked="true"/>
+<java.io.File n:id="dc" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\images"/>
+<DirNode n:id="db" valid="true" r:file="dc" r:nodeFunctionality="a" r:parent="d3" lastmodified="1225802811968" checked="true"/>
+<java.io.File n:id="de" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\manager"/>
+<java.io.File n:id="e1" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\manager\\Manager.agent.xml"/>
+<FileNode n:id="e0" valid="true" r:file="e1" r:nodeFunctionality="14" r:parent="dd" lastmodified="1224512851156" checked="true"/>
+<java.util.ArrayList n:id="df">e0</java.util.ArrayList>
+<DirNode n:id="dd" valid="true" r:file="de" r:nodeFunctionality="a" r:parent="d3" lastmodified="1225802817656" r:children="df" checked="true"/>
+<java.io.File n:id="e3" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\movement"/>
+<java.io.File n:id="e6" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\movement\\Movement.capability.xml"/>
+<FileNode n:id="e5" valid="true" r:file="e6" r:nodeFunctionality="14" r:parent="e2" lastmodified="1219420726250" checked="true"/>
+<java.util.ArrayList n:id="e4">e5</java.util.ArrayList>
+<DirNode n:id="e2" valid="true" r:file="e3" r:nodeFunctionality="a" r:parent="d3" lastmodified="1225802817625" r:children="e4" checked="true"/>
+<java.io.File n:id="e8" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\ontology"/>
+<DirNode n:id="e7" valid="true" r:file="e8" r:nodeFunctionality="a" r:parent="d3" lastmodified="1225802811765" checked="true"/>
+<java.io.File n:id="ea" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\producer"/>
+<java.io.File n:id="ed" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\producer\\Production.agent.xml"/>
+<FileNode n:id="ec" valid="true" r:file="ed" r:nodeFunctionality="14" r:parent="e9" lastmodified="1222246844109" checked="true"/>
+<java.util.ArrayList n:id="eb">ec</java.util.ArrayList>
+<DirNode n:id="e9" valid="true" r:file="ea" r:nodeFunctionality="a" r:parent="d3" lastmodified="1225802817593" r:children="eb" checked="true"/>
+<java.io.File n:id="ef" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\sentry"/>
+<java.io.File n:id="f2" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\sentry\\Sentry.agent.xml"/>
+<FileNode n:id="f1" valid="true" r:file="f2" r:nodeFunctionality="14" r:parent="ee" lastmodified="1221040698671" checked="true"/>
+<java.util.ArrayList n:id="f0">f1</java.util.ArrayList>
+<DirNode n:id="ee" valid="true" r:file="ef" r:nodeFunctionality="a" r:parent="d3" lastmodified="1225802817578" r:children="f0" checked="true"/>
+<java.util.ArrayList n:id="d5">d6 db dd e2 e7 e9 ee</java.util.ArrayList>
+<DirNode n:id="d3" valid="true" r:file="d4" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802817734" r:children="d5" checked="true"/>
+<java.io.File n:id="f4" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\ping"/>
+<java.io.File n:id="f7" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\ping\\Echo.agent.xml"/>
+<FileNode n:id="f6" valid="true" r:file="f7" r:nodeFunctionality="14" r:parent="f3" lastmodified="1221466008578" checked="true"/>
+<java.io.File n:id="f9" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\ping\\Manager.agent.xml"/>
+<FileNode n:id="f8" valid="true" r:file="f9" r:nodeFunctionality="14" r:parent="f3" lastmodified="1221649612796" checked="true"/>
+<java.io.File n:id="fb" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\ping\\Ping.agent.xml"/>
+<FileNode n:id="fa" valid="true" r:file="fb" r:nodeFunctionality="14" r:parent="f3" lastmodified="1221466008484" checked="true"/>
+<java.io.File n:id="fd" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\ping\\Pinging.agent.xml"/>
+<FileNode n:id="fc" valid="true" r:file="fd" r:nodeFunctionality="14" r:parent="f3" lastmodified="1221649612859" checked="true"/>
+<java.io.File n:id="ff" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\ping\\Pong.agent.xml"/>
+<FileNode n:id="fe" valid="true" r:file="ff" r:nodeFunctionality="14" r:parent="f3" lastmodified="1221466008312" checked="true"/>
+<java.util.ArrayList n:id="f5">f6 f8 fa fc fe</java.util.ArrayList>
+<DirNode n:id="f3" valid="true" r:file="f4" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802817562" r:children="f5" checked="true"/>
+<java.io.File n:id="101" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\puzzle"/>
+<java.io.File n:id="104" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\puzzle\\images"/>
+<DirNode n:id="103" valid="true" r:file="104" r:nodeFunctionality="a" r:parent="100" lastmodified="1225802811312" checked="true"/>
+<java.io.File n:id="106" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\puzzle\\Benchmark.agent.xml"/>
+<FileNode n:id="105" valid="true" r:file="106" r:nodeFunctionality="14" r:parent="100" lastmodified="1222358889687" checked="true"/>
+<java.io.File n:id="108" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\puzzle\\Sokrates.agent.xml"/>
+<FileNode n:id="107" valid="true" r:file="108" r:nodeFunctionality="14" r:parent="100" lastmodified="1224512846562" checked="true"/>
+<java.util.ArrayList n:id="102">103 105 107</java.util.ArrayList>
+<DirNode n:id="100" valid="true" r:file="101" r:nodeFunctionality="a" r:parent="17" lastmodified="1225802817546" r:children="102" checked="true"/>
+<java.io.File n:id="10a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\BeliefListener.agent.xml"/>
+<FileNode n:id="109" valid="true" r:file="10a" r:nodeFunctionality="14" r:parent="17" lastmodified="1213802979953" checked="true"/>
+<java.io.File n:id="10c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\DynamicFact.agent.xml"/>
+<FileNode n:id="10b" valid="true" r:file="10c" r:nodeFunctionality="14" r:parent="17" lastmodified="1219327710265" checked="true"/>
+<java.io.File n:id="10e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\HelloWorldGoal.agent.xml"/>
+<FileNode n:id="10d" valid="true" r:file="10e" r:nodeFunctionality="14" r:parent="17" lastmodified="1213802980000" checked="true"/>
+<java.util.ArrayList n:id="19">1a 21 3c 41 55 6f 7e 8b 92 d3 f3 100 109 10b 10d</java.util.ArrayList>
+<DirNode n:id="17" valid="false" r:file="18" r:nodeFunctionality="a" r:parent="c" lastmodified="1225802820234" r:children="19" checked="true"/>
+<java.io.File n:id="110" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases"/>
+<java.io.File n:id="113" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs"/>
+<java.io.File n:id="116" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\Array.agent.xml"/>
+<FileNode n:id="115" valid="true" r:file="116" r:nodeFunctionality="14" r:parent="112" lastmodified="1221665359546" checked="true"/>
+<java.io.File n:id="118" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\BeanChanges.agent.xml"/>
+<FileNode n:id="117" valid="true" r:file="118" r:nodeFunctionality="14" r:parent="112" lastmodified="1219825464609" checked="true"/>
+<java.io.File n:id="11a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\BeliefChanges.agent.xml"/>
+<FileNode n:id="119" valid="true" r:file="11a" r:nodeFunctionality="14" r:parent="112" lastmodified="1222685767906" checked="true"/>
+<java.io.File n:id="11c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\BeliefSetChanges.agent.xml"/>
+<FileNode n:id="11b" valid="true" r:file="11c" r:nodeFunctionality="14" r:parent="112" lastmodified="1221040694515" checked="true"/>
+<java.io.File n:id="11e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\BeliefSetContains.agent.xml"/>
+<FileNode n:id="11d" valid="true" r:file="11e" r:nodeFunctionality="14" r:parent="112" lastmodified="1216727363390" checked="true"/>
+<java.io.File n:id="120" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\DynamicBelief.agent.xml"/>
+<FileNode n:id="11f" valid="true" r:file="120" r:nodeFunctionality="14" r:parent="112" lastmodified="1222685768171" checked="true"/>
+<java.io.File n:id="122" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\Evaluationmodes.agent.xml"/>
+<FileNode n:id="121" valid="true" r:file="122" r:nodeFunctionality="14" r:parent="112" lastmodified="1217857353046" checked="true"/>
+<java.io.File n:id="124" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\InitialBelief.agent.xml"/>
+<FileNode n:id="123" valid="true" r:file="124" r:nodeFunctionality="14" r:parent="112" lastmodified="1219328926562" checked="true"/>
+<java.io.File n:id="126" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\InitialBelief.capability.xml"/>
+<FileNode n:id="125" valid="true" r:file="126" r:nodeFunctionality="14" r:parent="112" lastmodified="1213802982078" checked="true"/>
+<java.io.File n:id="128" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\PropagateChanges.agent.xml"/>
+<FileNode n:id="127" valid="true" r:file="128" r:nodeFunctionality="14" r:parent="112" lastmodified="1222685768218" checked="true"/>
+<java.io.File n:id="12a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\UpdatingBelief.agent.xml"/>
+<FileNode n:id="129" valid="true" r:file="12a" r:nodeFunctionality="14" r:parent="112" lastmodified="1217857386187" checked="true"/>
+<java.io.File n:id="12c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\beliefs\\WaitForFactAdded.agent.xml"/>
+<FileNode n:id="12b" valid="true" r:file="12c" r:nodeFunctionality="14" r:parent="112" lastmodified="1217852675718" checked="true"/>
+<java.util.ArrayList n:id="114">115 117 119 11b 11d 11f 121 123 125 127 129 12b</java.util.ArrayList>
+<DirNode n:id="112" valid="true" r:file="113" r:nodeFunctionality="a" r:parent="10f" lastmodified="1225802817343" r:children="114" checked="true"/>
+<java.io.File n:id="12e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\events"/>
+<java.io.File n:id="131" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\events\\InitialEvent.agent.xml"/>
+<FileNode n:id="130" valid="true" r:file="131" r:nodeFunctionality="14" r:parent="12d" lastmodified="1218112214328" checked="true"/>
+<java.io.File n:id="133" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\events\\InternalEventTriggerMatch.agent.xml"/>
+<FileNode n:id="132" valid="true" r:file="133" r:nodeFunctionality="14" r:parent="12d" lastmodified="1218114162609" checked="true"/>
+<java.io.File n:id="135" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\events\\MessageForward.agent.xml"/>
+<FileNode n:id="134" valid="true" r:file="135" r:nodeFunctionality="14" r:parent="12d" lastmodified="1216285453546" checked="true"/>
+<java.io.File n:id="137" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\events\\MessageMatching.agent.xml"/>
+<FileNode n:id="136" valid="true" r:file="137" r:nodeFunctionality="14" r:parent="12d" lastmodified="1217943805500" checked="true"/>
+<java.io.File n:id="139" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\events\\SendAndWait.agent.xml"/>
+<FileNode n:id="138" valid="true" r:file="139" r:nodeFunctionality="14" r:parent="12d" lastmodified="1218709799750" checked="true"/>
+<java.util.ArrayList n:id="12f">130 132 134 136 138</java.util.ArrayList>
+<DirNode n:id="12d" valid="true" r:file="12e" r:nodeFunctionality="a" r:parent="10f" lastmodified="1225802817250" r:children="12f" checked="true"/>
+<java.io.File n:id="13b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals"/>
+<java.io.File n:id="13e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\AchieveGoal.agent.xml"/>
+<FileNode n:id="13d" valid="true" r:file="13e" r:nodeFunctionality="14" r:parent="13a" lastmodified="1219329200812" checked="true"/>
+<java.io.File n:id="140" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\Candy.agent.xml"/>
+<FileNode n:id="13f" valid="true" r:file="140" r:nodeFunctionality="14" r:parent="13a" lastmodified="1218708903640" checked="true"/>
+<java.io.File n:id="142" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\DropGoal.agent.xml"/>
+<FileNode n:id="141" valid="true" r:file="142" r:nodeFunctionality="14" r:parent="13a" lastmodified="1218708903859" checked="true"/>
+<java.io.File n:id="144" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalBindings.agent.xml"/>
+<FileNode n:id="143" valid="true" r:file="144" r:nodeFunctionality="14" r:parent="13a" lastmodified="1218708903703" checked="true"/>
+<java.io.File n:id="146" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalConditions.agent.xml"/>
+<FileNode n:id="145" valid="true" r:file="146" r:nodeFunctionality="14" r:parent="13a" lastmodified="1219046442843" checked="true"/>
+<java.io.File n:id="148" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalFinishedTrigger.agent.xml"/>
+<FileNode n:id="147" valid="true" r:file="148" r:nodeFunctionality="14" r:parent="13a" lastmodified="1218784351031" checked="true"/>
+<java.io.File n:id="14a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalInhibition.agent.xml"/>
+<FileNode n:id="149" valid="true" r:file="14a" r:nodeFunctionality="14" r:parent="13a" lastmodified="1219046442562" checked="true"/>
+<java.io.File n:id="14c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalRecur.agent.xml"/>
+<FileNode n:id="14b" valid="true" r:file="14c" r:nodeFunctionality="14" r:parent="13a" lastmodified="1221486850421" checked="true"/>
+<java.io.File n:id="14e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalReferenceParameterSet.agent.xml"/>
+<FileNode n:id="14d" valid="true" r:file="14e" r:nodeFunctionality="14" r:parent="13a" lastmodified="1222180022093" checked="true"/>
+<java.io.File n:id="150" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalReferenceParameterSet.capability.xml"/>
+<FileNode n:id="14f" valid="true" r:file="150" r:nodeFunctionality="14" r:parent="13a" lastmodified="1222685768000" checked="true"/>
+<java.io.File n:id="152" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\GoalRegressionTest.agent.xml"/>
+<FileNode n:id="151" valid="true" r:file="152" r:nodeFunctionality="14" r:parent="13a" lastmodified="1219650273531" checked="true"/>
+<java.io.File n:id="154" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\MaintainGoalContext.agent.xml"/>
+<FileNode n:id="153" valid="true" r:file="154" r:nodeFunctionality="14" r:parent="13a" lastmodified="1219066282578" checked="true"/>
+<java.io.File n:id="156" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\ParameterSet.agent.xml"/>
+<FileNode n:id="155" valid="true" r:file="156" r:nodeFunctionality="14" r:parent="13a" lastmodified="1216727772328" checked="true"/>
+<java.io.File n:id="158" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\QueryGoal.agent.xml"/>
+<FileNode n:id="157" valid="true" r:file="158" r:nodeFunctionality="14" r:parent="13a" lastmodified="1219047718578" checked="true"/>
+<java.io.File n:id="15a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\SubgoalHandling.agent.xml"/>
+<FileNode n:id="159" valid="true" r:file="15a" r:nodeFunctionality="14" r:parent="13a" lastmodified="1216727769640" checked="true"/>
+<java.io.File n:id="15c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\goals\\TriggerBySuspension.agent.xml"/>
+<FileNode n:id="15b" valid="true" r:file="15c" r:nodeFunctionality="14" r:parent="13a" lastmodified="1222685768359" checked="true"/>
+<java.util.ArrayList n:id="13c">13d 13f 141 143 145 147 149 14b 14d 14f 151 153 155 157 159 15b</java.util.ArrayList>
+<DirNode n:id="13a" valid="true" r:file="13b" r:nodeFunctionality="a" r:parent="10f" lastmodified="1225802817203" r:children="13c" checked="true"/>
+<java.io.File n:id="15e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc"/>
+<java.io.File n:id="161" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\AMSTest.agent.xml"/>
+<FileNode n:id="160" valid="true" r:file="161" r:nodeFunctionality="14" r:parent="15d" lastmodified="1222355123625" checked="true"/>
+<java.io.File n:id="163" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\Arguments.agent.xml"/>
+<FileNode n:id="162" valid="true" r:file="163" r:nodeFunctionality="14" r:parent="15d" lastmodified="1222180038687" checked="true"/>
+<java.io.File n:id="165" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\ArgumentsWorker.agent.xml"/>
+<FileNode n:id="164" valid="true" r:file="165" r:nodeFunctionality="14" r:parent="15d" lastmodified="1217941689687" checked="true"/>
+<java.io.File n:id="167" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\Callback.agent.xml"/>
+<FileNode n:id="166" valid="true" r:file="167" r:nodeFunctionality="14" r:parent="15d" lastmodified="1217941689562" checked="true"/>
+<java.io.File n:id="169" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\ConfigElementRef.agent.xml"/>
+<FileNode n:id="168" valid="true" r:file="169" r:nodeFunctionality="14" r:parent="15d" lastmodified="1219657558421" checked="true"/>
+<java.io.File n:id="16b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\ConfigElementRefWorker.agent.xml"/>
+<FileNode n:id="16a" valid="true" r:file="16b" r:nodeFunctionality="14" r:parent="15d" lastmodified="1224864596890" checked="true"/>
+<java.io.File n:id="16d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\ConfigElementRefWorker.capability.xml"/>
+<FileNode n:id="16c" valid="true" r:file="16d" r:nodeFunctionality="14" r:parent="15d" lastmodified="1225097612671" checked="true"/>
+<java.io.File n:id="16f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\DFTest.agent.xml"/>
+<FileNode n:id="16e" valid="true" r:file="16f" r:nodeFunctionality="14" r:parent="15d" lastmodified="1219650273234" checked="true"/>
+<java.io.File n:id="171" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\EndState.agent.xml"/>
+<FileNode n:id="170" valid="true" r:file="171" r:nodeFunctionality="14" r:parent="15d" lastmodified="1217599509937" checked="true"/>
+<java.io.File n:id="173" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\EndStateDeregister.agent.xml"/>
+<FileNode n:id="172" valid="true" r:file="173" r:nodeFunctionality="14" r:parent="15d" lastmodified="1217860288875" checked="true"/>
+<java.io.File n:id="175" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\EndStateWorker.agent.xml"/>
+<FileNode n:id="174" valid="true" r:file="175" r:nodeFunctionality="14" r:parent="15d" lastmodified="1218465764000" checked="true"/>
+<java.io.File n:id="177" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\EndStateWorker.capability.xml"/>
+<FileNode n:id="176" valid="true" r:file="177" r:nodeFunctionality="14" r:parent="15d" lastmodified="1216285452500" checked="true"/>
+<java.io.File n:id="179" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\Expression.agent.xml"/>
+<FileNode n:id="178" valid="true" r:file="179" r:nodeFunctionality="14" r:parent="15d" lastmodified="1216727746750" checked="true"/>
+<java.io.File n:id="17b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\GUICloser.agent.xml"/>
+<FileNode n:id="17a" valid="true" r:file="17b" r:nodeFunctionality="14" r:parent="15d" lastmodified="1216136511875" checked="true"/>
+<java.io.File n:id="17d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\InitialTransaction.agent.xml"/>
+<FileNode n:id="17c" valid="true" r:file="17d" r:nodeFunctionality="14" r:parent="15d" lastmodified="1217606063765" checked="true"/>
+<java.io.File n:id="17f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\Leaker.agent.xml"/>
+<FileNode n:id="17e" valid="true" r:file="17f" r:nodeFunctionality="14" r:parent="15d" lastmodified="1219826522046" checked="true"/>
+<java.io.File n:id="181" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\MessagingTest.agent.xml"/>
+<FileNode n:id="180" valid="true" r:file="181" r:nodeFunctionality="14" r:parent="15d" lastmodified="1219825463062" checked="true"/>
+<java.io.File n:id="183" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\NoPackage.agent.xml"/>
+<FileNode n:id="182" valid="true" r:file="183" r:nodeFunctionality="14" r:parent="15d" lastmodified="1216727733000" checked="true"/>
+<java.io.File n:id="185" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\ParameterProtection.agent.xml"/>
+<FileNode n:id="184" valid="true" r:file="185" r:nodeFunctionality="14" r:parent="15d" lastmodified="1216727729093" checked="true"/>
+<java.io.File n:id="187" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\Repeatability.agent.xml"/>
+<FileNode n:id="186" valid="true" r:file="187" r:nodeFunctionality="14" r:parent="15d" lastmodified="1221040693265" checked="true"/>
+<java.io.File n:id="189" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\WaitFor.agent.xml"/>
+<FileNode n:id="188" valid="true" r:file="189" r:nodeFunctionality="14" r:parent="15d" lastmodified="1221040693546" checked="true"/>
+<java.io.File n:id="18b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\misc\\WatchdogTest.agent.xml"/>
+<FileNode n:id="18a" valid="true" r:file="18b" r:nodeFunctionality="14" r:parent="15d" lastmodified="1219852087484" checked="true"/>
+<java.util.ArrayList n:id="15f">160 162 164 166 168 16a 16c 16e 170 172 174 176 178 17a 17c 17e 180 182 184 186 188 18a</java.util.ArrayList>
+<DirNode n:id="15d" valid="true" r:file="15e" r:nodeFunctionality="a" r:parent="10f" lastmodified="1225802817109" r:children="15f" checked="true"/>
+<java.io.File n:id="18d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib"/>
+<java.io.File n:id="190" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\CMInitiator.agent.xml"/>
+<FileNode n:id="18f" valid="true" r:file="190" r:nodeFunctionality="14" r:parent="18c" lastmodified="1218191428281" checked="true"/>
+<java.io.File n:id="192" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\CMReceiver.agent.xml"/>
+<FileNode n:id="191" valid="true" r:file="192" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219327585265" checked="true"/>
+<java.io.File n:id="194" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\CNPInitiator.agent.xml"/>
+<FileNode n:id="193" valid="true" r:file="194" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219048122875" checked="true"/>
+<java.io.File n:id="196" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\CNPReceiver.agent.xml"/>
+<FileNode n:id="195" valid="true" r:file="196" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219329834437" checked="true"/>
+<java.io.File n:id="198" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\DAInitiator.agent.xml"/>
+<FileNode n:id="197" valid="true" r:file="198" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219331548718" checked="true"/>
+<java.io.File n:id="19a" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\DAReceiver.agent.xml"/>
+<FileNode n:id="199" valid="true" r:file="19a" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219331066718" checked="true"/>
+<java.io.File n:id="19c" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\EAInitiator.agent.xml"/>
+<FileNode n:id="19b" valid="true" r:file="19c" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219835528953" checked="true"/>
+<java.io.File n:id="19e" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\EAReceiver.agent.xml"/>
+<FileNode n:id="19d" valid="true" r:file="19e" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219327603531" checked="true"/>
+<java.io.File n:id="1a0" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\ICNPInitiator.agent.xml"/>
+<FileNode n:id="19f" valid="true" r:file="1a0" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219048152437" checked="true"/>
+<java.io.File n:id="1a2" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\ICNPReceiver.agent.xml"/>
+<FileNode n:id="1a1" valid="true" r:file="1a2" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219327608453" checked="true"/>
+<java.io.File n:id="1a4" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\PingInitiator.agent.xml"/>
+<FileNode n:id="1a3" valid="true" r:file="1a4" r:nodeFunctionality="14" r:parent="18c" lastmodified="1221040692828" checked="true"/>
+<java.io.File n:id="1a6" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\PingReceiver.agent.xml"/>
+<FileNode n:id="1a5" valid="true" r:file="1a6" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219680792125" checked="true"/>
+<java.io.File n:id="1a8" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\QPInitiator.agent.xml"/>
+<FileNode n:id="1a7" valid="true" r:file="1a8" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219919587312" checked="true"/>
+<java.io.File n:id="1aa" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\QPReceiver.agent.xml"/>
+<FileNode n:id="1a9" valid="true" r:file="1aa" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219680792062" checked="true"/>
+<java.io.File n:id="1ac" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\RPInitiator.agent.xml"/>
+<FileNode n:id="1ab" valid="true" r:file="1ac" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219680792000" checked="true"/>
+<java.io.File n:id="1ae" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\planlib\\RPReceiver.agent.xml"/>
+<FileNode n:id="1ad" valid="true" r:file="1ae" r:nodeFunctionality="14" r:parent="18c" lastmodified="1219329480000" checked="true"/>
+<java.util.ArrayList n:id="18e">18f 191 193 195 197 199 19b 19d 19f 1a1 1a3 1a5 1a7 1a9 1ab 1ad</java.util.ArrayList>
+<DirNode n:id="18c" valid="true" r:file="18d" r:nodeFunctionality="a" r:parent="10f" lastmodified="1225802816875" r:children="18e" checked="true"/>
+<java.io.File n:id="1b0" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans"/>
+<java.io.File n:id="1b3" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\AtomicException.agent.xml"/>
+<FileNode n:id="1b2" valid="true" r:file="1b3" r:nodeFunctionality="14" r:parent="1af" lastmodified="1219327136218" checked="true"/>
+<java.io.File n:id="1b5" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\BeliefTrigger.agent.xml"/>
+<FileNode n:id="1b4" valid="true" r:file="1b5" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216727704156" checked="true"/>
+<java.io.File n:id="1b7" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\Countdown.agent.xml"/>
+<FileNode n:id="1b6" valid="true" r:file="1b7" r:nodeFunctionality="14" r:parent="1af" lastmodified="1214897949343" checked="true"/>
+<java.io.File n:id="1b9" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\MLR.capability.xml"/>
+<FileNode n:id="1b8" valid="true" r:file="1b9" r:nodeFunctionality="14" r:parent="1af" lastmodified="1218817007875" checked="true"/>
+<java.io.File n:id="1bb" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\MLRRetry.agent.xml"/>
+<FileNode n:id="1ba" valid="true" r:file="1bb" r:nodeFunctionality="14" r:parent="1af" lastmodified="1218817014875" checked="true"/>
+<java.io.File n:id="1bd" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\MicroPlanStepExecution.agent.xml"/>
+<FileNode n:id="1bc" valid="true" r:file="1bd" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216975567656" checked="true"/>
+<java.io.File n:id="1bf" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\MultiplePlanTriggers.agent.xml"/>
+<FileNode n:id="1be" valid="true" r:file="1bf" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216910597609" checked="true"/>
+<java.io.File n:id="1c1" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PingBinding.agent.xml"/>
+<FileNode n:id="1c0" valid="true" r:file="1c1" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216727003265" checked="true"/>
+<java.io.File n:id="1c3" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanAbort.agent.xml"/>
+<FileNode n:id="1c2" valid="true" r:file="1c3" r:nodeFunctionality="14" r:parent="1af" lastmodified="1222685768046" checked="true"/>
+<java.io.File n:id="1c5" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanCondition.agent.xml"/>
+<FileNode n:id="1c4" valid="true" r:file="1c5" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216898914703" checked="true"/>
+<java.io.File n:id="1c7" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanContext.agent.xml"/>
+<FileNode n:id="1c6" valid="true" r:file="1c7" r:nodeFunctionality="14" r:parent="1af" lastmodified="1219650274000" checked="true"/>
+<java.io.File n:id="1c9" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanFail.agent.xml"/>
+<FileNode n:id="1c8" valid="true" r:file="1c9" r:nodeFunctionality="14" r:parent="1af" lastmodified="1222685768234" checked="true"/>
+<java.io.File n:id="1cb" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanMetaLevelReasoning.agent.xml"/>
+<FileNode n:id="1ca" valid="true" r:file="1cb" r:nodeFunctionality="14" r:parent="1af" lastmodified="1217843911921" checked="true"/>
+<java.io.File n:id="1cd" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanParameters.agent.xml"/>
+<FileNode n:id="1cc" valid="true" r:file="1cd" r:nodeFunctionality="14" r:parent="1af" lastmodified="1222180089656" checked="true"/>
+<java.io.File n:id="1cf" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanPass.agent.xml"/>
+<FileNode n:id="1ce" valid="true" r:file="1cf" r:nodeFunctionality="14" r:parent="1af" lastmodified="1222685768281" checked="true"/>
+<java.io.File n:id="1d1" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanPassedFailed.agent.xml"/>
+<FileNode n:id="1d0" valid="true" r:file="1d1" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216995770500" checked="true"/>
+<java.io.File n:id="1d3" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanPriorities.agent.xml"/>
+<FileNode n:id="1d2" valid="true" r:file="1d3" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216743294031" checked="true"/>
+<java.io.File n:id="1d5" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\PlanTermination.agent.xml"/>
+<FileNode n:id="1d4" valid="true" r:file="1d5" r:nodeFunctionality="14" r:parent="1af" lastmodified="1219327023937" checked="true"/>
+<java.io.File n:id="1d7" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\Precondition.agent.xml"/>
+<FileNode n:id="1d6" valid="true" r:file="1d7" r:nodeFunctionality="14" r:parent="1af" lastmodified="1218116122437" checked="true"/>
+<java.io.File n:id="1d9" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\SyncResultListener.agent.xml"/>
+<FileNode n:id="1d8" valid="true" r:file="1d9" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216727057312" checked="true"/>
+<java.io.File n:id="1db" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\TimeoutException.agent.xml"/>
+<FileNode n:id="1da" valid="true" r:file="1db" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216727676046" checked="true"/>
+<java.io.File n:id="1dd" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\WaitForBelief.agent.xml"/>
+<FileNode n:id="1dc" valid="true" r:file="1dd" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216743293968" checked="true"/>
+<java.io.File n:id="1df" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\WaitForBeliefSet.agent.xml"/>
+<FileNode n:id="1de" valid="true" r:file="1df" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216727670031" checked="true"/>
+<java.io.File n:id="1e1" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\WaitForMaxLong.agent.xml"/>
+<FileNode n:id="1e0" valid="true" r:file="1e1" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216727665937" checked="true"/>
+<java.io.File n:id="1e3" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\plans\\WaitqueueTest.agent.xml"/>
+<FileNode n:id="1e2" valid="true" r:file="1e3" r:nodeFunctionality="14" r:parent="1af" lastmodified="1216727662187" checked="true"/>
+<java.util.ArrayList n:id="1b1">1b2 1b4 1b6 1b8 1ba 1bc 1be 1c0 1c2 1c4 1c6 1c8 1ca 1cc 1ce 1d0 1d2 1d4 1d6 1d8 1da 1dc 1de 1e0 1e2</java.util.ArrayList>
+<DirNode n:id="1af" valid="true" r:file="1b0" r:nodeFunctionality="a" r:parent="10f" lastmodified="1225802816687" r:children="1b1" checked="true"/>
+<java.io.File n:id="1e5" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic"/>
+<java.io.File n:id="1e8" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\Corrupt.agent.xml"/>
+<FileNode n:id="1e7" valid="true" r:file="1e8" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1213802981812" checked="true"/>
+<java.io.File n:id="1ea" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\DebugFlag.agent.xml"/>
+<FileNode n:id="1e9" valid="true" r:file="1ea" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1216136238234" checked="true"/>
+<java.io.File n:id="1ec" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\Deletion.agent.xml"/>
+<FileNode n:id="1eb" valid="true" r:file="1ec" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1222180105546" checked="true"/>
+<java.io.File n:id="1ee" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\EndStateAbort.agent.xml"/>
+<FileNode n:id="1ed" valid="true" r:file="1ee" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1216743293328" checked="true"/>
+<java.io.File n:id="1f0" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\ErrorMessages.agent.xml"/>
+<FileNode n:id="1ef" valid="true" r:file="1f0" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1216136246390" checked="true"/>
+<java.io.File n:id="1f2" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\FullSecond.agent.xml"/>
+<FileNode n:id="1f1" valid="true" r:file="1f2" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1217857420515" checked="true"/>
+<java.io.File n:id="1f4" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\ShutdownPlatform.agent.xml"/>
+<FileNode n:id="1f3" valid="true" r:file="1f4" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1222332933812" checked="true"/>
+<java.io.File n:id="1f6" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\testcases\\semiautomatic\\Wakeup.agent.xml"/>
+<FileNode n:id="1f5" valid="true" r:file="1f6" r:nodeFunctionality="14" r:parent="1e4" lastmodified="1216136251906" checked="true"/>
+<java.util.ArrayList n:id="1e6">1e7 1e9 1eb 1ed 1ef 1f1 1f3 1f5</java.util.ArrayList>
+<DirNode n:id="1e4" valid="true" r:file="1e5" r:nodeFunctionality="a" r:parent="10f" lastmodified="1225802816468" r:children="1e6" checked="true"/>
+<java.util.ArrayList n:id="111">112 12d 13a 15d 18c 1af 1e4</java.util.ArrayList>
+<DirNode n:id="10f" valid="true" r:file="110" r:nodeFunctionality="a" r:parent="c" lastmodified="1225802817406" r:children="111" checked="true"/>
+<java.io.File n:id="1f8" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial"/>
+<java.io.File n:id="1fb" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationA1.agent.xml"/>
+<FileNode n:id="1fa" valid="true" r:file="1fb" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979296" checked="true"/>
+<java.io.File n:id="1fd" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationB1.agent.xml"/>
+<FileNode n:id="1fc" valid="true" r:file="1fd" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1219320409578" checked="true"/>
+<java.io.File n:id="1ff" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationB2.agent.xml"/>
+<FileNode n:id="1fe" valid="true" r:file="1ff" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979250" checked="true"/>
+<java.io.File n:id="201" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationB3.agent.xml"/>
+<FileNode n:id="200" valid="true" r:file="201" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979250" checked="true"/>
+<java.io.File n:id="203" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationB4.agent.xml"/>
+<FileNode n:id="202" valid="true" r:file="203" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979250" checked="true"/>
+<java.io.File n:id="205" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationC1.agent.xml"/>
+<FileNode n:id="204" valid="true" r:file="205" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979296" checked="true"/>
+<java.io.File n:id="207" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationC2.agent.xml"/>
+<FileNode n:id="206" valid="true" r:file="207" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979203" checked="true"/>
+<java.io.File n:id="209" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationC3.agent.xml"/>
+<FileNode n:id="208" valid="true" r:file="209" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1222685767796" checked="true"/>
+<java.io.File n:id="20b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationC4.agent.xml"/>
+<FileNode n:id="20a" valid="true" r:file="20b" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1222685768125" checked="true"/>
+<java.io.File n:id="20d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationD1.agent.xml"/>
+<FileNode n:id="20c" valid="true" r:file="20d" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979250" checked="true"/>
+<java.io.File n:id="20f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationD1.capability.xml"/>
+<FileNode n:id="20e" valid="true" r:file="20f" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979281" checked="true"/>
+<java.io.File n:id="211" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationD2.agent.xml"/>
+<FileNode n:id="210" valid="true" r:file="211" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1216136230937" checked="true"/>
+<java.io.File n:id="213" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationD2.capability.xml"/>
+<FileNode n:id="212" valid="true" r:file="213" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979234" checked="true"/>
+<java.io.File n:id="215" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationE1.agent.xml"/>
+<FileNode n:id="214" valid="true" r:file="215" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1218816872734" checked="true"/>
+<java.io.File n:id="217" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationE2.agent.xml"/>
+<FileNode n:id="216" valid="true" r:file="217" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1218816883640" checked="true"/>
+<java.io.File n:id="219" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationE3.agent.xml"/>
+<FileNode n:id="218" valid="true" r:file="219" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1222685768156" checked="true"/>
+<java.io.File n:id="21b" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationF1.agent.xml"/>
+<FileNode n:id="21a" valid="true" r:file="21b" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979250" checked="true"/>
+<java.io.File n:id="21d" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationF2.agent.xml"/>
+<FileNode n:id="21c" valid="true" r:file="21d" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979265" checked="true"/>
+<java.io.File n:id="21f" v="C:\\Files\\Checkouts\\jadex-maven\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\tutorial\\TranslationG1.agent.xml"/>
+<FileNode n:id="21e" valid="true" r:file="21f" r:nodeFunctionality="14" r:parent="1f7" lastmodified="1213802979218" checked="true"/>
+<java.util.ArrayList n:id="1f9">1fa 1fc 1fe 200 202 204 206 208 20a 20c 20e 210 212 214 216 218 21a 21c 21e</java.util.ArrayList>
+<DirNode n:id="1f7" valid="true" r:file="1f8" r:nodeFunctionality="a" r:parent="c" lastmodified="1225802816421" r:children="1f9" checked="true"/>
+<java.util.ArrayList n:id="e">f 17 10f 1f7</java.util.ArrayList>
+<DirNode n:id="c" valid="false" r:file="d" r:nodeFunctionality="a" r:parent="8" lastmodified="1225802815859" r:children="e" checked="true"/>
+<java.util.ArrayList n:id="b">c</java.util.ArrayList>
+<DirNode n:id="8" valid="false" r:file="9" r:nodeFunctionality="a" r:parent="4" lastmodified="1225802808953" r:children="b" checked="true"/>
+<java.util.ArrayList n:id="7">8</java.util.ArrayList>
+<DirNode n:id="4" valid="false" r:file="5" r:nodeFunctionality="6" r:parent="1" lastmodified="1225802808937" r:children="7" checked="true"/>
+<java.util.ArrayList n:id="3">4</java.util.ArrayList>
+<RootNode n:id="1" r:nodeFunctionality="2" r:children="3" checking="true"/>
+</n:root>
+]]></property>
+			<property type="lastpath">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes</property>
+			<property type="expanded">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes\jadex\bdi\examples\puzzle</property>
+			<property type="expanded">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes\jadex\bdi\examples</property>
+			<property type="expanded">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes\jadex</property>
+			<property type="expanded">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes</property>
+			<property type="expanded">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes\jadex\bdi</property>
+			<property type="selected">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes\jadex\bdi\examples\puzzle\Sokrates.agent.xml</property>
+			<property type="refresh">true</property>
+			<property type="filter">ADFs</property>
+		</properties>
+		<properties type="spanel">
+			<property type="model">C:\Files\Checkouts\jadex-maven\jadex-applications-bdi\target\classes\jadex\bdi\examples\puzzle\Sokrates.agent.xml</property>
+			<property type="config">5x5 board (standard)</property>
+			<property type="autogenerate">false</property>
+			<property type="name">Sokrates</property>
+			<property type="argument"></property>
+		</properties>
+	</properties>
+</properties>

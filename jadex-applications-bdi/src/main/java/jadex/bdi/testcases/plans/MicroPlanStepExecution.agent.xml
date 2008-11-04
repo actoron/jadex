@@ -1,0 +1,110 @@
+<!--
+	<H3>Test the micro-plan step execution of plans.</H3>
+	
+	Micro plan step agent; tests the micro plan step execution of a plan.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="MicroPlanStepExecution"
+	package="jadex.bdi.testcases.plans">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bdi.planlib.test.TestReport</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+
+		<belief name="a"  class="boolean">
+			<fact>false</fact>
+		</belief>
+		<belief name="b"  class="boolean">
+			<fact>false</fact>
+		</belief>
+		<belief name="a_cnt" class="int"/>
+		<belief name="b_cnt" class="int"/>
+		<belief name="ab_cnt" class="int"/>
+	</beliefs>
+
+	<plans>
+		<plan name="tester">
+			<body class="MicroStepPlan"/>
+		</plan>
+		<plan name="triggered_a">
+			<parameter name="beliefname" class="String">
+				<value>"a_cnt"</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<condition>
+					// $beliefbase.a 
+					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+					?mbelief = (mbelief (element_has_name "a"))
+				</condition>
+			</trigger>
+		</plan>
+		<plan name="triggered_b">
+			<parameter name="beliefname" class="String">
+				<value>"b_cnt"</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<condition>
+					// $beliefbase.b 
+					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+					?mbelief = (mbelief (element_has_name "b"))
+				</condition>
+			</trigger>
+		</plan>
+		<plan name="triggered_ab">
+			<parameter name="beliefname" class="String">
+				<value>"ab_cnt"</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<condition>
+					// $beliefbase.a &amp;&amp; $beliefbase.b
+					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+					?mbelief = (mbelief (element_has_name "a"))
+					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+					?mbelief = (mbelief (element_has_name "b"))
+				</condition>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!--<property name="logging.level">Level.INFO</property>-->
+		<property name="logging.useParentHandlers">true</property>
+		<!--<property name="debugging">true</property>-->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>3</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="tester"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

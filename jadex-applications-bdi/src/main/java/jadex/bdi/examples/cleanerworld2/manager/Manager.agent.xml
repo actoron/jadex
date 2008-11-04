@@ -1,0 +1,36 @@
+<!--
+	<H3>The manager agent for starting the application.</H3>
+
+	Can be used to start the cleaner world example with two
+	cleaner agents and one environment agent. The environment
+	agent displays the current state of the cleaner world
+	whereas the cleaner show their own perception of the
+	world in a gui reflecting the actual beliefs.
+-->
+	
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Manager"
+	package="jadex.bdi.examples.cleanerworld2.manager">
+
+	<imports>
+	</imports>
+	
+	<plans>
+		<!-- Start Plan. -->
+    	<plan name="start">
+      		<body class="StartPlan"/>
+    	</plan>
+	</plans>
+	
+	<configurations>
+    	<configuration name="default">
+      		<plans>
+	        	<initialplan ref="start"/>
+    		</plans>
+    	</configuration>
+	</configurations>
+
+</agent>

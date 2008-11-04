@@ -1,0 +1,118 @@
+<!--
+	<H3>Test retry in meta-level reasoning.</H3>
+
+	Test for ensuring that retry works in combination
+	with meta-level reasoning. In response to forum
+	post of a-orler at 02/17/06.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="MLRRetry"
+	package="jadex.bdi.testcases.plans">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.commons.*</import>
+		<import>java.util.*</import>
+		<import>jadex.bdi.planlib.test.TestReport</import>
+		<import>jadex.bdi.runtime.ICandidateInfo</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports" >
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+
+		<belief name="result" class="int"/>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="app_goal"/>
+
+		<metagoal name="ml_goal">
+			<parameterset name="applicables" class="ICandidateInfo"/>
+			<parameterset name="result" class="ICandidateInfo" direction="out"/>
+			<trigger>
+				<goal ref="app_goal"/>
+			</trigger>
+		</metagoal>
+	</goals>
+
+	<plans>
+		<plan name="plan2">
+			<parameter name="success" class="boolean">
+				<value>false</value>
+			</parameter>
+			<parameter name="value" class="Object">
+				<value>new Integer($beliefbase.result+1)</value>
+			</parameter>
+			<parameter name="belief" class="String">
+				<value>"result"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="app_goal"/>
+			</trigger>
+		</plan>
+
+		<plan name="plan1">
+			<parameter name="value" class="Object">
+				<value>new Integer($beliefbase.result+1)</value>
+			</parameter>
+			<parameter name="belief" class="String">
+				<value>"result"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="app_goal"/>
+			</trigger>
+		</plan>
+
+		<plan name="ml_plan">
+			<parameterset name="applicables" class="ICandidateInfo">
+				<goalmapping ref="ml_goal.applicables"/>
+			</parameterset>
+			<parameterset name="result" class="ICandidateInfo" direction="out">
+				<goalmapping ref="ml_goal.result"/>
+			</parameterset>
+			<body class="MLRPlan"/>
+			<trigger>
+				<goal ref="ml_goal"/>
+			</trigger>
+		</plan>
+
+		<plan name="tester">
+			<body class="MLRTesterPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="app_goal"/>
+			</goals>
+			<plans>
+				<initialplan ref="tester"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

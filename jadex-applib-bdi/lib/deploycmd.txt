@@ -1,0 +1,1 @@
+mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadex-maven/jadex-applib-bdi/lib -DrepositoryId=project -Dfile=icq.jar -Dversion=1 -DgroupId=jcq2k -DartifactId=jcq2k -Dpackaging=jar

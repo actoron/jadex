@@ -1,0 +1,30 @@
+package jadex.bdi.testcases.plans;
+
+import jadex.bdi.planlib.test.TestReport;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.Plan;
+
+/**
+ *  Test a plan precondition.
+ */
+public class PreconditionTesterPlan extends Plan
+{
+	/**
+	 * The body method is called on the
+	 * instatiated plan instance from the scheduler.
+	 */
+	public void body()
+	{
+		TestReport tr = new TestReport("#1", "Test plan precondition.");
+		IGoal goal = createGoal("test");
+		dispatchSubgoalAndWait(goal);
+
+		int result = ((Integer)getBeliefbase().getBelief("result").getFact()).intValue();
+		if(result==2)
+			tr.setSucceeded(true);
+		else
+			tr.setReason("Wrong plan were chosen.");
+
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+	}
+}

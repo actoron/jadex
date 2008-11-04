@@ -1,0 +1,704 @@
+package jadex.tools.dfbrowser;
+
+import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.adapter.base.fipa.IDF;
+import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFServiceDescription;
+import jadex.bdi.runtime.IGoal;
+import jadex.bridge.Properties;
+import jadex.bridge.Property;
+import jadex.commons.SGUI;
+import jadex.commons.SUtil;
+import jadex.tools.common.AgentTreeTable;
+import jadex.tools.common.GuiProperties;
+import jadex.tools.common.jtreetable.DefaultTreeTableNode;
+import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.common.plugin.IAgentListListener;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+
+import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.TreePath;
+
+/**
+ *  DFBrowserPlugin
+ */
+public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListListener
+{
+	//-------- constants --------
+	
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"dfbrowser", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_dfbrowser.png"), 
+		"dfbrowser_sel", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_dfbrowser_sel.png"), 
+		"remove_agent", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_remove_service.png"),
+		"starter", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_starter.png"),
+		"refresh", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_refresh_anim00.png")
+	});
+
+	/** Don't refresh. */
+	protected static final long REFRESH0 = 0;
+	
+	/** Refresh every second */
+	protected static final long REFRESH1 = 1000;
+
+	/** Refresh every 5 seconds */
+	protected static final long REFRESH5 = 5000;
+
+	/** Refresh every 30 seconds */
+	protected static final long REFRESH30 = 30000;
+	
+	//-------- attributes --------
+	
+	/** The agent table (showing platform DFs). */
+	protected AgentTreeTable df_agents;
+
+	/** The agent table. */
+	protected DFAgentTable agent_table;
+
+	/** The service table. */
+	protected DFServiceTable service_table;
+
+	/** The service panel. */
+	protected ServiceDescriptionPanel service_panel;
+
+	/** How long should the refresh process wait */
+	protected long sleep = REFRESH5;
+
+	/** The thread that refreshes the plugin views */
+	protected volatile Thread refresh_thread;
+
+	/** The first split pane. */
+	protected JSplitPane split1;
+
+	/** The second split pane. */
+	protected JSplitPane split2;
+
+	/** The third split pane. */
+	protected JSplitPane split3;
+	
+	/** Refresh setting . */
+	protected JRadioButtonMenuItem refresh0;
+	
+	/** Refresh setting . */
+	protected JRadioButtonMenuItem refresh1;
+
+	/** Refresh setting . */
+	protected JRadioButtonMenuItem refresh5;
+
+	/** Refresh setting . */
+	protected JRadioButtonMenuItem refresh30;
+
+	/** The old agent descriptions. */
+	protected IDFAgentDescription[] old_ads;
+
+	//-------- methods --------
+	
+	/**
+	 * @return "DF Browser"
+	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getName()
+	 */
+	public String getName()
+	{
+		return "DF Browser";
+	}
+
+	/**
+	 * @return the icon of DFBrowser
+	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getToolIcon()
+	 */
+	public Icon getToolIcon(boolean selected)
+	{
+		return selected? icons.getIcon("dfbrowser_sel"): icons.getIcon("dfbrowser");
+	}
+
+	/**
+	 *  Create tool bar.
+	 *  @return The tool bar.
+	 */
+	public JComponent[] createToolBar()
+	{
+		JButton b;
+
+		b = new JButton(REMOVE_AGENT);
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+
+		return new JComponent[]{b};
+	}
+	
+	/**
+	 *  Create main panel.
+	 *  @return The main panel.
+	 */
+	public JComponent createView()
+	{
+		df_agents = new AgentTreeTable(getJCC().getAgent().getPlatform().getName());
+		df_agents.setMinimumSize(new Dimension(0, 0));
+		df_agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		df_agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(REFRESH_DF);
+
+		service_panel = new ServiceDescriptionPanel();
+		service_table = new DFServiceTable();
+		JScrollPane stscroll = new JScrollPane(service_table);
+		stscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Registered Services"));
+		
+		agent_table = new DFAgentTable(this);
+		JScrollPane atscroll = new JScrollPane(agent_table);
+		atscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Registered Agent Descriptions"));
+		
+		// Listeners
+		jcc.addAgentListListener(this);
+		
+		df_agents.getTreetable().getSelectionModel().addListSelectionListener(
+			new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				//System.out.println("valueChanged: "+df_agents.getTreetable().getSelectedRow());
+				refresh();
+			}
+		});
+		/*df_agents.getTreetable().addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if(e.getClickCount() == 2)
+				{
+					refresh();
+				}
+			}
+		});*/
+		agent_table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				//updateServices(old_ads);
+				IDFAgentDescription[] selagents = agent_table.getSelectedAgents();
+				service_table.setAgentDescriptions(selagents);
+			}
+		});
+		service_table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				updateDetailedService();
+			}
+		});
+	
+		JPanel main_panel = new JPanel(new BorderLayout());
+		
+		split3 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		split3.setDividerLocation(250);
+		split3.add(stscroll);
+		split3.add(service_panel);
+		split3.setResizeWeight(1.0);
+		split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		split2.setDividerLocation(250);
+		split2.add(atscroll);
+		split2.add(split3);
+		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		split1.setDividerLocation(200);
+		split1.setOneTouchExpandable(true);
+		split1.add(df_agents);
+		split1.add(split2);
+	
+		main_panel.removeAll();
+		main_panel.add(split1, BorderLayout.CENTER);
+		main_panel.validate();
+
+		// Hack! Double invokeLater ensures that selection code is executed after agentBorn
+		/*SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						df_agents.adjustColumnWidths();
+						
+						DefaultTreeTableNode[] nodes = df_agents.getAllAgents();
+						//System.out.println(SUtil.arrayToString(nodes));
+						for(int i=0; i<nodes.length; i++)
+						{
+							IAMSAgentDescription desc = (IAMSAgentDescription)nodes[i].getUserObject();
+							if(desc.getName().getName().startsWith("df@"))
+							{
+								TreePath path = new TreePath(nodes[i].getPath());
+						        int row = df_agents.getTreetable().getTree().getRowForPath(path);
+						        df_agents.getTreetable().getSelectionModel().setSelectionInterval(row, row);
+						        //System.out.println("seleected: "+row);
+						        break;
+							}
+						}
+					}
+				});
+			}
+		});*/
+		
+		GuiProperties.setupHelp(split1, "tools.dfbrowser");
+		
+		return main_panel;
+	}
+	
+	/**
+	 *  Create menu bar.
+	 *  @return The menu bar.
+	 */
+	public JMenu[] createMenuBar()
+	{
+		ButtonGroup group = new ButtonGroup();
+		
+		JMenu menu = new JMenu("Refresh");
+		GuiProperties.setupHelp(menu, "tools.dfbrowser");
+
+		refresh0 = new JRadioButtonMenuItem(new AbstractAction("Never")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				sleep = REFRESH0;
+			}
+		});
+		refresh0.setSelected(sleep == REFRESH0);
+		group.add(refresh0);
+		menu.add(refresh0);
+		
+		refresh1 = new JRadioButtonMenuItem(new AbstractAction("1 s")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				sleep = REFRESH1;
+				startRefreshThread();
+			}
+		});
+		refresh1.setSelected(sleep == REFRESH1);
+		group.add(refresh1);
+		menu.add(refresh1);
+
+		refresh5 = new JRadioButtonMenuItem(new AbstractAction("5 s")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				sleep = REFRESH5;
+				startRefreshThread();
+			}
+		});
+		refresh5.setSelected(sleep == REFRESH5);
+		group.add(refresh5);
+		menu.add(refresh5);
+
+		refresh30 = new JRadioButtonMenuItem(new AbstractAction("30 s")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				sleep = REFRESH30;
+				startRefreshThread();
+			}
+		});
+		refresh30.setSelected(sleep == REFRESH30);
+		group.add(refresh30);
+		menu.add(refresh30);
+
+		//menu.addSeparator();
+		
+		startRefreshThread();
+
+		return new JMenu[]{menu};
+	}
+	
+	/**
+	 *  Load the properties.
+	 *  @param props
+	 */
+	public void setProperties(Properties props)
+	{
+//		System.out.println("Set props called: "+props);
+		
+		if(props.getProperty("split1.location")!=null)
+			split1.setDividerLocation(props.getIntProperty("split1.location"));
+		if(props.getProperty("split2.location")!=null)
+			split2.setDividerLocation(props.getIntProperty("split2.location"));
+		if(props.getProperty("split3.location")!=null)
+			split3.setDividerLocation(props.getIntProperty("split3.location"));
+
+		Properties	agenttableprops	= props.getSubproperty("agenttable");
+		if(agenttableprops!=null)
+			agent_table.setProperties(agenttableprops);
+		
+		Properties	servicetableprops	= props.getSubproperty("servicetable");
+		if(servicetableprops!=null)
+			service_table.setProperties(servicetableprops);
+		
+		if(props.getProperty("sleep")!=null)
+			this.sleep	= props.getLongProperty("sleep");
+		
+		refresh0.setSelected(sleep == REFRESH0);
+		refresh1.setSelected(sleep == REFRESH1);
+		refresh5.setSelected(sleep == REFRESH5);
+		refresh30.setSelected(sleep == REFRESH30);
+	}
+
+	/**
+	 *  Save the properties.
+	 *  @param props
+	 */
+	public Properties	getProperties()
+	{
+		Properties	props	= new Properties();
+		props.addProperty(new Property("split1.location", Integer.toString(split1.getDividerLocation())));
+		props.addProperty(new Property("split2.location", Integer.toString(split2.getDividerLocation())));
+		props.addProperty(new Property("split3.location", Integer.toString(split3.getDividerLocation())));
+		if(refresh0.isSelected())
+			props.addProperty(new Property("sleep", Long.toString(REFRESH0)));
+		else if(refresh1.isSelected())
+			props.addProperty(new Property("sleep", Long.toString(REFRESH1)));
+		else if(refresh5.isSelected())
+			props.addProperty(new Property("sleep", Long.toString(REFRESH5)));
+		else if(refresh30.isSelected())
+			props.addProperty(new Property("sleep", Long.toString(REFRESH30)));
+		
+		addSubproperties(props, "agenttable", agent_table.getProperties());
+		addSubproperties(props, "servicetable", service_table.getProperties());
+		
+		return props;
+	}
+	
+	/**
+	 * @see jadex.tools.common.plugin.IControlCenterPlugin#reset()
+	 */
+	public void reset()
+	{
+		// todo?
+	}
+
+	/**
+	 *  Refresh the view.
+	 */
+	protected void refresh()
+	{
+//		System.out.println("refresh: "+getSelectedDF());
+		IDFAgentDescription[] ads = new IDFAgentDescription[0];
+		
+		if(getSelectedDF() != null)
+		{
+			IDF	df	= (IDF)getJCC().getAgent().getPlatform().getService(IDF.class);
+
+			// Use a subgoal to search
+			IGoal ft = getJCC().getAgent().createGoal("df_search");
+			ft.getParameter("description").setValue(df.createDFAgentDescription(null, null));
+			ft.getParameter("constraints").setValue(df.createSearchConstraints(-1, 0));
+			ft.getParameter("df").setValue(getSelectedDF().getName());
+
+			try
+			{
+				getJCC().getAgent().dispatchTopLevelGoalAndWait(ft);
+				ads = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
+//				System.out.println("Found: "+SUtil.arrayToString(ads));
+			}
+			catch(Exception e)
+			{
+				//e.printStackTrace();
+				String text = SUtil.wrapText("Could not refresh descriptions: "+e.getMessage());
+				JOptionPane.showMessageDialog(SGUI.getWindowParent(getView()), text, "Refresh Problem", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		
+		if(old_ads == null || !Arrays.equals(old_ads, ads))
+		{
+			agent_table.setAgentDescriptions(ads);
+			updateServices(ads);
+			updateDetailedService();
+			old_ads = ads;
+		}
+	}
+	
+	/**
+	 *  Update the services panel.
+	 *  @param ads The agent descriptions.
+	 */
+	public void updateServices(IDFAgentDescription[] ads)
+	{
+		IDFAgentDescription[] selagents = agent_table.getSelectedAgents();
+		if(selagents.length==0)
+			service_table.setAgentDescriptions(ads);
+	}
+	
+	/**
+	 *  Update the detail view of services.
+	 */
+	public void updateDetailedService()
+	{
+		Object[] sdescs = service_table.getSelectedServices();
+		service_panel.setService((IDFAgentDescription)sdescs[1], 
+			(IDFServiceDescription)sdescs[0]);
+	}
+	
+	/**
+	 * @param ad
+	 */
+	public void agentDied(final IAMSAgentDescription ad)
+	{
+		// Update components on awt thread.
+		/*SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{*/
+				df_agents.removeAgent(ad);
+				//refresh();
+			/*}
+		});*/
+	}
+
+	/**
+	 * @param ad
+	 */
+	public void agentBorn(final IAMSAgentDescription ad)
+	{
+		//System.out.println("Agent born: "+ad.getName()+" "+Thread.currentThread());
+		
+		// Update components on awt thread.
+		/*SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{*/
+				// todo: Megahack replace with sth. useful (agent need not be there,
+				// todo: other agents could be the df and not be named df?)
+				if(ad.getName().getName().startsWith("df@"))
+				{
+					df_agents.addAgent(ad);
+					// Added first df -> select it.
+					if(df_agents.getAllAgents().length==1)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								df_agents.adjustColumnWidths();
+								
+								DefaultTreeTableNode[] nodes = df_agents.getAllAgents();
+								//System.out.println(SUtil.arrayToString(nodes));
+								for(int i=0; i<nodes.length; i++)
+								{
+									IAMSAgentDescription desc = (IAMSAgentDescription)nodes[i].getUserObject();
+									if(desc.getName().getName().startsWith("df@"))
+									{
+										TreePath path = new TreePath(nodes[i].getPath());
+								        int row = df_agents.getTreetable().getTree().getRowForPath(path);
+								        df_agents.getTreetable().getSelectionModel().setSelectionInterval(row, row);
+								        //System.out.println("seleected: "+row);
+								        break;
+									}
+								}
+							}
+						});
+					}
+						
+					//refresh();
+				}
+			/*}
+		});*/
+	}
+	
+	/**
+	 * @param ad
+	 */
+	public void agentChanged(final IAMSAgentDescription ad)
+	{
+		// nop?
+		// Update components on awt thread.
+		/*SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				agents.addAgent(ad);
+			}
+		});*/
+	}	
+
+	/**
+	 *  Get the selected df.
+	 *  @return The selected DF.
+	 */
+	public IAMSAgentDescription getSelectedDF()
+	{
+		IAMSAgentDescription ret = null;
+		if(df_agents.getTreetable().getTree().getSelectionPath()!=null)
+		{
+			DefaultTreeTableNode node = (DefaultTreeTableNode)df_agents.getTreetable().getTree()
+				.getSelectionPath().getLastPathComponent();
+			if(node != null && node.getUserObject() instanceof IAMSAgentDescription)
+				ret = (IAMSAgentDescription)node.getUserObject();
+		}
+		return ret;
+	}
+	
+	
+	/**
+	 * @return the help id of the perspective
+	 * @see jadex.tools.jcc.AbstractJCCPlugin#getHelpID()
+	 */
+	public String getHelpID()
+	{
+		return "tools.dfbrowser";
+	}
+
+	/**
+	 *  todo: Remove!
+	 *  Refresh the descriptions.
+	 */
+	protected void startRefreshThread()
+	{
+		if(refresh_thread == null && !refresh0.isSelected())
+		{
+//			System.out.println(refresh_thread+" "+refresh0.isSelected());
+			// todo: remove extra thread!
+		
+			refresh_thread = new Thread("DFBrowser refresh thread")
+			{
+				public void run()
+				{
+					//System.out.println("refresher started");
+					try
+					{
+						while(!refresh0.isSelected() && refresh_thread == this)
+						{
+//							System.out.println("refreshing");
+							refresh();
+							sleep(DFBrowserPlugin.this.sleep);
+						}
+					}
+					catch(Exception e)
+					{
+					}
+					if(refresh_thread == this)
+					{
+						refresh_thread = null;
+					}
+					//System.out.println("refresher ended");
+				}
+			};
+			refresh_thread.start();
+		}
+	}
+
+	/**
+	 * @see jadex.tools.jcc.AbstractJCCPlugin#shutdown()
+	 */
+	public void shutdown()
+	{
+		refresh_thread = null;
+	}
+
+	/**
+	 * @param description
+	 */
+	protected void removeAgentRegistration(IDFAgentDescription description)
+	{
+		try
+		{
+			IGoal deregister = getJCC().getAgent().createGoal("df_deregister");
+			deregister.getParameter("description").setValue(description);
+			deregister.getParameter("df").setValue(getSelectedDF().getName());
+			getJCC().getAgent().dispatchTopLevelGoalAndWait(deregister, 100);
+			refresh();
+		}
+		catch(Exception e)
+		{
+			// NOP
+		}
+	}
+	
+	/**
+	 *  Removes agent from the df.
+	 */
+	final AbstractAction REMOVE_AGENT = new RemoveAgentAction();
+
+	/**
+	 *  The remove agent action. 
+	 */
+	protected class RemoveAgentAction extends AbstractAction
+	{
+		/**
+		 * Create a new action.
+		 */
+		protected RemoveAgentAction()
+		{
+			super("Remove agent registration", icons.getIcon("remove_agent"));
+		}
+
+		/**
+		 * @param e
+		 */
+		public void actionPerformed(ActionEvent e)
+		{
+			boolean rem = false;
+			if(getSelectedDF() != null)
+			{
+				IDFAgentDescription[] as = agent_table.getSelectedAgents();
+				for(int i = 0; i < as.length; i++)
+				{
+					removeAgentRegistration(as[i]);
+				}
+				rem = as.length>0;
+				//refresh();
+			}
+			if(!rem)
+			{
+				String text = SUtil.wrapText("No agent description selected for removal.");
+				JOptionPane.showMessageDialog(SGUI.getWindowParent(getView()), text, 
+					"Remove Problem", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+	}
+	
+	/**
+	 *  Refresh df action.
+	 */
+	final AbstractAction REFRESH_DF = new RefreshDFAction();
+
+	/**
+	 *  The refresh DF action. 
+	 */
+	protected class RefreshDFAction extends AbstractAction
+	{
+		/**
+		 * Create a new action.
+		 */
+		protected RefreshDFAction()
+		{
+			super("Refresh DF view", icons.getIcon("refresh"));
+		}
+
+		/**
+		 * @param e
+		 */
+		public void actionPerformed(ActionEvent e)
+		{
+			refresh();
+		}
+	}
+}

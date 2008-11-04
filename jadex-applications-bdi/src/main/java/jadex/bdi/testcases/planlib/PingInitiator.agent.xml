@@ -1,0 +1,57 @@
+<!--
+	<H3>Test the ping capability.</H3>
+	This agent imports the ping capability and tests the ping behaviour.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="PingInitiator"
+	package="jadex.bdi.testcases.planlib">
+
+	<imports>
+		<import>java.util.logging.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+		<capability name="pingcap" file="jadex.bdi.planlib.ping.Ping"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		
+		<beliefref name="testcenter"  exported="true">
+			<concrete ref="testcap.testcenter"/>
+		</beliefref>
+	</beliefs>
+
+	<plans>
+		<plan name="tester">
+			<body class="PingTestPlan"/>
+		</plan>
+	</plans>	
+
+	<properties>
+		<!--<property name="debugging">true</property>-->
+		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
+		<!-- <property name="logging.useParentHandlers">true</property> -->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="tester"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>

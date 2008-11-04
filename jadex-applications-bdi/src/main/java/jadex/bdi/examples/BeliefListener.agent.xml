@@ -1,0 +1,45 @@
+<!--
+  <H3>This agent tests belief listeners.</H3>
+
+  Creates a plan and tests if belief (set) modifications can be observed
+  via listeners.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="BeliefListener"
+	package="jadex.bdi.examples">
+	
+	<beliefs>
+		<belief name="text" class="String">
+			<fact>"Welcome to Jadex."</fact>
+		</belief>
+		
+		<beliefset name="texts" class="String">
+			<fact>"a"</fact>
+			<fact>"b"</fact>
+			<fact>"c"</fact>
+		</beliefset>
+	</beliefs>
+	
+	<plans>
+		<plan name="blplan">
+			<body class="BeliefListenerPlan"/>
+		</plan>
+	</plans>
+	
+	<properties>
+	 	<!-- <property name="debugging">true</property> -->
+	</properties>
+
+	<configurations default="default">
+		<configuration name="default">
+			<plans>
+				<initialplan ref="blplan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

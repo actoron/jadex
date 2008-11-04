@@ -1,0 +1,18 @@
+<!--
+	<H3>Ping Agent for answering ping requests.</H3>
+
+	Reacts on "ping" query-ref and sends back inform "alive".
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Ping"
+	package="jadex.bdi.examples">
+
+	<capabilities>
+		<capability name="ping" file="jadex.bdi.planlib.ping.Ping"/>
+	</capabilities>
+
+</agent>

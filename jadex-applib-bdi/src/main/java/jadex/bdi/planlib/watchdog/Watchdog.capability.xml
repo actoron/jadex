@@ -1,0 +1,97 @@
+<!--
+	<H3>Watchdog capability</H3>
+	This watchdog capability has the purpose to test other agent's
+	vitality and informs some authority in error cases.
+
+	<H4>Explanation</H4>
+	The capability has a set of observation descriptions. Each description
+	corresponds to an agent to observe and contains information about
+	how to contact the admin.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Watchdog"
+	package="jadex.bdi.planlib.watchdog">
+
+	<imports>
+		<import>jadex.bdi.planlib.messaging.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="pingcap" file="jadex.bdi.planlib.ping.Ping"/>
+		<capability name="messagingcap" file="jadex.bdi.planlib.messaging.Messaging"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="emailaccount" exported="true">
+			<concrete ref="messagingcap.emailaccount"/>
+		</beliefref>
+		
+        <beliefref name="icqaccount" exported="true">
+            <concrete ref="messagingcap.icqaccount"/>
+        </beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoalref name="send_sms">
+			<concrete ref="messagingcap.send_sms"/>
+		</achievegoalref>
+
+		<achievegoalref name="send_email">
+			<concrete ref="messagingcap.send_email"/>
+		</achievegoalref>
+      
+        <achievegoalref name="send_im">
+             <concrete ref="messagingcap.send_im"/>
+        </achievegoalref>
+        
+        <achievegoalref name="pinging">
+             <concrete ref="pingcap.pinging"/>
+        </achievegoalref>
+
+		<achievegoal name="observe_agent" exported="true">
+			<parameter name="description" class="ObservationDescription"/>
+		</achievegoal>
+
+		<achievegoal name="recover_agent" exported="true">
+			<parameter name="description" class="ObservationDescription"/>
+		</achievegoal>
+
+		<achievegoal name="notify_admin" exported="true">
+			<parameter name="description" class="ObservationDescription"/>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="observe_agent_plan">
+			<parameter name="description" class="ObservationDescription">
+				<goalmapping ref="observe_agent.description"/>
+			</parameter>
+			<body class="ObserveAgentPlan" />
+			<trigger>
+				<goal ref="observe_agent" />
+			</trigger>
+		</plan>
+
+		<plan name="notify_admin_plan">
+			<parameter name="description" class="ObservationDescription">
+				<goalmapping ref="notify_admin.description"/>
+			</parameter>
+			<body class="NotifyAdminPlan" />
+			<trigger>
+				<goal ref="notify_admin"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- Only log outputs >= level are printed. -->
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<!-- The default parent handler prints out log messages on the console.-->
+		<property name="logging.useParentHandlers">true</property>
+	</properties>
+
+</capability>
