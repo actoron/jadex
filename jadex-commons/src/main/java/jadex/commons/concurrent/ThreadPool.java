@@ -190,10 +190,6 @@ public class ThreadPool implements IThreadPool, Runnable
 	 */
 	protected void addThreads(int num)
 	{
-		synchronized(this)
-		{
-			capacity += num;
-		}
 		//System.out.println("Cap+1(add): "+capacity);
 		for(int i=0; i<num; i++)
 		{
@@ -297,6 +293,10 @@ public class ThreadPool implements IThreadPool, Runnable
 //					+ "Capacity is "+capacity+".");
 				try
 				{
+					synchronized(ThreadPool.this)
+					{
+						capacity++;
+					}
 					this.task = ((Runnable)tasks.dequeue(THREAD_TIMEOUT));
 					threads.put(task, this);
 					this.start = System.currentTimeMillis();
@@ -307,21 +307,17 @@ public class ThreadPool implements IThreadPool, Runnable
 						this.task.run();
 					}
 					catch(ThreadDeath e){}
-					synchronized(ThreadPool.this)
-					{
-						capacity++;
-					}
 					//{System.out.println("Thread terminated (interrupted): "+this);}
 				}
 				catch(IBlockingQueue.ClosedException e){}
 				catch(IBlockingQueue.TimeoutException e)
 				{
+					synchronized(ThreadPool.this)
+					{
+						capacity--;
+					}
 					if(capacity>min)
 					{
-						synchronized(ThreadPool.this)
-						{
-							capacity--;
-						}
 						System.out.println("Thread timeout (queue): "+this);
 						break;
 					}
