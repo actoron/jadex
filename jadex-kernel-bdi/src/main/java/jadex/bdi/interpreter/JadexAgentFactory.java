@@ -8,6 +8,7 @@ import jadex.bridge.ILibraryService;
 import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.IPlatform;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVState;
 
 import java.io.IOException;
@@ -59,6 +60,7 @@ public class JadexAgentFactory implements IJadexAgentFactory
 		if(libservice==null)
 		{
 			libservice = (ILibraryService)platform.getService(ILibraryService.class);
+			loader.setClassLoader(libservice.getClassLoader());
 			ILibraryServiceListener lsl = new ILibraryServiceListener()
 			{
 				public void jarAdded(String path)
@@ -99,8 +101,12 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	{
 		init();
 		
-		OAVAgentModel loaded  = (OAVAgentModel)loadModel(model);
-		IOAVState	state	= new OAVState(OAVBDIRuntimeModel.bdi_rt_model); 
+		OAVAgentModel	loaded 	= (OAVAgentModel)loadModel(model);
+		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+		OAVTypeModel	tmodel	= new OAVTypeModel(adapter.getAgentIdentifier().getLocalName()+"_typemodel", loaded.getTypeModel().getClassLoader());
+		tmodel.addTypeModel(loaded.getTypeModel());
+		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+		IOAVState	state	= new OAVState(tmodel); 
 		state.addSubstate(loaded.getState());
 		return new BDIInterpreter(adapter, state, loaded, config, arguments, props);
 	}

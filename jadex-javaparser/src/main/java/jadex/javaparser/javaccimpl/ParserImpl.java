@@ -3,9 +3,8 @@ package jadex.javaparser.javaccimpl;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-
-import java.util.ArrayList;
 import java.util.Map;
+import java.util.ArrayList;
 
 
 /**
@@ -24,6 +23,9 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplC
 
         /** The local parameters (name->type). */
         protected Map   params;
+
+        /** The class loader. */
+        protected ClassLoader classloader;
 
         //-------- attribute accessors --------
 
@@ -53,6 +55,24 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplC
                 this.params     = params;
         }
 
+        /**
+	 *  Set the classloader.
+	 *  @param classloader The classloader.
+	 */
+        protected void  setClassLoader(ClassLoader classloader)
+        {
+                this.classloader = classloader;
+        }
+
+        /**
+	 *  Get the classloader.
+	 *  @return	The classloader.
+	 */
+        protected ClassLoader getClassLoader()
+        {
+                return this.classloader;
+        }
+
         //-------- helper methods --------
 
         /**
@@ -62,7 +82,7 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplC
 	 */
         protected Class findClass0(String name)
         {
-                return SReflect.findClass0(name, imports);
+                return SReflect.findClass0(name, imports, classloader);
         }
 
         /**
@@ -73,7 +93,7 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplC
 	 */
         protected Class findClass(String name) throws ClassNotFoundException
         {
-                return SReflect.findClass(name, imports);
+                return SReflect.findClass(name, imports, classloader);
         }
 
         /**
@@ -84,7 +104,7 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplC
 	 */
         protected Class getInnerClass(Class outer, String inner)
         {
-                return SReflect.classForName0(outer.getName()+"$"+inner);
+                return SReflect.classForName0(outer.getName()+"$"+inner, classloader);
         }
 
         /**
@@ -2505,64 +2525,6 @@ TOKEN : /* OPERATORS * /
     finally { jj_save(28, xla); }
   }
 
-  final private boolean jj_3R_113() {
-    if (jj_scan_token(76)) return true;
-    if (jj_3R_30()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_36() {
-    if (jj_3R_46()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_109() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_30()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_114()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3_16() {
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_21() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_36()) {
-    jj_scanpos = xsp;
-    if (jj_3_28()) return true;
-    }
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_37()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  final private boolean jj_3R_41() {
-    if (jj_3R_49()) return true;
-    return false;
-  }
-
-  final private boolean jj_3_27() {
-    if (jj_3R_30()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_113()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_40() {
-    if (jj_scan_token(75)) return true;
-    if (jj_3R_94()) return true;
-    return false;
-  }
-
   final private boolean jj_3R_39() {
     if (jj_scan_token(74)) return true;
     if (jj_3R_94()) return true;
@@ -3611,6 +3573,64 @@ TOKEN : /* OPERATORS * /
     if (jj_scan_token(LPAREN)) return true;
     if (jj_3R_21()) return true;
     if (jj_scan_token(RPAREN)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_113() {
+    if (jj_scan_token(76)) return true;
+    if (jj_3R_30()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_36() {
+    if (jj_3R_46()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_109() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_30()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_114()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3_16() {
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_21() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_36()) {
+    jj_scanpos = xsp;
+    if (jj_3_28()) return true;
+    }
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_37()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  final private boolean jj_3R_41() {
+    if (jj_3R_49()) return true;
+    return false;
+  }
+
+  final private boolean jj_3_27() {
+    if (jj_3R_30()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_113()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_40() {
+    if (jj_scan_token(75)) return true;
+    if (jj_3R_94()) return true;
     return false;
   }
 

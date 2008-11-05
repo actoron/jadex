@@ -151,20 +151,20 @@ public class CodecFactory
 	 *  Add a new codec.
 	 *  @param codec_id The codec_id.
 	 *  @param codec_clname The codec class name (fully qualified).
-	 */
+	 * /
 	public void addCodec(String codec_clname) throws ClassNotFoundException
 	{
 		addCodec(SReflect.classForName(codec_clname));
-	}
+	}*/
 	
 	/**
 	 *  Remove a codec.
 	 *  @param codec_clname The codec class name (fully qualified).
-	 */
+	 * /
 	public void removeCodec(String codec_clname) throws ClassNotFoundException
 	{
 		removeCodec(SReflect.classForName(codec_clname));
-	}
+	}*/
 	
 	/**
 	 *  Add a new codec.

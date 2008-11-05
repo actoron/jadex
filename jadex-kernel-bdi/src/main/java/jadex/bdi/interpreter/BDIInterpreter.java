@@ -181,7 +181,7 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 				Object key = it.next();
 				try
 				{
-					IParsedExpression pex = parser.parseExpression((String)arguments.get(key), null, null);
+					IParsedExpression pex = parser.parseExpression((String)arguments.get(key), null, null, state.getTypeModel().getClassLoader());
 					Object val = pex.getValue(null);
 					arguments.put(key, val);
 				}

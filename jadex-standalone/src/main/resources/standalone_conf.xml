@@ -26,7 +26,7 @@
 			<property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService(
 				new java.net.URL[]
 				{
-					new java.net.URL("file:///./jadex_v2/bdi/applib/classes"),
+					new java.net.URL("file:///c:/projects/jadex/jadex_v2/bdi/applib/classes"),
 					new java.net.URL("file:///./jadex_v2/bdi/applications/classes")
 				})
 			</property>

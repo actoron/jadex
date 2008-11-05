@@ -93,7 +93,7 @@ public class GraphEdgeBetweennessClusterer implements Transformer
 		}
 
 		WeakComponentClusterer wcSearch = new WeakComponentClusterer();
-		Set clusterSet = (Set)wcSearch.transform(graph);
+		Set clusterSet = (Set)wcSearch.transform((Graph)graph);
 		for(Iterator it = mEdgesRemoved.iterator(); it.hasNext();)
 		{
 			// BUGFIX goes here !!!

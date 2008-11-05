@@ -17,5 +17,5 @@ public interface IExpressionParser
 	 *  @param parameters Parameters declared in the expression (name -> OAV type).
 	 *  @return The parsed expression.
 	 */
-	public IParsedExpression parseExpression(String expression, String[] imports, Map parameters);	
+	public IParsedExpression parseExpression(String expression, String[] imports, Map parameters, ClassLoader classloader);	
 }

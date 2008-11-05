@@ -1,7 +1,6 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.AgentRules;
-import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBeliefbase;
@@ -330,7 +329,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return BDIInterpreter.getInterpreter(getState()).getModel().getClassLoader();
+		return getState().getTypeModel().getClassLoader();
 	}
 	
 	/**

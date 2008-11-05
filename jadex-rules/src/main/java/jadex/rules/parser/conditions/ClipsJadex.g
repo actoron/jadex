@@ -223,7 +223,7 @@ notce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
 	;
 
 testce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
-	: '(' 'test' (({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? call=functionCall[vars])  | call=operatorCall[vars]) ')'
+	: '(' 'test' (({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? call=functionCall[tmodel, vars])  | call=operatorCall[tmodel, vars]) ')'
 	{
 		$condition = new TestCondition(new PredicateConstraint(call));
 	}
@@ -239,7 +239,7 @@ collectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
 	{
 		conds.add(c);
 	}
-	)+  pc=predicateConstraint[$tmodel, vars]? ')'
+	)+  pc=predicateConstraint[$tmodel, null, vars]? ')' // null correct?
 	{
 		ObjectCondition first = (ObjectCondition)conds.get(0);
 		mfv.setType(first.getObjectType());
@@ -302,7 +302,7 @@ methodConstraint [OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [L
 	{
 		List exps = new ArrayList();
 	}
-	'(' mn=methodname '('(exp=parameter[vars]
+	'(' mn=methodname '('(exp=parameter[tmodel, vars]
 	{
 		exps.add(exp);
 	}
@@ -317,7 +317,7 @@ functionConstraint [OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns 
 	{
 		List exps = new ArrayList();
 	}
-	'(' fc=functionCall[vars] cs=constraint[tmodel, fc, vars] ')'
+	'(' fc=functionCall[tmodel, vars] cs=constraint[tmodel, fc, vars] ')'
 	{
 		$constraints = cs;
 	}
@@ -384,8 +384,8 @@ singleConstraint [OAVTypeModel tmodel, Object valuesource, Map vars] returns [IC
 	: tmp=literalConstraint[valuesource] {$constraint = tmp;} 
 	| tmp=boundConstraint[tmodel, valuesource, vars] {$constraint = tmp;}
 	| tmp=multiBoundConstraint[tmodel, valuesource, vars] {$constraint = tmp;}
-	| tmp=predicateConstraint[valuesource, vars] {$constraint = tmp;}
-	| tmp=returnValueConstraint[valuesource, vars] {$constraint = tmp;}
+	| tmp=predicateConstraint[tmodel, valuesource, vars] {$constraint = tmp;}
+	| tmp=returnValueConstraint[tmodel, valuesource, vars] {$constraint = tmp;}
 	;
 
 literalConstraint [Object valuesource] returns [IConstraint constraint]
@@ -441,25 +441,25 @@ multiBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns 
 	}
 	;
 	
-predicateConstraint[Object valuesource, Map vars] returns [IConstraint constraint]
-	: ':' ({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? fc=functionCall[vars] {$constraint = new PredicateConstraint(fc);} 
-	| oc=operatorCall[vars] {$constraint = new PredicateConstraint(oc);}
+predicateConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint]
+	: ':' ({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? fc=functionCall[tmodel, vars] {$constraint = new PredicateConstraint(fc);} 
+	| oc=operatorCall[tmodel, vars] {$constraint = new PredicateConstraint(oc);}
 	)
 	;
 	
 // todo: support other operators than =
-returnValueConstraint[Object valuesource, Map vars] returns [IConstraint constraint]
-	: equalOperator ({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? fc=functionCall[vars] {$constraint = new ValueSourceReturnValueConstraint(valuesource, fc, IOperator.EQUAL);} 
-	| oc=operatorCall[vars] {$constraint = new ValueSourceReturnValueConstraint(valuesource, oc, IOperator.EQUAL);} 
+returnValueConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint]
+	: equalOperator ({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? fc=functionCall[tmodel, vars] {$constraint = new ValueSourceReturnValueConstraint(valuesource, fc, IOperator.EQUAL);} 
+	| oc=operatorCall[tmodel, vars] {$constraint = new ValueSourceReturnValueConstraint(valuesource, oc, IOperator.EQUAL);} 
 	) 
 	;
 
-functionCall [Map vars] returns [FunctionCall fc]
+functionCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]
 	: 
 	{
 		List exps = new ArrayList();
 	}
-	'(' fn=functionName (exp=parameter[vars]
+	'(' fn=functionName (exp=parameter[tmodel, vars]
 	{
 		exps.add(exp);
 	}
@@ -473,7 +473,7 @@ functionCall [Map vars] returns [FunctionCall fc]
 				String clazzname = (String)exps.remove(0);
 				String methodname = (String)exps.remove(0);
 				
-				Class clazz = SReflect.classForName0(clazzname);
+				Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
 				Method[] methods	= SReflect.getMethods(clazz, methodname);
 				Method	method;
 	
@@ -492,7 +492,7 @@ functionCall [Map vars] returns [FunctionCall fc]
 			}
 			else
 			{
-				func = (IFunction)SReflect.classForName0(fn).newInstance();
+				func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
 			}
 			
 			$fc = new FunctionCall(func, exps);
@@ -504,19 +504,19 @@ functionCall [Map vars] returns [FunctionCall fc]
 	}
 	;
 
-operatorCall [Map vars] returns [FunctionCall fc]	
-	: '('  op=operator? exp1=parameter[vars] exp2=parameter[vars] ')'
+operatorCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]	
+	: '('  op=operator? exp1=parameter[tmodel, vars] exp2=parameter[tmodel, vars] ')'
 	{
 		IFunction func = new OperatorFunction(op!=null? op: IOperator.EQUAL);
 		$fc = new FunctionCall(func, new Object[]{exp1, exp2});
 	}
 	;
 
-parameter [Map vars] returns [Object val]	
+parameter [OAVTypeModel tmodel, Map vars] returns [Object val]	
 	: tmp1=constant {$val = tmp1;} 
 	| tmp2=variable[null, vars] {$val = tmp2;}
-	| {SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? tmp3=functionCall[vars] {$val = tmp3;}
-	| tmp4=operatorCall[vars] {$val = tmp4;}
+	| {SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? tmp3=functionCall[tmodel, vars] {$val = tmp3;}
+	| tmp4=operatorCall[tmodel, vars] {$val = tmp4;}
 	;
 
 constant returns [Object val]	

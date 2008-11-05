@@ -39,7 +39,7 @@ public class ClassValueConverter implements IValueConverter
 		{
 			String[]	imports	= getImports(state, stack);
 			
-			return SReflect.findClass(value, imports);
+			return SReflect.findClass(value, imports, state.getTypeModel().getClassLoader());
 		}
 		catch(ClassNotFoundException e)
 		{

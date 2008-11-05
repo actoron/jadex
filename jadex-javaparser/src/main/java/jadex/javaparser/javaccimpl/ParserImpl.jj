@@ -44,6 +44,9 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants/*@egen*/
 
 	/** The local parameters (name->type). */
 	protected Map	params;
+	
+	/** The class loader. */
+	protected ClassLoader classloader;
 
 	//-------- attribute accessors --------
 
@@ -72,6 +75,24 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants/*@egen*/
 	{
 		this.params	= params;
 	}
+	
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader.
+	 */
+	protected void	setClassLoader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
+	}
+	
+	/**
+	 *  Get the classloader.
+	 *  @return	The classloader.
+	 */
+	protected ClassLoader getClassLoader()
+	{
+		return this.classloader;
+	}
 
 	//-------- helper methods --------
 
@@ -82,7 +103,7 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants/*@egen*/
 	 */
 	protected Class	findClass0(String name)
 	{
-		return SReflect.findClass0(name, imports);
+		return SReflect.findClass0(name, imports, classloader);
 	}
 
 	/**
@@ -93,7 +114,7 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants/*@egen*/
 	 */
 	protected Class	findClass(String name) throws ClassNotFoundException
 	{
-		return SReflect.findClass(name, imports);
+		return SReflect.findClass(name, imports, classloader);
 	}
 
 	/**
@@ -104,7 +125,7 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants/*@egen*/
 	 */
 	protected Class	getInnerClass(Class outer, String inner)
 	{
-		return SReflect.classForName0(outer.getName()+"$"+inner);
+		return SReflect.classForName0(outer.getName()+"$"+inner, classloader);
 	}
 
 	/**

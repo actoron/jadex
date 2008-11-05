@@ -636,7 +636,7 @@ public abstract class AbstractPlan implements java.io.Serializable
 		}
 		
 		IParsedExpression pex = exp_parser.parseExpression(expression, coll==null? 
-			null: (String[])coll.toArray(new String[coll.size()]), params);
+			null: (String[])coll.toArray(new String[coll.size()]), params, Thread.currentThread().getContextClassLoader());
 		return new ExpressionNoModel(state, rcapa, pex);
 	}
 

@@ -32,9 +32,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	 *  Create a model.
 	 */
 	public OAVAgentModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types, ClassLoader classloader)
+		OAVTypeModel typemodel, Set types)
 	{
-		super(state, handle, typemodel, types, classloader);
+		super(state, handle, typemodel, types);
 	}
 	
 	//-------- IJadexModel methods --------
@@ -79,12 +79,12 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	
 	/**
 	 *  Copy content from another capability model.
-	 */
+	 * /
 	protected void	copyContentFrom(OAVCapabilityModel model)
 	{
 		super.copyContentFrom(model);
 		this.matcherfunc	= ((OAVAgentModel)model).getMatcherFunctionality();		
-	}
+	}*/
 	
 	//-------- methods --------
 	

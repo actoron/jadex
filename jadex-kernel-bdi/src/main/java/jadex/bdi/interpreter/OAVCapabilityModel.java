@@ -40,9 +40,6 @@ public class OAVCapabilityModel implements IJadexModel
 	/** The rulebase of the capability (includes type-specific rules, if any). */
 	protected Rulebase rulebase;
 	
-	/** The classloader. */
-	protected ClassLoader classloader;
-	
 	//-------- constructors --------
 	
 	/**
@@ -56,14 +53,13 @@ public class OAVCapabilityModel implements IJadexModel
 	 *  Create a model.
 	 */
 	public OAVCapabilityModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types, ClassLoader classloader)
+		OAVTypeModel typemodel, Set types)
 	{
 		this.state	= state;
 		this.handle	= handle;
 		this.typemodel	= typemodel;
 		this.types	= types;
 		this.rulebase	= new Rulebase();
-		this.classloader = classloader;
 	}
 	
 	//-------- IJadexModel methods --------
@@ -317,15 +313,6 @@ public class OAVCapabilityModel implements IJadexModel
 	}
 	
 	/**
-	 *  Get the classloader.
-	 *  @return The class loader.
-	 */
-	public ClassLoader getClassLoader()
-	{
-		return this.classloader;
-	}
-	
-	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
 	 */
@@ -337,7 +324,7 @@ public class OAVCapabilityModel implements IJadexModel
 
 	/**
 	 *  Copy content from another capability model.
-	 */
+	 * /
 	protected void	copyContentFrom(OAVCapabilityModel model)
 	{
 //		// Todo: use state factory.
@@ -349,8 +336,9 @@ public class OAVCapabilityModel implements IJadexModel
 		this.state	= model.getState();
 		this.handle	= model.getHandle();
 		this.types	= model.getTypes();
+		this.typemodel	= model.getTypeModel();
 		this.rulebase	= model.getRulebase();
-	}
+	}*/
 
 	/**
 	 *  Add a subcapability.

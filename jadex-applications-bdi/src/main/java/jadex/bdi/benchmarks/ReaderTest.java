@@ -66,8 +66,7 @@ public class ReaderTest
 		}
 		else
 		{
-			//Object	obj	= reader.read(new FileInputStream(file), state, mapping);
-			Object	obj	= reader.read(SUtil.getResource(args[0], null), state, mapping);
+			reader.read(SUtil.getResource(args[0], null), state, mapping);
 
 			OAVTreeModel.createOAVFrame(file.getName(), state).setVisible(true);
 

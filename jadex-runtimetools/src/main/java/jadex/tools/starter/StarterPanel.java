@@ -3,6 +3,7 @@ package jadex.tools.starter;
 import jadex.bridge.IArgument;
 import jadex.bridge.IJadexAgentFactory;
 import jadex.bridge.IJadexModel;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.IReport;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
@@ -303,7 +304,8 @@ public class StarterPanel extends JPanel
 							Object arg = null;
 							try
 							{
-								arg = new JavaCCExpressionParser().parseExpression(argval, null, null).getValue(null);
+								ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+								arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
 							}
 							catch(Exception e)
 							{
@@ -864,7 +866,8 @@ public class StarterPanel extends JPanel
 		final JValidatorTextField valt = new JValidatorTextField(15);
 		
 		// todo:
-		valt.setValidator(new ParserValidator());
+		ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		valt.setValidator(new ParserValidator(ls.getClassLoader()));
 		
 		String configname = (String)config.getSelectedItem();
 		JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));

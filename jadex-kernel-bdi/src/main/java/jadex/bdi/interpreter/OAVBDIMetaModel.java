@@ -1357,7 +1357,7 @@ public class OAVBDIMetaModel
 					{
 						try
 						{
-							ret = ParserHelper.parseCondition(value, OAVBDIRuntimeModel.bdi_rt_model);
+							ret = ParserHelper.parseCondition(value, state.getTypeModel());
 						}
 						catch(Exception e)
 						{
@@ -1378,7 +1378,7 @@ public class OAVBDIMetaModel
 					{
 						try
 						{
-							ret = exp_parser.parseExpression(value, ClassValueConverter.getImports(state, stack), null);
+							ret = exp_parser.parseExpression(value, ClassValueConverter.getImports(state, stack), null, state.getTypeModel().getClassLoader());
 						}
 						catch(Exception e)
 						{
@@ -1421,7 +1421,7 @@ public class OAVBDIMetaModel
 					{
 						try
 						{
-							ret = ParserHelper.parseCondition(value, OAVBDIRuntimeModel.bdi_rt_model);
+							ret = ParserHelper.parseCondition(value, state.getTypeModel());
 						}
 						catch(Exception e)
 						{

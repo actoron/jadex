@@ -2,6 +2,7 @@ package jadex.rules.state.io.xml;
 
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVTypeModel;
 
 import java.util.List;
 

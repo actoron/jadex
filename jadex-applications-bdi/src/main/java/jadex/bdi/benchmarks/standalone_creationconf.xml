@@ -22,7 +22,12 @@
 		<!-- Platform services. -->
 		<properties type="services">
 			<!-- Library service. -->
-			<property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService()</property>
+			<property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService(
+				new java.net.URL[]
+				{
+					new java.net.URL("file:///"+System.getProperty("user.dir")+"/../jadex-applications-bdi/target/classes")
+				})
+			</property>
 			
 			<!-- AMS service. -->
 			<property type="jadex.adapter.base.fipa.IAMS" name="ams_service">new jadex.adapter.standalone.ams.AMS($platform)</property> 

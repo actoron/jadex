@@ -89,7 +89,7 @@ public class Property
 	public Object	getJavaObject(IValueFetcher fetcher)
 	{
 		IExpressionParser	parser	= new JavaCCExpressionParser();
-		IParsedExpression	exp	= parser.parseExpression(value, null, null);
+		IParsedExpression	exp	= parser.parseExpression(value, null, null, null);
 		return exp.getValue(fetcher);
 	}
 	

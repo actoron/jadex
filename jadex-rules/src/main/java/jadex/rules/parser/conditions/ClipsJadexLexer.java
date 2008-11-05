@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2008-09-29 12:50:33
+// $ANTLR 3.0.1 C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2008-11-04 22:34:11
 
 package jadex.rules.parser.conditions;
 
@@ -60,14 +60,14 @@ public class ClipsJadexLexer extends Lexer {
     public ClipsJadexLexer(CharStream input) {
         super(input);
     }
-    public String getGrammarFileName() { return "C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g"; }
+    public String getGrammarFileName() { return "C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g"; }
 
     // $ANTLR start T25
     public final void mT25() throws RecognitionException {
         try {
             int _type = T25;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:6:5: ( '(' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:6:7: '('
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:6:5: ( '(' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:6:7: '('
             {
             match('('); 
 
@@ -84,8 +84,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT26() throws RecognitionException {
         try {
             int _type = T26;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:7:5: ( 'and' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:7:7: 'and'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:7:5: ( 'and' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:7:7: 'and'
             {
             match("and"); 
 
@@ -103,8 +103,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT27() throws RecognitionException {
         try {
             int _type = T27;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:8:5: ( ')' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:8:7: ')'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:8:5: ( ')' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:8:7: ')'
             {
             match(')'); 
 
@@ -121,8 +121,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT28() throws RecognitionException {
         try {
             int _type = T28;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:9:5: ( 'not' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:9:7: 'not'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:9:5: ( 'not' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:9:7: 'not'
             {
             match("not"); 
 
@@ -140,8 +140,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT29() throws RecognitionException {
         try {
             int _type = T29;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:10:5: ( 'test' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:10:7: 'test'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:10:5: ( 'test' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:10:7: 'test'
             {
             match("test"); 
 
@@ -159,8 +159,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT30() throws RecognitionException {
         try {
             int _type = T30;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:11:5: ( '<-' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:11:7: '<-'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:11:5: ( '<-' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:11:7: '<-'
             {
             match("<-"); 
 
@@ -178,8 +178,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT31() throws RecognitionException {
         try {
             int _type = T31;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:12:5: ( '=' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:12:7: '='
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:12:5: ( '=' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:12:7: '='
             {
             match('='); 
 
@@ -196,8 +196,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT32() throws RecognitionException {
         try {
             int _type = T32;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:13:5: ( 'collect' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:13:7: 'collect'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:13:5: ( 'collect' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:13:7: 'collect'
             {
             match("collect"); 
 
@@ -215,8 +215,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT33() throws RecognitionException {
         try {
             int _type = T33;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:14:5: ( '?' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:14:7: '?'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:14:5: ( '?' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:14:7: '?'
             {
             match('?'); 
 
@@ -233,8 +233,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT34() throws RecognitionException {
         try {
             int _type = T34;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:15:5: ( '$?' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:15:7: '$?'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:15:5: ( '$?' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:15:7: '$?'
             {
             match("$?"); 
 
@@ -252,8 +252,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT35() throws RecognitionException {
         try {
             int _type = T35;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:16:5: ( ':' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:16:7: ':'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:16:5: ( ':' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:16:7: ':'
             {
             match(':'); 
 
@@ -270,8 +270,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT36() throws RecognitionException {
         try {
             int _type = T36;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:17:5: ( '.' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:17:7: '.'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:17:5: ( '.' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:17:7: '.'
             {
             match('.'); 
 
@@ -288,8 +288,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT37() throws RecognitionException {
         try {
             int _type = T37;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:18:5: ( 'null' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:18:7: 'null'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:18:5: ( 'null' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:18:7: 'null'
             {
             match("null"); 
 
@@ -307,8 +307,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT38() throws RecognitionException {
         try {
             int _type = T38;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:19:5: ( '+' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:19:7: '+'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:19:5: ( '+' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:19:7: '+'
             {
             match('+'); 
 
@@ -325,8 +325,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT39() throws RecognitionException {
         try {
             int _type = T39;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:20:5: ( '-' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:20:7: '-'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:20:5: ( '-' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:20:7: '-'
             {
             match('-'); 
 
@@ -343,8 +343,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT40() throws RecognitionException {
         try {
             int _type = T40;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:21:5: ( '!=' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:21:7: '!='
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:21:5: ( '!=' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:21:7: '!='
             {
             match("!="); 
 
@@ -362,8 +362,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT41() throws RecognitionException {
         try {
             int _type = T41;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:22:5: ( '~' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:22:7: '~'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:22:5: ( '~' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:22:7: '~'
             {
             match('~'); 
 
@@ -380,8 +380,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT42() throws RecognitionException {
         try {
             int _type = T42;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:23:5: ( '>' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:23:7: '>'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:23:5: ( '>' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:23:7: '>'
             {
             match('>'); 
 
@@ -398,8 +398,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT43() throws RecognitionException {
         try {
             int _type = T43;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:24:5: ( '<' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:24:7: '<'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:24:5: ( '<' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:24:7: '<'
             {
             match('<'); 
 
@@ -416,8 +416,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT44() throws RecognitionException {
         try {
             int _type = T44;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:25:5: ( '>=' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:25:7: '>='
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:25:5: ( '>=' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:25:7: '>='
             {
             match(">="); 
 
@@ -435,8 +435,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT45() throws RecognitionException {
         try {
             int _type = T45;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:26:5: ( '<=' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:26:7: '<='
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:26:5: ( '<=' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:26:7: '<='
             {
             match("<="); 
 
@@ -454,8 +454,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT46() throws RecognitionException {
         try {
             int _type = T46;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:27:5: ( 'contains' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:27:7: 'contains'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:27:5: ( 'contains' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:27:7: 'contains'
             {
             match("contains"); 
 
@@ -473,8 +473,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT47() throws RecognitionException {
         try {
             int _type = T47;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:28:5: ( 'excludes' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:28:7: 'excludes'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:28:5: ( 'excludes' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:28:7: 'excludes'
             {
             match("excludes"); 
 
@@ -492,8 +492,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mT48() throws RecognitionException {
         try {
             int _type = T48;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:29:5: ( '==' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:29:7: '=='
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:29:5: ( '==' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:29:7: '=='
             {
             match("=="); 
 
@@ -511,8 +511,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mConstraintOperator() throws RecognitionException {
         try {
             int _type = ConstraintOperator;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:643:2: ( '&' | '|' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:643:2: ( '&' | '|' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
             {
             if ( input.LA(1)=='&'||input.LA(1)=='|' ) {
                 input.consume();
@@ -538,7 +538,7 @@ public class ClipsJadexLexer extends Lexer {
     public final void mBooleanLiteral() throws RecognitionException {
         try {
             int _type = BooleanLiteral;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:2: ( 'true' | 'false' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:2: ( 'true' | 'false' )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -556,7 +556,7 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:6: 'true'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:6: 'true'
                     {
                     match("true"); 
 
@@ -564,7 +564,7 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:15: 'false'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:15: 'false'
                     {
                     match("false"); 
 
@@ -584,8 +584,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mHexLiteral() throws RecognitionException {
         try {
             int _type = HexLiteral;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:2: ( '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )? )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:4: '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:2: ( '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )? )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:4: '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )?
             {
             match('0'); 
             if ( input.LA(1)=='X'||input.LA(1)=='x' ) {
@@ -598,7 +598,7 @@ public class ClipsJadexLexer extends Lexer {
                 recover(mse);    throw mse;
             }
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:18: ( HexDigit )+
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:18: ( HexDigit )+
             int cnt2=0;
             loop2:
             do {
@@ -612,7 +612,7 @@ public class ClipsJadexLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:18: HexDigit
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:18: HexDigit
             	    {
             	    mHexDigit(); 
 
@@ -628,7 +628,7 @@ public class ClipsJadexLexer extends Lexer {
                 cnt2++;
             } while (true);
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:28: ( IntegerTypeSuffix )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:28: ( IntegerTypeSuffix )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -637,7 +637,7 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt3) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:28: IntegerTypeSuffix
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:28: IntegerTypeSuffix
                     {
                     mIntegerTypeSuffix(); 
 
@@ -660,10 +660,10 @@ public class ClipsJadexLexer extends Lexer {
     public final void mDecimalLiteral() throws RecognitionException {
         try {
             int _type = DecimalLiteral;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:2: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )? )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:4: ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:2: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )? )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:4: ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )?
             {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:4: ( '0' | '1' .. '9' ( '0' .. '9' )* )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:4: ( '0' | '1' .. '9' ( '0' .. '9' )* )
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -681,17 +681,17 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt5) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:5: '0'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:5: '0'
                     {
                     match('0'); 
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:11: '1' .. '9' ( '0' .. '9' )*
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:11: '1' .. '9' ( '0' .. '9' )*
                     {
                     matchRange('1','9'); 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:20: ( '0' .. '9' )*
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:20: ( '0' .. '9' )*
                     loop4:
                     do {
                         int alt4=2;
@@ -704,7 +704,7 @@ public class ClipsJadexLexer extends Lexer {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:20: '0' .. '9'
+                    	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:20: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -722,7 +722,7 @@ public class ClipsJadexLexer extends Lexer {
 
             }
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:31: ( IntegerTypeSuffix )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:31: ( IntegerTypeSuffix )?
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -731,7 +731,7 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt6) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:31: IntegerTypeSuffix
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:31: IntegerTypeSuffix
                     {
                     mIntegerTypeSuffix(); 
 
@@ -754,11 +754,11 @@ public class ClipsJadexLexer extends Lexer {
     public final void mOctalLiteral() throws RecognitionException {
         try {
             int _type = OctalLiteral;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:2: ( '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )? )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:4: '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:2: ( '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )? )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:4: '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )?
             {
             match('0'); 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:8: ( '0' .. '7' )+
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:8: ( '0' .. '7' )+
             int cnt7=0;
             loop7:
             do {
@@ -772,7 +772,7 @@ public class ClipsJadexLexer extends Lexer {
 
                 switch (alt7) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:9: '0' .. '7'
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:9: '0' .. '7'
             	    {
             	    matchRange('0','7'); 
 
@@ -788,7 +788,7 @@ public class ClipsJadexLexer extends Lexer {
                 cnt7++;
             } while (true);
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:20: ( IntegerTypeSuffix )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:20: ( IntegerTypeSuffix )?
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -797,7 +797,7 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt8) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:20: IntegerTypeSuffix
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:20: IntegerTypeSuffix
                     {
                     mIntegerTypeSuffix(); 
 
@@ -819,8 +819,8 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start HexDigit
     public final void mHexDigit() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:663:9: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:663:11: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:663:9: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:663:11: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F')||(input.LA(1)>='a' && input.LA(1)<='f') ) {
                 input.consume();
@@ -844,8 +844,8 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start IntegerTypeSuffix
     public final void mIntegerTypeSuffix() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:668:2: ( ( 'l' | 'L' ) )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:668:4: ( 'l' | 'L' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:668:2: ( ( 'l' | 'L' ) )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:668:4: ( 'l' | 'L' )
             {
             if ( input.LA(1)=='L'||input.LA(1)=='l' ) {
                 input.consume();
@@ -870,14 +870,14 @@ public class ClipsJadexLexer extends Lexer {
     public final void mFloatingPointLiteral() throws RecognitionException {
         try {
             int _type = FloatingPointLiteral;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:6: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )? | '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )? | ( '0' .. '9' )+ Exponent ( FloatTypeSuffix )? | ( '0' .. '9' )+ ( Exponent )? FloatTypeSuffix )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:6: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )? | '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )? | ( '0' .. '9' )+ Exponent ( FloatTypeSuffix )? | ( '0' .. '9' )+ ( Exponent )? FloatTypeSuffix )
             int alt20=4;
             alt20 = dfa20.predict(input);
             switch (alt20) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:10: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:10: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )?
                     {
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:10: ( '0' .. '9' )+
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:10: ( '0' .. '9' )+
                     int cnt9=0;
                     loop9:
                     do {
@@ -891,7 +891,7 @@ public class ClipsJadexLexer extends Lexer {
 
                         switch (alt9) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:11: '0' .. '9'
+                    	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:11: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -908,7 +908,7 @@ public class ClipsJadexLexer extends Lexer {
                     } while (true);
 
                     match('.'); 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:26: ( '0' .. '9' )*
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:26: ( '0' .. '9' )*
                     loop10:
                     do {
                         int alt10=2;
@@ -921,7 +921,7 @@ public class ClipsJadexLexer extends Lexer {
 
                         switch (alt10) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:27: '0' .. '9'
+                    	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:27: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -933,7 +933,7 @@ public class ClipsJadexLexer extends Lexer {
                         }
                     } while (true);
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:38: ( Exponent )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:38: ( Exponent )?
                     int alt11=2;
                     int LA11_0 = input.LA(1);
 
@@ -942,7 +942,7 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     switch (alt11) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:38: Exponent
+                            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:38: Exponent
                             {
                             mExponent(); 
 
@@ -951,7 +951,7 @@ public class ClipsJadexLexer extends Lexer {
 
                     }
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:48: ( FloatTypeSuffix )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:48: ( FloatTypeSuffix )?
                     int alt12=2;
                     int LA12_0 = input.LA(1);
 
@@ -960,7 +960,7 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     switch (alt12) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:48: FloatTypeSuffix
+                            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:672:48: FloatTypeSuffix
                             {
                             mFloatTypeSuffix(); 
 
@@ -973,10 +973,10 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:7: '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:7: '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )?
                     {
                     match('.'); 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:11: ( '0' .. '9' )+
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:11: ( '0' .. '9' )+
                     int cnt13=0;
                     loop13:
                     do {
@@ -990,7 +990,7 @@ public class ClipsJadexLexer extends Lexer {
 
                         switch (alt13) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:12: '0' .. '9'
+                    	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:12: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -1006,7 +1006,7 @@ public class ClipsJadexLexer extends Lexer {
                         cnt13++;
                     } while (true);
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:23: ( Exponent )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:23: ( Exponent )?
                     int alt14=2;
                     int LA14_0 = input.LA(1);
 
@@ -1015,7 +1015,7 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     switch (alt14) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:23: Exponent
+                            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:23: Exponent
                             {
                             mExponent(); 
 
@@ -1024,7 +1024,7 @@ public class ClipsJadexLexer extends Lexer {
 
                     }
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:33: ( FloatTypeSuffix )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:33: ( FloatTypeSuffix )?
                     int alt15=2;
                     int LA15_0 = input.LA(1);
 
@@ -1033,7 +1033,7 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     switch (alt15) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:33: FloatTypeSuffix
+                            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:33: FloatTypeSuffix
                             {
                             mFloatTypeSuffix(); 
 
@@ -1046,9 +1046,9 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:7: ( '0' .. '9' )+ Exponent ( FloatTypeSuffix )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:7: ( '0' .. '9' )+ Exponent ( FloatTypeSuffix )?
                     {
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:7: ( '0' .. '9' )+
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:7: ( '0' .. '9' )+
                     int cnt16=0;
                     loop16:
                     do {
@@ -1062,7 +1062,7 @@ public class ClipsJadexLexer extends Lexer {
 
                         switch (alt16) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:8: '0' .. '9'
+                    	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:8: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -1079,7 +1079,7 @@ public class ClipsJadexLexer extends Lexer {
                     } while (true);
 
                     mExponent(); 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:28: ( FloatTypeSuffix )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:28: ( FloatTypeSuffix )?
                     int alt17=2;
                     int LA17_0 = input.LA(1);
 
@@ -1088,7 +1088,7 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     switch (alt17) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:28: FloatTypeSuffix
+                            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:28: FloatTypeSuffix
                             {
                             mFloatTypeSuffix(); 
 
@@ -1101,9 +1101,9 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:6: ( '0' .. '9' )+ ( Exponent )? FloatTypeSuffix
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:6: ( '0' .. '9' )+ ( Exponent )? FloatTypeSuffix
                     {
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:6: ( '0' .. '9' )+
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:6: ( '0' .. '9' )+
                     int cnt18=0;
                     loop18:
                     do {
@@ -1117,7 +1117,7 @@ public class ClipsJadexLexer extends Lexer {
 
                         switch (alt18) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:7: '0' .. '9'
+                    	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:7: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -1133,7 +1133,7 @@ public class ClipsJadexLexer extends Lexer {
                         cnt18++;
                     } while (true);
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:18: ( Exponent )?
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:18: ( Exponent )?
                     int alt19=2;
                     int LA19_0 = input.LA(1);
 
@@ -1142,7 +1142,7 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     switch (alt19) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:18: Exponent
+                            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:18: Exponent
                             {
                             mExponent(); 
 
@@ -1167,8 +1167,8 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start Exponent
     public final void mExponent() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:9: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:11: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:9: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:11: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -1180,7 +1180,7 @@ public class ClipsJadexLexer extends Lexer {
                 recover(mse);    throw mse;
             }
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:21: ( '+' | '-' )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:21: ( '+' | '-' )?
             int alt21=2;
             int LA21_0 = input.LA(1);
 
@@ -1189,7 +1189,7 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt21) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
                     {
                     if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                         input.consume();
@@ -1207,7 +1207,7 @@ public class ClipsJadexLexer extends Lexer {
 
             }
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:32: ( '0' .. '9' )+
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:32: ( '0' .. '9' )+
             int cnt22=0;
             loop22:
             do {
@@ -1221,7 +1221,7 @@ public class ClipsJadexLexer extends Lexer {
 
                 switch (alt22) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:33: '0' .. '9'
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:33: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -1249,8 +1249,8 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start FloatTypeSuffix
     public final void mFloatTypeSuffix() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:684:2: ( ( 'f' | 'F' | 'd' | 'D' ) )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:684:4: ( 'f' | 'F' | 'd' | 'D' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:684:2: ( ( 'f' | 'F' | 'd' | 'D' ) )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:684:4: ( 'f' | 'F' | 'd' | 'D' )
             {
             if ( input.LA(1)=='D'||input.LA(1)=='F'||input.LA(1)=='d'||input.LA(1)=='f' ) {
                 input.consume();
@@ -1275,11 +1275,11 @@ public class ClipsJadexLexer extends Lexer {
     public final void mCharacterLiteral() throws RecognitionException {
         try {
             int _type = CharacterLiteral;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:2: ( '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\'' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:6: '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\''
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:2: ( '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\'' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:6: '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\''
             {
             match('\''); 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:11: ( EscapeSequence | ~ ( '\\'' | '\\\\' ) )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:11: ( EscapeSequence | ~ ( '\\'' | '\\\\' ) )
             int alt23=2;
             int LA23_0 = input.LA(1);
 
@@ -1297,14 +1297,14 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt23) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:13: EscapeSequence
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:13: EscapeSequence
                     {
                     mEscapeSequence(); 
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:30: ~ ( '\\'' | '\\\\' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:688:30: ~ ( '\\'' | '\\\\' )
                     {
                     if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFE') ) {
                         input.consume();
@@ -1339,11 +1339,11 @@ public class ClipsJadexLexer extends Lexer {
             int _type = StringLiteral;
             Token text=null;
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:2: ( '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:5: '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:2: ( '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:5: '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:9: (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )*
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:9: (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )*
             loop24:
             do {
                 int alt24=3;
@@ -1359,7 +1359,7 @@ public class ClipsJadexLexer extends Lexer {
 
                 switch (alt24) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:11: text= EscapeSequence
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:11: text= EscapeSequence
             	    {
             	    int textStart554 = getCharIndex();
             	    mEscapeSequence(); 
@@ -1368,7 +1368,7 @@ public class ClipsJadexLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:33: ~ ( '\\\\' | '\"' )
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:692:33: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -1403,7 +1403,7 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start EscapeSequence
     public final void mEscapeSequence() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:697:2: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UnicodeEscape | OctalEscape )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:697:2: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UnicodeEscape | OctalEscape )
             int alt25=3;
             int LA25_0 = input.LA(1);
 
@@ -1454,7 +1454,7 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt25) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:697:6: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:697:6: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
                     match('\\'); 
                     if ( input.LA(1)=='\"'||input.LA(1)=='\''||input.LA(1)=='\\'||input.LA(1)=='b'||input.LA(1)=='f'||input.LA(1)=='n'||input.LA(1)=='r'||input.LA(1)=='t' ) {
@@ -1471,14 +1471,14 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:698:6: UnicodeEscape
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:698:6: UnicodeEscape
                     {
                     mUnicodeEscape(); 
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:699:6: OctalEscape
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:699:6: OctalEscape
                     {
                     mOctalEscape(); 
 
@@ -1495,7 +1495,7 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start OctalEscape
     public final void mOctalEscape() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:2: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:2: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
             int alt26=3;
             int LA26_0 = input.LA(1);
 
@@ -1541,25 +1541,25 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt26) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:6: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:6: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:11: ( '0' .. '3' )
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:12: '0' .. '3'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:11: ( '0' .. '3' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:12: '0' .. '3'
                     {
                     matchRange('0','3'); 
 
                     }
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:22: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:23: '0' .. '7'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:22: ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:23: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
                     }
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:33: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:34: '0' .. '7'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:33: ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:704:34: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1569,18 +1569,18 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:6: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:6: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:11: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:12: '0' .. '7'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:11: ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:12: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
                     }
 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:22: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:23: '0' .. '7'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:22: ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:705:23: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1590,11 +1590,11 @@ public class ClipsJadexLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:706:6: '\\\\' ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:706:6: '\\\\' ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:706:11: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:706:12: '0' .. '7'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:706:11: ( '0' .. '7' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:706:12: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1614,8 +1614,8 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start UnicodeEscape
     public final void mUnicodeEscape() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:711:2: ( '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:711:6: '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:711:2: ( '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:711:6: '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit
             {
             match('\\'); 
             match('u'); 
@@ -1636,11 +1636,11 @@ public class ClipsJadexLexer extends Lexer {
     public final void mIdentifiertoken() throws RecognitionException {
         try {
             int _type = Identifiertoken;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:715:2: ( Letter ( Letter | JavaIDDigit )* )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:715:6: Letter ( Letter | JavaIDDigit )*
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:715:2: ( Letter ( Letter | JavaIDDigit )* )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:715:6: Letter ( Letter | JavaIDDigit )*
             {
             mLetter(); 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:715:13: ( Letter | JavaIDDigit )*
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:715:13: ( Letter | JavaIDDigit )*
             loop27:
             do {
                 int alt27=2;
@@ -1653,7 +1653,7 @@ public class ClipsJadexLexer extends Lexer {
 
                 switch (alt27) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
             	    {
             	    if ( input.LA(1)=='$'||(input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z')||(input.LA(1)>='\u00C0' && input.LA(1)<='\u00D6')||(input.LA(1)>='\u00D8' && input.LA(1)<='\u00F6')||(input.LA(1)>='\u00F8' && input.LA(1)<='\u1FFF')||(input.LA(1)>='\u3040' && input.LA(1)<='\u318F')||(input.LA(1)>='\u3300' && input.LA(1)<='\u337F')||(input.LA(1)>='\u3400' && input.LA(1)<='\u3D2D')||(input.LA(1)>='\u4E00' && input.LA(1)<='\u9FFF')||(input.LA(1)>='\uF900' && input.LA(1)<='\uFAFF') ) {
             	        input.consume();
@@ -1687,8 +1687,8 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start Letter
     public final void mLetter() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:720:2: ( '\\u0024' | '\\u0041' .. '\\u005a' | '\\u005f' | '\\u0061' .. '\\u007a' | '\\u00c0' .. '\\u00d6' | '\\u00d8' .. '\\u00f6' | '\\u00f8' .. '\\u00ff' | '\\u0100' .. '\\u1fff' | '\\u3040' .. '\\u318f' | '\\u3300' .. '\\u337f' | '\\u3400' .. '\\u3d2d' | '\\u4e00' .. '\\u9fff' | '\\uf900' .. '\\ufaff' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:720:2: ( '\\u0024' | '\\u0041' .. '\\u005a' | '\\u005f' | '\\u0061' .. '\\u007a' | '\\u00c0' .. '\\u00d6' | '\\u00d8' .. '\\u00f6' | '\\u00f8' .. '\\u00ff' | '\\u0100' .. '\\u1fff' | '\\u3040' .. '\\u318f' | '\\u3300' .. '\\u337f' | '\\u3400' .. '\\u3d2d' | '\\u4e00' .. '\\u9fff' | '\\uf900' .. '\\ufaff' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
             {
             if ( input.LA(1)=='$'||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z')||(input.LA(1)>='\u00C0' && input.LA(1)<='\u00D6')||(input.LA(1)>='\u00D8' && input.LA(1)<='\u00F6')||(input.LA(1)>='\u00F8' && input.LA(1)<='\u1FFF')||(input.LA(1)>='\u3040' && input.LA(1)<='\u318F')||(input.LA(1)>='\u3300' && input.LA(1)<='\u337F')||(input.LA(1)>='\u3400' && input.LA(1)<='\u3D2D')||(input.LA(1)>='\u4E00' && input.LA(1)<='\u9FFF')||(input.LA(1)>='\uF900' && input.LA(1)<='\uFAFF') ) {
                 input.consume();
@@ -1712,8 +1712,8 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR start JavaIDDigit
     public final void mJavaIDDigit() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:737:2: ( '\\u0030' .. '\\u0039' | '\\u0660' .. '\\u0669' | '\\u06f0' .. '\\u06f9' | '\\u0966' .. '\\u096f' | '\\u09e6' .. '\\u09ef' | '\\u0a66' .. '\\u0a6f' | '\\u0ae6' .. '\\u0aef' | '\\u0b66' .. '\\u0b6f' | '\\u0be7' .. '\\u0bef' | '\\u0c66' .. '\\u0c6f' | '\\u0ce6' .. '\\u0cef' | '\\u0d66' .. '\\u0d6f' | '\\u0e50' .. '\\u0e59' | '\\u0ed0' .. '\\u0ed9' | '\\u1040' .. '\\u1049' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:737:2: ( '\\u0030' .. '\\u0039' | '\\u0660' .. '\\u0669' | '\\u06f0' .. '\\u06f9' | '\\u0966' .. '\\u096f' | '\\u09e6' .. '\\u09ef' | '\\u0a66' .. '\\u0a6f' | '\\u0ae6' .. '\\u0aef' | '\\u0b66' .. '\\u0b6f' | '\\u0be7' .. '\\u0bef' | '\\u0c66' .. '\\u0c6f' | '\\u0ce6' .. '\\u0cef' | '\\u0d66' .. '\\u0d6f' | '\\u0e50' .. '\\u0e59' | '\\u0ed0' .. '\\u0ed9' | '\\u1040' .. '\\u1049' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='\u0660' && input.LA(1)<='\u0669')||(input.LA(1)>='\u06F0' && input.LA(1)<='\u06F9')||(input.LA(1)>='\u0966' && input.LA(1)<='\u096F')||(input.LA(1)>='\u09E6' && input.LA(1)<='\u09EF')||(input.LA(1)>='\u0A66' && input.LA(1)<='\u0A6F')||(input.LA(1)>='\u0AE6' && input.LA(1)<='\u0AEF')||(input.LA(1)>='\u0B66' && input.LA(1)<='\u0B6F')||(input.LA(1)>='\u0BE7' && input.LA(1)<='\u0BEF')||(input.LA(1)>='\u0C66' && input.LA(1)<='\u0C6F')||(input.LA(1)>='\u0CE6' && input.LA(1)<='\u0CEF')||(input.LA(1)>='\u0D66' && input.LA(1)<='\u0D6F')||(input.LA(1)>='\u0E50' && input.LA(1)<='\u0E59')||(input.LA(1)>='\u0ED0' && input.LA(1)<='\u0ED9')||(input.LA(1)>='\u1040' && input.LA(1)<='\u1049') ) {
                 input.consume();
@@ -1738,8 +1738,8 @@ public class ClipsJadexLexer extends Lexer {
     public final void mWS() throws RecognitionException {
         try {
             int _type = WS;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:754:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:754:8: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:754:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:754:8: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
             {
             if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
@@ -1766,12 +1766,12 @@ public class ClipsJadexLexer extends Lexer {
     public final void mCOMMENT() throws RecognitionException {
         try {
             int _type = COMMENT;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:2: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:6: '/*' ( options {greedy=false; } : . )* '*/'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:2: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:6: '/*' ( options {greedy=false; } : . )* '*/'
             {
             match("/*"); 
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:11: ( options {greedy=false; } : . )*
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:11: ( options {greedy=false; } : . )*
             loop28:
             do {
                 int alt28=2;
@@ -1796,7 +1796,7 @@ public class ClipsJadexLexer extends Lexer {
 
                 switch (alt28) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:39: .
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:758:39: .
             	    {
             	    matchAny(); 
 
@@ -1825,12 +1825,12 @@ public class ClipsJadexLexer extends Lexer {
     public final void mLINE_COMMENT() throws RecognitionException {
         try {
             int _type = LINE_COMMENT;
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:2: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:4: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:2: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:4: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
             {
             match("//"); 
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:9: (~ ( '\\n' | '\\r' ) )*
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:9: (~ ( '\\n' | '\\r' ) )*
             loop29:
             do {
                 int alt29=2;
@@ -1843,7 +1843,7 @@ public class ClipsJadexLexer extends Lexer {
 
                 switch (alt29) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:9: ~ ( '\\n' | '\\r' )
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:9: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -1864,7 +1864,7 @@ public class ClipsJadexLexer extends Lexer {
                 }
             } while (true);
 
-            // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:23: ( '\\r' )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:23: ( '\\r' )?
             int alt30=2;
             int LA30_0 = input.LA(1);
 
@@ -1873,7 +1873,7 @@ public class ClipsJadexLexer extends Lexer {
             }
             switch (alt30) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:23: '\\r'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:762:23: '\\r'
                     {
                     match('\r'); 
 
@@ -1895,257 +1895,257 @@ public class ClipsJadexLexer extends Lexer {
     // $ANTLR end LINE_COMMENT
 
     public void mTokens() throws RecognitionException {
-        // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:8: ( T25 | T26 | T27 | T28 | T29 | T30 | T31 | T32 | T33 | T34 | T35 | T36 | T37 | T38 | T39 | T40 | T41 | T42 | T43 | T44 | T45 | T46 | T47 | T48 | ConstraintOperator | BooleanLiteral | HexLiteral | DecimalLiteral | OctalLiteral | FloatingPointLiteral | CharacterLiteral | StringLiteral | Identifiertoken | WS | COMMENT | LINE_COMMENT )
+        // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:8: ( T25 | T26 | T27 | T28 | T29 | T30 | T31 | T32 | T33 | T34 | T35 | T36 | T37 | T38 | T39 | T40 | T41 | T42 | T43 | T44 | T45 | T46 | T47 | T48 | ConstraintOperator | BooleanLiteral | HexLiteral | DecimalLiteral | OctalLiteral | FloatingPointLiteral | CharacterLiteral | StringLiteral | Identifiertoken | WS | COMMENT | LINE_COMMENT )
         int alt31=36;
         alt31 = dfa31.predict(input);
         switch (alt31) {
             case 1 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:10: T25
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:10: T25
                 {
                 mT25(); 
 
                 }
                 break;
             case 2 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:14: T26
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:14: T26
                 {
                 mT26(); 
 
                 }
                 break;
             case 3 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:18: T27
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:18: T27
                 {
                 mT27(); 
 
                 }
                 break;
             case 4 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:22: T28
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:22: T28
                 {
                 mT28(); 
 
                 }
                 break;
             case 5 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:26: T29
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:26: T29
                 {
                 mT29(); 
 
                 }
                 break;
             case 6 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:30: T30
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:30: T30
                 {
                 mT30(); 
 
                 }
                 break;
             case 7 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:34: T31
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:34: T31
                 {
                 mT31(); 
 
                 }
                 break;
             case 8 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:38: T32
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:38: T32
                 {
                 mT32(); 
 
                 }
                 break;
             case 9 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:42: T33
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:42: T33
                 {
                 mT33(); 
 
                 }
                 break;
             case 10 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:46: T34
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:46: T34
                 {
                 mT34(); 
 
                 }
                 break;
             case 11 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:50: T35
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:50: T35
                 {
                 mT35(); 
 
                 }
                 break;
             case 12 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:54: T36
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:54: T36
                 {
                 mT36(); 
 
                 }
                 break;
             case 13 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:58: T37
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:58: T37
                 {
                 mT37(); 
 
                 }
                 break;
             case 14 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:62: T38
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:62: T38
                 {
                 mT38(); 
 
                 }
                 break;
             case 15 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:66: T39
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:66: T39
                 {
                 mT39(); 
 
                 }
                 break;
             case 16 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:70: T40
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:70: T40
                 {
                 mT40(); 
 
                 }
                 break;
             case 17 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:74: T41
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:74: T41
                 {
                 mT41(); 
 
                 }
                 break;
             case 18 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:78: T42
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:78: T42
                 {
                 mT42(); 
 
                 }
                 break;
             case 19 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:82: T43
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:82: T43
                 {
                 mT43(); 
 
                 }
                 break;
             case 20 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:86: T44
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:86: T44
                 {
                 mT44(); 
 
                 }
                 break;
             case 21 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:90: T45
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:90: T45
                 {
                 mT45(); 
 
                 }
                 break;
             case 22 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:94: T46
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:94: T46
                 {
                 mT46(); 
 
                 }
                 break;
             case 23 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:98: T47
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:98: T47
                 {
                 mT47(); 
 
                 }
                 break;
             case 24 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:102: T48
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:102: T48
                 {
                 mT48(); 
 
                 }
                 break;
             case 25 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:106: ConstraintOperator
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:106: ConstraintOperator
                 {
                 mConstraintOperator(); 
 
                 }
                 break;
             case 26 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:125: BooleanLiteral
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:125: BooleanLiteral
                 {
                 mBooleanLiteral(); 
 
                 }
                 break;
             case 27 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:140: HexLiteral
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:140: HexLiteral
                 {
                 mHexLiteral(); 
 
                 }
                 break;
             case 28 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:151: DecimalLiteral
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:151: DecimalLiteral
                 {
                 mDecimalLiteral(); 
 
                 }
                 break;
             case 29 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:166: OctalLiteral
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:166: OctalLiteral
                 {
                 mOctalLiteral(); 
 
                 }
                 break;
             case 30 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:179: FloatingPointLiteral
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:179: FloatingPointLiteral
                 {
                 mFloatingPointLiteral(); 
 
                 }
                 break;
             case 31 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:200: CharacterLiteral
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:200: CharacterLiteral
                 {
                 mCharacterLiteral(); 
 
                 }
                 break;
             case 32 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:217: StringLiteral
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:217: StringLiteral
                 {
                 mStringLiteral(); 
 
                 }
                 break;
             case 33 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:231: Identifiertoken
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:231: Identifiertoken
                 {
                 mIdentifiertoken(); 
 
                 }
                 break;
             case 34 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:247: WS
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:247: WS
                 {
                 mWS(); 
 
                 }
                 break;
             case 35 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:250: COMMENT
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:250: COMMENT
                 {
                 mCOMMENT(); 
 
                 }
                 break;
             case 36 :
-                // C:\\Files\\Checkouts\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:258: LINE_COMMENT
+                // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:1:258: LINE_COMMENT
                 {
                 mLINE_COMMENT(); 
 

@@ -180,7 +180,7 @@ public class Platform extends AbstractPlatform
 			if(props[i].getType()==null)
 				type = IPlatformService.class;
 			else
-				type = SReflect.classForName0(props[i].getType());
+				type = SReflect.classForName0(props[i].getType(), null);
 			if(type==null)
 				throw new RuntimeException("Could not resolve service type: "+props[i].getType());
 			addService(type, props[i].getName(), (IPlatformService)props[i].getJavaObject(fetcher));

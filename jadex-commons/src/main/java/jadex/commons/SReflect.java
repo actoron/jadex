@@ -18,10 +18,12 @@ import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 
 /**
- * This class provides several useful static reflection methods.
+ *  This class provides several useful static reflection methods.
  */
 public class SReflect
 {
+	//-------- attributes --------
+	
 	/** Class not found identifier. */
 	protected static final Object	NOTFOUND	= new Object();
 
@@ -63,6 +65,8 @@ public class SReflect
 		clearClassCache();	// Hack!!! Needed to add basic types.
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *	Get the wrapped type. This method converts
 	 *  basic types such as boolean or int to the
@@ -100,9 +104,9 @@ public class SReflect
 	 *  @param name The class name.
 	 *  @return The class, or null if not found.
 	 */
-	public static Class	classForName0(String name)
+	public static Class	classForName0(String name, ClassLoader classloader)
 	{
-		return classForName0(name, true);
+		return classForName0(name, true, classloader);
 	}
 
 
@@ -113,10 +117,13 @@ public class SReflect
 	 *  @param name The class name.
 	 *  @return The class, or null if not found.
 	 */
-	public static Class	classForName0(String name, boolean initialize)
+	public static Class	classForName0(String name, boolean initialize, ClassLoader classloader)
 	{
 		if(name==null)
 			throw new IllegalArgumentException("Class name must not be null.");
+		
+		if(classloader==null)
+			classloader = SReflect.class.getClassLoader();
 		
 		Object ret = classcache.get(name);
 			
@@ -133,45 +140,46 @@ public class SReflect
 					dimension++;
 				}
 				clname	= clname.substring(0, clname.indexOf('['));
-				Class	clazz	= classForName0(clname, initialize);
+				Class	clazz	= classForName0(clname, initialize, classloader);
 				if(clazz!=null)
 				{
 					// Create array class object. Hack!!! Is there a better way?
 					ret	= Array.newInstance(clazz, new int[dimension]).getClass();
 				}
-				else
-				{
-					ret	= NOTFOUND;
-				}
+//				else
+//				{
+//					ret	= NOTFOUND;
+//				}
 			}
 			else
 			{
 				
 				try
 				{
-					ret	= Class.forName(clname);//, true, Thread.currentThread().getContextClassLoader());
+					ret = Class.forName(name, initialize, classloader);
+//					ret	= Class.forName(clname);//, true, Thread.currentThread().getContextClassLoader());
 //					ret	= SUtil.getClassLoader().loadClass(clname);
 //					System.out.println("cFN0: loaded "+clazz);
 				}
 				catch(ClassNotFoundException e)
 				{
 //					e.printStackTrace();
-					ret	= NOTFOUND;
+//					ret	= NOTFOUND;
 				}
 				// Also handled by dynamic url class loader, but not in applets/webstart.
 				catch(LinkageError e)
 				{
 //					e.printStackTrace();
-					ret	= NOTFOUND;
+//					ret	= NOTFOUND;
 				}
 			}
-			classcache.put(name, ret);
+//			classcache.put(name, ret);
 		}
 		
-		if(ret==NOTFOUND)
-		{
-			ret	= null;
-		}
+//		if(ret==NOTFOUND)
+//		{
+//			ret	= null;
+//		}
 		return (Class)ret;
 	}
 	
@@ -182,10 +190,10 @@ public class SReflect
 	 *  @param name The class name.
 	 *  @return The class.
 	 */
-	public static Class	classForName(String name)
+	public static Class	classForName(String name, ClassLoader classloader)
 		throws ClassNotFoundException
 	{
-		Object	clazz	= classForName0(name);
+		Object	clazz	= classForName0(name, classloader);
 		if(clazz==null)
 		{
 			throw new ClassNotFoundException("Class "+name+" not found.");
@@ -197,11 +205,11 @@ public class SReflect
 	 *	Beautifies names of arrays (eg 'String[]' instead of '[LString;').
 	 *  @return The beautified name of a class.
 	 */
-	public static String	getClassName(Class clazz)
+	public static String getClassName(Class clazz)
 	{
 		int dim	= 0;
 		if(clazz==null)
-			System.out.println("shit");
+			throw new IllegalArgumentException("Clazz must not null.");
 		while(clazz.isArray())
 		{
 			dim++;
@@ -464,10 +472,10 @@ public class SReflect
 	 *  @param imports	The comma separated list of imported packages.
 	 *  @throws ClassNotFoundException when the class is not found in the imports.
 	 */
-	public static Class	findClass(String clname, String[] imports)
+	public static Class	findClass(String clname, String[] imports, ClassLoader classloader)
 		throws ClassNotFoundException
 	{
-		Class	clazz	= findClass0(clname, imports);
+		Class	clazz	= findClass0(clname, imports, classloader);
 
 		if(clazz==null)
 		{
@@ -485,13 +493,13 @@ public class SReflect
 	 *  @param imports	The comma separated list of imported packages.
 	 *  @return null, when the class is not found in the imports.
 	 */
-	public static Class	findClass0(String clname, String[] imports)
+	public static Class	findClass0(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class	clazz	= null;
 //		System.out.println("+++fC: "+clname+" "+imports);
 
 		// Try to find fully qualified.
-		clazz	= classForName0(clname);
+		clazz	= classForName0(clname, classloader);
 
 		// Try to find in imports.
 		if(clazz==null && imports!=null)
@@ -505,13 +513,13 @@ public class SReflect
 				if(imp.endsWith(".*"))
 				{
 					clazz	= classForName0(
-						imp.substring(0, imp.length()-1) + clname);
+						imp.substring(0, imp.length()-1) + clname, classloader);
 //					System.out.println("+++cFN1: "+imp.substring(0, imp.length()-1) + clname+", "+clazz);
 				}
 				// Class import
 				else if(imports[i].endsWith(clname))
 				{
-					clazz	= classForName0(imp);
+					clazz	= classForName0(imp, classloader);
 //					System.out.println("+++cFN2: "+imp+", "+clazz);
 				}
 			}
@@ -520,7 +528,7 @@ public class SReflect
 		// No explicit imports, try java.lang (imported by default).
 		else if(clazz==null)
 		{
-			clazz	= classForName0("java.lang." + clname);
+			clazz	= classForName0("java.lang." + clname, classloader);
 		}
 		
 		return clazz;

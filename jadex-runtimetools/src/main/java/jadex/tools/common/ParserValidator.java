@@ -21,16 +21,20 @@ public class ParserValidator implements IValidator
 	/** The parser. */
 	protected IExpressionParser parser;
 	
+	/** The classloader. */
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 
 	/**
 	 *  Create a parser validator.
 	 */
-	public ParserValidator()
+	public ParserValidator(ClassLoader classloader)
 	{
 		this.lastvalid	= true;
 		this.lasttext	= null;
 		this.parser = new JavaCCExpressionParser();
+		this.classloader = classloader;
 	}
 	
 	//-------- IValidator interface --------
@@ -50,7 +54,7 @@ public class ParserValidator implements IValidator
 				{
 					try
 					{
-						IParsedExpression pexp = parser.parseExpression(text, null, null);
+						IParsedExpression pexp = parser.parseExpression(text, null, null, classloader);
 						pexp.getValue(null);
 						lastvalid	= true;
 					}

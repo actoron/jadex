@@ -229,7 +229,7 @@ public class ConfigurationDialog extends JAutoPositionDialog
 						for(int j=0; j<options.length; j++)
 						{
 							String	dependency	=(String)options[j].getClientProperty(PROPERTY_DEPENDENCY);
-							options[j].setEnabled(active && (dependency==null || SReflect.findClass0(dependency, null)!=null));
+							options[j].setEnabled(active && (dependency==null || SReflect.findClass0(dependency, null, null)!=null));
 						}
 					}
 				});

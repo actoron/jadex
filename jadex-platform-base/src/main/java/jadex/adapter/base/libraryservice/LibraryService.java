@@ -402,17 +402,12 @@ public class LibraryService implements IPlatformService, ILibraryService
 		{
 			Class clazz = null;
 
-			if((clazz = super.findClass(name)) != null)
-			{
-				return clazz;
-			}
-
 			if((clazz = (Class)classCache.get(name)) != null)
 			{
 				return clazz;
 			}
 
-			String classFilePath = name.replaceAll("\\.", File.pathSeparator) + ".class";
+			String classFilePath = name.replace('.', File.separatorChar) + ".class";
 			byte[] classFile = loadFile(classFilePath);
 
 			if(classFile != null)
@@ -551,7 +546,7 @@ public class LibraryService implements IPlatformService, ILibraryService
 			if(ret == null)
 			{
 				// If loading from .jar-files failed, attempt to load from paths
-				loadFileFromPaths(path);
+				ret = loadFileFromPaths(path);
 			}
 
 			return ret;
@@ -564,6 +559,8 @@ public class LibraryService implements IPlatformService, ILibraryService
 		 */
 		private byte[] loadFileFromJars(String path)
 		{
+			byte[] ret = null;
+			
 			Iterator it = jars.iterator();
 			while(it.hasNext())
 			{
@@ -571,12 +568,12 @@ public class LibraryService implements IPlatformService, ILibraryService
 				byte[] file = loadFileFromJar(path, jarPath);
 				if(file != null)
 				{
-					return file;
+					ret = file;
+					break;
 				}
 			}
 
-			// File not found
-			return null;
+			return ret;
 		}
 
 		/** 

@@ -10,6 +10,8 @@ import jadex.javaparser.IValueFetcher;
  */
 public class TypeNode	extends ExpressionNode
 {
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 
 	/**
@@ -21,6 +23,7 @@ public class TypeNode	extends ExpressionNode
 	{
 		super(p, id);
 		setStaticType(Class.class);
+		classloader = p.getClassLoader();
 	}
 
 	//-------- evaluation --------
@@ -47,7 +50,7 @@ public class TypeNode	extends ExpressionNode
 		String	name	= getText();
 
 		// Get class object.
-		Class	clazz	= SReflect.findClass0(getText(), imports);
+		Class	clazz	= SReflect.findClass0(getText(), imports, classloader);
 
 		if(clazz==null)
 		{

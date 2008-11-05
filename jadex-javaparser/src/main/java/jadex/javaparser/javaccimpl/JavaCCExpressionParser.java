@@ -22,7 +22,7 @@ public class JavaCCExpressionParser	implements IExpressionParser, Serializable
 	 *  @param parameters Parameters declared in the expression (name -> OAV type).
 	 *  @return The parsed expression.
 	 */
-	public IParsedExpression	parseExpression(String expression, String[] imports, Map parameters)	
+	public IParsedExpression parseExpression(String expression, String[] imports, Map parameters, ClassLoader classloader)	
 	{
 		// todo: use parameters for checking
 
@@ -33,6 +33,7 @@ public class JavaCCExpressionParser	implements IExpressionParser, Serializable
 		// and isn't thread safe.
 		ParserImpl	parser	= new ParserImpl(new StringReader(expression));
 		parser.setImports(imports);
+		parser.setClassLoader(classloader);
 		// todo: parser.setParameters(parameters);
 
 		ExpressionNode	node;

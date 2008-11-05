@@ -201,7 +201,7 @@ public class OAVBDIModelLoader
 	 */
 	protected OAVCapabilityModel loadModel(String name, String extension, String[] imports) throws IOException
 	{
-		OAVCapabilityModel ret;
+//		OAVCapabilityModel ret;
 		
 		if(extension==null)
 			extension = getFilenameExtension(name);
@@ -232,8 +232,9 @@ public class OAVBDIModelLoader
 			// Not found: load from disc and store in cache.
 			if(cached==null)
 			{
-				OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel");
-				typemodel.addTypeModel(OAVBDIMetaModel.bdimm_type_model);
+				OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", classloader);
+				// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
+				typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 				IOAVState	state	= new OAVState(typemodel);
 				
 				final Set	types	= new HashSet();
@@ -263,11 +264,11 @@ public class OAVBDIModelLoader
 
 				if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 				{
-					cached	=  new OAVAgentModel(state, handle, typemodel, types, classloader);
+					cached	=  new OAVAgentModel(state, handle, typemodel, types);
 				}
 				else
 				{
-					cached	=  new OAVCapabilityModel(state, handle, typemodel, types, classloader);
+					cached	=  new OAVCapabilityModel(state, handle, typemodel, types);
 				}
 
 				createAgentModelEntry(cached);
@@ -281,19 +282,20 @@ public class OAVBDIModelLoader
 			modelcache.put(keytuple, cached);
 		}
 
-		if(cached.getState().getType(cached.getHandle()).isSubtype(OAVBDIMetaModel.agent_type))
-		{
-			ret	=  new OAVAgentModel();
-		}
-		else
-		{
-			ret	=  new OAVCapabilityModel();
-		}
+//		if(cached.getState().getType(cached.getHandle()).isSubtype(OAVBDIMetaModel.agent_type))
+//		{
+//			ret	=  new OAVAgentModel();
+//		}
+//		else
+//		{
+//			ret	=  new OAVCapabilityModel();
+//		}
+//		
+//		// Copy data / rules / etc into clone.
+//		ret.copyContentFrom(cached);
 		
-		// Copy data / rules / etc into clone.
-		ret.copyContentFrom(cached);
-		
-		return ret;
+//		return ret;
+		return cached;
 	}
 	
 	/**

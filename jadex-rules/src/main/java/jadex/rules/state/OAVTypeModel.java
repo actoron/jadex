@@ -35,6 +35,9 @@ public class OAVTypeModel
 	/** The contained type models. */
 	protected OAVTypeModel[]	tmodels;
 	
+	/** The class loader. */
+	protected ClassLoader classloader;
+	
 	//-------- constructor --------
 	
 	/**
@@ -43,8 +46,18 @@ public class OAVTypeModel
 	 */
 	public OAVTypeModel(String name)
 	{
+		this(name, OAVTypeModel.class.getClassLoader());
+	}
+	
+	/**
+	 *  Create a new model.
+	 *  @param name The name.
+	 */
+	public OAVTypeModel(String name, ClassLoader classloader)
+	{
 		this.name = name;
 		this.types = new HashMap();
+		this.classloader = classloader;
 	}
 	
 	//-------- type management --------
@@ -168,7 +181,7 @@ public class OAVTypeModel
 		// Hack??? If not found, create implicit java type. 
 		if(ret==null)
 		{
-			Class	clazz = SReflect.classForName0(typename);
+			Class	clazz = SReflect.classForName0(typename, classloader);
 			if(clazz!=null)
 			{
 				// Find super types to determine kind.
@@ -249,6 +262,15 @@ public class OAVTypeModel
 	}
 	
 	/**
+	 *  Get the class loader.
+	 *  @return The class loader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
+	}
+	
+	/**
 	 *  Test if two types are equal.
 	 *  @return True if equal.
 	 */
@@ -288,7 +310,7 @@ public class OAVTypeModel
 	 */
 	public OAVTypeModel getDirectTypeModel()
 	{
-		OAVTypeModel	newmodel	= new OAVTypeModel(name+"_direct");
+		OAVTypeModel newmodel = new OAVTypeModel(name+"_direct", classloader);
 		newmodel.types.putAll(types);
 		return newmodel;
 	}

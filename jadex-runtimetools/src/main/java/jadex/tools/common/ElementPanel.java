@@ -334,7 +334,7 @@ public class ElementPanel extends JTabbedPane
 		{
 			try
 			{
-				htmlconv = (IRepresentationConverter)SReflect.findClass("jadex.tools.common.ElementHTMLGenerator", null).newInstance();
+				htmlconv = (IRepresentationConverter)SReflect.findClass("jadex.tools.common.ElementHTMLGenerator", null, null).newInstance();
 			}
 			catch(Throwable e)
 			{
