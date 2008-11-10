@@ -33,16 +33,20 @@ public class TCPInputConnection
 	/** The codec factory. */
 	protected CodecFactory codecfac;
 	
+	/** The classloader. */
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new tcp input connection.
 	 *  @param sock The client socket.
 	 */
-	public TCPInputConnection(Socket sock, CodecFactory codecfac) throws IOException
+	public TCPInputConnection(Socket sock, CodecFactory codecfac, ClassLoader classloader) throws IOException
 	{
 		this.sock = sock;
 		this.codecfac = codecfac;
+		this.classloader = classloader;
 		this.buffer = new byte[BUFFER_SIZE];
 		this.is = new BufferedInputStream(sock.getInputStream());
 	}
@@ -77,7 +81,7 @@ public class TCPInputConnection
 			byte[] rawmsg = new byte[count];
 			System.arraycopy(buffer, 0, rawmsg, 0, count);
 			IDecoder dec = codecfac.getDecoder(codec_id);
-			ret = (MessageEnvelope)dec.decode(rawmsg);
+			ret = (MessageEnvelope)dec.decode(rawmsg, classloader);
 		}
 		
 		return ret;

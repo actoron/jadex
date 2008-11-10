@@ -41,6 +41,9 @@ public class NIOTCPInputConnection
 	/** The codec factory. */
 	protected CodecFactory codecfac;
 	
+	/** The classloader. */
+	protected ClassLoader classloader;
+	
 	//-------- constrcutors --------
 	
 	/** 
@@ -49,11 +52,12 @@ public class NIOTCPInputConnection
 	 * @param dec
 	 * @throws IOException
 	 */
-	public NIOTCPInputConnection(SocketChannel sc, CodecFactory codecfac)
+	public NIOTCPInputConnection(SocketChannel sc, CodecFactory codecfac, ClassLoader classloader)
 	{
 		//System.out.println("Creating input con: "+sc);
 		this.sc = sc;
 		this.codecfac = codecfac;
+		this.classloader = classloader;
 		this.writebuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 		this.readbuffer = writebuffer.asReadOnlyBuffer();
 		msg_end = -1; // No message available.
@@ -98,7 +102,7 @@ public class NIOTCPInputConnection
 		   byte[] rawbytes = new byte[msg_end-NIOTCPTransport.PROLOG_SIZE];
 		   readbuffer.get(rawbytes);
 		   IDecoder dec = codecfac.getDecoder(codec_id);
-		   ret = (MessageEnvelope)dec.decode(rawbytes);
+		   ret = (MessageEnvelope)dec.decode(rawbytes, classloader);
 		   // Reset the readbuffer and compact (i.e. copy rest) the writebuffer
 		   writebuffer.limit(writebuffer.position());
 		   writebuffer.position(msg_end);

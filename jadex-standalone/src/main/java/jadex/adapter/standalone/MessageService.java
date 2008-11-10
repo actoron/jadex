@@ -9,6 +9,7 @@ import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IContentCodec;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
@@ -290,7 +291,11 @@ public class MessageService implements IMessageService
 			Object	value	= message.get(name);
 			IContentCodec	codec	= messagetype.findContentCodec(DEFCODECS, message, name);
 			if(codec!=null)
-				message.put(name, codec.decode((String)value));
+			{
+				// todo: use agent specific classloader
+				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				message.put(name, codec.decode((String)value, cl));
+			}
 		}
 
 

@@ -49,9 +49,10 @@ public class XMLCodec implements IEncoder, IDecoder
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(byte[] bytes)
+	public Object decode(byte[] bytes, ClassLoader classloader)
 	{
 		final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+		
 		XMLDecoder dec = new XMLDecoder(bais, null, new ExceptionListener()
 		{
 			public void exceptionThrown(Exception e)
@@ -59,7 +60,7 @@ public class XMLCodec implements IEncoder, IDecoder
 				System.out.println("XML decoding ERROR: "+bais);
 				e.printStackTrace();
 			}
-		});
+		}, classloader);
 		Object ret = dec.readObject();
 		dec.close();
 		try{bais.close();} catch(Exception e) {}

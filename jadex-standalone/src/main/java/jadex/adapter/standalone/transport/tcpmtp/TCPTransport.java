@@ -7,6 +7,7 @@ import jadex.adapter.standalone.transport.MessageEnvelope;
 import jadex.adapter.standalone.transport.codecs.CodecFactory;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ITimedObject;
 import jadex.bridge.ITimer;
@@ -179,7 +180,8 @@ public class TCPTransport implements ITransport
 					{
 						try
 						{
-							final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac);
+							ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+							final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, cl);
 							if(!async)
 							{
 								TCPTransport.this.deliverMessages(con);

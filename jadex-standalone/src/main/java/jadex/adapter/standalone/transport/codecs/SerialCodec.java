@@ -1,8 +1,9 @@
 package jadex.adapter.standalone.transport.codecs;
 
+import jadex.commons.ObjectInputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
@@ -50,13 +51,13 @@ public class SerialCodec implements IEncoder, IDecoder
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] bytes)
+	public Object decode(byte[] bytes, ClassLoader classloader)
 	{
 		Object ret = null;
 		try
 		{
 			ByteArrayInputStream baos = new ByteArrayInputStream(bytes);
-			ObjectInputStream ois = new ObjectInputStream(baos);
+			ObjectInputStream ois = new ObjectInputStream(baos, classloader);
 			ret = ois.readObject();
 			baos.close();
 			ois.close();
