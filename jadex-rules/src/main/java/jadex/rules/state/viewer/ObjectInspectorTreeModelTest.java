@@ -5,8 +5,6 @@ import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.javaimpl.OAVState;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.Timer;
 
 public class ObjectInspectorTreeModelTest extends OAVTreeModel
 {

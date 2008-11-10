@@ -10,7 +10,6 @@ import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
-import jadex.rules.state.javaimpl.OAVState;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -36,7 +35,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
-import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -972,9 +970,16 @@ public class OAVTreeModel implements TreeModel
 	public static JPanel	createOAVPanel(IOAVState state)
 	{
 		final OAVTreeModel	model	= new OAVTreeModel(state);
-		JTree	tree	= new JTree(model);
+		JTree tree = new JTree(model);
 		tree.setRootVisible(false);
 
+		// Open first tree entry when only one exists (Hack?)
+		if(model.getChildCount(model.getRoot())==1)
+		{
+			Object[] obs = ((ObjectNode)((RootNode)model.getRoot()).getChildren().get(0)).getPath();
+			tree.expandPath(new TreePath(obs));
+		}
+		
 		new TreeExpansionHandler(tree);
 		tree.setCellRenderer(new OAVTreeCellRenderer());
 		
