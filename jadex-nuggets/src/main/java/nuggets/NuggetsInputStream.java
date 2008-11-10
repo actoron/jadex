@@ -21,25 +21,25 @@ import java.io.InputStreamReader;
  */
 public class NuggetsInputStream
 {
-    private final BeanAssembler	ba;
-	private InputStreamReader	isr;
+//    private final BeanAssembler	ba;
+//	private InputStreamReader	isr;
 
 
 	/** 
      * Constructor for NuggetsOutputStream.
      * @param is
      * @throws IOException 
-     */
+     * /
     public NuggetsInputStream(InputStream is) throws IOException {
         isr = new InputStreamReader(is);
         ba = new BeanAssembler();
         ba.setReader(new JavaXMLReader());
-    }
+    }*/
 
 
 	/** 
      * @return the object that hast been written to the file
-     */
+     * /
     public Object readObject() {
         return ba.assemble(isr);
     }
@@ -47,23 +47,9 @@ public class NuggetsInputStream
     /**
      * @throws IOException  
      * 
-     */
+     * /
     public void close() throws IOException {
     	isr.close();
-    }
+    }*/
     
 }
-
-
-/* 
- * $Log$
- * Revision 1.3  2006/02/23 17:46:25  walczak
- * LF
- *
- * Revision 1.2  2006/02/20 15:00:56  walczak
- * ------------------------------------
- *
- * Revision 1.1  2006/02/20 14:11:24  walczak
- * Two help classes for the nuggets
- *
- */

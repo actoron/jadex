@@ -414,10 +414,11 @@ public class ModelExplorer extends JTree
 		{
 			try
 			{
-				RootNode	newroot = (RootNode)Nuggets.objectFromXML(rootxml);
+				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+				RootNode newroot = (RootNode)Nuggets.objectFromXML(rootxml, cl);
 				newroot.copyFrom(this.root);
 				newroot.setMyAgentFactory(jcc.getAgent().getPlatform().getAgentFactory());
-				this.root	= newroot;
+				this.root = newroot;
 				((DefaultTreeModel)getModel()).setRoot(this.root);
 			}
 			catch(Exception e)

@@ -26,5 +26,5 @@ public interface IContentCodec
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(String val);
+	public Object decode(String val, ClassLoader classloader);
 }

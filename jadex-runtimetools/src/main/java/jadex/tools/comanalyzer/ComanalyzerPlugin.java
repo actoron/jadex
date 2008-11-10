@@ -1480,7 +1480,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 //						addMessage(m);
 //					}
 //				}
-				Object[] stored = (Object[])Nuggets.objectFromXML(xml);
+				Object[] stored = (Object[])Nuggets.objectFromXML(xml, null);
 				
 				agentlist.removeAllAgents();
 				Agent[] agents = (Agent[])stored[0];

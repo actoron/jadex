@@ -69,12 +69,12 @@ public class Nuggets
 	 * @param is
 	 * @return the object read from the is stream
 	 */
-	public Object readObject(InputStream is)
+	public Object readObject(InputStream is, ClassLoader classloader)
 	{
 		InputStreamReader isr = new InputStreamReader(is);
 		synchronized(ba)
 		{
-			return ba.assemble(isr);
+			return ba.assemble(isr, classloader);
 		}
 	}
 
@@ -96,13 +96,13 @@ public class Nuggets
 	 * @param str
 	 * @return the Object from String representation
 	 */
-	public Object fromXML(String str)
+	public Object fromXML(String str, ClassLoader classloader)
 	{
 		try
 		{
 			synchronized(ba)
 			{
-				return ba.assemble(new StringReader(str));
+				return ba.assemble(new StringReader(str), classloader);
 			}
 		}
 		catch(PersistenceException e)
@@ -133,10 +133,10 @@ public class Nuggets
 	 * @param val The string value.
 	 * @return The encoded object.
 	 */
-	public static Object objectFromXML(String val)
+	public static Object objectFromXML(String val, ClassLoader classloader)
 	{
 		if(nuggets == null) nuggets = new Nuggets();
-		return nuggets.fromXML(val);
+		return nuggets.fromXML(val, classloader);
 	}
 
 }

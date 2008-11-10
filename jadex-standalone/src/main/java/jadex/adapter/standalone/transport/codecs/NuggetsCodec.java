@@ -33,8 +33,8 @@ public class NuggetsCodec implements IEncoder, IDecoder
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(byte[] bytes)
+	public Object decode(byte[] bytes, ClassLoader classloader)
 	{
-		return Nuggets.objectFromXML(new String(bytes));
+		return Nuggets.objectFromXML(new String(bytes), classloader);
 	}
 }

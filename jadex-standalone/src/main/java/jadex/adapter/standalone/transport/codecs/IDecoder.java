@@ -10,5 +10,5 @@ public interface IDecoder
 	 *  @param bytes The value bytes.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] bytes);
+	public Object decode(byte[] bytes, ClassLoader classloader);
 }

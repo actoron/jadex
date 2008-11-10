@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.commons.SGUI;
@@ -544,7 +545,8 @@ public class FipaConversationPanel extends JSplitPane
 	 */
 	public IMessageEvent	decodeMessage(String msg)
 	{
-		Map	map	= (Map)Nuggets.objectFromXML(msg);
+		ClassLoader cl = ((ILibraryService)agent.getPlatform().getService(ILibraryService.class)).getClassLoader();
+		Map	map	= (Map)Nuggets.objectFromXML(msg, cl);
 		IMessageEvent	message	= agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE));
 
 		IParameter[]	params	= message.getParameters();

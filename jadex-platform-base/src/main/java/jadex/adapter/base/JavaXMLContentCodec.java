@@ -1,6 +1,5 @@
 package jadex.adapter.base;
 
-
 import jadex.bridge.IContentCodec;
 
 import java.beans.ExceptionListener;
@@ -61,7 +60,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public synchronized Object decode(final String val)
+	public synchronized Object decode(final String val, ClassLoader classloader)
 	{
 		assert val != null;
 

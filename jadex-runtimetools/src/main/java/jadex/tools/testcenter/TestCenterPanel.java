@@ -5,6 +5,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IJadexAgentFactory;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.commons.SGUI;
@@ -338,7 +339,9 @@ public class TestCenterPanel extends JSplitPane
 						{
 							FileInputStream fis = new FileInputStream(file);
 							Nuggets nug = new Nuggets();
-							String[] names = (String[])nug.readObject(fis);
+							
+							ClassLoader cl = ((ILibraryService)plugin.getJCC().getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+							String[] names = (String[])nug.readObject(fis, cl);
 							teststable.setEntries(names);
 						}
 						catch(Exception e)

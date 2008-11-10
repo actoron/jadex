@@ -23,37 +23,37 @@ import nuggets.util.CharStream;
  */
 public class NuggetsOutputStream 
 {
-	private final CharStream	cos;
-	private final BeanCruncher	mill;
-	private final Writer	writer;
+//	private final CharStream	cos;
+//	private final BeanCruncher	mill;
+//	private final Writer	writer;
 
 	/** 
 	 * Constructor for NuggetsOutputStream.
 	 * @param file
 	 * @throws IOException 
-	 */
+	 * /
 	public NuggetsOutputStream(OutputStream file) throws IOException {
 		this.writer = new OutputStreamWriter(file);
 		this.cos = new CharStream();
 		this.mill = new BeanCruncher(new JavaXMLWriter(cos));
-	}
+	}*/
 	
 	/** 
 	 * @param value
 	 * @throws IOException
-	 */
+	 * /
 	public void writeObject(Object value) throws IOException
 	{
 		mill.persist(value);
 		cos.writeTo(writer);
-	}
+	}*/
 	
 	/** 
 	 * @throws IOException
-	 */
+	 * /
 	public void close() throws IOException {
 		writer.close();
-	}
+	}*/
 
 
 }
