@@ -188,7 +188,7 @@ public class OAVBDIModelLoader
 	 *  Set the class loader.
 	 *  @param classloader The class loader.
 	 */
-	public void setClassLoader(ClassLoader classloader)
+	public synchronized void setClassLoader(ClassLoader classloader)
 	{
 		this.classloader = classloader;
 		modelcache.clear();
@@ -199,10 +199,8 @@ public class OAVBDIModelLoader
 	/**
 	 *  Load a model.
 	 */
-	protected OAVCapabilityModel loadModel(String name, String extension, String[] imports) throws IOException
+	protected synchronized OAVCapabilityModel loadModel(String name, String extension, String[] imports) throws IOException
 	{
-//		OAVCapabilityModel ret;
-		
 		if(extension==null)
 			extension = getFilenameExtension(name);
 		
@@ -282,19 +280,6 @@ public class OAVBDIModelLoader
 			modelcache.put(keytuple, cached);
 		}
 
-//		if(cached.getState().getType(cached.getHandle()).isSubtype(OAVBDIMetaModel.agent_type))
-//		{
-//			ret	=  new OAVAgentModel();
-//		}
-//		else
-//		{
-//			ret	=  new OAVCapabilityModel();
-//		}
-//		
-//		// Copy data / rules / etc into clone.
-//		ret.copyContentFrom(cached);
-		
-//		return ret;
 		return cached;
 	}
 	
