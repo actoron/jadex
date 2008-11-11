@@ -65,13 +65,13 @@ public interface ILibraryService
 	 *  Returns the currently loaded .jar-files.
 	 *  @return currently loaded .jar-files
 	 */
-	public List getLoadedJars();
+//	public List getLoadedJars();
 	
 	/** 
 	 *  Returns the currently loaded class paths.
 	 *  @return currently loaded class paths
 	 */
-	public List getLoadedPaths();
+//	public List getLoadedPaths();
 	
 	/** 
 	 *  Returns the current ClassLoader.

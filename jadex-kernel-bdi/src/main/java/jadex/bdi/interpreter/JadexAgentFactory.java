@@ -12,6 +12,7 @@ import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVState;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
 
 /**
@@ -63,22 +64,12 @@ public class JadexAgentFactory implements IJadexAgentFactory
 			loader.setClassLoader(libservice.getClassLoader());
 			ILibraryServiceListener lsl = new ILibraryServiceListener()
 			{
-				public void jarAdded(String path)
+				public void urlAdded(URL url)
 				{
 					loader.setClassLoader(libservice.getClassLoader());
 				}
 				
-				public void jarRemoved(String path)
-				{
-					loader.setClassLoader(libservice.getClassLoader());
-				}
-				
-				public void pathAdded(String path)
-				{
-					loader.setClassLoader(libservice.getClassLoader()); 
-				}
-				
-				public void pathRemoved(String path)
+				public void urlRemoved(URL url)
 				{
 					loader.setClassLoader(libservice.getClassLoader());
 				}
