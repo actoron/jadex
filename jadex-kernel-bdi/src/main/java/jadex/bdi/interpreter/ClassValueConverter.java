@@ -43,11 +43,11 @@ public class ClassValueConverter implements IValueConverter
 		}
 		catch(ClassNotFoundException e)
 		{
-//			throw new RuntimeException(e);
-			System.out.println("Warning: Class not found "+value);
-			// changed, see javaflow bug: http://issues.apache.org/jira/browse/SANDBOX-111
-			//return Void.class;
-			return Void.TYPE;
+			throw new RuntimeException(e);
+//			System.out.println("Warning: Class not found "+value);
+//			// changed, see javaflow bug: http://issues.apache.org/jira/browse/SANDBOX-111
+//			//return Void.class;
+//			return Void.TYPE;
 		}
 	}
 

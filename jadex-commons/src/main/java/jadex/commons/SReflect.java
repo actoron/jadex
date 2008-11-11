@@ -25,23 +25,23 @@ public class SReflect
 	//-------- attributes --------
 	
 	/** Class lookup cache (classloader(weak)->Map([name, import]->class)). */
-	protected static Map classcache	= new WeakHashMap();
+	protected static Map classcache	= Collections.synchronizedMap(new WeakHashMap());
 
 	/** Inner class name lookup cache. */
-	protected static Map innerclassnamecache	= new WeakHashMap();
+	protected static Map innerclassnamecache	= Collections.synchronizedMap(new WeakHashMap());
 
 	/** Method lookup cache (class->(name->method[])). */
-	protected static Map methodcache	= new WeakHashMap();
+	protected static Map methodcache	= Collections.synchronizedMap(new WeakHashMap());
 
 	/** Field lookup cache (class->(name->field[])). */
-	protected static Map fieldcache = new WeakHashMap();
+	protected static Map fieldcache = Collections.synchronizedMap(new WeakHashMap());
 
 	/** Mapping from basic class name -> object type(class). */
 	protected static Map basictypes;
 
 	static
 	{
-		basictypes	= new Hashtable();
+		basictypes	= Collections.synchronizedMap(new HashMap());
 		basictypes.put("boolean", Boolean.class);
 		basictypes.put("int", Integer.class);
 		basictypes.put("double", Double.class);
@@ -461,7 +461,7 @@ public class SReflect
 
 		if(clazz==null)
 		{
-			throw new ClassNotFoundException("Class "+clname+" not found in imports: "+imports);
+			throw new ClassNotFoundException("Class "+clname+" not found in imports: "+SUtil.arrayToString(imports));
 		}
 
 		return clazz;
@@ -479,38 +479,99 @@ public class SReflect
 	{
 		Class	clazz	= null;
 //		System.out.println("+++fC: "+clname+" "+imports);
-
-		// Try to find fully qualified.
-		clazz	= classForName0(clname, classloader);
-
-		// Try to find in imports.
-		if(clazz==null && imports!=null)
+		
+		// Try to find in cache.
+		boolean	cachemiss	= false;
+		Map	cache	= (Map)classcache.get(classloader);
+		if(cache!=null)
 		{
-			for(int i=-1; clazz==null && i<imports.length; i++)
-			{
-				// Always import java.lang.* (Hack???)
-				String imp	= i==-1 ? "java.lang.*" : imports[i];	
+			// Hack!!! Tuple should be immutable, but currently doesn't copy entries, so we can do this to reduce number of created tuples
+			Object[]	entities	= new Object[]{clname, null};
+			Tuple	tuple	= new Tuple(entities);
 
-				// Package import
-				if(imp.endsWith(".*"))
+			if(cache.containsKey(tuple))
+			{
+				clazz	= (Class)cache.get(tuple);
+			}
+			else
+			{
+				cachemiss	= true;
+			}
+			
+			if(clazz==null && imports!=null)
+			{
+				for(int i=0; clazz==null && i<imports.length; i++)
 				{
-					clazz	= classForName0(
-						imp.substring(0, imp.length()-1) + clname, classloader);
-//					System.out.println("+++cFN1: "+imp.substring(0, imp.length()-1) + clname+", "+clazz);
+					entities[1]	= imports[i];	
+					if(cache.containsKey(tuple))
+					{
+						clazz	= (Class)cache.get(tuple);
+					}
+					else
+					{
+						cachemiss	= true;
+					}
 				}
-				// Class import
-				else if(imports[i].endsWith(clname))
+			}
+			if(clazz==null)
+			{
+				entities[1]	= "java.lang.*";
+				if(cache.containsKey(tuple))
 				{
-					clazz	= classForName0(imp, classloader);
-//					System.out.println("+++cFN2: "+imp+", "+clazz);
+					clazz	= (Class)cache.get(tuple);
+				}
+				else
+				{
+					cachemiss	= true;
 				}
 			}
 		}
-
-		// No explicit imports, try java.lang (imported by default).
-		else if(clazz==null)
+		else
 		{
-			clazz	= classForName0("java.lang." + clname, classloader);
+			cachemiss	= true;
+			cache	= Collections.synchronizedMap(new HashMap());
+			classcache.put(classloader, cache);
+		}
+
+		if(clazz==null && cachemiss)
+		{
+			// Try to find fully qualified.
+			clazz	= classForName0(clname, classloader);
+			cache.put(new Tuple(clname, null), clazz);
+	
+			// Try to find in imports.
+			if(clazz==null && imports!=null)
+			{
+				for(int i=0; clazz==null && i<imports.length; i++)
+				{
+					// Package import
+					if(imports[i].endsWith(".*"))
+					{
+						clazz	= classForName0(
+							imports[i].substring(0, imports[i].length()-1) + clname, classloader);
+	//					System.out.println("+++cFN1: "+imp.substring(0, imp.length()-1) + clname+", "+clazz);
+					}
+					// Class import
+					else if(imports[i].endsWith(clname))
+					{
+						clazz	= classForName0(imports[i], classloader);
+	//					System.out.println("+++cFN2: "+imp+", "+clazz);
+					}
+					cache.put(new Tuple(clname, imports[i]), clazz);
+				}
+			}
+	
+			// Try java.lang (imported by default).
+			if(clazz==null)
+			{
+				clazz	= classForName0("java.lang." + clname, classloader);
+				cache.put(new Tuple(clname, "java.lang.*"), clazz);
+			}
+			
+//			if(clazz==null)
+//			{
+//				System.err.println("Class not found: "+clname+", "+SUtil.arrayToString(imports));
+//			}
 		}
 		
 		return clazz;
