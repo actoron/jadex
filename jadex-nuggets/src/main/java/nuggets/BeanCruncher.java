@@ -47,9 +47,10 @@ public class BeanCruncher implements ICruncher
 	 * @param obj
 	 * @return the id of this object or 0
 	 */
-	public int declare(Object obj)
+	public int declare(Object obj, ClassLoader classloader)
 	{
-		if(obj != null) return persist_recursive(obj);
+		if(obj != null) 
+			return persist_recursive(obj, classloader);
 		return 0;
 	}
 
@@ -142,13 +143,13 @@ public class BeanCruncher implements ICruncher
 	 * 
 	 * @param root
 	 */
-	public void persist(Object root)
+	public void persist(Object root, ClassLoader classloader)
 	{
 		clear();
 		if (root!=null) setOntology(root.getClass());	
 
 		codec.start(ontology);
-		persist_recursive(root);
+		persist_recursive(root, classloader);
 		codec.end();
 	}
 
@@ -166,7 +167,7 @@ public class BeanCruncher implements ICruncher
 	 * @param o
 	 * @return the id of this object
 	 */
-	protected int persist_recursive(Object o)
+	protected int persist_recursive(Object o, ClassLoader classloader)
 	{
 		int id=ids.get(o);
 		if(id==0)
@@ -175,10 +176,10 @@ public class BeanCruncher implements ICruncher
 			Class clazz = o.getClass();
 
 			// find delegate
-			IDelegate m = PersistenceHelper.getDelegate(clazz);
+			IDelegate m = PersistenceHelper.getDelegate(clazz, classloader);
 			try
 			{
-				m.persist(o, this);
+				m.persist(o, this, classloader);
 				codec.end(getTag(clazz));
 			}
 			catch(Exception e)
@@ -244,10 +245,3 @@ public class BeanCruncher implements ICruncher
 	}
 
 }
-
-/*
- * $Log$
- * Revision 1.5  2006/05/30 09:05:06  walczak
- * fixed some bugs
- *
- */

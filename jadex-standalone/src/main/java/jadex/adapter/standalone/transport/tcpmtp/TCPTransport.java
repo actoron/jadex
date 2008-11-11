@@ -368,7 +368,8 @@ public class TCPTransport implements ITransport
 
 			try
 			{
-				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address));
+				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
 				connections.put(address, ret);
 			}
 			catch(Exception e)

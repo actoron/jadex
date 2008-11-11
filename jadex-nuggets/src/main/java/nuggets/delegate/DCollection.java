@@ -31,11 +31,11 @@ public class DCollection extends ADelegate
 	 * @param mill
 	 * @see nuggets.delegate.ADelegate#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 
 		Iterator it = ((Collection)o).iterator();
-		while(it.hasNext())			mill.declare(it.next());
+		while(it.hasNext())			mill.declare(it.next(), classloader);
 
 		  mill.startConcept(o);
 		it = ((Collection)o).iterator();

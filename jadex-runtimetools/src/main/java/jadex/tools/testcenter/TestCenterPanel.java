@@ -313,7 +313,8 @@ public class TestCenterPanel extends JSplitPane
 						{
 							Nuggets nug = new Nuggets();
 							FileOutputStream fos = new FileOutputStream(file);
-							nug.write(teststable.getEntries(), fos);
+							ClassLoader cl = ((ILibraryService)plugin.getJCC().getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+							nug.write(teststable.getEntries(), fos, cl);
 							fos.close();
 						}
 						catch(Exception e)

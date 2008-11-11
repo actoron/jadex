@@ -29,12 +29,12 @@ public class DObjectArray extends ADelegate implements IDelegate
 	 * @param mill
 	 * @see nuggets.delegate.ADelegate#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 		final int l = Array.getLength(o);
 		int i=l;
 		while(i>0) {
-			mill.declare(Array.get(o, --i));
+			mill.declare(Array.get(o, --i), classloader);
 		}
 		  mill.startConcept(o);
 		mill.put("type", o.getClass().getName());
@@ -113,20 +113,3 @@ public class DObjectArray extends ADelegate implements IDelegate
 	}
 		
 }
-
-
-/* 
- * $Log$
- * Revision 1.4  2006/02/23 17:46:25  walczak
- * LF
- *
- * Revision 1.3  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.2  2006/02/16 17:41:08  walczak
- * no reference to strings in Maps but a direct inclusion.
- *
- * Revision 1.1  2006/01/20 18:11:01  walczak
- * ------------------------
- *
- */

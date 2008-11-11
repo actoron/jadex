@@ -26,8 +26,12 @@ import java.util.logging.Logger;
 
 /**
  *  The Message service serves several message-oriented purposes: a) sending and
- *  delivering messages by using transports b) managemang of transports
+ *  delivering messages by using transports b) management of transports
  *  (add/remove)
+ *  
+ *  The message service performs sending and delivering messages by separate actions
+ *  that are individually executed on the execution service, i.e. they are delivered
+ *  synchronous or asynchronous depending on the execution service mode.
  */
 public class MessageService implements IMessageService
 {
@@ -93,7 +97,9 @@ public class MessageService implements IMessageService
 			IContentCodec	codec	= type.findContentCodec(DEFCODECS, message, name);
 			if(codec!=null)
 			{
-				message.put(name, codec.encode(value));
+				// todo: use agent specific classloader
+				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				message.put(name, codec.encode(value, cl));
 			}
 			else if(value!=null && !(value instanceof String) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())))
@@ -382,7 +388,6 @@ public class MessageService implements IMessageService
 		public synchronized void addMessage(Map message, String type, IAgentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-//			platform.getExecutorService().execute(this);
 			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
 		}
 	}
@@ -428,7 +433,6 @@ public class MessageService implements IMessageService
 		public synchronized void addMessage(Map message, String type, IAgentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-//			platform.getExecutorService().execute(this);
 			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
 		}
 	}

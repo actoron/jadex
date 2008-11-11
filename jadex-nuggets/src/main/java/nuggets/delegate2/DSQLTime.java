@@ -39,7 +39,7 @@ public class DSQLTime extends ADelegate
 	 * @param mill
 	 * @see nuggets.delegate.ASimpleDelegate#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 		mill.startConcept(o);
 		mill.put("v", Long.toString(((Time)o).getTime()));
@@ -88,19 +88,3 @@ public class DSQLTime extends ADelegate
 //		return new Time(Long.parseLong((String)value));
 //	}
 }
-
-
-/* 
- * $Log$
- * Revision 1.5  2006/12/21 10:38:59  walczak
- * removed the unmarshall methods. not tested with reflection
- *
- * Revision 1.4  2006/12/20 22:55:56  walczak
- * Moved some classes represented as string to the reference representation.
- * Subclasses when serialized as a string loose their class identity with the old approach.
- *
- * Revision 1.3  2006/06/29 17:27:25  walczak
- * created a reflection delegate. alpha
- *
- *
- */

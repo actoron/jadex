@@ -37,10 +37,10 @@ public class DBooleanObject extends ASimpleDelegate
     * @param mill
     * @see nuggets.delegate.ASimpleDelegate#persist(java.lang.Object, nuggets.ICruncher)
     */
-   public void persist(Object o, ICruncher mill)
+   public void persist(Object o, ICruncher mill, ClassLoader classloader)
    {
 		  mill.startConcept(o);
-      mill.put("v", o.toString());
+		  mill.put("v", o.toString());
    }
    
 	/** 

@@ -30,6 +30,9 @@ class TCPOutputConnection
 	/** The cleaner. */
 	protected Cleaner cleaner;
 	
+	/** The classloader. */
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 	
 	/**
@@ -39,12 +42,14 @@ class TCPOutputConnection
 	 *  @param enc
 	 *  @throws IOException
 	 */
-	public TCPOutputConnection(InetAddress iaddr, int iport, CodecFactory codecfac, Cleaner cleaner) throws IOException
+	public TCPOutputConnection(InetAddress iaddr, int iport, CodecFactory codecfac, 
+		Cleaner cleaner, ClassLoader classloader) throws IOException
 	{
 		this.sock = new Socket(iaddr, iport);
 		this.sos = new BufferedOutputStream(sock.getOutputStream());
 		this.codecfac = codecfac;
 		this.cleaner = cleaner;
+		this.classloader = classloader;
 		//address = SMTransport.SERVICE_SCHEMA+iaddr.getHostAddress()+":"+iport;
 	}
 
@@ -67,7 +72,7 @@ class TCPOutputConnection
 			if(codec_id==-1)
 				throw new IOException("Codec id not found: "+enc);
 			
-			byte[] enc_msg = enc.encode(msg);
+			byte[] enc_msg = enc.encode(msg, classloader);
 			
 			int size = enc_msg.length+TCPTransport.PROLOG_SIZE;
 			

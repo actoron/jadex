@@ -36,10 +36,10 @@ public class DJarAsDirectory extends ADelegate
 	 * @param mill
 	 * @see nuggets.delegate.ASimpleDelegate#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 		JarAsDirectory	jad	= (JarAsDirectory)o;
-		int	entries_id	= mill.declare(jad.entries);
+		int	entries_id	= mill.declare(jad.entries, classloader);
 		mill.startConcept(o);
 		mill.put("fullpath", jad.toString());
 		mill.put("jarpath", jad.jarpath);

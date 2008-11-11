@@ -23,9 +23,9 @@ public class NuggetsCodec implements IEncoder, IDecoder
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public byte[] encode(Object val)
+	public byte[] encode(Object val, ClassLoader classloader)
 	{
-		return Nuggets.objectToXML(val).getBytes();
+		return Nuggets.objectToXML(val, classloader).getBytes();
 	}
 
 	/**

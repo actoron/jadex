@@ -57,7 +57,6 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	{
 		this.platform	= platform;
 		this.aid	= aid;
-
 		this.agent = platform.getAgentFactory().createJadexAgent(this, model, state, args);		
 	}
 

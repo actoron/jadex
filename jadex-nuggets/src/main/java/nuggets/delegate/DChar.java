@@ -37,18 +37,3 @@ public class DChar extends ASimpleDelegate
 		return new Character(((String)value).charAt(0));
 	}
 }
-
-
-/* 
- * $Log$
- * Revision 1.7  2006/06/29 17:27:25  walczak
- * created a reflection delegate. alpha
- *
- * Revision 1.6  2006/02/23 17:46:25  walczak
- * LF
- *
- * Revision 1.5  2006/02/21 15:02:16  walczak
- * *** empty log message ***
- *
- *
- */

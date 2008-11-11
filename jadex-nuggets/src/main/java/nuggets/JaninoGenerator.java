@@ -29,7 +29,6 @@ public class JaninoGenerator implements IDelegateGenerator
 
 	static final String				IASSEMBLER_INTERFACE	= IAssembler.class.getName();
 
-	
 	/** 
 	 * Constructor for JaninoGenerator.
 	 */
@@ -44,16 +43,17 @@ public class JaninoGenerator implements IDelegateGenerator
 	 * @return a compiled delegate
 	 * @see nuggets.IDelegateGenerator#generateDelegate(java.lang.Class, java.util.Map)
 	 */
-	public IDelegate generateDelegate(Class clazz, Map props)
+	public IDelegate generateDelegate(Class clazz, Map props, ClassLoader classloader)
 	{
 		
 		String classbody = createDelegateClassBody(clazz, props);
-	//	System.out.println("BeanAnalyzer: generating delegate for class "+clazz.getName() +"\n"+classbody);
+//		System.out.println("BeanAnalyzer: generating delegate for class "+clazz.getName() +"\n"+classbody);
+//		System.out.println("cl: "+Thread.currentThread().getContextClassLoader());
 		try
 		{
 			return (IDelegate)ClassBodyEvaluator.createFastClassBodyEvaluator(new Scanner(
 				"<generated>", new StringReader(classbody)), "persistence.Delegate"
-				+ clazz.getName(), AGeneratedDelegate.class, new Class[]{IDelegate.class}, null/*, Thread.currentThread().getContextClassLoader()*/);
+				+ clazz.getName(), AGeneratedDelegate.class, new Class[]{IDelegate.class}, classloader);
 		}
 		catch(Exception e)
 		{
@@ -104,7 +104,7 @@ public class JaninoGenerator implements IDelegateGenerator
 				{ // all primitive classes can be represented as a string
 					ref_counter++;
 					reference_body += "   int id" + ref_counter + " = c.declare(x."
-							+ bp.getGetterName() + "());\n";
+							+ bp.getGetterName() + "()"+", classloader"+");\n";
 
 					persist_body += "   if (id" + ref_counter + "!=0) c.put(\"" + bp.getName()
 							+ "\", id" + ref_counter + ");\n";
@@ -114,7 +114,7 @@ public class JaninoGenerator implements IDelegateGenerator
 
 			// ---------------------- persist -------------------------------------
 			classbody += "\npublic void persist(Object o, " + ICRUNCHER_INTERFACE
-					+ " c) throws Exception {\n" + "   " + clazzname + " x=(" + clazzname + ")o;\n"
+					+ " c"+", ClassLoader classloader"+") throws Exception {\n" + "   " + clazzname + " x=(" + clazzname + ")o;\n"
 					+ reference_body + "   c.startConcept(o);\n" + persist_body + "}\n";
 
 			//----------------------- put ---------------------------
@@ -193,17 +193,3 @@ public class JaninoGenerator implements IDelegateGenerator
 	}
 
 }
-
-
-/* 
- * $Log$
- * Revision 1.3  2006/12/15 11:49:55  braubach
- * *** empty log message ***
- *
- * Revision 1.2  2006/07/14 10:29:23  walczak
- * sysout
- *
- * Revision 1.1  2006/06/29 17:27:25  walczak
- * created a reflection delegate. alpha
- *
- */

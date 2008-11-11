@@ -77,12 +77,12 @@ public class PersistenceHelper
 	 * @param clazz
 	 * @return the persistence delegate or null
 	 */
-	public static IDelegate getDelegate(final Class clazz)
+	public static IDelegate getDelegate(final Class clazz, ClassLoader classloader)
 	{
 		IDelegate m = lookUpDelegate(clazz);
 		if(m == null)
 		{
-			m = createPersistenceDelegate(clazz);
+			m = createPersistenceDelegate(clazz, classloader);
 			registerDelegate(clazz, m);
 		}
 
@@ -133,13 +133,13 @@ public class PersistenceHelper
 	 * @param clazz
 	 * @return a persistance delegate for the specified class
 	 */
-	private static IDelegate createPersistenceDelegate(Class clazz)
+	private static IDelegate createPersistenceDelegate(Class clazz, ClassLoader classloader)
 	{
 		try
 		{
 			Map props = INTROSPECTOR.getBeanProperties(clazz);
 			
-			return GENERATOR.generateDelegate(clazz, props);
+			return GENERATOR.generateDelegate(clazz, props, classloader);
 		}
 		catch(Exception e)
 		{
@@ -160,10 +160,14 @@ public class PersistenceHelper
 	 */
 	private static IDelegateGenerator getGenerator()
 	{
-		try {
-			return (IDelegateGenerator)Class.forName("nuggets.JaninoGenerator"/*, true, Thread.currentThread().getContextClassLoader()*/).newInstance();
-		}catch(Exception e)
-		{ // nop
+		try 
+		{
+			return(IDelegateGenerator)Class.forName("nuggets.JaninoGenerator"
+				/*, true, Thread.currentThread().getContextClassLoader()*/).newInstance();
+		}
+		catch(Exception e)
+		{ 
+			// nop
 		}
 		// fail safe
 		return new ReflectionGenerator();
@@ -180,7 +184,8 @@ public class PersistenceHelper
 			return (IBeanIntrospector)Class.forName("nuggets.BeanInfoIntrospector"/*, true, Thread.currentThread().getContextClassLoader()*/).newInstance();
 		}
 		catch(Exception e)
-		{ // nop
+		{ 
+			// nop
 		}
 		// fail safe
 		return new ReflectionIntrospector();
@@ -305,16 +310,24 @@ public class PersistenceHelper
 		}
 	}
 
-	
 	/** 
 	 * @param class_name
 	 * @param delegate_name
 	 */
 	private static void registerDelegate(String class_name, String delegate_name)
 	{
+		registerDelegate(class_name, delegate_name, PersistenceHelper.class.getClassLoader());
+	}
+	
+	/** 
+	 * @param class_name
+	 * @param delegate_name
+	 */
+	private static void registerDelegate(String class_name, String delegate_name, ClassLoader classloader)
+	{
 		try
 		{
-			registerDelegate(Class.forName(class_name), (IDelegate)Class.forName(delegate_name/*, true, Thread.currentThread().getContextClassLoader()*/).newInstance());
+			registerDelegate(Class.forName(class_name, true, classloader), (IDelegate)Class.forName(delegate_name, true, classloader).newInstance());
 		}
 		catch(Exception e)
 		{

@@ -21,7 +21,7 @@ public interface ICruncher
 	 * @param child
 	 * @return the id of this object
 	 */
-	int declare(Object child);
+	int declare(Object child, ClassLoader classloader);
 	
 	
 	/** Called after all references have been declared 
@@ -69,20 +69,3 @@ public interface ICruncher
 	void setText(char[] chars, int start, int len);
 
 }
-
-
-/* 
- * $Log$
- * Revision 1.3  2006/02/23 17:46:25  walczak
- * LF
- *
- * Revision 1.2  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.1  2006/01/20 18:11:02  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */

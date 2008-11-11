@@ -38,12 +38,3 @@ public class DDouble extends ASimpleDelegate
 		return new Double((String)value);
 	}
 }
-
-
-/* 
- * $Log$
- * Revision 1.7  2006/06/29 17:27:25  walczak
- * created a reflection delegate. alpha
- *
- *
- */

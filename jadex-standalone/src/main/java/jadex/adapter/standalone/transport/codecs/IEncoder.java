@@ -10,5 +10,5 @@ public interface IEncoder
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val);
+	public byte[] encode(Object val, ClassLoader classloader);
 }

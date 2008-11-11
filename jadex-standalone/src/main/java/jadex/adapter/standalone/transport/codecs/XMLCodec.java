@@ -26,7 +26,7 @@ public class XMLCodec implements IEncoder, IDecoder
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public byte[] encode(Object val)
+	public byte[] encode(Object val, ClassLoader classloader)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    XMLEncoder enc = new XMLEncoder(baos);
@@ -61,6 +61,7 @@ public class XMLCodec implements IEncoder, IDecoder
 				e.printStackTrace();
 			}
 		}, classloader);
+		
 		Object ret = dec.readObject();
 		dec.close();
 		try{bais.close();} catch(Exception e) {}

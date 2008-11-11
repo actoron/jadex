@@ -37,6 +37,9 @@ class NIOTCPOutputConnection
 
 	/** The cleaner. */
 	protected Cleaner cleaner;
+	
+	/** The classloader. */
+	protected ClassLoader classloader;
 
 	//-------- constructors --------
 	
@@ -46,10 +49,12 @@ class NIOTCPOutputConnection
 	 *  @param iport
 	 *  @throws IOException
 	 */
-	public NIOTCPOutputConnection(InetAddress iaddr, int iport, CodecFactory codecfac, Cleaner cleaner) throws IOException
+	public NIOTCPOutputConnection(InetAddress iaddr, int iport, CodecFactory codecfac, 
+		Cleaner cleaner, ClassLoader classloader) throws IOException
 	{
 		this.codecfac = codecfac;
 		this.cleaner = cleaner;
+		this.classloader = classloader;
 		
 		// Create a non-blocking socket channel
 	    this.sc = SocketChannel.open();
@@ -79,7 +84,7 @@ class NIOTCPOutputConnection
 	{
 		IEncoder enc = codecfac.getDefaultEncoder();
 		byte codec_id = codecfac.getCodecId(enc.getClass());
-		byte[] enc_msg = enc.encode(msg);
+		byte[] enc_msg = enc.encode(msg, classloader);
 		int size = enc_msg.length+NIOTCPTransport.PROLOG_SIZE;
 		buffer.put(codec_id);
 		buffer.putInt(size);

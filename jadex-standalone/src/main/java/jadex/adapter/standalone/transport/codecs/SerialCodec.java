@@ -26,11 +26,12 @@ public class SerialCodec implements IEncoder, IDecoder
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object object)
+	public byte[] encode(Object object, ClassLoader classloader)
 	{
 		byte[] ret = null;
 		try
 		{
+			// todo: use classloader for sth?
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
 			oos.writeObject(object);

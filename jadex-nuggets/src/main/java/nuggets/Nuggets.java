@@ -55,12 +55,12 @@ public class Nuggets
 	 * @param os
 	 * @throws IOException
 	 */
-	public void write(Object obj, OutputStream os) throws IOException
+	public void write(Object obj, OutputStream os, ClassLoader classloader) throws IOException
 	{
 		synchronized(cos)
 		{
 			cos.reset();
-			mill.persist(obj);
+			mill.persist(obj, classloader);
 			cos.writeTo(new OutputStreamWriter(os));
 		}
 	}
@@ -82,12 +82,12 @@ public class Nuggets
 	 * @param o
 	 * @return the string representation of this object in XML
 	 */
-	public String toXML(Object o)
+	public String toXML(Object o, ClassLoader classloader)
 	{
 		synchronized(cos)
 		{
 			cos.reset();
-			mill.persist(o);
+			mill.persist(o, classloader);
 			return cos.toString();
 		}
 	}
@@ -121,10 +121,10 @@ public class Nuggets
 	 * @param val The value.
 	 * @return The encoded object.
 	 */
-	public static String objectToXML(Object val)
+	public static String objectToXML(Object val, ClassLoader classloader)
 	{
 		if(nuggets == null) nuggets = new Nuggets();
-		return nuggets.toXML(val);
+		return nuggets.toXML(val, classloader);
 	}
 
 	/**

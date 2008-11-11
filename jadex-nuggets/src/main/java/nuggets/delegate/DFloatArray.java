@@ -24,9 +24,8 @@ public class DFloatArray extends ADelegate
 	 * @param mill
 	 * @see nuggets.delegate.ADelegate#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
-
 		  mill.startConcept(o);
 		mill.put("type", "[F");
 		float[] a=(float[]) o;

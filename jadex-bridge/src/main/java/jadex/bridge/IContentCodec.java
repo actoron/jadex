@@ -19,7 +19,7 @@ public interface IContentCodec
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public String encode(Object val);
+	public String encode(Object val, ClassLoader classloader);
 
 	/**
 	 *  Decode data with the codec.

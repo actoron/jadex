@@ -35,7 +35,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public String encode(Object val)
+	public String encode(Object val, ClassLoader classloader)
 	{
 		if(nuggets == null)
 			nuggets = new Nuggets();
@@ -44,7 +44,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 //		Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 //		System.err.println("encoding with class loader: "+Thread.currentThread()+", "+Thread.currentThread().getContextClassLoader());
 
-		return nuggets.toXML(val);
+		return nuggets.toXML(val, classloader);
 	}
 
 	/**

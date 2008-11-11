@@ -49,7 +49,7 @@ public class DCalendar extends ADelegate
 	 * @param mill
 	 * @see ASimpleDelegate#persist(Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 		  mill.startConcept(o);
 		mill.put("timezone", ((Calendar)o).getTimeZone().getID());
@@ -59,24 +59,3 @@ public class DCalendar extends ADelegate
 	}
 
 }
-
-/*
-
- * $Log$
- * Revision 1.5  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.4  2006/02/16 17:41:08  walczak
- * no reference to strings in Maps but a direct inclusion.
- *
- * Revision 1.3  2006/02/14 12:04:38  braubach
- * *** empty log message ***
- *
- * Revision 1.2  2006/01/20 18:11:02  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
-
- */

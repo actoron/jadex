@@ -39,7 +39,7 @@ public class DSQLTimestamp extends ADelegate
     * @param mill
     * @see nuggets.delegate.ASimpleDelegate#persist(java.lang.Object, nuggets.ICruncher)
     */
-   public void persist(Object o, ICruncher mill)
+   public void persist(Object o, ICruncher mill, ClassLoader classloader)
    {
 		  mill.startConcept(o);
       mill.put("v", Long.toString(((Timestamp)o).getTime()));
@@ -88,8 +88,3 @@ public class DSQLTimestamp extends ADelegate
 //		return new Timestamp(Long.parseLong((String)value));
 //	}
 }
-
-
-/* 
- * $Log: DSQLTimestamp.java,v 
- */

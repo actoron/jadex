@@ -23,7 +23,7 @@ public interface IDelegate
 	 * @param cruncher
 	 * @throws Exception 
 	 */
-	void persist(Object o, ICruncher cruncher) throws Exception;
+	void persist(Object o, ICruncher cruncher, ClassLoader classloader) throws Exception;
 
 
 	/** 
@@ -86,19 +86,3 @@ public interface IDelegate
 	 */
 	String marshall(Class clazz, Object object);
 }
-
-/* 
- * $Log$
- * Revision 1.3  2006/06/29 17:27:25  walczak
- * created a reflection delegate. alpha
- *
- * Revision 1.2  2006/02/21 15:02:16  walczak
- * *** empty log message ***
- *
- * Revision 1.1  2006/01/20 18:11:02  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */

@@ -32,10 +32,10 @@ public class DMap extends ADelegate
 	 * @param mill
 	 * @see nuggets.delegate.ADelegate#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 		Map map=(Map)o;
-		declareReferences(map, mill);
+		declareReferences(map, mill, classloader);
 		  mill.startConcept(o);
 		addReferences(map, mill);
 	}
@@ -62,15 +62,15 @@ public class DMap extends ADelegate
 	 * @param map
 	 * @param mill
 	 */
-	protected void declareReferences(Map map, ICruncher mill)
+	protected void declareReferences(Map map, ICruncher mill, ClassLoader classloader)
 	{
 		final Iterator it = map.keySet().iterator();
 		while(it.hasNext())
 		{
 			Object key = it.next();
-			mill.declare(key);
+			mill.declare(key, classloader);
 			Object value=map.get(key);
-			mill.declare(value);
+			mill.declare(value, classloader);
 		}
 	}
 
@@ -135,19 +135,3 @@ public class DMap extends ADelegate
 	}
 
 }
-
-/* 
- * $Log$
- * Revision 1.4  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.3  2006/02/16 17:41:08  walczak
- * no reference to strings in Maps but a direct inclusion.
- *
- * Revision 1.2  2006/01/20 18:11:01  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */

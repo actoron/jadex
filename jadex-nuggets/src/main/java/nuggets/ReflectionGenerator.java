@@ -35,7 +35,7 @@ public class ReflectionGenerator implements IDelegateGenerator
 	 * @return a reflection delegate
 	 * @see nuggets.IDelegateGenerator#generateDelegate(java.lang.Class, java.util.Map)
 	 */
-	public IDelegate generateDelegate(Class clazz, Map props)
+	public IDelegate generateDelegate(Class clazz, Map props, ClassLoader classloader)
 	{
 		return new ReflectionDelegate(clazz, props);
 	}
@@ -57,9 +57,9 @@ public class ReflectionGenerator implements IDelegateGenerator
 		 * @param cruncher
 		 * @see nuggets.IDelegate#persist(java.lang.Object, nuggets.ICruncher)
 		 */
-		public void persist(Object o, ICruncher cruncher) 
+		public void persist(Object o, ICruncher cruncher, ClassLoader classloader) 
 		{
-			persist_recursive(o, cruncher, bp.length);
+			persist_recursive(o, cruncher, bp.length, classloader);
 		}
 
 		/** 
@@ -67,7 +67,7 @@ public class ReflectionGenerator implements IDelegateGenerator
 		 * @param cruncher
 		 * @param i 
 		 */
-		private void persist_recursive(Object o, ICruncher c, int i)
+		private void persist_recursive(Object o, ICruncher c, int i, ClassLoader classloader)
 		{
 			if (i==0) {
 				c.startConcept(o);
@@ -76,7 +76,7 @@ public class ReflectionGenerator implements IDelegateGenerator
 			IDelegate del = PersistenceHelper.getDefaultDelegate(bp[--i].getType());
 			if(del.isSimple())
 			{
-				persist_recursive(o, c, i);
+				persist_recursive(o, c, i, classloader);
 				try
 				{
 					if(bp[i].getType().isPrimitive())
@@ -98,11 +98,11 @@ public class ReflectionGenerator implements IDelegateGenerator
 				int id=0;
 				try
 				{
-					id = c.declare(bp[i].getGetter().invoke(o, EMPTY_OBJECT_ARRAY));
+					id = c.declare(bp[i].getGetter().invoke(o, EMPTY_OBJECT_ARRAY), classloader);
 				} catch(Exception e) {
 					throw new PersistenceException(e);
 				}
-				persist_recursive(o, c, i);
+				persist_recursive(o, c, i, classloader);
 				if (id!=0) c.put(bp[i].getName(), id);
 			}
 		}

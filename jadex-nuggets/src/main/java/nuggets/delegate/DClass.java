@@ -38,7 +38,7 @@ public class DClass extends ASimpleDelegate
 	 * @param mill
 	 * @see nuggets.delegate.ASimpleDelegate#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 
 		mill.startConcept(o);
@@ -97,32 +97,3 @@ public class DClass extends ASimpleDelegate
 		}
 	}
 }
-
-
-/* 
- * $Log$
- * Revision 1.8  2006/07/06 16:21:58  pokahr
- * *** empty log message ***
- *
- * Revision 1.7  2006/06/29 17:27:25  walczak
- * created a reflection delegate. alpha
- *
- * Revision 1.6  2006/02/23 17:46:25  walczak
- * LF
- *
- * Revision 1.5  2006/02/21 15:02:16  walczak
- * *** empty log message ***
- *
- * Revision 1.4  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.3  2006/02/16 17:41:08  walczak
- * no reference to strings in Maps but a direct inclusion.
- *
- * Revision 1.2  2006/01/20 18:11:02  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */

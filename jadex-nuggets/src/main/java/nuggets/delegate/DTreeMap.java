@@ -29,11 +29,11 @@ public class DTreeMap extends DMap
 	 * @param mill
 	 * @see nuggets.delegate.DMap#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 		TreeMap map = (TreeMap)o;
-		declareReferences(map, mill);
-		int cmpID = mill.declare(map.comparator());
+		declareReferences(map, mill, classloader);
+		int cmpID = mill.declare(map.comparator(), classloader);
 		mill.startConcept(o);
 		mill.put("comparator", cmpID);
 		addReferences(map, mill);
@@ -50,22 +50,4 @@ public class DTreeMap extends DMap
 		Comparator cmp = (Comparator)asm.getAttributeValue("comparator");
 		return new TreeMap(cmp);
 	}
-
-
 }
-
-/* 
- * $Log$
- * Revision 1.4  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.3  2006/02/16 17:41:08  walczak
- * no reference to strings in Maps but a direct inclusion.
- *
- * Revision 1.2  2006/01/20 18:11:01  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */

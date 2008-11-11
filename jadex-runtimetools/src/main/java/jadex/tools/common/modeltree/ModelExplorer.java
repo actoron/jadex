@@ -356,7 +356,8 @@ public class ModelExplorer extends JTree
 	{
 		Properties	props	= new Properties();
 		// Save root node.
-		String	treesave	= Nuggets.objectToXML(getRootNode());
+		ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+		String	treesave	= Nuggets.objectToXML(getRootNode(), cl);
 		props.addProperty(new Property("rootnode", treesave));
 				
 		// Save the last loaded file.

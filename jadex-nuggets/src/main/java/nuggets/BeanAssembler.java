@@ -54,6 +54,7 @@ public class BeanAssembler implements IAssembler
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			throw new PersistenceException(e);
 		}
 
@@ -248,7 +249,7 @@ public class BeanAssembler implements IAssembler
 			buffer = null;
 			int id = Integer.parseInt(reader.getID(), 16);
 			Class clazz = getClass(tag, classloader);
-			delegate = PersistenceHelper.getDelegate(clazz);
+			delegate = PersistenceHelper.getDelegate(clazz, classloader);
 			object = delegate.getInstance(clazz, this);
 			set(id, object);
 			delegate.assemble(object, this);
@@ -294,6 +295,9 @@ public class BeanAssembler implements IAssembler
 	/**
 	 * @param tag
 	 * @return the class for this tag
+	 * 
+	 * Java Bug with classloader.loadClass() fails in JDK6 for array types.
+	 * http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=8ba64503affecffffffffb6789c3d861677d?bug_id=6434149
 	 */
 	private Class getClass(String tag, ClassLoader classloader)
 	{
@@ -311,8 +315,8 @@ public class BeanAssembler implements IAssembler
 		try
 		{
 			if(pack != null && tag.indexOf('.') < 0)
-				return classloader.loadClass(pack + '.' + tag); // , true,
-			// Thread.currentThread().getContextClassLoader());
+				return Class.forName(pack + '.' + tag, true, classloader);
+//				return classloader.loadClass(pack + '.' + tag); 
 		}
 		catch(ClassNotFoundException e1)
 		{ 
@@ -320,8 +324,8 @@ public class BeanAssembler implements IAssembler
 		}
 		try
 		{
-			return classloader.loadClass(tag); // , true,
-			// Thread.currentThread().getContextClassLoader());
+			return Class.forName(tag, true, classloader);
+//			return classloader.loadClass(tag); 
 		}
 		catch(ClassNotFoundException e)
 		{

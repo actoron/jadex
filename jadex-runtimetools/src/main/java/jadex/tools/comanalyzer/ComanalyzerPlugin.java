@@ -8,6 +8,7 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 import jadex.bridge.Properties;
@@ -70,8 +71,7 @@ import nuggets.Nuggets;
  */
 public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.common.plugin.IAgentListListener
 {
-
-	// -------- constants --------
+	//-------- constants --------
 
 	// todo: 
 	/** The system event types. */
@@ -1386,7 +1386,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 //				{
 //					message_maps.add(messages[i].getParameters());
 //				}
-				String xml = Nuggets.objectToXML(new Object[]{agentlist.getAgents(), messagelist.getMessages()});
+				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+				String xml = Nuggets.objectToXML(new Object[]{agentlist.getAgents(), messagelist.getMessages()}, cl);
 
 				byte buffer[] = xml.getBytes();
 				File f = new File(fileName);
@@ -1480,7 +1481,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 //						addMessage(m);
 //					}
 //				}
-				Object[] stored = (Object[])Nuggets.objectFromXML(xml, null);
+				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+				Object[] stored = (Object[])Nuggets.objectFromXML(xml, cl);
 				
 				agentlist.removeAllAgents();
 				Agent[] agents = (Agent[])stored[0];

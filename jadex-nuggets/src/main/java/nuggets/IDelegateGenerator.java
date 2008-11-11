@@ -24,14 +24,6 @@ public interface IDelegateGenerator
 	 * @param props
 	 * @return a delegate for this class
 	 */
-	IDelegate generateDelegate(Class clazz, Map props);
+	IDelegate generateDelegate(Class clazz, Map props, ClassLoader classloader);
 
 }
-
-
-/* 
- * $Log$
- * Revision 1.1  2006/06/29 17:27:25  walczak
- * created a reflection delegate. alpha
- *
- */

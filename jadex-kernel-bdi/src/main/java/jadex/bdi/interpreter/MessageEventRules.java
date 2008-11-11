@@ -683,7 +683,9 @@ public class MessageEventRules
 					Object	value	= message.get(name);
 					IContentCodec	codec	= mtype.findContentCodec(codecs, message, name);
 					if(codec!=null)
-						message.put(name, codec.encode(value));
+					{
+						message.put(name, codec.encode(value, state.getTypeModel().getClassLoader()));
+					}
 				}
 				
 				// Check receivers

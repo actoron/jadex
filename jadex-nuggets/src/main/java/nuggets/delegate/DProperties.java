@@ -29,7 +29,7 @@ public class DProperties extends  ADelegate {
     * @param mill
     * @see nuggets.delegate.ASimpleDelegate#persist(java.lang.Object, nuggets.ICruncher)
     */
-   public void persist(Object o, ICruncher mill)
+   public void persist(Object o, ICruncher mill, ClassLoader classloader)
    {
 		  mill.startConcept(o);
         final Properties props = (Properties) o;
@@ -78,24 +78,3 @@ public class DProperties extends  ADelegate {
    
 	
 }
-
-/* 
- * $Log$
- * Revision 1.5  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.4  2006/02/15 10:42:31  walczak
- * removed StringBuffer from XMLReader,
- * removed "new" from XMLReadr,
- * made generated Delegates use set method,
- *
- * Revision 1.3  2006/02/14 17:39:05  walczak
- * new version of nuggets
- *
- * Revision 1.2  2006/01/20 18:11:02  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */

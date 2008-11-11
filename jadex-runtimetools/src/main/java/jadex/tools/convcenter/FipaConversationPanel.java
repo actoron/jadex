@@ -613,7 +613,8 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				map.put(paramsets[i].getName(), paramsets[i].getValues());
 			}
-			String	msg	= Nuggets.objectToXML(map);
+			ClassLoader cl = ((ILibraryService)agent.getPlatform().getService(ILibraryService.class)).getClassLoader();
+			String	msg	= Nuggets.objectToXML(map, cl);
 			return msg;
 		}
 //		catch(AgentTerminatedException e)

@@ -31,12 +31,12 @@ public class DTreeSet extends DCollection
 	 * @param mill
 	 * @see nuggets.delegate.DMap#persist(java.lang.Object, nuggets.ICruncher)
 	 */
-	public void persist(Object o, ICruncher mill)
+	public void persist(Object o, ICruncher mill, ClassLoader classloader)
 	{
 		TreeSet set=(TreeSet)o;
-		int cmp_id=mill.declare(set.comparator());
+		int cmp_id=mill.declare(set.comparator(), classloader);
 		Iterator it = ((Collection)o).iterator();
-		while(it.hasNext())			mill.declare(it.next());
+		while(it.hasNext())			mill.declare(it.next(), classloader);
 
 		  mill.startConcept(o);
 
