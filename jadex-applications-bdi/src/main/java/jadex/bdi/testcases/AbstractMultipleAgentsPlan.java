@@ -65,7 +65,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				agents.add(ca.getParameter("agentidentifier").getValue());
 				
 				SyncResultListener	listener	= new SyncResultListener();
-				IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+				IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
 				ams.createAgent(null, type, config, args[i], listener);
 				IAgentIdentifier aid = (IAgentIdentifier)listener.waitForResult();
 				listener = new SyncResultListener();	// Hack!!! Allow reuse of result listener?

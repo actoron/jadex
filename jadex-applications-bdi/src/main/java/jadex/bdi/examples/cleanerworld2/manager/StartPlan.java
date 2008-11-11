@@ -21,7 +21,7 @@ public class StartPlan extends Plan
 	public void body()
 	{
 		final IAMS ams =
-			(IAMS) getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+			(IAMS) getScope().getPlatform().getService(IAMS.class);
 		
 		Map environmentArgs = new HashMap();
 		final String envName = "CleanerWorld2";

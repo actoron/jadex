@@ -51,7 +51,7 @@ public class EnvironmentGui	extends JFrame
 						try
 						{
 							IGoal kill = agent.createGoal("ams_destroy_agent");
-							IAMS ams = (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+							IAMS ams = (IAMS)agent.getPlatform().getService(IAMS.class);
 							kill.getParameter("agentidentifier").setValue(ams.createAgentIdentifier(wobs[i].getName(), true));
 //							kill.getParameter("agentidentifier").setValue(new AgentIdentifier(wobs[i].getName(), true));
 							agent.dispatchTopLevelGoalAndWait(kill);

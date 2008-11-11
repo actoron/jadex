@@ -118,14 +118,14 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		final IAMS ams = (IAMS)access.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		final IAMS ams = (IAMS)access.getPlatform().getService(IAMS.class);
 		dealeraid = ams.createAgentIdentifier(LOCAL_DEALER, true);
 		dealertf = new JTextField(20);
 		dealertf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				IAMS ams = (IAMS)access.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+				IAMS ams = (IAMS)access.getPlatform().getService(IAMS.class);
 				dealeraid = ams.createAgentIdentifier(dealertf.getText(), false);
 //				dealeraid = new AgentIdentifier(dealertf.getText());
 				//dealertf.setText(dealeraid.getName());

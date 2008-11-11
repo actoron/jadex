@@ -406,7 +406,7 @@ public class EnvironmentGui	extends JFrame
 					{
 						// Hack!!! Should ignore remote cleaners.
 						IGoal	kill	= agent.createGoal("ams_destroy_agent");
-						IAgentIdentifier aid = ((IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE))
+						IAgentIdentifier aid = ((IAMS)agent.getPlatform().getService(IAMS.class))
 							.createAgentIdentifier(cleaners[i].getName(), true);
 						kill.getParameter("agentidentifier").setValue(aid);
 						agent.dispatchTopLevelGoalAndWait(kill);

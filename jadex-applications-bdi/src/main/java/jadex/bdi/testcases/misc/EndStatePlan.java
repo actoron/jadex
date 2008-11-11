@@ -45,7 +45,7 @@ public class EndStatePlan extends Plan
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("amscap.ams_search_agents");
-		IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
 		search.getParameter("description").setValue(ams.createAMSAgentDescription(worker));
 		dispatchSubgoalAndWait(search);
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");

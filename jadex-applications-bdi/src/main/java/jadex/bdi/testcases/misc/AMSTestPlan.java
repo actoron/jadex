@@ -49,7 +49,7 @@ public class AMSTestPlan extends Plan
 		// Try to search the AMS.
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
-		IAMS amsservice = (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		IAMS amsservice = (IAMS)getScope().getPlatform().getService(IAMS.class);
 		IAMSAgentDescription desc = amsservice.createAMSAgentDescription(null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		/*AMSAgentDescription	desc	= new AMSAgentDescription();

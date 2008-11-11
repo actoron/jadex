@@ -13,6 +13,7 @@ import jadex.rules.state.OAVObjectType;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.ref.WeakReference;
@@ -22,12 +23,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -76,6 +78,7 @@ public class OAVTreeModel implements TreeModel
 	 */
 	protected static List timerList;
 
+	
 	//-------- attributes --------
 	
 	/** The root node. */
@@ -94,15 +97,18 @@ public class OAVTreeModel implements TreeModel
 	 *  Because the state is a (possibly cyclic) graph, there may be more than one node for a single object! */
 	protected MultiCollection	nodes;
 	
-//	/** listener for tree change */
-//	protected EventListenerList listenerList = new EventListenerList();
-	
 	/** list for all created Attribute inspector nodes */
 	protected List inspectors;
+	
+//	/** Random to generate unique(?) IDs*/
+//	protected Random rng;
+	
+	/** UUID counter */
+	private int uuidcounter;
 
 	
 	//-------- constructors --------
-	
+
 	/**
 	 *  Create new OAV tree model.
 	 *  @param id	The root object id.
@@ -116,6 +122,8 @@ public class OAVTreeModel implements TreeModel
 		this.root	= new RootNode();
 		
 		this.inspectors = new ArrayList();
+//		this.rng = new Random(System.currentTimeMillis());
+		this.uuidcounter = 0;
 		
 		Timer refreshTimer = new Timer(5000, new ObjectInspectorRefreshAction(this));
 		refreshTimer.start();
@@ -129,7 +137,7 @@ public class OAVTreeModel implements TreeModel
 		// model -> copystate -> listener -> model$this0
 		// 				|-> state -> listener -> copystate-lister$this0
 		//					  ^-<- Agent
-		// IMHO the OAVTreeModel for the Introspector plugin will be only removed
+		// IMHO the OAVTreeModel for the Introspector plugin will be removed only
 		// if the Agent that was introspected is removed too
 		copy.addStateListener(new IOAVStateListener()
 		{
@@ -527,11 +535,6 @@ public class OAVTreeModel implements TreeModel
 		if(listeners==null)
 			listeners	= new HashSet();
 		listeners.add(l);
-		
-//		// TO DO: change to listeners ^^
-//		if(listenerList == null)
-//			listenerList = new EventListenerList();
-//		listenerList.add(TreeModelListener.class, l);
 	}
 
 	/**
@@ -541,10 +544,6 @@ public class OAVTreeModel implements TreeModel
 	{
 		if(listeners!=null)
 			listeners.remove(l);
-		
-//		// TO DO: change to listeners ^^
-//		if(listenerList != null)
-//			listenerList.remove(TreeModelListener.class, l);
 	}
 
 	/**
@@ -555,18 +554,27 @@ public class OAVTreeModel implements TreeModel
 		// ignored...
 	}
 	
+	// --- helper methods to update the tree ---
+	
 	/**
-	 * Regenerate Tree if root node changed
-	 * @param oldRoot
+	 * Generate a unique id for ObjectNode's
+	 * @return synchronized call to System.currentTimeMillis();
+	 */
+	protected synchronized int getNextNodeUUID() 
+	{
+		//return rng.nextInt();
+		return uuidcounter += 1;
+		//return new Long(System.currentTimeMillis());
+	}
+	
+	/**
+	 * Regenerate subtree if a node was replaced
+	 * @param treePath The Path to the node that was changed
 	 */
 	protected void fireTreeStructureChanged(Object[] treePath)
 	{
 		TreeModelEvent event = 
 			new TreeModelEvent(this, treePath);
-//		Object[] listener = listenerList.getListenerList();
-//		for (int i = listener.length - 2; i >= 0; i -= 2)
-//			((TreeModelListener) listener[i + 1]).treeStructureChanged(event);
-//		
 		if (listeners != null)
 		{
 			TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
@@ -578,27 +586,88 @@ public class OAVTreeModel implements TreeModel
 		}
 	}
 
-	/** Returns the FIRST occurrence of child in given children list */
+	/**
+	 * Tests if two lists of Inspector nodes (e.g. children) 
+	 * are semantically equals
+	 * @param l1 list to test
+	 * @param l2 list to test
+	 * @return true if the lists are the same or contains the semantically same objects in the same order
+	 */
+	protected boolean testInspectorNodesListEquals(List l1, List l2)
+	{
+		if (l1 == l2)
+		    return true;
+		if (!(l1 instanceof List) || !(l2 instanceof List))
+		    return false;
+
+		ListIterator e1 = l1.listIterator();
+		ListIterator e2 = l2.listIterator();
+		while(e1.hasNext() && e2.hasNext()) 
+		{
+		    Object o1 = e1.next();
+		    Object o2 = e2.next();
+		    try 
+		    {
+			    if (!(o1==null ? o2==null : ((AbstractInspectorNode)o1).equals(o2, false)))
+			    	return false;
+		    }
+		    catch (ClassCastException e)
+		    {
+		    	return false;
+		    }
+		}
+		return !(e1.hasNext() || e2.hasNext());
+
+	}
+	
+	/**
+	 * Get the index for a child in children list, beginning with index=0
+	 * @see getIndexForChild(List children, Object child, int start)
+	 */
 	protected int getIndexForChild(List children, Object child)
+	{
+		return getIndexForChild(children, child, 0);
+	}
+	
+	/** 
+	 * Returns the FIRST occurrence of child in given children list. 
+	 * Be sure to remove the child from the list or to save the index 
+	 * to find additional occurrences of the child in later searches.
+	 * <p>
+	 * This method is using the "equals(Object o, boolean checkUID)" method 
+	 * to find a child with the checkUID parameter set to false and can be used
+	 * to find a semantically equal child.
+	 * <p>
+	 * @param children List to search for the child.
+	 * @param child The child to search for.
+	 * @return the FIRST index for the child in the children list
+	 */
+	protected int getIndexForChild(List children, Object child, int start)
 	{
 		
 		assert children != null; 
 		int index	= -1;
 		
-		for(int i=0; index==-1 && i<children.size(); i++)
+		for(int i=start; index==-1 && i<children.size(); i++)
+//		for(int i=children.size()-1; i>=0 && index == -1; i--)
 		{
 			if((children.get(i) instanceof ObjectNode) 
-				&& ((ObjectNode)children.get(i)).objequals(child, false))
+				&& ((ObjectNode)children.get(i)).equals(child, false))
 			{
 				index = i;
 			}
 			else if ((children.get(i) instanceof ObjectInspectorNode) 
-					&& ((ObjectInspectorNode)children.get(i)).objequals(child, false))
+					&& ((ObjectInspectorNode)children.get(i)).equals(child, false))
+			{
+				index = i;
+			}
+			else if ((children.get(i) instanceof ObjectInspectorAttributeNode) 
+					&& ((ObjectInspectorAttributeNode)children.get(i)).equals(child, false))
 			{
 				index = i;
 			}
 			else if ((children.get(i) instanceof ObjectInspectorValueNode) 
-					&& ((ObjectInspectorValueNode)children.get(i)).objequals(child, false))
+					&& ((ObjectInspectorValueNode)children.get(i)).equals(child, false))
 			{
 				index = i;
 			}
@@ -637,7 +706,7 @@ public class OAVTreeModel implements TreeModel
 			// TO DO: decide which implementation is more efficient
 			
 			for (int inspectorIndex = inspectorNodes.length-1; inspectorIndex >= 0; inspectorIndex--)
-			//for (int inspectorIndex = 0; inspectorIndex < inspectorNodes.length; inspectorIndex++)
+//			for (int inspectorIndex = 0; inspectorIndex < inspectorNodes.length; inspectorIndex++)
 			{
 				if (inspectorNodes[inspectorIndex] instanceof ObjectInspectorAttributeNode)
 				{
@@ -652,15 +721,14 @@ public class OAVTreeModel implements TreeModel
 						List newchildren = node.getChildren();
 						node.children = oldchildren;
 						
-						// HACK! This works only for fields declared as Array
-						// not for Object fields with an array bound to it
 						if (node.isArrayNode())
 						{
 							// if we have a simple type we don't have to check subtrees, 
 							// simply remove old and add new children
-							if (!OAVTreeModel.isInspectable(node.type.getComponentType(), true))
+							if (!isInspectable(node.type.getComponentType(), true))
 							{
-								if (!oldchildren.equals(newchildren))
+								//if (!oldchildren.equals(newchildren))
+								if (!testInspectorNodesListEquals(oldchildren, newchildren))
 								{
 									node.children = newchildren;
 									fireTreeStructureChanged(node.getPath());
@@ -670,245 +738,149 @@ public class OAVTreeModel implements TreeModel
 							// expanded subtree.
 							else
 							{
-//								// ############ this implementation collapse all subtrees ###########
-//								
-//								// replace all new children with existing old ones
-//								// then fire TreeStructureChanged
-//								for (Iterator iterator = oldchildren.iterator(); iterator.hasNext();)
-//								{
-//									Object oldchild = iterator.next();
-//									int newIndex = newchildren.indexOf(oldchild);
-//									if (newIndex != -1)
-//									{
-//										Object newchild = newchildren.get(newIndex);
-//										newchildren.remove(newIndex);
-//										newchildren.add(newIndex, oldchild);
-//										if (newchild instanceof ObjectInspectorNode)
-//											((ObjectInspectorNode) newchild).drop();
-//									} else {
-//										if (oldchild instanceof ObjectInspectorNode)
-//											((ObjectInspectorNode) oldchild).drop();
-//									}
-//								}
-//								node.children = newchildren;
-//								fireTreeStructureChanged(node.getPath());
-//								
-//								/// ####################################################################
-								
-
-								
-								// Number of children and index of a child can change at runtime for arrays
-								// array size is the same, assume the same array with (maybe) different values
-								if (oldchildren.size() == newchildren.size())
-									// WORKS !!!
+								// List to save already selected children from newchildren
+								// Needed to avoid double select of the same value in an array
+								List prevSelectedChildren = new ArrayList();
+							
+								// Handle removed children
+								Map removedChildren = new TreeMap();
+								for (int i = 0; i < oldchildren.size(); i++)
 								{
+									Object oldchild = oldchildren.get(i);
 									
-									// This implementation is only a special handling for arrays of the same
-									// size, the job is also done by the oldchildren.size() != newchildren.size()
-									// implementation
-									
-									Map changedSimpleChildren = new HashMap();
-									
-									// check if children has changed and what a tree update is needed
-									for (int childrenIndex = 0; childrenIndex < newchildren.size(); childrenIndex++)
+									// use only not previous selected children 
+									int index = getIndexForChild(newchildren, oldchild, 0);
+									while (index != -1 && prevSelectedChildren.contains(newchildren.get(index)))
 									{
-										Object	oldchild = 	oldchildren.get(childrenIndex);
-										Object	newchild = 	newchildren.get(childrenIndex);
-										// new child is not equal, so update it
-										if (!(oldchild.equals(newchildren))) {
-		
-											// handle ObjectInspectorNode's 
-											if (oldchild instanceof ObjectInspectorNode || newchild instanceof ObjectInspectorNode)
-											{
-												// check if the object node represents the same nodeObject
-												if (oldchild instanceof ObjectInspectorNode && newchild instanceof ObjectInspectorNode
-														&& ((ObjectInspectorNode)oldchild).nodeObject == ((ObjectInspectorNode)newchild).nodeObject)
-												{
-													// the ObjectNodes represents the same Object so we can use the old one, 
-													// but maybe a tree display (toString) update is needed
-													changedSimpleChildren.put(new Integer(childrenIndex), oldchild);
-												}
-												else {
-													// children are different objects, replace the old child with the new child
-													oldchildren.remove(childrenIndex);
-													oldchildren.add(childrenIndex, newchild);
-													// and drop the old one if it was a ObjectInspectorNode
-													if (oldchild instanceof ObjectInspectorNode)
-														((ObjectInspectorNode) oldchild).drop();
-													// the represented object has changed, we need a tree structure update for changed node
-													fireTreeStructureChanged((Object[]) SUtil.joinArrays(node.getPath(), new Object[]{oldchild}));
-												}
-											}
-											else
-											{
-												// not the old child nor the new child was an object node, 
-												// we have to update the displayed tree string only
-												changedSimpleChildren.put(new Integer(childrenIndex), oldchild);
-											}
-										}
-									} // for (childrenIndex)
-		
-									// create and fire event for all changed children in the array
-									if (changedSimpleChildren != null && changedSimpleChildren.size() > 0)
-									{
-										// create arrays for event
-										Object[] changed = changedSimpleChildren.entrySet().toArray();
-										int[] indexes = new int[changed.length];
-										Object[] childs = new Object[changed.length];
-										for (int changedIndex = 0; changedIndex < changed.length; changedIndex++)
-										{
-											Map.Entry entry = (Map.Entry) changed[changedIndex];
-											indexes[changedIndex] = ((Integer) entry.getKey()).intValue();
-											childs[changedIndex] = entry.getValue();
-										}
-										
-										// create and fire event
-										event = new TreeModelEvent(this, node.getPath(), indexes, childs);
-//										System.out.println("Simple: " + event);
-//										for (int li = listener.length - 2; li >= 0; li -= 2)
-//										{
-//											//System.out.println("Inform listener: " + listener[li + 1] + " with " + event);
-//											((TreeModelListener) listener[li + 1]).treeNodesChanged(event);
-//										}
-										TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-										for(int i=0; i<alisteners.length; i++)
-										{
-											alisteners[i].treeNodesChanged(event);
-										}
+										prevSelectedChildren.add(newchildren.get(index));
+										index = getIndexForChild(newchildren, oldchild, index+1);
 									}
 									
+									//if (!newchildren.contains(oldchild))
+									// value was removed
+									if (index == -1)
+									{
+										// add it to removedChildren
+										removedChildren.put(new Integer(i), oldchild);
+										// don't remove child from old children here! This will change 
+										// index of other child's as well
+									}
 								}
-								// new children size is different than old children
-								else if (newchildren.size() != oldchildren.size())
-//								if (!newchildren.equals(oldchildren))
+								// clear selected children after use
+								prevSelectedChildren.clear();
+
+								// remove the removed from oldchildren an store 
+								// index and value in change event arrays
+								Object[] removed = removedChildren.entrySet().toArray();
+								int[] indexes = new int[removed.length];
+								Object[] childs = new Object[removed.length];
+								for (int i = 0; i < removed.length; i++)
 								{
-									// check which children are removed
-									// check which children are the same 
-									// check which children where added
-									// merge into a new list
-									// update namePrefix for array
-									// fire remove event
-									// fire insert event
+									Map.Entry entry = (Map.Entry) removed[i];
+									indexes[i] = ((Integer) entry.getKey()).intValue();
+									childs[i] = entry.getValue();
 									
-									HashMap removedChildren = new HashMap();
-									for (int childrenIndex = 0; childrenIndex < oldchildren.size(); childrenIndex++)
+									// drop child if it is an inspector node
+									if (entry.getValue() instanceof ObjectInspectorNode)
+										((ObjectInspectorNode) entry.getValue()).drop();
+									
+									// remove from children list
+									oldchildren.remove(entry.getValue());
+									//oldchildren.remove(getIndexForChild(oldchildren, entry.getValue()));
+								}
+								
+								// Handle inserted children
+								// replace the rest of old children at their position in new children
+								// save the not replaced children as added nodes in change event arrays
+								Map insertedChildren = new TreeMap();
+								for (int i = 0; i < newchildren.size(); i++)
+								{
+									Object newchild = newchildren.get(i);
+									
+									// use only not previous selected children 
+									int index = getIndexForChild(oldchildren, newchild, 0);
+									while (index != -1 && prevSelectedChildren.contains(newchildren.get(index)))
 									{
-										Object oldchild = oldchildren.get(childrenIndex);
-										// value was removed
-										//if (!newchildren.contains(oldchild))
-										if (getIndexForChild(newchildren, oldchild) == -1)
-										{
-											// add it to removedChildren
-											removedChildren.put(new Integer(childrenIndex), oldchild);
-											// don't remove child from old children here! This will change 
-											// index of other child's as well
-										}
-									}
-
-									// remove the removed from oldchildren an store 
-									// index and value in change event arrays
-									Object[] removed = removedChildren.entrySet().toArray();
-									int[] indexes = new int[removed.length];
-									Object[] childs = new Object[removed.length];
-									for (int removedIndex = 0; removedIndex < removed.length; removedIndex++)
-									{
-										Map.Entry entry = (Map.Entry) removed[removedIndex];
-										indexes[removedIndex] = ((Integer) entry.getKey()).intValue();
-										childs[removedIndex] = entry.getValue();
-										
-										// drop child if it is an inspector node
-										if (entry.getValue() instanceof ObjectInspectorNode)
-											((ObjectInspectorNode) entry.getValue()).drop();
-										
-										// remove from children list
-										//oldchildren.remove(entry.getValue());
-										oldchildren.remove(indexes[removedIndex]);
+										prevSelectedChildren.add(oldchildren.get(index));
+										index = getIndexForChild(oldchildren, newchild, index+1);
 									}
 									
-									// replace the rest of old children at their position in new children
-									// save the not replaced children as added nodes in change event arrays
-									HashMap insertedChildren = new HashMap();
-									for (int childrenIndex = 0; childrenIndex < newchildren.size(); childrenIndex++)
+									// replace new with old as there may be expanded sub trees
+									//if (oldchildren.contains(newchild))
+									if (index != -1)
 									{
-										Object newchild = newchildren.get(childrenIndex);
-										// replace new with old as there may be expanded sub trees
-										//if (oldchildren.contains(newchild))
-										int newchildIndex = getIndexForChild(oldchildren, newchild);
-										if (newchildIndex != -1)
-										{
-											//Object oldchild = oldchildren.get(oldchildren.indexOf(newchild));
-											Object oldchild = oldchildren.get(newchildIndex);
-											newchildren.remove(childrenIndex);
-											newchildren.add(childrenIndex, oldchild);
-											// drop newchild, it was replaced by the old one
-											if (newchild instanceof ObjectInspectorNode)
-												((ObjectInspectorNode) newchild).drop();
-										}
-										// value was added
-										else
-										{
-											// register children for change event
-											insertedChildren.put(new Integer(childrenIndex), newchild);
-										}
+										//Object oldchild = oldchildren.get(oldchildren.indexOf(newchild));
+										Object oldchild = oldchildren.get(index);
+										// remove oldchild from oldchildren 
+										//(needed to support same object twice in arrays)
+										oldchildren.remove(index);
+										newchildren.remove(i);
+										newchildren.add(i, oldchild);
+										// drop newchild, it was replaced by the old one
+										if (newchild instanceof ObjectInspectorNode)
+											((ObjectInspectorNode) newchild).drop();
 									}
-									 
-									// create the array for nodes added change event 
-									Object[] inserted = insertedChildren.entrySet().toArray();
-									int[] insertedIndexes = new int[inserted.length];
-									Object[] insertedChilds = new Object[inserted.length];
-									for (int insertedIndex = 0; insertedIndex < inserted.length; insertedIndex++)
+									// value was added
+									else
 									{
-										Map.Entry entry = (Map.Entry) inserted[insertedIndex];
-										insertedIndexes[insertedIndex] = ((Integer) entry.getKey()).intValue();
-										insertedChilds[insertedIndex] = entry.getValue();
+										// register children for change event
+										insertedChildren.put(new Integer(i), newchild);
 									}
-									
-									// update the name prefix for children
-									for (int newChildrenIndex = 0; newChildrenIndex < newchildren.size(); newChildrenIndex++)
+								}
+								// clear selected children after use
+								prevSelectedChildren.clear();
+								
+								// update the name prefix for children
+								for (int i = 0; i < newchildren.size(); i++)
+								{
+									Object obj = newchildren.get(i);
+									if (obj instanceof ObjectInspectorNode)
 									{
-										Object obj = newchildren.get(newChildrenIndex);
-										if (obj instanceof ObjectInspectorNode)
-										{
-											((ObjectInspectorNode) obj).namePrefix = "["+newChildrenIndex+"] ";
-										}
-										else if (obj instanceof ObjectInspectorValueNode)
-										{
-											((ObjectInspectorValueNode) obj).namePrefix = "["+newChildrenIndex+"] ";
-										}
+										((ObjectInspectorNode) obj).namePrefix = "["+i+"] ";
 									}
-
-									// add the new children as node children
-									node.children = newchildren;
-									
-									TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-									
-									// create and fire event for removed children
+									else if (obj instanceof ObjectInspectorValueNode)
+									{
+										((ObjectInspectorValueNode) obj).namePrefix = "["+i+"] ";
+									}
+								}
+								
+								// create the array for nodes inserted change event 
+								Object[] inserted = insertedChildren.entrySet().toArray();
+								int[] insertedIndexes = new int[inserted.length];
+								Object[] insertedChilds = new Object[inserted.length];
+								for (int insertedIndex = 0; insertedIndex < inserted.length; insertedIndex++)
+								{
+									Map.Entry entry = (Map.Entry) inserted[insertedIndex];
+									insertedIndexes[insertedIndex] = ((Integer) entry.getKey()).intValue();
+									insertedChilds[insertedIndex] = entry.getValue();
+								}
+								
+								// add the new children as node children
+								node.children = newchildren;
+								
+								TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+								
+								// create and fire event for removed children
+								if (removedChildren.size() > 0)
+								{
 									event = new TreeModelEvent(this, node.getPath(), indexes, childs);
 									for(int i=0; i<alisteners.length; i++)
 									{
 										alisteners[i].treeNodesRemoved(event);
 									}
-//									for (int li = listener.length - 2; li >= 0; li -= 2)
-//									{
-//										//System.out.println("Inform listener: " + listener[li + 1] + " with " + event);
-//										((TreeModelListener) listener[li + 1]).treeNodesRemoved(event);
-//									}
-//									System.out.println("Removed: " + event);
-									
-									// create and fire event for added children
+									//System.out.println("Removed: " + event);
+								}
+								
+								// create and fire event for inserted children
+								if (insertedChildren.size() > 0)
+								{
 									event = new TreeModelEvent(this, node.getPath(), insertedIndexes, insertedChilds);
 									for(int i=0; i<alisteners.length; i++)
 									{
 										alisteners[i].treeNodesInserted(event);
 									}
-//									for (int li = listener.length - 2; li >= 0; li -= 2)
-//									{
-//										//System.out.println("Inform listener: " + listener[li + 1] + " with " + event);
-//										((TreeModelListener) listener[li + 1]).treeNodesInserted(event);
-//									}
-//									System.out.println("Inserted: " + event);
-
-								} // if (different size of children lists) 
+									//System.out.println("Inserted: " + event);
+								}
 							}
 						}
 						// we have no array, so expect only one child for the attribute node
@@ -919,9 +891,10 @@ public class OAVTreeModel implements TreeModel
 							// An attribute field can only have one value
 							assert newchildren.size() == 1 : node;
 							
-							if ( !(oldchildren.get(0).equals(newchildren.get(0))) )
+							//if ( !(oldchildren.get(0).equals(newchildren.get(0))) )
+							if ( getIndexForChild(oldchildren, newchildren.get(0)) == -1 )
 							{
-								// replace old children with new children and drop it
+								// replace old children with new children and drop old
 								node.children = newchildren;
 								if (oldchildren.get(0) instanceof ObjectInspectorNode)
 								{
@@ -929,18 +902,25 @@ public class OAVTreeModel implements TreeModel
 								}
 								
 								// create and fire event
-								event = new TreeModelEvent(this, node.getPath(), new int[]{0}, new Object[]{oldchildren.get(0)});
-//								System.out.println("Simple: " + event);
-								TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-								for(int i=0; i<alisteners.length; i++)
+								if (oldchildren.get(0) instanceof ObjectInspectorNode || newchildren.get(0) instanceof ObjectInspectorNode)
 								{
-									alisteners[i].treeNodesChanged(event);
+									// regenerate tree if inspector object node has changed
+									fireTreeStructureChanged((Object[]) SUtil.joinArrays(node.getPath(), new Object[]{oldchildren.get(0)}));
 								}
-//								for (int li = listener.length - 2; li >= 0; li -= 2)
-//								{
-//									//System.out.println("Inform listener: " + listener[li + 1] + " with " + event);
-//									((TreeModelListener) listener[li + 1]).treeNodesChanged(event);
-//								}
+								else
+								{
+									// only redraw node if we have a inspector value
+									event = new TreeModelEvent(this, node.getPath(), new int[]{0}, new Object[]{oldchildren.get(0)});
+//									System.out.println("Changed: " + event);
+									TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+									for(int i=0; i<alisteners.length; i++)
+									{
+										alisteners[i].treeNodesChanged(event);
+										
+									}
+								}
+								
+								
 							}
 							else if (newchildren.get(0) instanceof ObjectInspectorNode)
 							{
@@ -970,7 +950,7 @@ public class OAVTreeModel implements TreeModel
 	public static JPanel	createOAVPanel(IOAVState state)
 	{
 		final OAVTreeModel	model	= new OAVTreeModel(state);
-		JTree tree = new JTree(model);
+		JTree	tree	= new JTree(model);
 		tree.setRootVisible(false);
 
 		// Open first tree entry when only one exists (Hack?)
@@ -1004,16 +984,7 @@ public class OAVTreeModel implements TreeModel
 		frame.setSize(600, 400);		
 		return frame;
 	}
-	
-	/**
-	 * Generate a unique id for ObjectNode's
-	 * @return synchronized call to System.currentTimeMillis();
-	 */
-	protected static synchronized long getNextNodeUUID() 
-	{
-		return System.currentTimeMillis();
-	}
-	
+
 	/**
 	 *  Decide if java object should be inspectable.
 	 */
@@ -1033,7 +1004,7 @@ public class OAVTreeModel implements TreeModel
 	
 	/**
 	 *  Decide if java object should be inspectable.
-	 *  This method is used to test the 
+	 *  This method test if clazz.isAssignableFrom([String|Number|Character|])
 	 */
 	protected static boolean	isInspectable(Class clazz, boolean inspectObjectClass)
 	{
@@ -1059,7 +1030,7 @@ public class OAVTreeModel implements TreeModel
 	 */
 	public static void setRefreshDelay(int millis)
 	{
-		System.out.println("Set OAVTreeModel refresh delay to " + millis);
+//		System.out.println("Set OAVTreeModel refresh delay to " + millis);
 		if (timerList != null)
 		{
 			if (millis > 0)
@@ -1106,6 +1077,47 @@ public class OAVTreeModel implements TreeModel
 		}
 	}
 
+	/** A abstract node for this model */ 
+	abstract class AbstractInspectorNode
+	{
+		/** The parent node */
+		protected Object	parent;
+		
+		/** The children of this node (cached)*/
+		protected List 	children;
+
+		/** The path from the root node to this node. */
+		protected Object[]	path;
+		
+		/** A unique id for this node */
+		protected int 	nodeUUID;
+		
+		// --- constructor ---
+		
+		protected AbstractInspectorNode()
+		{
+			nodeUUID = getNextNodeUUID();
+		}
+		
+		// --- abstract methods ---
+		
+		public abstract List getChildren();
+		
+		public abstract Object[] getPath();
+		
+		protected abstract boolean equals(Object obj, boolean checkUUID);
+		
+		// --- methods ---
+		
+		public void drop() { };
+		
+		public int hashCode()
+		{		
+			return nodeUUID;
+		}
+		
+	}
+	
 	/**
 	 *  A node representing an attribute value.
 	 */
@@ -1113,17 +1125,20 @@ public class OAVTreeModel implements TreeModel
 	{
 		//-------- attributes --------
 		
-		/** The object node. */
-		protected ObjectNode	parent;
-		
 		/** The attribute. */
 		protected OAVAttributeType	attribute;
 		
+		/** The object node. */
+		protected ObjectNode	parent;
+
 		/** The children. */
 		protected List	children;
 		
 		/** The path from the root node to this node. */
 		protected Object[]	path;
+		
+		/** A unique id for this node */
+		protected int nodeUUID;
 
 		//-------- constructors --------
 		
@@ -1136,6 +1151,8 @@ public class OAVTreeModel implements TreeModel
 		{
 			this.parent	= parent;
 			this.attribute	= attribute;
+			
+			this.nodeUUID = getNextNodeUUID();
 		}
 		
 		//-------- methods --------
@@ -1231,18 +1248,35 @@ public class OAVTreeModel implements TreeModel
 			return name; //+" (attribute)";
 		}
 		
-		public boolean equals(Object obj)
+		protected boolean equals(Object obj, boolean checkUUID)
 		{
-			return obj instanceof AttributeNode
+			boolean ret = 
+				obj instanceof AttributeNode
 				&& ((AttributeNode)obj).parent==parent 
 				&& ((AttributeNode)obj).attribute==attribute;
+			
+			if (checkUUID && ret)
+				ret = ret && ((AttributeNode)obj).nodeUUID==nodeUUID;
+			
+			return ret;
+		}
+		
+		public boolean equals(Object obj)
+		{
+//			return obj instanceof AttributeNode
+//				&& ((AttributeNode)obj).parent==parent 
+//				&& ((AttributeNode)obj).attribute==attribute;
+			
+			return equals(obj, true);
 		}
 		
 		public int hashCode()
 		{
-			int	ret	= 31 + parent.hashCode();
-			ret	= ret*31 + attribute.hashCode();
-			return ret;
+//			int	ret	= 31 + parent.hashCode();
+//			ret	= ret*31 + attribute.hashCode();
+//			return ret;
+			
+			return nodeUUID;
 		}		
 	}
 	
@@ -1253,12 +1287,12 @@ public class OAVTreeModel implements TreeModel
 	{
 		//-------- attributes --------
 		
-		/** The parent node (attribute or root node). */
-		protected Object	parent;
-		
 		/** The object. */
 		protected Object	object;
 		
+		/** The parent node (attribute or root node). */
+		protected Object	parent;
+
 		/** The children. */
 		protected List	children;
 
@@ -1266,7 +1300,7 @@ public class OAVTreeModel implements TreeModel
 		protected Object[]	path;
 		
 		/** A unique id for this node */
-		protected long nodeUID;
+		protected int nodeUUID;
 		
 		//-------- constructors --------
 		
@@ -1280,7 +1314,7 @@ public class OAVTreeModel implements TreeModel
 		{
 			this.parent	= parent;
 			this.object	= object;
-			this.nodeUID = OAVTreeModel.getNextNodeUUID();
+			this.nodeUUID = getNextNodeUUID();
 			nodes.put(object, this);
 		}
 		
@@ -1380,39 +1414,43 @@ public class OAVTreeModel implements TreeModel
 			return ret;
 		}
 		
-		protected boolean objequals(Object obj, boolean checkUUID) 
+		/**
+		 * This method can be used to do a sematically equals check.
+		 * E.g. check only the fields, not the unique identifier.
+		 * @param obj Object to test for equals
+		 * @param checkUUID flag to check the unique Identifier for the node. <br><code>true</code>=do a compete equals check<br><code>false</code>=do a sematically equals check
+		 */
+		protected boolean equals(Object obj, boolean checkUUID) 
 		{
-			// we have swing drawing errors if only the object 
-			// reference is compared, e.g. for "OAVState" objects in
-			// "sentmessageevents" node for an agents.
-			// Workaround: Use a unique id as well
 			boolean ret =  obj instanceof ObjectNode
 					&& ((ObjectNode)obj).object==object;
+			
 			if (checkUUID && ret)
-				ret = ret && ((ObjectNode)obj).nodeUID==nodeUID;
+				ret = ret && ((ObjectNode)obj).nodeUUID==nodeUUID;
 			
 			return ret;
 		}
 		
 		public boolean equals(Object obj)
 		{
-			return objequals(obj, true);
-//			return obj instanceof ObjectNode
-//				&& ((ObjectNode)obj).object==object
-//				&& ((ObjectNode)obj).nodeUID==nodeUID;
-			
+			return equals(obj, true);
 		}
 		
 		public int hashCode()
 		{
-			return 31 + object.hashCode();
+//			int ret = 31 + object.hashCode();
+//				//ret = ret*31 + nodeUUID;
+//				//ret = ret*31	+ (nodeUUID != null ? nodeUUID.hashCode() : 0);
+//			return ret;
+			
+			return nodeUUID;
 		}
 	}
 	
 	/**
 	 *  The root node containing the nodes for the root objects of the state.
 	 */
-	public class RootNode
+	public class RootNode 
 	{
 		//-------- attributes --------
 		
@@ -1453,24 +1491,18 @@ public class OAVTreeModel implements TreeModel
 		}		
 	}
 	
-
+	
 
 	/**
 	 * TreeModel node for java object inspection
 	 * @author claas
 	 *
 	 */
-	class ObjectInspectorNode
+	class ObjectInspectorNode extends AbstractInspectorNode
 	{
-
+		
 		/** The Class type for this node */
 		protected Class type;
-		
-		/** The name for this node e.g. the objects name */
-		protected String name;
-		
-		/** A prefix to display with name, e.g. for arrays "[index]" */
-		protected String namePrefix;
 		
 		/** The object represented by this node */
 		protected Object nodeObject;
@@ -1478,14 +1510,11 @@ public class OAVTreeModel implements TreeModel
 		/** The list of fields of the represented object*/
 		protected List fields;
 		
-		/** The children of this node (cached)*/
-		protected List children;
+		/** The name for this node e.g. the objects name */
+		protected String name;
 		
-		/** The parent node (attribute or root node). */
-		protected Object	parent;
-		
-		/** The path from the root node to this node. */
-		protected Object[]	path;
+		/** A prefix to display with name, e.g. for arrays "[index]" */
+		protected String namePrefix;
 
 		// ---- constructors ----
 		
@@ -1551,7 +1580,7 @@ public class OAVTreeModel implements TreeModel
 							// get only nonstatic fields
 							if ((f[i].getModifiers() & Modifier.STATIC) == 0)
 								fields.add(f[i]);
-							// TODO: Filter other fields as well?
+							// TO-DO: Filter other fields as well?
 						}
 					}
 				}
@@ -1633,18 +1662,43 @@ public class OAVTreeModel implements TreeModel
 			}
 		}
 		
+		/** 
+		 * Access the object represented by this node
+		 * @return the nodeObject Attribute
+		 */
 		protected Object getNodeObject()
 		{
-//			if (this.isInpsectionRootNode)
+//			if (isInpsectionRootNode())
 				return nodeObject;
 //			else
 //			{
 //				try
 //				{
-//					//return this.field.get(((ObjectInspectorAttributeNode)parent).getFieldValue());
-//					// parent is an attribute, use the attribute value for this node
-//					nodeObject = ((ObjectInspectorAttributeNode)parent).getFieldValue();
+//					Object obj = null;
+//					if (((ObjectInspectorAttributeNode)parent).isArrayNode())
+//					{
+//						// parent is an array attribute, use the attribute value for this node
+//						obj = ((ObjectInspectorAttributeNode)parent).getArrayValue();
+//					}
+//					else
+//					{
+//						// parent is an normal attribute, use the attribute value for this node
+//						obj = ((ObjectInspectorAttributeNode)parent).getFieldValue();
+//					}
+//					
+//					if (obj == nodeObject || (obj != null && obj.equals(nodeObject)))
+//					{
+//						// ignore, its the same object
+//					}
+//					else
+//					{
+//						// replace nodeObject
+//						nodeObject = obj;
+//						fields = null;
+//					}
+//					
 //					return nodeObject;
+//					
 //				} catch (Exception e)
 //				{
 //					return "-ERROR- Exception occurred: " + e; 
@@ -1652,8 +1706,19 @@ public class OAVTreeModel implements TreeModel
 //				}
 //			}
 		}
+		
+		protected boolean isInpsectionRootNode()
+		{
+			return (!(parent instanceof ObjectInspectorAttributeNode));
+		}
 
-		public boolean objequals(Object obj, boolean checkNamePrefix)
+		/**
+		 * This method can be used to do a sematically equals check.
+		 * E.g. check only the fields, not the unique identifier.
+		 * @param obj Object to test for equals
+		 * @param checkUUID flag to check the unique Identifier for the node. <br><code>true</code>=do a compete equals check<br><code>false</code>=do a sematically equals check
+		 */
+		protected boolean equals(Object obj, boolean checkUUID)
 		{
 			boolean ret = obj instanceof ObjectInspectorNode
 				&& ((ObjectInspectorNode)obj).parent==parent
@@ -1661,9 +1726,11 @@ public class OAVTreeModel implements TreeModel
 				&& ((ObjectInspectorNode)obj).name==name
 				&& (fields != null && fields.equals(((ObjectInspectorNode)obj).fields))
 				&& (nodeObject != null && nodeObject.equals(((ObjectInspectorNode) obj).nodeObject));
-			if (checkNamePrefix && ret)
-				ret = ret && (namePrefix == null ? ((ObjectInspectorNode)obj).namePrefix == null : namePrefix.equals(((ObjectInspectorNode)obj).namePrefix));
-		return ret;
+			
+			if (checkUUID && ret)
+				ret = ret && ((ObjectInspectorNode)obj).nodeUUID==nodeUUID;
+			
+			return ret;
 		}
 		
 		/* (non-Javadoc)
@@ -1671,18 +1738,7 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public boolean equals(Object obj)
 		{
-			return objequals(obj, true);
-//			boolean ret = obj instanceof ObjectInspectorNode
-//				&& ((ObjectInspectorNode)obj).parent==parent
-//				&& ((ObjectInspectorNode)obj).type==type
-//				&& ((ObjectInspectorNode)obj).name==name
-//				&& (fields != null && fields.equals(((ObjectInspectorNode)obj).fields))
-//				&& (nodeObject != null && nodeObject.equals(((ObjectInspectorNode) obj).nodeObject))
-//				// TO DO: respect array values more than once in an array
-//				// e.g.: new Object[]{test3, test3, test3}
-//				&& (namePrefix == null ? ((ObjectInspectorNode)obj).namePrefix == null : namePrefix.equals(((ObjectInspectorNode)obj).namePrefix))
-//				;
-//			return ret;
+			return equals(obj, true);
 		}
 		
 		/* (non-Javadoc)
@@ -1690,12 +1746,17 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public int hashCode()
 		{		
-			int ret = 31 + (parent != null ? parent.hashCode() : 0);
-				ret = ret*31	+ (type!=null ? type.hashCode() : 0);
-				ret = ret*31	+ (name!=null ? name.hashCode() : 0);
-				ret = ret*31	+ (fields != null ? fields.hashCode() : 0);
-				ret = ret*31	+ (nodeObject != null ? nodeObject.hashCode() : 0);
-			return ret;
+//			int ret = 31 + (parent != null ? parent.hashCode() : 0);
+//				ret = ret*31	+ (type!=null ? type.hashCode() : 0);
+//				ret = ret*31	+ (name!=null ? name.hashCode() : 0);
+//				ret = ret*31	+ (fields != null ? fields.hashCode() : 0);
+//				ret = ret*31	+ (nodeObject != null ? nodeObject.hashCode() : 0);
+//				//ret = ret*31	+ nodeUUID;
+//				//ret = ret*31	+ (nodeUUID != null ? nodeUUID.hashCode() : 0);
+//			return ret;
+			
+			return nodeUUID;
+			
 		}
 
 		/**
@@ -1721,7 +1782,7 @@ public class OAVTreeModel implements TreeModel
 	 * @author claas
 	 *
 	 */
-	class ObjectInspectorAttributeNode
+	class ObjectInspectorAttributeNode extends AbstractInspectorNode
 	{
 		
 		/** The field represented by this node */
@@ -1739,14 +1800,6 @@ public class OAVTreeModel implements TreeModel
 		 */
 		protected Object attributeValue;
 
-		/** The parent of this node */
-		protected ObjectInspectorNode parent;
-		
-		/** The children of this node */
-		protected List children;
-		
-		/** The path from the root node to this node. */
-		protected Object[]	path;
 
 		// ---- constructor -----
 		
@@ -1866,7 +1919,7 @@ public class OAVTreeModel implements TreeModel
 		{
 			try
 			{
-				return field.get(parent.getNodeObject());
+				return field.get(((ObjectInspectorNode)parent).getNodeObject());
 			} catch (Exception e)
 			{
 				//e.printStackTrace();
@@ -1885,10 +1938,9 @@ public class OAVTreeModel implements TreeModel
 		{
 			try
 			{
-				//if (type.isArray() || field.get(parent.getNodeObject()).getClass().isArray())
 				if (isArrayNode())
 				{
-					return Array.get(field.get(parent.getNodeObject()), parent.getChildren().indexOf(this)/*-1*/);
+					return Array.get(field.get(((ObjectInspectorNode)parent).getNodeObject()), ((ObjectInspectorNode)parent).getChildren().indexOf(this)/*-1*/);
 				}
 				else
 					return "-ERROR- getArrayValue called on a non array type";
@@ -1926,7 +1978,7 @@ public class OAVTreeModel implements TreeModel
 			{
 				if(parent!=null)
 				{
-					path	= (Object[])SUtil.joinArrays(parent.getPath(), new Object[]{this});
+					path	= (Object[])SUtil.joinArrays(((ObjectInspectorNode)parent).getPath(), new Object[]{this});
 				}
 				else
 				{
@@ -1937,18 +1989,20 @@ public class OAVTreeModel implements TreeModel
 			return path;
 		}
 
-		
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
+		/**
+		 * This method can be used to do a sematically equals check.
+		 * E.g. check only the fields, not the unique identifier.
+		 * @param obj Object to test for equals
+		 * @param checkUUID flag to check the unique Identifier for the node. <br><code>true</code>=do a compete equals check<br><code>false</code>=do a sematically equals check
 		 */
-		public boolean equals(Object obj)
+		protected boolean equals(Object obj, boolean checkUUID)
 		{
 			boolean ret = obj instanceof ObjectInspectorAttributeNode
 						&& ((ObjectInspectorAttributeNode) obj).parent == parent
 						&& ((ObjectInspectorAttributeNode) obj).field == field
 						&& ((ObjectInspectorAttributeNode) obj).name == name
 						;
-						
+
 			if (ret) 
 			{
 				Object objValue = ((ObjectInspectorAttributeNode) obj).attributeValue;
@@ -1959,11 +2013,19 @@ public class OAVTreeModel implements TreeModel
 				else
 					ret = (attributeValue==objValue);
 			}
+			
+			if (checkUUID && ret)
+				ret = ret && ((ObjectInspectorAttributeNode)obj).nodeUUID==nodeUUID;
 
 			return ret;
-			
-			
-			
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		public boolean equals(Object obj)
+		{
+			return equals(obj, true);
 		}
 
 		/* (non-Javadoc)
@@ -1971,12 +2033,16 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public int hashCode()
 		{
-			int ret = 31 + (parent != null ? parent.hashCode() : 0);
-				ret = ret*31	+ (field!=null ? field.hashCode() : 0);
-				ret = ret*31	+ (name!=null ? name.hashCode() : 0);
-				ret = ret*31	+ (attributeValue != null ? attributeValue.hashCode() : 0);
-				
-			return ret;
+//			int ret = 31 + (parent != null ? parent.hashCode() : 0);
+//				ret = ret*31	+ (field!=null ? field.hashCode() : 0);
+//				ret = ret*31	+ (name!=null ? name.hashCode() : 0);
+//				ret = ret*31	+ (attributeValue != null ? attributeValue.hashCode() : 0);
+//				//ret = ret*31	+ nodeUUID;
+//				
+//			return ret;
+			
+			return nodeUUID;
+			
 		}
 
 		/**
@@ -2016,38 +2082,53 @@ public class OAVTreeModel implements TreeModel
 	 * @author claas
 	 *
 	 */
-	class ObjectInspectorValueNode
+	class ObjectInspectorValueNode extends AbstractInspectorNode
 	{
 		// ---- attributes ----
 		
-		/** The parent for this node */
-		ObjectInspectorAttributeNode parent;
-
 		/** A simple value node can have a displayed name prefix e.g. for Arrays */
-		String namePrefix;
+		protected String namePrefix;
 		
 		/** The simple Object represented by this node */
-		Object value;
-		
+		protected Object value;
+
 		// --- constructor ----
 		
 		/** create a simple value node */
 		public ObjectInspectorValueNode(ObjectInspectorAttributeNode parent, String namePrefix, Object value)
 		{
-			this.parent = parent;
+			super.parent = parent;
+			
 			this.namePrefix = namePrefix;
 			this.value = value;
+			
 		}
 		
 		// --- methods ---
 		
-		protected boolean objequals(Object obj, boolean checkNamePrefix)
+		public List getChildren()
+		{
+			return null;
+		}
+		
+		public Object[] getPath()
+		{
+			return (Object[]) SUtil.joinArrays(((AbstractInspectorNode)super.parent).getPath(), new Object[]{this});
+		}
+		
+		/**
+		 * This method can be used to do a sematically equals check.
+		 * E.g. check only the fields, not the unique identifier.
+		 * @param obj Object to test for equals
+		 * @param checkUUID flag to check the unique Identifier for the node. <br><code>true</code>=do a compete equals check<br><code>false</code>=do a sematically equals check
+		 */
+		protected boolean equals(Object obj, boolean checkUUID)
 		{
 			boolean ret = (obj instanceof ObjectInspectorValueNode)
 				&& ((ObjectInspectorValueNode)obj).parent == parent
 				&& (value == null ? ((ObjectInspectorValueNode)obj).value == null : value.equals(((ObjectInspectorValueNode)obj).value));
-			if (checkNamePrefix && ret)
-				ret = ret && (namePrefix == null ? ((ObjectInspectorValueNode)obj).namePrefix == null : namePrefix.equals(((ObjectInspectorValueNode)obj).namePrefix));
+			if (checkUUID && ret)
+				ret = ret && ((ObjectInspectorValueNode)obj).nodeUUID==nodeUUID;
 			
 			return ret;
 		}
@@ -2057,14 +2138,22 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public boolean equals(Object obj)
 		{
-			return objequals(obj, true);
-//			return (obj instanceof ObjectInspectorValueNode)
-//				&& ((ObjectInspectorValueNode)obj).parent == parent
-//				&& (value == null ? ((ObjectInspectorValueNode)obj).value == null : value.equals(((ObjectInspectorValueNode)obj).value))
-//				// TO DO: respect array values more than once in an array
-//				// e.g.: new Object[]{test3, test3, test3}
-//				&& (namePrefix == null ? ((ObjectInspectorValueNode)obj).namePrefix == null : namePrefix.equals(((ObjectInspectorValueNode)obj).namePrefix))
-//				;
+			return equals(obj, true);
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		public int hashCode()
+		{
+//			int ret = 31	+ (parent != null ? parent.hashCode() : 0);
+//				ret = ret*31	+ (value!=null ? value.hashCode() : 0);
+//				//ret = ret*31	+ nodeUUID;
+//				//ret = ret*31	+ (nodeUUID != null ? nodeUUID.hashCode() : 0);
+//			return ret;
+			
+			return nodeUUID;
+				
 		}
 
 		/* (non-Javadoc)
@@ -2072,8 +2161,9 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public String toString()
 		{
-			
-			return (namePrefix != null ? namePrefix : "") + (value != null ? value : "null");
+			String ret = (namePrefix != null ? namePrefix : "") + (value != null ? value : "null");
+//			ret = "[ValueNode: " + ret + "]";
+			return ret;
 		}
 		
 	} // class ObjectInspectorValueNode
@@ -2105,6 +2195,20 @@ public class OAVTreeModel implements TreeModel
 				setIcon(icons.getIcon("value"));
 			return this;
 		}
+
+		/* (non-Javadoc)
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getPreferredSize()
+		 */
+		public Dimension getPreferredSize()
+		{
+			// change prefered size to disable the swing 
+			// "..." bug in tree display
+			Dimension d = new Dimension(super.getPreferredSize());
+			d.setSize(d.getWidth()+10, d.getHeight());
+			return d;
+		}
+		
+		
 	}
 
 	
@@ -2147,7 +2251,7 @@ class ObjectInspectorRefreshAction implements ActionListener
 			if (obj instanceof Timer)
 				OAVTreeModel.removeRefreshTimer((Timer) obj);
 			
-			System.err.println("removed timer! - " + obj);
+//			System.err.println("removed timer! - " + obj);
 		}
 	}
 	
