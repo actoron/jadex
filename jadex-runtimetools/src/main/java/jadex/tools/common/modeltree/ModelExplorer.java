@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeExpansionEvent;
@@ -796,26 +797,28 @@ public class ModelExplorer extends JTree
 		 */
 		public boolean execute()
 		{
-//			ClassLoader	oldcl	= Thread.currentThread().getContextClassLoader();
-//			if(classloader!=null)
-//				Thread.currentThread().setContextClassLoader(classloader);
-			
 //			System.out.println("refresher: "+nodes_user+", "+nodes_out);
 
 			// Process user nodes (iterate through children).
 			if(!nodes_user.isEmpty())
 			{
 				// Update node, if necessary.
-				IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_user.remove(0);
+				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_user.remove(0);
 				String	tip	= node.getToolTipText();
 				if(tip!=null)
 					jcc.setStatusText("Scanning "+tip);
 				if(node.refresh())
 				{
 //					System.out.println("change detected in user node: "+node);
-					//((DefaultTreeModel)getModel()).reload(node);
-					((DefaultTreeModel)getModel()).reload(node);
-					nodes_out.add(node);
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							((DefaultTreeModel)getModel()).reload(node);
+						}
+					});
+					if(!nodes_out.contains(node))
+						nodes_out.add(0, node);	// Add to start for inner nodes being processed first (inverse order)
 				}
 				
 				// For user nodes iterate over children, regardless if node has changed.
@@ -830,21 +833,28 @@ public class ModelExplorer extends JTree
 			else if(!nodes_out.isEmpty())
 			{
 				// Update node, as often as necessary (e.g. integrity checks are performed on 2nd refresh).
-				IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_out.remove(0);
+				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_out.remove(0);
 				String	tip	= node.getToolTipText();
 				if(tip!=null)
 					jcc.setStatusText("Scanning "+tip);
 				if(node.refresh())
 				{
 //					System.out.println("change detected in out node: "+node);
-					((DefaultTreeModel)getModel()).reload(node);
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							((DefaultTreeModel)getModel()).reload(node);
+						}
+					});
 					nodes_out.add(node);
 				}
 				
 				// Otherwise move to parent node
 				else if(node.getParent()!=null)
 				{
-					nodes_out.add(node.getParent());
+					if(!nodes_out.contains(node.getParent()))
+						nodes_out.add(node.getParent());
 				}
 			}
 			
@@ -862,8 +872,6 @@ public class ModelExplorer extends JTree
 				}
 			}
 
-//			Thread.currentThread().setContextClassLoader(oldcl);
-			
 			return !finished;
 		}
 	}
@@ -893,8 +901,13 @@ public class ModelExplorer extends JTree
 			if(node.refresh())
 			{
 //				System.out.println("change detected in crawler node: "+node);
-				//((DefaultTreeModel)getModel()).reload(node);
-				((DefaultTreeModel)getModel()).reload(node);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						((DefaultTreeModel)getModel()).reload(node);
+					}
+				});
 				
 				// Scan changed node and subnodes with user priority.
 				refresh(node);
