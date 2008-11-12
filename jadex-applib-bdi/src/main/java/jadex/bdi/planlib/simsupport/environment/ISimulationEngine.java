@@ -8,6 +8,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
+import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
 /** The simulation engine interface.
  *  
@@ -17,9 +18,10 @@ import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
  *  	  during iteration, methods are already synchronized).
  *  	  If multiple *Access() objects are required at the same time,
  *  	  the following lock-order must be used to prevent deadlocks:
- *  	  0. getSimObjectAccess()
- *  	  1. getPreLayerAccess()
- *  	  2. getPostLayerAccess()
+ *  	  0. getSimObjectAccess() (also locks the engine)
+ *  	  1. getTypedSimObjectAccess()
+ *  	  2. getPreLayerAccess()
+ *  	  3. getPostLayerAccess()
  */
 public interface ISimulationEngine
 {
@@ -30,13 +32,17 @@ public interface ISimulationEngine
 	/** Adds a new SimObject to the simulation.
 	 *  
 	 *  @param type type of the object
+	 *  @param properties properties of the object (may be null)
+	 *  @param tasks tasks of the object (may be null)
 	 *  @param position position of the object
 	 *  @param velocity velocity of the object
-	 *  @param drawable drawable respresenting the object
+	 *  @param drawable drawable representing the object
 	 *  @param listener default object listener, may be null if none is required
 	 *  @return the simulation object ID
 	 */
 	public Integer createSimObject(String type,
+								   Map properties,
+								   List tasks,
 								   IVector2 position,
 					    		   IVector2 velocity,
 						    	   IDrawable drawable,
@@ -121,6 +127,12 @@ public interface ISimulationEngine
 	 *  @return direct access to simulation objects
 	 */
 	public Map getSimObjectAccess();
+	
+	/** Returns direct access to the typed simulation object view.\
+	 * 
+	 *  @return direct access to typed simulation object view
+	 */
+	public Map getTypedSimObjectAccess();
 	
 	/** Progresses the simulation.
 	 * 

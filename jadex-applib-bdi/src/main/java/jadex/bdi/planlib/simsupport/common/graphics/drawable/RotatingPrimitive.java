@@ -4,6 +4,8 @@ import jadex.bdi.planlib.simsupport.common.math.IVector2;
 
 public abstract class RotatingPrimitive extends ScalablePrimitive
 {
+	private static final float PI_2 = (float) (Math.PI / 2.0);
+	
     /** Object rotation
      */
     protected float rot_;
@@ -16,6 +18,6 @@ public abstract class RotatingPrimitive extends ScalablePrimitive
      */
     public void setVelocity(IVector2 velocity)
     {
-        rot_ = -velocity.getDirectionAsFloat();
+        rot_ = velocity.getDirectionAsFloat() + PI_2;
     }
 }

@@ -1,6 +1,8 @@
 package jadex.bdi.planlib.simsupport.simcap;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
@@ -18,6 +20,8 @@ public class LocalCreateObjectPlan extends Plan
 	public void body()
 	{
 		String type = (String) getParameter("type").getValue();
+		Map properties = (Map) getParameter("properties").getValue();
+		List tasks = (List) getParameter("tasks").getValue();
 		IVector2 position = (IVector2) getParameter("position").getValue();
 		IVector2 velocity = (IVector2) getParameter("velocity").getValue();
 		IDrawable drawable = (IDrawable) getParameter("drawable").getValue();
@@ -30,7 +34,7 @@ public class LocalCreateObjectPlan extends Plan
 		{
 			listener = new LocalSimulationEventListener(getExternalAccess());
 		}
-		Integer objectId = engine.createSimObject(type, position, velocity, drawable, listener);
+		Integer objectId = engine.createSimObject(type, properties, tasks, position, velocity, drawable, listener);
 		getParameter("object_id").setValue(objectId);
 	}
 }

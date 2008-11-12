@@ -19,6 +19,6 @@ public class LocalGetPositionPlan extends Plan
 		ISimulationEngine engine =
 			(ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
 		IVector2 position = engine.getSimulationObject(objectId).getPosition();
-		getParameter("position").setValue(position);
+		getParameter("position").setValue(position.copy());
 	}
 }

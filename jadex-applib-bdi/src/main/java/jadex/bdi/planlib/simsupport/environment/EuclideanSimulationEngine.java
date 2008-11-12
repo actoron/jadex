@@ -5,11 +5,13 @@ import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
+import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -31,6 +33,10 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	/** Integers/ObjectIDs (keys) and SimObject engine objects (values)
 	 */
 	private Map simObjects_;
+	
+	/** Strings (type of the SimObject) and Lists of SimObjects (typed view)
+	 */
+	private Map simObjectsByType_;
 	
 	/** Object ID counter for new IDs
 	 */
@@ -57,6 +63,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		preLayers_ = Collections.synchronizedList(new ArrayList());
 		postLayers_ = Collections.synchronizedList(new ArrayList());
 		simObjects_ = Collections.synchronizedMap(new HashMap());
+		simObjectsByType_ = Collections.synchronizedMap(new HashMap());
 		freeObjectIds_ = new Stack();
 		areaSize_ = areaSize.copy();
 	}
@@ -64,38 +71,66 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	/** Adds a new SimObject to the simulation.
 	 *  
 	 *  @param type type of the object
+	 *  @param properties properties of the object (may be null)
+	 *  @param tasks tasks of the object (may be null)
 	 *  @param position position of the object
 	 *  @param velocity velocity of the object
 	 *  @param drawables drawable representing the object
 	 *  @return the simulation object ID
 	 */
 	public Integer createSimObject(String type,
+								   Map properties,
+								   List tasks,
 								   IVector2 position,
 								   IVector2 velocity,
 								   IDrawable drawable,
 								   ISimulationEventListener listener)
 	{
-		Integer id;
-		synchronized(freeObjectIds_)
+		//default properties and tasks
+		if (properties == null)
 		{
-			if (!freeObjectIds_.empty())
-			{
-				id = (Integer) freeObjectIds_.pop();
-			}
-			else
-			{
-				id = objectIdCounter_.getNext();
-			}
+			properties = new HashMap();
 		}
-		SimObject simObject = new SimObject(id, type, position, velocity, drawable);
-		
-		if (listener != null)
+		if (tasks == null)
 		{
-			simObject.addListener(listener);
+			tasks = new LinkedList();
 		}
 		
-		simObjects_.put(id, simObject);
-		return id;
+		synchronized(simObjects_)
+		{
+			synchronized(simObjectsByType_)
+			{
+				Integer id;
+				synchronized(freeObjectIds_)
+				{
+					if (!freeObjectIds_.empty())
+					{
+						id = (Integer) freeObjectIds_.pop();
+					}
+					else
+					{
+						id = objectIdCounter_.getNext();
+					}
+				}
+				SimObject simObject = new SimObject(id, type, properties, tasks, position, velocity, drawable);
+
+				if (listener != null)
+				{
+					simObject.addListener(listener);
+				}
+				
+				List objectList = (List) simObjectsByType_.get(type);
+				if (objectList == null)
+				{
+					objectList = new LinkedList();
+					simObjectsByType_.put(type, objectList);
+				}
+				objectList.add(simObject);
+				
+				simObjects_.put(id, simObject);
+				return id;
+			}
+		}
 	}
 	
 	/** Removes a SimObject from the simulation.
@@ -104,8 +139,15 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	public void destroySimObject(Integer objectId)
 	{
-		simObjects_.remove(objectId);
-		freeObjectIds_.push(objectId);
+		synchronized(simObjects_)
+		{
+			synchronized(simObjectsByType_)
+			{
+				SimObject obj = (SimObject) simObjects_.remove(objectId);
+				((List) simObjectsByType_.get(obj.getType())).remove(obj);
+				freeObjectIds_.push(objectId);
+			}
+		}
 	}
 	
 	/** Adds a pre-layer (background).
@@ -225,13 +267,22 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		return simObjects_;
 	}
 	
+	/** Returns direct access to the typed simulation object view.\
+	 * 
+	 *  @return direct access to typed simulation object view
+	 */
+	public Map getTypedSimObjectAccess()
+	{
+		return simObjectsByType_;
+	}
+	
 	/** Progresses the simulation.
 	 * 
 	 * @param deltaT time difference since the last step
 	 */
 	public void simulateStep(IVector1 deltaT)
 	{
-		updatePositions(deltaT);
+		updateObjects(deltaT);
 		executeEnvironmentProcesses(deltaT);
 	}
 	
@@ -239,7 +290,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 * 
 	 * @param deltaT time difference since the last step
 	 */
-	private void updatePositions(IVector1 deltaT)
+	private void updateObjects(IVector1 deltaT)
 	{
 		synchronized (simObjects_)
 		{
@@ -247,7 +298,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			{
 				SimObject simObject = (SimObject) it.next();
 
-				simObject.updatePosition(deltaT);
+				simObject.updateObject(deltaT);
 			}
 		}
 	}
@@ -264,9 +315,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			{
 				IEnvironmentProcess process = (IEnvironmentProcess) it.next();
 				
-				// Use a copy of the time delta to prevent direct access
-				// by the environment process.
-				process.execute(deltaT.copy(), this);
+				process.execute(deltaT, this);
 			}
 		}
 	}

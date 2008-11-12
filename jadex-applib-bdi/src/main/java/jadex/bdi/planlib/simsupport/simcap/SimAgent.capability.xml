@@ -12,10 +12,13 @@
 
 	<imports>
 		<import>java.util.List</import>
+		<import>java.util.Map</import>
 		<import>jadex.bridge.IAgentIdentifier</import>
 		<import>jadex.bdi.planlib.simsupport.environment.*</import>
-		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.IVector2</import>
 		<import>jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable</import>
+		<import>jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask</import>
 		<import>jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess</import>
 	</imports>
 
@@ -46,6 +49,10 @@
 		<achievegoal name="sim_create_object" exported="true">
 			<!-- Type of the object. -->
 			<parameter name="type" class="String"/>
+			<!-- Properties of the object (may be null). -->
+			<parameter name="properties" class="Map"/>
+			<!-- Tasks of the object (may be null). -->
+			<parameter name="tasks" class="List"/>
 			<!-- Place new object at this position -->
 			<parameter name="position" class="IVector2"/>
 			<!-- Give the new object this velocity -->
@@ -84,6 +91,18 @@
 			</contextcondition>
 		</achievegoal>
 		
+		<!-- Sets the current position of the object. -->
+		<achievegoal name="sim_set_position" exported="true">
+			<!-- ID of the object -->
+			<parameter name="object_id" class="Integer"/>
+			<!-- The position of the object. -->
+			<parameter name="position" class="IVector2" direction="out"/>
+			<contextcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				?mbelief = (mbelief (element_has_name "connected"))
+			</contextcondition>
+		</achievegoal>
+		
 		<!-- Sets a new velocity for the object. -->
 		<achievegoal name="sim_set_velocity" exported="true">
 			<!-- ID of the object -->
@@ -108,6 +127,30 @@
 			<!-- The tolerated distance from the destination that is still
 				 considered to be within the destination -->
 			<parameter name="tolerance" class="IVector1"/>
+			<contextcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				?mbelief = (mbelief (element_has_name "connected"))
+			</contextcondition>
+		</achievegoal>
+		
+		<!-- Adds a new task for the object. -->
+		<achievegoal name="sim_add_task" exported="true">
+			<!-- ID of the object -->
+			<parameter name="object_id" class="Integer"/>
+			<!-- The task for the object. -->
+			<parameter name="task" class="ISimObjectTask"/>
+			<contextcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				?mbelief = (mbelief (element_has_name "connected"))
+			</contextcondition>
+		</achievegoal>
+		
+		<!-- Sets the current position of the object. -->
+		<achievegoal name="sim_remove_task" exported="true">
+			<!-- ID of the object -->
+			<parameter name="object_id" class="Integer"/>
+			<!-- The task for the object. -->
+			<parameter name="task" class="ISimObjectTask"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (element_has_name "connected"))
@@ -166,6 +209,12 @@
 			<parameter name="type" class="String">
 				<goalmapping ref="sim_create_object.type"/>
 			</parameter>
+			<parameter name="properties" class="Map">
+				<goalmapping ref="sim_create_object.properties"/>
+			</parameter>
+			<parameter name="tasks" class="List">
+				<goalmapping ref="sim_create_object.tasks"/>
+			</parameter>
 			<parameter name="position" class="IVector2">
  				<goalmapping ref="sim_create_object.position"/>
 			</parameter>
@@ -213,6 +262,20 @@
 			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
 		</plan>
 		
+		<plan name="local_set_position_plan">
+			<parameter name="object_id" class="Integer">
+ 				<goalmapping ref="sim_set_position.object_id"/>
+			</parameter>
+			<parameter name="position" class="IVector2">
+ 				<goalmapping ref="sim_set_position.position"/>
+			</parameter>
+			<body class="LocalSetPositionPlan" />
+			<trigger>
+				<goal ref="sim_set_position"/>
+			</trigger>
+			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
+		</plan>
+		
 		<plan name="local_set_velocity_plan">
 			<parameter name="object_id" class="Integer">
  				<goalmapping ref="sim_set_velocity.object_id"/>
@@ -227,22 +290,30 @@
 			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
 		</plan>
 		
-		<plan name="local_set_destination_plan">
+		<plan name="local_add_task_plan">
 			<parameter name="object_id" class="Integer">
- 				<goalmapping ref="sim_set_destination.object_id"/>
+ 				<goalmapping ref="sim_add_task.object_id"/>
 			</parameter>
-			<parameter name="destination" class="IVector2">
- 				<goalmapping ref="sim_set_destination.destination"/>
+			<parameter name="task" class="ISimObjectTask">
+ 				<goalmapping ref="sim_add_task.task"/>
 			</parameter>
-			<parameter name="speed" class="IVector1">
- 				<goalmapping ref="sim_set_destination.speed"/>
-			</parameter>
-			<parameter name="tolerance" class="IVector1">
- 				<goalmapping ref="sim_set_destination.tolerance"/>
-			</parameter>
-			<body class="LocalSetDestinationPlan" />
+			<body class="LocalAddTaskPlan" />
 			<trigger>
-				<goal ref="sim_set_destination"/>
+				<goal ref="sim_add_task"/>
+			</trigger>
+			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
+		</plan>
+		
+		<plan name="local_remove_task_plan">
+			<parameter name="object_id" class="Integer">
+ 				<goalmapping ref="sim_remove_task.object_id"/>
+			</parameter>
+			<parameter name="task" class="ISimObjectTask">
+ 				<goalmapping ref="sim_remove_task.task"/>
+			</parameter>
+			<body class="LocalRemoveTaskPlan" />
+			<trigger>
+				<goal ref="sim_remove_task"/>
 			</trigger>
 			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
 		</plan>
@@ -284,6 +355,27 @@
 		</plan>
 		
 		<!-- Remote plans -->
+		
+		<!-- General plans -->
+		
+		<plan name="set_destination_plan">
+			<parameter name="object_id" class="Integer">
+ 				<goalmapping ref="sim_set_destination.object_id"/>
+			</parameter>
+			<parameter name="destination" class="IVector2">
+ 				<goalmapping ref="sim_set_destination.destination"/>
+			</parameter>
+			<parameter name="speed" class="IVector1">
+ 				<goalmapping ref="sim_set_destination.speed"/>
+			</parameter>
+			<parameter name="tolerance" class="IVector1">
+ 				<goalmapping ref="sim_set_destination.tolerance"/>
+			</parameter>
+			<body class="SetDestinationPlan" />
+			<trigger>
+				<goal ref="sim_set_destination"/>
+			</trigger>
+		</plan>
 		
 		<!-- Special plans -->
 		<plan name="connect_environment_plan">

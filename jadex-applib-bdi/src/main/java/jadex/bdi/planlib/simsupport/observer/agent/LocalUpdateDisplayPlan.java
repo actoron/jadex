@@ -11,7 +11,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
-import jadex.bdi.planlib.simsupport.environment.SimObject;
+import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
 

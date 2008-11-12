@@ -1,16 +1,21 @@
-package jadex.bdi.planlib.simsupport.environment;
+package jadex.bdi.planlib.simsupport.environment.simobject;
 
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
+import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
+import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
 
 import java.beans.DesignMode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** An object in the simulation
@@ -25,6 +30,14 @@ public class SimObject
 	 */
 	private String type_;
 	
+	/** The object's properties.
+	 */
+	private Map properties_;
+	
+	/** The object's tasks
+	 */
+	private List tasks_;
+	
 	/** Object position.
 	 */
 	private IVector2 position_;
@@ -32,10 +45,6 @@ public class SimObject
 	/** Object direction vector.
 	 */
 	private IVector2 velocity_;
-	
-	/** Current object destination, null if no destination is set.
-	 */
-	private Destination destination_;
 	
 	/** Graphical representation of the object.
 	 */
@@ -49,23 +58,37 @@ public class SimObject
 	 * 
 	 * @param objectId the object's ID
 	 * @param type type of the object
+	 * @param properties object's properties
+	 * @param tasks initial task list
 	 * @param initialPosition the object's initial position
 	 * @param initialDirection the object's initial direction
 	 * @param drawable graphical representation
 	 */
 	public SimObject(Integer objectId,
 					 String type,
+					 Map properties,
+					 List tasks,
 					 IVector2 initialPosition,
 					 IVector2 initialDirection,
 					 IDrawable drawable)
 	{
 		objectId_ = objectId;
 		type_ = type;
+		properties_ = new HashMap(properties);
+		tasks_ = new ArrayList(tasks);
 		position_  = initialPosition;
 		velocity_ = initialDirection;
-		destination_ = null;
 		drawable_ = drawable;
-		listeners_ = Collections.synchronizedList(new ArrayList());
+		listeners_ = new ArrayList();
+	}
+	
+	/** Returns the ID of the object.
+	 * 
+	 *  @return the ID
+	 */
+	public synchronized Integer getId()
+	{
+		return objectId_;
 	}
 	
 	/** Returns the type of the object.
@@ -86,27 +109,32 @@ public class SimObject
 		return drawable_;
 	}
 	
-	public synchronized void updatePosition(IVector1 deltaT)
+	public synchronized void updateObject(IVector1 deltaT)
 	{
-		IVector2 pDelta = velocity_.copy().multiply(deltaT);
-		
-		position_.add(pDelta);
-		
-		if (destination_ != null)
+		Object[] tasks = tasks_.toArray();
+		for (int i = 0; i < tasks.length; ++i)
 		{
-			velocity_ = destination_.getPosition().copy().subtract(position_).normalize().multiply(velocity_.getLength());
-			if (position_.getDistance(destination_.getPosition()).less(destination_.getTolerance()))
-			{
-				// Destination reached, stop and trigger event.
-				
-				//Stop
-				velocity_.zero();
-				//remove destination
-				destination_ = null;
-				
-				fireDestinationReachedEvent();
-			}
+			ISimObjectTask task = (ISimObjectTask) tasks[i];
+			task.executeTask(deltaT, this);
 		}
+	}
+	
+	/** Adds a new task for the object.
+	 *  
+	 *  @param task new task
+	 */
+	public synchronized void addTask(ISimObjectTask task)
+	{
+		tasks_.add(task);
+	}
+	
+	/** Removes a task from the object.
+	 *  
+	 *  @param task the task
+	 */
+	public synchronized void removeTask(ISimObjectTask task)
+	{
+		tasks_.remove(task);
 	}
 	
 	/** Returns the current position of the object.
@@ -115,7 +143,7 @@ public class SimObject
 	 */
 	public synchronized IVector2 getPosition()
 	{
-		return position_.copy();
+		return position_;
 	}
 	
 	/** Sets a new position for the object.
@@ -124,7 +152,7 @@ public class SimObject
 	 */
 	public synchronized void setPosition(IVector2 position)
 	{
-		position_ = position.copy();
+		position_ = position;
 	}
 	
 	/** Returns the current velocity of the object.
@@ -133,7 +161,7 @@ public class SimObject
 	 */
 	public synchronized IVector2 getVelocity()
 	{
-		return velocity_.copy();
+		return velocity_;
 	}
 	
 	/** Sets a new velocity for the object.
@@ -142,20 +170,7 @@ public class SimObject
 	 */
 	public synchronized void setVelocity(IVector2 velocity)
 	{
-		velocity_ = velocity.copy();
-	}
-	
-	/** Sets the current destination of the object.
-	 *  
-	 *  @param destination new destination
-	 *  @param speed speed used to approach the destination
-	 *  @param tolerance tolerance used when considering whether the destination has been reached
-	 */
-	public synchronized void setDestination(IVector2 destination, IVector1 speed, IVector1 tolerance)
-	{
-		
-		destination_ = new Destination(destination, tolerance);
-		velocity_ = destination.copy().subtract(position_).normalize().multiply(speed);
+		velocity_ = velocity;
 	}
 	
 	/** Adds an event listener for this object.
@@ -187,15 +202,5 @@ public class SimObject
 			ISimulationEventListener listener = (ISimulationEventListener) it.next();
 			listener.simulationEvent(evt);
 		}
-	}
-	
-	// Events
-	
-	private void fireDestinationReachedEvent()
-	{
-		SimulationEvent evt = new SimulationEvent(SimulationEvent.DESTINATION_REACHED);
-		//TODO: Include parameters? yes, the object id, maybe more?
-		evt.setParameter("object_id", objectId_);
-		fireSimulationEvent(evt);
 	}
 }
