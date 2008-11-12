@@ -30,7 +30,7 @@
 	<capabilities>
 		<!-- Include the StartAgents capability as startcap for starting agents. -->
 		<capability name="startercap" file="jadex.bdi.planlib.starter.StartAgents"/>
-		<!-- <capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/> -->
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
 	</capabilities>
 
 	<beliefs>
@@ -47,6 +47,12 @@
 		</belief>
 	</beliefs>
 
+	<goals>
+		<achievegoalref name="ams_destroy_agent">
+			<concrete ref="amscap.ams_destroy_agent"/>
+		</achievegoalref>
+	</goals>
+	
 	<plans>
 		<plan name="starter">
 			<parameterset name="agentinfos" class="StartAgentInfo"/>

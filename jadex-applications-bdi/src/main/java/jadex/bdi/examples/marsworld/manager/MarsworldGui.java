@@ -5,7 +5,9 @@ import jadex.bdi.examples.marsworld.Environment;
 import jadex.bdi.examples.marsworld.Homebase;
 import jadex.bdi.examples.marsworld.Location;
 import jadex.bdi.examples.marsworld.Target;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
+import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IAgentIdentifier;
@@ -35,6 +37,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.border.BevelBorder;
@@ -110,20 +113,24 @@ public class MarsworldGui	extends JFrame
 			}
 		});
 		
-//		agent.addAgentListener(new IAgentListener()
-//		{
-//			public void agentTerminating(AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						MarsworldGui.this.timer.stop();
-//						MarsworldGui.this.dispose();
-//					}
-//				});
-//			}
-//		}, false);
+		agent.addAgentListener(new IAgentListener()
+		{
+			public void agentTerminating(AgentEvent ae)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						MarsworldGui.this.timer.stop();
+						MarsworldGui.this.dispose();
+					}
+				});
+			}
+			
+			public void agentTerminated(AgentEvent ae)
+			{
+			}
+		});
 
 		// Create the gui.
 		Environment	env	= (Environment)agent.getBeliefbase().getBelief("environment").getFact();

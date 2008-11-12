@@ -44,8 +44,8 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"profiler", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
-		"profiler_sel", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector_sel.png"),
+		"profiler", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/ruleprofiler.png"),
+		"profiler_sel", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/ruleprofiler_sel.png"),
 		"profile_agent", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
 		"close_profiler", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
 		"agent_profiled", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_agent_introspected.png"),

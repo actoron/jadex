@@ -1230,7 +1230,7 @@ public class AgentRules
 	 *  @param mbel The belief model.
 	 *  @param fetcher The fetcher.
 	 */
-	public static void initBelief(final IOAVState state, Object rcapa, final Object mbel, IValueFetcher fetcher)
+	public static void initBelief(final IOAVState state, final Object rcapa, final Object mbel, IValueFetcher fetcher)
 	{
 		Object agent = BDIInterpreter.getInterpreter(state).getAgent();
 		Map parents = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_initparents);
@@ -1265,8 +1265,16 @@ public class AgentRules
 				public void run()
 				{
 					Object	exp = state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_fact);
-					Object value = evaluateExpression(state, exp, fet);
-					BeliefRules.setBeliefValue(state, rbel, value);
+					try
+					{
+						Object value = evaluateExpression(state, exp, fet);
+						BeliefRules.setBeliefValue(state, rbel, value);
+					}
+					catch(Exception e)
+					{
+						String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getName();
+						getLogger(state, rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+					}
 	//					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
 						((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
@@ -1394,7 +1402,7 @@ public class AgentRules
 	 *  @param mbelset The beliefset model.
 	 *  @param fetcher The fetcher.
 	 */
-	public static void initBeliefSet(final IOAVState state, Object rcapa, final Object mbelset, IValueFetcher fetcher)
+	public static void initBeliefSet(final IOAVState state, final Object rcapa, final Object mbelset, IValueFetcher fetcher)
 	{
 		Object agent = BDIInterpreter.getInterpreter(state).getAgent();
 		Map parents = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_initparents);
@@ -1431,9 +1439,17 @@ public class AgentRules
 				public void run()
 				{
 					Object	exp = state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefset_has_factsexpression);
-					Object values	= evaluateExpression(state, exp, fet);
-					BeliefRules.updateBeliefSet(state, rbelset, values);
-//					// changed *.class to *.TYPE due to javaflow bug
+					try
+					{
+						Object values	= evaluateExpression(state, exp, fet);
+						BeliefRules.updateBeliefSet(state, rbelset, values);
+					}
+					catch(Exception e)
+					{
+						String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getName();
+						getLogger(state, rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+					}
+					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
 						.getAgentAdapter().getPlatform().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 				}
@@ -1958,16 +1974,16 @@ public class AgentRules
 			
 		Object ret	= null;
 		IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
-		try
+//		try
 		{
 			ret	= pex.getValue(fetcher);
 		}
-		catch(Exception e)
-		{
-			// Hack!!! Exception should be propagated.
-			System.err.println(pex.getExpressionText());
-			e.printStackTrace();
-		}
+//		catch(Exception e)
+//		{
+//			// Hack!!! Exception should be propagated.
+//			System.err.println(pex.getExpressionText());
+//			e.printStackTrace();
+//		}
 		return ret;
 	}
 	
@@ -2648,7 +2664,7 @@ public class AgentRules
 					if(state.containsObject(ragent))
 					{
 						// todo: cleanup? or in terminated action?
-						System.out.println("Forcing termination (timeout): "+interpreter.getAgentAdapter().getAgentIdentifier().getLocalName());
+						getLogger(state, ragent).info("Forcing termination (timeout): "+interpreter.getAgentAdapter().getAgentIdentifier().getLocalName());
 						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 							OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
 						interpreter.getAgentAdapter().wakeup();

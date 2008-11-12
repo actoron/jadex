@@ -255,9 +255,6 @@ public class ListenerRules
 				Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
 				Object le	= assignments.getVariableValue("?listenerentry");
 			
-//				System.out.println("XXXXXXXXXXXXXXXXXXXXXXX "+ce+" "+rbeliefset+" "+state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_element)+" "
-//					+state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
-									
 				IBeliefSetListener lis	= (IBeliefSetListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
 				AgentEvent	ae	= new AgentEvent(BeliefSetFlyweight.getBeliefSetFlyweight(state, rcapa, rbeliefset), ce);
 				

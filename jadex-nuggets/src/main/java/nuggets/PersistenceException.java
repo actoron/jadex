@@ -78,20 +78,3 @@ public class PersistenceException extends RuntimeException
 
 	
 }
-
-
-/* 
- * $Log$
- * Revision 1.4  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.3  2006/02/16 10:08:29  walczak
- * codding of XML text contents schould be better now
- *
- * Revision 1.2  2006/02/16 09:23:47  walczak
- * Extended debugg info
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */

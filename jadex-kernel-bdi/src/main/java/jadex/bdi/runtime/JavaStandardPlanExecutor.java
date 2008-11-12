@@ -495,10 +495,12 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		 */
 		public PlanExecutionTask(BDIInterpreter interpreter, Object rcapability, Object rplan)
 		{
-			if(rcapability==null)
-				System.out.println("plan already finished: "
-					+interpreter.getAgentAdapter().getAgentIdentifier().getLocalName()
-					+", "+rplan);
+//			if(rcapability==null)
+//			{
+//				System.out.println("plan already finished: "
+//					+interpreter.getAgentAdapter().getAgentIdentifier().getLocalName()
+//					+", "+rplan);
+//			}
 			assert rcapability!=null;
 			this.interpreter = interpreter;
 			this.rcapability = rcapability;

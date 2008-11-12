@@ -671,7 +671,7 @@ public class EventProcessingRules
 				{
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, 
 						OAVBDIRuntimeModel.PROCESSABLEELEMENT_NOCANDIDATES);
-					System.out.println("Meta-level reasoning did not return a result.");
+					AgentRules.getLogger(state, rcapa).severe("Meta-level reasoning did not return a result.");
 				}
 				
 				Collection coll = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);

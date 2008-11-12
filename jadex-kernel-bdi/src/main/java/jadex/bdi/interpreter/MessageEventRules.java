@@ -371,7 +371,7 @@ public class MessageEventRules
 				Object rawmsg = assignments.getVariableValue("?rawmsg");
 
 				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName();
-				System.out.println("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
+				AgentRules.getLogger(state, ragent).severe("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
 			
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_inbox, rawmsg);
 			}
@@ -1051,19 +1051,19 @@ public class MessageEventRules
 	 *  @param msgevent The message event.
 	 *  todo: indexing for msgevents for speed.
 	 */
-	public static void registerMessageEvent(IOAVState state,  Object rmevent, Object rscope)
+	public static void registerMessageEvent(IOAVState state,  Object rmevent, Object rcapa)
 	{
 		// todo: is not the global value :-(
-		Collection coll = state.getAttributeValues(rscope, OAVBDIRuntimeModel.capability_has_sentmessageevents);
+		Collection coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents);
 		if(MESSAGEEVENTS_MAX!=0 && coll!=null && coll.size()>MESSAGEEVENTS_MAX)
 		{
-			System.out.println("Agent does not save conversation due " +
+			AgentRules.getLogger(state, rcapa).severe("Agent does not save conversation due " +
 				"to too many outstanding messages. Increase buffer in runtime.xml - storedmessages.size");
 		}
 		else
 		{
-			state.addAttributeValue(rscope, OAVBDIRuntimeModel.capability_has_sentmessageevents, rmevent);
-			coll = state.getAttributeValues(rscope, OAVBDIRuntimeModel.capability_has_sentmessageevents);
+			state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents, rmevent);
+			coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents);
 //			System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
 //				.getAgentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
 //			Thread.dumpStack();

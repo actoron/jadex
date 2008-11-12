@@ -204,9 +204,9 @@ public class GoalLifecycleRules
 		{
 			Object	rgoal	= assignments.getVariableValue("?rgoal");
 			dropGoal(state, rgoal);
-			if(((String)state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)).startsWith("purchase"))
-				System.out.println("Dropping goal: "+rgoal+" "+state.getAttributeValue(state.getAttributeValue(rgoal, 
-						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+//			if(((String)state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)).startsWith("purchase"))
+//				System.out.println("Dropping goal: "+rgoal+" "+state.getAttributeValue(state.getAttributeValue(rgoal, 
+//						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 		}
 	};
 	

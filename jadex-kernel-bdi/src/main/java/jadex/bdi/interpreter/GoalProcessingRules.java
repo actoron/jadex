@@ -912,9 +912,9 @@ public class GoalProcessingRules
 			Object	rgoal	= assignments.getVariableValue("?rgoal");
 			Object	rplan	= assignments.getVariableValue("?rplan");
 			
-			if(((String)state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)).startsWith("purchase"))
-				System.out.println("FailedRemove: "+rgoal+" "+state.getAttributeValue(state.getAttributeValue(rgoal, 
-					OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+//			if(((String)state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)).startsWith("purchase"))
+//				System.out.println("FailedRemove: "+rgoal+" "+state.getAttributeValue(state.getAttributeValue(rgoal, 
+//					OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 			state.removeAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_finishedplans, rplan);
 
 			changeProcessingState(state, rgoal, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_FAILED);

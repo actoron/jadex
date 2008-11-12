@@ -65,13 +65,13 @@ public class MoveToLocationPlan extends Plan
 		//System.out.println("Agent received: "+myloc+" dest was: "+dest);
 	}
 	
-	public void aborted()
-	{
-		System.out.println("aborted "+getAgentName());
-	}
-	
-	public void failed()
-	{
-		System.out.println("failed "+getAgentName());
-	}
+//	public void aborted()
+//	{
+//		System.out.println("aborted "+getAgentName());
+//	}
+//	
+//	public void failed()
+//	{
+//		System.out.println("failed "+getAgentName());
+//	}
 }

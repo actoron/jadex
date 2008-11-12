@@ -29,8 +29,6 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	private BeliefSetFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		super(state, scope, handle);
-//		if(handle==null)
-//			System.out.println("shit");
 	}
 	
 	/**

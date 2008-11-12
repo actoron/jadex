@@ -27,10 +27,7 @@ public class StartAgentsPlan extends Plan
 //				create.getParameter("configuration").setValue(startinfos[i].getConfiguration());
 //				if(startinfos[i].getArguments()!=null)
 //					create.getParameter("arguments").setValue(startinfos[i].getArguments());
-//
 //				dispatchSubgoalAndWait(create);
-//				getParameterSet("agentidentifiers").addValue(
-//					create.getParameter("agentidentifier").getValue());
 				
 				SyncResultListener	listener	= new SyncResultListener();
 				IAMS	ams	= (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
@@ -39,7 +36,8 @@ public class StartAgentsPlan extends Plan
 				listener	= new SyncResultListener();	// Hack!!! Allow reuse of result listener?
 				ams.startAgent(aid, listener);
 				listener.waitForResult();
-
+				
+				getParameterSet("agentidentifiers").addValue(aid);
 				waitFor(startinfos[i].getDelay());
 			}
 			catch(Exception e)

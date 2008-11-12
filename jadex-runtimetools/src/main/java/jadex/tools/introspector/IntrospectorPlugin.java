@@ -201,7 +201,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 	 */
 	public String getName()
 	{
-		return "Introspector V2";
+		return "Introspector";
 	}
 
 	/**

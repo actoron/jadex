@@ -248,7 +248,7 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 	
 	//-------- IJadexAgent interface --------
 	
-	Lock lock = new ReentrantLock(); 
+//	Lock lock = new ReentrantLock(); 
 	/**
 	 *  Main method to perform agent execution.
 	 *  Whenever this method is called, the agent executes.
@@ -261,8 +261,8 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 	{
 		try
 		{
-			if(!lock.tryLock())
-				throw new RuntimeException("Internal execution error.");
+//			if(!lock.tryLock())
+//				throw new RuntimeException("Internal execution error.");
 			
 			// Remember execution thread.
 			this.agentthread	= Thread.currentThread();
@@ -291,12 +291,35 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 				if(entries[i] instanceof InterpreterTimedObjectAction)
 				{
 					if(((InterpreterTimedObjectAction)entries[i]).isValid())
-						entries[i].run();
-					((InterpreterTimedObjectAction)entries[i]).cleanup();
+					{
+						try
+						{
+							entries[i].run();
+						}
+						catch(Exception e)
+						{
+							AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+e);
+						}
+					}
+					try
+					{
+						((InterpreterTimedObjectAction)entries[i]).cleanup();
+					}
+					catch(Exception e)
+					{
+						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+e);
+					}
 				}
 				else //if(entries[i] instanceof Runnable)
 				{
-					entries[i].run();
+					try
+					{
+						entries[i].run();
+					}
+					catch(Exception e)
+					{
+						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+e);
+					}
 				}
 			}
 
@@ -365,7 +388,7 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 			// Reset execution thread.
 			this.agentthread = null;
 			
-			lock.unlock();
+//			lock.unlock();
 			
 			return execute && !rulesystem.getAgenda().isEmpty(); 
 	//			&& !OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state));
