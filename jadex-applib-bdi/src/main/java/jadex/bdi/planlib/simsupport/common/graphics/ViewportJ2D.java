@@ -5,6 +5,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingTexturedRec
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
 import java.awt.EventQueue;
@@ -45,6 +46,10 @@ public class ViewportJ2D extends Frame implements IViewport,
     
     private final static String DEFAULT_TITLE = "Viewport";
     private final static int    DEFAULT_BUFFER_STRATEGY=DOUBLE_BUFFER_STRATEGY;
+    
+    /** Library service for loading resources.
+     */
+    private ILibraryService libService_;
     
     //configuration
     private double directionLineScale_;
@@ -98,20 +103,13 @@ public class ViewportJ2D extends Frame implements IViewport,
     private Timer timer_;
     
     /** Creates a new Viewport.
-     */
-    public ViewportJ2D()
-    {
-        this(DEFAULT_TITLE, DEFAULT_BUFFER_STRATEGY, 60);
-    }
-    
-    /** Creates a new Viewport.
      * 
      *  @param title title of the viewport window
      *  @param fps target frames per second 
      */
-    public ViewportJ2D(String title, double fps)
+    public ViewportJ2D(String title, double fps, ILibraryService libService)
     {
-        this(title, DEFAULT_BUFFER_STRATEGY, fps);
+        this(title, DEFAULT_BUFFER_STRATEGY, fps, libService);
     }
     
     /** Creates a new Viewport.
@@ -120,9 +118,10 @@ public class ViewportJ2D extends Frame implements IViewport,
      *  @param bufferStrategy buffer strategy to use
      *  @param fps target frames per second or no autmatic refresh if zero
      */
-    public ViewportJ2D(String title, int bufferStrategy, double fps)
+    public ViewportJ2D(String title, int bufferStrategy, double fps, ILibraryService libService)
     {
         super(title);
+        libService_ = libService;
         size_ = new Vector2Double(1.0);
         preserveAR_ = true;
         drawables_ = Collections.synchronizedList(new ArrayList());
@@ -187,29 +186,6 @@ public class ViewportJ2D extends Frame implements IViewport,
 			});
 			timer_.start();
 		}
-    }
-    
-    /** Implementation of a small test of the Viewport
-     */
-    public static void main(String args[])
-    {
-        ViewportJ2D vp = new ViewportJ2D();
-        vp.setSize(new Vector2Double(1.0));
-        Vector2Double pos = new Vector2Double(0.0);
-        Vector2Double size = new Vector2Double(1.0);
-        Vector2Double velocity = new Vector2Double(0.0, 1.0);
-        String imgPath = ViewportJOGL.class.getPackage().getName().replaceAll("\\.", "/");
-        imgPath = imgPath + "/gravel.png";
-        IDrawable obj = new RotatingTexturedRectangle(pos, size, velocity, imgPath);
-        //IDrawable obj = new RotatingColoredRectangle(pos, size, velocity, Color.RED);
-        vp.addDrawable(obj);
-        IVector2 d = new Vector2Double(0.0);
-        while(vp.isShowing())
-        {
-            vp.renderFrame();
-            d.add(-0.0002);
-            vp.setPosition(d);
-        }
     }
     
     /** Sets the position of the bottom left corner of
@@ -433,7 +409,7 @@ public class ViewportJ2D extends Frame implements IViewport,
      */
     private BufferedImage loadImage(String path)
     {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = libService_.getClassLoader();
         
         BufferedImage image = null;
         try

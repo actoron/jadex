@@ -9,6 +9,7 @@ import jadex.bdi.planlib.simsupport.environment.agent.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.ILibraryService;
 
 public class InitializeObserverPlan extends Plan
 {
@@ -28,6 +29,15 @@ public class InitializeObserverPlan extends Plan
 		
 		boolean forceJ2D = ((Boolean) b.getBelief("force_java2d").getFact()).booleanValue();
 		boolean preserveAR = ((Boolean) b.getBelief("preserve_aspect_ratio").getFact()).booleanValue();
+		
+		ILibraryService libService = (ILibraryService) getScope().getPlatform().getService(ILibraryService.class,
+																						   ILibraryService.LIBRARY_SERVICE);
+		System.out.println(libService);
+		if (libService == null)
+		{
+			System.exit(1);
+		}
+		
 		IViewport viewport = null;
 		
 		if (!forceJ2D)
@@ -35,7 +45,7 @@ public class InitializeObserverPlan extends Plan
 			// Try OpenGL first...
 			try
 			{
-				ViewportJOGL vp = new ViewportJOGL(envName, 0.0);
+				ViewportJOGL vp = new ViewportJOGL(envName, 0.0, libService);
 				if (vp.isValid())
 				{
 					viewport = vp;
@@ -51,7 +61,7 @@ public class InitializeObserverPlan extends Plan
 		if (viewport == null)
 		{
 			// Use Java2D
-			viewport = new ViewportJ2D(envName, 0.0);
+			viewport = new ViewportJ2D(envName, 0.0, libService);
 		}
 		
 		viewport.setPreserveAspectRation(preserveAR);

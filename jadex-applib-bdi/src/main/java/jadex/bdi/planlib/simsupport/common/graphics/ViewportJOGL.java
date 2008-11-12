@@ -47,6 +47,7 @@ import javax.media.opengl.glu.GLU;
 import javax.swing.Timer;
 
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
+import jadex.bridge.ILibraryService;
 
 /** OpenGL/JOGL-based Viewport.
  *  This viewport attempts to use OpenGL for drawing.
@@ -59,6 +60,10 @@ public class ViewportJOGL implements IViewport,
 {
     private Frame frame_;
     private GLCanvas canvas_;
+    
+    /** Library service for loading resources.
+     */
+    private ILibraryService libService_;
     
     //position
     private float posX_;
@@ -135,9 +140,11 @@ public class ViewportJOGL implements IViewport,
      *
      *  @param title Title of the window.
      *  @param fps target frames per second or no autmatic refresh if zero
+     *  @param libService library service for loading resources.
      */
-    public ViewportJOGL(String title, double fps)
+    public ViewportJOGL(String title, double fps, ILibraryService libService)
     {
+    	libService_ = libService;
         uninitialized_ = true;
         preserveAR_ = true;
         valid_ = true;
@@ -198,29 +205,6 @@ public class ViewportJOGL implements IViewport,
         		}
         	});
         	timer_.start();
-        }
-    }
-    
-    public static void main(String[] args)
-    {
-        ViewportJOGL vp = new ViewportJOGL("JOGL_Viewport", 60);
-        vp.setSize(new Vector2Double(1.0));
-        
-        System.out.println(vp.isValid());
-        
-        Vector2Double pos = new Vector2Double(0.0);
-        Vector2Double size = new Vector2Double(0.1);
-        Vector2Double velocity = new Vector2Double(0.001);
-        String imgPath = ViewportJOGL.class.getPackage().getName().replaceAll("\\.", "/");
-        imgPath = imgPath + "/gravel.png";
-        RotatingTexturedRectangle obj =
-        	new RotatingTexturedRectangle(pos, size, velocity, imgPath);
-        
-        vp.addDrawable(obj);
-        while (vp.isShowing())
-        {
-            pos.add(velocity);
-            obj.setPosition(pos);
         }
     }
     
@@ -414,7 +398,7 @@ public class ViewportJOGL implements IViewport,
     										   int wrapMode)
     {
         // Load image
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = libService_.getClassLoader();
         
         BufferedImage tmpImage = null;
         try
@@ -427,6 +411,8 @@ public class ViewportJOGL implements IViewport,
         }
         catch (Exception e)
         {
+        	System.err.println("Image not found: " + path);
+        	throw new RuntimeException("Image not found: " + path);
         }
         
         int width = tmpImage.getWidth();
