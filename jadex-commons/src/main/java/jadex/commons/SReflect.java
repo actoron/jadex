@@ -36,28 +36,33 @@ public class SReflect
 	/** Field lookup cache (class->(name->field[])). */
 	protected static Map fieldcache = Collections.synchronizedMap(new WeakHashMap());
 
-	/** Mapping from basic class name -> object type(class). */
+	/** Mapping from basic class name -> basic type(class). */
 	protected static Map basictypes;
+
+	/** Mapping from basic class -> object type(class). */
+	protected static Map wrappedtypes;
 
 	static
 	{
 		basictypes	= Collections.synchronizedMap(new HashMap());
-		basictypes.put("boolean", Boolean.class);
-		basictypes.put("int", Integer.class);
-		basictypes.put("double", Double.class);
-		basictypes.put("float", Float.class);
-		basictypes.put("long", Long.class);
-		basictypes.put("short", Short.class);
-		basictypes.put("byte", Byte.class);
-		basictypes.put("char", Character.class);
-		basictypes.put(boolean.class, Boolean.class);
-		basictypes.put(int.class, Integer.class);
-		basictypes.put(double.class, Double.class);
-		basictypes.put(float.class, Float.class);
-		basictypes.put(long.class, Long.class);
-		basictypes.put(short.class, Short.class);
-		basictypes.put(byte.class, Byte.class);
-		basictypes.put(char.class, Character.class);
+		basictypes.put("boolean", boolean.class);
+		basictypes.put("int", int.class);
+		basictypes.put("double", double.class);
+		basictypes.put("float", float.class);
+		basictypes.put("long", long.class);
+		basictypes.put("short", short.class);
+		basictypes.put("byte", byte.class);
+		basictypes.put("char", char.class);
+		
+		wrappedtypes	= Collections.synchronizedMap(new HashMap());
+		wrappedtypes.put(boolean.class, Boolean.class);
+		wrappedtypes.put(int.class, Integer.class);
+		wrappedtypes.put(double.class, Double.class);
+		wrappedtypes.put(float.class, Float.class);
+		wrappedtypes.put(long.class, Long.class);
+		wrappedtypes.put(short.class, Short.class);
+		wrappedtypes.put(byte.class, Byte.class);
+		wrappedtypes.put(char.class, Character.class);
 	}
 
 	//-------- methods --------
@@ -79,7 +84,7 @@ public class SReflect
 		// (jls) there are the following primitive types:
 		// byte, short, int, long, char, float, double, boolean
 
-		Class	result	= (Class)basictypes.get(clazz);
+		Class	result	= (Class)wrappedtypes.get(clazz);
 		return result==null ? clazz : result;
 	}
 
@@ -89,7 +94,7 @@ public class SReflect
 	 */
 	public static boolean isBasicType(Class clazz)
 	{
-		return basictypes.get(clazz)!=null;
+		return wrappedtypes.get(clazz)!=null;
 	}
 
 	/**
