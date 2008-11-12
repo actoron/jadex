@@ -52,6 +52,8 @@
 			<parameter name="velocity" class="IVector2"/>
 			<!-- Use these drawables to represent the object -->
 			<parameter name="drawable" class="IDrawable"/>
+			<!-- Whether to listen to object events -->
+			<parameter name="listen" class="Boolean"/>
 			<!-- ID of the object -->
 			<parameter name="object_id" class="Integer" direction="out"/>
 			<contextcondition>
@@ -172,6 +174,9 @@
 			</parameter>
 			<parameter name="drawable" class="IDrawable">
  				<goalmapping ref="sim_create_object.drawable"/>
+			</parameter>
+			<parameter name="listen" class="Boolean">
+				<goalmapping ref="sim_create_object.listen"/>
 			</parameter>
 			<parameter name="object_id" class="Integer" direction="out">
  				<goalmapping ref="sim_create_object.object_id"/>

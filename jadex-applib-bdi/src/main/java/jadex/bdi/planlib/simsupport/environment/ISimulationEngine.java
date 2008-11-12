@@ -33,12 +33,14 @@ public interface ISimulationEngine
 	 *  @param position position of the object
 	 *  @param velocity velocity of the object
 	 *  @param drawable drawable respresenting the object
+	 *  @param listener default object listener, may be null if none is required
 	 *  @return the simulation object ID
 	 */
 	public Integer createSimObject(String type,
 								   IVector2 position,
 					    		   IVector2 velocity,
-						    	   IDrawable drawable);
+						    	   IDrawable drawable,
+						    	   ISimulationEventListener listener);
 	
 	/** Removes a SimObject from the simulation.
 	 * 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
@@ -20,11 +21,16 @@ public class LocalCreateObjectPlan extends Plan
 		IVector2 position = (IVector2) getParameter("position").getValue();
 		IVector2 velocity = (IVector2) getParameter("velocity").getValue();
 		IDrawable drawable = (IDrawable) getParameter("drawable").getValue();
+		boolean listen = ((Boolean) getParameter("listen").getValue()).booleanValue();
 		IBeliefbase b = getBeliefbase();
 		ISimulationEngine engine =
 			(ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
-		Integer objectId = engine.createSimObject(type, position, velocity, drawable);
-		engine.getSimulationObject(objectId).addListener(new LocalSimObjectStateListener(getExternalAccess()));
+		ISimulationEventListener listener = null;
+		if (listen)
+		{
+			listener = new LocalSimulationEventListener(getExternalAccess());
+		}
+		Integer objectId = engine.createSimObject(type, position, velocity, drawable, listener);
 		getParameter("object_id").setValue(objectId);
 	}
 }

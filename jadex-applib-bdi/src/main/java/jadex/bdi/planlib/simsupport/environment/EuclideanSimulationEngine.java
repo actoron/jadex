@@ -72,7 +72,8 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	public Integer createSimObject(String type,
 								   IVector2 position,
 								   IVector2 velocity,
-								   IDrawable drawable)
+								   IDrawable drawable,
+								   ISimulationEventListener listener)
 	{
 		Integer id;
 		synchronized(freeObjectIds_)
@@ -87,6 +88,12 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			}
 		}
 		SimObject simObject = new SimObject(id, type, position, velocity, drawable);
+		
+		if (listener != null)
+		{
+			simObject.addListener(listener);
+		}
+		
 		simObjects_.put(id, simObject);
 		return id;
 	}

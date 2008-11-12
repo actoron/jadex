@@ -7,6 +7,7 @@ import jadex.bdi.planlib.simsupport.common.math.IVector2;
 
 import java.beans.DesignMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +43,7 @@ public class SimObject
 	
 	/** Event listeners
 	 */
-	private Set listeners_;
+	private List listeners_;
 	
 	/** Creates a new SimObject
 	 * 
@@ -64,7 +65,7 @@ public class SimObject
 		velocity_ = initialDirection;
 		destination_ = null;
 		drawable_ = drawable;
-		listeners_ = new HashSet();
+		listeners_ = Collections.synchronizedList(new ArrayList());
 	}
 	
 	/** Returns the type of the object.
@@ -161,7 +162,7 @@ public class SimObject
 	 * 
 	 * @param listener the listener
 	 */
-	public synchronized void addListener(ISimObjectStateListener listener)
+	public synchronized void addListener(ISimulationEventListener listener)
 	{
 		listeners_.add(listener);
 	}
@@ -170,22 +171,31 @@ public class SimObject
 	 * 
 	 * @param listener the listener
 	 */
-	public synchronized void removeListener(ISimObjectStateListener listener)
+	public synchronized void removeListener(ISimulationEventListener listener)
 	{
 		listeners_.remove(listener);
+	}
+	
+	/** Fires a simulation event to all listeners of the object.
+	 *  
+	 *  @param evt the SimulationEvent
+	 */
+	public synchronized void fireSimulationEvent(SimulationEvent evt)
+	{
+		for (Iterator it = listeners_.iterator(); it.hasNext(); )
+		{
+			ISimulationEventListener listener = (ISimulationEventListener) it.next();
+			listener.simulationEvent(evt);
+		}
 	}
 	
 	// Events
 	
 	private void fireDestinationReachedEvent()
 	{
-		SimulationEvent evt = new SimulationEvent();
+		SimulationEvent evt = new SimulationEvent(SimulationEvent.DESTINATION_REACHED);
 		//TODO: Include parameters? yes, the object id, maybe more?
 		evt.setParameter("object_id", objectId_);
-		for (Iterator it = listeners_.iterator(); it.hasNext(); )
-		{
-			ISimObjectStateListener listener = (ISimObjectStateListener) it.next();
-			listener.destinationReached(evt);
-		}
+		fireSimulationEvent(evt);
 	}
 }
