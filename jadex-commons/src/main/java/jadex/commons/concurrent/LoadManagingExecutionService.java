@@ -1,8 +1,8 @@
 package jadex.commons.concurrent;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -19,14 +19,19 @@ public class LoadManagingExecutionService
 	/** The desired CPU load. */
 	protected double	load;
 
-	/** The time slice (in ms). */
+	/** The max time slice (in ms). Only met if single tasks are below this time. */
 	protected long	timeslice;
 
-	/** The tasks to do (executable->task). */
-	protected Map	tasks;
+	/** The tasks to do. */
+	protected Set	tasks;
 	
 	/** The executor for performing management operations. */
 	protected Executor	executor;
+	
+	/** A limit for concurrency (to avoid exceeding the timeslice). */
+	protected int	limit;
+	
+	//-------- transient attributes (set during one execution cycle) --------
 	
 	/** The sleep time (if sleeping is required before executing). */
 	protected long	sleep;
@@ -41,22 +46,22 @@ public class LoadManagingExecutionService
 	
 	/**
 	 *  Create an execution service with default settings
-	 *  (load=0.1, timeslice=50).
+	 *  (timeslice=50).
 	 */
 	public LoadManagingExecutionService(IThreadPool pool)
 	{
-		this(pool, 0.1, 50);
+		this(pool, 50);
 	}
 	
 	/**
 	 *  Create an execution service with given settings.
 	 */
-	public LoadManagingExecutionService(IThreadPool pool, double load, long timeslice)
+	public LoadManagingExecutionService(IThreadPool threadpool, long timeslice)
 	{
-		this.pool	= pool;
-		this.load	= load;
+		this.pool	= threadpool;
 		this.timeslice	= timeslice;
-		this.tasks	= new HashMap();
+		this.limit	= 1;
+		this.tasks	= new TreeSet();
 		this.executor	= new Executor(pool, new IExecutable()
 		{
 			public boolean execute()
@@ -78,15 +83,31 @@ public class LoadManagingExecutionService
 					if(concurrency!=0)
 						return false;	// Hack!!! execute can be called too often
 						
-					LoadManagingExecutionService.this.start	= System.nanoTime();
-					LoadManagingExecutionService.this.concurrency	= 0;
-					for(Iterator it=tasks.values().iterator(); it.hasNext(); )
+					start	= System.nanoTime();
+					concurrency	= 0;
+					load	= 0.0;
+					for(Iterator it=tasks.iterator(); concurrency<limit && it.hasNext(); )
 					{
-						Task	task	= (Task) it.next();
-						LoadManagingExecutionService.this.pool.execute(task);
-						concurrency++;
+						Task	task	= (Task)it.next();
+						if(load==0.0)
+						{
+							load	= task.priority;
+						}
+
+						if(load==task.priority)
+						{
+							it.remove();
+							pool.execute(task);
+							concurrency++;
+						}
+						else
+						{
+							break;
+						}
 					}
-//					System.out.println("Executing "+concurrency+" tasks.");
+					if(concurrency>0)
+						limit	= concurrency;
+//					System.out.println("Executing "+concurrency+" tasks with load "+load);
 				}
 				return false;
 			}
@@ -101,19 +122,9 @@ public class LoadManagingExecutionService
 	 *  @param executable The task to execute.
 	 *  @param listener Called when execution has started.
 	 */
-	public synchronized void	execute(IExecutable executable)
+	public synchronized void	execute(IExecutable executable, double priority)
 	{
-		Task	task	= (Task)tasks.get(executable);
-		if(task==null)
-		{
-			task	= new Task(executable);
-			tasks.put(executable, task);
-		}
-		else
-		{			
-			// Set continue flag of existing task to avoid task being finished.
-			task.setContinue(true);
-		}
+		tasks.add(new Task(executable, priority));
 
 		// Concurrency==0 means not currently running -> start.
 		if(concurrency==0)
@@ -125,18 +136,21 @@ public class LoadManagingExecutionService
 	/**
 	 *  Called when a task has been performed once.
 	 */
-	public synchronized void	taskPerformed(Task task)
+	protected synchronized void	taskPerformed(Task task)
 	{
-		if(task.isFinished())
-		{
-			tasks.remove(task);
-		}
-
 		concurrency--;
 		if(concurrency==0 && !tasks.isEmpty())
 		{
+			// Calculate sleep time to meet load setting.
 			long	time	= System.nanoTime() - start;
 			sleep	= (long)((time/load - time) / 1000000);
+			
+			// Calculate concurrency limit to meet max timeslice setting:
+			// newlimit = oldlimit * target_slice / actual_slice
+			double	newlimit	= limit * timeslice / (sleep + time/1000000);
+			// Use exponential annealing to avoid oscillations
+			limit	= Math.max(1, limit + (int)(0.5*(newlimit-limit)));
+			
 			executor.execute();
 //			System.out.println("Execution finished in "+time/1000000+" millis.");
 		}
@@ -144,65 +158,86 @@ public class LoadManagingExecutionService
 	
 	//-------- helper classes --------
 	
+	/** The counter. */
+	protected static int	COUNTER	= 0;
+
 	/**
 	 *  A task info holds a task and meta information.
 	 */
-	public class Task	implements Runnable
-	{
+	public class Task	implements Runnable, Comparable
+	{		
 		//-------- attributes --------
 		
 		/** The task. */
 		protected IExecutable	executable;
 		
-		/** Flag indicating the task is finished. */
-		protected boolean	finished;
+		/** The priority. */
+		protected double	priority;
 		
-		/** Flag indicating that the task has been registered again. */
-		protected boolean	cont;
+		/** The sequence number. */
+		protected int	seqnr;
 		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a new task info for a given task.
 		 */
-		public Task(IExecutable task)
+		public Task(IExecutable task, double priority)
 		{
 			this.executable	= task;
+			this.priority	= priority;
+			synchronized(Task.class)
+			{
+				this.seqnr	= COUNTER++;
+			}
 		}
 		
-		//-------- methods --------
+		//-------- Runnable interface --------
 
 		/**
 		 *  Perform the task once and notify the manager.
 		 */
 		public void	run()
 		{
-			finished	= !executable.execute() && !cont;
-			LoadManagingExecutionService.this.taskPerformed(this);
+//			System.out.println("Executing: "+this);
+			boolean	execute	= executable.execute();
+			synchronized(LoadManagingExecutionService.this)
+			{
+				if(execute)
+				{
+					LoadManagingExecutionService.this.execute(executable, priority);
+				}
+				LoadManagingExecutionService.this.taskPerformed(this);
+			}
 		}
 		
+		//-------- Comparable interface --------
+
 		/**
-		 *  Check if the task is done.
-		 */
-		public boolean isFinished()
+	     *  Return a negative integer, zero, or a positive integer as this object
+	     *		is less than, equal to, or greater than the specified object.
+	     */
+		public int compareTo(Object obj)
 		{
-			return finished;
+			double	ret	= -1;
+			if(obj instanceof Task)
+			{
+				if(priority!=((Task)obj).priority)
+					ret	= ((Task)obj).priority - priority;
+				else
+					ret	= seqnr - ((Task)obj).seqnr;
+			}
+			return ret>0 ? 1 : ret<0 ? -1 : 0;
 		}
 		
-		/**
-		 *  Set the continue flag.
-		 */
-		public void	setContinue(boolean cont)
-		{
-			this.cont	= cont;
-		}
+		//-------- methods --------
 		
 		/**
 		 *  Create a string representation of the task info.
 		 */
 		public String	toString()
 		{
-			return "Task("+executable+", finished="+finished+")";
+			return "Task("+executable+", seqnr="+seqnr+", priority="+priority+")";
 		}
 	}
 
@@ -210,26 +245,29 @@ public class LoadManagingExecutionService
 	
 	public static void main(String[] args)
 	{
+		double	PRIORITY	= 0.1;
 		LoadManagingExecutionService	service	= new LoadManagingExecutionService(
-			ThreadPoolFactory.createThreadPool(), 1, 50);
-		service.execute(new TestExecutable());
-		service.execute(new TestExecutable());
-		service.execute(new TestExecutable());
-		service.execute(new TestExecutable());
-		service.execute(new TestExecutable());
-		service.execute(new TestExecutable());
-		service.execute(new TestExecutable());
-		service.execute(new TestExecutable());
+			ThreadPoolFactory.createThreadPool());
+		service.execute(new TestExecutable(), PRIORITY);
+		service.execute(new TestExecutable(), PRIORITY+0.1);
+		service.execute(new TestExecutable(), PRIORITY+0.2);
+		service.execute(new TestExecutable(), PRIORITY+0.3);
+		service.execute(new TestExecutable(), PRIORITY+0.4);
+		service.execute(new TestExecutable(), PRIORITY+0.5);
+		service.execute(new TestExecutable(), PRIORITY+0.6);
+		service.execute(new TestExecutable(), PRIORITY+0.7);
 	}
 	
 	static class TestExecutable	implements IExecutable
 	{
+		int cnt	= 1;
 		public boolean execute()
 		{
 			double	sum	= 0;
-			for(int i=0; i<10000000; i++)
+			for(int i=0; i<5000000; i++)
 				sum+=i;
-			return true;
+			System.out.println("Executed "+this+", "+cnt);
+			return cnt++<10;
 		}
 	}
 }

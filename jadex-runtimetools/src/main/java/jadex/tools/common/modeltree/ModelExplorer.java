@@ -58,9 +58,6 @@ public class ModelExplorer extends JTree
 {
 	//-------- constants --------
 
-	/** The time to wait between checks. */
-	public static String	REFRESHER_ID	= "refresher";
-
 	/** The max time to check nodes as requested by the user (default 90%). */
 	public static double	PERCENTAGE_USER	= 0.90;
 	
