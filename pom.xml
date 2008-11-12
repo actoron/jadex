@@ -20,6 +20,7 @@
     <module>jadex-applications-bdi</module>
     <module>jadex-runtimetools</module>
     <module>jadex-launch</module>
+    <module>jadex-microkernel</module>
   </modules>
   <build>
     <plugins>
