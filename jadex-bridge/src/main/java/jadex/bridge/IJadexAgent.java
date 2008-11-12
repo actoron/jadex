@@ -11,6 +11,8 @@ public interface IJadexAgent
 	//-------- methods to be called by adapter --------
 
 	/**
+	 *  Can be called on the agent thread only.
+	 * 
 	 *  Main method to perform agent execution.
 	 *  Whenever this method is called, the agent performs
 	 *  one of its scheduled actions.
@@ -23,6 +25,8 @@ public interface IJadexAgent
 	public boolean executeAction();
 
 	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *  
 	 *  Inform the agent that a message has arrived.
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param message The message that arrived.
@@ -30,6 +34,8 @@ public interface IJadexAgent
 	public void messageArrived(IMessageAdapter message);
 
 	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *   
 	 *  Request agent to kill itself.
 	 *  The agent might perform arbitrary cleanup activities during which executeAction()
 	 *  will still be called as usual.
@@ -39,10 +45,12 @@ public interface IJadexAgent
 	public void killAgent(IResultListener listener);
 	
 	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 * 
 	 *  Get the external access for this agent.
 	 *  The specific external access interface is kernel specific
 	 *  and has to be casted to its corresponding incarnation.
-	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+	 *  @param listener	External access is delivered via result listener.
 	 */
 	public void getExternalAccess(IResultListener listener);
 }
