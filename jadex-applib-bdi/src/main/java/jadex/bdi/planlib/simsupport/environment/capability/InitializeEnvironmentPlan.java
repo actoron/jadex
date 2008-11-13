@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.simsupport.environment.agent;
+package jadex.bdi.planlib.simsupport.environment.capability;
 
 import java.util.Iterator;
 import java.util.List;

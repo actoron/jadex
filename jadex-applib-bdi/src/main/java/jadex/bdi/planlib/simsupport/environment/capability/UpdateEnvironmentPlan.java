@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.simsupport.environment.agent;
+package jadex.bdi.planlib.simsupport.environment.capability;
 
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
