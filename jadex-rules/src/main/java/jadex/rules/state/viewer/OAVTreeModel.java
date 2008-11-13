@@ -132,7 +132,7 @@ public class OAVTreeModel implements TreeModel
 		// Todo: create copy state on state thread.
 		this.copy	= new CopyState(state, new SwingSynchronizator());
 		
-		// could this anonymous inner class results in a cyclic reference  that prevents the TreeModel 
+		// could this anonymous inner class result in a cyclic reference  that prevents the TreeModel 
 		// to be removed from gc when Introspector plugin is closed?
 		// model -> copystate -> listener -> model$this0
 		// 				|-> state -> listener -> copystate-lister$this0
@@ -2243,7 +2243,7 @@ class ObjectInspectorRefreshAction implements ActionListener
 		if (model != null)
 		{
 			model.refreshInspectorNodes();
-			System.gc();
+			//System.gc();
 		}
 		else
 		{
