@@ -7,6 +7,7 @@ import java.util.Map;
 import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.examples.cleanerworld2.environment.process.WasteGenerationProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
@@ -34,7 +35,6 @@ public class StartPlan extends Plan
 		ArrayList backgroundLayers = new ArrayList();
 		backgroundLayers.add(background);
 		environmentArgs.put("background_layers", backgroundLayers);
-		environmentArgs.put("force_java2d", Boolean.FALSE);
 		ams.createAgent("CleanerWorld2_Environment",
 						"jadex/bdi/planlib/simsupport/environment/agent/Environment.agent.xml",
 						"default",
@@ -52,6 +52,15 @@ public class StartPlan extends Plan
 									exception.printStackTrace();
 								}
 							});
+		ISimulationEngine engine = null;
+		while (engine == null)
+		{
+			engine = SimulationEngineContainer.getInstance().getSimulationEngine(envName);
+			waitFor(100);
+		}
+		
+		engine.addEnvironmentProcess(new WasteGenerationProcess());
+		
 		//waitFor(1000);
 		for (int i = 0; i < 3; ++i){
 			environmentArgs = new HashMap();
@@ -73,8 +82,27 @@ public class StartPlan extends Plan
 						}
 					});
 			waitFor(100);
-			System.out.println(i);
-	
 		}
+		
+		environmentArgs = new HashMap();
+		environmentArgs.put("environment_name", envName);
+		environmentArgs.put("force_java2d", Boolean.TRUE);
+		ams.createAgent("CleanerWorld2_Observer",
+				"jadex/bdi/planlib/simsupport/observer/agent/SimObserver.agent.xml",
+				"default",
+				environmentArgs,
+				new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							IAgentIdentifier aid = (IAgentIdentifier) result;
+							ams.startAgent(aid, null);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							exception.printStackTrace();
+						}
+					});
 	}
 }

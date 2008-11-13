@@ -66,8 +66,10 @@
     </plans>
     
     <events>
-    	<!-- Destination reached event. -->
-    	<internalevent name="simobj_dest_reached"/>
+    	<!-- Generic simulation event. -->
+    	<internaleventref name="simulation_event">
+    		<concrete ref="simcap.simulation_event"/>
+    	</internaleventref>
 	</events>
     
   	<configurations>

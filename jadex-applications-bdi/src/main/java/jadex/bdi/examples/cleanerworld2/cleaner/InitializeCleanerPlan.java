@@ -11,6 +11,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredTriangle;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableRegularPolygon;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
@@ -25,13 +26,10 @@ public class InitializeCleanerPlan extends Plan
 {
 	public void body()
 	{
-		
-		IVector2 position = new Vector2Double(1.0, 1.0);
-		IVector2 velocity = new Vector2Double(0.0, 0.0);
 		DrawableCombiner drawable = new DrawableCombiner();
-		drawable.addDrawable(new RotatingColoredRectangle(position, new Vector2Double(8.0), velocity, Color.RED));
 		String cleanerImage = "jadex/bdi/examples/cleanerworld2/images/cleaner.png";
-		drawable.addDrawable(new ScalableTexturedRectangle(position, new Vector2Double(1.0), velocity, cleanerImage));
+		drawable.addDrawable(new ScalableRegularPolygon(new Vector2Double(3.0), 3, Color.RED));
+		drawable.addDrawable(new ScalableTexturedRectangle(new Vector2Double(1.0), cleanerImage));
 		
 		String envName = (String) getBeliefbase().getBelief("environment_name").getFact();
 		IGoal currentGoal = createGoal("sim_connect_environment");
@@ -44,11 +42,12 @@ public class InitializeCleanerPlan extends Plan
 		properties.put("battery",new Vector1Double(100.0));
 		currentGoal.getParameter("properties").setValue(properties);
 		List tasks = new ArrayList();
-		tasks.add(new MoveObjectTask());
+		tasks.add(new MoveObjectTask(new Vector2Double(0.0)));
 		currentGoal.getParameter("tasks").setValue(tasks);
+		IVector2 position = new Vector2Double(0.0);
 		currentGoal.getParameter("position").setValue(position);
-		currentGoal.getParameter("velocity").setValue(velocity);
 		currentGoal.getParameter("drawable").setValue(drawable);
+		currentGoal.getParameter("signal_destruction").setValue(Boolean.TRUE);
 		currentGoal.getParameter("listen").setValue(Boolean.TRUE);
 		dispatchSubgoalAndWait(currentGoal);
 		Integer objectId = (Integer) currentGoal.getParameter("object_id").getValue();
@@ -70,7 +69,7 @@ public class InitializeCleanerPlan extends Plan
 			currentGoal.getParameter("tolerance").setValue(new Vector1Double(0.1));
 			dispatchSubgoalAndWait(currentGoal);
 			
-			waitForInternalEvent(SimulationEvent.DESTINATION_REACHED);
+			waitForInternalEvent("simulation_event");
 		}
 	}
 }
