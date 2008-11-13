@@ -14,7 +14,7 @@ public class LocalRemoveEnvironmentProcessPlan extends Plan
 	 */
 	public void body()
 	{
-		IEnvironmentProcess process = (IEnvironmentProcess) getParameter("process").getValue();
+		String process = (String) getParameter("process_name").getValue();
 		IBeliefbase b = getBeliefbase();
 		ISimulationEngine engine =
 			(ISimulationEngine) b.getBelief("local_simulation_engine").getFact();

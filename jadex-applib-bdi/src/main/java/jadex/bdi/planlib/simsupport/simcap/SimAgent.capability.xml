@@ -182,8 +182,8 @@
 		
 		<!-- Removes an environment process. -->
 		<achievegoal name="sim_remove_environment_process" exported="true">
-			<!-- The environment process. -->
-			<parameter name="process" class="IEnvironmentProcess"/>
+			<!-- The environment process name. -->
+			<parameter name="process_name" class="String"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (element_has_name "connected"))
@@ -344,8 +344,8 @@
 		</plan>
 		
 		<plan name="local_remove_environment_process_plan">
-			<parameter name="process" class="IEnvironmentProcess">
- 				<goalmapping ref="sim_remove_environment_process.process"/>
+			<parameter name="process_name" class="String">
+ 				<goalmapping ref="sim_remove_environment_process.process_name"/>
 			</parameter>
 			<body class="LocalRemoveEnvironmentProcessPlan" />
 			<trigger>
@@ -390,6 +390,10 @@
 	</plans>
 	
 	<events>
+    	<!-- Generic simulation event event. -->
+    	<internalevent name="simulation_event">
+    		<parameter name="type" class="String"/>
+    	</internalevent>
 	</events>
 	
 	<properties>

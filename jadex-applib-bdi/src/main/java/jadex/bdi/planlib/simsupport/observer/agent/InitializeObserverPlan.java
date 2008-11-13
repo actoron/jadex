@@ -19,8 +19,14 @@ public class InitializeObserverPlan extends Plan
 		String envName = (String) b.getBelief("environment_name").getFact();
 		
 		// Attempt to connect locally
-		ISimulationEngine engine =
-			SimulationEngineContainer.getInstance().getSimulationEngine(envName);
+		ISimulationEngine engine = null;
+		
+		while (engine == null)
+		{
+			engine =
+				SimulationEngineContainer.getInstance().getSimulationEngine(envName);
+			waitFor(100);
+		}
 		
 		b.getBelief("local_simulation_engine").setFact(engine);
 		IVector2 areaSize = engine.getAreaSize();

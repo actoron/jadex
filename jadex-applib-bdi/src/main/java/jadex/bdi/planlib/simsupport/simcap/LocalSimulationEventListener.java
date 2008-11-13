@@ -29,7 +29,8 @@ public class LocalSimulationEventListener implements ISimulationEventListener
 	public void simulationEvent(SimulationEvent event)
 	{
 		IInternalEvent simEvent = 
-			agent_.createInternalEvent(event.getType());
+			agent_.createInternalEvent("simulation_event");
+		simEvent.getParameter("type").setValue(event.getType());
 		if (event.hasParameters())
 		{
 			Set parameters = event.getParameters();

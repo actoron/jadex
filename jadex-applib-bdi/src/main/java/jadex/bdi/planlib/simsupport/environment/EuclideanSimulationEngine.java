@@ -28,7 +28,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	
 	/** The environment processes.
 	 */
-	private List processes_;
+	private Map processes_;
 	
 	/** Integers/ObjectIDs (keys) and SimObject engine objects (values)
 	 */
@@ -59,7 +59,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 									 IVector2 areaSize)
 	{
 		objectIdCounter_ = new AtomicCounter();
-		processes_ = Collections.synchronizedList(new ArrayList());
+		processes_ = Collections.synchronizedMap(new HashMap());
 		preLayers_ = Collections.synchronizedList(new ArrayList());
 		postLayers_ = Collections.synchronizedList(new ArrayList());
 		simObjects_ = Collections.synchronizedMap(new HashMap());
@@ -197,16 +197,16 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	public void addEnvironmentProcess(IEnvironmentProcess process)
 	{
-		processes_.add(process);
+		processes_.put(process.getName(), process);
 	}
 	
 	/** Removes an environment process.
 	 * 
 	 *  @param process the environment process
 	 */
-	public void removeEnvironmentProcess(IEnvironmentProcess process)
+	public void removeEnvironmentProcess(String processName)
 	{
-		processes_.remove(process);
+		processes_.remove(processName);
 	}
 	
 	/** Retrieves a simulation object.
@@ -316,9 +316,10 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	{
 		synchronized(processes_)
 		{
-			for (Iterator it = processes_.iterator(); it.hasNext(); )
+			Object[] processes = processes_.values().toArray();
+			for (int i = 0; i < processes.length; ++i)
 			{
-				IEnvironmentProcess process = (IEnvironmentProcess) it.next();
+				IEnvironmentProcess process = (IEnvironmentProcess) processes[i];
 				
 				process.execute(deltaT, this);
 			}

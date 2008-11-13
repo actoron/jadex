@@ -36,27 +36,22 @@ public class ScalableTexturedRectangle extends ScalablePrimitive
      */
     public ScalableTexturedRectangle(String texturePath)
     {
-        this(new Vector2Double(0.0),
-             new Vector2Double(1.0),
-             new Vector2Double(0.0),
+        this(new Vector2Double(1.0),
              texturePath);
     }
     
     /** Creates a new TexturedCenteredRectangle drawable.
      *
-     *  @param pos initial position
      *  @param size initial size
      *  @param velocity initial velocity
      *  @param texturePath resource path of the texture
      */
-    public ScalableTexturedRectangle(IVector2 pos,
-                                     IVector2 size,
-                                     IVector2 velocity,
+    public ScalableTexturedRectangle(IVector2 size,
                                      String texturePath)
     {
-        setPosition(pos);
+        setPosition(new Vector2Double(0.0));
         setSize(size);
-        setVelocity(velocity);
+        setVelocity(new Vector2Double(0.0));
         texturePath_ = texturePath;
         texture_ = null;
         image_ = null;

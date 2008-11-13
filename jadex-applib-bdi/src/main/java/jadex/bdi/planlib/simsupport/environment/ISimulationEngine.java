@@ -85,9 +85,9 @@ public interface ISimulationEngine
 	
 	/** Removes an environment process.
 	 * 
-	 *  @param process the environment process
+	 *  @param processName name of the environment process
 	 */
-	public void removeEnvironmentProcess(IEnvironmentProcess process);
+	public void removeEnvironmentProcess(String processName);
 	
 	/** Retrieves a simulation object.
 	 *  
