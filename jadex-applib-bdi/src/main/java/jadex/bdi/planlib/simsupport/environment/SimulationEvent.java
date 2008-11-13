@@ -12,6 +12,7 @@ public class SimulationEvent implements Serializable
 {
 	// Default Event Types
 	public static final String DESTINATION_REACHED = "simobj_dest_reached";
+	public static final String OBJECT_DESTROYED = "simobj_destroyed";
 	
 	/** Event type
 	 */

@@ -2,6 +2,8 @@ package jadex.bdi.planlib.simsupport.simcap;
 
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
+import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
+import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
 
@@ -18,6 +20,9 @@ public class LocalSetVelocityPlan extends Plan
 		ISimulationEngine engine =
 			(ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
 		IVector2 velocity = (IVector2) getParameter("velocity").getValue();
-		engine.getSimulationObject(objectId).setVelocity(velocity.copy());
+		
+		SimObject object = engine.getSimulationObject(objectId);
+		MoveObjectTask moveTask = (MoveObjectTask) object.getTask(MoveObjectTask.DEFAULT_NAME);
+		moveTask.setVelocity(velocity.copy());
 	}
 }

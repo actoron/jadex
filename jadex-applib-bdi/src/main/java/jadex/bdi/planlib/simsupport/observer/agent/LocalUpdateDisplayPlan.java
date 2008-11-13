@@ -12,6 +12,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
+import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
 
@@ -93,7 +94,11 @@ public class LocalUpdateDisplayPlan extends Plan
 				SimObject so = (SimObject) entry.getValue();
 				IDrawable d = (IDrawable) drawables.get(objectId);
 				d.setPosition(so.getPosition());
-				d.setVelocity(so.getVelocity());
+				MoveObjectTask moveTask = (MoveObjectTask) so.getTask(MoveObjectTask.DEFAULT_NAME);
+				if (moveTask != null)
+				{
+					d.setVelocity(moveTask.getVelocity());
+				}
 			}
 		}
 		

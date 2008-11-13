@@ -35,7 +35,6 @@ public interface ISimulationEngine
 	 *  @param properties properties of the object (may be null)
 	 *  @param tasks tasks of the object (may be null)
 	 *  @param position position of the object
-	 *  @param velocity velocity of the object
 	 *  @param drawable drawable representing the object
 	 *  @param listener default object listener, may be null if none is required
 	 *  @return the simulation object ID
@@ -44,8 +43,8 @@ public interface ISimulationEngine
 								   Map properties,
 								   List tasks,
 								   IVector2 position,
-					    		   IVector2 velocity,
 						    	   IDrawable drawable,
+						    	   boolean signalDestruction,
 						    	   ISimulationEventListener listener);
 	
 	/** Removes a SimObject from the simulation.

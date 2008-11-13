@@ -23,8 +23,8 @@ public class LocalCreateObjectPlan extends Plan
 		Map properties = (Map) getParameter("properties").getValue();
 		List tasks = (List) getParameter("tasks").getValue();
 		IVector2 position = (IVector2) getParameter("position").getValue();
-		IVector2 velocity = (IVector2) getParameter("velocity").getValue();
 		IDrawable drawable = (IDrawable) getParameter("drawable").getValue();
+		boolean signalDestruction = ((Boolean) getParameter("signal_destruction").getValue()).booleanValue();
 		boolean listen = ((Boolean) getParameter("listen").getValue()).booleanValue();
 		IBeliefbase b = getBeliefbase();
 		ISimulationEngine engine =
@@ -34,7 +34,13 @@ public class LocalCreateObjectPlan extends Plan
 		{
 			listener = new LocalSimulationEventListener(getExternalAccess());
 		}
-		Integer objectId = engine.createSimObject(type, properties, tasks, position, velocity, drawable, listener);
+		Integer objectId = engine.createSimObject(type,
+												  properties,
+												  tasks,
+												  position,
+												  drawable,
+												  signalDestruction,
+												  listener);
 		getParameter("object_id").setValue(objectId);
 	}
 }

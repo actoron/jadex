@@ -1,6 +1,5 @@
 package jadex.bdi.planlib.simsupport.environment.simobject;
 
-import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
@@ -8,15 +7,11 @@ import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
 import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
 
-import java.beans.DesignMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /** An object in the simulation
  */
@@ -34,21 +29,21 @@ public class SimObject
 	 */
 	private Map properties_;
 	
-	/** The object's tasks
+	/** The object's tasks (task names -> tasks)
 	 */
-	private List tasks_;
+	private Map tasks_;
 	
 	/** Object position.
 	 */
 	private IVector2 position_;
 	
-	/** Object direction vector.
-	 */
-	private IVector2 velocity_;
-	
 	/** Graphical representation of the object.
 	 */
 	private IDrawable drawable_;
+	
+	/** Flag for destruction notification.
+	 */
+	private boolean signalDestruction_;
 	
 	/** Event listeners
 	 */
@@ -61,25 +56,36 @@ public class SimObject
 	 * @param properties object's properties
 	 * @param tasks initial task list
 	 * @param initialPosition the object's initial position
-	 * @param initialDirection the object's initial direction
 	 * @param drawable graphical representation
+	 * @param signalDestruction If set to true, all listeners will be notified when
+	 * 		  the object is destroyed.
 	 */
 	public SimObject(Integer objectId,
 					 String type,
 					 Map properties,
 					 List tasks,
 					 IVector2 initialPosition,
-					 IVector2 initialDirection,
-					 IDrawable drawable)
+					 IDrawable drawable,
+					 boolean sigDest)
 	{
 		objectId_ = objectId;
 		type_ = type;
 		properties_ = new HashMap(properties);
-		tasks_ = new ArrayList(tasks);
+		
 		position_  = initialPosition;
-		velocity_ = initialDirection;
 		drawable_ = drawable;
+		signalDestruction_ = sigDest;
+		
 		listeners_ = new ArrayList();
+		
+		tasks_ = new HashMap();
+		for (Iterator it = tasks.iterator(); it.hasNext(); )
+		{
+			ISimObjectTask task = (ISimObjectTask) it.next();
+			task.start(this);
+			tasks_.put(task.getName(), task);
+		}
+		
 	}
 	
 	/** Returns the ID of the object.
@@ -111,11 +117,11 @@ public class SimObject
 	
 	public synchronized void updateObject(IVector1 deltaT)
 	{
-		Object[] tasks = tasks_.toArray();
+		Object[] tasks = tasks_.values().toArray();
 		for (int i = 0; i < tasks.length; ++i)
 		{
 			ISimObjectTask task = (ISimObjectTask) tasks[i];
-			task.executeTask(deltaT, this);
+			task.execute(deltaT, this);
 		}
 	}
 	
@@ -125,16 +131,28 @@ public class SimObject
 	 */
 	public synchronized void addTask(ISimObjectTask task)
 	{
-		tasks_.add(task);
+		task.start(this);
+		tasks_.put(task.getName(), task);
+	}
+	
+	/** Returns a task by its name.
+	 *  
+	 *  @param taskName name of the task
+	 *  @return the task
+	 */
+	public synchronized ISimObjectTask getTask(String taskName)
+	{
+		return (ISimObjectTask) tasks_.get(taskName);
 	}
 	
 	/** Removes a task from the object.
 	 *  
-	 *  @param task the task
+	 *  @param taskName name of the task
 	 */
-	public synchronized void removeTask(ISimObjectTask task)
+	public synchronized void removeTask(String taskName)
 	{
-		tasks_.remove(task);
+		ISimObjectTask task = (ISimObjectTask) tasks_.remove(taskName);
+		task.shutdown(this);
 	}
 	
 	/** Returns the current position of the object.
@@ -155,24 +173,6 @@ public class SimObject
 		position_ = position;
 	}
 	
-	/** Returns the current velocity of the object.
-	 * 
-	 *  @return current velocity
-	 */
-	public synchronized IVector2 getVelocity()
-	{
-		return velocity_;
-	}
-	
-	/** Sets a new velocity for the object.
-	 * 
-	 *  @param velocity new velocity
-	 */
-	public synchronized void setVelocity(IVector2 velocity)
-	{
-		velocity_ = velocity;
-	}
-	
 	/** Adds an event listener for this object.
 	 * 
 	 * @param listener the listener
@@ -189,6 +189,13 @@ public class SimObject
 	public synchronized void removeListener(ISimulationEventListener listener)
 	{
 		listeners_.remove(listener);
+	}
+	
+	/** Tests if the object requires notification of listeners on destruction.
+	 */
+	public synchronized boolean signalDestruction()
+	{
+		return signalDestruction_;
 	}
 	
 	/** Fires a simulation event to all listeners of the object.

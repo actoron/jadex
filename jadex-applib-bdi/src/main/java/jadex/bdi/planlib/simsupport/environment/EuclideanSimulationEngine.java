@@ -74,16 +74,18 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 *  @param properties properties of the object (may be null)
 	 *  @param tasks tasks of the object (may be null)
 	 *  @param position position of the object
-	 *  @param velocity velocity of the object
 	 *  @param drawables drawable representing the object
+	 *  @param signalDestruction If set to true, all listeners will be notified when
+	 * 		   the object is destroyed.
+	 *  @param listeners listeners for the object
 	 *  @return the simulation object ID
 	 */
 	public Integer createSimObject(String type,
 								   Map properties,
 								   List tasks,
 								   IVector2 position,
-								   IVector2 velocity,
 								   IDrawable drawable,
+								   boolean signalDestruction,
 								   ISimulationEventListener listener)
 	{
 		//default properties and tasks
@@ -112,7 +114,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 						id = objectIdCounter_.getNext();
 					}
 				}
-				SimObject simObject = new SimObject(id, type, properties, tasks, position, velocity, drawable);
+				SimObject simObject = new SimObject(id, type, properties, tasks, position, drawable, signalDestruction);
 
 				if (listener != null)
 				{
@@ -146,6 +148,9 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 				SimObject obj = (SimObject) simObjects_.remove(objectId);
 				((List) simObjectsByType_.get(obj.getType())).remove(obj);
 				freeObjectIds_.push(objectId);
+				SimulationEvent destEvt = new SimulationEvent(SimulationEvent.OBJECT_DESTROYED);
+				destEvt.setParameter("object_id", obj.getId());
+				obj.fireSimulationEvent(destEvt);
 			}
 		}
 	}

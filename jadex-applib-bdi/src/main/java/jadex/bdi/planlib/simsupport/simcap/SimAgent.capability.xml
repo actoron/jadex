@@ -55,10 +55,10 @@
 			<parameter name="tasks" class="List"/>
 			<!-- Place new object at this position -->
 			<parameter name="position" class="IVector2"/>
-			<!-- Give the new object this velocity -->
-			<parameter name="velocity" class="IVector2"/>
 			<!-- Use these drawables to represent the object -->
 			<parameter name="drawable" class="IDrawable"/>
+			<!-- Whether the object will issue a destruction event -->
+			<parameter name="signal_destruction" class="Boolean"/>
 			<!-- Whether to listen to object events -->
 			<parameter name="listen" class="Boolean"/>
 			<!-- ID of the object -->
@@ -149,8 +149,8 @@
 		<achievegoal name="sim_remove_task" exported="true">
 			<!-- ID of the object -->
 			<parameter name="object_id" class="Integer"/>
-			<!-- The task for the object. -->
-			<parameter name="task" class="ISimObjectTask"/>
+			<!-- Name of the task for the object. -->
+			<parameter name="task_name" class="String"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (element_has_name "connected"))
@@ -218,11 +218,11 @@
 			<parameter name="position" class="IVector2">
  				<goalmapping ref="sim_create_object.position"/>
 			</parameter>
-			<parameter name="velocity" class="IVector2">
- 				<goalmapping ref="sim_create_object.velocity"/>
-			</parameter>
 			<parameter name="drawable" class="IDrawable">
  				<goalmapping ref="sim_create_object.drawable"/>
+			</parameter>
+			<parameter name="signal_destruction" class="Boolean">
+				<goalmapping ref="sim_create_object.signal_destruction"/>
 			</parameter>
 			<parameter name="listen" class="Boolean">
 				<goalmapping ref="sim_create_object.listen"/>
@@ -390,8 +390,6 @@
 	</plans>
 	
 	<events>
-    	<!-- Destination reached event. -->
-    	<internalevent name="simobj_dest_reached"/>
 	</events>
 	
 	<properties>

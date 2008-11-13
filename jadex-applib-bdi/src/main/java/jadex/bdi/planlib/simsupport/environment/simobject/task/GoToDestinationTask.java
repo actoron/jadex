@@ -10,6 +10,14 @@ import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
  */
 public class GoToDestinationTask implements ISimObjectTask
 {
+	/** Default task name.
+	 */
+	public static final String DEFAULT_NAME = "goto_dest";
+	
+	/** Name of the task.
+	 */
+	private String name_;
+	
 	/** Position of the destination.
 	 */
 	private IVector2 targetPosition_;
@@ -22,16 +30,54 @@ public class GoToDestinationTask implements ISimObjectTask
 	 */
 	private IVector1 tolerance_;
 	
+	/** Task that moves the object.
+	 */
+	private MoveObjectTask moveTask_;
+	
 	public GoToDestinationTask(IVector2 targetPosition,
+			   				   IVector1 speed,
+			   				   IVector1 tolerance)
+	{
+		this(DEFAULT_NAME, targetPosition, speed, tolerance);
+	}
+	
+	public GoToDestinationTask(String name,
+							   IVector2 targetPosition,
 							   IVector1 speed,
 							   IVector1 tolerance)
 	{
+		name_ = name;
 		targetPosition_ = targetPosition.copy();
 		speed_ = speed.copy();
 		tolerance_ = tolerance.copy();
+		moveTask_ = null;
 	}
 	
-	public void executeTask(IVector1 deltaT, SimObject object)
+	/** This method will be executed by the object before
+	 *  the task gets added to the execution queue.
+	 *  
+	 *  @param object the object that is executing the task
+	 */
+	public void start(SimObject object)
+	{
+		moveTask_ = (MoveObjectTask) object.getTask(MoveObjectTask.DEFAULT_NAME);
+	}
+	
+	/** This method will be executed by the object before
+	 *  the task is removed from the execution queue.
+	 *  
+	 *  @param object the object that is executing the task
+	 */
+	public void shutdown(SimObject object)
+	{
+	}
+	
+	/** Directs the object towards the destination.
+	 * 
+	 *  @param deltaT time passed
+	 *  @param object the object that is executing the task
+	 */
+	public void execute(IVector1 deltaT, SimObject object)
 	{
 		IVector2 currentPosition = object.getPosition();
 		IVector2 velocity = targetPosition_.copy().subtract(currentPosition).normalize().multiply(speed_);
@@ -47,24 +93,18 @@ public class GoToDestinationTask implements ISimObjectTask
 			//TODO: Include parameters? yes, the object id, maybe more?
 			evt.setParameter("object_id", object.getId());
 			object.fireSimulationEvent(evt);
-			object.removeTask(this);
+			object.removeTask(name_);
 		}
 		
-		object.setVelocity(velocity);
+		moveTask_.setVelocity(velocity);
 	}
 	
-	public boolean equals(Object obj)
+	/** Returns the name of the task.
+	 * 
+	 *  @return name of the task.
+	 */
+	public String getName()
 	{
-		if (obj instanceof GoToDestinationTask)
-		{
-			GoToDestinationTask other = (GoToDestinationTask) obj;
-			if ((targetPosition_.equals(other.targetPosition_)) &&
-				(speed_.equals(other.speed_)) &&
-				(tolerance_.equals(other.tolerance_)))
-			{
-				return true;
-			}
-		}
-		return false;
+		return name_;
 	}
 }
