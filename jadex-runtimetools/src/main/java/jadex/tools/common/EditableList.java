@@ -16,6 +16,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 /**
  *  A editable list with x / + symbols at each row.
@@ -283,8 +284,10 @@ public class EditableList extends JTable
 					public void actionPerformed(java.awt.event.ActionEvent e)
 					{
 //						System.out.println("remove");
-						entries.remove(rowIndex);
-						((AbstractTableModel)getModel()).fireTableRowsDeleted(rowIndex, rowIndex);
+//						((AbstractTableModel)getModel()).fireTableRowsDeleted(rowIndex, rowIndex);
+						Object entry = entries.remove(rowIndex);
+						((AbstractTableModel)getModel()).fireTableChanged(new EditableListEvent(getModel(), rowIndex, rowIndex, 
+							TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE, new Object[]{entry}));
 						fireEditingStopped();
 						refresh();
 					}
@@ -372,3 +375,5 @@ public class EditableList extends JTable
 		this.showcnt = showcnt;
 	}
 }
+
+

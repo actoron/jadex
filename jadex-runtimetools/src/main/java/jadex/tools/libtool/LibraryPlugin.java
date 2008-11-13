@@ -1,10 +1,13 @@
 package jadex.tools.libtool;
 
 import jadex.bridge.ILibraryService;
+import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.Properties;
+import jadex.bridge.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.tools.common.EditableList;
+import jadex.tools.common.EditableListEvent;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.starter.StarterPlugin;
 
@@ -32,6 +35,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIDefaults;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *  The library plugin.
@@ -91,25 +97,35 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		JScrollPane scroll = new JScrollPane(classpaths);
 		classpaths.setPreferredScrollableViewportSize(new Dimension(400, 200));
 		JPanel buts = new JPanel(new GridBagLayout());
-		JButton add = new JButton("Add");
+		JButton add = new JButton("Add ...");
 		add.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
-		JButton fetch = new JButton("Refresh");		
-		fetch.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
-//		JButton clear = new JButton("Clear");
-//		clear.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
+//		JButton fetch = new JButton("Refresh");		
+//		fetch.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
 		JButton remove = new JButton("Remove");
 		remove.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
 		add.setToolTipText("Add a class path entry");
-		remove.setToolTipText("Remove an entry from the classpath");
-		fetch.setToolTipText("Fetch all entries from current class path");
+		remove.setToolTipText("Remove one or more selected entries from the classpath");
+//		fetch.setToolTipText("Fetch all entries from current class path");
 		buts.add(add, new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.EAST,
 			GridBagConstraints.NONE, new Insets(2, 4, 4, 2), 0, 0));
 		buts.add(remove, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.NONE, new Insets(2, 4, 4, 2), 0, 0));
-		buts.add(fetch, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(2, 4, 4, 2), 0, 0));
+//		buts.add(fetch, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST,
+//			GridBagConstraints.NONE, new Insets(2, 4, 4, 2), 0, 0));
 		final JFileChooser cchooser = new JFileChooser(".");
-		cchooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		cchooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		cchooser.setFileFilter(new FileFilter()
+		{
+			public boolean accept(File name)
+			{
+				return name.isDirectory() || name.getName().endsWith(".jar");
+			}
+			public String getDescription()
+			{
+				return "*.jar";
+			}
+		});
+		cchooser.setMultiSelectionEnabled(true);
 		add.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -117,16 +133,20 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				if(cchooser.showDialog(SGUI.getWindowParent(classview)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
-					File file = cchooser.getSelectedFile();
-					classpaths.addEntry(""+file);
+					File[] files = cchooser.getSelectedFiles();
 					ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
-					try
+					for(int i=0; i<files.length; i++)
 					{
-						ls.addURL(file.toURI().toURL());
-					}
-					catch(MalformedURLException ex)
-					{
-						ex.printStackTrace();
+						try
+						{
+							URL url = files[i].toURI().toURL();
+							ls.addURL(url);
+							classpaths.addEntry(url.toString());
+						}
+						catch(MalformedURLException ex)
+						{
+							ex.printStackTrace();
+						}
 					}
 				}
 			}
@@ -153,25 +173,48 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				}
 			}
 		});
-		fetch.addActionListener(new ActionListener()
+//		fetch.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				classpaths.removeEntries();
+//				java.util.List entries = fetchManagedClasspathEntries();				
+//				for(int i=0; i<entries.size(); i++)
+//				{
+//					classpaths.addEntry((String)entries.get(i));
+//				}
+//			}
+//		});
+		classpaths.getModel().addTableModelListener(new TableModelListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void tableChanged(TableModelEvent e)
 			{
-				classpaths.removeEntries();
-				java.util.List entries = fetchManagedClasspathEntries();				
-				for(int i=0; i<entries.size(); i++)
+				if(e.getType()== TableModelEvent.DELETE && (e instanceof EditableListEvent))
 				{
-					classpaths.addEntry((String)entries.get(i));
+					EditableListEvent ele = (EditableListEvent)e;
+					int start = e.getFirstRow();
+					int end = e.getLastRow();
+
+					for(int i=0; i<=end-start; i++)
+					{
+						ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+						if(ele.getData(i)!=null && ((String)ele.getData(i)).length()>0)
+						{
+							try
+							{
+								ls.removeURL(new URL(ele.getData(i).toString()));
+							}
+							catch(MalformedURLException ex)
+							{
+								System.out.println(ele.getData(i));
+								ex.printStackTrace();
+							}	
+						}
+					}
 				}
 			}
 		});
-		/**clear.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				classpaths.removeEntries();
-			}
-		});*/
+		
 		classview.add("Center", scroll);
 		classview.add("South", buts);
 		
@@ -203,8 +246,26 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		otherview.add("South", obuts);
 		
 		lists.add("Managed Classpath Entries", classview);
-		lists.add("Other Classpath Entries", otherview);
+		lists.add("System Classpath Entries", otherview);
 
+		// Add a library service listener to be informed about library changes.
+		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ls.addLibraryServiceListener(new ILibraryServiceListener()
+		{
+			public void urlAdded(URL url)
+			{
+				// todo: make synchronized
+				if(!classpaths.containsEntry(url.toString()))
+					classpaths.addEntry(url.toString());
+			}
+			public void urlRemoved(URL url)
+			{
+				// todo: make synchronized
+				if(classpaths.containsEntry(url.toString()))
+					classpaths.removeEntry(url.toString());
+			}
+		});
+		
 		return lists;
 	}
 
@@ -213,7 +274,19 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	public void setProperties(Properties props)
 	{
-//		librarytool.setProperties(props);
+		Property[] ps = props.getProperties("cp");
+		for(int i=0; i<ps.length; i++)
+		{
+			ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+			try
+			{
+				ls.addURL(new URL((String)ps[i].getValue()));
+			}
+			catch(Exception e)
+			{
+				System.out.println("Classpath problem: "+ps[i].getValue());
+			}
+		}
 	}
 
 	/**
@@ -221,8 +294,15 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	public Properties	getProperties()
 	{
-		return new Properties();
-//		return librarytool.getProperties();
+		Properties	props	= new Properties();
+		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		List urls = ls.getURLs();
+
+		for(int i=0; i<urls.size(); i++)
+		{
+			props.addProperty(new Property("cp", urls.get(i).toString()));
+		}
+		return props;
 	}
 
 	/** 
@@ -239,7 +319,6 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	public void	reset()
 	{
-//		librarytool.reset();
 	}
 	
 	/**
@@ -254,19 +333,21 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		for(Iterator it=urls.iterator(); it.hasNext(); )
 		{
 			URL	url	= (URL)it.next();
-			String file = url.getFile();
-			File f = new File(file);
+			ret.add(url.toString());
 			
-			// Hack!!! Above code doesnt handle relative url paths. 
-			if(!f.exists())
-			{
-				File	newfile	= new File(new File("."), file);
-				if(newfile.exists())
-				{
-					f	= newfile;
-				}
-			}
-			ret.add(f.getAbsolutePath());
+//			String file = url.getFile();
+//			File f = new File(file);
+//			
+//			// Hack!!! Above code doesnt handle relative url paths. 
+//			if(!f.exists())
+//			{
+//				File	newfile	= new File(new File("."), file);
+//				if(newfile.exists())
+//				{
+//					f	= newfile;
+//				}
+//			}
+//			ret.add(f.getAbsolutePath());
 		}
 		return ret;
 	}
@@ -277,7 +358,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	protected java.util.List fetchOtherClasspathEntries()
 	{
-		java.util.List	entries	= new ArrayList();
+		java.util.List	ret	= new ArrayList();
 
 		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
 		
@@ -285,21 +366,23 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		for(int i=0; i<cps.size(); i++)
 		{
 			URL	url	= (URL)cps.get(i);
-			String file = url.getFile();
-			File f = new File(file);
+			ret.add(url.toString());
 			
-			// Hack!!! Above code doesnt handle relative url paths. 
-			if(!f.exists())
-			{
-				File	newfile	= new File(new File("."), file);
-				if(newfile.exists())
-				{
-					f	= newfile;
-				}
-			}
-			entries.add(f.getAbsolutePath());
+//			String file = url.getFile();
+//			File f = new File(file);
+//			
+//			// Hack!!! Above code doesnt handle relative url paths. 
+//			if(!f.exists())
+//			{
+//				File	newfile	= new File(new File("."), file);
+//				if(newfile.exists())
+//				{
+//					f	= newfile;
+//				}
+//			}
+//			ret.add(f.getAbsolutePath());
 		}
 		
-		return entries;
+		return ret;
 	}
 }
