@@ -67,9 +67,7 @@
     
     <events>
     	<!-- Destination reached event. -->
-    	<internaleventref name="simobj_dest_reached">
-    		<concrete ref="simcap.simobj_dest_reached"/>
-    	</internaleventref>
+    	<internalevent name="simobj_dest_reached"/>
 	</events>
     
   	<configurations>
