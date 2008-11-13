@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.simsupport.simcap;
 
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
-import jadex.bdi.planlib.simsupport.environment.agent.SimulationEngineContainer;
+import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;

@@ -1,6 +1,5 @@
-package jadex.bdi.planlib.simsupport.environment.agent;
+package jadex.bdi.planlib.simsupport.environment;
 
-import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 
 import java.util.Collections;
 import java.util.HashMap;

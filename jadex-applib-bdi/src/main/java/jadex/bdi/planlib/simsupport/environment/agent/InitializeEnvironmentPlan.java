@@ -7,6 +7,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.EuclideanSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
+import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
