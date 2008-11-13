@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The Environment Agent.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Environment"
+	package="jadex.bdi.examples.cleanerworld2.environment.Environment">
+	
+	<imports>
+		<import>java.util.*</import>
+		<import>jadex.adapter.base.clock.*</import>
+		<import>jadex.bdi.planlib.simsupport.environment.*</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+	</imports>
+	
+	<capabilities>
+    	<capability name="envcap" file="jadex.bdi.planlib.simsupport.environment.capability.SimEnvironment"/>
+	</capabilities>
+	
+	<beliefs>
+		<!-- Name of the simulation environment -->
+		<beliefref name="environment_name" class="String">
+			<concrete ref="envcap.environment_name"/>
+		</beliefref>
+		
+		<!-- The clock service -->
+		<beliefref name="clock_service" class="jadex.bridge.IClockService" exported="true">
+			<concrete ref="envcap.clock_service"/>
+		</beliefref>
+  	</beliefs>
+	
+	<goals>
+	    <achievegoalref name="sim_create_object">
+        	<concrete ref="simcap.sim_create_object"/>
+    	</achievegoalref>
+    	
+    	<achievegoalref name="sim_set_destination">
+    		<concrete ref="simcap.sim_set_destination"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_get_random_position">
+    		<concrete ref="simcap.sim_get_random_position"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_connect_environment">
+    		<concrete ref="simcap.sim_connect_environment"/>
+		</achievegoalref>
+  	</goals>
+  	
+  	<plans>
+    	<!-- Initialization Plan. -->
+    	<plan name="initialization">
+      		<body class="InitializeCleanerPlan"/>
+    	</plan>
+    </plans>
+    
+    <events>
+    	<!-- Generic simulation event. -->
+    	<internaleventref name="simulation_event">
+    		<concrete ref="simcap.simulation_event"/>
+    	</internaleventref>
+	</events>
+    
+  	<configurations>
+    	<configuration name="default">
+      		<plans>
+        		<initialplan ref="initialization"/>
+      		</plans>
+    	</configuration>
+  	</configurations>
+</agent>
