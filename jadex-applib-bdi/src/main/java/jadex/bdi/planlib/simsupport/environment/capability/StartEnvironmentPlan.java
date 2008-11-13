@@ -13,7 +13,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IClockService;
 
-public class InitializeEnvironmentPlan extends Plan
+public class StartEnvironmentPlan extends Plan
 {
 	public void body()
 	{

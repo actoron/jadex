@@ -7,14 +7,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
-	package="jadex.bdi.planlib.simsupport.environment.agent"
+	package="jadex.bdi.planlib.simsupport.environment.capability"
 	name="SimEnvironment">
 
 	<imports>
-		<import>java.util.*</import>
 		<import>jadex.adapter.base.clock.*</import>
 		<import>jadex.bdi.planlib.simsupport.environment.*</import>
-		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
 	</imports>
 
 	<capabilities>
@@ -43,7 +42,11 @@
 	</beliefs>
 
 	<goals>
-		<performgoal name="update_environment" retry="true" retrydelay="0" exclude="never" exported="true">
+		<!-- Starts the environment -->
+		<achievegoal name="sim_start_environment" exported="true">
+		</achievegoal>
+		
+		<performgoal name="update_environment" retry="true" retrydelay="0" exclude="never">
 			<!-- <maintaincondition>
 				?st_rbelief = (belief (element_has_model ?st_mbelief) (belief_has_fact ?sim_time))
 				?st_mbelief = (mbelief (element_has_name "sim_time"))
@@ -54,6 +57,13 @@
 	</goals>
 
 	<plans>
+		<plan name="start_environment_plan">
+			<body class="StartEnvironmentPlan" />
+			<trigger>
+				<goal ref="sim_start_environment"/>
+			</trigger>
+		</plan>
+		
     	<plan name="update_environment_plan">
 			<body class="UpdateEnvironmentPlan"/>
 			<trigger>
