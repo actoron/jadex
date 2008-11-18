@@ -6,6 +6,10 @@ import java.math.BigDecimal;
  */
 public class Vector2Double implements IVector2, Cloneable
 {
+	/** Zero vector.
+	 */
+	public static final IVector2 ZERO = new Vector2Double(0.0);
+	
 	private double x_;
 	private double y_;
 

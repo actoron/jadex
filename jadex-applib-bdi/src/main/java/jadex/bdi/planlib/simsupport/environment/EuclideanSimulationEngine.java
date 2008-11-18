@@ -4,6 +4,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
@@ -29,6 +30,10 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	/** The environment processes.
 	 */
 	private Map processes_;
+	
+	/** Available actions in the environment.
+	 */
+	private Map actions_;
 	
 	/** Integers/ObjectIDs (keys) and SimObject engine objects (values)
 	 */
@@ -60,6 +65,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	{
 		objectIdCounter_ = new AtomicCounter();
 		processes_ = Collections.synchronizedMap(new HashMap());
+		actions_ = Collections.synchronizedMap(new HashMap());
 		preLayers_ = Collections.synchronizedList(new ArrayList());
 		postLayers_ = Collections.synchronizedList(new ArrayList());
 		simObjects_ = Collections.synchronizedMap(new HashMap());
@@ -207,6 +213,51 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	public void removeEnvironmentProcess(String processName)
 	{
 		processes_.remove(processName);
+	}
+	
+	/** Adds a new executable action to the environment.
+	 *  
+	 *  @param action the new action
+	 */
+	public void addAction(ISimAction action)
+	{
+		actions_.put(action.getName(), action);
+	}
+	
+	/** Removes an action from the environment.
+	 *  
+	 *  @param actionName name of the action
+	 */
+	public void removeAction(String actionName)
+	{
+		actions_.remove(actionName);
+	}
+	
+	/** Executes an action.
+	 * 
+	 *  @param actionName name of the action
+	 *  @param actorId ID of the actor performing the action
+	 *  @param objectId ID of the object acted upon (may be null)
+	 *  @return true if the action was successful, false otherwise
+	 */
+	public boolean performAction(String actionName, Integer actorId, Integer objectId)
+	{
+		// Halt the engine
+		synchronized(simObjects_)
+		{
+			// Block all other actions
+			synchronized(actions_)
+			{
+				SimObject actor = (SimObject) simObjects_.get(actorId);
+				SimObject object = null;
+				if (objectId != null)
+				{
+					object = (SimObject) simObjects_.get(objectId);
+				}
+				ISimAction action = (ISimAction) actions_.get(actionName);
+				return action.perform(actor, object, this);
+			}
+		}
 	}
 	
 	/** Retrieves a simulation object.

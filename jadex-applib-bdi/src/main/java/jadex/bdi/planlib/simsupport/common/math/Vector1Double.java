@@ -6,6 +6,10 @@ import java.math.BigDecimal;
  */
 public class Vector1Double implements IVector1
 {
+	/** Zero vector
+	 */
+	public static final IVector1 ZERO = new Vector1Double(0.0);
+	
 	/** The component
 	 */
 	private double x_;

@@ -18,9 +18,7 @@ public class StartEnvironmentPlan extends Plan
 	public void body()
 	{
 		IBeliefbase b = getBeliefbase();
-		int shape = ((Integer) b.getBelief("shape").getFact()).intValue();
 		String name = ((String) b.getBelief("environment_name").getFact());
-		IVector2 areaSize = ((IVector2) b.getBelief("area_size").getFact());
 		
 		IClockService clockService = (IClockService) b.getBelief("clock_service").getFact();
 		if (clockService == null)
@@ -29,29 +27,10 @@ public class StartEnvironmentPlan extends Plan
 			b.getBelief("clock").setFact(clockService);
 		}
 		b.getBelief("sim_time").setFact(new Long(clockService.getTime()));
-		ISimulationEngine engine = null;
-		switch (shape)
-		{
-		case ISimulationEngine.EUCLIDEAN_SHAPE:
-			engine = new EuclideanSimulationEngine(name, areaSize);
-			break;
-			
-		default:
-			System.err.println("Simsupport: Unknown Shape");
-			killAgent();
-			fail();
-		}
 		
-		b.getBelief("simulation_engine").setFact(engine);
+		ISimulationEngine engine = (ISimulationEngine) b.getBelief("simulation_engine").getFact();
 		
 		SimulationEngineContainer.getInstance().addSimulationEngine(name, engine);
-		
-		List bgLayers = (List) b.getBelief("background_layers").getFact();
-		for (Iterator it = bgLayers.iterator(); it.hasNext(); )
-		{
-			ILayer layer = (ILayer) it.next();
-			engine.addPreLayer(layer);
-		}
 		
 		IGoal updateGoal = createGoal("update_environment");
 		dispatchTopLevelGoal(updateGoal);

@@ -125,6 +125,26 @@ public class SimObject
 		}
 	}
 	
+	/** Returns a property.
+	 * 
+	 *  @param name name of the property
+	 *  @return the property
+	 */
+	public synchronized Object getProperty(String name)
+	{
+		return properties_.get(name);
+	}
+	
+	/** Sets a property.
+	 * 
+	 *  @param name name of the property
+	 *  @param property the property
+	 */
+	public synchronized void setProperty(String name, Object property)
+	{
+		properties_.put(name, property);
+	}
+	
 	/** Adds a new task for the object.
 	 *  
 	 *  @param task new task

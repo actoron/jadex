@@ -7,6 +7,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
@@ -88,6 +89,27 @@ public interface ISimulationEngine
 	 *  @param processName name of the environment process
 	 */
 	public void removeEnvironmentProcess(String processName);
+	
+	/** Adds a new executable action to the environment.
+	 *  
+	 *  @param action the new action
+	 */
+	public void addAction(ISimAction action);
+	
+	/** Removes an action from the environment.
+	 *  
+	 *  @param actionName name of the action
+	 */
+	public void removeAction(String actionName);
+	
+	/** Performs an action.
+	 * 
+	 *  @param actionName name of the action
+	 *  @param actorId ID of the actor performing the action
+	 *  @param objectId ID of the object acted upon (may be null)
+	 *  @return true if the action was successful, false otherwise
+	 */
+	public boolean performAction(String actionName, Integer actorId, Integer objectId);
 	
 	/** Retrieves a simulation object.
 	 *  

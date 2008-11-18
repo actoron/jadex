@@ -14,6 +14,7 @@
 		<import>jadex.adapter.base.clock.*</import>
 		<import>jadex.bdi.planlib.simsupport.environment.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.Vector1Double</import>
 	</imports>
 
 	<capabilities>
@@ -32,13 +33,14 @@
 		
 		<!-- Clock Service used by the environment -->
 		<belief name="clock_service" class="jadex.bridge.IClockService" exported="true">
-			<fact>new SimulationTickClock($beliefbase.environment_name, 0, 1)</fact>
+			<fact>null</fact>
 		</belief>
+		
+		<!-- The simulation engine -->
+		<belief name="simulation_engine" class="ISimulationEngine" exported="true"/>
 		
 		<!-- Simulation time stamp of the last simulation step -->
 		<belief name="sim_time" class="Long"/>
-    	
-		<belief name="simulation_engine" class="ISimulationEngine" exported="true"/>
 	</beliefs>
 
 	<goals>
