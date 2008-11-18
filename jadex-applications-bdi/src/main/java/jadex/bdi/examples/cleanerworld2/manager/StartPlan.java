@@ -7,6 +7,7 @@ import java.util.Map;
 import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteGenerationProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
@@ -25,18 +26,9 @@ public class StartPlan extends Plan
 			(IAMS) getScope().getPlatform().getService(IAMS.class);
 		
 		Map environmentArgs = new HashMap();
-		final String envName = "CleanerWorld2";
-		environmentArgs.put("environment_name", envName);
-		environmentArgs.put("area_size", new Vector2Double(20.0, 20.0));
-		environmentArgs.put("clock_service", getClock());
-		String bgPath = this.getClass().getPackage().getName().replaceAll("\\.", "/");
-		bgPath = bgPath.replaceAll("/manager", "/images/background.png");
-		ILayer background =  new TiledLayer(new Vector2Double(2.0), bgPath);
-		ArrayList backgroundLayers = new ArrayList();
-		backgroundLayers.add(background);
-		environmentArgs.put("background_layers", backgroundLayers);
+		final String envName = Configuration.ENVIRONMENT_NAME;
 		ams.createAgent("CleanerWorld2_Environment",
-						"jadex/bdi/planlib/simsupport/environment/agent/Environment.agent.xml",
+						"jadex/bdi/examples/cleanerworld2/environment/Environment.agent.xml",
 						"default",
 						environmentArgs,
 						new IResultListener()
@@ -59,9 +51,6 @@ public class StartPlan extends Plan
 			waitFor(100);
 		}
 		
-		engine.addEnvironmentProcess(new WasteGenerationProcess());
-		
-		//waitFor(1000);
 		for (int i = 0; i < 3; ++i){
 			environmentArgs = new HashMap();
 			ams.createAgent("CleanerWorld2_Cleaner" + Integer.valueOf(i).toString(),
@@ -84,7 +73,7 @@ public class StartPlan extends Plan
 			waitFor(100);
 		}
 		
-		environmentArgs = new HashMap();
+		/*environmentArgs = new HashMap();
 		environmentArgs.put("environment_name", envName);
 		environmentArgs.put("force_java2d", Boolean.TRUE);
 		ams.createAgent("CleanerWorld2_Observer",
@@ -103,6 +92,6 @@ public class StartPlan extends Plan
 						{
 							exception.printStackTrace();
 						}
-					});
+					});*/
 	}
 }

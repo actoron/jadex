@@ -7,13 +7,9 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="Environment"
-	package="jadex.bdi.examples.cleanerworld2.environment.Environment">
+	package="jadex.bdi.examples.cleanerworld2.environment">
 	
 	<imports>
-		<import>java.util.*</import>
-		<import>jadex.adapter.base.clock.*</import>
-		<import>jadex.bdi.planlib.simsupport.environment.*</import>
-		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
 	</imports>
 	
 	<capabilities>
@@ -22,47 +18,33 @@
 	
 	<beliefs>
 		<!-- Name of the simulation environment -->
-		<beliefref name="environment_name" class="String">
+		<beliefref name="environment_name">
 			<concrete ref="envcap.environment_name"/>
 		</beliefref>
 		
 		<!-- The clock service -->
-		<beliefref name="clock_service" class="jadex.bridge.IClockService" exported="true">
+		<beliefref name="clock_service">
 			<concrete ref="envcap.clock_service"/>
+		</beliefref>
+		
+		<!-- The simulation engine -->
+		<beliefref name="simulation_engine">
+			<concrete ref="envcap.simulation_engine"/>
 		</beliefref>
   	</beliefs>
 	
 	<goals>
-	    <achievegoalref name="sim_create_object">
-        	<concrete ref="simcap.sim_create_object"/>
+	    <achievegoalref name="sim_start_environment">
+        	<concrete ref="envcap.sim_start_environment"/>
     	</achievegoalref>
-    	
-    	<achievegoalref name="sim_set_destination">
-    		<concrete ref="simcap.sim_set_destination"/>
-		</achievegoalref>
-		
-		<achievegoalref name="sim_get_random_position">
-    		<concrete ref="simcap.sim_get_random_position"/>
-		</achievegoalref>
-		
-		<achievegoalref name="sim_connect_environment">
-    		<concrete ref="simcap.sim_connect_environment"/>
-		</achievegoalref>
   	</goals>
   	
   	<plans>
     	<!-- Initialization Plan. -->
     	<plan name="initialization">
-      		<body class="InitializeCleanerPlan"/>
+      		<body class="InitializeEnvironmentPlan"/>
     	</plan>
     </plans>
-    
-    <events>
-    	<!-- Generic simulation event. -->
-    	<internaleventref name="simulation_event">
-    		<concrete ref="simcap.simulation_event"/>
-    	</internaleventref>
-	</events>
     
   	<configurations>
     	<configuration name="default">

@@ -30,6 +30,14 @@
 	</capabilities>
 	
 	<beliefs>
+		<!-- Battery state -->
+		<belief name="battery_state" class="String">
+			<fact>"charged"</fact>
+		</belief>
+		<!-- Our current waste target -->
+		<belief name="waste_target" class="Integer">
+			<fact>null</fact>
+		</belief>
 		<!-- Name of the simulation environment -->
 		<belief name="environment_name" class="String">
 			<fact>new String("CleanerWorld2")</fact>
@@ -41,6 +49,59 @@
   	</beliefs>
 	
 	<goals>
+		<!-- Observe the battery state. -->
+		<maintaingoal name="maintainbatteryloaded">
+			<deliberation>
+				<inhibits ref="performlookforwaste" inhibit="when_in_process"/>
+				<inhibits ref="achievecleanup" inhibit="when_in_process"/>
+			</deliberation>
+			<!-- Engage in actions when the state is low. -->
+ 			<maintaincondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				?mbelief = (mbelief (element_has_name "battery_state"))
+				(test (!= ?fact "low"))
+ 			</maintaincondition>
+			<!-- The goal is satisfied when the charge state is 1.0. -->
+			<targetcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				?mbelief = (mbelief (element_has_name "battery_state"))
+				(test (== ?fact "charged"))
+ 			</targetcondition>
+		</maintaingoal>
+		
+		<!-- Clean up some waste. -->
+		<achievegoal name="achievecleanup" retry="true" exclude="when_failed">
+			<parameter name="waste" class="Waste">
+				<!-- Bind against variable from creation condition. -->
+				<!-- <bindingoptions>"?waste"</bindingoptions> -->
+				<value>?waste</value>
+			</parameter>
+			<!-- Adopt when we have a target -->
+			<creationcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				?mbelief = (mbelief (element_has_name "waste_target"))
+				(test (!= ?fact null))
+			</creationcondition>
+			<deliberation cardinality="1">
+				<inhibits ref="performlookforwaste"/>
+			</deliberation>
+		</achievegoal>
+		
+		<!-- Look out for waste when nothing better to do. -->
+		<performgoal name="performlookforwaste" retry="true" exclude="never">
+ 		</performgoal>
+ 		
+ 		<!-- Event handling -->
+ 		
+ 		<plan name="low_battery_event_plan">
+			<body class="LowBatteryEventPlan"/>
+			<trigger>
+ 				<internalevent ref="simulation_event">
+					<match>$event.getParameter("type").getValue().equals("battery_low")</match>
+				</internalevent>
+			</trigger>
+		</plan>
+		
 	    <achievegoalref name="sim_create_object">
         	<concrete ref="simcap.sim_create_object"/>
     	</achievegoalref>
@@ -59,6 +120,9 @@
   	</goals>
   	
   	<plans>
+  		<plan name="look_for_waste_plan">
+  			<body class="LookForWastePlan"/>
+  		</plan>
     	<!-- Initialization Plan. -->
     	<plan name="initialization">
       		<body class="InitializeCleanerPlan"/>

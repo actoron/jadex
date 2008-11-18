@@ -64,7 +64,7 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 	 *  @param deltaT time passed during this simulation step
 	 *  @param engine the simulation engine
 	 */
-	public void execute(IVector1 deltaT, ISimulationEngine engine)
+	public synchronized void execute(IVector1 deltaT, ISimulationEngine engine)
 	{
 		while (waste_ <= maxWaste_)
 		{
@@ -99,9 +99,12 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 	{
 		public void simulationEvent(SimulationEvent event)
 		{
-			if (event.getType().equals("simobj_destroyed"))
+			synchronized(WasteGenerationProcess.this)
 			{
-				--waste_;
+				if (event.getType().equals("simobj_destroyed"))
+				{
+					--waste_;
+				}
 			}
 		}
 	}
