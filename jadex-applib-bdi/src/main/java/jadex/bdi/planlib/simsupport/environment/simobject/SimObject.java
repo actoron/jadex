@@ -3,6 +3,7 @@ package jadex.bdi.planlib.simsupport.environment.simobject;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.common.math.SynchronizedVector2Wrapper;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
 import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
@@ -72,7 +73,7 @@ public class SimObject
 		type_ = type;
 		properties_ = new HashMap(properties);
 		
-		position_  = initialPosition;
+		position_  = new SynchronizedVector2Wrapper(initialPosition.copy());
 		drawable_ = drawable;
 		signalDestruction_ = sigDest;
 		
@@ -86,6 +87,21 @@ public class SimObject
 			tasks_.put(task.getName(), task);
 		}
 		
+	}
+	
+	/** SimObject are the same if their ID matches.
+	 *  
+	 *  @param obj another SimObject
+	 *  @return true if obj is a SimObject and the ID matches
+	 */
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof SimObject))
+		{
+			return false;
+		}
+		SimObject other = (SimObject) obj;
+		return objectId_.equals(other.objectId_);
 	}
 	
 	/** Returns the ID of the object.
@@ -151,6 +167,7 @@ public class SimObject
 	 */
 	public synchronized void addTask(ISimObjectTask task)
 	{
+		System.out.println("Adding task: " + task.getName());
 		task.start(this);
 		tasks_.put(task.getName(), task);
 	}
@@ -172,7 +189,10 @@ public class SimObject
 	public synchronized void removeTask(String taskName)
 	{
 		ISimObjectTask task = (ISimObjectTask) tasks_.remove(taskName);
-		task.shutdown(this);
+		if (task != null)
+		{
+			task.shutdown(this);
+		}
 	}
 	
 	/** Returns the current position of the object.
@@ -190,7 +210,7 @@ public class SimObject
 	 */
 	public synchronized void setPosition(IVector2 position)
 	{
-		position_ = position;
+		position_ = new SynchronizedVector2Wrapper(position.copy());
 	}
 	
 	/** Adds an event listener for this object.

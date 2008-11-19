@@ -55,7 +55,7 @@
 	</beliefs>
 
 	<goals>
-		<performgoal name="simobs_update_display" retry="true" retrydelay="16" exclude="never">
+		<performgoal name="simobs_update_display" retry="true" retrydelay="33" exclude="never">
 		</performgoal>
 	</goals>
 

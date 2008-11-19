@@ -84,6 +84,13 @@ public interface ISimulationEngine
 	 */
 	public void addEnvironmentProcess(IEnvironmentProcess process);
 	
+	/** Returns an environment process.
+	 * 
+	 *  @param processName name of the environment process
+	 *  @return the environment process or null if not found
+	 */
+	public IEnvironmentProcess getEnvironmentProcess(String processName);
+	
 	/** Removes an environment process.
 	 * 
 	 *  @param processName name of the environment process
@@ -107,9 +114,10 @@ public interface ISimulationEngine
 	 *  @param actionName name of the action
 	 *  @param actorId ID of the actor performing the action
 	 *  @param objectId ID of the object acted upon (may be null)
+	 *  @param parameters parameters for the action (may be null)
 	 *  @return true if the action was successful, false otherwise
 	 */
-	public boolean performAction(String actionName, Integer actorId, Integer objectId);
+	public boolean performAction(String actionName, Integer actorId, Integer objectId, List parameters);
 	
 	/** Retrieves a simulation object.
 	 *  
@@ -117,6 +125,14 @@ public interface ISimulationEngine
 	 *  @return current the simulated object
 	 */
 	public SimObject getSimulationObject(Integer objectId);
+	
+	/** Returns the nearest object of a specific type to the given position.
+	 * 
+	 *  @param type type of the object
+	 *  @param position position the object should be nearest to
+	 *  @return nearest object of a specific type
+	 */
+	public SimObject getNearestObject(String type, IVector2 position);
 	
 	/** Returns the size of the simulated area.
 	 *  

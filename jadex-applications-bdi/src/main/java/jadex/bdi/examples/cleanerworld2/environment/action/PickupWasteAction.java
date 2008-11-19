@@ -1,5 +1,7 @@
 package jadex.bdi.examples.cleanerworld2.environment.action;
 
+import java.util.List;
+
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
@@ -18,7 +20,7 @@ public class PickupWasteAction implements ISimAction
 		name_ = DEFAULT_NAME;
 	}
 	
-	public boolean perform(SimObject actor, SimObject object, ISimulationEngine engine)
+	public boolean perform(SimObject actor, SimObject object, List parameters, ISimulationEngine engine)
 	{
 		if ((actor.getType() == "cleaner") &&
 			(object != null) &&

@@ -14,7 +14,11 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 {
 	public final static String WASTE_TYPE = "waste";
 	
-	public final static String FIXED_NAME = "WasteGeneration";
+	public final static String DEFAULT_NAME = "WasteGeneration";
+	
+	/** Process name
+	 */
+	private String name_;
 	
 	/** Maximum number of waste objects.
 	 */
@@ -39,6 +43,7 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 	{
 		maxWaste_ = maxWaste;
 		waste_ = 0;
+		name_ = DEFAULT_NAME;
 	}
 	
 	/** This method will be executed by the object before
@@ -69,9 +74,7 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 		while (waste_ <= maxWaste_)
 		{
 			IVector2 pos = engine.getRandomPosition(new Vector2Double(0.5));
-			System.out.println(this.getClass().getPackage().getName());
 			String imgPath = this.getClass().getPackage().getName().replaceAll("environment\\.process", "").concat("images.").replaceAll("\\.", "/").concat("waste.png");
-			System.out.println(imgPath);
 			IDrawable drawable = new ScalableTexturedRectangle(new Vector2Double(0.5), imgPath);
 															   
 			engine.createSimObject("waste",
@@ -91,7 +94,7 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 	 */
 	public String getName()
 	{
-		return FIXED_NAME;
+		return name_;
 	}
 	
 	

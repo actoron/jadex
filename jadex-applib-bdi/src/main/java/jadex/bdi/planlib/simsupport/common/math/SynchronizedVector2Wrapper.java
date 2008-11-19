@@ -2,56 +2,82 @@ package jadex.bdi.planlib.simsupport.common.math;
 
 import java.math.BigDecimal;
 
-/** Interface for cartesian 2-vectors
- *  NOTE: All operations on the vector are destructive and the instance
- *        returned is the same as the one whose method was called.
- *        If you require a copy of the vector before performing operations
- *        on it, use the copy constructor, the copy method or the clone
- *        interface.
+/** Wrapper for synchronized access of a vector2
  */
-public interface IVector2
+public class SynchronizedVector2Wrapper implements IVector2
 {
+	private IVector2 vector_;
+	
+	public SynchronizedVector2Wrapper(IVector2 vector)
+	{
+		vector_ = vector;
+	}
+	
 	/** Adds a scalar to each component of this vector.
 	 *
 	 *  @param scalar scalar value as double
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 add(double scalar);
+	public synchronized IVector2 add(double scalar)
+	{
+		vector_.add(scalar);
+		return this;
+	}
 	
 	/** Adds a scalar to each component of this vector.
 	 *
 	 *  @param scalar scalar value
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 add(IVector1 scalar);
+	public synchronized IVector2 add(IVector1 scalar)
+	{
+		vector_.add(scalar);
+		return this;
+	}
 
 	/** Adds another vector to this vector, adding individual components.
 	 *
 	 *  @param vector the vector to add to this vector
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 add(IVector2 vector);
+	public synchronized IVector2 add(IVector2 vector)
+	{
+		vector_.add(vector);
+		return this;
+	}
 	
 	/** Subtracts a scalar to each component of this vector.
 	 *
 	 *  @param scalar scalar value as double
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 subtract(double scalar);
+	public synchronized IVector2 subtract(double scalar)
+	{
+		vector_.subtract(scalar);
+		return this; 
+	}
 	
 	/** Subtracts a scalar to each component of this vector.
 	 *
 	 *  @param scalar scalar value
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 subtract(IVector1 scalar);
+	public synchronized IVector2 subtract(IVector1 scalar)
+	{
+		vector_.subtract(scalar);
+		return this;
+	}
 
 	/** Subtracts another vector to this vector, subtracting individual components.
 	 *
 	 *  @param vector the vector to subtract from this vector
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 subtract(IVector2 vector);
+	public synchronized IVector2 subtract(IVector2 vector)
+	{
+		vector_.subtract(vector);
+		return this;
+	}
 
 	/** Applies a modulo vector. The modulus will be added first so that
 	 *  values in the interval (-modulus, 0) will wrap over into the positive range.
@@ -59,159 +85,248 @@ public interface IVector2
 	 *  @param modulus modulus
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 mod(IVector2 modulus);
+	public synchronized IVector2 mod(IVector2 modulus)
+	{
+		vector_.mod(modulus);
+		return this;
+	}
 	
 	/** Performs a scalar multiplication (scaling) on the vector.
 	 *
 	 *  @param scalar the scale factor double
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 multiply(double scalar);
+	public synchronized IVector2 multiply(double scalar)
+	{
+		vector_.multiply(scalar);
+		return this;
+	}
 	
 	/** Performs a scalar multiplication (scaling) on the vector.
 	 *
 	 *  @param scalar the scale factor
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 multiply(IVector1 scalar);
+	public synchronized IVector2 multiply(IVector1 scalar)
+	{
+		vector_.multiply(scalar);
+		return this;
+	}
 	
 	/** Performs a multiplication on the vector.
 	 *
 	 *  @param vector vector
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 multiply(IVector2 vector);
+	public synchronized IVector2 multiply(IVector2 vector)
+	{
+		vector_.multiply(vector);
+		return this;
+	}
 	
 	/** Sets all vector components to zero.
 	 *
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 zero();
+	public synchronized IVector2 zero()
+	{
+		vector_.zero();
+		return this;
+	}
 	
 	/** Negates the x-component.
 	 *
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 negateX();
+	public synchronized IVector2 negateX()
+	{
+		vector_.negateX();
+		return this;
+	}
 	
 	/** Negates the y-component.
 	 *
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 negateY();
+	public synchronized IVector2 negateY()
+	{
+		vector_.negateY();
+		return this;
+	}
 	
 	/** Negates the vector by negating its components.
 	 *
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 negate();
+	public synchronized IVector2 negate()
+	{
+		vector_.negate();
+		return this;
+	}
 	
 	/** Sets the x-component to a random value in the interval [lower,upper]
 	 * 
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 randomX(IVector1 lower, IVector1 upper);
+	public synchronized IVector2 randomX(IVector1 lower, IVector1 upper)
+	{
+		vector_.randomX(lower, upper);
+		return this;
+	}
 	
 	/** Sets the y-component to a random value in the interval [lower,upper]
 	 * 
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
-	public IVector2 randomY(IVector1 lower, IVector1 upper);
+	public synchronized IVector2 randomY(IVector1 lower, IVector1 upper)
+	{
+		vector_.randomY(lower, upper);
+		return this;
+	}
 	
 	/** Converts the vector to a unit vector (normalization)
 	 */
-	public IVector2 normalize();
+	public synchronized IVector2 normalize()
+	{
+		vector_.normalize();
+		return this;
+	}
 	
 	/** Returns the length (magnitude) of the vector.
 	 *
 	 *  @return vector length
 	 */
-	public IVector1 getLength();
+	public synchronized IVector1 getLength()
+	{
+		return vector_.getLength();
+	}
 	
 	/** Returns the direction (theta) of the vector.
 	 *
 	 *  @return vector direction
 	 */
-	public IVector1 getDirection();
+	public synchronized IVector1 getDirection()
+	{
+		return vector_.getDirection();
+	}
 	
 	/** Returns the direction (theta) of the vector as float.
 	 *
 	 *  @return vector direction as float
 	 */
-	public float getDirectionAsFloat();
+	public synchronized float getDirectionAsFloat()
+	{
+		return vector_.getDirectionAsFloat();
+	}
 	
 	/** Returns the direction (theta) of the vector as double.
 	 *
 	 *  @return vector direction as double
 	 */
-	public double getDirectionAsDouble();
+	public synchronized double getDirectionAsDouble()
+	{
+		return vector_.getDirectionAsDouble();
+	}
 	
 	/** Returns the distance to another vector.
 	 *
 	 *  @param vector other vector 
 	 *  @return distance
 	 */
-	public IVector1 getDistance(IVector2 vector);
+	public synchronized IVector1 getDistance(IVector2 vector)
+	{
+		return vector_.getDistance(vector);
+	}
 	
 	/** Returns the x-component of the vector.
 	 *
 	 *  @return x-component
 	 */
-	public IVector1 getX();
+	public synchronized IVector1 getX()
+	{
+		return vector_.getX();
+	}
 
 	/** Returns the y-component of the vector.
 	 *
 	 *  @return y-component
 	 */
-	public IVector1 getY();
+	public synchronized IVector1 getY()
+	{
+		return vector_.getY();
+	}
 	
 	/** Returns the x-component of the vector as float.
 	 *
 	 *  @return x-component as float
 	 */
-	public float getXAsFloat();
+	public synchronized float getXAsFloat()
+	{
+		return vector_.getXAsFloat();
+	}
 
 	/** Returns the component of the vector as float.
 	 *
 	 *  @return y-component as float
 	 */
-	public float getYAsFloat();
+	public synchronized float getYAsFloat()
+	{
+		return vector_.getYAsFloat();
+	}
 
 	/** Returns the x-component of the vector as double.
 	 *
 	 *  @return x-component as double
 	 */
-	public double getXAsDouble();
+	public synchronized double getXAsDouble()
+	{
+		return vector_.getXAsDouble();
+	}
 
 	/** Returns the component of the vector as double.
 	 *
 	 *  @return y-component as double
 	 */
-	public double getYAsDouble();
+	public synchronized double getYAsDouble()
+	{
+		return vector_.getYAsDouble();
+	}
 	
 	/** Returns the x-component of the vector as BigDecimal.
 	 *
 	 *  @return x-component as BigDecimal
 	 */
-	public BigDecimal getXAsBigDecimal();
+	public synchronized BigDecimal getXAsBigDecimal()
+	{
+		return vector_.getXAsBigDecimal();
+	}
 
 	/** Returns the component of the vector as BigDecima;.
 	 *
 	 *  @return y-component as BigDecimal
 	 */
-	public BigDecimal getYAsBigDecimal();
+	public synchronized BigDecimal getYAsBigDecimal()
+	{
+		return vector_.getYAsBigDecimal();
+	}
 
 	/** Makes a copy of the vector without using the complex clone interface.
 	 *
 	 *  @return copy of the vector
 	 */
-	public IVector2 copy();
+	public synchronized IVector2 copy()
+	{
+		return vector_.copy();
+	}
 	
 	/** Generates a deep clone of the vector.
 	 *
 	 *  @return clone of this vector
 	 */
-	public Object clone() throws CloneNotSupportedException;
+	public synchronized Object clone() throws CloneNotSupportedException
+	{
+		return copy();
+	}
 	
 	/** Compares the vector to an object
 	 * 
@@ -219,7 +334,10 @@ public interface IVector2
 	 * @return always returns false unless the object is an IVector2,
 	 *         in which case it is equivalent to equals(IVector vector)
 	 */
-	public boolean equals(Object obj);
+	public synchronized boolean equals(Object obj)
+	{
+		return vector_.equals(obj);
+	}
 	
 	/** Compares the vector to another vector.
 	 *  The vectors are equal if the components are equal.
@@ -227,5 +345,8 @@ public interface IVector2
 	 * @param vector the other vector
 	 * @return true if the vectors are equal
 	 */
-	public boolean equals(IVector2 vector);
+	public synchronized boolean equals(IVector2 vector)
+	{
+		return vector_.equals(vector);
+	}
 }

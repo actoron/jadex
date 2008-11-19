@@ -482,8 +482,6 @@ public class ViewportJOGL implements IViewport,
         gl.glTexParameteri(GL.GL_TEXTURE_2D,
                            GL.GL_TEXTURE_WRAP_T,
                            wrapMode);
-        System.out.println(gl.glGetError());
-        System.out.println(imgData.length);
         GLU glu = new GLU();
         glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D,
         				      GL.GL_COMPRESSED_RGBA,
@@ -492,7 +490,6 @@ public class ViewportJOGL implements IViewport,
         				      GL.GL_RGBA,
         				      GL.GL_UNSIGNED_BYTE,
         				      buffer);
-        System.out.println(gl.glGetError());
         gl.glDisable(GL.GL_TEXTURE_2D);
         
         
@@ -554,7 +551,6 @@ public class ViewportJOGL implements IViewport,
         
         public void init(GLAutoDrawable drawable)
         {
-        	System.out.println("GL INIT");
             GL gl = drawable.getGL();
             gl.glViewport(0, 0, canvas_.getWidth(), canvas_.getHeight());
             gl.glMatrixMode(GL.GL_MODELVIEW);

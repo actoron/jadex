@@ -51,7 +51,7 @@ public class StartPlan extends Plan
 			waitFor(100);
 		}
 		
-		for (int i = 0; i < 3; ++i){
+		for (int i = 0; i < 1; ++i){
 			environmentArgs = new HashMap();
 			ams.createAgent("CleanerWorld2_Cleaner" + Integer.valueOf(i).toString(),
 					"jadex/bdi/examples/cleanerworld2/cleaner/Cleaner.agent.xml",
@@ -73,9 +73,9 @@ public class StartPlan extends Plan
 			waitFor(100);
 		}
 		
-		/*environmentArgs = new HashMap();
+		environmentArgs = new HashMap();
 		environmentArgs.put("environment_name", envName);
-		environmentArgs.put("force_java2d", Boolean.TRUE);
+		environmentArgs.put("force_java2d", Boolean.FALSE);
 		ams.createAgent("CleanerWorld2_Observer",
 				"jadex/bdi/planlib/simsupport/observer/agent/SimObserver.agent.xml",
 				"default",
@@ -92,6 +92,8 @@ public class StartPlan extends Plan
 						{
 							exception.printStackTrace();
 						}
-					});*/
+					});
+		
+		killAgent();
 	}
 }

@@ -176,40 +176,6 @@ public class Vector2Double implements IVector2, Cloneable
 		return this;
 	}
 
-	public boolean applyReflectionBoundaryX(IVector1 boundary)
-	{
-		if (x_ < 0.0)
-		{
-			x_ = -x_;
-			return true;
-		}
-		double bound = boundary.getAsDouble();
-		if (x_ > bound)
-		{
-			x_ = bound - (x_ - bound);
-			return true;
-		}
-
-		return false;
-	}
-
-	public boolean applyReflectionBoundaryY(IVector1 boundary)
-	{
-		if (y_ < 0.0)
-		{
-			y_ = -y_;
-			return true;
-		}
-		double bound = boundary.getAsDouble();
-		if (y_ > bound)
-		{
-			y_ = bound - (y_ - bound);
-			return true;
-		}
-
-		return false;
-	}
-
 	public IVector1 getLength()
 	{
 		return new Vector1Double(Math.sqrt((x_ * x_) + (y_ * y_)));

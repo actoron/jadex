@@ -17,6 +17,16 @@
 	</capabilities>
 	
 	<beliefs>
+		<!-- Number of waste bins -->
+		<belief name="waste_bin_count" class="Integer">
+			<fact>new Integer(3)</fact>
+		</belief>
+		
+		<!-- Number of charging stations -->
+		<belief name="charging_station_count" class="Integer">
+			<fact>new Integer(3)</fact>
+		</belief>
+		
 		<!-- Name of the simulation environment -->
 		<beliefref name="environment_name">
 			<concrete ref="envcap.environment_name"/>

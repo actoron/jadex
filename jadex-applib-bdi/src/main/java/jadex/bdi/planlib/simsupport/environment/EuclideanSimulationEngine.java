@@ -203,7 +203,18 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	public void addEnvironmentProcess(IEnvironmentProcess process)
 	{
+		process.start(this);
 		processes_.put(process.getName(), process);
+	}
+	
+	/** Returns an environment process.
+	 * 
+	 *  @param processName name of the environment process
+	 *  @return the environment process or null if not found
+	 */
+	public IEnvironmentProcess getEnvironmentProcess(String processName)
+	{
+		return (IEnvironmentProcess) processes_.get(processName);
 	}
 	
 	/** Removes an environment process.
@@ -212,7 +223,11 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	public void removeEnvironmentProcess(String processName)
 	{
-		processes_.remove(processName);
+		IEnvironmentProcess process = (IEnvironmentProcess) processes_.remove(processName);
+		if (process != null)
+		{
+			process.shutdown(this);
+		}
 	}
 	
 	/** Adds a new executable action to the environment.
@@ -238,9 +253,10 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 *  @param actionName name of the action
 	 *  @param actorId ID of the actor performing the action
 	 *  @param objectId ID of the object acted upon (may be null)
+	 *  @param parameters parameters for the action (may be null)
 	 *  @return true if the action was successful, false otherwise
 	 */
-	public boolean performAction(String actionName, Integer actorId, Integer objectId)
+	public boolean performAction(String actionName, Integer actorId, Integer objectId, List parameters)
 	{
 		// Halt the engine
 		synchronized(simObjects_)
@@ -255,7 +271,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 					object = (SimObject) simObjects_.get(objectId);
 				}
 				ISimAction action = (ISimAction) actions_.get(actionName);
-				return action.perform(actor, object, this);
+				return action.perform(actor, object, parameters, this);
 			}
 		}
 	}
@@ -269,6 +285,36 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	{
 		SimObject simObject = (SimObject) simObjects_.get(objectId);
 		return simObject;
+	}
+	
+	/** Returns the nearest object of a specific type to the given position.
+	 * 
+	 *  @param type type of the object
+	 *  @param position position the object should be nearest to
+	 *  @return nearest object of a specific type
+	 */
+	public SimObject getNearestObject(String type, IVector2 position)
+	{
+		SimObject nearest = null;
+		synchronized(simObjects_)
+		{
+			synchronized(simObjectsByType_)
+			{
+				IVector1 distance = null;
+				List objectList = (List) simObjectsByType_.get(type);
+				for (Iterator it = objectList.iterator(); it.hasNext(); )
+				{
+					SimObject currentObj = (SimObject) it.next();
+					if ((nearest == null) ||
+						(currentObj.getPosition().getDistance(position).less(distance)))
+					{
+						nearest = currentObj;
+						distance = currentObj.getPosition().getDistance(position);
+					}
+				}
+			}
+		}
+		return nearest;
 	}
 	
 	/** Returns the size of the simulated area.
@@ -338,7 +384,9 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	public void simulateStep(IVector1 deltaT)
 	{
+		System.out.println("Update Objects");
 		updateObjects(deltaT);
+		System.out.println("Execute Processes");
 		executeEnvironmentProcesses(deltaT);
 	}
 	
@@ -371,7 +419,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			for (int i = 0; i < processes.length; ++i)
 			{
 				IEnvironmentProcess process = (IEnvironmentProcess) processes[i];
-				
+				System.out.println(process.getName());
 				process.execute(deltaT, this);
 			}
 		}

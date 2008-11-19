@@ -34,8 +34,16 @@
 		<belief name="battery_state" class="String">
 			<fact>"charged"</fact>
 		</belief>
-		<!-- Our current waste target -->
+		<!-- Current waste target -->
 		<belief name="waste_target" class="Integer">
+			<fact>null</fact>
+		</belief>
+		<!-- Last known waste target position -->
+		<belief name="waste_target_position" class="IVector2">
+			<fact>null</fact>
+		</belief>
+		<!-- Current waste search waypoint -->
+		<belief name="waste_search_waypoint" class="IVector2">
 			<fact>null</fact>
 		</belief>
 		<!-- Name of the simulation environment -->
@@ -70,12 +78,7 @@
 		</maintaingoal>
 		
 		<!-- Clean up some waste. -->
-		<achievegoal name="achievecleanup" retry="true" exclude="when_failed">
-			<parameter name="waste" class="Waste">
-				<!-- Bind against variable from creation condition. -->
-				<!-- <bindingoptions>"?waste"</bindingoptions> -->
-				<value>?waste</value>
-			</parameter>
+		<achievegoal name="achievecleanup" retry="true"> <!-- exclude="when_failed"> -->
 			<!-- Adopt when we have a target -->
 			<creationcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
@@ -89,9 +92,101 @@
 		
 		<!-- Look out for waste when nothing better to do. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
+			<contextcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
+				?mbelief = (mbelief (element_has_name "waste_search_waypoint"))
+			</contextcondition>
  		</performgoal>
  		
- 		<!-- Event handling -->
+ 		<!-- Sets a new destination for the cleaner. -->
+ 		<achievegoal name="set_destination">
+ 			<!-- Destination of the cleaner -->
+			<parameter name="destination" class="IVector2"/>
+ 		</achievegoal>
+ 		
+ 		<!-- Stops the cleaner. -->
+ 		<achievegoal name="stop"/>
+ 		
+ 		<!-- Enable the waste sensor -->
+ 		<achievegoal name="enable_waste_sensor"/>
+		
+	    <achievegoalref name="sim_create_object">
+        	<concrete ref="simcap.sim_create_object"/>
+    	</achievegoalref>
+    	
+    	<achievegoalref name="sim_set_velocity">
+        	<concrete ref="simcap.sim_set_velocity"/>
+    	</achievegoalref>
+    	
+    	<achievegoalref name="sim_set_destination">
+    		<concrete ref="simcap.sim_set_destination"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_remove_task">
+    		<concrete ref="simcap.sim_remove_task"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_perform_action">
+    		<concrete ref="simcap.sim_perform_action"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_get_random_position">
+    		<concrete ref="simcap.sim_get_random_position"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_add_environment_process">
+    		<concrete ref="simcap.sim_add_environment_process"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_remove_environment_process">
+    		<concrete ref="simcap.sim_remove_environment_process"/>
+		</achievegoalref>
+		
+		<achievegoalref name="sim_connect_environment">
+    		<concrete ref="simcap.sim_connect_environment"/>
+		</achievegoalref>
+  	</goals>
+  	
+  	<plans>
+  		<plan name="achieve_cleanup_plan">
+  			<body class="AchieveCleanupPlan"/>
+  			<trigger>
+				<goal ref="achievecleanup"/>
+			</trigger>
+  		</plan>
+  		
+  		<plan name="look_for_waste_plan">
+  			<body class="LookForWastePlan"/>
+  			<trigger>
+				<goal ref="performlookforwaste"/>
+			</trigger>
+  		</plan>
+  		
+  		<plan name="enable_waste_sensor_plan">
+  			<body class="EnableWasteSensorPlan"/>
+  			<trigger>
+				<goal ref="enable_waste_sensor"/>
+			</trigger>
+  		</plan>
+  		
+  		<plan name="set_destination_plan">
+  			<parameter name="destination" class="IVector2">
+				<goalmapping ref="set_destination.destination"/>
+			</parameter>
+  			<body class="SetDestinationPlan"/>
+  			<trigger>
+				<goal ref="set_destination"/>
+			</trigger>
+  		</plan>
+  		
+  		<plan name="stop_plan">
+  			<body class="StopPlan"/>
+  			<trigger>
+				<goal ref="stop"/>
+			</trigger>
+  		</plan>
+  		
+  		<!-- Event handling -->
  		
  		<plan name="low_battery_event_plan">
 			<body class="LowBatteryEventPlan"/>
@@ -102,27 +197,24 @@
 			</trigger>
 		</plan>
 		
-	    <achievegoalref name="sim_create_object">
-        	<concrete ref="simcap.sim_create_object"/>
-    	</achievegoalref>
-    	
-    	<achievegoalref name="sim_set_destination">
-    		<concrete ref="simcap.sim_set_destination"/>
-		</achievegoalref>
+		<plan name="waste_found_event_plan">
+			<body class="WasteFoundEventPlan"/>
+			<trigger>
+ 				<internalevent ref="simulation_event">
+					<match>$event.getParameter("type").getValue().equals("waste_found")</match>
+				</internalevent>
+			</trigger>
+		</plan>
 		
-		<achievegoalref name="sim_get_random_position">
-    		<concrete ref="simcap.sim_get_random_position"/>
-		</achievegoalref>
-		
-		<achievegoalref name="sim_connect_environment">
-    		<concrete ref="simcap.sim_connect_environment"/>
-		</achievegoalref>
-  	</goals>
-  	
-  	<plans>
-  		<plan name="look_for_waste_plan">
-  			<body class="LookForWastePlan"/>
-  		</plan>
+		<plan name="destination_reached_event_plan">
+			<body class="DestinationReachedEventPlan"/>
+			<trigger>
+ 				<internalevent ref="simulation_event">
+					<match>$event.getParameter("type").getValue().equals(SimulationEvent.DESTINATION_REACHED)</match>
+				</internalevent>
+			</trigger>
+		</plan>
+  		
     	<!-- Initialization Plan. -->
     	<plan name="initialization">
       		<body class="InitializeCleanerPlan"/>
@@ -130,6 +222,8 @@
     </plans>
     
     <events>
+    	<!-- Reached waste event. -->
+    	<internalevent name="reached_waste_event"/>
     	<!-- Generic simulation event. -->
     	<internaleventref name="simulation_event">
     		<concrete ref="simcap.simulation_event"/>

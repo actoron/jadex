@@ -1,5 +1,7 @@
 package jadex.bdi.planlib.simsupport.environment.action;
 
+import java.util.List;
+
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
@@ -11,10 +13,11 @@ public interface ISimAction
 	 * 
 	 *  @param actor the object executing the action
 	 *  @param object the object that is being acted upon (may be null)
+	 *  @param parameters parameters for the action (may be null)
 	 *  @param engine the simulation engine
 	 *  @return true if the action was successful, false otherwise
 	 */
-	public boolean perform(SimObject actor, SimObject object, ISimulationEngine engine);
+	public boolean perform(SimObject actor, SimObject object, List parameters, ISimulationEngine engine);
 	
 	/** Returns the name of the action.
 	 *  

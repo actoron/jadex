@@ -157,6 +157,22 @@
 			</contextcondition>
 		</achievegoal>
 		
+		<!-- Attempts to perform an action. -->
+		<achievegoal name="sim_perform_action" exported="true">
+			<!-- Name of the action -->
+			<parameter name="action" class="String"/>
+			<!-- ID of the actor object -->
+			<parameter name="actor_id" class="Integer"/>
+			<!-- ID of the object being acted upon (may be null) -->
+			<parameter name="object_id" class="Integer"/>
+			<!-- Parameters of the action (may be null) -->
+			<parameter name="parameters" class="List"/>
+			<contextcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				?mbelief = (mbelief (element_has_name "connected"))
+			</contextcondition>
+		</achievegoal>
+		
 		<!-- Retrieves a random position in the simulated area
 		     with a minimum distance from the edge. -->
 		<achievegoal name="sim_get_random_position" exported="true">
@@ -308,12 +324,32 @@
 			<parameter name="object_id" class="Integer">
  				<goalmapping ref="sim_remove_task.object_id"/>
 			</parameter>
-			<parameter name="task" class="ISimObjectTask">
- 				<goalmapping ref="sim_remove_task.task"/>
+			<parameter name="task_name" class="String">
+ 				<goalmapping ref="sim_remove_task.task_name"/>
 			</parameter>
 			<body class="LocalRemoveTaskPlan" />
 			<trigger>
 				<goal ref="sim_remove_task"/>
+			</trigger>
+			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
+		</plan>
+		
+		<plan name="local_perform_action_plan">
+			<parameter name="action" class="String">
+ 				<goalmapping ref="sim_perform_action.action"/>
+			</parameter>
+			<parameter name="actor_id" class="Integer">
+ 				<goalmapping ref="sim_perform_action.actor_id"/>
+			</parameter>
+			<parameter name="object_id" class="Integer">
+ 				<goalmapping ref="sim_perform_action.object_id"/>
+			</parameter>
+			<parameter name="parameters" class="List">
+ 				<goalmapping ref="sim_perform_action.parameters"/>
+			</parameter>
+			<body class="LocalPerformActionPlan" />
+			<trigger>
+				<goal ref="sim_perform_action"/>
 			</trigger>
 			<precondition>$beliefbase.local_simulation_engine!=null</precondition>
 		</plan>
