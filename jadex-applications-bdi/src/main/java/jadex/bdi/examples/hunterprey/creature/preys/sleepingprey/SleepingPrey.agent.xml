@@ -1,8 +1,8 @@
 <!--
-	<H3>The lazy prey.</H3>
+	<H3>The sleeping prey.</H3>
 
-	The lazy prey does only move when chased by a wolf.
-	Otherwise it sits and waits.
+	The sleeping prey doesn't move when chased by a wolf.
+	Just sleeps being a steak.
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -36,11 +36,11 @@
 	<configurations>
 		<configuration name="default">
 			<capabilities>
-				<initialcapability ref="basiccap" configuration="flee"/>
+				<initialcapability ref="basiccap" configuration="sleep"/>
 			</capabilities>
 			<beliefs>
 				<initialbelief ref="my_self">
-					<fact>new Prey($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(10,10))</fact>
+					<fact>new Prey($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(15,15))</fact>
 				</initialbelief>
 			</beliefs>
 		</configuration>

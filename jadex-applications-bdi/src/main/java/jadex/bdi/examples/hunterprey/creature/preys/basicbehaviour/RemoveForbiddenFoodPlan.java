@@ -23,7 +23,8 @@ public class RemoveForbiddenFoodPlan extends Plan
 			if(!vision.contains(food[i]))
 			{
 				// avoid running back directly to forbidden food
-				getBeliefbase().getBeliefSet("food").removeFact(food[i]);
+				if (getBeliefbase().getBeliefSet("food").containsFact(food[i]))
+					getBeliefbase().getBeliefSet("food").removeFact(food[i]);
 				forb.removeFact(food[i]);
 				//System.out.println("REMOVING forb");
 			}
