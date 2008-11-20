@@ -89,7 +89,7 @@
 	<plans>
 		<!-- Handle a get vision goal. -->
 		<plan name="getvision">
-			<parameter name="vision" class="Vision">
+			<parameter name="vision" class="Vision" direction="out">
 				<goalmapping ref="get_vision.vision"/>
 				<goalmapping ref="maintain_lease.result"/>
 			</parameter>
