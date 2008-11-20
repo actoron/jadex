@@ -97,7 +97,7 @@
 		<achievegoal name="eat_food">
 			<parameter name="$food" class="Food">
 				<!-- <bindingoptions>$beliefbase.food</bindingoptions> -->
-				<!-- <value>?food</value> -->
+				<value>?food</value>
 			</parameter>
 			<!-- <unique/> -->
 			<creationcondition>
