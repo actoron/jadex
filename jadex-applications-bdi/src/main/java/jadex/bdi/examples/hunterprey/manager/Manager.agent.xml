@@ -64,12 +64,12 @@
 						<!--<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/preys/dumbprey/DumbPrey.agent.xml", "Duffy_%n", 0, null)</value>-->
 						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/preys/lazyprey/LazyPrey.agent.xml", "Heinz_%n", 0, null)</value>
 						<!--<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/preys/lazyprey/LazyPrey.agent.xml", "Harald_%n", 0, null)</value>-->
-						<value>new StartAgentInfo("jadex/examples/hunterprey/creature/preys/cleverprey/CleverPrey.agent.xml", "Clever_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/preys/cleverprey/CleverPrey.agent.xml", "Clever_%n", 0, null)</value>
 						<!--<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/preys/cleverprey/CleverPrey.agent.xml", "Charlton_%n", 0, null)</value>-->
 						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/DumbHunter.agent.xml", "Lenny_%n", 0, null)</value>
 						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/DumbHunter.agent.xml", "Louis_%n", 0, null)</value>
 						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/LAHunter.agent.xml", "Willy_%n", 0, null)</value>
-						<!--<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.ldahunter/LAHunter.agent.xml", "Wolfram_%n", 0, null)</value>-->
+						<!--<value>new StartAgentInfo("jadex.bdi.examples.hunterprey.creature.hunters.ldahunter/LAHunter.agent.xml", "Wolfram_%n", 0, null)</value>-->
 					</parameterset>
 				</initialgoal><!-- 
 				<initialgoal ref="ams_destroy_agent">

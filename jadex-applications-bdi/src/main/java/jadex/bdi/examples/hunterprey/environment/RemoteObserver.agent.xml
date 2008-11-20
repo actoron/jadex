@@ -9,7 +9,8 @@
 	package="jadex.examples.hunterprey.environment">
 
 	<imports>
-		<import>jadex.examples.hunterprey.*</import>
+		<import>jadex.bdi.examples.hunterprey.*</import>
+		<import>jadex.bdi.examples.hunterprey.environment.*</import>
 		<import>jadex.runtime.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.*</import>
@@ -17,7 +18,8 @@
 	</imports>
 
 	<capabilities>
-		<capability name="actsensecap" file="jadex/examples/hunterprey/creature/actsense/Creature.capability.xml"/>
+		<!--  <capability name="actsensecap" file="jadex/bdi/examples/hunterprey/creature/actsense/Creature.capability.xml"/> -->
+		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey.creature.actsense.Creature"/>
 	</capabilities>
 
 	<beliefs>

@@ -68,7 +68,9 @@ public class WorldObject
 	 */
 	public boolean equals(Object o)
 	{
-		return o.getClass() == this.getClass() && ((WorldObject)o).getLocation().equals(this.getLocation());
+		// this can cause NullPointerException
+		//return o.getClass() == this.getClass() && ((WorldObject)o).getLocation().equals(this.getLocation());
+		return (o != null ? (o instanceof WorldObject && this.getLocation().equals(((WorldObject) o).getLocation())) : false);
 	}
 
 	/**
