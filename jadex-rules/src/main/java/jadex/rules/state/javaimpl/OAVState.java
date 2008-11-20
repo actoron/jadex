@@ -105,21 +105,26 @@ public class OAVState	implements IOAVState
 	public OAVState(OAVTypeModel tmodel)
 	{
 		this.tmodel = tmodel;
-		this.objects	= new LinkedHashMap();
-//		this.objects	= new CheckedMap(new LinkedHashMap());
 		this.deletedobjects	= new LinkedHashMap();
 		this.types = new LinkedHashMap();
+		this.externalusages = new LinkedHashMap();
+		this.eventhandler	= new OAVEventHandler(); 
+		
+		this.objects	= new LinkedHashMap();
+//		this.objects	= new CheckedMap(new LinkedHashMap());
+
 //		this.generator = new OAVNameIdGenerator();
 		this.generator = new OAVDebugIdGenerator();
 //		this.generator = new OAVLongIdGenerator();
 //		this.generator = new OAVObjectIdGenerator();
+		
 		this.objectusages = new LinkedHashMap();
-		this.externalusages = new LinkedHashMap();
 		// Cannot be identity hashmap because Java objects might only be equal.
-		this.objectusages = new IdentityHashMap();
+//		this.objectusages = new IdentityHashMap();
+
 //		this.rootobjects = new IdentityHashSet(); ???
 		this.rootobjects = new LinkedHashSet();
-		this.eventhandler	= new OAVEventHandler(); 
+		
 //		this.nocheck = true;
 //		new Thread(new Runnable()
 //		{
