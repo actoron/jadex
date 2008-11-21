@@ -23,6 +23,7 @@
 		<import>jadex.adapter.base.clock.*</import>
 		<import>jadex.bdi.planlib.simsupport.environment.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+		<import>jadex.commons.Tuple</import>
 	</imports>
 	
 	<capabilities>
@@ -30,9 +31,20 @@
 	</capabilities>
 	
 	<beliefs>
+		<!-- Known waste bins and positions (id->position) -->
+		<beliefset name="waste_bins" class="Tuple"/>
+		
 		<!-- Battery state -->
 		<belief name="battery_state" class="String">
 			<fact>"charged"</fact>
+		</belief>
+		<!-- Maximum waste capacity -->
+		<belief name="max_waste_capacity" class="Integer">
+			<fact>3</fact>
+		</belief>
+		<!-- Current waste capacity -->
+		<belief name="waste_capacity" class="Integer">
+			<fact>3</fact>
 		</belief>
 		<!-- Current waste target -->
 		<belief name="waste_target" class="Integer">
@@ -60,8 +72,9 @@
 		<!-- Observe the battery state. -->
 		<maintaingoal name="maintainbatteryloaded">
 			<deliberation>
-				<inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-				<inhibits ref="achievecleanup" inhibit="when_in_process"/>
+				<inhibits ref="look_for_waste" inhibit="when_in_process"/>
+				<inhibits ref="dispose_waste" inhibit="when_in_process"/>
+				<inhibits ref="achieve_cleanup" inhibit="when_in_process"/>
 			</deliberation>
 			<!-- Engage in actions when the state is low. -->
  			<maintaincondition>
@@ -77,8 +90,20 @@
  			</targetcondition>
 		</maintaingoal>
 		
+		<!-- Dispose the waste. -->
+		<achievegoal name="dispose_waste">
+			<creationcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 0))
+				?mbelief = (mbelief (element_has_name "waste_capacity"))
+			</creationcondition>
+			<deliberation cardinality="1">
+				<inhibits ref="achieve_cleanup"/>
+				<inhibits ref="look_for_waste"/>
+			</deliberation>
+		</achievegoal>
+		
 		<!-- Clean up some waste. -->
-		<achievegoal name="achievecleanup" retry="true"> <!-- exclude="when_failed"> -->
+		<achievegoal name="achieve_cleanup">
 			<!-- Adopt when we have a target -->
 			<creationcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
@@ -86,13 +111,15 @@
 				(test (!= ?fact null))
 			</creationcondition>
 			<deliberation cardinality="1">
-				<inhibits ref="performlookforwaste"/>
+				<inhibits ref="look_for_waste"/>
 			</deliberation>
 		</achievegoal>
 		
 		<!-- Look out for waste when nothing better to do. -->
-		<performgoal name="performlookforwaste" retry="true" exclude="never">
+		<performgoal name="look_for_waste" retry="true" exclude="never">
 			<contextcondition>
+				?wtrbelief = (belief (element_has_model ?wtmbelief) (belief_has_fact null))
+				?wtmbelief = (mbelief (element_has_name "waste_target"))
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
 				?mbelief = (mbelief (element_has_name "waste_search_waypoint"))
 			</contextcondition>
@@ -114,6 +141,10 @@
         	<concrete ref="simcap.sim_create_object"/>
     	</achievegoalref>
     	
+    	<achievegoalref name="sim_get_position">
+        	<concrete ref="simcap.sim_get_position"/>
+    	</achievegoalref>
+    	
     	<achievegoalref name="sim_set_velocity">
         	<concrete ref="simcap.sim_set_velocity"/>
     	</achievegoalref>
@@ -126,9 +157,9 @@
     		<concrete ref="simcap.sim_remove_task"/>
 		</achievegoalref>
 		
-		<achievegoalref name="sim_perform_action">
+		<performgoalref name="sim_perform_action">
     		<concrete ref="simcap.sim_perform_action"/>
-		</achievegoalref>
+		</performgoalref>
 		
 		<achievegoalref name="sim_get_random_position">
     		<concrete ref="simcap.sim_get_random_position"/>
@@ -148,17 +179,24 @@
   	</goals>
   	
   	<plans>
+  		<plan name="dispose_waste_plan">
+  			<body class="DisposeWastePlan"/>
+  			<trigger>
+				<goal ref="dispose_waste"/>
+			</trigger>
+  		</plan>
+  		
   		<plan name="achieve_cleanup_plan">
   			<body class="AchieveCleanupPlan"/>
   			<trigger>
-				<goal ref="achievecleanup"/>
+				<goal ref="achieve_cleanup"/>
 			</trigger>
   		</plan>
   		
   		<plan name="look_for_waste_plan">
   			<body class="LookForWastePlan"/>
   			<trigger>
-				<goal ref="performlookforwaste"/>
+				<goal ref="look_for_waste"/>
 			</trigger>
   		</plan>
   		
@@ -197,6 +235,15 @@
 			</trigger>
 		</plan>
 		
+		<plan name="waste_bin_found_event_plan">
+			<body class="WasteBinFoundEventPlan"/>
+			<trigger>
+ 				<internalevent ref="simulation_event">
+					<match>$event.getParameter("type").getValue().equals("waste_bin_found")</match>
+				</internalevent>
+			</trigger>
+		</plan>
+		
 		<plan name="waste_found_event_plan">
 			<body class="WasteFoundEventPlan"/>
 			<trigger>
@@ -222,6 +269,8 @@
     </plans>
     
     <events>
+    	<!-- Reached destination in dispose mode. -->
+    	<internalevent name="reached_dispose_destination_event"/>
     	<!-- Reached waste event. -->
     	<internalevent name="reached_waste_event"/>
     	<!-- Generic simulation event. -->

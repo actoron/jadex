@@ -23,9 +23,7 @@ public class RotatingColoredRectangle extends RotatingColoredPrimitive
      */
     public RotatingColoredRectangle()
     {
-        this(new Vector2Double(0.0),
-             new Vector2Double(1.0),
-             new Vector2Double(0.0),
+        this(new Vector2Double(1.0),
              Color.WHITE);
     }
     
@@ -36,14 +34,11 @@ public class RotatingColoredRectangle extends RotatingColoredPrimitive
      *  @param velocity initial velocity
      *  @param c color
      */
-    public RotatingColoredRectangle(IVector2 pos,
-            				 IVector2 size,
-            				 IVector2 velocity,
-                             Color c)
+    public RotatingColoredRectangle(IVector2 size, Color c)
     {
-    	setPosition(pos);
+    	setPosition(new Vector2Double(0.0));
         setSize(size);
-        setVelocity(velocity);
+        setVelocity(new Vector2Double(0.0));
         c_ = c;
     }
     

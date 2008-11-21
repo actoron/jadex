@@ -26,23 +26,28 @@ public class LocalSimulationEventListener implements ISimulationEventListener
 		agent_ = agent;
 	}
 	
-	public void simulationEvent(SimulationEvent event)
+	public void simulationEvent(final SimulationEvent event)
 	{
-		IInternalEvent simEvent = 
-			agent_.createInternalEvent("simulation_event");
-		simEvent.getParameter("type").setValue(event.getType());
-		if (event.hasParameters())
+		agent_.invokeLater(new Runnable()
 		{
-			Set parameters = event.getParameters();
-			for (Iterator it = parameters.iterator(); it.hasNext(); )
+			public void run()
 			{
-				Map.Entry parameter = (Map.Entry) it.next();
-				String name = (String) parameter.getKey();
-				Object value = parameter.getValue();
-				simEvent.getParameter(name).setValue(value);
+				IInternalEvent simEvent = 
+					agent_.createInternalEvent("simulation_event");
+				simEvent.getParameter("type").setValue(event.getType());
+				if (event.hasParameters())
+				{
+					Set parameters = event.getParameters();
+					for (Iterator it = parameters.iterator(); it.hasNext(); )
+					{
+						Map.Entry parameter = (Map.Entry) it.next();
+						String name = (String) parameter.getKey();
+						Object value = parameter.getValue();
+						simEvent.getParameter(name).setValue(value);
+					}
+				}
+				agent_.dispatchInternalEvent(simEvent);
 			}
-		}
-		
-		agent_.dispatchInternalEvent(simEvent);
+		});
 	}
 }

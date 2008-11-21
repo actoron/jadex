@@ -1,9 +1,15 @@
 package jadex.bdi.planlib.simsupport.observer.agent;
 
+import java.awt.Color;
+
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJ2D;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredRectangle;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;

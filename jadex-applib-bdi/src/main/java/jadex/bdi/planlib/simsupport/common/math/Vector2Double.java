@@ -165,6 +165,15 @@ public class Vector2Double implements IVector2, Cloneable
 		r *= (u - l);
 		r += l;
 		y_ = r;
+		//if ((y_ < l) || (y_ > u))
+		//{
+			/*System.out.print("Y-random violation: ");
+			System.out.print(l);
+			System.out.print(", ");
+			System.out.print(u);
+			System.out.print(", ");
+			System.out.println(y_);*/
+		//}
 		return this;
 	}
 	

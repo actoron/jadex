@@ -1,14 +1,19 @@
 package jadex.bdi.examples.cleanerworld2.cleaner;
 
+import jadex.bdi.examples.cleanerworld2.environment.process.WasteBinSensorProcess;
+import jadex.bdi.examples.cleanerworld2.environment.process.WasteSensorProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredTriangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +27,7 @@ public class InitializeCleanerPlan extends Plan
 		String cleanerImage = "jadex/bdi/examples/cleanerworld2/images/cleaner.png";
 		//drawable.addDrawable(new ScalableRegularPolygon(new Vector2Double(3.0), 3, Color.RED));
 		drawable.addDrawable(new ScalableTexturedRectangle(new Vector2Double(1.0), cleanerImage));
+		//drawable.addDrawable(new RotatingColoredTriangle(new Vector2Double(1.0), new Vector2Double(1.0), new Vector2Double(0.0), Color.BLUE));
 		
 		String envName = (String) getBeliefbase().getBelief("environment_name").getFact();
 		IGoal currentGoal = createGoal("sim_connect_environment");
@@ -45,12 +51,20 @@ public class InitializeCleanerPlan extends Plan
 		Integer objectId = (Integer) currentGoal.getParameter("object_id").getValue();
 		getBeliefbase().getBelief("simobject_id").setFact(objectId);
 		
+		// Enable waste bin sensor
+		Integer cleanerId = (Integer) getBeliefbase().getBelief("simobject_id").getFact();
+		String processName = WasteBinSensorProcess.DEFAULT_NAME + this.toString();
+		IEnvironmentProcess sensorProcess = new WasteBinSensorProcess(processName, cleanerId);
+		IGoal addProcess = createGoal("sim_add_environment_process");
+		addProcess.getParameter("process").setValue(sensorProcess);
+		dispatchSubgoalAndWait(addProcess);
+		
 		// Enable waste sensor
 		currentGoal = createGoal("enable_waste_sensor");
 		dispatchSubgoalAndWait(currentGoal);
 		
 		// Start looking for waste
-		currentGoal = createGoal("performlookforwaste");
+		currentGoal = createGoal("look_for_waste");
 		dispatchTopLevelGoal(currentGoal);
 	}
 }

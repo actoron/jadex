@@ -79,24 +79,31 @@ public class GoToDestinationTask implements ISimObjectTask
 	 */
 	public void execute(IVector1 deltaT, SimObject object)
 	{
-		IVector2 currentPosition = object.getPosition();
-		IVector2 velocity = targetPosition_.copy().subtract(currentPosition).normalize().multiply(speed_);
-		
-		if (currentPosition.getDistance(targetPosition_).less(tolerance_))
+		synchronized (object)
 		{
-			// Destination reached, stop and trigger event.
-			
-			//Stop
-			velocity.zero();
-			
-			SimulationEvent evt = new SimulationEvent(SimulationEvent.DESTINATION_REACHED);
-			//TODO: Include parameters? yes, the object id, maybe more?
-			evt.setParameter("object_id", object.getId());
-			object.fireSimulationEvent(evt);
-			object.removeTask(name_);
-		}
+			IVector2 currentPosition = object.getPositionAccess();
+			IVector2 velocity = targetPosition_.copy().subtract(currentPosition).normalize().multiply(speed_);
 		
-		moveTask_.setVelocity(velocity);
+			if (currentPosition.getDistance(targetPosition_).less(tolerance_))
+			{
+				// Destination reached, stop and trigger event.
+			
+				//Stop
+				velocity.zero();
+				
+				object.removeTask(name_);
+				
+				SimulationEvent evt = new SimulationEvent(SimulationEvent.DESTINATION_REACHED);
+				//TODO: Include parameters? yes, the object id, maybe more?
+				evt.setParameter("object_id", object.getId());
+				object.fireSimulationEvent(evt);
+				
+				
+			}
+			
+			
+			moveTask_.setVelocity(velocity);
+		}
 	}
 	
 	/** Returns the name of the task.

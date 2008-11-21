@@ -144,6 +144,8 @@ public class ViewportJOGL implements IViewport,
      */
     public ViewportJOGL(String title, double fps, ILibraryService libService)
     {
+    	posX_ = 0.0f;
+    	posY_ = 0.0f;
     	libService_ = libService;
         uninitialized_ = true;
         preserveAR_ = true;
@@ -378,7 +380,6 @@ public class ViewportJOGL implements IViewport,
     private void setupMatrix(GL gl)
     { 
         gl.glLoadIdentity();
-        gl.glViewport(0, 0, frame_.getWidth(), frame_.getHeight());
         gl.glOrtho(0.0, paddedSize_.getXAsDouble(),
         		   0.0, paddedSize_.getYAsDouble(),
         		   -0.5, 0.5);
@@ -584,7 +585,6 @@ public class ViewportJOGL implements IViewport,
         public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
         {
             GL gl = drawable.getGL();
-            gl.glViewport(0, 0, width, height);
             setSize(size_);
             setupMatrix(gl);
         }

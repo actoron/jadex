@@ -19,7 +19,7 @@ public class UpdateEnvironmentPlan extends Plan
 		IVector1 timeCoeff = (IVector1) b.getBelief("time_coefficient").getFact();
 		//long currentTime = ((Long) b.getBelief("time").getFact()).longValue();
 		// TODO: dynamic evaluation not working?
-		long currentTime = ((IClockService) b.getBelief("clock_service").getFact()).getTime();
+		long currentTime = getClock().getTime(); // ((IClockService) b.getBelief("clock_service").getFact()).getTime();
 		//System.out.println("SimTime: " + lastTime);
 		//System.out.println("Time: " + currentTime);
 		IVector1 deltaT = timeCoeff.copy().multiply(new Vector1Long(currentTime - lastTime));

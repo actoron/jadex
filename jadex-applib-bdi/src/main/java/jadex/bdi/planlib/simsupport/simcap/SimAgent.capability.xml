@@ -158,7 +158,7 @@
 		</achievegoal>
 		
 		<!-- Attempts to perform an action. -->
-		<achievegoal name="sim_perform_action" exported="true">
+		<performgoal name="sim_perform_action" exported="true">
 			<!-- Name of the action -->
 			<parameter name="action" class="String"/>
 			<!-- ID of the actor object -->
@@ -171,7 +171,7 @@
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (element_has_name "connected"))
 			</contextcondition>
-		</achievegoal>
+		</performgoal>
 		
 		<!-- Retrieves a random position in the simulated area
 		     with a minimum distance from the edge. -->
@@ -268,7 +268,7 @@
 			<parameter name="object_id" class="Integer">
  				<goalmapping ref="sim_get_position.object_id"/>
 			</parameter>
-			<parameter name="position" class="IVector2">
+			<parameter name="position" class="IVector2" direction="out">
  				<goalmapping ref="sim_get_position.position"/>
 			</parameter>
 			<body class="LocalGetPositionPlan" />

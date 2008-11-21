@@ -17,7 +17,7 @@ public class Configuration
 	public static final IVector2 BACKGROUND_TILE_SIZE = new Vector2Double(2.0);
 	
 	public static final IVector2 WASTE_BIN_SIZE = new Vector2Double(1.0);
-	public static final IVector2 CHARGING_STATION_SIZE = new Vector2Double(1.5);
+	public static final IVector2 CHARGING_STATION_SIZE = new Vector2Double(1.0);
 	
 	/** Maximum distance a cleaner can reach.
 	 */
@@ -28,5 +28,9 @@ public class Configuration
 	public static final IVector2 CLEANER_SIZE = new Vector2Double(0.8);
 	public static final IVector1 CLEANER_SPEED = new Vector1Double(1.0);
 	public static final IVector1 CLEANER_DISCHARGE_RATE = new Vector1Double(0.5);
+	public static final IVector1 CLEANER_CHARGE_RATE = new Vector1Double(5.0);
 	public static final IVector1 LOW_BATTERY_THRESHOLD = new Vector1Double(20.0);
+	/** Threshold when the battery is considered charged.
+	 */
+	public static final IVector1 CHARGED_THRESHOLD = new Vector1Double(95.0);
 }

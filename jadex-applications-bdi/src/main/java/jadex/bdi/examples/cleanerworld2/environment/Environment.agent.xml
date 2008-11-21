@@ -10,6 +10,8 @@
 	package="jadex.bdi.examples.cleanerworld2.environment">
 	
 	<imports>
+		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.Vector1Double</import>
 	</imports>
 	
 	<capabilities>
@@ -17,13 +19,23 @@
 	</capabilities>
 	
 	<beliefs>
+		<!-- Waste spawn rate (in wastes every x seconds) -->
+		<belief name="waste_spawn_rate" class="IVector1" exported="true">
+			<fact>new Vector1Double(10.0)</fact>
+		</belief>
+		
+		<!-- Maximum number of waste objects -->
+		<belief name="max_wastes" class="Integer" exported="true">
+			<fact>new Integer(10)</fact>
+		</belief>
+		
 		<!-- Number of waste bins -->
-		<belief name="waste_bin_count" class="Integer">
+		<belief name="waste_bin_count" class="Integer" exported="true">
 			<fact>new Integer(3)</fact>
 		</belief>
 		
 		<!-- Number of charging stations -->
-		<belief name="charging_station_count" class="Integer">
+		<belief name="charging_station_count" class="Integer" exported="true">
 			<fact>new Integer(3)</fact>
 		</belief>
 		

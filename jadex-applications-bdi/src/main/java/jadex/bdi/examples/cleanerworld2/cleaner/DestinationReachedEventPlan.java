@@ -10,7 +10,12 @@ public class DestinationReachedEventPlan extends Plan
 	{
 		IBeliefbase b = getBeliefbase();
 		// TODO: split
-		if (b.getBelief("waste_target").getFact() != null)
+		if (((Integer) b.getBelief("waste_capacity").getFact()).intValue() <= 0)
+		{
+			IInternalEvent evt = createInternalEvent("reached_dispose_destination_event");
+			dispatchInternalEvent(evt);
+		}
+		else if (b.getBelief("waste_target").getFact() != null)
 		{
 			IInternalEvent evt = createInternalEvent("reached_waste_event");
 			dispatchInternalEvent(evt);

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
@@ -18,13 +19,13 @@ import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
-/** Simulates the waste sensor of a cleaner.
+/** Simulates the waste bin sensor of a cleaner.
  */
-public class WasteSensorProcess implements IEnvironmentProcess
+public class WasteBinSensorProcess implements IEnvironmentProcess
 {
 	public final static String DEFAULT_NAME = "WasteSensor";
 	
-	public final static String WASTE_FOUND_EVENT_TYPE = "waste_found";
+	public final static String WASTE_BIN_FOUND_EVENT_TYPE = "waste_bin_found";
 	
 	/** Cleaner object id
 	 */
@@ -38,13 +39,13 @@ public class WasteSensorProcess implements IEnvironmentProcess
 	 */
 	private String name_;
 	
-	/** The waste objects
+	/** Unknown waste_bin objects
 	 */
-	private List wastes_;
+	private List unknownWasteBins_;
 	
 	/** Creates an uninitialized WasteSensorProcess.
 	 */
-	public WasteSensorProcess()
+	public WasteBinSensorProcess()
 	{
 	}
 	
@@ -52,7 +53,7 @@ public class WasteSensorProcess implements IEnvironmentProcess
 	 *  
 	 *  @param name name of the sensor
 	 */
-	public WasteSensorProcess(String name, Integer cleanerId)
+	public WasteBinSensorProcess(String name, Integer cleanerId)
 	{
 		name_ = name;
 		cleanerId_ = cleanerId;
@@ -66,7 +67,11 @@ public class WasteSensorProcess implements IEnvironmentProcess
 	public void start(ISimulationEngine engine)
 	{
 		cleaner_ = engine.getSimulationObject(cleanerId_);
-		wastes_= (List) engine.getTypedSimObjectAccess().get(WasteGenerationProcess.WASTE_TYPE);
+		Map typedAccess = engine.getTypedSimObjectAccess();
+		synchronized(typedAccess)
+		{
+			unknownWasteBins_= new LinkedList((List) typedAccess.get("waste_bin"));
+		}
 	}
 	
 	/** This method will be executed by the object before
@@ -85,20 +90,19 @@ public class WasteSensorProcess implements IEnvironmentProcess
 	 */
 	public synchronized void execute(IVector1 deltaT, ISimulationEngine engine)
 	{
-		Map typedAccess = engine.getTypedSimObjectAccess();
-		synchronized (typedAccess)
+		for (Iterator it = unknownWasteBins_.iterator(); it.hasNext(); )
 		{
-			for (Iterator it = wastes_.iterator(); it.hasNext(); )
+			SimObject wasteBin = (SimObject) it.next();
+			if (wasteBin.getPosition().getDistance(cleaner_.getPosition()).less(Configuration.CLEANER_VISUAL_RANGE))
 			{
-				SimObject waste = (SimObject) it.next();
-				if (waste.getPosition().getDistance(cleaner_.getPosition()).less(Configuration.CLEANER_VISUAL_RANGE))
+				SimulationEvent evt = new SimulationEvent(WASTE_BIN_FOUND_EVENT_TYPE);
+				evt.setParameter("object_id", wasteBin.getId());
+				evt.setParameter("position", wasteBin.getPosition());
+				cleaner_.fireSimulationEvent(evt);
+				it.remove();
+				if (unknownWasteBins_.isEmpty())
 				{
-					SimulationEvent evt = new SimulationEvent(WASTE_FOUND_EVENT_TYPE);
-					evt.setParameter("object_id", waste.getId());
-					evt.setParameter("position", waste.getPosition());
-					cleaner_.fireSimulationEvent(evt);
 					engine.removeEnvironmentProcess(name_);
-					return;
 				}
 			}
 		}

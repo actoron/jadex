@@ -29,9 +29,30 @@ public class Vector1Double implements IVector1
 		return this;
 	}
 	
+	/** Subtracts another vector to this vector, subtracting individual components.
+	 *
+	 *  @param vector the vector to subtract from this vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector1 subtract(IVector1 vector)
+	{
+		x_ -= vector.getAsDouble();
+		return this;
+	}
+	
 	public IVector1 multiply(IVector1 vector)
 	{
 		x_ *= vector.getAsDouble();
+		return this;
+	}
+	
+	/** Sets the vector component to zero.
+	 *
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector1 zero()
+	{
+		x_ = 0.0;
 		return this;
 	}
 	

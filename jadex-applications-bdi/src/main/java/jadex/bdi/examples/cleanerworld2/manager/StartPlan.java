@@ -11,9 +11,12 @@ import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteGenerationProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
+import jadex.bdi.planlib.simsupport.common.math.IVector1;
+import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
+import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
@@ -22,10 +25,17 @@ public class StartPlan extends Plan
 {
 	public void body()
 	{
+		IBeliefbase b = getBeliefbase();
+		Integer maxWastes = (Integer) b.getBelief("max_wastes").getFact();
+		Double wasteSpawnRateDouble = (Double) b.getBelief("waste_spawn_rate").getFact();
+		IVector1 wasteSpawnRate = new Vector1Double(wasteSpawnRateDouble.doubleValue());
+		
 		final IAMS ams =
 			(IAMS) getScope().getPlatform().getService(IAMS.class);
 		
 		Map environmentArgs = new HashMap();
+		environmentArgs.put("max_wastes", maxWastes);
+		environmentArgs.put("waste_spawn_rate", wasteSpawnRate);
 		final String envName = Configuration.ENVIRONMENT_NAME;
 		ams.createAgent("CleanerWorld2_Environment",
 						"jadex/bdi/examples/cleanerworld2/environment/Environment.agent.xml",
@@ -51,7 +61,13 @@ public class StartPlan extends Plan
 			waitFor(100);
 		}
 		
-		for (int i = 0; i < 1; ++i){
+		int maxCleaner = ((Integer) b.getBelief("cleaner_count").getFact()).intValue();
+		if (maxCleaner <= 0)
+		{
+			maxCleaner = 1;
+		}
+		
+		for (int i = 0; i < maxCleaner; ++i){
 			environmentArgs = new HashMap();
 			ams.createAgent("CleanerWorld2_Cleaner" + Integer.valueOf(i).toString(),
 					"jadex/bdi/examples/cleanerworld2/cleaner/Cleaner.agent.xml",
@@ -76,6 +92,7 @@ public class StartPlan extends Plan
 		environmentArgs = new HashMap();
 		environmentArgs.put("environment_name", envName);
 		environmentArgs.put("force_java2d", Boolean.FALSE);
+		environmentArgs.put("preserve_aspect_ratio", Boolean.TRUE);
 		ams.createAgent("CleanerWorld2_Observer",
 				"jadex/bdi/planlib/simsupport/observer/agent/SimObserver.agent.xml",
 				"default",

@@ -11,12 +11,25 @@ public interface IVector1
 	 */
 	public IVector1 add(IVector1 vector);
 	
+	/** Subtracts another vector to this vector, subtracting individual components.
+	 *
+	 *  @param vector the vector to subtract from this vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector1 subtract(IVector1 vector);
+	
 	/** Performs a multiplication on the vector.
 	 *
 	 *  @param vector vector
 	 *  @return a reference to the called vector (NOT a copy)
 	 */
 	public IVector1 multiply(IVector1 vector);
+	
+	/** Sets the vector component to zero.
+	 *
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector1 zero();
 	
 	/** Negates the vector by negating its components.
 	 *

@@ -18,6 +18,23 @@
 	<imports>
 	</imports>
 	
+	<beliefs>
+		<!-- Waste spawn rate (in wastes every x seconds) -->
+		<belief name="waste_spawn_rate" class="Double" exported="true">
+			<fact>10.0</fact>
+		</belief>
+		
+		<!-- Maximum number of waste objects -->
+		<belief name="max_wastes" class="Integer" exported="true">
+			<fact>10</fact>
+		</belief>
+		
+		<!-- Number of cleaners -->
+		<belief name="cleaner_count" class="Integer" exported="true">
+			<fact>3</fact>
+		</belief>
+	</beliefs>
+	
 	<plans>
 		<!-- Start Plan. -->
     	<plan name="start">

@@ -1,13 +1,16 @@
 package jadex.bdi.examples.cleanerworld2.environment;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
+import jadex.bdi.examples.cleanerworld2.environment.action.DisposeWasteAction;
 import jadex.bdi.examples.cleanerworld2.environment.action.PickupWasteAction;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteGenerationProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
+import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.environment.EuclideanSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.runtime.IBeliefbase;
@@ -30,6 +33,12 @@ public class InitializeEnvironmentPlan extends Plan
 		
 		engine.addPreLayer(background);
 		
+		// Pre-declare object types
+		engine.declareObjectType("waste");
+		engine.declareObjectType("waste_bin");
+		engine.declareObjectType("charging_station");
+		engine.declareObjectType("cleaner");
+		
 		// Static Objects
 		String imgPath = this.getClass().getPackage().getName().replaceAll("environment", "").concat("images.").replaceAll("\\.", "/");
 		
@@ -50,10 +59,22 @@ public class InitializeEnvironmentPlan extends Plan
 		}
 		
 		// Processes
-		engine.addEnvironmentProcess(new WasteGenerationProcess());
+		int maxWastes = ((Integer) getBeliefbase().getBelief("max_wastes").getFact()).intValue();
+		if (maxWastes <= 0)
+		{
+			maxWastes = 1;
+		}
+		IVector1 wasteSpawnRate = (IVector1) getBeliefbase().getBelief("waste_spawn_rate").getFact();
+		if ((wasteSpawnRate.less(Vector1Double.ZERO)) ||
+			(wasteSpawnRate.equals(Vector1Double.ZERO)))
+		{
+			wasteSpawnRate = new Vector1Double(1.0);
+		}
+		engine.addEnvironmentProcess(new WasteGenerationProcess(maxWastes, wasteSpawnRate));
 		
 		// Actions
 		engine.addAction(new PickupWasteAction());
+		engine.addAction(new DisposeWasteAction());
 		
 		b.getBelief("simulation_engine").setFact(engine);
 		

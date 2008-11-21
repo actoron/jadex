@@ -74,6 +74,16 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		areaSize_ = areaSize.copy();
 	}
 	
+	/** Declares a type of object.
+	 *  
+	 *  @param type object type
+	 */
+	public void declareObjectType(String type)
+	{
+		List objectList = new LinkedList();
+		simObjectsByType_.put(type, objectList);
+	}
+	
 	/** Adds a new SimObject to the simulation.
 	 *  
 	 *  @param type type of the object
@@ -130,8 +140,8 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 				List objectList = (List) simObjectsByType_.get(type);
 				if (objectList == null)
 				{
-					objectList = new LinkedList();
-					simObjectsByType_.put(type, objectList);
+					declareObjectType(type);
+					objectList = (List) simObjectsByType_.get(type);
 				}
 				objectList.add(simObject);
 				
@@ -305,11 +315,14 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 				for (Iterator it = objectList.iterator(); it.hasNext(); )
 				{
 					SimObject currentObj = (SimObject) it.next();
-					if ((nearest == null) ||
-						(currentObj.getPosition().getDistance(position).less(distance)))
+					synchronized (currentObj)
 					{
-						nearest = currentObj;
-						distance = currentObj.getPosition().getDistance(position);
+						if ((nearest == null) ||
+							(currentObj.getPositionAccess().getDistance(position).less(distance)))
+						{
+							nearest = currentObj;
+							distance = currentObj.getPositionAccess().getDistance(position);
+						}
 					}
 				}
 			}
@@ -384,9 +397,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	public void simulateStep(IVector1 deltaT)
 	{
-		System.out.println("Update Objects");
 		updateObjects(deltaT);
-		System.out.println("Execute Processes");
 		executeEnvironmentProcesses(deltaT);
 	}
 	
@@ -419,7 +430,6 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			for (int i = 0; i < processes.length; ++i)
 			{
 				IEnvironmentProcess process = (IEnvironmentProcess) processes[i];
-				System.out.println(process.getName());
 				process.execute(deltaT, this);
 			}
 		}

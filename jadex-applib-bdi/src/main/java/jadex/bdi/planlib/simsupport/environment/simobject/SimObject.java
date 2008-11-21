@@ -73,7 +73,7 @@ public class SimObject
 		type_ = type;
 		properties_ = new HashMap(properties);
 		
-		position_  = new SynchronizedVector2Wrapper(initialPosition.copy());
+		position_  = initialPosition.copy();
 		drawable_ = drawable;
 		signalDestruction_ = sigDest;
 		
@@ -167,7 +167,6 @@ public class SimObject
 	 */
 	public synchronized void addTask(ISimObjectTask task)
 	{
-		System.out.println("Adding task: " + task.getName());
 		task.start(this);
 		tasks_.put(task.getName(), task);
 	}
@@ -195,13 +194,23 @@ public class SimObject
 		}
 	}
 	
-	/** Returns the current position of the object.
+	/** Returns access to the current position of the object.
+	 *  Object must be locked before using the access.
 	 * 
-	 *  @return current position
+	 *  @return current position access
+	 */
+	public synchronized IVector2 getPositionAccess()
+	{
+		return position_;
+	}
+	
+	/** Returns a copy of the current position of the object.
+	 * 
+	 *  @return current position access
 	 */
 	public synchronized IVector2 getPosition()
 	{
-		return position_;
+		return position_.copy();
 	}
 	
 	/** Sets a new position for the object.
@@ -210,7 +219,7 @@ public class SimObject
 	 */
 	public synchronized void setPosition(IVector2 position)
 	{
-		position_ = new SynchronizedVector2Wrapper(position.copy());
+		position_ = position.copy();
 	}
 	
 	/** Adds an event listener for this object.

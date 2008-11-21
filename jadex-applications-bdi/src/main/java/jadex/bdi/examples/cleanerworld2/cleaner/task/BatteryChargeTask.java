@@ -4,6 +4,7 @@ import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.GoToDestinationTask;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
@@ -11,11 +12,11 @@ import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 
 /** Task simulating the slow discharging of the cleaner's battery.
  */
-public class BatteryDischargeTask implements ISimObjectTask
+public class BatteryChargeTask implements ISimObjectTask
 {
 	/** Default name
 	 */
-	public static final String DEFAULT_NAME = "battery_discharger";
+	public static final String DEFAULT_NAME = "battery_charger";
 	
 	/** Task name
 	 */
@@ -27,7 +28,7 @@ public class BatteryDischargeTask implements ISimObjectTask
 	
 	/** Default constructor.
 	 */
-	public BatteryDischargeTask()
+	public BatteryChargeTask()
 	{
 		name_ = DEFAULT_NAME;
 	}
@@ -55,16 +56,16 @@ public class BatteryDischargeTask implements ISimObjectTask
 	 */
 	public void execute(IVector1 deltaT, SimObject object)
 	{
-		if (Vector1Double.ZERO.less(batteryState_))
+		if (batteryState_.less(Configuration.CHARGED_THRESHOLD))
 		{
-			IVector1 discharge = Configuration.CLEANER_DISCHARGE_RATE.copy().multiply(deltaT);
-			batteryState_.subtract(discharge);
+			IVector1 charge = Configuration.CLEANER_CHARGE_RATE.copy().multiply(deltaT);
+			batteryState_.add(charge);
 		}
 		else
 		{
-			object.removeTask(GoToDestinationTask.DEFAULT_NAME);
-			MoveObjectTask moveTask = (MoveObjectTask) object.getTask(MoveObjectTask.DEFAULT_NAME);
-			moveTask.setVelocity(Vector2Double.ZERO);
+			object.removeTask(name_);
+			SimulationEvent evt = new SimulationEvent("battery_charged");
+			object.fireSimulationEvent(evt);
 		}
 	}
 	

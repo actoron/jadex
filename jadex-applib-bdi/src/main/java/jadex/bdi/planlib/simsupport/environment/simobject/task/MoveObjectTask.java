@@ -51,7 +51,7 @@ public class MoveObjectTask implements ISimObjectTask
 	 *  
 	 *  @param object the object that is executing the task
 	 */
-	public void start(SimObject object)
+	public synchronized void start(SimObject object)
 	{
 	}
 	
@@ -60,7 +60,7 @@ public class MoveObjectTask implements ISimObjectTask
 	 *  
 	 *  @param object the object that is executing the task
 	 */
-	public void shutdown(SimObject object)
+	public synchronized void shutdown(SimObject object)
 	{
 	}
 	
@@ -71,27 +71,40 @@ public class MoveObjectTask implements ISimObjectTask
 	 */
 	public synchronized void execute(IVector1 deltaT, SimObject object)
 	{
-		IVector2 position = object.getPosition();
-		IVector2 pDelta = velocity_.copy().multiply(deltaT);
-		position.add(pDelta);
+		synchronized (object)
+		{
+			IVector2 position = object.getPositionAccess();
+			IVector2 pDelta = velocity_.copy().multiply(deltaT);
+			position.add(pDelta);
+		}
 	}
 	
 	/** Returns the name of the task.
 	 * 
 	 *  @return name of the task.
 	 */
-	public String getName()
+	public synchronized String getName()
 	{
 		return name_;
 	}
 	
-	/** Returns the current velocity.
+	/** Returns access to the current velocity.
+	 *  This task must be locked before the access is used.
 	 *  
-	 *  @return current velocity
+	 *  @return access to current velocity
+	 */
+	public synchronized IVector2 getVelocityAccess()
+	{
+		return velocity_;
+	}
+	
+	/** Returns a copy of the current velocity.
+	 *  
+	 *  @return copy of current velocity
 	 */
 	public synchronized IVector2 getVelocity()
 	{
-		return velocity_;
+		return velocity_.copy();
 	}
 	
 	/** Sets a new velocity.

@@ -30,6 +30,12 @@ public interface ISimulationEngine
 	 */
 	public static final int EUCLIDEAN_SHAPE = 0;
 	
+	/** Declares a type of object.
+	 *  
+	 *  @param type object type
+	 */
+	public void declareObjectType(String type);
+	
 	/** Adds a new SimObject to the simulation.
 	 *  
 	 *  @param type type of the object

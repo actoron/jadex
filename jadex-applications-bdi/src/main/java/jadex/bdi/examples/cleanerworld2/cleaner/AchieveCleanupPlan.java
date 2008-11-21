@@ -40,19 +40,21 @@ public class AchieveCleanupPlan extends Plan
 		pickupWaste.getParameter("object_id").setValue(wasteId);
 		dispatchSubgoalAndWait(pickupWaste);
 		
-		
-		// Re-enable waste sensor
-		IGoal reenableSensor = createGoal("enable_waste_sensor");
-		dispatchSubgoalAndWait(reenableSensor);
+		if (pickupWaste.isSucceeded())
+		{
+			IBelief wasteCapacity = b.getBelief("waste_capacity");
+			int currentCap = ((Integer) wasteCapacity.getFact()).intValue();
+			--currentCap;
+			wasteCapacity.setFact(new Integer(currentCap));
+		}
 		
 		// Remove search waypoint
 		b.getBelief("waste_search_waypoint").setFact(null);
 		b.getBelief("waste_target").setFact(null);
-		if (!pickupWaste.isSucceeded())
-		{
-			//fail();
-		}
 		
+		// Re-enable waste sensor
+		IGoal reenableSensor = createGoal("enable_waste_sensor");
+		dispatchSubgoalAndWait(reenableSensor);
 	}
 	
 }

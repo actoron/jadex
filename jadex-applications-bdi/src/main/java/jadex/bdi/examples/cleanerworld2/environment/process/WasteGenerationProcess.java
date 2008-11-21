@@ -4,6 +4,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
@@ -20,6 +21,14 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 	 */
 	private String name_;
 	
+	/** Waste spawn rate
+	 */
+	IVector1 spawnRate_;
+	
+	/** Time since last spawn
+	 */
+	IVector1 spawnDelay_;
+	
 	/** Maximum number of waste objects.
 	 */
 	private int maxWaste_;
@@ -32,17 +41,20 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 	 */
 	public WasteGenerationProcess()
 	{
-		this(10);
+		this(10, new Vector1Double(10.0));
 	}
 	
 	/** Creates a a new WasteGenerationProcess with a user-defined amount of waste.
 	 * 
 	 *  @param maxWaste maximum amount of waste
+	 *  @param spawnRate spawn rate of waste
 	 */
-	public WasteGenerationProcess(int maxWaste)
+	public WasteGenerationProcess(int maxWaste, IVector1 spawnRate)
 	{
 		maxWaste_ = maxWaste;
 		waste_ = 0;
+		spawnRate_ = spawnRate.copy();
+		spawnDelay_ = spawnRate.copy().zero();
 		name_ = DEFAULT_NAME;
 	}
 	
@@ -71,20 +83,25 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 	 */
 	public synchronized void execute(IVector1 deltaT, ISimulationEngine engine)
 	{
-		while (waste_ <= maxWaste_)
+		spawnDelay_.add(deltaT);
+		if (spawnRate_.less(spawnDelay_))
 		{
-			IVector2 pos = engine.getRandomPosition(new Vector2Double(0.5));
-			String imgPath = this.getClass().getPackage().getName().replaceAll("environment\\.process", "").concat("images.").replaceAll("\\.", "/").concat("waste.png");
-			IDrawable drawable = new ScalableTexturedRectangle(new Vector2Double(0.5), imgPath);
-															   
-			engine.createSimObject("waste",
-								   null,
-								   null,
-								   pos,
-								   drawable,
-								   true,
-								   new WasteListener());
-			++waste_;
+			if (waste_ < maxWaste_)
+			{
+				IVector2 pos = engine.getRandomPosition(new Vector2Double(0.5));
+				String imgPath = this.getClass().getPackage().getName().replaceAll("environment\\.process", "").concat("images.").replaceAll("\\.", "/").concat("waste.png");
+				IDrawable drawable = new ScalableTexturedRectangle(new Vector2Double(0.5), imgPath);
+
+				engine.createSimObject("waste",
+						null,
+						null,
+						pos,
+						drawable,
+						true,
+						new WasteListener());
+				++waste_;
+			}
+			spawnDelay_.subtract(spawnRate_);
 		}
 	}
 	

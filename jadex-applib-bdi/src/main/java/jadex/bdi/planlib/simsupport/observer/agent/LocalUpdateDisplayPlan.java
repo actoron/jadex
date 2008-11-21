@@ -93,11 +93,17 @@ public class LocalUpdateDisplayPlan extends Plan
 				Integer objectId = (Integer) entry.getKey();
 				SimObject so = (SimObject) entry.getValue();
 				IDrawable d = (IDrawable) drawables.get(objectId);
-				d.setPosition(so.getPosition());
+				synchronized (so)
+				{
+					d.setPosition(so.getPositionAccess());
+				}
 				MoveObjectTask moveTask = (MoveObjectTask) so.getTask(MoveObjectTask.DEFAULT_NAME);
 				if (moveTask != null)
 				{
-					d.setVelocity(moveTask.getVelocity());
+					synchronized (moveTask)
+					{
+						d.setVelocity(moveTask.getVelocityAccess());
+					}
 				}
 			}
 		}
