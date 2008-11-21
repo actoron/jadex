@@ -1,10 +1,11 @@
 package jadex.tools.common.modeltree;
 
-import jadex.bridge.IJadexAgentFactory;
 import jadex.commons.SUtil;
 
 import java.io.File;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
@@ -17,22 +18,19 @@ public class FileNode implements IExplorerTreeNode
 	//-------- attributes --------
 	
 	/** The parent of this node. */
-	protected TreeNode	parent;
+	protected IExplorerTreeNode	parent;
 
 	/** The file represented by this node. */
 	protected File	file;
 
-	/** The date when the file was last modified. */
-	protected long	lastmodified;
+//	/** The date when the file was last modified. */
+//	protected long	lastmodified;
+//
+//	/** Flag indicating if the current file has been checked. */
+//	protected boolean	checked;
 
-	/** The valid state. */
-	protected boolean	valid;
-
-	/** Flag indicating if the current file has been checked. */
-	protected boolean	checked;
-
-	/** The node checker. */
-	protected INodeFunctionality nof;
+	/** Custom properties used by different views (e.g. starter, test center). */
+	protected Map properties;
 
 	//-------- constructors --------
 	
@@ -41,23 +39,12 @@ public class FileNode implements IExplorerTreeNode
 	 *  @param parent
 	 *  @param file
 	 */
-	public FileNode(TreeNode parent, File file, INodeFunctionality nof)
-	{
-		this(parent, file, nof, true);
-	}
-	
-	/**
-	 *  Create a new file node.
-	 *  @param parent
-	 *  @param file
-	 */
-	public FileNode(TreeNode parent, File file, INodeFunctionality nof, boolean valid)
+	public FileNode(IExplorerTreeNode parent, File file)
 	{
 		this.parent = parent;
 		this.file = file;
-		this.lastmodified	= Long.MIN_VALUE;
-		this.nof = nof;
-		this.valid = valid;
+//		this.lastmodified	= Long.MIN_VALUE;
+		this.properties	= new HashMap();
 	}
 
 	/**
@@ -172,114 +159,6 @@ public class FileNode implements IExplorerTreeNode
 	}
 
 	/**
-	 *  Reset the state of the node.
-	 *  After the reset, the next call to refresh will compute a new valid state. 
-	 */
-	public void	uncheck()
-	{
-		this.checked	= false;
-		this.lastmodified	= Long.MIN_VALUE;
-	}
-
-	/**
-	 *  Update the node (when the file has changed).
-	 *  @return true, when a change has been detected.
-	 */
-	public boolean	refresh()
-	{
-		boolean	changed	= doRefresh();
-		
-		// When file has changed, reset checked state
-		// (will be checked on 2nd run to improve perceived speed).
-		if(changed)
-		{
-			checked	= false;
-		}
-		// When checking has been disabled recently, set checked to false.
-		//else if(checked && !valid && !getRootNode().isChecking())
-		else if(checked && !getRootNode().isChecking())
-		{
-			changed	= true;
-			this.checked	= false;
-		}
-		// Do check on 2nd run to improve perceived speed.
-		else if(!checked && getRootNode().isChecking())
-		{
-			//boolean	state	= getState();
-			boolean	state	= isValid();
-			changed	= doCheck();
-			checked	= true;
-
-			// Reset parent state to be rechecked.
-			//if(changed || state!=getState())
-			if(changed || state!=isValid())
-			{
-				if(getParent() instanceof FileNode)
-				{
-//					System.out.println("recheck parent "+getParent()+", "+getState());
-					((FileNode)getParent()).setChecked(false);
-				}
-			}
-
-			// Execute valid changed action.
-			if(changed)
-			{
-				INodeAction action = getRootNode().getAction(this.getClass());
-				if(action!=null)
-					action.validStateChanged(this, valid);
-			}
-		}
-		return changed;
-	}
-
-	/**
-	 *  Perform the actual refresh.
-	 *  Can be overridden by subclasses.
-	 *  @return true, if the node has changed and needs to be checked.
-	 */
-	protected boolean doRefresh()
-	{
-		return nof.refresh(this);
-	}
-	
-	/**
-	 *  Actualy perform the check.
-	 *  Can be overridden by subclasses.
-	 *  @return True, if the node has changed since last check (if any).
-	 */
-	protected boolean	doCheck()
-	{
-		boolean	oldvalid	= this.valid;
-		try
-		{
-			this.valid = nof==null? true: nof.check(this);
-		}
-		catch(Exception e)
-		{
-			this.valid	= false;
-		}
-		return this.valid!=oldvalid;
-	}
-	
-	/** 
-	 * @return the icon for this node
-	 * @see jadex.tools.common.modeltree.IExplorerTreeNode#getIcon()
-	 */
-	public Icon getIcon()
-	{
-		return nof.getIcon(this);
-	}
-
-	/**
-	 *  Return the valid state of the node for display purposes.
-	 * /
-	public boolean getState()
-	{
-		//return valid;// || !checked;
-		return valid;// || !getRootNode().isChecking();
-	}*/
-
-	/**
 	 *  Return the tooltip text for the node (if any).
 	 */
 	public String getToolTipText()
@@ -307,7 +186,7 @@ public class FileNode implements IExplorerTreeNode
 	 */
 	public void setParent(TreeNode parent)
 	{
-		this.parent = parent;
+		this.parent = (IExplorerTreeNode) parent;
 	}
 
 	/**
@@ -319,84 +198,74 @@ public class FileNode implements IExplorerTreeNode
 		this.file = file;
 	}
 
-	/**
-	 *  Get the checked of this FileNode.
-	 *  @return Returns the checked.
-	 */
-	public boolean isChecked()
-	{
-		return checked;
-	}
-
-	/**
-	 *  Set the checked of this FileNode.
-	 *  @param checked The checked to set.
-	 */
-	public void setChecked(boolean checked)
-	{
-		this.checked = checked;
-	}
-
-	/**
-	 *  Get the lastmodified of this FileNode.
-	 *  @return Returns the lastmodified.
-	 */
-	public long getLastmodified()
-	{
-		return lastmodified;
-	}
-
-	/**
-	 *  Set the lastmodified of this FileNode.
-	 *  @param lastmodified The lastmodified to set.
-	 */
-	public void setLastmodified(long lastmodified)
-	{
-		this.lastmodified = lastmodified;
-	}
-
-	/**
-	 *  Get the valid of this FileNode.
-	 *  @return Returns the valid.
-	 */
-	public boolean isValid()
-	{
-		return valid;
-	}
-
-	/**
-	 *  Set the valid of this FileNode.
-	 *  @param valid The valid to set.
-	 */
-	public void setValid(boolean valid)
-	{
-		this.valid = valid;
-	}
+//	/**
+//	 *  Get the checked of this FileNode.
+//	 *  @return Returns the checked.
+//	 */
+//	public boolean isChecked()
+//	{
+//		return checked;
+//	}
+//
+//	/**
+//	 *  Set the checked of this FileNode.
+//	 *  @param checked The checked to set.
+//	 */
+//	public void setChecked(boolean checked)
+//	{
+//		this.checked = checked;
+//	}
+//
+//	/**
+//	 *  Get the lastmodified of this FileNode.
+//	 *  @return Returns the lastmodified.
+//	 */
+//	public long getLastmodified()
+//	{
+//		return lastmodified;
+//	}
+//
+//	/**
+//	 *  Set the lastmodified of this FileNode.
+//	 *  @param lastmodified The lastmodified to set.
+//	 */
+//	public void setLastmodified(long lastmodified)
+//	{
+//		this.lastmodified = lastmodified;
+//	}
+//
+//	/**
+//	 *  Get the valid of this FileNode.
+//	 *  @return Returns the valid.
+//	 */
+//	public boolean isValid()
+//	{
+//		return valid;
+//	}
+//
+//	/**
+//	 *  Set the valid of this FileNode.
+//	 *  @param valid The valid to set.
+//	 */
+//	public void setValid(boolean valid)
+//	{
+//		this.valid = valid;
+//	}
 	
 	/**
-	 *  Get the node functionality.
-	 *  @return The node functionality.
+	 *  Get the properties of the node.
 	 */
-	public INodeFunctionality getNodeFunctionality()
+	public Map	getProperties()
 	{
-		return nof;
+		return this.properties;
 	}
-	
+
 	/**
-	 *  Get the node functionality.
-	 *  @return The node functionality.
+	 *  Set the properties of the node.
+	 *  Bean setter method.
 	 */
-	public void setNodeFunctionality(INodeFunctionality nof)
+	public void	setProperties(Map properties)
 	{
-		this.nof = nof;
-	}
-	
-	/**
-	 *  Get the agent factory.
-	 *  @return The agent factory.
-	 */
-	public IJadexAgentFactory getAgentFactory()
-	{
-		return ((IExplorerTreeNode)parent).getAgentFactory();
+		this.properties	= properties;
 	}
 }

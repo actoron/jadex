@@ -13,11 +13,11 @@ import javax.swing.UIDefaults;
 /**
  *
  */
-public class JarNodeFunctionality extends DirNodeFunctionality
+public class JarNodeFunctionality //extends DirNodeFunctionality
 {	
 	/**
 	 * The image  for (m/r) elements.
-	 */
+	 * /
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"src_jar", SGUI.makeIcon(JarNode.class, "/jadex/tools/common/images/new_src_jar.png"),
@@ -27,7 +27,7 @@ public class JarNodeFunctionality extends DirNodeFunctionality
 	 *  Perform the actual refresh.
 	 *  Can be overridden by subclasses.
 	 *  @return true, if the node has changed and needs to be checked.
-	 */
+	 * /
 	public boolean refresh(IExplorerTreeNode node)
 	{
 		FileNode fn = (FileNode)node;
@@ -47,7 +47,7 @@ public class JarNodeFunctionality extends DirNodeFunctionality
 	/**
 	 *  Get the icon.
 	 *  @return The icon.
-	 */
+	 * /
 	public Icon getIcon(IExplorerTreeNode node)
 	{
 		if(node.getParent() instanceof RootNode)
@@ -56,5 +56,5 @@ public class JarNodeFunctionality extends DirNodeFunctionality
 		}
 
 		return super.getIcon(node);
-	}
+	}*/
 }

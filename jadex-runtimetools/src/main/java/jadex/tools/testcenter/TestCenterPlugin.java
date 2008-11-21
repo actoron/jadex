@@ -11,6 +11,7 @@ import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.starter.StarterNodeFunctionality;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -122,7 +123,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		b.setEnabled(true);
 		ret[1] = b;
 
-		b = new JButton(mpanel.REFRESH_ALL);
+		b = new JButton(mpanel.REFRESH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -194,12 +195,12 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				return pathname.isDirectory() || getJCC().getAgent().getPlatform()
 					.getAgentFactory().isStartable(pathname.getName());
 			}
-		}, new RootNodeFunctionality()), refreshcomp); // todo: popup for testcenter
-		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH, 
-			mpanel.REFRESH_ALL,ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
+		}), null, new TestCenterNodeFunctionality(getJCC())); // todo: popup for testcenter
+		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
+			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 		// todo: hack, how can this be done better?
-		mpanel.TOGGLE_CHECKING.putValue(Action.NAME, "Auto find tests");
-		mpanel.TOGGLE_CHECKING.putValue(Action.SMALL_ICON, icons.get("test_small"));
+//		mpanel.TOGGLE_CHECKING.putValue(Action.NAME, "Auto find tests");
+//		mpanel.TOGGLE_CHECKING.putValue(Action.SMALL_ICON, icons.get("test_small"));
 
 //		mpanel.addTreeSelectionListener(new TreeSelectionListener()
 //		{
@@ -329,7 +330,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					String model = ((FileNode)n).getFile().getAbsolutePath();
 //					if(SXML.isAgentFilename(model) && ((FileNode)n).isValid())
 					if(getJCC().getAgent().getPlatform()
-						.getAgentFactory().isStartable(model) && ((FileNode)n).isValid())
+						.getAgentFactory().isStartable(model) /* && ((FileNode)n).isValid() */)
 					{
 						tcpanel.getTestList().addEntry(model);
 					}
@@ -341,7 +342,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			String model = ((FileNode)node).getFile().getAbsolutePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
 			if(getJCC().getAgent().getPlatform()
-				.getAgentFactory().isStartable(model) && ((FileNode)node).isValid())
+				.getAgentFactory().isStartable(model) /* && ((FileNode)node).isValid() */)
 			{
 				tcpanel.getTestList().addEntry(model);
 			}
@@ -374,7 +375,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					String model = ((FileNode)n).getFile().getAbsolutePath();
 //					if(SXML.isAgentFilename(model) && ((FileNode)n).isValid())
 					if(getJCC().getAgent().getPlatform()
-						.getAgentFactory().isStartable(model) && ((FileNode)n).isValid())
+						.getAgentFactory().isStartable(model) /*&& ((FileNode)n).isValid() */)
 					{
 						tcpanel.getTestList().removeEntry(model);
 					}
@@ -401,7 +402,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		public boolean isEnabled()
 		{
 			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
-			return node!=null && !(node instanceof DirNode) && ((FileNode)node).isValid();
+			return node!=null && !(node instanceof DirNode) /*&& ((FileNode)node).isValid()*/;
 		}
 	};
 	
@@ -445,7 +446,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		public boolean isEnabled()
 		{
 			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
-			return node!=null && !(node instanceof DirNode) && ((FileNode)node).isValid();
+			return node!=null && !(node instanceof DirNode) /*&& ((FileNode)node).isValid() */;
 		}
 	};
 	

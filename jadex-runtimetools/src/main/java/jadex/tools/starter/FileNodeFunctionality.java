@@ -16,33 +16,14 @@ import javax.swing.UIDefaults;
 /**
  *
  */
-public class FileNodeFunctionality implements INodeFunctionality
+public class FileNodeFunctionality //implements INodeFunctionality
 {
 	//	-------- constants --------
-
-	/**
-	 * The image  for (m/r) elements.
-	 */
-	static UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"agent", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_agent.png"),
-		"agent_broken", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_agent_broken.png"),
-		"capability", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_capability_small.png"),
-		"capability_broken", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_capability_broken.png"),
-		"src_folder", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder.png"),
-		"src_folder_broken", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder_broken.png"),
-		"src_jar", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
-		"src_jar_broken", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar_broken.png"),
-		"package", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_package.png"),
-		"package_broken", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/new_package_broken.png"),
-		"java_file", SGUI.makeIcon(FileNodeFunctionality.class, "/jadex/tools/common/images/java_file.png"),
-	
-	});
 	
 	/**
 	 *  Check if the node is valid.
 	 *  @return True, is valid.
-	 */
+	 * /
 	public boolean check(IExplorerTreeNode node)
 	{
 		boolean valid = true;
@@ -82,7 +63,7 @@ public class FileNodeFunctionality implements INodeFunctionality
 	 *  Perform the actual refresh.
 	 *  Can be overridden by subclasses.
 	 *  @return true, if the node has changed and needs to be checked.
-	 */
+	 * /
 	public boolean refresh(IExplorerTreeNode node)
 	{
 		FileNode fn = (FileNode)node;
@@ -100,7 +81,7 @@ public class FileNodeFunctionality implements INodeFunctionality
 	/**
 	 *  Get the icon.
 	 *  @return The icon.
-	 */
+	 * /
 	public Icon getIcon(IExplorerTreeNode node)
 	{
 		FileNode fn = (FileNode)node;
@@ -129,9 +110,9 @@ public class FileNodeFunctionality implements INodeFunctionality
 	 *  Create a new child node.
 	 *  @param file The file for the new child node.
 	 *	@return The new node.
-	 */
+	 * /
 	public IExplorerTreeNode createNode(IExplorerTreeNode node, File file)
 	{
 		return null;
-	}
+	}*/
 }

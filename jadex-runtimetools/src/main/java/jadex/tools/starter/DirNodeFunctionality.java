@@ -20,17 +20,17 @@ import javax.swing.tree.TreeNode;
 /**
  *
  */
-public class DirNodeFunctionality extends FileNodeFunctionality
+public class DirNodeFunctionality //extends FileNodeFunctionality
 {
-	/** The file node functionality. */
+	/** The file node functionality. * /
 	public static INodeFunctionality fnf = new FileNodeFunctionality();
-	/** The dir node functionality. */
+	/** The dir node functionality. * /
 	public static INodeFunctionality dnf = new DirNodeFunctionality();
 	
 	/**
 	 *  Check if the node is valid.
 	 *  @return True, is valid.
-	 */
+	 * /
 	public boolean check(IExplorerTreeNode node)
 	{
 		boolean	valid	= true;
@@ -44,7 +44,7 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 	 *  Perform the actual refresh.
 	 *  Can be overridden by subclasses.
 	 *  @return true, if the node has changed and needs to be checked.
-	 */
+	 * /
 	public boolean refresh(IExplorerTreeNode node)
 	{
 //		System.out.println("DNF refresh: "+node);
@@ -107,7 +107,7 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 	/**
 	 *  Get the icon.
 	 *  @return The icon.
-	 */
+	 * /
 	public Icon getIcon(IExplorerTreeNode node)
 	{
 		Icon	icon	= null;
@@ -126,20 +126,8 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 	}
 	
 	/**
-	 *  Create a new child node.
-	 *  @param file The file for the new child node.
-	 *	@return The new node.
-	 */
-	public IExplorerTreeNode createNode(IExplorerTreeNode node, File file)
-	{
-		return file.isDirectory()
-			? (IExplorerTreeNode)new DirNode(node, file, dnf)
-			: (IExplorerTreeNode)new FileNode(node, file, fnf);
-	}
-	
-	/**
 	 *  Comparator for filenodes.
-	 */
+	 * /
 	public static final Comparator FILENODE_COMPARATOR = new Comparator()
 	{
 		public int compare(Object o1, Object o2)
@@ -151,5 +139,5 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 
 			return f1.getName().compareTo(f2.getName());
 		}
-	};
+	};*/
 }

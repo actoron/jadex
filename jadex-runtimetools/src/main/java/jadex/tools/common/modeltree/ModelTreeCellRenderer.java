@@ -13,8 +13,22 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 public class ModelTreeCellRenderer extends DefaultTreeCellRenderer
 {
-
 	//-------- attributes --------
+	
+	/** The node functionality. */
+	protected INodeFunctionality	nof;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a model tree cell renderer.
+	 */
+	public ModelTreeCellRenderer(INodeFunctionality nof)
+	{
+		this.nof	= nof;
+	}
+	
+	//-------- methods --------
 
 	/**
 	 * @param tree
@@ -32,7 +46,7 @@ public class ModelTreeCellRenderer extends DefaultTreeCellRenderer
 		if(value instanceof IExplorerTreeNode) 
 		{
 			IExplorerTreeNode	node	= (IExplorerTreeNode)value;
-			icon = node.getIcon();
+			icon = nof.getIcon(node);
 			setToolTipText(node.getToolTipText());
 		}
 		else

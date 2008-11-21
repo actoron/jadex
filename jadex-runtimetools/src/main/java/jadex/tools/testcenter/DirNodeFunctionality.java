@@ -22,13 +22,13 @@ import javax.swing.tree.TreeNode;
 /**
  *
  */
-public class DirNodeFunctionality extends FileNodeFunctionality
+public class DirNodeFunctionality //extends FileNodeFunctionality
 {
 	//-------- constants --------
 
 	/**
 	 * The image  for (m/r) elements.
-	 */
+	 * /
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"src_folder", SGUI.makeIcon(DirNode.class, "/jadex/tools/common/images/new_src_folder.png"),
@@ -37,15 +37,15 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 		"package_testable", SGUI.makeIcon(DirNode.class, "/jadex/tools/common/images/new_package_testable.png"),
 	});
 	
-	/** The file node functionality. */
+	/** The file node functionality. * /
 	public static INodeFunctionality fnf = new FileNodeFunctionality();
-	/** The dir node functionality. */
+	/** The dir node functionality. * /
 	public static INodeFunctionality dnf = new DirNodeFunctionality();
 	
 	/**
 	 *  Check if the node is valid.
 	 *  @return True, is valid.
-	 */
+	 * /
 	public boolean check(IExplorerTreeNode node)
 	{
 		boolean	valid	= false;
@@ -59,7 +59,7 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 	 *  Perform the actual refresh.
 	 *  Can be overridden by subclasses.
 	 *  @return true, if the node has changed and needs to be checked.
-	 */
+	 * /
 	public boolean refresh(IExplorerTreeNode node)
 	{
 		boolean	changed	= super.refresh(node);
@@ -121,7 +121,7 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 	/**
 	 *  Get the icon.
 	 *  @return The icon.
-	 */
+	 * /
 	public Icon getIcon(IExplorerTreeNode node)
 	{
 		Icon	icon	= null;
@@ -141,28 +141,13 @@ public class DirNodeFunctionality extends FileNodeFunctionality
 	 *  Create a new child node.
 	 *  @param file The file for the new child node.
 	 *	@return The new node.
-	 */
+	 * /
 	public IExplorerTreeNode createNode(IExplorerTreeNode node, File file)
 	{
 		return file.isDirectory()
 			? (IExplorerTreeNode)new DirNode(node, file, dnf, false)
 			: (IExplorerTreeNode)new FileNode(node, file, fnf, false);
-	}
+	}*/
 	
-	/**
-	 *  Comparator for filenodes.
-	 */
-	public static final Comparator FILENODE_COMPARATOR = new Comparator()
-	{
-		public int compare(Object o1, Object o2)
-		{
-			File f1 = ((FileNode)o1).getFile();
-			File f2 = ((FileNode)o2).getFile();
-			if(f1.isDirectory() && !f2.isDirectory()) return -1;
-			if(!f1.isDirectory() && f2.isDirectory()) return 1;
-
-			return f1.getName().compareTo(f2.getName());
-		}
-	};
 	
 }

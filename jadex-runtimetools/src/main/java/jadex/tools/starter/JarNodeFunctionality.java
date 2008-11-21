@@ -10,13 +10,13 @@ import javax.swing.Icon;
 /**
  *  Functionality for jar nodes.
  */
-public class JarNodeFunctionality extends DirNodeFunctionality
+public class JarNodeFunctionality //extends DirNodeFunctionality
 {	
 	/**
 	 *  Perform the actual refresh.
 	 *  Can be overridden by subclasses.
 	 *  @return true, if the node has changed and needs to be checked.
-	 */
+	 * /
 	public boolean refresh(IExplorerTreeNode node)
 	{
 		FileNode fn = (FileNode)node;
@@ -36,7 +36,7 @@ public class JarNodeFunctionality extends DirNodeFunctionality
 	/**
 	 *  Get the icon.
 	 *  @return The icon.
-	 */
+	 * /
 	public Icon getIcon(IExplorerTreeNode node)
 	{
 		Icon icon;
@@ -52,5 +52,5 @@ public class JarNodeFunctionality extends DirNodeFunctionality
 		}
 		
 		return icon;
-	}
+	}*/
 }

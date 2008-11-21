@@ -1,0 +1,213 @@
+package jadex.tools.testcenter;
+
+import jadex.bridge.IJadexAgentFactory;
+import jadex.bridge.IJadexModel;
+import jadex.commons.SGUI;
+import jadex.commons.SUtil;
+import jadex.commons.concurrent.IExecutable;
+import jadex.tools.common.modeltree.AbstractNodeFunctionality;
+import jadex.tools.common.modeltree.DirNode;
+import jadex.tools.common.modeltree.FileNode;
+import jadex.tools.common.modeltree.IExplorerTreeNode;
+import jadex.tools.common.modeltree.JarNode;
+import jadex.tools.common.modeltree.ModelExplorer;
+import jadex.tools.common.modeltree.RootNode;
+import jadex.tools.common.plugin.IControlCenter;
+
+import javax.swing.Icon;
+import javax.swing.UIDefaults;
+
+/**
+ *  Model tree node functionality, specific for the test center plugin.
+ */
+public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
+{
+	//-------- constants --------
+	
+	/** The valid property. */
+	protected static final String	VALID	= "valid";
+	
+	/**
+	 * The image  for (m/r) elements.
+	 */
+	static UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"agent", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent.png"),
+		"agent_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_broken.png"),
+		"capability", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_small.png"),
+		"capability_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_broken.png"),
+		"src_folder", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder.png"),
+		"src_folder_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder_broken.png"),
+		"src_jar", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
+		"src_jar_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar_broken.png"),
+		"package", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_package.png"),
+		"package_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_package_broken.png"),
+		"java_file", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/java_file.png"),
+	
+	});
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a starter node functionality.
+	 */
+	public TestCenterNodeFunctionality(IControlCenter jcc)
+	{
+		super(jcc);
+	}
+	
+	//-------- INodeFunctionality interface --------
+	
+	/**
+	 *  Get the icon.
+	 *  @return The icon.
+	 */
+	public Icon getIcon(IExplorerTreeNode node)
+	{
+		Icon icon	= null;
+		if(node instanceof FileNode)
+		{
+			boolean	valid = isValid(node);// || !fn.getRootNode().isChecking();
+
+			if(node instanceof JarNode)
+			{
+				icon =  icons.getIcon(valid? "src_jar" : "src_jar_broken");
+			}
+			else if(node instanceof DirNode)
+			{
+				if(node.getParent() instanceof RootNode)
+				{
+					icon	= icons.getIcon(valid? "src_folder" : "src_folder_broken");
+				}
+				else
+				{
+					icon	= icons.getIcon(valid? "package" : "package_broken");
+				}
+			}
+			else if (node instanceof FileNode)
+			{
+				FileNode fn = (FileNode)node;
+				IJadexAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
+				if(fac.isLoadable(fn.getFile().getName()) && fac.isStartable(fn.getFile().getName()))
+				{
+					icon	= icons.getIcon(valid? "agent" : "agent_broken");
+				}
+				else if(fac.isLoadable(fn.getFile().getName()))
+				{
+					icon	= icons.getIcon(valid? "capability" : "capability_broken");
+				}
+				else if(SUtil.isJavaSourceFilename(fn.getFile().getName()))
+				{
+					icon	= icons.getIcon("java_file");
+				}
+			}
+		}
+		return icon;
+	}
+
+
+	/**
+	 *  Called when a change was detected in a node.
+	 *  Check node, if necessary.
+	 */
+	public void	nodeChanged(IExplorerTreeNode node)
+	{
+		// Use priority below user priority to scan first, then check.
+//		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+	}
+
+	//-------- helper classes --------
+	
+	/**
+	 *  A task to check a file.
+	 */
+	class CheckTask	implements IExecutable
+	{
+		//-------- attributes --------
+		
+		/** The node to refresh. */
+		protected IExplorerTreeNode	node;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a refresh task. 
+		 */
+		public CheckTask(IExplorerTreeNode node)
+		{
+			this.node	= node;
+		}
+		
+		//-------- IExecutable interface --------
+		
+		/**
+		 *  Execute the task.
+		 */
+		public boolean execute()
+		{
+			// Perform refresh only, when node still in tree.
+			if(isValidChild(node))
+			{
+				if(node instanceof FileNode)
+				{
+					boolean	oldvalid	= isValid(node);
+					boolean	newvalid	= false;
+					
+					// Check directory.
+					if(node instanceof DirNode)
+					{
+						newvalid	= true;
+						for(int i=0; newvalid && i<node.getChildCount(); i++)
+						{
+							newvalid	= isValid((IExplorerTreeNode) node.getChildAt(i));
+						}
+					}
+					
+					// Check file.
+					else
+					{
+						FileNode fn = (FileNode)node;
+						String	file	= fn.getFile().getAbsolutePath();
+						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+						{
+							try
+							{
+								IJadexModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+								if(model!=null)
+								{
+									newvalid	= model.getReport().isEmpty();
+								}
+								// else unknown jadex file type -> ignore.
+							}
+							catch(Exception e)
+							{
+							}
+						}
+					}
+					
+					
+					if(oldvalid!=newvalid)
+					{
+						
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	/**
+	 *  Check if the valid flag of a node is set to true.
+	 */
+	public static boolean	isValid(IExplorerTreeNode node)
+	{
+		boolean	ret	= true;	// Unknown node types are valid by default
+		if(node instanceof FileNode)
+		{
+			FileNode fn = (FileNode)node;
+			Boolean	val	= (Boolean)fn.getProperties().get(VALID);
+			ret	= val==null || val.booleanValue();	// Valid, if not yet checked.
+		}
+		return ret;
+	}
+}

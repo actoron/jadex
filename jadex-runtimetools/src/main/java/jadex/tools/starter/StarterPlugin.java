@@ -153,7 +153,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		b.setEnabled(true);
 		ret[1] = b;
 		
-		b = new JButton(mpanel.REFRESH_ALL);
+		b = new JButton(mpanel.REFRESH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -216,25 +216,26 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 		JLabel	refreshcomp	= new JLabel(icons.getIcon("scanning_on"));
 		refreshcomp.setToolTipText("Loading/checking agent models.");
-		mpanel = new ModelExplorer(getJCC(), new RootNode(ADF_FILTER, 
-			new RootNodeFunctionality()), refreshcomp, null, new String[]{"ADFs", "Agents", "Capabilities"}, 
+		mpanel = new ModelExplorer(getJCC(), new RootNode(ADF_FILTER), null,
+			new StarterNodeFunctionality(getJCC()),
+			new String[]{"ADFs", "Agents", "Capabilities"}, 
 			new java.io.FileFilter[]{ADF_FILTER, AGENT_FILTER, CAPABILITY_FILTER}
 		);
-		mpanel.setAction(FileNode.class, new INodeAction()
-		{
-			public void validStateChanged(TreeNode node, boolean valid)
-			{
-				String file1 = ((FileNode)node).getFile().getAbsolutePath();
-				String file2 = spanel.getFilename();
-				//System.out.println(file1+" "+file2);
-				if(file1!=null && file1.equals(file2))
-				{
-					spanel.reloadModel(file1);
-				}
-			}
-		});
+//		mpanel.setAction(FileNode.class, new INodeAction()
+//		{
+//			public void validStateChanged(TreeNode node, boolean valid)
+//			{
+//				String file1 = ((FileNode)node).getFile().getAbsolutePath();
+//				String file2 = spanel.getFilename();
+//				//System.out.println(file1+" "+file2);
+//				if(file1!=null && file1.equals(file2))
+//				{
+//					spanel.reloadModel(file1);
+//				}
+//			}
+//		});
 		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartAgentMenuItemConstructor(), mpanel.ADD_PATH,
-			mpanel.REMOVE_PATH, mpanel.REFRESH, mpanel.REFRESH_ALL}));
+			mpanel.REMOVE_PATH, mpanel.REFRESH}));
 		mpanel.addTreeSelectionListener(new TreeSelectionListener()
 		{
 			public void valueChanged(TreeSelectionEvent e)
@@ -627,7 +628,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(isAgentFilename(type) && ((FileNode)node).isValid())
+					if(isAgentFilename(type) )//&& ((FileNode)node).isValid())
 					{
 						try
 						{

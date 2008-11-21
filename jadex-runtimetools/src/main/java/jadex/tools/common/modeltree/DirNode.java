@@ -28,23 +28,15 @@ public class DirNode	extends FileNode
 	 */
 	public DirNode()
 	{
-		this(null, null, null);
+		this(null, null);
 	}
 	
 	/**
 	 *  Create a directory node for a given directory.
 	 */
-	public DirNode(TreeNode parent, File dir, INodeFunctionality nof)
+	public DirNode(IExplorerTreeNode parent, File dir)
 	{
-		this(parent, dir, nof, true);
-	}
-	
-	/**
-	 *  Create a directory node for a given directory.
-	 */
-	public DirNode(TreeNode parent, File dir, INodeFunctionality nof, boolean valid)
-	{
-		super(parent, dir, nof, valid);
+		super(parent, dir);
 	}
 
 	//-------- TreeNode interface --------
@@ -214,7 +206,9 @@ public class DirNode	extends FileNode
 	 */
 	protected TreeNode createNode(File file)
 	{
-		return nof.createNode(this, file);
+		return file.isDirectory()
+			? (IExplorerTreeNode)new DirNode(this, file)
+			: (IExplorerTreeNode)new FileNode(this, file);
 	}	
 
 	/**

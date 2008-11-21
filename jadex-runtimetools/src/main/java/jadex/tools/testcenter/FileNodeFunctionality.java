@@ -20,13 +20,13 @@ import javax.swing.UIDefaults;
 /**
  *
  */
-public class FileNodeFunctionality implements INodeFunctionality
+public class FileNodeFunctionality //implements INodeFunctionality
 {
 	//-------- constants --------
 
 	/**
 	 * The image  for (m/r) elements.
-	 */
+	 * /
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"agent", SGUI.makeIcon(FileNode.class, "/jadex/tools/common/images/new_agent.png"),
@@ -36,7 +36,7 @@ public class FileNodeFunctionality implements INodeFunctionality
 	/**
 	 *  Check if the node is valid.
 	 *  @return True, is valid.
-	 */
+	 * /
 	public boolean check(IExplorerTreeNode node)
 	{
 		boolean	valid	= false;
@@ -93,7 +93,7 @@ public class FileNodeFunctionality implements INodeFunctionality
 	 *  Perform the actual refresh.
 	 *  Can be overridden by subclasses.
 	 *  @return true, if the node has changed and needs to be checked.
-	 */
+	 * /
 	public boolean refresh(IExplorerTreeNode node)
 	{
 		FileNode fn = (FileNode)node;
@@ -111,7 +111,7 @@ public class FileNodeFunctionality implements INodeFunctionality
 	/**
 	 *  Get the icon.
 	 *  @return The icon.
-	 */
+	 * /
 	public Icon getIcon(IExplorerTreeNode node)
 	{
 		Icon	icon	= null;
@@ -129,9 +129,9 @@ public class FileNodeFunctionality implements INodeFunctionality
 	 *  Create a new child node.
 	 *  @param file The file for the new child node.
 	 *	@return The new node.
-	 */
+	 * /
 	public IExplorerTreeNode createNode(IExplorerTreeNode node, File file)
 	{
 		return null;
-	}
+	}*/
 }

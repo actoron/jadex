@@ -146,8 +146,8 @@ public class LoadManagingExecutionService
 			sleep	= (long)((time/load - time) / 1000000);
 			
 			// Calculate concurrency limit to meet max timeslice setting:
-			// newlimit = oldlimit * target_slice / actual_slice
-			double	newlimit	= limit * timeslice / (sleep + time/1000000);
+			double	lastslice	= Math.max(sleep + time/1000000, 0.1);
+			double	newlimit	= limit * timeslice / lastslice;
 			// Use exponential annealing to avoid oscillations
 			limit	= Math.max(1, limit + (int)(0.5*(newlimit-limit)));
 			

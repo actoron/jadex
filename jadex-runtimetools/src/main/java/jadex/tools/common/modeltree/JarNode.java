@@ -1,9 +1,5 @@
 package jadex.tools.common.modeltree;
 
-
-import javax.swing.tree.TreeNode;
-
-
 /**
  *  A jar node represents a jar file. 
  */
@@ -22,16 +18,8 @@ public class JarNode extends DirNode
 	/**
 	 *  Create a jar node.
 	 */
-	public JarNode(TreeNode parent, String jar, INodeFunctionality nof)
+	public JarNode(IExplorerTreeNode parent, String jar)
 	{
-		super(parent, new JarAsDirectory(jar), nof);
-	}
-	
-	/**
-	 *  Create a jar node.
-	 */
-	public JarNode(TreeNode parent, String jar, INodeFunctionality nof, boolean valid)
-	{
-		super(parent, new JarAsDirectory(jar), nof, valid);
+		super(parent, new JarAsDirectory(jar));
 	}
 }

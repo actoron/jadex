@@ -13,19 +13,19 @@ import javax.swing.Icon;
 /**
  *
  */
-public class RootNodeFunctionality implements INodeFunctionality
+public class RootNodeFunctionality //implements INodeFunctionality
 {
-	/** The jar node functionality. */
+	/** The jar node functionality. * /
 	public static INodeFunctionality jnf = new JarNodeFunctionality();
 
-	/** The file node functionality. */
+	/** The file node functionality. * /
 	public static INodeFunctionality dnf = new DirNodeFunctionality();
 
 	
 	/**
 	 *  Check if the node is valid.
 	 *  @return True, is valid.
-	 */
+	 * /
 	public boolean check(IExplorerTreeNode node)
 	{
 		return true; 
@@ -35,7 +35,7 @@ public class RootNodeFunctionality implements INodeFunctionality
 	 *  Perform the actual refresh.
 	 *  Can be overridden by subclasses.
 	 *  @return true, if the node has changed and needs to be checked.
-	 */
+	 * /
 	public boolean refresh(IExplorerTreeNode node)
 	{
 		return false;
@@ -44,7 +44,7 @@ public class RootNodeFunctionality implements INodeFunctionality
 	/**
 	 *  Get the icon.
 	 *  @return The icon.
-	 */
+	 * /
 	public Icon getIcon(IExplorerTreeNode node)
 	{
 		return null;
@@ -54,7 +54,7 @@ public class RootNodeFunctionality implements INodeFunctionality
 	 *  Create a new child node.
 	 *  @param file The file for the new child node.
 	 *	@return The new node.
-	 */
+	 * /
 	public IExplorerTreeNode createNode(IExplorerTreeNode node, File file)
 	{
 		FileNode ret	= null;
@@ -72,5 +72,5 @@ public class RootNodeFunctionality implements INodeFunctionality
 			}
 		}
 		return ret;
-	}
+	}*/
 }

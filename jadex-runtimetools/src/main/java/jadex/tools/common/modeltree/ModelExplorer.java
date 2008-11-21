@@ -8,6 +8,9 @@ import jadex.bridge.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.TreeExpansionHandler;
+import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.LoadManagingExecutionService;
+import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.SwingWorker;
 import jadex.tools.common.ToolTipAction;
@@ -83,9 +86,15 @@ public class ModelExplorer extends JTree
 
 	/** The root node. */
 	protected RootNode root;
-
-//	/** The current classloader of the project. */
-//	protected ClassLoader	classloader;
+	
+	/** The node functionality. */
+	protected INodeFunctionality	nof;
+	
+	/** The background work manager. */
+	protected LoadManagingExecutionService	worker;
+	
+	/** The crawler task. */
+	protected CrawlerTask	crawlertask;
 
 	/** Popup rightclick. */
 	protected PopupBuilder pubuilder;
@@ -99,14 +108,11 @@ public class ModelExplorer extends JTree
 	/** The automatic refresh flag. */
 	protected boolean	refresh;
 
-	/** The component (icon) to display in the statusbar while refreshing. */
-	protected JComponent	refreshcomp;
-
 	/** The refresh menu. */
 	protected JCheckBoxMenuItem	refreshmenu;
 
-	/** The check menu. */
-	protected JCheckBoxMenuItem	checkingmenu;
+//	/** The check menu. */
+//	protected JCheckBoxMenuItem	checkingmenu;
 	
 	/** The selected tree path. */
 	protected TreePath selected;
@@ -125,9 +131,10 @@ public class ModelExplorer extends JTree
 	/**
 	 *  Create a new ModelExplorer.
 	 */
-	public ModelExplorer(IControlCenter jcc, RootNode root, JComponent refreshcomp)
+	public ModelExplorer(IControlCenter jcc, RootNode root, 
+		PopupBuilder pubuilder, INodeFunctionality nof)
 	{
-		this(jcc, root, refreshcomp, null, null, null);
+		this(jcc, root, pubuilder, nof, null, null);
 	}
 	
 	/**
@@ -140,22 +147,24 @@ public class ModelExplorer extends JTree
 	 *  @param filters The file filters.
 	 */
 	public ModelExplorer(IControlCenter jcc, RootNode root, 
-		JComponent refreshcomp, PopupBuilder pubuilder, 
+		PopupBuilder pubuilder, INodeFunctionality nof,
 		String[] filternames, java.io.FileFilter[] filters)
 	{
 		super(root);
 		this.jcc = jcc;
+		this.nof = nof;
+		nof.setModelExplorer(this);
 		this.root = (RootNode)getModel().getRoot();
-		root.setMyAgentFactory(jcc.getAgent().getPlatform().getAgentFactory());
-		this.refreshcomp	= refreshcomp;
 		setRootVisible(false);
 		this.refresh	= true;
 		this.pubuilder = pubuilder!=null? pubuilder: new PopupBuilder(
-			new Action[]{ADD_PATH, REMOVE_PATH, REFRESH, REFRESH_ALL});
+			new Action[]{ADD_PATH, REMOVE_PATH, REFRESH});
 		this.filternames = filternames;
 		this.filters = filters;
+		this.worker	= new LoadManagingExecutionService(
+			ThreadPoolFactory.getThreadPool(jcc.getAgent().getPlatform().getName()));
 		
-		setCellRenderer(new ModelTreeCellRenderer());
+		setCellRenderer(new ModelTreeCellRenderer(nof));
 		setRowHeight(16);
 		addMouseListener(new MouseAdapter()
 		{
@@ -268,66 +277,21 @@ public class ModelExplorer extends JTree
 	}
 	
 	/**
-	 *  Set a nodetype specific action.
-	 *  @param nodetype The nodetype.
-	 *  @param action The action. 
-	 */
-	public void setAction(Class nodetype, INodeAction action)
-	{
-		getRootNode().setAction(nodetype, action);
-	}
-	
-	/**
 	 *  Set the file filter.
 	 *  @param filter The filter.
 	 */
 	public void setFileFilter(java.io.FileFilter filter)
 	{
 		getRootNode().setNewFileFilter(filter);
-		refreshAll(null);
+		refreshAll(getRootNode());
 	}
 	
 	/**
-	 *  Uncheck all nodes and assign the crawler task
-	 *  to refresh all child nodes from start node.
-	 *  @param node The start node.
+	 *  Recursively refresh a node and its subnodes.
 	 */
 	public void refreshAll(IExplorerTreeNode node)
 	{
-		if(node==null)
-			node = getRootNode();
-		List unchecknodes	= new LinkedList();
-		unchecknodes.add(node);
-		while(unchecknodes.size()>0)
-		{
-			node = (IExplorerTreeNode)unchecknodes.remove(0);
-			node.uncheck();
-			//System.out.println("Uncheck of"+node);
-			
-			for(int i=0; i<node.getChildCount(); i++)
-				unchecknodes.add(node.getChildAt(i));
-		}
-
-		refresh(node);
-	}
-	
-	/**
-	 *  Set the file filters.
-	 *  @param filter The filters.
-	 * /
-	public void setFileFilters(String[] filternames, java.io.FileFilter[] filters)
-	{
-		this.filternames = filternames;
-		this.filters = filters;
-	}*/
-	
-	/**
-	 *  Get the file filters.
-	 *  @return The filters.
-	 */
-	public java.io.FileFilter[] getFileFilters()
-	{
-		return filters;
+		worker.execute(new RecursiveRefreshTask(node), PERCENTAGE_USER);
 	}
 	
 	/**
@@ -337,15 +301,6 @@ public class ModelExplorer extends JTree
 	{
 		return root;
 	}
-
-	
-//	/**
-//	 * Get the classloader
-//	 */
-//	public ClassLoader	getClassLoader()
-//	{
-//		return classloader;
-//	}
 
 	/**
 	 *  Write current state into properties.
@@ -416,7 +371,6 @@ public class ModelExplorer extends JTree
 				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
 				RootNode newroot = (RootNode)Nuggets.objectFromXML(rootxml, cl);
 				newroot.copyFrom(this.root);
-				newroot.setMyAgentFactory(jcc.getAgent().getPlatform().getAgentFactory());
 				this.root = newroot;
 				((DefaultTreeModel)getModel()).setRoot(this.root);
 			}
@@ -427,10 +381,8 @@ public class ModelExplorer extends JTree
 			}
 		}
 		
-//		updateClassLoader();
 		if(getRootNode().getChildCount()>0)
 		{
-//			List urls	= new ArrayList();
 			for(Enumeration e=getRootNode().children(); e.hasMoreElements();)
 			{
 				// Todo: support non-file (e.g. url nodes).
@@ -467,18 +419,17 @@ public class ModelExplorer extends JTree
 					//e.printStackTrace();
 //				}
 			}
-//			classloader	= new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]));
 		}
 		
 		// Load the expanded tree nodes.
 		Property[]	expanded	= props.getProperties("expanded");
 		for(int i=0; i<expanded.length; i++)
 			expansionhandler.treeExpanded(new TreeExpansionEvent(
-				this, new TreePath(new FileNode(null, new File(expanded[i].getValue()), null))));
+				this, new TreePath(new FileNode(null, new File(expanded[i].getValue())))));
 
 		// Select the last selected model in the tree.
 		String sel = props.getStringProperty("selected");
-		expansionhandler.setSelectedNode(sel==null ? null : new FileNode(null, new File(sel), null));
+		expansionhandler.setSelectedNode(sel==null ? null : new FileNode(null, new File(sel)));
 		((DefaultTreeModel)getModel()).reload(getRootNode());
 
 		// Load last selected model.
@@ -500,14 +451,10 @@ public class ModelExplorer extends JTree
 		refresh	= !"false".equals(props.getStringProperty("refresh"));
 		if(refreshmenu!=null)
 			refreshmenu.setState(this.refresh);
-		if(checkingmenu!=null)
-			checkingmenu.setState(getRootNode().isChecking());
-		if(refresh)
-		{
-			if(crawlertask==null)
-				crawlertask	=	new CrawlerTask();
-			SwingWorker.addTask(crawlertask, PERCENTAGE_CRAWLER);
-		}
+//		if(checkingmenu!=null)
+//			checkingmenu.setState(getRootNode().isChecking());
+		
+		resetCrawler();
 		
 		// Load the current filter name
 		if(filternames!=null && filternames.length>0 && filtermenu!=null)
@@ -531,48 +478,6 @@ public class ModelExplorer extends JTree
 //			}
 //		});
 	}
-
-	/**
-	 *  Update the class loader, when the project settings change.
-	 * /
-	protected void updateClassLoader()
-	{
-		if(getRootNode().getChildCount()>0)
-		{
-			List urls	= new ArrayList();
-			for(Enumeration e=getRootNode().children(); e.hasMoreElements();)
-			{
-				// Todo: support non-file (e.g. url nodes).
-				File	file	= ((FileNode)e.nextElement()).getFile();
-				
-				// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
-				file	= new File(file.getParentFile(), file.getName());
-	//			String fname = file.getAbsolutePath();
-				// Todo: slash is needed for package determination(?)
-				// but breaks for jar files...
-	//			if(file.isDirectory() && !fname.endsWith(System.getProperty("file.separator", "/"))
-	//				&& !file.getName().endsWith(".jar"))
-	//			{
-	//				fname += "/";
-	//			}
-				try
-				{
-					urls.add(file.toURL());
-				}
-				catch(MalformedURLException ex)
-				{
-					String failed = SUtil.wrapText("Could not add path\n\n"+ex.getMessage());
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(ModelExplorer.this), failed, "Path Error", JOptionPane.ERROR_MESSAGE);
-					//e.printStackTrace();
-				}
-			}
-//			classloader	= new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]));
-		}
-//		else
-//		{
-//			classloader	= null;
-//		}
-	}*/
 	
 	/**
 	 *  Reset the tree.
@@ -580,15 +485,33 @@ public class ModelExplorer extends JTree
 	public void reset()
 	{
 		refresh	= false;	// stops crawler task, if any
-		// Stop user task (hack!!!?)
-		if(usertask!=null)
-		{
-			usertask.nodes_user.clear();
-			usertask.nodes_out.clear();
-		}		
+//		// Stop user task (hack!!!?)
+//		if(usertask!=null)
+//		{
+//			usertask.nodes_user.clear();
+//			usertask.nodes_out.clear();
+//		}		
 
 		root.reset();
 		((DefaultTreeModel)getModel()).nodeStructureChanged(root);
+	}
+	
+	/**
+	 *  Reset the crawler (e.g. when directories have been removed)
+	 */
+	public void	resetCrawler()
+	{
+		if(crawlertask!=null)
+		{
+			crawlertask.abort();
+			crawlertask	= null;
+		}
+		
+		if(refresh)
+		{
+			crawlertask	=	new CrawlerTask();
+			worker.execute(crawlertask, PERCENTAGE_CRAWLER);
+		}
 	}
 	
 	/**
@@ -612,56 +535,55 @@ public class ModelExplorer extends JTree
 		pop.show(this, x, y);
 	}
 
-	/**
-	 *  Recursively check models starting with the given node.
-	 *  @param node	The starting point.
-	 *  @param baseurl	The baseurl to load models relative to parent node.
-	 *  @return true if
-	 */
-	protected boolean	check(TreeNode node, String baseurl)
-	{
-		baseurl	= baseurl==null ? node.toString() : baseurl+ "/" + node.toString(); 
-		boolean	ok	= true;	// True, when all files ok
-		IJadexAgentFactory fac = jcc.getAgent().getPlatform().getAgentFactory();
-		
-		// Has children, must be directory.
-		if(node.getChildCount()>0)
-		{
-			for(int i=0; i<node.getChildCount(); i++)
-			{
-				boolean	check	= check(node.getChildAt(i), baseurl);
-				ok	= ok && check;
-			}
-		}
-		
-		// No more children, could be model
-		// todo: other kernel extensions
-		else if(fac.isLoadable(baseurl))
-		{
-			try
-			{
-				IJadexModel model = fac.loadModel(baseurl);
-				if(model!=null)
-				{
-					ok	= !checkingmenu.isSelected() || model.getReport().isEmpty();
-				}
-				// else unknown jadex file type -> ignore.
-			}
-			catch(Exception e)
-			{
-				ok	= false;
-			}
-		}
-
-		// Add check result to lookup table (used by tree cell renderer).
-//		checkstate.put(node, broken ? CHECK_BROKEN : ok ? CHECK_OK : CHECK_PARTIAL);
-		
-		return ok;
-	}
+//	/**
+//	 *  Recursively check models starting with the given node.
+//	 *  @param node	The starting point.
+//	 *  @param baseurl	The baseurl to load models relative to parent node.
+//	 *  @return true if
+//	 */
+//	protected boolean	check(TreeNode node, String baseurl)
+//	{
+//		baseurl	= baseurl==null ? node.toString() : baseurl+ "/" + node.toString(); 
+//		boolean	ok	= true;	// True, when all files ok
+//		IJadexAgentFactory fac = jcc.getAgent().getPlatform().getAgentFactory();
+//		
+//		// Has children, must be directory.
+//		if(node.getChildCount()>0)
+//		{
+//			for(int i=0; i<node.getChildCount(); i++)
+//			{
+//				boolean	check	= check(node.getChildAt(i), baseurl);
+//				ok	= ok && check;
+//			}
+//		}
+//		
+//		// No more children, could be model
+//		// todo: other kernel extensions
+//		else if(fac.isLoadable(baseurl))
+//		{
+//			try
+//			{
+//				IJadexModel model = fac.loadModel(baseurl);
+//				if(model!=null)
+//				{
+//					ok	= !checkingmenu.isSelected() || model.getReport().isEmpty();
+//				}
+//				// else unknown jadex file type -> ignore.
+//			}
+//			catch(Exception e)
+//			{
+//				ok	= false;
+//			}
+//		}
+//
+//		// Add check result to lookup table (used by tree cell renderer).
+////		checkstate.put(node, broken ? CHECK_BROKEN : ok ? CHECK_OK : CHECK_PARTIAL);
+//		
+//		return ok;
+//	}
 	
 	/**
-	 *  Create the menu bar.
-	 *  @return the same modified menubar
+	 *  Create the menu items.
 	 */
 	public JMenu[] createMenuBar()
 	{
@@ -671,11 +593,9 @@ public class ModelExplorer extends JTree
 		refreshmenu.setState(this.refresh);
 		menu.add(refreshmenu);
 		
-		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
-		checkingmenu.setState(getRootNode().isChecking());
-		menu.add(checkingmenu);
-		
-		//menubar.add(menu, menubar.getComponentCount()-1);
+//		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
+//		checkingmenu.setState(getRootNode().isChecking());
+//		menu.add(checkingmenu);
 		
 		if(filters!=null && filters.length>1)
 		{
@@ -760,136 +680,184 @@ public class ModelExplorer extends JTree
 
 	//-------- tree refreshing --------
 	
-	/** The high priority background task. */
-	protected UserTask	usertask;
-
-	/** The low priority background task. */
-	protected CrawlerTask	crawlertask;
-
 	/**
-	 *  Refresh a node.
+	 *  Get the background work manager.
 	 */
-	public void	refresh(IExplorerTreeNode node)
+	public LoadManagingExecutionService	getWorker()
 	{
-		if(usertask==null)
-		{
-			usertask	= new UserTask();
-			SwingWorker.addTask(usertask, PERCENTAGE_USER);
-			if(refreshcomp!=null)
-				jcc.addStatusComponent(this, refreshcomp);
-		}
-		usertask.nodes_user.add(node);
+		return this.worker;
 	}
 
 	/**
-	 *  The user-level refresher task.
+	 *  A task to recursively refresh a node and its children.
 	 */
-	public class UserTask	implements SwingWorker.Task
+	class RecursiveRefreshTask	implements IExecutable
 	{
-		/** User nodes to be refreshed (including children). */
-		protected List	nodes_user	= new LinkedList();
-	
-		/** Changed nodes to be refreshed (including parents). */
-		protected List	nodes_out	= new LinkedList();
-
+		//-------- attributes --------
+		
+		/** The node to refresh. */
+		protected IExplorerTreeNode	node;
+		
+		//-------- constructors --------
+		
 		/**
-		 * 
+		 *  Create a refresh task. 
+		 */
+		public RecursiveRefreshTask(IExplorerTreeNode node)
+		{
+			this.node	= node;
+		}
+		
+		//-------- IExecutable interface --------
+		
+		/**
+		 *  Execute the task.
 		 */
 		public boolean execute()
 		{
-//			System.out.println("refresher: "+nodes_user+", "+nodes_out);
-
-			// Process user nodes (iterate through children).
-			if(!nodes_user.isEmpty())
+			nof.refresh(node);
+			for(int i=0; i<node.getChildCount(); i++)
 			{
-				// Update node, if necessary.
-				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_user.remove(0);
-				String	tip	= node.getToolTipText();
-				if(tip!=null)
-					jcc.setStatusText("Scanning "+tip);
-				if(node.refresh())
-				{
-//					System.out.println("change detected in user node: "+node);
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							((DefaultTreeModel)getModel()).reload(node);
-						}
-					});
-					if(!nodes_out.contains(node))
-						nodes_out.add(0, node);	// Add to start for inner nodes being processed first (inverse order)
-				}
-				
-				// For user nodes iterate over children, regardless if node has changed.
-				Enumeration	children	= node.children();
-				while(children.hasMoreElements())
-				{
-					nodes_user.add(children.nextElement());
-				}
+				IExplorerTreeNode	child	= (IExplorerTreeNode) node.getChildAt(i);
+				worker.execute(new RecursiveRefreshTask(child), PERCENTAGE_USER);
 			}
-	
-			// Process out nodes (traverse back to root).
-			else if(!nodes_out.isEmpty())
-			{
-				// Update node, as often as necessary (e.g. integrity checks are performed on 2nd refresh).
-				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_out.remove(0);
-				String	tip	= node.getToolTipText();
-				if(tip!=null)
-					jcc.setStatusText("Scanning "+tip);
-				if(node.refresh())
-				{
-//					System.out.println("change detected in out node: "+node);
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							((DefaultTreeModel)getModel()).reload(node);
-						}
-					});
-					nodes_out.add(node);
-				}
-				
-				// Otherwise move to parent node
-				else if(node.getParent()!=null)
-				{
-					if(!nodes_out.contains(node.getParent()))
-						nodes_out.add(node.getParent());
-				}
-			}
-			
-			boolean finished	= nodes_user.isEmpty() && nodes_out.isEmpty();
-			if(finished)
-			{
-				usertask	= null;
-				if(refreshcomp!=null)
-					jcc.removeStatusComponent(ModelExplorer.this);
-				if(refresh)
-				{
-					if(crawlertask==null)
-						crawlertask	=	new CrawlerTask();
-					SwingWorker.addTask(crawlertask, PERCENTAGE_CRAWLER);
-				}
-			}
-
-			return !finished;
+			return false;
 		}
 	}
-
+	
+//	
+//	/** The high priority background task. */
+//	protected UserTask	usertask;
+//
+//	/** The low priority background task. */
+//	protected CrawlerTask	crawlertask;
+//
+//	/**
+//	 *  Refresh a node.
+//	 */
+//	public void	refresh(IExplorerTreeNode node)
+//	{
+//		if(usertask==null)
+//		{
+//			usertask	= new UserTask();
+//			SwingWorker.addTask(usertask, PERCENTAGE_USER);
+//			if(refreshcomp!=null)
+//				jcc.addStatusComponent(this, refreshcomp);
+//		}
+//		usertask.nodes_user.add(node);
+//	}
+//
+//	/**
+//	 *  The user-level refresher task.
+//	 */
+//	public class UserTask	implements SwingWorker.Task
+//	{
+//		/** User nodes to be refreshed (including children). */
+//		protected List	nodes_user	= new LinkedList();
+//	
+//		/** Changed nodes to be refreshed (including parents). */
+//		protected List	nodes_out	= new LinkedList();
+//
+//		/**
+//		 * 
+//		 */
+//		public boolean execute()
+//		{
+////			System.out.println("refresher: "+nodes_user+", "+nodes_out);
+//
+//			// Process user nodes (iterate through children).
+//			if(!nodes_user.isEmpty())
+//			{
+//				// Update node, if necessary.
+//				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_user.remove(0);
+//				String	tip	= node.getToolTipText();
+//				if(tip!=null)
+//					jcc.setStatusText("Scanning "+tip);
+//				if(node.refresh())
+//				{
+////					System.out.println("change detected in user node: "+node);
+//					SwingUtilities.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
+//							((DefaultTreeModel)getModel()).reload(node);
+//						}
+//					});
+//					if(!nodes_out.contains(node))
+//						nodes_out.add(0, node);	// Add to start for inner nodes being processed first (inverse order)
+//				}
+//				
+//				// For user nodes iterate over children, regardless if node has changed.
+//				Enumeration	children	= node.children();
+//				while(children.hasMoreElements())
+//				{
+//					nodes_user.add(children.nextElement());
+//				}
+//			}
+//	
+//			// Process out nodes (traverse back to root).
+//			else if(!nodes_out.isEmpty())
+//			{
+//				// Update node, as often as necessary (e.g. integrity checks are performed on 2nd refresh).
+//				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_out.remove(0);
+//				String	tip	= node.getToolTipText();
+//				if(tip!=null)
+//					jcc.setStatusText("Scanning "+tip);
+//				if(node.refresh())
+//				{
+////					System.out.println("change detected in out node: "+node);
+//					SwingUtilities.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
+//							((DefaultTreeModel)getModel()).reload(node);
+//						}
+//					});
+//					nodes_out.add(node);
+//				}
+//				
+//				// Otherwise move to parent node
+//				else if(node.getParent()!=null)
+//				{
+//					if(!nodes_out.contains(node.getParent()))
+//						nodes_out.add(node.getParent());
+//				}
+//			}
+//			
+//			boolean finished	= nodes_user.isEmpty() && nodes_out.isEmpty();
+//			if(finished)
+//			{
+//				usertask	= null;
+//				if(refreshcomp!=null)
+//					jcc.removeStatusComponent(ModelExplorer.this);
+//				if(refresh)
+//				{
+//					if(crawlertask==null)
+//						crawlertask	=	new CrawlerTask();
+//					SwingWorker.addTask(crawlertask, PERCENTAGE_CRAWLER);
+//				}
+//			}
+//
+//			return !finished;
+//		}
+//	}
+//
 	/**
 	 *  The crawler-level refresher task.
 	 */
-	public class CrawlerTask	implements SwingWorker.Task
+	public class CrawlerTask	implements IExecutable
 	{
 		/** Crawler nodes to be refreshed (including children). */
 		protected List	nodes_crawler	= new ArrayList();
+		
+		/** Abort flag to exit this crawler task (e.g. when project changed). */
+		protected boolean	abort;
 
 		public boolean execute()
 		{
-//			ClassLoader	oldcl	= Thread.currentThread().getContextClassLoader();
-//			if(classloader!=null)
-//				Thread.currentThread().setContextClassLoader(classloader);
-
+			if(abort)
+				return false;
+			
 			if(nodes_crawler.isEmpty())
 			{
 				nodes_crawler.add(getRootNode());
@@ -898,20 +866,7 @@ public class ModelExplorer extends JTree
 
 			// Update node if necessary:
 			final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_crawler.remove(0);
-			if(node.refresh())
-			{
-//				System.out.println("change detected in crawler node: "+node);
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						((DefaultTreeModel)getModel()).reload(node);
-					}
-				});
-				
-				// Scan changed node and subnodes with user priority.
-				refresh(node);
-			}
+			nof.refresh(node);
 			
 			// Iterate over children:
 			Enumeration	children	= node.children();
@@ -920,9 +875,15 @@ public class ModelExplorer extends JTree
 				nodes_crawler.add(children.nextElement());
 			}
 
-//			Thread.currentThread().setContextClassLoader(oldcl);
-
-			return refresh && usertask==null;
+			return refresh;
+		}
+		
+		/**
+		 *  Abort this crawler task (e.g. when project has changed).
+		 */
+		public void	abort()
+		{
+			this.abort	= true;
 		}
 	}
 	
@@ -934,26 +895,21 @@ public class ModelExplorer extends JTree
 		public void actionPerformed(ActionEvent e)
 		{
 			refresh	= ((JCheckBoxMenuItem)e.getSource()).getState();
-			if(refresh)
-			{
-				if(crawlertask==null)
-					crawlertask	=	new CrawlerTask();
-				SwingWorker.addTask(crawlertask, PERCENTAGE_CRAWLER);
-			}
+			resetCrawler();
 		}
 	};
 
-	/**
-	 *  The action for changing integrity checking settings.
-	 */
-	public final AbstractAction TOGGLE_CHECKING = new AbstractAction("Auto check", icons.getIcon("checking_menu"))
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			getRootNode().setChecking(((JCheckBoxMenuItem)e.getSource()).getState());
-			refresh(getRootNode());
-		}
-	};
+//	/**
+//	 *  The action for changing integrity checking settings.
+//	 */
+//	public final AbstractAction TOGGLE_CHECKING = new AbstractAction("Auto check", icons.getIcon("checking_menu"))
+//	{
+//		public void actionPerformed(ActionEvent e)
+//		{
+//			getRootNode().setChecking(((JCheckBoxMenuItem)e.getSource()).getState());
+//			refreshAll(getRootNode());
+//		}
+//	};
 	
 	/**
 	 *  Add a new path to the explorer.
@@ -980,7 +936,6 @@ public class ModelExplorer extends JTree
 					{
 						// Add file/directory to tree.
 						IExplorerTreeNode	node	= getRootNode().addPathEntry(file);
-						//updateClassLoader();
 						
 						// todo: jars
 						ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
@@ -994,8 +949,8 @@ public class ModelExplorer extends JTree
 							ex.printStackTrace();
 						}
 						
+						nof.refresh(node);
 						((DefaultTreeModel)getModel()).reload(getRootNode());
-						refresh(node);
 					}
 					else
 					{
@@ -1049,18 +1004,14 @@ public class ModelExplorer extends JTree
 					ex.printStackTrace();
 				}
 				
-				// Stop user task (hack!!!?)
-				if(usertask!=null)
-				{
-					usertask.nodes_user.clear();
-					usertask.nodes_out.clear();
-				}
-				// Reset crawler task (hack!!!?)
-				if(crawlertask!=null)
-				{
-					crawlertask.nodes_crawler.clear();
-				}
-				refresh(getRootNode());
+//				// Stop user task (hack!!!?)
+//				if(usertask!=null)
+//				{
+//					usertask.nodes_user.clear();
+//					usertask.nodes_out.clear();
+//				}
+				resetCrawler();
+				nof.refresh(getRootNode());
 
 				((DefaultTreeModel)getModel()).reload(getRootNode());
 			}
@@ -1088,25 +1039,8 @@ public class ModelExplorer extends JTree
 		 */
 		public void actionPerformed(ActionEvent e)
 		{
-			FileNode	node	= (FileNode)getLastSelectedPathComponent();
-			node.uncheck();
-			
-			// why recursively??? Shouldn't we use refreshAll()?
-			refreshAll(node);
-			
-			/*if(node instanceof DirNode)
-				((DirNode)node).refreshAll();
-			else
-				node.refresh();*/
-		}
-
-		/**
-		 *  Test if action is available in current context.
-		 *  @return True, if available.
-		 */
-		public boolean isEnabled()
-		{
-			return getLastSelectedPathComponent()!=null && ((FileNode)getLastSelectedPathComponent()).getChildCount()==0;
+			IExplorerTreeNode	node	= (IExplorerTreeNode)getLastSelectedPathComponent();
+			refreshAll(node!=null ? node : getRootNode());
 		}
 
 		/**
@@ -1121,50 +1055,9 @@ public class ModelExplorer extends JTree
 				ret = "Refresh directory recursively: "+((DirNode)tmp).getFile().getName();
 			else if(tmp instanceof FileNode)
 				ret = "Refresh file: "+((FileNode)tmp).getFile().getName();
+			else
+				ret = "Refresh all items of tree";
 			return ret;
-		}
-	};
-
-	/**
-	 *  Refresh all items.
-	 */
-	public final Action REFRESH_ALL = new ToolTipAction("Refresh All", icons.getIcon("refresh"), "Refresh all items of tree")
-	{
-		/**
-		 *  Test if action is available in current context.
-		 *  @return True, if available.
-		 */
-		public boolean isEnabled()
-		{
-			return getLastSelectedPathComponent()==null || ((FileNode)getLastSelectedPathComponent()).getChildCount()!=0;
-		}
-
-		public void actionPerformed(ActionEvent e)
-		{
-			IExplorerTreeNode	node	= (IExplorerTreeNode)getLastSelectedPathComponent();
-			if(node==null)
-			{
-				node	= getRootNode();
-			}
-			
-			refreshAll(node);
-			
-			// Recursively refresh all nodes.
-			//((RootNode)node).refreshAll();
-			
-			/*List	unchecknodes	= new LinkedList();
-			unchecknodes.add(node);
-			while(unchecknodes.size()>0)
-			{
-				node	= (IExplorerTreeNode)unchecknodes.remove(0);
-				node.uncheck();
-				for(int i=0; i<node.getChildCount(); i++)
-				{
-					unchecknodes.add(node.getChildAt(i));
-				}
-			}
-
-			refresh(node);*/
 		}
 	};
 }
