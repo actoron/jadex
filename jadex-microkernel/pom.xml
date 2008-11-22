@@ -25,5 +25,10 @@
     	<artifactId>jadex-bridge</artifactId>
     	<version>1.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+    	<groupId>jadex</groupId>
+    	<artifactId>jadex-platform-base</artifactId>
+    	<version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>

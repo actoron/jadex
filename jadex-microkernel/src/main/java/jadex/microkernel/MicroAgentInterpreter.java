@@ -3,6 +3,7 @@ package jadex.microkernel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -25,7 +26,10 @@ public class MicroAgentInterpreter implements IJadexAgent
 	protected MicroAgentModel model;
 	
 	/** The micro agent. */
-	protected IMicroAgent microagent;
+	protected MicroAgent microagent;
+	
+	/** The arguments. */
+	protected Map arguments;
 	
 	// todo: ensure that entries are empty when saving
 	/** The entries added from external threads. */
@@ -42,14 +46,17 @@ public class MicroAgentInterpreter implements IJadexAgent
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(IAgentAdapter adapter, MicroAgentModel model)
+	public MicroAgentInterpreter(IAgentAdapter adapter, MicroAgentModel model, Map arguments)
 	{
+		this.adapter = adapter;
 		this.model = model;
+		this.arguments = arguments;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		
 		try
 		{
-			this.microagent = (IMicroAgent)model.getMicroAgentClass().newInstance();
+			this.microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
+			this.microagent.init(this);
 		}
 		catch(Exception e)
 		{
@@ -327,4 +334,12 @@ public class MicroAgentInterpreter implements IJadexAgent
 		return model;
 	}
 	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map getArguments()
+	{
+		return arguments;
+	}
 }

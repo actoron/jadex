@@ -1,5 +1,7 @@
 package jadex.microkernel;
 
+import java.util.Map;
+
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
@@ -88,5 +90,24 @@ public abstract class MicroAgent implements IMicroAgent
 	public IPlatform getPlatform()
 	{
 		return interpreter.getAgentAdapter().getPlatform();
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map getArguments()
+	{
+		return interpreter.getArguments();
+	}
+	
+	/**
+	 *  Get an argument.
+	 *  @param name The argument name.
+	 *  @return The value. 
+	 */
+	public Object getArgument(String name)
+	{
+		return interpreter.getArguments().get(name);
 	}
 }

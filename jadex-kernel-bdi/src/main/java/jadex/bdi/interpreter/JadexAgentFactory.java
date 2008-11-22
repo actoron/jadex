@@ -112,7 +112,7 @@ public class JadexAgentFactory implements IJadexAgentFactory
 		
 		try
 		{
-			System.out.println("loading: "+filename);
+//			System.out.println("loading: "+filename);
 			OAVCapabilityModel loaded = loader.loadModel(filename, null, null);
 			return loaded;
 		}

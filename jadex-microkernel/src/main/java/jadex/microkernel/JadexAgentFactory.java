@@ -43,7 +43,7 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	public IJadexAgent	createJadexAgent(IAgentAdapter adapter, String model, String config, Map arguments)
 	{
 		MicroAgentModel lm = (MicroAgentModel)loadModel(model);
-		return new MicroAgentInterpreter(adapter, lm);
+		return new MicroAgentInterpreter(adapter, lm, arguments);
 	}
 	
 	/**
@@ -53,17 +53,18 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	 */
 	public IJadexModel loadModel(String model)
 	{
-		System.out.println("loading micro: "+model);
+//		System.out.println("loading micro: "+model);
 		IJadexModel ret = null;
 		ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
 		String clname = model.substring(0, model.indexOf(".class"));
 		
 		// Hack!
-		clname = clname.substring(model.indexOf("classes")+8);
+		if(clname.indexOf("classes")!=-1)
+			clname = clname.substring(model.indexOf("classes")+8);
 		clname = clname.replace("\\", ".");
 		
 		Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
-		System.out.println(clname+" "+cma+" "+ret);
+//		System.out.println(clname+" "+cma+" "+ret);
 		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
 			throw new RuntimeException("No micro agent file: "+model);
 		ret = new MicroAgentModel(cma, model);

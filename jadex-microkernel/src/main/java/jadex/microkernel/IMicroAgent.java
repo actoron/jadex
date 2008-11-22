@@ -35,12 +35,5 @@ public interface IMicroAgent
 	 *  will still be called as usual.
 	 */
 	public void killAgent();
-	
-	/**
-	 *  Get the external access for this agent.
-	 *  The specific external access interface is kernel specific
-	 *  and has to be casted to its corresponding incarnation.
-	 */
-	public Object getExternalAccess();
 }
 
