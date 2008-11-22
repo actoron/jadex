@@ -55,7 +55,7 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	public String getType()
 	{
 		// todo: 
-		return "v2agent";
+		return "v2bdiagent";
 	}
 
 

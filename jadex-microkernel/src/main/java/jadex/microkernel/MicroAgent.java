@@ -1,12 +1,31 @@
 package jadex.microkernel;
 
+import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IPlatform;
 
 /**
  *  Base class for application agents.
  */
 public abstract class MicroAgent implements IMicroAgent
 {
+	//-------- attributes --------
+	
+	/** The agent interpreter. */
+	protected MicroAgentInterpreter interpreter;
+	
+	//-------- constructors --------
+	
+	/**
+	 * 
+	 */
+	public void init(MicroAgentInterpreter interpreter)
+	{
+		this.interpreter = interpreter;
+	}
+	
+	//-------- interface methods --------
+	
 	/**
 	 *  Main method to perform agent execution.
 	 *  Whenever this method is called, the agent performs
@@ -51,4 +70,23 @@ public abstract class MicroAgent implements IMicroAgent
 		return null;
 	}
 
+	//-------- methods --------
+	
+	/**
+	 *  Get the agent adapter.
+	 *  @return The agent adapter.
+	 */
+	public IAgentAdapter getAgentAdapter()
+	{
+		return interpreter.getAgentAdapter();
+	}
+	
+	/**
+	 *  Get the agent platform.
+	 *  @return The agent platform. 
+	 */
+	public IPlatform getPlatform()
+	{
+		return interpreter.getAgentAdapter().getPlatform();
+	}
 }

@@ -100,6 +100,14 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			return pathname.isDirectory() || isCapabilityFilename(pathname.getName());
 		}
 	};
+	
+	protected static final java.io.FileFilter JAVAAGENT_FILTER = new FileFilter()
+	{
+		public boolean accept(File pathname)
+		{
+			return pathname.isDirectory() || pathname.getName().endsWith("Agent.class");
+		}
+	};
 
 	//-------- attributes --------
 
@@ -218,8 +226,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		refreshcomp.setToolTipText("Loading/checking agent models.");
 		mpanel = new ModelExplorer(getJCC(), new RootNode(ADF_FILTER), null,
 			new StarterNodeFunctionality(getJCC()),
-			new String[]{"ADFs", "Agents", "Capabilities"}, 
-			new java.io.FileFilter[]{ADF_FILTER, AGENT_FILTER, CAPABILITY_FILTER}
+			new String[]{"ADFs", "Agents", "Capabilities", "JavaAgents"}, 
+			new java.io.FileFilter[]{ADF_FILTER, AGENT_FILTER, CAPABILITY_FILTER, JAVAAGENT_FILTER}
 		);
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
@@ -729,7 +737,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	public static boolean isJadexFilename(String filename)
 	{
 		return filename!=null && (filename.toLowerCase().endsWith(FILE_EXTENSION_AGENT)
-			|| filename.toLowerCase().endsWith(FILE_EXTENSION_CAPABILITY));
+			|| filename.toLowerCase().endsWith(FILE_EXTENSION_CAPABILITY)
+			|| filename.toLowerCase().endsWith("agent.class"));
 	}
 
 	/**
