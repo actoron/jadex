@@ -1,5 +1,6 @@
 package jadex.microkernel;
 
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -342,5 +343,47 @@ public class MicroAgentInterpreter implements IJadexAgent
 	public Map getArguments()
 	{
 		return arguments;
+	}
+	
+	/**
+	 * 
+	 */
+	public IResultListener createResultListener(IResultListener listener)
+	{
+		return new MicroListener(listener);
+	}
+	
+	/**
+	 * 
+	 */
+	class MicroListener implements IResultListener
+	{
+		protected IResultListener listener;
+		
+		public MicroListener(IResultListener listener)
+		{
+			this.listener = listener;
+		}
+		
+		public void resultAvailable(final Object result)
+		{
+			invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					listener.resultAvailable(result);
+				}
+			});
+		}
+		public void exceptionOccurred(final Exception exception)
+		{
+			invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					listener.resultAvailable(exception);
+				}
+			});
+		}
 	}
 }

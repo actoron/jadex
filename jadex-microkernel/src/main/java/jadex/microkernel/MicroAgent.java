@@ -3,8 +3,11 @@ package jadex.microkernel;
 import java.util.Map;
 
 import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IClockService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
+import jadex.commons.concurrent.IResultListener;
+import jadex.microkernel.MicroAgentInterpreter.MicroListener;
 
 /**
  *  Base class for application agents.
@@ -110,5 +113,21 @@ public abstract class MicroAgent implements IMicroAgent
 	public Object getArgument(String name)
 	{
 		return interpreter.getArguments().get(name);
+	}
+	
+	/**
+	 * 
+	 */
+	public IResultListener createResultListener(IResultListener listener)
+	{
+		return interpreter.createResultListener(listener);
+	}
+	
+	/**
+	 * 
+	 */
+	public long getTime()
+	{
+		return ((IClockService)getPlatform().getService(IClockService.class)).getTime();
 	}
 }
