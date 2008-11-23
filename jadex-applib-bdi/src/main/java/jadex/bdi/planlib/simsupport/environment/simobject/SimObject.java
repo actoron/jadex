@@ -253,6 +253,7 @@ public class SimObject
 	 */
 	public synchronized void fireSimulationEvent(SimulationEvent evt)
 	{
+		evt.setParameter("object_id", objectId_);
 		for (Iterator it = listeners_.iterator(); it.hasNext(); )
 		{
 			ISimulationEventListener listener = (ISimulationEventListener) it.next();

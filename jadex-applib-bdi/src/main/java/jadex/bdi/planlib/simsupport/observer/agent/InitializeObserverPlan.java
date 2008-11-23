@@ -2,6 +2,8 @@ package jadex.bdi.planlib.simsupport.observer.agent;
 
 import java.awt.Color;
 
+import javax.media.opengl.GLException;
+
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJ2D;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
@@ -63,9 +65,14 @@ public class InitializeObserverPlan extends Plan
 					viewport = vp;
 				}
 			}
-			catch (Error e)
+			catch (GLException e1)
 			{
-				e.printStackTrace();
+				System.err.println("OpenGL initialization failed, using Java2D fallback...");
+				viewport = null;
+			}
+			catch (Error e2)
+			{
+				System.err.println("OpenGL initialization failed, using Java2D fallback...");
 				viewport = null;
 			}
 		}

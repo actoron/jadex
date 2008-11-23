@@ -102,6 +102,13 @@ public interface IVector1
 	 */
 	public boolean equals(IVector1 vector);
 	
+	/** Tests if the vector is greater than another vector.
+	 * 
+	 * @param vector the other vector
+	 * @return true if the vector is greater than the given vector.
+	 */
+	public boolean greater(IVector1 vector);
+	
 	/** Tests if the vector is less than another vector.
 	 * 
 	 * @param vector the other vector

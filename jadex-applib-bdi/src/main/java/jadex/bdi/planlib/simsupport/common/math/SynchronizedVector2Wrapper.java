@@ -316,7 +316,7 @@ public class SynchronizedVector2Wrapper implements IVector2
 	 */
 	public synchronized IVector2 copy()
 	{
-		return vector_.copy();
+		return new SynchronizedVector2Wrapper(vector_.copy());
 	}
 	
 	/** Generates a deep clone of the vector.

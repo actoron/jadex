@@ -4,7 +4,7 @@ import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
-import jadex.bdi.planlib.simsupport.environment.simobject.task.GoToDestinationTask;
+import jadex.bdi.planlib.simsupport.environment.simobject.task.SetDestinationTask;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
@@ -23,7 +23,7 @@ public class SetDestinationPlan extends Plan
 		IVector1 speed = (IVector1) getParameter("speed").getValue();
 		IVector1 tolerance = (IVector1) getParameter("tolerance").getValue();
 		
-		ISimObjectTask task = new GoToDestinationTask(destination, speed, tolerance);
+		ISimObjectTask task = new SetDestinationTask(destination, speed, tolerance);
 		
 		IGoal setTask = createGoal("sim_add_task");
 		setTask.getParameter("object_id").setValue(objectId);

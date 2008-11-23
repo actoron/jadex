@@ -8,7 +8,7 @@ import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 /** Tasks that directs the object towards a destination and
  *  issues an event when it has been reached.
  */
-public class GoToDestinationTask implements ISimObjectTask
+public class SetDestinationTask implements ISimObjectTask
 {
 	/** Default task name.
 	 */
@@ -34,14 +34,14 @@ public class GoToDestinationTask implements ISimObjectTask
 	 */
 	private MoveObjectTask moveTask_;
 	
-	public GoToDestinationTask(IVector2 targetPosition,
+	public SetDestinationTask(IVector2 targetPosition,
 			   				   IVector1 speed,
 			   				   IVector1 tolerance)
 	{
 		this(DEFAULT_NAME, targetPosition, speed, tolerance);
 	}
 	
-	public GoToDestinationTask(String name,
+	public SetDestinationTask(String name,
 							   IVector2 targetPosition,
 							   IVector1 speed,
 							   IVector1 tolerance)

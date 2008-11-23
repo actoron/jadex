@@ -117,6 +117,11 @@ public class Vector1Double implements IVector1
 		return (x_ == vector.getAsDouble());
 	}
 	
+	public boolean greater(IVector1 vector)
+	{
+		return (x_ > vector.getAsDouble());
+	}
+	
 	public boolean less(IVector1 vector)
 	{
 		return (x_ < vector.getAsDouble());

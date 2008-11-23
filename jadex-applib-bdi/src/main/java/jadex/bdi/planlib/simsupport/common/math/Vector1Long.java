@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 
 public class Vector1Long implements IVector1
 {
+	/** Zero vector
+	 */
+	public static final IVector1 ZERO = new Vector1Long(0);
+	
 	private long x_;
 	
 	/** Creates a new Vector1Long.
@@ -166,6 +170,16 @@ public class Vector1Long implements IVector1
 	public boolean equals(IVector1 vector)
 	{
 		return (x_ == vector.getAsLong());
+	}
+	
+	/** Tests if the vector is greater than another vector.
+	 * 
+	 * @param vector the other vector
+	 * @return true if the vector is greater than the given vector.
+	 */
+	public boolean greater(IVector1 vector)
+	{
+		return (x_ > vector.getAsLong());
 	}
 	
 	/** Tests if the vector is less than another vector.

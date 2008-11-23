@@ -26,6 +26,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -43,7 +44,9 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
+import javax.swing.JFrame;
 import javax.swing.Timer;
 
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
@@ -165,15 +168,28 @@ public class ViewportJOGL implements IViewport,
         frame_.setVisible(true);
         frame_.addWindowListener(this);
         
-        JOGLNativeLoader.loadJOGLLibraries();
-        GLCapabilities caps = new GLCapabilities();
-        caps.setDoubleBuffered(true);
-        caps.setHardwareAccelerated(true);
-        canvas_ = new GLCanvas(caps);
-        canvas_.addGLEventListener(new GLController());
-        
-        frame_.add(canvas_, BorderLayout.CENTER);
-        frame_.setVisible(true);
+        try
+        {
+        	JOGLNativeLoader.loadJOGLLibraries();
+        	GLCapabilities caps = new GLCapabilities();
+        	caps.setDoubleBuffered(true);
+        	caps.setHardwareAccelerated(true);
+        	canvas_ = new GLCanvas(caps);
+        	canvas_.addGLEventListener(new GLController());
+
+        	frame_.add(canvas_, BorderLayout.CENTER);
+        	frame_.setVisible(true);
+        }
+        catch (GLException e)
+        {
+        	close();
+        	throw e;
+        }
+        catch (Error e)
+        {
+        	close();
+        	throw e;
+        }
         
         setSize(new Vector2Double(1.0));
         
@@ -292,7 +308,22 @@ public class ViewportJOGL implements IViewport,
      */
     public void close()
     {
-    	frame_.dispose();
+    	try {
+			EventQueue.invokeAndWait(new Runnable()
+				{
+					public void run()
+					{
+						frame_.setVisible(false);
+				    	frame_.dispose();
+					}
+				});
+		}
+    	catch (InterruptedException e)
+		{
+		}
+    	catch (InvocationTargetException e)
+		{
+		}
     }
     
     /** Verifies the OpenGL context is valid and useable.
