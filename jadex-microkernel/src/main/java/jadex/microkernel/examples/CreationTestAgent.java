@@ -32,8 +32,8 @@ public class CreationTestAgent extends MicroAgent
 			if(args==null || args.size()==0)
 			{
 				args = new HashMap();
-				args.put("num", new Integer(0));
-				args.put("max", new Integer(10000));
+				args.put("num", new Integer(1));
+				args.put("max", new Integer(100000));
 				Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 				Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
 				args.put("startmem", startmem);
@@ -67,7 +67,7 @@ public class CreationTestAgent extends MicroAgent
 				Long starttime = (Long)args.get("starttime");
 				long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 				long omem = (used-startmem.longValue())/1024;
-				long upera = (used-startmem.longValue())/max.longValue()/1024;
+				double upera = ((long)(1000*(used-startmem.longValue())/max.longValue()/1024))/1000.0;
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 
 				long end = ((IClockService)getPlatform().getService(IClockService.class)).getTime();

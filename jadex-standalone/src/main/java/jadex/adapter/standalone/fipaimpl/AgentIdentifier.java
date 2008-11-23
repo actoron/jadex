@@ -62,8 +62,6 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public AgentIdentifier(String name, String[] addresses, IAgentIdentifier[] resolvers)
 	{
-		this.addresses = new ArrayList();
-		this.resolvers = new ArrayList();
 		this.name = name;
 
 		for(int i = 0; addresses != null && i < addresses.length; i++)
@@ -97,7 +95,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public String[] getAddresses()
 	{
-		return (String[])addresses.toArray(new String[addresses.size()]);
+		if(addresses!=null)
+			return (String[])addresses.toArray(new String[addresses.size()]);
+		else
+			return new String[0];
 	}
 
 	/**
@@ -106,7 +107,11 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void setAddresses(String[] addresses)
 	{
-		this.addresses.clear();
+		if(addresses!=null)
+			this.addresses.clear();
+		else
+			this.addresses = new ArrayList();
+
 		for(int i = 0; i < addresses.length; i++)
 			this.addresses.add(addresses[i]);
 	}
@@ -118,7 +123,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public String getAddress(int idx)
 	{
-		return (String)this.addresses.get(idx);
+		if(addresses!=null)
+			return (String)this.addresses.get(idx);
+		else
+			throw new ArrayIndexOutOfBoundsException(idx);
 	}
 
 	/**
@@ -128,7 +136,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void setAddress(int idx, String address)
 	{
-		this.addresses.set(idx, address);
+		if(addresses!=null)
+			this.addresses.set(idx, address);
+		else
+			throw new ArrayIndexOutOfBoundsException(idx);
 	}
 
 	/**
@@ -137,6 +148,8 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void addAddress(String address)
 	{
+		if(addresses==null)
+			this.addresses = new ArrayList();			
 		this.addresses.add(address);
 	}
 
@@ -147,7 +160,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public boolean removeAddress(String address)
 	{
-		return this.addresses.remove(address);
+		if(addresses!=null)
+			return this.addresses.remove(address);
+		else
+			return false;
 	}
 
 
@@ -157,7 +173,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public AgentIdentifier[] getResolvers()
 	{
-		return (AgentIdentifier[])resolvers.toArray(new AgentIdentifier[resolvers.size()]);
+		if(resolvers!=null)
+			return (AgentIdentifier[])resolvers.toArray(new AgentIdentifier[resolvers.size()]);
+		else
+			return new AgentIdentifier[0];
 	}
 
 	/**
@@ -166,7 +185,11 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void setResolvers(AgentIdentifier[] resolvers)
 	{
-		this.resolvers.clear();
+		if(resolvers!=null)
+			this.resolvers.clear();
+		else
+			this.resolvers = new ArrayList();
+			
 		for(int i = 0; i < resolvers.length; i++)
 			this.resolvers.add(resolvers[i]);
 	}
@@ -178,7 +201,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public AgentIdentifier getResolver(int idx)
 	{
-		return (AgentIdentifier)this.resolvers.get(idx);
+		if(resolvers!=null)
+			return (AgentIdentifier)this.resolvers.get(idx);
+		else
+			throw new ArrayIndexOutOfBoundsException(idx);
 	}
 
 	/**
@@ -188,7 +214,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void setResolver(int idx, AgentIdentifier resolver)
 	{
-		this.resolvers.set(idx, resolver);
+		if(resolvers!=null)
+			this.resolvers.set(idx, resolver);
+		else
+			throw new ArrayIndexOutOfBoundsException(idx);
 	}
 
 	/**
@@ -197,6 +226,8 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void addResolver(IAgentIdentifier resolver)
 	{
+		if(resolvers==null)
+			this.resolvers = new ArrayList();
 		this.resolvers.add(resolver);
 	}
 
@@ -207,7 +238,10 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public boolean removeResolver(IAgentIdentifier resolver)
 	{
-		return this.resolvers.remove(resolver);
+		if(resolvers==null)
+			return this.resolvers.remove(resolver);
+		else
+			return false;
 	}
 
 	//--------- methods --------
@@ -236,7 +270,7 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	public boolean hasAddress(String address)
 	{
 		boolean ret = false;
-		for(int i = 0; !ret && i < addresses.size(); i++)
+		for(int i = 0; !ret && addresses!=null && i < addresses.size(); i++)
 			ret = address.equals(addresses.get(i));
 
 		return ret;

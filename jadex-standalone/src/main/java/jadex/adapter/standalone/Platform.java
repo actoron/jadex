@@ -318,6 +318,12 @@ public class Platform extends AbstractPlatform
 	}
 
 	//-------- Static part --------
+	
+	/**
+	 *  Keep platform from being garbage collected, when created using main().
+	 *  Useful for debugging, profiling etc.
+	 */
+	private static Platform	platform;
 
 	/**
 	 *  Start a platform with the agents specified
@@ -341,7 +347,7 @@ public class Platform extends AbstractPlatform
 		// Hack as long as no loader is present.
 		ClassLoader cl = Platform.class.getClassLoader();
 		Properties configuration = XMLPropertiesReader.readProperties(SUtil.getResource(conffile, cl), cl);
-		final Platform platform = new Platform(configuration);
+		platform = new Platform(configuration);
 		platform.start();
 		startAgents(args, platform);
 		

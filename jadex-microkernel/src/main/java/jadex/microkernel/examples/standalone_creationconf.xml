@@ -16,7 +16,6 @@
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<!-- Kernels. -->
-		<propertiesref ref="kernel_v2_bdi"/>
 		<propertiesref ref="kernel_v2_micro"/>
 		
 		<!-- Platform services. -->
@@ -74,18 +73,7 @@
 	
 	<properties type="platform_jade" name="lars">
 	</properties>
-	
-	<properties type="kernel" id="kernel_v2_bdi">
-		<property type="agent_factory">new jadex.bdi.interpreter.JadexAgentFactory(jadex.commons.SUtil.createHashMap(
-			new String[]{"messagetype_fipa", "planexecutor_standard", "standard.timeout", "tooladapter.introspector"},
-			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
-			new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname)),
-			new java.lang.Long(10000),
-			jadex.tools.introspector.IntrospectorAdapter.class
-			}), $platform)
-			</property>
-	</properties>
-	
+		
 	<properties type="kernel" id="kernel_v2_micro">
 		<property type="agent_factory">new jadex.microkernel.JadexAgentFactory($platform)</property>
 	</properties>
