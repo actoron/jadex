@@ -29,22 +29,23 @@ public class CreationTestAgent extends MicroAgent
 			
 			Map args = getArguments();		
 			
-			if(args.size()==0)
+			if(args==null || args.size()==0)
 			{
+				args = new HashMap();
 				args.put("num", new Integer(0));
-				args.put("max", new Integer(1000));
+				args.put("max", new Integer(10000));
 				Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 				Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
 				args.put("startmem", startmem);
 				args.put("starttime", starttime);
 			}
 			
-			Integer num = (Integer)getArgument("num");
-			Integer max = (Integer)getArgument("max");
+			Integer num = (Integer)args.get("num");
+			Integer max = (Integer)args.get("max");
 			
 			System.out.println("Created peer: "+num);
 			
-			if(num.intValue()<1000)
+			if(num.intValue()<max.intValue())
 			{
 				args.put("num", new Integer(num.intValue()+1));
 //				System.out.println("Args: "+num+" "+args);

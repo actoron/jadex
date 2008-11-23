@@ -62,6 +62,7 @@ public class JadexAgentFactory implements IJadexAgentFactory
 		if(clname.indexOf("classes")!=-1)
 			clname = clname.substring(model.indexOf("classes")+8);
 		clname = clname.replace("\\", ".");
+		clname = clname.replace("/", ".");
 		
 		Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
 //		System.out.println(clname+" "+cma+" "+ret);

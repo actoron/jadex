@@ -23,6 +23,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void init(MicroAgentInterpreter interpreter)
 	{
+//		System.out.println("Init: "+interpreter);
 		this.interpreter = interpreter;
 	}
 	

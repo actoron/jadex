@@ -60,6 +60,7 @@ public class MicroAgentInterpreter implements IJadexAgent
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
