@@ -52,7 +52,6 @@ public class LowBatteryWarnTask implements ISimObjectTask
 		{
 			object.removeTask(name_);
 			SimulationEvent lowBattery = new SimulationEvent("battery_low");
-			lowBattery.setParameter("object_id", object.getId());
 			object.fireSimulationEvent(lowBattery);
 		}
 	}

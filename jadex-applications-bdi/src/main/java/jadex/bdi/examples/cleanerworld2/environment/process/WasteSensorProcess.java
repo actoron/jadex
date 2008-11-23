@@ -94,7 +94,6 @@ public class WasteSensorProcess implements IEnvironmentProcess
 				if (waste.getPosition().getDistance(cleaner_.getPosition()).less(Configuration.CLEANER_VISUAL_RANGE))
 				{
 					SimulationEvent evt = new SimulationEvent(WASTE_FOUND_EVENT_TYPE);
-					evt.setParameter("object_id", waste.getId());
 					evt.setParameter("position", waste.getPosition());
 					cleaner_.fireSimulationEvent(evt);
 					engine.removeEnvironmentProcess(name_);

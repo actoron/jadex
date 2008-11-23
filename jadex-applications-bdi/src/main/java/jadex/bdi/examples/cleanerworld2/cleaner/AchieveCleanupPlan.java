@@ -4,7 +4,7 @@ import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.examples.cleanerworld2.environment.action.PickupWasteAction;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
-import jadex.bdi.planlib.simsupport.environment.simobject.task.GoToDestinationTask;
+import jadex.bdi.planlib.simsupport.environment.simobject.task.SetDestinationTask;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;

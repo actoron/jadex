@@ -3,6 +3,7 @@ package jadex.bdi.examples.cleanerworld2;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
+import jadex.bdi.planlib.simsupport.common.math.Vector1Long;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 
 /** Environment configuration.
@@ -33,4 +34,5 @@ public class Configuration
 	/** Threshold when the battery is considered charged.
 	 */
 	public static final IVector1 CHARGED_THRESHOLD = new Vector1Double(95.0);
+	public static final IVector1 MAX_WASTE_CAPACITY = new Vector1Long(3);
 }

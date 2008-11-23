@@ -1,5 +1,6 @@
 package jadex.bdi.examples.cleanerworld2.cleaner;
 
+import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteBinSensorProcess;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteSensorProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
@@ -38,6 +39,7 @@ public class InitializeCleanerPlan extends Plan
 		currentGoal.getParameter("type").setValue("cleaner");
 		Map properties = new HashMap();
 		properties.put("battery",new Vector1Double(100.0));
+		properties.put("waste_capacity", Configuration.MAX_WASTE_CAPACITY.copy());
 		currentGoal.getParameter("properties").setValue(properties);
 		List tasks = new ArrayList();
 		tasks.add(new MoveObjectTask(new Vector2Double(0.0)));

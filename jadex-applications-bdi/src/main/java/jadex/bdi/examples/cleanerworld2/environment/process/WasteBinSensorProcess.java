@@ -96,7 +96,6 @@ public class WasteBinSensorProcess implements IEnvironmentProcess
 			if (wasteBin.getPosition().getDistance(cleaner_.getPosition()).less(Configuration.CLEANER_VISUAL_RANGE))
 			{
 				SimulationEvent evt = new SimulationEvent(WASTE_BIN_FOUND_EVENT_TYPE);
-				evt.setParameter("object_id", wasteBin.getId());
 				evt.setParameter("position", wasteBin.getPosition());
 				cleaner_.fireSimulationEvent(evt);
 				it.remove();
