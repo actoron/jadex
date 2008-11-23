@@ -12,7 +12,7 @@ public class SetDestinationTask implements ISimObjectTask
 {
 	/** Default task name.
 	 */
-	public static final String DEFAULT_NAME = "goto_dest";
+	public static final String DEFAULT_NAME = "set_destination";
 	
 	/** Name of the task.
 	 */
