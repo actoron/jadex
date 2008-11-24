@@ -1,0 +1,166 @@
+package jadex.microkernel.examples;
+
+import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.SFipa;
+import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IClockService;
+import jadex.commons.concurrent.IResultListener;
+import jadex.microkernel.MicroAgent;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ *  Agent creation benchmark. 
+ */
+public class AgentCreationAgent extends MicroAgent
+{
+	//-------- attributes --------
+	
+	/** The step indicating what should the agent do. */
+	protected int step;
+	
+	//-------- methods --------
+	
+	/**
+	 *  Execute an agent step.
+	 */
+	public boolean executeAction()
+	{
+		switch(step)
+		{
+			case 0:
+			step++;
+			
+			Map args = getArguments();		
+			
+			if(args==null || args.size()==0)
+			{
+				args = new HashMap();
+				args.put("num", new Integer(1));
+				args.put("max", new Integer(100000));
+				Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+				Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
+				args.put("startmem", startmem);
+				args.put("starttime", starttime);
+			}
+			
+			int num = ((Integer)args.get("num")).intValue();
+			int max = ((Integer)args.get("max")).intValue();
+			
+			System.out.println("Created peer: "+num);
+			
+			if(num<max)
+			{
+				args.put("num", new Integer(num+1));
+//				System.out.println("Args: "+num+" "+args);
+				final IAMS ams = (IAMS)getPlatform().getService(IAMS.class);
+				ams.createAgent(createPeerName(num+1), getClass().getName()+".class", null, args, 
+					createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						ams.startAgent((IAgentIdentifier)result, null);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				}));				
+			}
+			else
+			{
+				Long startmem = (Long)args.get("startmem");
+				Long starttime = (Long)args.get("starttime");
+				long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+				long omem = (used-startmem.longValue())/1024;
+				double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
+				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+
+				long end = getTime();
+				System.out.println("Last peer created. "+max+" agents started.");
+				double dur = ((double)end-starttime.longValue())/1000.0;
+				double pera = dur/max;
+				System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+			
+				// Delete prior agents.
+				deletePeers(max-1, getTime(), dur, pera, omem, upera);
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 *  Create a name for a peer with a given number.
+	 */
+	protected String createPeerName(int num)
+	{
+		String	name = getAgentAdapter().getAgentIdentifier().getLocalName();
+		int	index	= name.indexOf("Peer_#");
+		if(index!=-1)
+		{
+			name	= name.substring(0, index);
+		}
+		if(num!=1)
+		{
+			name	+= "Peer_#"+num;
+		}
+		return name;
+	}
+	
+	/**
+	 *  Delete all peers from last-1 to first.
+	 *  @param cnt The highest number of the agent to kill.
+	 */
+	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera, final long omem, final double upera)
+	{
+		final String name = createPeerName(cnt);
+//		System.out.println("Destroying peer: "+name);
+		final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
+		ams.destroyAgent(aid, createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("Successfully destroyed peer: "+name);
+				
+				if(cnt-1>0)
+				{
+					deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
+				}
+				else
+				{
+					killLastPeer(killstarttime, dur, pera, omem, upera);
+				}	
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		}));
+	}
+	
+	/**
+	 *  Kill the last peer and print out the results.
+	 */
+	protected void killLastPeer(long killstarttime, double dur, double pera, long omem, double upera)
+	{
+		int max = ((Integer)getArgument("max")).intValue();
+		
+		long killend = getTime();
+		System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+		double killdur = ((double)killend-killstarttime)/1000.0;
+		double killpera = killdur/(max-1);
+		
+		Runtime.getRuntime().gc();
+		long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+		
+		System.out.println("\nCumulated results:");
+		System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+		System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+		System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+		System.out.println("Still used memory: "+stillused+"kB.");
+
+		killAgent();
+	}
+}

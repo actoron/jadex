@@ -1,6 +1,10 @@
 package jadex.microkernel;
 
-import java.awt.event.ItemListener;
+import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IJadexAgent;
+import jadex.bridge.IMessageAdapter;
+import jadex.commons.concurrent.IResultListener;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,13 +12,9 @@ import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IJadexAgent;
-import jadex.bridge.IMessageAdapter;
-import jadex.commons.concurrent.IResultListener;
-
 /**
- * 
+ *  The micro agent interpreter is the connection between the agent platform 
+ *  and a user-written micro agent. 
  */
 public class MicroAgentInterpreter implements IJadexAgent
 {

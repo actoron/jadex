@@ -1,13 +1,13 @@
 package jadex.microkernel;
 
-import java.util.Map;
-
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IClockService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
+import jadex.bridge.ITimedObject;
 import jadex.commons.concurrent.IResultListener;
-import jadex.microkernel.MicroAgentInterpreter.MicroListener;
+
+import java.util.Map;
 
 /**
  *  Base class for application agents.
@@ -22,7 +22,8 @@ public abstract class MicroAgent implements IMicroAgent
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Init the micro agent with the interpreter.
+	 *  @param interpreter The interpreter.
 	 */
 	public void init(MicroAgentInterpreter interpreter)
 	{
@@ -71,9 +72,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public Object getExternalAccess()
 	{
-		// todo: implement me
-		
-		return null;
+		return new ExternalAccess(interpreter);
 	}
 
 	//-------- methods --------
@@ -116,7 +115,8 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 	
 	/**
-	 * 
+	 *  Create a result listener that is called on the agent thread.
+	 *  @param listener The listener to be called on the agent thread.
 	 */
 	public IResultListener createResultListener(IResultListener listener)
 	{
@@ -124,10 +124,33 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 	
 	/**
-	 * 
+	 *  Get the current time.
+	 *  @return The current time.
 	 */
 	public long getTime()
 	{
 		return ((IClockService)getPlatform().getService(IClockService.class)).getTime();
+	}
+	
+	/**
+	 *  Wait for an secified amount of time.
+	 *  @param time The time.
+	 */
+	public void waitFor(long time)
+	{
+		((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
+		{
+			public void timeEventOccurred()
+			{
+				getAgentAdapter().wakeup();
+//				interpreter.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						executeAction();
+//					}
+//				});
+			}
+		});
 	}
 }
