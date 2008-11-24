@@ -1,4 +1,4 @@
-package jadex.micro.benchmarks;
+package jadex.microkernel.examples;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
@@ -11,11 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ *  Agent creation benchmark. 
  */
-public class CreationTestAgent extends MicroAgent
+public class AgentCreationAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
+	/** The step indicating what should the agent do. */
 	protected int step;
+	
+	//-------- methods --------
 	
 	/**
 	 *  Execute an agent step.
@@ -33,7 +38,7 @@ public class CreationTestAgent extends MicroAgent
 			{
 				args = new HashMap();
 				args.put("num", new Integer(1));
-				args.put("max", new Integer(10000));
+				args.put("max", new Integer(100000));
 				Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 				Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
 				args.put("startmem", startmem);
@@ -50,7 +55,7 @@ public class CreationTestAgent extends MicroAgent
 				args.put("num", new Integer(num+1));
 //				System.out.println("Args: "+num+" "+args);
 				final IAMS ams = (IAMS)getPlatform().getService(IAMS.class);
-				ams.createAgent(createPeerName(num+1), "jadex.microkernel.examples.CreationTestAgent.class", null, args, 
+				ams.createAgent(createPeerName(num+1), getClass().getName()+".class", null, args, 
 					createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -79,48 +84,7 @@ public class CreationTestAgent extends MicroAgent
 				System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 			
 				// Delete prior agents.
-				long killstarttime	= getTime();
-				deletePeers(max-1, killstarttime, dur, pera, omem, upera);
-				
-//				for(int cnt=max; cnt>0; cnt--)
-//				{
-//					if(cnt!=num)
-//					{
-//						final String name = createPeerName(cnt);
-////						System.out.println("Destroying peer: "+name);
-//						final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-//						IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
-//						ams.destroyAgent(aid, createResultListener(new IResultListener()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//								System.out.println("Successfully destroyed peer: "+name);
-//								
-//							}
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								exception.printStackTrace();
-//							}
-//						}));
-//					}
-//				}				
-				
-				
-//				long killend = getTime();
-//				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
-//				double killdur = ((double)killend-killstarttime)/1000.0;
-//				double killpera = killdur/(max-1);
-//				
-//				Runtime.getRuntime().gc();
-//				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
-//				
-//				System.out.println("\nCumulated results:");
-//				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-//				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-//				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-//				System.out.println("Still used memory: "+stillused+"kB.");
-//
-//				killAgent();
+				deletePeers(max-1, getTime(), dur, pera, omem, upera);
 			}
 		}
 		return false;
@@ -145,7 +109,8 @@ public class CreationTestAgent extends MicroAgent
 	}
 	
 	/**
-	 * 
+	 *  Delete all peers from last-1 to first.
+	 *  @param cnt The highest number of the agent to kill.
 	 */
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera, final long omem, final double upera)
 	{
@@ -176,7 +141,7 @@ public class CreationTestAgent extends MicroAgent
 	}
 	
 	/**
-	 * 
+	 *  Kill the last peer and print out the results.
 	 */
 	protected void killLastPeer(long killstarttime, double dur, double pera, long omem, double upera)
 	{

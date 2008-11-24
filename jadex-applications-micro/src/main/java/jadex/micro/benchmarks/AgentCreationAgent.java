@@ -1,4 +1,4 @@
-package jadex.microkernel.examples;
+package jadex.micro.benchmarks;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;

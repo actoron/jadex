@@ -30,5 +30,10 @@
     	<artifactId>jadex-platform-base</artifactId>
     	<version>1.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+    	<groupId>jadex</groupId>
+    	<artifactId>jadex-kernel-micro</artifactId>
+    	<version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>
