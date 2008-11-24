@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.tree.DefaultTreeModel;
@@ -52,8 +53,17 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 		"src_jar", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
 		// Todo: testable jar icon.
 		"src_jar_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
+		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif"),	
 	});
 	
+	//-------- attributes --------
+
+	/** The check indicator for the status bar. */
+	protected JLabel	checkcomp;
+	
+	/** The check task counter. */
+	protected int	checkcnt;
+
 	//-------- constructors --------
 	
 	/**
@@ -62,6 +72,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	public TestCenterNodeFunctionality(IControlCenter jcc)
 	{
 		super(jcc);
+		checkcomp	= new JLabel(icons.getIcon("checking_on"));
+		checkcomp.setToolTipText("Checking if agent models are test cases.");
 	}
 	
 	//-------- INodeFunctionality interface --------
@@ -120,8 +132,35 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	public void	nodeChanged(IExplorerTreeNode node)
 	{
+		startCheckTask(node);
+	}
+
+	
+	/**
+	 *  Start a check task for a given node.
+	 */
+	protected synchronized void	startCheckTask(IExplorerTreeNode node)
+	{
+		if(checkcnt==0)
+			jcc.addStatusComponent(checkcomp, checkcomp);
+
+		checkcnt++;
 		// Use priority below user priority to scan first, then check.
 		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+	}
+
+	
+	/**
+	 *  Called, when a check task is finished.
+	 */
+	protected synchronized void	checkTaskFinished(IExplorerTreeNode node)
+	{
+		checkcnt--;
+		if(checkcnt==0)
+		{
+			jcc.removeStatusComponent(checkcomp);
+			jcc.setStatusText("");
+		}
 	}
 
 	//-------- helper classes --------
@@ -156,6 +195,10 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 			// Perform refresh only, when node still in tree.
 			if(isValidChild(node))
 			{
+				String	tip	= node.getToolTipText();
+				if(tip!=null)
+					jcc.setStatusText("Checking "+tip);
+
 				if(node instanceof FileNode)
 				{
 					FileNode fn = (FileNode)node;
@@ -233,6 +276,7 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 					}
 				}
 			}
+			checkTaskFinished(node);
 			return false;
 		}
 	}

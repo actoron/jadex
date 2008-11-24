@@ -15,6 +15,7 @@ import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.IControlCenter;
 
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.tree.DefaultTreeModel;
@@ -45,9 +46,17 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 		"package", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_package.png"),
 		"package_broken", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_package_broken.png"),
 		"java_file", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/java_file.png"),
-	
+		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif"),	
 	});
 	
+	//-------- attributes --------
+
+	/** The check indicator for the status bar. */
+	protected JLabel	checkcomp;
+	
+	/** The check task counter. */
+	protected int	checkcnt;
+
 	//-------- constructors --------
 	
 	/**
@@ -56,6 +65,8 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	public StarterNodeFunctionality(IControlCenter jcc)
 	{
 		super(jcc);
+		checkcomp	= new JLabel(icons.getIcon("checking_on"));
+		checkcomp.setToolTipText("Checking validity of agent models.");
 	}
 	
 	//-------- INodeFunctionality interface --------
@@ -114,8 +125,35 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	public void	nodeChanged(IExplorerTreeNode node)
 	{
+		startCheckTask(node);
+	}
+
+	
+	/**
+	 *  Start a check task for a given node.
+	 */
+	protected synchronized void	startCheckTask(IExplorerTreeNode node)
+	{
+		if(checkcnt==0)
+			jcc.addStatusComponent(checkcomp, checkcomp);
+
+		checkcnt++;
 		// Use priority below user priority to scan first, then check.
 		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+	}
+
+	
+	/**
+	 *  Called, when a check task is finished.
+	 */
+	protected synchronized void	checkTaskFinished(IExplorerTreeNode node)
+	{
+		checkcnt--;
+		if(checkcnt==0)
+		{
+			jcc.removeStatusComponent(checkcomp);
+			jcc.setStatusText("");
+		}
 	}
 
 	//-------- helper classes --------
@@ -150,6 +188,10 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 			// Perform refresh only, when node still in tree.
 			if(isValidChild(node))
 			{
+				String	tip	= node.getToolTipText();
+				if(tip!=null)
+					jcc.setStatusText("Checking "+tip);
+
 //				System.out.println("test valid: "+node);
 				if(node instanceof FileNode)
 				{
@@ -196,10 +238,6 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 						{
 							public void run()
 							{
-								String	tip	= node.getToolTipText();
-								if(tip!=null)
-									jcc.setStatusText("Checking "+tip);
-
 								((DefaultTreeModel)explorer.getModel()).nodeChanged(node);
 							}
 						});
@@ -207,12 +245,13 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
 						if(parent instanceof DirNode && newvalid!=isValid(parent))
 						{
-							explorer.getWorker().execute(new CheckTask(parent), ModelExplorer.PERCENTAGE_USER*0.9);
+							startCheckTask(parent);
 						}
 //						System.out.println("Valid?: "+node+", "+newvalid);
 					}
 				}
 			}
+			checkTaskFinished(node);
 			return false;
 		}
 	}

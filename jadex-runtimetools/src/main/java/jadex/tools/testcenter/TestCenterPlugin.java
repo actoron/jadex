@@ -325,11 +325,11 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				for(int j=0; j<n.getChildCount(); j++)
 					nodes.add(n.getChildAt(j));
 					
-				if(n instanceof FileNode)
+				if(n instanceof FileNode && !(n instanceof DirNode))
 				{
 					String model = ((FileNode)n).getFile().getAbsolutePath();
 					if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(model)
-						&& TestCenterNodeFunctionality.isTestcase((IExplorerTreeNode) node))
+						&& TestCenterNodeFunctionality.isTestcase((IExplorerTreeNode) n))
 					{
 						tcpanel.getTestList().addEntry(model);
 					}

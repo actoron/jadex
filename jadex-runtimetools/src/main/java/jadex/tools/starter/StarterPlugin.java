@@ -222,8 +222,6 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		JLabel	refreshcomp	= new JLabel(icons.getIcon("scanning_on"));
-		refreshcomp.setToolTipText("Loading/checking agent models.");
 		mpanel = new ModelExplorer(getJCC(), new RootNode(ADF_FILTER), null,
 			new StarterNodeFunctionality(getJCC()),
 			new String[]{"ADFs", "Agents", "Capabilities", "JavaAgents"}, 

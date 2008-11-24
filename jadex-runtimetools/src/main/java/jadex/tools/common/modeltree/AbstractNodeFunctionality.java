@@ -1,17 +1,7 @@
 package jadex.tools.common.modeltree;
 
-import jadex.bridge.IJadexAgentFactory;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.IExecutable;
-import jadex.tools.common.modeltree.DirNode;
-import jadex.tools.common.modeltree.FileNode;
-import jadex.tools.common.modeltree.IExplorerTreeNode;
-import jadex.tools.common.modeltree.INodeFunctionality;
-import jadex.tools.common.modeltree.JarAsDirectory;
-import jadex.tools.common.modeltree.JarNode;
-import jadex.tools.common.modeltree.ModelExplorer;
-import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.IControlCenter;
 
 import java.io.File;
@@ -23,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.tree.DefaultTreeModel;
@@ -37,6 +28,14 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	/** The last modified property. */
 	protected static final String	LAST_MODIFIED	= "last_modified";
 	
+	/**
+	 * The image icons.
+	 */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"scanning_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_refresh_anim.gif"),
+	});
+
 	//-------- attributes --------
 	
 	/** The tree model. */
@@ -44,6 +43,12 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	
 	/** The JCC. */
 	protected IControlCenter	jcc;
+	
+	/** The refresh indicator for the status bar. */
+	protected JLabel	refreshcomp;
+	
+	/** The task counter. */
+	protected int	cnt;
 	
 	//-------- constructors --------
 	
@@ -53,6 +58,8 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	public AbstractNodeFunctionality(IControlCenter jcc)
 	{
 		this.jcc	= jcc;
+		refreshcomp	= new JLabel(icons.getIcon("scanning_on"));
+		refreshcomp.setToolTipText("Scanning disc for agent models.");
 	}
 
 	/**
@@ -131,7 +138,7 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 							children.get(index), child)<=0; index++);
 						children.add(index, child);
 						
-						explorer.getWorker().execute(new RefreshTask(child), ModelExplorer.PERCENTAGE_USER);
+						startRefreshTask(child);
 					}
 				}
 				
@@ -160,10 +167,6 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 			{
 				public void run()
 				{
-					String	tip	= node.getToolTipText();
-					if(tip!=null)
-						jcc.setStatusText("Refreshing "+tip);
-
 					// Todo: remove old nodes from tree expansion handler
 					((DefaultTreeModel)explorer.getModel()).nodeStructureChanged(node);
 				}
@@ -198,6 +201,32 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 		return file.isDirectory()
 			? (IExplorerTreeNode)new DirNode(parent, file)
 			: (IExplorerTreeNode)new FileNode(parent, file);
+	}
+	
+	/**
+	 *  Start a refresh task for a given node.
+	 */
+	protected synchronized void	startRefreshTask(IExplorerTreeNode node)
+	{
+		if(cnt==0)
+			jcc.addStatusComponent(refreshcomp, refreshcomp);
+
+		cnt++;
+		explorer.getWorker().execute(new RefreshTask(node), ModelExplorer.PERCENTAGE_USER);
+	}
+
+	
+	/**
+	 *  Called, when a refresh task is finished.
+	 */
+	protected synchronized void	refreshTaskFinished(IExplorerTreeNode node)
+	{
+		cnt--;
+		if(cnt==0)
+		{
+			jcc.removeStatusComponent(refreshcomp);
+			jcc.setStatusText("");
+		}
 	}
 
 	/**
@@ -245,7 +274,13 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 		{
 			// Perform refresh only, when node still in tree.
 			if(isValidChild(node))
+			{
+				String	tip	= node.getToolTipText();
+				if(tip!=null)
+					jcc.setStatusText("Refreshing "+tip);
 				refresh(node);
+			}
+			refreshTaskFinished(node);
 			return false;
 		}
 	}
