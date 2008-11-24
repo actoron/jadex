@@ -44,7 +44,7 @@ public class MicroAgentModel implements IJadexModel
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 	
