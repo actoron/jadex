@@ -8,10 +8,10 @@ import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
+import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.starter.StarterNodeFunctionality;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -328,9 +328,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				if(n instanceof FileNode)
 				{
 					String model = ((FileNode)n).getFile().getAbsolutePath();
-//					if(SXML.isAgentFilename(model) && ((FileNode)n).isValid())
-					if(getJCC().getAgent().getPlatform()
-						.getAgentFactory().isStartable(model) /* && ((FileNode)n).isValid() */)
+					if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(model)
+						&& TestCenterNodeFunctionality.isTestcase((IExplorerTreeNode) node))
 					{
 						tcpanel.getTestList().addEntry(model);
 					}
@@ -341,8 +340,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		{
 			String model = ((FileNode)node).getFile().getAbsolutePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
-			if(getJCC().getAgent().getPlatform()
-				.getAgentFactory().isStartable(model) /* && ((FileNode)node).isValid() */)
+			if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(model)
+				&& TestCenterNodeFunctionality.isTestcase((IExplorerTreeNode) node))
 			{
 				tcpanel.getTestList().addEntry(model);
 			}
@@ -373,12 +372,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				if(n instanceof FileNode)
 				{
 					String model = ((FileNode)n).getFile().getAbsolutePath();
-//					if(SXML.isAgentFilename(model) && ((FileNode)n).isValid())
-					if(getJCC().getAgent().getPlatform()
-						.getAgentFactory().isStartable(model) /*&& ((FileNode)n).isValid() */)
-					{
-						tcpanel.getTestList().removeEntry(model);
-					}
+					tcpanel.getTestList().removeEntry(model);
 				}
 			}
 		}

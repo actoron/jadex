@@ -163,7 +163,9 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 					String	tip	= node.getToolTipText();
 					if(tip!=null)
 						jcc.setStatusText("Refreshing "+tip);
-					((DefaultTreeModel)explorer.getModel()).reload(node);
+
+					// Todo: remove old nodes from tree expansion handler
+					((DefaultTreeModel)explorer.getModel()).nodeStructureChanged(node);
 				}
 			});
 		}

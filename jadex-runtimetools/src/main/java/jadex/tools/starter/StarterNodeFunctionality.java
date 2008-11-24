@@ -15,7 +15,9 @@ import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.IControlCenter;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *  Model tree node functionality, specific for the starter plugin.
@@ -113,7 +115,7 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	public void	nodeChanged(IExplorerTreeNode node)
 	{
 		// Use priority below user priority to scan first, then check.
-//		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
 	}
 
 	//-------- helper classes --------
@@ -148,8 +150,10 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 			// Perform refresh only, when node still in tree.
 			if(isValidChild(node))
 			{
+//				System.out.println("test valid: "+node);
 				if(node instanceof FileNode)
 				{
+					FileNode fn = (FileNode)node;
 					boolean	oldvalid	= isValid(node);
 					boolean	newvalid	= false;
 					
@@ -166,7 +170,6 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 					// Check file.
 					else
 					{
-						FileNode fn = (FileNode)node;
 						String	file	= fn.getFile().getAbsolutePath();
 						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
 						{
@@ -188,7 +191,25 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 					
 					if(oldvalid!=newvalid)
 					{
-						
+						fn.getProperties().put(VALID, new Boolean(newvalid));
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								String	tip	= node.getToolTipText();
+								if(tip!=null)
+									jcc.setStatusText("Checking "+tip);
+
+								((DefaultTreeModel)explorer.getModel()).nodeChanged(node);
+							}
+						});
+
+						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
+						if(parent instanceof DirNode && newvalid!=isValid(parent))
+						{
+							explorer.getWorker().execute(new CheckTask(parent), ModelExplorer.PERCENTAGE_USER*0.9);
+						}
+//						System.out.println("Valid?: "+node+", "+newvalid);
 					}
 				}
 			}

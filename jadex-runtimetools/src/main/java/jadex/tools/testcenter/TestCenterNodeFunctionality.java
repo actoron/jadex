@@ -1,10 +1,13 @@
 package jadex.tools.testcenter;
 
+import jadex.bdi.interpreter.OAVAgentModel;
+import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bridge.IJadexAgentFactory;
 import jadex.bridge.IJadexModel;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IExecutable;
+import jadex.rules.state.IOAVState;
 import jadex.tools.common.modeltree.AbstractNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
@@ -14,8 +17,13 @@ import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.IControlCenter;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *  Model tree node functionality, specific for the test center plugin.
@@ -24,8 +32,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 {
 	//-------- constants --------
 	
-	/** The valid property. */
-	protected static final String	VALID	= "valid";
+	/** The testcase property. */
+	protected static final String	TESTCASE	= "testcase";
 	
 	/**
 	 * The image  for (m/r) elements.
@@ -33,23 +41,23 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"agent", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent.png"),
-		"agent_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_broken.png"),
+		"agent_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testable.png"),
 		"capability", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_small.png"),
-		"capability_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_broken.png"),
+		// Todo: testable capability icon.
+		"capability_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_small.png"),
 		"src_folder", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder.png"),
-		"src_folder_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder_broken.png"),
-		"src_jar", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
-		"src_jar_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar_broken.png"),
+		"src_folder_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder_testable.png"),
 		"package", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_package.png"),
-		"package_broken", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_package_broken.png"),
-		"java_file", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/java_file.png"),
-	
+		"package_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_package_testable.png"),
+		"src_jar", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
+		// Todo: testable jar icon.
+		"src_jar_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
 	});
 	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a starter node functionality.
+	 *  Create a test center node functionality.
 	 */
 	public TestCenterNodeFunctionality(IControlCenter jcc)
 	{
@@ -67,21 +75,21 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 		Icon icon	= null;
 		if(node instanceof FileNode)
 		{
-			boolean	valid = isValid(node);// || !fn.getRootNode().isChecking();
+			boolean	test = isTestcase(node);// || !fn.getRootNode().isChecking();
 
 			if(node instanceof JarNode)
 			{
-				icon =  icons.getIcon(valid? "src_jar" : "src_jar_broken");
+				icon =  icons.getIcon(test ? "src_jar_testable" :  "src_jar");
 			}
 			else if(node instanceof DirNode)
 			{
 				if(node.getParent() instanceof RootNode)
 				{
-					icon	= icons.getIcon(valid? "src_folder" : "src_folder_broken");
+					icon	= icons.getIcon(test ? "src_folder_testable" : "src_folder");
 				}
 				else
 				{
-					icon	= icons.getIcon(valid? "package" : "package_broken");
+					icon	= icons.getIcon(test ? "package_testable" : "package");
 				}
 			}
 			else if (node instanceof FileNode)
@@ -90,11 +98,11 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 				IJadexAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
 				if(fac.isLoadable(fn.getFile().getName()) && fac.isStartable(fn.getFile().getName()))
 				{
-					icon	= icons.getIcon(valid? "agent" : "agent_broken");
+					icon	= icons.getIcon(test ? "agent_testable" : "agent");
 				}
 				else if(fac.isLoadable(fn.getFile().getName()))
 				{
-					icon	= icons.getIcon(valid? "capability" : "capability_broken");
+					icon	= icons.getIcon(test ? "capability_testable" : "capability");
 				}
 				else if(SUtil.isJavaSourceFilename(fn.getFile().getName()))
 				{
@@ -113,7 +121,7 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	public void	nodeChanged(IExplorerTreeNode node)
 	{
 		// Use priority below user priority to scan first, then check.
-//		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
 	}
 
 	//-------- helper classes --------
@@ -150,32 +158,48 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 			{
 				if(node instanceof FileNode)
 				{
-					boolean	oldvalid	= isValid(node);
-					boolean	newvalid	= false;
+					FileNode fn = (FileNode)node;
+					boolean	oldtest	= isTestcase(node);
+					boolean	newtest	= false;
 					
 					// Check directory.
 					if(node instanceof DirNode)
 					{
-						newvalid	= true;
-						for(int i=0; newvalid && i<node.getChildCount(); i++)
+						for(int i=0; !newtest && i<node.getChildCount(); i++)
 						{
-							newvalid	= isValid((IExplorerTreeNode) node.getChildAt(i));
+							newtest	= isTestcase((IExplorerTreeNode) node.getChildAt(i));
 						}
 					}
 					
 					// Check file.
 					else
 					{
-						FileNode fn = (FileNode)node;
 						String	file	= fn.getFile().getAbsolutePath();
 						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
 						{
 							try
 							{
 								IJadexModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+								
 								if(model!=null)
 								{
-									newvalid	= model.getReport().isEmpty();
+									boolean ok	= model.getReport().isEmpty();
+
+									// HACK!!!
+									if(ok && model instanceof OAVAgentModel)
+									{
+										IOAVState	state	= ((OAVAgentModel)model).getState();
+										Object	magent	= ((OAVAgentModel)model).getHandle();
+										Collection	caparefs	= state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_capabilityrefs);
+										if(caparefs!=null)
+										{
+											for(Iterator it=caparefs.iterator(); !newtest && it.hasNext(); )
+											{
+												Object	name	= state.getAttributeValue(it.next(), OAVBDIMetaModel.capabilityref_has_file);
+												newtest = "jadex.bdi.planlib.test.Test".equals(name);
+											}
+										}
+									}
 								}
 								// else unknown jadex file type -> ignore.
 							}
@@ -186,9 +210,26 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 					}
 					
 					
-					if(oldvalid!=newvalid)
+					if(oldtest!=newtest)
 					{
-						
+						fn.getProperties().put(TESTCASE, new Boolean(newtest));
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								String	tip	= node.getToolTipText();
+								if(tip!=null)
+									jcc.setStatusText("Checking "+tip);
+
+								((DefaultTreeModel)explorer.getModel()).nodeChanged(node);
+							}
+						});
+
+						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
+						if(parent instanceof DirNode && newtest!=isTestcase(parent))
+						{
+							explorer.getWorker().execute(new CheckTask(parent), ModelExplorer.PERCENTAGE_USER*0.9);
+						}
 					}
 				}
 			}
@@ -197,16 +238,16 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	}
 
 	/**
-	 *  Check if the valid flag of a node is set to true.
+	 *  Check if the testcase flag of a node is set to true.
 	 */
-	public static boolean	isValid(IExplorerTreeNode node)
+	public static boolean	isTestcase(IExplorerTreeNode node)
 	{
-		boolean	ret	= true;	// Unknown node types are valid by default
+		boolean	ret	= false;	// Unknown node types are no testcases by default
 		if(node instanceof FileNode)
 		{
 			FileNode fn = (FileNode)node;
-			Boolean	val	= (Boolean)fn.getProperties().get(VALID);
-			ret	= val==null || val.booleanValue();	// Valid, if not yet checked.
+			Boolean	val	= (Boolean)fn.getProperties().get(TESTCASE);
+			ret	= val!=null && val.booleanValue();	// No testcase, if not yet checked.
 		}
 		return ret;
 	}
