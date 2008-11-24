@@ -49,7 +49,7 @@
     </dependency>
     <dependency>
     	<groupId>jadex</groupId>
-    	<artifactId>jadex-microkernel</artifactId>
+    	<artifactId>jadex-applications-micro</artifactId>
     	<version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

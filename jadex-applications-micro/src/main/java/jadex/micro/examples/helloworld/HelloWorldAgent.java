@@ -3,7 +3,7 @@ package jadex.micro.examples.helloworld;
 import jadex.microkernel.MicroAgent;
 
 /**
- * 
+ *  The micro version of the hello world agent.
  */
 public class HelloWorldAgent extends MicroAgent
 {
