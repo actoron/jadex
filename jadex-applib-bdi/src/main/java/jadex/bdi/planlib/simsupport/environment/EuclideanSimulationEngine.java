@@ -213,6 +213,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	public void addEnvironmentProcess(IEnvironmentProcess process)
 	{
+		System.out.println("Adding process: " + process.getName());
 		process.start(this);
 		processes_.put(process.getName(), process);
 	}

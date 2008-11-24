@@ -8,11 +8,11 @@ import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 /** Tasks that directs the object towards a destination and
  *  issues an event when it has been reached.
  */
-public class SetDestinationTask implements ISimObjectTask
+public class GoToDestinationTask implements ISimObjectTask
 {
 	/** Default task name.
 	 */
-	public static final String DEFAULT_NAME = "set_destination";
+	public static final String DEFAULT_NAME = "go_to_destination";
 	
 	/** Name of the task.
 	 */
@@ -34,14 +34,14 @@ public class SetDestinationTask implements ISimObjectTask
 	 */
 	private MoveObjectTask moveTask_;
 	
-	public SetDestinationTask(IVector2 targetPosition,
+	public GoToDestinationTask(IVector2 targetPosition,
 			   				   IVector1 speed,
 			   				   IVector1 tolerance)
 	{
 		this(DEFAULT_NAME, targetPosition, speed, tolerance);
 	}
 	
-	public SetDestinationTask(String name,
+	public GoToDestinationTask(String name,
 							   IVector2 targetPosition,
 							   IVector1 speed,
 							   IVector1 tolerance)
@@ -70,6 +70,13 @@ public class SetDestinationTask implements ISimObjectTask
 	 */
 	public void shutdown(SimObject object)
 	{
+		synchronized (object)
+		{
+			IVector2 currentPosition = object.getPositionAccess();
+			SimulationEvent evt = new SimulationEvent(SimulationEvent.GO_TO_DESTINATION_REACHED);
+			evt.setParameter("position", currentPosition.copy());
+			object.fireSimulationEvent(evt);
+		}
 	}
 	
 	/** Directs the object towards the destination.
@@ -92,11 +99,6 @@ public class SetDestinationTask implements ISimObjectTask
 				velocity.zero();
 				
 				object.removeTask(name_);
-				
-				SimulationEvent evt = new SimulationEvent(SimulationEvent.DESTINATION_REACHED);
-				object.fireSimulationEvent(evt);
-				
-				
 			}
 			
 			

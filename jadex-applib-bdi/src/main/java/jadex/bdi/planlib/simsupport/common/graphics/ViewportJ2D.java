@@ -348,9 +348,9 @@ public class ViewportJ2D extends Frame implements IViewport,
     
     private void setupTransform(Graphics2D g)
     {
-        g.translate(0.0, getHeight());
-        g.scale((getWidth() / paddedSize_.getXAsDouble()),
-                -(getHeight() / paddedSize_.getYAsDouble()));
+        g.translate(0.0, canvas_.getHeight());
+        g.scale((canvas_.getWidth() / paddedSize_.getXAsDouble()),
+                -(canvas_.getHeight() / paddedSize_.getYAsDouble()));
         g.translate(-posX_, -posY_);
     }
     

@@ -22,9 +22,11 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	 */
 	private Color c_;
 	
+	private int vertices_;
+	
 	/** The vertices.
 	 */
-	private List vertices_;
+	private List vertexList_;
 	
 	/** Path for Java2D.
 	 */
@@ -46,7 +48,11 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	public ScalableRegularPolygon(IVector2 size, int vertices, Color c)
 	{
 		c_ = c;
-		vertices_ = new ArrayList();
+		setPosition(new Vector2Double(0.0));
+        setSize(size);
+        setVelocity(new Vector2Double(0.0));
+		vertices_ = vertices;
+		vertexList_ = new ArrayList();
 		double op = 0.0;
 		IVector2 vertex = new Vector2Double(Math.sin(op) / 2.0, Math.cos(op) / 2.0);
 		for (int i = 0; i < vertices; ++i)
@@ -54,7 +60,7 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 			System.out.print(vertex.getXAsDouble());
 			System.out.print(", ");
 			System.out.println(vertex.getYAsDouble());
-			vertices_.add(vertex);
+			vertexList_.add(vertex);
 			op += (2.0 * Math.PI) / vertices;
 			vertex = new Vector2Double(Math.sin(op) / 2.0, Math.cos(op) / 2.0);
 		}
@@ -66,26 +72,23 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	 */
 	private ScalableRegularPolygon(ScalableRegularPolygon other)
 	{
-		vertices_ = new ArrayList(other.vertices_);
+		px_ = other.px_;
+    	py_ = other.py_;
+    	w_ = other.w_;
+    	h_ = other.h_;
+		vertices_ = other.vertices_;
+		vertexList_ = new ArrayList(other.vertexList_);
 		c_ = other.c_;
 	}
 	
 	public void init(ViewportJ2D vp, Graphics2D g)
 	{
 		path_ = new GeneralPath();
-		boolean first = true;
-		for (Iterator it = vertices_.iterator(); it.hasNext(); )
+		path_.moveTo(0.5, 0.0);
+		for (int i = 1; i < vertices_; ++i)
 		{
-			IVector2 vertex = (IVector2) it.next();
-			if (first)
-			{
-				path_.moveTo(vertex.getXAsFloat(), vertex.getYAsFloat());
-				first = false;
-			}
-			else
-			{
-				path_.lineTo(vertex.getXAsFloat(), vertex.getYAsFloat());
-			}
+			double x = Math.PI * 2 / vertices_ * i;
+			path_.lineTo(Math.cos(x) / 2.0, Math.sin(x) / 2.0);
 		}
 		path_.closePath();
 	}
@@ -113,13 +116,13 @@ public class ScalableRegularPolygon extends ScalablePrimitive
         
         gl.glBegin(GL.GL_TRIANGLE_FAN);
         gl.glVertex2f(0.0f, 0.0f);
-        for (Iterator it = vertices_.iterator(); it.hasNext(); )
+        for (Iterator it = vertexList_.iterator(); it.hasNext(); )
         {
         	IVector2 vertex = (IVector2) it.next();
         	gl.glVertex2f(vertex.getXAsFloat(), vertex.getYAsFloat());
         }
-        gl.glVertex2f(((IVector2) vertices_.get(0)).getXAsFloat(),
-        			  ((IVector2) vertices_.get(0)).getYAsFloat());
+        gl.glVertex2f(((IVector2) vertexList_.get(0)).getXAsFloat(),
+        			  ((IVector2) vertexList_.get(0)).getYAsFloat());
         gl.glEnd();
         
         gl.glPopMatrix();
