@@ -56,9 +56,12 @@ public class JadexAgentFactory implements IJadexAgentFactory
 //		System.out.println("loading micro: "+model);
 		IJadexModel ret = null;
 		ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
-		String clname = model.substring(0, model.indexOf(".class"));
 		
-		// Hack!
+		String clname = model;
+		
+		// Hack! for extracting clear classname
+		if(clname.endsWith(".class"))
+			clname = model.substring(0, model.indexOf(".class"));
 		if(clname.indexOf("classes")!=-1)
 			clname = clname.substring(model.indexOf("classes")+8);
 		clname = clname.replace("\\", ".");

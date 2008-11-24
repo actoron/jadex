@@ -11,7 +11,7 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.adapter.standalone.Platform"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf ../jadex-microkernel/src/main/java/jadex/microkernel/examples/standalone_creationconf.xml&#13;&#10;creation:jadex/microkernel/examples/CreationTestAgent.class"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf ../jadex-microkernel/src/main/java/jadex/microkernel/examples/standalone_creationconf.xml&#13;&#10;creation:jadex/microkernel/examples/AgentCreationAgent.class"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-launch"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.sourcepathProvider"/>
 </launchConfiguration>
