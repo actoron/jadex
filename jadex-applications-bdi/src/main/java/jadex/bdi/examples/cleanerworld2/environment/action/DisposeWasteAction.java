@@ -3,6 +3,7 @@ package jadex.bdi.examples.cleanerworld2.environment.action;
 import java.util.List;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
+import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
@@ -27,6 +28,8 @@ public class DisposeWasteAction implements ISimAction
 			(object.getType() == "waste_bin") &&
 			(actor.getPosition().getDistance(object.getPosition()).less(Configuration.REACH_DISTANCE)))
 		{
+			IVector1 wasteCap = (IVector1) actor.getProperty("waste_capacity");
+			wasteCap.zero().add(Configuration.MAX_WASTE_CAPACITY);
 			return true;
 		}
 		return false;

@@ -22,13 +22,9 @@ public class LookForWastePlan extends Plan
 		// new search waypoint
 		IVector2 waypoint = (IVector2) subGoal.getParameter("position").getValue();
 		//Go there
-		subGoal = createGoal("sim_set_destination");
-		subGoal.getParameter("object_id").setValue(cleanerId);
+		subGoal = createGoal("go_to_destination");
 		subGoal.getParameter("destination").setValue(waypoint);
-		subGoal.getParameter("speed").setValue(Configuration.CLEANER_SPEED);
-		subGoal.getParameter("tolerance").setValue(Configuration.REACH_DISTANCE.copy().multiply(new Vector1Double(0.5)));
 		dispatchSubgoalAndWait(subGoal);
-		b.getBelief("waste_search_waypoint").setFact(waypoint);
 	}
 	
 }

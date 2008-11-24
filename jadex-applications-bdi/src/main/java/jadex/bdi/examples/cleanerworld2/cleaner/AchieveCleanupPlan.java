@@ -21,39 +21,37 @@ public class AchieveCleanupPlan extends Plan
 		Integer cleanerId = (Integer) b.getBelief("simobject_id").getFact();
 		
 		// Stop the cleaner.
-		IGoal stop = createGoal("stop");
-		dispatchSubgoalAndWait(stop);
-		stop = null;
+		IGoal subGoal = createGoal("stop");
+		dispatchSubgoalAndWait(subGoal);
 		
 		// Go to waste position
-		IVector2 wastePos = (IVector2) b.getBelief("waste_target_position").getFact();
-		IGoal moveToWaste = createGoal("set_destination");
-		moveToWaste.getParameter("destination").setValue(wastePos);
-		dispatchSubgoalAndWait(moveToWaste);
-		moveToWaste = null;
+		boolean atPosition = false;
+		while (!atPosition)
+		{
+			IVector2 wastePos = (IVector2) getParameter("waste_position").getValue();
+			subGoal = createGoal("go_to_destination");
+			subGoal.getParameter("destination").setValue(wastePos);
+			System.out.println("Dispatching GOTO");
+			
+			dispatchSubgoalAndWait(subGoal);
+			System.out.println("Done GOTO");
+			if (subGoal.isSucceeded())
+			{
+				atPosition = true;
+			}
+		}
 		
-		waitForInternalEvent("reached_waste_event");
-		Integer wasteId = (Integer) b.getBelief("waste_target").getFact();
+		Integer wasteId = (Integer) getParameter("waste").getValue();
 		IGoal pickupWaste = createGoal("sim_perform_action");
 		pickupWaste.getParameter("action").setValue(PickupWasteAction.DEFAULT_NAME);
 		pickupWaste.getParameter("actor_id").setValue(cleanerId);
 		pickupWaste.getParameter("object_id").setValue(wasteId);
+		System.out.println("Dispatching pickup");
 		dispatchSubgoalAndWait(pickupWaste);
-		
-		if (pickupWaste.isSucceeded())
-		{
-			IBelief wasteCapacity = b.getBelief("waste_capacity");
-			int currentCap = ((Integer) wasteCapacity.getFact()).intValue();
-			--currentCap;
-			wasteCapacity.setFact(new Integer(currentCap));
-		}
-		
-		// Remove search waypoint
-		b.getBelief("waste_search_waypoint").setFact(null);
-		b.getBelief("waste_target").setFact(null);
 		
 		// Re-enable waste sensor
 		IGoal reenableSensor = createGoal("enable_waste_sensor");
+		System.out.println("Dispatching sensor");
 		dispatchSubgoalAndWait(reenableSensor);
 	}
 	

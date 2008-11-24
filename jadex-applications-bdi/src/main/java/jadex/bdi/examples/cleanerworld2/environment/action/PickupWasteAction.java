@@ -36,7 +36,7 @@ public class PickupWasteAction implements ISimAction
 			wasteCapacity.subtract(new Vector1Long(1));
 			if (wasteCapacity.equals(Vector1Long.ZERO))
 			{
-				actor.fireSimulationEvent(new SimulationEvent("waste_container_full"));
+				actor.fireSimulationEvent(new SimulationEvent("out_of_waste_capacity"));
 			}
 			return true;
 		}

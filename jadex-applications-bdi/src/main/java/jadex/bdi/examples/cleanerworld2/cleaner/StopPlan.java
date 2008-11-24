@@ -1,7 +1,7 @@
 package jadex.bdi.examples.cleanerworld2.cleaner;
 
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
-import jadex.bdi.planlib.simsupport.environment.simobject.task.SetDestinationTask;
+import jadex.bdi.planlib.simsupport.environment.simobject.task.GoToDestinationTask;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -17,7 +17,7 @@ public class StopPlan extends Plan
 		// Remove destination
 		IGoal removeDestination = createGoal("sim_remove_task");
 		removeDestination.getParameter("object_id").setValue(cleanerId);
-		removeDestination.getParameter("task_name").setValue(SetDestinationTask.DEFAULT_NAME);
+		removeDestination.getParameter("task_name").setValue(GoToDestinationTask.DEFAULT_NAME);
 		dispatchSubgoalAndWait(removeDestination);
 		
 		// Stop the cleaner

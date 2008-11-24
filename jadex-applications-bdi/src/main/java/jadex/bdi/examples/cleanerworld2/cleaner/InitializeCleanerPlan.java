@@ -5,6 +5,7 @@ import jadex.bdi.examples.cleanerworld2.environment.process.WasteBinSensorProces
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteSensorProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredTriangle;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableRegularPolygon;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
@@ -26,7 +27,7 @@ public class InitializeCleanerPlan extends Plan
 	{
 		DrawableCombiner drawable = new DrawableCombiner();
 		String cleanerImage = "jadex/bdi/examples/cleanerworld2/images/cleaner.png";
-		//drawable.addDrawable(new ScalableRegularPolygon(new Vector2Double(3.0), 3, Color.RED));
+		drawable.addDrawable(new ScalableRegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f)));
 		drawable.addDrawable(new ScalableTexturedRectangle(new Vector2Double(1.0), cleanerImage));
 		//drawable.addDrawable(new RotatingColoredTriangle(new Vector2Double(1.0), new Vector2Double(1.0), new Vector2Double(0.0), Color.BLUE));
 		
@@ -54,11 +55,10 @@ public class InitializeCleanerPlan extends Plan
 		getBeliefbase().getBelief("simobject_id").setFact(objectId);
 		
 		// Enable waste bin sensor
-		Integer cleanerId = (Integer) getBeliefbase().getBelief("simobject_id").getFact();
-		String processName = WasteBinSensorProcess.DEFAULT_NAME + this.toString();
-		IEnvironmentProcess sensorProcess = new WasteBinSensorProcess(processName, cleanerId);
+		String processName = WasteBinSensorProcess.DEFAULT_NAME + objectId.toString();
+		IEnvironmentProcess sensorProcess = new WasteBinSensorProcess(processName, objectId);
 		IGoal addProcess = createGoal("sim_add_environment_process");
-		addProcess.getParameter("process").setValue(sensorProcess);
+		addProcess.getParameter("process").setValue(sensorProcess);;
 		dispatchSubgoalAndWait(addProcess);
 		
 		// Enable waste sensor

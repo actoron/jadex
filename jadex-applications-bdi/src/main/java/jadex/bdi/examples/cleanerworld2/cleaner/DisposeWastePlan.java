@@ -33,11 +33,9 @@ public class DisposeWastePlan extends Plan
 			dispatchSubgoalAndWait(subGoal);
 			// new search waypoint
 			IVector2 waypoint = (IVector2) subGoal.getParameter("position").getValue();
-			subGoal = createGoal("set_destination");
+			subGoal = createGoal("go_to_destination");
 			subGoal.getParameter("destination").setValue(waypoint);
 			dispatchSubgoalAndWait(subGoal);
-			
-			waitForInternalEvent("reached_dispose_destination_event");
 		}
 		
 		// Find closest bin from our current location
@@ -67,10 +65,17 @@ public class DisposeWastePlan extends Plan
 		}
 		
 		// Go to the bin
-		subGoal = createGoal("set_destination");
-		subGoal.getParameter("destination").setValue(binPos.copy());
-		dispatchSubgoalAndWait(subGoal);
-		waitForInternalEvent("reached_dispose_destination_event");
+		boolean atPosition = false;
+		while (!atPosition)
+		{
+			subGoal = createGoal("go_to_destination");
+			subGoal.getParameter("destination").setValue(binPos.copy());
+			dispatchSubgoalAndWait(subGoal);
+			if (subGoal.isSucceeded())
+			{
+				atPosition = true;
+			}
+		}
 		
 		// Dispose the waste
 		subGoal = createGoal("sim_perform_action");
@@ -79,18 +84,9 @@ public class DisposeWastePlan extends Plan
 		subGoal.getParameter("object_id").setValue(bin);
 		dispatchSubgoalAndWait(subGoal);
 		
-		if (subGoal.isSucceeded())
-		{
-			IBelief wasteCapacity = b.getBelief("waste_capacity");
-			IBelief maxWasteCapacity = b.getBelief("max_waste_capacity");
-			wasteCapacity.setFact(maxWasteCapacity.getFact());
-		}
-		
-		b.getBelief("waste_search_waypoint").setFact(null);
-		b.getBelief("waste_target").setFact(null);
 		// Re-enable waste sensor
-		IGoal reenableSensor = createGoal("enable_waste_sensor");
-		dispatchSubgoalAndWait(reenableSensor);
+		//IGoal reenableSensor = createGoal("enable_waste_sensor");
+		//dispatchSubgoalAndWait(reenableSensor);
 	}
 	
 }

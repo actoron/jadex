@@ -23,7 +23,7 @@ import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
  */
 public class WasteBinSensorProcess implements IEnvironmentProcess
 {
-	public final static String DEFAULT_NAME = "WasteSensor";
+	public final static String DEFAULT_NAME = "WasteBinSensor";
 	
 	public final static String WASTE_BIN_FOUND_EVENT_TYPE = "waste_bin_found";
 	
@@ -96,6 +96,7 @@ public class WasteBinSensorProcess implements IEnvironmentProcess
 			if (wasteBin.getPosition().getDistance(cleaner_.getPosition()).less(Configuration.CLEANER_VISUAL_RANGE))
 			{
 				SimulationEvent evt = new SimulationEvent(WASTE_BIN_FOUND_EVENT_TYPE);
+				evt.setParameter("waste_bin_id", wasteBin.getId());
 				evt.setParameter("position", wasteBin.getPosition());
 				cleaner_.fireSimulationEvent(evt);
 				it.remove();

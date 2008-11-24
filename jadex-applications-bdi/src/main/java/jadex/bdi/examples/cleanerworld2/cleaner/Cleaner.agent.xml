@@ -92,10 +92,6 @@
 		
 		<!-- Dispose the waste. -->
 		<achievegoal name="dispose_waste">
-			<creationcondition>
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 0))
-				?mbelief = (mbelief (element_has_name "waste_capacity"))
-			</creationcondition>
 			<deliberation cardinality="1">
 				<inhibits ref="achieve_cleanup"/>
 				<inhibits ref="look_for_waste"/>
@@ -104,32 +100,21 @@
 		
 		<!-- Clean up some waste. -->
 		<achievegoal name="achieve_cleanup">
-			<!-- Adopt when we have a target -->
-			<creationcondition>
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (element_has_name "waste_target"))
-				(test (!= ?fact null))
-			</creationcondition>
+			<parameter name="waste" class="Integer"/>
+			<parameter name="waste_position" class="IVector2"/>
 			<deliberation cardinality="1">
 				<inhibits ref="look_for_waste"/>
 			</deliberation>
 		</achievegoal>
 		
 		<!-- Look out for waste when nothing better to do. -->
-		<performgoal name="look_for_waste" retry="true" exclude="never">
-			<contextcondition>
-				?wtrbelief = (belief (element_has_model ?wtmbelief) (belief_has_fact null))
-				?wtmbelief = (mbelief (element_has_name "waste_target"))
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
-				?mbelief = (mbelief (element_has_name "waste_search_waypoint"))
-			</contextcondition>
- 		</performgoal>
+		<performgoal name="look_for_waste" retry="true" exclude="never"/>
  		
  		<!-- Sets a new destination for the cleaner. -->
- 		<achievegoal name="set_destination">
+ 		<performgoal name="go_to_destination">
  			<!-- Destination of the cleaner -->
 			<parameter name="destination" class="IVector2"/>
- 		</achievegoal>
+ 		</performgoal>
  		
  		<!-- Stops the cleaner. -->
  		<achievegoal name="stop"/>
@@ -149,9 +134,9 @@
         	<concrete ref="simcap.sim_set_velocity"/>
     	</achievegoalref>
     	
-    	<achievegoalref name="sim_set_destination">
-    		<concrete ref="simcap.sim_set_destination"/>
-		</achievegoalref>
+    	<performgoalref name="sim_go_to_destination">
+    		<concrete ref="simcap.sim_go_to_destination"/>
+		</performgoalref>
 		
 		<achievegoalref name="sim_remove_task">
     		<concrete ref="simcap.sim_remove_task"/>
@@ -187,6 +172,12 @@
   		</plan>
   		
   		<plan name="achieve_cleanup_plan">
+  			<parameter name="waste" class="Integer">
+				<goalmapping ref="achieve_cleanup.waste"/>
+			</parameter>
+			<parameter name="waste_position" class="IVector2">
+				<goalmapping ref="achieve_cleanup.waste_position"/>
+			</parameter>
   			<body class="AchieveCleanupPlan"/>
   			<trigger>
 				<goal ref="achieve_cleanup"/>
@@ -207,13 +198,13 @@
 			</trigger>
   		</plan>
   		
-  		<plan name="set_destination_plan">
+  		<plan name="go_to_destination_plan">
   			<parameter name="destination" class="IVector2">
-				<goalmapping ref="set_destination.destination"/>
+				<goalmapping ref="go_to_destination.destination"/>
 			</parameter>
-  			<body class="SetDestinationPlan"/>
+  			<body class="GoToDestinationPlan"/>
   			<trigger>
-				<goal ref="set_destination"/>
+				<goal ref="go_to_destination"/>
 			</trigger>
   		</plan>
   		
@@ -235,6 +226,15 @@
 			</trigger>
 		</plan>
 		
+		<plan name="out_of_waste_capacity_event_plan">
+			<body class="OutOfWasteCapacityEventPlan"/>
+			<trigger>
+ 				<internalevent ref="simulation_event">
+					<match>$event.getParameter("type").getValue().equals("out_of_waste_capacity")</match>
+				</internalevent>
+			</trigger>
+		</plan>
+		
 		<plan name="waste_bin_found_event_plan">
 			<body class="WasteBinFoundEventPlan"/>
 			<trigger>
@@ -249,15 +249,6 @@
 			<trigger>
  				<internalevent ref="simulation_event">
 					<match>$event.getParameter("type").getValue().equals("waste_found")</match>
-				</internalevent>
-			</trigger>
-		</plan>
-		
-		<plan name="destination_reached_event_plan">
-			<body class="DestinationReachedEventPlan"/>
-			<trigger>
- 				<internalevent ref="simulation_event">
-					<match>$event.getParameter("type").getValue().equals(SimulationEvent.DESTINATION_REACHED)</match>
 				</internalevent>
 			</trigger>
 		</plan>
