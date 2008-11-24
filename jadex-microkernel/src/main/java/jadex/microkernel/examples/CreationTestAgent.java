@@ -1,15 +1,14 @@
 package jadex.microkernel.examples;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -81,42 +80,47 @@ public class CreationTestAgent extends MicroAgent
 			
 				// Delete prior agents.
 				long killstarttime	= getTime();
-				for(int cnt=max; cnt>0; cnt--)
-				{
-					if(cnt!=num)
-					{
-						final String name = createPeerName(cnt);
-//						System.out.println("Destroying peer: "+name);
-						final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-						IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
-						ams.destroyAgent(aid, createResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								System.out.println("Successfully destroyed peer: "+name);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-							}
-						}));
-					}
-				}
-				long killend = getTime();
-				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
-				double killdur = ((double)killend-killstarttime)/1000.0;
-				double killpera = killdur/(max-1);
+				deletePeers(max-1, killstarttime, dur, pera, omem, upera);
 				
-				Runtime.getRuntime().gc();
-				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+//				for(int cnt=max; cnt>0; cnt--)
+//				{
+//					if(cnt!=num)
+//					{
+//						final String name = createPeerName(cnt);
+////						System.out.println("Destroying peer: "+name);
+//						final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+//						IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
+//						ams.destroyAgent(aid, createResultListener(new IResultListener()
+//						{
+//							public void resultAvailable(Object result)
+//							{
+//								System.out.println("Successfully destroyed peer: "+name);
+//								
+//							}
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								exception.printStackTrace();
+//							}
+//						}));
+//					}
+//				}				
 				
-				System.out.println("\nCumulated results:");
-				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-				System.out.println("Still used memory: "+stillused+"kB.");
-
-				killAgent();
+				
+//				long killend = getTime();
+//				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+//				double killdur = ((double)killend-killstarttime)/1000.0;
+//				double killpera = killdur/(max-1);
+//				
+//				Runtime.getRuntime().gc();
+//				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+//				
+//				System.out.println("\nCumulated results:");
+//				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+//				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+//				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+//				System.out.println("Still used memory: "+stillused+"kB.");
+//
+//				killAgent();
 			}
 		}
 		return false;
@@ -138,5 +142,60 @@ public class CreationTestAgent extends MicroAgent
 			name	+= "Peer_#"+num;
 		}
 		return name;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera, final long omem, final double upera)
+	{
+		final String name = createPeerName(cnt);
+//		System.out.println("Destroying peer: "+name);
+		final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
+		ams.destroyAgent(aid, createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("Successfully destroyed peer: "+name);
+				
+				if(cnt-1>0)
+				{
+					deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
+				}
+				else
+				{
+					killLastPeer(killstarttime, dur, pera, omem, upera);
+				}	
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		}));
+	}
+	
+	/**
+	 * 
+	 */
+	protected void killLastPeer(long killstarttime, double dur, double pera, long omem, double upera)
+	{
+		int max = ((Integer)getArgument("max")).intValue();
+		
+		long killend = getTime();
+		System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+		double killdur = ((double)killend-killstarttime)/1000.0;
+		double killpera = killdur/(max-1);
+		
+		Runtime.getRuntime().gc();
+		long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+		
+		System.out.println("\nCumulated results:");
+		System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+		System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+		System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+		System.out.println("Still used memory: "+stillused+"kB.");
+
+		killAgent();
 	}
 }
