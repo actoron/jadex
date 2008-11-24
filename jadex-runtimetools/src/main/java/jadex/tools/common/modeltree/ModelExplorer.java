@@ -88,7 +88,7 @@ public class ModelExplorer extends JTree
 	protected RootNode root;
 	
 	/** The node functionality. */
-	protected INodeFunctionality	nof;
+	protected AbstractNodeFunctionality	nof;
 	
 	/** The background work manager. */
 	protected LoadManagingExecutionService	worker;
@@ -132,7 +132,7 @@ public class ModelExplorer extends JTree
 	 *  Create a new ModelExplorer.
 	 */
 	public ModelExplorer(IControlCenter jcc, RootNode root, 
-		PopupBuilder pubuilder, INodeFunctionality nof)
+		PopupBuilder pubuilder, AbstractNodeFunctionality nof)
 	{
 		this(jcc, root, pubuilder, nof, null, null);
 	}
@@ -147,7 +147,7 @@ public class ModelExplorer extends JTree
 	 *  @param filters The file filters.
 	 */
 	public ModelExplorer(IControlCenter jcc, RootNode root, 
-		PopupBuilder pubuilder, INodeFunctionality nof,
+		PopupBuilder pubuilder, AbstractNodeFunctionality nof,
 		String[] filternames, java.io.FileFilter[] filters)
 	{
 		super(root);
@@ -715,7 +715,7 @@ public class ModelExplorer extends JTree
 		 */
 		public boolean execute()
 		{
-			nof.refresh(node);
+			nof.startRefreshTask(node);
 			for(int i=0; i<node.getChildCount(); i++)
 			{
 				IExplorerTreeNode	child	= (IExplorerTreeNode) node.getChildAt(i);
@@ -725,123 +725,6 @@ public class ModelExplorer extends JTree
 		}
 	}
 	
-//	
-//	/** The high priority background task. */
-//	protected UserTask	usertask;
-//
-//	/** The low priority background task. */
-//	protected CrawlerTask	crawlertask;
-//
-//	/**
-//	 *  Refresh a node.
-//	 */
-//	public void	refresh(IExplorerTreeNode node)
-//	{
-//		if(usertask==null)
-//		{
-//			usertask	= new UserTask();
-//			SwingWorker.addTask(usertask, PERCENTAGE_USER);
-//			if(refreshcomp!=null)
-//				jcc.addStatusComponent(this, refreshcomp);
-//		}
-//		usertask.nodes_user.add(node);
-//	}
-//
-//	/**
-//	 *  The user-level refresher task.
-//	 */
-//	public class UserTask	implements SwingWorker.Task
-//	{
-//		/** User nodes to be refreshed (including children). */
-//		protected List	nodes_user	= new LinkedList();
-//	
-//		/** Changed nodes to be refreshed (including parents). */
-//		protected List	nodes_out	= new LinkedList();
-//
-//		/**
-//		 * 
-//		 */
-//		public boolean execute()
-//		{
-////			System.out.println("refresher: "+nodes_user+", "+nodes_out);
-//
-//			// Process user nodes (iterate through children).
-//			if(!nodes_user.isEmpty())
-//			{
-//				// Update node, if necessary.
-//				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_user.remove(0);
-//				String	tip	= node.getToolTipText();
-//				if(tip!=null)
-//					jcc.setStatusText("Scanning "+tip);
-//				if(node.refresh())
-//				{
-////					System.out.println("change detected in user node: "+node);
-//					SwingUtilities.invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-//							((DefaultTreeModel)getModel()).reload(node);
-//						}
-//					});
-//					if(!nodes_out.contains(node))
-//						nodes_out.add(0, node);	// Add to start for inner nodes being processed first (inverse order)
-//				}
-//				
-//				// For user nodes iterate over children, regardless if node has changed.
-//				Enumeration	children	= node.children();
-//				while(children.hasMoreElements())
-//				{
-//					nodes_user.add(children.nextElement());
-//				}
-//			}
-//	
-//			// Process out nodes (traverse back to root).
-//			else if(!nodes_out.isEmpty())
-//			{
-//				// Update node, as often as necessary (e.g. integrity checks are performed on 2nd refresh).
-//				final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_out.remove(0);
-//				String	tip	= node.getToolTipText();
-//				if(tip!=null)
-//					jcc.setStatusText("Scanning "+tip);
-//				if(node.refresh())
-//				{
-////					System.out.println("change detected in out node: "+node);
-//					SwingUtilities.invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-//							((DefaultTreeModel)getModel()).reload(node);
-//						}
-//					});
-//					nodes_out.add(node);
-//				}
-//				
-//				// Otherwise move to parent node
-//				else if(node.getParent()!=null)
-//				{
-//					if(!nodes_out.contains(node.getParent()))
-//						nodes_out.add(node.getParent());
-//				}
-//			}
-//			
-//			boolean finished	= nodes_user.isEmpty() && nodes_out.isEmpty();
-//			if(finished)
-//			{
-//				usertask	= null;
-//				if(refreshcomp!=null)
-//					jcc.removeStatusComponent(ModelExplorer.this);
-//				if(refresh)
-//				{
-//					if(crawlertask==null)
-//						crawlertask	=	new CrawlerTask();
-//					SwingWorker.addTask(crawlertask, PERCENTAGE_CRAWLER);
-//				}
-//			}
-//
-//			return !finished;
-//		}
-//	}
-//
 	/**
 	 *  The crawler-level refresher task.
 	 */
@@ -866,7 +749,7 @@ public class ModelExplorer extends JTree
 
 			// Update node if necessary:
 			final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_crawler.remove(0);
-			nof.refresh(node);
+			nof.startRefreshTask(node);
 			
 			// Iterate over children:
 			Enumeration	children	= node.children();
@@ -949,7 +832,7 @@ public class ModelExplorer extends JTree
 							ex.printStackTrace();
 						}
 						
-						nof.refresh(node);
+						nof.startRefreshTask(node);
 						((DefaultTreeModel)getModel()).reload(getRootNode());
 					}
 					else
@@ -990,7 +873,6 @@ public class ModelExplorer extends JTree
 				FileNode	node	= (FileNode)getLastSelectedPathComponent();
 				getRootNode().removePathEntry(node);
 				
-				//updateClassLoader();
 				// todo: jars
 				ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
 				File file = node.getFile();
@@ -1004,14 +886,8 @@ public class ModelExplorer extends JTree
 					ex.printStackTrace();
 				}
 				
-//				// Stop user task (hack!!!?)
-//				if(usertask!=null)
-//				{
-//					usertask.nodes_user.clear();
-//					usertask.nodes_out.clear();
-//				}
 				resetCrawler();
-				nof.refresh(getRootNode());
+				nof.startRefreshTask(getRootNode());
 
 				((DefaultTreeModel)getModel()).reload(getRootNode());
 			}

@@ -79,6 +79,10 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	 */
 	public void	refresh(final IExplorerTreeNode node)
 	{
+		String	tip	= node.getToolTipText();
+		if(tip!=null)
+			jcc.setStatusText("Refreshing "+tip);
+
 		// Todo: how/when to remove status comp?
 //		if(refreshcomp!=null)
 //			jcc.addStatusComponent(this, refreshcomp);
@@ -275,9 +279,6 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 			// Perform refresh only, when node still in tree.
 			if(isValidChild(node))
 			{
-				String	tip	= node.getToolTipText();
-				if(tip!=null)
-					jcc.setStatusText("Refreshing "+tip);
 				refresh(node);
 			}
 			refreshTaskFinished(node);
