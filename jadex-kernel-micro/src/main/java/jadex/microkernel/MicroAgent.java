@@ -5,8 +5,12 @@ import jadex.bridge.IClockService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ITimedObject;
+import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -161,6 +165,48 @@ public abstract class MicroAgent implements IMicroAgent
 //				});
 			}
 		});
+	}
+	
+	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(Map msg, MessageType mt)
+	{
+		Map reply = new HashMap();
+		
+		MessageType.ParameterSpecification[] params	= mt.getParameters();
+		for(int i=0; i<params.length; i++)
+		{
+			String sourcename = params[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					reply.put(params[i].getName(), sourceval);
+				}
+			}
+		}
+		
+		MessageType.ParameterSpecification[] paramsets = mt.getParameterSets();
+		for(int i=0; i<paramsets.length; i++)
+		{
+			String sourcename = paramsets[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					List tmp = new ArrayList();
+					tmp.add(sourceval);
+					reply.put(paramsets[i].getName(), tmp);	
+				}
+			}
+		}
+		
+		return reply;
 	}
 	
 }
