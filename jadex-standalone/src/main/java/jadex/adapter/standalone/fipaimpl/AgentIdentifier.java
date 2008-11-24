@@ -107,7 +107,7 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void setAddresses(String[] addresses)
 	{
-		if(addresses!=null)
+		if(this.addresses!=null)
 			this.addresses.clear();
 		else
 			this.addresses = new ArrayList();
@@ -185,7 +185,7 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 */
 	public void setResolvers(AgentIdentifier[] resolvers)
 	{
-		if(resolvers!=null)
+		if(this.resolvers!=null)
 			this.resolvers.clear();
 		else
 			this.resolvers = new ArrayList();
