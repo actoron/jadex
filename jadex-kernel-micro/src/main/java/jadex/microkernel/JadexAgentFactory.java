@@ -43,7 +43,7 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	public IJadexAgent	createJadexAgent(IAgentAdapter adapter, String model, String config, Map arguments)
 	{
 		MicroAgentModel lm = (MicroAgentModel)loadModel(model);
-		return new MicroAgentInterpreter(adapter, lm, arguments);
+		return new MicroAgentInterpreter(adapter, lm, arguments, config);
 	}
 	
 	/**

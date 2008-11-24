@@ -1,5 +1,6 @@
 package jadex.microkernel;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import jadex.bridge.IArgument;
@@ -21,6 +22,9 @@ public class MicroAgentModel implements IJadexModel
 	/** The filename. */
 	protected String filename;
 	
+	/** The meta information .*/
+	protected MicroAgentMetaInfo metainfo;
+	
 	//-------- constructors --------
 	
 	/**
@@ -30,6 +34,18 @@ public class MicroAgentModel implements IJadexModel
 	{
 		this.microagent = microagent;
 		this.filename = filename;
+		
+		// Try to read meta information from class.
+		try
+		{
+			Method m = microagent.getMethod("getMetaInfo", new Class[0]);
+			if(m!=null)
+				this.metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	//-------- IJadexModel methods --------
@@ -106,8 +122,11 @@ public class MicroAgentModel implements IJadexModel
 	 */
 	public String[] getConfigurations()
 	{
-		// todo
-		String[] ret = SUtil.EMPTY_STRING;
+		String[] ret;
+		if(metainfo!=null)
+			ret = metainfo.getConfigurations();
+		else
+			ret = SUtil.EMPTY_STRING;
 		return ret;
 	}
 	
@@ -117,8 +136,12 @@ public class MicroAgentModel implements IJadexModel
 	 */
 	public IArgument[] getArguments()
 	{		
-		// todo
-		return new IArgument[0];
+		IArgument[] ret;
+		if(metainfo!=null)
+			ret = metainfo.getArguments();
+		else
+			ret = new IArgument[0];
+		return ret;
 	}
 	
 	/**

@@ -115,6 +115,15 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 	
 	/**
+	 *  Get the configuration.
+	 *  @return the Configuration.
+	 */
+	public String getConfiguration()
+	{
+		return interpreter.getConfiguration();
+	}
+	
+	/**
 	 *  Create a result listener that is called on the agent thread.
 	 *  @param listener The listener to be called on the agent thread.
 	 */
@@ -153,4 +162,5 @@ public abstract class MicroAgent implements IMicroAgent
 			}
 		});
 	}
+	
 }

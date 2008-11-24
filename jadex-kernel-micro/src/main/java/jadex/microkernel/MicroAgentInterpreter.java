@@ -29,6 +29,9 @@ public class MicroAgentInterpreter implements IJadexAgent
 	/** The micro agent. */
 	protected MicroAgent microagent;
 	
+	/** The configuration. */
+	protected String config;
+	
 	/** The arguments. */
 	protected Map arguments;
 	
@@ -47,10 +50,11 @@ public class MicroAgentInterpreter implements IJadexAgent
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(IAgentAdapter adapter, MicroAgentModel model, Map arguments)
+	public MicroAgentInterpreter(IAgentAdapter adapter, MicroAgentModel model, Map arguments, String config)
 	{
 		this.adapter = adapter;
 		this.model = model;
+		this.config = config;
 		this.arguments = arguments;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		
@@ -166,9 +170,16 @@ public class MicroAgentInterpreter implements IJadexAgent
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public void getExternalAccess(IResultListener listener)
+	public void getExternalAccess(final IResultListener listener)
 	{
-		// todo call on agent thread
+		invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				Object exta = microagent.getExternalAccess();
+				listener.resultAvailable(exta);
+			}
+		});
 	}
 	
 	//-------- helpers --------
@@ -345,8 +356,20 @@ public class MicroAgentInterpreter implements IJadexAgent
 		return arguments;
 	}
 	
+	
 	/**
-	 * 
+	 *  Get the configuration.
+	 *  @return The configuration.
+	 */
+	public String getConfiguration()
+	{
+		return this.config;
+	}
+
+	/**
+	 *  Create a result listener which is called on agent thread.
+	 *  @param The original listener to be called.
+	 *  @return The listener.
 	 */
 	public IResultListener createResultListener(IResultListener listener)
 	{
@@ -354,7 +377,7 @@ public class MicroAgentInterpreter implements IJadexAgent
 	}
 	
 	/**
-	 * 
+	 *  The micro listener for redirecting listener invocations to the agent thread.
 	 */
 	class MicroListener implements IResultListener
 	{
