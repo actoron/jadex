@@ -333,7 +333,7 @@ public class SFipa
 	/**
 	 *  Create a globally unique conversation id.
 	 *  @return The conversation id.
-	 *  @deprecated
+	 *  @deprecated Use SUtil.createUniqueId() instead
 	 */
 	public static String createUniqueId(String name)
 	{
