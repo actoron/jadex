@@ -749,7 +749,7 @@ public class ModelExplorer extends JTree
 
 			// Update node if necessary:
 			final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_crawler.remove(0);
-			nof.startRefreshTask(node);
+			nof.refresh(node);	// Refresh in crawler and do not start task on user priority 
 			
 			// Iterate over children:
 			Enumeration	children	= node.children();

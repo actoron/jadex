@@ -79,10 +79,6 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	 */
 	public void	refresh(final IExplorerTreeNode node)
 	{
-		String	tip	= node.getToolTipText();
-		if(tip!=null)
-			jcc.setStatusText("Refreshing "+tip);
-
 		// Todo: how/when to remove status comp?
 //		if(refreshcomp!=null)
 //			jcc.addStatusComponent(this, refreshcomp);
@@ -91,12 +87,21 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 		if(node instanceof FileNode)
 		{
 			FileNode fn = (FileNode)node;
-			long newdate	= fn.getFile().lastModified();
-			Long	olddate	= (Long) fn.getProperties().get(LAST_MODIFIED);
-			if(olddate==null || olddate.longValue()<newdate)
+			if(!fn.getFile().exists())
 			{
-				fn.getProperties().put(LAST_MODIFIED, new Long(newdate));
-				changed	= true;
+				// happens e.g. when manually refreshing already removed file/dir
+				IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
+				startRefreshTask(parent);
+			}
+			else
+			{
+				long newdate	= fn.getFile().lastModified();
+				Long	olddate	= (Long) fn.getProperties().get(LAST_MODIFIED);
+				if(olddate==null || olddate.longValue()<newdate)
+				{
+					fn.getProperties().put(LAST_MODIFIED, new Long(newdate));
+					changed	= true;
+				}
 			}
 		}
 		
@@ -276,6 +281,10 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 		 */
 		public boolean execute()
 		{
+			String	tip	= node.getToolTipText();
+			if(tip!=null)
+				jcc.setStatusText("Refreshing "+tip);
+
 			// Perform refresh only, when node still in tree.
 			if(isValidChild(node))
 			{

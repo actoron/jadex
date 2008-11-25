@@ -72,6 +72,11 @@ public class LoadManagingExecutionService
 					try
 					{
 //						System.out.println("Sleeping: "+sleep);
+						if(sleep>1000)
+						{
+							System.out.println("Sleep warning: "+sleep);
+							sleep	= 1000;
+						}
 						Thread.sleep(sleep);
 					}
 					catch (InterruptedException e){}
