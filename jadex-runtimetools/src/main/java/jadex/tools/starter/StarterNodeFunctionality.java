@@ -14,6 +14,9 @@ import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.IControlCenter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -54,8 +57,8 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	/** The check indicator for the status bar. */
 	protected JLabel	checkcomp;
 	
-	/** The check task counter. */
-	protected int	checkcnt;
+	/** The nodes of queued check tasks. */
+	protected Set	checkqueue;
 
 	//-------- constructors --------
 	
@@ -134,12 +137,18 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	protected synchronized void	startCheckTask(IExplorerTreeNode node)
 	{
-		if(checkcnt==0)
+		if(checkqueue==null)
+		{
 			jcc.addStatusComponent(checkcomp, checkcomp);
+			checkqueue	= new HashSet();
+		}
 
-		checkcnt++;
-		// Use priority below user priority to scan first, then check.
-		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+		if(!checkqueue.contains(node))
+		{
+			checkqueue.add(node);
+			// Use priority below user priority to scan first, then check.
+			explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+		}
 	}
 
 	
@@ -148,9 +157,10 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	protected synchronized void	checkTaskFinished(IExplorerTreeNode node)
 	{
-		checkcnt--;
-		if(checkcnt==0)
+		checkqueue.remove(node);
+		if(checkqueue.isEmpty())
 		{
+			checkqueue	= null;
 			jcc.removeStatusComponent(checkcomp);
 			jcc.setStatusText("");
 		}
@@ -259,7 +269,7 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	/**
 	 *  Check if the valid flag of a node is set to true.
 	 */
-	public static boolean	isValid(IExplorerTreeNode node)
+	public boolean	isValid(IExplorerTreeNode node)
 	{
 		boolean	ret	= true;	// Unknown node types are valid by default
 		if(node instanceof FileNode)
@@ -267,6 +277,10 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 			FileNode fn = (FileNode)node;
 			Boolean	val	= (Boolean)fn.getProperties().get(VALID);
 			ret	= val==null || val.booleanValue();	// Valid, if not yet checked.
+			
+			// If not yet checked queue a check task.
+			if(val==null)
+				startCheckTask(node);
 		}
 		return ret;
 	}
