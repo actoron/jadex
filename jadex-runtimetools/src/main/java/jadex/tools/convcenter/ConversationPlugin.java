@@ -160,11 +160,12 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 	 */
 	public boolean processMessage(IMessageEvent message)
 	{
-		boolean	processed	= false;
+		boolean	processed = false;
 		try
 		{
-			String onto = (String)message.getParameter("ontology").getValue();
-			if (onto==null || !onto.startsWith("jadex.tools"))
+			String onto = message.hasParameter(SFipa.ONTOLOGY)? 
+				(String)message.getParameter(SFipa.ONTOLOGY).getValue(): null;
+			if(onto==null || !onto.startsWith("jadex.tools"))
 			{
 				convcenter.addMessage(message);
 				processed	= true;

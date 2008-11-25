@@ -104,6 +104,7 @@ public class PlanRules
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW);
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason, reason);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, reason);
 //		state.addAttributeValue(rcap, OAVBDIRuntimeModel.capability_has_plans, rplan);
 //		System.out.println("instantiatePlan: Setting plan to ready: "
 //				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
