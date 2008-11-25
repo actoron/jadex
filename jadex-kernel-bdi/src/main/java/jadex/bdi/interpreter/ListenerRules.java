@@ -119,8 +119,9 @@ public class ListenerRules
 				Object rbelief	= assignments.getVariableValue("?rbelief");
 				
 				IBeliefListener lis	= (IBeliefListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(BeliefFlyweight.getBeliefFlyweight(state, rcapa, rbelief), ce);
-				
+//				AgentEvent	ae	= new AgentEvent(BeliefFlyweight.getBeliefFlyweight(state, rcapa, rbelief), ce);
+				AgentEvent	ae	= new AgentEvent(BeliefFlyweight.getBeliefFlyweight(state, rcapa, rbelief), 
+					state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				lis.beliefChanged(ae);
 			}
 		};
@@ -256,7 +257,9 @@ public class ListenerRules
 				Object le	= assignments.getVariableValue("?listenerentry");
 			
 				IBeliefSetListener lis	= (IBeliefSetListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(BeliefSetFlyweight.getBeliefSetFlyweight(state, rcapa, rbeliefset), ce);
+//				AgentEvent	ae	= new AgentEvent(BeliefSetFlyweight.getBeliefSetFlyweight(state, rcapa, rbeliefset), ce);
+				AgentEvent	ae	= new AgentEvent(BeliefSetFlyweight.getBeliefSetFlyweight(state, rcapa, rbeliefset), 
+					state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(cetype))
