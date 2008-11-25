@@ -1,6 +1,7 @@
 package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  *  Base class for application agents.
@@ -165,6 +168,33 @@ public abstract class MicroAgent implements IMicroAgent
 //				});
 			}
 		});
+	}
+	
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger()
+	{
+		return interpreter.getLogger();
+	}
+	
+	/**
+	 *  Get the agent name.
+	 *  @return The agent name.
+	 */
+	public String getAgentName()
+	{
+		return getAgentIdentifier().getLocalName();
+	}
+	
+	/**
+	 * Get the agent identifier.
+	 * @return The agent identifier.
+	 */
+	public IAgentIdentifier	getAgentIdentifier()
+	{
+		return interpreter.getAgentAdapter().getAgentIdentifier();
 	}
 	
 	/**

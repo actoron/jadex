@@ -22,7 +22,7 @@ public class HelloWorldAgent extends MicroAgent
 	}
 	
 	/**
-	 * 
+	 *  Get the meta information about the agent.
 	 */
 	public static Object getMetaInfo()
 	{
