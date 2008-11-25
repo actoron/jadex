@@ -39,8 +39,8 @@
 
 		<belief name="last_direction" class="String"/>
 
-		<belief name="next_sheep" class="Prey">
-			<fact evaluationmode="dynamic">
+		<belief name="next_sheep" class="Prey" evaluationmode="pull">
+			<fact>
 				select one Prey $prey
 				from $beliefbase.preys
 				where $beliefbase.my_self.isInVisionRange($prey.getLocation())

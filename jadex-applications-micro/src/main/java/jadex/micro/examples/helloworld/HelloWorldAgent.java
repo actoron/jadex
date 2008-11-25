@@ -14,7 +14,6 @@ public class HelloWorldAgent extends MicroAgent
 	 */
 	public boolean executeAction()
 	{
-		
 		System.out.println("Hello world, this is a Jadex micro agent");
 		System.out.println(getArgument("text"));
 		System.out.println(getConfiguration());
