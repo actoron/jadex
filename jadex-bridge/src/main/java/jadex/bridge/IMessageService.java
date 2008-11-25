@@ -1,8 +1,5 @@
-package jadex.adapter.base;
+package jadex.bridge;
 
-import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IPlatformService;
-import jadex.bridge.MessageType;
 
 import java.util.Map;
 
@@ -16,10 +13,10 @@ public interface IMessageService extends IPlatformService
 	/**
 	 *  Send a message.
 	 */
-	public void sendMessage(Map message, MessageType msgtype, IAgentIdentifier[] receivers);
+	public void sendMessage(Map message, MessageType msgtype, IAgentIdentifier sender);
 	
 	/**
-	 *  Deliver a message to an agent.
+	 *  Deliver a message to some agents.
 	 */
 	public void deliverMessage(Map message, String msgtype, IAgentIdentifier[] receivers);
 	

@@ -4,6 +4,7 @@ import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ITimedObject;
 import jadex.bridge.MessageType;
@@ -41,12 +42,8 @@ public abstract class MicroAgent implements IMicroAgent
 	//-------- interface methods --------
 	
 	/**
-	 *  Main method to perform agent execution.
-	 *  Whenever this method is called, the agent performs
-	 *  one of its scheduled actions.
-	 *  The platform can provide different execution models for agents
-	 *  (e.g. thread based, or synchronous).
-	 *  To avoid idle waiting, the return value can be checked.
+	 *  Called when the agent is born and whenever it wants to execute an action
+	 *  (e.g. calls wakeup() in one of the other methods).
 	 *  The platform guarantees that executeAction() will not be called in parallel. 
 	 *  @return True, when there are more actions waiting to be executed. 
 	 */
@@ -56,10 +53,7 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 
 	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 *  
-	 *  Inform the agent that a message has arrived.
-	 *  Can be called concurrently (also during executeAction()).
+	 *  Called, whenever a message is received.
 	 *  @param message The message that arrived.
 	 */
 	public void messageArrived(IMessageAdapter message)
@@ -67,13 +61,13 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 
 	/**
-	 *  Request agent to kill itself.
-	 *  The agent might perform arbitrary cleanup activities during which executeAction()
-	 *  will still be called as usual.
+	 *  Called just before the agent is removed from the platform.
 	 */
-	public void killAgent()
+	public void agentKilled()
 	{
 	}
+
+	//-------- methods --------
 	
 	/**
 	 *  Get the external access for this agent.
@@ -82,11 +76,9 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public Object getExternalAccess()
 	{
-		return new ExternalAccess(interpreter);
+		return new ExternalAccess(this, interpreter);
 	}
 
-	//-------- methods --------
-	
 	/**
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.
@@ -180,6 +172,26 @@ public abstract class MicroAgent implements IMicroAgent
 	public Logger getLogger()
 	{
 		return interpreter.getLogger();
+	}	
+	
+	/**
+	 *  Kill the agent.
+	 */
+	public void killAgent()
+	{
+		interpreter.getAgentAdapter().killAgent();
+	}
+	
+	
+	/**
+	 *  Send a message.
+	 *  @param me	The message content (name value pairs).
+	 *  @param mt	The message type describing the content.
+	 */
+	public void sendMessage(Map me, MessageType mt)
+	{
+		((IMessageService)getPlatform().getService(IMessageService.class)).
+			sendMessage(me, mt, getAgentIdentifier());
 	}
 	
 	/**

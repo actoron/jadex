@@ -33,7 +33,7 @@
 			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
 			
 			<!-- Message service. -->
-			<property type="jadex.adapter.base.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
+			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
 				new jadex.adapter.standalone.transport.ITransport[]
 				{
 					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),

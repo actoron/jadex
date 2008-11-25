@@ -159,7 +159,7 @@
 				
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.adapter.base.IMessageService</value>
+						<value type="java.lang.Class">jadex.bridge.IMessageService</value>
 					</key>
 					<map>
 						<entry>

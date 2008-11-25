@@ -1,15 +1,17 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.IMessageService;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IClockService;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
@@ -18,6 +20,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +90,43 @@ public class MessageService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map message, MessageType type, IAgentIdentifier[] receivers)
+	public void sendMessage(Map message, MessageType type, IAgentIdentifier sender)
 	{
+		if(sender==null)
+			throw new RuntimeException("Sender must not be null: "+message);
+		
+		// Automatically add optional meta information.
+		String senid = type.getSenderIdentifier();
+		Object sen = message.get(senid);
+		if(sen==null)
+			message.put(senid, sender);
+		
+		String idid = type.getIdIdentifier();
+		Object id = message.get(idid);
+		if(id==null)
+			message.put(idid, SUtil.createUniqueId(sender.getLocalName()));
+
+		String sd = type.getTimestampIdentifier();
+		Object senddate = message.get(sd);
+		if(senddate==null)
+		{
+			IClockService	clock	= (IClockService) platform.getService(IClockService.class);
+			if(clock!=null)
+				message.put(sd, ""+clock.getTime());
+		}
+		
+		IAgentIdentifier[] receivers = null;
+		Object tmp = message.get(type.getReceiverIdentifier());
+		if(tmp instanceof Collection)
+			receivers = (IAgentIdentifier[])((Collection)tmp).toArray(new IAgentIdentifier[0]);
+		else
+			receivers = (IAgentIdentifier[])tmp;
+		
+		if(receivers==null || receivers==new IAgentIdentifier[0])
+		{
+			throw new RuntimeException("Receivers must not be empty: "+message);
+		}
+
 		// Conversion via platform specific codecs
 		for(Iterator it=message.keySet().iterator(); it.hasNext(); )
 		{

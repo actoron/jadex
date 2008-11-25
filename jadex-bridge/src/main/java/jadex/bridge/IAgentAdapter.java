@@ -38,13 +38,5 @@ public interface IAgentAdapter
 	 *  messages to this agent.
 	 */
 	public IAgentIdentifier getAgentIdentifier() throws AgentTerminatedException;
-	
-	// todo: make IMEssageService generic and remove method
-	/**
-	 *  Send a message via the adapter.
-	 *  @param mevent The message event. 
-	 */
-	public void sendMessage(IMessageAdapter msg) throws AgentTerminatedException;
-	
 }
 

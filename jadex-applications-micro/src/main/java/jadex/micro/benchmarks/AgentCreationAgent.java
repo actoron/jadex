@@ -95,7 +95,7 @@ public class AgentCreationAgent extends MicroAgent
 	 */
 	protected String createPeerName(int num)
 	{
-		String	name = getAgentAdapter().getAgentIdentifier().getLocalName();
+		String	name = getAgentIdentifier().getLocalName();
 		int	index	= name.indexOf("Peer_#");
 		if(index!=-1)
 		{
@@ -161,8 +161,7 @@ public class AgentCreationAgent extends MicroAgent
 		System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 		System.out.println("Still used memory: "+stillused+"kB.");
 
-		// Todo: killAgent() (and agentKilled())
-		final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-		ams.destroyAgent(getAgentIdentifier(), null);
+		// Todo: killAgent()
+		getAgentAdapter().killAgent();
 	}
 }

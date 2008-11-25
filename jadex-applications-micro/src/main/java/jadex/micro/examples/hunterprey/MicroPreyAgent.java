@@ -1,6 +1,5 @@
 package jadex.micro.examples.hunterprey;
 
-import jadex.adapter.base.IMessageService;
 import jadex.adapter.base.fipa.FIPAMessageType;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
@@ -192,8 +191,7 @@ public class MicroPreyAgent extends MicroAgent
 		msg.put(SFipa.LANGUAGE, SFipa.NUGGETS_XML);
 		msg.put(SFipa.RECEIVERS, Collections.singletonList(environment));
 		msg.put(SFipa.SENDER, getAgentAdapter().getAgentIdentifier());
-		IMessageService	ms	= (IMessageService) getPlatform().getService(IMessageService.class);
 		// Todo: message service shouldn't allow sending anonymous messages (i.e. w/o sender)
-		ms.sendMessage(msg, new FIPAMessageType(), new IAgentIdentifier[]{environment});
+		sendMessage(msg, new FIPAMessageType());
 	}	
 }

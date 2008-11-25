@@ -1,7 +1,6 @@
 package jadex.adapter.standalone.ams;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.IMessageService;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
@@ -14,6 +13,7 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatformService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;

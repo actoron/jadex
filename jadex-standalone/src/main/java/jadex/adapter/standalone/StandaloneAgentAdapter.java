@@ -1,6 +1,5 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.IMessageService;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
@@ -12,6 +11,7 @@ import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.bridge.IJadexAgent;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
@@ -95,7 +95,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	 *  Send a message via the adapter.
 	 *  @param message The message (name/value pairs).
 	 *  @param mytpe The message type.
-	 */
+	 * /
 	public void sendMessage(IMessageAdapter message)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
@@ -131,7 +131,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 		
 		IMessageService msgservice = (IMessageService)platform.getService(IMessageService.class);
 		msgservice.sendMessage(pmap, mt, recs);
-	}
+	}*/
 
 	/**
 	 *  Return an agent-identifier that allows to send

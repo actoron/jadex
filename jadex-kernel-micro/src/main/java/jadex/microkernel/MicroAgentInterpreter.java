@@ -156,7 +156,7 @@ public class MicroAgentInterpreter implements IJadexAgent
 		{
 			public void run()
 			{
-				microagent.killAgent();
+				microagent.agentKilled();
 				listener.resultAvailable(null);
 			}
 		});

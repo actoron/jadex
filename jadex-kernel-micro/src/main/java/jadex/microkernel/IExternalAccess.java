@@ -10,11 +10,11 @@ import java.util.Map;
 public interface IExternalAccess
 {
 	/**
-	 *  Send a message after some delay.
-	 *  @param me	The message event.
-	 *  @return The filter to wait for an answer.
+	 *  Send a message.
+	 *  @param me	The message.
+	 *  @param mt	The message type.
 	 */
-	public void	sendMessage(final Map me, final MessageType mt);
+	public void	sendMessage(Map me, MessageType mt);
 
 	/**
 	 *  Invoke some code on the agent thread.

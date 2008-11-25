@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  *  Interface for external messages to be passed to a Jadex agent.
  */
+//Todo: remove this struct?
 public interface IMessageAdapter
 {
 	/**

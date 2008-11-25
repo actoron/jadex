@@ -3,6 +3,7 @@ package jadex.bdi.interpreter;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageService;
 import jadex.bridge.IToolAdapter;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
@@ -706,8 +707,10 @@ public class MessageEventRules
 				
 				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
-				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);				
-				interpreter.getAgentAdapter().sendMessage(msg);
+				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
+				((IMessageService)interpreter.getAgentAdapter().getPlatform()
+					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
+						msg.getMessageType(), interpreter.getAgentAdapter().getAgentIdentifier());
 
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rme);
 				

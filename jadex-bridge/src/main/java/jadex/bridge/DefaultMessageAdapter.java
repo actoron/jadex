@@ -7,6 +7,7 @@ import java.util.Map;
 /**
  *  The adapter for messages on the standalone platform.
  */
+// Todo: remove this struct?
 public class DefaultMessageAdapter implements IMessageAdapter
 {
 	//-------- attributes ---------

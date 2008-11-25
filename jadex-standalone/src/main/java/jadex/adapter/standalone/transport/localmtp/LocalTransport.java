@@ -1,9 +1,9 @@
 package jadex.adapter.standalone.transport.localmtp;
 
-import jadex.adapter.base.IMessageService;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.commons.collection.SCollection;
 
