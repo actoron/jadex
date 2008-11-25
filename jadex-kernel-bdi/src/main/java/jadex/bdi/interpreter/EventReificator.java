@@ -100,7 +100,7 @@ public class EventReificator implements IOAVStateListener
 			}
 			else if(OAVBDIRuntimeModel.belief_has_fact.equals(attr))
 			{
-				System.out.println("fact changed: "+id+", "+newvalue);
+//				System.out.println("fact changed: "+id+", "+newvalue);
 				createChangeEvent(id, null, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED, newvalue);
 			}
 			else if(OAVBDIRuntimeModel.beliefset_has_facts.equals(attr))

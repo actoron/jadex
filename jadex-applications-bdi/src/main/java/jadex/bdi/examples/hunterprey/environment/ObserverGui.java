@@ -115,15 +115,7 @@ public class ObserverGui	extends EnvironmentGui
 		{
 			public void beliefChanged(AgentEvent ae)
 			{
-				Vision	vision = null;
-				try
-				{
-					vision	= (Vision)ae.getValue(); 
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+				Vision	vision	= (Vision)ae.getValue(); 
 				Creature	me	= (Creature)agent.getBeliefbase().getBelief("my_self").getFact();
 				if(vision!=null)
 				{
