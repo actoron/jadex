@@ -22,13 +22,24 @@ public class PingAgent extends MicroAgent
 	public void messageArrived(IMessageAdapter message)
 	{
 		MessageType mt = message.getMessageType();
-		Map reply = createReply(message.getParameterMap(), message.getMessageType());
-
-		IMessageService ms = (IMessageService)getPlatform().getService(IMessageService.class);
-		reply.put(SFipa.CONTENT, "alive");
-		reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-		reply.put(SFipa.SENDER, getAgentIdentifier());
-		List recs = (List)reply.get(SFipa.RECEIVERS);
-		ms.sendMessage(reply, mt, (IAgentIdentifier[])recs.toArray(new IAgentIdentifier[recs.size()]));
+		Map msg = message.getParameterMap();
+		
+		String perf = (String)msg.get(SFipa.PERFORMATIVE);
+		if((SFipa.QUERY_IF.equals(perf) || SFipa.QUERY_REF.equals(perf)) 
+			&& "ping".equals(msg.get(SFipa.CONTENT)))
+		{
+			Map reply = createReply(message.getParameterMap(), message.getMessageType());
+	
+			IMessageService ms = (IMessageService)getPlatform().getService(IMessageService.class);
+			reply.put(SFipa.CONTENT, "alive");
+			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+			reply.put(SFipa.SENDER, getAgentIdentifier());
+			List recs = (List)reply.get(SFipa.RECEIVERS);
+			ms.sendMessage(reply, mt, (IAgentIdentifier[])recs.toArray(new IAgentIdentifier[recs.size()]));
+		}
+		else
+		{
+			getLogger().severe("Could not process message: "+msg);
+		}
 	}
 }

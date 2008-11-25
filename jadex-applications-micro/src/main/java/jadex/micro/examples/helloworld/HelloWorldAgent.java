@@ -25,7 +25,8 @@ public class HelloWorldAgent extends MicroAgent
 	 */
 	public static Object getMetaInfo()
 	{
-		return new MicroAgentMetaInfo(new String[]{"c1", "c2"}, new IArgument[]{new IArgument()
+		return new MicroAgentMetaInfo("This agent prints out a hello message.", 
+			new String[]{"c1", "c2"}, new IArgument[]{new IArgument()
 		{
 			public Object getDefaultValue(String configname)
 			{

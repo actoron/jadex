@@ -77,7 +77,17 @@ public class MicroAgentModel implements IJadexModel
 	 */
 	public String getName()
 	{
-		return microagent.toString();
+		String ret = microagent.getSimpleName();
+		if(ret.endsWith("Agent"))
+			ret = ret.substring(0, ret.indexOf("Agent"));
+		return ret;
+		
+//		String ret;
+//		if(metainfo!=null && metainfo.getName()!=null)
+//			ret = metainfo.getName();
+//		else
+//			ret = microagent.getSimpleName();
+//		return ret;
 	}
 	
 	/**
@@ -86,8 +96,12 @@ public class MicroAgentModel implements IJadexModel
 	 */
 	public String getDescription()
 	{
-		// todo: 
-		return microagent.toString();
+		String ret;
+		if(metainfo!=null && metainfo.getDescription()!=null)
+			ret = metainfo.getDescription();
+		else
+			ret = null;
+		return ret;
 	}
 	
 	/**
