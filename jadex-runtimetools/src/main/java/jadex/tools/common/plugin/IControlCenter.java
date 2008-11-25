@@ -33,7 +33,7 @@ public interface IControlCenter
 	 *  Create a new agent on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public void createAgent(String type, String name, String configname, Map arguments/*, ClassLoader classloader*/);
+	public void createAgent(String type, String name, String configname, Map arguments);
 
 	/**
 	 *  Kill an agent on the platform.

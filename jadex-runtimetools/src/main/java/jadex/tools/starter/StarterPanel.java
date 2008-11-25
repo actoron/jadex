@@ -44,7 +44,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
@@ -109,6 +111,9 @@ public class StarterPanel extends JPanel
 	/** The starter plugin. */
 	protected StarterPlugin	starter;
 
+	/** The spinner for the number of agents to start. */
+	protected JSpinner numagents;
+	
 	//-------- constructors --------
 
 	/**
@@ -260,9 +265,13 @@ public class StarterPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				agentname.setEditable(!genagentname.isSelected());
+				numagents.setEnabled(genagentname.isSelected());
 			}
 		});
-
+		
+		numagents = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+		((JSpinner.DefaultEditor)numagents.getEditor()).getTextField().setColumns(4);
+		
 		// The arguments.
 		arguments = new JPanel(new GridBagLayout());
 
@@ -323,7 +332,14 @@ public class StarterPanel extends JPanel
 					}
 					else
 					{
-						starter.getJCC().createAgent(filename.getText(), an, configname, args/*, starter.getModelExplorer().getClassLoader()*/);
+						if(an==null) // i.e. name auto generate
+						{
+							int max = ((Integer)numagents.getValue()).intValue();
+							for(int i=0; i<max; i++)
+							{
+								starter.getJCC().createAgent(filename.getText(), an, configname, args);
+							}
+						}
 					}
 				}
 			}
@@ -374,8 +390,12 @@ public class StarterPanel extends JPanel
 		ap.add(agentnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
 		JPanel tmp = new JPanel(new BorderLayout());
-		tmp.add(agentname, "Center");
-		tmp.add(genagentname, "East");
+		tmp.add(agentname, BorderLayout.CENTER);
+		JPanel tmp2 = new JPanel(new BorderLayout());
+		tmp2.add(genagentname, BorderLayout.WEST);
+		tmp2.add(numagents, BorderLayout.EAST);
+		tmp.add(tmp2, BorderLayout.EAST);
+		
 		//content.add(agentname, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.WEST,
 		//			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		ap.add(tmp, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
@@ -945,7 +965,8 @@ public class StarterPanel extends JPanel
 			public void run()
 			{
 				genagentname.setSelected(autogen);
-				agentname.setEditable(!genagentname.isSelected());
+				agentname.setEditable(!autogen);
+				numagents.setEnabled(autogen);
 			}
 		});
 	}
