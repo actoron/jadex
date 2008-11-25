@@ -340,6 +340,10 @@ public class StarterPanel extends JPanel
 								starter.getJCC().createAgent(filename.getText(), an, configname, args);
 							}
 						}
+						else
+						{
+							starter.getJCC().createAgent(filename.getText(), an, configname, args);
+						}
 					}
 				}
 			}

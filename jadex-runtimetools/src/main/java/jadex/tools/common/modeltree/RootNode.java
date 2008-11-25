@@ -1,19 +1,14 @@
 package jadex.tools.common.modeltree;
 
-import jadex.bridge.IJadexAgentFactory;
 import jadex.commons.SUtil;
-import jadex.commons.collection.SCollection;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 
 /**

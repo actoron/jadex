@@ -3,6 +3,7 @@ package jadex.tools.common.modeltree;
 import jadex.bridge.IJadexAgentFactory;
 import jadex.bridge.IJadexModel;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.commons.SGUI;
@@ -24,6 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -265,6 +267,33 @@ public class ModelExplorer extends JTree
 			}
 		});
 		ToolTipManager.sharedInstance().registerComponent(this);
+		
+//		final ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+//		ls.addLibraryServiceListener(new ILibraryServiceListener()
+//		{
+//			public void urlAdded(URL url)
+//			{
+//			}
+//			public void urlRemoved(URL url)
+//			{
+//				List cs = getRootNode().getChildren();
+//				for(int i=0; i<cs.size(); i++)
+//				{
+//					try
+//					{
+//						String urlfile = url.getFile();
+//						FileNode fn = (FileNode)cs.get(i);
+//						
+////						fn.getFile()
+////						System.out.println("abc: "+urlfile+" "+cap);
+//					}
+//					catch(Exception e)
+//					{
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		});
 	}
 
 	/**
