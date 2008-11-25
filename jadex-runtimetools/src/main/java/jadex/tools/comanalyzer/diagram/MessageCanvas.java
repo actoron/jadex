@@ -1,5 +1,6 @@
 package jadex.tools.comanalyzer.diagram;
 
+import jadex.commons.SUtil;
 import jadex.tools.comanalyzer.Agent;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.PaintMaps;
@@ -215,7 +216,7 @@ public class MessageCanvas extends JPanel implements Serializable
 
 			// combine multicast by connecting endpoints
 //			boolean combine = message.getParameter(Message.ID).equals(lastId);
-			boolean combine = message.getId().equals(lastId);
+			boolean combine = SUtil.equals(message.getId(), lastId);
 			int ext = combine ? DiagramConstants.yDistTimeline : 0;
 			Line2D multiLine = new Line2D.Double(x1, y - ext - (DiagramConstants.arrowHeight / 2), x1, y + (DiagramConstants.arrowHeight / 2));
 			g2d.setPaint(msgColor);

@@ -50,7 +50,10 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  The platform guarantees that executeAction() will not be called in parallel. 
 	 *  @return True, when there are more actions waiting to be executed. 
 	 */
-	public abstract boolean executeAction();
+	public boolean executeAction()
+	{
+		return false;
+	}
 
 	/**
 	 *  Can be called concurrently (also during executeAction()).
