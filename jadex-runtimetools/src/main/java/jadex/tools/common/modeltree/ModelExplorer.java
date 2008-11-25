@@ -268,32 +268,34 @@ public class ModelExplorer extends JTree
 		});
 		ToolTipManager.sharedInstance().registerComponent(this);
 		
-//		final ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
-//		ls.addLibraryServiceListener(new ILibraryServiceListener()
-//		{
-//			public void urlAdded(URL url)
-//			{
-//			}
-//			public void urlRemoved(URL url)
-//			{
-//				List cs = getRootNode().getChildren();
-//				for(int i=0; i<cs.size(); i++)
-//				{
-//					try
-//					{
-//						String urlfile = url.getFile();
-//						FileNode fn = (FileNode)cs.get(i);
-//						
-////						fn.getFile()
-////						System.out.println("abc: "+urlfile+" "+cap);
-//					}
-//					catch(Exception e)
-//					{
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		});
+		final ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+		ls.addLibraryServiceListener(new ILibraryServiceListener()
+		{
+			public void urlAdded(URL url)
+			{
+			}
+			public void urlRemoved(URL url)
+			{
+				List cs = getRootNode().getChildren();
+				for(int i=0; i<cs.size(); i++)
+				{
+					try
+					{
+						FileNode fn = (FileNode)cs.get(i);
+						URL furl = fn.getFile().toURI().toURL();
+						if(url.equals(furl))
+						{
+							getRootNode().removePathEntry(fn);
+							((DefaultTreeModel)getModel()).nodeStructureChanged(getRootNode());
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 
 	/**
