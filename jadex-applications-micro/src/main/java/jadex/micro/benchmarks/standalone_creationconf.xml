@@ -24,7 +24,7 @@
 			<property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService(
 				new Object[]
 				{
-					"../jadex-applications-bdi/target/classes"
+					"../jadex-applications-micro/target/classes"
 				})
 			</property>
 			

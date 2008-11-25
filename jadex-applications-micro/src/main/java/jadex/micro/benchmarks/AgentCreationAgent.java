@@ -161,6 +161,8 @@ public class AgentCreationAgent extends MicroAgent
 		System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 		System.out.println("Still used memory: "+stillused+"kB.");
 
-		killAgent();
+		// Todo: killAgent() (and agentKilled())
+		final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		ams.destroyAgent(getAgentIdentifier(), null);
 	}
 }
