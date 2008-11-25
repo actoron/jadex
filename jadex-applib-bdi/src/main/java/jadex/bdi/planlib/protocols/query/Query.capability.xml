@@ -192,6 +192,23 @@
 
 	<events>
 		<messageevent name="qp_request" type="fipa" exported="true">
+			<!-- <parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.QUERY_IF</value>
+			</parameter> -->
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_QUERY</value>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.NUGGETS_XML</value>
+			</parameter>
+			<match>$beliefbase.qp_filter.filter($message) &amp;&amp; $conversation_id!=null
+				&amp;&amp; (SFipa.QUERY_IF.equals($performative) || SFipa.QUERY_REF.equals($performative))</match>
+		</messageevent> 
+		
+	<!--  <messageevent name="qp_request" type="fipa" exported="true">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.QUERY_IF</value>
 			</parameter>
@@ -205,7 +222,7 @@
 				<value>SFipa.NUGGETS_XML</value>
 			</parameter>
 			<match>$beliefbase.qp_filter.filter($message) &amp;&amp; $conversation_id!=null</match>
-		</messageevent> 
+		</messageevent> -->
 		
 		<!-- <messageevent name="qp_query_if" type="fipa" exported="true">
 			<parameter name="performative" class="String" direction="fixed">
