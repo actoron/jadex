@@ -18,7 +18,9 @@ import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.IControlCenter;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -61,8 +63,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	/** The check indicator for the status bar. */
 	protected JLabel	checkcomp;
 	
-	/** The check task counter. */
-	protected int	checkcnt;
+	/** The nodes of queued check tasks. */
+	protected Set	checkqueue;
 
 	//-------- constructors --------
 	
@@ -141,12 +143,18 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	protected synchronized void	startCheckTask(IExplorerTreeNode node)
 	{
-		if(checkcnt==0)
+		if(checkqueue==null)
+		{
 			jcc.addStatusComponent(checkcomp, checkcomp);
+			checkqueue	= new HashSet();
+		}
 
-		checkcnt++;
-		// Use priority below user priority to scan first, then check.
-		explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+		if(!checkqueue.contains(node))
+		{
+			checkqueue.add(node);
+			// Use priority below user priority to scan first, then check.
+			explorer.getWorker().execute(new CheckTask(node), ModelExplorer.PERCENTAGE_USER*0.9);
+		}
 	}
 
 	
@@ -155,9 +163,10 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	protected synchronized void	checkTaskFinished(IExplorerTreeNode node)
 	{
-		checkcnt--;
-		if(checkcnt==0)
+		checkqueue.remove(node);
+		if(checkqueue.isEmpty())
 		{
+			checkqueue	= null;
 			jcc.removeStatusComponent(checkcomp);
 			jcc.setStatusText("");
 		}
@@ -284,7 +293,7 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	/**
 	 *  Check if the testcase flag of a node is set to true.
 	 */
-	public static boolean	isTestcase(IExplorerTreeNode node)
+	public boolean	isTestcase(IExplorerTreeNode node)
 	{
 		boolean	ret	= false;	// Unknown node types are no testcases by default
 		if(node instanceof FileNode)
@@ -292,6 +301,10 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 			FileNode fn = (FileNode)node;
 			Boolean	val	= (Boolean)fn.getProperties().get(TESTCASE);
 			ret	= val!=null && val.booleanValue();	// No testcase, if not yet checked.
+			
+			// If not yet checked queue a check task.
+			if(val==null)
+				startCheckTask(node);
 		}
 		return ret;
 	}

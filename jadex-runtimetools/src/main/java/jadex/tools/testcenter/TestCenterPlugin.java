@@ -59,6 +59,9 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 
 	//-------- attributes --------
 
+	/** The node functionality. */
+	protected TestCenterNodeFunctionality	nof;
+
 	/** The panel showing the classpath models. */
 	protected ModelExplorer mpanel;
 
@@ -187,6 +190,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 
 		JLabel	refreshcomp	= new JLabel(icons.getIcon("scanning_on"));
 		refreshcomp.setToolTipText("Loading/checking test cases.");
+		nof	= new TestCenterNodeFunctionality(getJCC());
 		mpanel = new ModelExplorer(getJCC(), new RootNode(new FileFilter()
 		{
 			public boolean accept(File pathname)
@@ -195,7 +199,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				return pathname.isDirectory() || getJCC().getAgent().getPlatform()
 					.getAgentFactory().isStartable(pathname.getName());
 			}
-		}), null, new TestCenterNodeFunctionality(getJCC())); // todo: popup for testcenter
+		}), null, nof); // todo: popup for testcenter
 		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 		// todo: hack, how can this be done better?
@@ -329,7 +333,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				{
 					String model = ((FileNode)n).getFile().getAbsolutePath();
 					if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(model)
-						&& TestCenterNodeFunctionality.isTestcase((IExplorerTreeNode) n))
+						&& nof.isTestcase((IExplorerTreeNode) n))
 					{
 						tcpanel.getTestList().addEntry(model);
 					}
@@ -341,7 +345,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			String model = ((FileNode)node).getFile().getAbsolutePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
 			if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(model)
-				&& TestCenterNodeFunctionality.isTestcase((IExplorerTreeNode) node))
+				&& nof.isTestcase((IExplorerTreeNode) node))
 			{
 				tcpanel.getTestList().addEntry(model);
 			}
