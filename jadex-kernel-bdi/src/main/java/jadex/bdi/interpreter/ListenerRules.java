@@ -70,7 +70,9 @@ public class ListenerRules
 				Object ce = assignments.getVariableValue("?ce");
 				
 				IAgentListener lis	= (IAgentListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(new AgentFlyweight(state, ragent), ce);
+//				AgentEvent	ae	= new AgentEvent(new AgentFlyweight(state, ragent), ce);
+				AgentEvent	ae	= new AgentEvent(new AgentFlyweight(state, ragent), 
+					state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(cetype))
@@ -324,7 +326,10 @@ public class ListenerRules
 				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
 				
 				IInternalEventListener lis	= (IInternalEventListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalFlyweight(state, rcapa, revent), ce);
+//				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalFlyweight(state, rcapa, revent), ce);
+				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalFlyweight(state, rcapa, revent), 
+						state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
+				
 				
 				lis.internalEventOccurred(ae);
 			}
@@ -383,7 +388,10 @@ public class ListenerRules
 				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
 
 				IMessageEventListener lis	= (IMessageEventListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageFlyweight(state, rcapa, revent), ce);
+//				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageFlyweight(state, rcapa, revent), ce);
+				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageFlyweight(state, rcapa, revent), 
+						state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
+
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(cetype))
@@ -446,7 +454,10 @@ public class ListenerRules
 				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
 				
 				IGoalListener lis	= (IGoalListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal), ce);
+//				AgentEvent	ae	= new AgentEvent(GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal), ce);
+				AgentEvent	ae	= new AgentEvent(GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal), 
+					state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
+
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(cetype))
@@ -509,7 +520,9 @@ public class ListenerRules
 				Object rcapa = state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_scope);
 				
 				IPlanListener lis	= (IPlanListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(PlanFlyweight.getPlanFlyweight(state, rcapa, rplan), ce);
+//				AgentEvent	ae	= new AgentEvent(PlanFlyweight.getPlanFlyweight(state, rcapa, rplan), ce);
+				AgentEvent	ae	= new AgentEvent(PlanFlyweight.getPlanFlyweight(state, rcapa, rplan), 
+					state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(cetype))
