@@ -394,6 +394,32 @@ public abstract class Plan extends AbstractPlan
 		WaitAbstractionFlyweight.addFactRemoved(wa, beliefset, getState(), getRCapability());
 		return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
+	
+	/**
+	 *  Wait for a belief set fact addition or removal.
+	 *  @param beliefset The belief set type.
+	 *  @return The added fact value.
+	 */
+	public Object waitForFactAddedOrRemoved(String beliefset)
+	{
+		return waitForFactAddedOrRemoved(beliefset, -1);
+	}
+
+	/**
+	 *  Wait for a belief (set) fact addition or removal.
+	 *  @param beliefset The belief (set) type.
+	 *  @param timeout The timeout.
+	 *  @return The changed fact.
+	 */
+	public Object waitForFactAddedOrRemoved(String beliefset, long timeout)
+	{
+		// Todo: check thread access.
+		// todo: return change event to indicate the type of change
+		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
+		WaitAbstractionFlyweight.addFactAdded(wa, beliefset, getState(), getRCapability());
+		WaitAbstractionFlyweight.addFactRemoved(wa, beliefset, getState(), getRCapability());
+		return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
+	}
 
 	/**
 	 *  Wait for an external condition

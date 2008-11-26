@@ -94,13 +94,20 @@
 	</goals>
 
 	<plans>
-		<plan name="agent_list_update">
+		<!-- <plan name="agent_list_update">
 			<body class="AgentListUpdatePlan" />
 			<trigger>
-				<factchanged ref="agents"/>
 				<factadded ref="agents"/>
 				<factremoved ref="agents"/>
 			</trigger>
+		</plan> -->
+		
+		<plan name="agent_list_update">
+			<body class="AgentListUpdatePlan" />
+			<!-- <waitqueue>
+				<factadded ref="agents"/>
+				<factremoved ref="agents"/>
+			</waitqueue> -->
 		</plan>
 
 		<plan name="receiver">
@@ -184,6 +191,9 @@
 					</fact>
 				</initialbelief>
 			</beliefs>
+			<plans>
+				<initialplan ref="agent_list_update" />
+			</plans>
 		</configuration>
 	</configurations>
 

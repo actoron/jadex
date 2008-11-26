@@ -4,6 +4,7 @@ import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bdi.runtime.impl.ChangeEventFlyweight;
 import jadex.bdi.runtime.impl.GoalFlyweight;
 import jadex.bdi.runtime.impl.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
@@ -819,7 +820,7 @@ public class PlanRules
 			}
 		};
 		
-		Rule	planinstance_goalcleanupfinished	= new Rule("planinstance_goalcleanupfinished", plancon, action);
+		Rule planinstance_goalcleanupfinished	= new Rule("planinstance_goalcleanupfinished", plancon, action);
 		return planinstance_goalcleanupfinished;
 	}
 	
@@ -2101,6 +2102,15 @@ public class PlanRules
 			{
 				// Todo: Hack!!! wrong scope
 				ret = MessageEventFlyweight.getMessageFlyweight(state, rcapa, de);
+			}
+			else if(OAVBDIRuntimeModel.changeevent_type.equals(type))
+			{
+				// Todo: Hack!!! wrong scope
+				ret = new ChangeEventFlyweight(state, rcapa, de);
+			}
+			else
+			{
+				throw new RuntimeException("Unsupported return element: "+de+" "+type);
 			}
 		}
 		

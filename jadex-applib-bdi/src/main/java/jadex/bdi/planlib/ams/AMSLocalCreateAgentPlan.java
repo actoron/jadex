@@ -26,11 +26,6 @@ public class AMSLocalCreateAgentPlan extends Plan
 		boolean	start	= ((Boolean)getParameter("start").getValue()).booleanValue();
 		IPlatform plat	= getScope().getPlatform();
 
-//		ClassLoader	classloader	= (ClassLoader)getParameter("classloader").getValue();
-//		ClassLoader	oldcl	= Thread.currentThread().getContextClassLoader();
-//		if(classloader!=null)
-//			Thread.currentThread().setContextClassLoader(classloader);
-
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
@@ -46,9 +41,5 @@ public class AMSLocalCreateAgentPlan extends Plan
 //			e.printStackTrace();
 			fail(e); // Do not show exception on console. 
 		}
-//		finally
-//		{
-//			Thread.currentThread().setContextClassLoader(oldcl);
-//		}
 	}
 }
