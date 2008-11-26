@@ -672,6 +672,12 @@ public class AMS implements IAMS, IPlatformService
 		int agentend = filename.lastIndexOf(".agent.xml");
 		if(agentend!=-1)
 			shortname = filename.substring(0, agentend);
+		agentend = shortname.indexOf("Agent.class");
+		if(agentend!=-1)
+			shortname = shortname.substring(0, agentend);
+		agentend = shortname.indexOf(".class");
+		if(agentend!=-1)
+			shortname = shortname.substring(0, agentend);
 		
 		int namestart = Math.max(shortname.lastIndexOf(File.separatorChar),
 			Math.max(shortname.lastIndexOf("/"), shortname.lastIndexOf(".")));

@@ -17,6 +17,7 @@ import jadex.bdi.examples.hunterprey.RequestVision;
 import jadex.bdi.examples.hunterprey.WorldObject;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
@@ -71,10 +72,10 @@ public class MicroPreyAgent extends MicroAgent
 	/**
 	 *  React on messages from environment.
 	 */
-	public void messageArrived(IMessageAdapter message)
+	public void messageArrived(Map msg, MessageType mt)
 	{
-		System.out.println("message arrived: "+message);
-		Object content	= message.getParameterMap().get(SFipa.CONTENT);
+		System.out.println("message arrived: "+msg);
+		Object content	= msg.get(SFipa.CONTENT);
 		if(content instanceof CurrentVision)
 		{
 			// The following is almost exact copy from DumbPreyPlan

@@ -1,6 +1,8 @@
 package jadex.microkernel;
 
-import jadex.bridge.IMessageAdapter;
+import java.util.Map;
+
+import jadex.bridge.MessageType;
 
 /**
  *  This is a base interface for a minimal Jadex agent.
@@ -18,9 +20,10 @@ public interface IMicroAgent
 
 	/**
 	 *  Called, whenever a message is received.
-	 *  @param message The message that arrived.
+	 *  @param msg The message map.
+	 *  @param mt The message type.
 	 */
-	public void messageArrived(IMessageAdapter message);
+	public void messageArrived(Map msg, MessageType mt);
 
 	/**
 	 *  Called just before the agent is removed from the platform.

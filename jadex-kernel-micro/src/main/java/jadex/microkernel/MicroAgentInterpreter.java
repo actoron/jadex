@@ -112,7 +112,7 @@ public class MicroAgentInterpreter implements IJadexAgent
 			}
 			catch(Exception e)
 			{
-				getLogger().severe("Execution of action led to exeception: "+e);
+				getLogger().severe("Execution of agent led to exeception: "+e);
 			}
 		}
 
@@ -136,7 +136,7 @@ public class MicroAgentInterpreter implements IJadexAgent
 		{
 			public void run()
 			{
-				microagent.messageArrived(message);
+				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
 			}
 		});
 	}

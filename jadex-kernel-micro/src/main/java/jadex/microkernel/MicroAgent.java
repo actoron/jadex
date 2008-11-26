@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -54,9 +53,10 @@ public abstract class MicroAgent implements IMicroAgent
 
 	/**
 	 *  Called, whenever a message is received.
-	 *  @param message The message that arrived.
+	 *  @param msg The message.
+	 *  @param mt The message type.
 	 */
-	public void messageArrived(IMessageAdapter message)
+	public void messageArrived(Map msg, MessageType mt)
 	{
 	}
 

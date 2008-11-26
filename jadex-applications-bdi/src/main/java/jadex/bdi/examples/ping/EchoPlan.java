@@ -21,7 +21,7 @@ public class EchoPlan extends Plan
 		// Get the initial event.
 		IMessageEvent me = (IMessageEvent)getReason();
 	
-		System.out.println("Echo plan invoked: "+me.getParameter(SFipa.CONTENT).getValue());
+//		System.out.println("Echo plan invoked: "+me.getParameter(SFipa.CONTENT).getValue());
 		
 		// Create the reply.
 		IMessageEvent re = getEventbase().createReply(me, "any_message");
