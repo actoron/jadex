@@ -51,10 +51,9 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
@@ -408,45 +407,42 @@ public class RetePanel extends JPanel
 			}
 		});
 		
-		rulebasepanel.getList().addListSelectionListener(new ListSelectionListener()
+		rulebasepanel.addRuleSelectionListener(new ChangeListener()
 		{
-			 public void valueChanged(ListSelectionEvent e)
+			 public void stateChanged(ChangeEvent e)
 			 {
-				 if(!e.getValueIsAdjusting())
+				 IRule[] rules = rulebasepanel.getSelectedRules();
+//				 System.out.println("Selected: "+SUtil.arrayToString(rules)+" "+e);
+				 
+				 if(rules!=null && rules.length>0)
 				 {
-					 Object[] rules = rulebasepanel.getList().getSelectedValues();
-//					 System.out.println("Selected: "+SUtil.arrayToString(rules)+" "+e);
-					 
-					 if(rules!=null && rules.length>0)
+					 // Show all nodes
+					 if(remnodes!=null)
+						 showHiddenNodes();
+				 
+					 // Build subgraph of selected rules (terminal nodes).
+					 Set subgraph = new HashSet();
+					 for(int i=0; i<rules.length; i++)
 					 {
-						 // Show all nodes
-						 if(remnodes!=null)
-							 showHiddenNodes();
-					 
-						 // Build subgraph of selected rules (terminal nodes).
-						 Set subgraph = new HashSet();
-						 for(int i=0; i<rules.length; i++)
-						 {
-							 INode node = root.getTerminalNode((IRule)rules[i]);
-							 subgraph.add(node);
-						 }
-						 
-						 // Hide all but selected nodes
-						 hideMarkedNodes(subgraph);
-						 
-						 if(np.getNode()==null || !subgraph.contains(np.getNode()))
-							 np.setNode(root.getTerminalNode((IRule)rules[0]));
+						 INode node = root.getTerminalNode(rules[i]);
+						 subgraph.add(node);
 					 }
 					 
-					 // Show no nodes at all.
-					 else
-					 {
-						 hideMarkedNodes(Collections.EMPTY_SET);
-					 }
-
-					 layout.graphChanged();
-					 vv.repaint();
+					 // Hide all but selected nodes
+					 hideMarkedNodes(subgraph);
+					 
+					 if(np.getNode()==null || !subgraph.contains(np.getNode()))
+						 np.setNode(root.getTerminalNode(rules[0]));
 				 }
+				 
+				 // Show no nodes at all.
+				 else
+				 {
+					 hideMarkedNodes(Collections.EMPTY_SET);
+				 }
+
+				 layout.graphChanged();
+				 vv.repaint();
 			 }
 		});
 		
@@ -471,7 +467,7 @@ public class RetePanel extends JPanel
 //							System.out.println("Next activation: "+act);
 							if(followact.isSelected())
 							{
-								rulebasepanel.getList().clearSelection();
+								rulebasepanel.clearSelectedRules();
 								IRule	rule;
 								synchronized(RetePanel.this)
 								{
@@ -479,15 +475,7 @@ public class RetePanel extends JPanel
 								}
 								if(rule!=null)
 								{
-									ListModel	model	= rulebasepanel.getList().getModel();
-									for(int i=0; i<model.getSize(); i++)
-									{
-										if(rule.equals(model.getElementAt(i)))
-										{
-											rulebasepanel.getList().addSelectionInterval(i, i);
-											break;
-										}
-									}
+									rulebasepanel.selectRule(rule);
 								}
 							}
 						}
@@ -501,28 +489,15 @@ public class RetePanel extends JPanel
 			{
 				if(followact.isSelected())
 				{
-					// Todo: not thread safe (agenda access from wrong thread)
-					Collection acts = system.getAgenda().getActivations();
-					if(!acts.isEmpty())
+					Activation act = system.getAgenda().getNextActivation();
+					if(act!=null && followact.isSelected())
 					{
-						ListModel	model	= rulebasepanel.getList().getModel();
-						rulebasepanel.getList().clearSelection();
-						for(Iterator it=acts.iterator(); it.hasNext(); )
-						{
-							IRule	rule	= ((Activation)it.next()).getRule();
-							for(int i=0; i<model.getSize(); i++)
-							{
-								if(rule.equals(model.getElementAt(i)))
-								{
-									rulebasepanel.getList().addSelectionInterval(i, i);
-								}
-							}
-						}
+						rulebasepanel.selectRule(act.getRule());
 					}
 				}
 				else
 				{
-					rulebasepanel.getList().clearSelection();
+					rulebasepanel.clearSelectedRules();
 				}
 			}
 		});
@@ -531,7 +506,7 @@ public class RetePanel extends JPanel
 			Activation act = system.getAgenda().getNextActivation();
 			if(act!=null && followact.isSelected())
 			{
-				rulebasepanel.getList().setSelectedValue(act.getRule(), true);
+				rulebasepanel.selectRule(act.getRule());
 			}
 		}
 		/*ap.getActivationsList().addListSelectionListener(new ListSelectionListener()

@@ -956,8 +956,21 @@ public class OAVTreeModel implements TreeModel
 		// Open first tree entry when only one exists (Hack?)
 		if(model.getChildCount(model.getRoot())==1)
 		{
-			Object[] obs = ((ObjectNode)((RootNode)model.getRoot()).getChildren().get(0)).getPath();
-			tree.expandPath(new TreePath(obs));
+			Object	node	= ((RootNode)model.getRoot()).getChildren().get(0);
+			Object[]	obs	= null;	 
+			if(node instanceof ObjectNode)
+			{
+				obs = ((ObjectNode)node).getPath();
+			}
+			else if(node instanceof ObjectInspectorNode)
+			{
+				obs = ((ObjectInspectorNode)node).getPath();
+			}
+
+			if(obs!=null)
+			{
+				tree.expandPath(new TreePath(obs));
+			}
 		}
 		
 		new TreeExpansionHandler(tree);

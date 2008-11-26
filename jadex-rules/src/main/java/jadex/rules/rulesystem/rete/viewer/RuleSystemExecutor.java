@@ -237,51 +237,6 @@ public class RuleSystemExecutor implements ISteppable
 	{
 		JPanel	oavpanel	= OAVTreeModel.createOAVPanel(rulesystem.getState());
 		RetePanel rp = new RetePanel(rulesystem, steppable);
-		rp.getRulebasePanel().getList().setCellRenderer(new DefaultListCellRenderer()
-		{
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-			{
-				Component	ret	= super.getListCellRendererComponent(list, ((IRule)value).getName(), index, isSelected, cellHasFocus);
-				if(steppable.isBreakpoint((IRule)value))
-					setBackground(Color.red);
-				return ret;
-			}
-		});
-		rp.getRulebasePanel().getList().addMouseListener(new MouseAdapter()
-		{
-			public void mousePressed(MouseEvent e)
-			{
-				if(e.isPopupTrigger())
-					doPopup(e);
-			}
-			public void mouseReleased(MouseEvent e)
-			{
-				if(e.isPopupTrigger())
-					doPopup(e);
-			}
-			public void	doPopup(MouseEvent e)
-			{
-				JList	list	= (JList)e.getSource();
-				int index	= list.locationToIndex(e.getPoint());
-				if(index!=-1)
-				{
-					Iterator	it	= rulesystem.getRulebase().getRules().iterator();
-					for(int i=0; i<index && it.hasNext(); i++)
-					{
-						it.next();
-					}
-					if(it.hasNext())
-					{
-						IRule	rule	= (IRule)it.next();
-						if(steppable.isBreakpoint(rule))
-							steppable.removeBreakpoint(rule);
-						else
-							steppable.addBreakpoint(rule);
-						list.repaint();
-					}
-				}
-			}
-		});
 		
 		JComponent[]	tools	= new JComponent[]{oavpanel, rp};
 		oavpanel.setName("Working Memory");
