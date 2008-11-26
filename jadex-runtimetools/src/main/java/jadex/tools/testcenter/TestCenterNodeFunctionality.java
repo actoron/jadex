@@ -145,7 +145,13 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	{
 		if(checkqueue==null)
 		{
-			jcc.addStatusComponent(checkcomp, checkcomp);
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					jcc.addStatusComponent(checkcomp, checkcomp);
+				}
+			});
 			checkqueue	= new HashSet();
 		}
 
@@ -167,8 +173,14 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 		if(checkqueue.isEmpty())
 		{
 			checkqueue	= null;
-			jcc.removeStatusComponent(checkcomp);
-			jcc.setStatusText("");
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					jcc.removeStatusComponent(checkcomp);
+					jcc.setStatusText("");
+				}
+			});
 		}
 	}
 

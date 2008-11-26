@@ -218,7 +218,15 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	protected synchronized void	startRefreshTask(IExplorerTreeNode node)
 	{
 		if(cnt==0)
-			jcc.addStatusComponent(refreshcomp, refreshcomp);
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					jcc.addStatusComponent(refreshcomp, refreshcomp);
+				}
+			});
+		}
 
 		cnt++;
 		explorer.getWorker().execute(new RefreshTask(node), ModelExplorer.PERCENTAGE_USER);
@@ -233,8 +241,14 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 		cnt--;
 		if(cnt==0)
 		{
-			jcc.removeStatusComponent(refreshcomp);
-			jcc.setStatusText("");
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					jcc.removeStatusComponent(refreshcomp);
+					jcc.setStatusText("");
+				}
+			});
 		}
 	}
 
