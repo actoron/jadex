@@ -35,23 +35,7 @@
 	</capabilities>
 
 	<goals>
-		<achievegoalref name="start_agents">
-			<concrete ref="startcap.start_agents"/>
-			<parametersetref name="agentinfos">
-				<concrete ref="agentinfos"/>
-			</parametersetref>
-			<deliberation>
-				<!-- Wait for all agents being started before destroying the manager. -->
-				<inhibits ref="ams_destroy_agent"/>
-			</deliberation>
-		</achievegoalref>
-		<!-- Goal used to kill manager after startup. - ->
-		<achievegoalref name="ams_destroy_agent">
-			<concrete ref="amscap.ams_destroy_agent"/>
-			<parameterref name="agentidentifier">
-				<concrete ref="agentidentifier"/>
-			</parameterref>
-		</achievegoalref>-->
+
 	</goals>
 
 	<configurations>
@@ -77,7 +61,8 @@
 						<!--<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/LAHunter.agent.xml", "Wolfram_%n", 0, null)</value>-->
 						 
 					</parameterset>
-				</initialgoal><!-- 
+				</initialgoal>
+				<!-- Goal used to kill manager after startup. - -> 
 				<initialgoal ref="ams_destroy_agent">
 					<parameter ref="agentidentifier">
 						<value>$scope.getAgentIdentifier()</value>
@@ -92,7 +77,8 @@
 						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/environment/Environment.agent.xml", "Environment_%n", 2000, null)</value>
 						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/LAHunter.agent.xml", "Willy_%n", 0, null)</value>
 					</parameterset>
-				</initialgoal><!-- 
+				</initialgoal>
+				<!-- Goal used to kill manager after startup. - -> 
 				<initialgoal ref="ams_destroy_agent">
 					<parameter ref="agentidentifier">
 						<value>$scope.getAgentIdentifier()</value>

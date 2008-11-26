@@ -723,6 +723,7 @@ public class Environment implements IEnvironment
 		catch(Exception e)
 		{
 			System.out.println("Error writing hunterprey highscore 'highscore.dmp'.");
+			e.printStackTrace();
 		}
 	}
 

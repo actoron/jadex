@@ -18,18 +18,15 @@
 	</imports>
 
 	<capabilities>
-		<!--  <capability name="actsensecap" file="jadex/bdi/examples/hunterprey/creature/actsense/Creature.capability.xml"/> -->
 		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey.creature.actsense.Creature"/>
 	</capabilities>
 
 	<beliefs>
+	
 		<!-- The creature -->
-		<belief name="my_self" class="Creature">
-			<assignto ref="actsensecap.my_self"/>
-			<fact>
-				new Observer($agent.getName(), $agent.getAgentIdentifier(), new Location(0,0))
- 			</fact>
-		</belief>
+		<beliefref name="my_self">
+			<concrete ref="actsensecap.my_self"/>
+		</beliefref>
 
 		<!-- The current vision. -->
 		<beliefref name="vision">
@@ -37,13 +34,9 @@
 		</beliefref>
 
 		<!-- The df to search for the environment. -->
-		<belief name="df" class="jadex.bridge.IAgentIdentifier">
-			<assignto ref="actsensecap.df"/>
-			<fact>
-				new AgentIdentifier("df@alex",
-					new String[]{"nio-mtp://vsisstaff0:2102"})
-			</fact>
-		</belief>
+		<beliefref name="df">
+			<concrete ref="actsensecap.df"/>
+		</beliefref>
 
 		<!-- The location of the highscore. -->
 		<belief name="highscore" class="String">
@@ -52,9 +45,31 @@
 		
 		<!-- The gui. -->
 		<belief name="gui" class="ObserverGui">
-			<fact>new ObserverGui($agent.getExternalAccess())</fact>
+			<fact>new ObserverGui($scope.getExternalAccess())</fact>
 		</belief>
 	</beliefs>
+	
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="my_self">
+					<fact>new Observer($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(0,0))</fact>
+				</initialbelief>
+				<initialbelief ref="df">
+					<fact>
+						((IDF)$scope.getPlatform().getService(IDF.class))
+							.createAgentIdentifier("df@lars", false, new String[]{"nio-mtp://vsispool28:2102"} ))
+					</fact>
+					<!-- 
+					<fact>
+					new AgentIdentifier("df@lars",
+							new String[]{"nio-mtp://vsispool28:2102"})
+					</fact>
+					-->
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
 
 </agent>
 

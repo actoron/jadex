@@ -1,12 +1,14 @@
 package jadex.bdi.examples.hunterprey;
 
+
 import jadex.bridge.IAgentIdentifier;
 
 
 /**
  *  Editable Java class for concept Prey of hunterprey ontology.
  */
-public class Prey extends Creature
+//bean needs to be serializable due to highscore export for observers
+public class Prey extends Creature implements java.io.Serializable
 {
 	//-------- constructors --------
 

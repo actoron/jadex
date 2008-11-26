@@ -6,7 +6,8 @@ import jadex.bridge.IAgentIdentifier;
 /**
  *  Editable Java class for concept Hunter of hunterprey ontology.
  */
-public class Hunter extends Creature
+//bean needs to be serializable due to highscore export for observers
+public class Hunter extends Creature implements java.io.Serializable
 {
 	//-------- constructors --------
 
