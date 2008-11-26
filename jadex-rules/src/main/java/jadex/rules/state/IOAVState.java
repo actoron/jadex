@@ -14,13 +14,6 @@ import java.util.List;
 public interface IOAVState
 {
 	
-	/**
-     * The Class object representing the class corresponding to
-     * the this interface. Need due to JavaFlow Bug:
-     * http://issues.apache.org/jira/browse/SANDBOX-111
-     */
-	public static final Class TYPE = IOAVState.class;
-		
 	//-------- type management --------
 	
 	/**
