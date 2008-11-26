@@ -59,8 +59,8 @@ public class ThreadPool implements IThreadPool, Runnable
 	 */
 	public ThreadPool()
 	{
-		// min=10, max=unlimited.
-		this(10, -1, 50);
+		// min=3, max=unlimited, pref=3.
+		this(3, -1, 3);
 
 		// Todo: enable better thread recycling.
 //		this(1, 3);
