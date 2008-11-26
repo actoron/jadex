@@ -14,7 +14,6 @@ import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.modeltree.FileNode;
-import jadex.tools.common.modeltree.INodeAction;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -34,8 +33,8 @@ import java.io.FileFilter;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -48,6 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -69,12 +69,9 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		"kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"),
 		"starter", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter.png"),
 		"starter_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
-//		"scanning_on",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_testcheck.gif")
-		"scanning_on",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_refresh_anim.gif"),
-//		"scanning_off",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_refresh_anim00.png")
-		//"jadexdoc",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_jadexdoc.png"),
 		"start_agent",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/start.png"),
-		"agent_suspended", SGUI.makeIcon(AgentTreeTable.class, "/jadex/tools/common/images/new_agent_szzz.png")
+		"agent_suspended", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz.png"),
+		"checking_menu",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_broken.png")
 	});
 
 	protected static final java.io.FileFilter ADF_FILTER = new FileFilter()
@@ -117,6 +114,9 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	/** The panel showing the classpath models. */
 	private ModelExplorer mpanel;
 
+	/** The menu item for enabling/disabling agent model checking. */
+	private JCheckBoxMenuItem	checkingmenu;
+	
 	/** The agent instances in a tree. */
 	private AgentTreeTable agents;
 
@@ -206,7 +206,11 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 */
 	public JMenu[] createMenuBar()
 	{
-		return mpanel.createMenuBar();
+		JMenu[]	menu	= mpanel.createMenuBar();
+		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
+		this.checkingmenu.setSelected(true);	// Default: on
+		menu[0].insert(checkingmenu, 1);	// Hack??? Should not assume position.
+		return menu;
 	}
 	
 	/**
@@ -223,7 +227,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		lsplit.setResizeWeight(0.7);
 
 		mpanel = new ModelExplorer(getJCC(), new RootNode(ADF_FILTER), null,
-			new StarterNodeFunctionality(getJCC()),
+			new StarterNodeFunctionality(this),
 			new String[]{"ADFs", "Agents", "Capabilities", "JavaAgents"}, 
 			new java.io.FileFilter[]{ADF_FILTER, AGENT_FILTER, CAPABILITY_FILTER, JAVAAGENT_FILTER}
 		);
@@ -368,6 +372,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 		lsplit.setDividerLocation(props.getIntProperty("leftsplit.location"));
 		csplit.setDividerLocation(props.getIntProperty("mainsplit.location"));
+
+		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 	}
 
 	/**
@@ -383,6 +389,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		
 		props.addProperty(new Property("leftsplit.location", ""+lsplit.getDividerLocation()));
 		props.addProperty(new Property("mainsplit.location", ""+csplit.getDividerLocation()));
+		
+		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
 
 		return props;
 	}
@@ -417,6 +425,14 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	}
 	
 	/**
+	 *  Get the checking menu.
+	 */
+	protected JCheckBoxMenuItem getCheckingMenu()
+	{
+		return checkingmenu;
+	}
+	
+	/**
 	 *  Get the model explorer.
 	 * @return the model explorer
 	 */
@@ -434,6 +450,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		{
 			mpanel.reset();
 			spanel.reset();
+			this.checkingmenu.setSelected(true);	// Default: on
 		}
 		catch(Exception e)
 		{
@@ -718,6 +735,18 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			return ret;
 		}
 	}
+	
+	/**
+	 *  The action for changing integrity checking settings.
+	 */
+	public final AbstractAction TOGGLE_CHECKING = new AbstractAction("Auto check", icons.getIcon("checking_menu"))
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			((DefaultTreeModel)getModelExplorer().getModel())
+				.nodeStructureChanged(getModelExplorer().getRootNode());
+		}
+	};
 	
 	//-------- constants --------
 

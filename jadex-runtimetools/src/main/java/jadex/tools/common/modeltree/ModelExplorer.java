@@ -78,7 +78,6 @@ public class ModelExplorer extends JTree
 		"checker",	SGUI.makeIcon(ModelExplorer.class, "/jadex/tools/common/images/new_checker.png"),
 		"refresh",	SGUI.makeIcon(ModelExplorer.class, "/jadex/tools/common/images/new_refresh.png"),
 		"refresh_menu",	SGUI.makeIcon(ModelExplorer.class, "/jadex/tools/common/images/new_refresh_small.png"),
-		"checking_menu",	SGUI.makeIcon(ModelExplorer.class, "/jadex/tools/common/images/new_agent_broken.png"),
 	});
 
 	//-------- attributes --------
@@ -482,8 +481,6 @@ public class ModelExplorer extends JTree
 		refresh	= !"false".equals(props.getStringProperty("refresh"));
 		if(refreshmenu!=null)
 			refreshmenu.setState(this.refresh);
-//		if(checkingmenu!=null)
-//			checkingmenu.setState(getRootNode().isChecking());
 		
 		resetCrawler();
 		
@@ -623,10 +620,6 @@ public class ModelExplorer extends JTree
 		this.refreshmenu = new JCheckBoxMenuItem(TOGGLE_REFRESH);
 		refreshmenu.setState(this.refresh);
 		menu.add(refreshmenu);
-		
-//		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
-//		checkingmenu.setState(getRootNode().isChecking());
-//		menu.add(checkingmenu);
 		
 		if(filters!=null && filters.length>1)
 		{
@@ -812,18 +805,6 @@ public class ModelExplorer extends JTree
 			resetCrawler();
 		}
 	};
-
-//	/**
-//	 *  The action for changing integrity checking settings.
-//	 */
-//	public final AbstractAction TOGGLE_CHECKING = new AbstractAction("Auto check", icons.getIcon("checking_menu"))
-//	{
-//		public void actionPerformed(ActionEvent e)
-//		{
-//			getRootNode().setChecking(((JCheckBoxMenuItem)e.getSource()).getState());
-//			refreshAll(getRootNode());
-//		}
-//	};
 	
 	/**
 	 *  Add a new path to the explorer.

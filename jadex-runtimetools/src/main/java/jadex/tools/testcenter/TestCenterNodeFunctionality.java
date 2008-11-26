@@ -60,6 +60,9 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	
 	//-------- attributes --------
 
+	/** The test center plugin. */
+	protected TestCenterPlugin	testcenter;
+	
 	/** The check indicator for the status bar. */
 	protected JLabel	checkcomp;
 	
@@ -71,9 +74,10 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	/**
 	 *  Create a test center node functionality.
 	 */
-	public TestCenterNodeFunctionality(IControlCenter jcc)
+	public TestCenterNodeFunctionality(TestCenterPlugin testcenter)
 	{
-		super(jcc);
+		super(testcenter.getJCC());
+		this.testcenter	= testcenter;
 		checkcomp	= new JLabel(icons.getIcon("checking_on"));
 		checkcomp.setToolTipText("Checking if agent models are test cases.");
 	}
@@ -89,7 +93,7 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 		Icon icon	= null;
 		if(node instanceof FileNode)
 		{
-			boolean	test = isTestcase(node);// || !fn.getRootNode().isChecking();
+			boolean	test = isTestcase(node);
 
 			if(node instanceof JarNode)
 			{
@@ -134,7 +138,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	public void	nodeChanged(IExplorerTreeNode node)
 	{
-		startCheckTask(node);
+		if(testcenter.getCheckingMenu()!=null && testcenter.getCheckingMenu().isSelected())
+			startCheckTask(node);
 	}
 
 	
@@ -289,7 +294,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 						});
 
 						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
-						if(parent instanceof DirNode && newtest!=isTestcase(parent))
+						if(parent instanceof DirNode && newtest!=isTestcase(parent)
+							&& testcenter.getCheckingMenu()!=null && testcenter.getCheckingMenu().isSelected())
 						{
 							startCheckTask(parent);
 						}
@@ -307,7 +313,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	public boolean	isTestcase(IExplorerTreeNode node)
 	{
 		boolean	ret	= false;	// Unknown node types are no testcases by default
-		if(node instanceof FileNode)
+		if(node instanceof FileNode && testcenter.getCheckingMenu()!=null
+			&& testcenter.getCheckingMenu().isSelected())
 		{
 			FileNode fn = (FileNode)node;
 			Boolean	val	= (Boolean)fn.getProperties().get(TESTCASE);

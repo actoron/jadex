@@ -19,17 +19,19 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileFilter;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 /**
@@ -49,7 +51,6 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		"arrow_right", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/arrow_right.png"),		
 		"arrow_left", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/arrow_right.png"),
 		"test_small", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/new_agent_testable.png"),
-		"scanning_on",	SGUI.makeIcon(TestCenterPlugin.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif"),
 		"add_agent", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/new_add_agent_testable.png"),
 		"add_package", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/new_add_package_testable.png"),
 		"remove_agent", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/new_remove_agent_testable.png"),
@@ -65,6 +66,9 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	/** The panel showing the classpath models. */
 	protected ModelExplorer mpanel;
 
+	/** The menu item for enabling/disabling agent model checking. */
+	private JCheckBoxMenuItem	checkingmenu;
+	
 	/** The test center panel. */
 	protected TestCenterPanel tcpanel;
 
@@ -160,7 +164,19 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 */
 	public JMenu[] createMenuBar()
 	{
-		return mpanel.createMenuBar();
+		JMenu[]	menu	= mpanel.createMenuBar();
+		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
+		this.checkingmenu.setSelected(true);	// Default: on
+		menu[0].insert(checkingmenu, 1);	// Hack??? Should not assume position.
+		return menu;
+	}
+	
+	/**
+	 *  Get the checking menu.
+	 */
+	protected JCheckBoxMenuItem getCheckingMenu()
+	{
+		return checkingmenu;
 	}
 	
 	/**
@@ -188,9 +204,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //			}
 //		});
 
-		JLabel	refreshcomp	= new JLabel(icons.getIcon("scanning_on"));
-		refreshcomp.setToolTipText("Loading/checking test cases.");
-		nof	= new TestCenterNodeFunctionality(getJCC());
+		nof	= new TestCenterNodeFunctionality(this);
 		mpanel = new ModelExplorer(getJCC(), new RootNode(new FileFilter()
 		{
 			public boolean accept(File pathname)
@@ -202,9 +216,6 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		}), null, nof); // todo: popup for testcenter
 		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
-		// todo: hack, how can this be done better?
-//		mpanel.TOGGLE_CHECKING.putValue(Action.NAME, "Auto find tests");
-//		mpanel.TOGGLE_CHECKING.putValue(Action.SMALL_ICON, icons.get("test_small"));
 
 //		mpanel.addTreeSelectionListener(new TreeSelectionListener()
 //		{
@@ -286,6 +297,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			((JSplitPane)getView()).setDividerLocation(props.getIntProperty("mainsplit.location"));
 		if(props.getProperty("tcsplit.location")!=null);
 			tcpanel.setDividerLocation(props.getIntProperty("tcsplit.location"));
+
+		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 	}
 
 	/**
@@ -301,6 +314,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		props.addProperty(new Property("mainsplit.location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
 		props.addProperty(new Property("tcsplit.location", Integer.toString(tcpanel.getDividerLocation())));
 		
+		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
+
 		return props;
 	}
 
@@ -311,6 +326,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		mpanel.reset();
 		tcpanel.reset();
+		this.checkingmenu.setSelected(true);	// Default: on
 	}
 	
 	/**
@@ -467,6 +483,19 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		public boolean isEnabled()
 		{
 			return mpanel.getLastSelectedPathComponent() instanceof DirNode;
+		}
+	};
+
+	
+	/**
+	 *  The action for changing integrity checking settings.
+	 */
+	public final AbstractAction TOGGLE_CHECKING = new AbstractAction("Auto find tests", (Icon) icons.get("test_small"))
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			((DefaultTreeModel)getModelExplorer().getModel())
+				.nodeStructureChanged(getModelExplorer().getRootNode());
 		}
 	};
 }

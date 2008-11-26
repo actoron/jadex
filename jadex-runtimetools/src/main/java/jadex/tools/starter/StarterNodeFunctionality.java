@@ -54,6 +54,9 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	
 	//-------- attributes --------
 
+	/** The starter plugin. */
+	protected StarterPlugin	starter;
+	
 	/** The check indicator for the status bar. */
 	protected JLabel	checkcomp;
 	
@@ -65,9 +68,10 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	/**
 	 *  Create a starter node functionality.
 	 */
-	public StarterNodeFunctionality(IControlCenter jcc)
+	public StarterNodeFunctionality(StarterPlugin starter)
 	{
-		super(jcc);
+		super(starter.getJCC());
+		this.starter	= starter;
 		checkcomp	= new JLabel(icons.getIcon("checking_on"));
 		checkcomp.setToolTipText("Checking validity of agent models.");
 	}
@@ -83,7 +87,7 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 		Icon icon	= null;
 		if(node instanceof FileNode)
 		{
-			boolean	valid = isValid(node);// || !fn.getRootNode().isChecking();
+			boolean	valid = isValid(node);
 
 			if(node instanceof JarNode)
 			{
@@ -128,7 +132,8 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	public void	nodeChanged(IExplorerTreeNode node)
 	{
-		startCheckTask(node);
+		if(starter.getCheckingMenu()!=null && starter.getCheckingMenu().isSelected())
+			startCheckTask(node);
 	}
 
 	
@@ -264,7 +269,8 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 						});
 
 						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
-						if(parent instanceof DirNode && newvalid!=isValid(parent))
+						if(parent instanceof DirNode && newvalid!=isValid(parent)
+							&& starter.getCheckingMenu()!=null && starter.getCheckingMenu().isSelected())
 						{
 							startCheckTask(parent);
 						}
@@ -283,7 +289,8 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	public boolean	isValid(IExplorerTreeNode node)
 	{
 		boolean	ret	= true;	// Unknown node types are valid by default
-		if(node instanceof FileNode)
+		if(node instanceof FileNode && starter.getCheckingMenu()!=null
+			&& starter.getCheckingMenu().isSelected())
 		{
 			FileNode fn = (FileNode)node;
 			Boolean	val	= (Boolean)fn.getProperties().get(VALID);
