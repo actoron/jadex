@@ -252,10 +252,9 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 						}
 					}
 					
-					
+					fn.getProperties().put(VALID, new Boolean(newvalid));	// Add always, because old value could be null.
 					if(oldvalid!=newvalid)
 					{
-						fn.getProperties().put(VALID, new Boolean(newvalid));
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()

@@ -273,10 +273,9 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 						}
 					}
 					
-					
+					fn.getProperties().put(TESTCASE, new Boolean(newtest));	// Add always, because old value might be null.
 					if(oldtest!=newtest)
 					{
-						fn.getProperties().put(TESTCASE, new Boolean(newtest));
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
