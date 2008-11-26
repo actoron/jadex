@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,11 +23,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -44,7 +44,8 @@ public class RulebasePanel extends JPanel
 	/** The image icons. */
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/rulesystem/rete/viewer/images/bug_small.png"),
+		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/rulesystem/rete/viewer/images/important.png"),
+//		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/rulesystem/rete/viewer/images/lockoverlay.png"),
 	});
 
 	//-------- attributes --------
@@ -120,14 +121,18 @@ public class RulebasePanel extends JPanel
 
 		// Hack!!! Set header preferred size and afterwards set title text to "" (bug in JDK1.5).
 		list.getTableHeader().setPreferredSize(list.getTableHeader().getPreferredSize());
-		list.getColumnModel().getColumn(0).setHeaderRenderer(new TableCellRenderer()
+		list.getColumnModel().getColumn(0).setHeaderRenderer(new DefaultTableCellRenderer()
 		{
-			public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean selected, boolean focus, int row, int column)
-			{
-				return new JLabel((Icon)icons.get("breakpoint"));
-			}
-		});
+	        public Component getTableCellRendererComponent(JTable table, 
+	        	Object obj, boolean selected, boolean focus, int row, int column)
+	        {
+	        	setIcon(icons.getIcon("breakpoint"));
+	            setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+	            setHorizontalAlignment(JLabel.CENTER);
+				setToolTipText("Use checkbox to enable/disable breakpoint on a rule.");
+	            return this;
+	        }
+	    });
 		list.getColumnModel().getColumn(1).setHeaderValue("Rulebase");
 
 		list.setDefaultRenderer(JToggleButton.class, new ButtonCellManager());
