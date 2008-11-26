@@ -49,7 +49,7 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 		"package", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_package.png"),
 		"package_broken", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_package_broken.png"),
 		"java_file", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/java_file.png"),
-		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif"),	
+		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_check_anim.gif"),	
 	});
 	
 	//-------- attributes --------

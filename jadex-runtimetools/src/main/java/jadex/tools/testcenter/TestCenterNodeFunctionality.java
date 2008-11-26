@@ -291,7 +291,7 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
 						if(parent instanceof DirNode && newtest!=isTestcase(parent))
 						{
-							explorer.getWorker().execute(new CheckTask(parent), ModelExplorer.PERCENTAGE_USER*0.9);
+							startCheckTask(parent);
 						}
 					}
 				}
