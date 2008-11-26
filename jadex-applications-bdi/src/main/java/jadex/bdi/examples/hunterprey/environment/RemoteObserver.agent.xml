@@ -40,7 +40,8 @@
 
 		<!-- The location of the highscore. -->
 		<belief name="highscore" class="String">
-			<fact>"http://134.100.11.53:80/jade/highscore.dmp"</fact>
+			<!--<fact>"http://134.100.11.53:80/jade/highscore.dmp"</fact>-->
+			<fact>"highscore.dmp"</fact>
 		</belief>
 		
 		<!-- The gui. -->
@@ -57,8 +58,8 @@
 				</initialbelief>
 				<initialbelief ref="df">
 					<fact>
-						((IDF)$scope.getPlatform().getService(IDF.class))
-							.createAgentIdentifier("df@lars", false, new String[]{"nio-mtp://vsispool28:2102"} ))
+						((IDF) $scope.getPlatform().getService(IDF.class))
+							.createAgentIdentifier("df@claas", false, new String[]{"tcp-mtp://vsispool28:5050"} )
 					</fact>
 					<!-- 
 					<fact>
