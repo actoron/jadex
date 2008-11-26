@@ -3,9 +3,11 @@ package jadex.micro.benchmarks;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IArgument;
 import jadex.bridge.IClockService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
+import jadex.microkernel.MicroAgentMetaInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +34,14 @@ public class AgentCreationAgent extends MicroAgent
 			case 0:
 			step++;
 			
-			Map args = getArguments();		
-			
-			if(args==null || args.size()==0)
-			{
+			Map args = getArguments();	
+			if(args==null)
 				args = new HashMap();
+			
+			if(args.get("num")==null)
+			{
 				args.put("num", new Integer(1));
-				args.put("max", new Integer(100000));
+//				args.put("max", new Integer(100000));
 				Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 				Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
 				args.put("startmem", startmem);
@@ -163,5 +166,45 @@ public class AgentCreationAgent extends MicroAgent
 
 		// Todo: killAgent()
 		getAgentAdapter().killAgent();
+	}
+	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static Object getMetaInfo()
+	{
+		return new MicroAgentMetaInfo("This agents benchmarks agent creation and termination.", 
+			new String[0], new IArgument[]{new IArgument()
+		{
+			public Object getDefaultValue(String configname)
+			{
+				return new Integer(1000);
+			}
+			public String getDescription()
+			{
+				return "Maximum number of agents to create.";
+			}
+			public String getName()
+			{
+				return "max";
+			}
+			public String getTypename()
+			{
+				return "Integer";
+			}
+			public boolean validate(String input)
+			{
+				boolean ret = true;
+				try
+				{
+					Integer.parseInt(input);
+				}
+				catch(Exception e)
+				{
+					ret = false;
+				}
+				return ret;
+			}
+		}});
 	}
 }

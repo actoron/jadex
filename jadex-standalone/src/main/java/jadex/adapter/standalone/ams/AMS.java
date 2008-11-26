@@ -21,6 +21,7 @@ import jadex.commons.concurrent.IResultListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -123,7 +124,8 @@ public class AMS implements IAMS, IPlatformService
 						aid.setAddresses(ms.getAddresses());
 				}
 		
-				agent = new StandaloneAgentAdapter(platform, aid, model, config, args);
+				// Arguments must be isolated between agent instances.
+				agent = new StandaloneAgentAdapter(platform, aid, model, config, args==null? null: new HashMap(args));
 				adapters.put(aid, agent);
 				
 				ad	= new AMSAgentDescription(aid);
@@ -669,15 +671,29 @@ public class AMS implements IAMS, IPlatformService
 	public static String getShortName(String filename)
 	{
 		String shortname	= filename;
+		
+		// Hack! todo: make more general
 		int agentend = filename.lastIndexOf(".agent.xml");
 		if(agentend!=-1)
+		{
 			shortname = filename.substring(0, agentend);
-		agentend = shortname.indexOf("Agent.class");
-		if(agentend!=-1)
-			shortname = shortname.substring(0, agentend);
-		agentend = shortname.indexOf(".class");
-		if(agentend!=-1)
-			shortname = shortname.substring(0, agentend);
+		}
+		else
+		{
+			agentend = shortname.lastIndexOf("Agent.class");
+			if(agentend!=-1)
+			{
+				shortname = shortname.substring(0, agentend);
+			}
+			else
+			{
+				agentend = shortname.lastIndexOf(".class");
+				if(agentend!=-1)
+				{
+					shortname = shortname.substring(0, agentend);
+				}
+			}
+		}
 		
 		int namestart = Math.max(shortname.lastIndexOf(File.separatorChar),
 			Math.max(shortname.lastIndexOf("/"), shortname.lastIndexOf(".")));

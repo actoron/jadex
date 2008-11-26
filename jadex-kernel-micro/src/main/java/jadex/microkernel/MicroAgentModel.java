@@ -79,7 +79,7 @@ public class MicroAgentModel implements IJadexModel
 	{
 		String ret = microagent.getSimpleName();
 		if(ret.endsWith("Agent"))
-			ret = ret.substring(0, ret.indexOf("Agent"));
+			ret = ret.substring(0, ret.lastIndexOf("Agent"));
 		return ret;
 		
 //		String ret;

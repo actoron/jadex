@@ -1,12 +1,14 @@
 package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IArgument;
 import jadex.bridge.IJadexAgent;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.LogManager;
@@ -67,6 +69,22 @@ public class MicroAgentInterpreter implements IJadexAgent
 		{
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		}
+		
+		// Init the arguments with default values.
+		IArgument[] args = model.getArguments();
+		for(int i=0; i<args.length; i++)
+		{
+			if(args[i].getDefaultValue(config)!=null)
+			{
+				if(this.arguments==null)
+					this.arguments = new HashMap();
+			
+				if(this.arguments.get(args[i].getName())==null)
+				{
+					this.arguments.put(args[i].getName(), args[i].getDefaultValue(config));
+				}
+			}
 		}
 	}
 	
@@ -355,7 +373,6 @@ public class MicroAgentInterpreter implements IJadexAgent
 	{
 		return arguments;
 	}
-	
 	
 	/**
 	 *  Get the configuration.
