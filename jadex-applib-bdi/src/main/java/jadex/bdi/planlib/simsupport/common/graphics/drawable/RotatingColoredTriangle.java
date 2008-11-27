@@ -39,7 +39,7 @@ public class RotatingColoredTriangle extends RotatingColoredPrimitive
     	setPosition(pos);
         setSize(size);
         setVelocity(velocity);
-        c_ = c;
+        setColor(c);
         
         
     }
@@ -55,7 +55,7 @@ public class RotatingColoredTriangle extends RotatingColoredPrimitive
     	w_ = original.w_;
     	h_ = original.h_;
     	rot_ = original.rot_;
-    	c_ = original.c_;
+    	setColor(original.c_);
     }
     
     public void init(ViewportJ2D vp, Graphics2D g)
@@ -80,7 +80,7 @@ public class RotatingColoredTriangle extends RotatingColoredPrimitive
     public synchronized void draw(ViewportJOGL vp, GL gl)
     {
         gl.glPushMatrix();
-        gl.glColor4d(c_.getRed(), c_.getGreen(), c_.getBlue(), c_.getAlpha());
+        gl.glColor4fv(oglColor_, 0);
         gl.glTranslatef(px_, py_, 0.0f);
         gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
         gl.glScalef(w_, h_, 1.0f);

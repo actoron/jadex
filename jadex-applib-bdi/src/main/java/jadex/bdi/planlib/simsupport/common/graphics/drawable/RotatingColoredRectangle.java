@@ -39,7 +39,7 @@ public class RotatingColoredRectangle extends RotatingColoredPrimitive
     	setPosition(new Vector2Double(0.0));
         setSize(size);
         setVelocity(new Vector2Double(0.0));
-        c_ = c;
+        setColor(c);
     }
     
     /** Copies a RotatingColoredRectangle drawable from internal data.
@@ -53,7 +53,7 @@ public class RotatingColoredRectangle extends RotatingColoredPrimitive
     	w_ = original.w_;
     	h_ = original.h_;
     	rot_ = original.rot_;
-    	c_ = original.c_;
+    	setColor(original.c_);
     }
     
     public void init(ViewportJ2D vp, Graphics2D g)
@@ -80,7 +80,7 @@ public class RotatingColoredRectangle extends RotatingColoredPrimitive
     public synchronized void draw(ViewportJOGL vp, GL gl)
     {
         gl.glPushMatrix();
-        gl.glColor4d(c_.getRed(), c_.getGreen(), c_.getBlue(), c_.getAlpha());
+        gl.glColor4fv(oglColor_, 0);
         gl.glTranslatef(px_, py_, 0.0f);
         gl.glScalef(w_, h_, 1.0f);
         gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
