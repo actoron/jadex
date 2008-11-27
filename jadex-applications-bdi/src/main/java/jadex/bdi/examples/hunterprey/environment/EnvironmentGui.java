@@ -111,22 +111,35 @@ public class EnvironmentGui	extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				// todo: move to end goal
-				Environment en = (Environment)agent.getBeliefbase().getBelief("environment").getFact();
-				Creature[] creatures = en.getCreatures();
-				for(int i=0; i<creatures.length; i++)
+//				// todo: move to end goal
+//				Environment en = (Environment)agent.getBeliefbase().getBelief("environment").getFact();
+//				Creature[] creatures = en.getCreatures();
+//				for(int i=0; i<creatures.length; i++)
+//				{
+//					try
+//					{
+////						System.out.println(creatures[i].getAID());
+//						IGoal kg = agent.createGoal("ams_destroy_agent");
+//						kg.getParameter("agentidentifier").setValue(creatures[i].getAID());
+//						agent.dispatchTopLevelGoalAndWait(kg);
+//					}
+//					catch(GoalFailureException gfe) 
+//					{
+//					}
+//				}
+//				agent.killAgent();
+				
+				dispose();
+				
+				try
 				{
-					try
-					{
-//						System.out.println(creatures[i].getAID());
-						IGoal kg = agent.createGoal("ams_destroy_agent");
-						kg.getParameter("agentidentifier").setValue(creatures[i].getAID());
-						agent.dispatchTopLevelGoalAndWait(kg);
-					}
-					catch(GoalFailureException gfe) 
-					{
-					}
+					IGoal eg = agent.createGoal("end_agent");
+					agent.dispatchTopLevelGoalAndWait(eg);
 				}
+				catch(GoalFailureException gfe) 
+				{
+				}
+				
 				agent.killAgent();
 			}
 		});

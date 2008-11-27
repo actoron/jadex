@@ -58,6 +58,12 @@
 		<achievegoalref name="rp_execute_request">
 			<concrete ref="procap.rp_execute_request"/>
 		</achievegoalref>
+		
+		<!-- Destroy the Environment Agent. -->
+		<achievegoal name="end_agent">
+			<!-- The agent to destroy. -->
+			<!-- <parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/> -->
+		</achievegoal>
 	</goals>
 
 	<plans>
@@ -133,6 +139,19 @@
 		<!-- Simulation plan. -->
 		<plan name="simticker">
 			<body class="SimulationTickerPlan"/>
+		</plan>
+		
+		<!-- Simulation plan. -->
+		<plan name="simend">
+			<body class="SimulationEndPlan"/>
+			<trigger>
+				<goal ref="end_agent" />
+				<!--
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestEnd</match>
+				</goal>
+				-->
+			</trigger>
 		</plan>
 	</plans>
 

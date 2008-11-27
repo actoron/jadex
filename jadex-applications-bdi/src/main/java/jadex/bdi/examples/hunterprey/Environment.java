@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import nuggets.Nuggets;
 
 /**
  *  The environment is the container all objects and creatures.
@@ -716,9 +719,18 @@ public class Environment implements IEnvironment
 	{
 		try
 		{
-			ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream("highscore.dmp"));
-			os.writeObject(getHighscore());
+			String outputFile = "highscore.dmp";
+			
+			// write as serialized object
+			//ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(outputFile));
+			//os.writeObject(getHighscore());
+			//os.close();
+			
+			// write as xml file
+			OutputStreamWriter os = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
+			os.write(Nuggets.objectToXML(getHighscore(),this.getClass().getClassLoader()));
 			os.close();
+
 		}
 		catch(Exception e)
 		{

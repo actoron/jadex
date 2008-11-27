@@ -13,14 +13,22 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.StringBufferInputStream;
 
+import javax.security.auth.callback.TextInputCallback;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import nuggets.Nuggets;
 
 
 /**
@@ -93,10 +101,22 @@ public class ObserverGui	extends EnvironmentGui
 		// Read highscore list from resource.
 		try
 		{
-			ObjectInputStream is = new ObjectInputStream(
-				SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader()));
-			Creature[]	hscreatures	= (Creature[])is.readObject();
-			is.close();
+			// read as serialized object
+			//ObjectInputStream is = new ObjectInputStream(
+			//	SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader()));
+			//Creature[]	hscreatures	= (Creature[])is.readObject();
+			
+			// read as xml file
+			BufferedReader reader = new BufferedReader(new InputStreamReader(SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader())));
+			StringBuffer fileData = new StringBuffer(1000);
+			char[] buf = new char[1024];
+			int numRead=0;
+			while((numRead=reader.read(buf)) != -1){
+				fileData.append(buf, 0, numRead);
+			}
+			reader.close();
+			Creature[]	hscreatures	= (Creature[]) Nuggets.objectFromXML(fileData.toString(), this.getClass().getClassLoader());
+			
 			highscore.update(hscreatures);
 		}
 		catch(Exception e)
