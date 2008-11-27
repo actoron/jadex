@@ -47,8 +47,6 @@ public class DisposeWastePlan extends Plan
 		Integer bin = null;
 		IVector2 binPos = null;
 		IVector1 distance = null;
-		System.out.print("Known Waste Bins: ");
-		System.out.println(wasteBinArray.length);
 		for (int i = 0; i < wasteBinArray.length; ++i)
 		{
 			Tuple t = (Tuple) wasteBinArray[i];

@@ -21,7 +21,7 @@
 	<beliefs>
 		<!-- Waste spawn rate (in wastes every x seconds) -->
 		<belief name="waste_spawn_rate" class="Double" exported="true">
-			<fact>10.0</fact>
+			<fact>3.0</fact>
 		</belief>
 		
 		<!-- Maximum number of waste objects -->

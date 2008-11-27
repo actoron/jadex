@@ -31,10 +31,8 @@ public class AchieveCleanupPlan extends Plan
 			IVector2 wastePos = (IVector2) getParameter("waste_position").getValue();
 			subGoal = createGoal("go_to_destination");
 			subGoal.getParameter("destination").setValue(wastePos);
-			System.out.println("Dispatching GOTO");
 			
 			dispatchSubgoalAndWait(subGoal);
-			System.out.println("Done GOTO");
 			if (subGoal.isSucceeded())
 			{
 				atPosition = true;
@@ -46,12 +44,10 @@ public class AchieveCleanupPlan extends Plan
 		pickupWaste.getParameter("action").setValue(PickupWasteAction.DEFAULT_NAME);
 		pickupWaste.getParameter("actor_id").setValue(cleanerId);
 		pickupWaste.getParameter("object_id").setValue(wasteId);
-		System.out.println("Dispatching pickup");
 		dispatchSubgoalAndWait(pickupWaste);
 		
 		// Re-enable waste sensor
 		IGoal reenableSensor = createGoal("enable_waste_sensor");
-		System.out.println("Dispatching sensor");
 		dispatchSubgoalAndWait(reenableSensor);
 	}
 	

@@ -9,6 +9,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredTriangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableRegularPolygon;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
+import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
@@ -41,7 +42,9 @@ public class InitializeCleanerPlan extends Plan
 		currentGoal = createGoal("sim_create_object");
 		currentGoal.getParameter("type").setValue("cleaner");
 		Map properties = new HashMap();
-		properties.put("battery",new Vector1Double(100.0));
+		IVector1 batteryCharge = new Vector1Double(100.0);
+		batteryCharge.subtract(new Vector1Double(Math.random() * 50.0));
+		properties.put("battery", batteryCharge);
 		properties.put("waste_capacity", Configuration.MAX_WASTE_CAPACITY.copy());
 		currentGoal.getParameter("properties").setValue(properties);
 		List tasks = new ArrayList();
@@ -49,7 +52,11 @@ public class InitializeCleanerPlan extends Plan
 		tasks.add(new BatteryDischargeTask());
 		tasks.add(new LowBatteryWarnTask());
 		currentGoal.getParameter("tasks").setValue(tasks);
-		IVector2 position = new Vector2Double(0.0);
+		
+		IGoal getStartPos = createGoal("sim_get_random_position");
+		getStartPos.getParameter("distance").setValue(Configuration.CLEANER_SIZE.copy());
+		dispatchSubgoalAndWait(getStartPos);
+		IVector2 position = ((IVector2) getStartPos.getParameter("position").getValue()).copy();
 		currentGoal.getParameter("position").setValue(position);
 		currentGoal.getParameter("drawable").setValue(drawable);
 		currentGoal.getParameter("signal_destruction").setValue(Boolean.TRUE);

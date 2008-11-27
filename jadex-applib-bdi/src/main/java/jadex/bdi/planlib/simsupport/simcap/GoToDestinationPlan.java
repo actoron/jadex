@@ -22,6 +22,11 @@ public class GoToDestinationPlan extends Plan
 		IVector1 speed = (IVector1) getParameter("speed").getValue();
 		IVector1 tolerance = (IVector1) getParameter("tolerance").getValue();
 		
+		IGoal removeTask = createGoal("sim_remove_task");
+		removeTask.getParameter("object_id").setValue(objectId);
+		removeTask.getParameter("task_name").setValue(GoToDestinationTask.DEFAULT_NAME);
+		dispatchSubgoalAndWait(removeTask);
+		
 		ISimObjectTask task = new GoToDestinationTask(destination, speed, tolerance);
 		
 		IGoal setTask = createGoal("sim_add_task");

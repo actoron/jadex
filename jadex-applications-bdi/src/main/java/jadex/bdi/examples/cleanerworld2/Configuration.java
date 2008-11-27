@@ -15,7 +15,7 @@ public class Configuration
 	public static final IVector2 AREA_SIZE = new Vector2Double(20.0, 20.0);
 	
 	public static final String BACKGROUND_TILE = "jadex/bdi/examples/cleanerworld2/images/background.png";
-	public static final IVector2 BACKGROUND_TILE_SIZE = new Vector2Double(2.0);
+	public static final IVector2 BACKGROUND_TILE_SIZE = new Vector2Double(5.0);
 	
 	public static final IVector2 WASTE_BIN_SIZE = new Vector2Double(1.0);
 	public static final IVector2 CHARGING_STATION_SIZE = new Vector2Double(1.0);
@@ -30,9 +30,9 @@ public class Configuration
 	public static final IVector1 CLEANER_SPEED = new Vector1Double(1.0);
 	public static final IVector1 CLEANER_DISCHARGE_RATE = new Vector1Double(0.5);
 	public static final IVector1 CLEANER_CHARGE_RATE = new Vector1Double(5.0);
-	public static final IVector1 LOW_BATTERY_THRESHOLD = new Vector1Double(20.0);
+	public static final IVector1 LOW_BATTERY_THRESHOLD = new Vector1Double(25.0);
 	/** Threshold when the battery is considered charged.
 	 */
-	public static final IVector1 CHARGED_THRESHOLD = new Vector1Double(95.0);
+	public static final IVector1 CHARGED_THRESHOLD = new Vector1Double(99.0);
 	public static final IVector1 MAX_WASTE_CAPACITY = new Vector1Long(3);
 }
