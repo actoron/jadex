@@ -22,15 +22,21 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	 */
 	private Color c_;
 	
-	private int vertices_;
-	
-	/** The vertices.
+	/** OpenGL color cache.
 	 */
-	private List vertexList_;
+	private float[] oglColor_;
+	
+	/** Vertex count
+	 */
+	private int vertices_;
 	
 	/** Path for Java2D.
 	 */
 	private GeneralPath path_;
+	
+	/** Display list for OpenGL
+	 */
+	private int dList_;
 	
 	/** Generates a size 1.0 triangle.
 	 */
@@ -52,18 +58,6 @@ public class ScalableRegularPolygon extends ScalablePrimitive
         setSize(size);
         setVelocity(new Vector2Double(0.0));
 		vertices_ = vertices;
-		vertexList_ = new ArrayList();
-		double op = 0.0;
-		IVector2 vertex = new Vector2Double(Math.sin(op) / 2.0, Math.cos(op) / 2.0);
-		for (int i = 0; i < vertices; ++i)
-		{
-			System.out.print(vertex.getXAsDouble());
-			System.out.print(", ");
-			System.out.println(vertex.getYAsDouble());
-			vertexList_.add(vertex);
-			op += (2.0 * Math.PI) / vertices;
-			vertex = new Vector2Double(Math.sin(op) / 2.0, Math.cos(op) / 2.0);
-		}
 	}
 	
 	/** Private copy constructor.
@@ -77,7 +71,6 @@ public class ScalableRegularPolygon extends ScalablePrimitive
     	w_ = other.w_;
     	h_ = other.h_;
 		vertices_ = other.vertices_;
-		vertexList_ = new ArrayList(other.vertexList_);
 		c_ = other.c_;
 	}
 	
@@ -95,6 +88,36 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	
 	public void init(ViewportJOGL vp, GL gl)
 	{
+		oglColor_ = new float[4];
+		oglColor_[0] = c_.getRed() / 255.0f;
+		oglColor_[1] = c_.getGreen() / 255.0f;
+		oglColor_[2] = c_.getBlue() / 255.0f;
+		oglColor_[3] = c_.getAlpha() / 255.0f;
+		
+		String listName = getClass().getName() + "_" + new Integer(vertices_).toString();
+		Integer list = vp.getDisplayList(listName);
+		if (list == null)
+		{
+			int newList = gl.glGenLists(1);
+			gl.glNewList(newList, GL.GL_COMPILE);
+			
+			gl.glBegin(GL.GL_TRIANGLE_FAN);
+			gl.glVertex2d(0.0, 0.0);
+			gl.glVertex2d(0.5, 0.0);
+			for (int i = 1; i < vertices_; ++i)
+			{
+				double x = Math.PI * 2 / vertices_ * i;
+				gl.glVertex2d(Math.cos(x) / 2.0, Math.sin(x) / 2.0);
+			}
+			gl.glVertex2d(0.5, 0.0);
+			gl.glEnd();
+			gl.glEndList();
+			
+			list = new Integer(newList);
+			vp.setDisplayList(listName, list);
+		}
+		
+		dList_ = list.intValue();
 	}
 	
 	public void draw(ViewportJ2D vp, Graphics2D g)
@@ -110,20 +133,11 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	public void draw(ViewportJOGL vp, GL gl)
 	{
 		gl.glPushMatrix();
-        gl.glColor4d(c_.getRed(), c_.getGreen(), c_.getBlue(), c_.getAlpha());
+		gl.glColor4fv(oglColor_, 0);
         gl.glTranslatef(px_, py_, 0.0f);
         gl.glScalef(w_, h_, 1.0f);
         
-        gl.glBegin(GL.GL_TRIANGLE_FAN);
-        gl.glVertex2f(0.0f, 0.0f);
-        for (Iterator it = vertexList_.iterator(); it.hasNext(); )
-        {
-        	IVector2 vertex = (IVector2) it.next();
-        	gl.glVertex2f(vertex.getXAsFloat(), vertex.getYAsFloat());
-        }
-        gl.glVertex2f(((IVector2) vertexList_.get(0)).getXAsFloat(),
-        			  ((IVector2) vertexList_.get(0)).getYAsFloat());
-        gl.glEnd();
+        gl.glCallList(dList_);
         
         gl.glPopMatrix();
 	}

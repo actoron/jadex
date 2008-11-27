@@ -92,13 +92,9 @@ public class ViewportJOGL implements IViewport,
      */
     private Map repeatingTextureCache_;
     
-    /** Texture id counter
+    /** Display lists
      */
-    //private int textureIDCounter_;
-    
-    /** OpenGL textures
-     */
-    //private List textures_;
+    private Map displayLists_;
     
     /** True, until the OpenGL context is initialized.
      */
@@ -160,6 +156,7 @@ public class ViewportJOGL implements IViewport,
         postLayers_ = Collections.synchronizedList(new ArrayList());
         clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
         repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
+        displayLists_ = Collections.synchronizedMap(new HashMap());
         size_ = new Vector2Double(1.0);
         paddedSize_ = new Vector2Double(1.0);
         frame_ = new Frame(title);
@@ -376,6 +373,25 @@ public class ViewportJOGL implements IViewport,
         return texture;
     }
     
+    /** Returns a previous generated display list or null if it doesn't exist
+     *  
+     *  @param listName name of the list
+     *  @return previously generated display list
+     */
+    public Integer getDisplayList(String listName)
+    {
+    	return (Integer) displayLists_.get(listName);
+    }
+    
+    /** Sets a display list.
+     *  
+     *  @param listName name of the list
+     *  @param list the display list
+     */
+    public void setDisplayList(String listName, Integer list)
+    {
+    	displayLists_.put(listName, list);
+    }
     
     // Window Events
     
@@ -480,16 +496,13 @@ public class ViewportJOGL implements IViewport,
         g.setComposite(AlphaComposite.Src);
         int ow = tmpImage.getWidth();
         int oh = tmpImage.getHeight();
-        /*g.drawImage(tmpImage,0, 0, ow, oh, 0, oh, ow, 0, null);
-        g.drawImage(tmpImage,0, 0, ow, oh, 0, oh, ow, 0, null);*/
         g.drawImage(tmpImage, 0, 0, null);
         
-        if (wrapMode == GL.GL_REPEAT)
-        {
-        	g.drawImage(tmpImage, ow, 0, null);
-        	g.drawImage(tmpImage, 0, oh, null);
-        	g.drawImage(tmpImage, ow, oh, null);
-        }
+        // Fill up padded textures, may be wrong approach for
+        // clamped textures.
+        g.drawImage(tmpImage, ow, 0, null);
+        g.drawImage(tmpImage, 0, oh, null);
+        g.drawImage(tmpImage, ow, oh, null);
         
         g.dispose();
         tmpImage = null;
