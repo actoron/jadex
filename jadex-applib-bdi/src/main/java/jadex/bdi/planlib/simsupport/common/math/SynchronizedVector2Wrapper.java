@@ -256,6 +256,42 @@ public class SynchronizedVector2Wrapper implements IVector2
 		return vector_.getY();
 	}
 	
+	/** Returns the x-component of the vector as integer.
+	 *
+	 *  @return x-component as integer
+	 */
+	public synchronized int getXAsInteger()
+	{
+		return vector_.getXAsInteger();
+	}
+
+	/** Returns the component of the vector as integer.
+	 *
+	 *  @return y-component as float
+	 */
+	public synchronized int getYAsInteger()
+	{
+		return vector_.getYAsInteger();
+	}
+	
+	/** Returns the x-component of the vector as long.
+	 *
+	 *  @return x-component as long
+	 */
+	public synchronized long getXAsLong()
+	{
+		return vector_.getXAsLong();
+	}
+
+	/** Returns the component of the vector as float.
+	 *
+	 *  @return y-component as float
+	 */
+	public synchronized long getYAsLong()
+	{
+		return vector_.getYAsLong();
+	}
+	
 	/** Returns the x-component of the vector as float.
 	 *
 	 *  @return x-component as float

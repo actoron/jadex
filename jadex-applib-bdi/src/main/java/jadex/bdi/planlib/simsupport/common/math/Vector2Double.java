@@ -213,6 +213,42 @@ public class Vector2Double implements IVector2, Cloneable
 		return new Vector1Double(y_);
 	}
 	
+	/** Returns the x-component of the vector as integer.
+	 *
+	 *  @return x-component as integer
+	 */
+	public int getXAsInteger()
+	{
+		return (int) x_;
+	}
+
+	/** Returns the component of the vector as integer.
+	 *
+	 *  @return y-component as float
+	 */
+	public int getYAsInteger()
+	{
+		return (int) y_;
+	}
+	
+	/** Returns the x-component of the vector as long.
+	 *
+	 *  @return x-component as long
+	 */
+	public long getXAsLong()
+	{
+		return (long) x_;
+	}
+
+	/** Returns the component of the vector as float.
+	 *
+	 *  @return y-component as float
+	 */
+	public long getYAsLong()
+	{
+		return (long) y_;
+	}
+	
 	public float getXAsFloat()
 	{
 		return (float) x_;

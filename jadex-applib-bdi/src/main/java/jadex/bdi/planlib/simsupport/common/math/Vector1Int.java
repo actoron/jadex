@@ -2,19 +2,19 @@ package jadex.bdi.planlib.simsupport.common.math;
 
 import java.math.BigDecimal;
 
-public class Vector1Long implements IVector1
+public class Vector1Int implements IVector1
 {
 	/** Zero vector
 	 */
-	public static final IVector1 ZERO = new Vector1Long(0);
+	public static final IVector1 ZERO = new Vector1Int(0);
 	
-	private long x_;
+	private int x_;
 	
-	/** Creates a new Vector1Long.
+	/** Creates a new Vector1int.
 	 *  
 	 *  @param value vector value
 	 */
-	public Vector1Long(long value)
+	public Vector1Int(int value)
 	{
 		x_ = value;
 	}
@@ -26,7 +26,7 @@ public class Vector1Long implements IVector1
 	 */
 	public IVector1 add(IVector1 vector)
 	{
-		x_ += vector.getAsLong();
+		x_ += vector.getAsInteger();
 		return this;
 	}
 	
@@ -37,7 +37,7 @@ public class Vector1Long implements IVector1
 	 */
 	public IVector1 subtract(IVector1 vector)
 	{
-		x_ -= vector.getAsLong();
+		x_ -= vector.getAsInteger();
 		return this;
 	}
 	
@@ -48,7 +48,7 @@ public class Vector1Long implements IVector1
 	 */
 	public IVector1 multiply(IVector1 vector)
 	{
-		x_ *= vector.getAsLong();
+		x_ *= vector.getAsInteger();
 		return this;
 	}
 	
@@ -134,7 +134,7 @@ public class Vector1Long implements IVector1
 	 */
 	public IVector1 copy()
 	{
-		return new Vector1Long(x_);
+		return new Vector1Int(x_);
 	}
 	
 	/** Generates a deep clone of the vector.
@@ -169,7 +169,7 @@ public class Vector1Long implements IVector1
 	 */
 	public boolean equals(IVector1 vector)
 	{
-		return (x_ == vector.getAsLong());
+		return (x_ == vector.getAsInteger());
 	}
 	
 	/** Tests if the vector is greater than another vector.
@@ -179,7 +179,7 @@ public class Vector1Long implements IVector1
 	 */
 	public boolean greater(IVector1 vector)
 	{
-		return (x_ > vector.getAsLong());
+		return (x_ > vector.getAsInteger());
 	}
 	
 	/** Tests if the vector is less than another vector.
@@ -189,7 +189,7 @@ public class Vector1Long implements IVector1
 	 */
 	public boolean less(IVector1 vector)
 	{
-		return (x_ < vector.getAsLong());
+		return (x_ < vector.getAsInteger());
 	}
 
 }
