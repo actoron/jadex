@@ -199,7 +199,7 @@ public class GoalDeliberationRules
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION);
 			}
 		};
-		Rule	deliberate_goal_deactivation	= new Rule("deliberate_goal_deactivation",
+		Rule	deliberate_goal_deactivation = new Rule("deliberate_goal_deactivation",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), action);
 		return deliberate_goal_deactivation;
 	}
@@ -254,7 +254,7 @@ public class GoalDeliberationRules
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION);
 			}
 		};
-		Rule	deliberate_goal_deactivation2	= new Rule("deliberate_goal_deactivation2",
+		Rule	deliberate_goal_deactivation2 = new Rule("deliberate_goal_deactivation2",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), action);
 		return deliberate_goal_deactivation2;
 	}

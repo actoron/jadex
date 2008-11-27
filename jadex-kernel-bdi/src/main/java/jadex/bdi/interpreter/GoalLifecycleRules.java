@@ -212,6 +212,7 @@ public class GoalLifecycleRules
 	
 	/**
 	 *  Drop an RGoal and remove it from the goalbase. 
+	 *  Removes goal from capability.
 	 */
 	protected static IAction GOAL_DROP_ACTION	= new IAction()
 	{

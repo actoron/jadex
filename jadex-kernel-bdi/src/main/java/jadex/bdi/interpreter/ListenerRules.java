@@ -330,7 +330,6 @@ public class ListenerRules
 				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalFlyweight(state, rcapa, revent), 
 						state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				
-				
 				lis.internalEventOccurred(ae);
 			}
 		};

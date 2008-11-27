@@ -722,9 +722,9 @@ public class MessageEventRules
 			}
 		};
 		
-		Rule agent_message_arrived = new Rule("agent_send_message", 
+		Rule agent_send_message = new Rule("agent_send_message", 
 			new AndCondition(new ICondition[]{messagecon, agentcon}), action);
-		return agent_message_arrived;
+		return agent_send_message;
 	}
 	
 	//-------- helper methods --------

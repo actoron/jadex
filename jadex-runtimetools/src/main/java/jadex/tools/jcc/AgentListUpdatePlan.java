@@ -19,24 +19,24 @@ public class AgentListUpdatePlan extends Plan
 	{
 		ControlCenter ctrl = (ControlCenter) getBeliefbase().getBelief("jcc").getFact();
 		
-		waitFor(1000);
-		
-		Object[] agents = getBeliefbase().getBeliefSet("agents").getFacts();
-		if(ctrl != null && agents != null)
-		{
-			ctrl.agentlist.updateAgents(agents, (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE));
-		}
+//		waitFor(1000);
+//		
+//		Object[] agents = getBeliefbase().getBeliefSet("agents").getFacts();
+//		if(ctrl != null && agents != null)
+//		{
+//			ctrl.agentlist.updateAgents(agents, (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE));
+//		}
 		
 		while(true)
 		{
 			
-//			Object tmp = waitForFactAdded("agents");
+//			Object tmp = waitForFactAddedOrRemoved("agents");
 //			System.out.println(tmp+" "+((IChangeEvent)tmp).getValue());
 //			
 //			try
 //			{
 //				long delay = 300;
-//				for(long wait=0; wait<3000; wait+=delay)
+//				for(long wait=0; wait<1000; wait+=delay)
 //				{
 //					tmp = waitForFactAddedOrRemoved("agents" , delay);
 //					System.out.println(tmp+" "+((IChangeEvent)tmp).getValue());
@@ -47,10 +47,15 @@ public class AgentListUpdatePlan extends Plan
 //				e.printStackTrace();
 //			}
 			
-			waitFor(2000);
+			// Hack! Plan currently polls agents.
+			// Problem with the above code is that it requires that the plans
+			// reacts on fact-added events, which currently flood the jcc agent
+			// and cause it to slow down when many agents are started.
 			
-			System.out.println("refreshing");
-			agents = getBeliefbase().getBeliefSet("agents").getFacts();
+			waitFor(1000);
+			
+//			System.out.println("refreshing");
+			Object[] agents = getBeliefbase().getBeliefSet("agents").getFacts();
 			if(ctrl != null && agents != null)
 			{
 				ctrl.agentlist.updateAgents(agents, (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE));

@@ -128,7 +128,7 @@ public class GoalProcessingRules
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 
-		Rule	performgoal_processing	= new Rule("performgoal_processing", new AndCondition(new ICondition[]{mgoalcon, goalcon, capacon}), GOAL_PROCESSING);
+		Rule performgoal_processing	= new Rule("performgoal_processing", new AndCondition(new ICondition[]{mgoalcon, goalcon, capacon}), GOAL_PROCESSING);
 		return performgoal_processing;
 	}
 
@@ -467,7 +467,7 @@ public class GoalProcessingRules
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 
-		Rule querygoal_processing	= new Rule("querygoal_processing", new AndCondition(new ICondition[]{mgoalcon, goalcon, capcon}), GOAL_PROCESSING);
+		Rule querygoal_processing = new Rule("querygoal_processing", new AndCondition(new ICondition[]{mgoalcon, goalcon, capcon}), GOAL_PROCESSING);
 		return querygoal_processing;
 	}
 
