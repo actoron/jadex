@@ -1875,7 +1875,7 @@ public class PlanRules
 	};
 	
 	/**
-	 *  Reschedule a plan after change event
+	 *  Reschedule a plan after change event.
 	 */
 	protected static IAction PLAN_CHANGEWAIT = new IAction()
 	{
@@ -1977,6 +1977,10 @@ public class PlanRules
 
 		assert state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction)==null;
 		
+		// Clear dispatched element.
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
+
+		
 		if(wa!=null)
 		{
 			Collection rgoals = state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goals);
@@ -2035,7 +2039,6 @@ public class PlanRules
 //								+", "+rplan);
 						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
 						cleanupPlanWait(state, rcapa, rplan, false);
-						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
 						BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
 					}
 				}));

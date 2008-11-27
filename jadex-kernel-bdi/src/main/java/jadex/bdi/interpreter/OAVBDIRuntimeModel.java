@@ -1,6 +1,5 @@
 package jadex.bdi.interpreter;
 
-
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITimer;
