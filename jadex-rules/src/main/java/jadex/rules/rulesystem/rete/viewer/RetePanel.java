@@ -111,7 +111,7 @@ public class RetePanel extends JPanel
 	 */
 	public RetePanel(final RuleSystem system, final ISteppable steppable)
 	{
-		this.rulebasepanel = new RulebasePanel(system.getRulebase());
+		this.rulebasepanel = new RulebasePanel(system.getRulebase(), steppable);
 		this.infopanels = new JTabbedPane();
 		
 		final ReteNode root = ((RetePatternMatcherFunctionality)system.getMatcherFunctionality()).getReteNode();

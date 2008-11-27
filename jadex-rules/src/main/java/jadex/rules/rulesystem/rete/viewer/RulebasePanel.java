@@ -44,8 +44,7 @@ public class RulebasePanel extends JPanel
 	/** The image icons. */
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/rulesystem/rete/viewer/images/important.png"),
-//		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/rulesystem/rete/viewer/images/lockoverlay.png"),
+		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/rulesystem/rete/viewer/images/lockoverlay.png"),
 	});
 
 	//-------- attributes --------
@@ -60,19 +59,18 @@ public class RulebasePanel extends JPanel
 	/** The listeners (if any). */
 	protected List	listeners;
 	
-	/** The breakpoints. */
-	protected Set	breakpoints;
+	/** The steppable (to set/remove breakpoints). */
+	protected ISteppable	steppable;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rulebase panel.
 	 */
-	public RulebasePanel(final IRulebase rulebase)
+	public RulebasePanel(IRulebase rulebase, ISteppable steppable)
 	{
-//		this.rulebase = rulebase;
+		this.steppable	= steppable;
 		this.rules = new ArrayList();
-		this.breakpoints	= new HashSet();
 		for(Iterator it=rulebase.getRules().iterator(); it.hasNext(); )
 			rules.add(it.next());
 		
@@ -211,52 +209,6 @@ public class RulebasePanel extends JPanel
 			listeners	= null;
 	}
 
-//	rp.getRulebasePanel().getList().setCellRenderer(new DefaultListCellRenderer()
-//	{
-//		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-//		{
-//			Component	ret	= super.getListCellRendererComponent(list, ((IRule)value).getName(), index, isSelected, cellHasFocus);
-//			if(steppable.isBreakpoint((IRule)value))
-//				setBackground(Color.red);
-//			return ret;
-//		}
-//	});
-//	rp.getRulebasePanel().getList().addMouseListener(new MouseAdapter()
-//	{
-//		public void mousePressed(MouseEvent e)
-//		{
-//			if(e.isPopupTrigger())
-//				doPopup(e);
-//		}
-//		public void mouseReleased(MouseEvent e)
-//		{
-//			if(e.isPopupTrigger())
-//				doPopup(e);
-//		}
-//		public void	doPopup(MouseEvent e)
-//		{
-//			JList	list	= (JList)e.getSource();
-//			int index	= list.locationToIndex(e.getPoint());
-//			if(index!=-1)
-//			{
-//				Iterator	it	= rulesystem.getRulebase().getRules().iterator();
-//				for(int i=0; i<index && it.hasNext(); i++)
-//				{
-//					it.next();
-//				}
-//				if(it.hasNext())
-//				{
-//					IRule	rule	= (IRule)it.next();
-//					if(steppable.isBreakpoint(rule))
-//						steppable.removeBreakpoint(rule);
-//					else
-//						steppable.addBreakpoint(rule);
-//					list.repaint();
-//				}
-//			}
-//		}
-//	});
-
 	/**
 	 *  Table cell renderer / editor using add delete buttons.
 	 */
@@ -264,7 +216,7 @@ public class RulebasePanel extends JPanel
 	{
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex, int column)
 		{
-			boolean	selected	= breakpoints.contains(rules.get(rowIndex));
+			boolean	selected	= steppable.isBreakpoint((IRule) rules.get(rowIndex));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -274,7 +226,7 @@ public class RulebasePanel extends JPanel
 
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, final int rowIndex, int column)
 		{
-			boolean	selected	= breakpoints.contains(rules.get(rowIndex));
+			boolean	selected	= steppable.isBreakpoint((IRule) rules.get(rowIndex));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			final JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -285,11 +237,11 @@ public class RulebasePanel extends JPanel
 				{
 					if(but.isSelected())
 					{
-						breakpoints.add(rules.get(rowIndex));
+						steppable.addBreakpoint((IRule) rules.get(rowIndex));
 					}
 					else
 					{
-						breakpoints.remove(rules.get(rowIndex));
+						steppable.removeBreakpoint((IRule) rules.get(rowIndex));
 					}
 				}
 			});
