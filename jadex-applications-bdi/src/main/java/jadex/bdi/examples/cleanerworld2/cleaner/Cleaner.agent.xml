@@ -2,10 +2,11 @@
 <!--
 	<H3>The Cleaner Agent.</H3>
 
-	The agent mainly has 3 top-level goals:<br>
-	- Searching for waste (perform lookforwaste).<br>
-	- Cleaning up waste (achieve cleanup).<br>
-	- Keep the battery loaded (maintain battery loaded).<br><br>
+	The agent mainly has 4 top-level goals which may be triggered by various events:<br>
+	- Searching for waste (look_for_waste).<br>
+	- Cleaning up waste (achieve_cleanup).<br>
+	- Depositing the waste in a waste bin when the cleaner is full (dispose_waste)<br>
+	- Keep the battery loaded (charge_battery).<br><br>
 
 	To achieve this goals it uses various
 	subgoals for decomposition of the overall
@@ -31,33 +32,10 @@
 	</capabilities>
 	
 	<beliefs>
-		<!-- Known waste bins and positions (id->position) -->
+		<!-- Known waste bins and positions (id, position) -->
 		<beliefset name="waste_bins" class="Tuple"/>
-		
-		<!-- Battery state -->
-		<belief name="battery_state" class="String">
-			<fact>"charged"</fact>
-		</belief>
-		<!-- Maximum waste capacity -->
-		<belief name="max_waste_capacity" class="Integer">
-			<fact>3</fact>
-		</belief>
-		<!-- Current waste capacity -->
-		<belief name="waste_capacity" class="Integer">
-			<fact>3</fact>
-		</belief>
-		<!-- Current waste target -->
-		<belief name="waste_target" class="Integer">
-			<fact>null</fact>
-		</belief>
-		<!-- Last known waste target position -->
-		<belief name="waste_target_position" class="IVector2">
-			<fact>null</fact>
-		</belief>
-		<!-- Current waste search waypoint -->
-		<belief name="waste_search_waypoint" class="IVector2">
-			<fact>null</fact>
-		</belief>
+		<!-- Known charging stations and positions (id, position) -->
+		<beliefset name="charging_stations" class="Tuple"/>
 		<!-- Name of the simulation environment -->
 		<belief name="environment_name" class="String">
 			<fact>new String("CleanerWorld2")</fact>
@@ -69,26 +47,13 @@
   	</beliefs>
 	
 	<goals>
-		<!-- Observe the battery state. -->
-		<maintaingoal name="maintainbatteryloaded">
+		<achievegoal name="charge_battery">
 			<deliberation>
-				<inhibits ref="look_for_waste" inhibit="when_in_process"/>
 				<inhibits ref="dispose_waste" inhibit="when_in_process"/>
 				<inhibits ref="achieve_cleanup" inhibit="when_in_process"/>
+				<inhibits ref="look_for_waste" inhibit="when_in_process"/>
 			</deliberation>
-			<!-- Engage in actions when the state is low. -->
- 			<maintaincondition>
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (element_has_name "battery_state"))
-				(test (!= ?fact "low"))
- 			</maintaincondition>
-			<!-- The goal is satisfied when the charge state is 1.0. -->
-			<targetcondition>
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (element_has_name "battery_state"))
-				(test (== ?fact "charged"))
- 			</targetcondition>
-		</maintaingoal>
+		</achievegoal>
 		
 		<!-- Dispose the waste. -->
 		<achievegoal name="dispose_waste">
@@ -164,6 +129,13 @@
   	</goals>
   	
   	<plans>
+  		<plan name="charge_battery_plan">
+  			<body class="ChargeBatteryPlan"/>
+  			<trigger>
+				<goal ref="charge_battery"/>
+			</trigger>
+  		</plan>
+  		
   		<plan name="dispose_waste_plan">
   			<body class="DisposeWastePlan"/>
   			<trigger>
@@ -240,6 +212,15 @@
 			<trigger>
  				<internalevent ref="simulation_event">
 					<match>$event.getParameter("type").getValue().equals("waste_bin_found")</match>
+				</internalevent>
+			</trigger>
+		</plan>
+		
+		<plan name="charging_station_found_event_plan">
+			<body class="ChargingStationFoundEventPlan"/>
+			<trigger>
+ 				<internalevent ref="simulation_event">
+					<match>$event.getParameter("type").getValue().equals("charging_station_found")</match>
 				</internalevent>
 			</trigger>
 		</plan>

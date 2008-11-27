@@ -1,6 +1,7 @@
 package jadex.bdi.examples.cleanerworld2.environment;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
+import jadex.bdi.examples.cleanerworld2.environment.action.ChargeBatteryAction;
 import jadex.bdi.examples.cleanerworld2.environment.action.DisposeWasteAction;
 import jadex.bdi.examples.cleanerworld2.environment.action.PickupWasteAction;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteGenerationProcess;
@@ -75,6 +76,7 @@ public class InitializeEnvironmentPlan extends Plan
 		// Actions
 		engine.addAction(new PickupWasteAction());
 		engine.addAction(new DisposeWasteAction());
+		engine.addAction(new ChargeBatteryAction());
 		
 		b.getBelief("simulation_engine").setFact(engine);
 		

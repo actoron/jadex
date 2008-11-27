@@ -1,7 +1,9 @@
 package jadex.bdi.examples.cleanerworld2.cleaner;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
-import jadex.bdi.examples.cleanerworld2.environment.process.WasteBinSensorProcess;
+import jadex.bdi.examples.cleanerworld2.cleaner.task.BatteryDischargeTask;
+import jadex.bdi.examples.cleanerworld2.cleaner.task.LowBatteryWarnTask;
+import jadex.bdi.examples.cleanerworld2.environment.process.StaticObjectSensorProcess;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteSensorProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredTriangle;
@@ -44,6 +46,8 @@ public class InitializeCleanerPlan extends Plan
 		currentGoal.getParameter("properties").setValue(properties);
 		List tasks = new ArrayList();
 		tasks.add(new MoveObjectTask(new Vector2Double(0.0)));
+		tasks.add(new BatteryDischargeTask());
+		tasks.add(new LowBatteryWarnTask());
 		currentGoal.getParameter("tasks").setValue(tasks);
 		IVector2 position = new Vector2Double(0.0);
 		currentGoal.getParameter("position").setValue(position);
@@ -55,8 +59,8 @@ public class InitializeCleanerPlan extends Plan
 		getBeliefbase().getBelief("simobject_id").setFact(objectId);
 		
 		// Enable waste bin sensor
-		String processName = WasteBinSensorProcess.DEFAULT_NAME + objectId.toString();
-		IEnvironmentProcess sensorProcess = new WasteBinSensorProcess(processName, objectId);
+		String processName = StaticObjectSensorProcess.DEFAULT_NAME + objectId.toString();
+		IEnvironmentProcess sensorProcess = new StaticObjectSensorProcess(processName, objectId);
 		IGoal addProcess = createGoal("sim_add_environment_process");
 		addProcess.getParameter("process").setValue(sensorProcess);;
 		dispatchSubgoalAndWait(addProcess);

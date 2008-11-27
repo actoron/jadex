@@ -1,19 +1,22 @@
 package jadex.bdi.examples.cleanerworld2.cleaner;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
+import jadex.bdi.examples.cleanerworld2.environment.action.ChargeBatteryAction;
 import jadex.bdi.examples.cleanerworld2.environment.action.DisposeWasteAction;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.Tuple;
 
 /** Attempts to clean up some waste.
  */
-public class DisposeWastePlan extends Plan
+public class ChargeBatteryPlan extends Plan
 {
 	public void body()
 	{
@@ -24,9 +27,9 @@ public class DisposeWastePlan extends Plan
 		IGoal subGoal = createGoal("stop");
 		dispatchSubgoalAndWait(subGoal);
 		
-		// Look for bins if none are known
-		IBeliefSet wasteBins = b.getBeliefSet("waste_bins");
-		while (wasteBins.size() == 0)
+		// Look for stations if none are known
+		IBeliefSet charging_stations = b.getBeliefSet("charging_stations");
+		while (charging_stations.size() == 0)
 		{
 			subGoal = createGoal("sim_get_random_position");
 			subGoal.getParameter("distance").setValue(Configuration.CLEANER_SIZE.copy());
@@ -38,44 +41,42 @@ public class DisposeWastePlan extends Plan
 			dispatchSubgoalAndWait(subGoal);
 		}
 		
-		// Find closest bin from our current location
+		// Find closest charging station from our current location
 		subGoal = createGoal("sim_get_position");
 		subGoal.getParameter("object_id").setValue(cleanerId);
 		dispatchSubgoalAndWait(subGoal);
 		IVector2 myPosition = (IVector2) subGoal.getParameter("position").getValue();
-		Object[] wasteBinArray = wasteBins.getFacts();
-		Integer bin = null;
-		IVector2 binPos = null;
+		Object[] chargingStationsArray = charging_stations.getFacts();
+		Integer chargingStationId = null;
+		IVector2 chargingStationPos = null;
 		IVector1 distance = null;
-		System.out.print("Known Waste Bins: ");
-		System.out.println(wasteBinArray.length);
-		for (int i = 0; i < wasteBinArray.length; ++i)
+		for (int i = 0; i < chargingStationsArray.length; ++i)
 		{
-			Tuple t = (Tuple) wasteBinArray[i];
-			if (bin == null)
+			Tuple t = (Tuple) chargingStationsArray[i];
+			if (chargingStationId == null)
 			{
-				bin = (Integer) t.get(0);
-				binPos = (IVector2) t.get(1);
-				distance = binPos.getDistance(myPosition);
+				chargingStationId = (Integer) t.get(0);
+				chargingStationPos = (IVector2) t.get(1);
+				distance = chargingStationPos.getDistance(myPosition);
 			}
-			else
+			else 
 			{
-				IVector2 newBinPos = (IVector2) t.get(1);
-				if (newBinPos.getDistance(myPosition).less(distance))
+				IVector2 newCSPos = (IVector2) t.get(1);
+				if (newCSPos.getDistance(myPosition).less(distance))
 				{
-					bin = (Integer) t.get(0);
-					binPos = newBinPos;
-					distance = binPos.getDistance(myPosition);
+					chargingStationId = (Integer) t.get(0);
+					chargingStationPos = newCSPos;
+					distance = chargingStationPos.getDistance(myPosition);
 				}
 			}
 		}
 		
-		// Go to the bin
+		// Go to the station
 		boolean atPosition = false;
 		while (!atPosition)
 		{
 			subGoal = createGoal("go_to_destination");
-			subGoal.getParameter("destination").setValue(binPos.copy());
+			subGoal.getParameter("destination").setValue(chargingStationPos.copy());
 			dispatchSubgoalAndWait(subGoal);
 			if (subGoal.isSucceeded())
 			{
@@ -83,12 +84,20 @@ public class DisposeWastePlan extends Plan
 			}
 		}
 		
-		// Dispose the waste
+		// Start charging
 		subGoal = createGoal("sim_perform_action");
-		subGoal.getParameter("action").setValue(DisposeWasteAction.DEFAULT_NAME);
+		subGoal.getParameter("action").setValue(ChargeBatteryAction.DEFAULT_NAME);
 		subGoal.getParameter("actor_id").setValue(cleanerId);
-		subGoal.getParameter("object_id").setValue(bin);
+		subGoal.getParameter("object_id").setValue(chargingStationId);
 		dispatchSubgoalAndWait(subGoal);
+		
+		// Wait for charging to finish
+		IInternalEvent evt = null;
+		do
+		{
+			evt = waitForInternalEvent("simulation_event");
+		}
+		while (evt.getParameter("type").equals("battery_charged"));
 	}
 	
 }

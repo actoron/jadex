@@ -56,6 +56,8 @@ public class BatteryChargeTask implements ISimObjectTask
 	 */
 	public void execute(IVector1 deltaT, SimObject object)
 	{
+		System.out.print("Charging Battery: ");
+		System.out.println(batteryState_.getAsDouble());
 		if (batteryState_.less(Configuration.CHARGED_THRESHOLD))
 		{
 			IVector1 charge = Configuration.CLEANER_CHARGE_RATE.copy().multiply(deltaT);
@@ -64,6 +66,7 @@ public class BatteryChargeTask implements ISimObjectTask
 		else
 		{
 			object.removeTask(name_);
+			object.addTask(new LowBatteryWarnTask());
 			SimulationEvent evt = new SimulationEvent("battery_charged");
 			object.fireSimulationEvent(evt);
 		}

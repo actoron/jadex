@@ -21,11 +21,12 @@ import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
 /** Simulates the waste bin sensor of a cleaner.
  */
-public class WasteBinSensorProcess implements IEnvironmentProcess
+public class StaticObjectSensorProcess implements IEnvironmentProcess
 {
-	public final static String DEFAULT_NAME = "WasteBinSensor";
+	public final static String DEFAULT_NAME = "StaticObjectSensor";
 	
 	public final static String WASTE_BIN_FOUND_EVENT_TYPE = "waste_bin_found";
+	public final static String CHARGING_STATION_FOUND_EVENT_TYPE = "charging_station_found";
 	
 	/** Cleaner object id
 	 */
@@ -43,9 +44,13 @@ public class WasteBinSensorProcess implements IEnvironmentProcess
 	 */
 	private List unknownWasteBins_;
 	
+	/** Unknown waste_bin objects
+	 */
+	private List unknownChargingStations_;
+	
 	/** Creates an uninitialized WasteSensorProcess.
 	 */
-	public WasteBinSensorProcess()
+	public StaticObjectSensorProcess()
 	{
 	}
 	
@@ -53,7 +58,7 @@ public class WasteBinSensorProcess implements IEnvironmentProcess
 	 *  
 	 *  @param name name of the sensor
 	 */
-	public WasteBinSensorProcess(String name, Integer cleanerId)
+	public StaticObjectSensorProcess(String name, Integer cleanerId)
 	{
 		name_ = name;
 		cleanerId_ = cleanerId;
@@ -71,6 +76,7 @@ public class WasteBinSensorProcess implements IEnvironmentProcess
 		synchronized(typedAccess)
 		{
 			unknownWasteBins_= new LinkedList((List) typedAccess.get("waste_bin"));
+			unknownChargingStations_ = new LinkedList((List) typedAccess.get("charging_station"));
 		}
 	}
 	
@@ -100,11 +106,26 @@ public class WasteBinSensorProcess implements IEnvironmentProcess
 				evt.setParameter("position", wasteBin.getPosition());
 				cleaner_.fireSimulationEvent(evt);
 				it.remove();
-				if (unknownWasteBins_.isEmpty())
-				{
-					engine.removeEnvironmentProcess(name_);
-				}
 			}
+		}
+		
+		for (Iterator it = unknownChargingStations_.iterator(); it.hasNext(); )
+		{
+			SimObject station = (SimObject) it.next();
+			if (station.getPosition().getDistance(cleaner_.getPosition()).less(Configuration.CLEANER_VISUAL_RANGE))
+			{
+				SimulationEvent evt = new SimulationEvent(CHARGING_STATION_FOUND_EVENT_TYPE);
+				evt.setParameter("charging_station_id", station.getId());
+				evt.setParameter("position", station.getPosition());
+				cleaner_.fireSimulationEvent(evt);
+				it.remove();
+			}
+		}
+		
+		if ((unknownWasteBins_.isEmpty()) &&
+			(unknownChargingStations_.isEmpty()))
+		{
+			engine.removeEnvironmentProcess(name_);
 		}
 	}
 
