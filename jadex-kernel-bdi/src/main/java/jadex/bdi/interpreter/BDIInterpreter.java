@@ -257,14 +257,16 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 	 */
 	public boolean executeAction()
 	{
+		// Remember execution thread.
+		this.agentthread	= Thread.currentThread();
+		ClassLoader	cl	= agentthread.getContextClassLoader();
+		agentthread.setContextClassLoader(model.getTypeModel().getClassLoader());
+
 		try
 		{
 //			if(!lock.tryLock())
 //				throw new RuntimeException("Internal execution error.");
-			
-			// Remember execution thread.
-			this.agentthread	= Thread.currentThread();
-			
+						
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
 			boolean	extexecuted	= false;
@@ -383,8 +385,6 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 			state.notifyEventListeners();
 			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 						
-			// Reset execution thread.
-			this.agentthread = null;
 			
 //			lock.unlock();
 			
@@ -401,6 +401,12 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 				throw (Error)e;
 			else // Shouldn't happen!? 
 				throw new RuntimeException(e);
+		}
+		finally
+		{
+			// Reset execution thread.
+			agentthread.setContextClassLoader(cl);
+			this.agentthread = null;
 		}
 	}
 

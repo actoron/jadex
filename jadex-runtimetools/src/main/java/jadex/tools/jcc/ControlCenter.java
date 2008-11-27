@@ -115,7 +115,13 @@ public class ControlCenter implements IControlCenter
 		this.agentlist	= new AgentList();
 
 		msglisteners = new Vector();
+		
+		assert Thread.currentThread().getContextClassLoader()!=null;
 
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
 		window = new ControlCenterWindow(ControlCenter.this);
 		
 		agent.addAgentListener(new IAgentListener()
@@ -167,10 +173,6 @@ public class ControlCenter implements IControlCenter
 			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
 				if(!plugins.isEmpty())
 				{
 					// load project

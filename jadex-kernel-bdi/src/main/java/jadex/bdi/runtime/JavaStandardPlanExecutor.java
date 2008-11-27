@@ -527,6 +527,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			this.thread = Thread.currentThread();
 			interpreter.setPlanThread(thread);
 			ClassLoader oldcl = thread.getContextClassLoader();
+			assert interpreter.getState().getTypeModel().getClassLoader()!=null;
 			thread.setContextClassLoader(interpreter.getState().getTypeModel().getClassLoader());
 
 			// Execute the plan (interrupted by pause() calls).
