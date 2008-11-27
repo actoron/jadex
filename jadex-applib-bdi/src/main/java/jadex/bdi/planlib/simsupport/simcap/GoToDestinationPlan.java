@@ -32,8 +32,6 @@ public class GoToDestinationPlan extends Plan
 		do
 		{
 			evt = waitForInternalEvent("simulation_event");
-			System.out.println(evt.getParameter("type").getValue());
-			System.out.println(SimulationEvent.GO_TO_DESTINATION_REACHED);
 		}
 		while (!evt.getParameter("type").getValue().equals(SimulationEvent.GO_TO_DESTINATION_REACHED));
 		IVector2 position = (IVector2) evt.getParameter("position").getValue();

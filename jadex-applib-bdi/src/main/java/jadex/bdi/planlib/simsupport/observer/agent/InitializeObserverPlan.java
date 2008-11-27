@@ -46,7 +46,7 @@ public class InitializeObserverPlan extends Plan
 		
 		ILibraryService libService = (ILibraryService) getScope().getPlatform().getService(ILibraryService.class,
 																						   ILibraryService.LIBRARY_SERVICE);
-		System.out.println(libService);
+		
 		if (libService == null)
 		{
 			System.exit(1);
