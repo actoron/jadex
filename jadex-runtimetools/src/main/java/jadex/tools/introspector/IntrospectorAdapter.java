@@ -5,7 +5,7 @@ import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIFetcher;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bridge.IJadexAgent;
+import jadex.bridge.IKernelAgent;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
 import jadex.commons.ICommand;
@@ -45,7 +45,7 @@ public class IntrospectorAdapter implements IToolAdapter, ISteppable
 	/**
 	 *  Create a new introspector adapter.
 	 */
-	public void init(IJadexAgent agent)
+	public void init(IKernelAgent agent)
 	{
 		this.agent	= (BDIInterpreter)agent;
 

@@ -12,7 +12,7 @@ public interface IToolAdapter
 	 *  Initialize the tool adapter.
 	 *  Called once, before any other methods are invoked.
 	 */
-	public void	init(IJadexAgent adapter);
+	public void	init(IKernelAgent adapter);
 
 	/**
 	 *  Called when the agent sent a message.

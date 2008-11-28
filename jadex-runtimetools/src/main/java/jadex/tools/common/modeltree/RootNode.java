@@ -20,28 +20,8 @@ public class RootNode	implements IExplorerTreeNode
 	
 	/** The nodes for the directories and jar files of the project. */
 	protected List	children;
-
-	/** Filter for specifying which children should be shown. */
-	protected FileFilter	filter;
 	
 	//-------- constructors --------
-
-	/**
-	 *  Create a root node for file filter.
-	 */
-	public RootNode(FileFilter filter)
-	{
-		this.filter = filter;
-	}
-	
-	/**
-	 *  Copy settings from another node.
-	 *  @param source The source.
-	 */
-	public void copyFrom(RootNode source)
-	{
-		initFilter(source.getFileFilter());
-	}
 	
 	/**
 	 *  Create a new RootNode.
@@ -221,38 +201,6 @@ public class RootNode	implements IExplorerTreeNode
 	public String getToolTipText()
 	{
 		return null;
-	}
-
-	/**
-	 *  Get the filter of this RootNode.
-	 *  @return Returns the filter.
-	 */
-	// Hack??? Needed for directory nodes, cannot be given to nodes, as not beanynizable.
-	public FileFilter getFileFilter()
-	{
-		return filter;
-	}
-	
-	/**
-	 *  Set the file filter.
-	 *  // Problem: Must not be named setFileFilter() as otherwise
-	 *  // nuggets will try to persit the file filter.  
-	 *  @param filter The filter.
-	 */
-	public void setNewFileFilter(FileFilter filter)
-	{
-		this.filter = filter;
-	}
-	
-	/**
-	 *  Set the filter of this RootNode.
-	 *  Called init filter to avoid bean property.  
-	 *  @return Returns the filter.
-	 */
-	// Hack??? Because FileFilter impls not beanynizable.
-	public void	initFilter(FileFilter filter)
-	{
-		this.filter	= filter;
 	}
 	
 	//-------- bean properties --------

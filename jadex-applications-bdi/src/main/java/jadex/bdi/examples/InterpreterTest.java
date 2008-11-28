@@ -7,7 +7,7 @@ import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
-import jadex.bridge.IJadexAgentFactory;
+import jadex.bridge.IAgentFactory;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
 import jadex.commons.concurrent.Executor;
@@ -95,7 +95,7 @@ public class InterpreterTest
 				{
 					return new IPlatform()
 					{
-						public IJadexAgentFactory getAgentFactory()
+						public IAgentFactory getAgentFactory()
 						{
 							// TODO Auto-generated method stub
 							return null;

@@ -1,9 +1,12 @@
 package jadex.bridge;
 
 /**
- *  Jadex model interface to be used (invoked) by tools and adapters.
+ *  Agent model interface to be used (invoked) by tools and adapters.
+ *  Implemented by kernels to represent an agent type.
+ *  Agent types can be loaded by the kernel's agent factory
+ *  @link{IAgentFactory}. 
  */
-public interface IJadexModel
+public interface IAgentModel
 {
 	/**
 	 *  Get the name.
@@ -43,7 +46,7 @@ public interface IJadexModel
 	
 	/**
 	 *  Get the model type.
-	 *  @reeturn The model type (kernel specific).
+	 *  @return The model type (kernel specific).
 	 */
 	public String getType();
 	

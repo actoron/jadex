@@ -1,8 +1,8 @@
 package jadex.tools.starter;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.IJadexAgentFactory;
-import jadex.bridge.IJadexModel;
+import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentModel;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IReport;
 import jadex.bridge.Properties;
@@ -70,7 +70,7 @@ public class StarterPanel extends JPanel
 	//-------- attributes --------
 
 	/** The model. */
-	protected IJadexModel model;
+	protected IAgentModel model;
 
 	/** The last loaded filename. */
 	protected String lastfile;
@@ -106,7 +106,7 @@ public class StarterPanel extends JPanel
 	protected JPanel ap;
 	
 	/** The agent factory. */
-	protected IJadexAgentFactory agentfactory;
+	protected IAgentFactory agentfactory;
 	
 	/** The starter plugin. */
 	protected StarterPlugin	starter;

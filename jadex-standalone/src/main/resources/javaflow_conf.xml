@@ -63,7 +63,7 @@
 	</properties>
 	
 	<properties type="kernel" id="kernel_v2">
-		<property type="agent_factory">new jadex.bdi.interpreter.JadexAgentFactory(jadex.commons.SUtil.createHashMap(
+		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(jadex.commons.SUtil.createHashMap(
 			new String[]{"messagetype_fipa", "planexecutor_standard"},
 			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
 			new jadex.bdi.runtime.JavaFlowPlanExecutor()}))

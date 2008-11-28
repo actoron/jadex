@@ -1,7 +1,5 @@
 package jadex.tools.common.modeltree;
 
-import jadex.bridge.IJadexAgentFactory;
-import jadex.bridge.IJadexModel;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.Properties;
@@ -13,7 +11,6 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.LoadManagingExecutionService;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.tools.common.PopupBuilder;
-import jadex.tools.common.SwingWorker;
 import jadex.tools.common.ToolTipAction;
 import jadex.tools.common.plugin.IControlCenter;
 
@@ -24,25 +21,23 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeExpansionEvent;
@@ -112,46 +107,23 @@ public class ModelExplorer extends JTree
 	/** The refresh menu. */
 	protected JCheckBoxMenuItem	refreshmenu;
 
-//	/** The check menu. */
-//	protected JCheckBoxMenuItem	checkingmenu;
-	
 	/** The selected tree path. */
 	protected TreePath selected;
 	
-	/** The filter names. */
-	protected String[] filternames;
-	
-	/** The possible file filters. */
-	protected java.io.FileFilter[] filters;
-	
 	/** The filter menu. */
 	protected JMenu filtermenu;
+	
+	/** The file filter. */
+	protected FilenameFilter	filefilter;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new ModelExplorer.
 	 */
-	public ModelExplorer(IControlCenter jcc, RootNode root, 
-		PopupBuilder pubuilder, AbstractNodeFunctionality nof)
+	public ModelExplorer(IControlCenter jcc, AbstractNodeFunctionality nof)
 	{
-		this(jcc, root, pubuilder, nof, null, null);
-	}
-	
-	/**
-	 *  Create a new ModelExplorer.
-	 *  @param jcc The control center.
-	 *  @param root The root node.
-	 *  @param refreshcomp The status bar component.
-	 *  @param pubuilder The popup builder.
-	 *  @param filternames The file filter names.
-	 *  @param filters The file filters.
-	 */
-	public ModelExplorer(IControlCenter jcc, RootNode root, 
-		PopupBuilder pubuilder, AbstractNodeFunctionality nof,
-		String[] filternames, java.io.FileFilter[] filters)
-	{
-		super(root);
+		super(new RootNode());
 		this.jcc = jcc;
 		this.nof = nof;
 		nof.setModelExplorer(this);
@@ -160,8 +132,6 @@ public class ModelExplorer extends JTree
 		this.refresh	= true;
 		this.pubuilder = pubuilder!=null? pubuilder: new PopupBuilder(
 			new Action[]{ADD_PATH, REMOVE_PATH, REFRESH});
-		this.filternames = filternames;
-		this.filters = filters;
 		this.worker	= new LoadManagingExecutionService(
 			ThreadPoolFactory.getThreadPool(jcc.getAgent().getPlatform().getName()));
 		
@@ -307,16 +277,6 @@ public class ModelExplorer extends JTree
 	}
 	
 	/**
-	 *  Set the file filter.
-	 *  @param filter The filter.
-	 */
-	public void setFileFilter(java.io.FileFilter filter)
-	{
-		getRootNode().setNewFileFilter(filter);
-		refreshAll(getRootNode());
-	}
-	
-	/**
 	 *  Recursively refresh a node and its subnodes.
 	 */
 	public void refreshAll(IExplorerTreeNode node)
@@ -371,17 +331,17 @@ public class ModelExplorer extends JTree
 		// Save refresh/checking flags.
 		props.addProperty(new Property("refresh", Boolean.toString(refresh)));
 		
-		// Save the current filter name
-		if(filternames!=null && filternames.length>0)
+		// Save the state of file filters
+		if(filtermenu!=null && filtermenu.getComponentCount()>0)
 		{
-			String name = null;
-			for(int i=0; i<filters.length; i++)
+			Properties	filterprops	= new Properties(null, "filter", null);
+			for(int i=0; i<filtermenu.getComponentCount(); i++)
 			{
-				if(filters[i].equals(getRootNode().getFileFilter()))
-					name = filternames[i];
+				String	name	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).getText();
+				boolean	selected	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).isSelected();
+				filterprops.addProperty(new Property(name, ""+selected));
 			}
-			if(name!=null)
-			props.addProperty(new Property("filter", name));
+			props.addSubproperties(filterprops);
 		}
 		
 		return props;
@@ -399,9 +359,7 @@ public class ModelExplorer extends JTree
 			try
 			{
 				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
-				RootNode newroot = (RootNode)Nuggets.objectFromXML(rootxml, cl);
-				newroot.copyFrom(this.root);
-				this.root = newroot;
+				this.root	= (RootNode)Nuggets.objectFromXML(rootxml, cl);
 				((DefaultTreeModel)getModel()).setRoot(this.root);
 			}
 			catch(Exception e)
@@ -484,16 +442,21 @@ public class ModelExplorer extends JTree
 		
 		resetCrawler();
 		
-		// Load the current filter name
-		if(filternames!=null && filternames.length>0 && filtermenu!=null)
+		// Load the filter settings
+		Properties	filterprops	= props.getSubproperty("filter");
+		if(filterprops!=null && filtermenu!=null && filtermenu.getComponentCount()>0)
 		{
-			String name = props.getStringProperty("filter");
-			for(int i=0; name!=null && i<filternames.length; i++)
+			for(int i=0; i<filtermenu.getComponentCount(); i++)
 			{
-				if(filternames[i].equals(name))
+				JCheckBoxMenuItem	item	= (JCheckBoxMenuItem)filtermenu.getComponent(i);
+				String	name	= item.getText();
+				if(filterprops.getProperty(name)!=null)
 				{
-					((JRadioButtonMenuItem)filtermenu.getMenuComponent(i)).setSelected(true);
-					setFileFilter(filters[i]);
+					item.setSelected(filterprops.getBooleanProperty(name));
+				}
+				else
+				{
+					item.setSelected(true);
 				}
 			}
 		}
@@ -621,34 +584,53 @@ public class ModelExplorer extends JTree
 		refreshmenu.setState(this.refresh);
 		menu.add(refreshmenu);
 		
-		if(filters!=null && filters.length>1)
+		String[]	filetypes	= jcc.getAgent().getPlatform().getAgentFactory().getFileTypes();
+		if(filetypes!=null && filetypes.length>1)
 		{
 			filtermenu = new JMenu("File filter");
-			ButtonGroup bg = new ButtonGroup();
-			for(int i=0; i<filters.length; i++)
+			for(int i=0; i<filetypes.length; i++)
 			{
-				final java.io.FileFilter filter = filters[i];
-				JRadioButtonMenuItem ff = new JRadioButtonMenuItem(""+filternames[i]);
-				bg.add(ff);
+				Icon	icon	= jcc.getAgent().getPlatform().getAgentFactory().getFileTypeIcon(filetypes[i]);
+				JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], icon, true);
 				filtermenu.add(ff);
 				ff.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						if(!getRootNode().getFileFilter().equals(filter))
-						{
-							setFileFilter(filter);
-							((DefaultTreeModel)getModel()).reload(getRootNode());
-						}
+						refreshAll(getRootNode());
 					}
 				});
-				if(getRootNode().getFileFilter().equals(filter))
-					ff.setSelected(true);
 			}
 			menu.add(filtermenu);
 		}
 		
 		return new JMenu[]{menu};
+	}
+
+	/**
+	 *	Get a file filter according to current file type settings. 
+	 */
+	public FilenameFilter getFileFilter()
+	{
+		if(filefilter==null)
+		{
+			synchronized(this)
+			{
+				if(filefilter==null)
+				{
+					filefilter	= new FilenameFilter()
+					{
+						public boolean accept(File dir, String name)
+						{
+							File	file	= new File(dir, name);
+							return file.isDirectory() || jcc.getAgent()
+								.getPlatform().getAgentFactory().isLoadable(file.getAbsolutePath());
+						}
+					};
+				}
+			}
+		}
+		return filefilter;
 	}
 
 	//-------- helper classes --------

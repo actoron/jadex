@@ -40,7 +40,7 @@ public interface IPlatform
 	 *  @return The agent factory.
 	 */
 	// Todo: remove from external platform interface
-	public IJadexAgentFactory getAgentFactory();
+	public IAgentFactory getAgentFactory();
 	
 	/**
 	 *  Get the configuration.

@@ -4,7 +4,7 @@ import jadex.bdi.planlib.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.IJadexAgentFactory;
+import jadex.bridge.IAgentFactory;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
@@ -115,7 +115,7 @@ public class TestCenterPanel extends JSplitPane
 	
 		final JFileChooser addchooser = new JFileChooser(".");
 		addchooser.setAcceptAllFileFilterUsed(true);
-		final IJadexAgentFactory agentfactory = plugin.getJCC().getAgent().getPlatform().getAgentFactory();
+		final IAgentFactory agentfactory = plugin.getJCC().getAgent().getPlatform().getAgentFactory();
 		final javax.swing.filechooser.FileFilter load_filter = new javax.swing.filechooser.FileFilter()
 		{
 			public String getDescription()

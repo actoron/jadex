@@ -2,8 +2,8 @@ package jadex.tools.testcenter;
 
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bridge.IJadexAgentFactory;
-import jadex.bridge.IJadexModel;
+import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentModel;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IExecutable;
@@ -113,7 +113,7 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 			else if (node instanceof FileNode)
 			{
 				FileNode fn = (FileNode)node;
-				IJadexAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
+				IAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
 				if(fac.isLoadable(fn.getFile().getName()) && fac.isStartable(fn.getFile().getName()))
 				{
 					icon	= icons.getIcon(test ? "agent_testable" : "agent");
@@ -248,7 +248,7 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 						{
 							try
 							{
-								IJadexModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+								IAgentModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
 								
 								if(model!=null)
 								{

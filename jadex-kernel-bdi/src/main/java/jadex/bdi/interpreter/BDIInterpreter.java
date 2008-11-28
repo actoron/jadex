@@ -15,7 +15,7 @@ import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IJadexAgent;
+import jadex.bridge.IKernelAgent;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
 import jadex.commons.collection.LRU;
@@ -49,7 +49,7 @@ import java.util.Set;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIInterpreter implements IJadexAgent, ISynchronizator
+public class BDIInterpreter implements IKernelAgent, ISynchronizator
 {
 	//-------- static part --------
 	
@@ -244,7 +244,7 @@ public class BDIInterpreter implements IJadexAgent, ISynchronizator
 //			((RetePatternMatcherState)getRuleSystem().getMatcherState()).getReteMemory(), new Object());
 	}
 	
-	//-------- IJadexAgent interface --------
+	//-------- IKernelAgent interface --------
 	
 //	Lock lock = new ReentrantLock(); 
 	/**

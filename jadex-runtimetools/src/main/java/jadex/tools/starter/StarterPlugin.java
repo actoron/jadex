@@ -2,8 +2,8 @@ package jadex.tools.starter;
 
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bridge.IJadexAgentFactory;
-import jadex.bridge.IJadexModel;
+import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentModel;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.commons.SGUI;
@@ -74,6 +74,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		"checking_menu",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_broken.png")
 	});
 
+	/*
 	protected static final java.io.FileFilter ADF_FILTER = new FileFilter()
 	{
 		public boolean accept(File pathname)
@@ -105,6 +106,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			return pathname.isDirectory() || pathname.getName().endsWith("Agent.class");
 		}
 	};
+	*/
 
 	//-------- attributes --------
 
@@ -226,11 +228,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelExplorer(getJCC(), new RootNode(ADF_FILTER), null,
-			new StarterNodeFunctionality(this),
-			new String[]{"ADFs", "Agents", "Capabilities", "JavaAgents"}, 
-			new java.io.FileFilter[]{ADF_FILTER, AGENT_FILTER, CAPABILITY_FILTER, JAVAAGENT_FILTER}
-		);
+		mpanel = new ModelExplorer(getJCC(), new StarterNodeFunctionality(this));
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -262,7 +260,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					//  |  +- MyAgent.agent.xml
 
 					String model = ((FileNode)node).getFile().getAbsolutePath();
-					if(isJadexFilename(model))
+					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
 					{
 						loadModel(model);
 					}
@@ -283,7 +281,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 						{
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
-							if(isAgentFilename(type))
+							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
 								getJCC().createAgent(type, null, null, null/*, getModelExplorer().getClassLoader()*/);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
@@ -651,12 +649,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(isAgentFilename(type) )//&& ((FileNode)node).isValid())
+					if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type) )//&& ((FileNode)node).isValid())
 					{
 						try
 						{
-							IJadexAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
-							IJadexModel model = agentfactory.loadModel(type);
+							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
+							IAgentModel model = agentfactory.loadModel(type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -750,17 +748,17 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	
 	//-------- constants --------
 
-	/** The Jadex agent extension. */
+	/** The Jadex agent extension. * /
 	public static final String FILE_EXTENSION_AGENT = ".agent.xml";
 
-	/** The Jadex capability extension. */
+	/** The Jadex capability extension. * /
 	public static final String FILE_EXTENSION_CAPABILITY = ".capability.xml";
 	
 	/**
 	 *  Test if a file is a Jadex file.
 	 *  @param filename The filename.
 	 *  @return True, if it is a Jadex file.
-	 */
+	 * /
 	public static boolean isJadexFilename(String filename)
 	{
 		return filename!=null && (filename.toLowerCase().endsWith(FILE_EXTENSION_AGENT)
@@ -772,7 +770,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 *  Test if a file is an agent file.
 	 *  @param filename The filename.
 	 *  @return True, if it is an agent file.
-	 */
+	 * /
 	public static boolean isAgentFilename(String filename)
 	{
 		return filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_AGENT);
@@ -782,11 +780,11 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 *  Test if a file is a capability file.
 	 *  @param filename The filename.
 	 *  @return True, if it is a capability file.
-	 */
+	 * /
 	public static boolean isCapabilityFilename(String filename)
 	{
 		return filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_CAPABILITY);
-	}
+	}*/
 
 }
 

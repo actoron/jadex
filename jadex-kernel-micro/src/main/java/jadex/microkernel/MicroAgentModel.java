@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.IJadexModel;
+import jadex.bridge.IAgentModel;
 import jadex.bridge.IReport;
 import jadex.commons.SUtil;
 
@@ -12,7 +12,7 @@ import jadex.commons.SUtil;
  *  The agent model contains the OAV agent model in a state and
  *  a type-specific compiled rulebase (matcher functionality).
  */
-public class MicroAgentModel implements IJadexModel
+public class MicroAgentModel implements IAgentModel
 {
 	//-------- attributes --------
 
@@ -48,7 +48,7 @@ public class MicroAgentModel implements IJadexModel
 		}
 	}
 	
-	//-------- IJadexModel methods --------
+	//-------- IAgentModel methods --------
 	
 	/**
 	 *  Is the model startable.
@@ -69,8 +69,6 @@ public class MicroAgentModel implements IJadexModel
 		return "v2microagent";
 	}
 
-	//-------- IJadexModel methods --------
-	
 	/**
 	 *  Get the name.
 	 *  @return The name.

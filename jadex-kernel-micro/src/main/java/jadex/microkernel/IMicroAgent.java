@@ -5,7 +5,7 @@ import java.util.Map;
 import jadex.bridge.MessageType;
 
 /**
- *  This is a base interface for a minimal Jadex agent.
+ *  This is a base interface for a minimal kernel agent.
  *  All methods are called on agent thread (i.e. not concurrently)
  */
 public interface IMicroAgent

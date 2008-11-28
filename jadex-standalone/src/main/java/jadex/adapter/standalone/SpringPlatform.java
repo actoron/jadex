@@ -1,6 +1,6 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.JadexMetaAgentFactory;
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
@@ -148,7 +148,7 @@ public class SpringPlatform extends AbstractPlatform
 	 */
 	public void setAgentFactories(List factories)
 	{
-		this.agentfactory = new JadexMetaAgentFactory(factories);
+		this.agentfactory = new MetaAgentFactory(factories);
 	}
 
 	/**

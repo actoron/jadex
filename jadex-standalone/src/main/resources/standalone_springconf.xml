@@ -27,8 +27,8 @@
 		</property>
 		
 		<property name="agentFactories">
-			<list value-type="jadex.bridge.IJadexAgentFactory">
-				<bean id="kernel_v2_factory" class="jadex.bdi.interpreter.JadexAgentFactory">
+			<list value-type="jadex.bridge.IAgentFactory">
+				<bean id="kernel_v2_factory" class="jadex.bdi.interpreter.BDIAgentFactory">
 					<constructor-arg>
 						<map>
 							<entry>

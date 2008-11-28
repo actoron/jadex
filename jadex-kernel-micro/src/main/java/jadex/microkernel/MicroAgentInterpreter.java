@@ -2,7 +2,7 @@ package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IArgument;
-import jadex.bridge.IJadexAgent;
+import jadex.bridge.IKernelAgent;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
 
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class MicroAgentInterpreter implements IJadexAgent
+public class MicroAgentInterpreter implements IKernelAgent
 {
 	//-------- attributes --------
 	
@@ -88,7 +88,7 @@ public class MicroAgentInterpreter implements IJadexAgent
 		}
 	}
 	
-	//-------- IJadexAgent interface --------
+	//-------- IKernelAgent interface --------
 	
 	/**
 	 *  Can be called on the agent thread only.

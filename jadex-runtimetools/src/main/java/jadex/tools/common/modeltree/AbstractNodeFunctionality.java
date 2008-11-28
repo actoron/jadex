@@ -120,7 +120,7 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 		{
 			DirNode dn = (DirNode)node;
 			List children = dn.getChildren();
-			File files[] = dn.getFile().listFiles(dn.getRootNode().getFileFilter());
+			File files[] = dn.getFile().listFiles(explorer.getFileFilter());
 			if(files!=null)
 			{
 				Set	old	= null;

@@ -1,12 +1,13 @@
 package jadex.bdi.interpreter;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IJadexAgent;
-import jadex.bridge.IJadexAgentFactory;
-import jadex.bridge.IJadexModel;
+import jadex.bridge.IKernelAgent;
+import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentModel;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.IPlatform;
+import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVState;
@@ -15,15 +16,24 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
+import javax.swing.Icon;
+import javax.swing.UIDefaults;
+
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
-public class JadexAgentFactory implements IJadexAgentFactory
+public class BDIAgentFactory implements IAgentFactory
 {
 	//-------- constants --------
 	
-	/** Loader for XML agent models. */
-//	public static final OAVBDIModelLoader	LOADER	= new OAVBDIModelLoader();
+	/**
+	 * The image icons.
+	 */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"bdi_agent",	SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdi/images/bdi_agent.png"),
+		"bdi_capability",	SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdi/images/bdi_capability.png")
+	});
 
 	//-------- attributes --------
 	
@@ -45,7 +55,7 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public JadexAgentFactory(Map props, IPlatform platform)
+	public BDIAgentFactory(Map props, IPlatform platform)
 	{
 //		this.kernelprops = kernelprops;
 		this.props = props;
@@ -78,17 +88,17 @@ public class JadexAgentFactory implements IJadexAgentFactory
 		}
 	}
 	
-	//-------- IJadexAgentFactory interface --------
+	//-------- IAgentFactory interface --------
 	
 	/**
-	 *  Create a Jadex agent.
+	 *  Create a kernel agent.
 	 *  @param adapter	The platform adapter for the agent. 
 	 *  @param model	The agent model file (i.e. the name of the XML file).
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
-	 *  @return	An instance of a jadex agent.
+	 *  @return	An instance of a kernel agent.
 	 */
-	public IJadexAgent	createJadexAgent(IAgentAdapter adapter, String model, String config, Map arguments)
+	public IKernelAgent	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
 	{
 		init();
 		
@@ -103,10 +113,10 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	}
 	
 	/**
-	 *  Load a Jadex model.
+	 *  Load an agent model.
 	 *  @param filename The filename.
 	 */
-	public IJadexModel loadModel(String filename)
+	public IAgentModel loadModel(String filename)
 	{
 		init();
 		
@@ -149,5 +159,23 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	{
 		return model!=null && model.toLowerCase().endsWith(".agent.xml");
 //		return SXML.isAgentFilename(model);
+	}
+
+
+	/**
+	 *  Get the names of ADF file types supported by this factory.
+	 */
+	public String[] getFileTypes()
+	{
+		return new String[]{"BDI Agent", "BDI Capability"};
+	}
+
+	/**
+	 *  Get a default icon for a file type.
+	 */
+	public Icon getFileTypeIcon(String type)
+	{
+		return type.equals("BDI Agent") ? icons.getIcon("bdi_agent")
+			: type.equals("BDI Capability") ? icons.getIcon("bdi_capability") : null;
 	}
 }

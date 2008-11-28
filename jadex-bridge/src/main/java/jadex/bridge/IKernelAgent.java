@@ -3,10 +3,12 @@ package jadex.bridge;
 import jadex.commons.concurrent.IResultListener;
 
 /**
- *  Jadex agent interface to be used (invoked) by platform (adapters).
- *  To create a Jadex agent instance use the factory @link{JadexAgentFactory}. 
+ *  Agent interface to be used (invoked) by platform (adapters).
+ *  This interface is implemented by the different kernels.
+ *  To create a kernel agent instance use the kernel's agent factory
+ *  @link{IAgentFactory}. 
  */
-public interface IJadexAgent
+public interface IKernelAgent
 {
 	//-------- methods to be called by adapter --------
 

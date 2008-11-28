@@ -1,11 +1,11 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.JadexMetaAgentFactory;
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IJadexAgentFactory;
+import jadex.bridge.IAgentFactory;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
@@ -186,7 +186,7 @@ public class Platform extends AbstractPlatform
 			addService(type, props[i].getName(), (IPlatformService)props[i].getJavaObject(fetcher));
 		}
 
-		this.agentfactory = createJadexAgentFactory(platconf, fetcher);
+		this.agentfactory = createAgentFactory(platconf, fetcher);
 		
 		this.logger = Logger.getLogger("Platform_" + getName());
 
@@ -298,9 +298,9 @@ public class Platform extends AbstractPlatform
 	}
 	
 	/**
-	 *  Create the Jadex agent factory.
+	 *  Create the agent factory.
 	 */
-	public IJadexAgentFactory createJadexAgentFactory(Properties platconf, SimpleValueFetcher fetcher)
+	public IAgentFactory createAgentFactory(Properties platconf, SimpleValueFetcher fetcher)
 	{
 		Properties[] kernel_props = platconf.getSubproperties(KERNEL);
 
@@ -311,10 +311,10 @@ public class Platform extends AbstractPlatform
 			if(af == null)
 				throw new RuntimeException("Agent factory property not configured for kernel.");
 			fetcher.setValue("$props", kernel_props[i]);
-			IJadexAgentFactory fac = (IJadexAgentFactory)af.getJavaObject(fetcher);
+			IAgentFactory fac = (IAgentFactory)af.getJavaObject(fetcher);
 			factories.add(fac);
 		}
-		return new JadexMetaAgentFactory(factories);
+		return new MetaAgentFactory(factories);
 	}
 
 	//-------- Static part --------

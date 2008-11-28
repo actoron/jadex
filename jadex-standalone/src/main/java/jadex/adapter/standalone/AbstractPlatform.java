@@ -3,7 +3,7 @@ package jadex.adapter.standalone;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IJadexAgentFactory;
+import jadex.bridge.IAgentFactory;
 import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.MessageType;
@@ -49,7 +49,7 @@ public abstract class AbstractPlatform implements IPlatform
 	protected boolean shuttingdown;
 
 	/** The agent factory. */
-	protected IJadexAgentFactory agentfactory;
+	protected IAgentFactory agentfactory;
 
 	/** The platform name. */
 	protected String platformname;
@@ -193,7 +193,7 @@ public abstract class AbstractPlatform implements IPlatform
 	 *  Get the agent factory.
 	 *  @return The agent factory.
 	 */
-	public IJadexAgentFactory getAgentFactory()
+	public IAgentFactory getAgentFactory()
 	{
 		return agentfactory;
 	}

@@ -3,7 +3,7 @@ package jadex.bridge;
 
 /**
  *  The adapter for a specific platform agent (e.g. a JADE agent).
- *  These are the methods a Jadex agents needs to call on its host agent.
+ *  These are the methods a kernel agents needs to call on its host agent.
  */
 public interface IAgentAdapter
 {
@@ -22,7 +22,7 @@ public interface IAgentAdapter
 
 	/**
 	 *  Cause termination of the agent.
-	 *  IJadexAgent.killAgent(IResultListener) will be
+	 *  IKernelAgent.killAgent(IResultListener) will be
 	 *  called in turn.
 	 */
 	public void killAgent()	throws AgentTerminatedException;

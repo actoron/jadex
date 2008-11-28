@@ -205,15 +205,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //		});
 
 		nof	= new TestCenterNodeFunctionality(this);
-		mpanel = new ModelExplorer(getJCC(), new RootNode(new FileFilter()
-		{
-			public boolean accept(File pathname)
-			{
-//				return pathname.isDirectory() || SXML.isAgentFilename(pathname.getName());
-				return pathname.isDirectory() || getJCC().getAgent().getPlatform()
-					.getAgentFactory().isStartable(pathname.getName());
-			}
-		}), null, nof); // todo: popup for testcenter
+		mpanel = new ModelExplorer(getJCC(), nof);
 		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 

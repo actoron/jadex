@@ -37,7 +37,7 @@ public class OAVAgentModel	extends OAVCapabilityModel
 		super(state, handle, typemodel, types);
 	}
 	
-	//-------- IJadexModel methods --------
+	//-------- IAgentModel methods --------
 	
 	/**
 	 *  Is the model startable.

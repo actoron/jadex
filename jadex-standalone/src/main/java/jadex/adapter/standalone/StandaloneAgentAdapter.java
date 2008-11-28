@@ -9,7 +9,7 @@ import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
-import jadex.bridge.IJadexAgent;
+import jadex.bridge.IKernelAgent;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
@@ -38,8 +38,8 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	/** The agent identifier. */
 	protected IAgentIdentifier	aid;
 
-	/** The Jadex agent. */
-	protected IJadexAgent	agent;
+	/** The kernel agent. */
+	protected IKernelAgent	agent;
 
 	/** The state of the agent (according to FIPA, managed by AMS). */
 	protected String	state;
@@ -57,7 +57,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	{
 		this.platform	= platform;
 		this.aid	= aid;
-		this.agent = platform.getAgentFactory().createJadexAgent(this, model, state, args);		
+		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
 	}
 
 	//-------- IAgentAdapter methods --------
@@ -295,9 +295,9 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	//-------- test methods --------
 	
 	/**
-	 *  Make jadex agent available.
+	 *  Make kernel agent available.
 	 */
-	public IJadexAgent	getJadexAgent()
+	public IKernelAgent	getKernelAgent()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(aid.getName());

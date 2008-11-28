@@ -75,7 +75,7 @@
 	</properties>
 		
 	<properties type="kernel" id="kernel_v2_micro">
-		<property type="agent_factory">new jadex.microkernel.JadexAgentFactory($platform)</property>
+		<property type="agent_factory">new jadex.microkernel.MicroAgentFactory($platform)</property>
 	</properties>
 	
  

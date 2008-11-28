@@ -13,12 +13,12 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IAgentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatformService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -108,7 +108,6 @@ public class AMS implements IAMS, IPlatformService
 			{
 				if(name==null)
 				{
-					//aid = generateAgentIdentifier(SXML.getShortName(model));
 					aid = generateAgentIdentifier(getShortName(model));
 				}
 				else
@@ -477,7 +476,7 @@ public class AMS implements IAMS, IPlatformService
 		if(adapter==null)
 			listener.exceptionOccurred(new RuntimeException("No local agent found for agent identifier: "+aid));
 		else
-			adapter.getJadexAgent().getExternalAccess(listener);
+			adapter.getKernelAgent().getExternalAccess(listener);
 	}
 
 	
@@ -662,45 +661,15 @@ public class AMS implements IAMS, IPlatformService
 		}
     }
 
-    // Hack for removing SXML dependency
 	/**
-	 *  Strip the short type name from a model filename.
+	 *  Get the short type name from a model filename.
 	 *  @param filename The filename.
 	 *  @return The short type name.
 	 */
-	public static String getShortName(String filename)
+	public String getShortName(String filename)
 	{
-		String shortname	= filename;
-		
-		// Hack! todo: make more general
-		int agentend = filename.lastIndexOf(".agent.xml");
-		if(agentend!=-1)
-		{
-			shortname = filename.substring(0, agentend);
-		}
-		else
-		{
-			agentend = shortname.lastIndexOf("Agent.class");
-			if(agentend!=-1)
-			{
-				shortname = shortname.substring(0, agentend);
-			}
-			else
-			{
-				agentend = shortname.lastIndexOf(".class");
-				if(agentend!=-1)
-				{
-					shortname = shortname.substring(0, agentend);
-				}
-			}
-		}
-		
-		int namestart = Math.max(shortname.lastIndexOf(File.separatorChar),
-			Math.max(shortname.lastIndexOf("/"), shortname.lastIndexOf(".")));
-		if(namestart!=-1)
-			shortname = shortname.substring(namestart+1);
-
-		return shortname;
+		IAgentModel	model	= platform.getAgentFactory().loadModel(filename);
+		return model.getName();
 	}
 
 	/**

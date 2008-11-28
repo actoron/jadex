@@ -1,20 +1,34 @@
 package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IJadexAgent;
-import jadex.bridge.IJadexAgentFactory;
-import jadex.bridge.IJadexModel;
+import jadex.bridge.IKernelAgent;
+import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentModel;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
+import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 
 import java.util.Map;
 
+import javax.swing.Icon;
+import javax.swing.UIDefaults;
+
 /**
- *  Factory for creating Jadex V2 BDI agents.
+ *  Factory for creating micro agents.
  */
-public class JadexAgentFactory implements IJadexAgentFactory
+public class MicroAgentFactory implements IAgentFactory
 {
+	//-------- constants --------
+	
+	/**
+	 * The image icons.
+	 */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"micro_agent",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/microkernel/images/micro_agent.png"),
+	});
+
 	//-------- attributes --------
 	
 	/** The platform. */
@@ -25,36 +39,36 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public JadexAgentFactory(IPlatform platform)
+	public MicroAgentFactory(IPlatform platform)
 	{
 		this.platform = platform;
 	}
 	
-	//-------- IJadexAgentFactory interface --------
+	//-------- IAgentFactory interface --------
 	
 	/**
-	 *  Create a Jadex agent.
+	 *  Create a kernel agent.
 	 *  @param adapter	The platform adapter for the agent. 
 	 *  @param model	The agent model file (i.e. the name of the XML file).
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
-	 *  @return	An instance of a jadex agent.
+	 *  @return	An instance of a kernel agent.
 	 */
-	public IJadexAgent	createJadexAgent(IAgentAdapter adapter, String model, String config, Map arguments)
+	public IKernelAgent	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
 	{
 		MicroAgentModel lm = (MicroAgentModel)loadModel(model);
 		return new MicroAgentInterpreter(adapter, lm, arguments, config);
 	}
 	
 	/**
-	 *  Load a Jadex model.
+	 *  Load an agent model.
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public IJadexModel loadModel(String model)
+	public IAgentModel loadModel(String model)
 	{
 //		System.out.println("loading micro: "+model);
-		IJadexModel ret = null;
+		IAgentModel ret = null;
 		ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
 		
 		String clname = model;
@@ -102,5 +116,21 @@ public class JadexAgentFactory implements IJadexAgentFactory
 	public boolean isStartable(String model)
 	{
 		return isLoadable(model);
+	}
+
+	/**
+	 *  Get the names of ADF file types supported by this factory.
+	 */
+	public String[] getFileTypes()
+	{
+		return new String[]{"Micro Agent"};
+	}
+
+	/**
+	 *  Get a default icon for a file type.
+	 */
+	public Icon getFileTypeIcon(String type)
+	{
+		return type.equals("Micro Agent") ? icons.getIcon("micro_agent") : null;
 	}
 }
