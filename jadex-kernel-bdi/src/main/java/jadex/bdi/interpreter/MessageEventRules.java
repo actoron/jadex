@@ -378,15 +378,15 @@ public class MessageEventRules
 			}
 		};
 		
-		IPriorityEvaluator pe = new IPriorityEvaluator()
-		{
-			public int getPriority(IOAVState state, IVariableAssignments assignments)
-			{
-				return -1;
-			}
-		};
+//		IPriorityEvaluator pe = new IPriorityEvaluator()
+//		{
+//			public int getPriority(IOAVState state, IVariableAssignments assignments)
+//			{
+//				return -1;
+//			}
+//		};
 		
-		Rule message_no_match = new Rule("message_no_match", new AndCondition(new ICondition[]{messagecon, agentcon}), action, pe);
+		Rule message_no_match = new Rule("message_no_match", new AndCondition(new ICondition[]{messagecon, agentcon}), action);//, pe);
 		return message_no_match;
 	}
 	
@@ -1015,7 +1015,8 @@ public class MessageEventRules
 	 */
 	protected static int calculateDegree(IOAVState state, Object mevent)
 	{
-		int ret = 0;
+		// Start with one to be able to set the priority of no-match to 0.
+		int ret = 1;//0;
 		
 		Collection params = state.getAttributeValues(mevent, OAVBDIMetaModel.parameterelement_has_parameters);
 		if(params!=null)

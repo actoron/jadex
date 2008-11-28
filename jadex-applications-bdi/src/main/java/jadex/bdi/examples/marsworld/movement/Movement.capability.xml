@@ -78,21 +78,29 @@
 			<parameter name="destination" class="Location">
 				<value>$beliefbase.my_home</value>
 			</parameter>
-			<unique/>
+			<!-- <unique/>-->
 			<creationcondition>
 				// $beliefbase.missionend
 				// &amp;&amp; !$beliefbase.my_location.isNear($beliefbase.my_home)
 
 				(belief (element_has_model ?mbel_missionend) (belief_has_fact true))
-				?mbel_missionend	= (mbelief (element_has_name "missionend"))
+				?mbel_missionend = (mbelief (element_has_name "missionend"))
 				
 				(belief (element_has_model ?mbel_myhome) (belief_has_fact ?myhome))
-				?mbel_myhome	= (mbelief (element_has_name "my_home"))
+				?mbel_myhome = (mbelief (element_has_name "my_home"))
 				
 				(belief (element_has_model ?mbel_mylocation) (belief_has_fact ?mylocation))
-				?mbel_mylocation	= (mbelief (element_has_name "my_location"))
+				?mbel_mylocation = (mbelief (element_has_name "my_location"))
+				
+				// Ensure uniques.
+				(not 
+					(and 
+						?rgoal = (goal (element_has_model ?mgoal))
+						?mgoal = (mgoal (element_has_name "missionend"))
+					)
+				)
 
-				?mylocation	= (jadex.bdi.examples.marsworld.Location (isNear(?myhome) true))
+				?mylocation	= (jadex.bdi.examples.marsworld.Location (isNear(?myhome) false))
 			</creationcondition>
 		</achievegoal>
 	</goals>

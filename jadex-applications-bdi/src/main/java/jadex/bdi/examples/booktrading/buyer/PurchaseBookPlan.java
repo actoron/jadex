@@ -43,7 +43,7 @@ public class PurchaseBookPlan extends Plan
 			.getParameterSet("result").getValues();
 		if(result.length == 0)
 		{
-			System.out.println("No seller found, purchase failed.");
+			//System.out.println("No seller found, purchase failed.");
 			fail();
 		}
 		
