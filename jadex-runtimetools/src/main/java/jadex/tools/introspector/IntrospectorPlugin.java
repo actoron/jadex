@@ -180,6 +180,11 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 		{
 			props.addProperty(new Property(checkboxes[i].getText(), ""+checkboxes[i].isSelected()));
 		}
+		
+		Properties ps = props.getSubproperty("agents");
+		if(ps!=null)
+			agents.setProperties(ps);
+		
 		return props;
 	}
 	
@@ -193,6 +198,8 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 			boolean	selected	= props.getBooleanProperty(checkboxes[i].getText());
 			checkboxes[i].setSelected(selected);
 		}
+		
+		addSubproperties(props, "agents", agents.getProperties());
 	}
 	
 	/**
@@ -339,13 +346,13 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 		});
 
 		jcc.addAgentListListener(this);
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.adjustColumnWidths();
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				agents.adjustColumnWidths();
+//			}
+//		});
 
 		return split;
 	}

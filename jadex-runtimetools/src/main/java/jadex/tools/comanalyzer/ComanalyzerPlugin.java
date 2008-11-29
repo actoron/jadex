@@ -197,6 +197,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 //			System.out.println(""+checkboxes[i].getText()+" "+checkboxes[i].isSelected());
 			props.addProperty(new Property(checkboxes[i].getText(), ""+checkboxes[i].isSelected()));
 		}
+		
+		addSubproperties(props, "agents", agents.getProperties());
+
 		return props;
 	}
 	
@@ -239,7 +242,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				selected = true;
 			}
 		}
-
+		
+		Properties ps = props.getSubproperty("agents");
+		if(ps!=null)
+			agents.setProperties(ps);
 	}
 
 	/**
@@ -451,13 +457,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 		});
 
 		jcc.addAgentListListener(this);
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.adjustColumnWidths();
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				agents.adjustColumnWidths();
+//			}
+//		});
 
 		// add dummy agent to agentlist
 		Agent dummy = Agent.DUMMY_AGENT;

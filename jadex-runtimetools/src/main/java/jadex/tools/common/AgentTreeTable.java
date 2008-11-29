@@ -1,6 +1,8 @@
 package jadex.tools.common;
 
 import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.Properties;
+import jadex.bridge.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -126,11 +128,11 @@ public class AgentTreeTable extends JScrollPane
 
 	/**
 	 *  Adjust the column widths of the table to fit the current contents.
-	 */
+	 * /
 	public void	adjustColumnWidths()
 	{
 		header.resizeAllColumns();
-	}
+	}*/
 	
 	/**
 	 *  Add an agent.
@@ -165,6 +167,58 @@ public class AgentTreeTable extends JScrollPane
 		for(int i=0; i<tcm.getColumnCount(); i++)
 			widths[i]	= tcm.getColumn(i).getWidth();
 		System.out.println(msg+", column widths: "+SUtil.arrayToString(widths));
+	}
+	
+	/**
+	 *  Get the column widths.
+	 *  @param widths The widths.
+	 */
+	public int[] getColumnWidths()
+	{
+		TableColumnModel	tcm	= treetable.getColumnModel();
+		int[]	widths	= new int[tcm.getColumnCount()];
+		for(int i=0; i<tcm.getColumnCount(); i++)
+			widths[i]	= tcm.getColumn(i).getWidth();
+		return widths;
+	}
+	
+	/**
+	 *  Set the column width.
+	 *  @param widths The widths.
+	 */
+	public void setColumnWidths(int[] widths)
+	{
+//		System.out.println("Widths: "+SUtil.arrayToString(widths));
+		TableColumnModel	tcm	= treetable.getColumnModel();
+		for(int i=0; i<tcm.getColumnCount(); i++)
+			tcm.getColumn(i).setPreferredWidth(widths[i]);
+	}
+	
+	/**
+	 * Load the properties.
+	 */
+	public void setProperties(Properties props)
+	{
+//		System.out.println("Starter set props: "+props);
+		
+		Property[] aps = props.getProperties();
+		int[] widths = new int[aps.length];
+		for(int i=0; i<aps.length; i++)
+			widths[i] = Integer.parseInt(aps[i].getValue());
+		setColumnWidths(widths);
+	}
+
+	/**
+	 * Save the properties.
+	 * @param props
+	 */
+	public Properties	getProperties()
+	{
+		Properties props = new Properties();
+		int[] ws = getColumnWidths();
+		for(int i=0; i<ws.length; i++)
+			props.addProperty(new Property(""+i, ""+ws[i]));
+		return props;
 	}
 
 	/**

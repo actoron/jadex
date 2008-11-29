@@ -198,13 +198,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 		});
 
 		jcc.addAgentListListener(this);
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.adjustColumnWidths();
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				agents.adjustColumnWidths();
+//			}
+//		});
 
 		return split;
 	}

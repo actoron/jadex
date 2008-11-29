@@ -334,13 +334,13 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		csplit.setDividerLocation(180);
             			
 		jcc.addAgentListListener(this);
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.adjustColumnWidths();
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				agents.adjustColumnWidths();
+//			}
+//		});
 
 		return csplit;
 	}
@@ -372,6 +372,10 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		csplit.setDividerLocation(props.getIntProperty("mainsplit.location"));
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
+		
+		Properties ps = props.getSubproperty("agents");
+		if(ps!=null)
+			agents.setProperties(ps);
 	}
 
 	/**
@@ -390,6 +394,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		
 		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
 
+		addSubproperties(props, "agents", agents.getProperties());
+		
 		return props;
 	}
 	

@@ -66,53 +66,60 @@ public class LoadManagingExecutionService
 		{
 			public boolean execute()
 			{
-				// Sleep before executing, to match desired CPU load.
-				if(sleep>0)
+				try
 				{
-					try
+					// Sleep before executing, to match desired CPU load.
+					if(sleep>0)
 					{
-//						System.out.println("Sleeping: "+sleep);
-						if(sleep>1000)
+						try
 						{
-							System.out.println("Sleep warning: "+sleep);
-							sleep	= 1000;
+	//						System.out.println("Sleeping: "+sleep);
+							if(sleep>1000)
+							{
+								System.out.println("Sleep warning: "+sleep);
+								sleep	= 1000;
+							}
+							Thread.sleep(sleep);
 						}
-						Thread.sleep(sleep);
+						catch (InterruptedException e){}
+						sleep	= 0;
 					}
-					catch (InterruptedException e){}
-					sleep	= 0;
+					
+					synchronized(LoadManagingExecutionService.this)
+					{
+						if(concurrency!=0)
+							return false;	// Hack!!! execute can be called too often
+							
+						start	= System.nanoTime();
+						concurrency	= 0;
+						load	= 0.0;
+						for(Iterator it=tasks.iterator(); concurrency<limit && it.hasNext(); )
+						{
+							Task	task	= (Task)it.next();
+							if(load==0.0)
+							{
+								load	= task.priority;
+							}
+	
+							if(load==task.priority)
+							{
+								it.remove();
+								pool.execute(task);
+								concurrency++;
+							}
+							else
+							{
+								break;
+							}
+						}
+						if(concurrency>0)
+							limit	= concurrency;
+	//					System.out.println("Executing "+concurrency+" tasks with load "+load);
+					}
 				}
-				
-				synchronized(LoadManagingExecutionService.this)
+				catch(Exception e)
 				{
-					if(concurrency!=0)
-						return false;	// Hack!!! execute can be called too often
-						
-					start	= System.nanoTime();
-					concurrency	= 0;
-					load	= 0.0;
-					for(Iterator it=tasks.iterator(); concurrency<limit && it.hasNext(); )
-					{
-						Task	task	= (Task)it.next();
-						if(load==0.0)
-						{
-							load	= task.priority;
-						}
-
-						if(load==task.priority)
-						{
-							it.remove();
-							pool.execute(task);
-							concurrency++;
-						}
-						else
-						{
-							break;
-						}
-					}
-					if(concurrency>0)
-						limit	= concurrency;
-//					System.out.println("Executing "+concurrency+" tasks with load "+load);
+					// Can happen when threadpool is already shut down.
 				}
 				return false;
 			}

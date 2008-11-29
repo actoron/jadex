@@ -142,13 +142,13 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		});
 
 		jcc.addAgentListListener(this);
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.adjustColumnWidths();
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				agents.adjustColumnWidths();
+//			}
+//		});
 		jcc.addMessageListener(this);
 
 		return split;
@@ -184,7 +184,12 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 	 */
 	public void setProperties(Properties props)
 	{
-		convcenter.setProperties(props);
+		Properties ps = props.getSubproperty("convcenter");
+		if(ps!=null)
+			convcenter.setProperties(ps);
+		ps = props.getSubproperty("agents");
+		if(ps!=null)
+			agents.setProperties(ps);
 	}
 
 	/**
@@ -192,7 +197,10 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 	 */
 	public Properties	getProperties()
 	{
-		return convcenter.getProperties();
+		Properties props = new Properties();
+		addSubproperties(props, "convcenter", convcenter.getProperties());
+		addSubproperties(props, "agents", agents.getProperties());
+		return props;
 	}
 
 	/**

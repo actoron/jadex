@@ -360,6 +360,10 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		refresh1.setSelected(sleep == REFRESH1);
 		refresh5.setSelected(sleep == REFRESH5);
 		refresh30.setSelected(sleep == REFRESH30);
+		
+		Properties ps = props.getSubproperty("agents");
+		if(ps!=null)
+			df_agents.setProperties(ps);
 	}
 
 	/**
@@ -383,6 +387,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		
 		addSubproperties(props, "agenttable", agent_table.getProperties());
 		addSubproperties(props, "servicetable", service_table.getProperties());
+		addSubproperties(props, "agents", df_agents.getProperties());
 		
 		return props;
 	}
@@ -497,7 +502,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 						{
 							public void run()
 							{
-								df_agents.adjustColumnWidths();
+//								df_agents.adjustColumnWidths();
 								
 								DefaultTreeTableNode[] nodes = df_agents.getAllAgents();
 								//System.out.println(SUtil.arrayToString(nodes));
