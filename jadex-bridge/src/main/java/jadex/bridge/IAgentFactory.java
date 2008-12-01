@@ -50,4 +50,9 @@ public interface IAgentFactory
 	 *  Get a default icon for a file type.
 	 */
 	public Icon getFileTypeIcon(String type);
+
+	/**
+	 *  Get the file type of a model.
+	 */
+	public String getFileType(String model);
 }

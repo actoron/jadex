@@ -1,18 +1,14 @@
 package jadex.tools.starter;
 
-import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentModel;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.IExecutable;
 import jadex.tools.common.modeltree.AbstractNodeFunctionality;
+import jadex.tools.common.modeltree.CombiIcon;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
-import jadex.tools.common.modeltree.JarNode;
 import jadex.tools.common.modeltree.ModelExplorer;
-import jadex.tools.common.modeltree.RootNode;
-import jadex.tools.common.plugin.IControlCenter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,18 +34,8 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"agent", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_agent.png"),
-		"agent_broken", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_broken.png"),
-		"capability", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_small.png"),
-		"capability_broken", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_broken.png"),
-		"src_folder", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder.png"),
-		"src_folder_broken", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder_broken.png"),
-		"src_jar", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
-		"src_jar_broken", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar_broken.png"),
-		"package", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_package.png"),
-		"package_broken", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_package_broken.png"),
-		"java_file", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/java_file.png"),
-		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_check_anim.gif"),	
+		"check_overlay", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/check_overlay.png"),
+		"checking_on",	SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_check_anim.gif"),	
 	});
 	
 	//-------- attributes --------
@@ -84,43 +70,14 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	public Icon getIcon(IExplorerTreeNode node)
 	{
-		Icon icon	= null;
-		if(node instanceof FileNode)
+		Icon icon	= super.getIcon(node);
+		if(icon!=null && !isValid(node))
 		{
-			boolean	valid = isValid(node);
-
-			if(node instanceof JarNode)
+			icon	= new CombiIcon(new Icon[]
 			{
-				icon =  icons.getIcon(valid? "src_jar" : "src_jar_broken");
-			}
-			else if(node instanceof DirNode)
-			{
-				if(node.getParent() instanceof RootNode)
-				{
-					icon	= icons.getIcon(valid? "src_folder" : "src_folder_broken");
-				}
-				else
-				{
-					icon	= icons.getIcon(valid? "package" : "package_broken");
-				}
-			}
-			else if (node instanceof FileNode)
-			{
-				FileNode fn = (FileNode)node;
-				IAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
-				if(fac.isLoadable(fn.getFile().getName()) && fac.isStartable(fn.getFile().getName()))
-				{
-					icon	= icons.getIcon(valid? "agent" : "agent_broken");
-				}
-				else if(fac.isLoadable(fn.getFile().getName()))
-				{
-					icon	= icons.getIcon(valid? "capability" : "capability_broken");
-				}
-				else if(SUtil.isJavaSourceFilename(fn.getFile().getName()))
-				{
-					icon	= icons.getIcon("java_file");
-				}
-			}
+				icon,
+				icons.getIcon("check_overlay")
+			});
 		}
 		return icon;
 	}

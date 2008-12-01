@@ -36,7 +36,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
@@ -114,7 +113,7 @@ public class ModelExplorer extends JTree
 	protected JMenu filtermenu;
 	
 	/** The file filter. */
-	protected FilenameFilter	filefilter;
+	protected java.io.FileFilter	filefilter;
 	
 	//-------- constructors --------
 
@@ -610,7 +609,7 @@ public class ModelExplorer extends JTree
 	/**
 	 *	Get a file filter according to current file type settings. 
 	 */
-	public FilenameFilter getFileFilter()
+	public java.io.FileFilter getFileFilter()
 	{
 		if(filefilter==null)
 		{
@@ -618,11 +617,10 @@ public class ModelExplorer extends JTree
 			{
 				if(filefilter==null)
 				{
-					filefilter	= new FilenameFilter()
+					filefilter	= new java.io.FileFilter()
 					{
-						public boolean accept(File dir, String name)
+						public boolean accept(File file)
 						{
-							File	file	= new File(dir, name);
 							return file.isDirectory() || jcc.getAgent()
 								.getPlatform().getAgentFactory().isLoadable(file.getAbsolutePath());
 						}

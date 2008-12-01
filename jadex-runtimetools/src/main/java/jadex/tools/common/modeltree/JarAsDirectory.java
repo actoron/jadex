@@ -4,6 +4,7 @@ import jadex.commons.collection.MultiCollection;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +95,27 @@ public class JarAsDirectory	extends File
 		return ret;
 	}
 	
+	public File[] listFiles(FilenameFilter filter)
+	{
+		File[]	ret;
+		if(entries!=null)
+		{
+			List	list	= new ArrayList();
+			for(int i=0; i<entries.length; i++)
+			{
+				if(filter.accept(entries[i].getParentFile(), entries[i].getName()))
+					list.add(entries[i]);
+			}
+			ret	= (File[])list.toArray(new File[list.size()]);
+		}
+		else
+		{
+			ret	= new File[0];
+		}
+//		System.out.println("list files: "+entry+", "+SUtil.arrayToString(ret));
+		return ret;
+	}
+	
 	public String getAbsolutePath()
 	{
 		String	ret;
@@ -156,6 +178,14 @@ public class JarAsDirectory	extends File
 		}
 //		System.out.println("refresh: "+entry+", "+changed);
 		return changed;
+	}
+	
+	/**
+	 *  Check if the file exists.
+	 */
+	public boolean exists()
+	{
+		return true;	// hack???
 	}
 	
 	/**

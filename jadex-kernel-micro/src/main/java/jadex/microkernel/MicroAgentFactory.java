@@ -21,6 +21,9 @@ public class MicroAgentFactory implements IAgentFactory
 {
 	//-------- constants --------
 	
+	/** The micro agent file type. */
+	public static final String	FILETYPE_MICROAGENT	= "Micro Agent";
+	
 	/**
 	 * The image icons.
 	 */
@@ -123,7 +126,7 @@ public class MicroAgentFactory implements IAgentFactory
 	 */
 	public String[] getFileTypes()
 	{
-		return new String[]{"Micro Agent"};
+		return new String[]{FILETYPE_MICROAGENT};
 	}
 
 	/**
@@ -131,6 +134,15 @@ public class MicroAgentFactory implements IAgentFactory
 	 */
 	public Icon getFileTypeIcon(String type)
 	{
-		return type.equals("Micro Agent") ? icons.getIcon("micro_agent") : null;
+		return type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null;
+	}
+
+	/**
+	 *  Get the file type of a model.
+	 */
+	public String getFileType(String model)
+	{
+		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT
+			: null;
 	}
 }

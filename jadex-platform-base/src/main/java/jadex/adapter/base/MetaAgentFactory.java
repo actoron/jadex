@@ -152,4 +152,19 @@ public class MetaAgentFactory implements IAgentFactory
 		}
 		return ret;
 	}
+
+
+	/**
+	 *  Get the file type of a model.
+	 */
+	public String getFileType(String model)
+	{
+		String	ret = null;
+		for(int i=0; ret==null && i<factories.size(); i++)
+		{
+			IAgentFactory fac = (IAgentFactory)factories.get(i);
+			ret = fac.getFileType(model);
+		}
+		return ret;
+	}
 }

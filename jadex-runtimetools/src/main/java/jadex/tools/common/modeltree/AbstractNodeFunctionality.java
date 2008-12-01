@@ -1,8 +1,11 @@
 package jadex.tools.common.modeltree;
 
+import jadex.bridge.IAgentFactory;
 import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IExecutable;
 import jadex.tools.common.plugin.IControlCenter;
+import jadex.tools.starter.StarterNodeFunctionality;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,6 +37,9 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"scanning_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_refresh_anim.gif"),
+		"src_folder", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder.png"),
+		"src_jar", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
+		"package", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_package.png")
 	});
 
 	//-------- attributes --------
@@ -79,10 +85,6 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	 */
 	public void	refresh(final IExplorerTreeNode node)
 	{
-		// Todo: how/when to remove status comp?
-//		if(refreshcomp!=null)
-//			jcc.addStatusComponent(this, refreshcomp);
-
 		boolean	changed	= false;
 		if(node instanceof FileNode)
 		{
@@ -187,7 +189,37 @@ public abstract class AbstractNodeFunctionality implements INodeFunctionality
 	 *  Get the icon.
 	 *  @return The icon.
 	 */
-	public abstract Icon getIcon(IExplorerTreeNode node);
+	public Icon	getIcon(IExplorerTreeNode node)
+	{
+		Icon icon	= null;
+		if(node instanceof FileNode)
+		{
+			if(node instanceof JarNode)
+			{
+				icon =  icons.getIcon("src_jar");
+			}
+			else if(node instanceof DirNode)
+			{
+				if(node.getParent() instanceof RootNode)
+				{
+					icon	= icons.getIcon("src_folder");
+				}
+				else
+				{
+					icon	= icons.getIcon("package");
+				}
+			}
+			else if (node instanceof FileNode)
+			{
+				FileNode fn = (FileNode)node;
+				IAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
+				String	type	= fac.getFileType(fn.getFile().getAbsolutePath());
+				if(type!=null)
+						icon	= fac.getFileTypeIcon(type);
+			}
+		}
+		return icon;
+	}
 
 	/**
 	 *  Called when a change was detected in a node.

@@ -2,20 +2,16 @@ package jadex.tools.testcenter;
 
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentModel;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.IExecutable;
 import jadex.rules.state.IOAVState;
 import jadex.tools.common.modeltree.AbstractNodeFunctionality;
+import jadex.tools.common.modeltree.CombiIcon;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
-import jadex.tools.common.modeltree.JarNode;
 import jadex.tools.common.modeltree.ModelExplorer;
-import jadex.tools.common.modeltree.RootNode;
-import jadex.tools.common.plugin.IControlCenter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,19 +39,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"agent", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent.png"),
-		"agent_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testable.png"),
-		"capability", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_small.png"),
-		// Todo: testable capability icon.
-		"capability_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_capability_small.png"),
-		"src_folder", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder.png"),
-		"src_folder_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_folder_testable.png"),
-		"package", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_package.png"),
-		"package_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_package_testable.png"),
-		"src_jar", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
-		// Todo: testable jar icon.
-		"src_jar_testable", SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_src_jar.png"),
-		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif"),	
+		"test_overlay",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/test_overlay.png"),	
+		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif")	
 	});
 	
 	//-------- attributes --------
@@ -90,47 +75,17 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	public Icon getIcon(IExplorerTreeNode node)
 	{
-		Icon icon	= null;
-		if(node instanceof FileNode)
+		Icon icon	= super.getIcon(node);
+		if(icon!=null && isTestcase(node))
 		{
-			boolean	test = isTestcase(node);
-
-			if(node instanceof JarNode)
+			icon	= new CombiIcon(new Icon[]
 			{
-				icon =  icons.getIcon(test ? "src_jar_testable" :  "src_jar");
-			}
-			else if(node instanceof DirNode)
-			{
-				if(node.getParent() instanceof RootNode)
-				{
-					icon	= icons.getIcon(test ? "src_folder_testable" : "src_folder");
-				}
-				else
-				{
-					icon	= icons.getIcon(test ? "package_testable" : "package");
-				}
-			}
-			else if (node instanceof FileNode)
-			{
-				FileNode fn = (FileNode)node;
-				IAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
-				if(fac.isLoadable(fn.getFile().getName()) && fac.isStartable(fn.getFile().getName()))
-				{
-					icon	= icons.getIcon(test ? "agent_testable" : "agent");
-				}
-				else if(fac.isLoadable(fn.getFile().getName()))
-				{
-					icon	= icons.getIcon(test ? "capability_testable" : "capability");
-				}
-				else if(SUtil.isJavaSourceFilename(fn.getFile().getName()))
-				{
-					icon	= icons.getIcon("java_file");
-				}
-			}
+				icon,
+				icons.getIcon("test_overlay")
+			});
 		}
 		return icon;
 	}
-
 
 	/**
 	 *  Called when a change was detected in a node.

@@ -26,6 +26,12 @@ public class BDIAgentFactory implements IAgentFactory
 {
 	//-------- constants --------
 	
+	/** The BDI agent file type. */
+	public static final String	FILETYPE_BDIAGENT	= "BDI Agent";
+	
+	/** The BDI capability file type. */
+	public static final String	FILETYPE_BDICAPABILITY	= "BDI Capability";
+	
 	/**
 	 * The image icons.
 	 */
@@ -167,7 +173,7 @@ public class BDIAgentFactory implements IAgentFactory
 	 */
 	public String[] getFileTypes()
 	{
-		return new String[]{"BDI Agent", "BDI Capability"};
+		return new String[]{FILETYPE_BDIAGENT, FILETYPE_BDICAPABILITY};
 	}
 
 	/**
@@ -175,7 +181,17 @@ public class BDIAgentFactory implements IAgentFactory
 	 */
 	public Icon getFileTypeIcon(String type)
 	{
-		return type.equals("BDI Agent") ? icons.getIcon("bdi_agent")
-			: type.equals("BDI Capability") ? icons.getIcon("bdi_capability") : null;
+		return type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
+			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null;
+	}
+
+	/**
+	 *  Get the file type of a model.
+	 */
+	public String getFileType(String model)
+	{
+		return model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
+			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY
+			: null;
 	}
 }
