@@ -14,9 +14,7 @@ public class HelloWorldAgent extends MicroAgent
 	 */
 	public boolean executeAction()
 	{
-		System.out.println("Hello world, this is a Jadex micro agent");
-		System.out.println(getArgument("text"));
-		System.out.println(getConfiguration());
+		System.out.println(getArgument("welcome text"));
 		return false;
 	}
 	
@@ -30,7 +28,7 @@ public class HelloWorldAgent extends MicroAgent
 		{
 			public Object getDefaultValue(String configname)
 			{
-				return "default value";
+				return "Hello world, this is a Jadex micro agent";
 			}
 			public String getDescription()
 			{
@@ -38,7 +36,7 @@ public class HelloWorldAgent extends MicroAgent
 			}
 			public String getName()
 			{
-				return "text";
+				return "welcome text";
 			}
 			public String getTypename()
 			{

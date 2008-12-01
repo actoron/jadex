@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<bean name="platformName" class="java.lang.String">
 		<constructor-arg type="java.lang.String"><value>lars</value></constructor-arg>
@@ -26,7 +26,8 @@
 		</property>
 		
 		<property name="agentFactories">
-			<list value-type="jadex.bridge.IAgentFactory">
+			<list value-type="jadex.bridge.IJadexAgentFactory">
+				
 				<bean id="kernel_v2_bdi_factory" class="jadex.bdi.interpreter.BDIAgentFactory">
 					<constructor-arg>
 						<map>
@@ -65,7 +66,7 @@
 					<constructor-arg ref="platform"/>
 				</bean>
 				
-				<bean id="kernel_v2_micro_factory" class="jadex.microkernel.JadexAgentFactory">
+				<bean id="kernel_v2_micro_factory" class="jadex.microkernel.MicroAgentFactory">
 					<constructor-arg ref="platform"/>
 				</bean>
 				
@@ -255,11 +256,11 @@
 		<property name="daemonAgents">
 			<map>
 				<entry>
-					<key><value>AMS</value></key>
+					<key><value>ams</value></key>
 					<value type="java.lang.String">jadex/bdi/amsagent/AMS.agent.xml</value>
 				</entry>
 				<entry>
-					<key><value>DF</value></key>
+					<key><value>df</value></key>
 					<value type="java.lang.String">jadex/bdi/dfagent/DF.agent.xml</value>
 				</entry>
 			</map>
@@ -268,7 +269,7 @@
 		<property name="agents">
 			<map>
 				<entry>
-					<key><value>JCC</value></key>
+					<key><value>jcc</value></key>
 					<value type="java.lang.String">jadex/tools/jcc/JCC.agent.xml</value>
 				</entry>
 			</map>
