@@ -38,10 +38,6 @@ public class SimObject
 	 */
 	private IVector2 position_;
 	
-	/** Graphical representation of the object.
-	 */
-	private IDrawable drawable_;
-	
 	/** Flag for destruction notification.
 	 */
 	private boolean signalDestruction_;
@@ -66,7 +62,6 @@ public class SimObject
 					 Map properties,
 					 List tasks,
 					 IVector2 initialPosition,
-					 IDrawable drawable,
 					 boolean sigDest)
 	{
 		objectId_ = objectId;
@@ -74,7 +69,6 @@ public class SimObject
 		properties_ = new HashMap(properties);
 		
 		position_  = initialPosition.copy();
-		drawable_ = drawable;
 		signalDestruction_ = sigDest;
 		
 		listeners_ = new ArrayList();
@@ -120,15 +114,6 @@ public class SimObject
 	public synchronized String getType()
 	{
 		return type_;
-	}
-	
-	/** Returns the graphical representation of the object.
-	 * 
-	 *  @return drawable representing the object
-	 */
-	public synchronized IDrawable getDrawable()
-	{
-		return drawable_;
 	}
 	
 	public synchronized void updateObject(IVector1 deltaT)

@@ -23,7 +23,6 @@ public class LocalCreateObjectPlan extends Plan
 		Map properties = (Map) getParameter("properties").getValue();
 		List tasks = (List) getParameter("tasks").getValue();
 		IVector2 position = (IVector2) getParameter("position").getValue();
-		IDrawable drawable = (IDrawable) getParameter("drawable").getValue();
 		boolean signalDestruction = ((Boolean) getParameter("signal_destruction").getValue()).booleanValue();
 		boolean listen = ((Boolean) getParameter("listen").getValue()).booleanValue();
 		IBeliefbase b = getBeliefbase();
@@ -38,7 +37,6 @@ public class LocalCreateObjectPlan extends Plan
 												  properties,
 												  tasks,
 												  position,
-												  drawable,
 												  signalDestruction,
 												  listener);
 		getParameter("object_id").setValue(objectId);

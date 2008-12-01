@@ -11,6 +11,13 @@ import java.math.BigDecimal;
  */
 public interface IVector2
 {
+	/** Assigns this vector the values of another vector.
+	 * 
+	 *  @param vector the other vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector2 assign(IVector2 vector);
+	
 	/** Adds a scalar to each component of this vector.
 	 *
 	 *  @param scalar scalar value as double

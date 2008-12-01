@@ -1,17 +1,15 @@
-package jadex.bdi.planlib.simsupport.observer.agent;
+package jadex.bdi.planlib.simsupport.observer.capability;
 
-import java.awt.Color;
-
-import javax.media.opengl.GLException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJ2D;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingColoredRectangle;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;
@@ -19,10 +17,13 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ILibraryService;
 
-public class InitializeObserverPlan extends Plan
+import javax.media.opengl.GLException;
+
+public class StartObserverPlan extends Plan
 {
 	public void body()
 	{
+		System.out.println(this.getClass().getName());
 		IBeliefbase b = getBeliefbase();
 		String envName = (String) b.getBelief("environment_name").getFact();
 		
@@ -49,7 +50,8 @@ public class InitializeObserverPlan extends Plan
 		
 		if (libService == null)
 		{
-			System.exit(1);
+			System.err.println("Observer: Library service not found. Exiting.");
+			killAgent();
 		}
 		
 		IViewport viewport = null;
@@ -88,6 +90,25 @@ public class InitializeObserverPlan extends Plan
 		viewport.setSize(areaSize);
 		
 		b.getBelief("viewport").setFact(viewport);
+		
+		// Set pre- and postlayers
+		List preLayers = (List) b.getBelief("prelayers").getFact();
+		List postLayers = (List) b.getBelief("postlayers").getFact();
+		viewport.setPreLayers(preLayers);
+		viewport.setPostLayers(postLayers);
+		
+		// Register the drawables
+		List themes = (List) b.getBelief("object_themes").getFact();
+		for (Iterator it = themes.iterator(); it.hasNext(); )
+		{
+			Map theme = (Map) it.next();
+			Collection drawables = theme.values();
+			for (Iterator it2 = drawables.iterator(); it2.hasNext(); )
+			{
+				IDrawable d = (IDrawable) it2.next();
+				viewport.registerDrawable(d);
+			}
+		}
 		
 		IGoal updateGoal = createGoal("simobs_update_display");
 		dispatchTopLevelGoal(updateGoal);

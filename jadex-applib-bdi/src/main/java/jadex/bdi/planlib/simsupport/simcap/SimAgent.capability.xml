@@ -55,8 +55,6 @@
 			<parameter name="tasks" class="List"/>
 			<!-- Place new object at this position -->
 			<parameter name="position" class="IVector2"/>
-			<!-- Use these drawables to represent the object -->
-			<parameter name="drawable" class="IDrawable"/>
 			<!-- Whether the object will issue a destruction event -->
 			<parameter name="signal_destruction" class="Boolean"/>
 			<!-- Whether to listen to object events -->

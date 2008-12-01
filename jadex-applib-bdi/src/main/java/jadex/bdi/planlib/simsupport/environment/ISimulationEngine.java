@@ -21,8 +21,6 @@ import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
  *  	  the following lock-order must be used to prevent deadlocks:
  *  	  0. getSimObjectAccess() (also locks the engine)
  *  	  1. getTypedSimObjectAccess()
- *  	  2. getPreLayerAccess()
- *  	  3. getPostLayerAccess()
  */
 public interface ISimulationEngine
 {
@@ -42,7 +40,6 @@ public interface ISimulationEngine
 	 *  @param properties properties of the object (may be null)
 	 *  @param tasks tasks of the object (may be null)
 	 *  @param position position of the object
-	 *  @param drawable drawable representing the object
 	 *  @param listener default object listener, may be null if none is required
 	 *  @return the simulation object ID
 	 */
@@ -50,7 +47,6 @@ public interface ISimulationEngine
 								   Map properties,
 								   List tasks,
 								   IVector2 position,
-						    	   IDrawable drawable,
 						    	   boolean signalDestruction,
 						    	   ISimulationEventListener listener);
 	
@@ -59,30 +55,6 @@ public interface ISimulationEngine
 	 *  @param objectId the simulation object ID
 	 */
 	public void destroySimObject(Integer objectId);
-	
-	/** Adds a pre-layer (background).
-	 * 
-	 *  @param preLayer new pre-layer
-	 */
-	public void addPreLayer(ILayer preLayer);
-	
-	/** Removes a pre-layer (background).
-	 * 
-	 *  @param preLayer the pre-layer
-	 */
-	public void removePreLayer(ILayer preLayer);
-	
-	/** Adds a post-layer.
-	 * 
-	 *  @param postLayer new post-layer
-	 */
-	public void addPostLayer(ILayer postLayer);
-	
-	/** Removes a post-layer.
-	 * 
-	 *  @param preLayer new post-layer
-	 */
-	public void removePostLayer(ILayer postLayer);
 	
 	/** Adds an environment process.
 	 * 
@@ -152,18 +124,6 @@ public interface ISimulationEngine
 	 *  @param distance minimum distance from the edge
 	 */
 	public IVector2 getRandomPosition(IVector2 distance);
-	
-	/** Returns direct access to the pre-layers.
-	 * 
-	 *  @return direct access to pre-layers
-	 */
-	public List getPreLayerAccess();
-	
-	/** Returns direct access to the pre-layers.
-	 * 
-	 *  @return direct access to pre-layers
-	 */
-	public List getPostLayerAccess();
 	
 	/** Returns direct access to the simulation objects.
 	 * 

@@ -58,32 +58,8 @@ import jadex.bridge.ILibraryService;
  *  be sure to test isValid() afterwards to verify the availability of
  *  necessary extensions.
  */
-public class ViewportJOGL implements IViewport,
-									 WindowListener
+public class ViewportJOGL extends AbstractViewport implements WindowListener
 {
-    private Frame frame_;
-    private GLCanvas canvas_;
-    
-    /** Library service for loading resources.
-     */
-    private ILibraryService libService_;
-    
-    //position
-    private float posX_;
-    private float posY_;
-    
-    /** Size of the viewport without padding.
-     */
-    private IVector2 size_;
-    
-    /** Real size of the viewport including padding.
-     */
-    private IVector2 paddedSize_;
-    
-    /** Flag aspect ratio preservation.
-     */
-    private boolean preserveAR_;
-    
     /** Clamped texture cache
      */
     private Map clampedTextureCache_;
@@ -108,22 +84,6 @@ public class ViewportJOGL implements IViewport,
     /** True, if non-power-of-two texture support is available.
      */
     private boolean npot_;
-    
-    /** Newly added drawables.
-     */
-    private List newDrawables_;
-    
-    /** Current drawable buffer used for rendering
-     */
-    private List drawables_;
-    
-    /** Layers applied before drawable rendering
-     */
-    private List preLayers_;
-    
-    /** Layers applied after drawable rendering
-     */
-    private List postLayers_;
     
     /** Action that renders the frame.
      */
@@ -151,7 +111,7 @@ public class ViewportJOGL implements IViewport,
         valid_ = true;
         npot_ = false;
         newDrawables_ = Collections.synchronizedList(new LinkedList());
-        drawables_ = Collections.synchronizedList(new ArrayList());
+        objectList_ = Collections.synchronizedList(new ArrayList());
         preLayers_ = Collections.synchronizedList(new ArrayList());
         postLayers_ = Collections.synchronizedList(new ArrayList());
         clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
@@ -172,7 +132,7 @@ public class ViewportJOGL implements IViewport,
         	caps.setDoubleBuffered(true);
         	caps.setHardwareAccelerated(true);
         	canvas_ = new GLCanvas(caps);
-        	canvas_.addGLEventListener(new GLController());
+        	((GLCanvas) canvas_).addGLEventListener(new GLController());
 
         	frame_.add(canvas_, BorderLayout.CENTER);
         	frame_.setVisible(true);
@@ -194,7 +154,7 @@ public class ViewportJOGL implements IViewport,
     		{
     			public void run()
     			{
-    				ViewportJOGL.this.canvas_.display();
+    				((GLCanvas) ViewportJOGL.this.canvas_).display();
     			}
     		};
         
@@ -223,84 +183,11 @@ public class ViewportJOGL implements IViewport,
         }
     }
     
-    /** Sets the position of the bottom left corner of
-     *  the viewport.
-     */
-    public void setPosition(IVector2 pos)
-    {
-        posX_ = pos.getXAsFloat();
-        posY_ = pos.getYAsFloat();
-    }
-    
-    public void setSize(IVector2 size)
-    {
-    	size_ = size;
-    	
-    	double width = 1.0;
-		double height = 1.0;
-    	if (preserveAR_)
-    	{
-    		double sizeAR = size.getXAsDouble() / size.getYAsDouble();
-    		double windowAR = (double) canvas_.getWidth() / (double) canvas_.getHeight();
-    		
-    		if (sizeAR > windowAR)
-    		{
-    			width = size.getXAsDouble();
-    			height = size.getYAsDouble() * sizeAR / windowAR;
-    		}
-    		else
-    		{
-    			width = size.getXAsDouble() / sizeAR * windowAR;
-    			height = size.getYAsDouble();
-    		}
-    	}
-    	else
-    	{
-    		width = size.getXAsDouble();
-    		height = size.getYAsDouble();
-    	}
-    	paddedSize_ = new Vector2Double(width, height);
-    }
-    
-    public void setPreserveAspectRation(boolean preserveAR)
-    {
-    	preserveAR_ = preserveAR;
-    	setSize(size_);
-    }
-    
-    /** Adds an IDrawable to the scene.
-     *  
-     *  @param d the drawable
-     */
-    public void addDrawable(IDrawable d)
-    {
-        newDrawables_.add(d);
-    }
-    
-    /** Removes an IDrawable from the scene.
-     *  
-     *  @param d the drawable
-     */
-    public void removeDrawable(IDrawable d)
-    {
-        drawables_.remove(d);
-    }
-    
-    public void setPreLayers(List layers)
-    {
-    	preLayers_ = new ArrayList(layers);
-    }
-    
-    public void setPostLayers(List layers)
-    {
-    	postLayers_ = new ArrayList(layers);
-    }
-    
     public void refresh()
     {
     	EventQueue.invokeLater(renderFrameAction_);
     }
-
+    
     /** Closes the viewport.
      */
     public void close()
@@ -328,11 +215,6 @@ public class ViewportJOGL implements IViewport,
     public boolean isValid()
     {
         return valid_;
-    }
-    
-    public boolean isShowing()
-    {
-    	return frame_.isShowing();
     }
     
     /** Returns a repeating texture.
@@ -554,7 +436,6 @@ public class ViewportJOGL implements IViewport,
             {
             	IDrawable d = (IDrawable) newDrawables_.remove(0);
             	d.init(ViewportJOGL.this, gl);
-            	drawables_.add(d);
             }
             
             gl.glClear(gl.GL_COLOR_BUFFER_BIT);
@@ -569,12 +450,24 @@ public class ViewportJOGL implements IViewport,
                 }
             }
             
-            synchronized(drawables_)
+            synchronized(objectList_)
             {
-                Iterator it = drawables_.iterator();
+                Iterator it = objectList_.iterator();
                 while (it.hasNext())
                 {
-                    IDrawable d = (IDrawable) it.next();
+                	Object[] o = (Object[]) it.next();
+    				IVector2 pos = (IVector2) o[0];
+    				IVector2 vel = (IVector2) o[1];
+    				IDrawable d = (IDrawable) o[2];
+    				d.setPosition(pos);
+    				if (vel != null)
+    				{
+    					d.setVelocity(vel);
+    				}
+    				else
+    				{
+    					d.setVelocity(Vector2Double.ZERO);
+    				}
                     d.draw(ViewportJOGL.this, gl);
                 }
             }

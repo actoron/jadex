@@ -22,7 +22,9 @@ public class LocalSetVelocityPlan extends Plan
 		IVector2 velocity = (IVector2) getParameter("velocity").getValue();
 		
 		SimObject object = engine.getSimulationObject(objectId);
-		MoveObjectTask moveTask = (MoveObjectTask) object.getTask(MoveObjectTask.DEFAULT_NAME);
-		moveTask.setVelocity(velocity.copy());
+		synchronized(object)
+		{
+			((IVector2) object.getProperty("velocity")).assign(velocity);
+		}
 	}
 }

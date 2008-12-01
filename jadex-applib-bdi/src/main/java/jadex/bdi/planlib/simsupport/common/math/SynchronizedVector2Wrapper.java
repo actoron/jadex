@@ -13,6 +13,17 @@ public class SynchronizedVector2Wrapper implements IVector2
 		vector_ = vector;
 	}
 	
+	/** Assigns this vector the values of another vector.
+	 * 
+	 *  @param vector the other vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public synchronized IVector2 assign(IVector2 vector)
+	{
+		vector_.assign(vector);
+		return this;
+	}
+	
 	/** Adds a scalar to each component of this vector.
 	 *
 	 *  @param scalar scalar value as double

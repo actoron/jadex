@@ -53,6 +53,7 @@ public class MoveObjectTask implements ISimObjectTask
 	 */
 	public synchronized void start(SimObject object)
 	{
+		object.setProperty("velocity", velocity_);
 	}
 	
 	/** This method will be executed by the object before
@@ -86,33 +87,5 @@ public class MoveObjectTask implements ISimObjectTask
 	public synchronized String getName()
 	{
 		return name_;
-	}
-	
-	/** Returns access to the current velocity.
-	 *  This task must be locked before the access is used.
-	 *  
-	 *  @return access to current velocity
-	 */
-	public synchronized IVector2 getVelocityAccess()
-	{
-		return velocity_;
-	}
-	
-	/** Returns a copy of the current velocity.
-	 *  
-	 *  @return copy of current velocity
-	 */
-	public synchronized IVector2 getVelocity()
-	{
-		return velocity_.copy();
-	}
-	
-	/** Sets a new velocity.
-	 *  
-	 *  @param velocity new velocity
-	 */
-	public synchronized void setVelocity(IVector2 velocity)
-	{
-		velocity_ = velocity;
 	}
 }

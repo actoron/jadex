@@ -42,6 +42,18 @@ public class Vector2Int implements IVector2
 		y_ = y;
 	}
 	
+	/** Assigns this vector the values of another vector.
+	 * 
+	 *  @param vector the other vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector2 assign(IVector2 vector)
+	{
+		x_ = vector.getXAsInteger();
+		y_ = vector.getYAsInteger();
+		return this;
+	}
+	
 	/** Adds a scalar to each component of this vector.
 	 *
 	 *  @param scalar scalar value as double

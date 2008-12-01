@@ -28,18 +28,6 @@ public interface IViewport
      */
     public void setPreserveAspectRation(boolean preserveAR);
     
-    /** Adds an IDrawable to the scene.
-     *  
-     *  @param d the drawable
-     */
-    public void addDrawable(IDrawable d);
-
-    /** Removes an IDrawable from the scene.
-     *  
-     *  @param d the drawable
-     */
-    public void removeDrawable(IDrawable d);
-    
     /** Sets the layers that are applied before the drawables are drawn.
      *  
      *  @param layers new layers
@@ -51,6 +39,18 @@ public interface IViewport
      *  @param layers new layers
      */
     public void setPostLayers(List layer);
+    
+    /** Registers an IDrawable to be used in the object list.
+     *  
+     *  @param d the drawable
+     */
+    public void registerDrawable(IDrawable d);
+    
+    /** Sets the current objects to draw.
+     * 
+     *  @param objectList objects that should be drawn
+     */
+    public void setObjectList(List objectList);
     
     /** Refreshes the viewport.
      */

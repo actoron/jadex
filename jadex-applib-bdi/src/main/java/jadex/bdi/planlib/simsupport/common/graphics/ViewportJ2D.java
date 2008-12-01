@@ -36,63 +36,21 @@ import javax.swing.Timer;
 
 /** This class manages the GUI and all user interaction.
  */
-public class ViewportJ2D extends Frame implements IViewport,
-									 			  WindowListener,
-									 			  ComponentListener
+public class ViewportJ2D extends AbstractViewport implements WindowListener,
+															 ComponentListener
 {
     //constants
     public final static int DOUBLE_BUFFER_STRATEGY = 2;
     public final static int TRIPLE_BUFFER_STRATEGY = 3;
     
-    private final static String DEFAULT_TITLE = "Viewport";
     private final static int    DEFAULT_BUFFER_STRATEGY=DOUBLE_BUFFER_STRATEGY;
     
-    /** Library service for loading resources.
-     */
-    private ILibraryService libService_;
-    
     //configuration
-    private double directionLineScale_;
-    private int    dotRadius_;
-    private int    dotShift_;
     private int    bufferStrategy_;
     
-    private Canvas canvas_;
     private BufferStrategy strategy_;
-    private RenderingHints rh_;
-    
-    private double posX_;
-    private double posY_;
-    
-    /** Size of the viewport without padding.
-     */
-    private IVector2 size_;
-    
-    /** Real size of the viewport including padding.
-     */
-    private IVector2 paddedSize_;
-    
-    /** Flag aspect ratio preservation.
-     */
-    private boolean preserveAR_;
     
     private Map imageCache_;
-    
-    /** Newly added drawables.
-     */
-    private List newDrawables_;
-    
-    /** Current drawable buffer used for rendering
-     */
-    private List drawables_;
-    
-    /** Layers applied before drawable rendering
-     */
-    private List preLayers_;
-    
-    /** Layers applied after drawable rendering
-     */
-    private List postLayers_;
     
     /** Action that renders the frame.
      */
@@ -120,20 +78,18 @@ public class ViewportJ2D extends Frame implements IViewport,
      */
     public ViewportJ2D(String title, int bufferStrategy, double fps, ILibraryService libService)
     {
-        super(title);
+        frame_ = new Frame(title);
         libService_ = libService;
         size_ = new Vector2Double(1.0);
         preserveAR_ = true;
-        drawables_ = Collections.synchronizedList(new ArrayList());
         newDrawables_ = Collections.synchronizedList(new LinkedList());
+        objectList_ = Collections.synchronizedList(new ArrayList());
         preLayers_ = Collections.synchronizedList(new ArrayList());
         postLayers_ = Collections.synchronizedList(new ArrayList());
         imageCache_ = Collections.synchronizedMap(new HashMap());
         bufferStrategy_ = bufferStrategy;
-        rh_ = new RenderingHints(RenderingHints.KEY_RENDERING,
-                                 RenderingHints.VALUE_RENDER_DEFAULT);
-        posX_ = 0.0;
-        posY_ = 0.0;
+        posX_ = 0.0f;
+        posY_ = 0.0f;
         paddedSize_ = new Vector2Double(1.0);
         
         canvas_ = new Canvas();
@@ -143,17 +99,17 @@ public class ViewportJ2D extends Frame implements IViewport,
                 {
                     public void run()
                     {
-                    	setResizable(true);
-                        add(canvas_);
-                        addWindowListener(ViewportJ2D.this);
+                    	frame_.setResizable(true);
+                        frame_.add(canvas_);
+                        frame_.addWindowListener(ViewportJ2D.this);
                         canvas_.addComponentListener(ViewportJ2D.this);
-                        setIgnoreRepaint(true);
+                        frame_.setIgnoreRepaint(true);
                         canvas_.setIgnoreRepaint(true);
-                        setBackground(null);
+                        frame_.setBackground(null);
                         canvas_.setBackground(null);
-                        pack();
-                        setSize(300, 300);
-                        setVisible(true);
+                        frame_.pack();
+                        frame_.setSize(300, 300);
+                        frame_.setVisible(true);
                         canvas_.createBufferStrategy(bufferStrategy_);
                         strategy_ = canvas_.getBufferStrategy();
                     }
@@ -188,52 +144,6 @@ public class ViewportJ2D extends Frame implements IViewport,
 		}
     }
     
-    /** Sets the position of the bottom left corner of
-     *  the viewport.
-     */
-    public void setPosition(IVector2 pos)
-    {
-        posX_ = pos.getXAsDouble();
-        posY_ = pos.getYAsDouble();
-    }
-    
-    public void setSize(IVector2 size)
-    {
-    	size_ = size;
-    	
-    	double width = 1.0;
-		double height = 1.0;
-    	if (preserveAR_)
-    	{
-    		double sizeAR = size.getXAsDouble() / size.getYAsDouble();
-    		double windowAR = (double) getWidth() / (double) getHeight();
-    		
-    		if (sizeAR > windowAR)
-    		{
-    			width = size.getXAsDouble();
-    			height = size.getYAsDouble() * sizeAR / windowAR;
-    		}
-    		else
-    		{
-    			width = size.getXAsDouble() / sizeAR * windowAR;
-    			height = size.getYAsDouble();
-    		}
-    	}
-    	else
-    	{
-    		width = size.getXAsDouble();
-    		height = size.getYAsDouble();
-    	}
-    	
-    	paddedSize_ = new Vector2Double(width, height);
-    }
-    
-    public void setPreserveAspectRation(boolean preserveAR)
-    {
-    	preserveAR_ = preserveAR;
-    	setSize(size_);
-    }
-    
     /** Returns an image for texturing
      *
      *  @param path resource path of the image
@@ -249,34 +159,6 @@ public class ViewportJ2D extends Frame implements IViewport,
         }
         
         return image;
-    }
-    
-    /** Adds an IDrawable to the scene.
-     *  
-     *  @param d the drawable
-     */
-    public void addDrawable(IDrawable d)
-    {
-        newDrawables_.add(d);
-    }
-    
-    /** Removes an IDrawable from the scene.
-     *  
-     *  @param d the drawable
-     */
-    public void removeDrawable(IDrawable d)
-    {
-        drawables_.remove(d);
-    }
-    
-    public void setPreLayers(List layers)
-    {
-    	preLayers_ = new ArrayList(layers);
-    }
-    
-    public void setPostLayers(List layers)
-    {
-    	postLayers_ = new ArrayList(layers);
     }
     
     public void refresh()
@@ -299,7 +181,6 @@ public class ViewportJ2D extends Frame implements IViewport,
     		{
     			IDrawable d = (IDrawable) newDrawables_.remove(0);
     			d.init(this, g);
-    			drawables_.add(d);
     		}
     		
     		synchronized(preLayers_)
@@ -308,17 +189,28 @@ public class ViewportJ2D extends Frame implements IViewport,
                 while (it.hasNext())
                 {
                     ILayer l = (ILayer) it.next();
-                    //TODO: change back to padded size
-                    l.draw(size_, this, g);
+                    l.draw(paddedSize_, this, g);
                 }
             }
     		
-    		synchronized(drawables_)
+    		synchronized(objectList_)
     		{
-    			Iterator it = drawables_.iterator();
+    			Iterator it = objectList_.iterator();
     			while (it.hasNext())
     			{
-    				IDrawable d = (IDrawable) it.next();
+    				Object[] o = (Object[]) it.next();
+    				IVector2 pos = (IVector2) o[0];
+    				IVector2 vel = (IVector2) o[1];
+    				IDrawable d = (IDrawable) o[2];
+    				d.setPosition(pos);
+    				if (vel != null)
+    				{
+    					d.setVelocity(vel);
+    				}
+    				else
+    				{
+    					d.setVelocity(Vector2Double.ZERO);
+    				}
     				d.draw(this, g);
     			}
     		}
@@ -343,7 +235,7 @@ public class ViewportJ2D extends Frame implements IViewport,
     
     public void close()
     {
-    	this.dispose();
+    	frame_.dispose();
     }
     
     private void setupTransform(Graphics2D g)
@@ -366,7 +258,7 @@ public class ViewportJ2D extends Frame implements IViewport,
 
     public void windowClosing(WindowEvent e)
     {
-        this.dispose();
+        frame_.dispose();
     }
 
     public void windowDeactivated(WindowEvent e)

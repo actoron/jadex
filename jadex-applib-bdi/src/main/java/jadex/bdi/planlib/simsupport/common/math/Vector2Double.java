@@ -48,6 +48,18 @@ public class Vector2Double implements IVector2, Cloneable
 		y_ = y;
 	}
 	
+	/** Assigns this vector the values of another vector.
+	 * 
+	 *  @param vector the other vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector2 assign(IVector2 vector)
+	{
+		x_ = vector.getXAsDouble();
+		y_ = vector.getYAsDouble();
+		return this;
+	}
+	
 	public IVector2 add(double scalar)
 	{
 		x_ += scalar;

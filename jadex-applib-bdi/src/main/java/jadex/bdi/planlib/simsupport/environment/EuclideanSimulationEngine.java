@@ -19,14 +19,6 @@ import java.util.Stack;
 
 public class EuclideanSimulationEngine implements ISimulationEngine
 {
-	/** Pre-layers
-	 */
-	private List preLayers_;
-	
-	/** Post-layers
-	 */
-	private List postLayers_;
-	
 	/** The environment processes.
 	 */
 	private Map processes_;
@@ -66,8 +58,6 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		objectIdCounter_ = new AtomicCounter();
 		processes_ = Collections.synchronizedMap(new HashMap());
 		actions_ = Collections.synchronizedMap(new HashMap());
-		preLayers_ = Collections.synchronizedList(new ArrayList());
-		postLayers_ = Collections.synchronizedList(new ArrayList());
 		simObjects_ = Collections.synchronizedMap(new HashMap());
 		simObjectsByType_ = Collections.synchronizedMap(new HashMap());
 		freeObjectIds_ = new Stack();
@@ -90,7 +80,6 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 *  @param properties properties of the object (may be null)
 	 *  @param tasks tasks of the object (may be null)
 	 *  @param position position of the object
-	 *  @param drawables drawable representing the object
 	 *  @param signalDestruction If set to true, all listeners will be notified when
 	 * 		   the object is destroyed.
 	 *  @param listeners listeners for the object
@@ -100,7 +89,6 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 								   Map properties,
 								   List tasks,
 								   IVector2 position,
-								   IDrawable drawable,
 								   boolean signalDestruction,
 								   ISimulationEventListener listener)
 	{
@@ -130,7 +118,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 						id = objectIdCounter_.getNext();
 					}
 				}
-				SimObject simObject = new SimObject(id, type, properties, tasks, position, drawable, signalDestruction);
+				SimObject simObject = new SimObject(id, type, properties, tasks, position, signalDestruction);
 
 				if (listener != null)
 				{
@@ -169,42 +157,6 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 				obj.fireSimulationEvent(destEvt);
 			}
 		}
-	}
-	
-	/** Adds a pre-layer (background).
-	 * 
-	 *  @param preLayer new pre-layer
-	 */
-	public void addPreLayer(ILayer preLayer)
-	{
-		preLayers_.add(preLayer);
-	}
-	
-	/** Removes a pre-layer (background).
-	 * 
-	 *  @param preLayer the pre-layer
-	 */
-	public void removePreLayer(ILayer preLayer)
-	{
-		preLayers_.remove(preLayer);
-	}
-	
-	/** Adds a post-layer.
-	 * 
-	 *  @param postLayer new post-layer
-	 */
-	public void addPostLayer(ILayer postLayer)
-	{
-		postLayers_.add(postLayer);
-	}
-	
-	/** Removes a post-layer.
-	 * 
-	 *  @param preLayer new post-layer
-	 */
-	public void removePostLayer(ILayer postLayer)
-	{
-		postLayers_.remove(postLayer);
 	}
 	
 	/** Adds an environment process.
@@ -353,24 +305,6 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		position.randomY(distance.getY(),
 						 position.getY());
 		return position;
-	}
-	
-	/** Returns direct access to the pre-layers.
-	 * 
-	 *  @return direct access to pre-layers
-	 */
-	public List getPreLayerAccess()
-	{
-		return preLayers_;
-	}
-	
-	/** Returns direct access to the post-layers.
-	 * 
-	 *  @return direct access to post-layers
-	 */
-	public List getPostLayerAccess()
-	{
-		return postLayers_;
 	}
 	
 	/** Returns direct access to the simulation objects.\

@@ -24,7 +24,7 @@ public class StartEnvironmentPlan extends Plan
 		if (clockService == null)
 		{
 			clockService = getClock();
-			b.getBelief("clock").setFact(clockService);
+			b.getBelief("clock_service").setFact(clockService);
 		}
 		b.getBelief("sim_time").setFact(new Long(clockService.getTime()));
 		

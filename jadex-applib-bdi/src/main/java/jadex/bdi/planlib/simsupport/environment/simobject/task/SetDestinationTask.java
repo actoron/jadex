@@ -30,9 +30,9 @@ public class SetDestinationTask implements ISimObjectTask
 	 */
 	private IVector1 tolerance_;
 	
-	/** Task that moves the object.
+	/** The object's velocity.
 	 */
-	private MoveObjectTask moveTask_;
+	private IVector2 velocity_;
 	
 	public SetDestinationTask(IVector2 targetPosition,
 			   				   IVector1 speed,
@@ -50,7 +50,6 @@ public class SetDestinationTask implements ISimObjectTask
 		targetPosition_ = targetPosition.copy();
 		speed_ = speed.copy();
 		tolerance_ = tolerance.copy();
-		moveTask_ = null;
 	}
 	
 	/** This method will be executed by the object before
@@ -60,7 +59,7 @@ public class SetDestinationTask implements ISimObjectTask
 	 */
 	public void start(SimObject object)
 	{
-		moveTask_ = (MoveObjectTask) object.getTask(MoveObjectTask.DEFAULT_NAME);
+		velocity_ = (IVector2) object.getProperty("velocity");
 	}
 	
 	/** This method will be executed by the object before
@@ -100,7 +99,7 @@ public class SetDestinationTask implements ISimObjectTask
 			}
 			
 			
-			moveTask_.setVelocity(velocity);
+			velocity_.assign(velocity);
 		}
 	}
 	
