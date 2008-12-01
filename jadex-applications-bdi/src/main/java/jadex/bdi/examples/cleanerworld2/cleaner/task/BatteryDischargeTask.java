@@ -2,6 +2,7 @@ package jadex.bdi.examples.cleanerworld2.cleaner.task;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
+import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
@@ -64,8 +65,7 @@ public class BatteryDischargeTask implements ISimObjectTask
 		else
 		{
 			object.removeTask(GoToDestinationTask.DEFAULT_NAME);
-			MoveObjectTask moveTask = (MoveObjectTask) object.getTask(MoveObjectTask.DEFAULT_NAME);
-			moveTask.setVelocity(Vector2Double.ZERO);
+			((IVector2) object.getProperty("velocity")).assign(Vector2Double.ZERO);
 		}
 	}
 	

@@ -29,11 +29,6 @@ public class InitializeEnvironmentPlan extends Plan
 		ISimulationEngine engine  = new EuclideanSimulationEngine(Configuration.ENVIRONMENT_NAME,
 																  Configuration.AREA_SIZE);
 		
-		ILayer background =  new TiledLayer(Configuration.BACKGROUND_TILE_SIZE,
-											Configuration.BACKGROUND_TILE);
-		
-		engine.addPreLayer(background);
-		
 		// Pre-declare object types
 		engine.declareObjectType("waste");
 		engine.declareObjectType("waste_bin");
@@ -41,22 +36,18 @@ public class InitializeEnvironmentPlan extends Plan
 		engine.declareObjectType("cleaner");
 		
 		// Static Objects
-		String imgPath = this.getClass().getPackage().getName().replaceAll("environment", "").concat("images.").replaceAll("\\.", "/");
-		
 		int wasteBinCount = ((Integer) b.getBelief("waste_bin_count").getFact()).intValue();
 		for (int i = 0; i < wasteBinCount; ++i)
 		{
 			IVector2 pos = engine.getRandomPosition(Configuration.WASTE_BIN_SIZE);
-			IDrawable wbDrawable = new ScalableTexturedRectangle(Configuration.WASTE_BIN_SIZE, imgPath + "wastebin.png");
-			engine.createSimObject("waste_bin", null, null, pos, wbDrawable, false, null);
+			engine.createSimObject("waste_bin", null, null, pos, false, null);
 			
 		}
 		int chargingStationCount = ((Integer) b.getBelief("charging_station_count").getFact()).intValue();
 		for (int i = 0; i < chargingStationCount; ++i)
 		{
 			IVector2 pos = engine.getRandomPosition(Configuration.CHARGING_STATION_SIZE);
-			IDrawable csDrawable = new ScalableTexturedRectangle(Configuration.CHARGING_STATION_SIZE, imgPath + "chargingstation.png");
-			engine.createSimObject("charging_station", null, null, pos, csDrawable, false, null);
+			engine.createSimObject("charging_station", null, null, pos, false, null);
 		}
 		
 		// Processes

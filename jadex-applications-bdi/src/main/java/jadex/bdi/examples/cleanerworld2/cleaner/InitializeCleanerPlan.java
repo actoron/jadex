@@ -28,12 +28,6 @@ public class InitializeCleanerPlan extends Plan
 {
 	public void body()
 	{
-		DrawableCombiner drawable = new DrawableCombiner();
-		String cleanerImage = "jadex/bdi/examples/cleanerworld2/images/cleaner.png";
-		drawable.addDrawable(new ScalableRegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f)));
-		drawable.addDrawable(new ScalableTexturedRectangle(new Vector2Double(1.0), cleanerImage));
-		//drawable.addDrawable(new RotatingColoredTriangle(new Vector2Double(1.0), new Vector2Double(1.0), new Vector2Double(0.0), Color.BLUE));
-		
 		String envName = (String) getBeliefbase().getBelief("environment_name").getFact();
 		IGoal currentGoal = createGoal("sim_connect_environment");
 		currentGoal.getParameter("environment_name").setValue(envName);
@@ -58,7 +52,6 @@ public class InitializeCleanerPlan extends Plan
 		dispatchSubgoalAndWait(getStartPos);
 		IVector2 position = ((IVector2) getStartPos.getParameter("position").getValue()).copy();
 		currentGoal.getParameter("position").setValue(position);
-		currentGoal.getParameter("drawable").setValue(drawable);
 		currentGoal.getParameter("signal_destruction").setValue(Boolean.TRUE);
 		currentGoal.getParameter("listen").setValue(Boolean.TRUE);
 		dispatchSubgoalAndWait(currentGoal);

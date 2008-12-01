@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The Observer Agent.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Observer"
+	package="jadex.bdi.examples.cleanerworld2.observer">
+	
+	<imports>
+		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.Vector1Double</import>
+	</imports>
+	
+	<capabilities>
+    	<capability name="obscap" file="jadex.bdi.planlib.simsupport.observer.capability.SimObserver"/>
+	</capabilities>
+	
+	<beliefs>
+		<!-- Name of the simulation environment -->
+		<beliefref name="environment_name">
+			<concrete ref="obscap.environment_name"/>
+		</beliefref>
+		
+		<!-- Preservation of area aspect ratio in the window -->
+		<beliefref name="preserve_aspect_ratio">
+			<concrete ref="obscap.preserve_aspect_ratio"/>
+		</beliefref>
+		
+		<!-- Force the use of Java2D -->
+		<beliefref name="force_java2d">
+			<concrete ref="obscap.force_java2d"/>
+		</beliefref>
+		
+		<!-- List of themes for displaying objects -->
+		<beliefref name="object_themes">
+			<concrete ref="obscap.object_themes"/>
+		</beliefref>
+		
+		<!-- The pre-layers -->
+		<beliefref name="prelayers">
+			<concrete ref="obscap.prelayers"/>
+		</beliefref>
+		
+		<!-- The post-layers -->
+		<beliefref name="postlayers">
+			<concrete ref="obscap.postlayers"/>
+		</beliefref>
+  	</beliefs>
+	
+	<goals>
+	    <achievegoalref name="simobs_start">
+        	<concrete ref="obscap.simobs_start"/>
+    	</achievegoalref>
+  	</goals>
+  	
+  	<plans>
+    	<!-- Initialization Plan. -->
+    	<plan name="initialization">
+      		<body class="InitializeObserverPlan"/>
+    	</plan>
+    </plans>
+    
+  	<configurations>
+    	<configuration name="default">
+      		<plans>
+        		<initialplan ref="initialization"/>
+      		</plans>
+    	</configuration>
+  	</configurations>
+</agent>

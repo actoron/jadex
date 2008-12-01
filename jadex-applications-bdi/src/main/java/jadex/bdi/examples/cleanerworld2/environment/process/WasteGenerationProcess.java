@@ -89,14 +89,11 @@ public class WasteGenerationProcess implements IEnvironmentProcess
 			if (waste_ < maxWaste_)
 			{
 				IVector2 pos = engine.getRandomPosition(new Vector2Double(0.5));
-				String imgPath = this.getClass().getPackage().getName().replaceAll("environment\\.process", "").concat("images.").replaceAll("\\.", "/").concat("waste.png");
-				IDrawable drawable = new ScalableTexturedRectangle(new Vector2Double(0.5), imgPath);
 
 				engine.createSimObject("waste",
 						null,
 						null,
 						pos,
-						drawable,
 						true,
 						new WasteListener());
 				++waste_;

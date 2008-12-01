@@ -90,11 +90,8 @@ public class StartPlan extends Plan
 		}
 		
 		environmentArgs = new HashMap();
-		environmentArgs.put("environment_name", envName);
-		environmentArgs.put("force_java2d", Boolean.FALSE);
-		environmentArgs.put("preserve_aspect_ratio", Boolean.TRUE);
 		ams.createAgent("CleanerWorld2_Observer",
-				"jadex/bdi/planlib/simsupport/observer/agent/SimObserver.agent.xml",
+				"jadex/bdi/examples/cleanerworld2/observer/Observer.agent.xml",
 				"default",
 				environmentArgs,
 				new IResultListener()
