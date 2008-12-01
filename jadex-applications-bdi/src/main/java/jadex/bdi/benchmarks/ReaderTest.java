@@ -6,7 +6,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.javaimpl.OAVState;
-import jadex.rules.state.viewer.OAVTreeModel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,7 +67,7 @@ public class ReaderTest
 		{
 			reader.read(SUtil.getResource(args[0], null), state, mapping);
 
-			OAVTreeModel.createOAVFrame(file.getName(), state).setVisible(true);
+//			OAVTreeModel.createOAVFrame(file.getName(), state).setVisible(true);
 
 			System.out.println(state);
 		}

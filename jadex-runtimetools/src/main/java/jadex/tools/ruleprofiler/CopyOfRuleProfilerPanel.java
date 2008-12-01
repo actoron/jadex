@@ -3,7 +3,7 @@ package jadex.tools.ruleprofiler;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SGUI;
-import jadex.rules.state.viewer.OAVTreeModel;
+import jadex.rules.tools.stateviewer.OAVTreeModel;
 import jadex.tools.common.GuiProperties;
 
 import java.util.Comparator;

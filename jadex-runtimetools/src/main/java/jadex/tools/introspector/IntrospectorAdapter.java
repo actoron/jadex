@@ -11,7 +11,7 @@ import jadex.bridge.IToolAdapter;
 import jadex.commons.ICommand;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
-import jadex.rules.rulesystem.rete.viewer.ISteppable;
+import jadex.rules.rulesystem.ISteppable;
 import jadex.rules.state.IOAVState;
 
 import java.util.HashSet;

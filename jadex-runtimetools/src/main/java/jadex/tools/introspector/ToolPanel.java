@@ -7,7 +7,7 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
-import jadex.rules.rulesystem.rete.viewer.RuleSystemExecutor;
+import jadex.rules.tools.reteviewer.RetePanel;
 
 import java.awt.BorderLayout;
 
@@ -74,7 +74,7 @@ public class ToolPanel	extends JPanel
 					public void run()
 					{
 						final IntrospectorAdapter	tooladapter	= (IntrospectorAdapter)bdii.getToolAdapter(IntrospectorAdapter.class);
-						final JComponent	toolpanel	= RuleSystemExecutor.createToolPanel(bdii.getRuleSystem(), tooladapter);
+						final JComponent	toolpanel	= RetePanel.createToolPanel(bdii.getRuleSystem(), tooladapter);
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()

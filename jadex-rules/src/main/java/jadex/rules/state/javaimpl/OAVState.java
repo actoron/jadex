@@ -4,14 +4,14 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.concurrent.ISynchronizator;
-import jadex.rules.profiler.IProfiler;
-import jadex.rules.profiler.NoProfiler;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
+import jadex.rules.state.IProfiler.ProfilingInfo;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -91,7 +91,21 @@ public class OAVState	implements IOAVState
 	// #ifndef MIDP
 	/** The profiler. */
 	// Hack???
-	protected IProfiler	profiler	= new NoProfiler();
+	protected IProfiler	profiler = new IProfiler()
+	{
+		public void	start(String type, Object item)
+		{
+		}
+
+		public void	stop(String type, Object item)
+		{
+		}
+		
+		public ProfilingInfo[] getProfilingInfos(int start)
+		{
+			return new ProfilingInfo[0];
+		}
+	};
 	// #endif
 	
 	/** Counter for number of registered bean listeners. */

@@ -1,10 +1,10 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.rules.profiler.IProfiler;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.rete.builder.ReteBuilder;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 

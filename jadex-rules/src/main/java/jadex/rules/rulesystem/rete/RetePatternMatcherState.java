@@ -1,6 +1,5 @@
 package jadex.rules.rulesystem.rete;
 
-import jadex.rules.profiler.IProfiler;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.IAgenda;
 import jadex.rules.rulesystem.IPatternMatcherState;
@@ -8,6 +7,7 @@ import jadex.rules.rulesystem.rete.nodes.ReteMemory;
 import jadex.rules.rulesystem.rete.nodes.ReteNode;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 

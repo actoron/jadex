@@ -10,11 +10,10 @@ import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.jtable.ResizeableTableHeader;
-import jadex.rules.profiler.IProfiler;
-import jadex.rules.profiler.NoProfiler;
-import jadex.rules.profiler.Profiler;
-import jadex.rules.profiler.ProfilingInfo;
-import jadex.rules.state.viewer.OAVTreeModel;
+import jadex.rules.state.IProfiler;
+import jadex.rules.state.IProfiler.ProfilingInfo;
+import jadex.rules.tools.profiler.Profiler;
+import jadex.rules.tools.stateviewer.OAVTreeModel;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.AbstractTreeTableModel;
 import jadex.tools.common.jtreetable.DefaultTreeTableModel;
@@ -111,7 +110,7 @@ public class RuleProfilerPanel	extends JPanel
 //						{
 //							e.printStackTrace();
 //						}
-						if(tmp instanceof NoProfiler)	// hack!!!
+//						if(tmp instanceof NoProfiler)	// hack!!!
 						{
 							tmp	= new Profiler(null);
 							final IProfiler prof	= tmp;

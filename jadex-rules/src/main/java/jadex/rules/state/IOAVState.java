@@ -1,7 +1,6 @@
 package jadex.rules.state;
 
 import jadex.commons.concurrent.ISynchronizator;
-import jadex.rules.profiler.IProfiler;
 
 import java.util.Collection;
 import java.util.Iterator;

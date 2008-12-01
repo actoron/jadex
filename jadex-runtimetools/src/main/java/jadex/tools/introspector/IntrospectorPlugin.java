@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.commons.SGUI;
-import jadex.rules.state.viewer.OAVTreeModel;
+import jadex.rules.tools.stateviewer.OAVTreeModel;
 import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;

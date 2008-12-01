@@ -23,8 +23,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.rules.profiler.IProfiler;
-import jadex.rules.profiler.Profiler;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRulebase;
 import jadex.rules.rulesystem.PriorityAgenda;
@@ -32,6 +30,7 @@ import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.IProfiler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +40,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.antlr.runtime.debug.Profiler;
 
 
 /**
@@ -207,13 +208,13 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 		rulesystem.init();
 		
 		// HACK!!! Should use runtime properties. Problem: runtime properties are initialized within start agent action.
-		Object mprofiling	= state.getAttributeValue(model.getHandle(), OAVBDIMetaModel.capability_has_properties, "profiling");
-		if(mprofiling!=null)
-		{
-			Boolean	profile	= (Boolean)AgentRules.evaluateExpression(state, mprofiling, new OAVBDIFetcher(state, ragent));
-			if(profile!=null && profile.booleanValue())
-				state.setProfiler(new Profiler("./"+getAgentAdapter().getAgentIdentifier().getLocalName()+".profile.ser"));
-		}
+//		Object mprofiling	= state.getAttributeValue(model.getHandle(), OAVBDIMetaModel.capability_has_properties, "profiling");
+//		if(mprofiling!=null)
+//		{
+//			Boolean	profile	= (Boolean)AgentRules.evaluateExpression(state, mprofiling, new OAVBDIFetcher(state, ragent));
+//			if(profile!=null && profile.booleanValue())
+//				state.setProfiler(new Profiler("./"+getAgentAdapter().getAgentIdentifier().getLocalName()+".profile.ser"));
+//		}
 
 		// Initialize tool adapters.
 		this.tooladapters	= new IToolAdapter[0];
