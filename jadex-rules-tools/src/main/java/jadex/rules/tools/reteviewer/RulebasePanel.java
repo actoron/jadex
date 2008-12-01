@@ -45,7 +45,7 @@ public class RulebasePanel extends JPanel
 	/** The image icons. */
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/rulesystem/rete/viewer/images/lockoverlay.png"),
+		"breakpoint", SGUI.makeIcon(RulebasePanel.class,	"/jadex/rules/tools/reteviewer/images/lockoverlay.png"),
 	});
 
 	//-------- attributes --------

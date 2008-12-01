@@ -1,6 +1,5 @@
 package jadex.rules.tools.stateviewer;
 
-
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.TreeExpansionHandler;
@@ -65,12 +64,12 @@ public class OAVTreeModel implements TreeModel
 	protected static UIDefaults icons = new UIDefaults(new Object[]
 	{
 		// Tab icons.
-		"object", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/state/viewer/images/object.png"),
-		"attribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/state/viewer/images/attribute.png"),
-		"value", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/state/viewer/images/value.png"),
-		"javaobject", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/state/viewer/images/javaobject.png"),
-		"javaattribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/state/viewer/images/javaattribute.png"),
-		"javavalue", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/state/viewer/images/javavalue.png")
+		"object", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/object.png"),
+		"attribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/attribute.png"),
+		"value", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png"),
+		"javaobject", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaobject.png"),
+		"javaattribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaattribute.png"),
+		"javavalue", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javavalue.png")
 	});
 	
 	/**

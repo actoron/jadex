@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -86,8 +85,8 @@ public class RetePanel extends JPanel
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"show_state", SGUI.makeIcon(RuleSystemExecutor.class, "/jadex/rules/rulesystem/rete/viewer/images/bulb2.png"),
-		"show_rete", SGUI.makeIcon(RuleSystemExecutor.class, "/jadex/rules/rulesystem/rete/viewer/images/bug_small.png"),
+		"show_state", SGUI.makeIcon(RuleSystemExecutor.class, "/jadex/rules/tools/reteviewer/images/bulb2.png"),
+		"show_rete", SGUI.makeIcon(RuleSystemExecutor.class, "/jadex/rules/tools/reteviewer/images/bug_small.png"),
 	});
 	
 	/** The name of the node details panel. */
