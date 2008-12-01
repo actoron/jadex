@@ -2,6 +2,7 @@ package jadex.rules.rulesystem;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -130,8 +131,9 @@ public abstract class AbstractAgenda implements IAgenda
 	 */
 	public void	setHistoryEnabled(boolean enabled)
 	{
+		// Hack!!! synchronized because of AgendaPanel.
 		if(enabled && history==null)
-			history	= new ArrayList();
+			history	= Collections.synchronizedList(new ArrayList());
 		else if(!enabled && history!=null)
 			history	= null;
 	}

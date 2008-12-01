@@ -5,9 +5,15 @@ import jadex.rules.rulesystem.IAgenda;
 import jadex.rules.rulesystem.IAgendaListener;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -132,6 +138,29 @@ public class AgendaPanel extends JSplitPane
 			}
 		});
 		
+		JButton clear = new JButton("Clear");
+		clear.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				// todo: invoke on agent thread with invoke later
+				// works because history is synchronized.
+				List his = agenda.getHistory();
+				if(his!=null)
+					agenda.getHistory().clear();
+			}
+		});
+		
+		final JCheckBox hon = new JCheckBox("Store History");
+		hon.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				// todo: invoke on agent thread with invoke later
+				agenda.setHistoryEnabled(hon.isSelected());
+			}	
+		});
+		
 		JPanel	agendap	= new JPanel(new BorderLayout());
 		agendap.add(new JScrollPane(activations));
 		agendap.setBorder(BorderFactory.createTitledBorder("Agenda"));
@@ -139,6 +168,11 @@ public class AgendaPanel extends JSplitPane
 		JPanel	historyp	= new JPanel(new BorderLayout());
 		historyp.add(new JScrollPane(history));
 		historyp.setBorder(BorderFactory.createTitledBorder("History"));
+		
+		JPanel buts = new JPanel();
+		buts.add(hon);
+		buts.add(clear);
+		historyp.add(buts, BorderLayout.SOUTH);
 		
 		this.add(agendap);
 		this.add(historyp);
@@ -194,7 +228,6 @@ public class AgendaPanel extends JSplitPane
 			fireContentsChanged(this, 0, activations_clone.length);
 		}
 	}
-
 	
 	/**
 	 *  List model for history.
