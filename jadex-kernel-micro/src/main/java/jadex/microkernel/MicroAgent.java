@@ -3,7 +3,6 @@ package jadex.microkernel;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ITimedObject;

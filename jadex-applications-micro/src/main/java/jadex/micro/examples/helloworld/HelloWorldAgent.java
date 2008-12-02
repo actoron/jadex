@@ -9,14 +9,34 @@ import jadex.microkernel.MicroAgentMetaInfo;
  */
 public class HelloWorldAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
+	/** The state. */
+	protected int step;
+	
+	//-------- methods --------
+	
 	/**
 	 *  Execute an agent step.
 	 */
 	public boolean executeAction()
 	{
-		System.out.println(getArgument("welcome text"));
+		if(step==0)
+		{
+			System.out.println(getArgument("welcome text"));
+			waitFor(2000);
+			step++;
+		}
+		else if(step==1)
+		{
+			System.out.println("Good bye world.");
+			killAgent();
+			step++;
+		}
 		return false;
 	}
+	
+	//-------- static methods --------
 	
 	/**
 	 *  Get the meta information about the agent.
@@ -28,7 +48,7 @@ public class HelloWorldAgent extends MicroAgent
 		{
 			public Object getDefaultValue(String configname)
 			{
-				return "Hello world, this is a Jadex micro agent";
+				return "Hello world, this is a Jadex micro agent.";
 			}
 			public String getDescription()
 			{

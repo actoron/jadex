@@ -2,6 +2,7 @@ package jadex.adapter.base.fipa;
 
 import jadex.adapter.base.NuggetsXMLContentCodec;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 
@@ -187,6 +188,8 @@ public class SFipa
 	public static final String NUGGETS_XML = NuggetsXMLContentCodec.NUGGETS_XML;
 	//public static final String XSTREAM_XML = "xstream-xml"; //todo
 
+	public static final MessageType FIPA_MESSAGE_TYPE = new FIPAMessageType();
+	
 	/**
 	 *  Clone the agent identifier.
 	 *  @param source The source agent identifier.

@@ -193,6 +193,6 @@ public class MicroPreyAgent extends MicroAgent
 		msg.put(SFipa.RECEIVERS, Collections.singletonList(environment));
 		msg.put(SFipa.SENDER, getAgentAdapter().getAgentIdentifier());
 		// Todo: message service shouldn't allow sending anonymous messages (i.e. w/o sender)
-		sendMessage(msg, new FIPAMessageType());
+		sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
 	}	
 }
