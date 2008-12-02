@@ -192,9 +192,9 @@
 
 	<events>
 		<messageevent name="qp_request" type="fipa" exported="true">
-			<!-- <parameter name="performative" class="String" direction="fixed">
+			<parameter name="performative" class="String">
 				<value>SFipa.QUERY_IF</value>
-			</parameter> -->
+			</parameter>
 			<parameter name="protocol" class="String" direction="fixed">
 				<value>SFipa.PROTOCOL_QUERY</value>
 			</parameter>
