@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -222,7 +223,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public TaskInfo addEatTask(Creature me, WorldObject obj)
+	public synchronized TaskInfo addEatTask(Creature me, WorldObject obj)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"eat", me, obj});
 		tasklist.add(ret);
@@ -233,7 +234,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public TaskInfo addMoveTask(Creature me, String dir)
+	public synchronized TaskInfo addMoveTask(Creature me, String dir)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"move", me, dir});
 		tasklist.add(ret);
@@ -376,13 +377,14 @@ public class Environment implements IEnvironment
 	{
 		// Remove tasks of this creature.
 		int	tasks	= tasklist.size();
-		for(int i=0; i<tasks; i++)
+		for(Iterator it=tasklist.iterator(); it.hasNext(); )
 		{
-			Object[] params = (Object[])((TaskInfo)tasklist.get(i)).getAction();
+			TaskInfo	task	= (TaskInfo) it.next();
+			Object[] params = (Object[])task.getAction();
 			if(creature.equals(params[1]))
 			{
-				//System.out.println("Removed: "+tasklist.get(i));
-				tasklist.remove(i);
+//				System.out.println("Removed: "+task);
+				it.remove();
 			}
 		}
 		this.pcs.firePropertyChange("taskSize", tasks, tasklist.size());
@@ -394,7 +396,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Execute a step.
 	 */
-	public void executeStep()
+	public synchronized void executeStep()
 	{
 		// Creatures that already acted in this step.
 		Set	acted	= new HashSet();

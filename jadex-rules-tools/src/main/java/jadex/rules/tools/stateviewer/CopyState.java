@@ -335,7 +335,7 @@ public class CopyState implements IOAVState
 		}
 		else
 		{
-			ret	= getTypeModel().getJavaType(obj.getClass());
+			ret	= getTypeModel().getJavaType(object.getClass());
 		}
 		return ret;
 	}

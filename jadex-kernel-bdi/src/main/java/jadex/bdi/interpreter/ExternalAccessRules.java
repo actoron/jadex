@@ -117,7 +117,7 @@ public class ExternalAccessRules
 		IConstraint c1 = new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, rpe, IOperator.CONTAINS);
 		IConstraint c2 = new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, rpe, IOperator.CONTAINS);
 		capcon.addConstraint(new OrConstraint(new IConstraint[]{c1, c2}));
-		capcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
+//		capcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 
 		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
 		wacon.addConstraint(new BoundConstraint(null, wa));

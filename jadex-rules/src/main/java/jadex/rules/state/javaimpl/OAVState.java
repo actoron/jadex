@@ -11,7 +11,6 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.IProfiler.ProfilingInfo;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -53,14 +52,17 @@ public class OAVState	implements IOAVState
 	/** The root objects (will not be cleaned up when usages==0). */
 	protected Set rootobjects;
 	
-	/** The objects table. */
+	/** The objects table (oid -> content map). */
 	protected Map objects;
 	
-	/** The deleted objects (only available in event notifications). */
+	/** The deleted objects (only available in event notifications) (oid -> content map). */
 	protected Map deletedobjects;
 	
-	/** The object types (object -> type). */
+	/** The object types (oid -> type). */
 	protected Map types;
+	
+	/** The java objects set. */
+	protected Set javaobjects;
 	
 	/** The id generator. */
 	protected IOAVIdGenerator generator;
@@ -124,6 +126,8 @@ public class OAVState	implements IOAVState
 		this.externalusages = new LinkedHashMap();
 		this.eventhandler	= new OAVEventHandler(); 
 		
+		this.javaobjects	= new HashSet();
+
 		this.objects	= new LinkedHashMap();
 //		this.objects	= new CheckedMap(new LinkedHashMap());
 
@@ -365,14 +369,17 @@ public class OAVState	implements IOAVState
 		assert nocheck || !rootobjects.contains(object);
 		// #endif
 		
-		this.objects.put(object, object);
 		this.rootobjects.add(object);
-		OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
 		
-		if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
-			registerValue(java_type, object);
-		
-		eventhandler.objectAdded(object, java_type, true);
+		if(this.javaobjects.add(object))	// Todo: java objects in nested states.
+		{
+			OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
+			
+			if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
+				registerValue(java_type, object);
+
+			eventhandler.objectAdded(object, java_type, true);
+		}
 	}
 	
 	/**
@@ -382,17 +389,21 @@ public class OAVState	implements IOAVState
 	public void removeJavaRootObject(Object object)
 	{
 		// #ifndef MIDP
-		assert nocheck || rootobjects.contains(object);
+		assert nocheck || rootobjects.contains(object) && javaobjects.contains(object);
 		// #endif
 		
-		this.objects.remove(object);
 		this.rootobjects.remove(object);
-		OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
 		
-		if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
-			deregisterValue(java_type, object);
-		
-		eventhandler.objectRemoved(object, java_type);
+		if(!objectusages.containsKey(object))	// Todo: java objects in nested states.
+		{
+			javaobjects.remove(object);
+
+			OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
+			if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
+				deregisterValue(java_type, object);
+
+			eventhandler.objectRemoved(object, java_type);
+		}
 	}
 	
 	/**
@@ -693,14 +704,10 @@ public class OAVState	implements IOAVState
 		Iterator ret;
 		if(!eventhandler.notifying)
 		{
-			ret = objects.keySet().iterator();
-		}
-		else
-		{
 			ret = new Iterator()
 			{
 				Iterator it1 = objects.keySet().iterator();
-				Iterator it2 = deletedobjects.keySet().iterator();
+				Iterator it2 = javaobjects.iterator();
 				
 				public boolean hasNext()
 				{
@@ -717,6 +724,47 @@ public class OAVState	implements IOAVState
 					else if(it2.hasNext())
 					{
 						ret = it2.next();
+					}
+					else
+					{
+						throw new RuntimeException("No next element.");
+					}
+					return ret;
+				}
+				
+				public void remove()
+				{
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
+		else
+		{
+			ret = new Iterator()
+			{
+				Iterator it1 = objects.keySet().iterator();
+				Iterator it2 = deletedobjects.keySet().iterator();
+				Iterator it3 = javaobjects.iterator();
+				
+				public boolean hasNext()
+				{
+					return it1.hasNext() || it2.hasNext() || it3.hasNext();
+				}
+				
+				public Object next()
+				{
+					Object ret = null;
+					if(it1.hasNext())
+					{
+						ret = it1.next();
+					}
+					else if(it2.hasNext())
+					{
+						ret = it2.next();
+					}
+					else if(it3.hasNext())
+					{
+						ret = it3.next();
 					}
 					else
 					{
@@ -1918,13 +1966,13 @@ public class OAVState	implements IOAVState
 				cnt = new Integer(cnt.intValue()+1);
 			usages.put(ref, cnt);
 
-			if(newobject && !rootobjects.contains(value))
+			if(newobject && types.get(value)==null)
 			{
+//				if(whichattr.getType() instanceof OAVJavaType)
 				// When it is a Java object, it is not created in state,
 				// so we have to notify object addition to listeners on first usage.
 			
-//				if(whichattr.getType() instanceof OAVJavaType)
-				if(types.get(value)==null)
+				if(javaobjects.add(value))
 				{
 //					System.out.println("Creating reference: "+whichid+" "+whichattr.getName()+" "+value);
 					OAVJavaType	java_type = tmodel.getJavaType(value.getClass());
@@ -1935,6 +1983,21 @@ public class OAVState	implements IOAVState
 					eventhandler.objectAdded(value, java_type, false);
 				}
 			}
+			
+			// Check equal yet different java objects
+//			else if(!newobject && types.get(value)==null)
+//			{
+//				Object	oldval	= null;
+//				for(Iterator it=objectusages.keySet().iterator(); oldval==null && it.hasNext(); )
+//				{
+//					Object	val	= it.next();
+//					if(value.equals(val))
+//						oldval	= val;
+//				}
+//				if(value!=oldval)
+//					throw new RuntimeException("Adding different equal java object: "+value+", "+oldval);
+//			}
+			
 		}
 	}
 	
@@ -1983,8 +2046,9 @@ public class OAVState	implements IOAVState
 				
 				// When it is a Java object, it is not dropped from state,
 				// so we have to notify object removal to listeners on last usage.
-				else if(whichattr.getType() instanceof OAVJavaType)
+				else if(types.get(value)==null && !rootobjects.contains(value))
 				{
+					javaobjects.remove(value);
 //					System.out.println("Removing reference: "+whichid+" "+whichattr.getName()+" "+value);
 					OAVJavaType	java_type	= tmodel.getJavaType(value.getClass());
 					

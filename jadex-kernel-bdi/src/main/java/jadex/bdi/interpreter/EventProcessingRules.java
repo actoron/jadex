@@ -211,11 +211,11 @@ public class EventProcessingRules
 
 		// Rules for plan instances
 		Rule	add_rplan_to_apl	= new Rule("add_rplan_to_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, agentcon, wacon, plancon, new NotCondition(new AndCondition(new ICondition[]{candcon, aplcon1a}))}),
+				new AndCondition(new ICondition[]{rpecon, capcon, wacon, plancon, new NotCondition(new AndCondition(new ICondition[]{candcon, aplcon1a})), agentcon}),
 				ADD_RPLAN_TO_APL);
 
 		Rule	no_rplans_for_apl	= new Rule("no_rplans_for_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, agentcon, new NotCondition(aplcon1b), new NotCondition(new AndCondition(new ICondition[]{wacon, plancon, new NotCondition(aplcon1a)}))}),
+				new AndCondition(new ICondition[]{rpecon, capcon, new NotCondition(aplcon1b), new NotCondition(new AndCondition(new ICondition[]{wacon, plancon, new NotCondition(aplcon1a)})), agentcon}),
 				NO_RPLANS_FOR_APL);
 
 		
@@ -373,7 +373,7 @@ public class EventProcessingRules
   		}));
 
 		Rule	make_apl_available	= new Rule("make_apl_available",
-				new AndCondition(new ICondition[]{rpecon, agentcon, aplcon, capcon}), MAKE_APL_AVAILABLE);
+				new AndCondition(new ICondition[]{rpecon, aplcon, capcon, agentcon}), MAKE_APL_AVAILABLE);
 
 		return make_apl_available;		
 	}
@@ -821,7 +821,7 @@ public class EventProcessingRules
 		};
 		
 		Rule select_candidates = new Rule("select_candidates_for_goal", 
-			new AndCondition(new ICondition[]{rpecon, capcon, agentcon, nometacon}), action);
+			new AndCondition(new ICondition[]{rpecon, capcon, nometacon, agentcon}), action);
 		return select_candidates;
 	}
 	
@@ -905,7 +905,7 @@ public class EventProcessingRules
 		};
 		
 		Rule select_candidates = new Rule("select_candidates_for_internalevent", 
-			new AndCondition(new ICondition[]{rpecon, capcon, agentcon, nometacon}), action);
+			new AndCondition(new ICondition[]{rpecon, capcon, nometacon, agentcon}), action);
 		return select_candidates;
 	}
 	
@@ -990,7 +990,7 @@ public class EventProcessingRules
 		};
 		
 		Rule select_candidates = new Rule("select_candidates_for_messageevent", 
-			new AndCondition(new ICondition[]{rpecon, capcon, agentcon, nometacon}), action);
+			new AndCondition(new ICondition[]{rpecon, capcon, nometacon, agentcon}), action);
 		return select_candidates;
 	}
 	
@@ -1081,7 +1081,7 @@ public class EventProcessingRules
 		
 		
 		Rule dispatch_element = new Rule("dispatch_messageevent_from_waitqueue", 
-			new AndCondition(new ICondition[]{rpecon, plancon, capcon, agentcon, wacon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{rpecon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}
 	
@@ -1125,7 +1125,7 @@ public class EventProcessingRules
 			mpe, IOperator.CONTAINS));
 		
 		Rule dispatch_element = new Rule("dispatch_internalevent_from_waitqueue", 
-			new AndCondition(new ICondition[]{wqcon, plancon, capcon, agentcon, wacon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}
 	

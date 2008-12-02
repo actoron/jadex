@@ -41,6 +41,9 @@ public class SpringPlatform extends AbstractPlatform
 	/** The application agents. */
 	protected Map appagents;
 	
+	/** Flag indicating if autoshutdown. */
+	protected boolean autoshutdown;
+	
 	//-------- constructors --------
 
 	/**

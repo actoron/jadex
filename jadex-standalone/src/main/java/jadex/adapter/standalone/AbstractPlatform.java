@@ -60,9 +60,6 @@ public abstract class AbstractPlatform implements IPlatform
 	/** The shutdown time. */
 	protected long shutdowntime;
 
-	/** Flag indicating if autoshutdown. */
-	protected boolean autoshutdown;
-
 	//-------- methods --------
 
 	/**

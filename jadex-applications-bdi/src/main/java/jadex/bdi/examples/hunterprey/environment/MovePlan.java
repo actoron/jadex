@@ -28,7 +28,7 @@ public class  MovePlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("a) move: "+getName());
+//		System.out.println("a) move: "+getAgentName());
 		RequestMove rm = (RequestMove)getParameter("action").getValue();
 
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
@@ -37,7 +37,7 @@ public class  MovePlan extends Plan
 		// Wait until all tasks are processed by the environment.
 		waitForCondition("notasks");
 
-//		System.out.println("b) move: "+getName());
+//		System.out.println("b) move: "+getAgentName());
 
 		// Result is null, when creature died and action was not executed.
 		if(ti.getResult()!=null && ((Boolean)ti.getResult()).booleanValue())

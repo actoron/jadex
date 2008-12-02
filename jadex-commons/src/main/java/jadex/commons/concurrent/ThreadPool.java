@@ -60,7 +60,7 @@ public class ThreadPool implements IThreadPool, Runnable
 	public ThreadPool()
 	{
 		// min=3, max=unlimited, pref=3.
-		this(0, -1, 0);
+		this(1, -1, 1);
 
 		// Todo: enable better thread recycling.
 //		this(1, 3);
@@ -343,7 +343,7 @@ public class ThreadPool implements IThreadPool, Runnable
 					}
 				}
 			}
-//			System.out.println("removed thread: now "+capacity+" of "+pool.size()+" threads available.");
+			System.out.println("removed thread: now "+capacity+" of "+pool.size()+" threads available.");
 			pool.remove(this);
 		}
 

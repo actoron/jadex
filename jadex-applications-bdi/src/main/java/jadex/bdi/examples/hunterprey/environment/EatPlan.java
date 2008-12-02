@@ -28,7 +28,7 @@ public class  EatPlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("a) eat: "+getName());
+//		System.out.println("a) eat: "+getAgentName());
 
 		RequestEat re = (RequestEat)getParameter("action").getValue();
 
@@ -39,7 +39,7 @@ public class  EatPlan extends Plan
 		//waitForCondition(getCondition("emptylist"));
 		waitForCondition("notasks");
 
-//		System.out.println("b) eat: "+getName());
+//		System.out.println("b) eat: "+getAgentName());
 
 		// Result can null when creature died and action was not executed.
 		if(ti.getResult()!=null && ((Boolean)ti.getResult()).booleanValue())
