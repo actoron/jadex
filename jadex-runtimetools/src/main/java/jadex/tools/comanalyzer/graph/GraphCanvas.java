@@ -28,12 +28,14 @@ import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.algorithms.layout.util.Relaxer;
 import edu.uci.ics.jung.algorithms.layout.util.VisRunner;
+import edu.uci.ics.jung.algorithms.util.IterativeContext;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Context;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.AbsoluteCrossoverScalingControl;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
@@ -108,6 +110,9 @@ public class GraphCanvas extends ToolCanvas
 	/** Support for picking and transforming */
 	protected DefaultModalGraphMouse gm;
 
+	protected AbsoluteCrossoverScalingControl scaler;
+	
+	
 	/** The transformer for vertex label */
 	protected VertexTransformer.Label v_string;
 
@@ -256,6 +261,8 @@ public class GraphCanvas extends ToolCanvas
 		gm.setMode(Mode.PICKING);
 		gm.add(new PopupGraphMousePlugin(this)); // handles mouse events
 		vv.setGraphMouse(gm);
+		
+		scaler = new AbsoluteCrossoverScalingControl();
 
 		this.setLayout(new BorderLayout());
 		this.add(BorderLayout.CENTER, scrollPane);
@@ -372,8 +379,8 @@ public class GraphCanvas extends ToolCanvas
 		{
 			// initialize layout
 			layout.initialize();
-			// for iterativ layouts use visrunner (no effect for other layouts)
-			Relaxer relaxer = new VisRunner((edu.uci.ics.jung.algorithms.util.IterativeContext)layout);
+			// for iterative layouts use visrunner (no effect for other layouts)
+			Relaxer relaxer = new VisRunner((IterativeContext)layout);
 			relaxer.stop();
 			relaxer.prerelax();
 			// assign to static layout
@@ -381,7 +388,7 @@ public class GraphCanvas extends ToolCanvas
 
 			if(!animate)
 			{
-				// if animator is off, set graphlayout direct
+				// if animator is off, set graphlayout
 				vv.setGraphLayout(staticLayout);
 			}
 			else
@@ -403,6 +410,41 @@ public class GraphCanvas extends ToolCanvas
 
 	// -------- GraphCanvas methods --------
 
+	/**
+	 * Repaints the canvas with reinitializes its layout.
+	 */
+	public void reinitializeCanvas() {
+		
+		StaticLayout staticLayout;		
+		
+		// initialize layout
+		layout.initialize();
+		// for iterative layouts use visrunner (no effect for other layouts)
+		Relaxer relaxer = new VisRunner((IterativeContext)layout);
+		relaxer.stop();
+		relaxer.prerelax();
+		// assign to static layout
+		staticLayout = new StaticLayout(graph, layout);
+
+		if(!animate)
+		{
+			// if animator is off, set graphlayout direct
+			vv.setGraphLayout(staticLayout);
+		}
+		else
+		{
+			// create transition from current layout to the new static one
+			staticLayout.setSize(layout.getSize());
+			GraphLayoutTransition lt = new GraphLayoutTransition(vv, vv.getGraphLayout(), staticLayout);
+
+			Animator animator = new Animator(lt);
+			animator.start();
+		}
+
+
+		
+	}
+	
 	/**
 	 * Add message with given sender and receiver (for redirection)
 	 * @param message The message to add.
@@ -439,6 +481,11 @@ public class GraphCanvas extends ToolCanvas
 	public void addAgent(Agent agent)
 	{
 		graph.addVertexElement(agent);
+		
+		VisRunner runner = new VisRunner((IterativeContext)layout);		
+		layout.initialize();
+		runner.prerelax();
+
 		visible_agents.add(agent);
 	}
 
@@ -446,7 +493,7 @@ public class GraphCanvas extends ToolCanvas
 	 * Cluster the vertices with edge betweenness algorithm.
 	 * 
 	 * @param numEdgesToRemove The number of edges to remove.
-	 * @param groupClusters <code>true</code> if the vertices shoul be
+	 * @param groupClusters <code>true</code> if the vertices should be
 	 * clustered. <code>false</code> for cancel the grouping.
 	 */
 	public void clusterGraph(int numEdgesToRemove, boolean groupClusters)

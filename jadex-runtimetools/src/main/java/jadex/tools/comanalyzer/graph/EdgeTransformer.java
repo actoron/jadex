@@ -137,7 +137,7 @@ public class EdgeTransformer
 	}
 
 	/**
-	 * A Transformer for assigning a weigted strokes to the message group (the
+	 * A Transformer for assigning a weighted stroke to the message group (the
 	 * edge). The size is calculated from the edge weight of the message group
 	 * (the number of elements (messages) inside the group) in relation to the
 	 * highest edge weight of all message groups in the graph.

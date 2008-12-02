@@ -10,9 +10,11 @@ import jadex.tools.comanalyzer.graph.EdgeTransformer.WeightStroke;
 import jadex.tools.comanalyzer.graph.VertexTransformer.IconSize;
 import jadex.tools.comanalyzer.table.TablePanel;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -30,6 +32,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -74,8 +77,8 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 	/**
 	 * The image icons. 
 	 */
-	protected static UIDefaults defaults = new UIDefaults(new Object[]{"zoom", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "zoom.png"), "fitcontent",
-			SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "fitcontent.png")});
+	protected static UIDefaults defaults = new UIDefaults(new Object[]{"refresh", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "refresh3.png"), "zoom",
+			SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "zoom.png")});
 
 	/** The map of different layouts. */
 	public static Map LAYOUTS;
@@ -85,8 +88,8 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 		LAYOUTS.put("Kamada-Kawai", KKLayout.class);
 		LAYOUTS.put("Fruchterman-Reingold ", FRLayout.class);
 		LAYOUTS.put("Circle Layout", GraphCircleLayout.class);
-		LAYOUTS.put("Spring Layout", SpringLayout.class);
-		LAYOUTS.put("Spring Layout2", SpringLayout2.class);
+		LAYOUTS.put("Spring Layout", SpringLayout2.class);
+//		LAYOUTS.put("Spring Layout2", SpringLayout2.class);
 		LAYOUTS.put("Meyer's self-organizing", GraphISOMLayout.class);
 	}
 
@@ -104,12 +107,18 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 
 	// layout controls
 	protected JComboBox l_layout;
+	
+	protected JButton l_refresh;
 
 	protected JCheckBox l_init;
 
 	protected JCheckBox l_animate;
 
 	protected JCheckBox l_gmmode;
+	
+	protected JSlider l_zoom_slider;
+	
+	protected JButton l_identity;
 
 	// vertex controls
 	protected JCheckBox v_label;
@@ -207,10 +216,6 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 		if(actions == null)
 		{
 			List actionlist = SUtil.arrayToList(super.getActions());
-			actionlist.add(null); // seperator
-			actionlist.add(FIT_ZOOM);
-			actionlist.add(RESIZE_LAYOUT);
-
 			actions = (Action[])actionlist.toArray((new Action[actionlist.size()]));
 		}
 		return this.actions;
@@ -256,10 +261,15 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 		// layout controls
 		Box layout_panel = Box.createVerticalBox();
 		layout_panel.setBorder(BorderFactory.createTitledBorder("Layout"));
+		
+		JPanel l_layout_panel = new JPanel(new GridBagLayout());		
 		l_layout = new JComboBox((String[])LAYOUTS.keySet().toArray(new String[LAYOUTS.keySet().size()]));
 		l_layout.setSelectedIndex(0); // TODO: select the one the graph is currently using
 		l_layout.addActionListener(new LayoutComboListener());
-
+		l_refresh = new JButton(defaults.getIcon("refresh"));
+		l_refresh.setToolTipText("Reinitialize Layout");
+		l_refresh.addActionListener(this);
+		
 		JPanel l_control_panel = new JPanel(new GridLayout(4, 0));
 		l_init = new JCheckBox("Initialize On Change");
 		l_init.setSelected(panelcan.autolayout);
@@ -271,38 +281,42 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 		l_gmmode.setSelected(panelcan.gm.getSelectedObjects()[0] == ModalGraphMouse.Mode.TRANSFORMING);
 		l_gmmode.addActionListener(this);
 
-		final AbsoluteCrossoverScalingControl scaler = new AbsoluteCrossoverScalingControl();
-		JSlider zoom_slider = new JSlider(JSlider.HORIZONTAL);
-		zoom_slider.setMinimum(1);
-		zoom_slider.setMaximum(300);
-		zoom_slider.setValue(50);
-		zoom_slider.setPreferredSize(new Dimension(60, 0));
-		zoom_slider.addChangeListener(new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent e)
-			{
-				JSlider source = (JSlider)e.getSource();
-//				if(!source.getValueIsAdjusting()) 
-				{
-					int val = (int)source.getValue();
-					scaler.scale(panelcan.vv, val/50.0f, panelcan.vv.getCenter());
-				}
-			}
-		});
+		
+		l_zoom_slider = new JSlider(JSlider.HORIZONTAL);
+		l_zoom_slider.setMinimum(1);
+		l_zoom_slider.setMaximum(300);
+		l_zoom_slider.setValue(50);
+		l_zoom_slider.setPreferredSize(new Dimension(60, 0));
+		l_zoom_slider.addChangeListener(this);
+		l_identity = new JButton(defaults.getIcon("zoom"));
+		l_identity.setToolTipText("Set Zoom To Identity");
+		l_identity.addActionListener(this);
+		
 //		JPanel zp = new JPanel(new BorderLayout());
 //		zp.add(new JLabel("Zoom"), BorderLayout.WEST);
 //		zp.add(zoom_slider, BorderLayout.CENTER);
 		JPanel zp = new JPanel(new GridBagLayout());
 		zp.add(new JLabel("Zoom"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(2,6,2,2), 0, 0));
-		zp.add(zoom_slider, new GridBagConstraints(1, 0, 1, 1, 1, 1,
+		zp.add(l_zoom_slider, new GridBagConstraints(1, 0, 1, 1, 1, 1,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+		zp.add(l_identity, new GridBagConstraints(2, 0, 1, 1, 0, 0,
+				GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+		
+//		l_layout_panel.add(l_layout);
+//		l_layout_panel.add(l_refresh);
+		l_layout_panel.add(l_layout, new GridBagConstraints(0, 0, 1, 1, 0, 0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(2,3,2,2), 0, 0));
+		l_layout_panel.add(l_refresh, new GridBagConstraints(1, 0, 1, 1, 1, 1,
+				GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+		
+		
 		l_control_panel.add(l_init);
 		l_control_panel.add(l_animate);
 		l_control_panel.add(l_gmmode);
 		l_control_panel.add(zp);
 
-		layout_panel.add(l_layout);
+		layout_panel.add(l_layout_panel);
 		layout_panel.add(l_control_panel);
 		control_panel.add(layout_panel, gbc);
 
@@ -450,12 +464,17 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 	public void stateChanged(ChangeEvent e)
 	{
 		JSlider source = (JSlider)e.getSource();
-		if(source == v_size_slider) // && !source.getValueIsAdjusting())
+		if(source == l_zoom_slider) // && !source.getValueIsAdjusting())
+		{
+			int val = (int)source.getValue();
+			panelcan.scaler.scale(panelcan.vv, val/50.0f, panelcan.vv.getCenter());
+		}
+		else if(source == v_size_slider) // && !source.getValueIsAdjusting())
 		{
 			panelcan.v_icon.setScaleRange(source.getValue());
 			panelcan.vv.repaint();
 		}
-		if(source == v_prop_slider) // && !source.getValueIsAdjusting())
+		else if(source == v_prop_slider) // && !source.getValueIsAdjusting())
 		{
 			panelcan.v_icon.setPropFactor(source.getValue());
 			panelcan.vv.repaint();
@@ -498,6 +517,11 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 		{
 			panelcan.setGraphType(GraphCanvas.UNDIRECTED_GRAPH);
 		}
+		else if(source == l_refresh)
+		{
+			// Hack??
+			l_layout.setSelectedIndex(l_layout.getSelectedIndex());
+		}
 		else if(source == l_init)
 		{
 			panelcan.autolayout = source.isSelected();
@@ -510,6 +534,12 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 		else if(source == l_gmmode)
 		{
 			panelcan.gm.setMode(source.isSelected() ? ModalGraphMouse.Mode.TRANSFORMING : ModalGraphMouse.Mode.PICKING);
+		}
+		else if(source == l_identity)
+		{
+//			panelcan.scaler.scale(panelcan.vv, 1.0f, panelcan.vv.getCenter());
+			panelcan.vv.getRenderContext().getMultiLayerTransformer().setToIdentity();						
+			l_zoom_slider.setValue(50);
 		}
 		else if(source == e_nocolor)
 		{
@@ -581,47 +611,12 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 
 	// -------- Actions --------
 
-	/** Set the zoom to identity. That is 100% */
-	protected final AbstractAction FIT_ZOOM = new AbstractAction("Set Zoom To Identity", defaults.getIcon("zoom"))
-	{
-		public void actionPerformed(ActionEvent ae)
-		{
-			panelcan.vv.getRenderContext().getMultiLayerTransformer().setToIdentity();
-			panelcan.vv.repaint();
-		}
-	};
-
-	/** Resizes the layout to fit in pane. */
-	protected final AbstractAction RESIZE_LAYOUT = new AbstractAction("Resize Layout To Fit Panel", defaults.getIcon("fitcontent"))
-	{
-		public void actionPerformed(ActionEvent ae)
-		{
-			// TODO: adjust adjust vertices locations without reinitializing the
-			// layout
-
-			panelcan.layout.setSize(panelcan.vv.getSize());
-
-			// initialize has to be done in any case to adjust locations of
-			// vertices
-			if(!panelcan.autolayout)
-			{
-				panelcan.layout.initialize();
-				Relaxer relaxer = new VisRunner((IterativeContext)panelcan.layout);
-				relaxer.stop();
-				relaxer.prerelax();
-
-				StaticLayout staticLayout = new StaticLayout(panelcan.graph, panelcan.layout);
-				panelcan.vv.setGraphLayout(staticLayout);
-			}
-			panelcan.repaintCanvas();
-		}
-	};
 
 	// -------- inner classes --------
 
 	/**
-	 * Listener for the layout combobox. Creates a new layout from the choosen
-	 * entry of the combobox and assings it to the graph.
+	 * Listener for the layout combobox. Creates a new layout from the chosen
+	 * entry of the combobox and assigns it to the graph.
 	 */
 	protected final class LayoutComboListener implements ActionListener
 	{
@@ -638,15 +633,16 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 				Object o = constructor.newInstance(constructorArgs);
 				Layout l = (Layout)o;
 
-				l.setInitializer(panelcan.vv.getGraphLayout());
 				l.setSize(panelcan.vv.getSize());
 
 				panelcan.layout.removeAll();
 				panelcan.layout.setDelegate(l);
 
-				//				StaticLayout staticLayout = new StaticLayout(panelcan.graph, panelcan.layout);
-
-				panelcan.repaintCanvas();
+				// set zoom to identity
+				panelcan.vv.getRenderContext().getMultiLayerTransformer().setToIdentity();			
+				l_zoom_slider.setValue(50);
+				
+				panelcan.reinitializeCanvas();
 
 			}
 			catch(Exception e)

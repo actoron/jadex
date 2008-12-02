@@ -2,10 +2,13 @@ package jadex.tools.comanalyzer;
 
 import jadex.bdi.runtime.IFilter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.collection.SortedList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -17,7 +20,7 @@ public class Agent extends ParameterElement
 	public static final Agent DUMMY_AGENT = new Agent();
 
 	/** The name for the dummy agent */
-	public static final String DUMMY_NAME = "Other";
+	public static final String DUMMY_NAME = "Dummy";
 
 	// Names of the parameters for an agent
 	public static final String STATE = "state";
@@ -88,14 +91,14 @@ public class Agent extends ParameterElement
 	{
 		this.visible = true;
 
-		parameters.put(ID, aid==null? "dummy": aid.getName());
+		parameters.put(ID, aid==null? DUMMY_NAME: aid.getName());
 		parameters.put(AID, aid);
 
 		// parameters.put(STATE, STATE_UNKNOWN);
 		parameters.put(MESSAGE_COUNT, new Integer(NO_MESSAGES));
 		parameters.put(MESSAGE_VISIBLE, new Integer(NO_MESSAGES));
 
-		parameters.put(NAME, aid==null? "dummy": aid.getName());
+		parameters.put(NAME, aid==null? DUMMY_NAME: aid.getName());
 		parameters.put(CLASS, Agent.class.getSimpleName());
 	}
 
@@ -115,7 +118,7 @@ public class Agent extends ParameterElement
 	public Map getParameters()
 	{
 		// calculate message count on access
-		// but skip dummy agent, because this filter doesnt apply
+		// but skip dummy agent, because this filter doesnt apply to it
 		if(!this.equals(Agent.DUMMY_AGENT))
 		{
 			int msg_visible = NO_MESSAGES;
@@ -189,9 +192,10 @@ public class Agent extends ParameterElement
 	/**
 	 * Applies a filter to the agent and returns if the visibility has changed.
 	 * @param filter The array of filters to apply to.
+	 * @param zeromessages <code>True</code> if the zero message filter should be applied
 	 * @return True if visibility has changed.
 	 */
-	public boolean applyFilter(AgentFilter[] filter)
+	public boolean applyFilter(AgentFilter[] filter, boolean zeromessages)
 	{
 		boolean old = visible;
 
@@ -202,7 +206,11 @@ public class Agent extends ParameterElement
 			// do not add empty filter
 			if(filter[i].hasValues())
 			{
-				filters.add(filter[i]);
+				if (zeromessages) {
+					filters.add(filter[i]);
+				} else if (!filter[i].containsValue(Agent.MESSAGE_VISIBLE, new Integer(Agent.NO_MESSAGES)))  {
+					filters.add(filter[i]);
+				}
 			}
 		}
 

@@ -154,6 +154,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	/** The global agentfilter */
 	protected AgentFilter[] agentfilter;
 
+	/** The agentfilter for zero messages*/
+	protected static final AgentFilter[] zeromessages = new AgentFilter[] {new AgentFilter(Agent.MESSAGE_VISIBLE, new Integer(Agent.NO_MESSAGES))};	
+	
 	/** Observe all new agents. */
 	protected boolean observe_all_new;
 
@@ -672,14 +675,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				// to account for new visibility of the message
 				Agent sender = messages[i].getSender();
 				Agent receiver = messages[i].getReceiver();
-				if(sender.applyFilter(agentfilter))
+				if(sender.applyFilter(agentfilter, true))
 				{
 					if(!updated_agents.contains(sender))
 					{
 						updated_agents.add(sender);
 					}
 				}
-				if(receiver.applyFilter(agentfilter))
+				if(receiver.applyFilter(agentfilter, true))
 				{
 					if(!updated_agents.contains(receiver))
 					{
@@ -689,6 +692,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			}
 		}
 
+
+		
 		agentlist.fireAgentsChanged((Agent[])updated_agents
 			.toArray(new Agent[updated_agents.size()]));
 		messagelist.fireMessagesChanged((Message[])updated_messages
@@ -771,52 +776,50 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 
 	/**
 	 * Applies the current agentfilter to the given agents.
-	 * @param agents The agents to apply the filter to.
+	 * 
+	 * @param agents
+	 *            The agents to apply the filter to.
 	 */
-	protected void applyAgentFilter(Agent[] agents)
-	{
-		boolean addDummy = false;
+	protected void applyAgentFilter(Agent[] agents) {
+		boolean[] last = new boolean[agents.length];
 		List updated_agents = new ArrayList();
 		List updated_messages = new ArrayList();
 
-		for(int i = 0; i < agents.length; i++)
-		{
-			if(agents[i].applyFilter(agentfilter))
-			{
-				updated_agents.add(agents[i]);
+		// Hack!!!
+		// apply with out zero message filter first
+		for (int i = 0; i < agents.length; i++) {
+			last[i]=agents[i].isVisible();
+			agents[i].applyFilter(agentfilter, false);	
+			if (!agents[i].equals(Agent.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
+				if (agents[i].isVisible()) {
+					Agent.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
+				} else {
+					Agent.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
 
-				// add or remove agents messages from the dummy's messageslist
-				// and fire update for the messages
-				if(!agents[i].equals(Agent.DUMMY_AGENT) && agents[i].getMessages().size() > 0)
-				{
-					addDummy = true;
-					if(agents[i].isVisible())
-					{
+				}
+			}			
+		}	
+		
+		for (int i = 0; i < agents.length; i++) {
+			agents[i].applyFilter(agentfilter, true);
+				if (!agents[i].equals(Agent.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
+					if (agents[i].isVisible()) {
 						Agent.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
-					}
-					else
-					{
+					} else {
 						Agent.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
+
 					}
-					updated_messages.addAll(agents[i].getMessages());
 				}
-				// if dummy changes, fire update for the redirected messages
-				if(agents[i].equals(Agent.DUMMY_AGENT))
-				{
-					updated_messages.addAll(agents[i].getMessages());
-				}
-
-			}
 		}
+		
 
-		// dummy can change visibility by adding or removing messages
-		if(addDummy && Agent.DUMMY_AGENT.applyFilter(agentfilter))
-		{
-			updated_agents.add(Agent.DUMMY_AGENT);
-		}
+		updated_agents.addAll(agentlist.getList());		
+		updated_messages.addAll(messagelist.getList());
 
-		agentlist.fireAgentsChanged((Agent[])updated_agents.toArray(new Agent[updated_agents.size()]));
-		messagelist.fireMessagesChanged((Message[])updated_messages.toArray(new Message[updated_messages.size()]));
+		agentlist.fireAgentsChanged((Agent[]) updated_agents
+				.toArray(new Agent[updated_agents.size()]));
+		messagelist.fireMessagesChanged((Message[]) updated_messages
+				.toArray(new Message[updated_messages.size()]));
 	}
 
 	/**
@@ -987,7 +990,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			sender = new Agent(sid);
 			sender.setState(Agent.STATE_DEAD);
 			sender.addMessage(message);
-			sender.applyFilter(agentfilter);
+			sender.applyFilter(agentfilter, true);
 			agentlist.addAgent(sender);
 
 			// add to agent tree table
@@ -1009,7 +1012,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			receiver = new Agent(rid);
 			receiver.setState(Agent.STATE_DEAD);
 			receiver.addMessage(message);
-			receiver.applyFilter(agentfilter);
+			receiver.applyFilter(agentfilter, true);
 			agentlist.addAgent(receiver);
 
 			// add to agent tree table
@@ -1130,7 +1133,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				}
 			}
 
-			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
+//			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
+			applyAgentFilter();			
 		}
 	};
 
@@ -1154,7 +1158,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					ComanalyzerPlugin.this.agents.updateAgent(desc);
 				}
 			}
-			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
+//			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
+			applyAgentFilter();				
 		}
 	};
 
@@ -1207,7 +1212,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				agents[i].removeAllMessages();
 				update.add(agents[i]);
 			}
-			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
+//			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
+			applyAgentFilter();				
 		}
 	};
 

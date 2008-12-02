@@ -143,7 +143,7 @@ public class Message extends ParameterElement
 
 		// parameters for element panel
 		//		this.parameters.put(NAME, parameters.get(ID));
-		this.parameters.put(NAME, parameters.get(SFipa.X_MESSAGE_ID));
+		this.parameters.put(NAME, message.getParameterMap().get(SFipa.X_MESSAGE_ID));
 		this.parameters.put(CLASS, Message.class.getSimpleName());
 		this.parameters.put(RECEIVER, receiver);
 	}
@@ -274,8 +274,9 @@ public class Message extends ParameterElement
 		}
 		else
 		{
-			// no filter -> no unvisible message
-			return visible = true;
+			// no filter -> no invisible message
+			visible = true;
+			return old != visible;		
 		}
 
 		try

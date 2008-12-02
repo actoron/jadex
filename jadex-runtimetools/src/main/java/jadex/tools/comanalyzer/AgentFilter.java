@@ -19,4 +19,16 @@ public class AgentFilter extends ParameterElementFilter
 	{
 	}
 
+	
+	/**
+	 * Create an agent filter with given arguments.
+	 * 
+	 * @param name The attribute name.
+	 * @param value The attribute value.
+	 */
+	public AgentFilter(String name, Object value)
+	{
+		addValue(name, value);
+	}
+
 }
