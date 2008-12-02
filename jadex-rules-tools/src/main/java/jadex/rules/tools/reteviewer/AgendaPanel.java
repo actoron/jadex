@@ -5,6 +5,7 @@ import jadex.rules.rulesystem.IAgenda;
 import jadex.rules.rulesystem.IAgendaListener;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -105,8 +106,9 @@ public class AgendaPanel extends JSplitPane
 			{
 				synchronized(AgendaPanel.this)
 				{
+					List his = agenda.getHistory();
 					activations_clone	= agenda.getActivations().toArray();
-					history_clone	= agenda.getHistory().toArray();
+					history_clone	= his!=null? his.toArray(): new Object[0];
 					next	= agenda.getNextActivation();
 				}
 				if(!invoked)
@@ -160,6 +162,7 @@ public class AgendaPanel extends JSplitPane
 				agenda.setHistoryEnabled(hon.isSelected());
 			}	
 		});
+		hon.setSelected(true);
 		
 		JPanel	agendap	= new JPanel(new BorderLayout());
 		agendap.add(new JScrollPane(activations));
@@ -169,7 +172,7 @@ public class AgendaPanel extends JSplitPane
 		historyp.add(new JScrollPane(history));
 		historyp.setBorder(BorderFactory.createTitledBorder("History"));
 		
-		JPanel buts = new JPanel();
+		JPanel buts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		buts.add(hon);
 		buts.add(clear);
 		historyp.add(buts, BorderLayout.SOUTH);
