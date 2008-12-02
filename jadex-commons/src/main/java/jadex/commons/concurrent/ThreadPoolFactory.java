@@ -72,15 +72,15 @@ public class ThreadPoolFactory
 		IThreadPool	instance;
 		try
 		{
-			try
-			{
-				instance	= (IThreadPool)Class.forName(THREADPOOL_JAVA5).newInstance();
-			}
-			catch(Throwable e)
-			{
-				e.printStackTrace();
+//			try
+//			{
+//				instance	= (IThreadPool)Class.forName(THREADPOOL_JAVA5).newInstance();
+//			}
+//			catch(Throwable e)
+//			{
+//				e.printStackTrace();
 				instance	= (IThreadPool)Class.forName(THREADPOOL_STANDARD).newInstance();
-			}
+//			}
 		}
 		catch(Exception e)
 		{
