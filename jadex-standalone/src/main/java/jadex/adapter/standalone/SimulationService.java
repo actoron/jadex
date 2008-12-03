@@ -55,7 +55,7 @@ public class SimulationService implements ISimulationService
 	/**
 	 *  Create a new execution control.
 	 */
-	public SimulationService(AbstractPlatform platform)//final IClock clock, final IExecutorService executor, String mode)
+	public SimulationService(AbstractPlatform platform)
 	{
 		this.platform = platform;
 //		this.mode = mode;

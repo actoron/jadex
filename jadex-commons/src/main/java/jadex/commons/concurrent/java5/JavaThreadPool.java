@@ -24,8 +24,8 @@ public class JavaThreadPool implements IThreadPool
 	public JavaThreadPool()
 	{
 		System.out.println("Using Java 5.0 ThreadPool");
-		executor	= Executors. newCachedThreadPool();
-//		executor	= Executors. newFixedThreadPool(20);
+		executor	= Executors.newCachedThreadPool();
+//		executor	= Executors.newFixedThreadPool(20);
 	}
 	
 	//-------- IThreadPool interface --------

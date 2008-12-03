@@ -285,6 +285,7 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 	protected static boolean	inprocess(IOAVState state, Object parameterelement, Object scope)
 	{
 		boolean	ret;
+		
 		if(state.getType(parameterelement).isSubtype(OAVBDIRuntimeModel.plan_type))
 		{
 			ret	= OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING.equals(state.getAttributeValue(parameterelement, OAVBDIRuntimeModel.plan_has_processingstate));
@@ -314,6 +315,7 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 				ret	= events!=null && events.contains(parameterelement);
 			}
 		}
+		
 		return ret;
 	}
 }

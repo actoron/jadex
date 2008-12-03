@@ -114,7 +114,7 @@ public class ArrayBlockingQueue	implements IBlockingQueue
 	            		if(size==0)
 	            		{
 		            		timeout	= Math.max(0, timeout + starttime - System.currentTimeMillis());
-		            		System.out.println("Remaining timeout: "+timeout);
+//		            		System.out.println("Remaining timeout: "+timeout);
 	            		}
 	            	}
 				}

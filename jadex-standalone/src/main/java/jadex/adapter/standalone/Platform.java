@@ -353,6 +353,13 @@ public class Platform extends AbstractPlatform
 		
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");
+		
+//		while(true)
+//		{
+//			try{Thread.currentThread().sleep(500);}
+//			catch(Exception e){}
+//			System.out.println(".");
+//		}
 	}
 
 	/**

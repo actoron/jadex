@@ -11,7 +11,7 @@ public class ThreadPoolFactory
 	//-------- constants --------
 	
 	/** The standard (1.4 compliant) thread pool implementation. */
-	public static final String	THREADPOOL_STANDARD	= "jadex.commons.concurrent.StrategyThreadPool";
+	public static final String	THREADPOOL_STANDARD	= "jadex.commons.concurrent.ThreadPool";
 
 	/** The java 5.0 thread pool implementation. */
 	public static final String	THREADPOOL_JAVA5	= "jadex.commons.concurrent.java5.JavaThreadPool";

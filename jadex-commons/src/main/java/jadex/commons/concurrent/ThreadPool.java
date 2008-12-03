@@ -4,7 +4,6 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -14,27 +13,23 @@ import java.util.Vector;
  *  A thread pool manages pool and saves resources
  *  and time by precreating and reusing pool.
  */
-public class ThreadPool implements IThreadPool, Runnable
+public class ThreadPool implements IThreadPool
 {
 	//-------- constants --------
 	
-	/** Timeout in milliseconds before an idle thread is garbage collected. */
-//	protected static final long	THREAD_TIMEOUT	= 60000;
-	protected static final long	THREAD_TIMEOUT	= -1;
-	
 	/** The thread number. */
 	protected static int threadcnt = 0;
+	
+	/** The static thread pool number. */
+	protected static int poolcnt = 0;
 
 	//-------- attributes --------
 
-	/** The min number of threads in the pool. */
-	protected int	min;
-
-	/** The max number of threads in the pool. */
-	protected int	max;
-
-	/** The preferred number of threads in the pool. */
-	protected int pref;
+	/** The thread group. */
+	protected ThreadGroup group;
+	
+	/** The strategy. */
+	protected IThreadPoolStrategy strategy;
 	
 	/** The pool of service threads. */
 	protected List	pool;
@@ -46,46 +41,30 @@ public class ThreadPool implements IThreadPool, Runnable
 	/** The running flag. */
 	protected boolean	running;
 
-	/** The capacity of idle threads, that can execute a task. */
-	protected int	capacity;
-
 	/** The task - thread mapping. */
 	protected Map	threads;
 
 	//-------- constructors --------
 
 	/**
-	 *  Default constructor, called by the factory.
+	 *  Create a new thread pool.
 	 */
 	public ThreadPool()
 	{
-		// min=3, max=unlimited, pref=3.
-		this(1, -1, 1);
-
-		// Todo: enable better thread recycling.
-//		this(1, 3);
+		this(new DefaultThreadPoolStrategy(0, 20, 30000));
 	}
 	
 	/**
 	 *  Create a new thread pool.
-	 *  @param min The min (and initial) number of pool.
-	 *  @param max The max number of pool (-1 for unlimited).
 	 */
-	private ThreadPool(int min, int max, int pref)
+	public ThreadPool(IThreadPoolStrategy strategy)
 	{
-		this.min = min;
-		this.max = max;
-		this.pref = pref;
+		this.strategy = strategy;
+		this.group = new ThreadGroup("strategy_thread_pool_"+poolcnt++);
 		this.running = true;
-		this.capacity	= 0;
 		this.tasks	= new ArrayBlockingQueue();
 		this.pool = new Vector();
 		this.threads = new Hashtable();
-        addThreads(min);
-        
-        // Observer for testing!
-//		Thread observer = new Thread(this);
-//		observer.start();
 	}
 
 	//-------- methods --------
@@ -96,26 +75,19 @@ public class ThreadPool implements IThreadPool, Runnable
 	 */
 	public synchronized void execute(Runnable task)
 	{
-		//System.out.println("Execute: "+task);
 		if(!running)
 			throw new RuntimeException("Thread pool not running: "+this);
-		capacity--;
-        if(capacity<0 && (max==-1 || pool.size()<max))
-		{
+		
+		if(this.strategy.taskAdded())
 			addThreads(1);
-//			System.out.println("added thread: now "+capacity+" of "+pool.size()+" threads available.");
-		}
-//        else
-//        {
-//        	System.out.println("reusing threads: "+capacity+" of "+pool.size()+" threads available.");
-//        }
+		
 		this.tasks.enqueue(task);
 	}
 
 	/**
 	 *  Shutdown the task pool
 	 */
-	public void dispose()
+	public synchronized void dispose()
 	{
 		this.running = false;
 		this.tasks.setClosed(true);
@@ -126,54 +98,7 @@ public class ThreadPool implements IThreadPool, Runnable
 			t.stop();
 		}
 	}
-
-	static int cnt = 0;
-	static int todo;
-	/**
-	 *  Main for testing.
-	 *  @param args The arguments.
-	 */
-	public static void main(String[] args)
-	{
-		final ThreadPool tp	= new ThreadPool(0, 10, 5);
-		int max = 10000;
-		todo = max;
-		for(int i=0; i<max; i++)
-		{
-			tp.execute(new Runnable()
-			{
-				int n = cnt++;
-				public void run()
-				{
-					String t = Thread.currentThread().toString();
-					System.out.println("a_"+this+" : "+t);
-//					try{Thread.sleep(100);}
-//					catch(InterruptedException e){}
-					System.out.println("b_"+this+" : "+t);
-					synchronized(tp)
-					{
-						todo--;
-						if(todo==0)
-							System.out.println("Execution finished.");
-					}
-				}
-
-				public String toString()
-				{
-					return "Task_"+n;
-				}
-			});
-
-			//Thread.currentThread().yield();
-		}
-		
-		
-		
-		/*try{Thread.currentThread().sleep(2000);}
-		catch(Exception e){}
-		tp.dispose();*/
-	}
-
+	
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
@@ -182,11 +107,7 @@ public class ThreadPool implements IThreadPool, Runnable
 	{
 		StringBuffer buf = new StringBuffer();
 		buf.append(SReflect.getInnerClassName(getClass()));
-		buf.append("(min=");
-		buf.append(min);
-		buf.append(" max=");
-		buf.append(max);
-		buf.append(", poolsize=");
+		buf.append("poolsize=");
 		buf.append(pool.size());
 		buf.append(", running=");
 		buf.append(running);
@@ -202,19 +123,22 @@ public class ThreadPool implements IThreadPool, Runnable
 	 */
 	protected void addThreads(int num)
 	{
-		//System.out.println("Cap+1(add): "+capacity);
 		for(int i=0; i<num; i++)
 		{
 			Thread thread = new ServiceThread();
+			// Thread gets daemon state of parent, i.e. thread daemon state would
+			// depend on called thread, which is not desired.
+			thread.setDaemon(false);
 			pool.add(thread);
 			thread.start();
+//			System.out.println("poola: "+pool.size());
 		}
 	}
 
 	/**
 	 *  Get a thread for a task.
 	 */
-	public Thread getThread(Runnable task)
+	protected Thread getThread(Runnable task)
 	{
 		return (Thread)threads.get(task);
 	}
@@ -222,7 +146,7 @@ public class ThreadPool implements IThreadPool, Runnable
 	/**
 	 *  The task for a given thread.
 	 */
-	public Runnable getTask(Thread thread)
+	protected Runnable getTask(Thread thread)
 	{
 		Runnable	ret	= null;
 		if(thread instanceof ServiceThread)
@@ -230,38 +154,6 @@ public class ThreadPool implements IThreadPool, Runnable
 			ret	= ((ServiceThread)thread).getTask();
 		}
 		return ret;
-	}
-
-	/**
-	 *  The observer thread.
-	 */
-	public void run()
-	{
-		int	longrunning	= 10000;
-		while(true)
-		{
-			try{Thread.sleep(longrunning);}
-			catch(InterruptedException e){}
-			ArrayList longrunners = new ArrayList();
-			int	cnt	= 0;
-			for(int i=0; i<pool.size(); i++)
-			{
-				ServiceThread st = (ServiceThread)pool.get(i);
-				long time = st.getTaskExecutionTime();
-				if(time>(int)(longrunning*0.9))
-				{
-					// Add output string directly, as printing causes context switches leading to outdated data.
-					longrunners.add((++cnt)+". ("+time/1000+"s): "+st.getName());
-				}
-			}
-			System.out.println("\n-----------------------------------");
-			System.out.println("Threadpool longrunners: ");
-			for(int i=0; i<longrunners.size(); i++)
-			{
-				System.out.println(longrunners.get(i));
-			}
-			System.out.println("-----------------------------------\n");
-		}
 	}
 
 	//-------- inner classes --------
@@ -286,7 +178,7 @@ public class ThreadPool implements IThreadPool, Runnable
 		 */
 		public ServiceThread()
 		{
-            super("ServiceThread_"+(++threadcnt));
+            super(group, "ServiceThread_"+(++threadcnt));
 		}
 
 		//-------- methods --------
@@ -297,19 +189,13 @@ public class ThreadPool implements IThreadPool, Runnable
 		 */
 		public void run()
 		{
-//			for(int reuse=0; ; reuse++)
-			while(running && isSurviver())
+			boolean terminate = false;
+			
+			while(running && !terminate)
 			{
-//				System.out.println(this+" reused "+reuse+" times. "
-//					+ "Pool size is "+pool.size()+"."
-//					+ "Capacity is "+capacity+".");
 				try
 				{
-					synchronized(ThreadPool.this)
-					{
-						capacity++;
-					}
-					this.task = ((Runnable)tasks.dequeue(THREAD_TIMEOUT));
+					this.task = ((Runnable)tasks.dequeue(strategy.getThreadTimeout()));
 					threads.put(task, this);
 					this.start = System.currentTimeMillis();
 					this.setName(task.toString());
@@ -319,48 +205,25 @@ public class ThreadPool implements IThreadPool, Runnable
 						this.task.run();
 					}
 					catch(ThreadDeath e){}
-					//{System.out.println("Thread terminated (interrupted): "+this);}
 				}
 				catch(IBlockingQueue.ClosedException e){}
 				catch(IBlockingQueue.TimeoutException e)
 				{
-					synchronized(ThreadPool.this)
-					{
-						capacity--;
-					}
-					if(capacity>min)
-					{
-						System.out.println("Thread timeout (queue): "+this);
-						break;
-					}
+					task = null;
+					terminate = strategy.threadTimeoutOccurred();
 				}
-				finally
+				
+				if(task!=null)
 				{
-					if(task!=null)
-					{
-						threads.remove(task);
-						this.task = null;
-					}
+					threads.remove(task);
+					this.task = null;
+					terminate = strategy.taskFinished();
 				}
 			}
-			System.out.println("removed thread: now "+capacity+" of "+pool.size()+" threads available.");
+			
 			pool.remove(this);
 		}
 
-		/**
-		 *  Test if a thread shall stay in the pool.
-		 *  @return True, if it should stay.
-		 */
-		public boolean isSurviver()
-		{
-			return true;
-			
-			// more tasks than capacity
-			// or threads under pref
-//			return tasks.size() > capacity
-//				|| threads.size() < pref;
-		}
-		
 		/**
 		 *  Get the runnable (the task).
 		 *  @return The runnable.
@@ -369,16 +232,46 @@ public class ThreadPool implements IThreadPool, Runnable
 		{
 			return this.task;
 		}
-
-		/**
-		 *  Get the task execution time.
-		 */
-		public long getTaskExecutionTime()
+	}
+	
+	//-------- static part --------
+	
+	static int cnt = 0;
+	static int todo;
+	/**
+	 *  Main for testing.
+	 *  @param args The arguments.
+	 */
+	public static void main(String[] args)
+	{
+		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(0, 10, 10000));
+		int max = 10000;
+		todo = max;
+		for(int i=0; i<max; i++)
 		{
-			long ret = 0;
-			if(task!=null)
-				ret = System.currentTimeMillis()-start;
-			return ret;
+			tp.execute(new Runnable()
+			{
+				int n = cnt++;
+				public void run()
+				{
+					String t = Thread.currentThread().toString();
+					System.out.println("a_"+this+" : "+t);
+					try{Thread.sleep(100);}
+					catch(InterruptedException e){}
+					System.out.println("b_"+this+" : "+t);
+					synchronized(tp)
+					{
+						todo--;
+						if(todo==0)
+							System.out.println("Execution finished.");
+					}
+				}
+
+				public String toString()
+				{
+					return "Task_"+n;
+				}
+			});
 		}
 	}
 }
