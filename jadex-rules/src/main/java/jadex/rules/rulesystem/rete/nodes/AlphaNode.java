@@ -8,7 +8,9 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -239,11 +241,12 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
-		return new LinkedHashSet();
+		return state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) :	new LinkedHashSet();
 	}
 	
 	//-------- helper methods --------

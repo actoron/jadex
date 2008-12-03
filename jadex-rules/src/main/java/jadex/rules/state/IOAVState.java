@@ -314,4 +314,19 @@ public interface IOAVState
 	 *  Get the substates.
 	 */
 	public IOAVState[] getSubstates();
+
+	//-------- identity vs. equality --------
+	
+	/**
+	 *  Flag indicating that java objects are
+	 *  stored by identity instead of equality.  
+	 */
+	public boolean	isJavaIdentity();
+
+	/**
+	 *  Test if two values are equal
+	 *  according to current identity/equality
+	 *  settings. 
+	 */
+	public boolean	equals(Object a, Object b);
 }

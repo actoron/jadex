@@ -98,7 +98,7 @@ public class RetePatternMatcherFunctionality
 	 */
 	public IPatternMatcherState createMatcherState(IOAVState state, AbstractAgenda agenda)
 	{
-		return new RetePatternMatcherState(node, state, new ReteMemory(), agenda);
+		return new RetePatternMatcherState(node, state, new ReteMemory(state), agenda);
 	}
 
 	//-------- methods --------

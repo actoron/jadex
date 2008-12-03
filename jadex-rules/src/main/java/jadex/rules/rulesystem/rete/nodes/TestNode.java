@@ -259,9 +259,10 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
 		return new LinkedHashSet();
 	}

@@ -1,5 +1,7 @@
 package jadex.rules.rulesystem.rules;
 
+import jadex.rules.state.IOAVState;
+
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -18,11 +20,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return val1 instanceof Number && val2 instanceof Number
 				? compare(val1,val2)==0
@@ -47,11 +50,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return val1 instanceof Number && val2 instanceof Number
 				? compare(val1,val2)!=0
@@ -76,11 +80,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return val1!=null && val2!=null && compare(val1, val2)<0;
 		}
@@ -103,11 +108,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return val1!=null && val2!=null && compare(val1, val2)<=0;
 		}
@@ -130,11 +136,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return val1!=null && val2!=null && compare(val1, val2)>0;
 		}
@@ -157,11 +164,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return val1!=null && val2!=null && compare(val1, val2)>=0;
 		}
@@ -185,11 +193,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			if(!(val1 instanceof String))
 				throw new IllegalArgumentException("Matches operator only applies for strings: +"+val1);
@@ -221,11 +230,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			if(!(val1 instanceof String))
 				throw new IllegalArgumentException("Matches operator only applies for strings: +"+val1);
@@ -256,11 +266,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return contains(val1, val2);
 		}
@@ -283,11 +294,12 @@ public class Operator
 		/**
 		 *  Evaluate two objects with respect to the
 		 *  operator semantics.
+		 *  @param state The state.
 		 *  @param val1 The first object.
 		 *  @param val2 The second object.
 		 *  @return True, if objects fit wrt. the operator semantics.
 		 */
-		public boolean evaluate(Object val1, Object val2)
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
 			return !contains(val1, val2);
 		}

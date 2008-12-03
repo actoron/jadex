@@ -1,7 +1,7 @@
 package jadex.rules.rulesystem.rete;
 
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
+import jadex.rules.state.IOAVState;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +13,9 @@ import java.util.List;
 public class Tuple
 {
 	//-------- attributes --------
+	
+	/** The state. */
+	protected IOAVState state;
 	
 	/** The object. */
 	protected Object object;
@@ -32,8 +35,9 @@ public class Tuple
 	/**
 	 *  Create a new tuple.
 	 */
-	public Tuple(Tuple last, Object object)
+	public Tuple(IOAVState state, Tuple last, Object object)
 	{
+		this.state = state;
 		this.object = object;
 		this.last = last;
 		this.size = last==null? 1: last.size()+1;
@@ -130,7 +134,7 @@ public class Tuple
 			ret	= tuple1.size==tuple2.size;
 			while(ret && tuple1!=null)
 			{
-				ret = SUtil.equals(tuple1.object, tuple2.object);
+				ret = state.equals(tuple1.object, tuple2.object);
 				tuple1	= tuple1.last;
 				tuple2	= tuple2.last;
 			}

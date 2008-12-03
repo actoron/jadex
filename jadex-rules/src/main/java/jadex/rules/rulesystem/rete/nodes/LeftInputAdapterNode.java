@@ -40,7 +40,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
 		
 		Collection amem = (Collection)mem.getNodeMemory(this);
-		Tuple tuple = mem.getTuple(null, object);
+		Tuple tuple = mem.getTuple(state, null, object);
 		amem.add(tuple);
 		
 		ITupleConsumerNode[] tcs = tconsumers;
@@ -64,7 +64,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 		if(mem.hasNodeMemory(this))
 		{
 			Collection amem = (Collection)mem.getNodeMemory(this);
-			Tuple tuple = mem.getTuple(null, object);
+			Tuple tuple = mem.getTuple(state, null, object);
 			if(amem.remove(tuple))
 			{
 				ITupleConsumerNode[] tcs = tconsumers;
@@ -89,7 +89,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 		if(getRelevantAttributes().contains(type))
 		{
 			// Check if modification changes node memory.
-			Tuple tuple = mem.getTuple(null, object);
+			Tuple tuple = mem.getTuple(state, null, object);
 			ITupleConsumerNode[] tcs = tconsumers;
 			for(int j=0; tcs!=null && j<tcs.length; j++)
 				tcs[j].modifyTuple(tuple, 0, type, oldvalue, newvalue, state, mem, agenda);
@@ -193,9 +193,10 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
 		return new LinkedHashSet();
 	}

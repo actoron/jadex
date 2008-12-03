@@ -39,7 +39,7 @@ public class OperatorFunction implements IFunction
 		if(paramvalues==null || paramvalues.length!=2)
 			throw new IllegalArgumentException("Operator function needs two parameters: "+paramvalues);
 
-		return new Boolean(operator.evaluate(paramvalues[0], paramvalues[1]));
+		return new Boolean(operator.evaluate(state, paramvalues[0], paramvalues[1]));
 	}
 	
 	/**

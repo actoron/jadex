@@ -9,7 +9,9 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -150,7 +152,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		}
 
 		// Get object memory from the indexed constraints
-		Collection omem = fetchObjectMemory(left, mem);
+		Collection omem = fetchObjectMemory(state, left, mem);
 		if(omem!=null)
 		{
 			// Evaluate non-indexed constraints for all found objects
@@ -178,7 +180,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 
-		Collection omem = fetchObjectMemory(left, mem);
+		Collection omem = fetchObjectMemory(state, left, mem);
 		if(omem!=null)
 		{
 			// Simply tries to remove all found entries
@@ -234,7 +236,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			boolean	changed	= false;
 			if(indexers!=null)
 			{
-				oldmem = fetchObjectMemory(left, mem);
+				oldmem = fetchObjectMemory(state, left, mem);
 				for(int i=0; i<indexers.length; i++)
 				{
 					if(indexers[i].isLeftIndex(tupleindex, type))
@@ -249,14 +251,14 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			}
 			
 			// Handle objects from current (new) object memory
-			Collection newmem = indexers==null || changed ? fetchObjectMemory(left, mem) : oldmem;
+			Collection newmem = indexers==null || changed ? fetchObjectMemory(state, left, mem) : oldmem;
 			if(newmem!=null)
 			{
 				for(Iterator it=newmem.iterator(); it.hasNext(); )
 				{
 					// Action depends on if tuple is now valid (=check) and was previously valid (=contains)
 					Object	right	= it.next();
-					boolean contains = isMatchContained(left, right, mem);
+					boolean contains = isMatchContained(state, left, right, mem);
 					boolean	check	= checkNonindexedConstraints(left, right, state);
 	
 					// Tuple newly valid -> add match
@@ -283,7 +285,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 					for(Iterator it=oldmem.iterator(); it.hasNext(); )
 					{
 						Object right = it.next();
-						boolean contains = isMatchContained(left, right, mem);
+						boolean contains = isMatchContained(state, left, right, mem);
 		
 						// Remove matches, when object in old memory but not in new memory.
 						if(contains && (newmem==null || !newmem.contains(right)))
@@ -338,7 +340,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		}
 
 		// Evaluate the indexed constraints
-		Collection tmem = fetchTupleMemory(right, mem);
+		Collection tmem = fetchTupleMemory(state, right, mem);
 		if(tmem!=null)
 		{
 			// Evaluate non-indexed constraints for all found tuples
@@ -366,7 +368,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
 		
-		Collection tmem = fetchTupleMemory(right, mem);
+		Collection tmem = fetchTupleMemory(state, right, mem);
 		if(tmem!=null)
 		{
 			// Simply tries to remove all found entries
@@ -409,7 +411,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			boolean	changed	= false;
 			if(indexers!=null)
 			{
-				oldmem = fetchTupleMemory(right, mem);
+				oldmem = fetchTupleMemory(state, right, mem);
 				for(int i=0; i<indexers.length; i++)
 				{
 					if(indexers[i].isRightIndex(type))
@@ -424,14 +426,14 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			}
 			
 			// Handle tuples from current (new) tuple memory
-			Collection newmem = indexers==null || changed ? fetchTupleMemory(right, mem) : oldmem;
+			Collection newmem = indexers==null || changed ? fetchTupleMemory(state, right, mem) : oldmem;
 			if(newmem!=null)
 			{
 				for(Iterator it=newmem.iterator(); it.hasNext(); )
 				{
 					// Action depends on if tuple is now valid (=check) and was previously valid (=contains)
 					Tuple	left	= (Tuple)it.next();
-					boolean contains = isMatchContained(left, right, mem);
+					boolean contains = isMatchContained(state, left, right, mem);
 					boolean	check	= checkNonindexedConstraints(left, right, state);
 	
 					// Tuple newly valid -> add match
@@ -457,7 +459,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 					for(Iterator it=oldmem.iterator(); it.hasNext(); )
 					{
 						Tuple left = (Tuple)it.next();
-						boolean contains = isMatchContained(left, right, mem);
+						boolean contains = isMatchContained(state, left, right, mem);
 		
 						// Remove matches, when object in old memory but not in new memory.
 						if(contains && (newmem==null || !newmem.contains(left)))
@@ -493,11 +495,12 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
-		return new BetaMemory(this);
+		return new BetaMemory(state);
 	}
 	
 	/**
@@ -526,12 +529,12 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 *  @param c2 The second collection.
 	 *  @return The intersection.
 	 */
-	protected Collection intersection(Collection c1, Collection c2)
+	protected Collection intersection(IOAVState state, Collection c1, Collection c2)
 	{
 		if(c1==null || c2==null)
 			return null;
 		
-		Collection ret = new LinkedHashSet();
+		Collection ret = state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new LinkedHashSet();
 		for(Iterator it=c1.iterator(); it.hasNext(); )
 		{
 			Object o1 = it.next();
@@ -548,7 +551,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 *  @param state The state.
 	 *  @return The tuple memory matching that object (or complete).
 	 */
-	protected Collection fetchTupleMemory(Object right, ReteMemory mem)
+	protected Collection fetchTupleMemory(IOAVState state, Object right, ReteMemory mem)
 	{
 		// Evaluate the indexed constraints
 		Collection ret = null;
@@ -562,7 +565,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 				for(int i=1; ret!=null && i<indexers.length; i++)
 				{
 					Collection cres	= indexers[i].findTuples(right, bmem);
-					ret = intersection(ret, cres);
+					ret = intersection(state, ret, cres);
 				}
 			}
 		}
@@ -585,7 +588,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 *  @param state The state.
 	 *  @return The tuple memory matching that object (or complete).
 	 */
-	protected Collection fetchObjectMemory(Tuple left, ReteMemory mem)
+	protected Collection fetchObjectMemory(IOAVState state, Tuple left, ReteMemory mem)
 	{
 		// Evaluate the indexed constraints
 		Collection ret	= null;
@@ -600,7 +603,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 				{
 					Collection cres	= indexers[i].findObjects(left, bmem);
 
-					ret = intersection(ret, cres);
+					ret = intersection(state, ret, cres);
 				}
 			}
 		}
@@ -744,5 +747,5 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	/**
 	 *  Check if a match is contained.
 	 */
-	protected abstract boolean isMatchContained(Tuple left, Object right, ReteMemory mem);
+	protected abstract boolean isMatchContained(IOAVState state, Tuple left, Object right, ReteMemory mem);
 }

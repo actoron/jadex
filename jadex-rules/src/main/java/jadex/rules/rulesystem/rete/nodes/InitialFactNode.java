@@ -21,12 +21,6 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	// Todo: should be in state?
 	public static final String	INITIAL_FACT	= "initial-fact";
 	
-	/** The initial fact tuple. */
-	public static final Tuple	INITIAL_FACT_TUPLE	= new Tuple(null, INITIAL_FACT);
-	
-	/** The initial fact memory. */
-	public static final Collection	INITIAL_FACT_MEM	= Collections.singletonList(INITIAL_FACT_TUPLE);
-	
 	//-------- attributes --------
 	
 	/** The tuple consumers. */
@@ -38,6 +32,12 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	/** The set of relevant attributes. */
 	protected Set	relevants;
 
+	/** The initial fact tuple. */
+	protected Tuple	initial_fact_tuple;
+	
+	/** The initial fact memory. */
+	protected Collection	initial_fact_mem;
+	
 	//-------- methods --------
 	
 	/**
@@ -47,9 +47,11 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	 */
 	public void init(IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+		this.initial_fact_tuple	= new Tuple(state, null, INITIAL_FACT);
+		this.initial_fact_mem	= Collections.singletonList(initial_fact_tuple);
 		ITupleConsumerNode[]	tcon	= tconsumers;
 		for(int i=0; tcon!=null && i<tcon.length; i++)
-			tcon[i].addTuple(INITIAL_FACT_TUPLE, state, mem, agenda);
+			tcon[i].addTuple(initial_fact_tuple, state, mem, agenda);
 	}
 
 	//-------- object consumer interface --------
@@ -170,7 +172,7 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	 */
 	public Collection getNodeMemory(ReteMemory mem)
 	{
-		return INITIAL_FACT_MEM;
+		return initial_fact_mem;
 	}
 
 
@@ -178,9 +180,10 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
 		return null;
 	}

@@ -12,8 +12,10 @@ import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +57,8 @@ public class CopyState implements IOAVState
 	 */
 	public CopyState(final IOAVState state, ISynchronizator synchronizator)
 	{
-		this.copy	= new HashMap();
-		this.rootobjects	= new HashSet();
+		this.copy	= state.isJavaIdentity() ? (Map)new IdentityHashMap() : new HashMap();
+		this.rootobjects	= state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new HashSet();
 		setSynchronizator(synchronizator);
 		
 		// Copy initial objects.
@@ -609,6 +611,25 @@ public class CopyState implements IOAVState
 	 *  Get the substates.
 	 */
 	public IOAVState[] getSubstates()
+	{
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	/**
+	 *  Test if two values are equal
+	 *  according to current identity/equality
+	 *  settings. 
+	 */
+	public boolean	equals(Object a, Object b)
+	{
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	/**
+	 *  Flag indicating that java objects are
+	 *  stored by identity instead of equality.  
+	 */
+	public boolean	isJavaIdentity()
 	{
 		throw new UnsupportedOperationException("Not yet implemented");
 	}

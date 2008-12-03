@@ -49,6 +49,7 @@ public class StartPeerPlan extends Plan
 				args.put("counter", counter);
 				args.put("starttime", starttime);
 				args.put("startmem", startmem);
+				args.put("parallel", new Boolean(parallel));
 				
 				IAgentIdentifier aid;
 				if(service)
@@ -71,6 +72,7 @@ public class StartPeerPlan extends Plan
 					args.put("counter", counter);
 					args.put("starttime", starttime);
 					args.put("startmem", startmem);
+					args.put("parallel", new Boolean(parallel));
 					
 					IAgentIdentifier aid;
 					if(service)

@@ -1,5 +1,7 @@
 package jadex.rules.rulesystem.rules;
 
+import jadex.rules.state.IOAVState;
+
 /**
  *  Interface for all operators.
  */
@@ -44,9 +46,10 @@ public interface IOperator
 	/**
 	 *  Evaluate two objects with respect to the
 	 *  operator semantics.
+	 *  @param state The state.
 	 *  @param a The first object.
 	 *  @param b The second object.
 	 *  @return True, if objects fit wrt. the operator semantics.
 	 */
-	public boolean evaluate(Object a, Object b);
+	public boolean evaluate(IOAVState state, Object a, Object b);
 }

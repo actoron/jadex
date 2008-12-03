@@ -162,9 +162,10 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
 		return null;
 	}

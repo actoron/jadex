@@ -1,10 +1,12 @@
 package jadex.rules.rulesystem.rete.nodes;
 
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,9 +27,9 @@ public class NotMemory	extends BetaMemory
 	/**
 	 *  Create a new not memory.
 	 */
-	public NotMemory(NotNode node)
+	public NotMemory(IOAVState state)
 	{
-		super(node);
+		super(state);
 		this.mappings = new LinkedHashMap();
 	}
 
@@ -37,12 +39,12 @@ public class NotMemory	extends BetaMemory
 	 *  Add a mapping for the key to the memory.
 	 *  Multiples mappings for the same key will be stored in a set.
 	 */
-	public void	addMapping(Tuple key, Object value)
+	public void	addMapping(IOAVState state, Tuple key, Object value)
 	{
 		Set	values	= (Set)mappings.get(key);
 		if(values==null)
 		{
-			values	= new HashSet();
+			values	= state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new HashSet();
 			mappings.put(key, values);
 		}
 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -108,7 +109,8 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
 		
 		Map smem = (Map)mem.getNodeMemory(this);
-		if(!smem.containsKey(object))
+		assert !smem.containsKey(object) : object;
+//		if(!smem.containsKey(object))
 		{
 			Collection vfs = generateVirtualFacts(object, state);
 			smem.put(object, vfs);
@@ -134,7 +136,8 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
 		
-		if(mem.hasNodeMemory(this))
+		assert mem.hasNodeMemory(this);
+//		if(mem.hasNodeMemory(this))
 		{
 			Map smem = (Map)mem.getNodeMemory(this);
 			Collection vfs = (Collection)smem.remove(object);
@@ -182,7 +185,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 						Object o = it.next();
 						
 						// Remove a fact that was contained and is not anymore
-						if(!after.contains(o))
+						if(!contains(state, after, o))
 						{
 							it.remove();
 							propagateRemovalToObjectConsumers(o, state, mem, agenda);
@@ -195,8 +198,8 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 					for(Iterator it=after.iterator(); it.hasNext(); )
 					{
 						Object o = it.next();
-						if(o instanceof List)
-							System.out.print("shit");
+//						if(o instanceof List)
+//							System.out.println("shit");
 						
 						// Add a fact that was not contained is now
 						if(!before.contains(o))
@@ -322,11 +325,12 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
-		return new LinkedHashMap();
+		return state.isJavaIdentity() ? (Map)new IdentityHashMap() :	new LinkedHashMap();
 	}
 	
 	//-------- helper methods --------
@@ -593,4 +597,32 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 		sn.addObject(b1, state, mem, null);
 	}*/
 
+	/**
+	 *  Check if an object is contained in a collection.
+	 *  Avoid the need for an "IdentityArrayList".
+	 */
+	protected boolean	contains(IOAVState state, Collection coll, Object o)
+	{
+		boolean	ret	= false;
+		for(Iterator it=coll.iterator(); !ret && it.hasNext(); )
+		{
+			Object	val	= it.next();
+			if(val instanceof ArrayList && o instanceof ArrayList)
+			{
+				ArrayList	l1	= (ArrayList) val;
+				ArrayList	l2	= (ArrayList) o;
+				if(l1.size()==l2.size())
+				{
+					ret	= true;
+					for(int i=0; ret && i<l1.size(); i++)
+						ret	= state.equals(l1.get(i), l2.get(i));
+				}
+			}
+			else
+			{
+				ret	= state.equals(val, o);
+			}
+		}
+		return ret;
+	}
 }

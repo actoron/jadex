@@ -115,7 +115,7 @@ public class OAVWeakState	implements IOAVState
 		this.objectusages = new LinkedHashMap();
 //		this.objectusages = new IdentityHashMap();
 		this.rootobjects = new LinkedHashSet();
-		this.eventhandler	= new OAVEventHandler(); 
+		this.eventhandler	= new OAVEventHandler(this); 
 //		this.nocheck = true;
 	}
 	
@@ -1577,6 +1577,27 @@ public class OAVWeakState	implements IOAVState
 	public IOAVState[] getSubstates()
 	{
 		return null;
+	}
+
+	//-------- identity vs. equality --------
+	
+	/**
+	 *  Flag indicating that java objects are
+	 *  stored by identity instead of equality.  
+	 */
+	public boolean	isJavaIdentity()
+	{
+		return false;
+	}
+	
+	/**
+	 *  Test if two values are equal
+	 *  according to current identity/equality
+	 *  settings. 
+	 */
+	public boolean	equals(Object a, Object b)
+	{
+		return SUtil.equals(a, b);
 	}
 }
 // #endif

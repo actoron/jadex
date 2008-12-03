@@ -1,5 +1,6 @@
 package jadex.rules.state.javaimpl;
 
+import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
@@ -7,6 +8,7 @@ import jadex.rules.state.OAVObjectType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,6 +22,9 @@ import java.util.Set;
 public class OAVEventHandler
 {
 	//-------- attributes --------
+	
+	/** The state. */
+	protected IOAVState state;
 	
 	/** The bunch state listeners. */
 	protected List listeners;
@@ -47,8 +52,9 @@ public class OAVEventHandler
 	/**
 	 *  Create a new OAV event handler.
 	 */
-	public OAVEventHandler()
+	public OAVEventHandler(IOAVState state)
 	{
+		this.state	= state;
 		this.listeners	= new ArrayList();
 		this.directlisteners = new ArrayList();
 		this.oavevents = new LinkedHashSet();
@@ -188,7 +194,7 @@ public class OAVEventHandler
 			if((added_objects==null || !added_objects.contains(id))
 				&& (removed_objects==null || !removed_objects.contains(id)))
 			{
-				OAVObjectModifiedEvent evt = new OAVObjectModifiedEvent(id, type, attr, oldvalue, newvalue);
+				OAVObjectModifiedEvent evt = new OAVObjectModifiedEvent(state, id, type, attr, oldvalue, newvalue);
 				oavevents.remove(evt); // All events are necessary for external listeners
 				oavevents.add(evt);
 			}
@@ -210,7 +216,7 @@ public class OAVEventHandler
 	{
 		synchronized(beanevents)
 		{
-			OAVObjectModifiedEvent evt = new OAVObjectModifiedEvent(bean, type, attr, oldvalue, newvalue);
+			OAVObjectModifiedEvent evt = new OAVObjectModifiedEvent(state, bean, type, attr, oldvalue, newvalue);
 			if(!listeners.isEmpty())
 			{
 				beanevents.remove(evt);
@@ -241,7 +247,7 @@ public class OAVEventHandler
 			}
 			
 			if(added_objects==null)
-				added_objects	= new HashSet();
+				added_objects	= createIdSet();
 			added_objects.add(id);
 		}
 		
@@ -273,11 +279,21 @@ public class OAVEventHandler
 				added_objects.remove(id);
 			}
 			if(removed_objects==null)
-				removed_objects	= new HashSet();
+				removed_objects	= createIdSet();
 			removed_objects.add(id);
 		}
 		
 		for(int i=0; i<directlisteners.size(); i++)
 			((IOAVStateListener)directlisteners.get(i)).objectRemoved(id, type);
+	}
+
+	/**
+	 *  Create a set for holding object ids.
+	 */
+	protected Set	createIdSet()
+	{
+		return state.isJavaIdentity()
+			? Collections.newSetFromMap(new IdentityHashMap())
+			: new HashSet();
 	}
 }

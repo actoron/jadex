@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.nodes;
 
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,13 +20,17 @@ public class ReteMemory
 	/** The memory. */
 	protected Map memory;
 	
+	/** The state. */
+	protected IOAVState	state;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rete memory.
 	 */
-	public ReteMemory()
+	public ReteMemory(IOAVState state)
 	{
+		this.state	= state;
 		this.memory = new HashMap();
 	}
 	
@@ -54,7 +59,7 @@ public class ReteMemory
 		Object ret = memory.get(node);
 		if(ret == null)
 		{
-			ret = node.createNodeMemory();
+			ret = node.createNodeMemory(state);
 			memory.put(node, ret);
 		}
 		
@@ -84,9 +89,9 @@ public class ReteMemory
 	 *  Returns an existing tuple from the cache, if present.
 	 *  Otherwise a new one is created.
 	 */
-	public Tuple	getTuple(Tuple left, Object right)
+	public Tuple	getTuple(IOAVState state, Tuple left, Object right)
 	{
-		return new Tuple(left, right);
+		return new Tuple(state, left, right);
 //		Tuple	ret;
 //		Map	lefties	= (Map)tuplememory.get(left);
 //		if(lefties==null)

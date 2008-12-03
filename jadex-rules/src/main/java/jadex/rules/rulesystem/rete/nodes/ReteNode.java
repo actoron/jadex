@@ -314,9 +314,10 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
 		return null;
 	}

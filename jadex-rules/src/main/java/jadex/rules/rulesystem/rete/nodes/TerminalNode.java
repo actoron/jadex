@@ -164,9 +164,10 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
 		// Memory stores old variable assignments:
 		// Map(tuple -> Map(variable -> value))

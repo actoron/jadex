@@ -3,9 +3,12 @@ package jadex.rules.rulesystem.rete.nodes;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
+import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -21,6 +24,9 @@ public class BetaMemory
 {
 	//-------- attributes --------
 	
+	/** The state. */
+	protected IOAVState state;
+	
 	/** The indexed memories (indexed constraint evaluator -> memory). */
 	protected Map xmems;
 	
@@ -33,14 +39,10 @@ public class BetaMemory
 	 *  Create a new beta memory.
 	 *  @param node The beta node.
 	 */
-	public BetaMemory(AbstractBetaNode node)
+	public BetaMemory(IOAVState state)
 	{
-		ConstraintIndexer[] cis = node.getConstraintIndexers();
-		for(int i=0; cis!=null && i<cis.length; i++)
-		{
-			addIndexedMemory(cis[i]);
-		}
-		resultmem = new LinkedHashSet();
+		this.state	= state;
+		
 	}
 	
 	//-------- methods --------
@@ -65,7 +67,7 @@ public class BetaMemory
 	 */
 	public boolean	removeResultTuple(Tuple tuple)
 	{
-		return resultmem==null || resultmem.remove(tuple);
+		return resultmem!=null && resultmem.remove(tuple);
 	}
 	
 	/**
@@ -74,7 +76,7 @@ public class BetaMemory
 	 */
 	public Collection getResultMemory()
 	{
-		return resultmem;
+		return resultmem!=null ? resultmem : Collections.EMPTY_SET;
 	}
 	
 	/**
@@ -144,23 +146,15 @@ public class BetaMemory
 	}
 	
 	/**
-	 *  Add a memory for a constraint indexer.
-	 *  @param ci The constraint indexer.
-	 */
-	public void addIndexedMemory(ConstraintIndexer ci)
-	{
-		if(xmems==null)
-			xmems = new HashMap();
-		
-		xmems.put(ci, new IndexedConstraintMemory());
-	}
-	
-	/**
 	 *  Get the indexed memory per constraint indexer.
 	 *  @param ci The constraint indexer.
 	 */
 	protected IndexedConstraintMemory getIndexedMemory(ConstraintIndexer ci)
 	{
+		if(xmems==null)
+			xmems	= new HashMap();
+		if(xmems.get(ci)==null)
+			xmems.put(ci, new IndexedConstraintMemory(state));			
 		return (IndexedConstraintMemory)xmems.get(ci);
 	}
 	
@@ -211,20 +205,25 @@ public class BetaMemory
 		/** The map for (value -> tuples). */
 		protected Map tuples;
 		
-		/** The cached values (tuple or object -> value).
+		/** The cached values (object -> value).
 		 *  Required, because objects can change and old value (for removal) can no longer be obtained. */
-		protected Map values;
+		protected Map ovalues;
+		
+		/** The cached values (tuple -> value).
+		 *  Required, because objects can change and old value (for removal) can no longer be obtained. */
+		protected Map tvalues;
 		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a new constraint memory.
 		 */
-		public IndexedConstraintMemory()
+		public IndexedConstraintMemory(IOAVState state)
 		{
-			this.objects = new HashMap();
-			this.tuples = new HashMap();
-			this.values = new HashMap();
+			this.objects = state.isJavaIdentity() ? (Map) new IdentityHashMap() : new HashMap();
+			this.tuples = state.isJavaIdentity() ? (Map) new IdentityHashMap() : new HashMap();
+			this.ovalues = state.isJavaIdentity() ? (Map) new IdentityHashMap() : new HashMap();
+			this.tvalues = new HashMap();
 		}	
 		
 		//-------- methods --------
@@ -256,7 +255,7 @@ public class BetaMemory
 		 */
 		public Object	getObjectValue(Object object)
 		{
-			return values.get(object);
+			return ovalues.get(object);
 		}
 		
 		/**
@@ -266,7 +265,7 @@ public class BetaMemory
 		 */
 		public Object	getTupleValue(Tuple tuple)
 		{
-			return values.get(tuple);
+			return tvalues.get(tuple);
 		}
 		
 		/**
@@ -286,7 +285,7 @@ public class BetaMemory
 				objects.put(value, os);
 			}
 			os.add(object);
-			values.put(object, value);
+			ovalues.put(object, value);
 		}
 		
 		/**
@@ -295,7 +294,7 @@ public class BetaMemory
 		 */
 		public void removeObject(Object object)
 		{
-			Object	value	= values.remove(object);
+			Object	value	= ovalues.remove(object);
 			Set os = (Set)objects.get(value);
 			
 			if(os!=null)
@@ -325,7 +324,7 @@ public class BetaMemory
 				tuples.put(value, os);
 			}
 			os.add(tuple);
-			values.put(tuple, value);
+			tvalues.put(tuple, value);
 		}
 		
 		/**
@@ -334,7 +333,7 @@ public class BetaMemory
 		 */
 		public void removeTuple(Tuple tuple)
 		{
-			Object value	= values.remove(tuple);
+			Object value	= tvalues.remove(tuple);
 			Set os = (Set)tuples.get(value);
 			if(os!=null)
 			{

@@ -43,13 +43,13 @@ public class BetaNode extends AbstractBetaNode
 
 		if(!isAffected(type))
 		{
-			Collection omem = fetchObjectMemory(left, mem);
+			Collection omem = fetchObjectMemory(state, left, mem);
 			if(omem!=null)
 			{
 				for(Iterator it=omem.iterator(); it.hasNext(); )
 				{
 					Object	right = it.next();
-					boolean	contains = isMatchContained(left, right, mem);
+					boolean	contains = isMatchContained(state, left, right, mem);
 				
 					// Tuple changed in memory -> propagate modification
 					if(contains)
@@ -74,13 +74,13 @@ public class BetaNode extends AbstractBetaNode
 		
 		if(!isAffected(type))
 		{
-			Collection tmem = fetchTupleMemory(right, mem);
+			Collection tmem = fetchTupleMemory(state, right, mem);
 			if(tmem!=null)
 			{
 				for(Iterator it=tmem.iterator(); it.hasNext(); )
 				{
 					Tuple	left = (Tuple)it.next();
-					boolean	contains = isMatchContained(left, right, mem);
+					boolean	contains = isMatchContained(state, left, right, mem);
 				
 					// Tuple changed in memory -> propagate modification
 					if(contains)
@@ -97,7 +97,7 @@ public class BetaNode extends AbstractBetaNode
 	 */
 	protected void addMatch(Tuple left, Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		Tuple result = mem.getTuple(left, right);
+		Tuple result = mem.getTuple(state, left, right);
 		BetaMemory bmem = (BetaMemory)mem.getNodeMemory(this);
 		if(bmem.addResultTuple(result))
 		{
@@ -114,7 +114,7 @@ public class BetaNode extends AbstractBetaNode
 	{
 		if(mem.hasNodeMemory(this))
 		{
-			Tuple result = mem.getTuple(left, right);
+			Tuple result = mem.getTuple(state, left, right);
 			if(((BetaMemory)mem.getNodeMemory(this)).removeResultTuple(result))
 			{
 				ITupleConsumerNode[] tcs = tconsumers;
@@ -129,7 +129,7 @@ public class BetaNode extends AbstractBetaNode
 	 */
 	protected void propagateModification(Tuple left, Object right, int tupleindex, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		Tuple	tuple	= mem.getTuple(left, right);
+		Tuple	tuple	= mem.getTuple(state, left, right);
 		ITupleConsumerNode[] tcs = tconsumers;
 		for(int j=0; tcs!=null && j<tcs.length; j++)
 			tcs[j].modifyTuple(tuple, tupleindex, type, oldvalue, newvalue, state, mem, agenda);
@@ -139,11 +139,11 @@ public class BetaNode extends AbstractBetaNode
 	/**
 	 *  Check if a match is contained.
 	 */
-	protected boolean isMatchContained(Tuple left, Object right, ReteMemory mem)
+	protected boolean isMatchContained(IOAVState state, Tuple left, Object right, ReteMemory mem)
 	{
 		return mem.hasNodeMemory(this)
 		 && ((BetaMemory)mem.getNodeMemory(this)).getResultMemory()
-		 	.contains(mem.getTuple(left, right));
+		 	.contains(mem.getTuple(state, left, right));
 	}
 
 	/**

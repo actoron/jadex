@@ -1,6 +1,8 @@
 package jadex.rules.rulesystem.rete.nodes;
 
 
+import jadex.rules.state.IOAVState;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -38,9 +40,10 @@ public interface INode extends Cloneable
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory();
+	public Object createNodeMemory(IOAVState state);
 	
 	/**
 	 *  Get the memory for this node.

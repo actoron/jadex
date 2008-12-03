@@ -62,7 +62,7 @@ public class ConstraintEvaluator implements IConstraintEvaluator
 		boolean ret = false;
 		try
 		{
-			ret = operator.evaluate(extractor1.getValue(left, right, state), 
+			ret = operator.evaluate(state, extractor1.getValue(left, right, state), 
 				extractor2.getValue(left, right, state));
 //			System.out.println(toString()+" "+ret);//+" "+extractor1.getValue(left, right, state)+" "+extractor2.getValue(left, right, state));
 		}

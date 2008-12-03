@@ -8,7 +8,9 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -142,7 +144,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
 
-		Tuple indextuple = createIndexTuple(left, mem);
+		Tuple indextuple = createIndexTuple(state, left, mem);
 		CollectMemory nodemem = (CollectMemory)mem.getNodeMemory(this);
 		
 		Tuple resulttuple = nodemem.getWorkingTuple(indextuple);
@@ -153,14 +155,14 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			{
 				if(i!=tupleindex)
 				{
-					resulttuple = mem.getTuple(resulttuple, obs.get(i));
+					resulttuple = mem.getTuple(state, resulttuple, obs.get(i));
 				}
 				else
 				{
 					// todo: what kind of collection should be provided as result
-					Set vals = new HashSet();
+					Set vals = state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new HashSet();
 					vals.add(obs.get(i));
-					resulttuple = mem.getTuple(resulttuple, vals);
+					resulttuple = mem.getTuple(state, resulttuple, vals);
 				}
 			}
 			nodemem.putWorkingTuple(indextuple, resulttuple);
@@ -218,7 +220,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 
-		Tuple indextuple = createIndexTuple(left, mem);
+		Tuple indextuple = createIndexTuple(state, left, mem);
 		CollectMemory nodemem = (CollectMemory)mem.getNodeMemory(this);
 		Tuple resulttuple = nodemem.getWorkingTuple(indextuple);
 		assert resulttuple!=null: "No working tuple found: "+indextuple;
@@ -269,7 +271,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			return;
 
 		// Problem: changed tuple could produce changed indextuple -> no identification of old value
-		Tuple indextuple = createIndexTuple(left, mem);
+		Tuple indextuple = createIndexTuple(state, left, mem);
 		CollectMemory nodemem = (CollectMemory)mem.getNodeMemory(this);
 		Tuple resulttuple = nodemem.getWorkingTuple(indextuple);
 		assert resulttuple!=null: "No working tuple found: "+indextuple;
@@ -342,9 +344,10 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
 		return new CollectMemory();
 	}
@@ -473,14 +476,14 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	 *  @param tuple The tuple.
 	 *  @return The index tuple. 
 	 */
-	protected Tuple createIndexTuple(Tuple tuple, ReteMemory mem)
+	protected Tuple createIndexTuple(IOAVState state, Tuple tuple, ReteMemory mem)
 	{
 		List obs = tuple.getObjects();
 		Tuple t = null;
 		for(int i=0; i<obs.size(); i++)
 		{
 			if(i<tupleindex)
-				t = mem.getTuple(t, obs.get(i));
+				t = mem.getTuple(state, t, obs.get(i));
 		}
 		return t;
 	}

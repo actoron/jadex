@@ -62,7 +62,7 @@ public class RetePatternMatcherState implements IPatternMatcherState, IOAVStateL
 		for(Iterator objects=state.getDeepObjects(); objects.hasNext(); )
 		{
 			Object	object	= objects.next();
-			objectAdded(object, state.getType(object), false);	// Hack!!! Should chack if root?
+			objectAdded(object, state.getType(object), false);	// Hack!!! Should check if root?
 		}
 
 		state.addStateListener(this, true);

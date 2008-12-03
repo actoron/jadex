@@ -173,7 +173,7 @@ public class NotNode extends AbstractBetaNode
 	protected void addMatch(Tuple left, Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
 		NotMemory nomem = (NotMemory)mem.getNodeMemory(this);
-		nomem.addMapping(left, right);
+		nomem.addMapping(state, left, right);
 		if(!delay && nomem.removeResultTuple(left))
 		{
 			ITupleConsumerNode[] tcs = tconsumers;
@@ -213,7 +213,7 @@ public class NotNode extends AbstractBetaNode
 	/**
 	 *  Check if a match is contained.
 	 */
-	protected boolean isMatchContained(Tuple left, Object right, ReteMemory mem)
+	protected boolean isMatchContained(IOAVState state, Tuple left, Object right, ReteMemory mem)
 	{
 		boolean	ret	= false;
 		if(mem.hasNodeMemory(this))
@@ -227,10 +227,11 @@ public class NotNode extends AbstractBetaNode
 
 	/**
 	 *  Create the node memory.
+	 *  @param state	The state.
 	 *  @return The node memory.
 	 */
-	public Object createNodeMemory()
+	public Object createNodeMemory(IOAVState state)
 	{
-		return new NotMemory(this);
+		return new NotMemory(state);
 	}
 }

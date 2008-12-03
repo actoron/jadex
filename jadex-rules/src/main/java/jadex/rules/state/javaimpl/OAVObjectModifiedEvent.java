@@ -1,6 +1,7 @@
 package jadex.rules.state.javaimpl;
 
 import jadex.commons.SUtil;
+import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 
@@ -10,6 +11,9 @@ import jadex.rules.state.OAVObjectType;
 class OAVObjectModifiedEvent
 {
 	//-------- attributes --------
+	
+	/** The state. */
+	protected IOAVState	state;
 	
 	/** The object id. */
 	protected Object id;
@@ -31,9 +35,10 @@ class OAVObjectModifiedEvent
 	/**
 	 *  Create a new object modified event.
 	 */
-	public OAVObjectModifiedEvent(Object id, OAVObjectType type, 
+	public OAVObjectModifiedEvent(IOAVState	state, Object id, OAVObjectType type, 
 		OAVAttributeType attribute, Object oldvalue, Object newvalue)
 	{
+		this.state	= state;
 		this.id = id;
 		this.type = type;
 		this.attribute = attribute;
@@ -86,7 +91,7 @@ class OAVObjectModifiedEvent
 			// For a single attribute only the last event should occur
 			
 			OAVObjectModifiedEvent evt = (OAVObjectModifiedEvent)obj;
-			if(SUtil.equals(id, evt.id) && SUtil.equals(type, evt.type)
+			if(state.equals(id, evt.id) && SUtil.equals(type, evt.type)
 				&& SUtil.equals(attribute, evt.attribute)
 			)
 			{
