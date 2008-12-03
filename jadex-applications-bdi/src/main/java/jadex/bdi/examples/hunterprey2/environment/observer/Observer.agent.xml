@@ -1,0 +1,112 @@
+<!--
+	<H3>An observer agent allows to view an environment.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-0.96.xsd"
+	name="Observer"
+	package="jadex.examples.hunterprey2.environment.observer">
+
+	<imports>
+		<import>jadex.bdi.examples.hunterprey2.*</import>
+		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
+		<import>jadex.bdi.examples.hunterprey2.environment.observer.*</import>
+		<import>jadex.runtime.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey2.creature.actsense.Creature"/>
+		<capability name="obscap" file="jadex.bdi.planlib.simsupport.observer.capability.SimObserver"/>
+	</capabilities>
+
+	<beliefs>
+
+		<!-- The creature -->
+		<beliefref name="my_self">
+			<concrete ref="actsensecap.my_self"/>
+		</beliefref>
+
+		<!-- The current vision. -->
+		<beliefref name="vision">
+			 <concrete ref="actsensecap.vision"/>	
+		</beliefref>
+
+		<!-- The location of the highscore. -->
+		<belief name="highscore" class="String">
+			<fact>"highscore.dmp"</fact>
+			<!--<fact>"highscore.xml"</fact>-->
+		</belief>
+
+		<!-- The gui. -->
+		<belief name="gui" class="ObserverGui">
+			<fact>new ObserverGui($scope.getExternalAccess())</fact>
+		</belief>
+		
+		<!-- Name of the simulation environment -->
+		<beliefref name="environment_name_obs">
+			<concrete ref="obscap.environment_name"/>
+		</beliefref>
+		
+		<!-- Sim engine -->
+		
+		<!-- Preservation of area aspect ratio in the window -->
+		<beliefref name="preserve_aspect_ratio">
+			<concrete ref="obscap.preserve_aspect_ratio"/>
+		</beliefref>
+		
+		<!-- Force the use of Java2D -->
+		<beliefref name="force_java2d">
+			<concrete ref="obscap.force_java2d"/>
+		</beliefref>
+		
+		<!-- List of themes for displaying objects -->
+		<beliefref name="object_themes">
+			<concrete ref="obscap.object_themes"/>
+		</beliefref>
+		
+		<!-- The pre-layers -->
+		<beliefref name="prelayers">
+			<concrete ref="obscap.prelayers"/>
+		</beliefref>
+		
+		<!-- The post-layers -->
+		<beliefref name="postlayers">
+			<concrete ref="obscap.postlayers"/>
+		</beliefref>
+		
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="end_agent" />
+		
+		<achievegoalref name="simobs_start">
+        	<concrete ref="obscap.simobs_start"/>
+    	</achievegoalref>
+	</goals>
+	
+	<plans>
+    	<!-- Initialization Plan. -->
+    	<plan name="initialization">
+      		<body class="InitializeObserverPlan"/>
+    	</plan>
+    </plans>
+	
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="my_self">
+					<fact>new Observer($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(0,0))</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+        		<initialplan ref="initialization"/>
+      		</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+
