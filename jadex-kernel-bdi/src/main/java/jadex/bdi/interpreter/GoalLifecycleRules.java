@@ -276,7 +276,8 @@ public class GoalLifecycleRules
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
-		
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+
 		ObjectCondition	mgoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
 		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
 		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
@@ -285,8 +286,12 @@ public class GoalLifecycleRules
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED));
+
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		ICondition goalcond = new AndCondition(new ICondition[]{mgoalcon, goalcon, usercond});
+		ICondition goalcond = new AndCondition(new ICondition[]{mgoalcon, goalcon, capcon, usercond});
 		
 		Rule goal_optionize	= new Rule(gtname+"_option", goalcond, GOAL_OPTION_ACTION);
 		return goal_optionize;
@@ -301,7 +306,8 @@ public class GoalLifecycleRules
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
-		
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+	
 		ObjectCondition	mgoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
 		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
 		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
@@ -311,7 +317,11 @@ public class GoalLifecycleRules
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED, IOperator.NOTEQUAL));
 		
-		ICondition goalcond = new AndCondition(new ICondition[]{mgoalcon, goalcon, new NotCondition(usercond)});
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+		
+		ICondition goalcond = new AndCondition(new ICondition[]{mgoalcon, goalcon, capcon, new NotCondition(usercond)});
 		
 		Rule goal_dropping = new Rule(gtname+"_suspend", goalcond, GOAL_SUSPEND_ACTION);
 		return goal_dropping;
