@@ -8,7 +8,7 @@ import java.util.Set;
  *  Interface for the Library Service. It provides a platform service
  *  for dynamic loading and unloading of classes, libraries and resources.
  */
-public interface ILibraryService
+public interface ILibraryService extends IPlatformService
 {
 	/** 
 	 * The (standard) Library service name.

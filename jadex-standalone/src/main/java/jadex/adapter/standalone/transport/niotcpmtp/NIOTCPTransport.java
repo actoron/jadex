@@ -1,5 +1,6 @@
 package jadex.adapter.standalone.transport.niotcpmtp;
 
+import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.adapter.standalone.transport.MessageEnvelope;
@@ -16,6 +17,7 @@ import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
 
 import java.io.IOException;
@@ -159,7 +161,7 @@ public class NIOTCPTransport implements ITransport
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start receiver thread.
-			ThreadPoolFactory.getThreadPool(platform.getName()).execute(new Runnable()
+			((IThreadPool)platform.getService(ThreadPoolService.class)).execute(new Runnable()
 			{
 				public void run()
 				{

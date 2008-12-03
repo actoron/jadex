@@ -1,6 +1,7 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.ISimulationService;
+import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.base.clock.ContinuousClock;
 import jadex.adapter.base.clock.IClock;
 import jadex.adapter.base.clock.ISimulationClock;
@@ -13,6 +14,7 @@ import jadex.bridge.ITimer;
 import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
 
 import java.util.List;
@@ -225,9 +227,9 @@ public class SimulationService implements ISimulationService
 
 		IClock clock = null;
 		if(IClock.TYPE_CONTINUOUS.equals(type))
-			clock = new ContinuousClock(oldclock, ThreadPoolFactory.getThreadPool(platform.getName()));
+			clock = new ContinuousClock(oldclock, (IThreadPool)platform.getService(ThreadPoolService.class));
 		else if(IClock.TYPE_SYSTEM.equals(type))
-			clock = new SystemClock(oldclock, ThreadPoolFactory.getThreadPool(platform.getName()));
+			clock = new SystemClock(oldclock, (IThreadPool)platform.getService(ThreadPoolService.class));
 		else if(IClock.TYPE_TIME_DRIVEN.equals(type))
 			clock = new SimulationTickClock(oldclock);
 		else if(IClock.TYPE_EVENT_DRIVEN.equals(type))

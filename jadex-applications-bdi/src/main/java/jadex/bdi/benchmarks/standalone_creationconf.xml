@@ -29,6 +29,13 @@
 				})
 			</property>
 			
+			<!-- Threadpool service. -->
+			<property type="jadex.adapter.base.ThreadPoolService" name="threadpool_service">
+				new jadex.adapter.base.ThreadPoolService(
+					new jadex.commons.concurrent.ThreadPool(
+					new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
+			</property>
+			
 			<!-- AMS service. -->
 			<property type="jadex.adapter.base.fipa.IAMS" name="ams_service">new jadex.adapter.standalone.ams.AMS($platform)</property> 
 			
@@ -61,9 +68,8 @@
 			<!-- Execution service. -->
 			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
 				new jadex.adapter.base.execution.AsyncExecutionService(
-					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
 			</property>
-		
 		</properties>
 		
 		<!-- Agents. -->

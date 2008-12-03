@@ -34,19 +34,6 @@ public class ThreadPoolFactory
 	/**
 	 *  Get the global thread pool instance.
 	 *  @return The global thread pool.
-	 * /
-	public static synchronized IThreadPool	getThreadPool()
-	{
-		if(instance==null)
-		{
-			instance	= createThreadPool();
-		}
-		return instance;
-	}*/
-	
-	/**
-	 *  Get the global thread pool instance.
-	 *  @return The global thread pool.
 	 */
 	public static synchronized IThreadPool	getThreadPool(String name)
 	{

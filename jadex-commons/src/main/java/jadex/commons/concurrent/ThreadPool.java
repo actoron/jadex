@@ -4,10 +4,10 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 /**
  *  A thread pool manages pool and saves resources
@@ -63,7 +63,7 @@ public class ThreadPool implements IThreadPool
 		this.group = new ThreadGroup("strategy_thread_pool_"+poolcnt++);
 		this.running = true;
 		this.tasks	= new ArrayBlockingQueue();
-		this.pool = new Vector();
+		this.pool = new ArrayList();
 		this.threads = new Hashtable();
 	}
 
@@ -103,7 +103,7 @@ public class ThreadPool implements IThreadPool
 	 *  Get the string representation.
 	 *  @return The string representation.
 	 */
-	public String toString()
+	public synchronized String toString()
 	{
 		StringBuffer buf = new StringBuffer();
 		buf.append(SReflect.getInnerClassName(getClass()));
@@ -121,7 +121,7 @@ public class ThreadPool implements IThreadPool
 	 *  Create some pool.
 	 *  @param num The number of pool.
 	 */
-	protected void addThreads(int num)
+	protected synchronized void addThreads(int num)
 	{
 		for(int i=0; i<num; i++)
 		{
@@ -138,7 +138,7 @@ public class ThreadPool implements IThreadPool
 	/**
 	 *  Get a thread for a task.
 	 */
-	protected Thread getThread(Runnable task)
+	protected synchronized Thread getThread(Runnable task)
 	{
 		return (Thread)threads.get(task);
 	}
@@ -146,7 +146,7 @@ public class ThreadPool implements IThreadPool
 	/**
 	 *  The task for a given thread.
 	 */
-	protected Runnable getTask(Thread thread)
+	protected synchronized Runnable getTask(Thread thread)
 	{
 		Runnable	ret	= null;
 		if(thread instanceof ServiceThread)
@@ -221,7 +221,10 @@ public class ThreadPool implements IThreadPool
 				}
 			}
 			
-			pool.remove(this);
+			synchronized(ThreadPool.this)
+			{
+				pool.remove(this);
+			}
 		}
 
 		/**

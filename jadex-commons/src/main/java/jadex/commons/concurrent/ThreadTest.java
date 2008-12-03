@@ -21,7 +21,7 @@ public class ThreadTest
 	 */
 	public ThreadTest()
 	{
-		IThreadPool tp = ThreadPoolFactory.getThreadPool("test");
+		IThreadPool tp = ThreadPoolFactory.createThreadPool();
 		MyTask[] tasks = new MyTask[10];
 		MyMonitor[] monitors = new MyMonitor[tasks.length];
 		for(int i=0; i<monitors.length; i++)

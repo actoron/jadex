@@ -18,12 +18,19 @@
 		<!-- Kernels. -->
 		<propertiesref ref="kernel_v2_bdi"/>
 	 	<propertiesref ref="kernel_v2_micro"/>
-		
+				
 		<!-- Platform services. -->
 		<properties type="services">
 			<!-- Library service. -->
 			<property type="jadex.bridge.ILibraryService" name="library_service">
 				new jadex.adapter.base.libraryservice.LibraryService()
+			</property>
+			
+			<!-- Threadpool service. -->
+			<property type="jadex.adapter.base.ThreadPoolService" name="threadpool_service">
+				new jadex.adapter.base.ThreadPoolService(
+					new jadex.commons.concurrent.ThreadPool(
+					new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
 			
 			<!-- AMS service. -->
@@ -58,7 +65,7 @@
 			<!-- Execution service. -->
 			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
 				new jadex.adapter.base.execution.AsyncExecutionService(
-					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
 			</property>
 		</properties>
 		

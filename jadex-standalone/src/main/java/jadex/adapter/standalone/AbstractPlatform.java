@@ -9,6 +9,7 @@ import jadex.bridge.IPlatformService;
 import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
 
 import java.util.Collection;
@@ -59,6 +60,9 @@ public abstract class AbstractPlatform implements IPlatform
 
 	/** The shutdown time. */
 	protected long shutdowntime;
+	
+	/** The threadpool. */
+	protected IThreadPool threadpool;
 
 	//-------- methods --------
 
@@ -397,7 +401,7 @@ public abstract class AbstractPlatform implements IPlatform
 				//					listener.resultAvailable(null);
 				//				System.exit(0);
 
-				ThreadPoolFactory.getThreadPool(getName()).dispose();
+//				ThreadPoolFactory.getThreadPool(getName()).dispose();
 			}
 		}).start();
 	}

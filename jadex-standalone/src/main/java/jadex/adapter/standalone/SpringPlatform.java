@@ -8,6 +8,7 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IPlatformService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.IThreadPool;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -171,7 +172,7 @@ public class SpringPlatform extends AbstractPlatform
 	{
 		this.appagents = appagents;
 	}
-
+	
 	/**
 	 *  Start the platform.
 	 */

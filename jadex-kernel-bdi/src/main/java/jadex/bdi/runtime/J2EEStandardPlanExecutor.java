@@ -69,6 +69,7 @@ public class J2EEStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 */
 	public J2EEStandardPlanExecutor(String threadpoolIdentifier)
 	{
+		// todo: refactor to use threadpoolservice
 		this(ThreadPoolFactory.getThreadPool(threadpoolIdentifier));
 		this.threadpoolIdentifier = threadpoolIdentifier;
 	}

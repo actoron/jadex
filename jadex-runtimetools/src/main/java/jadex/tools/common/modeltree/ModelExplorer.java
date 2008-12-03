@@ -1,5 +1,6 @@
 package jadex.tools.common.modeltree;
 
+import jadex.adapter.base.ThreadPoolService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.Properties;
@@ -8,6 +9,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.LoadManagingExecutionService;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.tools.common.PopupBuilder;
@@ -132,7 +134,7 @@ public class ModelExplorer extends JTree
 		this.pubuilder = pubuilder!=null? pubuilder: new PopupBuilder(
 			new Action[]{ADD_PATH, REMOVE_PATH, REFRESH});
 		this.worker	= new LoadManagingExecutionService(
-			ThreadPoolFactory.getThreadPool(jcc.getAgent().getPlatform().getName()));
+			((IThreadPool)jcc.getAgent().getPlatform().getService(ThreadPoolService.class)));
 		
 		setCellRenderer(new ModelTreeCellRenderer(nof));
 		setRowHeight(16);

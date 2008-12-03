@@ -46,12 +46,12 @@ public class RuleSystemExecutor implements ISteppable
 	}
 	
 	/**
-	 * 
+	 *  Executor for rule systems.
 	 */
 	public RuleSystemExecutor(final RuleSystem rulesystem, boolean stepmode, IThreadPool threadpool)
 	{
 		this.rulesystem = rulesystem;
-		this.executor = new Executor(threadpool!=null? threadpool: ThreadPoolFactory.getThreadPool("default"), 
+		this.executor = new Executor(threadpool!=null? threadpool: ThreadPoolFactory.createThreadPool(), 
 			new IExecutable()
 		{
 			public boolean execute()

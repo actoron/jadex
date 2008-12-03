@@ -178,7 +178,7 @@ public class AgentCreationAgent extends MicroAgent
 		{
 			public Object getDefaultValue(String configname)
 			{
-				return new Integer(1000);
+				return new Integer(10000);
 			}
 			public String getDescription()
 			{
