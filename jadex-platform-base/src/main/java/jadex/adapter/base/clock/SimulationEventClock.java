@@ -36,25 +36,33 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 	 *  Advance one event.
 	 *  @return True, if clock could be advanced.
 	 */
-	public synchronized boolean advanceEvent()
+	public boolean advanceEvent()
 	{
 		boolean	advanced	= false;
+		Timer t = null;
 		
-		if(STATE_RUNNING.equals(state) && timers.size()>0)
+		synchronized(this)
 		{
-			advanced	= true;
-			Timer t = (Timer)timers.first();
-			long tmptime = t.getNotificationTime();
-			
-			if(tmptime>currenttime)
-				currenttime = tmptime;
+			if(STATE_RUNNING.equals(state) && timers.size()>0)
+			{
+				advanced	= true;
+				t = (Timer)timers.first();
+				long tmptime = t.getNotificationTime();
 				
-			//System.out.println("time event notificaton: "+t);
-			removeTimer(t);
-			t.getTimedObject().timeEventOccurred();
-			//System.out.println("timers remaining: "+timers.size());
+				if(tmptime>currenttime)
+					currenttime = tmptime;
+					
+				//System.out.println("time event notificaton: "+t);
+				removeTimer(t);
+//				t.getTimedObject().timeEventOccurred();
+				//System.out.println("timers remaining: "+timers.size());
+			}
 		}
 		
+		// Must not be done while holding lock to avoid deadlocks.
+		if(t!=null)
+			t.getTimedObject().timeEventOccurred();
+			
 		notifyListeners();
 		return advanced;
 	}

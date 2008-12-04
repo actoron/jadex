@@ -8,7 +8,7 @@
 		<constructor-arg type="java.lang.String"><value>lars</value></constructor-arg>
 	</bean>
 	
-	<bean name="threadPool" class="jadex.commons.concurrent.ThreadPool">
+	<!--  <bean name="threadPool" class="jadex.commons.concurrent.ThreadPool">
 		<constructor-arg>
 			<bean class="jadex.commons.concurrent.DefaultThreadPoolStrategy">
 				<constructor-arg type="int" value="0" />
@@ -16,7 +16,9 @@
 				<constructor-arg type="long" value="30000" />
 			</bean>
 		</constructor-arg>
-	</bean>
+	</bean>-->
+	
+	<!-- <bean name="threadPool" class="jadex.commons.concurrent.ThreadPoolFactory" factory-method="createThreadPool" />  -->
 
 	<bean id="platform" class="jadex.adapter.standalone.SpringPlatform">
 		
@@ -52,11 +54,7 @@
 									<value>planexecutor_standard</value>
 								</key>
 								<bean class="jadex.bdi.runtime.JavaStandardPlanExecutor">
-									<constructor-arg>
-										<bean class="jadex.commons.concurrent.ThreadPoolFactory" factory-method="getThreadPool">
-											<constructor-arg ref="platformName"/>
-										</bean>
-									</constructor-arg>
+									<constructor-arg ref="threadPool" />
 								</bean>
 							</entry>
 							<entry>
@@ -230,11 +228,7 @@
 							<bean class="jadex.adapter.base.clock.SystemClock">
 								<constructor-arg type="java.lang.String" value="system_clock"/>
 								<constructor-arg type="long" value="1"/>
-								<constructor-arg type="jadex.commons.concurrent.IThreadPool">
-									<bean class="jadex.commons.concurrent.ThreadPoolFactory" factory-method="getThreadPool">
-										<constructor-arg ref="platformName"/>
-									</bean>
-								</constructor-arg>
+								<constructor-arg type="jadex.commons.concurrent.IThreadPool" ref="threadPool"/>
 							</bean>
 						</entry>
 					</map>

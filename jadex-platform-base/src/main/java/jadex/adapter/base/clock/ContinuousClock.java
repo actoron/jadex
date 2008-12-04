@@ -127,18 +127,22 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	 *  Set the clocks dilation.
 	 *  @param dilation The clocks dilation.
 	 */
-	public synchronized void setDilation(double dilation)
+	public void setDilation(double dilation)
 	{
-		if(STATE_RUNNING.equals(state))
+		synchronized(this)
 		{
-			long ct = System.currentTimeMillis();
-			this.elapsed += (ct-laststart)*getDilation();
-			this.laststart = ct;
+			if(STATE_RUNNING.equals(state))
+			{
+				long ct = System.currentTimeMillis();
+				this.elapsed += (ct-laststart)*getDilation();
+				this.laststart = ct;
+			}
+			this.dilation = dilation;
+			
+			this.notify();
+			executor.execute();
 		}
-		this.dilation = dilation;
 		
-		this.notify();
-		executor.execute();
 		notifyListeners();
 	}
 	
@@ -154,13 +158,23 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	/**
 	 *  Start the clock.
 	 */
-	public synchronized void start()
+	public void start()
 	{
-		if(!STATE_RUNNING.equals(state))
+		boolean notify = false;
+		
+		synchronized(this)
 		{
-			this.state = STATE_RUNNING;
-			this.laststart = System.currentTimeMillis();
-			executor.execute();
+			if(!STATE_RUNNING.equals(state))
+			{
+				this.state = STATE_RUNNING;
+				this.laststart = System.currentTimeMillis();
+				executor.execute();
+				notify = true;
+			}
+		}
+		
+		if(notify)
+		{
 			notificator.execute();
 			notifyListeners();
 		}
@@ -169,27 +183,39 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	/**
 	 *  Stop the clock.
 	 */
-	public synchronized void stop()
+	public void stop()
 	{
-		if(STATE_RUNNING.equals(state))
+		boolean notify = false;
+		
+		synchronized(this)
 		{
-			this.state = STATE_SUSPENDED;
-			//this.elpased += System.currentTimeMillis()-laststart;
-			this.elapsed += (System.currentTimeMillis()-laststart)*dilation;
-			notifyListeners();
+			if(STATE_RUNNING.equals(state))
+			{
+				this.state = STATE_SUSPENDED;
+				//this.elpased += System.currentTimeMillis()-laststart;
+				this.elapsed += (System.currentTimeMillis()-laststart)*dilation;
+				notify = true;
+			}
 		}
+		
+		if(notify)
+			notifyListeners();
 	}
 	
 	/**
 	 *  Reset the clock.
 	 */
-	public synchronized void reset()
+	public void reset()
 	{
-		if(STATE_RUNNING.equals(state))
-			this.state = STATE_SUSPENDED;
-		this.elapsed = 0;
-		this.laststart = 0;
-		this.currenttime = starttime;
+		synchronized(this)
+		{
+			if(STATE_RUNNING.equals(state))
+				this.state = STATE_SUSPENDED;
+			this.elapsed = 0;
+			this.laststart = 0;
+			this.currenttime = starttime;
+		}
+		
 		notifyListeners();
 	}
 	

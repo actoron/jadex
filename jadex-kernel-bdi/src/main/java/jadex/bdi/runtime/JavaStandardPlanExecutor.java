@@ -6,6 +6,7 @@ import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.rules.state.OAVAttributeType;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -42,9 +43,8 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	/**
 	 *  Create a new threadbased plan executor.
 	 */
-	public JavaStandardPlanExecutor(/*BDIInterpreter interpreter,*/ IThreadPool threadpool)
+	public JavaStandardPlanExecutor(IThreadPool threadpool)
 	{
-		//this.interpreter = interpreter;
 		this.threadpool = threadpool;
 		this.tasks = Collections.synchronizedMap(SCollection.createHashMap());
 	}
@@ -117,7 +117,9 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		// Lock the pool monitor and start it.
 		// Because it needs its monitor to run, it starts
 		// not until the scheduler has called wait().
-		//System.out.println("now scheduling: "+plinfo);
+//		System.out.println("plan step started: "+rplan+" "+interpreter.getState()
+//			.getAttributeValue(interpreter.getState().getAttributeValue(rplan, 
+//			OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 		synchronized(monitor)
 		{
 			task.setStepType(steptype);
@@ -166,6 +168,11 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 
 //        if(task.getState().equals(PlanExecutionTask.STATE_TERMINATED))
 //        {
+		
+//		System.out.println("plan step finished: "+rplan+" "+interpreter.getState()
+//			.getAttributeValue(interpreter.getState().getAttributeValue(rplan, 
+//			OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+			
             //plan.setCleanupFinished(true);
         	if(task.getThrowable() instanceof Exception)
         		throw (Exception)task.getThrowable();

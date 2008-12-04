@@ -67,21 +67,24 @@ public class SimulationService implements ISimulationService
 		this.simcommand = new ICommand()
 		{
 			public void execute(Object args)
-			{
+			{				
+				ISimulationClock simclock = (ISimulationClock)getClock();
+				
+				boolean steptime = false;
+				boolean advanceevent = false;
 				synchronized(SimulationService.this)
 				{
-					ISimulationClock simclock = (ISimulationClock)getClock();
 					if(MODE_NORMAL.equals(getMode()) && executing)
 					{
-						if(!simclock.advanceEvent())
-							setExecuting(false);
+						advanceevent = true;
 					}
-					else if(MODE_TIME_STEP.equals(getMode()))
+					if(MODE_TIME_STEP.equals(getMode()))
 					{
 						//System.out.println("Do one step: "+timesteptime);
 						ITimer t = simclock.getNextTimer();
 						if(t!=null && t.getNotificationTime()<=timesteptime)
-							stepTime();
+							//stepTime();
+							steptime = true;
 						else
 							setExecuting(false);
 					}
@@ -90,6 +93,11 @@ public class SimulationService implements ISimulationService
 						setExecuting(false);
 					}
 				}
+				
+				if(steptime)
+					stepTime();
+				else if(advanceevent)
+					simclock.advanceEvent();
 			}	
 		};
 	}
@@ -110,15 +118,19 @@ public class SimulationService implements ISimulationService
 	/**
 	 *  Start (and run) the execution. 
 	 */
-	public synchronized void start()
+	public void start()
 	{
-		setMode(MODE_NORMAL);
-		setExecuting(true);
-		if(!running)
+		synchronized(this)
 		{
-			getClock().start();
-			running = true;
+			setMode(MODE_NORMAL);
+			setExecuting(true);
+			if(!running)
+			{
+				getClock().start();
+				running = true;
+			}
 		}
+		
 		getExecutorService().start();
 	}
 	
@@ -139,63 +151,77 @@ public class SimulationService implements ISimulationService
 	/**
 	 *  Perform one event.
 	 */
-	public synchronized void stepEvent()
+	public void stepEvent()
 	{
-		if(!(getClock() instanceof ISimulationClock))
-			throw new RuntimeException("Step only possible in simulation mode.");
-		if(executing)
-			throw new RuntimeException("Step only possible when executing.");
-
-		setMode(MODE_ACTION_STEP);
-		setExecuting(true);
-		if(!running)
+		synchronized(this)
 		{
-			getClock().start();
-			getExecutorService().start();
-			running = true;
+			if(!(getClock() instanceof ISimulationClock))
+				throw new RuntimeException("Step only possible in simulation mode.");
+			if(executing)
+				throw new RuntimeException("Step only possible when executing.");
+	
+			setMode(MODE_ACTION_STEP);
+			setExecuting(true);
+			if(!running)
+			{
+				getClock().start();
+				getExecutorService().start();
+				running = true;
+			}
 		}
-
+		
 		boolean advanced = ((ISimulationClock)getClock()).advanceEvent();
 		
-		// Have to make sure that executing is set back to false,
-		// even if there is no time point or timing entry does not cause any execution.
-		if(!advanced || getExecutorService().isIdle())
+		synchronized(this)
 		{
-			//System.out.println("No further timepoint.");
-			setExecuting(false);
+			// Have to make sure that executing is set back to false,
+			// even if there is no time point or timing entry does not cause any execution.
+			if(!advanced || getExecutorService().isIdle())
+			{
+				//System.out.println("No further timepoint.");
+				setExecuting(false);
+			}
 		}
 	}
 	
 	/**
 	 *  Perform all actions belonging to one time point.
 	 */
-	public synchronized void stepTime()
+	public void stepTime()
 	{
-		if(!(getClock() instanceof ISimulationClock))
-			throw new RuntimeException("Step only possible in simulation mode.");
-		if(executing)
-			throw new RuntimeException("Step only possible when not executing.");
-
-		//System.out.println(simclock.getTimers().length+" "+jadex.commons.SUtil.arrayToString(simclock.getTimers()));
-			
-		setMode(MODE_TIME_STEP);
-		setExecuting(true);
-		if(!running)
+		synchronized(this)
 		{
-			getClock().start();
-			getExecutorService().start();
-			running = true;
+			if(!(getClock() instanceof ISimulationClock))
+				throw new RuntimeException("Step only possible in simulation mode.");
+			if(executing)
+				throw new RuntimeException("Step only possible when not executing.");
+	
+			//System.out.println(simclock.getTimers().length+" "+jadex.commons.SUtil.arrayToString(simclock.getTimers()));
+				
+			setMode(MODE_TIME_STEP);
+			setExecuting(true);
+			if(!running)
+			{
+				getClock().start();
+				getExecutorService().start();
+				running = true;
+			}
 		}
 
+		// Do not hold lock while clock is advanced to avoid deadlocks
 		boolean advanced = ((ISimulationClock)getClock()).advanceEvent();
-		if(!advanced || getExecutorService().isIdle())
+		
+		synchronized(this)
 		{
-			setExecuting(false);
-		}
-		else
-		{
-			timesteptime = getClock().getTime();
-			//System.out.println("Steptime is: "+timesteptime);
+			if(!advanced || getExecutorService().isIdle())
+			{
+				setExecuting(false);
+			}
+			else
+			{
+				timesteptime = getClock().getTime();
+				//System.out.println("Steptime is: "+timesteptime);
+			}
 		}
 	}
 	

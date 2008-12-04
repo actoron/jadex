@@ -197,17 +197,20 @@ public abstract class AbstractClock implements IClockService, IClock
 	 *  Set the clock delta.
 	 *  param delta The new clock delta.
 	 */
-	public synchronized void setDelta(long delta)
+	public void setDelta(long delta)
 	{
-		this.delta	= delta;
-		
-		// Reset tick timer, if still in future
-		if(timers.contains(ticktimer) && ticktimer.getNotificationTime()>getTime())
+		synchronized(this)
 		{
-			long num = (getTime()-getStarttime())/getDelta();
-			long time = (num+1)*getDelta()+getStarttime();
-			ticktimer.setNotificationTime(time);
-			//System.out.println("Ticktimer at: "+time);
+			this.delta	= delta;
+			
+			// Reset tick timer, if still in future
+			if(timers.contains(ticktimer) && ticktimer.getNotificationTime()>getTime())
+			{
+				long num = (getTime()-getStarttime())/getDelta();
+				long time = (num+1)*getDelta()+getStarttime();
+				ticktimer.setNotificationTime(time);
+				//System.out.println("Ticktimer at: "+time);
+			}
 		}
 		
 		notifyListeners();
@@ -326,10 +329,14 @@ public abstract class AbstractClock implements IClockService, IClock
 	 *  Add a timer.
 	 *  @param timer The timer.
 	 */
-	public synchronized void addTimer(ITimer timer)
+	public void addTimer(ITimer timer)
 	{
+		synchronized(this)
+		{
 //		System.err.println("Added timer: "+timer);
-		timers.add(timer);
+			timers.add(timer);
+		}
+		
 		notifyListeners();
 	}
 	
@@ -337,10 +344,14 @@ public abstract class AbstractClock implements IClockService, IClock
 	 *  Remove a timer.
 	 *  @param timer The timer.
 	 */
-	public synchronized void removeTimer(ITimer timer)
+	public void removeTimer(ITimer timer)
 	{
+		synchronized(this)
+		{
 //		System.out.println("Removed timer: "+timer);
-		timers.remove(timer);
+			timers.remove(timer);
+		}
+		
 		notifyListeners();
 	}
 	
@@ -348,16 +359,20 @@ public abstract class AbstractClock implements IClockService, IClock
 	 *  Add a tick timer.
 	 *  @param timer The timer.
 	 */
-	public synchronized void addTickTimer(ITimer timer)
+	public void addTickTimer(ITimer timer)
 	{
-		ticktimers.add(timer);
-		if(!timers.contains(ticktimer))
+		synchronized(this)
 		{
-			long num = (getTime()-getStarttime())/getDelta();
-			long time = (num+1)*getDelta()+getStarttime();
-			ticktimer.setNotificationTime(time);
-			//System.out.println("Ticktimer at: "+time);
+			ticktimers.add(timer);
+			if(!timers.contains(ticktimer))
+			{
+				long num = (getTime()-getStarttime())/getDelta();
+				long time = (num+1)*getDelta()+getStarttime();
+				ticktimer.setNotificationTime(time);
+				//System.out.println("Ticktimer at: "+time);
+			}
 		}
+		
 		notifyListeners();
 	}
 	
@@ -365,11 +380,15 @@ public abstract class AbstractClock implements IClockService, IClock
 	 *  Remove a tick timer.
 	 *  @param timer The timer.
 	 */
-	public synchronized void removeTickTimer(ITimer timer)
+	public void removeTickTimer(ITimer timer)
 	{
+		synchronized(this)
+		{
 		ticktimers.remove(timer);
 		if(ticktimers.size()==0)
 			removeTimer(ticktimer);
+		}
+		
 		notifyListeners();
 	}
 	

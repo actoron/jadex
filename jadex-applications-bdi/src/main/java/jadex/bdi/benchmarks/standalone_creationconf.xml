@@ -20,7 +20,7 @@
 <!-- 		<propertiesref ref="kernel_v1"/> -->
 		
 		<!-- Platform services. -->
-		<properties type="services">
+		<properties type="services">			
 			<!-- Library service. -->
 			<property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService(
 				new Object[]
@@ -32,6 +32,7 @@
 			<!-- Threadpool service. -->
 			<property type="jadex.adapter.base.ThreadPoolService" name="threadpool_service">
 				new jadex.adapter.base.ThreadPoolService(
+					//jadex.commons.concurrent.ThreadPoolFactory.createThreadPool())
 					new jadex.commons.concurrent.ThreadPool(
 					new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
@@ -50,21 +51,21 @@
 					new jadex.adapter.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
 					new jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
 				})
-			</property> -->
+			</property>-->
 			
 			<!-- Clock service. -->
 			<property type="jadex.bridge.IClockService" name="clock_service">
 				new jadex.adapter.base.clock.SystemClock("system_clock", 1,
-					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
 //				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 100)
 			</property>
-			
+
 			<!-- Simulation service. - ->
 			<property type="jadex.adapter.base.ISimulationService" name="simulation_service">
 				new jadex.adapter.standalone.SimulationService($platform)
-			</property>-->
-			
+			</property> -->
+		
 			<!-- Execution service. -->
 			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
 				new jadex.adapter.base.execution.AsyncExecutionService(
@@ -85,7 +86,7 @@
 		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(jadex.commons.SUtil.createHashMap(
 			new String[]{"messagetype_fipa", "planexecutor_standard", "standard.timeout", "tooladapter.introspector"},
 			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
-			new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname)),
+			new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
 			new java.lang.Long(10000),
 			jadex.tools.introspector.IntrospectorAdapter.class
 			}), $platform)

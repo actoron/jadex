@@ -37,26 +37,34 @@ public class SimulationTickClock extends AbstractClock implements ISimulationClo
 	 *  Advance one event.
 	 *  @return True, if clock could be advanced.
 	 */
-	public synchronized boolean advanceEvent()
+	public boolean advanceEvent()
 	{
-		boolean advanced = false;
+		boolean	advanced	= false;
+		Timer t = null;
 		
-		if(STATE_RUNNING.equals(state) && timers.size()!=0)
+		synchronized(this)
 		{
-			// Determine next timepoint.
-			Timer t = (Timer)timers.first();
-			long num = (long)Math.ceil((t.getNotificationTime()-getStarttime())/(double)(getDelta()));
-			long time = num*getDelta()+getStarttime();
-			
-			// Ensure that clock does not run backwards.
-			if(time>currenttime)
-				currenttime = time;
-			
+			if(STATE_RUNNING.equals(state) && timers.size()!=0)
+			{
+				// Determine next timepoint.
+				t = (Timer)timers.first();
+				long num = (long)Math.ceil((t.getNotificationTime()-getStarttime())/(double)(getDelta()));
+				long time = num*getDelta()+getStarttime();
+				
+				// Ensure that clock does not run backwards.
+				if(time>currenttime)
+					currenttime = time;
+				
+				removeTimer(t);
+				
+				advanced = true;
+			}
+		}
+		
+		if(advanced)
+		{
 			// Execute due timers.
-			removeTimer(t);
 			t.getTimedObject().timeEventOccurred();
-			
-			advanced = true;
 		}
 		
 		notifyListeners();
