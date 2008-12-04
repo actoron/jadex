@@ -777,18 +777,15 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	/**
 	 * Applies the current agentfilter to the given agents.
 	 * 
-	 * @param agents
-	 *            The agents to apply the filter to.
+	 * @param agents The agents to apply the filter to.
 	 */
 	protected void applyAgentFilter(Agent[] agents) {
-		boolean[] last = new boolean[agents.length];
 		List updated_agents = new ArrayList();
 		List updated_messages = new ArrayList();
 
 		// Hack!!!
 		// apply with out zero message filter first
 		for (int i = 0; i < agents.length; i++) {
-			last[i]=agents[i].isVisible();
 			agents[i].applyFilter(agentfilter, false);	
 			if (!agents[i].equals(Agent.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
 				if (agents[i].isVisible()) {
