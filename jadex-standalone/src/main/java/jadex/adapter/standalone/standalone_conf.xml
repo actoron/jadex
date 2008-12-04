@@ -29,8 +29,9 @@
 			<!-- Threadpool service. -->
 			<property type="jadex.adapter.base.ThreadPoolService" name="threadpool_service">
 				new jadex.adapter.base.ThreadPoolService(
-					new jadex.commons.concurrent.ThreadPool(
-					new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
+					jadex.commons.concurrent.ThreadPoolFactory.createThreadPool())
+					//new jadex.commons.concurrent.ThreadPool(
+					//new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
 			
 			<!-- AMS service. -->
@@ -52,7 +53,7 @@
 			<!-- Clock service. -->
 			<property type="jadex.bridge.IClockService" name="clock_service">
 				new jadex.adapter.base.clock.SystemClock("system_clock", 1,
-					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
 //				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 100)
 			</property>
@@ -82,7 +83,7 @@
 		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(jadex.commons.SUtil.createHashMap(
 			new String[]{"messagetype_fipa", "planexecutor_standard", "standard.timeout", "tooladapter.introspector"},
 			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
-			new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname)),
+			new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
 			new java.lang.Long(10000),
 			jadex.tools.introspector.IntrospectorAdapter.class
 			}), $platform)
