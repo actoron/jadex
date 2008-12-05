@@ -380,7 +380,7 @@ public abstract class AbstractPlatform implements IPlatform
 					((IPlatformService)servicelist.remove(servicelist.size() - 1)).shutdown(null);
 				}*/
 
-				// Start the services.
+				// Stop the services.
 				for(Iterator it = services.keySet().iterator(); it.hasNext();)
 				{
 					Object key = it.next();

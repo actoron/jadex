@@ -330,7 +330,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	 */
 	public Object createNodeMemory(IOAVState state)
 	{
-		return state.isJavaIdentity() ? (Map)new IdentityHashMap() :	new LinkedHashMap();
+		return new LinkedHashMap();
 	}
 	
 	//-------- helper methods --------

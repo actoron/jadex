@@ -49,11 +49,12 @@ public class DefaultThreadPoolStrategy implements IThreadPoolStrategy
 		{
 			ret = true;
 			threadcnt++;
-//			System.out.println("Capacity: "+capacity+" "+threadcnt);
+//			System.out.println("Capacity(tA1): "+capacity+" "+threadcnt);
 		}
 		else
 		{
 			capacity--;
+//			System.out.println("Capacity(tA2): "+capacity+" "+threadcnt);
 		}
 		
 		return ret;
@@ -72,11 +73,12 @@ public class DefaultThreadPoolStrategy implements IThreadPoolStrategy
 		{
 			ret = true;
 			threadcnt--;
-//			System.out.println("Capacity: "+capacity+" "+threadcnt);
+//			System.out.println("Capacity(tF1): "+capacity+" "+threadcnt);
 		}
 		else
 		{
 			capacity++;
+//			System.out.println("Capacity(tF2): "+capacity+" "+threadcnt);
 		}
 		
 		return ret;
@@ -111,6 +113,9 @@ public class DefaultThreadPoolStrategy implements IThreadPoolStrategy
 	 */
 	public synchronized boolean threadTimeoutOccurred()
 	{
+		threadcnt--;
+		capacity--;
+//		System.out.println("Capacity(tTO): "+capacity+" "+threadcnt);
 		return true;
 		
 //		boolean ret = false;

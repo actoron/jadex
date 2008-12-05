@@ -129,10 +129,12 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// It must be avoided that the new thread
 				// immediately starts. Therefore its first
 				// instruction is synchronized(monitor){}
+//				System.out.println("execute: "+rplan);
 				threadpool.execute(task);
 			}
 			else
 			{
+//				System.out.println("notify: "+rplan);
 				monitor.notify();
 			}
 
@@ -141,16 +143,22 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// Wait causes to free the monitor
 				// and awakens the plan thread which needs
 				// the monitor to execute
+//				System.out.println("wait: "+rplan);
 				if(getMaxExecutionTime()==0)
 					monitor.wait();
 				else
 					monitor.wait(getMaxExecutionTime());
+//				System.out.println("resumed: "+rplan);
 			}
 			catch(InterruptedException e)
 			{
 				// Shouldn't happen (agent thread shouldn't be interrupted)
 				System.err.println("Warning, agent thread was interrupted");
 				e.printStackTrace(System.err);
+			}
+			catch(Throwable e)
+			{
+				e.printStackTrace();
 			}
 			
 			if(PlanExecutionTask.STATE_RUNNING.equals(task.getState()))
@@ -522,6 +530,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		 */
 		public void run()
 		{
+//			System.out.println("start: "+rplan);
 			// When the thread is new it has to wait till the
 			// scheduler is finished (called wait).
 			// The plan is not allowed to hold the monitor for
@@ -638,10 +647,11 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			// Finally, transfer execution back to agent thread.
 			synchronized(monitor)
 			{
+//				System.out.println("finish1: "+rplan);
 				interpreter.setPlanThread(null);
 				thread.setContextClassLoader(oldcl);
 				monitor.notify();
-				//System.out.println("Execution of plan finished: "+type+", "+this+": "+rplan);
+//				System.out.println("finish2: "+rplan);
 			}
 		}
 
@@ -676,6 +686,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				try
 				{
 					interpreter.setPlanThread(null);
+//					System.out.println("givebackcontrol: "+rplan);
 					monitor.wait();
 				}
 				catch(InterruptedException e)

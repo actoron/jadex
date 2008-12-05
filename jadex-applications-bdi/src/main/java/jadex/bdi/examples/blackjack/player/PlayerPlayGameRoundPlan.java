@@ -11,6 +11,7 @@ import jadex.bdi.examples.blackjack.RequestBet;
 import jadex.bdi.examples.blackjack.RequestDraw;
 import jadex.bdi.examples.blackjack.RequestFinished;
 import jadex.bdi.examples.blackjack.player.HumanPlayerInterface.HumanPlayerControlPanel;
+import jadex.bdi.planlib.GuiCreator;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
@@ -34,7 +35,15 @@ public class PlayerPlayGameRoundPlan extends Plan
 	{
 		getLogger().info("created: " + this);
 		if(getBeliefbase().containsBelief("gui"))
-			hpi = (HumanPlayerInterface)getBeliefbase().getBelief("gui").getFact();
+		{
+			Object	gui	= getBeliefbase().getBelief("gui").getFact();
+			if(gui instanceof GuiCreator)
+			{
+				gui	= ((GuiCreator)gui).getFrame();
+				getBeliefbase().getBelief("gui").setFact(gui);	// Hack!!!
+			}
+			hpi = (HumanPlayerInterface)gui;
+		}
 	}
 
 	//-------- attributes --------

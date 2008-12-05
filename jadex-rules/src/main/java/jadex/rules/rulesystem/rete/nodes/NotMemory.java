@@ -44,7 +44,7 @@ public class NotMemory	extends BetaMemory
 		Set	values	= (Set)mappings.get(key);
 		if(values==null)
 		{
-			values	= state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new HashSet();
+			values	= state.isJavaIdentity() ? (Set)new MixedIdentityHashSet(state) : new HashSet();
 			mappings.put(key, values);
 		}
 

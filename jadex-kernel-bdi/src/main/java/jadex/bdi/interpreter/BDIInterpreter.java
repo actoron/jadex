@@ -324,59 +324,61 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 				}
 			}
 
-			// Notify/ask tools that we are about to execute an action.
 			boolean	execute	= true;
-			for(int i=0; execute && i<tooladapters.length; i++)
-				execute	= tooladapters[i].executeAction();
-
-			if(execute && !extexecuted) // stepcnt==-1 indicates normal execution, stepcnt>0 is stepped execution, setpcnt==0 is stop
-			{	
-				// Execute rules.
-				// Remove obsolete user objects.
-				/*WeakEntry entry;
-				while((entry = (WeakEntry)extaccesses.poll()) !=null)
-				{*/
-	//				Object obj = entry.getValue();
-	//				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_temporaryobjects, obj);
-	//				System.out.println("Removed: "+entry);
-				//}
-	//			System.out.println("User objects: "+extaccesses.getEntriesSize());
-			
-	//			if(rulesystem.getState().getUnreferencedObjects().size()>0)
-	//			{
-	//				Collection coll = rulesystem.getState().getUnreferencedObjects();
-	//				for(Iterator it=coll.iterator(); it.hasNext(); )
+			if(!extexecuted)
+			{
+				// Notify/ask tools that we are about to execute an action.
+				for(int i=0; execute && i<tooladapters.length; i++)
+					execute	= tooladapters[i].executeAction();
+				if(execute)
+				{
+					// Execute rules.
+					// Remove obsolete user objects.
+					/*WeakEntry entry;
+					while((entry = (WeakEntry)extaccesses.poll()) !=null)
+					{*/
+		//				Object obj = entry.getValue();
+		//				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_temporaryobjects, obj);
+		//				System.out.println("Removed: "+entry);
+					//}
+		//			System.out.println("User objects: "+extaccesses.getEntriesSize());
+				
+		//			if(rulesystem.getState().getUnreferencedObjects().size()>0)
+		//			{
+		//				Collection coll = rulesystem.getState().getUnreferencedObjects();
+		//				for(Iterator it=coll.iterator(); it.hasNext(); )
+		//				{
+		//					Object o = it.next();
+		//					System.out.println(o+" "+state.getAttributeValue(state.getAttributeValue(o, 
+		//						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+		//				}	
+		//			}
+					
+	//				if(rulesystem.getState().getUnreferencedObjects().size()>0)
+	//					System.out.println("here: "+rulesystem.getState().getUnreferencedObjects());
+					
+	//				Collection unrefs = rulesystem.getState().getUnreferencedObjects();
+	//				if(!unrefs.isEmpty())
 	//				{
-	//					Object o = it.next();
-	//					System.out.println(o+" "+state.getAttributeValue(state.getAttributeValue(o, 
-	//						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
-	//				}	
-	//			}
-				
-//				if(rulesystem.getState().getUnreferencedObjects().size()>0)
-//					System.out.println("here: "+rulesystem.getState().getUnreferencedObjects());
-				
-//				Collection unrefs = rulesystem.getState().getUnreferencedObjects();
-//				if(!unrefs.isEmpty())
-//				{
-//					List	cycle	= rulesystem.getState().findCycle(unrefs);
-//					if(cycle!=null && !cycle.isEmpty())
-//					{
-//						JPanel	oavpanel1	= OAVTreeModel.createOAVPanel(state, cycle.get(0));
-//						JPanel	oavpanel2	= OAVTreeModel.createOAVPanel(state, ragent);
-//						JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, oavpanel1, oavpanel2);
-//						
-//						JFrame	frame	= new JFrame("Unreferenced Objects / Agent");
-//						frame.getContentPane().add(split, BorderLayout.CENTER);
-//						frame.setSize(800, 600);
-//						frame.setVisible(true);
-//					}
-//				}
-				assert rulesystem.getState().getUnreferencedObjects().size()==0
-					: getAgentAdapter().getAgentIdentifier().getLocalName()
-					+ ", " + rulesystem.getAgenda().getLastActivation()
-					+ ", " + rulesystem.getState().getUnreferencedObjects();
-				rulesystem.getAgenda().fireRule();
+	//					List	cycle	= rulesystem.getState().findCycle(unrefs);
+	//					if(cycle!=null && !cycle.isEmpty())
+	//					{
+	//						JPanel	oavpanel1	= OAVTreeModel.createOAVPanel(state, cycle.get(0));
+	//						JPanel	oavpanel2	= OAVTreeModel.createOAVPanel(state, ragent);
+	//						JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, oavpanel1, oavpanel2);
+	//						
+	//						JFrame	frame	= new JFrame("Unreferenced Objects / Agent");
+	//						frame.getContentPane().add(split, BorderLayout.CENTER);
+	//						frame.setSize(800, 600);
+	//						frame.setVisible(true);
+	//					}
+	//				}
+					assert rulesystem.getState().getUnreferencedObjects().size()==0
+						: getAgentAdapter().getAgentIdentifier().getLocalName()
+						+ ", " + rulesystem.getAgenda().getLastActivation()
+						+ ", " + rulesystem.getState().getUnreferencedObjects();
+					rulesystem.getAgenda().fireRule();
+				}
 			}
 			// Necessary because in step mode state changes may happen and 
 			// event listeners need to be notified!

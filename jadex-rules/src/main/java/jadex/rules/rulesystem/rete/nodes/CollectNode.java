@@ -160,7 +160,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 				else
 				{
 					// todo: what kind of collection should be provided as result
-					Set vals = state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new HashSet();
+					Set vals = state.isJavaIdentity() ? (Set)new MixedIdentityHashSet(state) : new HashSet();
 					vals.add(obs.get(i));
 					resulttuple = mem.getTuple(state, resulttuple, vals);
 				}

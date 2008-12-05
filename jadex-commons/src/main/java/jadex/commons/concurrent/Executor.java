@@ -2,7 +2,9 @@ package jadex.commons.concurrent;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -69,12 +71,18 @@ public class Executor implements Runnable
 	}
 		
 	//-------- methods --------
+	
+	protected static Map	threads	= new Hashtable();
 
 	/**
 	 *  Execute the code. 
 	 */
 	public void run()
 	{
+		Object	old	= threads.put(this, Thread.currentThread());
+		if(old!=null)
+			System.out.println("Old thread: "+this+", "+old);
+		
 		// running is already set to true in execute()
 		
 		boolean	iwanttorun	= true;
@@ -105,6 +113,10 @@ public class Executor implements Runnable
 //				throw new RuntimeException(e);
 //			}
 		}
+
+		old	= threads.remove(this);
+		if(old!=Thread.currentThread())
+			System.out.println("Old thread removed: "+this+", "+old+", "+Thread.currentThread());
 		
 		// Notify shutdown listeners when execution has ended.
 		synchronized(shutdownlisteners)

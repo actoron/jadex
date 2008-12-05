@@ -31,8 +31,9 @@
 			<!-- Threadpool service. -->
 			<property type="jadex.adapter.base.ThreadPoolService" name="threadpool_service">
 				new jadex.adapter.base.ThreadPoolService(
+					//new jadex.commons.concurrent.java5.JavaThreadPool()
 					new jadex.commons.concurrent.ThreadPool(
-					new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
+						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
 			
 			<!-- AMS service. -->

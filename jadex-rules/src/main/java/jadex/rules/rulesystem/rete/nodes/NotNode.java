@@ -39,6 +39,9 @@ public class NotNode extends AbstractBetaNode
 	 */
 	public void addTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(getNodeId()==1137)
+//			System.out.println(this+".addTuple: "+left);
+		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
 
@@ -67,6 +70,9 @@ public class NotNode extends AbstractBetaNode
 	 */
 	public void removeTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(getNodeId()==1137)
+//			System.out.println(this+".removeTuple: "+left);
+
 		//System.out.println("Remove tuple called: "+this+" "+left);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
@@ -109,6 +115,9 @@ public class NotNode extends AbstractBetaNode
 	{
 		if(!getRelevantAttributes().contains(type))
 			return;
+
+//		if(getNodeId()==1137)
+//			System.out.println(this+".modifyTuple: "+left);
 
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEMODIFIED);
@@ -172,6 +181,9 @@ public class NotNode extends AbstractBetaNode
 	 */
 	protected void addMatch(Tuple left, Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(getNodeId()==1137)
+//			System.out.println(this+".addMatch: "+left+", "+right);
+
 		NotMemory nomem = (NotMemory)mem.getNodeMemory(this);
 		nomem.addMapping(state, left, right);
 		if(!delay && nomem.removeResultTuple(left))
@@ -187,6 +199,9 @@ public class NotNode extends AbstractBetaNode
 	 */
 	protected void removeMatch(Tuple left, Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(getNodeId()==1137)
+//			System.out.println(this+".removeMatch: "+left+", "+right);
+
 		if(mem.hasNodeMemory(this))
 		{
 			NotMemory nomem = (NotMemory)mem.getNodeMemory(this);

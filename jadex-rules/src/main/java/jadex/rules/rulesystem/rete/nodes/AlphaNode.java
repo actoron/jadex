@@ -246,7 +246,7 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	 */
 	public Object createNodeMemory(IOAVState state)
 	{
-		return state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) :	new LinkedHashSet();
+		return state.isJavaIdentity() ? (Set)new MixedIdentityHashSet(state) :	new LinkedHashSet();
 	}
 	
 	//-------- helper methods --------

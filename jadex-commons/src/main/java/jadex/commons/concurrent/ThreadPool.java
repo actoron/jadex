@@ -205,8 +205,16 @@ public class ThreadPool implements IThreadPool
 						this.task.run();
 					}
 					catch(ThreadDeath e){}
+					catch(Throwable e)
+					{
+						e.printStackTrace();
+					}
 				}
-				catch(IBlockingQueue.ClosedException e){}
+				catch(IBlockingQueue.ClosedException e)
+				{
+					task = null;
+					terminate	= true;
+				}
 				catch(IBlockingQueue.TimeoutException e)
 				{
 					task = null;

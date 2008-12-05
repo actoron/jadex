@@ -381,12 +381,14 @@ public class OAVState	implements IOAVState
 		assert nocheck || !rootobjects.contains(object);
 		// #endif
 		
+		OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
+		if(OAVJavaType.KIND_VALUE.equals(java_type.getKind()))
+			throw new RuntimeException("Value types not supported for Java root objects: "+java_type+", "+object);
+		
 		this.rootobjects.add(object);
 		
 		if(this.javaobjects.add(object))	// Todo: java objects in nested states.
 		{
-			OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
-			
 			if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
 				registerValue(java_type, object);
 
@@ -405,13 +407,16 @@ public class OAVState	implements IOAVState
 		assert nocheck || rootobjects.contains(object) && javaobjects.contains(object);
 		// #endif
 		
+		OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
+		if(OAVJavaType.KIND_VALUE.equals(java_type.getKind()))
+			throw new RuntimeException("Value types not supported for Java root objects: "+java_type+", "+object);
+
 		this.rootobjects.remove(object);
 		
 		if(!objectusages.containsKey(object))	// Todo: java objects in nested states.
 		{
 			javaobjects.remove(object);
 
-			OAVJavaType	java_type = tmodel.getJavaType(object.getClass());
 			if(OAVJavaType.KIND_BEAN.equals(java_type.getKind()))
 				deregisterValue(java_type, object);
 

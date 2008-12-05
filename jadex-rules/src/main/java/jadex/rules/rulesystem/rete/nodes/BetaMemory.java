@@ -220,9 +220,9 @@ public class BetaMemory
 		 */
 		public IndexedConstraintMemory(IOAVState state)
 		{
-			this.objects = state.isJavaIdentity() ? (Map) new IdentityHashMap() : new HashMap();
-			this.tuples = state.isJavaIdentity() ? (Map) new IdentityHashMap() : new HashMap();
-			this.ovalues = state.isJavaIdentity() ? (Map) new IdentityHashMap() : new HashMap();
+			this.objects = state.isJavaIdentity() ? (Map) new MixedIdentityHashMap(state) : new HashMap();
+			this.tuples = state.isJavaIdentity() ? (Map) new MixedIdentityHashMap(state) : new HashMap();
+			this.ovalues = state.isJavaIdentity() ? (Map) new MixedIdentityHashMap(state) : new HashMap();
 			this.tvalues = new HashMap();
 		}	
 		
@@ -381,5 +381,4 @@ public class BetaMemory
 		}
 		
 	}
-	
 }

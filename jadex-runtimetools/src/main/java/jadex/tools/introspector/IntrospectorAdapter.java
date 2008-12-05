@@ -182,7 +182,7 @@ public class IntrospectorAdapter implements IToolAdapter, ISteppable
 	public boolean executeAction()
 	{
 		// Check for breakpoints, if any.
-		if(breakpoints!=null)
+		if(!step && breakpoints!=null)
 		{
 //			System.out.println("+++ Testing breakpoints: "+breakpoints+", "+rulesystem.getAgenda().getActivations());
 			Iterator	it	= agent.getRuleSystem().getAgenda().getActivations().iterator();

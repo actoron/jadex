@@ -325,6 +325,9 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 */
 	public void addObject(Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(getNodeId()==1137)
+//			System.out.println(this+".addObject: "+right);
+
 //		System.out.println("Add object called: "+this+" "+right);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
@@ -364,6 +367,9 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 */
 	public void removeObject(Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(getNodeId()==1137)
+//			System.out.println(this+".removeObject: "+right);
+
 		//System.out.println("Remove object called: "+this+" "+right);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
@@ -400,6 +406,9 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	{
 		if(!getRelevantAttributes().contains(type))
 			return;
+
+//		if(getNodeId()==1137)
+//			System.out.println(this+".modifyObject: "+right);
 
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
@@ -534,7 +543,27 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		if(c1==null || c2==null)
 			return null;
 		
-		Collection ret = state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new LinkedHashSet();
+		Collection ret = new LinkedHashSet();
+		for(Iterator it=c1.iterator(); it.hasNext(); )
+		{
+			Object o1 = it.next();
+			if(c2.contains(o1))
+				ret.add(o1);
+		}
+		return ret;
+	}	
+	/**
+	 *  Compute the intersection of two collections.
+	 *  @param c1 The first collection.
+	 *  @param c2 The second collection.
+	 *  @return The intersection.
+	 */
+	protected Collection identityIntersection(IOAVState state, Collection c1, Collection c2)
+	{
+		if(c1==null || c2==null)
+			return null;
+		
+		Collection ret = state.isJavaIdentity() ? (Set)new MixedIdentityHashSet(state) : new LinkedHashSet();
 		for(Iterator it=c1.iterator(); it.hasNext(); )
 		{
 			Object o1 = it.next();
@@ -603,7 +632,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 				{
 					Collection cres	= indexers[i].findObjects(left, bmem);
 
-					ret = intersection(state, ret, cres);
+					ret = identityIntersection(state, ret, cres);
 				}
 			}
 		}
