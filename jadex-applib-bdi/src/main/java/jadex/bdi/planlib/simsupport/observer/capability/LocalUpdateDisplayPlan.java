@@ -24,6 +24,10 @@ public class LocalUpdateDisplayPlan extends Plan
 		IBeliefbase b = getBeliefbase();
 		ISimulationEngine engine = (ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
 		IViewport viewport = (IViewport) b.getBelief("viewport").getFact();
+		if (!viewport.isShowing())
+		{
+			return;
+		}
 		
 		List themes = (List) b.getBelief("object_themes").getFact();
 		Integer themeId = (Integer) b.getBelief("selected_theme").getFact();

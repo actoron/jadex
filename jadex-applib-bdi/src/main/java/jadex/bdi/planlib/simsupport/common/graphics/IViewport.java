@@ -1,5 +1,6 @@
 package jadex.bdi.planlib.simsupport.common.graphics;
 
+import java.awt.Canvas;
 import java.util.List;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
@@ -52,13 +53,13 @@ public interface IViewport
      */
     public void setObjectList(List objectList);
     
+    /** Returns the canvas that is used for displaying the objects.
+     */
+    public Canvas getCanvas();
+    
     /** Refreshes the viewport.
      */
     public void refresh();
-    
-    /** Closes the viewport
-     */
-    public void close();
     
     /** Checks if this IViewport is showing on screen.
      *  

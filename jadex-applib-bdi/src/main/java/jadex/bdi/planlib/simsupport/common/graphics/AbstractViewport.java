@@ -14,10 +14,6 @@ import javax.swing.JFrame;
 
 public abstract class AbstractViewport implements IViewport
 {
-	/** Frame displaying the viewport.
-	 */
-	protected JFrame frame_;
-	
 	/** Canvas for graphical output.
 	 */
 	protected Canvas canvas_;
@@ -86,6 +82,13 @@ public abstract class AbstractViewport implements IViewport
     public void registerDrawable(IDrawable d)
     {
         newDrawables_.add(d);
+    }
+    
+    /** Returns the canvas that is used for displaying the objects.
+     */
+    public Canvas getCanvas()
+    {
+    	return canvas_;
     }
     
     /** Sets the pre-layers for the viewport.
@@ -162,7 +165,7 @@ public abstract class AbstractViewport implements IViewport
      */
     public boolean isShowing()
     {
-    	return frame_.isShowing();
+    	return canvas_.isShowing();
     }
 
 }

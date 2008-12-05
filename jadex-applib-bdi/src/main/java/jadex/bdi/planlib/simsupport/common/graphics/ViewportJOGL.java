@@ -2,7 +2,7 @@ package jadex.bdi.planlib.simsupport.common.graphics;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
-import jadex.bdi.planlib.simsupport.common.graphics.order.ReverseYOrder;
+import jadex.bdi.planlib.simsupport.common.graphics.order.YOrder;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bridge.ILibraryService;
@@ -54,7 +54,7 @@ import javax.swing.Timer;
  *  be sure to test isValid() afterwards to verify the availability of
  *  necessary extensions.
  */
-public class ViewportJOGL extends AbstractViewport implements WindowListener
+public class ViewportJOGL extends AbstractViewport
 {
     /** Clamped texture cache
      */
@@ -85,10 +85,6 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
      */
     private Runnable renderFrameAction_;
     
-    /** Redraw Timer
-     */
-    private Timer timer_;
-    
     /** Creates a new OpenGL-based viewport.
      *  May throw UnsatisfiedLinkError and RuntimeException if linking
      *  to OpenGL fails.
@@ -97,15 +93,15 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
      *  @param fps target frames per second or no autmatic refresh if zero
      *  @param libService library service for loading resources.
      */
-    public ViewportJOGL(String title, double fps, ILibraryService libService)
+    public ViewportJOGL(ILibraryService libService)
     {
-    	drawOrder_ = new ReverseYOrder();
+    	drawOrder_ = new YOrder();
     	posX_ = 0.0f;
     	posY_ = 0.0f;
     	libService_ = libService;
         uninitialized_ = true;
         preserveAR_ = true;
-        valid_ = true;
+        valid_ = false;
         npot_ = false;
         newDrawables_ = Collections.synchronizedList(new LinkedList());
         objectList_ = Collections.synchronizedList(new ArrayList());
@@ -116,11 +112,6 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
         displayLists_ = Collections.synchronizedMap(new HashMap());
         size_ = new Vector2Double(1.0);
         paddedSize_ = new Vector2Double(1.0);
-        frame_ = new JFrame(title);
-        frame_.setLayout(new BorderLayout());
-        frame_.setSize(400, 400);
-        frame_.setVisible(true);
-        frame_.addWindowListener(this);
         
         try
         {
@@ -130,23 +121,17 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
         	caps.setHardwareAccelerated(true);
         	canvas_ = new GLCanvas(caps);
         	((GLCanvas) canvas_).addGLEventListener(new GLController());
-
-        	frame_.add(canvas_, BorderLayout.CENTER);
-        	frame_.setVisible(true);
         }
         catch (GLException e)
         {
-        	close();
         	throw e;
         }
         catch (Error e)
         {
-        	close();
         	throw e;
         }
         
         setSize(new Vector2Double(1.0));
-        
         renderFrameAction_ = new Runnable()
     		{
     			public void run()
@@ -154,30 +139,6 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
     				((GLCanvas) ViewportJOGL.this.canvas_).display();
     			}
     		};
-        
-        while (uninitialized_)
-        {
-            try
-            {
-                Thread.currentThread().sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-            }
-        }
-        
-        if (fps != 0.0)
-        {
-        	int delay = (int) (1000/fps);
-        	timer_ = new Timer(delay, new ActionListener()
-        	{
-        		public void actionPerformed(ActionEvent e)
-        		{
-        			refresh();
-        		}
-        	});
-        	timer_.start();
-        }
     }
     
     public void refresh()
@@ -185,32 +146,20 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
     	EventQueue.invokeLater(renderFrameAction_);
     }
     
-    /** Closes the viewport.
-     */
-    public void close()
-    {
-    	try {
-			EventQueue.invokeAndWait(new Runnable()
-				{
-					public void run()
-					{
-						frame_.setVisible(false);
-				    	frame_.dispose();
-					}
-				});
-		}
-    	catch (InterruptedException e)
-		{
-		}
-    	catch (InvocationTargetException e)
-		{
-		}
-    }
-    
     /** Verifies the OpenGL context is valid and useable.
      */
     public boolean isValid()
     {
+    	while (uninitialized_)
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+            }
+        }
         return valid_;
     }
     
@@ -270,37 +219,6 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
     public void setDisplayList(String listName, Integer list)
     {
     	displayLists_.put(listName, list);
-    }
-    
-    // Window Events
-    
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        frame_.dispose();
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-    
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
     }
     
     private void setupMatrix(GL gl)
@@ -504,6 +422,9 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
             {
                 npot_ = true;
             }
+            
+            // TODO: Add checks.
+            valid_ = true;
             
             /**if (!(gl.isFunctionAvailable("glGenBuffers")))
             {

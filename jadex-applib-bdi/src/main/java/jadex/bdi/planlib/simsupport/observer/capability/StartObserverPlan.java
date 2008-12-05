@@ -1,5 +1,7 @@
 package jadex.bdi.planlib.simsupport.observer.capability;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -18,12 +20,12 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.ILibraryService;
 
 import javax.media.opengl.GLException;
+import javax.swing.JFrame;
 
 public class StartObserverPlan extends Plan
 {
 	public void body()
 	{
-		System.out.println(this.getClass().getName());
 		IBeliefbase b = getBeliefbase();
 		String envName = (String) b.getBelief("environment_name").getFact();
 		
@@ -54,49 +56,60 @@ public class StartObserverPlan extends Plan
 			killAgent();
 		}
 		
-		IViewport viewport = null;
+		JFrame frame = new JFrame(envName);
+		frame.setLayout(new BorderLayout());
+		frame.setUndecorated(true);
+		frame.pack();
+		frame.setSize(1, 1);
 		
+		boolean useOpenGl = false;
 		if (!forceJ2D)
 		{
-			// Try OpenGL first...
+			// Try OpenGL...
 			try
 			{
-				ViewportJOGL vp = new ViewportJOGL(envName, 0.0, libService);
-				if (vp.isValid())
+				ViewportJOGL vp = new ViewportJOGL(libService);
+				frame.add(vp.getCanvas());
+				frame.setVisible(true);
+				if (!((ViewportJOGL) vp).isValid())
 				{
-					viewport = vp;
+					System.err.println("OpenGL support insufficient, using Java2D fallback...");
+				}
+				else
+				{
+					useOpenGl = true;
 				}
 			}
 			catch (GLException e1)
 			{
 				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-				viewport = null;
 			}
 			catch (Error e2)
 			{
 				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-				viewport = null;
 			}
 		}
+		frame.dispose();
+		frame = null;
 		
-		if (viewport == null)
+		IViewport viewport = null;
+		if (useOpenGl)
 		{
-			// Use Java2D
-			viewport = new ViewportJ2D(envName, 0.0, libService);
+			viewport = new ViewportJOGL(libService);
+		}
+		else
+		{
+			viewport = new ViewportJ2D(libService);
 		}
 		
 		viewport.setPreserveAspectRation(preserveAR);
-		
 		viewport.setSize(areaSize);
-		
-		b.getBelief("viewport").setFact(viewport);
 		
 		// Set pre- and postlayers
 		List preLayers = (List) b.getBelief("prelayers").getFact();
 		List postLayers = (List) b.getBelief("postlayers").getFact();
 		viewport.setPreLayers(preLayers);
 		viewport.setPostLayers(postLayers);
-		
 		// Register the drawables
 		List themes = (List) b.getBelief("object_themes").getFact();
 		for (Iterator it = themes.iterator(); it.hasNext(); )
@@ -108,6 +121,24 @@ public class StartObserverPlan extends Plan
 				IDrawable d = (IDrawable) it2.next();
 				viewport.registerDrawable(d);
 			}
+		}
+		b.getBelief("viewport").setFact(viewport);
+		
+		boolean customGui = ((Boolean) b.getBelief("custom_gui").getFact()).booleanValue();
+		if (customGui)
+		{
+			b.getBelief("canvas").setFact(viewport.getCanvas());
+		}
+		else
+		{
+			frame = new JFrame(envName);
+			frame.setResizable(true);
+			frame.add(viewport.getCanvas());
+			frame.setIgnoreRepaint(true);
+			frame.setBackground(null);
+			frame.pack();
+			frame.setSize(400, 400);
+			frame.setVisible(true);
 		}
 		
 		IGoal updateGoal = createGoal("simobs_update_display");

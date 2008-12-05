@@ -8,6 +8,7 @@ import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
 import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,49 +34,20 @@ import javax.swing.Timer;
 
 /** This class manages the GUI and all user interaction.
  */
-public class ViewportJ2D extends AbstractViewport implements WindowListener,
-															 ComponentListener
+public class ViewportJ2D extends AbstractViewport implements ComponentListener
 {
-    //constants
-    public final static int DOUBLE_BUFFER_STRATEGY = 2;
-    public final static int TRIPLE_BUFFER_STRATEGY = 3;
-    
-    private final static int    DEFAULT_BUFFER_STRATEGY=DOUBLE_BUFFER_STRATEGY;
-    
-    //configuration
-    private int    bufferStrategy_;
-    
-    private BufferStrategy strategy_;
-    
     private Map imageCache_;
     
     /** Action that renders the frame.
      */
     private Runnable renderFrameAction_;
     
-    /** Redraw Timer
-     */
-    private Timer timer_;
-    
-    /** Creates a new Viewport.
-     * 
-     *  @param title title of the viewport window
-     *  @param fps target frames per second 
-     */
-    public ViewportJ2D(String title, double fps, ILibraryService libService)
-    {
-        this(title, DEFAULT_BUFFER_STRATEGY, fps, libService);
-    }
-    
     /** Creates a new Viewport.
      *  
-     *  @param title title of the viewport window
-     *  @param bufferStrategy buffer strategy to use
-     *  @param fps target frames per second or no autmatic refresh if zero
+     *  @param libService the library service
      */
-    public ViewportJ2D(String title, int bufferStrategy, double fps, ILibraryService libService)
+    public ViewportJ2D(ILibraryService libService)
     {
-        frame_ = new JFrame(title);
         libService_ = libService;
         size_ = new Vector2Double(1.0);
         preserveAR_ = true;
@@ -84,61 +56,20 @@ public class ViewportJ2D extends AbstractViewport implements WindowListener,
         preLayers_ = Collections.synchronizedList(new ArrayList());
         postLayers_ = Collections.synchronizedList(new ArrayList());
         imageCache_ = Collections.synchronizedMap(new HashMap());
-        bufferStrategy_ = bufferStrategy;
         posX_ = 0.0f;
         posY_ = 0.0f;
         paddedSize_ = new Vector2Double(1.0);
         
-        canvas_ = new Canvas();
-        try
-        {
-            EventQueue.invokeAndWait(new Runnable()
-                {
-                    public void run()
-                    {
-                    	frame_.setResizable(true);
-                        frame_.add(canvas_);
-                        frame_.addWindowListener(ViewportJ2D.this);
-                        canvas_.addComponentListener(ViewportJ2D.this);
-                        frame_.setIgnoreRepaint(true);
-                        canvas_.setIgnoreRepaint(true);
-                        frame_.setBackground(null);
-                        canvas_.setBackground(null);
-                        frame_.pack();
-                        frame_.setSize(300, 300);
-                        frame_.setVisible(true);
-                        canvas_.createBufferStrategy(bufferStrategy_);
-                        strategy_ = canvas_.getBufferStrategy();
-                    }
-                });
-        }
-        catch (InterruptedException e)
-        {
-        }
-        catch (InvocationTargetException e)
-        {
-        }
+        canvas_ = new ViewportCanvas();
+        canvas_.addComponentListener(this);
         
         renderFrameAction_ = new Runnable()
 		{
         	public void run()
 			{
-				renderFrame();
+				canvas_.repaint();
 			};
 		};
-        
-		if (fps != 0.0)
-		{
-			int delay = (int) (1000/fps);
-			timer_ = new Timer(delay, new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					refresh();
-				}
-			});
-			timer_.start();
-		}
     }
     
     /** Returns an image for texturing
@@ -161,117 +92,6 @@ public class ViewportJ2D extends AbstractViewport implements WindowListener,
     public void refresh()
     {
     	EventQueue.invokeLater(renderFrameAction_);
-    }
-    
-    /** Commits a frame to the screen
-     */
-    private void renderFrame()
-    {
-    	try
-    	{
-    		Graphics2D g = (Graphics2D) strategy_.getDrawGraphics();
-    		g.setColor(java.awt.Color.BLACK);
-    		g.fillRect(0, 0, canvas_.getWidth(), canvas_.getHeight());
-    		setupTransform(g);
-    		
-    		while (!newDrawables_.isEmpty())
-    		{
-    			IDrawable d = (IDrawable) newDrawables_.remove(0);
-    			d.init(this, g);
-    		}
-    		
-    		synchronized(preLayers_)
-            {
-                Iterator it = preLayers_.iterator();
-                while (it.hasNext())
-                {
-                    ILayer l = (ILayer) it.next();
-                    l.draw(paddedSize_, this, g);
-                }
-            }
-    		
-    		synchronized(objectList_)
-    		{
-    			Iterator it = objectList_.iterator();
-    			while (it.hasNext())
-    			{
-    				Object[] o = (Object[]) it.next();
-    				IVector2 pos = (IVector2) o[0];
-    				IVector2 vel = (IVector2) o[1];
-    				IDrawable d = (IDrawable) o[2];
-    				d.setPosition(pos);
-    				if (vel != null)
-    				{
-    					d.setVelocity(vel);
-    				}
-    				else
-    				{
-    					d.setVelocity(Vector2Double.ZERO);
-    				}
-    				d.draw(this, g);
-    			}
-    		}
-    		
-    		synchronized(postLayers_)
-            {
-                Iterator it = postLayers_.iterator();
-                while (it.hasNext())
-                {
-                    ILayer l = (ILayer) it.next();
-                    l.draw(paddedSize_, this, g);
-                }
-            }
-
-    		g.dispose();
-    		strategy_.show();
-    	}
-    	catch (IllegalStateException e)
-    	{
-    	}
-    }
-    
-    public void close()
-    {
-    	frame_.dispose();
-    }
-    
-    private void setupTransform(Graphics2D g)
-    {
-        g.translate(0.0, canvas_.getHeight());
-        g.scale((canvas_.getWidth() / paddedSize_.getXAsDouble()),
-                -(canvas_.getHeight() / paddedSize_.getYAsDouble()));
-        g.translate(-posX_, -posY_);
-    }
-    
-    // Window Events
-    
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        frame_.dispose();
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-    
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
     }
     
     // Component events
@@ -314,5 +134,105 @@ public class ViewportJ2D extends AbstractViewport implements WindowListener,
         }
         
         return image;
+    }
+    
+    private class ViewportCanvas extends Canvas
+    {
+    	private BufferedImage backBuffer_;
+    	
+    	public ViewportCanvas()
+    	{
+    		backBuffer_ = new BufferedImage(1,
+    										1,
+    										BufferedImage.TYPE_4BYTE_ABGR_PRE);
+    	}
+    	
+    	public void paint(Graphics gfx)
+    	{
+    		try
+        	{
+    			if ((backBuffer_.getWidth() != getWidth()) ||
+    				(backBuffer_.getHeight() != getHeight()))
+    			{
+    				backBuffer_ = new BufferedImage(getWidth(),
+													getHeight(),
+													BufferedImage.TYPE_4BYTE_ABGR_PRE);
+    			}
+    				
+        		Graphics2D g = (Graphics2D) backBuffer_.getGraphics();
+        		g.setColor(java.awt.Color.BLACK);
+        		g.fillRect(0, 0, getWidth(), getHeight());
+        		setupTransform(g);
+        		
+        		while (!newDrawables_.isEmpty())
+        		{
+        			IDrawable d = (IDrawable) newDrawables_.remove(0);
+        			d.init(ViewportJ2D.this, g);
+        		}
+        		
+        		synchronized(preLayers_)
+                {
+                    Iterator it = preLayers_.iterator();
+                    while (it.hasNext())
+                    {
+                        ILayer l = (ILayer) it.next();
+                        l.draw(paddedSize_, ViewportJ2D.this, g);
+                    }
+                }
+        		
+        		synchronized(objectList_)
+        		{
+        			Iterator it = objectList_.iterator();
+        			while (it.hasNext())
+        			{
+        				Object[] o = (Object[]) it.next();
+        				IVector2 pos = (IVector2) o[0];
+        				IVector2 vel = (IVector2) o[1];
+        				IDrawable d = (IDrawable) o[2];
+        				d.setPosition(pos);
+        				if (vel != null)
+        				{
+        					d.setVelocity(vel);
+        				}
+        				else
+        				{
+        					d.setVelocity(Vector2Double.ZERO);
+        				}
+        				d.draw(ViewportJ2D.this, g);
+        			}
+        		}
+        		
+        		synchronized(postLayers_)
+                {
+                    Iterator it = postLayers_.iterator();
+                    while (it.hasNext())
+                    {
+                        ILayer l = (ILayer) it.next();
+                        l.draw(paddedSize_, ViewportJ2D.this, g);
+                    }
+                }
+
+        		g.dispose();
+        		
+        		gfx.drawImage(backBuffer_, 0, 0, null);
+        		gfx.dispose();
+        	}
+        	catch (IllegalStateException e)
+        	{
+        	}
+    	}
+    	
+    	public void update(Graphics g)
+    	{
+    		paint(g);
+    	}
+    	
+        private void setupTransform(Graphics2D g)
+        {
+            g.translate(0.0, backBuffer_.getHeight());
+            g.scale((backBuffer_.getWidth() / paddedSize_.getXAsDouble()),
+                    -(backBuffer_.getHeight() / paddedSize_.getYAsDouble()));
+            g.translate(-posX_, -posY_);
+        }
     }
 }

@@ -27,6 +27,11 @@
 			<fact>null</fact>
 		</belief>
 		
+		<!-- Offer canvas access for building a custom GUI. -->
+		<belief name="custom_gui" class="Boolean" exported="true">
+			<fact>new Boolean(false)</fact>
+		</belief>
+		
 		<!-- Preservation of area aspect ratio in the window -->
 		<belief name="preserve_aspect_ratio" class="Boolean" exported="true">
 			<fact>new Boolean(true)</fact>
@@ -52,7 +57,14 @@
 			<fact>new ArrayList()</fact>
 		</belief>
 		
-		<belief name="selected_theme" class="Integer">
+		<!-- The canvas for integration in a custom GUI.
+			 Only exposed if custom_gui is true. -->
+		<belief name="canvas" class="java.awt.Canvas" exported="true">
+			<fact>null</fact>
+		</belief>
+		
+		<!-- The currently selected theme. -->
+		<belief name="selected_theme" class="Integer" exported="true">
 			<fact>new Integer(0)</fact>
 		</belief>
 		
