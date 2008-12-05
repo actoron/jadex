@@ -56,7 +56,6 @@ public class InitializeObserverPlan extends Plan
 		List preLayers = (List) b.getBelief("prelayers").getFact();
 		preLayers.add(background);
 		
-		System.out.println("Starting Observer");
 		IGoal start = createGoal("simobs_start");
 		dispatchSubgoalAndWait(start);
 	}

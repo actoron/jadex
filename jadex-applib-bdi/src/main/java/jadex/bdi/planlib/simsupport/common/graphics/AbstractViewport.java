@@ -6,15 +6,17 @@ import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
-import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+
+import javax.swing.JFrame;
 
 public abstract class AbstractViewport implements IViewport
 {
 	/** Frame displaying the viewport.
 	 */
-	protected Frame frame_;
+	protected JFrame frame_;
 	
 	/** Canvas for graphical output.
 	 */
@@ -51,6 +53,10 @@ public abstract class AbstractViewport implements IViewport
     /** List of objects that should be drawn.
      */
     protected List objectList_;
+    
+    /** Order in which the objects are drawn.
+     */
+    protected Comparator drawOrder_;
     
     /** Layers applied before drawable rendering
      */

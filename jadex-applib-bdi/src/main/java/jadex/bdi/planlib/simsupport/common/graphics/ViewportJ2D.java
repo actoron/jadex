@@ -1,7 +1,6 @@
 package jadex.bdi.planlib.simsupport.common.graphics;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
@@ -9,9 +8,7 @@ import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
 import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -28,10 +25,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.Timer;
 
 /** This class manages the GUI and all user interaction.
@@ -78,7 +75,7 @@ public class ViewportJ2D extends AbstractViewport implements WindowListener,
      */
     public ViewportJ2D(String title, int bufferStrategy, double fps, ILibraryService libService)
     {
-        frame_ = new Frame(title);
+        frame_ = new JFrame(title);
         libService_ = libService;
         size_ = new Vector2Double(1.0);
         preserveAR_ = true;

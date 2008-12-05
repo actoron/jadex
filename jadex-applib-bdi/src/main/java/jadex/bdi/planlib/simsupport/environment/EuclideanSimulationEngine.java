@@ -35,13 +35,13 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	 */
 	private Map simObjectsByType_;
 	
+	/** Environment properties
+	 */
+	private Map environmentProperties_;
+	
 	/** Object ID counter for new IDs
 	 */
 	private AtomicCounter objectIdCounter_;
-	
-	/** Stack with free object IDs
-	 */
-	private Stack freeObjectIds_;
 	
 	/** Area size
 	 */
@@ -60,7 +60,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		actions_ = Collections.synchronizedMap(new HashMap());
 		simObjects_ = Collections.synchronizedMap(new HashMap());
 		simObjectsByType_ = Collections.synchronizedMap(new HashMap());
-		freeObjectIds_ = new Stack();
+		environmentProperties_ = Collections.synchronizedMap(new HashMap());
 		areaSize_ = areaSize.copy();
 	}
 	
@@ -107,17 +107,12 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			synchronized(simObjectsByType_)
 			{
 				Integer id;
-				synchronized(freeObjectIds_)
+				do
 				{
-					if (!freeObjectIds_.empty())
-					{
-						id = (Integer) freeObjectIds_.pop();
-					}
-					else
-					{
-						id = objectIdCounter_.getNext();
-					}
+					id = objectIdCounter_.getNext();
 				}
+				while (simObjects_.containsKey(id));
+				
 				SimObject simObject = new SimObject(id, type, properties, tasks, position, signalDestruction);
 
 				if (listener != null)
@@ -151,10 +146,12 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			{
 				SimObject obj = (SimObject) simObjects_.remove(objectId);
 				((List) simObjectsByType_.get(obj.getType())).remove(obj);
-				freeObjectIds_.push(objectId);
-				SimulationEvent destEvt = new SimulationEvent(SimulationEvent.OBJECT_DESTROYED);
-				destEvt.setParameter("object_id", obj.getId());
-				obj.fireSimulationEvent(destEvt);
+				if (obj.signalDestruction())
+				{
+					SimulationEvent destEvt = new SimulationEvent(SimulationEvent.OBJECT_DESTROYED);
+					destEvt.setParameter("object_id", obj.getId());
+					obj.fireSimulationEvent(destEvt);
+				}
 			}
 		}
 	}
@@ -190,6 +187,26 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		{
 			process.shutdown(this);
 		}
+	}
+	
+	/** Returns an environment property.
+	 * 
+	 *  @param name name of the property
+	 *  @return the property
+	 */
+	public Object getEnvironmentProperty(String name)
+	{
+		return environmentProperties_.get(name);
+	}
+	
+	/** Sets an environment property.
+	 * 
+	 *  @param name name of the property
+	 *  @param property the property
+	 */
+	public void setEnvironmentProperty(String name, Object property)
+	{
+		environmentProperties_.put(name, property);
 	}
 	
 	/** Adds a new executable action to the environment.

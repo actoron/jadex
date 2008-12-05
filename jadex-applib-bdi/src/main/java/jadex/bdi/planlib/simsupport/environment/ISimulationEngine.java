@@ -75,6 +75,20 @@ public interface ISimulationEngine
 	 */
 	public void removeEnvironmentProcess(String processName);
 	
+	/** Returns an environment property.
+	 * 
+	 *  @param name name of the property
+	 *  @return the property
+	 */
+	public Object getEnvironmentProperty(String name);
+	
+	/** Sets an environment property.
+	 * 
+	 *  @param name name of the property
+	 *  @param property the property
+	 */
+	public void setEnvironmentProperty(String name, Object property);
+	
 	/** Adds a new executable action to the environment.
 	 *  
 	 *  @param action the new action

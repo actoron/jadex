@@ -1,16 +1,16 @@
 package jadex.bdi.planlib.simsupport.common.graphics;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.RotatingTexturedRectangle;
+import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
+import jadex.bdi.planlib.simsupport.common.graphics.order.ReverseYOrder;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bridge.ILibraryService;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -48,9 +47,6 @@ import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 import javax.swing.Timer;
-
-import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
-import jadex.bridge.ILibraryService;
 
 /** OpenGL/JOGL-based Viewport.
  *  This viewport attempts to use OpenGL for drawing.
@@ -103,6 +99,7 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
      */
     public ViewportJOGL(String title, double fps, ILibraryService libService)
     {
+    	drawOrder_ = new ReverseYOrder();
     	posX_ = 0.0f;
     	posY_ = 0.0f;
     	libService_ = libService;
@@ -119,7 +116,7 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
         displayLists_ = Collections.synchronizedMap(new HashMap());
         size_ = new Vector2Double(1.0);
         paddedSize_ = new Vector2Double(1.0);
-        frame_ = new Frame(title);
+        frame_ = new JFrame(title);
         frame_.setLayout(new BorderLayout());
         frame_.setSize(400, 400);
         frame_.setVisible(true);
@@ -452,6 +449,7 @@ public class ViewportJOGL extends AbstractViewport implements WindowListener
             
             synchronized(objectList_)
             {
+            	Collections.sort(objectList_, drawOrder_);
                 Iterator it = objectList_.iterator();
                 while (it.hasNext())
                 {
