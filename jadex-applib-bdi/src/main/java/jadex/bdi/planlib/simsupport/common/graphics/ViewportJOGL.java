@@ -95,7 +95,6 @@ public class ViewportJOGL extends AbstractViewport
      */
     public ViewportJOGL(ILibraryService libService)
     {
-    	drawOrder_ = new YOrder();
     	posX_ = 0.0f;
     	posY_ = 0.0f;
     	libService_ = libService;
@@ -367,7 +366,6 @@ public class ViewportJOGL extends AbstractViewport
             
             synchronized(objectList_)
             {
-            	Collections.sort(objectList_, drawOrder_);
                 Iterator it = objectList_.iterator();
                 while (it.hasNext())
                 {

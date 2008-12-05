@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.simsupport.common.graphics;
 
 import java.awt.Canvas;
+import java.util.Comparator;
 import java.util.List;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;

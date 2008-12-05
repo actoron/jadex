@@ -50,10 +50,6 @@ public abstract class AbstractViewport implements IViewport
      */
     protected List objectList_;
     
-    /** Order in which the objects are drawn.
-     */
-    protected Comparator drawOrder_;
-    
     /** Layers applied before drawable rendering
      */
     protected List preLayers_;

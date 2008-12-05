@@ -10,6 +10,8 @@ import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -63,6 +65,12 @@ public class LocalUpdateDisplayPlan extends Plan
 					}
 				}
 			}
+		}
+		
+		Comparator drawOrder = (Comparator) b.getBelief("draw_order").getFact();
+		if (drawOrder != null)
+		{
+			Collections.sort(objectList, drawOrder);
 		}
 		
 		viewport.setObjectList(objectList);

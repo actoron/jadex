@@ -39,6 +39,11 @@
 			<concrete ref="obscap.object_themes"/>
 		</beliefref>
 		
+		<!-- Object draw order -->
+		<beliefref name="draw_order">
+			<concrete ref="obscap.draw_order"/>
+		</beliefref>
+		
 		<!-- The pre-layers -->
 		<beliefref name="prelayers">
 			<concrete ref="obscap.prelayers"/>

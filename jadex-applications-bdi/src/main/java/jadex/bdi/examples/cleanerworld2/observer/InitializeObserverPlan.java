@@ -12,6 +12,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableRegularPoly
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
+import jadex.bdi.planlib.simsupport.common.graphics.order.YOrder;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
@@ -26,6 +27,7 @@ public class InitializeObserverPlan extends Plan
 		b.getBelief("environment_name").setFact(Configuration.ENVIRONMENT_NAME);
 		b.getBelief("preserve_aspect_ratio").setFact(Boolean.TRUE);
 		b.getBelief("force_java2d").setFact(Boolean.FALSE);
+		b.getBelief("draw_order").setFact(new YOrder());
 		
 		Map theme = new HashMap();
 		

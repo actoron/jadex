@@ -47,6 +47,11 @@
 			<fact>new ArrayList()</fact>
 		</belief>
 		
+		<!-- Order in which objects are drawn. -->
+		<belief name="draw_order" class="Comparator" exported="true">
+			<fact>null</fact>
+		</belief>
+		
 		<!-- The pre-layers -->
 		<belief name="prelayers" class="List" exported="true">
 			<fact>new ArrayList()</fact>
