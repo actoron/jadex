@@ -61,6 +61,11 @@ import nuggets.Nuggets;
  */
 public class TestCenterPanel extends JSplitPane
 {
+	//-------- constants --------
+	
+	/** The file extension for test suites. */
+	public static final String FILEEXTENSION_TESTS = ".tests";
+
 	//-------- attributes --------
 
 	/** The table of tests. */
@@ -143,7 +148,7 @@ public class TestCenterPanel extends JSplitPane
 
 			public boolean accept(File f)
 			{
-				return f.isDirectory() || f.getName().endsWith(".tests");
+				return f.isDirectory() || f.getName().endsWith(FILEEXTENSION_TESTS);
 			}
 		};
 		loadsavechooser.addChoosableFileFilter(save_filter);
@@ -311,6 +316,11 @@ public class TestCenterPanel extends JSplitPane
 					{
 						try
 						{
+							if(!file.getName().endsWith(FILEEXTENSION_TESTS))
+							{
+								file	= new File(file.getParentFile(), file.getName()+FILEEXTENSION_TESTS);
+								loadsavechooser.setSelectedFile(file);
+							}
 							Nuggets nug = new Nuggets();
 							FileOutputStream fos = new FileOutputStream(file);
 							ClassLoader cl = ((ILibraryService)plugin.getJCC().getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();

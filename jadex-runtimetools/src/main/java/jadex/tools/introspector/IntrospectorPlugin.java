@@ -370,7 +370,9 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 				agents.removeAgent(ad);
 				if(cards.isAvailable(ad))
 				{
-					detail.remove(cards.getComponent(ad));
+					ToolPanel intro = (ToolPanel)cards.getComponent(ad);
+//					intro.
+					detail.remove(intro);
 				}
 			}
 		});
