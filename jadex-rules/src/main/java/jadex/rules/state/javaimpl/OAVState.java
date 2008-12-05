@@ -124,7 +124,7 @@ public class OAVState	implements IOAVState
 	public OAVState(OAVTypeModel tmodel)
 	{
 		this.tmodel = tmodel;
-		this.javaidentity = false;
+		this.javaidentity = true;
 		
 		// OID data structures
 		this.deletedobjects	= new LinkedHashMap();
@@ -1354,7 +1354,7 @@ public class OAVState	implements IOAVState
 			for(Iterator it=coll.iterator(); it.hasNext(); )
 			{
 				Object	next	= it.next();
-				if(equals(next, value))
+				if(SUtil.equals(next, value))	// Use equality to find original object regardless of identity settings.
 				{
 					value	= next;
 					break;
