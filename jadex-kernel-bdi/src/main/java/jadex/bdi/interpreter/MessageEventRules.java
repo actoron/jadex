@@ -11,6 +11,7 @@ import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.javaparser.IValueFetcher;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -54,7 +55,6 @@ import java.util.Set;
  */
 public class MessageEventRules
 {
-	
 	/**
      * The Class object representing the class corresponding to
      * the this Class. Need due to JavaFlow Bug:
@@ -476,7 +476,7 @@ public class MessageEventRules
 	/**
 	 *  Message arrived rule.
 	 *  Dispatch a received message.
-	 * /
+	 */
 	protected static Rule createMessageArrivedRule()
 	{
 		ObjectCondition messagecon = new ObjectCondition(OAVBDIRuntimeModel.java_imessageadapter_type);
@@ -493,7 +493,7 @@ public class MessageEventRules
 				Object ragent = assignments.getVariableValue("?ragent");
 				IMessageAdapter message = (IMessageAdapter)assignments.getVariableValue("?msg");
 				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName();
-				System.out.println("Agent has received msg: "+agentname+" "+message);
+//				System.out.println("Agent has received msg: "+agentname+" "+message);
 				
 				// Find the event to which the message is a reply (if any).
 				Object original = null;
@@ -585,7 +585,7 @@ public class MessageEventRules
 					Object mevent = ((Object[])events.get(0))[0];
 					Object rcapa = ((Object[])events.get(0))[1];
 					
-					System.out.println("Matched: "+mevent+" "+message);
+//					System.out.println("Matched: "+mevent+" "+message);
 					
 					Object revent = createReceivedMessageEvent(state, mevent, message, rcapa, original);
 					state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_messageevents, revent);
@@ -606,9 +606,9 @@ public class MessageEventRules
 			}
 		};
 		
-		Rule agent_message_arrived = new Rule("agent_message_arrived", new AndCondition(new ICondition[]{messagecon, agentcon}), action);
+		Rule agent_message_arrived = new Rule("agent_message_arrived", new AndCondition(new ICondition[]{messagecon, ragentcon}), action);
 		return agent_message_arrived;
-	}*/
+	}
 	
 	/**
 	 *  Send message rule.
@@ -731,7 +731,7 @@ public class MessageEventRules
 	
 	/**
 	 *  Match message events with a message adapter.
-	 * /
+	 */
 	protected static int matchMessageEvents(IOAVState state, IMessageAdapter message, Collection mevents, 
 		Object rcapa, List matched, List events, int degree)
 	{
@@ -742,8 +742,8 @@ public class MessageEventRules
 
 			try
 			{
-				if((dir.equals(IMMessageEvent.DIRECTION_RECEIVE)
-					|| dir.equals(IMMessageEvent.DIRECTION_SEND_RECEIVE))
+				if((dir.equals(OAVBDIMetaModel.MESSAGE_DIRECTION_RECEIVE)
+					|| dir.equals(OAVBDIMetaModel.MESSAGE_DIRECTION_SEND_RECEIVE))
 					&& match(state, message, mevent, rcapa))
 				{
 					matched.add(mevent);
@@ -770,13 +770,13 @@ public class MessageEventRules
 			}
 		}
 		return degree;
-	}*/
+	}
 	
 	/**
 	 *  Match a message with a message event.
 	 *  @param mevent The message event.
 	 *  @return True, if message matches the message event.
-	 * /
+	 */
 	public static boolean match(final IOAVState state, final IMessageAdapter message, Object mevent, final Object scope)
 	{
 		MessageType mt = message.getMessageType(); 
@@ -784,8 +784,8 @@ public class MessageEventRules
 		if(mt==null)
 			throw new RuntimeException("Message has no message type: "+message);
 		
-		String meventmt = (String)state.getAttributeValue(mevent, OAVBDIMetaModel.messageevent_has_type);
-		boolean	match	= mt.getName().equals(meventmt);
+		MessageType mt2 = (MessageType)state.getAttributeValue(mevent, OAVBDIMetaModel.messageevent_has_type);
+		boolean	match	= mt.equals(mt2);
 		final IValueFetcher fetcher = new OAVBDIFetcher(state, scope);
 		
 		// Match against parameters specified in the event type.
@@ -798,7 +798,7 @@ public class MessageEventRules
 				String dir = (String)state.getAttributeValue(param, OAVBDIMetaModel.parameter_has_direction);
 				Object mexp = state.getAttributeValue(param, OAVBDIMetaModel.parameter_has_value);
 				
-				if(dir.equals(IMParameter.DIRECTION_FIXED) && mexp!=null)
+				if(dir.equals(OAVBDIMetaModel.PARAMETER_DIRECTION_FIXED) && mexp!=null)
 				{
 					String name = (String)state.getAttributeValue(param, OAVBDIMetaModel.modelelement_has_name);
 					Object defvalue = AgentRules.evaluateExpression(state, mexp, fetcher);
@@ -825,7 +825,7 @@ public class MessageEventRules
 				Collection mexps = state.getAttributeValues(paramset, OAVBDIMetaModel.parameterset_has_values);
 				Object mexp = state.getAttributeValues(paramset, OAVBDIMetaModel.parameterset_has_valuesexpression);
 					
-				if(dir.equals(IMParameterSet.DIRECTION_FIXED))
+				if(dir.equals(OAVBDIMetaModel.PARAMETER_DIRECTION_FIXED))
 				{
 					// Create and save the default values that must be contained in the native message to match.
 					List vals = new ArrayList();
@@ -862,8 +862,7 @@ public class MessageEventRules
 		if(match && matchexp!=null)
 		{
 			//System.out.println("Matchexp: "+msgevent.getMatchExpression()+" "+msgevent.getName());
-			String tmp = (String)state.getAttributeValue(mevent, OAVBDIMetaModel.messageevent_has_type);
-			final MessageType mtype = Configuration.getConfiguration().getMessageType(tmp);
+			final MessageType mtype = (MessageType)state.getAttributeValue(mevent, OAVBDIMetaModel.messageevent_has_type);
 			
 			IValueFetcher fetcher2 = new IValueFetcher()
 			{
@@ -916,7 +915,7 @@ public class MessageEventRules
 		}
 	
 		return match;
-	}*/
+	}
 	
 	/**
 	 *  Get the value for a parameter, or the values
@@ -926,34 +925,8 @@ public class MessageEventRules
 	 */
 	public static Object getValue(IMessageAdapter message, String name, Object scope)
 	{
-		Object val = message.getValue(name);
-		
 		// codecs are handled on platform level.
-//		if(val != null)
-//		{
-//			String[] infos = message.getMessageType().getCodecInfos(name);
-//			Properties props = null;
-//			for(int i=0; i<infos.length; i++)
-//			{
-//				if(i==0)
-//					props = new Properties();
-//				
-//				Object tmp = message.getRawValue(infos[i]);
-//				if(tmp!=null)
-//					props.put(infos[i], tmp);
-//			}
-//			if(props!=null)
-//			{
-//				// todo: codecs
-//				IContentCodec codec = null; //scope.getContentCodec(props); // agent.get.. does not work :-(
-//				if(codec==null && !(val instanceof String))
-//					throw new ContentException("No content codec found for: "+props);
-//				
-//				if(codec!=null)
-//					val = codec.decode((String)val);
-//			}
-//		}
-		
+		Object val = message.getValue(name);
 //		System.out.println(name+" "+val);
 		return val;
 	}

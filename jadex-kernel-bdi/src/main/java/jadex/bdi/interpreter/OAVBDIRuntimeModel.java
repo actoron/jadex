@@ -241,7 +241,7 @@ public class OAVBDIRuntimeModel
 		lead to the same plan instance candidate being selected which is
 		only valid in the first schedule action). */
 	// todo: hack remove somehow (e.g. rule priorities / ruleflow processing?!)
-	public static OAVAttributeType agent_has_eventprocessing;
+//	public static OAVAttributeType agent_has_eventprocessing;
 	
 	//-------- capability --------
 	
@@ -894,7 +894,7 @@ public class OAVBDIRuntimeModel
 		agent_has_timer = agent_type.createAttributeType("agent_has_timer", java_timer_type);
 		agent_has_killlisteners = agent_type.createAttributeType("agent_has_killlisteners", java_resultlistener_type, OAVAttributeType.SET);
 		agent_has_changeevents = agent_type.createAttributeType("agent_has_changeevents", changeevent_type, OAVAttributeType.LIST);
-		agent_has_eventprocessing = agent_type.createAttributeType("agent_has_eventprocessing", processableelement_type);
+//		agent_has_eventprocessing = agent_type.createAttributeType("agent_has_eventprocessing", processableelement_type);
 
 		// changeevents
 		changeevent_has_element = changeevent_type.createAttributeType("changeevent_has_element", element_type);

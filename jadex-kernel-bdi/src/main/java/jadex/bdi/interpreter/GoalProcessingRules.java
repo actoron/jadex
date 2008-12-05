@@ -60,8 +60,8 @@ public class GoalProcessingRules
 			
 			// Reset event processing.
 			BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-			if(rgoal.equals(state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing)))
-				state.setAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+//			if(rgoal.equals(state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing)))
+//				state.setAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 			
 			// Reset APL.
 			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_apl, null);

@@ -116,7 +116,6 @@ public class OAVTreeModel implements TreeModel
 	 */
 	public OAVTreeModel(IOAVState state)
 	{
-		
 		this.nodes	= new MultiCollection();
 		this.root	= new RootNode();
 		
@@ -643,7 +642,6 @@ public class OAVTreeModel implements TreeModel
 	 */
 	protected int getIndexForChild(List children, Object child, int start)
 	{
-		
 		assert children != null; 
 		int index	= -1;
 		
@@ -686,7 +684,6 @@ public class OAVTreeModel implements TreeModel
 		 */
 		protected void refreshInspectorNodes()
 		{
-			
 //			System.out.println("refresh called");
 			
 			TreeModelEvent event = null;

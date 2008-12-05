@@ -52,7 +52,7 @@ public class EventProcessingRules
 			Object	rplan	= assignments.getVariableValue("?rplan");
 			Object	rcapa	= assignments.getVariableValue("?rcapa");
 
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
+//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
 			
 			Object	apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
 			if(apl==null)
@@ -77,7 +77,7 @@ public class EventProcessingRules
 			Object	rpe	= assignments.getVariableValue("?rpe");
 			Object	ragent	= assignments.getVariableValue("?ragent");
 
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
+//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
 
 			Object	apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
 			if(apl==null)
@@ -101,7 +101,7 @@ public class EventProcessingRules
 			Object	ragent	= assignments.getVariableValue("?ragent");
 			Object	rplan	= assignments.getVariableValue("?rplan");
 
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
+//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
 
 			Object	apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
 			if(apl==null)
@@ -124,7 +124,7 @@ public class EventProcessingRules
 			Object	rpe	= assignments.getVariableValue("?rpe");
 			Object	ragent	= assignments.getVariableValue("?ragent");
 
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
+//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
 
 			Object	apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
 			if(apl==null)
@@ -174,11 +174,11 @@ public class EventProcessingRules
 		
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-		}));
+//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
+//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
+//		}));
 
 		ObjectCondition	wacon	= new ObjectCondition(wa.getType());
 		wacon.addConstraint(new BoundConstraint(null, wa));
@@ -316,7 +316,7 @@ public class EventProcessingRules
 					OAVBDIRuntimeModel.PROCESSABLEELEMENT_NOCANDIDATES);
 				
 				// When no candidates found, event processing stops here.
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 				
 				if(!state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type)
 					|| state.getAttributeValues(rpe, OAVBDIRuntimeModel.goal_has_triedmplans)==null)
@@ -355,7 +355,7 @@ public class EventProcessingRules
 
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe));
+//		agentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe));
 
 		ObjectCondition	aplcon	= new ObjectCondition(apl.getType());
 		aplcon.addConstraint(new BoundConstraint(null, apl));
@@ -413,11 +413,11 @@ public class EventProcessingRules
 		// Agent should be processing the pe
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-		}));
+//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
+//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
+//		}));
 		
 		// Specific part for goals
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, 
@@ -467,11 +467,11 @@ public class EventProcessingRules
 		// Agent should be processing the pe
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-		}));
+//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
+//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
+//		}));
 
 		// Specific part for goals
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, 
@@ -522,11 +522,11 @@ public class EventProcessingRules
 		// Agent should be processing the pe
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-		}));
+//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
+//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
+//		}));
 
 		// Specific part for goals
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, 
@@ -609,7 +609,7 @@ public class EventProcessingRules
 			
 			// Set processing from original rpe to metagoal to allow buildAPL rule
 			// Will be reset to null, once a candidate is selected.
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rmetagoal);
+//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rmetagoal);
 		}
 	};
 	
@@ -751,11 +751,11 @@ public class EventProcessingRules
 
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-		}));
+//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
+//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
+//		}));
 				
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
@@ -816,7 +816,7 @@ public class EventProcessingRules
 				}
 				
 				// Reset inprocess flag.
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 			}
 		};
 		
@@ -852,11 +852,11 @@ public class EventProcessingRules
 				
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-		}));
+//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
+//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
+//		}));
 
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
@@ -897,7 +897,7 @@ public class EventProcessingRules
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
 			
 				// Reset inprocess flag.
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 			
 				// Remove rpe if internal event
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_internalevents, rpe);
@@ -936,11 +936,11 @@ public class EventProcessingRules
 				
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-		}));
+//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
+//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
+//		}));
 
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
@@ -982,7 +982,7 @@ public class EventProcessingRules
 				}
 				
 				// Reset inprocess flag.
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 			
 				// Remove rpe if message or internal event
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_messageevents, rpe);
@@ -1068,7 +1068,7 @@ public class EventProcessingRules
 		
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
+//		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 
 		// special condition for message elements
 		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
@@ -1116,7 +1116,7 @@ public class EventProcessingRules
 		
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
+//		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 
 		// special condition for internal events
 		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
@@ -1207,7 +1207,7 @@ public class EventProcessingRules
 
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
+//		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
 		Rule dispatch_element = new Rule("dispatch_factadded_from_waitqueue", 
 			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
@@ -1249,7 +1249,7 @@ public class EventProcessingRules
 
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
+//		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
 		Rule dispatch_element = new Rule("dispatch_factremoved_from_waitqueue", 
 			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
@@ -1291,7 +1291,7 @@ public class EventProcessingRules
 
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
+//		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
 		Rule dispatch_element = new Rule("dispatch_factchanged_from_waitqueue", 
 			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
@@ -1340,7 +1340,7 @@ public class EventProcessingRules
 
 		ObjectCondition	agentcon = new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rgoal));
+//		agentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rgoal));
 		
 		Rule remove_eventprocessing_artifact = new Rule("remove_eventprocessing_artifact", 
 			new AndCondition(new ICondition[]{goalcon, capcon, agentcon}), new IAction()
@@ -1350,7 +1350,7 @@ public class EventProcessingRules
 				Object ragent = assignments.getVariableValue("?ragent");
 
 				// Remove that event processing artifact.
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 
 			}
 		});
