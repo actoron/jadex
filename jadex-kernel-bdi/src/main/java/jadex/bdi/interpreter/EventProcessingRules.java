@@ -4,6 +4,7 @@ import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanInfoFlyweight;
 import jadex.bdi.runtime.impl.PlanInstanceInfoFlyweight;
+import jadex.bridge.IMessageAdapter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IValueFetcher;
@@ -14,6 +15,7 @@ import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
+import jadex.rules.rulesystem.rules.IPriorityEvaluator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
@@ -410,7 +412,7 @@ public class EventProcessingRules
 		capacon.addConstraint(new BoundConstraint(null, rcapa));
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
 		
-		// Agent should be processing the pe
+		// Agent should be processing the rpe
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new OrConstraint(new IConstraint[]
@@ -613,6 +615,18 @@ public class EventProcessingRules
 		}
 	};
 	
+//	static IPriorityEvaluator pe_meta = new IPriorityEvaluator()
+//	{
+//		public int getPriority(IOAVState state, IVariableAssignments assignments)
+//		{
+//			// Ensure that metalevel reasoning is done before other things
+//			int ret = 1;
+//			Object rpe = assignments.getVariableValue("?rpe");
+//			if(state.getType(rpe).equals(OAVBDIMetaModel.metagoal_type))
+//				ret = 2;
+//			return ret;
+//		}
+//	};
 	
 	/**
 	 *  Create the metalevel reasoning finished rule.
@@ -1321,7 +1335,7 @@ public class EventProcessingRules
 	 *  Create the clean eventprocessing rule for non-active goals.
 	 *  // todo: Hack. Only necessary because eventprocessing state must be
 	 *  saved in OAVBDIRuntimeModel.capability_has_eventprocessing
-	 */
+	 * /
 	protected static Rule createRemoveEventprocessingArtifactRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -1356,7 +1370,7 @@ public class EventProcessingRules
 		});
 		
 		return remove_eventprocessing_artifact;
-	}
+	}*/
 	
 	//-------- helper methods --------
 	

@@ -145,7 +145,7 @@ public class GoalDeliberationRules
 				GoalProcessingRules.changeProcessingState(state, rgoal, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE);
 			}
 		};
-		Rule	deliberate_goal_activation	= new Rule("deliberate_goal_activation", cond, action);
+		Rule deliberate_goal_activation	= new Rule("deliberate_goal_activation", cond, action);
 		return deliberate_goal_activation;
 	}
 	

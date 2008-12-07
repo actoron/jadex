@@ -206,19 +206,19 @@ public class MessageEventRules
 			}
 		};
 		
-		IPriorityEvaluator pe = new IPriorityEvaluator()
-		{
-			public int getPriority(IOAVState state, IVariableAssignments assignments)
-			{
-				Object mevent = assignments.getVariableValue("?mevent");
-				return calculateDegree(state, mevent);
-			}
-		};
-
 		Rule message_matching = new Rule("message_matching", new AndCondition(new ICondition[]{messagecon, meventcon, 
-			ragentcon, mcapacon, rcapacon, new NotCondition(paramcon), new NotCondition(paramsetcon), matchcon}), action, pe);
+			ragentcon, mcapacon, rcapacon, new NotCondition(paramcon), new NotCondition(paramsetcon), matchcon}), action, pe_mm);
 		return message_matching;
 	}
+	
+	static IPriorityEvaluator pe_mm = new IPriorityEvaluator()
+	{
+		public int getPriority(IOAVState state, IVariableAssignments assignments)
+		{
+			Object mevent = assignments.getVariableValue("?mevent");
+			return calculateDegree(state, mevent);
+		}
+	};
 	
 	/**
 	 *  Message conversation matching rule.
@@ -328,25 +328,24 @@ public class MessageEventRules
 			}
 		};
 		
-		IPriorityEvaluator pe = new IPriorityEvaluator()
-		{
-			public int getPriority(IOAVState state, IVariableAssignments assignments)
-			{
-				// Ensure that these matches are always better than non-conversation matches.
-				IMessageAdapter rawmsg = (IMessageAdapter)assignments.getVariableValue("?rawmsg");
-				int paramcnt = rawmsg.getMessageType().getParameterNames().length 
-					+ rawmsg.getMessageType().getParameterSetNames().length + 1; 
-				Object mevent = assignments.getVariableValue("?mevent");
-				return calculateDegree(state, mevent) + paramcnt;
-				
-			}
-		};
-		
 		Rule message_conversation_matching = new Rule("message_matching_conversation",
 			new AndCondition(new ICondition[]{meventcon, mcapacon, rcapacon, messagecon, ragentcon,
-				new NotCondition(paramcon), new NotCondition(paramsetcon), matchcon}), action, pe);
+				new NotCondition(paramcon), new NotCondition(paramsetcon), matchcon}), action, pe_mmc);
 		return message_conversation_matching;
 	}
+	
+	static IPriorityEvaluator pe_mmc = new IPriorityEvaluator()
+	{
+		public int getPriority(IOAVState state, IVariableAssignments assignments)
+		{
+			// Ensure that these matches are always better than non-conversation matches.
+			IMessageAdapter rawmsg = (IMessageAdapter)assignments.getVariableValue("?rawmsg");
+			int paramcnt = rawmsg.getMessageType().getParameterNames().length 
+				+ rawmsg.getMessageType().getParameterSetNames().length + 1; 
+			Object mevent = assignments.getVariableValue("?mevent");
+			return calculateDegree(state, mevent) + paramcnt;	
+		}
+	};
 	
 	/**
 	 *  Message matching rule for the case that no match can be found.
