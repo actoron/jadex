@@ -157,7 +157,8 @@ public class AgendaPanel extends JSplitPane
 				List his = agenda.getHistory();
 				if(his!=null)
 				{
-					agenda.getHistory().clear();
+					his.clear();
+					history_clone	= new Object[0];
 					history.repaint();
 				}
 			}
