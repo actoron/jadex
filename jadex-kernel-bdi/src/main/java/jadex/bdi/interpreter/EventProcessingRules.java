@@ -155,6 +155,7 @@ public class EventProcessingRules
 		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	wa2	= new Variable("?wa2", OAVBDIRuntimeModel.waitabstraction_type);
 		
 		// Shared conditions
 		ObjectCondition	rpecon	= new ObjectCondition(rpe.getType());
@@ -211,9 +212,13 @@ public class EventProcessingRules
 		aplcon1b.addConstraint(new BoundConstraint(null, apl));
 		aplcon1b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
 
+		ObjectCondition	aplcon1c	= new ObjectCondition(apl.getType());
+		aplcon1c.addConstraint(new BoundConstraint(null, apl));
+		aplcon1c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.FALSE));
+		
 		// Rules for plan instances
 		Rule	add_rplan_to_apl	= new Rule("add_rplan_to_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, wacon, plancon, new NotCondition(new AndCondition(new ICondition[]{candcon, aplcon1a})), agentcon}),
+				new AndCondition(new ICondition[]{aplcon1c, rpecon, capcon, wacon, plancon, new NotCondition(new AndCondition(new ICondition[]{candcon, aplcon1a})), agentcon}),
 				ADD_RPLAN_TO_APL);
 
 		Rule	no_rplans_for_apl	= new Rule("no_rplans_for_apl",
@@ -221,10 +226,24 @@ public class EventProcessingRules
 				NO_RPLANS_FOR_APL);
 
 		
+		ObjectCondition	wacon2	= new ObjectCondition(wa2.getType());
+		wacon.addConstraint(new BoundConstraint(null, wa2));
+		wacon.addConstraint(new OrConstraint(new IConstraint[]
+		{
+				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
+				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, org, IOperator.CONTAINS),
+				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, mpe, IOperator.CONTAINS),
+				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS),
+		}));
+		
 		// Conditions for waitqueue candidates
 		ObjectCondition	plancon2	= new ObjectCondition(rplan.getType());
 		plancon2.addConstraint(new BoundConstraint(null, rplan));
 		plancon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wa));
+		
+		ObjectCondition	plancon3	= new ObjectCondition(rplan.getType());
+		plancon3.addConstraint(new BoundConstraint(null, rplan));
+		plancon3.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa2));
 		
 		ObjectCondition	aplcon2a	= new ObjectCondition(apl.getType());
 		aplcon2a.addConstraint(new BoundConstraint(null, apl));
@@ -234,9 +253,13 @@ public class EventProcessingRules
 		aplcon2b.addConstraint(new BoundConstraint(null, apl));
 		aplcon2b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildwaitqueuecandsfinished, Boolean.TRUE));
 		
+		ObjectCondition	aplcon2c	= new ObjectCondition(apl.getType());
+		aplcon2c.addConstraint(new BoundConstraint(null, apl));
+		aplcon2c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
+		
 		// Rules for waitqueue candidates
 		Rule	add_waitqueuecand_to_apl	= new Rule("add_waitqueuecand_to_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, agentcon, wacon, plancon2, new NotCondition(aplcon2a)}),
+				new AndCondition(new ICondition[]{rpecon, capcon, agentcon, wacon, plancon2, aplcon2c, new NotCondition(new AndCondition(new ICondition[]{aplcon2a, plancon3}))}),
 				ADD_WAITQUEUECAND_TO_APL);
 
 		Rule	no_waitqueuecands_for_apl	= new Rule("no_waitqueuecands_for_apl",
@@ -614,20 +637,7 @@ public class EventProcessingRules
 //			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rmetagoal);
 		}
 	};
-	
-//	static IPriorityEvaluator pe_meta = new IPriorityEvaluator()
-//	{
-//		public int getPriority(IOAVState state, IVariableAssignments assignments)
-//		{
-//			// Ensure that metalevel reasoning is done before other things
-//			int ret = 1;
-//			Object rpe = assignments.getVariableValue("?rpe");
-//			if(state.getType(rpe).equals(OAVBDIMetaModel.metagoal_type))
-//				ret = 2;
-//			return ret;
-//		}
-//	};
-	
+		
 	/**
 	 *  Create the metalevel reasoning finished rule.
 	 */
@@ -800,37 +810,64 @@ public class EventProcessingRules
 //				System.out.println("createSelectCandidatesForGoalRule: schedulePlanInstance: "
 //						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 
-				// Create resp. activate plan(instances)
-				scheduleCandidates(state, rpe, apl, cands);
-				
-				// Remove candidates from apl if not rebuild
-				boolean rebuild = ((Boolean)state.getAttributeValue(mpe, OAVBDIMetaModel.goal_has_rebuild)).booleanValue();
-				boolean retry = ((Boolean)state.getAttributeValue(mpe, OAVBDIMetaModel.goal_has_retry)).booleanValue();
-				
-//				if(!rebuild)
-//				{
-//					for(int i=0; i<cands.size(); i++)
-//						removeAPLCandidate(state, rpe, cands.get(i));
-//					
-//					// Clear apl if empty
-//					Collection pcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
-//					Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
-//					Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
-//					if(pcs==null && pics==null && wqcs==null)
-//					{
-////						System.out.println("Set null apl: "+rpe+" "+apl);
-//						state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
-//					}
-//				}
-				
-				// If always rebuild or not retry clear apl.
-				if(rebuild || !retry)
+				// Check if candidates are still valid.
+				// Uses optimistic scheme, i.e. apl may hold invalid entries.
+				// Then the process must be started over again.
+				Object cand = checkCandidates(state, rpe, apl, cands);
+				if(cand!=null)
 				{
-					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
+					System.out.println("Check candidates failed: "+cand);
+
+					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
+					boolean rebuild = ((Boolean)state.getAttributeValue(mpe, OAVBDIMetaModel.goal_has_rebuild)).booleanValue();
+					
+					if(rebuild)
+					{
+						state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
+					}
+					else
+					{
+						// Remove plan candidate from apl.
+						if(cand instanceof WaitqueueCandidate)
+							state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, ((WaitqueueCandidate)cand).getWaitqueueCandidate());
+						else
+							state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates, cand);
+					}
 				}
+				else
+				{
+					// Create resp. activate plan(instances)
+					scheduleCandidates(state, rpe, apl, cands);
+					
+					// Remove candidates from apl if not rebuild
+					boolean rebuild = ((Boolean)state.getAttributeValue(mpe, OAVBDIMetaModel.goal_has_rebuild)).booleanValue();
+					boolean retry = ((Boolean)state.getAttributeValue(mpe, OAVBDIMetaModel.goal_has_retry)).booleanValue();
+					
+	//				if(!rebuild)
+	//				{
+	//					for(int i=0; i<cands.size(); i++)
+	//						removeAPLCandidate(state, rpe, cands.get(i));
+	//					
+	//					// Clear apl if empty
+	//					Collection pcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
+	//					Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
+	//					Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
+	//					if(pcs==null && pics==null && wqcs==null)
+	//					{
+	////						System.out.println("Set null apl: "+rpe+" "+apl);
+	//						state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
+	//					}
+	//				}
+					
+					// If always rebuild or not retry clear apl.
+					if(rebuild || !retry)
+					{
+						state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
+					}
 				
-				// Reset inprocess flag.
-//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+					// Reset inprocess flag.
+//					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+				}
 			}
 		};
 		
@@ -900,21 +937,36 @@ public class EventProcessingRules
 //				System.out.println("createSelectCandidatesForInternalEventRule: schedulePlanInstance: "
 //						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 
-				// Create resp. activate plan(instances)
-				scheduleCandidates(state, rpe, apl, cands);
-				
-				// Clear apl if empty
-				Collection pcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
-				Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
-				Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
-				if(pcs==null && pics==null && wqcs==null)
+				// Check if candidates are still valid.
+				// Uses optimistic scheme, i.e. apl may hold invalid entries.
+				// Then the process must be started over again.
+				Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
+				Object cand = checkCandidates(state, rpe, apl, cands);
+				if(cand!=null)
+				{
+					System.out.println("Check candidates failed: "+cand);
+
+					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
-			
-				// Reset inprocess flag.
-//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
-			
-				// Remove rpe if internal event
-				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_internalevents, rpe);
+				}
+				else
+				{	
+					// Create resp. activate plan(instances)
+					scheduleCandidates(state, rpe, apl, cands);
+					
+					// Clear apl if empty
+					Collection pcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
+					Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
+					Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
+					if(pcs==null && pics==null && wqcs==null)
+						state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
+				
+					// Reset inprocess flag.
+	//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+				
+					// Remove rpe if internal event
+					state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_internalevents, rpe);
+				}
 			}
 		};
 		
@@ -973,7 +1025,7 @@ public class EventProcessingRules
 			{
 				Object	rpe	= assignments.getVariableValue("?rpe");
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
-				Object	ragent	= assignments.getVariableValue("?ragent");
+//				Object	ragent	= assignments.getVariableValue("?ragent");
 				Object	apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
 
 				// Find best candidates
@@ -982,24 +1034,39 @@ public class EventProcessingRules
 //				System.out.println("createSelectCandidatesForMessageEventRule: schedulePlanInstance: "
 //						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 
-				// Create resp. activate plan(instances)
-				scheduleCandidates(state, rpe, apl, cands);
-				
-				// Clear apl if empty
-				Collection pcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
-				Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
-				Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
-				if(pcs==null && pics==null && wqcs==null)
+				// Check if candidates are still valid.
+				// Uses optimistic scheme, i.e. apl may hold invalid entries.
+				// Then the process must be started over again.
+				Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
+				Object cand = checkCandidates(state, rpe, apl, cands);
+				if(cand!=null)
 				{
-//					System.out.println("Set null apl: "+rpe+" "+apl);
+					System.out.println("Check candidates failed: "+cand);
+
+					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
 				}
+				else
+				{
+					// Create resp. activate plan(instances)
+					scheduleCandidates(state, rpe, apl, cands);
+					
+					// Clear apl if empty
+					Collection pcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
+					Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
+					Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
+					if(pcs==null && pics==null && wqcs==null)
+					{
+	//					System.out.println("Set null apl: "+rpe+" "+apl);
+						state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
+					}
+					
+					// Reset inprocess flag.
+	//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 				
-				// Reset inprocess flag.
-//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
-			
-				// Remove rpe if message or internal event
-				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_messageevents, rpe);
+					// Remove rpe if message or internal event
+					state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_messageevents, rpe);
+				}
 			}
 		};
 		
@@ -1566,7 +1633,7 @@ public class EventProcessingRules
 				// Hack!!! Cannot check if still waiting for same event
 				Object	cand	= it.next();
 				Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
-				if(OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate)))
+//				if(OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate)))
 					candidatelist.add(cand);
 			}
 		}
@@ -1699,8 +1766,84 @@ public class EventProcessingRules
 	 *  @param apl The applicable candidate list.
 	 *  @param cands The candidate List.
 	 */
-	protected static void scheduleCandidates(IOAVState state, Object rpe, Object apl, List cands)
+	protected static Object checkCandidates(IOAVState state, Object rpe, Object apl, List cands)
 	{
+		// Assure that selected candidates are still valid.
+		// Checks for each rplan and waitqueue element if
+		// it still waits for such an element.
+		// Note that this check must not be totally correct
+		// in the sense that it might return true but only because
+		// more than one trigger may match (e.g. reply and template match) 
+		// todo: Use some kind of version tracking of waitabstractions?!
+		Object cand = null;
+		boolean ok = true;
+		for(int i=0; ok && i<cands.size(); i++)
+		{
+			cand = cands.get(i);
+			Object wa;
+			if(cand instanceof WaitqueueCandidate) 
+			{
+				Object wq = ((WaitqueueCandidate)cand).getWaitqueueCandidate();
+				wa = state.getAttributeValue(wq, OAVBDIRuntimeModel.plan_has_waitqueuewa);
+			}
+			else if(state.getType(cand).equals(OAVBDIRuntimeModel.plancandidate_type))
+			{
+				Object rplan = state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
+				wa = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction);
+			}
+			else
+			{
+				continue;
+			}
+			
+			if(wa==null)
+			{
+				ok = false;
+			}
+			else
+			{
+				// Belief changes need not be checked because they are posttoall and do not build an apl.
+
+				if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
+				{
+					Collection coll = (Collection)state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds);
+					ok = coll.contains(rpe);
+				}
+				else if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.internalevent_type))
+				{
+					Collection coll = (Collection)state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes);
+					Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
+					ok = coll.contains(mpe);
+				}
+				else if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.messageevent_type))
+				{
+					Collection coll = (Collection)state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_messageevents);
+					Object org = state.getAttributeValue(rpe, OAVBDIRuntimeModel.messageevent_has_original);
+					ok = coll.contains(org);
+					
+					if(!ok)
+					{
+						coll = (Collection)state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes);
+						Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
+						ok = coll.contains(mpe);
+					}
+				}
+			}
+		}			
+		
+		return ok? null: cand;
+	}
+	
+	/**
+	 *  Schedule the selected candidates.
+	 *  @param state The state.
+	 *  @param rcapa The capability.
+	 *  @param rpe The processable element.
+	 *  @param apl The applicable candidate list.
+	 *  @param cands The candidate List.
+	 */
+	protected static void scheduleCandidates(IOAVState state, Object rpe, Object apl, List cands)
+	{	
 		for(int i=0; i<cands.size(); i++)
 		{
 			Object cand = cands.get(i);
@@ -1715,7 +1858,6 @@ public class EventProcessingRules
 	{
 		if(cand instanceof WaitqueueCandidate) 
 		{
-			
 			scheduleWaitqueueCandidate(state, rpe, ((WaitqueueCandidate)cand).getWaitqueueCandidate());
 			
 			// Save candidate in plan for later apl removal and exclude list management.
