@@ -340,14 +340,6 @@ public class RetePanel extends JPanel
 		
 		// The step action
 		JPanel tmp4 = new JPanel(new GridBagLayout());
-		final JCheckBox	stepmode = new JCheckBox("Step Mode", steppable.isStepmode());
-		stepmode.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				steppable.setStepmode(stepmode.isSelected());
-			}
-		});
 		final JButton	step	= new JButton("Step");
 		step.addActionListener(new ActionListener()
 		{
@@ -356,7 +348,16 @@ public class RetePanel extends JPanel
 				steppable.doStep();
 			}
 		});
-//		step.setEnabled(interpreter.isStep() && !agenda.isEmpty());		
+		step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
+		final JCheckBox	stepmode = new JCheckBox("Step Mode", steppable.isStepmode());
+		stepmode.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				steppable.setStepmode(stepmode.isSelected());
+				step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
+			}
+		});
 		steppable.addBreakpointCommand(new ICommand()
 		{
 			public void execute(Object args)
@@ -366,6 +367,7 @@ public class RetePanel extends JPanel
 					public void run()
 					{
 						stepmode.setSelected(steppable.isStepmode());
+						step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
 					}
 				});
 			}
@@ -480,6 +482,7 @@ public class RetePanel extends JPanel
 									rulebasepanel.selectRule(rule);
 								}
 							}
+							step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
 						}
 					});
 				}

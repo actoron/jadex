@@ -334,6 +334,8 @@ public class OAVState	implements IOAVState
 	 */
 	public void	dropObject(Object id)
 	{
+//		System.out.println("drop: "+id);
+		
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObject(id);
@@ -434,7 +436,7 @@ public class OAVState	implements IOAVState
 	 */
 	protected void internalDropObject(Object id, Set dropset, boolean keepalive)
 	{
-//		System.out.println("internalDropObject: "+object+", "+dropset);
+//		System.out.println("internalDropObject: "+id+", "+dropset);
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		// #endif
@@ -1955,7 +1957,7 @@ public class OAVState	implements IOAVState
 
 		if(isManaged(value))
 		{
-//			System.err.println("Removing reference: "+whichid+" "+whichattr.getName()+" "+value);
+//			System.out.println("Removing reference: "+whichid+" "+whichattr.getName()+" "+value);
 
 			// Increase external usage counter, if source object is externally referenced.
 			if(keepalive && generator.isId(value))

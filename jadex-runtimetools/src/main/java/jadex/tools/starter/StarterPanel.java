@@ -505,9 +505,9 @@ public class StarterPanel extends JPanel
 	{
 		if(lastfile==null)
 			return;
-		String cachename = lastfile.substring(0, lastfile.length()-3)+"cam";
 		
 		// todo: remove this hack
+//		String cachename = lastfile.substring(0, lastfile.length()-3)+"cam";
 //		SXML.clearModelCache(cachename);
 		
 		String toload = lastfile;

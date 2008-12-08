@@ -81,8 +81,8 @@ public class MicroAgentFactory implements IAgentFactory
 			clname = model.substring(0, model.indexOf(".class"));
 		if(clname.indexOf("classes")!=-1)
 			clname = clname.substring(model.indexOf("classes")+8);
-		clname = clname.replace("\\", ".");
-		clname = clname.replace("/", ".");
+		clname = clname.replace('\\', '.');
+		clname = clname.replace('/', '.');
 		
 		Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
 //		System.out.println(clname+" "+cma+" "+ret);

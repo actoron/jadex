@@ -10,14 +10,11 @@ import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
-import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileFilter;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;

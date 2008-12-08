@@ -69,7 +69,8 @@ public class StartPlan extends Plan
 		
 		for (int i = 0; i < maxCleaner; ++i){
 			environmentArgs = new HashMap();
-			ams.createAgent("CleanerWorld2_Cleaner" + Integer.valueOf(i).toString(),
+//			ams.createAgent("CleanerWorld2_Cleaner" + Integer.valueOf(i).toString(),
+			ams.createAgent("CleanerWorld2_Cleaner" + i,	// 1.4 compliant code
 					"jadex/bdi/examples/cleanerworld2/cleaner/Cleaner.agent.xml",
 					"default",
 					environmentArgs,

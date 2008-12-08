@@ -18,9 +18,9 @@ public class RotatingColoredTriangle extends RotatingColoredPrimitive
     private static final GeneralPath TRIANGLE = new GeneralPath();
     static
     {
-        TRIANGLE.moveTo(-0.5, -0.5);
-        TRIANGLE.lineTo(0.0, 0.5);
-        TRIANGLE.lineTo(0.5, -0.5);
+        TRIANGLE.moveTo(-0.5f, -0.5f);
+        TRIANGLE.lineTo(0.0f, 0.5f);
+        TRIANGLE.lineTo(0.5f, -0.5f);
         TRIANGLE.closePath();
     }
     

@@ -15,7 +15,6 @@ import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.ModelExplorer;
-import jadex.tools.common.modeltree.RootNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IAgentListListener;
 
@@ -27,8 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileFilter;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;

@@ -156,7 +156,10 @@ public class AgendaPanel extends JSplitPane
 				// works because history is synchronized.
 				List his = agenda.getHistory();
 				if(his!=null)
+				{
 					agenda.getHistory().clear();
+					history.repaint();
+				}
 			}
 		});
 		

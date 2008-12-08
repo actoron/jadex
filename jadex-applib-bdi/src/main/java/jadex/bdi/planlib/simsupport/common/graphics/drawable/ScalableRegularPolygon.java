@@ -77,11 +77,11 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	public void init(ViewportJ2D vp, Graphics2D g)
 	{
 		path_ = new GeneralPath();
-		path_.moveTo(0.5, 0.0);
+		path_.moveTo(0.5f, 0.0f);
 		for (int i = 1; i < vertices_; ++i)
 		{
 			double x = Math.PI * 2 / vertices_ * i;
-			path_.lineTo(Math.cos(x) / 2.0, Math.sin(x) / 2.0);
+			path_.lineTo((float)(Math.cos(x) / 2.0), (float)(Math.sin(x) / 2.0));
 		}
 		path_.closePath();
 	}

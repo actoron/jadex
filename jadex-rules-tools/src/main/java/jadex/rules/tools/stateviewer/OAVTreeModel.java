@@ -367,9 +367,10 @@ public class OAVTreeModel implements TreeModel
 								((RootNode)onode.parent).children.remove(index);
 								path	= new Object[]{OAVTreeModel.this.root};
 							}
-							else
+							else if(onode.parent instanceof AttributeNode)
 							{
-								assert	coll==null : "Removed object still used: "+id+", "+coll;
+								((AttributeNode)onode.parent).children.remove(index);
+								path	= ((AttributeNode)onode.parent).getPath();
 							}
 							onode.drop();
 							

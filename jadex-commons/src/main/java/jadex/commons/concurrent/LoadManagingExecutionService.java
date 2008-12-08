@@ -90,7 +90,8 @@ public class LoadManagingExecutionService
 						if(concurrency!=0)
 							return false;	// Hack!!! execute can be called too often
 							
-						start	= System.nanoTime();
+						start	= System.currentTimeMillis();	// accuracy of about 16ms (Sun JVM / Windows)
+//						start	= System.nanoTime();
 						concurrency	= 0;
 						load	= 0.0;
 						for(Iterator it=tasks.iterator(); concurrency<limit && it.hasNext(); )
@@ -154,11 +155,14 @@ public class LoadManagingExecutionService
 		if(concurrency==0 && !tasks.isEmpty())
 		{
 			// Calculate sleep time to meet load setting.
-			long	time	= System.nanoTime() - start;
-			sleep	= (long)((time/load - time) / 1000000);
+			long	time	= System.currentTimeMillis() - start;
+			sleep	= (long)((time/load - time));
+//			long	time	= System.nanoTime() - start;
+//			sleep	= (long)((time/load - time) / 1000000);
 			
 			// Calculate concurrency limit to meet max timeslice setting:
-			double	lastslice	= Math.max(sleep + time/1000000, 0.1);
+			double	lastslice	= Math.max(sleep + time, 0.1);
+//			double	lastslice	= Math.max(sleep + time/1000000, 0.1);
 			double	newlimit	= limit * timeslice / lastslice;
 			// Use exponential annealing to avoid oscillations
 			limit	= Math.max(1, limit + (int)(0.5*(newlimit-limit)));

@@ -9,7 +9,6 @@ import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import sun.security.action.GetBooleanAction;
 
 /** Attempts to clean up some waste.
  */

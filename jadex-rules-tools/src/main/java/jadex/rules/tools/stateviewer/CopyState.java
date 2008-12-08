@@ -1,6 +1,7 @@
 package jadex.rules.tools.stateviewer;
 
 
+import jadex.commons.collection.IdentityHashSet;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -12,7 +13,6 @@ import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -65,7 +65,7 @@ public class CopyState implements IOAVState
 	{
 		this.state	= state;
 		this.copy	= state.isJavaIdentity() ? (Map)new IdentityHashMap() : new HashMap();
-		this.rootobjects	= state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new HashSet();
+		this.rootobjects	= state.isJavaIdentity() ? (Set)new IdentityHashSet() : new HashSet();
 		setSynchronizator(synchronizator);
 		
 		// Copy initial objects.

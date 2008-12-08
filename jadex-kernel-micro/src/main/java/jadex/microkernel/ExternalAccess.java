@@ -1,7 +1,5 @@
 package jadex.microkernel;
 
-import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 
 import java.util.Map;

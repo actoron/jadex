@@ -6,6 +6,7 @@ import java.util.Map;
 import jadex.bridge.IArgument;
 import jadex.bridge.IAgentModel;
 import jadex.bridge.IReport;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 /**
@@ -75,7 +76,7 @@ public class MicroAgentModel implements IAgentModel
 	 */
 	public String getName()
 	{
-		String ret = microagent.getSimpleName();
+		String ret = SReflect.getUnqualifiedClassName(microagent);
 		if(ret.endsWith("Agent"))
 			ret = ret.substring(0, ret.lastIndexOf("Agent"));
 		return ret;

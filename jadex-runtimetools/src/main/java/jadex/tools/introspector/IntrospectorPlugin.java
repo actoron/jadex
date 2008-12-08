@@ -378,7 +378,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 				if(cards.isAvailable(ad))
 				{
 					ToolPanel intro = (ToolPanel)cards.getComponent(ad);
-					System.err.println("Agent died: "+ad);
+//					System.err.println("Agent died: "+ad);
 					intro.dispose();
 					detail.remove(intro);
 				}

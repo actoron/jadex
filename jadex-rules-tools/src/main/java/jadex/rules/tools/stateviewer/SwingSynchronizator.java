@@ -47,9 +47,49 @@ public class SwingSynchronizator implements ISynchronizator
 	 *  the method will throw a terminated exception.
 	 *  @param action The action.
 	 */
-	public void invokeLater(Runnable action)
+	public void invokeLater(final Runnable action)
 	{
-		SwingUtilities.invokeLater(action);
+//		boolean	debug	= false;
+//		assert	debug=true;
+//		RuntimeException	re	= null;
+//		if(debug)
+//		{
+//			try
+//			{
+//				throw new RuntimeException("Caller Stack");
+//			}
+//			catch(RuntimeException e)
+//			{
+//				re	= e;
+//			}
+//			final RuntimeException	e	= re;
+//			SwingUtilities.invokeLater(new Runnable()
+//			{
+//				public void run()
+//				{
+//					try
+//					{
+//						action.run();
+//					}
+//					catch(Error t)
+//					{
+//						Error	er	= new Error(t);
+//						er.setStackTrace(e.getStackTrace());
+//						throw er;
+//					}
+//					catch(RuntimeException t)
+//					{
+//						RuntimeException	re	= new RuntimeException(t);
+//						re.setStackTrace(e.getStackTrace());
+//						throw re;
+//					}
+//				}
+//			});
+//		}
+//		else
+//		{
+			SwingUtilities.invokeLater(action);
+//		}
 	}
 
 	/**
