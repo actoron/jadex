@@ -23,8 +23,7 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVState;
-import jadex.rules.tools.reteviewer.RetePanel;
-import jadex.rules.tools.stateviewer.OAVTreeModel;
+import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -146,7 +145,7 @@ public class Hanoi
 	/**
 	 *  Test method. Calls one of the implementations once.
 	 */
-	protected static void test(int discs, int impl, boolean showoav, boolean showtowers, boolean showrete)
+	protected static void test(int discs, int impl, boolean showtowers, boolean showrete)
 	{
 		switch(impl)
 		{
@@ -155,7 +154,7 @@ public class Hanoi
 			{
 				IOAVState state = createState();
 				RuleSystem	rete	= initializeRete(state, showrete);
-				Object agent = initState(discs, state, showoav, showtowers);
+				Object agent = initState(discs, state, showtowers);
 				moveWithRete(state, agent, agent_has_tower_a, agent_has_tower_b, agent_has_tower_c, discs, rete, showrete);
 				break;
 			}
@@ -163,7 +162,7 @@ public class Hanoi
 			case 2:
 			{
 				IOAVState state = createState();
-				Object agent = initState(discs, state, showoav, showtowers);
+				Object agent = initState(discs, state, showtowers);
 				moveWithoutRete(state, agent, agent_has_tower_a, agent_has_tower_b, agent_has_tower_c, discs);
 				break;
 			}
@@ -171,7 +170,7 @@ public class Hanoi
 			case 3:
 			{
 				IOAVState state = createState();
-				Object agent = initState(discs, state, showoav, showtowers);
+				Object agent = initState(discs, state, showtowers);
 				moveWithState(state, agent, agent_has_tower_a, agent_has_tower_b, agent_has_tower_c, discs);
 				break;
 			}
@@ -179,7 +178,7 @@ public class Hanoi
 			case 4:
 			{
 				IOAVState state = createState();
-				Object agent = initState(discs, state, showoav, showtowers);
+				Object agent = initState(discs, state, showtowers);
 				List	from	= new ArrayList();
 				List	to	= new ArrayList();
 				List	temp	= new ArrayList();
@@ -202,7 +201,7 @@ public class Hanoi
 	/**
 	 *  Initialize the state with the given number of discs.
 	 */
-	protected static Object initState(int discs, IOAVState state, boolean showoav, boolean showtowers)
+	protected static Object initState(int discs, IOAVState state, boolean showtowers)
 	{
 		// Setup
 		Object	agent	= state.createRootObject(agent_type);
@@ -212,10 +211,6 @@ public class Hanoi
 			state.setAttributeValue(disc, disc_has_size, new Integer(i));
 			state.addAttributeValue(agent, agent_has_tower_a, disc);
 		}
-		
-		// Show OAV Model in JFrame.
-		if(showoav)
-			OAVTreeModel.createOAVFrame("Towers of Hanoi", state).setVisible(true);
 		
 		// Show Hanoi towers in JFrame.
 		if(showtowers)
@@ -236,7 +231,7 @@ public class Hanoi
 		{
 			// Simple list based implementation (no state involved).
 			IOAVState	state	= createState();
-			Object	agent	= initState(discs, state, false, false);
+			Object	agent	= initState(discs, state, false);
 			List	from	= new ArrayList();
 			List	to	= new ArrayList();
 			List	temp	= new ArrayList();
@@ -257,7 +252,7 @@ public class Hanoi
 
 			// Simple state based implementation
 			state	= createState();
-			agent	= initState(discs, state, false, false);
+			agent	= initState(discs, state, false);
 			long	statestart	= System.currentTimeMillis();
 			for(int i=0; i<times; i++)
 			{
@@ -274,7 +269,7 @@ public class Hanoi
 			
 			// Goal based implementation.
 			state	= createState();
-			agent	= initState(discs, state, false, false);
+			agent	= initState(discs, state, false);
 			long	noretestart	= System.currentTimeMillis();
 			for(int i=0; i<Math.ceil(times/5.0); i++)
 			{
@@ -292,7 +287,7 @@ public class Hanoi
 			// Rete based implementation.
 			state = createState();
 			RuleSystem	rete	= initializeRete(state, false);
-			agent = initState(discs, state, false, false);
+			agent = initState(discs, state, false);
 			long	retestart	= System.currentTimeMillis();
 			for(int i=0; i<Math.ceil(times/25.0); i++)
 			{
@@ -672,7 +667,7 @@ public class Hanoi
 		if(showrete)
 		{
 			RuleSystemExecutor	exe	= new RuleSystemExecutor(rete, true);
-			RetePanel.createReteFrame(exe, "Hanoi Rete Structure");
+			RuleEnginePanel.createRuleEngineFrame(exe, "Hanoi Rete Structure");
 		}
 		else
 		{

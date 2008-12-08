@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -30,7 +29,13 @@ import javax.swing.event.ListSelectionListener;
 public class AgendaPanel extends JSplitPane
 {
 	//------- attributes --------
-
+	
+	/** The agenda. */
+	protected IAgenda	agenda;
+	
+	/** The agenda listener. */
+	protected IAgendaListener	listener;
+	
 	/** Local copy of activations. */
 	Object[]	activations_clone;
 	
@@ -60,6 +65,7 @@ public class AgendaPanel extends JSplitPane
 	public AgendaPanel(final IAgenda agenda)
 	{
 		super(VERTICAL_SPLIT);
+		this.agenda	= agenda;
 		this.setOneTouchExpandable(true);
 		
 		this.amodel	= new ActivationsModel();
@@ -95,7 +101,7 @@ public class AgendaPanel extends JSplitPane
 		activations_clone	= agenda.getActivations().toArray();
 		history_clone	= agenda.getHistory().toArray();
 		next	= agenda.getNextActivation();
-		agenda.addAgendaListener(new IAgendaListener()
+		this.listener	= new IAgendaListener()
 		{
 			Object[]	activations_clone;
 			Object[]	history_clone;
@@ -130,7 +136,8 @@ public class AgendaPanel extends JSplitPane
 					});
 				}
 			}
-		});
+		};
+		agenda.addAgendaListener(listener);
 
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -179,6 +186,16 @@ public class AgendaPanel extends JSplitPane
 		
 		this.add(agendap);
 		this.add(historyp);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Dispose the panel and remove any listeners.
+	 */
+	public void	dispose()
+	{
+		agenda.removeAgendaListener(listener);
 	}
 	
 	//-------- helper methods --------

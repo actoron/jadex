@@ -53,8 +53,8 @@ public class Profiler implements IProfiler, Serializable
 			return;
 		ProfilingInfo	parent	= stack.isEmpty() ? null : (ProfilingInfo)stack.get(stack.size()-1);
 		// System.nanoTime() : @since 1.5
-		//stack.add(new ProfilingInfo(type, item, parent, System.nanoTime(), 0));
-		stack.add(new ProfilingInfo(type, item, parent, System.currentTimeMillis(), 0));
+		stack.add(new ProfilingInfo(type, item, parent, System.nanoTime(), 0));
+//		stack.add(new ProfilingInfo(type, item, parent, System.currentTimeMillis(), 0));
 //		System.out.println("start: "+stack);
 	}
 
@@ -77,8 +77,8 @@ public class Profiler implements IProfiler, Serializable
 		ProfilingInfo	current	= (ProfilingInfo)stack.get(stack.size()-1);
 		// Calculate total and inherent time.
 		// System.nanoTime() : @since 1.5
-		//current.time	= System.nanoTime() - current.time;
-		current.time	= System.currentTimeMillis() - current.time;
+		current.time	= System.nanoTime() - current.time;
+//		current.time	= System.currentTimeMillis() - current.time;
 		current.inherent	= current.time - current.inherent;
 						
 		// Create profiling entry.

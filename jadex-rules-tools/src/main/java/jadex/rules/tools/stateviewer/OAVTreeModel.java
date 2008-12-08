@@ -2,7 +2,6 @@ package jadex.rules.tools.stateviewer;
 
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.TreeExpansionHandler;
 import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -10,7 +9,6 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -30,9 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
@@ -678,321 +673,272 @@ public class OAVTreeModel implements TreeModel
 		return index;
 	}
 
-		/**
-		 * Refresh all displayed attributes
-		 * @param oldRoot
-		 */
-		protected void refreshInspectorNodes()
-		{
+	/**
+	 * Refresh all displayed attributes
+	 * @param oldRoot
+	 */
+	protected void refreshInspectorNodes()
+	{
 //			System.out.println("refresh called");
-			
-			TreeModelEvent event = null;
+		
+		TreeModelEvent event = null;
 //			Object[] listener = listenerList.getListenerList();
-			
-			Object[] inspectorNodes = inspectors.toArray(new Object[inspectors.size()]);
-			// the array contains all attribute nodes ordered in the path from root to leaf.
-			// e.g. a parent node will have a lower index than his children
-			//
-			// we could loop from leafs to root, to avoid drawing problems when updating a node that was
-			// already removed due to a parent object change 
-			// OR 
-			// null all (grand) children from a dropped node in the array to avoid later redrawing what will
-			// cause a drawing error / problem
-			//
-			// TO DO: decide which implementation is more efficient
-			
-			for (int inspectorIndex = inspectorNodes.length-1; inspectorIndex >= 0; inspectorIndex--)
+		
+		Object[] inspectorNodes = inspectors.toArray(new Object[inspectors.size()]);
+		// the array contains all attribute nodes ordered in the path from root to leaf.
+		// e.g. a parent node will have a lower index than his children
+		//
+		// we could loop from leafs to root, to avoid drawing problems when updating a node that was
+		// already removed due to a parent object change 
+		// OR 
+		// null all (grand) children from a dropped node in the array to avoid later redrawing what will
+		// cause a drawing error / problem
+		//
+		// TO DO: decide which implementation is more efficient
+		
+		for (int inspectorIndex = inspectorNodes.length-1; inspectorIndex >= 0; inspectorIndex--)
 //			for (int inspectorIndex = 0; inspectorIndex < inspectorNodes.length; inspectorIndex++)
+		{
+			if (inspectorNodes[inspectorIndex] instanceof ObjectInspectorAttributeNode)
 			{
-				if (inspectorNodes[inspectorIndex] instanceof ObjectInspectorAttributeNode)
+				ObjectInspectorAttributeNode node = (ObjectInspectorAttributeNode) inspectorNodes[inspectorIndex];
+				
+				if (node.children!=null) // if childrens are not displayed, no update is needed
 				{
-					ObjectInspectorAttributeNode node = (ObjectInspectorAttributeNode) inspectorNodes[inspectorIndex];
+					// Regenerate children and fire change event for changed values
+					// keep and restore old children as there may be expanded subtrees
+					List oldchildren = node.children;
+					node.children = null;
+					List newchildren = node.getChildren();
+					node.children = oldchildren;
 					
-					if (node.children!=null) // if childrens are not displayed, no update is needed
+					if (node.isArrayNode())
 					{
-						// Regenerate children and fire change event for changed values
-						// keep and restore old children as there may be expanded subtrees
-						List oldchildren = node.children;
-						node.children = null;
-						List newchildren = node.getChildren();
-						node.children = oldchildren;
-						
-						if (node.isArrayNode())
+						// if we have a simple type we don't have to check subtrees, 
+						// simply remove old and add new children
+						if (!isInspectable(node.type.getComponentType(), true))
 						{
-							// if we have a simple type we don't have to check subtrees, 
-							// simply remove old and add new children
-							if (!isInspectable(node.type.getComponentType(), true))
+							//if (!oldchildren.equals(newchildren))
+							if (!testInspectorNodesListEquals(oldchildren, newchildren))
 							{
-								//if (!oldchildren.equals(newchildren))
-								if (!testInspectorNodesListEquals(oldchildren, newchildren))
-								{
-									node.children = newchildren;
-									fireTreeStructureChanged(node.getPath());
-								}
-							}
-							// some array fields can be inspected, so assume that there may be a
-							// expanded subtree.
-							else
-							{
-								// List to save already selected children from newchildren
-								// Needed to avoid double select of the same value in an array
-								List prevSelectedChildren = new ArrayList();
-							
-								// Handle removed children
-								Map removedChildren = new TreeMap();
-								for (int i = 0; i < oldchildren.size(); i++)
-								{
-									Object oldchild = oldchildren.get(i);
-									
-									// use only not previous selected children 
-									int index = getIndexForChild(newchildren, oldchild, 0);
-									while (index != -1 && prevSelectedChildren.contains(newchildren.get(index)))
-									{
-										prevSelectedChildren.add(newchildren.get(index));
-										index = getIndexForChild(newchildren, oldchild, index+1);
-									}
-									
-									//if (!newchildren.contains(oldchild))
-									// value was removed
-									if (index == -1)
-									{
-										// add it to removedChildren
-										removedChildren.put(new Integer(i), oldchild);
-										// don't remove child from old children here! This will change 
-										// index of other child's as well
-									}
-								}
-								// clear selected children after use
-								prevSelectedChildren.clear();
-
-								// remove the removed from oldchildren an store 
-								// index and value in change event arrays
-								Object[] removed = removedChildren.entrySet().toArray();
-								int[] indexes = new int[removed.length];
-								Object[] childs = new Object[removed.length];
-								for (int i = 0; i < removed.length; i++)
-								{
-									Map.Entry entry = (Map.Entry) removed[i];
-									indexes[i] = ((Integer) entry.getKey()).intValue();
-									childs[i] = entry.getValue();
-									
-									// drop child if it is an inspector node
-									if (entry.getValue() instanceof ObjectInspectorNode)
-										((ObjectInspectorNode) entry.getValue()).drop();
-									
-									// remove from children list
-									oldchildren.remove(entry.getValue());
-									//oldchildren.remove(getIndexForChild(oldchildren, entry.getValue()));
-								}
-								
-								// Handle inserted children
-								// replace the rest of old children at their position in new children
-								// save the not replaced children as added nodes in change event arrays
-								Map insertedChildren = new TreeMap();
-								for (int i = 0; i < newchildren.size(); i++)
-								{
-									Object newchild = newchildren.get(i);
-									
-									// use only not previous selected children 
-									int index = getIndexForChild(oldchildren, newchild, 0);
-									while (index != -1 && prevSelectedChildren.contains(newchildren.get(index)))
-									{
-										prevSelectedChildren.add(oldchildren.get(index));
-										index = getIndexForChild(oldchildren, newchild, index+1);
-									}
-									
-									// replace new with old as there may be expanded sub trees
-									//if (oldchildren.contains(newchild))
-									if (index != -1)
-									{
-										//Object oldchild = oldchildren.get(oldchildren.indexOf(newchild));
-										Object oldchild = oldchildren.get(index);
-										// remove oldchild from oldchildren 
-										//(needed to support same object twice in arrays)
-										oldchildren.remove(index);
-										newchildren.remove(i);
-										newchildren.add(i, oldchild);
-										// drop newchild, it was replaced by the old one
-										if (newchild instanceof ObjectInspectorNode)
-											((ObjectInspectorNode) newchild).drop();
-									}
-									// value was added
-									else
-									{
-										// register children for change event
-										insertedChildren.put(new Integer(i), newchild);
-									}
-								}
-								// clear selected children after use
-								prevSelectedChildren.clear();
-								
-								// update the name prefix for children
-								for (int i = 0; i < newchildren.size(); i++)
-								{
-									Object obj = newchildren.get(i);
-									if (obj instanceof ObjectInspectorNode)
-									{
-										((ObjectInspectorNode) obj).namePrefix = "["+i+"] ";
-									}
-									else if (obj instanceof ObjectInspectorValueNode)
-									{
-										((ObjectInspectorValueNode) obj).namePrefix = "["+i+"] ";
-									}
-								}
-								
-								// create the array for nodes inserted change event 
-								Object[] inserted = insertedChildren.entrySet().toArray();
-								int[] insertedIndexes = new int[inserted.length];
-								Object[] insertedChilds = new Object[inserted.length];
-								for (int insertedIndex = 0; insertedIndex < inserted.length; insertedIndex++)
-								{
-									Map.Entry entry = (Map.Entry) inserted[insertedIndex];
-									insertedIndexes[insertedIndex] = ((Integer) entry.getKey()).intValue();
-									insertedChilds[insertedIndex] = entry.getValue();
-								}
-								
-								// add the new children as node children
 								node.children = newchildren;
-								
-								TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-								
-								// create and fire event for removed children
-								if (removedChildren.size() > 0)
-								{
-									event = new TreeModelEvent(this, node.getPath(), indexes, childs);
-									for(int i=0; i<alisteners.length; i++)
-									{
-										alisteners[i].treeNodesRemoved(event);
-									}
-									//System.out.println("Removed: " + event);
-								}
-								
-								// create and fire event for inserted children
-								if (insertedChildren.size() > 0)
-								{
-									event = new TreeModelEvent(this, node.getPath(), insertedIndexes, insertedChilds);
-									for(int i=0; i<alisteners.length; i++)
-									{
-										alisteners[i].treeNodesInserted(event);
-									}
-									//System.out.println("Inserted: " + event);
-								}
+								fireTreeStructureChanged(node.getPath());
 							}
 						}
-						// we have no array, so expect only one child for the attribute node
-						else {
-							
-							// Number of children and index of a child can't change at runtime, expect of arrays
-							assert oldchildren.size() == newchildren.size(): node;
-							// An attribute field can only have one value
-							assert newchildren.size() == 1 : node;
-							
-							//if ( !(oldchildren.get(0).equals(newchildren.get(0))) )
-							if ( getIndexForChild(oldchildren, newchildren.get(0)) == -1 )
+						// some array fields can be inspected, so assume that there may be a
+						// expanded subtree.
+						else
+						{
+							// List to save already selected children from newchildren
+							// Needed to avoid double select of the same value in an array
+							List prevSelectedChildren = new ArrayList();
+						
+							// Handle removed children
+							Map removedChildren = new TreeMap();
+							for (int i = 0; i < oldchildren.size(); i++)
 							{
-								// replace old children with new children and drop old
-								node.children = newchildren;
-								if (oldchildren.get(0) instanceof ObjectInspectorNode)
+								Object oldchild = oldchildren.get(i);
+								
+								// use only not previous selected children 
+								int index = getIndexForChild(newchildren, oldchild, 0);
+								while (index != -1 && prevSelectedChildren.contains(newchildren.get(index)))
 								{
-									((ObjectInspectorNode) oldchildren.get(0)).drop();
+									prevSelectedChildren.add(newchildren.get(index));
+									index = getIndexForChild(newchildren, oldchild, index+1);
 								}
 								
-								// create and fire event
-								if (oldchildren.get(0) instanceof ObjectInspectorNode || newchildren.get(0) instanceof ObjectInspectorNode)
+								//if (!newchildren.contains(oldchild))
+								// value was removed
+								if (index == -1)
 								{
-									// regenerate tree if inspector object node has changed
-									fireTreeStructureChanged((Object[]) SUtil.joinArrays(node.getPath(), new Object[]{oldchildren.get(0)}));
+									// add it to removedChildren
+									removedChildren.put(new Integer(i), oldchild);
+									// don't remove child from old children here! This will change 
+									// index of other child's as well
 								}
+							}
+							// clear selected children after use
+							prevSelectedChildren.clear();
+
+							// remove the removed from oldchildren an store 
+							// index and value in change event arrays
+							Object[] removed = removedChildren.entrySet().toArray();
+							int[] indexes = new int[removed.length];
+							Object[] childs = new Object[removed.length];
+							for (int i = 0; i < removed.length; i++)
+							{
+								Map.Entry entry = (Map.Entry) removed[i];
+								indexes[i] = ((Integer) entry.getKey()).intValue();
+								childs[i] = entry.getValue();
+								
+								// drop child if it is an inspector node
+								if (entry.getValue() instanceof ObjectInspectorNode)
+									((ObjectInspectorNode) entry.getValue()).drop();
+								
+								// remove from children list
+								oldchildren.remove(entry.getValue());
+								//oldchildren.remove(getIndexForChild(oldchildren, entry.getValue()));
+							}
+							
+							// Handle inserted children
+							// replace the rest of old children at their position in new children
+							// save the not replaced children as added nodes in change event arrays
+							Map insertedChildren = new TreeMap();
+							for (int i = 0; i < newchildren.size(); i++)
+							{
+								Object newchild = newchildren.get(i);
+								
+								// use only not previous selected children 
+								int index = getIndexForChild(oldchildren, newchild, 0);
+								while (index != -1 && prevSelectedChildren.contains(newchildren.get(index)))
+								{
+									prevSelectedChildren.add(oldchildren.get(index));
+									index = getIndexForChild(oldchildren, newchild, index+1);
+								}
+								
+								// replace new with old as there may be expanded sub trees
+								//if (oldchildren.contains(newchild))
+								if (index != -1)
+								{
+									//Object oldchild = oldchildren.get(oldchildren.indexOf(newchild));
+									Object oldchild = oldchildren.get(index);
+									// remove oldchild from oldchildren 
+									//(needed to support same object twice in arrays)
+									oldchildren.remove(index);
+									newchildren.remove(i);
+									newchildren.add(i, oldchild);
+									// drop newchild, it was replaced by the old one
+									if (newchild instanceof ObjectInspectorNode)
+										((ObjectInspectorNode) newchild).drop();
+								}
+								// value was added
 								else
 								{
-									// only redraw node if we have a inspector value
-									event = new TreeModelEvent(this, node.getPath(), new int[]{0}, new Object[]{oldchildren.get(0)});
-//									System.out.println("Changed: " + event);
-									TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-									for(int i=0; i<alisteners.length; i++)
-									{
-										alisteners[i].treeNodesChanged(event);
-										
-									}
+									// register children for change event
+									insertedChildren.put(new Integer(i), newchild);
 								}
-								
-								
 							}
-							else if (newchildren.get(0) instanceof ObjectInspectorNode)
+							// clear selected children after use
+							prevSelectedChildren.clear();
+							
+							// update the name prefix for children
+							for (int i = 0; i < newchildren.size(); i++)
 							{
-								// no difference between children, drop new children if it is an ObjectInspectorNode
-								((ObjectInspectorNode) newchildren.get(0)).drop();
+								Object obj = newchildren.get(i);
+								if (obj instanceof ObjectInspectorNode)
+								{
+									((ObjectInspectorNode) obj).namePrefix = "["+i+"] ";
+								}
+								else if (obj instanceof ObjectInspectorValueNode)
+								{
+									((ObjectInspectorValueNode) obj).namePrefix = "["+i+"] ";
+								}
+							}
+							
+							// create the array for nodes inserted change event 
+							Object[] inserted = insertedChildren.entrySet().toArray();
+							int[] insertedIndexes = new int[inserted.length];
+							Object[] insertedChilds = new Object[inserted.length];
+							for (int insertedIndex = 0; insertedIndex < inserted.length; insertedIndex++)
+							{
+								Map.Entry entry = (Map.Entry) inserted[insertedIndex];
+								insertedIndexes[insertedIndex] = ((Integer) entry.getKey()).intValue();
+								insertedChilds[insertedIndex] = entry.getValue();
+							}
+							
+							// add the new children as node children
+							node.children = newchildren;
+							
+							TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+							
+							// create and fire event for removed children
+							if (removedChildren.size() > 0)
+							{
+								event = new TreeModelEvent(this, node.getPath(), indexes, childs);
+								for(int i=0; i<alisteners.length; i++)
+								{
+									alisteners[i].treeNodesRemoved(event);
+								}
+								//System.out.println("Removed: " + event);
+							}
+							
+							// create and fire event for inserted children
+							if (insertedChildren.size() > 0)
+							{
+								event = new TreeModelEvent(this, node.getPath(), insertedIndexes, insertedChilds);
+								for(int i=0; i<alisteners.length; i++)
+								{
+									alisteners[i].treeNodesInserted(event);
+								}
+								//System.out.println("Inserted: " + event);
 							}
 						}
 					}
+					// we have no array, so expect only one child for the attribute node
+					else
+					{
+						
+						// Number of children and index of a child can't change at runtime, expect of arrays
+						assert oldchildren.size() == newchildren.size(): node;
+						// An attribute field can only have one value
+						assert newchildren.size() == 1 : node;
+						
+						//if ( !(oldchildren.get(0).equals(newchildren.get(0))) )
+						if ( getIndexForChild(oldchildren, newchildren.get(0)) == -1 )
+						{
+							// replace old children with new children and drop old
+							node.children = newchildren;
+							if (oldchildren.get(0) instanceof ObjectInspectorNode)
+							{
+								((ObjectInspectorNode) oldchildren.get(0)).drop();
+							}
+							
+							// create and fire event
+							if (oldchildren.get(0) instanceof ObjectInspectorNode || newchildren.get(0) instanceof ObjectInspectorNode)
+							{
+								// regenerate tree if inspector object node has changed
+								fireTreeStructureChanged((Object[]) SUtil.joinArrays(node.getPath(), new Object[]{oldchildren.get(0)}));
+							}
+							else
+							{
+								// only redraw node if we have a inspector value
+								event = new TreeModelEvent(this, node.getPath(), new int[]{0}, new Object[]{oldchildren.get(0)});
+//									System.out.println("Changed: " + event);
+								TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+								for(int i=0; i<alisteners.length; i++)
+								{
+									alisteners[i].treeNodesChanged(event);
+									
+								}
+							}
+							
+							
+						}
+						else if (newchildren.get(0) instanceof ObjectInspectorNode)
+						{
+							// no difference between children, drop new children if it is an ObjectInspectorNode
+							((ObjectInspectorNode) newchildren.get(0)).drop();
+						}
+					}
 				}
-				else 
-				{
-					if (inspectorNodes[inspectorIndex] != null)
-						System.err.println("Error in ObjectInspectorTreeModel, unknown inspector node type: " + inspectorNodes[inspectorIndex]);
-				}
-
+			}
+			else 
+			{
+				if (inspectorNodes[inspectorIndex] != null)
+					System.err.println("Error in ObjectInspectorTreeModel, unknown inspector node type: " + inspectorNodes[inspectorIndex]);
 			}
 		}
+	}
+	
+	/**
+	 *  Dispose the model and remove all listeners.
+	 */
+	public void	dispose()
+	{
+		this.copy.dispose();
+	}
 	
 	//-------- static part --------
-	
-	/**
-	 *  Create a panel for an OAV state.
-	 *  @param state	The OAV state.
-	 *  @param obj	The OAV root object.
-	 *  @return	The panel.
-	 */
-	public static JPanel	createOAVPanel(IOAVState state)
-	{
-		final OAVTreeModel	model	= new OAVTreeModel(state);
-		JTree	tree	= new JTree(model);
-		tree.setRootVisible(false);
-
-		// Open first tree entry when only one exists (Hack?)
-		if(model.getChildCount(model.getRoot())==1)
-		{
-			Object	node	= ((RootNode)model.getRoot()).getChildren().get(0);
-			Object[]	obs	= null;	 
-			if(node instanceof ObjectNode)
-			{
-				obs = ((ObjectNode)node).getPath();
-			}
-			else if(node instanceof ObjectInspectorNode)
-			{
-				obs = ((ObjectInspectorNode)node).getPath();
-			}
-
-			if(obs!=null)
-			{
-				tree.expandPath(new TreePath(obs));
-			}
-		}
-		
-		new TreeExpansionHandler(tree);
-		tree.setCellRenderer(new OAVTreeCellRenderer());
-		
-		JPanel	ret	= new JPanel(new BorderLayout());
-		ret.add(new JScrollPane(tree), BorderLayout.CENTER);
-
-		return ret;
-	}
-	
-	
-	/**
-	 *  Create a frame for an OAV state.
-	 *  @param title	The title for the frame.
-	 *  @param state	The OAV state.
-	 *  @param obj	The OAV root object.
-	 *  @return	The frame.
-	 */
-	public static JFrame	createOAVFrame(String title, IOAVState state)
-	{
-		JFrame	frame	= new JFrame(title);
-		frame.getContentPane().add(createOAVPanel(state), BorderLayout.CENTER);
-		frame.setSize(600, 400);		
-		return frame;
-	}
 
 	/**
 	 *  Decide if java object should be inspectable.

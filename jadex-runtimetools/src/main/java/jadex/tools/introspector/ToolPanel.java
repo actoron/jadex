@@ -7,13 +7,11 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
-import jadex.rules.tools.reteviewer.RetePanel;
+import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -28,18 +26,9 @@ public class ToolPanel	extends JPanel
 
 	//-------- attributes --------
 
-	/** The agent access. */
-	protected IExternalAccess	agent;
+	/** The rule engine panel. */
+	protected RuleEnginePanel	panel;
 	
-	/** The agent to observe. */
-	protected IAgentIdentifier	observed;
-	
-	/** The tab panel. */
-	protected JTabbedPane tabs;
-
-	/** The tool components. */
-	protected JComponent[]	tools;
-
 	//-------- constructors --------
 
 	/**
@@ -47,12 +36,8 @@ public class ToolPanel	extends JPanel
 	 *  @param agent	The agent access.
 	 *  @param active	Flags indicating which tools should be active.
 	 */
-	public ToolPanel(IExternalAccess agent, IAgentIdentifier observed, final boolean[] active)
+	public ToolPanel(IExternalAccess agent, IAgentIdentifier observed)
 	{
-		this.agent	= agent;
-		this.observed	= observed;
-		this.tabs = new JTabbedPane();
-
         // Hack!?!?!
 		((IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE))
 			.getExternalAccess(observed, new IResultListener()
@@ -66,21 +51,19 @@ public class ToolPanel	extends JPanel
 			{
 				// Hack!!!
 				final BDIInterpreter bdii = ((ElementFlyweight)result).getInterpreter();
-//				StandaloneAgentAdapter	adapter	= (StandaloneAgentAdapter)result;
-//				final BDIInterpreter bdii	= (BDIInterpreter)adapter.getJadexAgent();
-				// Open tool on introspected agent thread (hack!!!)
+				// Open tool on introspected agent thread as required for copy state constructor (hack!!!)
 				bdii.invokeLater(new Runnable()
 				{
 					public void run()
 					{
 						final IntrospectorAdapter	tooladapter	= (IntrospectorAdapter)bdii.getToolAdapter(IntrospectorAdapter.class);
-						final JComponent	toolpanel	= RetePanel.createToolPanel(bdii.getRuleSystem(), tooladapter);
+						ToolPanel.this.panel	= new RuleEnginePanel(bdii.getRuleSystem(), tooladapter);
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
 							{
 								setLayout(new BorderLayout());
-								add("Center", toolpanel);
+								add("Center", ToolPanel.this.panel);
 								
 								doLayout();
 								repaint();
@@ -90,5 +73,14 @@ public class ToolPanel	extends JPanel
 				});
 			}
 		});
-	}	
+	}
+	
+	/**
+	 *  Dispose the panel and remove all listeners.
+	 */
+	public void	dispose()
+	{
+		if(panel!=null)
+			panel.dispose();
+	}
 }

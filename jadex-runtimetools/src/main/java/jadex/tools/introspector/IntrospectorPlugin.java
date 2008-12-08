@@ -43,7 +43,7 @@ import javax.swing.tree.TreePath;
  *  Introspector plugin allows to inspect beliefs, goals and plans of an agent
  *  and to debug the steps in the agent's agenda.
  */
-public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListListener
+public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentListListener
 {
 	//-------- constants --------
 
@@ -358,6 +358,13 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 	}
 	
 	/**
+	 *  Called when an agent has changed its state (e.g. suspended).
+	 */
+	public void agentChanged(IAMSAgentDescription ad)
+	{
+	}
+	
+	/**
 	 * @param ad
 	 */
 	public void agentDied(final IAMSAgentDescription ad)
@@ -371,7 +378,8 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 				if(cards.isAvailable(ad))
 				{
 					ToolPanel intro = (ToolPanel)cards.getComponent(ad);
-//					intro.
+					System.err.println("Agent died: "+ad);
+					intro.dispose();
 					detail.remove(intro);
 				}
 			}
@@ -397,19 +405,6 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 		});
 	}
 
-	/**
-	 * @param ad
-	 */
-	public void agentChanged(final IAMSAgentDescription ad)
-	{
-		// nop?
-		// Update components on awt thread.
-		/*
-		 * SwingUtilities.invokeLater(new Runnable() { public void run() {
-		 * agents.addAgent(ad); } });
-		 */
-	}
-
 	final AbstractAction START_INTROSPECTOR	= new AbstractAction("Introspect Agent", icons.getIcon("introspect_agent"))
 	{
 		public void actionPerformed(ActionEvent e)
@@ -424,7 +419,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 			boolean[]	active	= new boolean[checkboxes.length];
 			for(int i=0; i<checkboxes.length; i++)
 				active[i]	= checkboxes[i].isSelected();
-			ToolPanel	intro = new ToolPanel(getJCC().getAgent(), desc.getName(), active);
+			ToolPanel	intro = new ToolPanel(getJCC().getAgent(), desc.getName());
 			GuiProperties.setupHelp(intro, "tools.introspector");
 			detail.add(intro, node.getUserObject());
 			agents.updateAgent(desc);
@@ -454,7 +449,8 @@ public class IntrospectorPlugin extends AbstractJCCPlugin implements IAgentListL
 
 			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			ToolPanel intro = (ToolPanel)cards.getComponent(node.getUserObject());			
+			ToolPanel intro = (ToolPanel)cards.getComponent(node.getUserObject());
+			intro.dispose();
 			detail.remove(intro);
 			agents.updateAgent((IAMSAgentDescription)node.getUserObject());
 			split.setCursor(Cursor.getDefaultCursor());

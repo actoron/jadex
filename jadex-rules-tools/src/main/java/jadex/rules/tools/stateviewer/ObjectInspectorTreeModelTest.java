@@ -80,7 +80,7 @@ public class ObjectInspectorTreeModelTest extends OAVTreeModel
 			}
 		});
 		
-		frame.show();
+		frame.setVisible(true);
 		
 		ObjectInspectorTreeModelExample example = new ObjectInspectorTreeModelExample(new String[]{"String","array", "as", "Object", "parameter"});
 		// inspect the root node

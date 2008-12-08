@@ -24,7 +24,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVState;
-import jadex.rules.tools.reteviewer.RetePanel;
+import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
 /**
  *  Calculating fibonacci numbers example.
@@ -143,6 +143,6 @@ public class JavaFibonacci
 //			f50.getValue() + " took " + (stop-start) + "ms" );
 		
 		RuleSystemExecutor exe = new RuleSystemExecutor(rete, true);
-		RetePanel.createReteFrame(exe, "Fibonacci");
+		RuleEnginePanel.createRuleEngineFrame(exe, "Fibonacci");
 	}
 }

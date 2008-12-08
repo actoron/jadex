@@ -17,7 +17,7 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVState;
-import jadex.rules.tools.reteviewer.RetePanel;
+import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
 /**
  *  Simple hello world program for illustrating how a simple
@@ -66,6 +66,6 @@ public class OAVHelloWorld
 		rete.init();
 		
 		RuleSystemExecutor exe = new RuleSystemExecutor(rete, true);
-		RetePanel.createReteFrame(exe, "HelloWorld");
+		RuleEnginePanel.createRuleEngineFrame(exe, "HelloWorld");
 	}
 }

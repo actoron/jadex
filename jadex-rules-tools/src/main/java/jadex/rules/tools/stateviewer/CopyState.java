@@ -45,6 +45,12 @@ public class CopyState implements IOAVState
 	/** The synchronizator (e.g. swing sync.). */
 	protected ISynchronizator	synchronizator;
 	
+	/** The original state. */
+	protected IOAVState	state;
+	
+	/** The listener on the original state. */
+	protected IOAVStateListener	listener;
+	
 	/** The listeners. */
 	protected List	listeners;
 
@@ -57,6 +63,7 @@ public class CopyState implements IOAVState
 	 */
 	public CopyState(final IOAVState state, ISynchronizator synchronizator)
 	{
+		this.state	= state;
 		this.copy	= state.isJavaIdentity() ? (Map)new IdentityHashMap() : new HashMap();
 		this.rootobjects	= state.isJavaIdentity() ? Collections.newSetFromMap(new IdentityHashMap()) : new HashSet();
 		setSynchronizator(synchronizator);
@@ -83,7 +90,7 @@ public class CopyState implements IOAVState
 		}
 
 		// Add listener for updating on changes.
-		state.addStateListener(new IOAVStateListener()
+		listener	= new IOAVStateListener()
 		{
 			public void objectModified(final Object id, final OAVObjectType type,  
 				final OAVAttributeType attr, final Object oldvalue, final Object newvalue)
@@ -186,7 +193,8 @@ public class CopyState implements IOAVState
 					});
 				}
 			}
-		}, false);
+		};
+		state.addStateListener(listener	, false);
 	}
 	
 
@@ -195,7 +203,7 @@ public class CopyState implements IOAVState
 	 */
 	public void dispose()
 	{
-		// todo?
+		state.removeStateListener(listener);
 	}
 	
 	//-------- methods --------

@@ -11,10 +11,8 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JCheckBox;
@@ -51,7 +49,9 @@ public class RulebasePanel extends JPanel
 	//-------- attributes --------
 	
 	/** The rulebase. */
-//	protected IRulebase rulebase;
+	protected IRulebase rulebase;
+
+	/** The rules. */
 	protected List rules;
 	
 	/** The list. */
@@ -63,6 +63,9 @@ public class RulebasePanel extends JPanel
 	/** The steppable (to set/remove breakpoints). */
 	protected ISteppable	steppable;
 	
+	/** The rulebase listener. */
+	protected IRulebaseListener	listener;
+	
 	//-------- constructors --------
 	
 	/**
@@ -71,6 +74,7 @@ public class RulebasePanel extends JPanel
 	public RulebasePanel(IRulebase rulebase, ISteppable steppable)
 	{
 		this.steppable	= steppable;
+		this.rulebase	= rulebase;
 		this.rules = new ArrayList();
 		for(Iterator it=rulebase.getRules().iterator(); it.hasNext(); )
 			rules.add(it.next());
@@ -99,7 +103,7 @@ public class RulebasePanel extends JPanel
 			}
 		};
 		
-		rulebase.addRulebaseListener(new IRulebaseListener()
+		listener	= new IRulebaseListener()
 		{
 			public void ruleAdded(IRule rule)
 			{
@@ -110,7 +114,8 @@ public class RulebasePanel extends JPanel
 			{
 				rules.remove(rule);
 			}
-		});
+		};
+		rulebase.addRulebaseListener(listener);
 		
 		this.list = new JTable(lm);
 		this.setLayout(new BorderLayout());
@@ -154,6 +159,16 @@ public class RulebasePanel extends JPanel
 				 }
 			}
 		});
+	}
+	
+	
+	/**
+	 *  Dispose the panel
+	 *  and remove all listeners.
+	 */
+	public void	dispose()
+	{
+		rulebase.removeRulebaseListener(listener);
 	}
 	
 	/**

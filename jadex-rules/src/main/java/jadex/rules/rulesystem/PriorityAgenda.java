@@ -61,18 +61,33 @@ public class PriorityAgenda extends AbstractAgenda
 		});
 	}
 	
+//	long	total	= 0;
+//	long	last	= 0;
+//	long	lasttime	= 0;
+	
 	/**
 	 *  Add a new activation.
 	 *  @param act The activation.
 	 */
 	public void addActivation(Activation act)
 	{
+//		total	-= System.nanoTime();
 //		System.out.println("Add: "+act);
 		this.counts.put(act, new Long(count++));
 		this.activations.add(act);
 		
 		state++;
 		notifyListeners();
+
+//		total	+= System.nanoTime();
+//		long	currenttime	 = System.currentTimeMillis();
+//		if(currenttime>lasttime+1000)
+//		{
+//			if(lasttime!=0)
+//				System.out.println("Total agenda time: "+((int)(total/1000000.0))+" ms, "+((int)((total-last)/1000.0)/(currenttime-lasttime))/10.0+"% in last step.");
+//			last	= total;
+//			lasttime	= currenttime;
+//		}		
 	}
 	
 	/**
@@ -81,6 +96,7 @@ public class PriorityAgenda extends AbstractAgenda
 	 */
 	public void removeActivation(Activation act)
 	{
+//		total	-= System.nanoTime();
 //		System.out.println("Remove: "+act);
 		
 		this.activations.remove(act);
@@ -91,6 +107,16 @@ public class PriorityAgenda extends AbstractAgenda
 		
 //		state++;
 		notifyListeners();
+
+//		total	+= System.nanoTime();
+//		long	currenttime	 = System.currentTimeMillis();
+//		if(currenttime>lasttime+1000)
+//		{
+//			if(lasttime!=0)
+//				System.out.println("Total agenda time: "+((int)(total/1000000.0))+" ms, "+((int)((total-last)/1000.0)/(currenttime-lasttime))/10.0+"% in last step.");
+//			lasttime	= currenttime;
+//			last	= total;
+//		}		
 	}
 	
 	/**

@@ -26,6 +26,7 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVState;
 import jadex.rules.tools.reteviewer.RetePanel;
+import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
 /**
  *  The blocks world meta model.
@@ -112,7 +113,7 @@ public class Blocks
 	{
 		RuleSystem system = createReteSystem();
 		RuleSystemExecutor	exe	= new RuleSystemExecutor(system, true);
-		RetePanel.createReteFrame(exe, "Blocksworld Test");
+		RuleEnginePanel.createRuleEngineFrame(exe, "Blocksworld Test");
 		IOAVState state = system.getState();
 		
 		Object b1 = state.createRootObject(block_type);

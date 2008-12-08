@@ -1,13 +1,11 @@
 package jadex.rules.tools.reteviewer;
 
 import jadex.commons.ICommand;
-import jadex.commons.SGUI;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IAgendaListener;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.ISteppable;
 import jadex.rules.rulesystem.RuleSystem;
-import jadex.rules.rulesystem.RuleSystemExecutor;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rete.RetePatternMatcherState;
 import jadex.rules.rulesystem.rete.nodes.AlphaNode;
@@ -27,7 +25,6 @@ import jadex.rules.rulesystem.rete.nodes.SplitNode;
 import jadex.rules.rulesystem.rete.nodes.TerminalNode;
 import jadex.rules.rulesystem.rete.nodes.TestNode;
 import jadex.rules.rulesystem.rete.nodes.TypeNode;
-import jadex.rules.tools.stateviewer.OAVTreeModel;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -48,16 +45,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -80,15 +74,6 @@ public class RetePanel extends JPanel
 {
 	//-------- constants --------
 
-	/**
-	 * The image icons.
-	 */
-	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
-	{
-		"show_state", SGUI.makeIcon(RuleSystemExecutor.class, "/jadex/rules/tools/reteviewer/images/bulb2.png"),
-		"show_rete", SGUI.makeIcon(RuleSystemExecutor.class, "/jadex/rules/tools/reteviewer/images/bug_small.png"),
-	});
-	
 	/** The name of the node details panel. */
 	public static final String	NODE_DETAILS_NAME	= "Node Details";
 	
@@ -102,6 +87,9 @@ public class RetePanel extends JPanel
 	
 	/** The rulebase panel. */
 	protected RulebasePanel rulebasepanel;
+
+	/** The agenda panel. */
+	protected AgendaPanel ap;
 
 	/** The info panels on the right hand side. */
 	protected JTabbedPane infopanels;
@@ -119,6 +107,12 @@ public class RetePanel extends JPanel
 	/** The layout. */
 	protected ReteLayout	layout;
 	
+	/** The agenda listener. */
+	protected IAgendaListener	agendalistener;
+	
+	/** The rule system. */
+	protected RuleSystem	system;
+	
 	//-------- constructors --------
 	
 	/**
@@ -128,6 +122,7 @@ public class RetePanel extends JPanel
 	{
 		this.rulebasepanel = new RulebasePanel(system.getRulebase(), steppable);
 		this.infopanels = new JTabbedPane();
+		this.system	= system;
 		
 		final ReteNode root = ((RetePatternMatcherFunctionality)system.getMatcherFunctionality()).getReteNode();
 		final ReteMemory mem = ((RetePatternMatcherState)system.getMatcherState()).getReteMemory();
@@ -336,7 +331,7 @@ public class RetePanel extends JPanel
 		JPanel tmp = new JPanel(new BorderLayout());
 		tmp.add(np, BorderLayout.CENTER);
 		tmp.add(buts, BorderLayout.SOUTH);
-		final AgendaPanel ap = new AgendaPanel(system.getAgenda());
+		this.ap = new AgendaPanel(system.getAgenda());
 		JPanel tmp3 = new JPanel(new BorderLayout());
 		final JCheckBox followact = new JCheckBox("Follow activation", true);
 		followact.setToolTipText("Follow the selected activation by displaying the rule.");
@@ -414,14 +409,6 @@ public class RetePanel extends JPanel
 			}
 		});
 		
-		system.getAgenda().addAgendaListener(new IAgendaListener()
-		{
-			public void agendaChanged()
-			{
-				repaint();
-			}
-		});
-		
 		rulebasepanel.addRuleSelectionListener(new ChangeListener()
 		{
 			 public void stateChanged(ChangeEvent e)
@@ -461,7 +448,7 @@ public class RetePanel extends JPanel
 			 }
 		});
 		
-		system.getAgenda().addAgendaListener(new IAgendaListener()
+		this.agendalistener	= new IAgendaListener()
 		{
 			boolean	invoked	= false;
 			Activation	next	= null;
@@ -497,7 +484,8 @@ public class RetePanel extends JPanel
 					});
 				}
 			}
-		});
+		};
+		system.getAgenda().addAgendaListener(agendalistener);
 		followact.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -539,6 +527,16 @@ public class RetePanel extends JPanel
 				}
 			}
 		});*/
+	}
+	
+	/**
+	 *  Dispose the panel and remove any listeners.
+	 */
+	public void	dispose()
+	{
+		ap.dispose();
+		rulebasepanel.dispose();
+		system.getAgenda().removeAgendaListener(agendalistener);
 	}
 	
 	/**
@@ -780,57 +778,4 @@ public class RetePanel extends JPanel
 		
 		return f;
 	}*/
-	
-//-------- methods --------
-	
-	/**
-	 *  Create a frame for a rete structure.
-	 *  @param title	The title for the frame.
-	 *  @param rs	The rule system.
-	 *  @return	The frame.
-	 */
-	public static JFrame createReteFrame(RuleSystemExecutor exe, String title)
-	{
-		JComponent	tabs	= createToolPanel(exe.getRulesystem(), exe);
-		JFrame f = new JFrame(title);
-		f.getContentPane().setLayout(new BorderLayout());
-		f.add("Center", tabs);
-		f.setSize(800,600);
-        f.setVisible(true);
-        
-        // todo: integrate state viewer
-		
-		return f;
-	
-	}
-
-	/**
-	 *  Create a panel for a steppable.
-	 */
-	public static JComponent	createToolPanel(final RuleSystem rulesystem, final ISteppable steppable)
-	{
-		JPanel	oavpanel	= OAVTreeModel.createOAVPanel(rulesystem.getState());
-		RetePanel rp = new RetePanel(rulesystem, steppable);
-		
-		JComponent[]	tools	= new JComponent[]{oavpanel, rp};
-		oavpanel.setName("Working Memory");
-		rp.setName("Rule Engine");
-        Icon[]	toolicons	= new Icon[]{icons.getIcon("show_state"), icons.getIcon("show_rete")};
-        JTabbedPane	tabs	= new JTabbedPane();
-        
-        boolean selected	= false;
-        for(int i=0; i<tools.length; i++)
-		{
-			tabs.addTab(tools[i].getName(), toolicons[i], tools[i]);
-
-			// Select first active tab.
-			if(!selected)
-			{
-				tabs.setSelectedIndex(i);
-				selected	= true;
-			}
-		}
-
-        return tabs;
-	}
 }
