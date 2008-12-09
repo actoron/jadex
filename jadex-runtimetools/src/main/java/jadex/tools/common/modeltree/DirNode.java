@@ -15,11 +15,6 @@ import javax.swing.tree.TreeNode;
  */
 public class DirNode	extends FileNode
 {
-	//-------- attributes --------
-
-	/** The children of the node (i.e. contained files and subdirectories). */
-	protected List	children;
-	
 	//-------- constructors --------
 
 	/**
@@ -41,64 +36,64 @@ public class DirNode	extends FileNode
 
 	//-------- TreeNode interface --------
 
-	/**
-	 *  Returns the child TreeNode at index childIndex.
-	 *  @param childIndex the index of the child to return
-	 *  @return a TreeNode instance
-	 */
-	public TreeNode getChildAt(int childIndex)
-	{
-		if(children==null)
-			throw new ArrayIndexOutOfBoundsException(childIndex);
-		return (TreeNode)children.get(childIndex);
-	}
-
-	/**
-	 *  Returns the number of children TreeNodes the receiver contains.
-	 *  @return the number of children TreeNodes the receiver contains
-	 */
-	public int getChildCount()
-	{
-		return children!=null ? children.size() : 0;
-	}
-
-	/**
-	 *  Returns the index of node in the receivers children. If the receiver
-	 *  does not contain node, -1 will be returned.
-	 *  @param node
-	 *  @return an int.
-	 */
-	public int getIndex(TreeNode node)
-	{
-		return children!=null ? children.indexOf(node) : -1;
-	}
-
-	/**
-	 *  Returns true if the receiver allows children.
-	 *  @return a boolean.
-	 */
-	public boolean getAllowsChildren()
-	{
-		return true;
-	}
-
-	/**
-	 *  Returns true if the receiver is a leaf.
-	 *  @return a boolean
-	 */
-	public boolean isLeaf()
-	{
-		return false;
-	}
-
-	/**
-	 *  Returns the children of the reciever as an Enumeration.
-	 *  @return an Enumeration
-	 */
-	public Enumeration children()
-	{
-		return children!=null?Collections.enumeration(children): SUtil.EMPTY_ENUMERATION;
-	}
+//	/**
+//	 *  Returns the child TreeNode at index childIndex.
+//	 *  @param childIndex the index of the child to return
+//	 *  @return a TreeNode instance
+//	 */
+//	public TreeNode getChildAt(int childIndex)
+//	{
+//		if(children==null)
+//			throw new ArrayIndexOutOfBoundsException(childIndex);
+//		return (TreeNode)children.get(childIndex);
+//	}
+//
+//	/**
+//	 *  Returns the number of children TreeNodes the receiver contains.
+//	 *  @return the number of children TreeNodes the receiver contains
+//	 */
+//	public int getChildCount()
+//	{
+//		return children!=null ? children.size() : 0;
+//	}
+//
+//	/**
+//	 *  Returns the index of node in the receivers children. If the receiver
+//	 *  does not contain node, -1 will be returned.
+//	 *  @param node
+//	 *  @return an int.
+//	 */
+//	public int getIndex(TreeNode node)
+//	{
+//		return children!=null ? children.indexOf(node) : -1;
+//	}
+//
+//	/**
+//	 *  Returns true if the receiver allows children.
+//	 *  @return a boolean.
+//	 */
+//	public boolean getAllowsChildren()
+//	{
+//		return true;
+//	}
+//
+//	/**
+//	 *  Returns true if the receiver is a leaf.
+//	 *  @return a boolean
+//	 */
+//	public boolean isLeaf()
+//	{
+//		return false;
+//	}
+//
+//	/**
+//	 *  Returns the children of the reciever as an Enumeration.
+//	 *  @return an Enumeration
+//	 */
+//	public Enumeration children()
+//	{
+//		return children!=null?Collections.enumeration(children): SUtil.EMPTY_ENUMERATION;
+//	}
 	
 	/**
 	 *  Refresh and rebuild the complete tree.
@@ -204,7 +199,7 @@ public class DirNode	extends FileNode
 	/**
 	 *  Create a node for a given file.
 	 */
-	protected TreeNode createNode(File file)
+	protected IExplorerTreeNode createNode(File file)
 	{
 		return file.isDirectory()
 			? (IExplorerTreeNode)new DirNode(this, file)
@@ -212,7 +207,7 @@ public class DirNode	extends FileNode
 	}	
 
 	/**
-	 * Return the string reoresentation of this node.
+	 * Return the string representation of this node.
 	 * @return its name
 	 */
 	public String toString()
@@ -222,23 +217,23 @@ public class DirNode	extends FileNode
 
 	//-------- bean property accessors --------
 	
-	/**
-	 *  Get the children of this DirNode.
-	 *  @return Returns the children.
-	 */
-	public List getChildren()
-	{
-		return children;
-	}
-
-	/**
-	 *  Set the children of this DirNode.
-	 *  @param children The children to set.
-	 */
-	public void setChildren(List children)
-	{
-		this.children = children;
-	}
+//	/**
+//	 *  Get the children of this DirNode.
+//	 *  @return Returns the children.
+//	 */
+//	public List getChildren()
+//	{
+//		return children;
+//	}
+//
+//	/**
+//	 *  Set the children of this DirNode.
+//	 *  @param children The children to set.
+//	 */
+//	public void setChildren(List children)
+//	{
+//		this.children = children;
+//	}
 	
 	/**
 	 * 

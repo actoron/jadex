@@ -6,8 +6,8 @@ import jadex.bridge.IAgentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IExecutable;
 import jadex.rules.state.IOAVState;
-import jadex.tools.common.modeltree.AbstractNodeFunctionality;
 import jadex.tools.common.modeltree.CombiIcon;
+import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
@@ -27,7 +27,7 @@ import javax.swing.tree.DefaultTreeModel;
 /**
  *  Model tree node functionality, specific for the test center plugin.
  */
-public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
+public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 {
 	//-------- constants --------
 	
@@ -39,8 +39,8 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 	 */
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"test_overlay",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/test_overlay.png"),	
-		"checking_on",	SGUI.makeIcon(AbstractNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif")	
+		"test_overlay",	SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/test_overlay.png"),	
+		"checking_on",	SGUI.makeIcon(TestCenterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_testcheckanim.gif")	
 	});
 	
 	//-------- attributes --------
@@ -174,90 +174,90 @@ public class TestCenterNodeFunctionality extends AbstractNodeFunctionality
 		public boolean execute()
 		{
 			// Perform refresh only, when node still in tree.
-			if(isValidChild(node))
-			{
-				String	tip	= node.getToolTipText();
-				if(tip!=null)
-					jcc.setStatusText("Checking "+tip);
-
-				if(node instanceof FileNode)
-				{
-					FileNode fn = (FileNode)node;
-					boolean	oldtest	= isTestcase(node);
-					boolean	newtest	= false;
-					
-					// Check directory.
-					if(node instanceof DirNode)
-					{
-						for(int i=0; !newtest && i<node.getChildCount(); i++)
-						{
-							newtest	= isTestcase((IExplorerTreeNode) node.getChildAt(i));
-						}
-					}
-					
-					// Check file.
-					else
-					{
-						String	file	= fn.getFile().getAbsolutePath();
-						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
-						{
-							try
-							{
-								IAgentModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
-								
-								if(model!=null)
-								{
-									boolean ok	= model.getReport().isEmpty();
-
-									// HACK!!!
-									if(ok && model instanceof OAVAgentModel)
-									{
-										IOAVState	state	= ((OAVAgentModel)model).getState();
-										Object	magent	= ((OAVAgentModel)model).getHandle();
-										Collection	caparefs	= state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_capabilityrefs);
-										if(caparefs!=null)
-										{
-											for(Iterator it=caparefs.iterator(); !newtest && it.hasNext(); )
-											{
-												Object	name	= state.getAttributeValue(it.next(), OAVBDIMetaModel.capabilityref_has_file);
-												newtest = "jadex.bdi.planlib.test.Test".equals(name);
-											}
-										}
-									}
-								}
-								// else unknown jadex file type -> ignore.
-							}
-							catch(Exception e)
-							{
-							}
-						}
-					}
-					
-					fn.getProperties().put(TESTCASE, new Boolean(newtest));	// Add always, because old value might be null.
-					if(oldtest!=newtest)
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								String	tip	= node.getToolTipText();
-								if(tip!=null)
-									jcc.setStatusText("Checking "+tip);
-
-								((DefaultTreeModel)explorer.getModel()).nodeChanged(node);
-							}
-						});
-
-						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
-						if(parent instanceof DirNode && newtest!=isTestcase(parent)
-							&& testcenter.getCheckingMenu()!=null && testcenter.getCheckingMenu().isSelected())
-						{
-							startCheckTask(parent);
-						}
-					}
-				}
-			}
-			checkTaskFinished(node);
+//			if(isValidChild(node))
+//			{
+//				String	tip	= node.getToolTipText();
+//				if(tip!=null)
+//					jcc.setStatusText("Checking "+tip);
+//
+//				if(node instanceof FileNode)
+//				{
+//					FileNode fn = (FileNode)node;
+//					boolean	oldtest	= isTestcase(node);
+//					boolean	newtest	= false;
+//					
+//					// Check directory.
+//					if(node instanceof DirNode)
+//					{
+//						for(int i=0; !newtest && i<node.getChildCount(); i++)
+//						{
+//							newtest	= isTestcase((IExplorerTreeNode) node.getChildAt(i));
+//						}
+//					}
+//					
+//					// Check file.
+//					else
+//					{
+//						String	file	= fn.getFile().getAbsolutePath();
+//						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+//						{
+//							try
+//							{
+//								IAgentModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+//								
+//								if(model!=null)
+//								{
+//									boolean ok	= model.getReport().isEmpty();
+//
+//									// HACK!!!
+//									if(ok && model instanceof OAVAgentModel)
+//									{
+//										IOAVState	state	= ((OAVAgentModel)model).getState();
+//										Object	magent	= ((OAVAgentModel)model).getHandle();
+//										Collection	caparefs	= state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_capabilityrefs);
+//										if(caparefs!=null)
+//										{
+//											for(Iterator it=caparefs.iterator(); !newtest && it.hasNext(); )
+//											{
+//												Object	name	= state.getAttributeValue(it.next(), OAVBDIMetaModel.capabilityref_has_file);
+//												newtest = "jadex.bdi.planlib.test.Test".equals(name);
+//											}
+//										}
+//									}
+//								}
+//								// else unknown jadex file type -> ignore.
+//							}
+//							catch(Exception e)
+//							{
+//							}
+//						}
+//					}
+//					
+//					fn.getProperties().put(TESTCASE, new Boolean(newtest));	// Add always, because old value might be null.
+//					if(oldtest!=newtest)
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								String	tip	= node.getToolTipText();
+//								if(tip!=null)
+//									jcc.setStatusText("Checking "+tip);
+//
+//								((DefaultTreeModel)explorer.getModel()).nodeChanged(node);
+//							}
+//						});
+//
+//						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
+//						if(parent instanceof DirNode && newtest!=isTestcase(parent)
+//							&& testcenter.getCheckingMenu()!=null && testcenter.getCheckingMenu().isSelected())
+//						{
+//							startCheckTask(parent);
+//						}
+//					}
+//				}
+//			}
+//			checkTaskFinished(node);
 			return false;
 		}
 	}

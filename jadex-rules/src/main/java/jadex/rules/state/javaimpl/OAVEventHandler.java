@@ -1,5 +1,6 @@
 package jadex.rules.state.javaimpl;
 
+import jadex.commons.collection.IdentityHashSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -8,7 +9,6 @@ import jadex.rules.state.OAVObjectType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -292,8 +292,6 @@ public class OAVEventHandler
 	 */
 	protected Set	createIdSet()
 	{
-		return state.isJavaIdentity()
-			? Collections.newSetFromMap(new IdentityHashMap())
-			: new HashSet();
+		return state.isJavaIdentity() ? (Set)new IdentityHashSet() : new HashSet();
 	}
 }

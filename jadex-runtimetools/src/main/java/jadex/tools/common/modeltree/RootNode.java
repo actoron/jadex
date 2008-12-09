@@ -42,10 +42,10 @@ public class RootNode	implements IExplorerTreeNode
 	//-------- TreeNode interface --------
 
 	/**
-	 *  Returns the parent TreeNode of the receiver.
-	 *  @return a TreeNode
+	 *  Returns the parent node of the receiver.
+
 	 */
-	public TreeNode getParent()
+	public IExplorerTreeNode getParent()
 	{
 		return null;
 	}
@@ -55,11 +55,11 @@ public class RootNode	implements IExplorerTreeNode
 	 *  @param childIndex the index of the child to return
 	 *  @return a TreeNode instance
 	 */
-	public TreeNode getChildAt(int childIndex)
+	public IExplorerTreeNode getChildAt(int childIndex)
 	{
 		if(children==null)
 			throw new ArrayIndexOutOfBoundsException(childIndex);
-		return (TreeNode)children.get(childIndex);
+		return (IExplorerTreeNode)children.get(childIndex);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class RootNode	implements IExplorerTreeNode
 	 *  @param node
 	 *  @return an int.
 	 */
-	public int getIndex(TreeNode node)
+	public int getIndex(IExplorerTreeNode node)
 	{
 		return children!=null ? children.indexOf(node) : -1;
 	}
@@ -152,7 +152,7 @@ public class RootNode	implements IExplorerTreeNode
 	/**
 	 *  Remove a path entry from the tree.
 	 */
-	public void removePathEntry(TreeNode child)
+	public void removePathEntry(IExplorerTreeNode child)
 	{
 		if(children!=null)
 			children.remove(child);
@@ -166,7 +166,7 @@ public class RootNode	implements IExplorerTreeNode
 		String[]	ret	= new String[getChildCount()];
 		for(int i=0; i<ret.length; i++)
 		{
-			TreeNode	node	= getChildAt(i);
+			IExplorerTreeNode	node	= getChildAt(i);
 //			if(node instanceof DirNode)
 //			{
 				ret[i]	= ((DirNode)node).getFile().getAbsolutePath();

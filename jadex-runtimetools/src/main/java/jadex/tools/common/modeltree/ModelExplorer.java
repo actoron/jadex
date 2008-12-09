@@ -27,6 +27,7 @@ import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -85,7 +86,7 @@ public class ModelExplorer extends JTree
 	protected RootNode root;
 	
 	/** The node functionality. */
-	protected AbstractNodeFunctionality	nof;
+	protected DefaultNodeFunctionality	nof;
 	
 	/** The background work manager. */
 	protected LoadManagingExecutionService	worker;
@@ -122,9 +123,9 @@ public class ModelExplorer extends JTree
 	/**
 	 *  Create a new ModelExplorer.
 	 */
-	public ModelExplorer(IControlCenter jcc, AbstractNodeFunctionality nof)
+	public ModelExplorer(IControlCenter jcc, DefaultNodeFunctionality nof)
 	{
-		super(new RootNode());
+		super(new ModelExplorerTreeModel(new RootNode(), nof));
 		this.jcc = jcc;
 		this.nof = nof;
 		nof.setModelExplorer(this);
@@ -255,8 +256,9 @@ public class ModelExplorer extends JTree
 						URL furl = fn.getFile().toURI().toURL();
 						if(url.equals(furl))
 						{
+							int	index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, fn);
 							getRootNode().removePathEntry(fn);
-							((DefaultTreeModel)getModel()).nodeStructureChanged(getRootNode());
+							((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), fn, index);
 						}
 					}
 					catch(Exception e)
@@ -361,7 +363,7 @@ public class ModelExplorer extends JTree
 			{
 				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
 				this.root	= (RootNode)Nuggets.objectFromXML(rootxml, cl);
-				((DefaultTreeModel)getModel()).setRoot(this.root);
+				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
 			}
 			catch(Exception e)
 			{
@@ -419,7 +421,7 @@ public class ModelExplorer extends JTree
 		// Select the last selected model in the tree.
 		String sel = props.getStringProperty("selected");
 		expansionhandler.setSelectedNode(sel==null ? null : new FileNode(null, new File(sel)));
-		((DefaultTreeModel)getModel()).reload(getRootNode());
+		((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(getRootNode());
 
 		// Load last selected model.
 		String lastpath = props.getStringProperty("lastpath");
@@ -485,7 +487,7 @@ public class ModelExplorer extends JTree
 //		}		
 
 		root.reset();
-		((DefaultTreeModel)getModel()).nodeStructureChanged(root);
+		((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(root);
 	}
 	
 	/**
@@ -721,11 +723,15 @@ public class ModelExplorer extends JTree
 		 */
 		public boolean execute()
 		{
-			nof.startRefreshTask(node);
-			for(int i=0; i<node.getChildCount(); i++)
+			if(nof.isValidChild(node))
 			{
-				IExplorerTreeNode	child	= (IExplorerTreeNode) node.getChildAt(i);
-				worker.execute(new RecursiveRefreshTask(child), PERCENTAGE_USER);
+				nof.startNodeTask(new DefaultNodeFunctionality.RefreshTask(nof, node));
+				int	children	= ((ModelExplorerTreeModel)getModel()).getChildCount(node);
+				for(int i=0; i<children; i++)
+				{
+					IExplorerTreeNode	child	= (IExplorerTreeNode) ((ModelExplorerTreeModel)getModel()).getChild(node, i);
+					worker.execute(new RecursiveRefreshTask(child), PERCENTAGE_USER);
+				}
 			}
 			return false;
 		}
@@ -757,11 +763,12 @@ public class ModelExplorer extends JTree
 			final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_crawler.remove(0);
 			nof.refresh(node);	// Refresh in crawler and do not start task on user priority 
 			
-			// Iterate over children:
-			Enumeration	children	= node.children();
-			while(children.hasMoreElements())
+			// Iterate over children
+			int	children	= ((ModelExplorerTreeModel)getModel()).getChildCount(node);
+			for(int i=0; i<children; i++)
 			{
-				nodes_crawler.add(children.nextElement());
+				IExplorerTreeNode	child	= (IExplorerTreeNode) ((ModelExplorerTreeModel)getModel()).getChild(node, i);
+				nodes_crawler.add(child);
 			}
 
 			return refresh;
@@ -826,8 +833,8 @@ public class ModelExplorer extends JTree
 							ex.printStackTrace();
 						}
 						
-						nof.startRefreshTask(node);
-						((DefaultTreeModel)getModel()).reload(getRootNode());
+						((ModelExplorerTreeModel)getModel()).fireNodeAdded(getRootNode(), node,
+							((ModelExplorerTreeModel)getModel()).getChildCount(root)-1);
 					}
 					else
 					{
@@ -865,6 +872,7 @@ public class ModelExplorer extends JTree
 			if(isEnabled())
 			{
 				FileNode	node	= (FileNode)getLastSelectedPathComponent();
+				int index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, node);
 				getRootNode().removePathEntry(node);
 				
 				// todo: jars
@@ -881,9 +889,8 @@ public class ModelExplorer extends JTree
 				}
 				
 				resetCrawler();
-				nof.startRefreshTask(getRootNode());
 
-				((DefaultTreeModel)getModel()).reload(getRootNode());
+				((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
 			}
 		}
 

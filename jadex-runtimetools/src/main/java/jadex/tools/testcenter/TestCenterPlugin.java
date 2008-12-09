@@ -10,6 +10,7 @@ import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
+import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 
 import java.awt.event.ActionEvent;
@@ -483,8 +484,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			((DefaultTreeModel)getModelExplorer().getModel())
-				.nodeStructureChanged(getModelExplorer().getRootNode());
+			((ModelExplorerTreeModel)getModelExplorer().getModel())
+				.fireTreeStructureChanged(getModelExplorer().getRootNode());
 		}
 	};
 }

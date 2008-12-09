@@ -16,14 +16,14 @@ public class ModelTreeCellRenderer extends DefaultTreeCellRenderer
 	//-------- attributes --------
 	
 	/** The node functionality. */
-	protected INodeFunctionality	nof;
+	protected DefaultNodeFunctionality	nof;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a model tree cell renderer.
 	 */
-	public ModelTreeCellRenderer(INodeFunctionality nof)
+	public ModelTreeCellRenderer(DefaultNodeFunctionality nof)
 	{
 		this.nof	= nof;
 	}

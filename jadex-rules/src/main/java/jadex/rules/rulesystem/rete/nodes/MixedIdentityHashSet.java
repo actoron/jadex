@@ -1,14 +1,13 @@
 package jadex.rules.rulesystem.rete.nodes;
 
 import jadex.commons.SUtil;
+import jadex.commons.collection.IdentityHashSet;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -40,7 +39,7 @@ public class MixedIdentityHashSet	implements Set
 	{
 		this.state	= state;
 		this.equality	= new LinkedHashSet();
-		this.identity	= Collections.newSetFromMap(new IdentityHashMap());
+		this.identity	= new IdentityHashSet();
 	}
 	
 	//-------- Set interface --------

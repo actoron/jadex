@@ -3,8 +3,8 @@ package jadex.tools.starter;
 import jadex.bridge.IAgentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IExecutable;
-import jadex.tools.common.modeltree.AbstractNodeFunctionality;
 import jadex.tools.common.modeltree.CombiIcon;
+import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
@@ -22,7 +22,7 @@ import javax.swing.tree.DefaultTreeModel;
 /**
  *  Model tree node functionality, specific for the starter plugin.
  */
-public class StarterNodeFunctionality extends AbstractNodeFunctionality
+public class StarterNodeFunctionality extends DefaultNodeFunctionality
 {
 	//-------- constants --------
 	
@@ -169,73 +169,73 @@ public class StarterNodeFunctionality extends AbstractNodeFunctionality
 		 */
 		public boolean execute()
 		{
-			// Perform refresh only, when node still in tree.
-			if(isValidChild(node))
-			{
-				String	tip	= node.getToolTipText();
-				if(tip!=null)
-					jcc.setStatusText("Checking "+tip);
-
-//				System.out.println("test valid: "+node);
-				if(node instanceof FileNode)
-				{
-					FileNode fn = (FileNode)node;
-					boolean	oldvalid	= isValid(node);
-					boolean	newvalid	= false;
-					
-					// Check directory.
-					if(node instanceof DirNode)
-					{
-						newvalid	= true;
-						for(int i=0; newvalid && i<node.getChildCount(); i++)
-						{
-							newvalid	= isValid((IExplorerTreeNode) node.getChildAt(i));
-						}
-					}
-					
-					// Check file.
-					else
-					{
-						String	file	= fn.getFile().getAbsolutePath();
-						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
-						{
-							try
-							{
-								IAgentModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
-								if(model!=null)
-								{
-									newvalid	= model.getReport().isEmpty();
-								}
-								// else unknown jadex file type -> ignore.
-							}
-							catch(Exception e)
-							{
-							}
-						}
-					}
-					
-					fn.getProperties().put(VALID, new Boolean(newvalid));	// Add always, because old value could be null.
-					if(oldvalid!=newvalid)
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								((DefaultTreeModel)explorer.getModel()).nodeChanged(node);
-							}
-						});
-
-						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
-						if(parent instanceof DirNode && newvalid!=isValid(parent)
-							&& starter.getCheckingMenu()!=null && starter.getCheckingMenu().isSelected())
-						{
-							startCheckTask(parent);
-						}
-//						System.out.println("Valid?: "+node+", "+newvalid);
-					}
-				}
-			}
-			checkTaskFinished(node);
+//			// Perform refresh only, when node still in tree.
+//			if(isValidChild(node))
+//			{
+//				String	tip	= node.getToolTipText();
+//				if(tip!=null)
+//					jcc.setStatusText("Checking "+tip);
+//
+////				System.out.println("test valid: "+node);
+//				if(node instanceof FileNode)
+//				{
+//					FileNode fn = (FileNode)node;
+//					boolean	oldvalid	= isValid(node);
+//					boolean	newvalid	= false;
+//					
+//					// Check directory.
+//					if(node instanceof DirNode)
+//					{
+//						newvalid	= true;
+//						for(int i=0; newvalid && i<node.getChildCount(); i++)
+//						{
+//							newvalid	= isValid((IExplorerTreeNode) node.getChildAt(i));
+//						}
+//					}
+//					
+//					// Check file.
+//					else
+//					{
+//						String	file	= fn.getFile().getAbsolutePath();
+//						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+//						{
+//							try
+//							{
+//								IAgentModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+//								if(model!=null)
+//								{
+//									newvalid	= model.getReport().isEmpty();
+//								}
+//								// else unknown jadex file type -> ignore.
+//							}
+//							catch(Exception e)
+//							{
+//							}
+//						}
+//					}
+//					
+//					fn.getProperties().put(VALID, new Boolean(newvalid));	// Add always, because old value could be null.
+//					if(oldvalid!=newvalid)
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								((DefaultTreeModel)explorer.getModel()).nodeChanged(node);
+//							}
+//						});
+//
+//						IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
+//						if(parent instanceof DirNode && newvalid!=isValid(parent)
+//							&& starter.getCheckingMenu()!=null && starter.getCheckingMenu().isSelected())
+//						{
+//							startCheckTask(parent);
+//						}
+////						System.out.println("Valid?: "+node+", "+newvalid);
+//					}
+//				}
+//			}
+//			checkTaskFinished(node);
 			return false;
 		}
 	}

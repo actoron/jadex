@@ -15,6 +15,7 @@ import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.ModelExplorer;
+import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IAgentListListener;
 
@@ -744,8 +745,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			((DefaultTreeModel)getModelExplorer().getModel())
-				.nodeStructureChanged(getModelExplorer().getRootNode());
+			((ModelExplorerTreeModel)getModelExplorer().getModel())
+				.fireTreeStructureChanged(getModelExplorer().getRootNode());
 		}
 	};
 	

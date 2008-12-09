@@ -13,6 +13,19 @@
     <version>1.0-SNAPSHOT</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
+  <build>
+   <plugins>
+      <!-- Java 1.5 Thread Pool. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+     </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

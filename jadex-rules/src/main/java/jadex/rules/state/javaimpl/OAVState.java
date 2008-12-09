@@ -3,6 +3,7 @@ package jadex.rules.state.javaimpl;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.collection.IdentityHashSet;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -134,11 +135,11 @@ public class OAVState	implements IOAVState
 //		this.objects	= new CheckedMap(new LinkedHashMap());
 		
 		// Java object data structures (todo: repeatability/ordering for identity map)
-		this.javaobjects	= javaidentity ? Collections.newSetFromMap(new IdentityHashMap()) : new LinkedHashSet();
+		this.javaobjects	= javaidentity ? (Set)new IdentityHashSet() : new LinkedHashSet();
 
 		// Mixed data structures (oids + java objects)  (todo: repeatability/ordering for identity map)
 		this.objectusages = javaidentity ? (Map)new IdentityHashMap() : new LinkedHashMap();
-		this.rootobjects = javaidentity ? Collections.newSetFromMap(new IdentityHashMap()) : new LinkedHashSet();
+		this.rootobjects = javaidentity ? (Set)new IdentityHashSet() : new LinkedHashSet();
 
 		
 		this.eventhandler	= new OAVEventHandler(this); 
