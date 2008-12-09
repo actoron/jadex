@@ -124,7 +124,7 @@ public class OAVState	implements IOAVState
 	public OAVState(OAVTypeModel tmodel)
 	{
 		this.tmodel = tmodel;
-		this.javaidentity = true;
+		this.javaidentity = false;
 		
 		// OID data structures
 		this.deletedobjects	= new LinkedHashMap();

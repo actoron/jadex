@@ -35,12 +35,6 @@ public class OAVBDIRuntimeModel
 	/** The processable element state unprocessed. */
 	public static final String	PROCESSABLEELEMENT_UNPROCESSED	= "unprocessed";
 
-	/** The processable element state apl rplans ready. */
-	public static final String	PROCESSABLEELEMENT_APLRPLANSREADY = "aplrplansready";
-
-	/** The processable element state apl waitqueues ready. */
-	public static final String	PROCESSABLEELEMENT_APLWAITQUEUESREADY = "aplwaitqueuesready";
-	
 	/** The processable element state apl available. */
 	public static final String	PROCESSABLEELEMENT_APLAVAILABLE	= "aplavailable";
 	
@@ -288,9 +282,6 @@ public class OAVBDIRuntimeModel
 	public static OAVAttributeType capability_has_properties;
 
 
-	/** Capability has properties attribute. */
-	//public static OAVAttributeType capability_has_properties;
-
 	/** The capability has listeners. */
 	public static OAVAttributeType capability_has_listeners;
 	
@@ -523,9 +514,6 @@ public class OAVBDIRuntimeModel
 	
 	/** The apl has metagoal. */
 	public static OAVAttributeType apl_has_metagoal;
-
-//	/** The apl has precandidates. */
-//	public static OAVAttributeType apl_has_precandidates;
 	
 	/** The apl has plan candidates. */
 	public static OAVAttributeType apl_has_plancandidates;
@@ -535,15 +523,6 @@ public class OAVBDIRuntimeModel
 	
 	/** The apl has plan waitqueue candidates. */
 	public static OAVAttributeType apl_has_waitqueuecandidates;
-	
-	/** Flag indicating that plan instance candidates building is finished. */
-//	public static OAVAttributeType apl_has_buildrplansfinished;
-	
-//	/** Flag indicating that mplan candidates building is finished. */
-//	public static OAVAttributeType apl_has_buildmplansfinished;
-	
-	/** Flag indicating that waitqueue candidates building is finished. */
-//	public static OAVAttributeType apl_has_buildwaitqueuecandsfinished;
 	
 	//-------- mplancandidate --------
 	
@@ -564,14 +543,25 @@ public class OAVBDIRuntimeModel
 
 	//-------- plancandidate --------
 	
-	/** The mplancandidate type. */
+	/** The plancandidate type. */
 	public static OAVObjectType	plancandidate_type;
 	
-	/** The mplancandidate has plan instance. */
+	/** The plancandidate has plan instance. */
 	public static OAVAttributeType	plancandidate_has_plan;
 
-	/** The mplancandidate has an rcapability. */
+	/** The plancandidate has an rcapability. */
 	public static OAVAttributeType	plancandidate_has_rcapa;
+	
+	//-------- waitqueuecandidate --------
+	
+	/** The waitqueuecandidate type. */
+	public static OAVObjectType	waitqueuecandidate_type;
+	
+	/** The waitqueuecandidate has plan instance. */
+	public static OAVAttributeType	waitqueuecandidate_has_plan;
+
+	/** The waitqueuecandidate has an rcapability. */
+	public static OAVAttributeType	waitqueuecandidate_has_rcapa;
 
 	//-------- precandidate --------
 	
@@ -737,6 +727,7 @@ public class OAVBDIRuntimeModel
 		apl_type = bdi_rt_model.createType("apl");
 		mplancandidate_type = bdi_rt_model.createType("mplancandidate", OAVBDIMetaModel.object_type);
 		plancandidate_type = bdi_rt_model.createType("plancandidate", OAVBDIMetaModel.object_type);
+		waitqueuecandidate_type = bdi_rt_model.createType("waitqueuecandidate", OAVBDIMetaModel.object_type);
 		precandidate_type = bdi_rt_model.createType("precandidate", OAVBDIMetaModel.object_type);
 		precandidatelist_type = bdi_rt_model.createType("precandidatelist", OAVBDIMetaModel.object_type);
 		capabilityreference_type = bdi_rt_model.createType("capabilityreference");
@@ -801,13 +792,9 @@ public class OAVBDIRuntimeModel
 		
 		// apl
 		apl_has_metagoal = apl_type.createAttributeType("apl_has_metagoal", OAVBDIRuntimeModel.goal_type);
-//		apl_has_precandidates = apl_type.createAttributeType("apl_has_precandidates", OAVBDIRuntimeModel.precandidate_type, OAVAttributeType.LIST);
 		apl_has_plancandidates = apl_type.createAttributeType("apl_has_plancandidates", OAVBDIRuntimeModel.mplancandidate_type, OAVAttributeType.LIST);
 		apl_has_planinstancecandidates = apl_type.createAttributeType("apl_has_planinstancecandidates", OAVBDIRuntimeModel.plancandidate_type, OAVAttributeType.LIST);
-		apl_has_waitqueuecandidates = apl_type.createAttributeType("apl_has_waitqueuecandidates", OAVBDIRuntimeModel.plan_type, OAVAttributeType.LIST);
-//		apl_has_buildrplansfinished = apl_type.createAttributeType("apl_has_buildrplansfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-//		apl_has_buildmplansfinished = apl_type.createAttributeType("apl_has_buildmplansfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-//		apl_has_buildwaitqueuecandsfinished = apl_type.createAttributeType("apl_has_buildwaitqueuecandsfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		apl_has_waitqueuecandidates = apl_type.createAttributeType("apl_has_waitqueuecandidates", OAVBDIRuntimeModel.waitqueuecandidate_type, OAVAttributeType.LIST);
 		
 		// mplancandidate
 		mplancandidate_has_mplan	= mplancandidate_type.createAttributeType("mplancandidate_has_mplan", OAVBDIMetaModel.plan_type); 
@@ -819,6 +806,10 @@ public class OAVBDIRuntimeModel
 		plancandidate_has_plan	= plancandidate_type.createAttributeType("plancandidate_has_plan", OAVBDIRuntimeModel.plan_type); 
 		plancandidate_has_rcapa	= plancandidate_type.createAttributeType("plancandidate_has_rcapa", OAVBDIRuntimeModel.capability_type); 
 
+		// waitqueuecandidate
+		waitqueuecandidate_has_plan	= waitqueuecandidate_type.createAttributeType("waitqueuecandidate_has_plan", OAVBDIRuntimeModel.plan_type); 
+		waitqueuecandidate_has_rcapa = waitqueuecandidate_type.createAttributeType("waitqueuecandidate_has_rcapa", OAVBDIRuntimeModel.capability_type); 
+		
 		// precandidate
 		precandidate_has_mplan	= precandidate_type.createAttributeType("precandidate_has_mplan", OAVBDIMetaModel.plan_type); 
 		precandidate_has_capability	= precandidate_type.createAttributeType("precandidate_has_capability", OAVBDIRuntimeModel.capability_type); 

@@ -39,7 +39,7 @@
 	<properties>
 		<!--<property name="logging.level">java.util.logging.Level.FINE</property>-->
 		<property name="logging.useParentHandlers">true</property>
-		<property name="debugging">false</property>
+		<property name="debugging">true</property>
 	</properties>
 
 	<configurations>

@@ -4,7 +4,6 @@ import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanInfoFlyweight;
 import jadex.bdi.runtime.impl.PlanInstanceInfoFlyweight;
-import jadex.bridge.IMessageAdapter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IValueFetcher;
@@ -15,7 +14,6 @@ import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
-import jadex.rules.rulesystem.rules.IPriorityEvaluator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
@@ -71,7 +69,7 @@ public class EventProcessingRules
 	
 	/**
 	 *  Action to set rplan apl building to finished.
-	 */
+	 * /
 	protected static IAction	NO_RPLANS_FOR_APL	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
@@ -93,7 +91,7 @@ public class EventProcessingRules
 
 //			state.setAttributeValue(apl, OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE);
 		}
-	};
+	};*/
 
 	/**
 	 *  Action to add matching waitqueue candidate to apl.
@@ -103,7 +101,7 @@ public class EventProcessingRules
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
 			Object	rpe	= assignments.getVariableValue("?rpe");
-//			Object	ragent	= assignments.getVariableValue("?ragent");
+			Object	rcapa	= assignments.getVariableValue("?rcapa");
 			Object	rplan	= assignments.getVariableValue("?rplan");
 
 //			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
@@ -115,7 +113,11 @@ public class EventProcessingRules
 				state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, apl);
 			}
 			
-			state.addAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, rplan);
+			Object wc = state.createObject(OAVBDIRuntimeModel.waitqueuecandidate_type);
+			state.setAttributeValue(wc, OAVBDIRuntimeModel.waitqueuecandidate_has_plan, rplan);
+			state.setAttributeValue(wc, OAVBDIRuntimeModel.waitqueuecandidate_has_rcapa, rcapa);
+			
+			state.addAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, wc);
 		}
 	};
 	
@@ -154,14 +156,14 @@ public class EventProcessingRules
 	{
 		Variable	rpe	= new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable	apl	= new Variable("?apl", OAVBDIRuntimeModel.apl_type);
-		Variable	cand	= new Variable("?cand", OAVBDIRuntimeModel.plancandidate_type);
+		Variable	candpi	= new Variable("?candpi", OAVBDIRuntimeModel.plancandidate_type);
+		Variable	candwq	= new Variable("?candwq", OAVBDIRuntimeModel.waitqueuecandidate_type);
 		Variable	org	= new Variable("?org", OAVBDIRuntimeModel.processableelement_type);
 		Variable	mpe	= new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
 		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	wa2	= new Variable("?wa2", OAVBDIRuntimeModel.waitabstraction_type);
+		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
 		
 		// Shared conditions
 		ObjectCondition	rpecon	= new ObjectCondition(rpe.getType());
@@ -180,14 +182,6 @@ public class EventProcessingRules
   				new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, rpe, IOperator.CONTAINS),
   				new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, rpe, IOperator.CONTAINS)
   		}));
-		
-//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-//		agentcon.addConstraint(new BoundConstraint(null, ragent));
-//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-//		{
-//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-//		}));
 
 		ObjectCondition	wacon	= new ObjectCondition(wa.getType());
 		wacon.addConstraint(new BoundConstraint(null, wa));
@@ -200,40 +194,40 @@ public class EventProcessingRules
 		}));
 		
 		// Conditions for plan instances
-		ObjectCondition	plancon	= new ObjectCondition(rplan.getType());
-		plancon.addConstraint(new BoundConstraint(null, rplan));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
-		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+		ObjectCondition	planconwa	= new ObjectCondition(rplan.getType());
+		planconwa.addConstraint(new BoundConstraint(null, rplan));
+		planconwa.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		planconwa.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		
-		ObjectCondition	candcon	= new ObjectCondition(cand.getType());
-		candcon.addConstraint(new BoundConstraint(null, cand));
-		candcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plancandidate_has_plan, rplan));
+		ObjectCondition	candconpi	= new ObjectCondition(candpi.getType());
+		candconpi.addConstraint(new BoundConstraint(null, candpi));
+		candconpi.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plancandidate_has_plan, rplan));
 
-		ObjectCondition	aplcon1a	= new ObjectCondition(apl.getType());
-		aplcon1a.addConstraint(new BoundConstraint(null, apl));
-		aplcon1a.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.apl_has_planinstancecandidates, cand, IOperator.CONTAINS));
+		ObjectCondition	aplconpi	= new ObjectCondition(apl.getType());
+		aplconpi.addConstraint(new BoundConstraint(null, apl));
+		aplconpi.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.apl_has_planinstancecandidates, candpi, IOperator.CONTAINS));
 
-//		ObjectCondition	aplcon1b	= new ObjectCondition(apl.getType());
-//		aplcon1b.addConstraint(new BoundConstraint(null, apl));
-//		aplcon1b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
+		// todo: maybe better to ensure the rplan is not already added to wq.
+		// Here a phase model is assumed that first allows plan instance candidates to be added and the waitqueue candidates.
 
-//		ObjectCondition	aplcon1c	= new ObjectCondition(apl.getType());
-//		aplcon1c.addConstraint(new BoundConstraint(null, apl));
-//		aplcon1c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.FALSE));
+		ObjectCondition	aplconpi2	= new ObjectCondition(apl.getType());
+		aplconpi2.addConstraint(new BoundConstraint(null, apl));
+		aplconpi2.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_waitqueuecandidates, null, IOperator.NOTEQUAL));
 		
 		// Rules for plan instances
-		Rule	add_rplan_to_apl	= new Rule("add_rplan_to_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, wacon, plancon, new NotCondition(new AndCondition(new ICondition[]{candcon, aplcon1a}))}),
-				ADD_RPLAN_TO_APL);
-
-		Rule	no_rplans_for_apl	= new Rule("no_rplans_for_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, new NotCondition(new AndCondition(new ICondition[]{wacon, plancon, new NotCondition(aplcon1a)}))}),
-				NO_RPLANS_FOR_APL);
+		Rule add_rplan_to_apl	= new Rule("add_rplan_to_apl",
+			new AndCondition(new ICondition[]{
+				rpecon, capcon, wacon, planconwa,
+				new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
+				new NotCondition(aplconpi2)}),
+			ADD_RPLAN_TO_APL);
 		
-		ObjectCondition	wacon2	= new ObjectCondition(wa2.getType());
-		wacon2.addConstraint(new BoundConstraint(null, wa2));
-		wacon2.addConstraint(new OrConstraint(new IConstraint[]
+		// Conditions for waitqueue candidates
+		
+		ObjectCondition	waconwq	= new ObjectCondition(wqwa.getType());
+		waconwq.addConstraint(new BoundConstraint(null, wqwa));
+		waconwq.addConstraint(new OrConstraint(new IConstraint[]
 		{
 				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
 				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, org, IOperator.CONTAINS),
@@ -241,47 +235,39 @@ public class EventProcessingRules
 				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS),
 		}));
 		
-		// Conditions for waitqueue candidates
-		ObjectCondition	plancon2	= new ObjectCondition(rplan.getType());
-		plancon2.addConstraint(new BoundConstraint(null, rplan));
-		plancon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wa));
+		ObjectCondition	planconwq	= new ObjectCondition(rplan.getType());
+		planconwq.addConstraint(new BoundConstraint(null, rplan));
+		planconwq.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
 		
-		ObjectCondition	plancon3	= new ObjectCondition(rplan.getType());
-		plancon3.addConstraint(new BoundConstraint(null, rplan));
-		plancon3.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa2));
-		plancon3.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
-			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
+		ObjectCondition	aplconwc	= new ObjectCondition(apl.getType());
+		aplconwc.addConstraint(new BoundConstraint(null, apl));
+		aplconwc.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.apl_has_waitqueuecandidates, candwq, IOperator.CONTAINS));
 		
-		ObjectCondition	aplcon2a	= new ObjectCondition(apl.getType());
-		aplcon2a.addConstraint(new BoundConstraint(null, apl));
-		aplcon2a.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.apl_has_waitqueuecandidates, rplan, IOperator.CONTAINS));
-		
-//		ObjectCondition	aplcon2b	= new ObjectCondition(apl.getType());
-//		aplcon2b.addConstraint(new BoundConstraint(null, apl));
-//		aplcon2b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildwaitqueuecandsfinished, Boolean.TRUE));
-		
-//		ObjectCondition	aplcon2c	= new ObjectCondition(apl.getType());
-//		aplcon2c.addConstraint(new BoundConstraint(null, apl));
-//		aplcon2c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
-		
-		ObjectCondition	rpecon2	= new ObjectCondition(rpe.getType());
-		rpecon2.addConstraint(new BoundConstraint(null, rpe));
-		rpecon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.processableelement_has_apl, apl));
-		rpecon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.messageevent_has_original, org));
-		rpecon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
-		rpecon2.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_state, 
-			OAVBDIRuntimeModel.PROCESSABLEELEMENT_APLRPLANSREADY));
+		ObjectCondition	candconwc	= new ObjectCondition(candwq.getType());
+		candconwc.addConstraint(new BoundConstraint(null, candwq));
+		candconwc.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitqueuecandidate_has_plan, rplan));
 		
 		// Rules for waitqueue candidates
-		Rule	add_waitqueuecand_to_apl	= new Rule("add_waitqueuecand_to_apl",
-				new AndCondition(new ICondition[]{rpecon2, capcon, wacon, plancon2, new NotCondition(new AndCondition(new ICondition[]{wacon2, plancon3, aplcon2a}))}),
+		Rule add_waitqueuecand_to_apl = new Rule("add_waitqueuecand_to_apl",
+			new AndCondition(new ICondition[]{
+				rpecon, capcon, 
+				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa})),
+				waconwq, planconwq,
+				new NotCondition(aplconwc)}),
 				ADD_WAITQUEUECAND_TO_APL);
 
-		Rule	no_waitqueuecands_for_apl	= new Rule("no_waitqueuecands_for_apl",
-				new AndCondition(new ICondition[]{rpecon2, capcon, new NotCondition(new AndCondition(new ICondition[]{wacon, plancon2, new NotCondition(aplcon2a)}))}),
+		Rule no_waitqueuecands_for_apl	= new Rule("make_apl_available",
+			new AndCondition(new ICondition[]{
+				rpecon, capcon, 
+				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa, 
+					new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi}))})),
+				new NotCondition(new AndCondition(new ICondition[]{waconwq, planconwq, 
+					new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
+					new NotCondition(new AndCondition(new ICondition[]{candconwc, aplconwc}))
+				}))}),
 				NO_WAITQUEUECANDS_FOR_APL);
 		
-		return new Rule[]{add_rplan_to_apl, no_rplans_for_apl, add_waitqueuecand_to_apl, no_waitqueuecands_for_apl};		
+		return new Rule[]{add_rplan_to_apl, add_waitqueuecand_to_apl, no_waitqueuecands_for_apl};		
 	}
 	
 	//-------- APL Building finished rule --------
@@ -710,6 +696,7 @@ public class EventProcessingRules
 					BeliefRules.addParameterSetValue(state, appparamset, piif);
 				}
 			}
+			
 			Collection mcands = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
 			if(mcands!=null)
 			{
@@ -893,7 +880,6 @@ public class EventProcessingRules
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				Object rpe	= assignments.getVariableValue("?rpe");
-				Object ragent	= assignments.getVariableValue("?ragent");
 				Object apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
 
 				Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model); 
@@ -924,8 +910,8 @@ public class EventProcessingRules
 					else
 					{
 						// Remove plan candidate from apl.
-						if(cand instanceof WaitqueueCandidate)
-							state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, ((WaitqueueCandidate)cand).getWaitqueueCandidate());
+						if(state.getType(cand).equals(OAVBDIRuntimeModel.waitqueuecandidate_type))
+							state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, cand);
 						else
 							state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates, cand);
 					}
@@ -1739,7 +1725,7 @@ public class EventProcessingRules
 		{
 			for(Iterator it=coll.iterator(); it.hasNext(); )
 			{
-				candidatelist.add(new WaitqueueCandidate(it.next()));
+				candidatelist.add(it.next());
 			}
 		}
 		
@@ -1810,9 +1796,10 @@ public class EventProcessingRules
 	protected static int getPriority(IOAVState state, Object cand)
 	{
 		Object	mplan;
-		if(cand instanceof WaitqueueCandidate)
+		if(state.getType(cand).equals(OAVBDIRuntimeModel.waitqueuecandidate_type))
 		{
-			mplan = state.getAttributeValue(((WaitqueueCandidate)cand).getWaitqueueCandidate(), OAVBDIRuntimeModel.element_has_model);
+			Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan);
+			mplan = state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
 		}
 		else if(state.getType(cand).equals(OAVBDIRuntimeModel.plancandidate_type))
 		{
@@ -1838,7 +1825,7 @@ public class EventProcessingRules
 	protected static int getRank(IOAVState state, Object cand, Object apl)
 	{
 		int rank;
-		if(cand instanceof WaitqueueCandidate)
+		if(state.getType(cand).equals(OAVBDIRuntimeModel.waitqueuecandidate_type))
 		{
 			rank = 1; // waitqueue
 		}
@@ -1877,10 +1864,10 @@ public class EventProcessingRules
 		{
 			cand = cands.get(i);
 			Object wa;
-			if(cand instanceof WaitqueueCandidate) 
+			if(state.getType(cand).equals(OAVBDIRuntimeModel.waitqueuecandidate_type)) 
 			{
-				Object wq = ((WaitqueueCandidate)cand).getWaitqueueCandidate();
-				wa = state.getAttributeValue(wq, OAVBDIRuntimeModel.plan_has_waitqueuewa);
+				Object rplan = state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan);
+				wa = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa);
 			}
 			else if(state.getType(cand).equals(OAVBDIRuntimeModel.plancandidate_type))
 			{
@@ -1952,13 +1939,14 @@ public class EventProcessingRules
 	 */
 	protected static void scheduleCandidate(IOAVState state, Object rpe, Object apl, Object cand)
 	{
-		if(cand instanceof WaitqueueCandidate) 
+		if(state.getType(cand).equals(OAVBDIRuntimeModel.waitqueuecandidate_type)) 
 		{
-			scheduleWaitqueueCandidate(state, rpe, ((WaitqueueCandidate)cand).getWaitqueueCandidate());
+			scheduleWaitqueueCandidate(state, rpe, cand);
 			
 			// Save candidate in plan for later apl removal and exclude list management.
 			if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
-				state.setAttributeValue(((WaitqueueCandidate)cand).getWaitqueueCandidate(), OAVBDIRuntimeModel.plan_has_waitqueuecandidate, cand);
+				state.setAttributeValue(state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan)
+					, OAVBDIRuntimeModel.plan_has_waitqueuecandidate, cand);
 		}
 		else if(state.getType(cand).equals(OAVBDIRuntimeModel.mplancandidate_type))
 		{
@@ -2022,7 +2010,8 @@ public class EventProcessingRules
 	 */
 	protected static void scheduleWaitqueueCandidate(IOAVState state, Object rpe, Object cand)
 	{
-		state.addAttributeValue(cand, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
+		Object	rplan = state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan);
+		state.addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
 	}
 	
 	/**
@@ -2105,15 +2094,15 @@ public class EventProcessingRules
 	/**
 	 *  Marker class for distinguishing between plan instance 
 	 *  candidates and waitqueue candidates (both plan_type).
-	 */
+	 * /
 	static class WaitqueueCandidate
 	{
-		/** The waitqueue candidate. */
+		/** The waitqueue candidate. * /
 		protected Object waitqueuecandidate;
 		
 		/**
 		 *  Create a new {@link WaitqueueCandidate} candidate. 
-		 */
+		 * /
 		public WaitqueueCandidate(Object waitqueuecandidate)
 		{
 			this.waitqueuecandidate = waitqueuecandidate;
@@ -2122,10 +2111,10 @@ public class EventProcessingRules
 		/**
 		 *  Get the waitqueuecandidate.
 		 *  @return The waitqueuecandidate.
-		 */
+		 * /
 		public Object getWaitqueueCandidate()
 		{
 			return waitqueuecandidate;
 		}
-	}
+	}*/
 }
