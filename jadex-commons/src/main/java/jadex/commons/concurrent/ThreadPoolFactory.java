@@ -65,7 +65,7 @@ public class ThreadPoolFactory
 			}
 			catch(Throwable e)
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				instance	= (IThreadPool)Class.forName(THREADPOOL_STANDARD).newInstance();
 			}
 		}

@@ -34,6 +34,12 @@ public class OAVBDIRuntimeModel
 	
 	/** The processable element state unprocessed. */
 	public static final String	PROCESSABLEELEMENT_UNPROCESSED	= "unprocessed";
+
+	/** The processable element state apl rplans ready. */
+	public static final String	PROCESSABLEELEMENT_APLRPLANSREADY = "aplrplansready";
+
+	/** The processable element state apl waitqueues ready. */
+	public static final String	PROCESSABLEELEMENT_APLWAITQUEUESREADY = "aplwaitqueuesready";
 	
 	/** The processable element state apl available. */
 	public static final String	PROCESSABLEELEMENT_APLAVAILABLE	= "aplavailable";
@@ -531,13 +537,13 @@ public class OAVBDIRuntimeModel
 	public static OAVAttributeType apl_has_waitqueuecandidates;
 	
 	/** Flag indicating that plan instance candidates building is finished. */
-	public static OAVAttributeType apl_has_buildrplansfinished;
+//	public static OAVAttributeType apl_has_buildrplansfinished;
 	
 //	/** Flag indicating that mplan candidates building is finished. */
 //	public static OAVAttributeType apl_has_buildmplansfinished;
 	
 	/** Flag indicating that waitqueue candidates building is finished. */
-	public static OAVAttributeType apl_has_buildwaitqueuecandsfinished;
+//	public static OAVAttributeType apl_has_buildwaitqueuecandsfinished;
 	
 	//-------- mplancandidate --------
 	
@@ -799,9 +805,9 @@ public class OAVBDIRuntimeModel
 		apl_has_plancandidates = apl_type.createAttributeType("apl_has_plancandidates", OAVBDIRuntimeModel.mplancandidate_type, OAVAttributeType.LIST);
 		apl_has_planinstancecandidates = apl_type.createAttributeType("apl_has_planinstancecandidates", OAVBDIRuntimeModel.plancandidate_type, OAVAttributeType.LIST);
 		apl_has_waitqueuecandidates = apl_type.createAttributeType("apl_has_waitqueuecandidates", OAVBDIRuntimeModel.plan_type, OAVAttributeType.LIST);
-		apl_has_buildrplansfinished = apl_type.createAttributeType("apl_has_buildrplansfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		apl_has_buildrplansfinished = apl_type.createAttributeType("apl_has_buildrplansfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 //		apl_has_buildmplansfinished = apl_type.createAttributeType("apl_has_buildmplansfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		apl_has_buildwaitqueuecandsfinished = apl_type.createAttributeType("apl_has_buildwaitqueuecandsfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		apl_has_buildwaitqueuecandsfinished = apl_type.createAttributeType("apl_has_buildwaitqueuecandsfinished", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		
 		// mplancandidate
 		mplancandidate_has_mplan	= mplancandidate_type.createAttributeType("mplancandidate_has_mplan", OAVBDIMetaModel.plan_type); 

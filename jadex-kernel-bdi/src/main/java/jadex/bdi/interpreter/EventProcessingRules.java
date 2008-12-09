@@ -50,7 +50,7 @@ public class EventProcessingRules
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
 			Object	rpe	= assignments.getVariableValue("?rpe");
-			Object	ragent	= assignments.getVariableValue("?ragent");
+//			Object	ragent	= assignments.getVariableValue("?ragent");
 			Object	rplan	= assignments.getVariableValue("?rplan");
 			Object	rcapa	= assignments.getVariableValue("?rcapa");
 
@@ -77,7 +77,7 @@ public class EventProcessingRules
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
 			Object	rpe	= assignments.getVariableValue("?rpe");
-			Object	ragent	= assignments.getVariableValue("?ragent");
+//			Object	ragent	= assignments.getVariableValue("?ragent");
 
 //			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
 
@@ -88,7 +88,10 @@ public class EventProcessingRules
 				state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, apl);
 			}
 
-			state.setAttributeValue(apl, OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE);
+			state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, 
+				OAVBDIRuntimeModel.PROCESSABLEELEMENT_APLRPLANSREADY);
+
+//			state.setAttributeValue(apl, OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE);
 		}
 	};
 
@@ -100,7 +103,7 @@ public class EventProcessingRules
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
 			Object	rpe	= assignments.getVariableValue("?rpe");
-			Object	ragent	= assignments.getVariableValue("?ragent");
+//			Object	ragent	= assignments.getVariableValue("?ragent");
 			Object	rplan	= assignments.getVariableValue("?rplan");
 
 //			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
@@ -123,8 +126,9 @@ public class EventProcessingRules
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
-			Object	rpe	= assignments.getVariableValue("?rpe");
-			Object	ragent	= assignments.getVariableValue("?ragent");
+			Object rpe	= assignments.getVariableValue("?rpe");
+			Object rcapa = assignments.getVariableValue("?rcapa");
+//			Object ragent	= assignments.getVariableValue("?ragent");
 
 //			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, rpe);
 
@@ -135,7 +139,9 @@ public class EventProcessingRules
 				state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, apl);
 			}
 
-			state.setAttributeValue(apl, OAVBDIRuntimeModel.apl_has_buildwaitqueuecandsfinished, Boolean.TRUE);
+//			state.setAttributeValue(apl, OAVBDIRuntimeModel.apl_has_buildwaitqueuecandsfinished, Boolean.TRUE);
+		
+			addMPlansToAPL(state, rpe, rcapa);
 		}
 	};
 	
@@ -175,8 +181,8 @@ public class EventProcessingRules
   				new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, rpe, IOperator.CONTAINS)
   		}));
 		
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
+//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
+//		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new OrConstraint(new IConstraint[]
 //		{
 //			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
@@ -208,27 +214,26 @@ public class EventProcessingRules
 		aplcon1a.addConstraint(new BoundConstraint(null, apl));
 		aplcon1a.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.apl_has_planinstancecandidates, cand, IOperator.CONTAINS));
 
-		ObjectCondition	aplcon1b	= new ObjectCondition(apl.getType());
-		aplcon1b.addConstraint(new BoundConstraint(null, apl));
-		aplcon1b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
+//		ObjectCondition	aplcon1b	= new ObjectCondition(apl.getType());
+//		aplcon1b.addConstraint(new BoundConstraint(null, apl));
+//		aplcon1b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
 
-		ObjectCondition	aplcon1c	= new ObjectCondition(apl.getType());
-		aplcon1c.addConstraint(new BoundConstraint(null, apl));
-		aplcon1c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.FALSE));
+//		ObjectCondition	aplcon1c	= new ObjectCondition(apl.getType());
+//		aplcon1c.addConstraint(new BoundConstraint(null, apl));
+//		aplcon1c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.FALSE));
 		
 		// Rules for plan instances
 		Rule	add_rplan_to_apl	= new Rule("add_rplan_to_apl",
-				new AndCondition(new ICondition[]{aplcon1c, rpecon, capcon, wacon, plancon, new NotCondition(new AndCondition(new ICondition[]{candcon, aplcon1a})), agentcon}),
+				new AndCondition(new ICondition[]{rpecon, capcon, wacon, plancon, new NotCondition(new AndCondition(new ICondition[]{candcon, aplcon1a}))}),
 				ADD_RPLAN_TO_APL);
 
 		Rule	no_rplans_for_apl	= new Rule("no_rplans_for_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, new NotCondition(aplcon1b), new NotCondition(new AndCondition(new ICondition[]{wacon, plancon, new NotCondition(aplcon1a)})), agentcon}),
+				new AndCondition(new ICondition[]{rpecon, capcon, new NotCondition(new AndCondition(new ICondition[]{wacon, plancon, new NotCondition(aplcon1a)}))}),
 				NO_RPLANS_FOR_APL);
-
 		
 		ObjectCondition	wacon2	= new ObjectCondition(wa2.getType());
-		wacon.addConstraint(new BoundConstraint(null, wa2));
-		wacon.addConstraint(new OrConstraint(new IConstraint[]
+		wacon2.addConstraint(new BoundConstraint(null, wa2));
+		wacon2.addConstraint(new OrConstraint(new IConstraint[]
 		{
 				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
 				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, org, IOperator.CONTAINS),
@@ -244,28 +249,37 @@ public class EventProcessingRules
 		ObjectCondition	plancon3	= new ObjectCondition(rplan.getType());
 		plancon3.addConstraint(new BoundConstraint(null, rplan));
 		plancon3.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa2));
+		plancon3.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
+			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		
 		ObjectCondition	aplcon2a	= new ObjectCondition(apl.getType());
 		aplcon2a.addConstraint(new BoundConstraint(null, apl));
 		aplcon2a.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.apl_has_waitqueuecandidates, rplan, IOperator.CONTAINS));
 		
-		ObjectCondition	aplcon2b	= new ObjectCondition(apl.getType());
-		aplcon2b.addConstraint(new BoundConstraint(null, apl));
-		aplcon2b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildwaitqueuecandsfinished, Boolean.TRUE));
+//		ObjectCondition	aplcon2b	= new ObjectCondition(apl.getType());
+//		aplcon2b.addConstraint(new BoundConstraint(null, apl));
+//		aplcon2b.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildwaitqueuecandsfinished, Boolean.TRUE));
 		
-		ObjectCondition	aplcon2c	= new ObjectCondition(apl.getType());
-		aplcon2c.addConstraint(new BoundConstraint(null, apl));
-		aplcon2c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
+//		ObjectCondition	aplcon2c	= new ObjectCondition(apl.getType());
+//		aplcon2c.addConstraint(new BoundConstraint(null, apl));
+//		aplcon2c.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_buildrplansfinished, Boolean.TRUE));
+		
+		ObjectCondition	rpecon2	= new ObjectCondition(rpe.getType());
+		rpecon2.addConstraint(new BoundConstraint(null, rpe));
+		rpecon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.processableelement_has_apl, apl));
+		rpecon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.messageevent_has_original, org));
+		rpecon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
+		rpecon2.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_state, 
+			OAVBDIRuntimeModel.PROCESSABLEELEMENT_APLRPLANSREADY));
 		
 		// Rules for waitqueue candidates
 		Rule	add_waitqueuecand_to_apl	= new Rule("add_waitqueuecand_to_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, agentcon, wacon, plancon2, aplcon2c, new NotCondition(new AndCondition(new ICondition[]{aplcon2a, plancon3}))}),
+				new AndCondition(new ICondition[]{rpecon2, capcon, wacon, plancon2, new NotCondition(new AndCondition(new ICondition[]{wacon2, plancon3, aplcon2a}))}),
 				ADD_WAITQUEUECAND_TO_APL);
 
 		Rule	no_waitqueuecands_for_apl	= new Rule("no_waitqueuecands_for_apl",
-				new AndCondition(new ICondition[]{rpecon, capcon, agentcon, new NotCondition(aplcon2b),	new NotCondition(new AndCondition(new ICondition[]{wacon, plancon2, new NotCondition(aplcon2a)}))}),
+				new AndCondition(new ICondition[]{rpecon2, capcon, new NotCondition(new AndCondition(new ICondition[]{wacon, plancon2, new NotCondition(aplcon2a)}))}),
 				NO_WAITQUEUECANDS_FOR_APL);
-
 		
 		return new Rule[]{add_rplan_to_apl, no_rplans_for_apl, add_waitqueuecand_to_apl, no_waitqueuecands_for_apl};		
 	}
@@ -273,8 +287,90 @@ public class EventProcessingRules
 	//-------- APL Building finished rule --------
 	
 	/**
-	 *  Action to check preconditions and match expressions of mplans and set APL_AVAILABLE
+	 * 
 	 */
+	protected static void addMPlansToAPL(IOAVState state, Object rpe, Object rcapa)
+	{
+		Object	mpe	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
+		Object	apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
+		
+		// Add mplans from precandidates
+		Object	precandlist	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_precandidates, mpe);
+		if(precandlist!=null)
+		{
+			Collection	precands	= state.getAttributeValues(precandlist, OAVBDIRuntimeModel.precandidatelist_has_precandidates);
+			if(precands!=null)
+			{
+				for(Iterator it=precands.iterator(); it.hasNext(); )
+				{
+					Object	precand	= it.next();
+					Object	mplan	= state.getAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_mplan);
+					Object	scope	= state.getAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_capability);
+					Object	triggerref	= state.getAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_triggerreference);
+					Object	mexp	= state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_match);
+					
+					OAVBDIFetcher	fetcher	= new OAVBDIFetcher(state, scope);
+					if(OAVBDIRuntimeModel.goal_type.equals(state.getType(rpe)))
+						fetcher.setRGoal(rpe);
+					else if(OAVBDIRuntimeModel.internalevent_type.equals(state.getType(rpe)))
+						fetcher.setRInternalEvent(rpe);
+					else if(OAVBDIRuntimeModel.messageevent_type.equals(state.getType(rpe)))
+						fetcher.setRMessageEvent(rpe);
+					boolean	match	= true;
+					if(mexp!=null)
+					{
+						try
+						{
+							match = ((Boolean)AgentRules.evaluateExpression(state, mexp, fetcher)).booleanValue();
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							match	= false;
+						}
+					}
+					
+					if(match)
+						createMPlanCandidates(state, rpe, scope, apl, mplan, fetcher);
+				}
+			}
+		}
+		
+		// When no candidates, remove apl as required by other rules (hack???)
+		Collection	plancands	= state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
+		Collection	pinscands	= state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
+		Collection	waitcands	= state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
+		
+		if((plancands==null || plancands.isEmpty())
+			&& (pinscands==null || pinscands.isEmpty())
+			&& (waitcands==null || waitcands.isEmpty()))
+		{
+			state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
+			state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, 
+				OAVBDIRuntimeModel.PROCESSABLEELEMENT_NOCANDIDATES);
+			
+			// When no candidates found, event processing stops here.
+//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_eventprocessing, null);
+			
+			if(!state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type)
+				|| state.getAttributeValues(rpe, OAVBDIRuntimeModel.goal_has_triedmplans)==null)
+			{
+				AgentRules.getLogger(state, rcapa).warning("Warning: Event/goal not handled: "+rpe+" "
+					+state.getAttributeValue(state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+			}
+		}
+		else
+		{
+			state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state,
+				OAVBDIRuntimeModel.PROCESSABLEELEMENT_APLAVAILABLE);
+		
+//			System.out.println("APL available: "+rpe);
+		}
+	}
+	
+	/**
+	 *  Action to check preconditions and match expressions of mplans and set APL_AVAILABLE
+	 * /
 	protected static IAction	MAKE_APL_AVAILABLE	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
@@ -358,13 +454,13 @@ public class EventProcessingRules
 //				System.out.println("APL available: "+rpe);
 			}
 		}
-	};
+	};*/
 	
 	/**
 	 *  Add matching waiting rplans or plans with matching waitqueues to the APL
 	 *  of an unprocessed processable element and set the APL to building finished,
 	 *  when no more found.
-	 */
+	 * /
 	protected static Rule	createMakeAPLAvailableRule()
 	{
 		Variable	rpe	= new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
@@ -401,7 +497,7 @@ public class EventProcessingRules
 				new AndCondition(new ICondition[]{rpecon, aplcon, capcon, agentcon}), MAKE_APL_AVAILABLE);
 
 		return make_apl_available;		
-	}
+	}*/
 
 	//-------- rule methods --------
 

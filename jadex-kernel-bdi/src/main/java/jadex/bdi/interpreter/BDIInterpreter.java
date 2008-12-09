@@ -998,7 +998,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 		Rule[]	aplrules = EventProcessingRules.createBuildRPlanAPLRules();
 		for(int i=0; i<aplrules.length; i++)
 			RULEBASE.addRule(aplrules[i]);
-		RULEBASE.addRule(EventProcessingRules.createMakeAPLAvailableRule());
+//		RULEBASE.addRule(EventProcessingRules.createMakeAPLAvailableRule());
 		RULEBASE.addRule(EventProcessingRules.createMetaLevelReasoningForGoalRule());
 		RULEBASE.addRule(EventProcessingRules.createMetaLevelReasoningForInternalEventRule());
 		RULEBASE.addRule(EventProcessingRules.createMetaLevelReasoningForMessageEventRule());
