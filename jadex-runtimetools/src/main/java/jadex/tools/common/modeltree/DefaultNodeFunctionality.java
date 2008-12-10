@@ -129,8 +129,10 @@ public class	DefaultNodeFunctionality
 	 */
 	public List	getChildren(FileNode node)
 	{
+//		System.out.println("Get Children: "+node.getToolTipText());
 		if(hasChanged(node, CHILDREN))
 		{
+			System.out.println("Get Children2: "+node.getToolTipText());
 			startNodeTask(new UpdateChildrenTask(node));
 		}
 		return (List) node.getProperties().get(CHILDREN);
@@ -350,6 +352,7 @@ public class	DefaultNodeFunctionality
 		 */
 		public void performTask()
 		{
+			System.out.println("Get Children3: "+node.getToolTipText());
 			boolean	changed	= true;
 			if(node instanceof JarNode)
 			{
