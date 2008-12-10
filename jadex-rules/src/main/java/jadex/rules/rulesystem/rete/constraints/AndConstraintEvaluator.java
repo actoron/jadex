@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rete.constraints;
 
+import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
@@ -102,9 +103,8 @@ public class AndConstraintEvaluator implements IConstraintEvaluator
 	 */
 	public int hashCode()
 	{
-		// Arrays.hashCode(Object[]) : @since 1.5
-		//return 31 + Arrays.hashCode(evaluators);
-		return 31 + evaluators.hashCode();
+		// Arrays.hashCode(Object[]): JDK 1.5
+		return 31 + SUtil.arrayHashCode(evaluators);
 	}
 
 	/**

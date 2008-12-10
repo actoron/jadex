@@ -141,7 +141,7 @@ public class ReteBuilder
 		long end = System.currentTimeMillis();
 		
 		if(REPORTING)
-			report.addInfo(rule, (end-start)/1000);
+			report.addInfo(rule, (end-start));
 		
 		return ret;
 	}

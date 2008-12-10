@@ -371,6 +371,22 @@ public class SUtil
 	}
 
 	/**
+	 *  Calculate a hash code for an array.
+	 */
+	public static int arrayHashCode(Object a)
+	{
+		int	ret	= 1;
+
+		for(int i=0; i<Array.getLength(a); i++)
+		{
+			Object	val	= Array.get(a, i);
+			ret	= 31 * ret + (val!=null ? val.hashCode() : 0);
+		}
+
+		return ret;
+	}
+
+	  /**
 	 * Get a string representation for an array.
 	 * @param array The array.
 	 * @return formatted string.

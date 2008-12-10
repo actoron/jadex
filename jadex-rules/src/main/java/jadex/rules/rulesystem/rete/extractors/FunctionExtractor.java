@@ -126,9 +126,8 @@ public class FunctionExtractor implements IValueExtractor
 	public int hashCode()
 	{
 		int	result	= 31 + (function!=null ? function.hashCode() : 0);
-		// Arrays.hashCode(Object[]) : @since 1.5
-		//result	= result*31 + Arrays.hashCode(extractors);
-		result	= result*31 + extractors.hashCode();
+		// Arrays.hashCode(Object[]): JDK 1.5
+		result	= result*31 + SUtil.arrayHashCode(extractors);
 		return result;
 	}
 
