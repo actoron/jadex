@@ -38,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -210,8 +211,15 @@ public class AgentSelectorDialog
 		}
 		catch(BDIFailureException e)
 		{
-			String text = SUtil.wrapText("Could not refresh agent list: "+e.getMessage());
-			JOptionPane.showMessageDialog(SGUI.getWindowParent(parent), text, "Agent List Problem", JOptionPane.INFORMATION_MESSAGE);
+			final String text = SUtil.wrapText("Could not refresh agent list: "+e.getMessage());
+			
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					JOptionPane.showMessageDialog(SGUI.getWindowParent(parent), text, "Agent List Problem", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
 		}
 	}
 

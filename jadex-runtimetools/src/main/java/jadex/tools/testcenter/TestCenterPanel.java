@@ -838,12 +838,18 @@ public class TestCenterPanel extends JSplitPane
 			Integer to = new Integer(text);
 			plugin.getJCC().getAgent().getBeliefbase().getBelief("testcase_timeout").setFact(to);
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
 			//e.printStackTrace();
-			String msg = SUtil.wrapText("No integer timeout: "+e.getMessage());
-			JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
-				msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					String msg = SUtil.wrapText("No integer timeout: "+e.getMessage());
+					JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
+						msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
 		}
 	}
 
@@ -863,20 +869,32 @@ public class TestCenterPanel extends JSplitPane
 			{
 				concurrency	= Integer.parseInt(text);
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
 				//e.printStackTrace();
-				String msg = SUtil.wrapText("No integer concurrency: "+e.getMessage());
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
-					msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						String msg = SUtil.wrapText("No integer concurrency: "+e.getMessage());
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
+							msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
 			}
 			
 			if(concurrency<=0)
 			{
 				concurrency	= 1;
-				String msg = SUtil.wrapText("Concurrency must be greater zero.");
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
-					msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						String msg = SUtil.wrapText("Concurrency must be greater zero.");
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
+							msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
 			}
 		}
 	}

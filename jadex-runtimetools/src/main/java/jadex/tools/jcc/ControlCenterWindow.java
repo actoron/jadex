@@ -1,6 +1,7 @@
 package jadex.tools.jcc;
 
 import jadex.commons.BrowserLauncher;
+import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.tools.common.AboutDialog;
 import jadex.tools.common.ConfigurationDialog;
@@ -47,6 +48,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
@@ -573,45 +575,51 @@ public class ControlCenterWindow extends JFrame
 	{
 		if(filechooser.showDialog(this, "Save Project As")==JFileChooser.APPROVE_OPTION)
 		{
-			File file = filechooser.getSelectedFile();
+			final File f = filechooser.getSelectedFile();
 
-			if(file!=null)
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				if(file.exists())
+				public void run()
 				{
-					String	msg	= SUtil.wrapText("The file: "+file.getAbsolutePath()+" exists.\n"+
-						" Do you want to overwrite the file?");
-					int o = JOptionPane.showConfirmDialog(this, msg,
-						"Overwrite Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-
-					if(JOptionPane.NO_OPTION==o)
-						return;
+					File file = f;
+					if(file!=null)
+					{
+						if(file.exists())
+						{
+							String	msg	= SUtil.wrapText("The file: "+file.getAbsolutePath()+" exists.\n"+
+								" Do you want to overwrite the file?");
+							int o = JOptionPane.showConfirmDialog(ControlCenterWindow.this, msg,
+								"Overwrite Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		
+							if(JOptionPane.NO_OPTION==o)
+								return;
+						}
+						else if(!file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION))
+						{
+							file = new File(file.getAbsolutePath()+ControlCenter.JCCPROJECT_EXTENSION);
+							filechooser.setSelectedFile(file);
+						}
+						try
+						{
+							file.createNewFile();
+						}
+						catch(IOException e)
+						{
+						}
+		
+						if(file.canWrite())
+						{
+							controlcenter.setCurrentProject(file);
+							controlcenter.saveProject();
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(ControlCenterWindow.this, "Cannot save project here. The project file: \n"
+								+file.getAbsolutePath()+"\n cannot be written", "New Project Error",JOptionPane.ERROR_MESSAGE);
+						}
+					}
 				}
-				else if(!file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION))
-				{
-					file = new File(file.getAbsolutePath()+ControlCenter.JCCPROJECT_EXTENSION);
-					filechooser.setSelectedFile(file);
-				}
-				try
-				{
-					file.createNewFile();
-				}
-				catch(IOException e)
-				{
-				}
-
-				if(file.canWrite())
-				{
-					controlcenter.setCurrentProject(file);
-					controlcenter.saveProject();
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Cannot save project here. The project file: \n"
-							+file.getAbsolutePath()+"\n cannot be written", "New Project Error",
-							JOptionPane.ERROR_MESSAGE);
-				}
-			}
+			});
 		}
 	}
 
@@ -623,7 +631,7 @@ public class ControlCenterWindow extends JFrame
 	{
 		if(filechooser.showDialog(this, "Open Project")==JFileChooser.APPROVE_OPTION)
 		{
-			File file = filechooser.getSelectedFile();
+			final File file = filechooser.getSelectedFile();
 
 			boolean canopen = file!=null && file.canWrite() && file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION);
 			if(canopen)
@@ -641,9 +649,15 @@ public class ControlCenterWindow extends JFrame
 			
 			if(!canopen)
 			{
-				String	msg	= SUtil.wrapText("Cannot open the project from file:\n"+file);
-				JOptionPane.showMessageDialog(this, msg, "Cannot open the project",
-					JOptionPane.ERROR_MESSAGE);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						String	msg	= SUtil.wrapText("Cannot open the project from file:\n"+file);
+						JOptionPane.showMessageDialog(ControlCenterWindow.this, msg, "Cannot open the project",
+							JOptionPane.ERROR_MESSAGE);
+					}
+				});
 			}
 		}
 	}

@@ -427,8 +427,14 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 			catch(Exception e)
 			{
 				//e.printStackTrace();
-				String text = SUtil.wrapText("Could not refresh descriptions: "+e.getMessage());
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(getView()), text, "Refresh Problem", JOptionPane.INFORMATION_MESSAGE);
+				final String text = SUtil.wrapText("Could not refresh descriptions: "+e.getMessage());
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(getView()), text, "Refresh Problem", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
 			}
 		}
 		

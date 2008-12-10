@@ -125,7 +125,7 @@ public class FipaConversationPanel extends JSplitPane
 				{
 					String text = SUtil.wrapText("Could not send message: "+e.getMessage());
 					JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text,
-							"Message Error", JOptionPane.INFORMATION_MESSAGE);
+						"Message Error", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});
@@ -505,8 +505,14 @@ public class FipaConversationPanel extends JSplitPane
 			}
 			catch(Exception e)
 			{
-				String text = SUtil.wrapText("Could not decode stored message: "+e.getMessage());
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
+				final String text = SUtil.wrapText("Could not decode stored message: "+e.getMessage());
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
 			}
 		}
 		
@@ -533,9 +539,15 @@ public class FipaConversationPanel extends JSplitPane
 			}
 			catch(Exception e)
 			{
-				String text = SUtil.wrapText("Could not decode stored message: "+e.getMessage());
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
-			}
+				final String text = SUtil.wrapText("Could not decode stored message: "+e.getMessage());
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+			}			
 		}
 		setSentMessages((IMessageEvent[])sentmsgs.toArray(new IMessageEvent[sentmsgs.size()]));
 	}

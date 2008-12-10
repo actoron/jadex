@@ -567,10 +567,16 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			{
 				jcc.getAgent().dispatchTopLevelGoal(jcc.getAgent().createGoal("ams_shutdown_platform"));
 			}
-			catch(GoalFailureException ex)
+			catch(final GoalFailureException ex)
 			{
-				String text = SUtil.wrapText("Could not kill platform: "+ex.getMessage());
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(spanel), text, "Platform Shutdown Problem", JOptionPane.INFORMATION_MESSAGE);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						String text = SUtil.wrapText("Could not kill platform: "+ex.getMessage());
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(spanel), text, "Platform Shutdown Problem", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
 			}
 		}
 	};

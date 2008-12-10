@@ -16,6 +16,7 @@ import jadex.tools.common.ElementPanel;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.JValidatorTextField;
 import jadex.tools.common.ParserValidator;
+import jadex.tools.jcc.ControlCenterWindow;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -607,7 +608,7 @@ public class StarterPanel extends JPanel
 	 *  Update the GUI for a new model.
 	 *  @param adf The adf.
 	 */
-	void updateGuiForNewModel(String adf)
+	void updateGuiForNewModel(final String adf)
 	{
 		if(model==null)
 			return;
@@ -660,34 +661,46 @@ public class StarterPanel extends JPanel
 			String clazz = SReflect.getInnerClassName(model.getClass());
 			if(clazz.endsWith("Data")) clazz = clazz.substring(0, clazz.length()-4);
 
-			IReport report = model.getReport();
+			final IReport report = model.getReport();
 			if(report!=null && !report.isEmpty())
 			{
-				Icon icon = GuiProperties.getElementIcon(clazz+"_broken");
+				final Icon icon = GuiProperties.getElementIcon(clazz+"_broken");
 				try
 				{
 					modeldesc.addHTMLContent(model.getName(), icon, report.toHTMLString(), adf, report.getDocuments());
 				}
-				catch(Exception e)
+				catch(final Exception e)
 				{
 					//e.printStackTrace();
-					String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-					modeldesc.addTextContent(model.getName(), icon, report.toString(), adf);
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
+							JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
+							modeldesc.addTextContent(model.getName(), icon, report.toString(), adf);
+						}
+					});
 				}
 			}
 			else
 			{
-				Icon icon = GuiProperties.getElementIcon(clazz);
+				final Icon icon = GuiProperties.getElementIcon(clazz);
 				try
 				{
 					modeldesc.addHTMLContent(model.getName(), icon, model.getDescription(), adf, null);
 				}
-				catch(Exception e)
+				catch(final Exception e)
 				{
-					String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-					modeldesc.addTextContent(model.getName(), icon, model.getDescription(), adf);
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
+							JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
+							modeldesc.addTextContent(model.getName(), icon, model.getDescription(), adf);
+						}
+					});
 				}
 			}
 

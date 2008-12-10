@@ -544,7 +544,7 @@ public abstract class Plan extends AbstractPlan
 		public void exceptionOccurred(Exception exception)
 		{
 //			System.out.println("exeception: "+this+", "+exception);
-			exception.printStackTrace();
+//			exception.printStackTrace();
 			SyncResultListener.this.exception = exception;
 			SyncResultListener.this.alreadyresumed = true;
 			pcs.firePropertyChange("true", Boolean.FALSE, Boolean.TRUE);

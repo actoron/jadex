@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -85,7 +86,7 @@ public class ComanalyzerListener //implements IToolManagement
 				if(!goal.isSucceeded())
 				{
 
-					String text;
+					final String text;
 					if(errormessage == null && goal.getException() == null)
 					{
 						text = errortitle;
@@ -103,7 +104,14 @@ public class ComanalyzerListener //implements IToolManagement
 					{
 						text = errormessage + "\n" + goal.getExcludeMode();
 					}
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(tool), SUtil.wrapText(text), errortitle, JOptionPane.ERROR_MESSAGE);
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							JOptionPane.showMessageDialog(SGUI.getWindowParent(tool), 
+								SUtil.wrapText(text), errortitle, JOptionPane.ERROR_MESSAGE);
+						}
+					});
 				}
 				goal.removeGoalListener(this);
 			}
