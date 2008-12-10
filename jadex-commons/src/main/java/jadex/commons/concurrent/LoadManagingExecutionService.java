@@ -73,7 +73,7 @@ public class LoadManagingExecutionService
 					{
 						try
 						{
-	//						System.out.println("Sleeping: "+sleep);
+							System.out.println("Sleeping: "+sleep);
 							if(sleep>1000)
 							{
 								System.out.println("Sleep warning: "+sleep);
@@ -90,8 +90,7 @@ public class LoadManagingExecutionService
 						if(concurrency!=0)
 							return false;	// Hack!!! execute can be called too often
 							
-						start	= System.currentTimeMillis();	// accuracy of about 16ms (Sun JVM / Windows)
-//						start	= System.nanoTime();
+						start	= System.nanoTime();	// accuracy of System.currentTimeMillis() only about 16ms (Sun JVM / Windows)
 						concurrency	= 0;
 						load	= 0.0;
 						for(Iterator it=tasks.iterator(); concurrency<limit && it.hasNext(); )
@@ -105,8 +104,8 @@ public class LoadManagingExecutionService
 							if(load==task.priority)
 							{
 								it.remove();
-								pool.execute(task);
 								concurrency++;
+								pool.execute(task);
 							}
 							else
 							{
@@ -114,8 +113,10 @@ public class LoadManagingExecutionService
 							}
 						}
 						if(concurrency>0)
+						{
 							limit	= concurrency;
-	//					System.out.println("Executing "+concurrency+" tasks with load "+load);
+							System.out.println("Executing "+concurrency+" tasks with load "+load);
+						}
 					}
 				}
 				catch(Exception e)
@@ -152,23 +153,28 @@ public class LoadManagingExecutionService
 	protected synchronized void	taskPerformed(Task task)
 	{
 		concurrency--;
-		if(concurrency==0 && !tasks.isEmpty())
+		if(concurrency==0)
 		{
 			// Calculate sleep time to meet load setting.
-			long	time	= System.currentTimeMillis() - start;
-			sleep	= (long)((time/load - time));
-//			long	time	= System.nanoTime() - start;
-//			sleep	= (long)((time/load - time) / 1000000);
+			long	time	= System.nanoTime() - start;
+			sleep	= (long)((time/load - time) / 1000000);
 			
 			// Calculate concurrency limit to meet max timeslice setting:
-			double	lastslice	= Math.max(sleep + time, 0.1);
-//			double	lastslice	= Math.max(sleep + time/1000000, 0.1);
+			double	lastslice	= Math.max(sleep + time/1000000, 0.1);
 			double	newlimit	= limit * timeslice / lastslice;
 			// Use exponential annealing to avoid oscillations
 			limit	= Math.max(1, limit + (int)(0.5*(newlimit-limit)));
 			
-			executor.execute();
-//			System.out.println("Execution finished in "+time/1000000+" millis.");
+			System.out.println("Execution finished in "+(time/100000)/10.0+" millis. New limit: "+limit);
+
+			if(!tasks.isEmpty())
+			{
+				executor.execute();
+			}
+			else
+			{
+				sleep	= 0; 	// do not sleep, when re starting after idle time.
+			}
 		}
 	}
 	
@@ -215,8 +221,16 @@ public class LoadManagingExecutionService
 		 */
 		public void	run()
 		{
-//			System.out.println("Executing: "+this);
-			boolean	execute	= executable.execute();
+			boolean	execute	= false;
+			try
+			{
+//				System.out.println("Executing: "+this);
+				execute	= executable.execute();
+			}
+			catch(RuntimeException e)
+			{
+				e.printStackTrace();
+			}
 			synchronized(LoadManagingExecutionService.this)
 			{
 				if(execute)
@@ -265,13 +279,13 @@ public class LoadManagingExecutionService
 		LoadManagingExecutionService	service	= new LoadManagingExecutionService(
 			ThreadPoolFactory.createThreadPool());
 		service.execute(new TestExecutable(), PRIORITY);
-		service.execute(new TestExecutable(), PRIORITY+0.1);
-		service.execute(new TestExecutable(), PRIORITY+0.2);
+		service.execute(new TestExecutable(), PRIORITY);
+		service.execute(new TestExecutable(), PRIORITY);
 		service.execute(new TestExecutable(), PRIORITY+0.3);
-		service.execute(new TestExecutable(), PRIORITY+0.4);
-		service.execute(new TestExecutable(), PRIORITY+0.5);
-		service.execute(new TestExecutable(), PRIORITY+0.6);
-		service.execute(new TestExecutable(), PRIORITY+0.7);
+		service.execute(new TestExecutable(), PRIORITY+0.3);
+		service.execute(new TestExecutable(), PRIORITY+0.3);
+		service.execute(new TestExecutable(), PRIORITY+0.8);
+		service.execute(new TestExecutable(), PRIORITY+0.8);
 	}
 	
 	static class TestExecutable	implements IExecutable
