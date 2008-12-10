@@ -135,7 +135,7 @@ public class	DefaultNodeFunctionality
 			startNodeTask(new UpdateChildrenTask(node));
 			System.out.println("Get Children2: "+node.getToolTipText());
 		}
-		return (List) node.getProperties().get(CHILDREN);
+		return (List)node.getProperties().get(CHILDREN);
 	}
 
 	/**

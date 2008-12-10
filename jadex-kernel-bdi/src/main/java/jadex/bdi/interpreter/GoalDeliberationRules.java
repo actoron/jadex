@@ -4,6 +4,7 @@ import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.AndConstraint;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.FunctionCall;
@@ -152,7 +153,7 @@ public class GoalDeliberationRules
 	
 	/**
 	 *  Create the deliberate goal deactivation rule (when_active).
-	 */
+	 * /
 	protected static Rule createDeliberateGoalDeactivationRule()
 	{
 		Variable	rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -202,11 +203,11 @@ public class GoalDeliberationRules
 		Rule	deliberate_goal_deactivation = new Rule("deliberate_goal_deactivation",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), action);
 		return deliberate_goal_deactivation;
-	}
+	}*/
 	
 	/**
 	 *  Create the deliberate goal deactivation rule (when_in_process).
-	 */
+	 * /
 	protected static Rule createDeliberateGoalDeactivationRule2()
 	{
 		Variable	rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -257,7 +258,197 @@ public class GoalDeliberationRules
 		Rule	deliberate_goal_deactivation2 = new Rule("deliberate_goal_deactivation2",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), action);
 		return deliberate_goal_deactivation2;
+	}*/
+	
+	/**
+	 *  Create the deliberate goal deactivation rule.
+	 */
+	protected static Rule createDeliberateGoalDeactivationRule()
+	{
+		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable inhibits	= new Variable("?inhibits", OAVBDIMetaModel.inhibits_type);
+		Variable ref	= new Variable("?ref", OAVJavaType.java_string_type);
+		Variable mingoal	= new Variable("?mingoal", OAVBDIMetaModel.goal_type);
+		Variable ringoal	= new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
+		Variable rincapa	= new Variable("?rincapa", OAVBDIRuntimeModel.capability_type);
+		Variable inmode = new Variable("?inmode", OAVJavaType.java_string_type);
+		
+		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
+		
+		ObjectCondition rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
+		rcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+		
+		ObjectCondition	inhicon	= new ObjectCondition(OAVBDIMetaModel.inhibits_type);
+		inhicon.addConstraint(new BoundConstraint(null, inhibits));
+		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_ref, ref));
+		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_inhibit, inmode));
+		
+		ObjectCondition	mingoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
+		mingoalcon.addConstraint(new BoundConstraint(null, mingoal));
+		mingoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_inhibits, inhibits, IOperator.CONTAINS));
+		
+		ObjectCondition	ingoalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		ingoalcon.addConstraint(new BoundConstraint(null, ringoal));
+		ingoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mingoal));
+		ingoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
+		ingoalcon.addConstraint(new OrConstraint(new LiteralConstraint(inmode, OAVBDIMetaModel.INHIBITS_WHEN_ACTIVE), 
+			new AndConstraint(new LiteralConstraint(inmode, OAVBDIMetaModel.INHIBITS_WHEN_IN_PROCESS), 
+				new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS))));
+		ingoalcon.addConstraint(new BoundConstraint(null, rgoal, IOperator.NOTEQUAL));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rincapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, ringoal, IOperator.CONTAINS));
+		capcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rincapa, ref, rgoal, rcapa})));
+
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rgoal	= assignments.getVariableValue("?rgoal");
+				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION);
+			}
+		};
+		Rule	deliberate_goal_deactivation2 = new Rule("deliberate_goal_deactivation2",
+			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), action);
+		return deliberate_goal_deactivation2;
 	}
+	
+	/**
+	 *  Add an inhibition entry (the inhibitor) to a goal when
+	 *  a) there is an inhibiting rgoal on type level
+	 *  b) there has no inhibition condition been specified.
+	 */
+	protected static Rule addTypeInhibitionLinkRule()
+	{
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable inhibits = new Variable("?inhibits", OAVBDIMetaModel.inhibits_type);
+		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
+		Variable mingoal = new Variable("?mingoal", OAVBDIMetaModel.goal_type);
+		Variable ringoal = new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
+		Variable rincapa = new Variable("?rincapa", OAVBDIRuntimeModel.capability_type);
+		Variable inmode = new Variable("?inmode", OAVJavaType.java_string_type);
+		
+		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+//		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
+		
+		ObjectCondition rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
+		rcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+		
+		ObjectCondition	inhicon	= new ObjectCondition(OAVBDIMetaModel.inhibits_type);
+		inhicon.addConstraint(new BoundConstraint(null, inhibits));
+		inhicon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.expression_has_content, null));
+		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_ref, ref));
+		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_inhibit, inmode));
+	
+		ObjectCondition	mingoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
+		mingoalcon.addConstraint(new BoundConstraint(null, mingoal));
+		mingoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_inhibits, inhibits, IOperator.CONTAINS));
+		
+		ObjectCondition	ingoalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		ingoalcon.addConstraint(new BoundConstraint(null, ringoal));
+		ingoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mingoal));
+		ingoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
+		ingoalcon.addConstraint(new OrConstraint(new LiteralConstraint(inmode, OAVBDIMetaModel.INHIBITS_WHEN_ACTIVE), 
+			new AndConstraint(new LiteralConstraint(inmode, OAVBDIMetaModel.INHIBITS_WHEN_IN_PROCESS), 
+				new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS))));
+		ingoalcon.addConstraint(new BoundConstraint(null, rgoal, IOperator.NOTEQUAL));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rincapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, ringoal, IOperator.CONTAINS));
+		capcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rincapa, ref, rgoal, rcapa})));
+
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object rgoal = assignments.getVariableValue("?rgoal");
+				Object ringoal = assignments.getVariableValue("?ringoal");
+//				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION);
+				System.out.println("Adding inhibitor to goal: "+rgoal+" "+ringoal);
+				state.addAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_inhibitors, ringoal);
+			}
+		};
+		Rule deliberate_goal_deactivation2 = new Rule("deliberate_goal_addtypeinhibition",
+			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), action);
+		return deliberate_goal_deactivation2;
+	}
+	
+	/**
+	 *  Remove an inhibition entry (the inhibitor) to a goal when
+	 *  a) there is an inhibiting rgoal on type level
+	 *  b) there has no inhibition condition been specified.
+	 * /
+	protected static Rule removeTypeInhibitionLinkRule()
+	{
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable inhibits = new Variable("?inhibits", OAVBDIMetaModel.inhibits_type);
+		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
+		Variable mingoal = new Variable("?mingoal", OAVBDIMetaModel.goal_type);
+		Variable ringoal = new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
+		Variable rincapa = new Variable("?rincapa", OAVBDIRuntimeModel.capability_type);
+		Variable inmode = new Variable("?inmode", OAVJavaType.java_string_type);
+		
+		ObjectCondition	inhicon	= new ObjectCondition(OAVBDIMetaModel.inhibits_type);
+		inhicon.addConstraint(new BoundConstraint(null, inhibits));
+		inhicon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.expression_has_content, null));
+		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_ref, ref));
+		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_inhibit, inmode));
+	
+		ObjectCondition	mingoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
+		mingoalcon.addConstraint(new BoundConstraint(null, mingoal));
+		mingoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_inhibits, inhibits, IOperator.CONTAINS));
+		
+		ObjectCondition	ingoalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		ingoalcon.addConstraint(new BoundConstraint(null, ringoal));
+		ingoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mingoal));
+		ingoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
+		ingoalcon.addConstraint(new OrConstraint(new LiteralConstraint(inmode, OAVBDIMetaModel.INHIBITS_WHEN_ACTIVE), 
+			new AndConstraint(new LiteralConstraint(inmode, OAVBDIMetaModel.INHIBITS_WHEN_IN_PROCESS), 
+				new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS))));
+		ingoalcon.addConstraint(new BoundConstraint(null, rgoal, IOperator.NOTEQUAL));
+		
+//		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+//		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+//		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_inhibitors));
+		
+//		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
+		
+		ObjectCondition rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
+		rcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+		
+		
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rincapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, ringoal, IOperator.CONTAINS));
+		capcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rincapa, ref, rgoal, rcapa})));
+
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object rgoal = assignments.getVariableValue("?rgoal");
+				Object ringoal = assignments.getVariableValue("?ringoal");
+//				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION);
+				System.out.println("Adding inhibitor to goal: "+rgoal+" "+ringoal);
+				state.addAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_inhibitors, ringoal);
+			}
+		};
+		Rule deliberate_goal_deactivation2 = new Rule("deliberate_goal_addtypeinhibition",
+			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), action);
+		return deliberate_goal_deactivation2;
+	}*/
 	
 	/**
 	 *  Create the goal exit active state rule.

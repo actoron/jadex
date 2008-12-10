@@ -400,6 +400,9 @@ public class OAVBDIRuntimeModel
 	/** The goal has plans to which the finished event was already dispatched. */
 	public static OAVAttributeType goal_has_finisheddispatchedplans;
 	
+	/** The goal has inhibitors attribute. */
+	public static OAVAttributeType goal_has_inhibitors;
+	
 	//-------- plan --------
 	
 	/** The plan type. */
@@ -789,6 +792,7 @@ public class OAVBDIRuntimeModel
 		goal_has_retrytimer = goal_type.createAttributeType("goal_has_retrytimer", java_timer_type);
 		goal_has_recurtimer = goal_type.createAttributeType("goal_has_recurtimer", java_timer_type);
 		goal_has_finisheddispatchedplans = goal_type.createAttributeType("goal_has_finisheddispatchedplans", plan_type, OAVAttributeType.SET);
+		goal_has_inhibitors = goal_type.createAttributeType("goal_has_inhibitors", goal_type, OAVAttributeType.SET);
 		
 		// apl
 		apl_has_metagoal = apl_type.createAttributeType("apl_has_metagoal", OAVBDIRuntimeModel.goal_type);

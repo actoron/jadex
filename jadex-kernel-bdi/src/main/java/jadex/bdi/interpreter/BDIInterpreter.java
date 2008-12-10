@@ -1011,7 +1011,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 		// Goal deliberation rules.
 		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalActivationRule());
 		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalDeactivationRule());
-		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalDeactivationRule2());
+//		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalDeactivationRule2());
 		RULEBASE.addRule(GoalDeliberationRules.createGoalExitActiveStateRule());
 		
 		// Goal lifecycle rules.

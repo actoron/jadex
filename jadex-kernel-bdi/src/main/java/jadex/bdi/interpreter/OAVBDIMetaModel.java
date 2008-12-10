@@ -305,7 +305,7 @@ public class OAVBDIMetaModel
 	
 	/** Inhibit has inhibits attribute. */
 	public static OAVAttributeType inhibits_has_inhibit;
-
+	
 	//-------- expression --------
 	
 	/** The expression type. */
@@ -852,7 +852,7 @@ public class OAVBDIMetaModel
 		beliefset_type = bdimm_type_model.createType("mbeliefset", typedelement_type);
 //		beliefsetreference_type = bdimm_type_model.createType("mbeliefsetreference", typedelementreference_type);
 		beliefsetreference_type = bdimm_type_model.createType("mbeliefsetreference", elementreference_type);
-		inhibits_type = bdimm_type_model.createType("minhibits", expression_type);
+		inhibits_type = bdimm_type_model.createType("minhibits", condition_type);
 		goal_type = bdimm_type_model.createType("mgoal", processableelement_type);
 		goalreference_type = bdimm_type_model.createType("mgoalreference", elementreference_type);
 		performgoal_type = bdimm_type_model.createType("mperformgoal", goal_type);
@@ -986,7 +986,7 @@ public class OAVBDIMetaModel
 		
 		// inhibit
 		inhibits_has_ref = inhibits_type.createAttributeType("inhibits_has_ref", OAVJavaType.java_string_type);
-		inhibits_has_inhibit = inhibits_type.createAttributeType("inhibits_has_inhibit", OAVJavaType.java_string_type, OAVAttributeType.NONE,  INHIBITS_WHEN_ACTIVE);
+		inhibits_has_inhibit = inhibits_type.createAttributeType("inhibits_has_inhibit", OAVJavaType.java_string_type, OAVAttributeType.NONE, INHIBITS_WHEN_ACTIVE);
 		
 		// goal
 		//goal_has_exported = new OAVAttributeType("goal_has_exported", java_boolean_type, Boolean.FALSE);
@@ -1006,10 +1006,6 @@ public class OAVBDIMetaModel
 		goal_has_unique = goal_type.createAttributeType("goal_has_unique", OAVJavaType.java_boolean_type);
 		goal_has_excludedparameter = goal_type.createAttributeType("goal_has_excludedparameter", typedelement_type, OAVAttributeType.LIST);
 		
-//		// goal reference
-//		goalreference_has_inhibits = goalreference_type.createAttributeType("goalreference_has_inhibits", inhibits_type, OAVAttributeType.LIST);
-//		goalreference_has_cardinality = goalreference_type.createAttributeType("goalreference_has_cardinality", OAVJavaType.java_integer_type);
-			
 		// perform goal
 		
 		// achieve goal
@@ -1218,7 +1214,6 @@ public class OAVBDIMetaModel
 //		expansions.addExpansion(elementreference_has_required,	"abstract/required");
 		
 		expansions.addExpansion(properties_has_properties, "property");
-		
 		
 		Set	roottypes	= new HashSet();
 		roottypes.add(OAVBDIMetaModel.agent_type);
