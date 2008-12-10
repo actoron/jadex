@@ -137,7 +137,7 @@ public class FileNode implements IExplorerTreeNode
 
 	/**
 	 *  Check if this object is equal to another object.
-	 */
+	 * /
 	public boolean equals(Object obj)
 	{
 		return (obj instanceof FileNode) && this.file.getAbsolutePath().equals(((FileNode)obj).file.getAbsolutePath());
@@ -145,11 +145,11 @@ public class FileNode implements IExplorerTreeNode
 
 	/**
 	 *  Return the hash code for this element. 
-	 */
+	 * /
 	public int hashCode()
 	{
 		return file.getAbsolutePath().hashCode();
-	}
+	}*/
 
 	/**
 	 *  Return the tooltip text for the node (if any).

@@ -132,8 +132,8 @@ public class	DefaultNodeFunctionality
 //		System.out.println("Get Children: "+node.getToolTipText());
 		if(hasChanged(node, CHILDREN))
 		{
-			System.out.println("Get Children2: "+node.getToolTipText());
 			startNodeTask(new UpdateChildrenTask(node));
+			System.out.println("Get Children2: "+node.getToolTipText());
 		}
 		return (List) node.getProperties().get(CHILDREN);
 	}
@@ -236,6 +236,7 @@ public class	DefaultNodeFunctionality
 			}
 			queue.add(task.getNode());
 			explorer.getWorker().execute(task, task.getPriority());
+			System.out.println("Added: "+task);
 
 			if(statuscomp!=null)
 			{
