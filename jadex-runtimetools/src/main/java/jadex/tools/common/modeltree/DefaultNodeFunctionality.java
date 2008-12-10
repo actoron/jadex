@@ -56,8 +56,8 @@ public class	DefaultNodeFunctionality
 	/** The refresh indicator for the status bar. */
 	protected JLabel	refreshcomp;
 	
-	/** The task counters (status component -> Integer). */
-	protected Map	taskcnt;
+	/** The task queues (status component -> Set{queued nodes}). */
+	protected Map	taskqueues;
 	
 	//-------- constructors --------
 	
@@ -103,7 +103,7 @@ public class	DefaultNodeFunctionality
 			{
 				// happens e.g. when manually refreshing already removed file/dir
 				IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
-				startNodeTask(new RefreshTask(this, parent));
+				startNodeTask(new RefreshNodeTask(this, parent));
 			}
 			else
 			{
@@ -131,71 +131,7 @@ public class	DefaultNodeFunctionality
 	{
 		if(hasChanged(node, CHILDREN))
 		{
-			boolean	changed	= true;
-			if(node instanceof JarNode)
-			{
-				FileNode fn = (FileNode)node;
-				if(!(fn.getFile() instanceof JarAsDirectory))
-				{
-					System.err.println("Failed to refresh jar node: " + fn.getFile());
-				}
-				changed	= ((JarAsDirectory)fn.getFile()).refresh();
-			}
-
-			// Only check changed directories.
-			if(changed && node instanceof DirNode)
-			{
-				DirNode dn = (DirNode)node;
-				List children = (List) dn.getProperties().get(CHILDREN);
-				File files[] = dn.getFile().listFiles(explorer.getFileFilter());
-				if(files!=null)
-				{
-					Set	old	= null;
-					if(children!=null)
-					{
-						old	= new HashSet(children);
-					}
-					else if(files.length>0)
-					{
-						children = new ArrayList();
-						dn.getProperties().put(CHILDREN, children);
-					}
-					
-					for(int i = 0; i<files.length; i++)
-					{
-						IExplorerTreeNode	child = files[i].isDirectory()
-							? (IExplorerTreeNode)new DirNode(node, files[i])
-							: (IExplorerTreeNode)new FileNode(node, files[i]);
-		
-						// Check if child is new
-						if(old==null || !old.remove(child))
-						{
-							int	index;
-							for(index=0; index<children.size() 
-								&& FILENODE_COMPARATOR.compare(
-								children.get(index), child)<=0; index++);
-							children.add(index, child);
-							
-							startNodeTask(new RefreshTask(this, child));
-						}
-					}
-					
-					// Remove old entries.
-					if(old!=null)
-					{
-						for(Iterator it=old.iterator(); it.hasNext(); )
-						{
-							children.remove(it.next());
-						}
-					}
-				}
-				
-				// Cannot access directory.
-				else if(children!=null)
-				{
-					dn.getProperties().remove(CHILDREN);
-				}
-			}
+			startNodeTask(new UpdateChildrenTask(node));
 		}
 		return (List) node.getProperties().get(CHILDREN);
 	}
@@ -262,27 +198,44 @@ public class	DefaultNodeFunctionality
 		Long	propdate	= (Long) node.getProperties().get(property+"_"+LAST_MODIFIED);
 		boolean	ret	= !SUtil.equals(filedate, propdate);
 		if(filedate==null)
-			refresh(node);
+			startNodeTask(new RefreshNodeTask(this, node));
 		else if(ret)
 			node.getProperties().put(property+"_"+LAST_MODIFIED, filedate);
 		return ret;
 	}
 
 	/**
-	 *  Start a refresh task for a given node.
+	 *  Start a task for a given node.
+	 *  Task will be added to the queue if not
+	 *  already contained.
 	 */
 	public synchronized void	startNodeTask(NodeTask task)
 	{
+		boolean	add	= true;
+		Set	queue	= null;
 		final JComponent	statuscomp	= task.getStatusComponent();
-		if(statuscomp!=null)
+		if(taskqueues!=null)
 		{
-			int	cnt	= 0;
-			if(taskcnt!=null)
+			queue	= (Set) taskqueues.get(statuscomp);
+			if(queue!=null)
+				add	= !queue.contains(task.getNode());
+		}
+
+		if(add)
+		{
+			if(taskqueues==null)
 			{
-				Integer	icnt	= (Integer) taskcnt.get(statuscomp);
-				cnt	= icnt!=null ? icnt.intValue() : cnt;
+				taskqueues	= new HashMap();
 			}
-			if(cnt==0)
+			if(queue==null)
+			{
+				queue	= new HashSet();
+				taskqueues.put(statuscomp, queue);
+			}
+			queue.add(task.getNode());
+			explorer.getWorker().execute(task, task.getPriority());
+
+			if(statuscomp!=null)
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -292,45 +245,44 @@ public class	DefaultNodeFunctionality
 					}
 				});
 			}
-
-			cnt++;
-			if(taskcnt==null)
-				taskcnt	= new HashMap();
-			taskcnt.put(statuscomp, new Integer(cnt));
 		}
-		
-		explorer.getWorker().execute(task, task.getPriority());
 	}
-
 	
 	/**
+	 *  Called, when a node task actually starts.
+	 *  Task will be removed from the queue.
+	 */
+	public synchronized void	nodeTaskStarting(NodeTask task)
+	{
+		Set	queue	= (Set)taskqueues.get(task.getStatusComponent());
+		queue.remove(task.getNode());
+		if(queue.isEmpty())
+		{
+			taskqueues.remove(task.getStatusComponent());
+			if(taskqueues.isEmpty())
+			{
+				taskqueues	= null;
+			}
+		}
+	}
+
+	/**
 	 *  Called, when a node task is finished.
+	 *  Removes the status component, if last task of type.
 	 */
 	public synchronized void	nodeTaskFinished(NodeTask task)
 	{
 		final JComponent	statuscomp	= task.getStatusComponent();
-		if(statuscomp!=null)
+		if(taskqueues==null || !taskqueues.containsKey(statuscomp))
 		{
-			int	cnt	= ((Integer) taskcnt.get(statuscomp)).intValue();
-			cnt--;
-			if(cnt==0)
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				taskcnt.remove(statuscomp);
-				if(taskcnt.isEmpty())
-					taskcnt	= null;
-				SwingUtilities.invokeLater(new Runnable()
+				public void run()
 				{
-					public void run()
-					{
-						jcc.removeStatusComponent(statuscomp);
-						jcc.setStatusText("");
-					}
-				});
-			}
-			else
-			{
-				taskcnt.put(statuscomp, new Integer(cnt));
-			}
+					jcc.removeStatusComponent(statuscomp);
+					jcc.setStatusText("");
+				}
+			});
 		}
 	}
 
@@ -353,14 +305,14 @@ public class	DefaultNodeFunctionality
 	/**
 	 *  A task to refresh a node.
 	 */
-	static class RefreshTask	extends NodeTask
+	static class RefreshNodeTask	extends NodeTask
 	{
 		//-------- constructors --------
 		
 		/**
 		 *  Create a refresh task. 
 		 */
-		public RefreshTask(DefaultNodeFunctionality nof, IExplorerTreeNode node)
+		public RefreshNodeTask(DefaultNodeFunctionality nof, IExplorerTreeNode node)
 		{
 			super(nof, node, ModelExplorer.PERCENTAGE_USER, "Refreshing ", nof.refreshcomp);
 		}
@@ -373,6 +325,110 @@ public class	DefaultNodeFunctionality
 		public void performTask()
 		{
 			nof.refresh(node);
+		}
+	}
+
+	/**
+	 *  A task to update the children of a node.
+	 */
+	class UpdateChildrenTask	extends NodeTask
+	{
+		//-------- constructors --------
+		
+		/**
+		 *  Create a refresh task. 
+		 */
+		public UpdateChildrenTask(IExplorerTreeNode node)
+		{
+			super(DefaultNodeFunctionality.this, node, ModelExplorer.PERCENTAGE_USER, "Refreshing ", refreshcomp);
+		}
+		
+		//-------- NodeTask methods --------
+		
+		/**
+		 *  Perform the task.
+		 */
+		public void performTask()
+		{
+			boolean	changed	= true;
+			if(node instanceof JarNode)
+			{
+				FileNode fn = (FileNode)node;
+				if(!(fn.getFile() instanceof JarAsDirectory))
+				{
+					System.err.println("Failed to refresh jar node: " + fn.getFile());
+				}
+				changed	= ((JarAsDirectory)fn.getFile()).refresh();
+			}
+
+			// Only check changed directories.
+			if(changed && node instanceof DirNode)
+			{
+				changed	= false;
+				DirNode dn = (DirNode)node;
+				List children = (List) dn.getProperties().get(CHILDREN);
+				File files[] = dn.getFile().listFiles(explorer.getFileFilter());
+				if(files!=null)
+				{
+					Set	old	= null;
+					if(children!=null)
+					{
+						old	= new HashSet(children);
+					}
+					else if(files.length>0)
+					{
+						children = new ArrayList();
+						dn.getProperties().put(CHILDREN, children);
+					}
+					
+					for(int i = 0; i<files.length; i++)
+					{
+						IExplorerTreeNode	child = files[i].isDirectory()
+							? (IExplorerTreeNode)new DirNode(node, files[i])
+							: (IExplorerTreeNode)new FileNode(node, files[i]);
+		
+						// Check if child is new
+						if(old==null || !old.remove(child))
+						{
+							int	index;
+							for(index=0; index<children.size() 
+								&& FILENODE_COMPARATOR.compare(
+								children.get(index), child)<=0; index++);
+							children.add(index, child);	
+							changed	= true;
+						}
+					}
+					
+					// Remove old entries.
+					if(old!=null)
+					{
+						for(Iterator it=old.iterator(); it.hasNext(); )
+						{
+							children.remove(it.next());
+							changed	= true;
+						}
+					}
+				}
+				
+				// Cannot access directory.
+				else if(children!=null)
+				{
+					dn.getProperties().remove(CHILDREN);
+					changed	= true;
+				}
+			}
+			
+			if(changed)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						// Hack??? Should propagate adds/removes separately?
+						((ModelExplorerTreeModel)explorer.getModel()).fireTreeStructureChanged(node);
+					}
+				});
+			}
 		}
 	}
 }

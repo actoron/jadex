@@ -177,9 +177,9 @@ public class FileNode implements IExplorerTreeNode
 	 *  Set the parent of this FileNode.
 	 *  @param parent The parent to set.
 	 */
-	public void setParent(TreeNode parent)
+	public void setParent(IExplorerTreeNode parent)
 	{
-		this.parent = (IExplorerTreeNode) parent;
+		this.parent = parent;
 	}
 
 	/**

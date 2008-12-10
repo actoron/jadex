@@ -40,6 +40,7 @@ import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeExpansionEvent;
@@ -725,7 +726,7 @@ public class ModelExplorer extends JTree
 		{
 			if(nof.isValidChild(node))
 			{
-				nof.startNodeTask(new DefaultNodeFunctionality.RefreshTask(nof, node));
+				nof.startNodeTask(new DefaultNodeFunctionality.RefreshNodeTask(nof, node));
 				int	children	= ((ModelExplorerTreeModel)getModel()).getChildCount(node);
 				for(int i=0; i<children; i++)
 				{
@@ -756,12 +757,19 @@ public class ModelExplorer extends JTree
 			if(nodes_crawler.isEmpty())
 			{
 				nodes_crawler.add(getRootNode());
-//				System.out.println("restarted: "+this);
+				System.out.println("restarted: "+this);
 			}
 
 			// Update node if necessary:
 			final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_crawler.remove(0);
-			nof.refresh(node);	// Refresh in crawler and do not start task on user priority 
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					jcc.setStatusText("Crawling "+node.getToolTipText());
+				}
+			});
+			nof.refresh(node);	// Refresh in crawler and do not start task on user priority
 			
 			// Iterate over children
 			int	children	= ((ModelExplorerTreeModel)getModel()).getChildCount(node);
@@ -852,7 +860,7 @@ public class ModelExplorer extends JTree
 		 */
 		public boolean isEnabled()
 		{
-			TreeNode rm = (TreeNode)getLastSelectedPathComponent();
+			IExplorerTreeNode rm = (IExplorerTreeNode)getLastSelectedPathComponent();
 			return rm==null;
 		}
 	};
@@ -900,7 +908,7 @@ public class ModelExplorer extends JTree
 		 */
 		public boolean isEnabled()
 		{
-			TreeNode rm = (TreeNode)getLastSelectedPathComponent();
+			IExplorerTreeNode rm = (IExplorerTreeNode)getLastSelectedPathComponent();
 			return rm!=null && rm.getParent()==getRootNode();
 		}
 	};

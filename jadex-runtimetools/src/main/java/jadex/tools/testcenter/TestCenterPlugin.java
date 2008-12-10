@@ -16,6 +16,7 @@ import jadex.tools.common.plugin.AbstractJCCPlugin;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -29,8 +30,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 
 /**
  *  Plugin for the test center.
@@ -323,7 +322,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 *  Add testcases for a file or directory recusively.
 	 *  @param node The file/dir node to start.
 	 */
-	protected void addTestcases(TreeNode node)
+	protected void addTestcases(IExplorerTreeNode node)
 	{
 		if(node instanceof DirNode)
 		{
@@ -331,9 +330,10 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			nodes.add(node);
 			while(nodes.size()>0)
 			{
-				TreeNode n = (TreeNode)nodes.remove(0);
-				for(int j=0; j<n.getChildCount(); j++)
-					nodes.add(n.getChildAt(j));
+				IExplorerTreeNode n = (IExplorerTreeNode)nodes.remove(0);
+				List	lchildren	= nof.getChildren((FileNode)n);
+				for(int j=0; lchildren!=null && j<lchildren.size(); j++)
+					nodes.add(lchildren.get(j));
 					
 				if(n instanceof FileNode && !(n instanceof DirNode))
 				{
@@ -362,7 +362,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 *  Remove testcases for a file or directory recusively.
 	 *  @param node The file/dir node to start.
 	 */
-	protected void removeTestcases(TreeNode node)
+	protected void removeTestcases(IExplorerTreeNode node)
 	{
 		if(node instanceof FileNode)
 		{
@@ -375,9 +375,10 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			nodes.add(node);
 			while(nodes.size()>0)
 			{
-				TreeNode n = (TreeNode)nodes.remove(0);
-				for(int j=0; j<n.getChildCount(); j++)
-					nodes.add(n.getChildAt(j));
+				IExplorerTreeNode n = (IExplorerTreeNode)nodes.remove(0);
+				List	lchildren	= nof.getChildren((FileNode)n);
+				for(int j=0; lchildren!=null && j<lchildren.size(); j++)
+					nodes.add(lchildren.get(j));
 					
 				if(n instanceof FileNode)
 				{
@@ -395,7 +396,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			addTestcases(node);
 		}
 
@@ -405,7 +406,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		 */
 		public boolean isEnabled()
 		{
-			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			return node!=null && !(node instanceof DirNode) /*&& ((FileNode)node).isValid()*/;
 		}
 	};
@@ -417,7 +418,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			if(node!=null)
 				addTestcases(node);
 		}
@@ -439,7 +440,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			removeTestcases(node);
 		}
 
@@ -449,7 +450,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		 */
 		public boolean isEnabled()
 		{
-			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			return node!=null && !(node instanceof DirNode) /*&& ((FileNode)node).isValid() */;
 		}
 	};
@@ -461,7 +462,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			if(node!=null)
 				removeTestcases(node);
 		}

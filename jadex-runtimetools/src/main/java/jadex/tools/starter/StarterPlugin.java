@@ -14,6 +14,7 @@ import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.modeltree.FileNode;
+import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -45,7 +46,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -649,7 +649,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 			if(isEnabled())
 			{
-				TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+				IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
@@ -725,7 +725,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		public boolean isEnabled()
 		{
 			boolean ret = false;
-			TreeNode node = (TreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();

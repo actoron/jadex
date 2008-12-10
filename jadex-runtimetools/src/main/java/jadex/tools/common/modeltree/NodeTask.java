@@ -49,6 +49,14 @@ public abstract class NodeTask implements IExecutable
 	public abstract void	performTask();
 	
 	/**
+	 *  Get the node.
+	 */
+	public IExplorerTreeNode	getNode()
+	{
+		return node;
+	}
+	
+	/**
 	 *  Get the priority.
 	 */
 	public double	getPriority()
@@ -71,6 +79,7 @@ public abstract class NodeTask implements IExecutable
 	 */
 	public boolean execute()
 	{
+		nof.nodeTaskStarting(this);
 		// Perform task only, when node still in tree.
 		if(nof.isValidChild(node))
 		{
