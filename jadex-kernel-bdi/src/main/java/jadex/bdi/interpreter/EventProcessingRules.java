@@ -1941,7 +1941,8 @@ public class EventProcessingRules
 	{
 		if(state.getType(cand).equals(OAVBDIRuntimeModel.waitqueuecandidate_type)) 
 		{
-			scheduleWaitqueueCandidate(state, rpe, cand);
+			Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan);
+			scheduleWaitqueueCandidate(state, rpe, rplan);
 			
 			// Save candidate in plan for later apl removal and exclude list management.
 			if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
@@ -2008,9 +2009,8 @@ public class EventProcessingRules
 	/**
 	 *  Schedule a waitqueue candidate.
 	 */
-	protected static void scheduleWaitqueueCandidate(IOAVState state, Object rpe, Object cand)
+	protected static void scheduleWaitqueueCandidate(IOAVState state, Object rpe, Object rplan)
 	{
-		Object	rplan = state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan);
 		state.addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
 	}
 	

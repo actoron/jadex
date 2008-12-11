@@ -19,22 +19,14 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	protected IPatternMatcherFunctionality matcherfunc;
 	
 	//-------- constructors --------
-	
-	/**
-	 *  Create a model for later copying content into.
-	 */
-	protected OAVAgentModel()
-	{
-		super();
-	}
-	
+
 	/**
 	 *  Create a model.
 	 */
 	public OAVAgentModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types)
+		OAVTypeModel typemodel, Set types, String filename, long lastmod)
 	{
-		super(state, handle, typemodel, types);
+		super(state, handle, typemodel, types, filename, lastmod);
 	}
 	
 	//-------- IAgentModel methods --------

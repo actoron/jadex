@@ -40,26 +40,27 @@ public class OAVCapabilityModel implements IAgentModel
 	/** The rulebase of the capability (includes type-specific rules, if any). */
 	protected Rulebase rulebase;
 	
-	//-------- constructors --------
+	/** The filename. */
+	protected String	filename;
 	
-	/**
-	 *  Create a model for later copying content into.
-	 */
-	protected OAVCapabilityModel()
-	{
-	}
+	/** The last modified date. */
+	protected long	lastmod;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a model.
 	 */
 	public OAVCapabilityModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types)
+		OAVTypeModel typemodel, Set types, String filename, long lastmod)
 	{
 		this.state	= state;
 		this.handle	= handle;
 		this.typemodel	= typemodel;
 		this.types	= types;
 		this.rulebase	= new Rulebase();
+		this.filename	= filename;
+		this.lastmod	= lastmod;
 	}
 	
 	//-------- IAgentModel methods --------
@@ -259,9 +260,16 @@ public class OAVCapabilityModel implements IAgentModel
 	 */
 	public String getFilename()
 	{
-		String fn = (String)state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_filename);
-//		System.out.println("Filename: "+fn);
-		return fn;
+		return this.filename;
+	}
+	
+	/**
+	 *  Get the last modified date.
+	 *  @return The last modified date.
+	 */
+	public long getLastModified()
+	{
+		return this.lastmod;
 	}
 	
 	//-------- methods --------

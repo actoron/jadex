@@ -128,7 +128,6 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 		return ret;
 	}
 
-	
 	/**
 	 *  Called when the corresponding file of a node has changed.
 	 *  Empty default implementation to be overridden by subclasses.
@@ -215,7 +214,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 				}
 				
 				fn.getProperties().put(VALID, new Boolean(newvalid));	// Add always, because old value could be null.
-				fn.getProperties().put(VALID_DATE, new Date());	// Add always, because old value could be null.
+				fn.getProperties().put(VALID_DATE, new Date());
 				if(oldvalid!=newvalid)
 				{
 					if(node.getParent() instanceof DirNode)
@@ -228,7 +227,6 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 							((ModelExplorerTreeModel)explorer.getModel()).fireNodeChanged(node);
 						}
 					});	
-	//				System.out.println("Valid?: "+node+", "+newvalid);
 				}
 			}
 		}

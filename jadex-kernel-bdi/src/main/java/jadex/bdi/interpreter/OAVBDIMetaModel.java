@@ -390,10 +390,6 @@ public class OAVBDIMetaModel
 	/** Capability has abstract attribute. */
 	public static OAVAttributeType capability_has_abstract;
 	
-	/** Capability has filename attribute. */
-	// Todo: Remove???
-	public static OAVAttributeType capability_has_filename;
-	
 	/** Capability has imports attribute. */
 	public static OAVAttributeType capability_has_imports;
 	
@@ -1093,7 +1089,6 @@ public class OAVBDIMetaModel
 		// capability
 		capability_has_package = capability_type.createAttributeType("capability_has_package", OAVJavaType.java_string_type);
 		capability_has_abstract = capability_type.createAttributeType("capability_has_abstract", OAVJavaType.java_boolean_type);
-		capability_has_filename = capability_type.createAttributeType("capability_has_filename", OAVJavaType.java_string_type);
 		capability_has_imports = capability_type.createAttributeType("capability_has_imports", OAVJavaType.java_string_type, OAVAttributeType.LIST);
 		capability_has_capabilityrefs = capability_type.createAttributeType("capability_has_capabilityrefs", capabilityref_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_beliefs = capability_type.createAttributeType("capability_has_beliefs", belief_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);

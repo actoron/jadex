@@ -156,7 +156,7 @@ public class OAVObjectType
 		}
 		
 		if(ret==null)
-			throw new RuntimeException("Attribute not found: "+attribute);
+			throw new RuntimeException("Attribute not found: "+this+", "+attribute);
 		
 		return ret;
 	}

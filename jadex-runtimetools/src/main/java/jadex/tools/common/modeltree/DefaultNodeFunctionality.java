@@ -373,70 +373,73 @@ public class	DefaultNodeFunctionality
 		{
 //			System.out.println("UpdateChildren: "+node.getToolTipText());
 			boolean	changed	= node instanceof DirNode;
-			if(node instanceof JarNode)
+			synchronized(node)	// task might be called concurrently due to race conditions.
 			{
-				FileNode fn = (FileNode)node;
-				if(!(fn.getFile() instanceof JarAsDirectory))
+				if(node instanceof JarNode)
 				{
-					System.err.println("Failed to refresh jar node: " + fn.getFile());
+					FileNode fn = (FileNode)node;
+					if(!(fn.getFile() instanceof JarAsDirectory))
+					{
+						System.err.println("Failed to refresh jar node: " + fn.getFile());
+					}
+					changed	= ((JarAsDirectory)fn.getFile()).refresh();
 				}
-				changed	= ((JarAsDirectory)fn.getFile()).refresh();
-			}
-
-			// Only check changed directories.
-			if(changed && node instanceof DirNode)
-			{
-				changed	= false;
-				DirNode dn = (DirNode)node;
-				List children = (List) dn.getProperties().get(CHILDREN);
-				File files[] = dn.getFile().listFiles(explorer.getFileFilter());
-				if(files!=null)
+	
+				// Only check changed directories.
+				if(changed && node instanceof DirNode)
 				{
-					Set	old	= null;
-					if(children!=null)
+					changed	= false;
+					DirNode dn = (DirNode)node;
+					List children = (List) dn.getProperties().get(CHILDREN);
+					File files[] = dn.getFile().listFiles(explorer.getFileFilter());
+					if(files!=null)
 					{
-						old	= new HashSet(children);
-					}
-					else if(files.length>0)
-					{
-						children = new ArrayList();
-						dn.getProperties().put(CHILDREN, children);
-					}
-					
-					for(int i = 0; i<files.length; i++)
-					{
-						IExplorerTreeNode	child = files[i].isDirectory()
-							? (IExplorerTreeNode)new DirNode(node, files[i])
-							: (IExplorerTreeNode)new FileNode(node, files[i]);
-		
-						// Check if child is new
-						if(old==null || !old.remove(child))
+						Set	old	= null;
+						if(children!=null)
 						{
-							int	index;
-							for(index=0; index<children.size() 
-								&& FILENODE_COMPARATOR.compare(
-								children.get(index), child)<=0; index++);
-							children.add(index, child);	
-							changed	= true;
+							old	= new HashSet(children);
+						}
+						else if(files.length>0)
+						{
+							children = new ArrayList();
+							dn.getProperties().put(CHILDREN, children);
+						}
+						
+						for(int i = 0; i<files.length; i++)
+						{
+							IExplorerTreeNode	child = files[i].isDirectory()
+								? (IExplorerTreeNode)new DirNode(node, files[i])
+								: (IExplorerTreeNode)new FileNode(node, files[i]);
+			
+							// Check if child is new
+							if(old==null || !old.remove(child))
+							{
+								int	index;
+								for(index=0; index<children.size() 
+									&& FILENODE_COMPARATOR.compare(
+									children.get(index), child)<=0; index++);
+								children.add(index, child);	
+								changed	= true;
+							}
+						}
+						
+						// Remove old entries.
+						if(old!=null)
+						{
+							for(Iterator it=old.iterator(); it.hasNext(); )
+							{
+								children.remove(it.next());
+								changed	= true;
+							}
 						}
 					}
 					
-					// Remove old entries.
-					if(old!=null)
+					// Cannot access directory.
+					else if(children!=null)
 					{
-						for(Iterator it=old.iterator(); it.hasNext(); )
-						{
-							children.remove(it.next());
-							changed	= true;
-						}
+						dn.getProperties().remove(CHILDREN);
+						changed	= true;
 					}
-				}
-				
-				// Cannot access directory.
-				else if(children!=null)
-				{
-					dn.getProperties().remove(CHILDREN);
-					changed	= true;
 				}
 			}
 			

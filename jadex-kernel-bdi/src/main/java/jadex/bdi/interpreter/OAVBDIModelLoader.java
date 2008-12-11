@@ -213,18 +213,23 @@ public class OAVBDIModelLoader
 			System.arraycopy(imports, 0, keys, 2, imports.length);
 		Tuple	keytuple	= new Tuple(keys);
 		
-//		synchronized(modelcache)
+		ResourceInfo	info	= getResourceInfo(name, extension, imports, classloader);
+
+		//		synchronized(modelcache)
 //		{
 			cached	= (OAVCapabilityModel)modelcache.get(keytuple);
+			if(cached!=null && cached.getLastModified()<info.getLastModified())
+				cached	= null;
 //		}
 
 		if(cached==null)
 		{
 			// Lookup cache by resolved filename.
-			ResourceInfo	info	= getResourceInfo(name, extension, imports, classloader);
 //			synchronized(modelcache)
 //			{
 				cached	= (OAVCapabilityModel)modelcache.get(info.getFilename());
+				if(cached!=null && cached.getLastModified()<info.getLastModified())
+					cached	= null;
 //			}
 			
 			// Not found: load from disc and store in cache.
@@ -256,17 +261,15 @@ public class OAVBDIModelLoader
 				
 				state.addStateListener(listener, false);
 				Object handle = reader.read(info.getInputStream(), state, mapping);
-				state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_filename, 
-					info.getFilename());
 				state.removeStateListener(listener);
 
 				if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 				{
-					cached	=  new OAVAgentModel(state, handle, typemodel, types);
+					cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
 				}
 				else
 				{
-					cached	=  new OAVCapabilityModel(state, handle, typemodel, types);
+					cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
 				}
 
 				createAgentModelEntry(cached);

@@ -37,9 +37,8 @@
 	</events>
 
 	<properties>
-		<!--<property name="logging.level">java.util.logging.Level.FINE</property>-->
-		<property name="logging.useParentHandlers">true</property>
-		<property name="debugging">true</property>
+		<!--<property name="logging.level">java.util.logging.Level.INFO</property>-->
+		<property name="debugging">false</property>
 	</properties>
 
 	<configurations>
