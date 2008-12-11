@@ -26,7 +26,13 @@ public class SimulationTickerPlan extends Plan
 	 */
 	public void body()
 	{
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = null;
+		while (env == null)
+		{
+			env = (Environment)getBeliefbase().getBelief("environment").getFact();
+			// HACK! Use condition to check environment creation
+			waitFor(1000);
+		}
 		while(true)
 		{
 			waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());

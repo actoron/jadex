@@ -10,7 +10,7 @@ public class SimulationEndPlan extends Plan {
 
 	public void body() {
 
-		Environment en = (Environment) getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment en = (Environment) getBeliefbase().getBelief("environment").getFact();
 		Creature[] creatures = en.getCreatures();
 		for(int i=0; i<creatures.length; i++)
 		{
@@ -26,6 +26,18 @@ public class SimulationEndPlan extends Plan {
 			catch(GoalFailureException gfe) 
 			{
 			}
+		}
+		
+		// end sim environment
+		try
+		{
+
+			IGoal kg = createGoal("ams_destroy_agent");
+			kg.getParameter("agentidentifier").setValue(getBeliefbase().getBelief("simagent").getFact());
+			dispatchSubgoalAndWait(kg);
+		}
+		catch(GoalFailureException gfe) 
+		{
 		}
 		
 //		// kill via gui		

@@ -1,4 +1,4 @@
-package jadex.bdi.examples.hunterprey2.environment.process;
+package jadex.bdi.examples.hunterprey2.engine.process;
 
 import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.Food;

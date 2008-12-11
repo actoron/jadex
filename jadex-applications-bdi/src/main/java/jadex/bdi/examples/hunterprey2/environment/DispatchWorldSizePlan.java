@@ -29,7 +29,7 @@ public class DispatchWorldSizePlan extends Plan
 	{
 		/*IMessageEvent req = (IMessageEvent)getInitialEvent();
 		RequestWorldSize rws = (RequestWorldSize)req.getContent();
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		rws.setWidth(env.getWidth());
 		rws.setHeight(env.getHeight());
 		Done done = new Done();
@@ -37,7 +37,7 @@ public class DispatchWorldSizePlan extends Plan
 		sendMessage(req.createReply("inform_done", done));*/
 
 		RequestWorldSize rws = (RequestWorldSize)getParameter("action").getValue();
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		rws.setWidth(env.getWidth());
 		rws.setHeight(env.getHeight());
 		Done done = new Done();

@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jadex.bdi.examples.hunterprey2.Configuration;
 import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.WorldObject;
-import jadex.bdi.examples.hunterprey2.environment.Configuration;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableRegularPolygon;

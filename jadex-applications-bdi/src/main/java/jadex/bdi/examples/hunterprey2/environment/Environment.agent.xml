@@ -9,20 +9,23 @@
 	package="jadex.bdi.examples.hunterprey2.environment">
 
 	<imports>
-		<import>jadex.bdi.examples.hunterprey2.*</import>
-		<import>jadex.bdi.examples.hunterprey2.environment.observer.*</import>
+		<import>jadex.bdi.planlib.starter.StartAgentInfo</import>
+		<import>jadex.bridge.IAgentIdentifier</import>
 		<import>jadex.bdi.runtime.IFilter</import>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.Vector1Int</import>
+		<import>jadex.bdi.examples.hunterprey2.*</import>
+		<import>jadex.bdi.examples.hunterprey2.engine.*</import>
+		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
+		<import>jadex.bdi.examples.hunterprey2.environment.observer.*</import>
 	</imports>
 	
 	<capabilities>
-		<!-- The all in one sim agent :-) -->
-    	<capability name="envcap" file="jadex.bdi.planlib.simsupport.environment.capability.SimEnvironment"/>
 		<capability name="obscap" file="jadex.bdi.planlib.simsupport.observer.capability.SimObserver"/>
 		<capability name="simcap" file="jadex.bdi.planlib.simsupport.simcap.SimAgent"/>
 		
+		<capability name="startcap" file="jadex.bdi.planlib.starter.StartAgents"/>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
@@ -30,26 +33,33 @@
 
 	<beliefs>
 		
+		<!-- the discrete hunterprey2 environment -->
+		<belief name="environment" class="Environment">
+			<!-- <fact>Environment.getInstance()</fact> -->
+			<!-- <fact>new Environment()</fact> -->
+		</belief>
 		
 		<belief name="roundtime" class="long">
 			<fact>1000</fact>
 		</belief>
 		
+		<!-- all registered observers -->
 		<beliefset name="observers" class="Observer" />
+		
+		<!-- the local gui -->
+		<belief name="gui" class="EnvironmentGui" />
+		
+		<!-- the sim environment agent -->
+		<belief name="simagent" class="IAgentIdentifier" />
+		<belief name="simagent_info" class="StartAgentInfo" >
+			<fact>new StartAgentInfo("jadex/bdi/examples/hunterprey2/engine/SimEngine.agent.xml", "SimEngine", 0, null)</fact>
+		</belief>
 
 		<!-- The filter for deciding which request messages are handled in this capability. -->
 		<beliefref name="rp_filter">
 			<concrete ref="procap.rp_filter"/>
 		</beliefref>
 
-		<belief name="gui" class="EnvironmentGui">
-			<!--<fact>new EnvironmentGui($scope.getExternalAccess())</fact>-->
-		</belief>
-		
-		<!-- ######################## -->
-		<!--   configure environment  -->
-		<!-- ######################## -->
-		
 		<!-- food spawn rate (in salads every x seconds) -->
 		<belief name="food_spawn_rate" class="IVector1" exported="true">
 			<fact>new Vector1Int(10)</fact>
@@ -65,24 +75,7 @@
 			<fact>new Integer(100)</fact>
 		</belief>
 
-		<!-- Name of the simulation environment -->
-		<beliefref name="environment_name_env">
-			<concrete ref="envcap.environment_name"/>
-		</beliefref>
-		
-		<!-- The clock service -->
-		<beliefref name="clock_service">
-			<concrete ref="envcap.clock_service"/>
-		</beliefref>
-		
-		<!-- The simulation engine -->
-		<beliefref name="simulation_engine">
-			<concrete ref="envcap.simulation_engine"/>
-		</beliefref>
-		
-		<!-- ######################## -->
 		<!-- this is an observer too  -->
-		<!-- ######################## -->
 		
 		<!-- Name of the simulation environment -->
 		<beliefref name="environment_name_obs">
@@ -135,6 +128,10 @@
 			<concrete ref="procap.rp_execute_request"/>
 		</achievegoalref>
 		
+		<achievegoalref name="start_agents">
+			<concrete ref="startcap.start_agents"/>
+		</achievegoalref>
+		
 		<!-- Destroy the Environment Agent. -->
 		<achievegoal name="end_agent">
 			<!-- The agent to destroy. -->
@@ -163,6 +160,10 @@
 		
 		<achievegoalref name="sim_create_object">
         	<concrete ref="simcap.sim_create_object"/>
+    	</achievegoalref>
+    	
+    	<achievegoalref name="sim_destroy_object">
+        	<concrete ref="simcap.sim_destroy_object"/>
     	</achievegoalref>
     	
     	<achievegoalref name="sim_get_position">
@@ -456,6 +457,7 @@
  					</parameter>
 				</initialgoal>
 				<endgoal ref="df_deregister"/>
+				
 			</goals>
 			<plans>
 				<initialplan ref="env_initialization"/>

@@ -32,7 +32,7 @@ public class  EatPlan extends Plan
 
 		RequestEat re = (RequestEat)getParameter("action").getValue();
 
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		TaskInfo ti = env.addEatTask(re.getCreature(), re.getObject());
 
 		// Wait until all tasks are processed by the environment.
@@ -64,7 +64,7 @@ public class  EatPlan extends Plan
 		IMessageEvent req = (IMessageEvent)getInitialEvent();
 		RequestEat re = (RequestEat)req.getContent();
 
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		TaskInfo ti = env.addEatTask(re.getCreature(), re.getObject());
 
 		// Wait until all tasks are processed by the environment.

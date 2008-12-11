@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey2;
 
-import jadex.bdi.examples.hunterprey2.environment.Configuration;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;

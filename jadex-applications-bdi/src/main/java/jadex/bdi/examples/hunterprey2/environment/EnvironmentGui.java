@@ -112,7 +112,7 @@ public class EnvironmentGui	extends JFrame
 			public void windowClosing(WindowEvent e)
 			{
 //				// todo: move to end goal
-//				Environment en = (Environment)agent.getBeliefbase().getBelief("simulation_engine").getFact();
+//				Environment en = (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 //				Creature[] creatures = en.getCreatures();
 //				for(int i=0; i<creatures.length; i++)
 //				{
@@ -169,7 +169,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	protected JPanel createOptionsPanel(final IExternalAccess agent)
 	{
-		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("simulation_engine").getFact();
+		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 
 		JPanel	options	= new JPanel(new GridBagLayout());
 		options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
@@ -239,7 +239,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	protected void	enableGuiUpdate(IExternalAccess agent)
 	{
-		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("simulation_engine").getFact();
+		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 		env.addPropertyChangeListener(new PropertyChangeListener()
 		{
 			// Hack!!! Dummy creature required for world size.

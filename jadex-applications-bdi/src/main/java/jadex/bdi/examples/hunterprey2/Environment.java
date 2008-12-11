@@ -1,16 +1,12 @@
 package jadex.bdi.examples.hunterprey2;
 
-import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
-import jadex.bdi.planlib.simsupport.environment.EuclideanSimulationEngine;
-import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;
@@ -34,7 +30,7 @@ import nuggets.Nuggets;
 /**
  *  The environment is the container all objects and creatures.
  */
-public class Environment extends EuclideanSimulationEngine implements IEnvironment
+public class Environment implements IEnvironment
 {
 	public static final String OBJECT_TYPE_OBSTACLE 	= "obstacle"; 
 	public static final String OBJECT_TYPE_FOOD 		= "food"; 
@@ -103,7 +99,7 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 	public Environment(String title, IVector2 areaSize, IExternalAccess agent)
 	{
 
-		super(title, areaSize);
+		
 		
 		this.agent = agent;
 		
@@ -115,10 +111,10 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 		this.pcs = new SimplePropertyChangeSupport(this);
 		
 		// Pre-declare object types
-		super.declareObjectType(OBJECT_TYPE_HUNTER);
-		super.declareObjectType(OBJECT_TYPE_PREY);
-		super.declareObjectType(OBJECT_TYPE_OBSTACLE);
-		super.declareObjectType(OBJECT_TYPE_FOOD);
+//		super.declareObjectType(OBJECT_TYPE_HUNTER);
+//		super.declareObjectType(OBJECT_TYPE_PREY);
+//		super.declareObjectType(OBJECT_TYPE_OBSTACLE);
+//		super.declareObjectType(OBJECT_TYPE_FOOD);
 		
 		// Actions
 //		engine.addAction(new PickupWasteAction());
@@ -140,6 +136,49 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 		}
 	}
 
+	//--- simulation engine support methods -----
+	
+	/**
+	 * Create a sim object
+	 * @return the sim object with new sim id
+	 */
+	protected WorldObject createSimObject(WorldObject wo, String type, Map properties, List tasks, Boolean sigDes, Boolean listen)
+	{
+		Location l = wo.getLocation();
+		Map props = properties;
+		if (properties == null)
+			props = new HashMap();
+		
+		props.put(PROPERTY_ONTOLOGY, wo);
+		
+		IGoal cg = agent.createGoal("sim_create_object");
+		cg.getParameter("type").setValue(type);
+		cg.getParameter("properties").setValue(props);
+		cg.getParameter("position").setValue(new Vector2Int(l.getX(), l.getY()));
+		
+		cg.getParameter("signal_destruction").setValue(sigDes);
+		cg.getParameter("listen").setValue(listen);
+		
+		agent.dispatchTopLevelGoalAndWait(cg);
+		wo.setSimId((Integer) cg.getParameter("object_id").getValue());
+		
+		return wo;
+	}
+	
+	/**
+	 * Destroy a sim object
+	 * @param wo
+	 * @return
+	 */
+	protected WorldObject destroySimObject(WorldObject wo)
+	{
+
+		IGoal cg = agent.createGoal("sim_destroy_object");
+		cg.getParameter("object_id").setValue(wo.getSimId());
+		agent.dispatchTopLevelGoalAndWait(cg);
+		
+		return wo;
+	}
 
 
 	//-------- interface methods --------
@@ -289,7 +328,10 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 	public int	getWidth()
 	{
 //		return sizex;
-		return super.getAreaSize().getX().getAsInteger();
+		
+//		return super.getAreaSize().getX().getAsInteger();
+		// HACK! use sim environment
+		return Configuration.AREA_SIZE.getXAsInteger();
 	}
 
 	/**
@@ -298,7 +340,9 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 	public int	getHeight()
 	{
 //		return sizey;
-		return super.getAreaSize().getY().getAsInteger();
+//		return super.getAreaSize().getY().getAsInteger();
+		// HACK! use sim environment
+		return Configuration.AREA_SIZE.getYAsInteger();
 	}
 
 	//-------- management methods --------
@@ -309,13 +353,15 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 	 */
 	public void addFood(Food nfood)
 	{		
-		Location l = nfood.getLocation();
-		Map props = new HashMap();
-		props.put(PROPERTY_ONTOLOGY, nfood);
-		nfood.setSimId(super.createSimObject(OBJECT_TYPE_FOOD, props, null, new Vector2Int(l.getX(), l.getY()), false, null));
+//		Location l = nfood.getLocation();
+//		Map props = new HashMap();
+//		props.put(PROPERTY_ONTOLOGY, nfood);
+//		nfood.setSimId(super.createSimObject(OBJECT_TYPE_FOOD, props, null, new Vector2Int(l.getX(), l.getY()), false, null));
 		
-		this.food.add(nfood);
-		this.world.put(nfood.getLocation(), nfood);
+		WorldObject food = createSimObject(nfood, OBJECT_TYPE_FOOD, null, null, Boolean.TRUE, Boolean.FALSE);
+		
+		this.food.add(food);
+		this.world.put(food.getLocation(), food);
 	}
 
 	/**
@@ -325,8 +371,10 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 	public boolean removeFood(Food nfood)
 	{
 
+		//super.destroySimObject(nfood.getSimId());
+		destroySimObject(nfood);
+		
 		this.world.remove(nfood.getLocation(), nfood);
-		super.destroySimObject(nfood.getSimId());
 		return this.food.remove(nfood);
 		
 	}
@@ -337,12 +385,15 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 	 */
 	public void addObstacle(Obstacle obstacle)
 	{
-		Location l = obstacle.getLocation();
-		Map props = new HashMap();
-		props.put(PROPERTY_ONTOLOGY, obstacle);
-		obstacle.setSimId(super.createSimObject(OBJECT_TYPE_OBSTACLE, props, null, new Vector2Int(l.getX(), l.getY()), false, null));
-		this.obstacles.add(obstacle);
-		this.world.put(obstacle.getLocation(), obstacle);
+//		Location l = obstacle.getLocation();
+//		Map props = new HashMap();
+//		props.put(PROPERTY_ONTOLOGY, obstacle);
+//		obstacle.setSimId(super.createSimObject(OBJECT_TYPE_OBSTACLE, props, null, new Vector2Int(l.getX(), l.getY()), false, null));
+		
+		WorldObject wo = createSimObject(obstacle, OBJECT_TYPE_OBSTACLE, null, null, Boolean.TRUE, Boolean.FALSE);
+		
+		this.obstacles.add(wo);
+		this.world.put(obstacle.getLocation(), wo);
 	}
 
 	/**
@@ -351,8 +402,10 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 	 */
 	public boolean removeObstacle(Obstacle obstacle)
 	{
+		//super.destroySimObject(obstacle.getSimId());
+		destroySimObject(obstacle);
+		
 		this.world.remove(obstacle.getLocation(), obstacle);
-		super.destroySimObject(obstacle.getSimId());
 		return this.obstacles.remove(obstacle);
 	}
 
@@ -386,7 +439,9 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 				List tasks = new ArrayList();
 				tasks.add(new MoveObjectTask(new Vector2Double(0.0)));
 				
-				copy.setSimId(super.createSimObject(getSimObjectType(copy), props, tasks, new Vector2Int(copy.getLocation().getX(),copy.getLocation().getY()), true, null));
+				
+				//copy.setSimId(super.createSimObject(getSimObjectType(copy), props, tasks, new Vector2Int(copy.getLocation().getX(),copy.getLocation().getY()), true, null));
+				copy = (Creature) createSimObject(copy, getSimObjectType(copy), props, tasks, Boolean.TRUE, Boolean.TRUE);
 				
 				this.creatures.put(copy.getSimId(), copy);
 				this.world.put(copy.getLocation(), copy);
@@ -421,7 +476,8 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 		if(this.world.containsKey(creature.getLocation()))
 			this.world.remove(creature.getLocation(), creature);
 		
-		super.destroySimObject(creature.getSimId());
+		//super.destroySimObject(creature.getSimId());
+		destroySimObject(creature);
 		return this.creatures.remove(creature.getSimId())!=null;
 
 	}
@@ -760,7 +816,11 @@ public class Environment extends EuclideanSimulationEngine implements IEnvironme
 		Location	ret	= null;
 		while(ret==null)
 		{
-			IVector2 v = super.getRandomPosition(edgedistance);
+			IGoal getPos = agent.createGoal("sim_get_random_position");
+			getPos.getParameter("distance").setValue(edgedistance.copy());
+			agent.dispatchTopLevelGoalAndWait(getPos);
+			IVector2 v = ((IVector2) getPos.getParameter("position").getValue()).copy();
+			
 			ret	= new Location(v.getXAsInteger(), v.getYAsInteger());
 			if(world.containsKey(ret))
 			{

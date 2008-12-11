@@ -26,7 +26,7 @@ public class  EnvironmentGuiPlan extends Plan
 	public void body()
 	{
 
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		if (env == null)
 		{
 			fail();

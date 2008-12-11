@@ -32,7 +32,7 @@ public class DispatchVisionPlan extends Plan
 //		System.out.println("Env: dispatching vision!!!");
 
 		RequestVision rv = (RequestVision)getParameter("action").getValue();
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		Vision v = env.getVision(rv.getCreature());
 		rv.setVision(v);
 		Done done = new Done();
@@ -41,7 +41,7 @@ public class DispatchVisionPlan extends Plan
 
 		/*IMessageEvent req = (IMessageEvent)getInitialEvent();
 		RequestVision rv = (RequestVision)req.getContent();
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		Vision v = env.getVision(rv.getCreature());
 		rv.setVision(v);
 		Done done = new Done();

@@ -1,7 +1,7 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.adapter.base.fipa.Done;
-import jadex.bdi.examples.hunterprey2.environment.Configuration;
+import jadex.bdi.examples.hunterprey2.Configuration;
 import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.RequestMove;
@@ -36,7 +36,7 @@ public class  MovePlan extends Plan
 //		System.out.println("a) move: "+getName());
 		RequestMove rm = (RequestMove)getParameter("action").getValue();
 
-		Environment env = (Environment)getBeliefbase().getBelief("simulation_engine").getFact();
+		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		TaskInfo ti = env.addMoveTask(rm.getCreature(), rm.getDirection());
 
 		// Wait until all tasks are processed by the environment.
