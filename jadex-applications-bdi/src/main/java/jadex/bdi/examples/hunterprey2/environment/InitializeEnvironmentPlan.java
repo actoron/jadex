@@ -53,8 +53,8 @@ public class InitializeEnvironmentPlan extends Plan
 		b.getBelief("environment").setFact(env);
 		
 		// start observer befor gui to use canvas 
-		IGoal observer = createGoal("start_observer_gui");
-		dispatchTopLevelGoal(observer);
+		//IGoal observer = createGoal("start_observer_gui");
+		//dispatchTopLevelGoal(observer);
 		
 		// after observer creation start gui
 		IGoal gui = createGoal("start_environment_gui");

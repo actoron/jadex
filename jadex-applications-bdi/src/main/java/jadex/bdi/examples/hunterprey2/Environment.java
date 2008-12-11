@@ -437,7 +437,7 @@ public class Environment implements IEnvironment
 				props.put(PROPERTY_ONTOLOGY, copy);
 				
 				List tasks = new ArrayList();
-				tasks.add(new MoveObjectTask(new Vector2Double(0.0)));
+				tasks.add(new MoveObjectTask(new Vector2Double(0.1)));
 				
 				
 				//copy.setSimId(super.createSimObject(getSimObjectType(copy), props, tasks, new Vector2Int(copy.getLocation().getX(),copy.getLocation().getY()), true, null));
@@ -616,7 +616,7 @@ public class Environment implements IEnvironment
 			IGoal goToDestination = agent.createGoal("sim_go_to_destination");
 			goToDestination.getParameter("object_id").setValue(me.getSimId());
 			goToDestination.getParameter("destination").setValue(new Vector2Int(newloc.getX(), newloc.getY()));
-			goToDestination.getParameter("speed").setValue(Creature.CREATURE_SPEED);
+			goToDestination.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
 			goToDestination.getParameter("tolerance").setValue(new Vector1Double(0.1));
 			agent.dispatchTopLevelGoalAndWait(goToDestination);
 			
