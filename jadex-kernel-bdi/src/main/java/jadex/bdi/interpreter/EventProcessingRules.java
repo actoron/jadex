@@ -1890,19 +1890,19 @@ public class EventProcessingRules
 				if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
 				{
 					Collection coll = (Collection)state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds);
-					ok = coll.contains(rpe);
+					ok = coll!=null && coll.contains(rpe);
 				}
 				else if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.internalevent_type))
 				{
 					Collection coll = (Collection)state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes);
 					Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
-					ok = coll.contains(mpe);
+					ok = coll!=null && coll.contains(mpe);
 				}
 				else if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.messageevent_type))
 				{
 					Collection coll = (Collection)state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_messageevents);
 					Object org = state.getAttributeValue(rpe, OAVBDIRuntimeModel.messageevent_has_original);
-					ok = coll.contains(org);
+					ok = coll!=null && coll.contains(org);
 					
 					if(!ok)
 					{

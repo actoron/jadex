@@ -1009,10 +1009,15 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 //		RULEBASE.addRule(EventProcessingRules.createRemoveEventprocessingArtifactRule());  // todo: remove
 		
 		// Goal deliberation rules.
-		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalActivationRule());
-		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalDeactivationRule());
-//		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalDeactivationRule2());
 		RULEBASE.addRule(GoalDeliberationRules.createGoalExitActiveStateRule());
+		
+//		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalActivationRule());
+//		RULEBASE.addRule(GoalDeliberationRules.createDeliberateGoalDeactivationRule());
+		
+		RULEBASE.addRule(GoalDeliberationRules.createAddTypeInhibitionLinkRule());
+		RULEBASE.addRule(GoalDeliberationRules.createRemoveTypeInhibitionLinkRule());
+		RULEBASE.addRule(GoalDeliberationRules.createActivateGoalRule());
+		RULEBASE.addRule(GoalDeliberationRules.createDeactivateGoalRule());
 		
 		// Goal lifecycle rules.
 		RULEBASE.addRule(GoalLifecycleRules.createGoalDroppingRule());
