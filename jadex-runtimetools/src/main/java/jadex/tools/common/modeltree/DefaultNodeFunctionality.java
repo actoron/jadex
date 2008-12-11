@@ -8,6 +8,7 @@ import jadex.tools.common.plugin.IControlCenter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,11 +29,14 @@ public class	DefaultNodeFunctionality
 {
 	//-------- constants --------
 	
-	/** The last modified property (Long). */
+	/** The last modified property (Date). */
 	protected static final String	LAST_MODIFIED	= "last_modified";
 	
 	/** The children property (List). */
 	protected static final String	CHILDREN	= "children";
+	
+	/** The last check date of the children property (Date). */
+	protected static final String	CHILDREN_DATE	= "children_date";
 	
 	/**
 	 * The image icons.
@@ -90,9 +94,11 @@ public class	DefaultNodeFunctionality
 	}
 	
 	/**
-	 *  Perform the actual refresh.
-	 *  Can be overridden by subclasses.
-	 *  @return true, if the node has changed and needs to be checked.
+	 *  Check for changes in the file system.
+	 *  If the file has changed, the last modified
+	 *  date is saved and the node is repainted
+	 *  leading to other properties being updated,
+	 *  if necessary.
 	 */
 	public void	refresh(final IExplorerTreeNode node)
 	{
@@ -107,11 +113,12 @@ public class	DefaultNodeFunctionality
 			}
 			else
 			{
-				long	newdate	= fn.getFile().lastModified();
-				Long	olddate	= (Long) fn.getProperties().get(LAST_MODIFIED);
-				if(olddate==null || olddate.longValue()<newdate)
+				Date	newdate	= new Date(fn.getFile().lastModified());
+				Date	olddate	= (Date) fn.getProperties().get(LAST_MODIFIED);
+				if(olddate==null || olddate.before(newdate))
 				{
-					fn.getProperties().put(LAST_MODIFIED, new Long(newdate));
+					fn.getProperties().put(LAST_MODIFIED, newdate);
+					nodeChanged(fn);
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
@@ -129,13 +136,15 @@ public class	DefaultNodeFunctionality
 	 */
 	public List	getChildren(FileNode node)
 	{
-//		System.out.println("Get Children: "+node.getToolTipText());
-		if(hasChanged(node, CHILDREN))
+//		System.out.println("getChildren: "+node.getToolTipText());
+		Date	filedate	= getLastModified(node);
+		Date	childate	= (Date)node.getProperties().get(CHILDREN_DATE);
+		if(filedate!=null && (childate==null || childate.before(filedate)))
 		{
 			startNodeTask(new UpdateChildrenTask(node));
-			System.out.println("Get Children2: "+node.getToolTipText());
+//			System.out.println("Get Children2: "+node.getToolTipText());
 		}
-		return (List)node.getProperties().get(CHILDREN);
+		return (List) node.getProperties().get(CHILDREN);
 	}
 
 	/**
@@ -173,6 +182,22 @@ public class	DefaultNodeFunctionality
 		}
 		return icon;
 	}
+	
+	/**
+	 *  Called when the corresponding file of a node has changed.
+	 *  Empty default implementation to be overridden by subclasses.
+	 */
+	public void	nodeChanged(FileNode node)
+	{
+	}
+
+	/**
+	 *  Called when children of a directory node have been added or removed.
+	 *  Empty default implementation to be overridden by subclasses.
+	 */
+	public void	childrenChanged(DirNode node)
+	{
+	}
 
 	//-------- helper methods --------
 
@@ -188,21 +213,13 @@ public class	DefaultNodeFunctionality
 	}
 
 	/**
-	 *  Test if the underlying file has changed since
-	 *  a property was last checked.
-	 *  In case of a change, the property date will be
-	 *  set to the new date (i.e. subsequent calls will
-	 *  return false until the file is changed again).
+	 *  Get the last modified date (if already checked).
 	 */
-	public boolean	hasChanged(FileNode node, String property)
+	public Date	getLastModified(FileNode node)
 	{
-		Long	filedate	= (Long) node.getProperties().get(LAST_MODIFIED);
-		Long	propdate	= (Long) node.getProperties().get(property+"_"+LAST_MODIFIED);
-		boolean	ret	= !SUtil.equals(filedate, propdate);
-		if(filedate==null)
+		Date	ret	= (Date)node.getProperties().get(LAST_MODIFIED);
+		if(ret==null)
 			startNodeTask(new RefreshNodeTask(this, node));
-		else if(ret)
-			node.getProperties().put(property+"_"+LAST_MODIFIED, filedate);
 		return ret;
 	}
 
@@ -236,7 +253,7 @@ public class	DefaultNodeFunctionality
 			}
 			queue.add(task.getNode());
 			explorer.getWorker().execute(task, task.getPriority());
-			System.out.println("Added: "+task);
+//			System.out.println("Added: "+task);
 
 			if(statuscomp!=null)
 			{
@@ -327,6 +344,7 @@ public class	DefaultNodeFunctionality
 		 */
 		public void performTask()
 		{
+//			System.out.println("Refresh: "+node.getToolTipText());
 			nof.refresh(node);
 		}
 	}
@@ -353,8 +371,8 @@ public class	DefaultNodeFunctionality
 		 */
 		public void performTask()
 		{
-			System.out.println("Get Children3: "+node.getToolTipText());
-			boolean	changed	= true;
+//			System.out.println("UpdateChildren: "+node.getToolTipText());
+			boolean	changed	= node instanceof DirNode;
 			if(node instanceof JarNode)
 			{
 				FileNode fn = (FileNode)node;
@@ -422,8 +440,10 @@ public class	DefaultNodeFunctionality
 				}
 			}
 			
+			((FileNode)node).getProperties().put(CHILDREN_DATE, new Date());
 			if(changed)
 			{
+				childrenChanged((DirNode) node);
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()

@@ -11,13 +11,13 @@ import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.modeltree.NodeTask;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
-import javax.swing.tree.DefaultTreeModel;
 
 /**
  *  Model tree node functionality, specific for the starter plugin.
@@ -29,6 +29,9 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 	/** The valid property. */
 	protected static final String	VALID	= "valid";
 	
+	/** The last check date of the valid property (Date). */
+	protected static final String	VALID_DATE	= "valid_date";
+
 	/**
 	 * The image for (m/r) elements.
 	 */
@@ -59,7 +62,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 		checkcomp.setToolTipText("Checking validity of agent models.");
 	}
 	
-	//-------- INodeFunctionality interface --------
+	//-------- methods --------
 	
 	/**
 	 *  Get the icon.
@@ -77,6 +80,73 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 			});
 		}
 		return icon;
+	}
+
+	/**
+	 *  Check if the valid flag of a node is set to true.
+	 */
+	public boolean	isValid(IExplorerTreeNode node)
+	{
+//		System.out.println("isValid: "+node.getToolTipText());
+		boolean	ret	= true;	// Unknown node types are valid by default
+		if(node instanceof FileNode && starter.getCheckingMenu()!=null
+			&& starter.getCheckingMenu().isSelected())
+		{
+			FileNode fn = (FileNode)node;
+			Date	filedate	= getLastModified(fn);
+			Date	validate	= (Date) fn.getProperties().get(VALID_DATE);
+			boolean	check	= filedate!=null && (validate==null || validate.before(filedate));
+			if(!check && filedate!=null)
+			{
+				List	children	= getChildren(fn);
+				if(children!=null)
+				{
+					for(int i=0; !check && i<children.size(); i++)
+					{
+						Date childate	= (Date) ((FileNode)children.get(i)).getProperties().get(VALID_DATE);
+						
+						// If child not checked, check child first before continuing.
+						if(childate==null)
+						{
+							startNodeTask(new CheckTask(fn));
+							break;
+						}
+						else
+						{
+							check	= validate==null || validate.before(childate);
+						}
+					}
+				}
+			}
+			if(check)
+			{
+				startNodeTask(new CheckTask(fn));
+			}
+			Boolean	val	= (Boolean)fn.getProperties().get(VALID);
+			ret	= val==null || val.booleanValue();	// Valid, if not yet checked.
+		}
+		return ret;
+	}
+
+	
+	/**
+	 *  Called when the corresponding file of a node has changed.
+	 *  Empty default implementation to be overridden by subclasses.
+	 */
+	public void	nodeChanged(FileNode node)
+	{
+//		System.out.println("nodeChanged("+node.getToolTipText()+")");
+		isValid(node);
+	}
+
+	/**
+	 *  Called when children of a directory node have been added or removed.
+	 *  Empty default implementation to be overridden by subclasses.
+	 */
+	public void	childrenChanged(DirNode node)
+	{
+//		System.out.println("childrenChanged("+node.getToolTipText()+")");
+		isValid(node);
 	}
 
 	//-------- helper classes --------
@@ -104,10 +174,12 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 		 */
 		public void	performTask()
 		{
+//			System.out.println("Check: "+node.getToolTipText());
 			if(node instanceof FileNode)
 			{
 				FileNode fn = (FileNode)node;
-				boolean	oldvalid	= isValid(node);
+				Boolean	val	= (Boolean)fn.getProperties().get(VALID);
+				boolean	oldvalid	= val==null || val.booleanValue();
 				boolean	newvalid	= false;
 				
 				// Check directory.
@@ -143,45 +215,22 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 				}
 				
 				fn.getProperties().put(VALID, new Boolean(newvalid));	// Add always, because old value could be null.
+				fn.getProperties().put(VALID_DATE, new Date());	// Add always, because old value could be null.
 				if(oldvalid!=newvalid)
 				{
+					if(node.getParent() instanceof DirNode)
+						childrenChanged((DirNode) node.getParent());
+					
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
 						{
 							((ModelExplorerTreeModel)explorer.getModel()).fireNodeChanged(node);
 						}
-					});
-	
-					IExplorerTreeNode	parent	= (IExplorerTreeNode) fn.getParent();
-					if(parent instanceof DirNode && newvalid!=isValid(parent)
-						&& starter.getCheckingMenu()!=null && starter.getCheckingMenu().isSelected())
-					{
-						startNodeTask(new CheckTask(parent));
-					}
+					});	
 	//				System.out.println("Valid?: "+node+", "+newvalid);
 				}
 			}
 		}
-	}
-
-	/**
-	 *  Check if the valid flag of a node is set to true.
-	 */
-	public boolean	isValid(IExplorerTreeNode node)
-	{
-		boolean	ret	= true;	// Unknown node types are valid by default
-		if(node instanceof FileNode && starter.getCheckingMenu()!=null
-			&& starter.getCheckingMenu().isSelected())
-		{
-			FileNode fn = (FileNode)node;
-			if(hasChanged(fn, VALID))
-			{
-				startNodeTask(new CheckTask(fn));
-			}
-			Boolean	val	= (Boolean)fn.getProperties().get(VALID);
-			ret	= val==null || val.booleanValue();	// Valid, if not yet checked.
-		}
-		return ret;
 	}
 }

@@ -15,6 +15,11 @@ import javax.swing.tree.TreeNode;
  */
 public class FileNode implements IExplorerTreeNode
 {
+	//-------- constants --------
+	
+	/** Node id counter. */
+	protected static int	COUNTER	= 0;
+	
 	//-------- attributes --------
 	
 	/** The parent of this node. */
@@ -134,22 +139,6 @@ public class FileNode implements IExplorerTreeNode
 	{
 		return file.getName();
 	}
-
-	/**
-	 *  Check if this object is equal to another object.
-	 * /
-	public boolean equals(Object obj)
-	{
-		return (obj instanceof FileNode) && this.file.getAbsolutePath().equals(((FileNode)obj).file.getAbsolutePath());
-	}
-
-	/**
-	 *  Return the hash code for this element. 
-	 * /
-	public int hashCode()
-	{
-		return file.getAbsolutePath().hashCode();
-	}*/
 
 	/**
 	 *  Return the tooltip text for the node (if any).

@@ -297,25 +297,37 @@ public class ModelExplorer extends JTree
 	}
 
 	/**
+	 *  Struct for storing Tree proeprties.
+	 */
+	public static class	ModelExplorerProperties
+	{
+		/** The root node. */
+		protected RootNode	root;
+		/** The selected node (if any). */
+		protected FileNode	selected;
+		/** This list of expanded nodes. */
+		protected List	expanded;
+		
+		public RootNode	getRootNode(){return root;}
+		public FileNode	getSelectedNode(){return selected;}
+		public List	getExpandedNodes(){return expanded;}
+		public void	setRootNode(RootNode root){this.root=root;}
+		public void	setSelectedNode(FileNode selected){this.selected=selected;}
+		public void	setExpandedNodes(List expanded){this.expanded=expanded;}
+	}
+	
+	/**
 	 *  Write current state into properties.
 	 */
 	public Properties	getProperties()
 	{
 		Properties	props	= new Properties();
-		// Save root node.
-		ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
-		String	treesave	= Nuggets.objectToXML(getRootNode(), cl);
-		props.addProperty(new Property("rootnode", treesave));
-				
-		// Save the last loaded file.
-		File sf = filechooser.getSelectedFile();
-		if(sf!=null)
-		{
-			props.addProperty(new Property("lastpath", sf.getAbsolutePath()));
-		}
-
-		// Save the expanded tree nodes.
-		int expi=0;
+		// Save tree properties.
+		ModelExplorerProperties	mep	= new ModelExplorerProperties();
+		mep.root	= getRootNode();
+		mep.selected	= getSelectionPath()==null ? null
+			: (FileNode)getSelectionPath().getLastPathComponent();
+		mep.expanded	= new ArrayList();
 		Enumeration exp = getExpandedDescendants(new TreePath(getRootNode()));
 		if(exp!=null)
 		{
@@ -324,13 +336,20 @@ public class ModelExplorer extends JTree
 				TreePath	path	= (TreePath)exp.nextElement();
 				if(path.getLastPathComponent() instanceof FileNode)
 				{
-					props.addProperty(new Property("expanded", ((FileNode)path.getLastPathComponent()).getFile().getAbsolutePath()));
+					mep.expanded.add(path.getLastPathComponent());
 				}
 			}
 		}
-		// Save the selected tree node
-		if(getSelectionPath()!=null)
-			props.addProperty(new Property("selected", ""+((FileNode)getSelectionPath().getLastPathComponent()).getFile().getAbsolutePath()));
+		ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+		String	treesave	= Nuggets.objectToXML(mep, cl);
+		props.addProperty(new Property("tree", treesave));
+				
+		// Save the last loaded file.
+		File sf = filechooser.getSelectedFile();
+		if(sf!=null)
+		{
+			props.addProperty(new Property("lastpath", sf.getAbsolutePath()));
+		}
 
 		// Save refresh/checking flags.
 		props.addProperty(new Property("refresh", Boolean.toString(refresh)));
@@ -357,14 +376,25 @@ public class ModelExplorer extends JTree
 	public void setProperties(final Properties props)
 	{
 		// Load root node.
-		String	rootxml	= props.getStringProperty("rootnode");
-		if(rootxml!=null)
+		String	treexml	= props.getStringProperty("tree");
+		if(treexml!=null)
 		{
 			try
 			{
 				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
-				this.root	= (RootNode)Nuggets.objectFromXML(rootxml, cl);
+				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl); 
+				this.root	= mep.root;
 				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
+
+				// Select the last selected model in the tree.
+				expansionhandler.setSelectedNode(mep.selected);
+
+				// Load the expanded tree nodes.
+				for(int i=0; i<mep.expanded.size(); i++)
+					expansionhandler.treeExpanded(new TreeExpansionEvent(
+						this, new TreePath(mep.expanded.get(i))));
+
+				((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(getRootNode());
 			}
 			catch(Exception e)
 			{
@@ -413,17 +443,6 @@ public class ModelExplorer extends JTree
 			}
 		}
 		
-		// Load the expanded tree nodes.
-		Property[]	expanded	= props.getProperties("expanded");
-		for(int i=0; i<expanded.length; i++)
-			expansionhandler.treeExpanded(new TreeExpansionEvent(
-				this, new TreePath(new FileNode(null, new File(expanded[i].getValue())))));
-
-		// Select the last selected model in the tree.
-		String sel = props.getStringProperty("selected");
-		expansionhandler.setSelectedNode(sel==null ? null : new FileNode(null, new File(sel)));
-		((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(getRootNode());
-
 		// Load last selected model.
 		String lastpath = props.getStringProperty("lastpath");
 		if(lastpath!=null)
@@ -757,18 +776,18 @@ public class ModelExplorer extends JTree
 			if(nodes_crawler.isEmpty())
 			{
 				nodes_crawler.add(getRootNode());
-				System.out.println("restarted: "+this);
+//				System.out.println("restarted: "+this);
 			}
 
 			// Update node if necessary:
 			final IExplorerTreeNode	node	= (IExplorerTreeNode)nodes_crawler.remove(0);
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					jcc.setStatusText("Crawling "+node.getToolTipText());
-				}
-			});
+//			SwingUtilities.invokeLater(new Runnable()
+//			{
+//				public void run()
+//				{
+//					jcc.setStatusText("Crawling "+node.getToolTipText());
+//				}
+//			});
 			nof.refresh(node);	// Refresh in crawler and do not start task on user priority
 			
 			// Iterate over children

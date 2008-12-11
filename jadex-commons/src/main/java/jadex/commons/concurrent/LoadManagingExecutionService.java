@@ -73,7 +73,7 @@ public class LoadManagingExecutionService
 					{
 						try
 						{
-							System.out.println("Sleeping: "+sleep);
+//							System.out.println("Sleeping: "+sleep);
 							if(sleep>1000)
 							{
 								System.out.println("Sleep warning: "+sleep);
@@ -115,7 +115,7 @@ public class LoadManagingExecutionService
 						if(concurrency>0)
 						{
 							limit	= concurrency;
-							System.out.println("Executing "+concurrency+" tasks with load "+load);
+//							System.out.println("Executing "+concurrency+" tasks with load "+load);
 						}
 					}
 				}
@@ -165,7 +165,7 @@ public class LoadManagingExecutionService
 			// Use exponential annealing to avoid oscillations
 			limit	= Math.max(1, limit + (int)(0.5*(newlimit-limit)));
 			
-			System.out.println("Execution finished in "+(time/100000)/10.0+" millis. New limit: "+limit);
+//			System.out.println("Execution finished in "+(time/100000)/10.0+" millis. New limit: "+limit);
 
 			if(!tasks.isEmpty())
 			{
