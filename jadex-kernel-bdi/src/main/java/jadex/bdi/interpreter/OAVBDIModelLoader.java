@@ -335,6 +335,21 @@ public class OAVBDIModelLoader
 					rb.addRule(GoalProcessingRules.createGoalRecurUserRule(usercond, gtname));
 				}
 				
+				// Create deliberation rules
+				Collection inhibits = (Collection)state.getAttributeValues(mgoal, OAVBDIMetaModel.goal_has_inhibits);
+				if(inhibits!=null)
+				{
+					for(Iterator it2=inhibits.iterator(); it2.hasNext(); )
+					{
+						Object inhibit = it2.next();
+						ICondition usercond = (ICondition)state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_content);
+						if(usercond!=null)
+						{
+							rb.addRule(GoalDeliberationRules.createAddTypeInhibitionLinkUserRule(usercond, gtname));
+						}
+					}
+				}
+				
 				// Create achievegoal specific rules
 				
 				if(state.getType(mgoal).equals(OAVBDIMetaModel.achievegoal_type))

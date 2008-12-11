@@ -25,7 +25,7 @@ public class SConditions
         		throw new RuntimeException("Type must not be null.");
         	
         	OAVObjectType otype = var.getType();
-        	//System.out.println("Having: "+otype+" "+type);
+        	System.out.println("Having: "+otype+" "+type);
         	if(otype==null)
         	{
         		var.setType(type);
@@ -35,15 +35,22 @@ public class SConditions
         		// Check compatibility and use most specific type
         		if(otype instanceof OAVJavaType)
         		{
-        			Class oclazz = ((OAVJavaType)otype).getClazz();
-        			Class clazz = ((OAVJavaType)type).getClazz();
-        			if(oclazz.isAssignableFrom(clazz))
+        			try
         			{
-        				var.setType(type);
-        				//System.out.println("Setting: "+type);
+	        			Class oclazz = ((OAVJavaType)otype).getClazz();
+	        			Class clazz = ((OAVJavaType)type).getClazz();
+	        			if(oclazz.isAssignableFrom(clazz))
+	        			{
+	        				var.setType(type);
+	        				//System.out.println("Setting: "+type);
+	        			}
+	        			else if(!clazz.isAssignableFrom(oclazz))
+	        				throw new RuntimeException("Incompatible variable types: "+var+" "+oclazz+" "+clazz);
         			}
-        			else if(!clazz.isAssignableFrom(oclazz))
-        				throw new RuntimeException("Incompatible variable types: "+var+" "+oclazz+" "+clazz);
+        			catch(Exception e)
+        			{
+        				e.printStackTrace();
+        			}
         		}
         		else
         		{

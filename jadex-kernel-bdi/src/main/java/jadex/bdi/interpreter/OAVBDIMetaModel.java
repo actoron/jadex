@@ -1344,7 +1344,7 @@ public class OAVBDIMetaModel
 				
 				String lang = (String)state.getAttributeValue(se.object, OAVBDIMetaModel.expression_has_language);
 				
-				if(state.getType(se.object).equals(condition_type))
+				if(state.getType(se.object).isSubtype(condition_type))
 				{
 //					System.out.println("Found condition: "+se.object);
 

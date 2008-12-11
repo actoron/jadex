@@ -146,14 +146,17 @@
 			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
 			<!-- todo: remove unique support? <unique/>--> 
 			<creationcondition>
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?adopted	= (goal (element_has_model ?mgoal))
-					?rcapa		= (capability (capability_has_goals contains ?adopted))
-				))
-
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
 				?mbeliefset = (mbeliefset (element_has_name "wastes"))
+				
+				// unique (?rcapa and ?mgoal are provided internally)
+				(not (and
+					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+					?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
+					// ?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters $?x ?rparam $?y))
+					//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+					?rcapa = (capability (capability_has_goals contains ?adopted))
+				))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
 			<contextcondition>
@@ -178,8 +181,22 @@
 			<deliberation cardinality="1">
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">
-					$beliefbase.my_location.getDistance($goal.waste.getLocation())
-					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+					// $beliefbase.my_location.getDistance($goal.waste.getLocation())
+					// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+					
+					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
+					?mbelief = (mbelief (element_has_name "mylocation"))
+					
+					?rgoal = (goal (parameterelement_has_parameters $?x ?rparam $?y))
+					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+					?waste = (jadex.bdi.examples.cleanerworld.Waste (location ?wasteloc))
+					
+					?ringoal = (goal (parameterelement_has_parameters $?x ?rinparam $?y))
+					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?inwaste))
+					?inwaste = (jadex.bdi.examples.cleanerworld.Waste (location ?inwasteloc))
+	
+					?wasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) ?wastedist))
+					?inwasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &gt; ?wastedist))				
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. - ->
