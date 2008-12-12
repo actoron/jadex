@@ -87,7 +87,7 @@ public class Platform extends AbstractPlatform
 	public static final String PLATFORMNAME = "platformname";
 
 	/** The fallback configuration. */
-	public static final String FALLBACK_CONFIGURATION = "standalone_conf.xml";
+	public static final String FALLBACK_CONFIGURATION = "jadex/adapter/standalone/standalone_conf.xml";
 
 	/** Configuration entry for platform shutdown delay (time for agents to terminate gracefully). */
 	public static String PLATFORM_SHUTDOWN_TIME = "platform_shutdown_time";

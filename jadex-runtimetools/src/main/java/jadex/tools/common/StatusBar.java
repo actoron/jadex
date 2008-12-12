@@ -7,7 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -43,7 +44,7 @@ public class StatusBar extends JPanel
 	 */
 	public StatusBar()
 	{
-		this.components = new HashMap();
+		this.components = new LinkedHashMap();
 		this.textl = new JLabel(" ");
 		this.timer = new Timer(5000, new ActionListener()
 		{
@@ -55,8 +56,7 @@ public class StatusBar extends JPanel
 
 		this.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		this.setLayout(new GridBagLayout());
-		this.add(textl, new GridBagConstraints(0, 0, 1, 1, 1, 1,
-			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,4,4,2), 0, 0));
+		layoutComponents();
 	}
 
 	//-------- methods --------
@@ -86,11 +86,7 @@ public class StatusBar extends JPanel
 		if(!components.containsKey(id))
 		{
 			components.put(id, comp);
-			this.add(comp, new GridBagConstraints(this.getComponentCount(), 0, 1, 1, 0, 0,
-				GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0,0,0,0), 0, 0));
-			this.invalidate();
-			this.doLayout();
-			this.repaint();
+			layoutComponents();
 		}
 	}
 
@@ -110,10 +106,29 @@ public class StatusBar extends JPanel
 		// todo: shift other components
 		if(components.containsKey(id))
 		{
-			this.remove((Component)components.get(id));
 			components.remove(id);
-			this.repaint();
+			layoutComponents();
 		}
+	}
+
+	/**
+	 *  Relayout components after components have been added or removed.
+	 */
+	protected void layoutComponents()
+	{
+		// Remove and re-add all components in inverse insertion order (adding from right-to-left).
+		this.removeAll();
+		this.add(textl, new GridBagConstraints(0, 0, 1, 1, 1, 1,
+				GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,4,4,2), 0, 0));
+		int pos	= components.size();
+		for(Iterator it=components.values().iterator(); it.hasNext(); )
+		{
+			this.add((Component)it.next(), new GridBagConstraints(pos--, 0, 1, 1, 0, 0,
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0,0,0,0), 0, 0));
+		}
+		this.invalidate();
+		this.doLayout();
+		this.repaint();
 	}
 
 	// todo: add replaceStatusComponent etc.
