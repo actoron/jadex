@@ -153,9 +153,9 @@
 				(not (and
 					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
 					?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
+					?rcapa = (capability (capability_has_goals contains ?adopted))
 					// ?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters $?x ?rparam $?y))
 					//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-					?rcapa = (capability (capability_has_goals contains ?adopted))
 				))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
@@ -178,14 +178,15 @@
 				?mbelief = (mbelief (element_has_name "carriedwaste"))
 				// todo: make sure that all elements are in same capa
  			</dropcondition>
-			<deliberation cardinality="1">
+			<!--  <deliberation cardinality="1">-->
+			<deliberation>
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">
 					// $beliefbase.my_location.getDistance($goal.waste.getLocation())
 					// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
 					
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (element_has_name "mylocation"))
+					?mbelief = (mbelief (element_has_name "my_location"))
 					
 					?rgoal = (goal (parameterelement_has_parameters $?x ?rparam $?y))
 					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
@@ -193,10 +194,16 @@
 					
 					?ringoal = (goal (parameterelement_has_parameters $?x ?rinparam $?y))
 					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?inwaste))
-					?inwaste = (jadex.bdi.examples.cleanerworld.Waste (location ?inwasteloc))
+					?inwaste = (jadex.bdi.examples.cleanerworld.Waste (location ?inwasteloc &amp; 
+						:(&lt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction 
+							"jadex.bdi.examples.cleanerworld.Location" "getDistance" ?myloc ?wasteloc)
+							(jadex.rules.rulesystem.rules.functions.MethodCallFunction 
+							"jadex.bdi.examples.cleanerworld.Location" "getDistance" ?myloc ?inwasteloc)  
+					)))
 	
-					?wasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) ?wastedist))
-					?inwasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &gt; ?wastedist))				
+					// Does not work because Locations are not directly in state.
+					// ?wasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) ?wastedist))
+					// ?inwasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &lt; ?wastedist))				
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. - ->
@@ -241,6 +248,9 @@
  				from $beliefbase.wastebins
 				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
 			</failurecondition> -->
+			<!-- <dropcondition>
+				
+			</dropcondition> -->
 		</achievegoal>
 
 		<!-- Try to move to the specified location. -->

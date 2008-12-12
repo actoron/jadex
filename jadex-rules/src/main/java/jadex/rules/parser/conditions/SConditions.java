@@ -25,7 +25,7 @@ public class SConditions
         		throw new RuntimeException("Type must not be null.");
         	
         	OAVObjectType otype = var.getType();
-        	System.out.println("Having: "+otype+" "+type);
+//        	System.out.println("Having: "+otype+" "+type);
         	if(otype==null)
         	{
         		var.setType(type);

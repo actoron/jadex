@@ -163,6 +163,9 @@ public class Environment implements IEnvironment
 	 */
 	public boolean dropWasteInWastebin(Waste waste, Wastebin wastebin)
 	{
+		if(waste==null)
+			System.out.println("here");
+		
 		boolean ret = false;
 
 		wastebin	= getWastebin(wastebin);

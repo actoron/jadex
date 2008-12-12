@@ -33,7 +33,10 @@ public class DropWastePlan extends Plan
 	public void body()
 	{
 		Waste waste = (Waste)getBeliefbase().getBelief("carriedwaste").getFact();
-
+//		System.out.println("carriedwaste a ="+waste);
+//		if(waste==null)
+//			System.out.println("here");
+		
 		// Move to a not full waste-bin
 		Wastebin wastebin = (Wastebin)getParameter("wastebin").getValue();
 		if(wastebin==null)
@@ -67,6 +70,7 @@ public class DropWastePlan extends Plan
 			wbs.addFact(wastebin);
 		//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wastebin);
 		getBeliefbase().getBelief("carriedwaste").setFact(null);
+//		System.out.println("carriedwaste b =null");
 //		endAtomic();
 	}
 }

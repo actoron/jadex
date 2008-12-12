@@ -363,7 +363,8 @@ public class OAVBDIModelLoader
 						ICondition usercond = (ICondition)state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
-							rb.addRule(GoalDeliberationRules.createAddTypeInhibitionLinkUserRule(usercond, gtname));
+							rb.addRule(GoalDeliberationRules.createAddInhibitionLinkUserRule(usercond, gtname));
+							rb.addRule(GoalDeliberationRules.createRemoveInhibitionLinkUserRule(usercond, gtname));
 						}
 					}
 				}
