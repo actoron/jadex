@@ -3,6 +3,7 @@ package jadex.bdi.interpreter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.concurrent.ThreadPool;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
@@ -24,15 +25,22 @@ import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.javaimpl.OAVState;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  *  Loader for reading agent XMLs into OAV representation.
@@ -259,24 +267,31 @@ public class OAVBDIModelLoader
 					}
 				};
 				
-				state.addStateListener(listener, false);
-				Object handle = reader.read(info.getInputStream(), state, mapping);
-				state.removeStateListener(listener);
-
-				if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
-				{
-					cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
-				}
-				else
-				{
-					cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
-				}
-
-				createAgentModelEntry(cached);
-				info.cleanup();	
 				
-				// Store by filename also, to avoid reloading with different imports.
-				modelcache.put(info.getFilename(), cached);
+				try
+				{
+					state.addStateListener(listener, false);
+					Object handle = reader.read(info.getInputStream(), state, mapping);
+					state.removeStateListener(listener);
+	
+					if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
+					{
+						cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
+					}
+					else
+					{
+						cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
+					}
+	
+					createAgentModelEntry(cached);
+
+					// Store by filename also, to avoid reloading with different imports.
+					modelcache.put(info.getFilename(), cached);
+				}
+				finally
+				{
+					info.cleanup();
+				}				
 			}
 			
 			// Associate cached model to new key (name/extension/imports).
@@ -713,5 +728,68 @@ public class OAVBDIModelLoader
 		if(ret==null)
 			throw new RuntimeException("Unknown extension: "+filename);
 		return ret;
+	}
+
+	public static void	main(String[] args) throws IOException
+	{
+		final OAVBDIModelLoader	loader	= new OAVBDIModelLoader(Collections.EMPTY_MAP);
+		loader.setClassLoader(OAVBDIModelLoader.class.getClassLoader());
+		final File	file	= new File("../target/jadex-1.0-SNAPSHOT-dist.dir/lib/jadex-applications-bdi-1.0-SNAPSHOT.jar");
+		final SAXParserFactory	factory	= SAXParserFactory.newInstance();
+		factory.setNamespaceAware(false);
+		JarFile	jar	= new JarFile(file);
+		ThreadPool	tp	= new ThreadPool();
+		Enumeration	entries	= jar.entries();
+		while(entries.hasMoreElements())
+		{
+			final Object	entry	= entries.nextElement();
+			tp.execute(new Runnable()
+			{
+				public void run()
+				{
+					final String	filename	= "jar:file:/"+file.getAbsolutePath()
+						+"!/"+((JarEntry) entry).getName();
+					if(filename.endsWith(FILE_EXTENSION_AGENT) || filename.endsWith(FILE_EXTENSION_CAPABILITY))
+					{
+//						ResourceInfo	rinfo	= null;
+						try
+						{
+							loader.loadModel(filename, null, null);
+
+//							rinfo = getResourceInfo(filename, loader.getFilenameExtension(filename), null, null);
+//							OAVTypeModel	typemodel	= new OAVTypeModel(filename+"_typemodel", null);
+//							typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+//							loader.reader.read(rinfo.getInputStream(), new OAVState(typemodel), loader.mapping);
+
+//							XMLReader	xmlreader	= factory.newSAXParser().getXMLReader();
+//							xmlreader.setContentHandler(new DefaultHandler()
+//							{
+//								public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
+//								{
+//									if(Math.random()>0.9)
+//										throw new SAXException("kaputt");
+//								}
+//							});
+//							xmlreader.parse(new InputSource(rinfo.getInputStream()));
+
+//							InputStream	is	= rinfo.getInputStream();
+//							while(is.read()!=-1);
+						}
+						catch(NullPointerException e)
+						{
+							System.err.println("Error loading: "+filename);
+							e.printStackTrace();
+						}
+						catch(Exception e)
+						{
+							System.err.println("Error loading: "+filename+", "+e.getClass());
+						}
+						
+//						if(rinfo!=null)
+//							rinfo.cleanup();
+					}
+				}
+			});
+		}
 	}
 }

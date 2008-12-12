@@ -1345,14 +1345,14 @@ public class OAVBDIMetaModel
 
 					if(lang==null || "clips".equals(lang))
 					{
-						try
-						{
+//						try
+//						{
 							ret = ParserHelper.parseCondition(value, state.getTypeModel());
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
+//						}
+//						catch(Exception e)
+//						{
+//							e.printStackTrace();
+//						}
 					}
 					else
 					{
@@ -1366,15 +1366,15 @@ public class OAVBDIMetaModel
 //					System.out.println("Found expression: "+se.object);
 					if(lang==null || "java".equals(lang))
 					{
-						try
-						{
+//						try
+//						{
 							ret = exp_parser.parseExpression(value, ClassValueConverter.getImports(state, stack), null, state.getTypeModel().getClassLoader());
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
+//						}
+//						catch(Exception e)
+//						{
+//							e.printStackTrace();
 	//						ret = exp_parser.parseExpression(value, ClassValueConverter.getImports(state, stack), state.getTypeModel(), null);
-						}
+//						}
 						
 //						// Trigger reference has expression and referenced element
 //						if(state.getType(se.object).equals(triggerreference_type))
@@ -1409,14 +1409,14 @@ public class OAVBDIMetaModel
 					}
 					else if("clips".equals(lang))
 					{
-						try
-						{
+//						try
+//						{
 							ret = ParserHelper.parseCondition(value, state.getTypeModel());
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
+//						}
+//						catch(Exception e)
+//						{
+//							e.printStackTrace();
+//						}
 					}
 					else
 					{
