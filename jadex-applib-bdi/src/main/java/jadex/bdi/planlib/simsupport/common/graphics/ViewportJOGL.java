@@ -430,7 +430,6 @@ public class ViewportJOGL extends AbstractViewport
         
         public void init(GLAutoDrawable drawable)
         {
-        	System.out.println("INIT!");
             GL gl = drawable.getGL();
             gl.glViewport(0, 0, canvas_.getWidth(), canvas_.getHeight());
             gl.glMatrixMode(GL.GL_MODELVIEW);

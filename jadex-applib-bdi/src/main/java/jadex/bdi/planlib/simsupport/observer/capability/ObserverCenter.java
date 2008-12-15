@@ -25,6 +25,7 @@ import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.ObjectIntrospectorPlugin;
+import jadex.bdi.planlib.simsupport.observer.capability.plugin.VisualsPlugin;
 import jadex.bdi.runtime.IExternalAccess;
 
 /** The default observer center
@@ -132,6 +133,15 @@ public class ObserverCenter
 			});
 	}
 	
+	/** Returns access to the agent
+	 * 
+	 *  @return observer agent access
+	 */
+	public IExternalAccess getAgentAccess()
+	{
+		return agent_;
+	}
+	
 	/** Returns access to the simulation engine
 	 * 
 	 *  @return simulation engine access
@@ -194,8 +204,10 @@ public class ObserverCenter
 		ArrayList plugins = new ArrayList();
 		
 		// TODO: remove hard coding
-		IObserverCenterPlugin introspector = new ObjectIntrospectorPlugin();
-		plugins.add(introspector);
+		IObserverCenterPlugin plugin = new ObjectIntrospectorPlugin();
+		plugins.add(plugin);
+		plugin = new VisualsPlugin();
+		plugins.add(plugin);
 		
 		plugins_ = (IObserverCenterPlugin[]) plugins.toArray(new IObserverCenterPlugin[0]);
 		

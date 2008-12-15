@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.media.opengl.GL;
 
-public interface IDrawable extends Serializable
+public interface IDrawable
 {
 	/** Initializes the object for a Java2D viewport
 	 * 

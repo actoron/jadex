@@ -49,8 +49,8 @@
 		</belief>
 		
 		<!-- List of themes for displaying objects -->
-		<belief name="object_themes" class="List" exported="true">
-			<fact>new ArrayList()</fact>
+		<belief name="object_themes" class="Map" exported="true">
+			<fact>Collections.synchronizedMap(new HashMap())</fact>
 		</belief>
 		
 		<!-- Order in which objects are drawn. -->
@@ -59,13 +59,13 @@
 		</belief>
 		
 		<!-- The pre-layers -->
-		<belief name="prelayers" class="List" exported="true">
-			<fact>new ArrayList()</fact>
+		<belief name="prelayer_themes" class="Map" exported="true">
+			<fact>new HashMap()</fact>
 		</belief>
 		
 		<!-- The post-layers -->
-		<belief name="postlayers" class="List" exported="true">
-			<fact>new ArrayList()</fact>
+		<belief name="postlayer_themes" class="Map" exported="true">
+			<fact>new HashMap()</fact>
 		</belief>
 		
 		<!-- The canvas for integration in a custom GUI.
@@ -75,9 +75,7 @@
 		</belief>
 		
 		<!-- The currently selected theme. -->
-		<belief name="selected_theme" class="Integer" exported="true">
-			<fact>new Integer(0)</fact>
-		</belief>
+		<belief name="selected_theme" class="String" exported="true"/>
 		
 		<!-- Maximum distance of a point clicked on the screen and
 			 and the position of an object to be considered in range. -->

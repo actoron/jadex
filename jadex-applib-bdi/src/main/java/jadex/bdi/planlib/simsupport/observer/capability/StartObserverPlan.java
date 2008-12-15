@@ -109,23 +109,27 @@ public class StartObserverPlan extends Plan
 		viewport.setPreserveAspectRation(preserveAR);
 		viewport.setSize(areaSize);
 		
-		// Set pre- and postlayers
-		List preLayers = (List) b.getBelief("prelayers").getFact();
-		List postLayers = (List) b.getBelief("postlayers").getFact();
-		viewport.setPreLayers(preLayers);
-		viewport.setPostLayers(postLayers);
 		// Register the drawables
-		List themes = (List) b.getBelief("object_themes").getFact();
-		for (Iterator it = themes.iterator(); it.hasNext(); )
+		Map themes = (Map) b.getBelief("object_themes").getFact();
+		synchronized(themes)
 		{
-			Map theme = (Map) it.next();
-			Collection drawables = theme.values();
-			for (Iterator it2 = drawables.iterator(); it2.hasNext(); )
+			for (Iterator it = themes.values().iterator(); it.hasNext(); )
 			{
-				DrawableCombiner d = (DrawableCombiner) it2.next();
-				viewport.registerDrawableCombiner(d);
+				Map theme = (Map) it.next();
+				Collection drawables = theme.values();
+				for (Iterator it2 = drawables.iterator(); it2.hasNext(); )
+				{
+					DrawableCombiner d = (DrawableCombiner) it2.next();
+					viewport.registerDrawableCombiner(d);
+				}
 			}
 		}
+		
+		if (b.getBelief("selected_theme").getFact() == null)
+		{
+			b.getBelief("selected_theme").setFact(themes.keySet().toArray()[0]);
+		}
+		
 		b.getBelief("viewport").setFact(viewport);
 		
 		DrawableCombiner objectMarker = new DrawableCombiner();

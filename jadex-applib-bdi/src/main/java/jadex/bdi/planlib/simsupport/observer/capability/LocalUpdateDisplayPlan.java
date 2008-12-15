@@ -41,9 +41,18 @@ public class LocalUpdateDisplayPlan extends Plan
 			return;
 		}
 		
-		List themes = (List) b.getBelief("object_themes").getFact();
-		Integer themeId = (Integer) b.getBelief("selected_theme").getFact();
-		Map theme = (Map) themes.get(themeId.intValue());
+		String themeId = (String) b.getBelief("selected_theme").getFact();
+		
+		// Set pre- and postlayers
+		Map preLayerThemes = (Map) b.getBelief("prelayer_themes").getFact();
+		Map postLayerThemes = (Map) b.getBelief("postlayer_themes").getFact();
+		List preLayers = (List) preLayerThemes.get(themeId);
+		List postLayers = (List) postLayerThemes.get(themeId);
+		viewport.setPreLayers(preLayers);
+		viewport.setPostLayers(postLayers);
+		
+		Map themes = (Map) b.getBelief("object_themes").getFact();
+		Map theme = (Map) themes.get(themeId);
 		
 		Map objectAccess = engine.getSimObjectAccess();
 		Map typedAccess = engine.getTypedSimObjectAccess();

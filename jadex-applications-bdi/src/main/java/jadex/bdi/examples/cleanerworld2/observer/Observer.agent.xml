@@ -45,13 +45,18 @@
 		</beliefref>
 		
 		<!-- The pre-layers -->
-		<beliefref name="prelayers">
-			<concrete ref="obscap.prelayers"/>
+		<beliefref name="prelayer_themes">
+			<concrete ref="obscap.prelayer_themes"/>
 		</beliefref>
 		
 		<!-- The post-layers -->
-		<beliefref name="postlayers">
-			<concrete ref="obscap.postlayers"/>
+		<beliefref name="postlayer_themes">
+			<concrete ref="obscap.postlayer_themes"/>
+		</beliefref>
+		
+		<!-- The selected theme -->
+		<beliefref name="selected_theme">
+			<concrete ref="obscap.selected_theme"/>
 		</beliefref>
   	</beliefs>
 	

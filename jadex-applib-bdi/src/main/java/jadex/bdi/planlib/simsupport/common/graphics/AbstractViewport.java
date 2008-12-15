@@ -128,7 +128,14 @@ public abstract class AbstractViewport implements IViewport
      */
     public void setPreLayers(List layers)
     {
-    	preLayers_ = new ArrayList(layers);
+    	if (layers != null)
+    	{
+    		preLayers_ = new ArrayList(layers);
+    	}
+    	else
+    	{
+    		preLayers_ = new ArrayList();
+    	}
     }
     
     /** Sets the post-layers for the viewport.
@@ -137,7 +144,14 @@ public abstract class AbstractViewport implements IViewport
      */
     public void setPostLayers(List layers)
     {
-    	postLayers_ = new ArrayList(layers);
+    	if (layers != null)
+    	{
+    		postLayers_ = new ArrayList(layers);
+    	}
+    	else
+    	{
+    		postLayers_ = new ArrayList();
+    	}
     }
     
     /** Sets the size of the display area.

@@ -35,7 +35,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 {
 	/** Plugin name
 	 */
-	private static final String NAME = "Object Introspector";
+	private static final String NAME = "Introspector";
 	
 	/** Column names
 	 */
@@ -68,7 +68,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	public ObjectIntrospectorPlugin()
 	{
 		mainPanel_ = new JPanel(new GridBagLayout());
-		mainPanel_.setBorder(new TitledBorder("Object Introspector"));
+		mainPanel_.setBorder(new TitledBorder(NAME));
 		
 		mainPanel_.setMinimumSize(new Dimension(200, 200));
 		
