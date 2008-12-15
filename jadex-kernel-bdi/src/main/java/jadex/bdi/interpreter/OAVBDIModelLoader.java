@@ -27,6 +27,8 @@ import jadex.rules.state.javaimpl.OAVState;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -733,12 +735,14 @@ public class OAVBDIModelLoader
 
 	public static void	main(String[] args) throws IOException
 	{
-		final OAVBDIModelLoader	loader	= new OAVBDIModelLoader(Collections.EMPTY_MAP);
-		loader.setClassLoader(OAVBDIModelLoader.class.getClassLoader());
 		final File	file	= new File("../target/jadex-1.0-SNAPSHOT-dist.dir/lib/jadex-applications-bdi-1.0-SNAPSHOT.jar");
+		JarFile	jar	= new JarFile(file);
+		ClassLoader	cl	= new URLClassLoader(new URL[]{file.toURI().toURL()}, OAVBDIModelLoader.class.getClassLoader());
+
+		final OAVBDIModelLoader	loader	= new OAVBDIModelLoader(Collections.EMPTY_MAP);
+		loader.setClassLoader(cl);
 		final SAXParserFactory	factory	= SAXParserFactory.newInstance();
 		factory.setNamespaceAware(false);
-		JarFile	jar	= new JarFile(file);
 		ThreadPool	tp	= new ThreadPool();
 		Enumeration	entries	= jar.entries();
 		while(entries.hasMoreElements())

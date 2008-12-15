@@ -1082,6 +1082,7 @@ public class SUtil
 					{
 						url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
 						URLConnection con = url.openConnection();
+						con.setDefaultUseCaches(false);	// See Java Bug ID 4386865
 						long	modified = con.getLastModified();
 						String	filename = url.getFile();
 						if(con instanceof JarURLConnection)
