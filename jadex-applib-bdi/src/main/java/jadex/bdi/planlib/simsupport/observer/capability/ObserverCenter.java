@@ -121,7 +121,7 @@ public class ObserverCenter
 						});
 					timer_.start();
 					
-					mainWindow_.addWindowListener(new ObserverWindowsController());
+					mainWindow_.addWindowListener(new ObserverWindowController());
 				}
 			});
 	}
@@ -306,7 +306,7 @@ public class ObserverCenter
 		}
 	}
 	
-	private class ObserverWindowsController implements WindowListener
+	private class ObserverWindowController implements WindowListener
 	{
 		public void windowActivated(WindowEvent e)
 		{
@@ -314,20 +314,20 @@ public class ObserverCenter
 		
 		public void windowClosed(WindowEvent e)
 		{
-			timer_.stop();
-			agent_.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						System.out.println("Killing observer...");
-						agent_.killAgent();
-						
-					}
-				});
 		}
 		
 		public void windowClosing(WindowEvent e)
 		{
+			timer_.stop();
+			mainWindow_.dispose();
+			agent_.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						agent_.killAgent();
+						
+					}
+				});
 		}
 		
 		public void windowDeactivated(WindowEvent e)

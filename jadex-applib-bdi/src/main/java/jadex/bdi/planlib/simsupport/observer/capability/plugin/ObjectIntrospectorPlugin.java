@@ -76,11 +76,11 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		objectPanel.setLayout(new GridLayout(3, 2));
 		JLabel idLabelDesc = new JLabel("Object ID");
 		objectPanel.add(idLabelDesc, BorderLayout.WEST);
-		idLabel_ = new JLabel("0");
+		idLabel_ = new JLabel("");
 		objectPanel.add(idLabel_, BorderLayout.EAST);
 		JLabel posLabelDesc = new JLabel("Position");
 		objectPanel.add(posLabelDesc, BorderLayout.WEST);
-		posLabel_ = new JLabel("0.0, 0.0");
+		posLabel_ = new JLabel("");
 		objectPanel.add(posLabel_, BorderLayout.EAST);
 		JLabel typeLabelDesc = new JLabel("Type");
 		objectPanel.add(typeLabelDesc);

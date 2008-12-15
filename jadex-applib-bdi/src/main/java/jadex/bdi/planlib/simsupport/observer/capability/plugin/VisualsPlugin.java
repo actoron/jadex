@@ -16,6 +16,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -49,19 +50,27 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		
 		mainPanel_.setMinimumSize(new Dimension(200, 200));
 		
-		JPanel themePanel = new JPanel();
+		JPanel themePanel = new JPanel(new GridBagLayout());
 		themePanel.setBorder(new TitledBorder("Theme"));
 		themeList_ = new JList(new DefaultComboBoxModel());
+		JScrollPane themeScrollPane = new JScrollPane(themeList_);
 		themeController_ = new ThemeController();
-		themePanel.add(themeList_);
-		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weighty = 1.0;
 		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		themePanel.add(themeScrollPane, c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weighty = 1.0;
+		c.weightx = 1.0;
 		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.BOTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		mainPanel_.add(themePanel, c);
 	}
 	
