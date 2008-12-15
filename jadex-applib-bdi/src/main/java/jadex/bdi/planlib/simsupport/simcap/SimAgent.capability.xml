@@ -70,7 +70,7 @@
 		<!-- Destroys a simulation object. -->
 		<achievegoal name="sim_destroy_object" exported="true">
 			<!-- ID of the object -->
-			<parameter name="object_id" class="Integer" direction="out"/>
+			<parameter name="object_id" class="Integer" direction="in"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (element_has_name "connected"))
