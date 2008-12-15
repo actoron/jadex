@@ -21,7 +21,7 @@ public class Wastebin extends LocationObject
 
 	/** Attribute for slot name. */
 	protected String name;
-
+	
 	//-------- constructors --------
 
 	/**
@@ -113,7 +113,6 @@ public class Wastebin extends LocationObject
 	{
 		return this.wastes.remove(waste);
 	}
-
 
 	/**
 	 *  Get the capacity of this Wastebin.
