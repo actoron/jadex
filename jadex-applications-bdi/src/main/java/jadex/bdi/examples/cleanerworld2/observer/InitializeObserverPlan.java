@@ -33,22 +33,28 @@ public class InitializeObserverPlan extends Plan
 		
 		String imgPath = this.getClass().getPackage().getName().replaceAll("observer", "").concat("images.").replaceAll("\\.", "/");
 		
-		DrawableCombiner cleanerDrawable = new DrawableCombiner();
+		DrawableCombiner combiner = new DrawableCombiner();
 		String cleanerImage = imgPath.concat("cleaner.png");
-		cleanerDrawable.addDrawable(new ScalableRegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f)));
-		cleanerDrawable.addDrawable(new ScalableTexturedRectangle(new Vector2Double(1.0), cleanerImage));
+		combiner.addDrawable(new ScalableRegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f)), -1);
+		combiner.addDrawable(new ScalableTexturedRectangle(new Vector2Double(1.0), cleanerImage), 0);
 		//cleanerDrawable.addDrawable(new RotatingColoredTriangle(new Vector2Double(1.0), new Vector2Double(1.0), new Vector2Double(0.0), Color.BLUE));
-		theme.put("cleaner", cleanerDrawable);
+		theme.put("cleaner", combiner);
 		
+		combiner = new DrawableCombiner(new Vector2Double(0.5));
 		String wasteImage = imgPath.concat("waste.png");
 		IDrawable wasteDrawable = new ScalableTexturedRectangle(new Vector2Double(0.5), wasteImage);
-		theme.put("waste", wasteDrawable);
+		combiner.addDrawable(wasteDrawable);
+		theme.put("waste", combiner);
 		
+		combiner = new DrawableCombiner(Configuration.WASTE_BIN_SIZE);
 		IDrawable wbDrawable = new ScalableTexturedRectangle(Configuration.WASTE_BIN_SIZE, imgPath + "wastebin.png");
-		theme.put("waste_bin", wbDrawable);
+		combiner.addDrawable(wbDrawable);
+		theme.put("waste_bin", combiner);
 		
+		combiner = new DrawableCombiner(Configuration.CHARGING_STATION_SIZE);
 		IDrawable csDrawable = new ScalableTexturedRectangle(Configuration.CHARGING_STATION_SIZE, imgPath + "chargingstation.png");
-		theme.put("charging_station", csDrawable);
+		combiner.addDrawable(csDrawable);
+		theme.put("charging_station", combiner);
 		
 		List themes = (List) b.getBelief("object_themes").getFact();
 		themes.add(theme);

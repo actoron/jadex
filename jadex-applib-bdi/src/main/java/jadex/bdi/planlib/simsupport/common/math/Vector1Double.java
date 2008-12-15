@@ -126,4 +126,9 @@ public class Vector1Double implements IVector1
 	{
 		return (x_ < vector.getAsDouble());
 	}
+	
+	public String toString()
+	{
+		return Double.toString(x_);
+	}
 }

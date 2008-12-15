@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.simsupport.observer.capability;
 
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
@@ -24,6 +25,15 @@ public class LocalUpdateDisplayPlan extends Plan
 	public void body()
 	{
 		IBeliefbase b = getBeliefbase();
+		
+		int fps = ((Integer) b.getBelief("frame_rate").getFact()).intValue();
+		int delay = 0;
+		if (fps > 0)
+		{
+			delay = 1000 / fps;
+		}
+		waitFor(delay);
+		
 		ISimulationEngine engine = (ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
 		IViewport viewport = (IViewport) b.getBelief("viewport").getFact();
 		if (!viewport.isShowing())
@@ -48,7 +58,7 @@ public class LocalUpdateDisplayPlan extends Plan
 				for (Iterator it = entrySet.iterator(); it.hasNext(); )
 				{
 					Map.Entry entry = (Entry) it.next();
-					IDrawable d = (IDrawable) theme.get((String) entry.getKey());
+					DrawableCombiner d = (DrawableCombiner) theme.get((String) entry.getKey());
 					List objects = (List) entry.getValue();
 					for (Iterator it2 = objects.iterator(); it2.hasNext(); )
 					{
@@ -64,6 +74,28 @@ public class LocalUpdateDisplayPlan extends Plan
 						objectList.add(viewObj);
 					}
 				}
+			}
+			
+			Integer markedObject = (Integer) b.getBelief("marked_object").getFact();
+			SimObject mObj = null;
+			if (markedObject != null)
+			{
+				mObj = (SimObject) objectAccess.get(markedObject);
+			}
+			if (mObj != null)
+			{
+				IVector2 size = ((DrawableCombiner) theme.get(mObj.getType())).getSize();
+				size.multiply(2.0);
+				IDrawable markerDrawable = (IDrawable) b.getBelief("object_marker_drawable").getFact();
+				markerDrawable.setSize(size);
+				Object[] viewObj = new Object[3];
+				viewObj[0] = mObj.getPosition();
+				viewObj[2] = b.getBelief("object_marker").getFact();;
+				objectList.add(viewObj);
+			}
+			else
+			{
+				b.getBelief("marked_object").setFact(null);
 			}
 		}
 		

@@ -3,28 +3,48 @@ package jadex.bdi.planlib.simsupport.common.graphics.drawable;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJ2D;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.media.opengl.GL;
 
 /** This drawable combines multiple drawables into a single drawable object.
  */
-public class DrawableCombiner implements IDrawable
+public class DrawableCombiner
 {
 	/** The drawables.
 	 */
-	private List drawables_;
+	private Map drawables_;
 	
-	/** Creates a new DrawableCombiner.
+	/** The size of the object
+	 */
+	private IVector2 size_;
+	
+	/** Creates a new DrawableCombiner of size 1.0.
 	 */
 	public DrawableCombiner()
 	{
-		drawables_ = new ArrayList();
+		this(new Vector2Double(1.0));
+	}
+	
+	/** Creates a new DrawableCombiner.
+	 *  
+	 *  @param size size of the object
+	 */
+	public DrawableCombiner(IVector2 size)
+	{
+		drawables_ = new HashMap();
+		size_ = size;
 	}
 	
 	/** Adds a drawable to the combiner.
@@ -33,16 +53,40 @@ public class DrawableCombiner implements IDrawable
 	 */
 	public void addDrawable(IDrawable d)
 	{
-		drawables_.add(d);
+		addDrawable(d, 0);
 	}
 	
-	/** Removes a drawable from the combiner.
+	/** Adds a drawable to the combiner in a specific layer.
+	 * 
+	 *  @param d the drawable
+	 *  @param layer the layer
+	 *  @param sizeDefining true if the added object should be the size-defining one
+	 */
+	public void addDrawable(IDrawable d, int layer)
+	{
+		Integer l = new Integer(layer);
+		List drawList = (List) drawables_.get(l);
+		if (drawList == null)
+		{
+			drawList = new ArrayList();
+			drawables_.put(l, drawList);
+		}
+		drawList.add(d);
+	}
+	
+	/** Removes a drawable from all layers in the combiner.
 	 * 
 	 * @param d the drawable
 	 */
 	public void removeDrawable(IDrawable d)
 	{
-		drawables_.remove(d);
+		Collection drawLists = drawables_.values();
+		
+		for (Iterator it = drawLists.iterator(); it.hasNext(); )
+		{
+			List drawList = (List) it.next();
+			drawList.remove(d);
+		}
 	}
 	
 	/** Initializes all objects for a Java2D viewport
@@ -52,10 +96,14 @@ public class DrawableCombiner implements IDrawable
 	 */
 	public void init(ViewportJ2D vp, Graphics2D g)
 	{
-		for (Iterator it = drawables_.iterator(); it.hasNext(); )
+		for (Iterator it = drawables_.values().iterator(); it.hasNext(); )
 		{
-			IDrawable d = (IDrawable) it.next();
-			d.init(vp, g);
+			List drawList = (List) it.next();
+			for (Iterator it2 = drawList.iterator(); it2.hasNext(); )
+			{
+				IDrawable d = (IDrawable) it2.next();
+				d.init(vp, g);
+			}
 		}
 	}
 	
@@ -66,20 +114,31 @@ public class DrawableCombiner implements IDrawable
 	 */
 	public void init(ViewportJOGL vp, GL gl)
 	{
-		for (Iterator it = drawables_.iterator(); it.hasNext(); )
+		for (Iterator it = drawables_.values().iterator(); it.hasNext(); )
 		{
-			IDrawable d = (IDrawable) it.next();
-			d.init(vp, gl);
+			List drawList = (List) it.next();
+			for (Iterator it2 = drawList.iterator(); it2.hasNext(); )
+			{
+				IDrawable d = (IDrawable) it2.next();
+				d.init(vp, gl);
+			}
 		}
 	}
 	/** Draws the objects to a Java2D viewport
 	 * 
+	 * @param layer the current layer
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void draw(ViewportJ2D vp, Graphics2D g)
+	public void draw(Integer layer, ViewportJ2D vp, Graphics2D g)
 	{
-		for (Iterator it = drawables_.iterator(); it.hasNext(); )
+		List drawList = (List) drawables_.get(layer);
+		if (drawList == null)
+		{
+			return;
+		}
+		
+		for (Iterator it = drawList.iterator(); it.hasNext(); )
 		{
 			IDrawable d = (IDrawable) it.next();
 			d.draw(vp, g);
@@ -88,12 +147,19 @@ public class DrawableCombiner implements IDrawable
 	
     /** Draws the objects to an OpenGL viewport
      * 
+     * @param layer the current layer
      * @param vp the viewport
      * @param gl OpenGL context
      */
-	public void draw(ViewportJOGL vp, GL gl)
+	public void draw(Integer layer, ViewportJOGL vp, GL gl)
 	{
-		for (Iterator it = drawables_.iterator(); it.hasNext(); )
+		List drawList = (List) drawables_.get(layer);
+		if (drawList == null)
+		{
+			return;
+		}
+		
+		for (Iterator it = drawList.iterator(); it.hasNext(); )
 		{
 			IDrawable d = (IDrawable) it.next();
 			d.draw(vp, gl);
@@ -106,10 +172,14 @@ public class DrawableCombiner implements IDrawable
      */
 	public void setPosition(IVector2 pos)
 	{
-		for (Iterator it = drawables_.iterator(); it.hasNext(); )
+		for (Iterator it = drawables_.values().iterator(); it.hasNext(); )
 		{
-			IDrawable d = (IDrawable) it.next();
-			d.setPosition(pos);
+			List drawList = (List) it.next();
+			for (Iterator it2 = drawList.iterator(); it2.hasNext(); )
+			{
+				IDrawable d = (IDrawable) it2.next();
+				d.setPosition(pos);
+			}
 		}
 	}
 	
@@ -119,21 +189,31 @@ public class DrawableCombiner implements IDrawable
      */
 	public void setVelocity(IVector2 velocity)
 	{
-		for (Iterator it = drawables_.iterator(); it.hasNext(); )
+		for (Iterator it = drawables_.values().iterator(); it.hasNext(); )
 		{
-			IDrawable d = (IDrawable) it.next();
-			d.setVelocity(velocity);
+			List drawList = (List) it.next();
+			for (Iterator it2 = drawList.iterator(); it2.hasNext(); )
+			{
+				IDrawable d = (IDrawable) it2.next();
+				d.setVelocity(velocity);
+			}
 		}
 	}
 	
-	public IDrawable copy()
+	/** Returns the size of the object
+	 */
+	public IVector2 getSize()
 	{
-		DrawableCombiner newCombiner = new DrawableCombiner();
-		for (Iterator it = drawables_.iterator(); it.hasNext(); )
-		{
-			IDrawable d = (IDrawable) it.next();
-			newCombiner.addDrawable(d.copy());
-		}
-		return newCombiner;
+		return size_.copy();
+	}
+	
+	/** Returns all layers used by this DrawableCombiner.
+     *  
+     *  @return all layers used by the DrawableCombiner
+     */
+	public Set getLayers()
+	{
+		Set layers = new HashSet(drawables_.keySet());
+		return layers;
 	}
 }

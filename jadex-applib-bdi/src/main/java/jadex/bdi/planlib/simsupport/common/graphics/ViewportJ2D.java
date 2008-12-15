@@ -1,5 +1,7 @@
 package jadex.bdi.planlib.simsupport.common.graphics;
 
+import jadex.bdi.planlib.simsupport.common.graphics.AbstractViewport.MouseController;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
@@ -10,6 +12,7 @@ import java.awt.Canvas;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -17,6 +20,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -24,9 +28,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -48,20 +54,14 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
      */
     public ViewportJ2D(ILibraryService libService)
     {
+    	super();
         libService_ = libService;
-        size_ = new Vector2Double(1.0);
-        preserveAR_ = true;
-        newDrawables_ = Collections.synchronizedList(new LinkedList());
-        objectList_ = Collections.synchronizedList(new ArrayList());
-        preLayers_ = Collections.synchronizedList(new ArrayList());
-        postLayers_ = Collections.synchronizedList(new ArrayList());
         imageCache_ = Collections.synchronizedMap(new HashMap());
-        posX_ = 0.0f;
-        posY_ = 0.0f;
-        paddedSize_ = new Vector2Double(1.0);
         
         canvas_ = new ViewportCanvas();
         canvas_.addComponentListener(this);
+        
+        canvas_.addMouseListener(new MouseController());
         
         renderFrameAction_ = new Runnable()
 		{
@@ -140,11 +140,21 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
     {
     	private BufferedImage backBuffer_;
     	
+    	private Rectangle.Double clearRectangle_;
+    	private GeneralPath scissorPolygon_;
+    	
     	public ViewportCanvas()
     	{
     		backBuffer_ = new BufferedImage(1,
     										1,
     										BufferedImage.TYPE_4BYTE_ABGR_PRE);
+    		scissorPolygon_ = new GeneralPath();
+    		setupScissorPolygon();
+    		clearRectangle_ = new Rectangle.Double();
+    		clearRectangle_.x = 0.0;
+    		clearRectangle_.y = 0.0;
+    		clearRectangle_.width = size_.getXAsDouble();
+    		clearRectangle_.height = size_.getYAsDouble();
     	}
     	
     	public void paint(Graphics gfx)
@@ -157,6 +167,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
     				backBuffer_ = new BufferedImage(getWidth(),
 													getHeight(),
 													BufferedImage.TYPE_4BYTE_ABGR_PRE);
+    				setupScissorPolygon();
     			}
     				
         		Graphics2D g = (Graphics2D) backBuffer_.getGraphics();
@@ -164,9 +175,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
         		g.fillRect(0, 0, getWidth(), getHeight());
         		setupTransform(g);
         		
-        		while (!newDrawables_.isEmpty())
+        		while (!newDrawableCombiners_.isEmpty())
         		{
-        			IDrawable d = (IDrawable) newDrawables_.remove(0);
+        			DrawableCombiner d = (DrawableCombiner) newDrawableCombiners_.remove(0);
         			d.init(ViewportJ2D.this, g);
         		}
         		
@@ -176,29 +187,36 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
                     while (it.hasNext())
                     {
                         ILayer l = (ILayer) it.next();
-                        l.draw(paddedSize_, ViewportJ2D.this, g);
+                        l.draw(size_, ViewportJ2D.this, g);
                     }
                 }
         		
         		synchronized(objectList_)
         		{
-        			Iterator it = objectList_.iterator();
-        			while (it.hasNext())
+        			synchronized(objectLayers_)
         			{
-        				Object[] o = (Object[]) it.next();
-        				IVector2 pos = (IVector2) o[0];
-        				IVector2 vel = (IVector2) o[1];
-        				IDrawable d = (IDrawable) o[2];
-        				d.setPosition(pos);
-        				if (vel != null)
+        				for (Iterator it = objectLayers_.iterator(); it.hasNext(); )
         				{
-        					d.setVelocity(vel);
+        					Integer layer = (Integer) it.next();
+        					Iterator it2 = objectList_.iterator();
+        					while (it2.hasNext())
+        					{
+        						Object[] o = (Object[]) it2.next();
+        						IVector2 pos = (IVector2) o[0];
+        						IVector2 vel = (IVector2) o[1];
+        						DrawableCombiner d = (DrawableCombiner) o[2];
+        						d.setPosition(pos);
+        						if (vel != null)
+        						{
+        							d.setVelocity(vel);
+        						}
+        						else
+        						{
+        							d.setVelocity(Vector2Double.ZERO);
+        						}
+        						d.draw(layer, ViewportJ2D.this, g);
+        					}
         				}
-        				else
-        				{
-        					d.setVelocity(Vector2Double.ZERO);
-        				}
-        				d.draw(ViewportJ2D.this, g);
         			}
         		}
         		
@@ -208,10 +226,14 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
                     while (it.hasNext())
                     {
                         ILayer l = (ILayer) it.next();
-                        l.draw(paddedSize_, ViewportJ2D.this, g);
+                        l.draw(size_, ViewportJ2D.this, g);
                     }
                 }
-
+        		
+        		// glScissor replacement
+                g.setColor(java.awt.Color.BLACK);
+                g.fill(scissorPolygon_);
+                
         		g.dispose();
         		
         		gfx.drawImage(backBuffer_, 0, 0, null);
@@ -233,6 +255,22 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
             g.scale((backBuffer_.getWidth() / paddedSize_.getXAsDouble()),
                     -(backBuffer_.getHeight() / paddedSize_.getYAsDouble()));
             g.translate(-posX_, -posY_);
+        }
+        
+        private void setupScissorPolygon()
+        {
+        	scissorPolygon_.reset();
+        	scissorPolygon_.moveTo(posX_, posY_);
+        	scissorPolygon_.lineTo(paddedSize_.getXAsDouble(), posY_);
+        	scissorPolygon_.lineTo(paddedSize_.getXAsDouble(), paddedSize_.getYAsDouble());
+        	scissorPolygon_.lineTo(posX_, paddedSize_.getYAsDouble());
+        	scissorPolygon_.lineTo(posX_, size_.getYAsDouble());
+        	scissorPolygon_.lineTo(size_.getXAsDouble(), size_.getYAsDouble());
+        	scissorPolygon_.lineTo(size_.getXAsDouble(), 0.0);
+        	scissorPolygon_.lineTo(0.0, 0.0);
+        	scissorPolygon_.lineTo(0.0, size_.getYAsDouble());
+        	scissorPolygon_.lineTo(posX_, size_.getYAsDouble());
+        	scissorPolygon_.closePath();
         }
     }
 }

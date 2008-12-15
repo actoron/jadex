@@ -9,13 +9,16 @@ import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 public class EuclideanSimulationEngine implements ISimulationEngine
 {
@@ -209,6 +212,54 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		environmentProperties_.put(name, property);
 	}
 	
+	/** Returns the position of an object.
+	 *  
+	 *  @param objectId the object ID
+	 *  @return the position of the object
+	 */
+	public IVector2 getObjectPosition(Integer objectId)
+	{
+		SimObject object = getSimulationObject(objectId);
+		if (object == null)
+		{
+			return null;
+		}
+		
+		return object.getPosition();
+	}
+	
+	/** Returns the type of an object.
+	 *  
+	 *  @param objectId the object ID
+	 *  @return the type of the object
+	 */
+	public String getObjectType(Integer objectId)
+	{
+		SimObject object = getSimulationObject(objectId);
+		if (object == null)
+		{
+			return null;
+		}
+		
+		return object.getType();
+	}
+	
+	/** Returns the properties of an object.
+	 *  
+	 *  @param objectId the object ID
+	 *  @return the properties
+	 */
+	public Map getObjectProperties(Integer objectId)
+	{
+		SimObject object = getSimulationObject(objectId);
+		if (object != null)
+		{
+			return object.getProperties();
+		}
+		
+		return null;
+	}
+	
 	/** Adds a new executable action to the environment.
 	 *  
 	 *  @param action the new action
@@ -264,6 +315,64 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 	{
 		SimObject simObject = (SimObject) simObjects_.get(objectId);
 		return simObject;
+	}
+	
+	/** Returns the nearest object to the given position.
+	 * 
+	 *  @param position position the object should be nearest to
+	 *  @return nearest object
+	 */
+	public Integer getNearestObjectId(IVector2 position)
+	{
+		Integer nearest = null;
+		synchronized(simObjects_)
+		{
+			Set objects = simObjects_.entrySet();
+			IVector1 distance = null;
+			for (Iterator it = objects.iterator(); it.hasNext(); )
+			{
+				Map.Entry entry = (Entry) it.next();
+				SimObject currentObj = (SimObject) entry.getValue();
+				synchronized (currentObj)
+				{
+					if ((nearest == null) ||
+						(currentObj.getPositionAccess().getDistance(position).less(distance)))
+					{
+						nearest = (Integer) entry.getKey();
+						distance = currentObj.getPositionAccess().getDistance(position);
+					}
+				}
+			}
+		}
+		return nearest;
+	}
+	
+	/** Returns the ID of the nearest object to the given position
+	 *  within a maximum distance from the position.
+	 *  
+	 *  @param position position the object should be nearest to
+	 *  @param distance maximum distance from the position
+	 *  @return nearest object's ID or null if none is found
+	 */
+	public Integer getNearestObjectId(IVector2 position, IVector1 distance)
+	{
+		synchronized(simObjects_)
+		{
+			SimObject obj = getNearestObject(position);
+			if (obj.getPosition().getDistance(position).less(distance))
+			{
+				return obj.getId();
+			}
+			return null;
+		}
+	}
+	
+	public SimObject getNearestObject(IVector2 position)
+	{
+		synchronized(simObjects_)
+		{
+			return getSimulationObject(getNearestObjectId(position));
+		}
 	}
 	
 	/** Returns the nearest object of a specific type to the given position.

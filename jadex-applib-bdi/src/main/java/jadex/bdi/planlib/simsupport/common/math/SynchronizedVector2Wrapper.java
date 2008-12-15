@@ -396,4 +396,9 @@ public class SynchronizedVector2Wrapper implements IVector2
 	{
 		return vector_.equals(vector);
 	}
+	
+	public synchronized String toString()
+	{
+		return vector_.toString();
+	}
 }

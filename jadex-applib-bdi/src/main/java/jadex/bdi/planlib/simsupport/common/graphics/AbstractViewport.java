@@ -1,14 +1,25 @@
 package jadex.bdi.planlib.simsupport.common.graphics;
 
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.JFrame;
 
@@ -42,9 +53,13 @@ public abstract class AbstractViewport implements IViewport
      */
     protected IVector2 paddedSize_;
 	
-	/** Newly registered drawables.
+	/** Newly registered drawableCombiners.
      */
-    protected List newDrawables_;
+    protected List newDrawableCombiners_;
+    
+    /** Registered object layers
+     */
+    protected SortedSet objectLayers_;
     
     /** List of objects that should be drawn.
      */
@@ -57,6 +72,25 @@ public abstract class AbstractViewport implements IViewport
     /** Layers applied after drawable rendering
      */
     protected List postLayers_;
+    
+    /** The listeners of the viewport
+     */
+    private Set listeners_;
+    
+    public AbstractViewport()
+    {
+        posX_ = 0.0f;
+        posY_ = 0.0f;
+        preserveAR_ = true;
+        size_ = new Vector2Double(1.0);
+        paddedSize_ = size_.copy();
+        newDrawableCombiners_ = Collections.synchronizedList(new LinkedList());
+        objectLayers_ = Collections.synchronizedSortedSet(new TreeSet());
+        objectList_ = Collections.synchronizedList(new ArrayList());
+        preLayers_ = Collections.synchronizedList(new ArrayList());
+        postLayers_ = Collections.synchronizedList(new ArrayList());
+        listeners_ = Collections.synchronizedSet(new HashSet());
+	}
     
     /** Sets the current objects to draw.
      * 
@@ -71,13 +105,14 @@ public abstract class AbstractViewport implements IViewport
     	}
     }
     
-    /** Registers an IDrawable to be used in the object list.
+    /** Registers a DrawableCombiner to be used in the object list.
      *  
-     *  @param d the drawable
+     *  @param d the DrawableCombiner
      */
-    public void registerDrawable(IDrawable d)
+    public void registerDrawableCombiner(DrawableCombiner d)
     {
-        newDrawables_.add(d);
+    	objectLayers_.addAll(d.getLayers());
+        newDrawableCombiners_.add(d);
     }
     
     /** Returns the canvas that is used for displaying the objects.
@@ -130,6 +165,9 @@ public abstract class AbstractViewport implements IViewport
     			width = size.getXAsDouble() / sizeAR * windowAR;
     			height = size.getYAsDouble();
     		}
+    		
+    		posX_ = (float) -((width - size.getXAsDouble()) / 2.0);
+    		posY_ = (float) -((height - size.getYAsDouble()) / 2.0);
     	}
     	else
     	{
@@ -163,5 +201,70 @@ public abstract class AbstractViewport implements IViewport
     {
     	return canvas_.isShowing();
     }
-
+    
+    /** Adds a IViewportListener
+     *  
+     *  @param listener new listener
+     */
+    public void addViewportListener(IViewportListener listener)
+    {
+    	listeners_.add(listener);
+    }
+    
+    /** Removes a IViewportListener
+     *  
+     *  @param listener the listener
+     */
+    public void removeViewportListener(IViewportListener listener)
+    {
+    	listeners_.remove(listener);
+    }
+    
+    /** Fires a left mouse click event
+     * 
+     *  @param position the clicked position
+     */
+    private void fireLeftMouseClickEvent(IVector2 position)
+    {
+    	synchronized (listeners_)
+    	{
+    		for (Iterator it = listeners_.iterator(); it.hasNext(); )
+    		{
+    			IViewportListener listener = (IViewportListener) it.next();
+    			listener.leftClicked(position.copy());
+    		}
+    	}
+    }
+    
+    protected class MouseController implements MouseListener
+    {
+    	public void mouseClicked(MouseEvent e)
+    	{
+    		if (e.getButton() == MouseEvent.BUTTON1)
+    		{
+    			Point p = e.getPoint();
+    			double xFac = (paddedSize_.getXAsDouble()) / canvas_.getWidth();
+    	        double yFac = (paddedSize_.getYAsDouble()) / canvas_.getHeight();
+    	        IVector2 position = new Vector2Double((xFac * p.x) + posX_,
+    	        									  (yFac * (canvas_.getHeight() - p.y)) + posY_);
+    	        fireLeftMouseClickEvent(position);
+    		}
+    	}
+    	
+    	public void mouseEntered(MouseEvent e)
+    	{
+    	}
+    	
+    	public void mouseExited(MouseEvent e)
+    	{
+    	}
+    	
+    	public void mousePressed(MouseEvent e)
+    	{
+    	}
+    	
+    	public void mouseReleased(MouseEvent e)
+    	{
+    	}
+    }
 }

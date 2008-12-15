@@ -16,6 +16,7 @@
 		<import>jadex.bdi.planlib.simsupport.environment.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.graphics.IViewport</import>
+		<import>jadex.bdi.planlib.simsupport.common.graphics.drawable.*</import>
 	</imports>
 
 	<capabilities>
@@ -35,6 +36,11 @@
 		<!-- Preservation of area aspect ratio in the window -->
 		<belief name="preserve_aspect_ratio" class="Boolean" exported="true">
 			<fact>new Boolean(true)</fact>
+		</belief>
+		
+		<!-- The target frame rate -->
+		<belief name="frame_rate" class="Integer" exported="true">
+			<fact>30</fact>
 		</belief>
 		
 		<!-- Force the use of Java2D -->
@@ -73,7 +79,23 @@
 			<fact>new Integer(0)</fact>
 		</belief>
 		
+		<!-- Maximum distance of a point clicked on the screen and
+			 and the position of an object to be considered in range. -->
+		<belief name="selector_distance" class="IVector1" exported="true">
+			<fact>new Vector1Double(1.0)</fact>
+		</belief>
+		
+		<!-- The currently marked object. -->
+		<belief name="marked_object" class="Integer" exported="true">
+			<fact>null</fact>
+		</belief>
+		
+		<belief name="object_marker" class="DrawableCombiner"/>
+		<belief name="object_marker_drawable" class="IDrawable"/>
+		
 		<belief name="viewport" class="IViewport"/>
+		
+		<belief name="simulation_engine_access" class="IExternalEngineAccess"/>
     	
 		<belief name="local_simulation_engine" class="ISimulationEngine"/>
 	</beliefs>
@@ -82,7 +104,7 @@
 		<!-- Starts the observer -->
 		<achievegoal name="simobs_start" exported="true" />
 		
-		<performgoal name="simobs_update_display" retry="true" retrydelay="33" exclude="never"/>
+		<performgoal name="simobs_update_display" retry="true" retrydelay="0" exclude="never"/>
 	</goals>
 
 	<plans>

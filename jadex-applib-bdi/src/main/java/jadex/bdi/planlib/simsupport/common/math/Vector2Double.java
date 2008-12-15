@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.simsupport.common.math;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 /** Implementation of a cartesian 2-vector using double components.
  */
@@ -314,6 +315,30 @@ public class Vector2Double implements IVector2, Cloneable
 	public boolean equals(IVector2 vector)
 	{
 		return (x_ == vector.getXAsDouble() && y_ == vector.getYAsDouble());
+	}
+	
+	public String toString()
+	{
+		StringBuffer buffer = new StringBuffer();
+		DecimalFormat format = new DecimalFormat("####.####");
+		if ((x_ < 1000) || (x_ > 0.001))
+		{
+			buffer.append(format.format(x_));
+		}
+		else
+		{
+			buffer.append(Double.toString(x_));
+		}
+		buffer.append(", ");
+		if ((y_ < 10000) || (y_ > 0.001))
+		{
+			buffer.append(format.format(y_));
+		}
+		else
+		{
+			buffer.append(Double.toString(y_));
+		}
+		return buffer.toString();
 	}
 }
 

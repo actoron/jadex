@@ -1,5 +1,6 @@
 package jadex.bdi.planlib.simsupport.common.graphics;
 
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.order.YOrder;
@@ -10,11 +11,15 @@ import jadex.bridge.ILibraryService;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
@@ -32,10 +37,12 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
@@ -95,22 +102,14 @@ public class ViewportJOGL extends AbstractViewport
      */
     public ViewportJOGL(ILibraryService libService)
     {
-    	posX_ = 0.0f;
-    	posY_ = 0.0f;
+    	super();
     	libService_ = libService;
         uninitialized_ = true;
-        preserveAR_ = true;
         valid_ = false;
         npot_ = false;
-        newDrawables_ = Collections.synchronizedList(new LinkedList());
-        objectList_ = Collections.synchronizedList(new ArrayList());
-        preLayers_ = Collections.synchronizedList(new ArrayList());
-        postLayers_ = Collections.synchronizedList(new ArrayList());
         clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
         repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
         displayLists_ = Collections.synchronizedMap(new HashMap());
-        size_ = new Vector2Double(1.0);
-        paddedSize_ = new Vector2Double(1.0);
         
         try
         {
@@ -129,6 +128,9 @@ public class ViewportJOGL extends AbstractViewport
         {
         	throw e;
         }
+        
+        canvas_.setMinimumSize(new Dimension(1, 1));
+        canvas_.addMouseListener(new MouseController());
         
         setSize(new Vector2Double(1.0));
         renderFrameAction_ = new Runnable()
@@ -227,6 +229,15 @@ public class ViewportJOGL extends AbstractViewport
         		   0.0, paddedSize_.getYAsDouble(),
         		   -0.5, 0.5);
         gl.glTranslated(-posX_, -posY_, 0.0);
+        
+        // Setup the scissor box
+        double xFac = canvas_.getWidth() / paddedSize_.getXAsDouble();
+        double yFac = canvas_.getHeight() / paddedSize_.getYAsDouble();
+        int x = (int)(-posX_ * xFac);
+        int y = (int)(-posY_ * yFac);
+        int w = (int)Math.ceil(size_.getXAsDouble() * xFac);
+        int h = (int)Math.ceil(size_.getYAsDouble() * yFac);
+        gl.glScissor(x, y, w, h);
     }
     
     
@@ -344,15 +355,15 @@ public class ViewportJOGL extends AbstractViewport
         {
             GL gl = drawable.getGL();
             
-            setupMatrix(gl);
-            
-            while (!newDrawables_.isEmpty())
+            while (!newDrawableCombiners_.isEmpty())
             {
-            	IDrawable d = (IDrawable) newDrawables_.remove(0);
+            	DrawableCombiner d = (DrawableCombiner) newDrawableCombiners_.remove(0);
             	d.init(ViewportJOGL.this, gl);
             }
             
             gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+            
+            gl.glEnable(GL.GL_SCISSOR_TEST);
             
             synchronized(preLayers_)
             {
@@ -360,30 +371,37 @@ public class ViewportJOGL extends AbstractViewport
                 while (it.hasNext())
                 {
                     ILayer l = (ILayer) it.next();
-                    l.draw(paddedSize_, ViewportJOGL.this, gl);
+                    l.draw(size_, ViewportJOGL.this, gl);
                 }
             }
             
             synchronized(objectList_)
             {
-                Iterator it = objectList_.iterator();
-                while (it.hasNext())
-                {
-                	Object[] o = (Object[]) it.next();
-    				IVector2 pos = (IVector2) o[0];
-    				IVector2 vel = (IVector2) o[1];
-    				IDrawable d = (IDrawable) o[2];
-    				d.setPosition(pos);
-    				if (vel != null)
+            	synchronized(objectLayers_)
+    			{
+    				for (Iterator it = objectLayers_.iterator(); it.hasNext(); )
     				{
-    					d.setVelocity(vel);
+    					Integer layer = (Integer) it.next();
+    					Iterator it2 = objectList_.iterator();
+    					while (it2.hasNext())
+    					{
+    						Object[] o = (Object[]) it2.next();
+    						IVector2 pos = (IVector2) o[0];
+    						IVector2 vel = (IVector2) o[1];
+    						DrawableCombiner d = (DrawableCombiner) o[2];
+    						d.setPosition(pos);
+    						if (vel != null)
+    						{
+    							d.setVelocity(vel);
+    						}
+    						else
+    						{
+    							d.setVelocity(Vector2Double.ZERO);
+    						}
+    						d.draw(layer, ViewportJOGL.this, gl);
+    					}
     				}
-    				else
-    				{
-    					d.setVelocity(Vector2Double.ZERO);
-    				}
-                    d.draw(ViewportJOGL.this, gl);
-                }
+    			}
             }
             
             synchronized(postLayers_)
@@ -392,9 +410,11 @@ public class ViewportJOGL extends AbstractViewport
                 while (it.hasNext())
                 {
                     ILayer l = (ILayer) it.next();
-                    l.draw(paddedSize_, ViewportJOGL.this, gl);
+                    l.draw(size_, ViewportJOGL.this, gl);
                 }
             }
+            
+            gl.glDisable(GL.GL_SCISSOR_TEST);
         }
         
         public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)

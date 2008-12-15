@@ -10,8 +10,11 @@ import java.util.Map;
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJ2D;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;
@@ -40,6 +43,7 @@ public class StartObserverPlan extends Plan
 		}
 		
 		b.getBelief("local_simulation_engine").setFact(engine);
+		b.getBelief("simulation_engine_access").setFact(engine);
 		IVector2 areaSize = engine.getAreaSize();
 		
 		//TODO: Remote case
@@ -118,11 +122,18 @@ public class StartObserverPlan extends Plan
 			Collection drawables = theme.values();
 			for (Iterator it2 = drawables.iterator(); it2.hasNext(); )
 			{
-				IDrawable d = (IDrawable) it2.next();
-				viewport.registerDrawable(d);
+				DrawableCombiner d = (DrawableCombiner) it2.next();
+				viewport.registerDrawableCombiner(d);
 			}
 		}
 		b.getBelief("viewport").setFact(viewport);
+		
+		DrawableCombiner objectMarker = new DrawableCombiner();
+		IDrawable markerDrawable = new ScalableTexturedRectangle(getClass().getPackage().getName().replaceAll("capability", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
+		objectMarker.addDrawable(markerDrawable, Integer.MAX_VALUE);
+		viewport.registerDrawableCombiner(objectMarker);
+		b.getBelief("object_marker").setFact(objectMarker);
+		b.getBelief("object_marker_drawable").setFact(markerDrawable);
 		
 		boolean customGui = ((Boolean) b.getBelief("custom_gui").getFact()).booleanValue();
 		if (customGui)
@@ -131,14 +142,7 @@ public class StartObserverPlan extends Plan
 		}
 		else
 		{
-			frame = new JFrame(envName);
-			frame.setResizable(true);
-			frame.add(viewport.getCanvas());
-			frame.setIgnoreRepaint(true);
-			frame.setBackground(null);
-			frame.pack();
-			frame.setSize(400, 400);
-			frame.setVisible(true);
+			new ObserverCenter(getExternalAccess());
 		}
 		
 		IGoal updateGoal = createGoal("simobs_update_display");

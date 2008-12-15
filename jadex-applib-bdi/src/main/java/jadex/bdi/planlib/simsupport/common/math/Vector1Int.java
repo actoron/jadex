@@ -191,5 +191,9 @@ public class Vector1Int implements IVector1
 	{
 		return (x_ < vector.getAsInteger());
 	}
-
+	
+	public String toString()
+	{
+		return Integer.toString(x_);
+	}
 }

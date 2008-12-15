@@ -6,6 +6,7 @@ import jadex.bdi.planlib.simsupport.common.math.IVector2;
 
 import java.awt.Graphics2D;
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.media.opengl.GL;
 
@@ -27,6 +28,7 @@ public interface IDrawable extends Serializable
 	
 	/** Draws the object to a Java2D viewport
 	 * 
+	 * @param layer the current layer
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
@@ -34,6 +36,7 @@ public interface IDrawable extends Serializable
     
     /** Draws the object to an OpenGL viewport
      * 
+     * @param layer the current layer
      * @param vp the viewport
      * @param gl OpenGL context
      */
@@ -53,7 +56,9 @@ public interface IDrawable extends Serializable
      */
     public void setVelocity(IVector2 velocity);
     
-    /** Provides an uninitialized copy of the drawable.
+    /** Sets the size of the drawable on screen.
+     * 
+     *  @param size new size
      */
-    public IDrawable copy();
+    public void setSize(IVector2 size);
 }

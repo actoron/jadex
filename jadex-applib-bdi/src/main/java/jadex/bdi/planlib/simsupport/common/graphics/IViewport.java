@@ -4,6 +4,7 @@ import java.awt.Canvas;
 import java.util.Comparator;
 import java.util.List;
 
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
@@ -42,11 +43,11 @@ public interface IViewport
      */
     public void setPostLayers(List layer);
     
-    /** Registers an IDrawable to be used in the object list.
+    /** Registers a DrawableCombiner to be used in the object list.
      *  
-     *  @param d the drawable
+     *  @param d the DrawableCombiner
      */
-    public void registerDrawable(IDrawable d);
+    public void registerDrawableCombiner(DrawableCombiner d);
     
     /** Sets the current objects to draw.
      * 
@@ -67,4 +68,16 @@ public interface IViewport
      *  @return true if the IViewport is showing, false otherwise
      */
     public boolean isShowing();
+    
+    /** Adds a IViewportListener
+     *  
+     *  @param listener new listener
+     */
+    public void addViewportListener(IViewportListener listener);
+    
+    /** Removes a IViewportListener
+     *  
+     *  @param listener the listener
+     */
+    public void removeViewportListener(IViewportListener listener);
 }

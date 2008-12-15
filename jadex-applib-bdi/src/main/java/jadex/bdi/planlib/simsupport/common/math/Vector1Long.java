@@ -191,5 +191,9 @@ public class Vector1Long implements IVector1
 	{
 		return (x_ < vector.getAsLong());
 	}
-
+	
+	public String toString()
+	{
+		return Long.toString(x_);
+	}
 }

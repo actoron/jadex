@@ -460,4 +460,13 @@ public class Vector2Int implements IVector2
 	{
 		return ((x_ == vector.getXAsInteger()) && (y_ == vector.getYAsInteger()));
 	}
+	
+	public String toString()
+	{
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(x_);
+		buffer.append(", ");
+		buffer.append(y_);
+		return buffer.toString();
+	}
 }

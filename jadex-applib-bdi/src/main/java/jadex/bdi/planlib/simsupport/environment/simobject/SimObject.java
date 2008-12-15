@@ -146,6 +146,15 @@ public class SimObject
 		properties_.put(name, property);
 	}
 	
+	/** Returns a copy of all properties.
+	 *  
+	 *  @return the properties
+	 */
+	public synchronized Map getProperties()
+	{
+		return new HashMap(properties_);
+	}
+	
 	/** Adds a new task for the object.
 	 *  
 	 *  @param task new task
