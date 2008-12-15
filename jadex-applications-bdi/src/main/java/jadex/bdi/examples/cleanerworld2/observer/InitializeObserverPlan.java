@@ -36,7 +36,7 @@ public class InitializeObserverPlan extends Plan
 		DrawableCombiner combiner = new DrawableCombiner();
 		String cleanerImage = imgPath.concat("cleaner.png");
 		combiner.addDrawable(new RegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false), -1);
-		combiner.addDrawable(new TexturedRectangle(new Vector2Double(1.0), cleanerImage, true), 0);
+		combiner.addDrawable(new TexturedRectangle(new Vector2Double(1.0), cleanerImage, false), 0);
 		//cleanerDrawable.addDrawable(new RotatingColoredTriangle(new Vector2Double(1.0), new Vector2Double(1.0), new Vector2Double(0.0), Color.BLUE));
 		theme.put("cleaner", combiner);
 		

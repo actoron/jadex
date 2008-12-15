@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -75,6 +76,10 @@ public class ViewportJOGL extends AbstractViewport
      */
     private Map displayLists_;
     
+    /** Registered drawables
+     */
+    private List registeredDrawables_;
+    
     /** True, until the OpenGL context is initialized.
      */
     private volatile boolean uninitialized_;
@@ -103,6 +108,7 @@ public class ViewportJOGL extends AbstractViewport
     public ViewportJOGL(ILibraryService libService)
     {
     	super();
+    	registeredDrawables_ = Collections.synchronizedList(new ArrayList());
     	libService_ = libService;
         uninitialized_ = true;
         valid_ = false;
@@ -359,6 +365,7 @@ public class ViewportJOGL extends AbstractViewport
             {
             	DrawableCombiner d = (DrawableCombiner) newDrawableCombiners_.remove(0);
             	d.init(ViewportJOGL.this, gl);
+            	registeredDrawables_.add(d);
             }
             
             gl.glClear(gl.GL_COLOR_BUFFER_BIT);
@@ -423,6 +430,7 @@ public class ViewportJOGL extends AbstractViewport
         
         public void init(GLAutoDrawable drawable)
         {
+        	System.out.println("INIT!");
             GL gl = drawable.getGL();
             gl.glViewport(0, 0, canvas_.getWidth(), canvas_.getHeight());
             gl.glMatrixMode(GL.GL_MODELVIEW);
@@ -452,6 +460,16 @@ public class ViewportJOGL extends AbstractViewport
             {
                 
             }*/
+            
+            clampedTextureCache_.clear();
+            repeatingTextureCache_.clear();
+            displayLists_.clear();
+            
+            for (Iterator it = registeredDrawables_.iterator(); it.hasNext(); )
+            {
+            	DrawableCombiner d = (DrawableCombiner) it.next();
+            	d.init(ViewportJOGL.this, gl);
+            }
             
             uninitialized_ = false;
         }
