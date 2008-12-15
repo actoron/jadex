@@ -261,15 +261,15 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
         {
         	scissorPolygon_.reset();
         	scissorPolygon_.moveTo(posX_, posY_);
-        	scissorPolygon_.lineTo(paddedSize_.getXAsDouble(), posY_);
-        	scissorPolygon_.lineTo(paddedSize_.getXAsDouble(), paddedSize_.getYAsDouble());
-        	scissorPolygon_.lineTo(posX_, paddedSize_.getYAsDouble());
-        	scissorPolygon_.lineTo(posX_, size_.getYAsDouble());
-        	scissorPolygon_.lineTo(size_.getXAsDouble(), size_.getYAsDouble());
-        	scissorPolygon_.lineTo(size_.getXAsDouble(), 0.0);
-        	scissorPolygon_.lineTo(0.0, 0.0);
-        	scissorPolygon_.lineTo(0.0, size_.getYAsDouble());
-        	scissorPolygon_.lineTo(posX_, size_.getYAsDouble());
+        	scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), posY_);
+        	scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), paddedSize_.getYAsFloat());
+        	scissorPolygon_.lineTo(posX_, paddedSize_.getYAsFloat());
+        	scissorPolygon_.lineTo(posX_, size_.getYAsFloat());
+        	scissorPolygon_.lineTo(size_.getXAsFloat(), size_.getYAsFloat());
+        	scissorPolygon_.lineTo(size_.getXAsFloat(), 0.0f);
+        	scissorPolygon_.lineTo(0.0f, 0.0f);
+        	scissorPolygon_.lineTo(0.0f, size_.getYAsFloat());
+        	scissorPolygon_.lineTo(posX_, size_.getYAsFloat());
         	scissorPolygon_.closePath();
         }
     }

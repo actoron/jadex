@@ -97,7 +97,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		
 		propertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane tableScrollPane = new JScrollPane(propertyTable_);
-		propertyTable_.setFillsViewportHeight(true);
+//		propertyTable_.setFillsViewportHeight(true);	// Not in Java 1.4
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;

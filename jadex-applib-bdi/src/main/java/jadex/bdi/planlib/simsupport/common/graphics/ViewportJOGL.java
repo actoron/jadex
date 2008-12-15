@@ -135,7 +135,7 @@ public class ViewportJOGL extends AbstractViewport
         	throw e;
         }
         
-        canvas_.setMinimumSize(new Dimension(1, 1));
+//        canvas_.setMinimumSize(new Dimension(1, 1)); // not in Java 1.4
         canvas_.addMouseListener(new MouseController());
         
         setSize(new Vector2Double(1.0));

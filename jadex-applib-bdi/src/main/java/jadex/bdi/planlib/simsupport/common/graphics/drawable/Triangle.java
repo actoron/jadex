@@ -19,9 +19,9 @@ public class Triangle extends ColoredPrimitive
 	private static final GeneralPath J2D_TRIANGLE = new GeneralPath();
 	static
 	{
-		J2D_TRIANGLE.moveTo(-0.5, -0.5);
-		J2D_TRIANGLE.lineTo(0.5, -0.5);
-		J2D_TRIANGLE.lineTo(0.0, 0.5);
+		J2D_TRIANGLE.moveTo(-0.5f, -0.5f);
+		J2D_TRIANGLE.lineTo(0.5f, -0.5f);
+		J2D_TRIANGLE.lineTo(0.0f, 0.5f);
 		J2D_TRIANGLE.closePath();
 	}
 	
