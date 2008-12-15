@@ -1,7 +1,7 @@
 package jadex.bdi.examples.hunterprey2;
 
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 
@@ -128,6 +128,6 @@ public class WorldObject
 		String className = this.getClass().getName();
 		String simpleClassName = className.substring(className.lastIndexOf("."));
 		
-		return new ScalableTexturedRectangle(WORLD_OBJECT_SIZE, imgPath + simpleClassName + ".png");
+		return new TexturedRectangle(WORLD_OBJECT_SIZE, imgPath + simpleClassName + ".png", false);
 	}
 }

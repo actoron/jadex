@@ -8,8 +8,8 @@ import java.util.Map;
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableRegularPolygon;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.RegularPolygon;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.order.YOrder;
@@ -35,24 +35,24 @@ public class InitializeObserverPlan extends Plan
 		
 		DrawableCombiner combiner = new DrawableCombiner();
 		String cleanerImage = imgPath.concat("cleaner.png");
-		combiner.addDrawable(new ScalableRegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f)), -1);
-		combiner.addDrawable(new ScalableTexturedRectangle(new Vector2Double(1.0), cleanerImage), 0);
+		combiner.addDrawable(new RegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false), -1);
+		combiner.addDrawable(new TexturedRectangle(new Vector2Double(1.0), cleanerImage, true), 0);
 		//cleanerDrawable.addDrawable(new RotatingColoredTriangle(new Vector2Double(1.0), new Vector2Double(1.0), new Vector2Double(0.0), Color.BLUE));
 		theme.put("cleaner", combiner);
 		
 		combiner = new DrawableCombiner(new Vector2Double(0.5));
 		String wasteImage = imgPath.concat("waste.png");
-		IDrawable wasteDrawable = new ScalableTexturedRectangle(new Vector2Double(0.5), wasteImage);
+		IDrawable wasteDrawable = new TexturedRectangle(new Vector2Double(0.5), wasteImage, false);
 		combiner.addDrawable(wasteDrawable);
 		theme.put("waste", combiner);
 		
 		combiner = new DrawableCombiner(Configuration.WASTE_BIN_SIZE);
-		IDrawable wbDrawable = new ScalableTexturedRectangle(Configuration.WASTE_BIN_SIZE, imgPath + "wastebin.png");
+		IDrawable wbDrawable = new TexturedRectangle(Configuration.WASTE_BIN_SIZE, imgPath + "wastebin.png", false);
 		combiner.addDrawable(wbDrawable);
 		theme.put("waste_bin", combiner);
 		
 		combiner = new DrawableCombiner(Configuration.CHARGING_STATION_SIZE);
-		IDrawable csDrawable = new ScalableTexturedRectangle(Configuration.CHARGING_STATION_SIZE, imgPath + "chargingstation.png");
+		IDrawable csDrawable = new TexturedRectangle(Configuration.CHARGING_STATION_SIZE, imgPath + "chargingstation.png", false);
 		combiner.addDrawable(csDrawable);
 		theme.put("charging_station", combiner);
 		

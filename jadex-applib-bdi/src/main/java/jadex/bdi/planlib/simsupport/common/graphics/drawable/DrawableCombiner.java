@@ -166,7 +166,7 @@ public class DrawableCombiner
 		}
 	}
 	
-	/** Sets the position of the objects.
+	/** Sets the position of the drawables.
      * 
      * 	@param pos new position
      */
@@ -183,7 +183,7 @@ public class DrawableCombiner
 		}
 	}
 	
-	/** Sets the velocity of the objects.
+	/** Sets the velocity of the drawables.
      *  
      * 	@param velocity new velocity
      */
@@ -200,11 +200,37 @@ public class DrawableCombiner
 		}
 	}
 	
+	/** Sets the sizes of all drawables to a single value.
+     *  
+     * 	@param size new size
+     */
+	public void setDrawableSizes(IVector2 size)
+	{
+		for (Iterator it = drawables_.values().iterator(); it.hasNext(); )
+		{
+			List drawList = (List) it.next();
+			for (Iterator it2 = drawList.iterator(); it2.hasNext(); )
+			{
+				IDrawable d = (IDrawable) it2.next();
+				d.setSize(size);
+			}
+		}
+	}
+	
 	/** Returns the size of the object
 	 */
 	public IVector2 getSize()
 	{
 		return size_.copy();
+	}
+	
+	/** Sets the size of the object
+	 * 
+	 *  @param size new size of the object
+	 */
+	public void setSize(IVector2 size)
+	{
+		size_ = size.copy();
 	}
 	
 	/** Returns all layers used by this DrawableCombiner.

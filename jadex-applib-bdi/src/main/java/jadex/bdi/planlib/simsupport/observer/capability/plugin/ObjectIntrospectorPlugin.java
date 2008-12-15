@@ -31,8 +31,7 @@ import javax.swing.table.DefaultTableModel;
 
 /** The object introspector
  */
-public class ObjectIntrospectorPlugin implements IObserverCenterPlugin,
-												 IViewportListener
+public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 {
 	/** Plugin name
 	 */
@@ -41,10 +40,6 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin,
 	/** Column names
 	 */
 	private static final String[] COLUMM_NAMES = {"Property", "Value"};
-	
-	/** Currently observed object.
-	 */
-	private Integer observedId_;
 	
 	/** The main panel
 	 */
@@ -72,8 +67,6 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin,
 	
 	public ObjectIntrospectorPlugin()
 	{
-		observedId_ = new Integer(0);
-		
 		mainPanel_ = new JPanel(new GridBagLayout());
 		mainPanel_.setBorder(new TitledBorder("Object Introspector"));
 		
@@ -119,12 +112,10 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin,
 	public synchronized void start(ObserverCenter main)
 	{
 		observerCenter_ = main;
-		observerCenter_.getViewport().addViewportListener(this);
 	}
 	
 	public synchronized void shutdown()
 	{
-		observerCenter_.getViewport().removeViewportListener(this);
 	}
 	
 	public synchronized String getName()
@@ -137,9 +128,10 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin,
 		return mainPanel_;
 	}
 	
-	public void refresh()
+	public synchronized void refresh()
 	{
-		if (observedId_ == null)
+		Integer observedId = observerCenter_.getMarkedObject();
+		if (observedId == null)
 		{
 			idLabel_.setText("");
 			posLabel_.setText("");
@@ -148,17 +140,16 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin,
 			return;
 		}
 		IExternalEngineAccess engine = observerCenter_.getEngineAccess();
-		Map properties = engine.getObjectProperties(observedId_);
-		IVector2 position = engine.getObjectPosition(observedId_);
-		String type = engine.getObjectType(observedId_);
+		Map properties = engine.getObjectProperties(observedId);
+		IVector2 position = engine.getObjectPosition(observedId);
+		String type = engine.getObjectType(observedId);
 		if ((properties == null) || (position == null) || (type == null))
 		{
-			observedId_ = null;
-			refresh();
+			observerCenter_.markObject(null);
 			return;
 		}
 		
-		idLabel_.setText(observedId_.toString());
+		idLabel_.setText(observedId.toString());
 		posLabel_.setText(position.toString());
 		typeLabel_.setText(type);
 		Set entries = properties.entrySet();
@@ -174,20 +165,5 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin,
 		DefaultTableModel model = (DefaultTableModel) propertyTable_.getModel();
 		model.setDataVector(dataSet, COLUMM_NAMES);
 		model.fireTableStructureChanged();
-	}
-	
-	public void leftClicked(IVector2 position)
-	{
-		IVector1 maxDist = observerCenter_.getSelectorDistance();
-		IExternalEngineAccess engine = observerCenter_.getEngineAccess();
-		observedId_ = engine.getNearestObjectId(position, maxDist);
-		observerCenter_.markObject(observedId_);
-		EventQueue.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					refresh();
-				}
-			});
 	}
 }

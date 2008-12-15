@@ -6,7 +6,7 @@ import jadex.bdi.examples.cleanerworld2.environment.action.DisposeWasteAction;
 import jadex.bdi.examples.cleanerworld2.environment.action.PickupWasteAction;
 import jadex.bdi.examples.cleanerworld2.environment.process.WasteGenerationProcess;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;

@@ -91,7 +91,6 @@
 		</belief>
 		
 		<belief name="object_marker" class="DrawableCombiner"/>
-		<belief name="object_marker_drawable" class="IDrawable"/>
 		
 		<belief name="viewport" class="IViewport"/>
 		

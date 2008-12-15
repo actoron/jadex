@@ -18,7 +18,9 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Timer;
 
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
+import jadex.bdi.planlib.simsupport.common.graphics.IViewportListener;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
+import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
@@ -40,6 +42,10 @@ public class ObserverCenter
 	/** The main window.
 	 */
 	private ObserverCenterWindow mainWindow_;
+	
+	/** Viewport controller
+	 */
+	private ViewportController viewportController_;
 	
 	/** Currently active plugin
 	 */
@@ -107,13 +113,19 @@ public class ObserverCenter
 						{
 							public void actionPerformed(ActionEvent e)
 							{
-								if (activePlugin_ != null)
+								synchronized(plugins_)
 								{
-									activePlugin_.refresh();
+									if (activePlugin_ != null)
+									{
+										activePlugin_.refresh();
+									}
 								}
 							}
 						});
 					timer_.start();
+					
+					viewportController_ = new ViewportController();
+					getViewport().addViewportListener(viewportController_);
 					
 					mainWindow_.addWindowListener(new ObserverWindowsController());
 				}
@@ -138,29 +150,41 @@ public class ObserverCenter
 		return (IViewport) agent_.getBeliefbase().getBelief("viewport").getFact();
 	}
 	
-	/** Marks an object on the viewport
+	/** Marks an object.
 	 *  
-	 *  @param objectId the ID of the object
+	 *  @param object to mark
 	 */
 	public void markObject(final Integer objectId)
 	{
 		agent_.invokeLater(new Runnable()
+		{
+			public void run()
 			{
-				public void run()
-				{
-					agent_.getBeliefbase().getBelief("marked_object").setFact(objectId);
-				}
-			});
+				agent_.getBeliefbase().getBelief("marked_object").setFact(objectId);
+				EventQueue.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							synchronized(plugins_)
+							{
+								if (activePlugin_ != null)
+								{
+									activePlugin_.refresh();
+								}
+							}
+						}
+					});
+			}
+		});
 	}
 	
-	/** Returns the selector distance
-	 *  
-	 *  @return selector distance
+	/** Returns the currently marked object.
+	 * 
+	 *  @return currently marked object
 	 */
-	public IVector1 getSelectorDistance()
+	public Integer getMarkedObject()
 	{
-		IVector1 distance = (IVector1) agent_.getBeliefbase().getBelief("selector_distance").getFact();
-		return distance;
+		return (Integer) agent_.getBeliefbase().getBelief("marked_object").getFact();
 	}
 	
 	/** Loads all available plugins
@@ -185,16 +209,19 @@ public class ObserverCenter
 	
 	private void activatePlugin(IObserverCenterPlugin plugin)
 	{
-		IObserverCenterPlugin oldPlugin = activePlugin_;
-		oldPlugin = null;
-		if (oldPlugin != null)
+		synchronized (plugins_)
 		{
-			oldPlugin.shutdown();
+			IObserverCenterPlugin oldPlugin = activePlugin_;
+			oldPlugin = null;
+			if (oldPlugin != null)
+			{
+				oldPlugin.shutdown();
+			}
+
+			mainWindow_.setPluginView(plugin.getView());
+			plugin.start(this);
+			activePlugin_ = plugin;
 		}
-		
-		mainWindow_.setPluginView(plugin.getView());
-		plugin.start(this);
-		activePlugin_ = plugin;
 	}
 	
 	private class PluginAction extends AbstractAction
@@ -284,6 +311,7 @@ public class ObserverCenter
 		public void windowClosed(WindowEvent e)
 		{
 			timer_.stop();
+			getViewport().removeViewportListener(viewportController_);
 			agent_.invokeLater(new Runnable()
 				{
 					public void run()
@@ -315,5 +343,16 @@ public class ObserverCenter
 		{
 		}
 		
+	}
+	
+	private class ViewportController implements IViewportListener
+	{
+		public void leftClicked(IVector2 position)
+		{
+			IVector1 maxDist = (IVector1) agent_.getBeliefbase().getBelief("selector_distance").getFact();
+			final Integer observedId = getEngineAccess().getNearestObjectId(position, maxDist);
+			
+			markObject(observedId);
+		}
 	}
 }

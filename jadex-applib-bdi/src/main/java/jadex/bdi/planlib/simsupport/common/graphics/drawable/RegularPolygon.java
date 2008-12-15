@@ -16,16 +16,8 @@ import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 
-public class ScalableRegularPolygon extends ScalablePrimitive
+public class RegularPolygon extends ColoredPrimitive
 {
-	/** Color of the Polygon.
-	 */
-	private Color c_;
-	
-	/** OpenGL color cache.
-	 */
-	private float[] oglColor_;
-	
 	/** Vertex count
 	 */
 	private int vertices_;
@@ -40,38 +32,27 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	
 	/** Generates a size 1.0 triangle.
 	 */
-	public ScalableRegularPolygon()
+	public RegularPolygon()
 	{
-		this(new Vector2Double(1.0), 3, Color.WHITE);
+		this(new Vector2Double(1.0), 3, Color.WHITE, false);
 	}
 	
-	/** Generates a new ScalableRegularPolygon.
+	/** Generates a new RegularPolygon.
 	 * 
 	 *  @param size size of the polygon
 	 *  @param vertices number of vertices (corners)
 	 *  @param c color of the polygon
+	 *  @param rotating if true, the resulting drawable will rotate depending on
+	 *  	   the velocity
 	 */
-	public ScalableRegularPolygon(IVector2 size, int vertices, Color c)
+	public RegularPolygon(IVector2 size, int vertices, Color c, boolean rotating)
 	{
-		c_ = c;
+		setColor(c);
 		setPosition(new Vector2Double(0.0));
         setSize(size);
         setVelocity(new Vector2Double(0.0));
+        setRotating(rotating);
 		vertices_ = vertices;
-	}
-	
-	/** Private copy constructor.
-	 *
-	 *  @param other the original
-	 */
-	private ScalableRegularPolygon(ScalableRegularPolygon other)
-	{
-		px_ = other.px_;
-    	py_ = other.py_;
-    	w_ = other.w_;
-    	h_ = other.h_;
-		vertices_ = other.vertices_;
-		c_ = other.c_;
 	}
 	
 	public void init(ViewportJ2D vp, Graphics2D g)
@@ -88,12 +69,6 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 	
 	public void init(ViewportJOGL vp, GL gl)
 	{
-		oglColor_ = new float[4];
-		oglColor_[0] = c_.getRed() / 255.0f;
-		oglColor_[1] = c_.getGreen() / 255.0f;
-		oglColor_[2] = c_.getBlue() / 255.0f;
-		oglColor_[3] = c_.getAlpha() / 255.0f;
-		
 		String listName = getClass().getName() + "_" + new Integer(vertices_).toString();
 		Integer list = vp.getDisplayList(listName);
 		if (list == null)
@@ -125,6 +100,10 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 		AffineTransform transform = g.getTransform();
         g.translate(px_, py_);
         g.scale(w_, h_);
+        if (rotating_)
+        {
+        	g.rotate(rot_);
+        }
         g.setColor(c_);
         g.fill(path_);
         g.setTransform(transform);
@@ -136,15 +115,13 @@ public class ScalableRegularPolygon extends ScalablePrimitive
 		gl.glColor4fv(oglColor_, 0);
         gl.glTranslatef(px_, py_, 0.0f);
         gl.glScalef(w_, h_, 1.0f);
+        if (rotating_)
+        {
+        	gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
+        }
         
         gl.glCallList(dList_);
         
         gl.glPopMatrix();
 	}
-	
-	public IDrawable copy()
-	{
-		return new ScalableRegularPolygon(this);
-	}
-
 }

@@ -12,7 +12,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.ViewportJ2D;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.ScalableTexturedRectangle;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
@@ -129,11 +129,10 @@ public class StartObserverPlan extends Plan
 		b.getBelief("viewport").setFact(viewport);
 		
 		DrawableCombiner objectMarker = new DrawableCombiner();
-		IDrawable markerDrawable = new ScalableTexturedRectangle(getClass().getPackage().getName().replaceAll("capability", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
+		IDrawable markerDrawable = new TexturedRectangle(getClass().getPackage().getName().replaceAll("capability", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
 		objectMarker.addDrawable(markerDrawable, Integer.MAX_VALUE);
 		viewport.registerDrawableCombiner(objectMarker);
 		b.getBelief("object_marker").setFact(objectMarker);
-		b.getBelief("object_marker_drawable").setFact(markerDrawable);
 		
 		boolean customGui = ((Boolean) b.getBelief("custom_gui").getFact()).booleanValue();
 		if (customGui)

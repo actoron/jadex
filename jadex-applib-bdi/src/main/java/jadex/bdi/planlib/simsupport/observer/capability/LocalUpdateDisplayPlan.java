@@ -86,11 +86,11 @@ public class LocalUpdateDisplayPlan extends Plan
 			{
 				IVector2 size = ((DrawableCombiner) theme.get(mObj.getType())).getSize();
 				size.multiply(2.0);
-				IDrawable markerDrawable = (IDrawable) b.getBelief("object_marker_drawable").getFact();
-				markerDrawable.setSize(size);
 				Object[] viewObj = new Object[3];
+				DrawableCombiner marker = (DrawableCombiner) b.getBelief("object_marker").getFact();;
+				marker.setDrawableSizes(size);
 				viewObj[0] = mObj.getPosition();
-				viewObj[2] = b.getBelief("object_marker").getFact();;
+				viewObj[2] = marker;
 				objectList.add(viewObj);
 			}
 			else

@@ -22,6 +22,7 @@ public interface IField
 	 */
 	public void update(IVector1 deltaT, ISimulationEngine engine);
 	
+	// TODO: Move to appropriate interfaces
 	/** Returns the scalar field value at a specific position.
 	 *  This represents a scalar field view.
 	 *  This method is optional.
@@ -30,7 +31,7 @@ public interface IField
 	 *  @return scalar value
 	 *  @throws UnsupportedOperationException if the operation is unsupported.
 	 */
-	public IVector1 getScalar(IVector2 position);
+	//public IVector1 getScalar(IVector2 position);
 	
 	/** Returns the vector field value at a specific position.
 	 *  The returned value may be a gradient of an underlying scalar field
@@ -41,5 +42,5 @@ public interface IField
 	 * 	@return vector value
 	 * 	@throws UnsupportedOperationException if the operation is unsupported.
 	 */
-	public IVector2 getVector(IVector2 position);
+	//public IVector2 getVector(IVector2 position);
 }
