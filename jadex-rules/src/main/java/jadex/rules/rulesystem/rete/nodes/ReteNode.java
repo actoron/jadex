@@ -6,6 +6,7 @@ import jadex.rules.rulesystem.rete.builder.ReteBuilder;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.ArrayList;
@@ -72,6 +73,12 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	public void addObject(Object id, OAVObjectType type, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
 //		System.out.println("Value added: "+id+" "+type);
+		
+		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
+		{
+			System.out.println("addedRETE: "+id);
+		}
+		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
 		
@@ -98,6 +105,11 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public void removeObject(Object id, OAVObjectType type, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
+		{
+			System.out.println("removedRETE: "+id);
+		}
+		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
 

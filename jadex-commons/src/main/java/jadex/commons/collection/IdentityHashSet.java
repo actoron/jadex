@@ -148,7 +148,7 @@ public class IdentityHashSet	implements Set
      */
     public boolean add(Object o)
     {
-    	return map.put(o, o)!=null;
+    	return map.put(o, o)==null;
     }
 
 

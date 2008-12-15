@@ -1,5 +1,9 @@
 package jadex.bdi.examples.cleanerworld;
 
+import jadex.commons.SimplePropertyChangeSupport;
+
+import java.beans.PropertyChangeListener;
+
 
 /**
  *  Editable Java class for concept LocationObject of cleaner-generated ontology.
@@ -14,6 +18,9 @@ public abstract class LocationObject implements Cloneable
 	/** The location of the object. */
 	protected Location location;
 
+	/** The property change support. */
+	protected SimplePropertyChangeSupport pcs;
+	
 	//-------- constructors --------
 
 	/**
@@ -22,6 +29,7 @@ public abstract class LocationObject implements Cloneable
 	public LocationObject()
 	{
 		// Empty constructor required for JavaBeans (do not remove).
+		pcs = new SimplePropertyChangeSupport(this);
 	}
 
 	/**
@@ -31,6 +39,7 @@ public abstract class LocationObject implements Cloneable
 	{
 		setId(id);
 		setLocation(location);
+		pcs = new SimplePropertyChangeSupport(this);
 	}
 
 	//-------- accessor methods --------
@@ -50,7 +59,9 @@ public abstract class LocationObject implements Cloneable
 	 */
 	public void setId(String id)
 	{
+		String oldid = this.id;
 		this.id = id;
+		pcs.firePropertyChange("id", oldid, id);
 	}
 
 	/**
@@ -70,7 +81,9 @@ public abstract class LocationObject implements Cloneable
 	 */
 	public void setLocation(Location location)
 	{
+		Location oldloc = this.location;
 		this.location = location;
+		pcs.firePropertyChange("location", oldloc, location);
 	}
 
 	//-------- object methods --------
@@ -92,7 +105,8 @@ public abstract class LocationObject implements Cloneable
 	 */
 	public boolean equals(Object o)
 	{
-		return o instanceof LocationObject && ((LocationObject)o).id.equals(id);
+		return o instanceof LocationObject && ((LocationObject)o).id.equals(id)
+			&& o.getClass().equals(this.getClass());
 	}
 
 	/**
@@ -112,13 +126,38 @@ public abstract class LocationObject implements Cloneable
 		try
 		{
 			LocationObject clone = (LocationObject)super.clone();
-			clone.setLocation((Location)getLocation().clone());
+			if(getLocation()!=null)
+				clone.setLocation((Location)getLocation().clone());
 			return clone;
 		}
 		catch(CloneNotSupportedException e)
 		{
-			assert false;
 			throw new RuntimeException("Clone not supported");
 		}
+	}
+	
+	//-------- property methods --------
+
+	/**
+	 * Add a PropertyChangeListener to the listener list.
+	 * The listener is registered for all properties.
+	 *
+	 * @param listener The PropertyChangeListener to be added.
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener listener)
+	{
+		pcs.addPropertyChangeListener(listener);
+	}
+
+	/**
+	 * Remove a PropertyChangeListener from the listener list.
+	 * This removes a PropertyChangeListener that was registered
+	 * for all properties.
+	 *
+	 * @param listener The PropertyChangeListener to be removed.
+	 */
+	public void removePropertyChangeListener(PropertyChangeListener listener)
+	{
+		pcs.removePropertyChangeListener(listener);
 	}
 }

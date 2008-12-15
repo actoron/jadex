@@ -32,7 +32,7 @@ public interface IBeliefSet extends IElement
 	 *  Get a value equal to the given object.
 	 *  @param oldval The old value.
 	 */
-//	public Object	getFact(Object oldval);
+	public Object getFact(Object oldval);
 
 	/**
 	 *  Test if a fact is contained in a belief.
@@ -52,7 +52,7 @@ public interface IBeliefSet extends IElement
 	 *  value with equals, removes it and stores the new fact.
 	 *  @param newfact The new fact.
 	 */
-	public void updateFact(Object newfact);
+//	public void updateFact(Object newfact);
 
 	/**
 	 *  Get the number of values currently

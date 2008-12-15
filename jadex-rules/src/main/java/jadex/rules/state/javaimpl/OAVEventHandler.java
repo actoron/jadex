@@ -4,6 +4,7 @@ import jadex.commons.collection.IdentityHashSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.ArrayList;
@@ -235,6 +236,11 @@ public class OAVEventHandler
 	 */
 	public void objectAdded(Object id, OAVObjectType type, boolean root)
 	{
+		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
+		{
+			System.out.println("added: "+id);
+		}
+		
 		if(!listeners.isEmpty())
 		{
 			if(removed_objects==null || !removed_objects.contains(id))
@@ -262,6 +268,11 @@ public class OAVEventHandler
 	 */
 	public void objectRemoved(Object id, OAVObjectType type/*, Map content*/)
 	{
+		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
+		{
+			System.out.println("removed: "+id);
+		}
+		
 		/*if(id.toString().indexOf("id=Chargingstation")!=-1)
 		{
 			System.out.println("Removed: "+id);			

@@ -27,7 +27,8 @@ public class LocalGetVisionActionPlan extends	Plan
 			((Number)getBeliefbase().getBelief("my_vision").getFact()).doubleValue(),
 			((Number)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue());
 
-		Vision	vision	= environment.getVision(cl);
+		Vision	vision	= (Vision)environment.getVision(cl).clone();
+//		Vision	vision	= (Vision)environment.getVision(cl);
 
 		getParameter("vision").setValue(vision);
 	}

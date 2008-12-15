@@ -94,6 +94,7 @@ public class MoveToLocationPlan extends Plan
 		if(vi!=null)
 		{
 			getBeliefbase().getBelief("daytime").setFact(new Boolean(vi.isDaytime()));
+			
 			Waste[] ws = vi.getWastes();
 			Wastebin[] wbs = vi.getWastebins();
 			Chargingstation[] cs = vi.getStations();
@@ -154,18 +155,30 @@ public class MoveToLocationPlan extends Plan
 				// Now its safe to add wastebin to beliefs.
 				IBeliefSet bs = getBeliefbase().getBeliefSet("wastebins");
 				if(bs.containsFact(wbs[i]))
-					bs.updateFact(wbs[i]);
+				{
+//					bs.updateFact(wbs[i]);
+					Wastebin wb = (Wastebin)bs.getFact(wbs[i]);
+					wb.update(wbs[i]);
+				}
 				else
+				{
 					bs.addFact(wbs[i]);
+				}
 				//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wbs[i]);
 			}
 			for(int i=0; i<cs.length; i++)
 			{
 				IBeliefSet bs = getBeliefbase().getBeliefSet("chargingstations");
 				if(bs.containsFact(cs[i]))
-					bs.updateFact(cs[i]);
+				{
+//					bs.updateFact(cs[i]);
+					Chargingstation stat = (Chargingstation)bs.getFact(cs[i]);
+					stat.update(cs[i]);
+				}
 				else
+				{
 					bs.addFact(cs[i]);
+				}
 				//getBeliefbase().getBeliefSet("chargingstations").updateOrAddFact(cs[i]);
 			}
 			for(int i=0; i<cls.length; i++)
@@ -174,9 +187,15 @@ public class MoveToLocationPlan extends Plan
 				{
 					IBeliefSet bs = getBeliefbase().getBeliefSet("cleaners");
 					if(bs.containsFact(cls[i]))
-						bs.updateFact(cls[i]);
+					{
+//						bs.updateFact(cls[i]);
+						Cleaner clea = (Cleaner)bs.getFact(cs[i]);
+						clea.update(cls[i]);
+					}
 					else
+					{
 						bs.addFact(cls[i]);
+					}
 					//getBeliefbase().getBeliefSet("cleaners").updateOrAddFact(cls[i]);
 				}
 			}

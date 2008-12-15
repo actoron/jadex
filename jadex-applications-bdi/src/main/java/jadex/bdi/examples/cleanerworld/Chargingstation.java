@@ -1,5 +1,9 @@
 package jadex.bdi.examples.cleanerworld;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 
 /**
  *  Editable Java class for concept Chargingstation of cleaner-generated ontology.
@@ -60,6 +64,14 @@ public class Chargingstation extends LocationObject
 		this.name = name;
 	}
 
+	/**
+	 *  Update this wastebin.
+	 */
+	public void update(Chargingstation st)
+	{
+		assert this.getId().equals(st.getId());
+	}
+	
 	//-------- object methods --------
 
 	/**

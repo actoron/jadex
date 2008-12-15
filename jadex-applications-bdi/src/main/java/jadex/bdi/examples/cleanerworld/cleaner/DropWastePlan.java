@@ -65,9 +65,14 @@ public class DropWastePlan extends Plan
 //		startAtomic();
 		IBeliefSet wbs = getBeliefbase().getBeliefSet("wastebins");
 		if(wbs.containsFact(wastebin))
-			wbs.updateFact(wastebin);
+		{
+			((Wastebin)wbs.getFact(wastebin)).update(wastebin);
+//			wbs.updateFact(wastebin);
+		}
 		else
+		{
 			wbs.addFact(wastebin);
+		}
 		//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wastebin);
 		getBeliefbase().getBelief("carriedwaste").setFact(null);
 //		System.out.println("carriedwaste b =null");

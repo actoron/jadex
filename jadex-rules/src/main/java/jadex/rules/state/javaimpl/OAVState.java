@@ -115,7 +115,7 @@ public class OAVState	implements IOAVState
 	protected int beanlistenercnt;
 	
 	/** Flag to enable identity handling of java objects (instead of equality). */
-	protected boolean	javaidentity;
+	protected boolean javaidentity;
 	
 	//-------- constructors --------
 	
@@ -141,7 +141,6 @@ public class OAVState	implements IOAVState
 		this.objectusages = javaidentity ? (Map)new IdentityHashMap() : new LinkedHashMap();
 		this.rootobjects = javaidentity ? (Set)new IdentityHashSet() : new LinkedHashSet();
 
-		
 		this.eventhandler	= new OAVEventHandler(this); 
 
 //		this.generator = new OAVNameIdGenerator();
@@ -1033,7 +1032,7 @@ public class OAVState	implements IOAVState
 	 *  @param value	The value (basic, object id or java object).
 	 */
 	public void	setAttributeValue(Object id, OAVAttributeType attribute, Object value)
-	{
+	{	
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObject(id): id+" "+attribute+" "+value;
@@ -1233,6 +1232,11 @@ public class OAVState	implements IOAVState
 	 */
 	public void	addAttributeValue(Object id, OAVAttributeType attribute, Object value)
 	{
+		if(value!=null && value.getClass().getName().indexOf("Wastebin")!=-1)
+		{
+			System.out.println("add: "+id);
+		}
+		
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObject(id);

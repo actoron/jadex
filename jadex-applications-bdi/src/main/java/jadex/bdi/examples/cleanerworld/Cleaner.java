@@ -1,5 +1,11 @@
 package jadex.bdi.examples.cleanerworld;
 
+import jadex.commons.SUtil;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 
 /**
  *  Editable Java class for concept Cleaner of cleaner-generated ontology.
@@ -113,6 +119,20 @@ public class Cleaner extends LocationObject
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	/**
+	 *  Update this wastebin.
+	 */
+	public void update(Cleaner cl)
+	{
+		assert this.getId().equals(cl.getId());
+		
+		setChargestate(cl.getChargestate());
+		setVisionRange(cl.getVisionRange());
+		
+		if(SUtil.equals(getCarriedWaste(), cl.getCarriedWaste()))
+			setCarriedWaste(cl.getCarriedWaste());
 	}
 
 	//-------- object methods --------

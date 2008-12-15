@@ -1,5 +1,6 @@
 package jadex.bdi.examples.cleanerworld;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -279,6 +280,7 @@ public class Vision extends LocationObject
 	public void addStation(Chargingstation station)
 	{
 		this.stations.add(station);
+		pcs.firePropertyChange("stations", null, stations);
 	}
 
 	/**
@@ -288,7 +290,9 @@ public class Vision extends LocationObject
 	 */
 	public boolean removeStation(Chargingstation station)
 	{
-		return this.stations.remove(station);
+		boolean ret = this.stations.remove(station);
+		pcs.firePropertyChange("stations", null, stations);
+		return ret;
 	}
 
 
@@ -307,7 +311,9 @@ public class Vision extends LocationObject
 	 */
 	public void setDaytime(boolean daytime)
 	{
+		boolean oldd = this.daytime;
 		this.daytime = daytime;
+//		pcs.firePropertyChange("daytime", oldd, daytime);
 	}
 
 	//-------- object methods --------
@@ -321,5 +327,16 @@ public class Vision extends LocationObject
 		return "Vision(" + "id=" + getId() + ", location=" + getLocation() + ")";
 	}
 
-	//-------- custom code --------
+	/**
+	 *  Clone the object.
+	 */
+	public Object clone()
+	{
+		Vision clone = (Vision)super.clone();
+		clone.cleaners = (ArrayList)((ArrayList)this.cleaners).clone();
+		clone.wastebins = (ArrayList)((ArrayList)this.wastebins).clone();
+		clone.wastes = (ArrayList)((ArrayList)this.wastes).clone();
+		clone.stations = (ArrayList)((ArrayList)this.stations).clone();
+		return clone;
+	}
 }

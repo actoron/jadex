@@ -1,6 +1,10 @@
 package jadex.bdi.examples.cleanerworld;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -73,6 +77,7 @@ public class Wastebin extends LocationObject
 		this.wastes.clear();
 		for(int i = 0; i < wastes.length; i++)
 			this.wastes.add(wastes[i]);
+		pcs.firePropertyChange("wastes", null, wastes);
 	}
 
 	/**
@@ -93,6 +98,7 @@ public class Wastebin extends LocationObject
 	public void setWaste(int idx, Waste waste)
 	{
 		this.wastes.set(idx, waste);
+		pcs.firePropertyChange("wastes", null, wastes);
 	}
 
 	/**
@@ -102,6 +108,7 @@ public class Wastebin extends LocationObject
 	public void addWaste(Waste waste)
 	{
 		this.wastes.add(waste);
+		pcs.firePropertyChange("wastes", null, wastes);
 	}
 
 	/**
@@ -111,7 +118,10 @@ public class Wastebin extends LocationObject
 	 */
 	public boolean removeWaste(Waste waste)
 	{
-		return this.wastes.remove(waste);
+		boolean ret = this.wastes.remove(waste);
+		if(ret)
+			pcs.firePropertyChange("wastes", null, wastes);
+		return ret;
 	}
 
 	/**
@@ -129,7 +139,9 @@ public class Wastebin extends LocationObject
 	 */
 	public void setCapacity(int capacity)
 	{
+		int oldc = this.capacity;
 		this.capacity = capacity;
+		pcs.firePropertyChange("capacity", oldc, capacity);
 	}
 
 	/**
@@ -147,7 +159,9 @@ public class Wastebin extends LocationObject
 	 */
 	public void setName(String name)
 	{
+		String oldn = this.name;
 		this.name = name;
+		pcs.firePropertyChange("name", oldn, name);
 	}
 	
 	//-------- object methods --------
@@ -210,5 +224,38 @@ public class Wastebin extends LocationObject
 		for(int i = 0; i < wastes.size(); i++)
 			clone.wastes.add(((Waste)wastes.get(i)).clone());
 		return clone;
+	}
+	
+	/**
+	 *  Update this wastebin.
+	 */
+	public void update(Wastebin wb)
+	{
+		assert this.getId().equals(wb.getId());
+		
+		Waste[] newwastes = wb.getWastes();
+		
+		Set toremove = new HashSet();
+		for(int i=0; i<wastes.size(); i++)
+			toremove.add(wastes.get(i));
+		
+		// Add new wastes and mark old existing ones.
+		for(int i=0; i<newwastes.length; i++)
+		{
+			if(toremove.contains(newwastes[i]))
+			{
+				toremove.remove(newwastes[i]);
+			}
+			else
+			{
+				addWaste(newwastes[i]);
+			}
+		}
+		
+		// Delete old non-existing ones.
+		for(Iterator it=toremove.iterator(); it.hasNext(); )
+		{
+			removeWaste((Waste)it.next());
+		}
 	}
 }
