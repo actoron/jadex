@@ -29,6 +29,7 @@ public class SimulationTickerPlan extends Plan
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		while(true)
 		{
+			waitForCondition("notasks");
 			waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
 			env.executeStep();
 			//System.out.println("Actual tick cnt: "+getBeliefbase().getBelief("???").getFact("tickcnt"));
