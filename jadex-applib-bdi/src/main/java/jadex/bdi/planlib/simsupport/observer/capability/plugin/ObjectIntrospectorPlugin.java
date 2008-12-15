@@ -5,12 +5,10 @@ import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.observer.capability.ObserverCenter;
-import jadex.commons.collection.TwoWayMultiCollection;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -19,13 +17,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.print.attribute.standard.MediaSize.Engineering;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -64,6 +59,10 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	/** The observer center
 	 */
 	private ObserverCenter observerCenter_;
+	
+	/** Selection controller
+	 */
+	private SelectionController selectionController_;
 	
 	public ObjectIntrospectorPlugin()
 	{
@@ -112,10 +111,14 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	public synchronized void start(ObserverCenter main)
 	{
 		observerCenter_ = main;
+		selectionController_ = new SelectionController();
+		observerCenter_.getViewport().addViewportListener(selectionController_);
 	}
 	
 	public synchronized void shutdown()
 	{
+		observerCenter_.markObject(null);
+		observerCenter_.getViewport().removeViewportListener(selectionController_);
 	}
 	
 	public synchronized String getName()
@@ -165,5 +168,16 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		DefaultTableModel model = (DefaultTableModel) propertyTable_.getModel();
 		model.setDataVector(dataSet, COLUMM_NAMES);
 		model.fireTableStructureChanged();
+	}
+	
+	private class SelectionController implements IViewportListener
+	{
+		public void leftClicked(IVector2 position)
+		{
+			IVector1 maxDist = (IVector1) observerCenter_.getAgentAccess().getBeliefbase().getBelief("selector_distance").getFact();
+			final Integer observedId = observerCenter_.getEngineAccess().getNearestObjectId(position, maxDist);
+			
+			observerCenter_.markObject(observedId);
+		}
 	}
 }

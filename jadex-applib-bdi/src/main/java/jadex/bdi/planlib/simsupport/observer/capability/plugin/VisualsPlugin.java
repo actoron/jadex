@@ -38,6 +38,10 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	 */
 	private ObserverCenter observerCenter_;
 	
+	/** The theme selection controller
+	 */
+	private ThemeController themeController_;
+	
 	public VisualsPlugin()
 	{
 		mainPanel_ = new JPanel(new GridBagLayout());
@@ -48,7 +52,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		JPanel themePanel = new JPanel();
 		themePanel.setBorder(new TitledBorder("Theme"));
 		themeList_ = new JList(new DefaultComboBoxModel());
-		themeList_.addListSelectionListener(new ListController());
+		themeController_ = new ThemeController();
 		themePanel.add(themeList_);
 		
 		GridBagConstraints c = new GridBagConstraints();
@@ -80,6 +84,8 @@ public class VisualsPlugin implements IObserverCenterPlugin
 			}
 		}
 		
+		themeList_.addListSelectionListener(themeController_);
+		
 		refresh();
 	}
 	
@@ -88,7 +94,8 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	 */
 	public void shutdown()
 	{
-		
+		themeList_.removeListSelectionListener(themeController_);
+		((DefaultComboBoxModel) themeList_.getModel()).removeAllElements();
 	}
 	
 	/** Returns the name of the plugin
@@ -117,7 +124,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		themeList_.setSelectedValue(selection, true);
 	}
 	
-	private class ListController implements ListSelectionListener
+	private class ThemeController implements ListSelectionListener
 	{
 		public void valueChanged(ListSelectionEvent e)
 		{

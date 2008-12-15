@@ -44,10 +44,6 @@ public class ObserverCenter
 	 */
 	private ObserverCenterWindow mainWindow_;
 	
-	/** Viewport controller
-	 */
-	private ViewportController viewportController_;
-	
 	/** Currently active plugin
 	 */
 	private IObserverCenterPlugin activePlugin_;
@@ -124,9 +120,6 @@ public class ObserverCenter
 							}
 						});
 					timer_.start();
-					
-					viewportController_ = new ViewportController();
-					getViewport().addViewportListener(viewportController_);
 					
 					mainWindow_.addWindowListener(new ObserverWindowsController());
 				}
@@ -224,7 +217,6 @@ public class ObserverCenter
 		synchronized (plugins_)
 		{
 			IObserverCenterPlugin oldPlugin = activePlugin_;
-			oldPlugin = null;
 			if (oldPlugin != null)
 			{
 				oldPlugin.shutdown();
@@ -323,7 +315,6 @@ public class ObserverCenter
 		public void windowClosed(WindowEvent e)
 		{
 			timer_.stop();
-			getViewport().removeViewportListener(viewportController_);
 			agent_.invokeLater(new Runnable()
 				{
 					public void run()
@@ -355,16 +346,5 @@ public class ObserverCenter
 		{
 		}
 		
-	}
-	
-	private class ViewportController implements IViewportListener
-	{
-		public void leftClicked(IVector2 position)
-		{
-			IVector1 maxDist = (IVector1) agent_.getBeliefbase().getBelief("selector_distance").getFact();
-			final Integer observedId = getEngineAccess().getNearestObjectId(position, maxDist);
-			
-			markObject(observedId);
-		}
 	}
 }
