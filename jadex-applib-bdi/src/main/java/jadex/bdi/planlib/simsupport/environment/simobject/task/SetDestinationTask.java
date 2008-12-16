@@ -59,6 +59,8 @@ public class SetDestinationTask implements ISimObjectTask
 	 */
 	public void start(SimObject object)
 	{
+		// MoveObjectTask must have initialized velocity
+		assert object.getProperty("velocity") != null;
 		velocity_ = (IVector2) object.getProperty("velocity");
 	}
 	

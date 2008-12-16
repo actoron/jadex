@@ -94,10 +94,8 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		mainPanel_.add(objectPanel, c);
-		
 		propertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane tableScrollPane = new JScrollPane(propertyTable_);
-//		propertyTable_.setFillsViewportHeight(true);	// Not in Java 1.4
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;
@@ -178,6 +176,10 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 			final Integer observedId = observerCenter_.getEngineAccess().getNearestObjectId(position, maxDist);
 			
 			observerCenter_.markObject(observedId);
+		}
+		
+		public void rightClicked(IVector2 position)
+		{
 		}
 	}
 }

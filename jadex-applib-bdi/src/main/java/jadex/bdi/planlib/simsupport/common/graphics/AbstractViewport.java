@@ -250,19 +250,26 @@ public abstract class AbstractViewport implements IViewport
     	}
     }
     
+    /** Fires a right mouse click event
+     * 
+     *  @param position the clicked position
+     */
+    private void fireRightMouseClickEvent(IVector2 position)
+    {
+    	synchronized (listeners_)
+    	{
+    		for (Iterator it = listeners_.iterator(); it.hasNext(); )
+    		{
+    			IViewportListener listener = (IViewportListener) it.next();
+    			listener.rightClicked(position.copy());
+    		}
+    	}
+    }
+    
     protected class MouseController implements MouseListener
     {
     	public void mouseClicked(MouseEvent e)
     	{
-    		if (e.getButton() == MouseEvent.BUTTON1)
-    		{
-    			Point p = e.getPoint();
-    			double xFac = (paddedSize_.getXAsDouble()) / canvas_.getWidth();
-    	        double yFac = (paddedSize_.getYAsDouble()) / canvas_.getHeight();
-    	        IVector2 position = new Vector2Double((xFac * p.x) + posX_,
-    	        									  (yFac * (canvas_.getHeight() - p.y)) + posY_);
-    	        fireLeftMouseClickEvent(position);
-    		}
     	}
     	
     	public void mouseEntered(MouseEvent e)
@@ -275,6 +282,23 @@ public abstract class AbstractViewport implements IViewport
     	
     	public void mousePressed(MouseEvent e)
     	{
+    		if (e.getButton() == MouseEvent.BUTTON1)
+    		{
+    			Point p = e.getPoint();
+    			double xFac = (paddedSize_.getXAsDouble()) / canvas_.getWidth();
+    	        double yFac = (paddedSize_.getYAsDouble()) / canvas_.getHeight();
+    	        IVector2 position = new Vector2Double((xFac * p.x) + posX_,
+    	        									  (yFac * (canvas_.getHeight() - p.y)) + posY_);
+    	        
+    	        if (e.getButton() == MouseEvent.BUTTON1)
+    	        {
+    	        	fireLeftMouseClickEvent(position);
+    	        }
+    	        else if (e.getButton() == MouseEvent.BUTTON2)
+    	        {
+    	        	fireRightMouseClickEvent(position);
+    	        }
+    		}
     	}
     	
     	public void mouseReleased(MouseEvent e)

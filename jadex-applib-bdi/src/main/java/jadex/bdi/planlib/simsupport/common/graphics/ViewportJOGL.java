@@ -123,7 +123,7 @@ public class ViewportJOGL extends AbstractViewport
         	GLCapabilities caps = new GLCapabilities();
         	caps.setDoubleBuffered(true);
         	caps.setHardwareAccelerated(true);
-        	canvas_ = new GLCanvas(caps);
+        	canvas_ = new ResizeableGLCanvas(caps);
         	((GLCanvas) canvas_).addGLEventListener(new GLController());
         }
         catch (GLException e)
@@ -135,7 +135,6 @@ public class ViewportJOGL extends AbstractViewport
         	throw e;
         }
         
-//        canvas_.setMinimumSize(new Dimension(1, 1)); // not in Java 1.4
         canvas_.addMouseListener(new MouseController());
         
         setSize(new Vector2Double(1.0));
@@ -480,5 +479,18 @@ public class ViewportJOGL extends AbstractViewport
             setupMatrix(gl);
         }
         
+    }
+    
+    private class ResizeableGLCanvas extends GLCanvas
+    {
+    	public ResizeableGLCanvas(GLCapabilities caps)
+    	{
+    		super(caps);
+		}
+    	
+    	public Dimension getMinimumSize()
+    	{
+    		return new Dimension(1, 1);
+    	}
     }
 }

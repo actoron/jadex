@@ -9,6 +9,7 @@ import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -155,6 +156,11 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
     		clearRectangle_.y = 0.0;
     		clearRectangle_.width = size_.getXAsDouble();
     		clearRectangle_.height = size_.getYAsDouble();
+    	}
+    	
+    	public Dimension getMinimumSize()
+    	{
+    		return new Dimension(1, 1);
     	}
     	
     	public void paint(Graphics gfx)
