@@ -23,6 +23,7 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
+import jadex.rules.state.io.xml.StackElement;
 import jadex.rules.state.javaimpl.OAVState;
 
 import java.io.File;
@@ -270,9 +271,9 @@ public class OAVBDIModelLoader
 				};
 				
 				
+				Report	report	= new Report();
 				try
 				{
-					Report	report	= new Report();
 					state.addStateListener(listener, false);
 					Object handle = reader.read(info.getInputStream(), state, mapping, report.entries);
 					state.removeStateListener(listener);
@@ -291,7 +292,7 @@ public class OAVBDIModelLoader
 					info.cleanup();
 				}				
 				
-				createAgentModelEntry(cached);
+				createAgentModelEntry(cached, report);
 
 				// Store by filename also, to avoid reloading with different imports.
 				modelcache.put(info.getFilename(), cached);
@@ -308,7 +309,7 @@ public class OAVBDIModelLoader
 	 *  Rules for agent elements have to be created and added to the generic
 	 *  BDI interpreter rules.
 	 */
-	public void	createAgentModelEntry(OAVCapabilityModel model)	throws IOException
+	public void	createAgentModelEntry(OAVCapabilityModel model, Report report)	throws IOException
 	{
 		IRulebase rb = model.getRulebase();
 		IOAVState	state	= model.getState();
@@ -523,6 +524,14 @@ public class OAVBDIModelLoader
 				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
 				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, null);
 				model.addSubcapabilityModel(cmodel);
+				if(!cmodel.getReport().isEmpty())
+				{
+					StackElement	se	= new StackElement();
+					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
+					se.object	= mcaparef;
+					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
+					report.addDocument(cmodel.getFilename(), cmodel.getReport().toHTMLString());
+				}
 
 				state.setAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());				
 			}
