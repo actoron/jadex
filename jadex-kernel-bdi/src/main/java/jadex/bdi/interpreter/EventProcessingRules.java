@@ -4,11 +4,13 @@ import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanInfoFlyweight;
 import jadex.bdi.runtime.impl.PlanInstanceInfoFlyweight;
+import jadex.bridge.IToolAdapter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IValueFetcher;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
+import jadex.rules.rulesystem.ISteppable;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
@@ -24,9 +26,12 @@ import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Static helper class for event processing rules and actions.
@@ -124,7 +129,7 @@ public class EventProcessingRules
 	/**
 	 *  Action to set waitqueue candidate apl building to finished.
 	 */
-	protected static IAction	NO_WAITQUEUECANDS_FOR_APL	= new IAction()
+	protected static IAction	MAKE_APL_AVAILABLE	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -260,12 +265,13 @@ public class EventProcessingRules
 			new AndCondition(new ICondition[]{
 				rpecon, capcon, 
 				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa, 
-					new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi}))})),
+					new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
+					new NotCondition(new AndCondition(new ICondition[]{candconwc, aplconwc}))})),
 				new NotCondition(new AndCondition(new ICondition[]{waconwq, planconwq, 
 					new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
 					new NotCondition(new AndCondition(new ICondition[]{candconwc, aplconwc}))
 				}))}),
-				NO_WAITQUEUECANDS_FOR_APL);
+				MAKE_APL_AVAILABLE);
 		
 		return new Rule[]{add_rplan_to_apl, add_waitqueuecand_to_apl, no_waitqueuecands_for_apl};		
 	}
@@ -898,7 +904,7 @@ public class EventProcessingRules
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
-					System.out.println("Check candidates failed: "+cand);
+//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					boolean rebuild = ((Boolean)state.getAttributeValue(mpe, OAVBDIMetaModel.goal_has_rebuild)).booleanValue();
@@ -1026,7 +1032,7 @@ public class EventProcessingRules
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
-					System.out.println("Check candidates failed: "+cand);
+//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
@@ -1123,7 +1129,7 @@ public class EventProcessingRules
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
-					System.out.println("Check candidates failed: "+cand);
+//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
@@ -1474,9 +1480,9 @@ public class EventProcessingRules
 			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rpe);
 			PlanRules.cleanupPlanWait(state, rcapa, rplan, false);
 			state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
-//			System.out.println("DISPATCH_WAITQUEUE_ELEMENT_ACTION: schedulePlanInstance: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
-//				+", "+rplan);
+			System.out.println("DISPATCH_WAITQUEUE_ELEMENT_ACTION: schedulePlanInstance: "
+				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+				+", "+rplan+", "+rpe);
 		}
 	};
 	
@@ -2006,11 +2012,23 @@ public class EventProcessingRules
 			OAVBDIRuntimeModel.PROCESSABLEELEMENT_CANDIDATESSELECTED);
 	}
 	
+	protected static Set	susiciousplans	= Collections.synchronizedSet(new HashSet());
+	
 	/**
 	 *  Schedule a waitqueue candidate.
 	 */
 	protected static void scheduleWaitqueueCandidate(IOAVState state, Object rpe, Object rplan)
 	{
+		if(BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName().indexOf("jcc")!=-1)
+		{
+			System.out.println("Post to waitqueue: "+rplan+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+			susiciousplans.add(rplan); 
+//			IToolAdapter[]	adapters	= BDIInterpreter.getInterpreter(state).getToolAdapters();
+//			for(int i=0; i<adapters.length; i++)
+//				if(adapters[i] instanceof ISteppable)
+//					((ISteppable)adapters[i]).setStepmode(true);
+		}
+		System.out.println("Post to waitqueue: "+rplan+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 		state.addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
 	}
 	
