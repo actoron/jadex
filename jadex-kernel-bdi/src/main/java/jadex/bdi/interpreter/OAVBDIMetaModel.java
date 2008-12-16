@@ -2,6 +2,7 @@ package jadex.bdi.interpreter;
 
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
+import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -1228,7 +1229,7 @@ public class OAVBDIMetaModel
 				return false;
 			}
 	
-			public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+			public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 			{
 				// If tag (e.g. <unique> or <abstract>) exists, attribute is true.
 				return Boolean.TRUE;
@@ -1328,7 +1329,7 @@ public class OAVBDIMetaModel
 			return true;
 		}
 
-		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 		{
 //			System.out.println("convert value: "+value);
 			Object ret = null;
@@ -1345,18 +1346,20 @@ public class OAVBDIMetaModel
 
 					if(lang==null || "clips".equals(lang))
 					{
-//						try
-//						{
+						try
+						{
 							ret = ParserHelper.parseCondition(value, state.getTypeModel());
-//						}
-//						catch(Exception e)
-//						{
+						}
+						catch(Exception e)
+						{
+							report.put(se, e.toString());
 //							e.printStackTrace();
-//						}
+						}
 					}
 					else
 					{
-						throw new RuntimeException("Unknown condition language: "+lang);
+						report.put(se, "Unknown condition language: "+lang);
+//						throw new RuntimeException("Unknown condition language: "+lang);
 					}	
 //					System.out.println(ret);
 					
@@ -1366,15 +1369,15 @@ public class OAVBDIMetaModel
 //					System.out.println("Found expression: "+se.object);
 					if(lang==null || "java".equals(lang))
 					{
-//						try
-//						{
+						try
+						{
 							ret = exp_parser.parseExpression(value, ClassValueConverter.getImports(state, stack), null, state.getTypeModel().getClassLoader());
-//						}
-//						catch(Exception e)
-//						{
+						}
+						catch(Exception e)
+						{
+							report.put(se, e.toString());
 //							e.printStackTrace();
-	//						ret = exp_parser.parseExpression(value, ClassValueConverter.getImports(state, stack), state.getTypeModel(), null);
-//						}
+						}
 						
 //						// Trigger reference has expression and referenced element
 //						if(state.getType(se.object).equals(triggerreference_type))
@@ -1409,18 +1412,20 @@ public class OAVBDIMetaModel
 					}
 					else if("clips".equals(lang))
 					{
-//						try
-//						{
+						try
+						{
 							ret = ParserHelper.parseCondition(value, state.getTypeModel());
-//						}
-//						catch(Exception e)
-//						{
+						}
+						catch(Exception e)
+						{
+							report.put(se, e.toString());
 //							e.printStackTrace();
-//						}
+						}
 					}
 					else
 					{
-						throw new RuntimeException("Unknown condition language: "+lang);
+						report.put(se, "Unknown condition language: "+lang);
+//						throw new RuntimeException("Unknown condition language: "+lang);
 					}
 				}
 			}
@@ -1439,7 +1444,7 @@ public class OAVBDIMetaModel
 			return true;
 		}
 
-		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 		{
 			Object	ret	= null;
 			
@@ -1558,7 +1563,8 @@ public class OAVBDIMetaModel
 			
 			if(ret==null)
 			{
-				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value);
+				report.put(stack.get(stack.size()-1), "Could not resolve reference to: "+value);
+//				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value);
 			}
 			
 			return ret;
@@ -1575,7 +1581,7 @@ public class OAVBDIMetaModel
 			return true;
 		}
 
-		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 		{
 			Object	ret	= null;
 			
@@ -1623,7 +1629,8 @@ public class OAVBDIMetaModel
 			
 			if(ret==null)
 			{
-				throw new RuntimeException("Could not resolve parameter: "+value);
+				report.put(stack.get(stack.size()-1), "Could not resolve parameter: "+value);
+//				throw new RuntimeException("Could not resolve parameter: "+value);
 			}
 			
 			return ret;
@@ -1640,7 +1647,7 @@ public class OAVBDIMetaModel
 			return true;
 		}
 
-		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 		{
 			Object	ret	= null;
 			
@@ -1694,7 +1701,8 @@ public class OAVBDIMetaModel
 
 			if(coll==null)
 			{
-				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value+", "+stack);
+				report.put(stack.get(stack.size()-1), "Could not resolve reference to: "+value);
+//				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value+", "+stack);
 			}
 
 			for(Iterator it=coll.iterator(); ret==null && it.hasNext();)
@@ -1708,7 +1716,8 @@ public class OAVBDIMetaModel
 			
 			if(ret==null)
 			{
-				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value);
+				report.put(stack.get(stack.size()-1), "Could not resolve reference to: "+value);
+//				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value);
 			}
 			
 			return ret;
@@ -1726,7 +1735,7 @@ public class OAVBDIMetaModel
 			return true;
 		}
 
-		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 		{
 			Object	ret	= null;
 			
@@ -1777,7 +1786,8 @@ public class OAVBDIMetaModel
 			}
 			
 			if(orig==null)
-				throw new RuntimeException("Unknown referenced element: "+elemname);
+				report.put(stack.get(stack.size()-1), "Unknown referenced element: "+elemname);
+//				throw new RuntimeException("Unknown referenced element: "+elemname);
 				
 			OAVObjectType otype = state.getType(orig);
 			boolean	set	= ((StackElement)stack.get(stack.size()-2)).path.endsWith("parameterset");
@@ -1840,7 +1850,8 @@ public class OAVBDIMetaModel
 			}
 			
 			if(ret==null)
-				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value);
+				report.put(stack.get(stack.size()-1), "Could not resolve reference to: "+value);
+//				throw new RuntimeException("Could not resolve reference to "+referrer+": "+value);
 			
 			return ret;
 		}
@@ -1882,11 +1893,12 @@ public class OAVBDIMetaModel
 			return false;
 		}
 
-		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+		public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 		{
 			Object	ret	= messagetypes.get(value);
 			if(ret==null)
-				throw new RuntimeException("Could not resolve: "+attribute+" "+value);
+				report.put(stack.get(stack.size()-1), "Unknown message type: "+value);
+//				throw new RuntimeException("Could not resolve: "+attribute+" "+value);
 			
 			return ret;
 		}

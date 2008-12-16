@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 
 import java.io.IOException;
@@ -41,14 +42,15 @@ public class Reader
 	 *  @param in	The XML input stream.
 	 *  @param state	The OAV state.
 	 *  @param xmlmapping	The XML -> meta model mapping.
+	 *  @param report	An empty check report for adding errors during loading.
 	 *  @return The object id of the root object, created from the xml.
 	 *  @throws IOException 
 	 */
-	public Object	read(InputStream in, IOAVState state, IOAVXMLMapping xmlmapping) throws IOException
+	public Object	read(InputStream in, IOAVState state, IOAVXMLMapping xmlmapping, MultiCollection report) throws IOException
 	{
 		try
 		{
-			OAVContentHandler	handler	= new OAVContentHandler(state, xmlmapping);
+			OAVContentHandler	handler	= new OAVContentHandler(state, xmlmapping, report);
 			XMLReader	xmlreader	= factory.newSAXParser().getXMLReader();
 			xmlreader.setContentHandler(handler);
 			xmlreader.parse(new InputSource(in));

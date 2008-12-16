@@ -24,9 +24,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	 *  Create a model.
 	 */
 	public OAVAgentModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types, String filename, long lastmod)
+		OAVTypeModel typemodel, Set types, String filename, long lastmod, Report report)
 	{
-		super(state, handle, typemodel, types, filename, lastmod);
+		super(state, handle, typemodel, types, filename, lastmod, report);
 	}
 	
 	//-------- IAgentModel methods --------

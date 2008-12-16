@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -29,13 +30,14 @@ public class BasicValueConverter implements IValueConverter
 	 *
 	 *  @param state	The current OAV state.
 	 *  @param stack	The current stack of OAV objects, created from XML.
-	 *  @param attribute	The OAV attribute type.
+	 *  @param attr	The OAV attribute type.
 	 *  @param value	The XML string value.
+	 *  @param report	Collection for adding any conversion errors (stack element -> error message).
 	 *  @return	The OAV object value.
 	 */
-	public Object	convertValue(IOAVState state, List stack, OAVAttributeType attr, String svalue)
+	public Object convertValue(IOAVState state, List stack, OAVAttributeType attr, String svalue, MultiCollection report)
 	{
-		Object	value;
+		Object	value	= null;
 		OAVObjectType	vtype	= attr.getType();
 		if(vtype instanceof OAVJavaType)
 		{
@@ -59,12 +61,14 @@ public class BasicValueConverter implements IValueConverter
 			// todo: other basic or "fromstringable" classes.
 			else
 			{
-				throw new RuntimeException("Value class not supported: "+clazz);
+				report.put(stack.get(stack.size()-1), "Value class not supported: "+clazz);
+//				throw new RuntimeException("Value class not supported: "+clazz);
 			}
 		}
 		else
 		{
-			throw new RuntimeException("Value type not supported: "+vtype);
+			report.put(stack.get(stack.size()-1), "Value type not supported: "+vtype);
+//			throw new RuntimeException("Value type not supported: "+vtype);
 		}
 		return getValue(value);
 	}

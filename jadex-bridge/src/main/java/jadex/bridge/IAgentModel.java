@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+
 /**
  *  Agent model interface to be used (invoked) by tools and adapters.
  *  Implemented by kernels to represent an agent type.

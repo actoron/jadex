@@ -1,6 +1,7 @@
 package jadex.bdi.interpreter;
 
 import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.io.xml.IValueConverter;
@@ -31,24 +32,28 @@ public class ClassValueConverter implements IValueConverter
 	 *  @param stack	The current stack of OAV objects, created from XML.
 	 *  @param attribute	The OAV attribute type.
 	 *  @param value	The XML string value.
+	 *  @param report	Collection for adding any conversion errors (stack element -> error message).
 	 *  @return	The OAV object value.
 	 */
-	public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value)
+	public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report)
 	{
+		Object	ret	= null;
 		try
 		{
 			String[]	imports	= getImports(state, stack);
 			
-			return SReflect.findClass(value, imports, state.getTypeModel().getClassLoader());
+			ret	= SReflect.findClass(value, imports, state.getTypeModel().getClassLoader());
 		}
 		catch(ClassNotFoundException e)
 		{
-			throw new RuntimeException(e);
+			report.put(stack.get(stack.size()-1), e.toString());
+//			throw new RuntimeException(e);
 //			System.out.println("Warning: Class not found "+value);
 //			// changed, see javaflow bug: http://issues.apache.org/jira/browse/SANDBOX-111
 //			//return Void.class;
 //			return Void.TYPE;
 		}
+		return ret;
 	}
 
 	protected static String[] getImports(IOAVState state, List stack)

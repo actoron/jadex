@@ -46,13 +46,16 @@ public class OAVCapabilityModel implements IAgentModel
 	/** The last modified date. */
 	protected long	lastmod;
 	
+	/** The check report. */
+	protected Report	report;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a model.
 	 */
 	public OAVCapabilityModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types, String filename, long lastmod)
+		OAVTypeModel typemodel, Set types, String filename, long lastmod, Report report)
 	{
 		this.state	= state;
 		this.handle	= handle;
@@ -61,6 +64,8 @@ public class OAVCapabilityModel implements IAgentModel
 		this.rulebase	= new Rulebase();
 		this.filename	= filename;
 		this.lastmod	= lastmod;
+		this.report	= report;
+		report.setModel(this);
 	}
 	
 	//-------- IAgentModel methods --------
@@ -145,24 +150,7 @@ public class OAVCapabilityModel implements IAgentModel
 	 */
 	public IReport getReport()
 	{
-		// todo: 
-		return new IReport()
-		{
-			public Map getDocuments()
-			{
-				return null;
-			}
-			
-			public boolean isEmpty()
-			{
-				return true;
-			}
-			
-			public String toHTMLString()
-			{
-				return "";
-			}
-		};
+		return report;
 	}
 	
 	/**

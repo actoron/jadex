@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -28,18 +29,22 @@ public class DeferredValueConversion
 	/** The stack. */
 	protected List	stack;
 	
+	/** The report. */
+	protected MultiCollection	report;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a deferred value conversion object.
 	 */
-	public DeferredValueConversion(Object object, OAVAttributeType attribute, String value, IValueConverter converter,List	stack)
+	public DeferredValueConversion(Object object, OAVAttributeType attribute, String value, IValueConverter converter, List stack, MultiCollection report)
 	{
 		this.object	= object;
 		this.attribute	= attribute;
 		this.value	= value;
 		this.converter	= converter;
 		this.stack	= stack;
+		this.report	= report;
 	}
 	
 	//-------- methods --------
@@ -51,11 +56,11 @@ public class DeferredValueConversion
 	{
 		if(OAVAttributeType.NONE.equals(attribute.getMultiplicity()))
 		{
-			state.setAttributeValue(object, attribute, converter.convertValue(state, stack, attribute, value));
+			state.setAttributeValue(object, attribute, converter.convertValue(state, stack, attribute, value, report));
 		}
 		else
 		{
-			state.addAttributeValue(object, attribute, converter.convertValue(state, stack, attribute, value));
+			state.addAttributeValue(object, attribute, converter.convertValue(state, stack, attribute, value, report));
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
@@ -48,6 +49,9 @@ public class OAVContentHandler	implements ContentHandler
 	
 	protected Map mapobjs;
 	
+	/** The check report. */
+	protected MultiCollection	report;
+	
 	//-------- constructors --------
 	
 	/**
@@ -55,13 +59,14 @@ public class OAVContentHandler	implements ContentHandler
 	 *  @param state	The OAV state.
 	 *  @param xmlmapping	The XML -> meta model mapping..
 	 */
-	public OAVContentHandler(IOAVState state, IOAVXMLMapping xmlmapping)
+	public OAVContentHandler(IOAVState state, IOAVXMLMapping xmlmapping, MultiCollection report)
 	{
 		this.state	= state;
 		this.xmlmapping	= xmlmapping;
 		this.stack	= new ArrayList();
 		this.deferred	= new ArrayList();
 		this.mapobjs = new HashMap();
+		this.report	= report;
 	}
 	
 	//-------- methods --------
@@ -186,7 +191,8 @@ public class OAVContentHandler	implements ContentHandler
    			// Ignored paths are mapped to null.
    			if(debug && !xmlmapping.isIgnored(element.path))
    			{
-				System.out.println("No object or attribute type for path: "+element.path);
+   				report.put(element, "Unknown tag");
+//				System.out.println("No object or attribute type for path: "+element.path);
    			}
    		}
    		
@@ -204,7 +210,8 @@ public class OAVContentHandler	implements ContentHandler
 	   			// Ignored paths are mapped to null.
 	   			if(debug && !xmlmapping.isIgnored(attrpath))
 	   			{
-					System.out.println("Warning: Ignoring unknown attribute: "+attrpath);
+	   				report.put(element, "Unknown attribute: "+attrs.getQName(i));
+//					System.out.println("Warning: Ignoring unknown attribute: "+attrpath);
 	   			}
 			}
 		}    
@@ -244,7 +251,8 @@ public class OAVContentHandler	implements ContentHandler
 		else if(content!=null && content.trim().length()>0)	// Ignore only whitespace content (hack???).
 		{
 			if(debug)
-				System.out.println("Warning: Unexpected content for path "+element.path+":"+element.content.toString().trim());
+				report.put(element, "Unexpected content for element: "+element.content.toString().trim());
+//				System.out.println("Warning: Unexpected content for path "+element.path+":"+element.content.toString().trim());
 		}
 
 		Object[] toadd = (Object[])mapobjs.remove(element);
@@ -252,7 +260,8 @@ public class OAVContentHandler	implements ContentHandler
 		{
 			OAVAttributeType idxattr = ((OAVAttributeType)toadd[1]).getIndexAttribute();
 			if(state.getAttributeValue(element.object, idxattr)==null)
-				System.out.println("Warning: Could not add map attribute "+element.path);
+				report.put(element, "Could not add map attribute.");
+//				System.out.println("Warning: Could not add map attribute "+element.path);
 			else
 				state.addAttributeValue(toadd[0], (OAVAttributeType)toadd[1], element.object);
 		}
@@ -338,11 +347,11 @@ public class OAVContentHandler	implements ContentHandler
 			{
 				if(converter.isTwoPass())
 				{
-					deferred.add(new DeferredValueConversion(obj, attr, value, converter, new ArrayList(stack)));
+					deferred.add(new DeferredValueConversion(obj, attr, value, converter, new ArrayList(stack), report));
 				}
 				else
 				{
-					Object val = converter.convertValue(state, stack, attr, value);
+					Object val = converter.convertValue(state, stack, attr, value, report);
 					if(OAVAttributeType.NONE.equals(attr.getMultiplicity()))
 					{
 						state.setAttributeValue(obj, attr, val);
@@ -355,12 +364,14 @@ public class OAVContentHandler	implements ContentHandler
 			}
 			else
 			{
-				throw new RuntimeException("Cannot store attribute, because no object exists: "+((StackElement)stack.get(stack.size()-1)).path);
+				report.put(stack.get(stack.size()-1), "Cannot store attribute, because no object exists");
+//				throw new RuntimeException("Cannot store attribute, because no object exists: "+((StackElement)stack.get(stack.size()-1)).path);
 			}
 		}
 		else
 		{
-			throw new RuntimeException("Attribute or value type not supported: attribute="+attr.getName()+", type="+attr.getType().getName()+", value="+value);
+			report.put(stack.get(stack.size()-1), "Attribute or value type not supported: attribute="+attr.getName()+", type="+attr.getType().getName()+", value="+value);
+//			throw new RuntimeException("Attribute or value type not supported: attribute="+attr.getName()+", type="+attr.getType().getName()+", value="+value);
 		}
     }
 }

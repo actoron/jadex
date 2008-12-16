@@ -2,6 +2,7 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.commons.SUtil;
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
@@ -55,7 +56,7 @@ public class ReaderTest
 				if(file.getName().endsWith(".agent.xml") || file.getName().endsWith(".capability.xml"))
 				{
 					System.out.println(file);
-					reader.read(new FileInputStream(file), state, mapping);
+					reader.read(new FileInputStream(file), state, mapping, new MultiCollection());
 				}
 				else if(file.isDirectory())
 				{
@@ -65,7 +66,7 @@ public class ReaderTest
 		}
 		else
 		{
-			reader.read(SUtil.getResource(args[0], null), state, mapping);
+			reader.read(SUtil.getResource(args[0], null), state, mapping, new MultiCollection());
 
 //			OAVTreeModel.createOAVFrame(file.getName(), state).setVisible(true);
 

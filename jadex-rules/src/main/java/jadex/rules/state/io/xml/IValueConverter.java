@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -26,7 +27,8 @@ public interface IValueConverter
 	 *  @param stack	The current stack of OAV objects, created from XML.
 	 *  @param attribute	The OAV attribute type.
 	 *  @param value	The XML string value.
+	 *  @param report	Collection for adding any conversion errors (stack element -> error message).
 	 *  @return	The OAV object value.
 	 */
-	public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value);
+	public Object convertValue(IOAVState state, List stack, OAVAttributeType attribute, String value, MultiCollection report);
 }

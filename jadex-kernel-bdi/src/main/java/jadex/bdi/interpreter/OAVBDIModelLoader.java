@@ -272,28 +272,29 @@ public class OAVBDIModelLoader
 				
 				try
 				{
+					Report	report	= new Report();
 					state.addStateListener(listener, false);
-					Object handle = reader.read(info.getInputStream(), state, mapping);
+					Object handle = reader.read(info.getInputStream(), state, mapping, report.entries);
 					state.removeStateListener(listener);
 	
 					if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 					{
-						cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
+						cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
 					}
 					else
 					{
-						cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified());
+						cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
 					}
-	
-					createAgentModelEntry(cached);
-
-					// Store by filename also, to avoid reloading with different imports.
-					modelcache.put(info.getFilename(), cached);
 				}
 				finally
 				{
 					info.cleanup();
 				}				
+				
+				createAgentModelEntry(cached);
+
+				// Store by filename also, to avoid reloading with different imports.
+				modelcache.put(info.getFilename(), cached);
 			}
 			
 			// Associate cached model to new key (name/extension/imports).

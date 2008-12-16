@@ -1,6 +1,7 @@
 package jadex.bdi.benchmarks;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
@@ -43,7 +44,7 @@ public class ReaderBenchmark
 		kernelprops.put("messagetype_fipa", new jadex.adapter.base.fipa.FIPAMessageType());
 		
 		IOAVXMLMapping	xmlmapping	= OAVBDIMetaModel.getXMLMapping(kernelprops);
-		Object	obj	= reader.read(new FileInputStream(args[0]), state, xmlmapping);
+		Object	obj	= reader.read(new FileInputStream(args[0]), state, xmlmapping, new MultiCollection());
 		
 		// Start tests.
 		int cnt	= 100;
@@ -83,7 +84,7 @@ public class ReaderBenchmark
 		{
 			states[i]	= new OAVState(OAVBDIMetaModel.bdimm_type_model);
 //			states[i]	= new JenaOAVState();
-			reader.read(new FileInputStream(arg), states[i], xmlmapping);
+			reader.read(new FileInputStream(arg), states[i], xmlmapping, new MultiCollection());
 		}
 		return states;
 	}
