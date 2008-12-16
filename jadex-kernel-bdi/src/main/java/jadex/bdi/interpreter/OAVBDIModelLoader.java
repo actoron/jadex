@@ -224,79 +224,102 @@ public class OAVBDIModelLoader
 			System.arraycopy(imports, 0, keys, 2, imports.length);
 		Tuple	keytuple	= new Tuple(keys);
 		
-		ResourceInfo	info	= getResourceInfo(name, extension, imports, classloader);
-
+		ResourceInfo	info	= null;
 		//		synchronized(modelcache)
 //		{
 			cached	= (OAVCapabilityModel)modelcache.get(keytuple);
-			if(cached!=null && cached.getLastModified()<info.getLastModified())
-				cached	= null;
+			// If model is in cache, check at most every second if file on disc is newer.
+			if(cached!=null && cached.getLastChecked()+1000<System.currentTimeMillis())
+			{
+				info	= getResourceInfo(name, extension, imports, classloader);
+				if(cached.getLastModified()<info.getLastModified())
+				{
+					cached	= null;
+				}
+				else
+				{
+					cached.setLastChecked(System.currentTimeMillis());
+				}
+			}
 //		}
 
-		if(cached==null)
+		if(cached==null && info==null)
 		{
 			// Lookup cache by resolved filename.
 //			synchronized(modelcache)
 //			{
+				info	= getResourceInfo(name, extension, imports, classloader);
 				cached	= (OAVCapabilityModel)modelcache.get(info.getFilename());
-				if(cached!=null && cached.getLastModified()<info.getLastModified())
-					cached	= null;
-//			}
-			
-			// Not found: load from disc and store in cache.
-			if(cached==null)
-			{
-				OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", classloader);
-				// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
-				typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-				IOAVState	state	= new OAVState(typemodel);
-				
-				final Set	types	= new HashSet();
-				IOAVStateListener	listener	= new IOAVStateListener()
+				if(cached!=null)
 				{
-					public void objectAdded(Object id, OAVObjectType type, boolean root)
+					if(cached.getLastModified()<info.getLastModified())
 					{
-						// Add the type and its supertypes (if not already contained).
-						while(type!=null && types.add(type))
-							type	= type.getSupertype();
-					}
-					
-					public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, Object newvalue)
-					{
-					}
-					
-					public void objectRemoved(Object id, OAVObjectType type)
-					{
-					}
-				};
-				
-				
-				Report	report	= new Report();
-				try
-				{
-					state.addStateListener(listener, false);
-					Object handle = reader.read(info.getInputStream(), state, mapping, report.entries);
-					state.removeStateListener(listener);
-	
-					if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
-					{
-						cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
+						cached	= null;
 					}
 					else
 					{
-						cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
+						cached.setLastChecked(System.currentTimeMillis());
 					}
-				}
-				finally
-				{
-					info.cleanup();
-				}				
-				
-				createAgentModelEntry(cached, report);
 
-				// Store by filename also, to avoid reloading with different imports.
-				modelcache.put(info.getFilename(), cached);
+					// Associate cached model to new key (name/extension/imports).
+					modelcache.put(keytuple, cached);
+				}
+//			}
+		}
+			
+		// Not found: load from disc and store in cache.
+		if(cached==null)
+		{
+			OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", classloader);
+			// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
+			typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+			IOAVState	state	= new OAVState(typemodel);
+			
+			final Set	types	= new HashSet();
+			IOAVStateListener	listener	= new IOAVStateListener()
+			{
+				public void objectAdded(Object id, OAVObjectType type, boolean root)
+				{
+					// Add the type and its supertypes (if not already contained).
+					while(type!=null && types.add(type))
+						type	= type.getSupertype();
+				}
+				
+				public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, Object newvalue)
+				{
+				}
+				
+				public void objectRemoved(Object id, OAVObjectType type)
+				{
+				}
+			};
+			
+			
+			Report	report	= new Report();
+			try
+			{
+				state.addStateListener(listener, false);
+				Object handle = reader.read(info.getInputStream(), state, mapping, report.entries);
+				state.removeStateListener(listener);
+
+				if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
+				{
+					cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
+				}
+				else
+				{
+					cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
+				}
 			}
+			finally
+			{
+				info.cleanup();
+			}				
+			
+			createAgentModelEntry(cached, report);
+
+			// Store by filename also, to avoid reloading with different imports.
+			modelcache.put(info.getFilename(), cached);
 			
 			// Associate cached model to new key (name/extension/imports).
 			modelcache.put(keytuple, cached);
@@ -304,7 +327,7 @@ public class OAVBDIModelLoader
 
 		return cached;
 	}
-	
+
 	/**
 	 *  Rules for agent elements have to be created and added to the generic
 	 *  BDI interpreter rules.
@@ -330,7 +353,8 @@ public class OAVBDIModelLoader
 				if(create!=null)
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
-					rb.addRule(GoalLifecycleRules.createGoalCreationUserRule(usercond, gtname));
+					if(usercond!=null)
+						rb.addRule(GoalLifecycleRules.createGoalCreationUserRule(usercond, gtname));
 				}
 				
 				Object context = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_contextcondition);
@@ -338,15 +362,19 @@ public class OAVBDIModelLoader
 				{
 					// Two rules have to be added (negated condition for suspend)
 					ICondition usercond = (ICondition)state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
-					rb.addRule(GoalLifecycleRules.createGoalOptionUserRule(usercond, gtname));
-					rb.addRule(GoalLifecycleRules.createGoalSuspendUserRule(usercond, gtname));
+					if(usercond!=null)
+					{
+						rb.addRule(GoalLifecycleRules.createGoalOptionUserRule(usercond, gtname));
+						rb.addRule(GoalLifecycleRules.createGoalSuspendUserRule(usercond, gtname));
+					}
 				}
 				
 				Object drop = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_dropcondition);
 				if(drop!=null)
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(drop, OAVBDIMetaModel.expression_has_content);
-					rb.addRule(GoalLifecycleRules.createGoalDroppingUserRule(usercond, gtname));
+					if(usercond!=null)
+						rb.addRule(GoalLifecycleRules.createGoalDroppingUserRule(usercond, gtname));
 				}
 				
 				// Create recur condition
@@ -354,7 +382,8 @@ public class OAVBDIModelLoader
 				if(recur!=null)
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(recur, OAVBDIMetaModel.expression_has_content);
-					rb.addRule(GoalProcessingRules.createGoalRecurUserRule(usercond, gtname));
+					if(usercond!=null)
+						rb.addRule(GoalProcessingRules.createGoalRecurUserRule(usercond, gtname));
 				}
 				
 				// Create deliberation rules
@@ -381,7 +410,8 @@ public class OAVBDIModelLoader
 					if(target!=null)
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
-						rb.addRule(GoalProcessingRules.createAchievegoalSucceededUserRule(usercond, gtname));
+						if(usercond!=null)
+							rb.addRule(GoalProcessingRules.createAchievegoalSucceededUserRule(usercond, gtname));
 					}
 				}
 				
@@ -392,8 +422,9 @@ public class OAVBDIModelLoader
 					Object maintain = state.getAttributeValue(mgoal, OAVBDIMetaModel.maintaingoal_has_maintaincondition);
 					if(maintain!=null)
 					{
-						ICondition usercond = (ICondition)state.getAttributeValue(maintain, OAVBDIMetaModel.expression_has_content);						
-						rb.addRule(GoalProcessingRules.createMaintaingoalProcessingUserRule(usercond, gtname));
+						ICondition usercond = (ICondition)state.getAttributeValue(maintain, OAVBDIMetaModel.expression_has_content);						if(usercond!=null)
+						if(usercond!=null)
+							rb.addRule(GoalProcessingRules.createMaintaingoalProcessingUserRule(usercond, gtname));
 					}
 					
 					Object target = state.getAttributeValue(mgoal, OAVBDIMetaModel.maintaingoal_has_targetcondition);
@@ -401,7 +432,8 @@ public class OAVBDIModelLoader
 					if(target!=null)
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
-						rb.addRule(GoalProcessingRules.createMaintaingoalSucceededUserRule(usercond, gtname));
+						if(usercond!=null)
+							rb.addRule(GoalProcessingRules.createMaintaingoalSucceededUserRule(usercond, gtname));
 					}
 				}
 				
@@ -431,7 +463,8 @@ public class OAVBDIModelLoader
 					if(create!=null)
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
-						rb.addRule(PlanRules.createPlanCreationUserRule(usercond, ptname));
+						if(usercond!=null)
+							rb.addRule(PlanRules.createPlanCreationUserRule(usercond, ptname));
 					}
 				}
 				
@@ -439,7 +472,8 @@ public class OAVBDIModelLoader
 				if(context!=null)
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
-					rb.addRule(PlanRules.createPlanContextInvalidUserRule(usercond, ptname));
+					if(usercond!=null)
+						rb.addRule(PlanRules.createPlanContextInvalidUserRule(usercond, ptname));
 				}
 				
 				// Create rules for dynamic parameter values.

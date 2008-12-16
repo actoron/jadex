@@ -46,6 +46,9 @@ public class OAVCapabilityModel implements IAgentModel
 	/** The last modified date. */
 	protected long	lastmod;
 	
+	/** The last checked date (when the file date was last read). */
+	protected long	lastcheck;
+	
 	/** The check report. */
 	protected Report	report;
 	
@@ -262,6 +265,23 @@ public class OAVCapabilityModel implements IAgentModel
 	
 	//-------- methods --------
 
+	/**
+	 *  Get the last check date.
+	 */
+	public long getLastChecked()
+	{
+		return this.lastcheck;
+	}
+	
+	/**
+	 *  Set the last modified date.
+	 *  @return The last modified date.
+	 */
+	public void	setLastChecked(long lastcheck)
+	{
+		this.lastcheck	= lastcheck;
+	}
+	
 	/**
 	 *  Get the state.
 	 *  @return The state.
