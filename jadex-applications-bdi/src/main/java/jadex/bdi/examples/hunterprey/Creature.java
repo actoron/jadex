@@ -309,7 +309,7 @@ public abstract class Creature extends WorldObject
 	 */
 	public int getDistance(WorldObject a)
 	{
-		return getDistance(getLocation(), a.getLocation());
+		return getLocationDistance(getLocation(), a.getLocation());
 	}
 
 	/**
@@ -318,14 +318,14 @@ public abstract class Creature extends WorldObject
 	 */
 	public int getDistance(WorldObject a, WorldObject b)
 	{
-		return getDistance(a.getLocation(), b.getLocation());
+		return getLocationDistance(a.getLocation(), b.getLocation());
 	}
 
 	/**
 	 *  Get the distance between two locations.
 	 *  @return The number of moves required to move between the locations.
 	 */
-	public int getDistance(Location a, Location b)
+	public int getLocationDistance(Location a, Location b)
 	{
 		int dx = Math.abs(a.getX() - b.getX());
 		int dy = Math.abs(a.getY() - b.getY());
@@ -389,7 +389,7 @@ public abstract class Creature extends WorldObject
 	 */
 	public String[] getDirections(Location a, Location b)
 	{
-		int distance = getDistance(a, b);
+		int distance = getLocationDistance(a, b);
 		ArrayList directions = new ArrayList();
 		directions.add(RequestMove.DIRECTION_UP);
 		directions.add(RequestMove.DIRECTION_DOWN);
@@ -398,7 +398,7 @@ public abstract class Creature extends WorldObject
 		for(Iterator i = directions.iterator(); i.hasNext();)
 		{
 			// Remove, if direction is not towards second location.
-			if(getDistance(createLocation(a, (String)i.next()), b) >= distance)
+			if(getLocationDistance(createLocation(a, (String)i.next()), b) >= distance)
 			{
 				i.remove();
 			}
@@ -423,7 +423,7 @@ public abstract class Creature extends WorldObject
 		{
 			public int compare(Object o1, Object o2)
 			{
-				return getDistance(loc, ((WorldObject)o1).getLocation()) - getDistance(loc, ((WorldObject)o2).getLocation());
+				return getLocationDistance(loc, ((WorldObject)o1).getLocation()) - getLocationDistance(loc, ((WorldObject)o2).getLocation());
 			}
 		});
 	}
@@ -460,4 +460,24 @@ public abstract class Creature extends WorldObject
 		return (String[])posdirs.toArray(new String[posdirs.size()]);
 	}
 
+	/**
+	 *  Update the creature.
+	 */
+	public void update(Creature creature)
+	{
+		if(getAge()!=creature.getAge())
+			setAge(creature.getAge());
+		if(getPoints()!=creature.getPoints())
+			setPoints(creature.getPoints());
+		if(getName().equals(creature.getName()))
+			setName(creature.getName());
+		if(getVisionRange()!=creature.getVisionRange())
+			setVisionRange(creature.getVisionRange());
+		if(getWorldHeight()!=creature.getWorldHeight())
+			setWorldHeight(creature.getWorldHeight());
+		if(getWorldWidth()!=creature.getWorldWidth())
+			setWorldWidth(creature.getWorldWidth());
+		if(getLeaseticks()!=creature.getLeaseticks())
+			setWorldWidth(creature.getLeaseticks());
+	}
 }

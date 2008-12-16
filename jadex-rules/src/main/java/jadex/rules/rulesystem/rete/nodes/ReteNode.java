@@ -74,11 +74,6 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	{
 //		System.out.println("Value added: "+id+" "+type);
 		
-		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
-		{
-			System.out.println("addedRETE: "+id);
-		}
-		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
 		

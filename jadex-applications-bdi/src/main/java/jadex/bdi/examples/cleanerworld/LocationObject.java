@@ -37,9 +37,9 @@ public abstract class LocationObject implements Cloneable
 	 */
 	public LocationObject(String id, Location location)
 	{
+		pcs = new SimplePropertyChangeSupport(this);
 		setId(id);
 		setLocation(location);
-		pcs = new SimplePropertyChangeSupport(this);
 	}
 
 	//-------- accessor methods --------

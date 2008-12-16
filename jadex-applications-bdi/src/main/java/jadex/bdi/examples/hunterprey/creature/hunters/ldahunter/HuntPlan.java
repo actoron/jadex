@@ -72,9 +72,9 @@ public class HuntPlan extends Plan {
     to = prey!=null?prey.getLocation():jf.getBestLocation(); 
     pf.update(jf, myLoc, to.getX(), to.getY());
     
-    while(myself.getDistance(myLoc, to)>1 && jf.getNearerLocation(to))  {/**/}
+    while(myself.getLocationDistance(myLoc, to)>1 && jf.getNearerLocation(to))  {/**/}
     
-    if(myself.getDistance(myLoc, to)==1) {
+    if(myself.getLocationDistance(myLoc, to)==1) {
       String dirs[] = myself.getDirections(myLoc, to);
       if(dirs.length>0) dir = dirs[0];
     } 

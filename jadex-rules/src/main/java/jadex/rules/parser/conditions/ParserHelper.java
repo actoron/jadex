@@ -32,7 +32,7 @@ public class ParserHelper
 		catch(Exception e)
 //		catch(RecognitionException e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 		if(ret==null)

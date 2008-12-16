@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2008-11-04 22:34:11
+// $ANTLR 3.0.1 C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2008-12-16 15:48:54
 
 package jadex.rules.parser.conditions;
 
@@ -6958,42 +6958,45 @@ public class ClipsJadexParser extends Parser {
 
             match(input,27,FOLLOW_27_in_functionCall936); 
             
-            		try
-            		{
-            			IFunction func;
-            			if("jadex.rules.rulesystem.rules.functions.MethodCallFunction".equals(fn))
-            			{
-            				String clazzname = (String)exps.remove(0);
-            				String methodname = (String)exps.remove(0);
-            				
-            				Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
-            				Method[] methods	= SReflect.getMethods(clazz, methodname);
-            				Method	method;
-            	
-            				// Find one matching regardless of param types (hack???). 
-            				// First param is object on which function will be called. 
-            				if(methods.length==1 && methods[0].getParameterTypes().length==exps.size()-1)
-            				{
-            					method	= methods[0];
-            				}
-            				else
-            				{
-            					throw new RuntimeException("Cannot decide which method to use.");
-                				}
-                				
-            				func = new MethodCallFunction(method);
-            			}
-            			else
-            			{
-            				func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
-            			}
-            			
-            			fc = new FunctionCall(func, exps);
-            		}
-            		catch(Exception e)
-            		{ 
-            			throw new RuntimeException("Function not found: "+fn);
-            		}
+            		IFunction func = null;
+                        	if("jadex.rules.rulesystem.rules.functions.MethodCallFunction".equals(fn))
+                        	{
+                        		String clazzname = (String)exps.remove(0);
+                        		String methodname = (String)exps.remove(0);
+                        				
+                        		Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
+                        		Method[] methods	= SReflect.getMethods(clazz, methodname);
+                        		Method	method = null;
+                        	
+                        		// Find one matching regardless of param types (hack???). 
+                        		// First param is object on which function will be called. 
+                        		for(int i=0; i<methods.length && method==null; i++)
+                        		{
+                        			if(methods[i].getParameterTypes().length==exps.size()-1)
+                        			{
+                        				method	= methods[i];
+                        			}
+                        		}
+                        				
+                        		if(method!=null)	
+                        			func = new MethodCallFunction(method);
+                        	}
+                        	else
+                        	{
+                        		try
+                        		{
+                        			func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
+                        		}
+                        		catch(Exception e)
+                        		{
+                        			// nop.
+                        		}
+                        	}
+                        			
+                        	if(func==null)
+                        		throw new RuntimeException("Function not found: "+fn);
+                        			
+                        	fc = new FunctionCall(func, exps);
             	
 
             }
@@ -7011,7 +7014,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start operatorCall
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:507:1: operatorCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:503:1: operatorCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' ;
     public final FunctionCall operatorCall(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         FunctionCall fc = null;
 
@@ -7023,11 +7026,11 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:508:2: ( '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:508:4: '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')'
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:2: ( '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:4: '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')'
             {
             match(input,25,FOLLOW_25_in_operatorCall957); 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:508:11: (op= operator )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:11: (op= operator )?
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -7036,7 +7039,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt22) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:508:11: op= operator
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:11: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_operatorCall962);
                     op=operator();
@@ -7077,7 +7080,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start parameter
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:515:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );
     public final Object parameter(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         Object val = null;
 
@@ -7091,7 +7094,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:516:2: (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:512:2: (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] )
             int alt23=4;
             switch ( input.LA(1) ) {
             case CharacterLiteral:
@@ -7153,7 +7156,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("515:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 5, input);
+                            new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 5, input);
 
                         throw nvae;
                     }
@@ -7171,7 +7174,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("515:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 6, input);
+                            new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 6, input);
 
                         throw nvae;
                     }
@@ -7187,7 +7190,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("515:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 3, input);
+                        new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 3, input);
 
                     throw nvae;
                 }
@@ -7196,14 +7199,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("515:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 0, input);
+                    new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 0, input);
 
                 throw nvae;
             }
 
             switch (alt23) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:516:4: tmp1= constant
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:512:4: tmp1= constant
                     {
                     pushFollow(FOLLOW_constant_in_parameter998);
                     tmp1=constant();
@@ -7214,7 +7217,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:517:4: tmp2= variable[null, vars]
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:513:4: tmp2= variable[null, vars]
                     {
                     pushFollow(FOLLOW_variable_in_parameter1008);
                     tmp2=variable(null,  vars);
@@ -7225,7 +7228,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:518:4: {...}?tmp3= functionCall[tmodel, vars]
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:514:4: {...}?tmp3= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "parameter", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -7239,7 +7242,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:519:4: tmp4= operatorCall[tmodel, vars]
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:515:4: tmp4= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_parameter1030);
                     tmp4=operatorCall(tmodel,  vars);
@@ -7264,7 +7267,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start constant
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:522:1: constant returns [Object val] : tmp= literal ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:518:1: constant returns [Object val] : tmp= literal ;
     public final Object constant() throws RecognitionException {
         Object val = null;
 
@@ -7272,8 +7275,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:523:2: (tmp= literal )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:523:4: tmp= literal
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:519:2: (tmp= literal )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:519:4: tmp= literal
             {
             pushFollow(FOLLOW_literal_in_constant1051);
             tmp=literal();
@@ -7296,7 +7299,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start variable
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:526:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:522:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );
     public final Variable variable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7304,7 +7307,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:527:2: (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:523:2: (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] )
             int alt24=2;
             int LA24_0 = input.LA(1);
 
@@ -7316,13 +7319,13 @@ public class ClipsJadexParser extends Parser {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("526:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );", 24, 0, input);
+                    new NoViableAltException("522:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );", 24, 0, input);
 
                 throw nvae;
             }
             switch (alt24) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:527:4: tmp= singleFieldVariable[type, vars]
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:523:4: tmp= singleFieldVariable[type, vars]
                     {
                     pushFollow(FOLLOW_singleFieldVariable_in_variable1074);
                     tmp=singleFieldVariable(type,  vars);
@@ -7333,7 +7336,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:528:4: tmp= multiFieldVariable[type, vars]
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:524:4: tmp= multiFieldVariable[type, vars]
                     {
                     pushFollow(FOLLOW_multiFieldVariable_in_variable1084);
                     tmp=multiFieldVariable(type,  vars);
@@ -7358,7 +7361,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start singleFieldVariable
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:531:1: singleFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '?' id= identifier ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:527:1: singleFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '?' id= identifier ;
     public final Variable singleFieldVariable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7366,8 +7369,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:532:2: ( '?' id= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:532:4: '?' id= identifier
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:528:2: ( '?' id= identifier )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:528:4: '?' id= identifier
             {
             match(input,33,FOLLOW_33_in_singleFieldVariable1104); 
             pushFollow(FOLLOW_identifier_in_singleFieldVariable1108);
@@ -7403,7 +7406,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start multiFieldVariable
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:548:1: multiFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '$?' id= identifier ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:544:1: multiFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '$?' id= identifier ;
     public final Variable multiFieldVariable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7411,8 +7414,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:2: ( '$?' id= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:4: '$?' id= identifier
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:545:2: ( '$?' id= identifier )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:545:4: '$?' id= identifier
             {
             match(input,34,FOLLOW_34_in_multiFieldVariable1130); 
             pushFollow(FOLLOW_identifier_in_multiFieldVariable1134);
@@ -7448,7 +7451,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start typename
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:565:1: typename returns [String id] : tmp= identifier ( '.' tmp= identifier )* ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:561:1: typename returns [String id] : tmp= identifier ( '.' tmp= identifier )* ;
     public final String typename() throws RecognitionException {
         String id = null;
 
@@ -7456,8 +7459,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:566:2: (tmp= identifier ( '.' tmp= identifier )* )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:567:2: tmp= identifier ( '.' tmp= identifier )*
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:562:2: (tmp= identifier ( '.' tmp= identifier )* )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:563:2: tmp= identifier ( '.' tmp= identifier )*
             {
             
             		StringBuffer buf = new StringBuffer();
@@ -7469,7 +7472,7 @@ public class ClipsJadexParser extends Parser {
             
             		buf.append(tmp.getText());
             	
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:574:2: ( '.' tmp= identifier )*
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:570:2: ( '.' tmp= identifier )*
             loop25:
             do {
                 int alt25=2;
@@ -7482,7 +7485,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt25) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:574:3: '.' tmp= identifier
+            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:570:3: '.' tmp= identifier
             	    {
             	    match(input,36,FOLLOW_36_in_typename1168); 
             	    pushFollow(FOLLOW_identifier_in_typename1172);
@@ -7520,7 +7523,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start slotname
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:584:1: slotname returns [String id] : tmp= identifier ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:580:1: slotname returns [String id] : tmp= identifier ;
     public final String slotname() throws RecognitionException {
         String id = null;
 
@@ -7528,8 +7531,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:585:2: (tmp= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:585:4: tmp= identifier
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:581:2: (tmp= identifier )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:581:4: tmp= identifier
             {
             pushFollow(FOLLOW_identifier_in_slotname1199);
             tmp=identifier();
@@ -7552,7 +7555,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start methodname
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:588:1: methodname returns [String id] : tmp= identifier ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:584:1: methodname returns [String id] : tmp= identifier ;
     public final String methodname() throws RecognitionException {
         String id = null;
 
@@ -7560,8 +7563,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:589:2: (tmp= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:589:4: tmp= identifier
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:585:2: (tmp= identifier )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:585:4: tmp= identifier
             {
             pushFollow(FOLLOW_identifier_in_methodname1219);
             tmp=identifier();
@@ -7584,7 +7587,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start functionName
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:592:1: functionName returns [String id] : tmp= typename ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:588:1: functionName returns [String id] : tmp= typename ;
     public final String functionName() throws RecognitionException {
         String id = null;
 
@@ -7592,8 +7595,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:2: (tmp= typename )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:4: tmp= typename
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:589:2: (tmp= typename )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:589:4: tmp= typename
             {
             pushFollow(FOLLOW_typename_in_functionName1238);
             tmp=typename();
@@ -7616,7 +7619,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start literal
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:596:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:592:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
     public final Object literal() throws RecognitionException {
         Object val = null;
 
@@ -7627,7 +7630,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:597:2: (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:2: (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
             int alt26=6;
             switch ( input.LA(1) ) {
             case 38:
@@ -7643,7 +7646,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("596:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 1, input);
+                        new NoViableAltException("592:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 1, input);
 
                     throw nvae;
                 }
@@ -7683,14 +7686,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("596:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 0, input);
+                    new NoViableAltException("592:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 0, input);
 
                 throw nvae;
             }
 
             switch (alt26) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:597:4: lit= floatingPointLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:4: lit= floatingPointLiteral
                     {
                     pushFollow(FOLLOW_floatingPointLiteral_in_literal1258);
                     lit=floatingPointLiteral();
@@ -7701,7 +7704,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:598:4: lit= integerLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:594:4: lit= integerLiteral
                     {
                     pushFollow(FOLLOW_integerLiteral_in_literal1267);
                     lit=integerLiteral();
@@ -7712,7 +7715,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:599:4: CharacterLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:595:4: CharacterLiteral
                     {
                     CharacterLiteral2=(Token)input.LT(1);
                     match(input,CharacterLiteral,FOLLOW_CharacterLiteral_in_literal1274); 
@@ -7721,7 +7724,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:600:4: StringLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:596:4: StringLiteral
                     {
                     StringLiteral3=(Token)input.LT(1);
                     match(input,StringLiteral,FOLLOW_StringLiteral_in_literal1281); 
@@ -7730,7 +7733,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:601:4: BooleanLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:597:4: BooleanLiteral
                     {
                     BooleanLiteral4=(Token)input.LT(1);
                     match(input,BooleanLiteral,FOLLOW_BooleanLiteral_in_literal1288); 
@@ -7739,7 +7742,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:4: 'null'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:598:4: 'null'
                     {
                     match(input,37,FOLLOW_37_in_literal1295); 
                     val = null;
@@ -7761,7 +7764,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start floatingPointLiteral
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:605:1: floatingPointLiteral returns [Object val] : (sign= ( '+' | '-' ) )? FloatingPointLiteral ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:601:1: floatingPointLiteral returns [Object val] : (sign= ( '+' | '-' ) )? FloatingPointLiteral ;
     public final Object floatingPointLiteral() throws RecognitionException {
         Object val = null;
 
@@ -7769,10 +7772,10 @@ public class ClipsJadexParser extends Parser {
         Token FloatingPointLiteral5=null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:2: ( (sign= ( '+' | '-' ) )? FloatingPointLiteral )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:4: (sign= ( '+' | '-' ) )? FloatingPointLiteral
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:2: ( (sign= ( '+' | '-' ) )? FloatingPointLiteral )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:4: (sign= ( '+' | '-' ) )? FloatingPointLiteral
             {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:8: (sign= ( '+' | '-' ) )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:8: (sign= ( '+' | '-' ) )?
             int alt27=2;
             int LA27_0 = input.LA(1);
 
@@ -7781,7 +7784,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt27) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:8: sign= ( '+' | '-' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:8: sign= ( '+' | '-' )
                     {
                     sign=(Token)input.LT(1);
                     if ( (input.LA(1)>=38 && input.LA(1)<=39) ) {
@@ -7819,7 +7822,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start integerLiteral
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:609:1: integerLiteral returns [Object val] : (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:605:1: integerLiteral returns [Object val] : (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) ;
     public final Object integerLiteral() throws RecognitionException {
         Object val = null;
 
@@ -7829,10 +7832,10 @@ public class ClipsJadexParser extends Parser {
         Token DecimalLiteral8=null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:2: ( (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:4: (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:2: ( (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:4: (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral )
             {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:8: (sign= ( '+' | '-' ) )?
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:8: (sign= ( '+' | '-' ) )?
             int alt28=2;
             int LA28_0 = input.LA(1);
 
@@ -7841,7 +7844,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt28) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:8: sign= ( '+' | '-' )
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:8: sign= ( '+' | '-' )
                     {
                     sign=(Token)input.LT(1);
                     if ( (input.LA(1)>=38 && input.LA(1)<=39) ) {
@@ -7860,7 +7863,7 @@ public class ClipsJadexParser extends Parser {
 
             }
 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:20: ( HexLiteral | OctalLiteral | DecimalLiteral )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:20: ( HexLiteral | OctalLiteral | DecimalLiteral )
             int alt29=3;
             switch ( input.LA(1) ) {
             case HexLiteral:
@@ -7880,14 +7883,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("610:20: ( HexLiteral | OctalLiteral | DecimalLiteral )", 29, 0, input);
+                    new NoViableAltException("606:20: ( HexLiteral | OctalLiteral | DecimalLiteral )", 29, 0, input);
 
                 throw nvae;
             }
 
             switch (alt29) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:21: HexLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:21: HexLiteral
                     {
                     HexLiteral6=(Token)input.LT(1);
                     match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1349); 
@@ -7896,7 +7899,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:611:4: OctalLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:607:4: OctalLiteral
                     {
                     OctalLiteral7=(Token)input.LT(1);
                     match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1356); 
@@ -7905,7 +7908,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:612:4: DecimalLiteral
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:608:4: DecimalLiteral
                     {
                     DecimalLiteral8=(Token)input.LT(1);
                     match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1363); 
@@ -7932,7 +7935,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start operator
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:615:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:611:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );
     public final IOperator operator() throws RecognitionException {
         IOperator operator = null;
 
@@ -7940,7 +7943,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:616:2: (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:612:2: (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' )
             int alt30=9;
             switch ( input.LA(1) ) {
             case 48:
@@ -7990,14 +7993,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("615:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );", 30, 0, input);
+                    new NoViableAltException("611:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );", 30, 0, input);
 
                 throw nvae;
             }
 
             switch (alt30) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:616:4: tmp= equalOperator
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:612:4: tmp= equalOperator
                     {
                     pushFollow(FOLLOW_equalOperator_in_operator1383);
                     tmp=equalOperator();
@@ -8008,7 +8011,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:617:4: '!='
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:613:4: '!='
                     {
                     match(input,40,FOLLOW_40_in_operator1391); 
                     operator = IOperator.NOTEQUAL;
@@ -8016,7 +8019,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:618:4: '~'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:614:4: '~'
                     {
                     match(input,41,FOLLOW_41_in_operator1398); 
                     operator = IOperator.NOTEQUAL;
@@ -8024,7 +8027,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:4: '>'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:615:4: '>'
                     {
                     match(input,42,FOLLOW_42_in_operator1405); 
                     operator = IOperator.GREATER;
@@ -8032,7 +8035,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:620:4: '<'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:616:4: '<'
                     {
                     match(input,43,FOLLOW_43_in_operator1412); 
                     operator = IOperator.LESS;
@@ -8040,7 +8043,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:621:4: '>='
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:617:4: '>='
                     {
                     match(input,44,FOLLOW_44_in_operator1419); 
                     operator = IOperator.GREATEROREQUAL;
@@ -8048,7 +8051,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:622:4: '<='
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:618:4: '<='
                     {
                     match(input,45,FOLLOW_45_in_operator1426); 
                     operator = IOperator.LESSOREQUAL;
@@ -8056,7 +8059,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:4: 'contains'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:4: 'contains'
                     {
                     match(input,46,FOLLOW_46_in_operator1433); 
                     operator = IOperator.CONTAINS;
@@ -8064,7 +8067,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 9 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:624:4: 'excludes'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:620:4: 'excludes'
                     {
                     match(input,47,FOLLOW_47_in_operator1440); 
                     operator = IOperator.EXCLUDES;
@@ -8086,13 +8089,13 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start equalOperator
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:1: equalOperator returns [IOperator operator] : '==' ;
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:1: equalOperator returns [IOperator operator] : '==' ;
     public final IOperator equalOperator() throws RecognitionException {
         IOperator operator = null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:628:2: ( '==' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:628:4: '=='
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:624:2: ( '==' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:624:4: '=='
             {
             match(input,48,FOLLOW_48_in_equalOperator1457); 
             operator = IOperator.EQUAL;
@@ -8112,14 +8115,14 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start identifier
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:631:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );
+    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );
     public final Token identifier() throws RecognitionException {
         Token identifier = null;
 
         Token tmp=null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:632:2: (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' )
+            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:628:2: (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' )
             int alt31=6;
             switch ( input.LA(1) ) {
             case Identifiertoken:
@@ -8154,14 +8157,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("631:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );", 31, 0, input);
+                    new NoViableAltException("627:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );", 31, 0, input);
 
                 throw nvae;
             }
 
             switch (alt31) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:632:4: tmp= Identifiertoken
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:628:4: tmp= Identifiertoken
                     {
                     tmp=(Token)input.LT(1);
                     match(input,Identifiertoken,FOLLOW_Identifiertoken_in_identifier1477); 
@@ -8170,7 +8173,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:633:4: tmp= 'test'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:629:4: tmp= 'test'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,29,FOLLOW_29_in_identifier1486); 
@@ -8179,7 +8182,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:634:4: tmp= 'not'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:630:4: tmp= 'not'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,28,FOLLOW_28_in_identifier1495); 
@@ -8188,7 +8191,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:635:4: tmp= 'and'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:631:4: tmp= 'and'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,26,FOLLOW_26_in_identifier1504); 
@@ -8197,7 +8200,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:636:4: tmp= 'contains'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:632:4: tmp= 'contains'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,46,FOLLOW_46_in_identifier1513); 
@@ -8206,7 +8209,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:637:4: tmp= 'excludes'
+                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:633:4: tmp= 'excludes'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,47,FOLLOW_47_in_identifier1522); 

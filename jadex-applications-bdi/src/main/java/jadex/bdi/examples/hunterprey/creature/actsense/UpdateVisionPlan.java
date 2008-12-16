@@ -1,6 +1,7 @@
 package jadex.bdi.examples.hunterprey.creature.actsense;
 
 import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.examples.hunterprey.Creature;
 import jadex.bdi.examples.hunterprey.CurrentVision;
 import jadex.bdi.examples.hunterprey.Food;
 import jadex.bdi.examples.hunterprey.Hunter;
@@ -68,18 +69,30 @@ public class UpdateVisionPlan extends Plan
 			{
 				IBeliefSet bs = getBeliefbase().getBeliefSet("preys");
 				if(bs.containsFact(seenobs[i]))
-					bs.updateFact(seenobs[i]);
+				{
+//					bs.updateFact(seenobs[i]);
+					Prey p = (Prey)bs.getFact(seenobs[i]);
+					p.update((Creature)seenobs[i]);
+				}
 				else
+				{
 					bs.addFact(seenobs[i]);
+				}
 				//getBeliefbase().getBeliefSet("preys").updateOrAddFact(seenobs[i]);
 			}
 			else if(seenobs[i] instanceof Hunter)
 			{
 				IBeliefSet bs = getBeliefbase().getBeliefSet("hunters");
 				if(bs.containsFact(seenobs[i]))
-					bs.updateFact(seenobs[i]);
+				{
+//					bs.updateFact(seenobs[i]);
+					Hunter h = (Hunter)bs.getFact(seenobs[i]);
+					h.update((Creature)seenobs[i]);
+				}
 				else
+				{
 					bs.addFact(seenobs[i]);
+				}
 				//getBeliefbase().getBeliefSet("hunters").updateOrAddFact(seenobs[i]);
 			}
 			else if(seenobs[i] instanceof Obstacle)

@@ -186,8 +186,28 @@
 			<deliberation cardinality="1">
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">
-					$beliefbase.my_location.getDistance($goal.waste.getLocation())
-					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+					// $beliefbase.my_location.getDistance($goal.waste.getLocation())
+					// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+					
+					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
+					?mbelief = (mbelief (element_has_name "my_location"))
+					
+					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+					?waste = (jadex.bdi.examples.cleanerworld.Waste (location ?wasteloc))
+					
+					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?inwaste))
+					?ringoal = (goal (parameterelement_has_parameters contains ?rinparam))
+					?inwaste = (jadex.bdi.examples.cleanerworld.Waste (location ?inwasteloc &amp; 
+						:(&lt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction 
+							"jadex.bdi.examples.cleanerworld.Location" "getDistance" ?myloc ?wasteloc)
+							(jadex.rules.rulesystem.rules.functions.MethodCallFunction 
+							"jadex.bdi.examples.cleanerworld.Location" "getDistance" ?myloc ?inwasteloc)  
+					)))
+	
+					// Does not work because Locations are not directly in state.
+					// ?wasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) ?wastedist))
+					// ?inwasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &lt; ?wastedist))				
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. - ->
@@ -232,6 +252,13 @@
  				from $beliefbase.wastebins
 				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
 			</failurecondition> -->
+			<dropcondition>
+				?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
+				?wastebin = (jadex.bdi.examples.cleanerworld.Wastebin (isFull() true)) 
+					//&amp; :(jadex.rules.rulesystem.rules.functions.MethodCallFunction 
+					//	"jadex.bdi.examples.cleanerworld.Wastebin" "isFull" ?wastebin)))
+				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			</dropcondition>
 		</achievegoal>
 
 		<!-- Try to move to the specified location. -->

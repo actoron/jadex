@@ -291,6 +291,7 @@
 							?loc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &gt; ?otherdist))
 						)
 					)
+					// todo: fix not condition, should not use Location object condition, locations are not directly in state
 				</value>
 			</parameter>
 		</querygoal>
@@ -316,6 +317,7 @@
 							?loc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &gt; ?otherdist))
 						)
 					)
+					// todo: fix not condition, should not use Location object condition, locations are not directly in state
 				</value>
 			</parameter>
 		</querygoal>

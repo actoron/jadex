@@ -236,10 +236,10 @@ public class OAVEventHandler
 	 */
 	public void objectAdded(Object id, OAVObjectType type, boolean root)
 	{
-		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
-		{
-			System.out.println("added: "+id);
-		}
+//		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
+//		{
+//			System.out.println("added: "+id);
+//		}
 		
 		if(!listeners.isEmpty())
 		{
@@ -268,10 +268,10 @@ public class OAVEventHandler
 	 */
 	public void objectRemoved(Object id, OAVObjectType type/*, Map content*/)
 	{
-		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
-		{
-			System.out.println("removed: "+id);
-		}
+//		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
+//		{
+//			System.out.println("removed: "+id);
+//		}
 		
 		/*if(id.toString().indexOf("id=Chargingstation")!=-1)
 		{

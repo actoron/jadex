@@ -1232,11 +1232,6 @@ public class OAVState	implements IOAVState
 	 */
 	public void	addAttributeValue(Object id, OAVAttributeType attribute, Object value)
 	{
-		if(value!=null && value.getClass().getName().indexOf("Wastebin")!=-1)
-		{
-			System.out.println("add: "+id);
-		}
-		
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObject(id);

@@ -450,6 +450,7 @@ public class ReflectNode	extends ExpressionNode
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					throw new RuntimeException(e);
 				}
 			}
