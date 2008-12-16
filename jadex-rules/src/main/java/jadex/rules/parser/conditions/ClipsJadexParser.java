@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2008-12-16 15:48:54
+// $ANTLR 3.0.1 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2008-12-16 16:27:29
 
 package jadex.rules.parser.conditions;
 
@@ -51,7 +51,7 @@ public class ClipsJadexParser extends Parser {
         
 
     public String[] getTokenNames() { return tokenNames; }
-    public String getGrammarFileName() { return "C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g"; }
+    public String getGrammarFileName() { return "C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g"; }
 
     
     protected static void adaptConditionType(Variable var, OAVObjectType type)
@@ -197,11 +197,33 @@ public class ClipsJadexParser extends Parser {
     	return ret;
     }
     
+        protected List	errors;
+        public void displayRecognitionError(String[] tokenNames, RecognitionException e)
+        {
+            if(errors!=null)
+            {
+                String hdr = getErrorHeader(e);
+                String msg = getErrorMessage(e, tokenNames);
+            	errors.add(hdr + " " + msg);
+            }
+            else
+            {
+            	super.displayRecognitionError(tokenNames, e);
+            }
+        }
+        public void setErrorList(List errors)
+        {
+            this.errors	= errors;
+        }
+        public List getErrorList()
+        {
+            return errors;
+        }
 
 
 
     // $ANTLR start rhs
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:174:1: rhs[OAVTypeModel tmodel] returns [ICondition condition] : (c= ce[tmodel, vars] )+ EOF ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:196:1: rhs[OAVTypeModel tmodel] returns [ICondition condition] : (c= ce[tmodel, vars] )+ EOF ;
     public final ICondition rhs(OAVTypeModel tmodel) throws RecognitionException {
         ICondition condition = null;
 
@@ -209,15 +231,15 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:175:2: ( (c= ce[tmodel, vars] )+ EOF )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:176:2: (c= ce[tmodel, vars] )+ EOF
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:197:2: ( (c= ce[tmodel, vars] )+ EOF )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:198:2: (c= ce[tmodel, vars] )+ EOF
             {
             
             		List conds = new ArrayList();
             		Map vars = new HashMap();
             		
             	
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:181:2: (c= ce[tmodel, vars] )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:203:2: (c= ce[tmodel, vars] )+
             int cnt1=0;
             loop1:
             do {
@@ -231,7 +253,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt1) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:181:3: c= ce[tmodel, vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:203:3: c= ce[tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_ce_in_rhs53);
             	    c=ce(tmodel,  vars);
@@ -276,7 +298,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start ce
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:195:1: ce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:217:1: ce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] );
     public final ICondition ce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -284,12 +306,12 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:196:2: (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:218:2: (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] )
             int alt2=5;
             alt2 = dfa2.predict(input);
             switch (alt2) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:196:4: tmp= andce[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:218:4: tmp= andce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_andce_in_ce89);
                     tmp=andce(tmodel,  vars);
@@ -300,7 +322,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:197:4: tmp= notce[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:219:4: tmp= notce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_notce_in_ce101);
                     tmp=notce(tmodel,  vars);
@@ -311,7 +333,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:198:4: tmp= testce[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:220:4: tmp= testce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_testce_in_ce113);
                     tmp=testce(tmodel,  vars);
@@ -322,7 +344,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:199:4: tmp= collectce[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:221:4: tmp= collectce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_collectce_in_ce125);
                     tmp=collectce(tmodel,  vars);
@@ -333,7 +355,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:200:4: {...}?tmp= objectce[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:222:4: {...}?tmp= objectce[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "ce", "SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)");
@@ -361,7 +383,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start andce
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:203:1: andce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'and' (c= ce[$tmodel, vars] )+ ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:225:1: andce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'and' (c= ce[$tmodel, vars] )+ ')' ;
     public final ICondition andce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -369,15 +391,15 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:204:2: ( '(' 'and' (c= ce[$tmodel, vars] )+ ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:205:2: '(' 'and' (c= ce[$tmodel, vars] )+ ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:2: ( '(' 'and' (c= ce[$tmodel, vars] )+ ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:227:2: '(' 'and' (c= ce[$tmodel, vars] )+ ')'
             {
             
             		List conds = new ArrayList();
             	
             match(input,25,FOLLOW_25_in_andce163); 
             match(input,26,FOLLOW_26_in_andce165); 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:208:12: (c= ce[$tmodel, vars] )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:230:12: (c= ce[$tmodel, vars] )+
             int cnt3=0;
             loop3:
             do {
@@ -391,7 +413,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt3) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:208:13: c= ce[$tmodel, vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:230:13: c= ce[$tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_ce_in_andce170);
             	    c=ce(tmodel,  vars);
@@ -433,7 +455,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start notce
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:218:1: notce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'not' c= ce[$tmodel, vars] ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:240:1: notce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'not' c= ce[$tmodel, vars] ')' ;
     public final ICondition notce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -441,8 +463,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:219:2: ( '(' 'not' c= ce[$tmodel, vars] ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:219:4: '(' 'not' c= ce[$tmodel, vars] ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:241:2: ( '(' 'not' c= ce[$tmodel, vars] ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:241:4: '(' 'not' c= ce[$tmodel, vars] ')'
             {
             match(input,25,FOLLOW_25_in_notce199); 
             match(input,28,FOLLOW_28_in_notce201); 
@@ -470,7 +492,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start testce
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:225:1: testce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:247:1: testce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' ;
     public final ICondition testce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -478,20 +500,20 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:2: ( '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:4: '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:248:2: ( '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:248:4: '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')'
             {
             match(input,25,FOLLOW_25_in_testce227); 
             match(input,29,FOLLOW_29_in_testce229); 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:15: ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:248:15: ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] )
             int alt4=2;
             alt4 = dfa4.predict(input);
             switch (alt4) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:16: ({...}?call= functionCall[tmodel, vars] )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:248:16: ({...}?call= functionCall[tmodel, vars] )
                     {
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:16: ({...}?call= functionCall[tmodel, vars] )
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:17: {...}?call= functionCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:248:16: ({...}?call= functionCall[tmodel, vars] )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:248:17: {...}?call= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "testce", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -507,7 +529,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:119: call= operatorCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:248:119: call= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_testce246);
                     call=operatorCall(tmodel,  vars);
@@ -539,7 +561,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start collectce
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:232:1: collectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:1: collectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' ;
     public final ICondition collectce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -551,13 +573,13 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:233:2: ( (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:234:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:255:2: ( (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:256:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')'
             {
             
             		List conds = new ArrayList();
             	
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:237:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:259:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -566,7 +588,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:237:3: mfv= multiFieldVariable[null, vars] ( '<-' | '=' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:259:3: mfv= multiFieldVariable[null, vars] ( '<-' | '=' )
                     {
                     pushFollow(FOLLOW_multiFieldVariable_in_collectce277);
                     mfv=multiFieldVariable(null,  vars);
@@ -590,7 +612,7 @@ public class ClipsJadexParser extends Parser {
 
             match(input,25,FOLLOW_25_in_collectce292); 
             match(input,32,FOLLOW_32_in_collectce294); 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:238:16: (c= ce[$tmodel, vars] )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:260:16: (c= ce[$tmodel, vars] )+
             int cnt6=0;
             loop6:
             do {
@@ -604,7 +626,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt6) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:238:17: c= ce[$tmodel, vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:260:17: c= ce[$tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_ce_in_collectce299);
             	    c=ce(tmodel,  vars);
@@ -626,7 +648,7 @@ public class ClipsJadexParser extends Parser {
                 cnt6++;
             } while (true);
 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:242:8: (pc= predicateConstraint[$tmodel, null, vars] )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:264:8: (pc= predicateConstraint[$tmodel, null, vars] )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -635,7 +657,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:242:8: pc= predicateConstraint[$tmodel, null, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:264:8: pc= predicateConstraint[$tmodel, null, vars]
                     {
                     pushFollow(FOLLOW_predicateConstraint_in_collectce312);
                     pc=predicateConstraint(tmodel,  null,  vars);
@@ -674,7 +696,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start objectce
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:256:1: objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )* ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:278:1: objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )* ')' ;
     public final ICondition objectce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -690,13 +712,13 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:257:2: ( (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )* ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:258:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )* ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:279:2: ( (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )* ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:280:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )* ')'
             {
             
             		List consts = new ArrayList();
             	
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:261:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:283:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )?
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -705,7 +727,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt8) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:261:3: sfv= singleFieldVariable[null, vars] ( '<-' | '=' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:283:3: sfv= singleFieldVariable[null, vars] ( '<-' | '=' )
                     {
                     pushFollow(FOLLOW_singleFieldVariable_in_objectce345);
                     sfv=singleFieldVariable(null,  vars);
@@ -732,7 +754,7 @@ public class ClipsJadexParser extends Parser {
             tn=typename();
             _fsp--;
 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:265:2: (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:287:2: (acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars] | mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars] | fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars] )*
             loop9:
             do {
                 int alt9=4;
@@ -837,7 +859,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt9) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:265:3: acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:287:3: acs= attributeConstraint[tmodel, tmodel.getObjectType(tn), vars]
             	    {
             	    pushFollow(FOLLOW_attributeConstraint_in_objectce375);
             	    acs=attributeConstraint(tmodel,  tmodel.getObjectType(tn),  vars);
@@ -850,7 +872,7 @@ public class ClipsJadexParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:269:4: mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:291:4: mcs= methodConstraint[tmodel, tmodel.getObjectType(tn), vars]
             	    {
             	    pushFollow(FOLLOW_methodConstraint_in_objectce386);
             	    mcs=methodConstraint(tmodel,  tmodel.getObjectType(tn),  vars);
@@ -863,7 +885,7 @@ public class ClipsJadexParser extends Parser {
             	    }
             	    break;
             	case 3 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:273:4: fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:295:4: fcs= functionConstraint[tmodel, tmodel.getObjectType(tn), vars]
             	    {
             	    pushFollow(FOLLOW_functionConstraint_in_objectce397);
             	    fcs=functionConstraint(tmodel,  tmodel.getObjectType(tn),  vars);
@@ -909,7 +931,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start attributeConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:293:1: attributeConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' sn= slotname cs= constraint[tmodel, otype.getAttributeType(sn), vars] ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:315:1: attributeConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' sn= slotname cs= constraint[tmodel, otype.getAttributeType(sn), vars] ')' ;
     public final List attributeConstraint(OAVTypeModel tmodel, OAVObjectType otype, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -919,8 +941,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:294:2: ( '(' sn= slotname cs= constraint[tmodel, otype.getAttributeType(sn), vars] ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:294:4: '(' sn= slotname cs= constraint[tmodel, otype.getAttributeType(sn), vars] ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:316:2: ( '(' sn= slotname cs= constraint[tmodel, otype.getAttributeType(sn), vars] ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:316:4: '(' sn= slotname cs= constraint[tmodel, otype.getAttributeType(sn), vars] ')'
             {
             match(input,25,FOLLOW_25_in_attributeConstraint431); 
             pushFollow(FOLLOW_slotname_in_attributeConstraint435);
@@ -951,7 +973,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start methodConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:300:1: methodConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:322:1: methodConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' ;
     public final List methodConstraint(OAVTypeModel tmodel, OAVObjectType otype, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -963,8 +985,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:301:2: ( '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:302:2: '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:323:2: ( '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:324:2: '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')'
             {
             
             		List exps = new ArrayList();
@@ -975,7 +997,7 @@ public class ClipsJadexParser extends Parser {
             _fsp--;
 
             match(input,25,FOLLOW_25_in_methodConstraint475); 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:305:23: (exp= parameter[tmodel, vars] )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:327:23: (exp= parameter[tmodel, vars] )*
             loop10:
             do {
                 int alt10=2;
@@ -988,7 +1010,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt10) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:305:24: exp= parameter[tmodel, vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:327:24: exp= parameter[tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_parameter_in_methodConstraint479);
             	    exp=parameter(tmodel,  vars);
@@ -1031,7 +1053,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start functionConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:315:1: functionConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:337:1: functionConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' ;
     public final List functionConstraint(OAVTypeModel tmodel, OAVObjectType otype, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -1041,8 +1063,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:316:2: ( '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:317:2: '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:338:2: ( '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:339:2: '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')'
             {
             
             		List exps = new ArrayList();
@@ -1076,7 +1098,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start constraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:326:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:348:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );
     public final List constraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -1087,7 +1109,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:327:2: ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:349:2: ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* )
             int alt12=3;
             switch ( input.LA(1) ) {
             case 33:
@@ -1102,7 +1124,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("326:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );", 12, 1, input);
+                        new NoViableAltException("348:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );", 12, 1, input);
 
                     throw nvae;
                 }
@@ -1120,7 +1142,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("326:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );", 12, 2, input);
+                        new NoViableAltException("348:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );", 12, 2, input);
 
                     throw nvae;
                 }
@@ -1152,28 +1174,28 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("326:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );", 12, 0, input);
+                    new NoViableAltException("348:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );", 12, 0, input);
 
                 throw nvae;
             }
 
             switch (alt12) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:331:2: '?'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:353:2: '?'
                     {
                     match(input,33,FOLLOW_33_in_constraint565); 
 
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:332:4: '$?'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:354:4: '$?'
                     {
                     match(input,34,FOLLOW_34_in_constraint571); 
 
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:333:4: last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:355:4: last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
                     {
                     pushFollow(FOLLOW_singleConstraint_in_constraint579);
                     last=singleConstraint(tmodel,  valuesource,  vars);
@@ -1188,7 +1210,7 @@ public class ClipsJadexParser extends Parser {
                     		else
                     			consts.add(last);
                     	
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:343:2: ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:365:2: ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
                     loop11:
                     do {
                         int alt11=2;
@@ -1201,7 +1223,7 @@ public class ClipsJadexParser extends Parser {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:343:3: ConstraintOperator next= singleConstraint[tmodel, valuesource, vars]
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:365:3: ConstraintOperator next= singleConstraint[tmodel, valuesource, vars]
                     	    {
                     	    ConstraintOperator1=(Token)input.LT(1);
                     	    match(input,ConstraintOperator,FOLLOW_ConstraintOperator_in_constraint588); 
@@ -1272,7 +1294,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start singleConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );
     public final IConstraint singleConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -1280,7 +1302,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:384:2: (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:406:2: (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] )
             int alt13=5;
             switch ( input.LA(1) ) {
             case 48:
@@ -1301,7 +1323,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -1319,7 +1341,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -1337,7 +1359,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -1355,7 +1377,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -1373,7 +1395,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -1391,7 +1413,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -1399,7 +1421,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -1421,7 +1443,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -1439,7 +1461,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -1457,7 +1479,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -1475,7 +1497,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -1493,7 +1515,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -1511,7 +1533,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -1519,7 +1541,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -1547,7 +1569,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 1, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 1, input);
 
                     throw nvae;
                 }
@@ -1586,7 +1608,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -1604,7 +1626,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -1622,7 +1644,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -1640,7 +1662,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -1658,7 +1680,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -1676,7 +1698,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -1684,7 +1706,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -1706,7 +1728,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -1724,7 +1746,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -1742,7 +1764,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -1760,7 +1782,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -1778,7 +1800,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -1796,7 +1818,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -1804,7 +1826,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -1813,7 +1835,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 2, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 2, input);
 
                     throw nvae;
                 }
@@ -1852,7 +1874,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -1870,7 +1892,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -1888,7 +1910,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -1906,7 +1928,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -1924,7 +1946,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -1942,7 +1964,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -1950,7 +1972,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -1972,7 +1994,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -1990,7 +2012,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -2008,7 +2030,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -2026,7 +2048,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -2044,7 +2066,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -2062,7 +2084,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -2070,7 +2092,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -2079,7 +2101,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 3, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 3, input);
 
                     throw nvae;
                 }
@@ -2118,7 +2140,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -2136,7 +2158,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -2154,7 +2176,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -2172,7 +2194,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -2190,7 +2212,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -2208,7 +2230,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -2216,7 +2238,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -2238,7 +2260,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -2256,7 +2278,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -2274,7 +2296,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -2292,7 +2314,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -2310,7 +2332,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -2328,7 +2350,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -2336,7 +2358,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -2345,7 +2367,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 4, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 4, input);
 
                     throw nvae;
                 }
@@ -2370,7 +2392,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -2388,7 +2410,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -2406,7 +2428,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -2424,7 +2446,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -2442,7 +2464,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -2460,7 +2482,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -2468,7 +2490,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -2490,7 +2512,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -2508,7 +2530,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -2526,7 +2548,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -2544,7 +2566,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -2562,7 +2584,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -2580,7 +2602,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -2588,7 +2610,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -2611,7 +2633,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 5, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 5, input);
 
                     throw nvae;
                 }
@@ -2636,7 +2658,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -2654,7 +2676,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -2672,7 +2694,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -2690,7 +2712,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -2708,7 +2730,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -2726,7 +2748,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -2734,7 +2756,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -2756,7 +2778,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -2774,7 +2796,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -2792,7 +2814,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -2810,7 +2832,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -2828,7 +2850,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -2846,7 +2868,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -2854,7 +2876,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -2877,7 +2899,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 6, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 6, input);
 
                     throw nvae;
                 }
@@ -2916,7 +2938,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -2934,7 +2956,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -2952,7 +2974,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -2970,7 +2992,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -2988,7 +3010,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -3006,7 +3028,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -3014,7 +3036,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -3036,7 +3058,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -3054,7 +3076,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -3072,7 +3094,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -3090,7 +3112,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -3108,7 +3130,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -3126,7 +3148,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -3134,7 +3156,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -3143,7 +3165,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 7, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 7, input);
 
                     throw nvae;
                 }
@@ -3182,7 +3204,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -3200,7 +3222,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -3218,7 +3240,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -3236,7 +3258,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -3254,7 +3276,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -3272,7 +3294,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -3280,7 +3302,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -3302,7 +3324,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -3320,7 +3342,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -3338,7 +3360,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -3356,7 +3378,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -3374,7 +3396,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -3392,7 +3414,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -3400,7 +3422,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -3409,7 +3431,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 8, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 8, input);
 
                     throw nvae;
                 }
@@ -3448,7 +3470,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                             throw nvae;
                         }
@@ -3466,7 +3488,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                             throw nvae;
                         }
@@ -3484,7 +3506,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                             throw nvae;
                         }
@@ -3502,7 +3524,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                             throw nvae;
                         }
@@ -3520,7 +3542,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                             throw nvae;
                         }
@@ -3538,7 +3560,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                             throw nvae;
                         }
@@ -3546,7 +3568,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                         throw nvae;
                     }
@@ -3568,7 +3590,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                             throw nvae;
                         }
@@ -3586,7 +3608,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                             throw nvae;
                         }
@@ -3604,7 +3626,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                             throw nvae;
                         }
@@ -3622,7 +3644,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                             throw nvae;
                         }
@@ -3640,7 +3662,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                             throw nvae;
                         }
@@ -3658,7 +3680,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                                new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                             throw nvae;
                         }
@@ -3666,7 +3688,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                         throw nvae;
                     }
@@ -3675,7 +3697,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 9, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 9, input);
 
                     throw nvae;
                 }
@@ -3711,7 +3733,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 15, input);
 
                         throw nvae;
                     }
@@ -3729,7 +3751,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 16, input);
 
                         throw nvae;
                     }
@@ -3747,7 +3769,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 17, input);
 
                         throw nvae;
                     }
@@ -3765,7 +3787,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 18, input);
 
                         throw nvae;
                     }
@@ -3783,7 +3805,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 19, input);
 
                         throw nvae;
                     }
@@ -3801,7 +3823,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 20, input);
 
                         throw nvae;
                     }
@@ -3809,7 +3831,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 11, input);
 
                     throw nvae;
                 }
@@ -3831,7 +3853,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 21, input);
 
                         throw nvae;
                     }
@@ -3849,7 +3871,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 22, input);
 
                         throw nvae;
                     }
@@ -3867,7 +3889,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 23, input);
 
                         throw nvae;
                     }
@@ -3885,7 +3907,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 24, input);
 
                         throw nvae;
                     }
@@ -3903,7 +3925,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 25, input);
 
                         throw nvae;
                     }
@@ -3921,7 +3943,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
+                            new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 26, input);
 
                         throw nvae;
                     }
@@ -3929,7 +3951,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
+                        new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 12, input);
 
                     throw nvae;
                 }
@@ -3943,14 +3965,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("383:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 0, input);
+                    new NoViableAltException("405:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );", 13, 0, input);
 
                 throw nvae;
             }
 
             switch (alt13) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:384:4: tmp= literalConstraint[valuesource]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:406:4: tmp= literalConstraint[valuesource]
                     {
                     pushFollow(FOLLOW_literalConstraint_in_singleConstraint624);
                     tmp=literalConstraint(valuesource);
@@ -3961,7 +3983,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:385:4: tmp= boundConstraint[tmodel, valuesource, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:407:4: tmp= boundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_boundConstraint_in_singleConstraint635);
                     tmp=boundConstraint(tmodel,  valuesource,  vars);
@@ -3972,7 +3994,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:386:4: tmp= multiBoundConstraint[tmodel, valuesource, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:408:4: tmp= multiBoundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_multiBoundConstraint_in_singleConstraint645);
                     tmp=multiBoundConstraint(tmodel,  valuesource,  vars);
@@ -3983,7 +4005,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:387:4: tmp= predicateConstraint[tmodel, valuesource, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:409:4: tmp= predicateConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_predicateConstraint_in_singleConstraint655);
                     tmp=predicateConstraint(tmodel,  valuesource,  vars);
@@ -3994,7 +4016,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:388:4: tmp= returnValueConstraint[tmodel, valuesource, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:410:4: tmp= returnValueConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_returnValueConstraint_in_singleConstraint665);
                     tmp=returnValueConstraint(tmodel,  valuesource,  vars);
@@ -4019,7 +4041,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start literalConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:391:1: literalConstraint[Object valuesource] returns [IConstraint constraint] : (op= operator )? val= constant ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:413:1: literalConstraint[Object valuesource] returns [IConstraint constraint] : (op= operator )? val= constant ;
     public final IConstraint literalConstraint(Object valuesource) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -4029,10 +4051,10 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:392:2: ( (op= operator )? val= constant )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:392:4: (op= operator )? val= constant
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:414:2: ( (op= operator )? val= constant )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:414:4: (op= operator )? val= constant
             {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:392:6: (op= operator )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:414:6: (op= operator )?
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -4041,7 +4063,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt14) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:392:6: op= operator
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:414:6: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_literalConstraint687);
                     op=operator();
@@ -4079,7 +4101,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start someBoundConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );
     public final IConstraint someBoundConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -4089,7 +4111,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:402:2: (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:424:2: (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] )
             int alt15=2;
             switch ( input.LA(1) ) {
             case 48:
@@ -4110,7 +4132,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -4128,7 +4150,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -4146,7 +4168,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -4164,7 +4186,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -4182,7 +4204,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -4200,7 +4222,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -4208,7 +4230,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -4228,7 +4250,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -4246,7 +4268,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -4264,7 +4286,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -4282,7 +4304,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -4300,7 +4322,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -4318,7 +4340,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -4326,7 +4348,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -4334,7 +4356,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 1, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 1, input);
 
                     throw nvae;
                 }
@@ -4358,7 +4380,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -4376,7 +4398,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -4394,7 +4416,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -4412,7 +4434,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -4430,7 +4452,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -4448,7 +4470,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -4456,7 +4478,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -4476,7 +4498,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -4494,7 +4516,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -4512,7 +4534,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -4530,7 +4552,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -4548,7 +4570,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -4566,7 +4588,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -4574,7 +4596,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -4582,7 +4604,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 2, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 2, input);
 
                     throw nvae;
                 }
@@ -4606,7 +4628,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -4624,7 +4646,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -4642,7 +4664,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -4660,7 +4682,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -4678,7 +4700,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -4696,7 +4718,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -4704,7 +4726,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -4724,7 +4746,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -4742,7 +4764,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -4760,7 +4782,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -4778,7 +4800,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -4796,7 +4818,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -4814,7 +4836,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -4822,7 +4844,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -4830,7 +4852,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 3, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 3, input);
 
                     throw nvae;
                 }
@@ -4854,7 +4876,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -4872,7 +4894,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -4890,7 +4912,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -4908,7 +4930,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -4926,7 +4948,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -4944,7 +4966,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -4952,7 +4974,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -4972,7 +4994,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -4990,7 +5012,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -5008,7 +5030,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -5026,7 +5048,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -5044,7 +5066,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -5062,7 +5084,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -5070,7 +5092,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -5078,7 +5100,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 4, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 4, input);
 
                     throw nvae;
                 }
@@ -5102,7 +5124,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -5120,7 +5142,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -5138,7 +5160,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -5156,7 +5178,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -5174,7 +5196,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -5192,7 +5214,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -5200,7 +5222,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -5220,7 +5242,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -5238,7 +5260,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -5256,7 +5278,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -5274,7 +5296,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -5292,7 +5314,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -5310,7 +5332,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -5318,7 +5340,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -5326,7 +5348,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 5, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 5, input);
 
                     throw nvae;
                 }
@@ -5350,7 +5372,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -5368,7 +5390,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -5386,7 +5408,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -5404,7 +5426,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -5422,7 +5444,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -5440,7 +5462,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -5448,7 +5470,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -5468,7 +5490,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -5486,7 +5508,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -5504,7 +5526,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -5522,7 +5544,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -5540,7 +5562,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -5558,7 +5580,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -5566,7 +5588,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -5574,7 +5596,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 6, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 6, input);
 
                     throw nvae;
                 }
@@ -5598,7 +5620,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -5616,7 +5638,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -5634,7 +5656,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -5652,7 +5674,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -5670,7 +5692,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -5688,7 +5710,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -5696,7 +5718,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -5716,7 +5738,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -5734,7 +5756,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -5752,7 +5774,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -5770,7 +5792,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -5788,7 +5810,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -5806,7 +5828,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -5814,7 +5836,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -5822,7 +5844,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 7, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 7, input);
 
                     throw nvae;
                 }
@@ -5846,7 +5868,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -5864,7 +5886,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -5882,7 +5904,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -5900,7 +5922,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -5918,7 +5940,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -5936,7 +5958,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -5944,7 +5966,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -5964,7 +5986,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -5982,7 +6004,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -6000,7 +6022,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -6018,7 +6040,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -6036,7 +6058,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -6054,7 +6076,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -6062,7 +6084,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -6070,7 +6092,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 8, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 8, input);
 
                     throw nvae;
                 }
@@ -6094,7 +6116,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                             throw nvae;
                         }
@@ -6112,7 +6134,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                             throw nvae;
                         }
@@ -6130,7 +6152,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                             throw nvae;
                         }
@@ -6148,7 +6170,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                             throw nvae;
                         }
@@ -6166,7 +6188,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                             throw nvae;
                         }
@@ -6184,7 +6206,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                             throw nvae;
                         }
@@ -6192,7 +6214,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                         throw nvae;
                     }
@@ -6212,7 +6234,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                             throw nvae;
                         }
@@ -6230,7 +6252,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                             throw nvae;
                         }
@@ -6248,7 +6270,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                             throw nvae;
                         }
@@ -6266,7 +6288,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                             throw nvae;
                         }
@@ -6284,7 +6306,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                             throw nvae;
                         }
@@ -6302,7 +6324,7 @@ public class ClipsJadexParser extends Parser {
                         }
                         else {
                             NoViableAltException nvae =
-                                new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                                new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                             throw nvae;
                         }
@@ -6310,7 +6332,7 @@ public class ClipsJadexParser extends Parser {
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                         throw nvae;
                     }
@@ -6318,7 +6340,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 9, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 9, input);
 
                     throw nvae;
                 }
@@ -6339,7 +6361,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 12, input);
 
                         throw nvae;
                     }
@@ -6357,7 +6379,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 13, input);
 
                         throw nvae;
                     }
@@ -6375,7 +6397,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 14, input);
 
                         throw nvae;
                     }
@@ -6393,7 +6415,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 15, input);
 
                         throw nvae;
                     }
@@ -6411,7 +6433,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 16, input);
 
                         throw nvae;
                     }
@@ -6429,7 +6451,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 17, input);
 
                         throw nvae;
                     }
@@ -6437,7 +6459,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 10, input);
 
                     throw nvae;
                 }
@@ -6459,7 +6481,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 18, input);
 
                         throw nvae;
                     }
@@ -6477,7 +6499,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 19, input);
 
                         throw nvae;
                     }
@@ -6495,7 +6517,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 20, input);
 
                         throw nvae;
                     }
@@ -6513,7 +6535,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 21, input);
 
                         throw nvae;
                     }
@@ -6531,7 +6553,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 22, input);
 
                         throw nvae;
                     }
@@ -6549,7 +6571,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
+                            new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 23, input);
 
                         throw nvae;
                     }
@@ -6557,7 +6579,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
+                        new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 11, input);
 
                     throw nvae;
                 }
@@ -6566,14 +6588,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("401:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 0, input);
+                    new NoViableAltException("423:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );", 15, 0, input);
 
                 throw nvae;
             }
 
             switch (alt15) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:402:4: bc= boundConstraint[tmodel, valuesource, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:424:4: bc= boundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_boundConstraint_in_someBoundConstraint715);
                     bc=boundConstraint(tmodel,  valuesource,  vars);
@@ -6586,7 +6608,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:406:4: mbc= multiBoundConstraint[tmodel, valuesource, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:428:4: mbc= multiBoundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_multiBoundConstraint_in_someBoundConstraint728);
                     mbc=multiBoundConstraint(tmodel,  valuesource,  vars);
@@ -6613,7 +6635,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start boundConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:412:1: boundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:434:1: boundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] ;
     public final IConstraint boundConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6623,10 +6645,10 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:413:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:413:4: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars]
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:435:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:435:4: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars]
             {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:413:6: (op= operator )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:435:6: (op= operator )?
             int alt16=2;
             int LA16_0 = input.LA(1);
 
@@ -6635,7 +6657,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt16) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:413:6: op= operator
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:435:6: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_boundConstraint751);
                     op=operator();
@@ -6673,7 +6695,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start multiBoundConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:422:1: multiBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:444:1: multiBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ ;
     public final IConstraint multiBoundConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6685,13 +6707,13 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:423:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:424:2: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:445:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:446:2: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
             {
             
             		List vs = new ArrayList();
             	
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:427:4: (op= operator )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:449:4: (op= operator )?
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -6700,7 +6722,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt17) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:427:4: op= operator
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:449:4: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_multiBoundConstraint784);
                     op=operator();
@@ -6719,7 +6741,7 @@ public class ClipsJadexParser extends Parser {
             
             		vs.add(var);
             	
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:431:2: (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:453:2: (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
             int cnt18=0;
             loop18:
             do {
@@ -6733,7 +6755,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt18) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:431:3: varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:453:3: varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars]
             	    {
             	    pushFollow(FOLLOW_variable_in_multiBoundConstraint799);
             	    varn=variable(SConditions.getValueSourceType(tmodel,  valuesource),  vars);
@@ -6777,7 +6799,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start predicateConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:444:1: predicateConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:466:1: predicateConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
     public final IConstraint predicateConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6787,16 +6809,16 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:445:2: ( ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:445:4: ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:467:2: ( ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:467:4: ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             {
             match(input,35,FOLLOW_35_in_predicateConstraint827); 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:445:8: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:467:8: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             int alt19=2;
             alt19 = dfa19.predict(input);
             switch (alt19) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:445:9: {...}?fc= functionCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:467:9: {...}?fc= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "predicateConstraint", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -6810,7 +6832,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:446:4: oc= operatorCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:468:4: oc= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_predicateConstraint845);
                     oc=operatorCall(tmodel,  vars);
@@ -6839,7 +6861,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start returnValueConstraint
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:451:1: returnValueConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:1: returnValueConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
     public final IConstraint returnValueConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6849,19 +6871,19 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:452:2: ( equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:452:4: equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:474:2: ( equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:474:4: equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             {
             pushFollow(FOLLOW_equalOperator_in_returnValueConstraint869);
             equalOperator();
             _fsp--;
 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:452:18: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:474:18: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             int alt20=2;
             alt20 = dfa20.predict(input);
             switch (alt20) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:452:19: {...}?fc= functionCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:474:19: {...}?fc= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "returnValueConstraint", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -6875,7 +6897,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:453:4: oc= operatorCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:475:4: oc= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_returnValueConstraint887);
                     oc=operatorCall(tmodel,  vars);
@@ -6904,7 +6926,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start functionCall
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:457:1: functionCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:479:1: functionCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' ;
     public final FunctionCall functionCall(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         FunctionCall fc = null;
 
@@ -6914,8 +6936,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:458:2: ( '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:459:2: '(' fn= functionName (exp= parameter[tmodel, vars] )* ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:2: ( '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:481:2: '(' fn= functionName (exp= parameter[tmodel, vars] )* ')'
             {
             
             		List exps = new ArrayList();
@@ -6925,7 +6947,7 @@ public class ClipsJadexParser extends Parser {
             fn=functionName();
             _fsp--;
 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:462:22: (exp= parameter[tmodel, vars] )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:484:22: (exp= parameter[tmodel, vars] )*
             loop21:
             do {
                 int alt21=2;
@@ -6938,7 +6960,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt21) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:462:23: exp= parameter[tmodel, vars]
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:484:23: exp= parameter[tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_parameter_in_functionCall926);
             	    exp=parameter(tmodel,  vars);
@@ -6959,44 +6981,36 @@ public class ClipsJadexParser extends Parser {
             match(input,27,FOLLOW_27_in_functionCall936); 
             
             		IFunction func = null;
-                        	if("jadex.rules.rulesystem.rules.functions.MethodCallFunction".equals(fn))
-                        	{
-                        		String clazzname = (String)exps.remove(0);
-                        		String methodname = (String)exps.remove(0);
-                        				
-                        		Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
-                        		Method[] methods	= SReflect.getMethods(clazz, methodname);
-                        		Method	method = null;
-                        	
-                        		// Find one matching regardless of param types (hack???). 
-                        		// First param is object on which function will be called. 
-                        		for(int i=0; i<methods.length && method==null; i++)
-                        		{
-                        			if(methods[i].getParameterTypes().length==exps.size()-1)
-                        			{
-                        				method	= methods[i];
-                        			}
-                        		}
-                        				
-                        		if(method!=null)	
-                        			func = new MethodCallFunction(method);
-                        	}
-                        	else
-                        	{
-                        		try
-                        		{
-                        			func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
-                        		}
-                        		catch(Exception e)
-                        		{
-                        			// nop.
-                        		}
-                        	}
-                        			
-                        	if(func==null)
-                        		throw new RuntimeException("Function not found: "+fn);
-                        			
-                        	fc = new FunctionCall(func, exps);
+                           if("jadex.rules.rulesystem.rules.functions.MethodCallFunction".equals(fn))
+                           {
+                               String clazzname = (String)exps.remove(0);
+                               String methodname = (String)exps.remove(0);
+                               Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
+                               Method[] methods    = SReflect.getMethods(clazz, methodname);
+                               Method    method = null;
+                                              // Find one matching regardless of param types (hack???).
+                               // First param is object on which function will be called.
+                               for(int i=0; i<methods.length && method==null; i++)
+                               {
+                                  if(methods[i].getParameterTypes().length==exps.size()-1)
+                                   {
+                                       method    = methods[i];
+                                   }
+                               }
+                               if(method!=null)                      
+                                    func = new MethodCallFunction(method);
+                           }
+                           else
+                           {
+                           		try
+                           		{
+            	                   func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
+            	                }
+            	                catch(Exception e){}
+                           }
+                           if(func==null)
+                               throw new RuntimeException("Function not found: "+fn);
+                           fc = new FunctionCall(func, exps); 
             	
 
             }
@@ -7014,7 +7028,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start operatorCall
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:503:1: operatorCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:524:1: operatorCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' ;
     public final FunctionCall operatorCall(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         FunctionCall fc = null;
 
@@ -7026,11 +7040,11 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:2: ( '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:4: '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:525:2: ( '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:525:4: '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')'
             {
             match(input,25,FOLLOW_25_in_operatorCall957); 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:11: (op= operator )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:525:11: (op= operator )?
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -7039,7 +7053,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt22) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:504:11: op= operator
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:525:11: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_operatorCall962);
                     op=operator();
@@ -7080,7 +7094,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start parameter
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:532:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );
     public final Object parameter(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         Object val = null;
 
@@ -7094,7 +7108,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:512:2: (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:533:2: (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] )
             int alt23=4;
             switch ( input.LA(1) ) {
             case CharacterLiteral:
@@ -7156,7 +7170,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 5, input);
+                            new NoViableAltException("532:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 5, input);
 
                         throw nvae;
                     }
@@ -7174,7 +7188,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 6, input);
+                            new NoViableAltException("532:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 6, input);
 
                         throw nvae;
                     }
@@ -7190,7 +7204,7 @@ public class ClipsJadexParser extends Parser {
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 3, input);
+                        new NoViableAltException("532:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 3, input);
 
                     throw nvae;
                 }
@@ -7199,14 +7213,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("511:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 0, input);
+                    new NoViableAltException("532:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );", 23, 0, input);
 
                 throw nvae;
             }
 
             switch (alt23) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:512:4: tmp1= constant
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:533:4: tmp1= constant
                     {
                     pushFollow(FOLLOW_constant_in_parameter998);
                     tmp1=constant();
@@ -7217,7 +7231,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:513:4: tmp2= variable[null, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:4: tmp2= variable[null, vars]
                     {
                     pushFollow(FOLLOW_variable_in_parameter1008);
                     tmp2=variable(null,  vars);
@@ -7228,7 +7242,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:514:4: {...}?tmp3= functionCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:535:4: {...}?tmp3= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "parameter", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -7242,7 +7256,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:515:4: tmp4= operatorCall[tmodel, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:536:4: tmp4= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_parameter1030);
                     tmp4=operatorCall(tmodel,  vars);
@@ -7267,7 +7281,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start constant
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:518:1: constant returns [Object val] : tmp= literal ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:539:1: constant returns [Object val] : tmp= literal ;
     public final Object constant() throws RecognitionException {
         Object val = null;
 
@@ -7275,8 +7289,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:519:2: (tmp= literal )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:519:4: tmp= literal
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:540:2: (tmp= literal )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:540:4: tmp= literal
             {
             pushFollow(FOLLOW_literal_in_constant1051);
             tmp=literal();
@@ -7299,7 +7313,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start variable
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:522:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:543:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );
     public final Variable variable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7307,7 +7321,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:523:2: (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:544:2: (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] )
             int alt24=2;
             int LA24_0 = input.LA(1);
 
@@ -7319,13 +7333,13 @@ public class ClipsJadexParser extends Parser {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("522:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );", 24, 0, input);
+                    new NoViableAltException("543:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );", 24, 0, input);
 
                 throw nvae;
             }
             switch (alt24) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:523:4: tmp= singleFieldVariable[type, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:544:4: tmp= singleFieldVariable[type, vars]
                     {
                     pushFollow(FOLLOW_singleFieldVariable_in_variable1074);
                     tmp=singleFieldVariable(type,  vars);
@@ -7336,7 +7350,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:524:4: tmp= multiFieldVariable[type, vars]
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:545:4: tmp= multiFieldVariable[type, vars]
                     {
                     pushFollow(FOLLOW_multiFieldVariable_in_variable1084);
                     tmp=multiFieldVariable(type,  vars);
@@ -7361,7 +7375,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start singleFieldVariable
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:527:1: singleFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '?' id= identifier ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:548:1: singleFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '?' id= identifier ;
     public final Variable singleFieldVariable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7369,8 +7383,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:528:2: ( '?' id= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:528:4: '?' id= identifier
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:2: ( '?' id= identifier )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:4: '?' id= identifier
             {
             match(input,33,FOLLOW_33_in_singleFieldVariable1104); 
             pushFollow(FOLLOW_identifier_in_singleFieldVariable1108);
@@ -7406,7 +7420,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start multiFieldVariable
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:544:1: multiFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '$?' id= identifier ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:565:1: multiFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '$?' id= identifier ;
     public final Variable multiFieldVariable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7414,8 +7428,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:545:2: ( '$?' id= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:545:4: '$?' id= identifier
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:566:2: ( '$?' id= identifier )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:566:4: '$?' id= identifier
             {
             match(input,34,FOLLOW_34_in_multiFieldVariable1130); 
             pushFollow(FOLLOW_identifier_in_multiFieldVariable1134);
@@ -7451,7 +7465,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start typename
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:561:1: typename returns [String id] : tmp= identifier ( '.' tmp= identifier )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:582:1: typename returns [String id] : tmp= identifier ( '.' tmp= identifier )* ;
     public final String typename() throws RecognitionException {
         String id = null;
 
@@ -7459,8 +7473,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:562:2: (tmp= identifier ( '.' tmp= identifier )* )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:563:2: tmp= identifier ( '.' tmp= identifier )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:583:2: (tmp= identifier ( '.' tmp= identifier )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:584:2: tmp= identifier ( '.' tmp= identifier )*
             {
             
             		StringBuffer buf = new StringBuffer();
@@ -7472,7 +7486,7 @@ public class ClipsJadexParser extends Parser {
             
             		buf.append(tmp.getText());
             	
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:570:2: ( '.' tmp= identifier )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:591:2: ( '.' tmp= identifier )*
             loop25:
             do {
                 int alt25=2;
@@ -7485,7 +7499,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt25) {
             	case 1 :
-            	    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:570:3: '.' tmp= identifier
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:591:3: '.' tmp= identifier
             	    {
             	    match(input,36,FOLLOW_36_in_typename1168); 
             	    pushFollow(FOLLOW_identifier_in_typename1172);
@@ -7523,7 +7537,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start slotname
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:580:1: slotname returns [String id] : tmp= identifier ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:601:1: slotname returns [String id] : tmp= identifier ;
     public final String slotname() throws RecognitionException {
         String id = null;
 
@@ -7531,8 +7545,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:581:2: (tmp= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:581:4: tmp= identifier
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:2: (tmp= identifier )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:4: tmp= identifier
             {
             pushFollow(FOLLOW_identifier_in_slotname1199);
             tmp=identifier();
@@ -7555,7 +7569,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start methodname
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:584:1: methodname returns [String id] : tmp= identifier ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:605:1: methodname returns [String id] : tmp= identifier ;
     public final String methodname() throws RecognitionException {
         String id = null;
 
@@ -7563,8 +7577,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:585:2: (tmp= identifier )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:585:4: tmp= identifier
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:2: (tmp= identifier )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:4: tmp= identifier
             {
             pushFollow(FOLLOW_identifier_in_methodname1219);
             tmp=identifier();
@@ -7587,7 +7601,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start functionName
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:588:1: functionName returns [String id] : tmp= typename ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:609:1: functionName returns [String id] : tmp= typename ;
     public final String functionName() throws RecognitionException {
         String id = null;
 
@@ -7595,8 +7609,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:589:2: (tmp= typename )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:589:4: tmp= typename
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:2: (tmp= typename )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:4: tmp= typename
             {
             pushFollow(FOLLOW_typename_in_functionName1238);
             tmp=typename();
@@ -7619,7 +7633,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start literal
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:592:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:613:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
     public final Object literal() throws RecognitionException {
         Object val = null;
 
@@ -7630,7 +7644,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:2: (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:614:2: (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
             int alt26=6;
             switch ( input.LA(1) ) {
             case 38:
@@ -7646,7 +7660,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("592:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 1, input);
+                        new NoViableAltException("613:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 1, input);
 
                     throw nvae;
                 }
@@ -7686,14 +7700,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("592:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 0, input);
+                    new NoViableAltException("613:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 26, 0, input);
 
                 throw nvae;
             }
 
             switch (alt26) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:4: lit= floatingPointLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:614:4: lit= floatingPointLiteral
                     {
                     pushFollow(FOLLOW_floatingPointLiteral_in_literal1258);
                     lit=floatingPointLiteral();
@@ -7704,7 +7718,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:594:4: lit= integerLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:615:4: lit= integerLiteral
                     {
                     pushFollow(FOLLOW_integerLiteral_in_literal1267);
                     lit=integerLiteral();
@@ -7715,7 +7729,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:595:4: CharacterLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:616:4: CharacterLiteral
                     {
                     CharacterLiteral2=(Token)input.LT(1);
                     match(input,CharacterLiteral,FOLLOW_CharacterLiteral_in_literal1274); 
@@ -7724,7 +7738,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:596:4: StringLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:617:4: StringLiteral
                     {
                     StringLiteral3=(Token)input.LT(1);
                     match(input,StringLiteral,FOLLOW_StringLiteral_in_literal1281); 
@@ -7733,7 +7747,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:597:4: BooleanLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:618:4: BooleanLiteral
                     {
                     BooleanLiteral4=(Token)input.LT(1);
                     match(input,BooleanLiteral,FOLLOW_BooleanLiteral_in_literal1288); 
@@ -7742,7 +7756,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:598:4: 'null'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:4: 'null'
                     {
                     match(input,37,FOLLOW_37_in_literal1295); 
                     val = null;
@@ -7764,7 +7778,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start floatingPointLiteral
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:601:1: floatingPointLiteral returns [Object val] : (sign= ( '+' | '-' ) )? FloatingPointLiteral ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:622:1: floatingPointLiteral returns [Object val] : (sign= ( '+' | '-' ) )? FloatingPointLiteral ;
     public final Object floatingPointLiteral() throws RecognitionException {
         Object val = null;
 
@@ -7772,10 +7786,10 @@ public class ClipsJadexParser extends Parser {
         Token FloatingPointLiteral5=null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:2: ( (sign= ( '+' | '-' ) )? FloatingPointLiteral )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:4: (sign= ( '+' | '-' ) )? FloatingPointLiteral
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:2: ( (sign= ( '+' | '-' ) )? FloatingPointLiteral )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:4: (sign= ( '+' | '-' ) )? FloatingPointLiteral
             {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:8: (sign= ( '+' | '-' ) )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:8: (sign= ( '+' | '-' ) )?
             int alt27=2;
             int LA27_0 = input.LA(1);
 
@@ -7784,7 +7798,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt27) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:602:8: sign= ( '+' | '-' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:8: sign= ( '+' | '-' )
                     {
                     sign=(Token)input.LT(1);
                     if ( (input.LA(1)>=38 && input.LA(1)<=39) ) {
@@ -7822,7 +7836,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start integerLiteral
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:605:1: integerLiteral returns [Object val] : (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:626:1: integerLiteral returns [Object val] : (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) ;
     public final Object integerLiteral() throws RecognitionException {
         Object val = null;
 
@@ -7832,10 +7846,10 @@ public class ClipsJadexParser extends Parser {
         Token DecimalLiteral8=null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:2: ( (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:4: (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:2: ( (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:4: (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral )
             {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:8: (sign= ( '+' | '-' ) )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:8: (sign= ( '+' | '-' ) )?
             int alt28=2;
             int LA28_0 = input.LA(1);
 
@@ -7844,7 +7858,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt28) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:8: sign= ( '+' | '-' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:8: sign= ( '+' | '-' )
                     {
                     sign=(Token)input.LT(1);
                     if ( (input.LA(1)>=38 && input.LA(1)<=39) ) {
@@ -7863,7 +7877,7 @@ public class ClipsJadexParser extends Parser {
 
             }
 
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:20: ( HexLiteral | OctalLiteral | DecimalLiteral )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:20: ( HexLiteral | OctalLiteral | DecimalLiteral )
             int alt29=3;
             switch ( input.LA(1) ) {
             case HexLiteral:
@@ -7883,14 +7897,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("606:20: ( HexLiteral | OctalLiteral | DecimalLiteral )", 29, 0, input);
+                    new NoViableAltException("627:20: ( HexLiteral | OctalLiteral | DecimalLiteral )", 29, 0, input);
 
                 throw nvae;
             }
 
             switch (alt29) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:606:21: HexLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:21: HexLiteral
                     {
                     HexLiteral6=(Token)input.LT(1);
                     match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1349); 
@@ -7899,7 +7913,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:607:4: OctalLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:628:4: OctalLiteral
                     {
                     OctalLiteral7=(Token)input.LT(1);
                     match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1356); 
@@ -7908,7 +7922,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:608:4: DecimalLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:629:4: DecimalLiteral
                     {
                     DecimalLiteral8=(Token)input.LT(1);
                     match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1363); 
@@ -7935,7 +7949,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start operator
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:611:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:632:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );
     public final IOperator operator() throws RecognitionException {
         IOperator operator = null;
 
@@ -7943,7 +7957,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:612:2: (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:633:2: (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' )
             int alt30=9;
             switch ( input.LA(1) ) {
             case 48:
@@ -7993,14 +8007,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("611:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );", 30, 0, input);
+                    new NoViableAltException("632:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );", 30, 0, input);
 
                 throw nvae;
             }
 
             switch (alt30) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:612:4: tmp= equalOperator
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:633:4: tmp= equalOperator
                     {
                     pushFollow(FOLLOW_equalOperator_in_operator1383);
                     tmp=equalOperator();
@@ -8011,7 +8025,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:613:4: '!='
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:634:4: '!='
                     {
                     match(input,40,FOLLOW_40_in_operator1391); 
                     operator = IOperator.NOTEQUAL;
@@ -8019,7 +8033,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:614:4: '~'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:635:4: '~'
                     {
                     match(input,41,FOLLOW_41_in_operator1398); 
                     operator = IOperator.NOTEQUAL;
@@ -8027,7 +8041,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:615:4: '>'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:636:4: '>'
                     {
                     match(input,42,FOLLOW_42_in_operator1405); 
                     operator = IOperator.GREATER;
@@ -8035,7 +8049,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:616:4: '<'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:637:4: '<'
                     {
                     match(input,43,FOLLOW_43_in_operator1412); 
                     operator = IOperator.LESS;
@@ -8043,7 +8057,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:617:4: '>='
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:638:4: '>='
                     {
                     match(input,44,FOLLOW_44_in_operator1419); 
                     operator = IOperator.GREATEROREQUAL;
@@ -8051,7 +8065,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:618:4: '<='
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:639:4: '<='
                     {
                     match(input,45,FOLLOW_45_in_operator1426); 
                     operator = IOperator.LESSOREQUAL;
@@ -8059,7 +8073,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:4: 'contains'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:640:4: 'contains'
                     {
                     match(input,46,FOLLOW_46_in_operator1433); 
                     operator = IOperator.CONTAINS;
@@ -8067,7 +8081,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 9 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:620:4: 'excludes'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:641:4: 'excludes'
                     {
                     match(input,47,FOLLOW_47_in_operator1440); 
                     operator = IOperator.EXCLUDES;
@@ -8089,13 +8103,13 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start equalOperator
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:1: equalOperator returns [IOperator operator] : '==' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:644:1: equalOperator returns [IOperator operator] : '==' ;
     public final IOperator equalOperator() throws RecognitionException {
         IOperator operator = null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:624:2: ( '==' )
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:624:4: '=='
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:645:2: ( '==' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:645:4: '=='
             {
             match(input,48,FOLLOW_48_in_equalOperator1457); 
             operator = IOperator.EQUAL;
@@ -8115,14 +8129,14 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start identifier
-    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:627:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:648:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );
     public final Token identifier() throws RecognitionException {
         Token identifier = null;
 
         Token tmp=null;
 
         try {
-            // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:628:2: (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:649:2: (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' )
             int alt31=6;
             switch ( input.LA(1) ) {
             case Identifiertoken:
@@ -8157,14 +8171,14 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("627:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );", 31, 0, input);
+                    new NoViableAltException("648:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );", 31, 0, input);
 
                 throw nvae;
             }
 
             switch (alt31) {
                 case 1 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:628:4: tmp= Identifiertoken
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:649:4: tmp= Identifiertoken
                     {
                     tmp=(Token)input.LT(1);
                     match(input,Identifiertoken,FOLLOW_Identifiertoken_in_identifier1477); 
@@ -8173,7 +8187,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:629:4: tmp= 'test'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:650:4: tmp= 'test'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,29,FOLLOW_29_in_identifier1486); 
@@ -8182,7 +8196,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:630:4: tmp= 'not'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:4: tmp= 'not'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,28,FOLLOW_28_in_identifier1495); 
@@ -8191,7 +8205,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:631:4: tmp= 'and'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:4: tmp= 'and'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,26,FOLLOW_26_in_identifier1504); 
@@ -8200,7 +8214,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:632:4: tmp= 'contains'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:653:4: tmp= 'contains'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,46,FOLLOW_46_in_identifier1513); 
@@ -8209,7 +8223,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\projects\\jadex\\jadex_v2\\microkernel\\src\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:633:4: tmp= 'excludes'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:654:4: tmp= 'excludes'
                     {
                     tmp=(Token)input.LT(1);
                     match(input,47,FOLLOW_47_in_identifier1522); 
@@ -8570,7 +8584,7 @@ public class ClipsJadexParser extends Parser {
             this.transition = DFA2_transition;
         }
         public String getDescription() {
-            return "195:1: ce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] );";
+            return "217:1: ce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] );";
         }
         public int specialStateTransition(int s, IntStream input) throws NoViableAltException {
         	int _s = s;
@@ -9173,7 +9187,7 @@ public class ClipsJadexParser extends Parser {
             this.transition = DFA4_transition;
         }
         public String getDescription() {
-            return "226:15: ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] )";
+            return "248:15: ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] )";
         }
     }
     static final String DFA19_eotS =
@@ -9257,7 +9271,7 @@ public class ClipsJadexParser extends Parser {
             this.transition = DFA19_transition;
         }
         public String getDescription() {
-            return "445:8: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )";
+            return "467:8: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )";
         }
     }
     static final String DFA20_eotS =
@@ -9341,7 +9355,7 @@ public class ClipsJadexParser extends Parser {
             this.transition = DFA20_transition;
         }
         public String getDescription() {
-            return "452:18: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )";
+            return "474:18: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )";
         }
     }
  

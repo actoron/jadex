@@ -167,6 +167,28 @@ protected static OAVObjectType getValueSourceType(OAVTypeModel tmodel, Object va
 	return ret;
 }
 
+    protected List	errors;
+    public void displayRecognitionError(String[] tokenNames, RecognitionException e)
+    {
+        if(errors!=null)
+        {
+            String hdr = getErrorHeader(e);
+            String msg = getErrorMessage(e, tokenNames);
+        	errors.add(hdr + " " + msg);
+        }
+        else
+        {
+        	super.displayRecognitionError(tokenNames, e);
+        }
+    }
+    public void setErrorList(List errors)
+    {
+        this.errors	= errors;
+    }
+    public List getErrorList()
+    {
+        return errors;
+    }
 }
 
 // Parser
@@ -465,42 +487,37 @@ functionCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]
 	}
 	)* ')'
 	{
-		try
-		{
-			IFunction func;
-			if("jadex.rules.rulesystem.rules.functions.MethodCallFunction".equals(fn))
-			{
-				String clazzname = (String)exps.remove(0);
-				String methodname = (String)exps.remove(0);
-				
-				Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
-				Method[] methods	= SReflect.getMethods(clazz, methodname);
-				Method	method;
-	
-				// Find one matching regardless of param types (hack???). 
-				// First param is object on which function will be called. 
-				if(methods.length==1 && methods[0].getParameterTypes().length==exps.size()-1)
-				{
-					method	= methods[0];
-				}
-				else
-				{
-					throw new RuntimeException("Cannot decide which method to use.");
-    				}
-    				
-				func = new MethodCallFunction(method);
-			}
-			else
-			{
-				func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
-			}
-			
-			$fc = new FunctionCall(func, exps);
-		}
-		catch(Exception e)
-		{ 
-			throw new RuntimeException("Function not found: "+fn);
-		}
+		IFunction func = null;
+               if("jadex.rules.rulesystem.rules.functions.MethodCallFunction".equals(fn))
+               {
+                   String clazzname = (String)exps.remove(0);
+                   String methodname = (String)exps.remove(0);
+                   Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
+                   Method[] methods    = SReflect.getMethods(clazz, methodname);
+                   Method    method = null;
+                                  // Find one matching regardless of param types (hack???).
+                   // First param is object on which function will be called.
+                   for(int i=0; i<methods.length && method==null; i++)
+                   {
+                      if(methods[i].getParameterTypes().length==exps.size()-1)
+                       {
+                           method    = methods[i];
+                       }
+                   }
+                   if(method!=null)                      
+                        func = new MethodCallFunction(method);
+               }
+               else
+               {
+               		try
+               		{
+	                   func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
+	                }
+	                catch(Exception e){}
+               }
+               if(func==null)
+                   throw new RuntimeException("Function not found: "+fn);
+               fc = new FunctionCall(func, exps); 
 	}
 	;
 

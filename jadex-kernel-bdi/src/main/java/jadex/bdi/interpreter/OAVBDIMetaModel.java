@@ -1346,14 +1346,22 @@ public class OAVBDIMetaModel
 
 					if(lang==null || "clips".equals(lang))
 					{
+						List	errors	= new ArrayList();
 						try
 						{
-							ret = ParserHelper.parseCondition(value, state.getTypeModel());
+							ret = ParserHelper.parseCondition(value, state.getTypeModel(), errors);
 						}
 						catch(Exception e)
 						{
 							report.put(se, e.toString());
 //							e.printStackTrace();
+						}
+						if(!errors.isEmpty())
+						{
+							for(int i=0; i<errors.size(); i++)
+							{
+								report.put(se, errors.get(i));
+							}
 						}
 					}
 					else
@@ -1412,14 +1420,22 @@ public class OAVBDIMetaModel
 					}
 					else if("clips".equals(lang))
 					{
+						List	errors	= new ArrayList();
 						try
 						{
-							ret = ParserHelper.parseCondition(value, state.getTypeModel());
+							ret = ParserHelper.parseCondition(value, state.getTypeModel(), errors);
 						}
 						catch(Exception e)
 						{
 							report.put(se, e.toString());
 //							e.printStackTrace();
+						}
+						if(!errors.isEmpty())
+						{
+							for(int i=0; i<errors.size(); i++)
+							{
+								report.put(se, errors.get(i));
+							}
 						}
 					}
 					else
