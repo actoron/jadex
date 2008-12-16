@@ -30,7 +30,7 @@ public class Prey extends Creature implements java.io.Serializable
 		setAID(aid);
 		setLocation(location);
 	}
-
+	
 	//-------- custom code --------
 
 	/**

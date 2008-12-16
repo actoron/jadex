@@ -7,6 +7,7 @@ import jadex.bdi.examples.hunterprey2.Hunter;
 import jadex.bdi.examples.hunterprey2.Obstacle;
 import jadex.bdi.examples.hunterprey2.Prey;
 import jadex.bdi.examples.hunterprey2.WorldObject;
+import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
@@ -68,7 +69,11 @@ public class UpdateVisionPlan extends Plan
 			{
 				IBeliefSet bs = getBeliefbase().getBeliefSet("preys");
 				if(bs.containsFact(seenobs[i]))
-					bs.updateFact(seenobs[i]);
+				{
+//					bs.updateFact(seenobs[i]);
+					Prey p = (Prey)bs.getFact(seenobs[i]);
+					p.update((Creature)seenobs[i]);
+				}
 				else
 					bs.addFact(seenobs[i]);
 				//getBeliefbase().getBeliefSet("preys").updateOrAddFact(seenobs[i]);
@@ -77,9 +82,15 @@ public class UpdateVisionPlan extends Plan
 			{
 				IBeliefSet bs = getBeliefbase().getBeliefSet("hunters");
 				if(bs.containsFact(seenobs[i]))
-					bs.updateFact(seenobs[i]);
+				{
+//					bs.updateFact(seenobs[i]);
+					Hunter h = (Hunter)bs.getFact(seenobs[i]);
+					h.update((Creature)seenobs[i]);
+				}
 				else
+				{
 					bs.addFact(seenobs[i]);
+				}
 				//getBeliefbase().getBeliefSet("hunters").updateOrAddFact(seenobs[i]);
 			}
 			else if(seenobs[i] instanceof Obstacle)
