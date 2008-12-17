@@ -469,7 +469,7 @@ public abstract class Creature extends WorldObject
 			setAge(creature.getAge());
 		if(getPoints()!=creature.getPoints())
 			setPoints(creature.getPoints());
-		if(getName().equals(creature.getName()))
+		if(!getName().equals(creature.getName()))
 			setName(creature.getName());
 		if(getVisionRange()!=creature.getVisionRange())
 			setVisionRange(creature.getVisionRange());
@@ -479,5 +479,7 @@ public abstract class Creature extends WorldObject
 			setWorldWidth(creature.getWorldWidth());
 		if(getLeaseticks()!=creature.getLeaseticks())
 			setWorldWidth(creature.getLeaseticks());
+		if(!getLocation().equals(creature.getLocation()))
+			setLocation(creature.getLocation());
 	}
 }

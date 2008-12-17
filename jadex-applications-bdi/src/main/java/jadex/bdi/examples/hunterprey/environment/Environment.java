@@ -1,5 +1,17 @@
-package jadex.bdi.examples.hunterprey;
+package jadex.bdi.examples.hunterprey.environment;
 
+import jadex.bdi.examples.hunterprey.Creature;
+import jadex.bdi.examples.hunterprey.Food;
+import jadex.bdi.examples.hunterprey.Hunter;
+import jadex.bdi.examples.hunterprey.IEnvironment;
+import jadex.bdi.examples.hunterprey.Location;
+import jadex.bdi.examples.hunterprey.Observer;
+import jadex.bdi.examples.hunterprey.Obstacle;
+import jadex.bdi.examples.hunterprey.Prey;
+import jadex.bdi.examples.hunterprey.RequestMove;
+import jadex.bdi.examples.hunterprey.TaskInfo;
+import jadex.bdi.examples.hunterprey.Vision;
+import jadex.bdi.examples.hunterprey.WorldObject;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;

@@ -100,10 +100,10 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public void removeObject(Object id, OAVObjectType type, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
-		{
-			System.out.println("removedRETE: "+id);
-		}
+//		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
+//		{
+//			System.out.println("removedRETE: "+id);
+//		}
 		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);

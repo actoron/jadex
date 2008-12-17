@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -42,6 +44,9 @@ public class JarAsDirectory	extends File
 	
 	/** The subentries contained in the entry. */
 	protected File[]	entries;
+	
+	/** The files for the entry paths (cached for easy access). */
+	protected Map	entryfiles;
 	
 	//-------- constructors -------- 
 	
@@ -143,7 +148,7 @@ public class JarAsDirectory	extends File
 	/**
 	 *  Refresh the jar entries.
 	 */
-	public boolean	refresh()
+	public synchronized boolean	refresh()
 	{
 		boolean	changed	= false;
 		// Only the root node needs to be refreshed.
@@ -173,6 +178,7 @@ public class JarAsDirectory	extends File
 			}
 			
 			// Recursively create files for entries.
+			this.entryfiles	= new HashMap();
 			this.entries	= createFiles("/", entries);
 			
 		}
@@ -199,13 +205,43 @@ public class JarAsDirectory	extends File
 		Iterator	it	= col.iterator();
 		for(int i=0; it.hasNext(); i++)
 		{
-			ret[i]	= new JarAsDirectory(jarpath, (ZipEntry)it.next());
+			ZipEntry	entry	= (ZipEntry)it.next();
+			ret[i]	= new JarAsDirectory(jarpath, entry);
 			if(ret[i].isDirectory())
 			{
 				ret[i].entries	= createFiles(ret[i].entry.getName(), entries);
 			}
+			entryfiles.put(entry.getName(), ret[i]);
 		}
 //		System.out.println("create files: "+key+", "+SUtil.arrayToString(ret));
 		return ret;
+	}
+	
+	/**
+	 *  Get the path to the jar file.
+	 */
+	public String	getJarPath()
+	{
+		return jarpath;
+	}
+
+	/**
+	 *  Get the zip entry, if any (file pointer inside jar file).
+	 *  The jar file itself (root) has no entry (i.e. entry=null).
+	 */
+	public ZipEntry	getZipEntry()
+	{
+		return entry;
+	}
+	
+	/**
+	 *  Get a file for an entry path.
+	 */
+	public synchronized File	 getFile(String path)
+	{
+		if(entryfiles==null)
+			refresh();
+		
+		return (File)entryfiles.get(path);
 	}
 }

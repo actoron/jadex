@@ -3,7 +3,6 @@ package jadex.bdi.examples.hunterprey.environment;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.hunterprey.Creature;
 import jadex.bdi.examples.hunterprey.CurrentVision;
-import jadex.bdi.examples.hunterprey.Environment;
 import jadex.bdi.examples.hunterprey.Vision;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
@@ -29,7 +28,6 @@ public class SimulationTickerPlan extends Plan
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		while(true)
 		{
-			waitForCondition("notasks");
 			waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
 			env.executeStep();
 			//System.out.println("Actual tick cnt: "+getBeliefbase().getBelief("???").getFact("tickcnt"));

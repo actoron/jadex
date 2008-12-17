@@ -212,7 +212,7 @@ public class DirNode	extends FileNode
 	 */
 	public String toString()
 	{
-		return (getParent() instanceof RootNode)? file.getName()+" ("+file.getAbsolutePath()+")": file.getName();
+		return (getParent() instanceof RootNode)? getFile().getName()+" ("+getFile().getAbsolutePath()+")": getFile().getName();
 	}
 
 	//-------- bean property accessors --------

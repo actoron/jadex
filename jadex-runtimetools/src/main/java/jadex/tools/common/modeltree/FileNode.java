@@ -28,6 +28,9 @@ public class FileNode implements IExplorerTreeNode
 	/** The file represented by this node. */
 	protected File	file;
 
+	/** The relative file name. */
+	protected String	relative;
+
 	/** Custom properties used by different views (e.g. starter, test center). */
 	protected Map properties;
 
@@ -42,6 +45,7 @@ public class FileNode implements IExplorerTreeNode
 	{
 		this.parent = parent;
 		this.file = file;
+		this.relative	= convertPathToRelative(file);
 		this.properties	= new HashMap();
 	}
 
@@ -124,10 +128,46 @@ public class FileNode implements IExplorerTreeNode
 	//-------- methods --------
 
 	/**
+	 *  Get the relative path.
+	 */
+	public String	getRelativePath()
+	{
+		return this.relative;
+	}
+
+	/**
+	 *  Set the relative path.
+	 */
+	public void	setRelativePath(String relative)
+	{
+		this.relative	= relative;
+	}
+
+	/**
 	 *  Get the file represented by this node.
 	 */
 	public File getFile()
 	{
+		if(file==null)
+		{
+			IExplorerTreeNode	parent	= getParent();
+			JarNode	node	= null;
+			while(node==null && parent!=null)
+			{
+				if(parent instanceof JarNode)
+					node	= (JarNode)parent;
+				parent	= parent.getParent();
+			}
+			
+			if(node!=null)
+			{
+				file	= ((JarAsDirectory)node.getFile()).getFile(relative);
+			}
+			else
+			{
+				file	= new File(relative);
+			}
+		}
 		return this.file;
 	}
 
@@ -137,7 +177,7 @@ public class FileNode implements IExplorerTreeNode
 	 */
 	public String toString()
 	{
-		return file.getName();
+		return getFile().getName();
 	}
 
 	/**
@@ -174,7 +214,7 @@ public class FileNode implements IExplorerTreeNode
 	/**
 	 *  Set the file of this FileNode.
 	 *  @param file The file to set.
-	 */
+	 * /
 	public void setFile(File file)
 	{
 		this.file = file;
@@ -195,5 +235,27 @@ public class FileNode implements IExplorerTreeNode
 	public void	setProperties(Map properties)
 	{
 		this.properties	= properties;
+	}
+
+	/**
+	 *  Get the corresponding relative path for a file.
+	 *  Handles jars specially.
+	 */
+	protected String convertPathToRelative(File file)
+	{
+		String	ret;
+		if(file instanceof JarAsDirectory)
+		{
+			JarAsDirectory	jar	= (JarAsDirectory) file;
+			if(jar.getZipEntry()!=null)
+				ret	= jar.getZipEntry().getName();
+			else
+				ret	= SUtil.convertPathToRelative(jar.getJarPath());
+		}
+		else
+		{
+			ret	= file!=null ? SUtil.convertPathToRelative(file.getAbsolutePath()) : null;
+		}
+		return ret;
 	}
 }

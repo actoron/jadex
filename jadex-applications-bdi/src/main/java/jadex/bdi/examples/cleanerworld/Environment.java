@@ -71,7 +71,7 @@ public class Environment implements IEnvironment
 	 *  Get the singleton.
 	 *  @return The environment.
 	 */
-	public static Environment getInstance()
+	public static synchronized Environment getInstance()
 	{
 		if(instance==null)
 		{
@@ -87,7 +87,7 @@ public class Environment implements IEnvironment
 	 *  @param cleaner The cleaner.
 	 *  @return The current vision, null if failure.
 	 */
-	public Vision getVision(Cleaner cleaner)
+	public synchronized Vision getVision(Cleaner cleaner)
 	{
 		// Update cleaner
 		if(cleaners.contains(cleaner))
@@ -144,7 +144,7 @@ public class Environment implements IEnvironment
 	 *  @param waste The waste.
 	 *  @return True if the waste could be picked up.
 	 */
-	public boolean pickUpWaste(Waste waste)
+	public synchronized boolean pickUpWaste(Waste waste)
 	{
 		// Todo: Implement random failure?
 		boolean ret	= wastes.remove(waste);
@@ -161,7 +161,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Drop a piece of waste.
 	 */
-	public boolean dropWasteInWastebin(Waste waste, Wastebin wastebin)
+	public synchronized boolean dropWasteInWastebin(Waste waste, Wastebin wastebin)
 	{
 		if(waste==null)
 			System.out.println("here");
@@ -181,7 +181,7 @@ public class Environment implements IEnvironment
 	 *  Get a wastebin for a template.
 	 *  @return The wastebin.
 	 */
-	protected Wastebin	getWastebin(Wastebin wb)
+	protected synchronized Wastebin	getWastebin(Wastebin wb)
 	{
 		Wastebin ret = null;
 		for(int i=0; i<wastebins.size() && ret==null; i++)
@@ -198,7 +198,7 @@ public class Environment implements IEnvironment
 	 *  Get the complete vision.
 	 *  @return The current vision, null if failure.
 	 */
-	public Vision getCompleteVision()
+	public synchronized Vision getCompleteVision()
 	{
 		// Construct the ontology vision object.
 		return new Vision(wastes, wastebins, stations, cleaners, getDaytime());
@@ -208,7 +208,7 @@ public class Environment implements IEnvironment
 	 *  Get the daytime.
 	 *  @return The current vision.
 	 */
-	public boolean getDaytime()
+	public synchronized boolean getDaytime()
 	{
 		return daytime;
 	}
@@ -217,7 +217,7 @@ public class Environment implements IEnvironment
 	 *  Set the daytime.
 	 *  @param daytime The daytime.
 	 */
-	public void setDaytime(boolean daytime)
+	public synchronized void setDaytime(boolean daytime)
 	{
 		this.daytime = daytime;
 		this.pcs.firePropertyChange("daytime", null, new Boolean(daytime));
@@ -227,7 +227,7 @@ public class Environment implements IEnvironment
 	 *  Add a cleaner.
 	 *  @param cleaner The cleaner.
 	 */
-	public void addCleaner(Cleaner cleaner)
+	public synchronized void addCleaner(Cleaner cleaner)
 	{
 		cleaners.add(cleaner);
 		this.pcs.firePropertyChange("cleaners", null, cleaner);
@@ -237,7 +237,7 @@ public class Environment implements IEnvironment
 	 *  Remove a cleaner.
 	 *  @param cleaner The cleaner.
 	 */
-	public void removeCleaner(Cleaner cleaner)
+	public synchronized void removeCleaner(Cleaner cleaner)
 	{
 		cleaners.remove(cleaner);
 		this.pcs.firePropertyChange("cleaners", null, cleaner);
@@ -247,7 +247,7 @@ public class Environment implements IEnvironment
 	 *  Add a piece of waste.
 	 *  @param waste The new piece of waste.
 	 */
-	public void addWaste(Waste waste)
+	public synchronized void addWaste(Waste waste)
 	{
 		wastes.add(waste);
 		this.pcs.firePropertyChange("wastes", null, waste);
@@ -257,7 +257,7 @@ public class Environment implements IEnvironment
 	 *  Remove a piece of waste.
 	 *  @param waste The piece of waste.
 	 */
-	public void removeWaste(Waste waste)
+	public synchronized void removeWaste(Waste waste)
 	{
 		wastes.remove(waste);
 		this.pcs.firePropertyChange("wastes", waste, null);
@@ -267,7 +267,7 @@ public class Environment implements IEnvironment
 	 *  Add a wastebin.
 	 *  @param wastebin The new waste bin.
 	 */
-	public void addWastebin(Wastebin wastebin)
+	public synchronized void addWastebin(Wastebin wastebin)
 	{
 		wastebins.add(wastebin);
 		this.pcs.firePropertyChange("wastebins", null, wastebin);
@@ -277,7 +277,7 @@ public class Environment implements IEnvironment
 	 *  Add a charging station.
 	 *  @param station The new charging station.
 	 */
-	public void addChargingStation(Chargingstation station)
+	public synchronized void addChargingStation(Chargingstation station)
 	{
 		stations.add(station);
 		this.pcs.firePropertyChange("chargingstations", null, station);
@@ -287,7 +287,7 @@ public class Environment implements IEnvironment
 	 *  Get all wastes.
 	 *  @return All wastes.
 	 */
-	public Waste[] getWastes()
+	public synchronized Waste[] getWastes()
 	{
 		return (Waste[])wastes.toArray(new Waste[wastes.size()]);
 	}
@@ -296,7 +296,7 @@ public class Environment implements IEnvironment
 	 *  Get all wastebins.
 	 *  @return All wastebins.
 	 */
-	public Wastebin[] getWastebins()
+	public synchronized Wastebin[] getWastebins()
 	{
 		return (Wastebin[])wastebins.toArray(new Wastebin[wastebins.size()]);
 	}
@@ -305,7 +305,7 @@ public class Environment implements IEnvironment
 	 *  Get all charging stations.
 	 *  @return All stations.
 	 */
-	public Chargingstation[] getChargingstations()
+	public synchronized Chargingstation[] getChargingstations()
 	{
 		return (Chargingstation[])stations.toArray(new Chargingstation[stations.size()]);
 	}
@@ -314,7 +314,7 @@ public class Environment implements IEnvironment
 	 *  Get all cleaners.
 	 *  @return All cleaners.
 	 */
-	public Cleaner[] getCleaners()
+	public synchronized Cleaner[] getCleaners()
 	{
 		Cleaner[] cls = (Cleaner[])cleaners.toArray(new Cleaner[cleaners.size()]);
 		// Increase ages of cleaners
@@ -345,7 +345,7 @@ public class Environment implements IEnvironment
 	 *  Get a wastebin for a name.
 	 *  @return The wastebin.
 	 */
-	public Wastebin getWastebin(String name)
+	public synchronized Wastebin getWastebin(String name)
 	{
 		Wastebin ret = null;
 		for(int i=0; i<wastebins.size() && ret==null; i++)
@@ -359,7 +359,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Clear the environment.
 	 */
-	public void clear()
+	public synchronized void clear()
 	{
 		cleaners.clear();
 		wastes.clear();
@@ -372,7 +372,7 @@ public class Environment implements IEnvironment
 	 *  Get the age of a cleaner.
 	 *  @return The age.
 	 */
-	public int getAge(Cleaner cleaner)
+	public synchronized int getAge(Cleaner cleaner)
 	{
 		int ret = 0;
 		Integer age = (Integer)ages.get(cleaner);
@@ -388,7 +388,7 @@ public class Environment implements IEnvironment
      *  The listener is registered for all properties.
      *  @param listener  The PropertyChangeListener to be added.
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener)
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener)
 	{
 		pcs.addPropertyChangeListener(listener);
     }
@@ -399,7 +399,7 @@ public class Environment implements IEnvironment
      *  for all properties.
      *  @param listener  The PropertyChangeListener to be removed.
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener)
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener)
 	{
 		pcs.removePropertyChangeListener(listener);
     }

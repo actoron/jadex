@@ -189,7 +189,7 @@ public class MoveToLocationPlan extends Plan
 					if(bs.containsFact(cls[i]))
 					{
 //						bs.updateFact(cls[i]);
-						Cleaner clea = (Cleaner)bs.getFact(cs[i]);
+						Cleaner clea = (Cleaner)bs.getFact(cls[i]);
 						clea.update(cls[i]);
 					}
 					else

@@ -1411,74 +1411,6 @@ public class SUtil
 	}
 	
 	/**
-	 *  Find the relativ path from a start directory to a destination directory.
-	 *  @param startdir The start directory.
-	 *  @param destdir The destination directory.
-	 *  @return The relativ path from start to destination.
-	 *  // todo: what if paths are on different drives
-	 */
-	public static String getRelativePath(String startdir, String destdir)
-	{
-		String ret = "";
-		File startdirf = new File(startdir);
-		if(startdirf.exists() && !startdirf.isDirectory())
-			startdirf = startdirf.getParentFile();
-		
-		List tmpl = SCollection.createArrayList();
-		File tmp = startdirf;
-		while(tmp!=null)
-		{
-			//String name = tmp.getName().length()>0? tmp.getName(): tmp.getPath();
-			String name = tmp.getName();
-			if(name.length()==0)
-				break;
-			tmpl.add(0, name);
-			tmp = tmp.getParentFile();
-		}
-		String[] startpath = (String[])tmpl.toArray(new String[tmpl.size()]);
-		
-		File destdirf = new File(destdir);
-		if(destdirf.exists() && !destdirf.isDirectory())
-			destdirf = startdirf.getParentFile();
-		tmpl = SCollection.createArrayList();
-		tmp = destdirf;
-		while(tmp!=null)
-		{
-			String name = tmp.getName();
-			if(name.length()==0)
-				break;
-			tmpl.add(0, name);
-			tmp = tmp.getParentFile();
-		}
-		String[] destpath = (String[])tmpl.toArray(new String[tmpl.size()]);
-		
-		// Test which is the common base
-		int baselength = 0;
-		for(int i=0; i<Math.min(startpath.length, destpath.length); i++)
-		{
-			if(startpath[i].equals(destpath[i]))
-				baselength++;
-			else
-				break;
-		}
-				
-		// Build target by 
-		// a) moving back from start to common base and 
-		// b) moving forward to target
-		
-		for(int i=startpath.length; i>baselength; i--)
-			ret += ret.length()!=0? File.separator+"..": ".."; 
-	
-		for(int i=baselength; i<destpath.length; i++)
-			ret += File.separator+destpath[i];
-
-		if(ret.length()>0)
-			ret += File.separator;
-		
-		return ret;
-	}
-	
-	/**
 	 *  Create a hash map from keys and values.
 	 *  @param keys The keys.
 	 *  @param values The values.
@@ -1508,6 +1440,58 @@ public class SUtil
 			//return "id_"+name+"_"+System.currentTimeMillis()+"_"+Math.random()+"_"+(++convidcnt);
 			return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
 		}
+	}
+	
+	public static String	convertPathToRelative(String absolute)
+	{
+		// Build path as list of files (directories).
+		File	basedir	= new File(System.getProperty("user.dir"));
+		List	basedirs	= new ArrayList();
+		while(basedir!=null)
+		{
+			basedirs.add(0, basedir);
+			basedir	= basedir.getParentFile();
+		}
+
+		// Build path as list of files (directories).
+		File	target	= new File(absolute);
+		List	targets	= new ArrayList();
+		while(target!=null)
+		{
+			targets.add(0, target);
+			target	= target.getParentFile();
+		}
+		
+		// Find common path prefix
+		int index	= 0;
+		while(index<basedirs.size() && index<targets.size() && basedirs.get(index).equals(targets.get(index)))
+		{
+			index++;
+		}
+
+		String	ret;
+		if(index>0)
+		{
+			StringBuffer	buf	= new StringBuffer();
+			for(int i=index; i<basedirs.size(); i++)
+			{
+				buf.append("..");
+				buf.append(File.separatorChar);
+			}
+			for(int i=index; i<targets.size(); i++)
+			{
+				buf.append(((File)targets.get(i)).getName());
+				if(i!=targets.size()-1)
+					buf.append(File.separatorChar);
+			}
+			ret	= buf.toString();
+		}
+		else
+		{
+			ret	= absolute;
+		}
+		
+		return ret;
 	}
 	
 	/**

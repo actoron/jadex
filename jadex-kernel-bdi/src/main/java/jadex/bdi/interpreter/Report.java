@@ -252,7 +252,7 @@ public class Report implements IReport, Cloneable
 			boolean	add	= true;
 			for(int j=0; add && j<excludes.length; j++)
 			{
-				add	= elements[i].path.indexOf(excludes[j])!=-1;
+				add	= elements[i].path.indexOf(excludes[j])==-1;
 			}
 			if(add)
 				errors.add(elements[i]);
