@@ -33,8 +33,8 @@ public class LoadManagingExecutionService
 	
 	//-------- transient attributes (set during one execution cycle) --------
 	
-	/** The sleep time (if sleeping is required before executing). */
-	protected long	sleep;
+//	/** The sleep time (if sleeping is required before executing). */
+//	protected long	sleep;
 	
 	/** The last start time. */
 	protected long	start;
@@ -69,21 +69,21 @@ public class LoadManagingExecutionService
 				try
 				{
 					// Sleep before executing, to match desired CPU load.
-					if(sleep>0)
-					{
+//					if(sleep>0)
+//					{
 						try
 						{
-//							System.out.println("Sleeping: "+sleep);
-							if(sleep>1000)
-							{
-								System.out.println("Sleep warning: "+sleep);
-								sleep	= 1000;
-							}
-							Thread.sleep(sleep);
+//							System.out.println("Sleeping: "+(long)(LoadManagingExecutionService.this.timeslice*(1-load)));
+//							if(sleep>1000)
+//							{
+//								System.out.println("Sleep warning: "+sleep);
+//								sleep	= 1000;
+//							}
+							Thread.sleep((long)(LoadManagingExecutionService.this.timeslice*(1-load)));
 						}
 						catch (InterruptedException e){}
-						sleep	= 0;
-					}
+//						sleep	= 0;
+//					}
 					
 					synchronized(LoadManagingExecutionService.this)
 					{
@@ -157,11 +157,12 @@ public class LoadManagingExecutionService
 		{
 			// Calculate sleep time to meet load setting.
 			long	time	= System.nanoTime() - start;
-			sleep	= (long)((time/load - time) / 1000000);
+//			sleep	= (long)((time/load - time) / 1000000);
 			
 			// Calculate concurrency limit to meet max timeslice setting:
-			double	lastslice	= Math.max(sleep + time/1000000, 0.1);
-			double	newlimit	= limit * timeslice / lastslice;
+//			double	lastslice	= Math.max(sleep + time/1000000, 0.1);
+//			double	newlimit	= limit * timeslice / lastslice;
+			double	newlimit	= limit * (timeslice*load*1000000) / time;
 			// Use exponential annealing to avoid oscillations
 			limit	= Math.max(1, limit + (int)(0.5*(newlimit-limit)));
 			
@@ -171,10 +172,10 @@ public class LoadManagingExecutionService
 			{
 				executor.execute();
 			}
-			else
-			{
-				sleep	= 0; 	// do not sleep, when re starting after idle time.
-			}
+//			else
+//			{
+//				sleep	= 0; 	// do not sleep, when re starting after idle time.
+//			}
 		}
 	}
 	
