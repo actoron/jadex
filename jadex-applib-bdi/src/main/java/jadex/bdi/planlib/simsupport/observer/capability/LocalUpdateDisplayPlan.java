@@ -2,18 +2,15 @@ package jadex.bdi.planlib.simsupport.observer.capability;
 
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
-import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,97 +21,106 @@ public class LocalUpdateDisplayPlan extends Plan
 {
 	public void body()
 	{
-		IBeliefbase b = getBeliefbase();
-		
-		int fps = ((Integer) b.getBelief("frame_rate").getFact()).intValue();
-		int delay = 0;
-		if (fps > 0)
+		while(true)
 		{
-			delay = 1000 / fps;
-		}
-		waitFor(delay);
-		
-		ISimulationEngine engine = (ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
-		IViewport viewport = (IViewport) b.getBelief("viewport").getFact();
-		if (!viewport.isShowing())
-		{
-			return;
-		}
-		
-		String themeId = (String) b.getBelief("selected_theme").getFact();
-		
-		// Set pre- and postlayers
-		Map preLayerThemes = (Map) b.getBelief("prelayer_themes").getFact();
-		Map postLayerThemes = (Map) b.getBelief("postlayer_themes").getFact();
-		List preLayers = (List) preLayerThemes.get(themeId);
-		List postLayers = (List) postLayerThemes.get(themeId);
-		viewport.setPreLayers(preLayers);
-		viewport.setPostLayers(postLayers);
-		
-		Map themes = (Map) b.getBelief("object_themes").getFact();
-		Map theme = (Map) themes.get(themeId);
-		
-		Map objectAccess = engine.getSimObjectAccess();
-		Map typedAccess = engine.getTypedSimObjectAccess();
-		
-		List objectList = null;
-		synchronized(objectAccess)
-		{
-			synchronized(typedAccess)
+			IBeliefbase b = getBeliefbase();
+			
+			int fps = ((Integer) b.getBelief("frame_rate").getFact()).intValue();
+			int delay = 0;
+			if (fps > 0)
 			{
-				objectList = new ArrayList(objectAccess.size());
-				Set entrySet = typedAccess.entrySet();
-				for (Iterator it = entrySet.iterator(); it.hasNext(); )
+				delay = 1000 / fps;
+			}
+			waitFor(delay);
+			
+			ISimulationEngine engine = (ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
+			IViewport viewport = (IViewport) b.getBelief("viewport").getFact();
+			if (!viewport.isShowing())
+			{
+				return;
+			}
+			
+			String themeId = (String) b.getBelief("selected_theme").getFact();
+			
+			// Set pre- and postlayers
+			Map preLayerThemes = (Map) b.getBelief("prelayer_themes").getFact();
+			Map postLayerThemes = (Map) b.getBelief("postlayer_themes").getFact();
+			List preLayers = (List) preLayerThemes.get(themeId);
+			List postLayers = (List) postLayerThemes.get(themeId);
+			viewport.setPreLayers(preLayers);
+			viewport.setPostLayers(postLayers);
+			
+			Map themes = (Map) b.getBelief("object_themes").getFact();
+			Map theme = (Map) themes.get(themeId);
+			
+			Map objectAccess = engine.getSimObjectAccess();
+			Map typedAccess = engine.getTypedSimObjectAccess();
+			
+			List objectList = null;
+			synchronized(objectAccess)
+			{
+				synchronized(typedAccess)
 				{
-					Map.Entry entry = (Entry) it.next();
-					DrawableCombiner d = (DrawableCombiner) theme.get((String) entry.getKey());
-					List objects = (List) entry.getValue();
-					for (Iterator it2 = objects.iterator(); it2.hasNext(); )
+					objectList = new ArrayList(objectAccess.size());
+					Set entrySet = typedAccess.entrySet();
+					for (Iterator it = entrySet.iterator(); it.hasNext(); )
 					{
-						Object[] viewObj = new Object[3];
-						SimObject so = (SimObject) it2.next();
-						viewObj[0] = so.getPosition();
-						IVector2 vel = ((IVector2) so.getProperty("velocity"));
-						if (vel != null)
+						Map.Entry entry = (Entry) it.next();
+						DrawableCombiner d = (DrawableCombiner) theme.get((String) entry.getKey());
+						List objects = (List) entry.getValue();
+						for (Iterator it2 = objects.iterator(); it2.hasNext(); )
 						{
-							viewObj[1] = vel.copy();
+							Object[] viewObj = new Object[3];
+							SimObject so = (SimObject) it2.next();
+							viewObj[0] = so.getPosition();
+							IVector2 vel = ((IVector2) so.getProperty("velocity"));
+							if (vel != null)
+							{
+								viewObj[1] = vel.copy();
+							}
+							viewObj[2] = d;
+							objectList.add(viewObj);
 						}
-						viewObj[2] = d;
-						objectList.add(viewObj);
 					}
+				}
+				
+				Integer markedObject = (Integer) b.getBelief("marked_object").getFact();
+				SimObject mObj = null;
+				if (markedObject != null)
+				{
+					mObj = (SimObject) objectAccess.get(markedObject);
+				}
+				if (mObj != null)
+				{
+					IVector2 size = ((DrawableCombiner) theme.get(mObj.getType())).getSize();
+					size.multiply(2.0);
+					Object[] viewObj = new Object[3];
+					DrawableCombiner marker = (DrawableCombiner) b.getBelief("object_marker").getFact();;
+					marker.setDrawableSizes(size);
+					viewObj[0] = mObj.getPosition();
+					viewObj[2] = marker;
+					objectList.add(viewObj);
+				}
+				else
+				{
+					b.getBelief("marked_object").setFact(null);
 				}
 			}
 			
-			Integer markedObject = (Integer) b.getBelief("marked_object").getFact();
-			SimObject mObj = null;
-			if (markedObject != null)
+			Comparator drawOrder = (Comparator) b.getBelief("draw_order").getFact();
+			if (drawOrder != null)
 			{
-				mObj = (SimObject) objectAccess.get(markedObject);
+				Collections.sort(objectList, drawOrder);
 			}
-			if (mObj != null)
-			{
-				IVector2 size = ((DrawableCombiner) theme.get(mObj.getType())).getSize();
-				size.multiply(2.0);
-				Object[] viewObj = new Object[3];
-				DrawableCombiner marker = (DrawableCombiner) b.getBelief("object_marker").getFact();;
-				marker.setDrawableSizes(size);
-				viewObj[0] = mObj.getPosition();
-				viewObj[2] = marker;
-				objectList.add(viewObj);
-			}
-			else
-			{
-				b.getBelief("marked_object").setFact(null);
-			}
+			
+	//		System.out.println("update");
+			viewport.setObjectList(objectList);
+			viewport.refresh();
+			
+			// Waits for 1000/rate, assumes painting takes no time.
+			int fr =((Integer)getBeliefbase().getBelief("frame_rate").getFact()).intValue();
+			// System.out.println((long)(1000.d/fr));
+			waitFor((long)(1000.d/fr));
 		}
-		
-		Comparator drawOrder = (Comparator) b.getBelief("draw_order").getFact();
-		if (drawOrder != null)
-		{
-			Collections.sort(objectList, drawOrder);
-		}
-		
-		viewport.setObjectList(objectList);
-		viewport.refresh();
 	}
 }

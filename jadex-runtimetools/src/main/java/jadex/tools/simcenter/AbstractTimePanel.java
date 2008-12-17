@@ -1,7 +1,7 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.clock.IClock;
+import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
 
@@ -67,10 +67,10 @@ public abstract class AbstractTimePanel extends JPanel
 		// The context listener is used to change the clock listener, when the clock is exchanged.
 		contextlistener = new ChangeListener()
 		{
-			IClock oldclock	= getClock();
+			IClockService oldclock	= getClockService();
 			public void stateChanged(ChangeEvent e)
 			{
-				IClock newclock	= getClock();
+				IClockService newclock	= getClockService();
 				if(oldclock!=newclock)
 				{
 					oldclock.removeChangeListener(clocklistener);
@@ -95,13 +95,13 @@ public abstract class AbstractTimePanel extends JPanel
 			if(active)
 			{
 				getSimulationService().addChangeListener(contextlistener);
-				getClock().addChangeListener(clocklistener);
+				getClockService().addChangeListener(clocklistener);
 				updateView();
 			}
 			else
 			{
 				getSimulationService().removeChangeListener(contextlistener);
-				getClock().removeChangeListener(clocklistener);
+				getClockService().removeChangeListener(clocklistener);
 			}
 		}
 	}
@@ -128,9 +128,9 @@ public abstract class AbstractTimePanel extends JPanel
 	 *  Get the simulation service.
 	 *  @return The simulation service.
 	 */
-	protected IClock getClock()
+	protected IClockService getClockService()
 	{
-		return (IClock)getPlatform().getService(IClockService.class);
+		return (IClockService)getPlatform().getService(IClockService.class);
 	}
 	
 	/**

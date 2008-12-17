@@ -1,5 +1,7 @@
 package jadex.adapter.base.clock;
 
+import jadex.bridge.IClock;
+
 
 /**
  *  Continuous clock interface extends a normal clock

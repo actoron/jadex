@@ -1,5 +1,6 @@
 package jadex.adapter.base.clock;
 
+import jadex.bridge.IClock;
 import jadex.bridge.ITimer;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;

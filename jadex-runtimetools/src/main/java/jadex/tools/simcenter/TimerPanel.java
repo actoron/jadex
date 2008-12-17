@@ -1,7 +1,7 @@
 package jadex.tools.simcenter;
 
-import jadex.adapter.base.clock.IClock;
 import jadex.adapter.base.clock.Timer;
+import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
 import jadex.bridge.ITimer;
 import jadex.commons.collection.SCollection;
@@ -147,7 +147,7 @@ public class TimerPanel extends AbstractTimePanel
 		if(!active)
 			return;
 		
-		ITimer[] t = ((IClock)getPlatform().getService(IClockService.class)).getTimers();
+		ITimer[] t = ((IClockService)getPlatform().getService(IClockService.class)).getTimers();
 		//System.out.println(SUtil.arrayToString(t));
 		model.removeAllRows();
 	

@@ -1,7 +1,6 @@
 package jadex.tools.simcenter;
 
-import jadex.adapter.base.clock.IClock;
-import jadex.adapter.base.clock.IContinuousClock;
+import jadex.bridge.IClock;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -241,13 +240,13 @@ public class ClockPanel extends AbstractTimePanel
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				if(!(getClock() instanceof IContinuousClock))
+				if(!IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType()))
 					return;
 				
 				try
 				{
 					double dil = ((Double)dilation.getValue()).doubleValue();
-					((IContinuousClock)getClock()).setDilation(dil);
+					getClockService().setDilation(dil);
 				}
 				catch(NumberFormatException ex)
 				{
@@ -262,7 +261,7 @@ public class ClockPanel extends AbstractTimePanel
 				try
 				{
 					long tick = Long.parseLong(ticksize.getText());
-					getClock().setDelta(tick);
+					getClockService().setDelta(tick);
 					//System.out.println("Setting tick size to: "+tick);
 				}
 				catch(NumberFormatException ex)
@@ -311,13 +310,13 @@ public class ClockPanel extends AbstractTimePanel
 //		}
 		
 		String	tsstring	= curticksize.getText();
-		String	tsstring_new	= ""+numberformat.format(getClock().getDelta());
+		String	tsstring_new	= ""+numberformat.format(getClockService().getDelta());
 		
 		if(!tsstring.equals(tsstring_new))
 			curticksize.setText(tsstring_new);
 
 		String	ststring	= starttime.getText();
-		String	ststring_new	= ""+getClock().getStarttime();
+		String	ststring_new	= ""+getClockService().getStarttime();
 		if(!ststring.equals(ststring_new))
 			starttime.setText(ststring_new);
 		
@@ -327,15 +326,15 @@ public class ClockPanel extends AbstractTimePanel
 		else
 			currenttime.setText(""+dateformat.format(new Date(getContext().getClock().getTime())));
 		*/
-		currenttime.setText(simp.formatTime(getClock().getTime()));
+		currenttime.setText(simp.formatTime(getClockService().getTime()));
 		
-		tickcount.setText(""+getClock().getTick());
+		tickcount.setText(""+getClockService().getTick());
 		systemtime.setText(simp.formatTime(System.currentTimeMillis()));
 			
-		if(getClock().getType().equals(IClock.TYPE_CONTINUOUS))
+		if(getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS))
 		{
 			String	dstring	= curdilation.getText();
-			String	dstring_new	= ""+((IContinuousClock)getClock()).getDilation();
+			String	dstring_new	= ""+getClockService().getDilation();
 			if(!dstring.equals(dstring_new))
 			{
 				curdilation.setText(dstring_new);
@@ -343,11 +342,11 @@ public class ClockPanel extends AbstractTimePanel
 		}
 		
 		// Clock change actions
-		if(lastclocktype==null || !lastclocktype.equals(getClock().getType()))
+		if(lastclocktype==null || !lastclocktype.equals(getClockService().getClockType()))
 		{
-			lastclocktype	= getClock().getType();
-			curticksize.setText(""+getClock().getDelta());
-			ticksize.setText(""+getClock().getDelta());
+			lastclocktype	= getClockService().getClockType();
+			curticksize.setText(""+getClockService().getDelta());
+			ticksize.setText(""+getClockService().getDelta());
 			if(lastclocktype.equals(IClock.TYPE_SYSTEM))
 			{
 				emode.setSelectedItem("System");
@@ -357,8 +356,8 @@ public class ClockPanel extends AbstractTimePanel
 			else if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))
 			{
 				emode.setSelectedItem("Continuous");
-				dilation.setValue(new Double(((IContinuousClock)getClock()).getDilation()));
-				curdilation.setText(""+((IContinuousClock)getClock()).getDilation());
+				dilation.setValue(new Double(getClockService().getDilation()));
+				curdilation.setText(""+getClockService().getDilation());
 			}
 			else if(lastclocktype.equals(IClock.TYPE_TIME_DRIVEN))
 			{

@@ -1,7 +1,5 @@
-package jadex.adapter.base.clock;
+package jadex.bridge;
 
-import jadex.bridge.ITimedObject;
-import jadex.bridge.ITimer;
 
 import javax.swing.event.ChangeListener;
 

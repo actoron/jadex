@@ -1,7 +1,7 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.clock.IClock;
+import jadex.bridge.IClock;
 import jadex.commons.SGUI;
 import jadex.tools.common.ToolTipAction;
 
@@ -145,9 +145,9 @@ public class ContextPanel extends AbstractTimePanel
 		 */
 		public boolean isEnabled()
 		{
-			boolean clockok = getClock().getNextTimer()!=null 
-				|| getClock().getType().equals(IClock.TYPE_CONTINUOUS)
-				|| getClock().getType().equals(IClock.TYPE_SYSTEM);
+			boolean clockok = getClockService().getNextTimer()!=null 
+				|| getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS)
+				|| getClockService().getClockType().equals(IClock.TYPE_SYSTEM);
 			return !getSimulationService().isExecuting() && clockok;
 		}
 	};
@@ -180,9 +180,9 @@ public class ContextPanel extends AbstractTimePanel
 		 */
 		public boolean isEnabled()
 		{
-			boolean clockok = getClock().getNextTimer()!=null; 
-			return !getClock().getType().equals(IClock.TYPE_CONTINUOUS) 
-				&& !getClock().getType().equals(IClock.TYPE_SYSTEM) 
+			boolean clockok = getClockService().getNextTimer()!=null; 
+			return !getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS) 
+				&& !getClockService().getClockType().equals(IClock.TYPE_SYSTEM) 
 				&& !getSimulationService().isExecuting() && clockok;
 		}
 	};
@@ -215,9 +215,9 @@ public class ContextPanel extends AbstractTimePanel
 		 */
 		public boolean isEnabled()
 		{
-			boolean clockok = getClock().getNextTimer()!=null;
-			return !getClock().getType().equals(IClock.TYPE_CONTINUOUS)
-				&& !getClock().getType().equals(IClock.TYPE_SYSTEM)
+			boolean clockok = getClockService().getNextTimer()!=null;
+			return !getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS)
+				&& !getClockService().getClockType().equals(IClock.TYPE_SYSTEM)
 				&& !getSimulationService().isExecuting() && clockok;
 		}
 	};

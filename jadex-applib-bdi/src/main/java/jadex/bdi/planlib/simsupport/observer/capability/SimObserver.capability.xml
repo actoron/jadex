@@ -19,9 +19,6 @@
 		<import>jadex.bdi.planlib.simsupport.common.graphics.drawable.*</import>
 	</imports>
 
-	<capabilities>
-	</capabilities>
-
 	<beliefs>
 		<!-- Name of the environment -->
 		<belief name="environment_name" class="String" exported="true">
@@ -40,7 +37,7 @@
 		
 		<!-- The target frame rate -->
 		<belief name="frame_rate" class="Integer" exported="true">
-			<fact>30</fact>
+			<fact>50</fact>
 		</belief>
 		
 		<!-- Force the use of Java2D -->
@@ -101,7 +98,7 @@
 		<!-- Starts the observer -->
 		<achievegoal name="simobs_start" exported="true" />
 		
-		<performgoal name="simobs_update_display" retry="true" retrydelay="0" exclude="never"/>
+		<performgoal name="simobs_update_display" /> <!-- retry="true" retrydelay="0" exclude="never"/> --> 
 	</goals>
 
 	<plans>

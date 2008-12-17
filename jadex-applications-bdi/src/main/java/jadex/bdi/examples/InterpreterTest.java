@@ -1,5 +1,6 @@
 package jadex.bdi.examples;
 
+import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVAgentModel;
@@ -62,7 +63,7 @@ public class InterpreterTest
 			OAVAgentModel loaded = loader.loadAgentModel(model, null);
 	
 			// Initialize agent interpreter.
-			final IClockService clock = new SystemClock("system", 1, ThreadPoolFactory.createThreadPool());
+			final IClockService clock = new ClockService(new SystemClock("system", 1, ThreadPoolFactory.createThreadPool()), null);
 			clock.start();
 			final Executor exe = new Executor(ThreadPoolFactory.createThreadPool());
 			final BDIInterpreter[]	interpreters	= new BDIInterpreter[1];

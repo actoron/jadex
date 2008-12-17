@@ -9,6 +9,8 @@ import java.awt.MenuBar;
 import java.lang.reflect.InvocationTargetException;
 
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
+import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -65,6 +67,7 @@ public class ObserverCenterWindow extends JFrame
 		setBackground(null);
 		pack();
 		setSize(600, 400);
+		setLocation(SGUI.calculateMiddlePosition(this));
 		setVisible(true);
 	}
 	

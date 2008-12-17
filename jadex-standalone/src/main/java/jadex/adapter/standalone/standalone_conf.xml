@@ -52,10 +52,11 @@
 			
 			<!-- Clock service. -->
 			<property type="jadex.bridge.IClockService" name="clock_service">
-				new jadex.adapter.base.clock.SystemClock("system_clock", 1,
-					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
+				new jadex.adapter.base.clock.ClockService(
+					new jadex.adapter.base.clock.SystemClock("system_clock", 1,
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class)), $platform)
 //				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
-//					System.currentTimeMillis(), 100)
+//					System.currentTimeMillis(), 100))
 			</property>
 
 			<!-- Simulation service. -->

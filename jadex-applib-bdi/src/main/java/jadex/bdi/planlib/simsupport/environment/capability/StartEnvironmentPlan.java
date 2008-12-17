@@ -1,11 +1,5 @@
 package jadex.bdi.planlib.simsupport.environment.capability;
 
-import java.util.Iterator;
-import java.util.List;
-
-import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
-import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.environment.EuclideanSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;
@@ -21,7 +15,7 @@ public class StartEnvironmentPlan extends Plan
 		String name = ((String) b.getBelief("environment_name").getFact());
 		
 		IClockService clockService = (IClockService) b.getBelief("clock_service").getFact();
-		if (clockService == null)
+		if(clockService == null)
 		{
 			clockService = getClock();
 			b.getBelief("clock_service").setFact(clockService);

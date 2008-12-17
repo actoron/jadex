@@ -1,5 +1,7 @@
 package jadex.adapter.base.clock;
 
+import jadex.bridge.IClock;
+
 
 /**
  *  A time-driven simulation clock represents a discrete 
@@ -40,8 +42,8 @@ public class SimulationTickClock extends AbstractClock implements ISimulationClo
 	public boolean advanceEvent()
 	{
 		boolean	advanced	= false;
-		Timer t = null;
 		
+		Timer t = null;
 		synchronized(this)
 		{
 			if(STATE_RUNNING.equals(state) && timers.size()!=0)
@@ -55,7 +57,7 @@ public class SimulationTickClock extends AbstractClock implements ISimulationClo
 				if(time>currenttime)
 					currenttime = time;
 				
-				removeTimer(t);
+//				removeTimer(t);
 				
 				advanced = true;
 			}
@@ -63,6 +65,7 @@ public class SimulationTickClock extends AbstractClock implements ISimulationClo
 		
 		if(advanced)
 		{
+			removeTimer(t);
 			// Execute due timers.
 			t.getTimedObject().timeEventOccurred();
 		}

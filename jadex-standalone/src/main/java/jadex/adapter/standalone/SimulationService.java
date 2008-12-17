@@ -2,13 +2,14 @@ package jadex.adapter.standalone;
 
 import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.ThreadPoolService;
+import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.ContinuousClock;
-import jadex.adapter.base.clock.IClock;
 import jadex.adapter.base.clock.ISimulationClock;
 import jadex.adapter.base.clock.SimulationEventClock;
 import jadex.adapter.base.clock.SimulationTickClock;
 import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.execution.IExecutionService;
+import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
 import jadex.bridge.ITimer;
 import jadex.commons.ICommand;
@@ -68,7 +69,7 @@ public class SimulationService implements ISimulationService
 		{
 			public void execute(Object args)
 			{				
-				ISimulationClock simclock = (ISimulationClock)getClock();
+				IClockService simclock = getClockService();
 				
 				boolean steptime = false;
 				boolean advanceevent = false;
@@ -120,32 +121,43 @@ public class SimulationService implements ISimulationService
 	 */
 	public void start()
 	{
+		boolean dorun = false;
 		synchronized(this)
 		{
 			setMode(MODE_NORMAL);
 			setExecuting(true);
 			if(!running)
 			{
-				getClock().start();
+				dorun = true;
 				running = true;
 			}
 		}
 		
+		if(dorun)
+			getClockService().start();
+			
 		getExecutorService().start();
 	}
 	
 	/**
 	 *  Pause the execution (can be resumed via start or step).
 	 */
-	public synchronized void pause()
+	public void pause()
 	{
-		if(running)
+		boolean dostop = false;
+		synchronized(this)
 		{
-			getClock().stop();
-//			executor.stop();
-			running = false;
+			if(running)
+			{
+	//			executor.stop();
+				dostop = true;
+				running = false;
+			}
+			setExecuting(false);
 		}
-		setExecuting(false);
+		
+		if(dostop)
+			getClockService().stop();
 	}
 	
 	/**
@@ -153,10 +165,14 @@ public class SimulationService implements ISimulationService
 	 */
 	public void stepEvent()
 	{
+		boolean dorun = false;
 		synchronized(this)
 		{
-			if(!(getClock() instanceof ISimulationClock))
+			if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
+				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
+			{
 				throw new RuntimeException("Step only possible in simulation mode.");
+			}
 			if(executing)
 				throw new RuntimeException("Step only possible when executing.");
 	
@@ -164,13 +180,18 @@ public class SimulationService implements ISimulationService
 			setExecuting(true);
 			if(!running)
 			{
-				getClock().start();
-				getExecutorService().start();
+				dorun = true;
 				running = true;
 			}
 		}
 		
-		boolean advanced = ((ISimulationClock)getClock()).advanceEvent();
+		if(dorun)
+		{
+			getClockService().start();
+			getExecutorService().start();
+		}
+		
+		boolean advanced = getClockService().advanceEvent();
 		
 		synchronized(this)
 		{
@@ -189,27 +210,37 @@ public class SimulationService implements ISimulationService
 	 */
 	public void stepTime()
 	{
+		boolean dorun = false;
 		synchronized(this)
 		{
-			if(!(getClock() instanceof ISimulationClock))
+			if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
+				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
+			{
 				throw new RuntimeException("Step only possible in simulation mode.");
+			}
 			if(executing)
+			{
 				throw new RuntimeException("Step only possible when not executing.");
-	
+			}
 			//System.out.println(simclock.getTimers().length+" "+jadex.commons.SUtil.arrayToString(simclock.getTimers()));
 				
 			setMode(MODE_TIME_STEP);
 			setExecuting(true);
 			if(!running)
 			{
-				getClock().start();
-				getExecutorService().start();
+				dorun = true;
 				running = true;
 			}
 		}
 
+		if(dorun)
+		{
+			getClockService().start();
+			getExecutorService().start();
+		}
+		
 		// Do not hold lock while clock is advanced to avoid deadlocks
-		boolean advanced = ((ISimulationClock)getClock()).advanceEvent();
+		boolean advanced = getClockService().advanceEvent();
 		
 		synchronized(this)
 		{
@@ -219,7 +250,7 @@ public class SimulationService implements ISimulationService
 			}
 			else
 			{
-				timesteptime = getClock().getTime();
+				timesteptime = getClockService().getTime();
 				//System.out.println("Steptime is: "+timesteptime);
 			}
 		}
@@ -249,37 +280,28 @@ public class SimulationService implements ISimulationService
 	 */
 	public void setClockType(String type)
 	{
-		IClock oldclock	= (IClock)getClock();
-
-		IClock clock = null;
-		if(IClock.TYPE_CONTINUOUS.equals(type))
-			clock = new ContinuousClock(oldclock, (IThreadPool)platform.getService(ThreadPoolService.class));
-		else if(IClock.TYPE_SYSTEM.equals(type))
-			clock = new SystemClock(oldclock, (IThreadPool)platform.getService(ThreadPoolService.class));
-		else if(IClock.TYPE_TIME_DRIVEN.equals(type))
-			clock = new SimulationTickClock(oldclock);
-		else if(IClock.TYPE_EVENT_DRIVEN.equals(type))
-			clock = new SimulationEventClock(oldclock);
-		else
-			throw new RuntimeException("Unknown clock type: "+type);
+		IClockService cs = (IClockService)platform.getService(IClockService.class);
+		String oldtype = cs.getClockType();
 		
 		if(isExecuting())
 			throw new RuntimeException("Change clock not allowed during execution.");
 		
 		//System.out.println("Exchanged clock!!! "+clock);
-		if(getClock() instanceof ISimulationClock)
+		if(IClock.TYPE_EVENT_DRIVEN.equals(oldtype)
+			|| IClock.TYPE_TIME_DRIVEN.equals(oldtype))
+		{
 			getExecutorService().removeIdleCommand(simcommand);
+		}
 		
-		platform.removeService(IClockService.class, null);
-		platform.addService(IClockService.class, "clock_service", (IClockService)clock);
+		((ClockService)cs).setClock(type);
 		
-		if(clock instanceof ISimulationClock)
+		if(IClock.TYPE_EVENT_DRIVEN.equals(type)
+			|| IClock.TYPE_TIME_DRIVEN.equals(type))
+		{
 			getExecutorService().addIdleCommand(simcommand);
+		}
 		
 		running = false;
-		
-		if(oldclock!=null)
-			oldclock.dispose();
 		notifyListeners();
 	}
 		
@@ -341,9 +363,9 @@ public class SimulationService implements ISimulationService
 	 *  Get the platform clock.
 	 *  @return The clock.
 	 */
-	protected IClock getClock()
+	protected IClockService getClockService()
 	{
-		return (IClock)platform.getService(IClockService.class);
+		return (IClockService)platform.getService(IClockService.class);
 	}
 	
 	/**

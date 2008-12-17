@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import javax.swing.event.ChangeListener;
+
 
 /**
  *  The clock service.
@@ -30,14 +32,45 @@ public interface IClockService extends IPlatformService
 	/**
 	 *  Get the clocks start time.
 	 *  @return The start time.
-	 * /
-	public long getStarttime();*/
+	 */
+	public long getStarttime();
 	
 	/**
 	 *  Get the clock delta.
 	 *  @return The clock delta.
 	 */
 	public long getDelta();
+	
+	/**
+	 *  Get the clock state.
+	 *  @return The clock state.
+	 */
+	public String getState();
+	
+	/**
+	 *  Set the clock delta.
+	 *  @param delta The new clock delta.
+	 */
+	public void setDelta(long delta);
+	
+	/**
+	 *  Get the clocks dilation.
+	 *  @return The clocks dilation.
+	 *  // Hack. Remove? only for continuous
+	 */
+	public double getDilation();
+	
+	/**
+	 *  Set the clocks dilation.
+	 *  @param dilation The clocks dilation.
+	 *  // Hack. Remove? only for continuous
+	 */
+	public void setDilation(double dilation);
+	
+	/**
+	 *  Stop the clock.
+	 */
+	public void stop();
 	
 	/**
 	 *  Create a new timer.
@@ -56,5 +89,41 @@ public interface IClockService extends IPlatformService
 	 *  @param to The timed object.
 	 */
 	public ITimer createTickTimer(ITimedObject to);
+	
+	/**
+	 *  Get the next timer.
+	 *  @return The next timer.
+	 */
+	public ITimer getNextTimer();
+
+	/**
+	 *  Get all active timers.
+	 *  @return The active timers.
+	 */
+	public ITimer[] getTimers();
+	
+	/**
+	 *  Add a change listener.
+	 *  @param listener The change listener.
+	 */
+	public void addChangeListener(ChangeListener listener);
+	
+	/**
+	 *  Remove a change listener.
+	 *  @param listener The change listener.
+	 */
+	public void removeChangeListener(ChangeListener listener);
+	
+	/**
+	 *  Get the clock type.
+	 *  @return The clock type.
+	 */
+	public String getClockType();
+	
+	/**
+	 *  Advance one event.
+	 *  @return True, if clock could be advanced.
+	 */
+	public boolean advanceEvent();
 	
 }

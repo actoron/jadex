@@ -92,7 +92,7 @@ public class GoToDestinationTask implements ISimObjectTask
 			IVector2 currentPosition = object.getPositionAccess();
 			IVector2 velocity = targetPosition_.copy().subtract(currentPosition).normalize().multiply(speed_);
 		
-			if (currentPosition.getDistance(targetPosition_).less(tolerance_))
+			if(currentPosition.getDistance(targetPosition_).less(tolerance_))
 			{
 				// Destination reached, stop and trigger event.
 			

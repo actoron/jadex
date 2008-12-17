@@ -1,6 +1,6 @@
 package jadex.adapter.base.clock;
 
-import jadex.bridge.IClockService;
+import jadex.bridge.IClock;
 import jadex.bridge.ITimedObject;
 import jadex.bridge.ITimer;
 import jadex.commons.collection.SCollection;
@@ -19,7 +19,7 @@ import javax.swing.event.ChangeListener;
 /**
  *  Abstract base class for all clocks.
  */
-public abstract class AbstractClock implements IClockService, IClock
+public abstract class AbstractClock implements IClock
 {
 	//-------- attributes --------
 
