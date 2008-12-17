@@ -45,7 +45,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="testcap.testcase_cnt">
-					<fact>1</fact>
+					<fact>2</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

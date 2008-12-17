@@ -264,7 +264,7 @@ public class PersistenceHelper
 		registerDelegate("java.util.Calendar","nuggets.delegate.DCalendar");
 		registerDelegate("java.util.GregorianCalendar","nuggets.delegate.DCalendar");
 		registerDelegate("java.util.Collection","nuggets.delegate.DCollection");
-		registerDelegate("java.util.List","nuggets.delegate.DCollection");
+		registerDelegate("java.util.List","nuggets.delegate.DList");
 		registerDelegate("java.util.Set","nuggets.delegate.DCollection");
 		registerDelegate("java.util.Date","nuggets.delegate.DDate");
 		registerDelegate("java.util.Locale","nuggets.delegate.DLocale");

@@ -89,7 +89,7 @@ public class DList extends DCollection
 		 */
 		public void perform(IAssembler asm) throws Exception
 		{
-			l.set(i, asm.getValue(id));
+			l.add(i, asm.getValue(id));
 		}
 	}
 

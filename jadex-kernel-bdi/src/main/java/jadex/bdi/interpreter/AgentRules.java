@@ -1975,9 +1975,9 @@ public class AgentRules
 		Object ret	= null;
 		IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
 //		try
-		{
+//		{
 			ret	= pex.getValue(fetcher);
-		}
+//		}
 //		catch(Exception e)
 //		{
 //			// Hack!!! Exception should be propagated.

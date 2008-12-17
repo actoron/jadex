@@ -30,28 +30,28 @@ public class APLTesterPlan extends Plan
 		waitForInternalEvent("someevent");
 		waitForInternalEvent("someevent", 500);
 		tr.setSucceeded(true);
-		getBeliefbase().getBeliefSet("reports").addFact(tr);
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		
-//		TestReport tr = new TestReport("#2", "Tests if waitqueue works.");
-//		
-//		getWaitqueue().addInternalEvent("someevent");
-//		
-//		IInternalEvent ev3 = createInternalEvent("someevent");
-//		IInternalEvent ev4 = createInternalEvent("someevent");
-//		dispatchInternalEvent(ev3);
-//		dispatchInternalEvent(ev4);
+		tr = new TestReport("#2", "Tests if waitqueue works.");
+		
+		getWaitqueue().addInternalEvent("someevent");
+		
+		IInternalEvent ev3 = createInternalEvent("someevent");
+		IInternalEvent ev4 = createInternalEvent("someevent");
+		dispatchInternalEvent(ev3);
+		dispatchInternalEvent(ev4);
 //		System.out.println("all disptached");
-//		
-//		try
-//		{
-//			waitForInternalEvent("someevent",500);
-//			waitForInternalEvent("someevent",500);
-//			tr.setSucceeded(true);
-//		}
-//		catch(Exception e)
-//		{
-//			tr.setReason("Plan should receive both internal events.");
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+		
+		try
+		{
+			waitForInternalEvent("someevent",500);
+			waitForInternalEvent("someevent",500);
+			tr.setSucceeded(true);
+		}
+		catch(Exception e)
+		{
+			tr.setReason("Plan should receive both internal events.");
+		}
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 }

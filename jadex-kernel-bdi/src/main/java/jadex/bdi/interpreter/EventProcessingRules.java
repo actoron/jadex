@@ -1480,9 +1480,9 @@ public class EventProcessingRules
 			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rpe);
 			PlanRules.cleanupPlanWait(state, rcapa, rplan, false);
 			state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
-			System.out.println("DISPATCH_WAITQUEUE_ELEMENT_ACTION: schedulePlanInstance: "
-				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
-				+", "+rplan+", "+rpe);
+//			System.out.println("DISPATCH_WAITQUEUE_ELEMENT_ACTION: schedulePlanInstance: "
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+", "+rplan+", "+rpe);
 		}
 	};
 	
@@ -2019,16 +2019,6 @@ public class EventProcessingRules
 	 */
 	protected static void scheduleWaitqueueCandidate(IOAVState state, Object rpe, Object rplan)
 	{
-		if(BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName().indexOf("jcc")!=-1)
-		{
-			System.out.println("Post to waitqueue: "+rplan+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
-			susiciousplans.add(rplan); 
-//			IToolAdapter[]	adapters	= BDIInterpreter.getInterpreter(state).getToolAdapters();
-//			for(int i=0; i<adapters.length; i++)
-//				if(adapters[i] instanceof ISteppable)
-//					((ISteppable)adapters[i]).setStepmode(true);
-		}
-		System.out.println("Post to waitqueue: "+rplan+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 		state.addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
 	}
 	
