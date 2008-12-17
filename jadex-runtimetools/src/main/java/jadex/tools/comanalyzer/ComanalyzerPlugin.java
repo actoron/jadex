@@ -182,7 +182,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 		this.agentfilter = new AgentFilter[]{AgentFilter.EMPTY};
 		this.messagelist = new MessageList();
 		this.messagefilter = new MessageFilter[]{MessageFilter.EMPTY};
-		this.timer = new Timer();
+		this.timer = new Timer(true);
 		this.adapters = new HashMap();
 		this.paintmaps = new PaintMaps();
 	}
