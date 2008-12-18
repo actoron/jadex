@@ -37,7 +37,7 @@
 		
 		<!-- The target frame rate -->
 		<belief name="frame_rate" class="Integer" exported="true">
-			<fact>50</fact>
+			<fact>30</fact>
 		</belief>
 		
 		<!-- Force the use of Java2D -->

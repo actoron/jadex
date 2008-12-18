@@ -8,7 +8,7 @@
 		<constructor-arg type="java.lang.String"><value>lars</value></constructor-arg>
 	</bean>
 	
-	<!--  <bean name="threadPool" class="jadex.commons.concurrent.ThreadPool">
+	<bean name="threadPool" class="jadex.commons.concurrent.ThreadPool">
 		<constructor-arg>
 			<bean class="jadex.commons.concurrent.DefaultThreadPoolStrategy">
 				<constructor-arg type="int" value="0" />
@@ -16,7 +16,7 @@
 				<constructor-arg type="long" value="30000" />
 			</bean>
 		</constructor-arg>
-	</bean>-->
+	</bean>
 	
 	<!-- <bean name="threadPool" class="jadex.commons.concurrent.ThreadPoolFactory" factory-method="createThreadPool" />  -->
 
@@ -69,6 +69,12 @@
 								</key>
 								<value type="java.lang.Class">jadex.tools.introspector.IntrospectorAdapter</value>
 							</entry>
+							<entry>
+								<key>
+									<value>microplansteps</value>
+								</key>
+								<value type="boolean">true</value>
+							</entry>
 						</map>
 					</constructor-arg>
 					<constructor-arg ref="platform"/>
@@ -77,47 +83,6 @@
 				<bean id="kernel_v2_micro_factory" class="jadex.microkernel.MicroAgentFactory">
 					<constructor-arg ref="platform"/>
 				</bean>
-				
-				<!-- <bean id="kernel_v1_factory" class="jadex.runtime.impl.JadexAgentFactory">
-					<constructor-arg>
-						<map>
-							<entry>
-								<key>
-									<value>model_checking</value>
-								</key>
-								<value type="boolean">false</value>
-							</entry>
-							<entry>
-								<key>
-									<value>model_caching</value>
-								</key>
-								<value type="boolean">true</value>
-							</entry>
-							<entry>
-								<key>
-									<value>model_cache_autorefresh</value>
-								</key>
-								<value type="boolean">true</value>
-							</entry>
-							<entry>
-								<key>
-									<value>messagetype_fipa</value>
-								</key>
-								<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
-							</entry>
-							<entry>
-								<key>
-									<value>parser_factory</value>
-								</key>
-								<bean class="jadex.parser.javaccimpl.Parser">
-									<constructor-arg type="java.util.Map">
-										<null/>
-									</constructor-arg>
-								</bean>
-							</entry>
-						</map>
-					</constructor-arg>
-				</bean> -->
 			</list>
 		</property>
 
@@ -225,11 +190,16 @@
 							<key>
 								<value type="java.lang.String">clock_service</value>
 							</key>
-							<bean class="jadex.adapter.base.clock.SystemClock">
-								<constructor-arg type="java.lang.String" value="system_clock"/>
-								<constructor-arg type="long" value="1"/>
-								<constructor-arg type="jadex.commons.concurrent.IThreadPool" ref="threadPool"/>
-							</bean>
+
+							<bean class="jadex.adapter.base.clock.ClockService">
+								<constructor-arg>
+									<bean class="jadex.adapter.base.clock.SystemClock">
+										<constructor-arg type="java.lang.String" value="system_clock"/>
+										<constructor-arg type="long" value="1"/>
+										<constructor-arg type="jadex.commons.concurrent.IThreadPool" ref="threadPool"/>
+									</bean>
+								</constructor-arg>
+							</bean>	
 						</entry>
 					</map>
 				</entry>

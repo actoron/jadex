@@ -81,73 +81,29 @@
 	</properties>
 	
 	<properties type="kernel" id="kernel_v2_bdi">
-		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(jadex.commons.SUtil.createHashMap(
-			new String[]{"messagetype_fipa", "planexecutor_standard", "standard.timeout", "tooladapter.introspector"},
-			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
-			new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
-			new java.lang.Long(10000),
-			jadex.tools.introspector.IntrospectorAdapter.class
-			}), $platform)
+		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
+			jadex.commons.SUtil.createHashMap(
+				new String[]
+				{
+					"messagetype_fipa", 
+					"planexecutor_standard", 
+					"standard.timeout", 
+					"tooladapter.introspector",
+					"microplansteps"
+				},
+				new Object[]
+				{
+					new jadex.adapter.base.fipa.FIPAMessageType(), 
+					new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
+					new java.lang.Long(10000),
+					jadex.tools.introspector.IntrospectorAdapter.class,
+					Boolean.TRUE
+				}
+			), $platform)
 			</property>
 	</properties>
 	
 	<properties type="kernel" id="kernel_v2_micro">
 		<property type="agent_factory">new jadex.microkernel.MicroAgentFactory($platform)</property>
-	</properties>
-	
-	<!-- <properties type="kernel" id="kernel_v1">
-		<!- - V1 Factory / JiBX Model loader - ->
-		<!- - <property type="agent_factory">new jadex.runtime.impl.JadexAgentFactory($props)</property> - ->
-		<property type="agent_factory">new jadex.runtime.impl.JadexAgentFactory(jadex.commons.SUtil.createHashMap(
-			new String[]{"model_checking", "model_caching", "model_cache_autorefresh", "messagetype_fipa", "parser_factory"},
-			new Object[]{false, true, true, new jadex.adapter.base.fipa.FIPAMessageType(), new jadex.parser.javaccimpl.Parser(null)}
-			))</property>
-	</properties> -->
-	
-	<!--  <properties type="kernel" name="kernel_v1">
-		<!- - V1 Factory / JiBX Model loader - ->
-		<property type="agentfactory">new jadex.runtime.impl.JadexAgentFactory($props)</property>
-		<property type="model_checking">true</property>
-		<property type="model_caching">true</property>
-		<property type="model_cache_autorefresh">true</property>
-		<property type="messagetype" name="fipa">new jadex.adapter.fipa.FIPAMessageType()</property>
-		<properties type="parser">
-			<property type="parser_factory">new jadex.parser.javaccimpl.Parser($props)</property>
-			<property type="javacc_plan_reloading">false</property>
-		</properties>
-		<property name="janino_write_cache"></property>
-		<property name="janino_read_cache"></property>
-		<property name="logging.level">java.util.logging.Level.SEVERE</property>
-		<property name="logging.useParentHandlers">true</property>
-		<property name="logging.level.exceptions">java.util.logging.Level.SEVERE</property>
-		<!- - Max millis for one plan step, 0 for unlimited. - ->
-		<property name="max_planstep_time">0</property>
-		<!- - Limitations for message settings. - ->
-		<!- - Max number of stored and open outgoing messages, 0 for unlimited. - ->
-		<property name="storedmessages.size">0</property>
-		<!- - The standard timeout setting (default for protocols and agent termination). - ->
-		<property name="standard.timeout">10000</property>
-		<!- - The termination timeout (if null, standard.timeout will be used). - ->
-		<property name="termination.timeout">null</property>
-		<!- - Plan executors. - ->
-		<property name="planexecutor.standard">new jadex.runtime.JavaStandardPlanExecutor($agent)</property>
-		<property name="planexecutor.mobile">new jadex.runtime.JavaMobilePlanExecutor()</property>
-		<!- - Tool adapters - ->
-		<property name="tooladapter.introspector">new jadex.tools.introspector.IntrospectorAdapter($agent)</property>
-		<property name="tooladapter.tracer">new jadex.tools.tracer.TracerAdapter($agent)</property>
-		<!- - <property name="tooladapter.logger">new jadex.tools.logger.LoggerAdapter($agent)</property> - ->
-		<!- - Content codecs - ->
-		<property name="contentcodec.java_xml">new jadex.adapter.base.JavaXMLContentCodec()</property>
-		<property name="contentcodec.nuggets_xml">new jadex.adapter.base.NuggetsXMLContentCodec()</property>
-	</properties>
--->
-<!-- 
-	<properties name="kernel_v2">
-		<property name="agentfactory">new jadex.bdi.interpreter.JadexAgentFactory($props)</property>
-		<property type="messagetype" name="fipa">new jadex.adapter.fipa.FIPAMessageType()</property>
-		<!- - Plan executors. - ->
-		<property name="planexecutor.standard">new jadex.bdi.runtime.JavaStandardPlanExecutor($agent)</property>
-	</properties>
- -->	
- 
+	</properties> 
 </properties>

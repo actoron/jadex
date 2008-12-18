@@ -16,8 +16,7 @@
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<!-- Kernels. -->
-		<propertiesref ref="kernel_v2"/>
-<!-- 		<propertiesref ref="kernel_v1"/> -->
+		<propertiesref ref="kernel_v2_bdi"/>
 		
 		<!-- Platform services. -->
 		<properties type="services">			
@@ -55,10 +54,11 @@
 			
 			<!-- Clock service. -->
 			<property type="jadex.bridge.IClockService" name="clock_service">
-				new jadex.adapter.base.clock.SystemClock("system_clock", 1,
-					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
+				new jadex.adapter.base.clock.ClockService(
+					new jadex.adapter.base.clock.SystemClock("system_clock", 1,
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class)), $platform)
 //				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
-//					System.currentTimeMillis(), 100)
+//					System.currentTimeMillis(), 100))
 			</property>
 
 			<!-- Simulation service. - ->
@@ -82,14 +82,26 @@
 	<properties type="platform_jade" name="lars">
 	</properties>
 	
-	<properties type="kernel" id="kernel_v2">
-		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(jadex.commons.SUtil.createHashMap(
-			new String[]{"messagetype_fipa", "planexecutor_standard", "standard.timeout", "tooladapter.introspector"},
-			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
-			new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
-			new java.lang.Long(10000),
-			jadex.tools.introspector.IntrospectorAdapter.class
-			}), $platform)
+	<properties type="kernel" id="kernel_v2_bdi">
+		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
+			jadex.commons.SUtil.createHashMap(
+				new String[]
+				{
+					"messagetype_fipa", 
+					"planexecutor_standard", 
+					"standard.timeout", 
+					"tooladapter.introspector",
+					"microplansteps"
+				},
+				new Object[]
+				{
+					new jadex.adapter.base.fipa.FIPAMessageType(), 
+					new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
+					new java.lang.Long(10000),
+					jadex.tools.introspector.IntrospectorAdapter.class,
+					Boolean.FALSE
+				}
+			), $platform)
 			</property>
 	</properties>
  

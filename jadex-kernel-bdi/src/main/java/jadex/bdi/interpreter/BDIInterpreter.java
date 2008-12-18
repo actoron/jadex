@@ -41,9 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.antlr.runtime.debug.Profiler;
-
-
 /**
  *  Main entry point for the reasoning engine
  *  holding the relevant agent data structure
@@ -113,6 +110,9 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	/** The entries added from external threads. */
 	protected transient final List ext_entries;
 	
+	/** The flag for microplansteps. */
+	protected transient boolean microplansteps; 
+	
 	// todo: close tools when saving (restore on load!?)
 	/** The tool adapters. */
 	protected IToolAdapter[] tooladapters;
@@ -152,7 +152,8 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
-	public BDIInterpreter(IAgentAdapter adapter, IOAVState state, OAVAgentModel model, String config, Map arguments, Map kernelprops)
+	public BDIInterpreter(IAgentAdapter adapter, IOAVState state, OAVAgentModel model, 
+		String config, Map arguments, Map kernelprops)
 	{
 		this.adapter = adapter;
 		this.state = state;
@@ -162,6 +163,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 		this.planexecutors = new HashMap();
 		this.volcache = new LRU(50);
 		this.stacache = new LRU(20);
+		this.microplansteps = true;
 
 		state.setSynchronizator(this);
 				
@@ -238,6 +240,10 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 					}
 				}
 			}
+			
+			Boolean mps = (Boolean)kernelprops.get("microplansteps");
+			if(mps!=null)
+				this.microplansteps = mps.booleanValue();
 		}
 		
 //		OAVTreeModel.createOAVFrame("Agent State", getState(), getAgent()).setVisible(true);
@@ -823,9 +829,12 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	 */
 	public void startMonitorConsequences()
 	{
-		monitor_consequences++;
-		if(monitor_consequences==1)
-			agenda_state = getRuleSystem().getAgenda().getState();
+		if(microplansteps)
+		{
+			monitor_consequences++;
+			if(monitor_consequences==1)
+				agenda_state = getRuleSystem().getAgenda().getState();
+		}
 	}
 
 	/**
@@ -834,24 +843,27 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	 */
 	public void endMonitorConsequences()
 	{
-		assert monitor_consequences>0;
-	
-		monitor_consequences--;
-		// Interrupt only when not in atomic block.
-		if(monitor_consequences==0 && !isAtomic())
+		if(microplansteps)
 		{
-			// When consequences pause plan (micro step)
-			// to allow consequences being executed.
-			// todo: only when actions are added this is of importance
-			state.notifyEventListeners();
-			if(agenda_state!=getRuleSystem().getAgenda().getState())
+			assert monitor_consequences>0;
+		
+			monitor_consequences--;
+			// Interrupt only when not in atomic block.
+			if(monitor_consequences==0 && !isAtomic())
 			{
-				Object rplan = getCurrentPlan();
-				if(rplan!=null)
+				// When consequences pause plan (micro step)
+				// to allow consequences being executed.
+				// todo: only when actions are added this is of importance
+				state.notifyEventListeners();
+				if(agenda_state!=getRuleSystem().getAgenda().getState())
 				{
-//					rplan.interruptPlanStep();
-					// todo: support different plan executors
-					getPlanExecutor(rplan).interruptPlanStep(rplan);
+					Object rplan = getCurrentPlan();
+					if(rplan!=null)
+					{
+	//					rplan.interruptPlanStep();
+						// todo: support different plan executors
+						getPlanExecutor(rplan).interruptPlanStep(rplan);
+					}
 				}
 			}
 		}
