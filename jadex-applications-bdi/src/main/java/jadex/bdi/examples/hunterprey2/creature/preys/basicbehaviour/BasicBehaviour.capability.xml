@@ -125,7 +125,7 @@
 					?rparam = (parameter (parameter_has_name "$food") (parameter_has_value ?food))
 					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 					
-					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?infood))
+					?rinparam = (parameter (parameter_has_name "food") (parameter_has_value ?infood))
 					?ringoal = (goal (parameterelement_has_parameters contains ?rinparam &amp;
 						:(&lt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction 
 							"jadex.bdi.examples.hunterprey.Creature" "getDistance" ?myself ?food)
