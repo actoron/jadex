@@ -28,7 +28,7 @@ public class  MovePlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("a) move: "+getName());
+
 		RequestMove rm = (RequestMove)getParameter("action").getValue();
 
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
@@ -37,17 +37,20 @@ public class  MovePlan extends Plan
 		// Wait until all tasks are processed by the environment.
 		waitForCondition("notasks");
 
-//		System.out.println("b) move: "+getName());
-
 		// perform move goal in sim engine
 		if(ti.getResult()!=null && ti.getResult() instanceof IGoal)
 		{
 			IGoal moveGoal = (IGoal) ti.getResult();
+			// is this is too late ?
 			dispatchSubgoalAndWait(moveGoal);
+			//waitForGoal(moveGoal);
+			env.removeGoalTask(ti);
 			assert moveGoal.isSucceeded() : "Sim-Engine Problem with move goal"+moveGoal; 
 			ti.setResult(new Boolean(moveGoal.isSucceeded()));
 		}
 		
+		// Wait until all sim goals are processed by other plans.
+		waitForCondition("nogoaltasks");
 		
 		// Result is null, when creature died and action was not executed.
 		if(ti.getResult()!=null && ((Boolean)ti.getResult()).booleanValue())

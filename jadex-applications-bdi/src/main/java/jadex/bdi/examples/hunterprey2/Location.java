@@ -107,4 +107,10 @@ public class Location
 	public IVector2 getAsIVector() {
 		return new Vector2Double(this.x, this.y);
 	}
+	
+	public String toString()
+	{
+		
+		return "Location("+x+","+y+")";
+	}
 }

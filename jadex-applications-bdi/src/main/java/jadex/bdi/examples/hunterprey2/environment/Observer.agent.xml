@@ -87,18 +87,21 @@
 	
 	<goals>
 		<achievegoal name="end_agent" />
-		
+		<!--  
 		<achievegoalref name="simobs_start">
         	<concrete ref="obscap.simobs_start"/>
     	</achievegoalref>
+    	-->
 	</goals>
 	
+	<!--
 	<plans>
-    	<!-- Initialization Plan. -->
+    	<!- - Initialization Plan. - ->
     	<plan name="initialization">
       		<body class="InitializeObserverPlan"/>
     	</plan>
     </plans>
+	-->
 	
 	<configurations>
 		<configuration name="default">

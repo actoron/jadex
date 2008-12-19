@@ -43,6 +43,11 @@
 			<fact>1000</fact>
 		</belief>
 		
+		<!-- the simulation (tick) flag -->
+		<belief name="tick" class="Boolean">
+			<fact>new Boolean(false)</fact>
+		</belief>
+		
 		<!-- all registered observers -->
 		<beliefset name="observers" class="Observer" />
 		
@@ -110,6 +115,14 @@
 		<!-- The selected start theme -->
 		<beliefref name="selected_theme">
 			<concrete ref="obscap.selected_theme"/>
+		</beliefref>
+
+		<!-- Offer canvas access for building a custom GUI. -->
+		<beliefref name="custom_gui">
+			<concrete ref="obscap.custom_gui"/>
+		</beliefref>
+		<beliefref name="worldmap">
+			<concrete ref="obscap.canvas"/>
 		</beliefref>
 	
 	</beliefs>
@@ -304,22 +317,23 @@
     	
     	
     	
-    	<!-- gui plan -->
+    	<!-- gui plan - ->
     	<plan name="start_environment_gui">
     		<body class="EnvironmentGuiPlan"/>
     		<trigger>
-    			<!-- todo: use condition if environment is set -->
 				<goal ref="start_environment_gui" />
 			</trigger>
     	</plan>
+    	-->
     	
-    	<!-- sim observer init Plan. -->
+    	<!-- sim observer init Plan. - ->
     	<plan name="obs_initialization">
       		<body class="InitializeObserverPlan"/>
       		<trigger>
 				<goal ref="obs_initialization" />
 			</trigger>
     	</plan>
+    	-->
     	
 	</plans>
 
@@ -433,6 +447,11 @@
 			?mbel_env	= (mbelief (element_has_name "environment"))
 			?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (taskSize 0))
 		</condition>
+		<condition name="nogoaltasks">
+			?rbel_env	= (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+			?mbel_env	= (mbelief (element_has_name "environment"))
+			?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (goalTaskSize 0))
+		</condition>
 	</expressions>
 
 	<properties>
@@ -445,11 +464,11 @@
 				<initialbelief ref="rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
-				<initialbelief ref="force_java2d">
-					<fact>new Boolean(true)</fact>
-				</initialbelief>
 				<initialbelief ref="selected_theme">
 					<fact>"default"</fact>
+				</initialbelief>
+				<initialbelief ref="custom_gui">
+					<fact>new Boolean(true)</fact>
 				</initialbelief>
 				
 			</beliefs>

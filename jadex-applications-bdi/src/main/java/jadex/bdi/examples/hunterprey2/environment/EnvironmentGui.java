@@ -12,6 +12,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -46,8 +47,11 @@ public class EnvironmentGui	extends JFrame
 {
 	//-------- attributes --------
 	
-	/** The panel showing the map. */
-	protected MapPanel	map;
+//	/** The panel showing the map. */
+//	protected MapPanel	map;
+	
+	/** The canvas provided by observer capability */
+	protected JPanel map;
 	
 	/** The round counter label. */
 	protected JLabel	roundcnt;
@@ -63,18 +67,43 @@ public class EnvironmentGui	extends JFrame
 	
 	//-------- constructors --------
 
+	public EnvironmentGui(final IExternalAccess agent)
+	{
+		this(agent, null);
+	}
+	
 	/**
 	 *  Create a new gui plan.
+	 *  @param agent The agent created this GUI
+	 *  @param world The displayable word canvas. If 'null' internal MapPanel is used.
+	 *  
 	 */
-	public EnvironmentGui(final IExternalAccess agent)
+	public EnvironmentGui(final IExternalAccess agent, Canvas worldmap)
 	{
 		super(agent.getAgentName());
 		
-		// Map panel.
-		this.map	= new MapPanel();
-		map.setMinimumSize(new Dimension(300, 300));
-		map.setPreferredSize(new Dimension(600, 600));
-
+		
+		if (worldmap != null)
+		{
+			// create JPanel container with world map
+			
+			this.map = new JPanel();
+			worldmap.setMinimumSize(new Dimension(300, 300));
+			worldmap.setPreferredSize(new Dimension(600, 600));
+			map.setMinimumSize(new Dimension(300, 300));
+			map.setPreferredSize(new Dimension(600, 600));
+			map.add(worldmap);
+		}
+		else
+		{
+			// Map panel.
+			this.map	= new MapPanel();
+			map.setMinimumSize(new Dimension(300, 300));
+			map.setPreferredSize(new Dimension(600, 600));
+		}
+		
+		
+		
 		JPanel options = createOptionsPanel(agent);
 
 		this.creatures = new CreaturePanel();
@@ -254,7 +283,11 @@ public class EnvironmentGui	extends JFrame
 				Vision	vision	= new Vision();
 				vision.setObjects(env.getAllObjects());
 	
-				map.update(new CurrentVision(dummy, vision));
+				if (map instanceof MapPanel)
+				{
+					((MapPanel)map).update(new CurrentVision(dummy, vision));
+				}
+				
 				creatures.update(env.getCreatures());
 				observers.update(env.getCreatures());
 				highscore.update(env.getHighscore());

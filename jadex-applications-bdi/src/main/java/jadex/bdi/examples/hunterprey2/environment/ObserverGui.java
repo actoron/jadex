@@ -140,7 +140,10 @@ public class ObserverGui	extends EnvironmentGui
 				if(vision!=null)
 				{
 					// Update map and creature list from vision.
-					map.update(new CurrentVision(me, vision));
+					if (map instanceof MapPanel)
+					{
+						((MapPanel)map).update(new CurrentVision(me, vision));
+					}
 					creatures.update(vision.getCreatures());
 					observers.update(vision.getCreatures());
 				}

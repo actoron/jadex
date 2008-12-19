@@ -19,14 +19,13 @@ import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.impl.InternalEventFlyweight;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;
 
 import java.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +33,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,7 +59,7 @@ public class Environment implements IEnvironment
 	
 	// this is no plan, so we need a external access on the
 	// agent that created this Environment to dispatch sim goals
-	/** The agent created this evnironment */
+	/** The agent created this environment */
 	protected IExternalAccess agent;
 
 	/** The creatures simId's */
@@ -84,6 +82,9 @@ public class Environment implements IEnvironment
 
 	/** The list for move and eat requests. */
 	protected List tasklist;
+	
+	/** The list for task that needed a sim goal */
+	protected List goaltasks;
 
 	/** The helper object for bean events. */
 	protected SimplePropertyChangeSupport pcs;
@@ -120,35 +121,40 @@ public class Environment implements IEnvironment
 		this.food = new HashSet();
 		this.world = new MultiCollection();
 		this.tasklist = new ArrayList();
+		this.goaltasks = new ArrayList();
 		this.pcs = new SimplePropertyChangeSupport(this);
 		
-		// Pre-declare object types
-//		super.declareObjectType(OBJECT_TYPE_HUNTER);
-//		super.declareObjectType(OBJECT_TYPE_PREY);
-//		super.declareObjectType(OBJECT_TYPE_OBSTACLE);
-//		super.declareObjectType(OBJECT_TYPE_FOOD);
-		
-		// Actions
-//		engine.addAction(new PickupWasteAction());
-//		engine.addAction(new DisposeWasteAction());
-//		engine.addAction(new ChargeBatteryAction());
-		
 		this.saveinterval	= 5000;
-		// Read highscore list.
-		try
-		{
-			ObjectInputStream is = new ObjectInputStream(SUtil.getResource("highscore.dmp", Environment.class.getClassLoader()));
-			this.highscore = SUtil.arrayToList(is.readObject());
-			is.close();
-		}
-		catch(Exception e)
-		{
-			System.out.println(e);
-			highscore = new ArrayList();
-		}
+		highscore = loadHighscore();
+		
 	}
+	
 
 	//--- simulation engine support methods -----
+	
+	protected String getSimObjectType(WorldObject wo) {
+		if (wo instanceof Hunter)
+		{
+			return OBJECT_TYPE_HUNTER;
+		}
+		else if (wo instanceof Prey)
+		{
+			return OBJECT_TYPE_PREY;
+		}
+		else if (wo instanceof Food)
+		{
+			return OBJECT_TYPE_FOOD;
+		}
+		else if (wo instanceof Obstacle) 
+		{
+			return OBJECT_TYPE_OBSTACLE;
+		}
+		else
+		{
+			return "undefined";
+		}
+		
+	}
 	
 	/**
 	 * Create a sim object
@@ -156,6 +162,8 @@ public class Environment implements IEnvironment
 	 */
 	private WorldObject createSimObject(WorldObject wo, String type, Map properties, List tasks, Boolean sigDes, Boolean listen)
 	{
+		assert agent != null : this + " - no external access provided";
+		
 		Location l = wo.getLocation();
 		Map props = properties;
 		if (properties == null)
@@ -185,7 +193,8 @@ public class Environment implements IEnvironment
 	 */
 	private WorldObject destroySimObject(WorldObject wo)
 	{
-
+		assert agent != null : this + " - no external access provided";
+		
 		IGoal cg = agent.createGoal("sim_destroy_object");
 		cg.getParameter("object_id").setValue(wo.getSimId());
 		agent.dispatchTopLevelGoalAndWait(cg);
@@ -194,7 +203,8 @@ public class Environment implements IEnvironment
 		return wo;
 	}
 	
-	private IGoal createMoveGoal(Creature me, String dir) {
+	private IGoal getMoveGoal(Creature me, String dir) 
+	{
 		assert agent != null : this + " - no external access provided";
 		
 		IVector2 destination = createLocation(me.getLocation(), dir).getAsIVector();
@@ -204,8 +214,36 @@ public class Environment implements IEnvironment
 		goToDest.getParameter("destination").setValue(destination);
 		goToDest.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
 		goToDest.getParameter("tolerance").setValue(new Vector1Double(0.01));
-		
+
 		return goToDest;
+	}
+	
+	/**
+	 *  Add a move or eat goal to the queue.
+	 */
+	public void addGoalTask(TaskInfo task)
+	{
+		goaltasks.add(task);
+		//this.pcs.firePropertyChange("goaltasks", goaltasks.size()-1, goaltasks.size());
+	}
+	
+	/**
+	 * Remove a goal from the queue
+	 * @param task
+	 */
+	public void removeGoalTask(TaskInfo task)
+	{
+		goaltasks.remove(task);
+		//this.pcs.firePropertyChange("goaltasks", goaltasks.size()+1, goaltasks.size());
+	}
+	
+	/**
+	 *  Return the size of the task list.
+	 *  @return The task size.
+	 */
+	public int getGoalTaskSize()
+	{
+		return goaltasks.size();
 	}
 
 	//-------- interface methods --------
@@ -315,6 +353,16 @@ public class Environment implements IEnvironment
 		this.pcs.firePropertyChange("taskSize", tasklist.size()-1, tasklist.size());
 		return ret;
 	}
+	
+//	/**
+//	 * Remove a task from the queue
+//	 * @param task
+//	 */
+//	public void removeTask(TaskInfo task)
+//	{
+//		tasklist.remove(task);
+//		this.pcs.firePropertyChange("taskSize", tasklist.size()+1, tasklist.size());
+//	}
 
 	/**
 	 *  Get the current vision (without updating the creatures leaseticks).
@@ -539,8 +587,8 @@ public class Environment implements IEnvironment
 			{
 				if(!acted.contains(params[1]) && move((Creature)params[1], (String)params[2]))
 				{
-					
-					tasks[i].setResult(createMoveGoal((Creature)params[1], (String)params[2]));
+					tasks[i].setResult(getMoveGoal((Creature)params[1], (String)params[2]));
+					goaltasks.add(tasks[i]);
 					acted.add(params[1]);
 				}
 				else
@@ -587,7 +635,7 @@ public class Environment implements IEnvironment
 //					System.out.println("removed goal");
 //					
 //					// find TaskInfo for actor
-//					// TODO: change from list to map?
+//					// TO DO: change from list to map?
 //					TaskInfo task = null;
 //					for (int j = 0; task==null && j<tasks.length; j++)
 //					{
@@ -607,10 +655,34 @@ public class Environment implements IEnvironment
 //			}
 //			
 //			// let agent finish the goals
-//			// TODO: change to something agent specific
+//			// TO DO: change to something agent specific
 //			agent.waitFor(100);
 //			
 //		}
+		
+		
+		
+//		// let the goals finish
+//		agent.waitFor(500);
+//		// change finished move goals to boolean
+//		while (!goaltasks.isEmpty())
+//		{
+//			for (Iterator gt = goaltasks.iterator(); gt.hasNext();)
+//			{
+//				TaskInfo task = (TaskInfo) gt.next();
+//				IGoal goal = (IGoal) task.getResult();
+//				if (goal.isFinished())
+//				{
+//					gt.remove();
+//					assert goal.isSucceeded() : "difference between discrete and continous world";
+//					task.setResult(new Boolean(true));
+//				}
+//			}
+//			System.err.println("goaltasks:" +goaltasks.size());
+//			agent.waitFor(100);
+//			
+//		}
+		
 		
 		tasklist.clear();
 		this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
@@ -660,13 +732,15 @@ public class Environment implements IEnvironment
 	 *  @param me The creature.
 	 *  @param dir The direction.
 	 */
-	private boolean move(Creature me, String dir)
+	public boolean move(Creature me, String dir)
 	{
-		System.out.println("move called: " + me + " -> " + dir);
+		
 		
 		me	= getCreature(me);
 		me.setLeaseticks(DEFAULT_LEASE_TICKS);
 		Location newloc = createLocation(me.getLocation(), dir);
+		
+		System.out.println("move called: " + me.getName()+" ("+dir+") -> "+newloc);
 		
 		Collection col = world.getCollection(newloc);
 		if(col!=null && col.size()==1 && col.iterator().next() instanceof Obstacle)
@@ -740,29 +814,7 @@ public class Environment implements IEnvironment
 		return (WorldObject[])ret.toArray(new WorldObject[ret.size()]);
 	}
 	
-	protected String getSimObjectType(WorldObject wo) {
-		if (wo instanceof Hunter)
-		{
-			return OBJECT_TYPE_HUNTER;
-		}
-		else if (wo instanceof Prey)
-		{
-			return OBJECT_TYPE_PREY;
-		}
-		else if (wo instanceof Food)
-		{
-			return OBJECT_TYPE_FOOD;
-		}
-		else if (wo instanceof Obstacle) 
-		{
-			return OBJECT_TYPE_OBSTACLE;
-		}
-		else
-		{
-			return "undefined";
-		}
-		
-	}
+	
 
 	/**
 	 *  Create a location.
@@ -772,7 +824,8 @@ public class Environment implements IEnvironment
 	 */
 	protected Location createLocation(Location loc, String dir)
 	{
-		// TODO: respect world end, don't use sphere like behavior
+		// TO DO: respect world end, don't use sphere like behavior
+		// TO DO: flip over x to use sim engine (math) behavior
 		int sizey = getHeight();
 		int sizex = getWidth();
 		
@@ -781,19 +834,23 @@ public class Environment implements IEnvironment
 
 		if(RequestMove.DIRECTION_UP.equals(dir))
 		{
-			y = (sizey+y-1)%sizey;
+			y = (y+1 <= sizey ? y+1 : y);
+			//y = (sizey+y-1)%sizey;
 		}
 		else if(RequestMove.DIRECTION_DOWN.equals(dir))
 		{
-			y = (y+1)%sizey;
+			y = (y-1 >= 0 ? y-1 : y);
+			//y = (y+1)%sizey;
 		}
 		else if(RequestMove.DIRECTION_LEFT.equals(dir))
 		{
-			x = (sizex+x-1)%sizex;
+			x = (x-1 >= 0 ? x-1 : x);
+			//x = (sizex+x-1)%sizex;
 		}
 		else if(RequestMove.DIRECTION_RIGHT.equals(dir))
 		{
-			x = (x+1)%sizex;
+			x = (x+1 <= sizex ? x+1 : x);
+			//x = (x+1)%sizex;
 		}
 
 		return new Location(x, y);
@@ -875,7 +932,9 @@ public class Environment implements IEnvironment
 	 */
 	protected WorldObject[] getNearObjects(Location loc, int range)
 	{
-		// TODO: respect world end, don't use sphere like behavior
+		// TO DO: respect world end, don't use sphere like behavior
+		// TO DO: flip over x to use sim engine (math) behavior
+		
 		int sizey = getHeight();
 		int sizex = getWidth();
 		
@@ -883,11 +942,19 @@ public class Environment implements IEnvironment
 		int x = loc.getX();
 		int y = loc.getY();
 
-		for(int i=x-range; i<=x+range; i++)
+		int minx = (x-range>=0 ? x-range : 0 );
+		int maxx = (x+range<=sizex ? x+range : sizex);
+		
+		int miny = (y-range>=0 ? y-range : 0 );
+		int maxy = (y+range<=sizey ? y+range : sizey);
+		
+		//for(int i=x-range; i<=x+range; i++)
+		for(int i=minx; i<=maxx; i++)
 		{
-			for(int j=y-range; j<=y+range; j++)
+			//for(int j=y-range; j<=y+range; j++)
+			for(int j=miny; j<=maxy; j++)
 			{
-				Collection tmp = world.getCollection(new Location((i+sizex)%sizex, (j+sizey)%sizey));
+				Collection tmp = world.getCollection(new Location(i, j));
 				if(tmp!=null)
 					ret.addAll(tmp);
 			}
@@ -915,10 +982,59 @@ public class Environment implements IEnvironment
 	}
 
 	/**
+	 *  Load the highscore from a file.
+	 */
+	private List loadHighscore()
+	{
+		List highscore_ = null;
+		
+		// Read highscore list.
+		InputStream is = null;
+		try
+		{
+//			InputStream tmp = SUtil.getResource("highscore.dmp", Environment.class.getClassLoader());
+//			ObjectInputStream is = new ObjectInputStream(tmp);
+//			this.highscore = SUtil.arrayToList(is.readObject());
+//			is.close();
+			
+			is = SUtil.getResource("highscore.dmp", Environment.class.getClassLoader());
+			StringBuffer out = new StringBuffer();
+			byte[] b = new byte[4096];
+			for(int n; (n = is.read(b)) != -1;) 
+			{
+				out.append(new String(b, 0, n));
+			}
+			highscore_ = SUtil.arrayToList(Nuggets.objectFromXML(out.toString(), Environment.class.getClassLoader()));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+//			System.out.println(e);
+			highscore_ = new ArrayList();
+		}
+		finally
+		{
+			if(is!=null)
+			{
+				try
+				{
+					is.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
+		
+		return highscore_;
+	}
+	
+	/**
 	 *  Save the highscore to a file.
 	 */
 	public synchronized void saveHighscore()
 	{
+		OutputStreamWriter os = null;
 		try
 		{
 			String outputFile = "highscore.dmp";
@@ -929,15 +1045,29 @@ public class Environment implements IEnvironment
 			//os.close();
 			
 			// write as xml file
-			OutputStreamWriter os = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
+			os = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
 			os.write(Nuggets.objectToXML(getHighscore(),this.getClass().getClassLoader()));
 			os.close();
 
+			System.out.println("Saved highscore.");
 		}
 		catch(Exception e)
 		{
 			System.out.println("Error writing hunterprey highscore 'highscore.dmp'.");
 			e.printStackTrace();
+		}
+		finally
+		{
+			if(os!=null)
+			{
+				try
+				{
+					os.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 	}
 
