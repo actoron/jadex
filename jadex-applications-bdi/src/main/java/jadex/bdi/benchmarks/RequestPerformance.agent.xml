@@ -1,0 +1,97 @@
+<!--
+	<H3>Test request protocol perfomance.</H3>
+	
+	Starts a partner agent and performs a number of simple
+	request-reply conversations using the request capability. 
+	Prints out the time it takes.
+
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="RequestPerformance"
+	package="jadex.bdi.benchmarks">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.bdi.runtime.IFilter</import>
+	</imports>
+
+	<capabilities>
+		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- The master is responsible for starting the second agent. -->
+		<belief name="master" class="boolean" exported="true">
+			<fact>true</fact>
+		</belief>
+	
+		<!-- If the receiver is non-null, this agent is the sender. -->
+		<belief name="receiver" class="IAgentIdentifier" exported="true" />
+
+		<!-- The number of conversations to perform. -->
+		<belief name="max" class="int" exported="true">
+			<fact>1000</fact>
+		</belief>
+	</beliefs>
+	
+	<plans>
+		<!-- The master plan starts the slave agent. -->
+		<plan name="master_plan">
+			<body class="RequestMasterPlan" />
+			<trigger>
+				<condition>
+					?mbelief= (mbelief (element_has_name "master"))
+					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact true))
+				</condition>
+			</trigger>
+		</plan>
+
+		<!-- The request sender plan starts request protocols. -->
+		<plan name="sender_plan">
+			<body class="RequestSenderPlan" />
+			<trigger>
+				<condition>
+					?mbelief= (mbelief (element_has_name "receiver"))
+					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact != null))
+				</condition>
+			</trigger>
+		</plan>
+
+		<!-- Receiver plan for answering a single request. -->
+		<plan name="receiver_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="procap.rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="procap.rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestReceiverPlan"/>
+			<trigger>
+				<goal ref="procap.rp_execute_request"/>
+			</trigger>
+		</plan>
+	</plans>
+
+
+	<properties>
+        <!-- <property name="debugging">true</property> -->
+        <property name="logging.level">Level.INFO</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="procap.rp_filter">
+					<fact>IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</agent>
+
