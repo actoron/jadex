@@ -202,20 +202,7 @@ public class SpringPlatform extends AbstractPlatform
 			for(Iterator it = daemagents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
-				ams.createAgent(name, (String)daemagents.get(name), null, null, new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						AgentIdentifier agent = (AgentIdentifier)result;
-						daemonagents.add(agent);
-						((IAMS)getService(IAMS.class)).startAgent(agent, null);
-					}
-
-					public void exceptionOccurred(Exception exception)
-					{
-						System.err.println("Exception occurred: " + exception);
-					}
-				});
+				createAgent(name, (String)daemagents.get(name), null, null, true);
 			}
 		}
 		
@@ -226,19 +213,7 @@ public class SpringPlatform extends AbstractPlatform
 			for(Iterator it = appagents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
-				ams.createAgent(name, (String)appagents.get(name), null, null, new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						AgentIdentifier agent = (AgentIdentifier)result;
-						((IAMS)getService(IAMS.class)).startAgent(agent, null);
-					}
-
-					public void exceptionOccurred(Exception exception)
-					{
-						System.err.println("Exception occurred: " + exception);
-					}
-				});
+				createAgent(name, (String)appagents.get(name), null, null, false);
 			}
 		}
 	}

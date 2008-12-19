@@ -199,6 +199,7 @@
 										<constructor-arg type="jadex.commons.concurrent.IThreadPool" ref="threadPool"/>
 									</bean>
 								</constructor-arg>
+								<constructor-arg ref="platform"/>
 							</bean>	
 						</entry>
 					</map>

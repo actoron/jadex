@@ -6,6 +6,7 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
@@ -15,10 +16,12 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,7 +56,19 @@ public class Platform extends AbstractPlatform
 
 	/** An application agent. */
 	public static final String AGENT = "agent";
+	
+	/** An agent argument. */
+	public static final String ARGUMENT = "argument";
 
+	/** An agent argument set. */
+	public static final String ARGUMENTSET = "argumentset";
+	
+	/** An agent model. */
+	public static final String MODEL = "model";
+	
+	/** An agent config. */
+	public static final String CONFIG = "config";
+	
 //	/** The allowed command-line options. */
 //	public static final Set COMMAND_LINE_OPTIONS;
 
@@ -258,39 +273,30 @@ public class Platform extends AbstractPlatform
 			Property[] props = platconf.getProperties(DAEMONAGENT);
 			for(int i = 0; i < props.length; i++)
 			{
-				ams.createAgent(props[i].getName(), props[i].getValue(), null, null, new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						AgentIdentifier agent = (AgentIdentifier)result;
-						daemonagents.add(agent);
-						((IAMS)getService(IAMS.class)).startAgent(agent, null);
-					}
-	
-					public void exceptionOccurred(Exception exception)
-					{
-						System.err.println("Exception occurred: " + exception);
-					}
-				});
+				createAgent(props[i].getName(), props[i].getValue(), null, null, true);
+			}
+			Properties[] subprops = platconf.getSubproperties(DAEMONAGENT);
+			for(int i = 0; i < subprops.length; i++)
+			{
+				Map args = getArguments(subprops[i]);
+				Property model = subprops[i].getProperty(MODEL);
+				Property config = subprops[i].getProperty(CONFIG);
+				createAgent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
 			}
 	
 			// Create application agents.
 			props = platconf.getProperties(AGENT);
 			for(int i = 0; i < props.length; i++)
 			{
-				ams.createAgent(props[i].getName(), props[i].getValue(), null, null, new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						AgentIdentifier agent = (AgentIdentifier)result;
-						((IAMS)getService(IAMS.class)).startAgent(agent, null);
-					}
-	
-					public void exceptionOccurred(Exception exception)
-					{
-						System.err.println("Exception occurred: " + exception);
-					}
-				});
+				createAgent(props[i].getName(), props[i].getValue(), null, null, false);
+			}
+			subprops = platconf.getSubproperties(AGENT);
+			for(int i = 0; i < subprops.length; i++)
+			{
+				Map args = getArguments(subprops[i]);
+				Property model = subprops[i].getProperty(MODEL);
+				Property config = subprops[i].getProperty(CONFIG);
+				createAgent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
 			}
 		}
 		
@@ -315,6 +321,49 @@ public class Platform extends AbstractPlatform
 			factories.add(fac);
 		}
 		return new MetaAgentFactory(factories);
+	}
+	
+	/**
+	 *  Get an agent's arguments.
+	 *  @param props The argument properties.
+	 *  @return The map of arguments.
+	 */
+	protected Map getArguments(Properties props)
+	{
+		Map arguments = new HashMap();
+		
+		Property[] args = props.getProperties(ARGUMENT);
+		for(int i = 0; i < args.length; i++)
+		{
+			Object arg = null;
+			try
+			{
+				ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
+				arg = new JavaCCExpressionParser().parseExpression(args[i].getValue(), null, null, ls.getClassLoader()).getValue(null);
+				arguments.put(args[i].getName(), arg);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Argument could not be parsed: "+args[i].getValue());
+			}
+		}
+		Property[] argsets = props.getProperties(ARGUMENTSET);
+		for(int i = 0; i < argsets.length; i++)
+		{
+			Object arg = null;
+			try
+			{
+				ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
+				arg = new JavaCCExpressionParser().parseExpression(argsets[i].getValue(), null, null, ls.getClassLoader()).getValue(null);
+				arguments.put(argsets[i].getName(), arg);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Argument could not be parsed: "+argsets[i].getValue());
+			}
+		}
+		
+		return arguments.size()>0? arguments: null;
 	}
 
 	//-------- Static part --------

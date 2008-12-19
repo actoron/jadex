@@ -405,6 +405,29 @@ public abstract class AbstractPlatform implements IPlatform
 			}
 		}).start();
 	}
+	
+	/**
+	 *  Create an agent.
+	 */
+	protected void createAgent(String name, String model, String config, Map args, final boolean daemon)
+	{
+		IAMS ams = (IAMS)getService(IAMS.class);
+		ams.createAgent(name, model, config, args, new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				AgentIdentifier agent = (AgentIdentifier)result;
+				if(daemon)
+					daemonagents.add(agent);
+				((IAMS)getService(IAMS.class)).startAgent(agent, null);
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				System.err.println("Exception occurred: " + exception);
+			}
+		});
+	}
 
 	//-------- static part --------
 

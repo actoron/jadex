@@ -2,11 +2,7 @@ package jadex.adapter.base.clock;
 
 
 import jadex.bridge.IClock;
-import jadex.commons.concurrent.Executor;
-import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
-
-import java.util.Iterator;
 
 /**
  *  Clock implementation that corresponds to the exact system clock.
