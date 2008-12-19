@@ -1,7 +1,7 @@
 package jadex.bdi.examples.hunterprey2;
 
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
+import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 
 
 /**
@@ -99,9 +99,12 @@ public class Location
 		return getX() << 16 + getY();
 	}
 	
-	// --- simulation engine convinience methods ---
-
+	
+	/** 
+	 * simulation-engine convenience method
+	 * @return
+	 */
 	public IVector2 getAsIVector() {
-		return new Vector2Int(this.x, this.y);
+		return new Vector2Double(this.x, this.y);
 	}
 }

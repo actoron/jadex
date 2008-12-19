@@ -84,9 +84,6 @@ public class Environment implements IEnvironment
 
 	/** The list for move and eat requests. */
 	protected List tasklist;
-	
-	/** the Map for task -> sim-engine-goal mapping */
-	protected HashMap simgoals;
 
 	/** The helper object for bean events. */
 	protected SimplePropertyChangeSupport pcs;
@@ -123,7 +120,6 @@ public class Environment implements IEnvironment
 		this.food = new HashSet();
 		this.world = new MultiCollection();
 		this.tasklist = new ArrayList();
-		this.simgoals = new HashMap();
 		this.pcs = new SimplePropertyChangeSupport(this);
 		
 		// Pre-declare object types
@@ -170,7 +166,7 @@ public class Environment implements IEnvironment
 		IGoal cg = agent.createGoal("sim_create_object");
 		cg.getParameter("type").setValue(type);
 		cg.getParameter("properties").setValue(props);
-		cg.getParameter("position").setValue(new Vector2Double(l.getX(), l.getY()));
+		cg.getParameter("position").setValue(l.getAsIVector());
 		cg.getParameter("tasks").setValue(tasks);
 		
 		cg.getParameter("signal_destruction").setValue(sigDes);
@@ -193,10 +189,24 @@ public class Environment implements IEnvironment
 		IGoal cg = agent.createGoal("sim_destroy_object");
 		cg.getParameter("object_id").setValue(wo.getSimId());
 		agent.dispatchTopLevelGoalAndWait(cg);
+		wo.setSimId(null);
 		
 		return wo;
 	}
-
+	
+	private IGoal createMoveGoal(Creature me, String dir) {
+		assert agent != null : this + " - no external access provided";
+		
+		IVector2 destination = createLocation(me.getLocation(), dir).getAsIVector();
+		// request simulation engine move
+		IGoal goToDest = agent.createGoal("sim_go_to_destination");
+		goToDest.getParameter("object_id").setValue(me.getSimId());
+		goToDest.getParameter("destination").setValue(destination);
+		goToDest.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
+		goToDest.getParameter("tolerance").setValue(new Vector1Double(0.01));
+		
+		return goToDest;
+	}
 
 	//-------- interface methods --------
 
@@ -378,7 +388,7 @@ public class Environment implements IEnvironment
 
 	/**
 	 *  remove a prey food to the world.
-	 *  @param nfood Thefood.
+	 *  @param nfood The food.
 	 */
 	public boolean removeFood(Food nfood)
 	{
@@ -445,7 +455,7 @@ public class Environment implements IEnvironment
 				
 				copy = (Creature) createSimObject(copy, getSimObjectType(copy), props, tasks, Boolean.TRUE, Boolean.TRUE);
 				
-				this.creatures.put(copy.getSimId(), copy);
+				this.creatures.put(copy, copy);
 				this.world.put(copy.getLocation(), copy);
 				this.highscore.add(copy);
 			}
@@ -479,14 +489,14 @@ public class Environment implements IEnvironment
 			this.world.remove(creature.getLocation(), creature);
 		
 		destroySimObject(creature);
-		return this.creatures.remove(creature.getSimId())!=null;
+		return this.creatures.remove(creature)!=null;
 
 	}
 
 	/**
 	 *  Execute a step.
 	 */
-	public /*synchronized*/ void executeStep()
+	public synchronized void executeStep()
 	{
 		
 		System.out.println("executing step " + age);
@@ -504,113 +514,106 @@ public class Environment implements IEnvironment
 		}
 
 		// Perform eat/move tasks.
-		synchronized (tasklist)
+		TaskInfo[]	tasks	= (TaskInfo[])tasklist.toArray(new TaskInfo[tasklist.size()]);
+		for(int i=0; i<tasks.length; i++)
 		{
-			TaskInfo[]	tasks	= (TaskInfo[])tasklist.toArray(new TaskInfo[tasklist.size()]);
-			
-			synchronized (simgoals)
-			{	
-				for(int i=0; i<tasks.length; i++)
+			Object[] params = (Object[])tasks[i].getAction();
+			if(params[0].equals("eat"))
+			{
+				if(!acted.contains(params[1]))
 				{
-					Object[] params = (Object[])tasks[i].getAction();
-					if(params[0].equals("eat"))
-					{
-						if(!acted.contains(params[1]) 
-							&& eat((Creature)params[1], (WorldObject)params[2]))
-						{
-							acted.add(params[1]);
-						}
-						else
-						{
-							tasks[i].setResult(new Boolean(false));
-						}
-						
-					}
-				}
-				for(int i=0; i<tasks.length; i++)
-				{
-					Object[] params = (Object[])tasks[i].getAction();
-					if(params[0].equals("move"))
-					{
-						if(!acted.contains(params[1])
-							&& move((Creature)params[1], (String)params[2]))
-						{
-							
-							acted.add(params[1]);
-						}
-						else
-						{
-							tasks[i].setResult(new Boolean(false));
-						}
-					}
-				}
-				
-				// set task results from simulation goals
-				while (!simgoals.isEmpty())
-				{
-					System.out.println("simgoals size: " + simgoals.size());
 					
-					//Iterator it = simgoals.entrySet().iterator();
-					//while (it.hasNext())
-					Creature[] actors = (Creature[]) simgoals.keySet().toArray(new Creature[simgoals.size()]);
-					for (int i = 0; i < actors.length; i++)
-					{
-						//Creature actor = (Creature) ((Map.Entry)it.next()).getKey();
-						Creature actor = actors[i];
-						assert actor != null;
-						
-						IGoal simgoal = (IGoal)simgoals.get(actor);
-						if (simgoal == null)
-							simgoals.remove(actor);
-
-						if (simgoal != null && simgoal.isFinished())
-						{
-							//it.remove();
-							simgoals.remove(actor);
-							System.out.println("removed goal");
-							
-							// find TaskInfo for actor
-							// TODO: change from list to map?
-							TaskInfo task = null;
-							for (int j = 0; task==null && j<tasks.length; j++)
-							{
-								Object[] params = (Object[])tasks[j].getAction();
-								if (actor.equals(params[1]))
-								{
-									task = tasks[j];
-								}
-							}
-
-							assert simgoal.isSucceeded() : "Sim-Engine-Goal failed - respect collision detection!?";
-							if (simgoal.isSucceeded())
-							{
-								task.setResult(new Boolean(true));
-							}
-						}
-					}
-					
-					// let agent finish the goals
-					// TODO: change to something agent specific
-					agent.waitFor(100);
-				};
+					tasks[i].setResult(new Boolean(eat((Creature)params[1], (WorldObject)params[2])));
+					acted.add(params[1]);
+				}
+				else
+				{
+					tasks[i].setResult(new Boolean(false));
+				}
 			}
+		}
+		for(int i=0; i<tasks.length; i++)
+		{
+			Object[] params = (Object[])tasks[i].getAction();
+			if(params[0].equals("move"))
+			{
+				if(!acted.contains(params[1]) && move((Creature)params[1], (String)params[2]))
+				{
+					
+					tasks[i].setResult(createMoveGoal((Creature)params[1], (String)params[2]));
+					acted.add(params[1]);
+				}
+				else
+				{
+					tasks[i].setResult(new Boolean(false));
+				}
+			}
+		}
 
-//			// Place new food.
-//			if(age%foodrate==0)
+		// Place new food.
+		if(age%foodrate==0)
+		{
+			Location	loc	= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+			Location	test= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+			// Make sure there will be some empty location left.
+			if(!loc.equals(test))
+			{
+				addFood(new Food(loc));
+			}
+		}
+		
+//		// set task results from simulation goals
+//		while (!simgoals.isEmpty())
+//		{
+//			System.out.println("simgoals size: " + simgoals.size());
+//			
+//			//Iterator it = simgoals.entrySet().iterator();
+//			//while (it.hasNext())
+//			Creature[] actors = (Creature[]) simgoals.keySet().toArray(new Creature[simgoals.size()]);
+//			for (int i = 0; i < actors.length; i++)
 //			{
-//				Location	loc	= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
-//				Location	test= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
-//				// Make sure there will be some empty location left.
-//				if(!loc.equals(test))
+//				//Creature actor = (Creature) ((Map.Entry)it.next()).getKey();
+//				Creature actor = actors[i];
+//				assert actor != null;
+//				
+//				IGoal simgoal = (IGoal)simgoals.get(actor);
+//				if (simgoal == null)
+//					simgoals.remove(actor);
+//
+//				if (simgoal != null && simgoal.isFinished())
 //				{
-//					addFood(new Food(loc));
+//					//it.remove();
+//					simgoals.remove(actor);
+//					System.out.println("removed goal");
+//					
+//					// find TaskInfo for actor
+//					// TODO: change from list to map?
+//					TaskInfo task = null;
+//					for (int j = 0; task==null && j<tasks.length; j++)
+//					{
+//						Object[] params = (Object[])tasks[j].getAction();
+//						if (actor.equals(params[1]))
+//						{
+//							task = tasks[j];
+//						}
+//					}
+//
+//					assert simgoal.isSucceeded() : "Sim-Engine-Goal failed - respect collision detection!?";
+//					if (simgoal.isSucceeded())
+//					{
+//						task.setResult(new Boolean(true));
+//					}
 //				}
 //			}
-
-			tasklist.clear();
-			this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
-
-		}
+//			
+//			// let agent finish the goals
+//			// TODO: change to something agent specific
+//			agent.waitFor(100);
+//			
+//		}
+		
+		tasklist.clear();
+		this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
 		
 		// Save highscore.
 		long	time	= System.currentTimeMillis();
@@ -686,23 +689,9 @@ public class Environment implements IEnvironment
 				e.printStackTrace();
 				return false; 
 			}
-			
-			assert agent != null : this + " - no external access provided";
-
-			// request simulation engine move
-			IGoal goToDestination = agent.createGoal("sim_go_to_destination");
-			goToDestination.getParameter("object_id").setValue(me.getSimId());
-			goToDestination.getParameter("destination").setValue(new Vector2Double(newloc.getX(), newloc.getY()));
-			goToDestination.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
-			goToDestination.getParameter("tolerance").setValue(new Vector1Double(0.01));
-//			agent.dispatchTopLevelGoalAndWait(goToDestination);
-			agent.dispatchTopLevelGoal(goToDestination);
-			
-			System.out.println("top level goal dispatched: " + goToDestination);
-			
-			simgoals.put(me, goToDestination);
 
 			return true;
+
 		}
 
 	}
@@ -869,7 +858,7 @@ public class Environment implements IEnvironment
 	 */
 	protected Creature getCreature(Creature creature)
 	{
-		Creature ret = (Creature)creatures.get(creature.getSimId());
+		Creature ret = (Creature)creatures.get(creature);
 		
 		if(ret==null)
 		{

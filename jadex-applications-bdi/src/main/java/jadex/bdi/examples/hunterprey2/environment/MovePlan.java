@@ -3,6 +3,7 @@ package jadex.bdi.examples.hunterprey2.environment;
 import jadex.adapter.base.fipa.Done;
 import jadex.bdi.examples.hunterprey2.RequestMove;
 import jadex.bdi.examples.hunterprey2.TaskInfo;
+import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -38,6 +39,16 @@ public class  MovePlan extends Plan
 
 //		System.out.println("b) move: "+getName());
 
+		// perform move goal in sim engine
+		if(ti.getResult()!=null && ti.getResult() instanceof IGoal)
+		{
+			IGoal moveGoal = (IGoal) ti.getResult();
+			dispatchSubgoalAndWait(moveGoal);
+			assert moveGoal.isSucceeded() : "Sim-Engine Problem with move goal"+moveGoal; 
+			ti.setResult(new Boolean(moveGoal.isSucceeded()));
+		}
+		
+		
 		// Result is null, when creature died and action was not executed.
 		if(ti.getResult()!=null && ((Boolean)ti.getResult()).booleanValue())
 		{
