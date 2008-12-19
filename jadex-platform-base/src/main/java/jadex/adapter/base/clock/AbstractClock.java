@@ -93,10 +93,13 @@ public abstract class AbstractClock implements IClock
 			{
 				synchronized(AbstractClock.this)
 				{
-					//System.out.println("Ticktimer notified: "+ticktimers);
-					for(int i=0; i<ticktimers.size(); i++)
-						((TickTimer)ticktimers.get(i)).getTimedObject().timeEventOccurred();
+//					System.out.println("Ticktimer notified: "+ticktimers);
+					
+					TickTimer[] tts = (TickTimer[])ticktimers.toArray(new TickTimer[ticktimers.size()]);
 					ticktimers.clear();
+					
+					for(int i=0; i<tts.length; i++)
+						tts[i].getTimedObject().timeEventOccurred();
 				}
 			}
 		});
@@ -132,10 +135,12 @@ public abstract class AbstractClock implements IClock
 		ITimer[] tts = oldclock.getTickTimers();
 		for(int i=0; i<tts.length; i++)
 		{
-			Timer timer	= (Timer)ticktimers.get(i);
-			addTickTimer(new Timer(timer.getNotificationTime(), this, timer.getTimedObject()));
+			TickTimer timer	= (TickTimer)ticktimers.get(i);
+			addTickTimer(new TickTimer(this, timer.getTimedObject()));
 //			ticktimers.add(new Timer(timer.getNotificationTime(), this, timer.getTimedObject()));
 		}		
+		
+		activateTickTimer();
 	}
 
 	/**
@@ -364,16 +369,32 @@ public abstract class AbstractClock implements IClock
 		synchronized(this)
 		{
 			ticktimers.add(timer);
-			if(!timers.contains(ticktimer))
-			{
-				long num = (getTime()-getStarttime())/getDelta();
-				long time = (num+1)*getDelta()+getStarttime();
-				ticktimer.setNotificationTime(time);
-				//System.out.println("Ticktimer at: "+time);
-			}
+			activateTickTimer();
+			
+//			if(!timers.contains(ticktimer))
+//			{
+//				long num = (getTime()-getStarttime())/getDelta();
+//				long time = (num+1)*getDelta()+getStarttime();
+//				ticktimer.setNotificationTime(time);
+//				System.out.println("Ticktimer at: "+time+" "+getTime());
+//			}
 		}
 		
 		notifyListeners();
+	}
+
+	/**
+	 *  Activate the tick timer.
+	 */
+	protected void activateTickTimer()
+	{
+		if(!timers.contains(ticktimer))
+		{
+			long num = (getTime()-getStarttime())/getDelta();
+			long time = (num+1)*getDelta()+getStarttime();
+			ticktimer.setNotificationTime(time);
+//			System.out.println("Ticktimer at: "+time+" "+getTime());
+		}
 	}
 	
 	/**
@@ -384,9 +405,9 @@ public abstract class AbstractClock implements IClock
 	{
 		synchronized(this)
 		{
-		ticktimers.remove(timer);
-		if(ticktimers.size()==0)
-			removeTimer(ticktimer);
+			ticktimers.remove(timer);
+			if(ticktimers.size()==0)
+				removeTimer(ticktimer);
 		}
 		
 		notifyListeners();

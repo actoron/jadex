@@ -1,6 +1,7 @@
 package jadex.adapter.base.clock;
 
 import jadex.bridge.IClock;
+import jadex.bridge.ITimedObject;
 import jadex.bridge.ITimer;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -34,7 +35,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	
 	/** Continuous notification generator. */
 	// Hack???
-	protected Executor notificator;
+//	protected Executor notificator;
 	
 	//-------- constructors --------
 	
@@ -68,7 +69,24 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 		this.executor = createExecutor();
 		
 		// Notification generator.
-		this.notificator = createNotificator();
+//		this.notificator = createNotificator();
+		
+		// If a delta is set a continuous tick timer will be installed.
+//		System.out.println("Delta: "+delta);
+//		if(delta>0)
+//		{
+			createTickTimer(new ITimedObject()
+			{
+				public void timeEventOccurred()
+				{
+					synchronized(this)
+					{
+//						System.out.println("tick: "+getTime()+" "+getTick());
+						createTickTimer(this);
+					}
+				}
+			});
+//		}
 	}
 	
 	/**
@@ -100,7 +118,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	public void dispose()
 	{
 		executor.shutdown(null);
-		notificator.shutdown(null);
+//		notificator.shutdown(null);
 	}
 
 	//-------- methods --------
@@ -176,7 +194,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 		
 		if(notify)
 		{
-			notificator.execute();
+//			notificator.execute();
 			notifyListeners();
 		}
 	}
@@ -264,7 +282,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	public void addChangeListener(ChangeListener listener)
 	{
 		super.addChangeListener(listener);
-		notificator.execute();
+//		notificator.execute();
 	}
 	
 	//-------- helper methods --------
@@ -300,23 +318,23 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 					// Must check diff>0 as wait(0) performs endless wait()
 					if(diff>0)
 					{
-	//					 Exit thread when timetable is empty.
+						// Exit thread when timetable is empty.
 						if(timers.isEmpty() || STATE_SUSPENDED.equals(state))
 							return false;
 						
 						// Get next entry from timetable.
 						next = (Timer)timers.first();
 						diff = (long)((next.time - getTime())/getDilation());
-						//System.out.println("diff: "+diff);
+//						System.out.println("diff: "+diff+" "+next.time+" "+getTime()+" "+next);
 	
 						// Wait until next entry is due.
 						if(diff>0)
 						{
 							try
 							{
-								//System.out.println("timer waiting for "+diff+" millis");
+//								System.out.println("timer waiting for "+diff+" millis");
 								ContinuousClock.this.wait(diff);
-								//System.out.println("timer awake");
+//								System.out.println("timer awake");
 							}
 							catch(InterruptedException e){}
 						}
@@ -347,7 +365,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 					try
 					{
 						next.getTimedObject().timeEventOccurred();
-						//System.out.println("notified: "+next);
+//						System.out.println("notified: "+next);
 					}
 					catch(Exception e)
 					{
@@ -355,7 +373,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 					}
 				}
 	
-				//System.out.println("Exit"+timers.isEmpty());
+//				System.out.println("Exit"+timers.isEmpty());
 				notifyListeners();
 	
 				return !timers.isEmpty();
@@ -365,7 +383,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	
 	/**
 	 *  Create a notificator thread for continuously informing listeners.
-	 */
+	 * /
 	protected Executor	createNotificator()
 	{
 		return new Executor(threadpool, new IExecutable()
@@ -383,7 +401,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 				return hasListeners() && STATE_RUNNING.equals(state);
 			}
 		});		
-	}
+	}*/
 	
 	/**
 	 *  Main for testing.

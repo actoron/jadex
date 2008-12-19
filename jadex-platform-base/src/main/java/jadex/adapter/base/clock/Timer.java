@@ -75,6 +75,7 @@ public class Timer implements ITimer, Serializable
 	{
 		clock.removeTimer(this);
 		this.time = time;
+//		System.out.println("Noti time: "+time+" "+this);
 		clock.addTimer(this);
 	}
 	
@@ -98,10 +99,10 @@ public class Timer implements ITimer, Serializable
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
-	 */
+	 * /
 	public String toString()
 	{
 		//return "Timer( "+number+" ,"+(time-clock.getTime())+")";
 		return "Timer( "+number+" ,"+new Date(time)+")";
-	}
+	}*/
 }

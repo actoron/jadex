@@ -24,20 +24,20 @@ public class SystemClock extends ContinuousClock
 	
 	/**
 	 *  Create a new clock.
-	 */
-	public SystemClock(String name, long delta, IThreadPool threadpool)
-	{
-		super(name, System.currentTimeMillis(), delta, threadpool);
-	}
-
-	/**
-	 *  Create a new clock.
 	 *  @param oldclock The old clock.
 	 */
 	public SystemClock(IClock oldclock, IThreadPool threadpool)
 	{
 		this(null, 1, threadpool);
 		copyFromClock(oldclock);
+	}
+	
+	/**
+	 *  Create a new clock.
+	 */
+	public SystemClock(String name, long delta, IThreadPool threadpool)
+	{
+		super(name, System.currentTimeMillis(), delta, threadpool);
 	}
 
 	/**
@@ -78,18 +78,21 @@ public class SystemClock extends ContinuousClock
 	
 	/**
 	 *  Start the clock. 
-	 */
+	 * /
 	public synchronized void start()
 	{
-		long	offset	= getTime() - stoptime;
-		for(Iterator it=timers.iterator(); it.hasNext();)
+		if(stoptime!=0)
 		{
-			Timer	timer	= (Timer)it.next();
-			timer.time	= timer.time + offset;
-			// Ticktimer is also moved, to stay aligend with non-tick timers.
+			long offset	= getTime() - stoptime;
+			for(Iterator it=timers.iterator(); it.hasNext();)
+			{
+				Timer	timer	= (Timer)it.next();
+				timer.time	= timer.time + offset;
+				// Ticktimer is also moved, to stay aligend with non-tick timers.
+			}
 		}
 		super.start();
-	}
+	}*/
 
 	/**
 	 *  Stop the clock.
@@ -102,7 +105,7 @@ public class SystemClock extends ContinuousClock
 	
 	/**
 	 *  Create a notificator thread for continuously informing listeners.
-	 */
+	 * /
 	protected Executor	createNotificator()
 	{
 		// Overwritten, because notification should also occur when the clock is stopped. 
@@ -121,5 +124,5 @@ public class SystemClock extends ContinuousClock
 				return hasListeners();
 			}
 		});		
-	}
+	}*/
 }
