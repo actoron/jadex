@@ -135,8 +135,7 @@ public abstract class AbstractClock implements IClock
 		ITimer[] tts = oldclock.getTickTimers();
 		for(int i=0; i<tts.length; i++)
 		{
-			TickTimer timer	= (TickTimer)ticktimers.get(i);
-			addTickTimer(new TickTimer(this, timer.getTimedObject()));
+			addTickTimer(new TickTimer(this, tts[i].getTimedObject()));
 //			ticktimers.add(new Timer(timer.getNotificationTime(), this, timer.getTimedObject()));
 		}		
 		

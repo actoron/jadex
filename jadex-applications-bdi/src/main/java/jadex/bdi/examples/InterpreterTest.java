@@ -18,6 +18,7 @@ import jadex.commons.concurrent.ThreadPoolFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class InterpreterTest
 	{
 		try
 		{
-			String	model	= "/jadex/bdi/examples/HelloWorld.agent.xml";
+			String	model	= "/jadex/bdi/examples/helloworld/HelloWorld.agent.xml";
 	//		String	model	= "/jadex/bdi/examples/HelloWorldGoal.agent.xml";
 			if(args.length==1)
 			{
@@ -109,17 +110,17 @@ public class InterpreterTest
 						
 						public Collection getServices(Class type)
 						{
-							return null;
+							return type==IClockService.class ? Collections.singleton(clock) : null;
 						}
 						
 						public Object getService(Class type, String name)
 						{
-							return null;
+							return type==IClockService.class ? clock : null;
 						}
 						
 						public Object getService(Class type)
 						{
-							return null;
+							return type==IClockService.class ? clock : null;
 						}
 					};
 				}
