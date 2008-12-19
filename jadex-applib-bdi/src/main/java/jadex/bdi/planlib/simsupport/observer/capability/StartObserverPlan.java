@@ -86,14 +86,10 @@ public class StartObserverPlan extends Plan
 			}
 			catch (RuntimeException e0)
 			{
-				System.out.println(e0);
-				e0.printStackTrace();
 				System.err.println("OpenGL initialization failed, using Java2D fallback...");
 			}
 			catch (Error e1)
 			{
-				System.out.println(e1);
-				e1.printStackTrace();
 				System.err.println("OpenGL initialization failed, using Java2D fallback...");
 			}
 		}
