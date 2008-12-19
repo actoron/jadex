@@ -18,8 +18,7 @@ import jadex.commons.collection.MultiCollection;
 
 import java.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -122,16 +121,41 @@ public class Environment implements IEnvironment
 			addFood(new Food(getEmptyLocation()));
 
 		// Read highscore list.
+		InputStream is = null;
 		try
 		{
-			ObjectInputStream is = new ObjectInputStream(SUtil.getResource("highscore.dmp", Environment.class.getClassLoader()));
-			this.highscore = SUtil.arrayToList(is.readObject());
-			is.close();
+//			InputStream tmp = SUtil.getResource("highscore.dmp", Environment.class.getClassLoader());
+//			ObjectInputStream is = new ObjectInputStream(tmp);
+//			this.highscore = SUtil.arrayToList(is.readObject());
+//			is.close();
+			
+			is = SUtil.getResource("highscore.dmp", Environment.class.getClassLoader());
+			StringBuffer out = new StringBuffer();
+			byte[] b = new byte[4096];
+			for(int n; (n = is.read(b)) != -1;) 
+			{
+				out.append(new String(b, 0, n));
+			}
+			highscore = SUtil.arrayToList(Nuggets.objectFromXML(out.toString(), Environment.class.getClassLoader()));
 		}
 		catch(Exception e)
 		{
-			System.out.println(e);
+			e.printStackTrace();
+//			System.out.println(e);
 			highscore = new ArrayList();
+		}
+		finally
+		{
+			if(is!=null)
+			{
+				try
+				{
+					is.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 	}
 
@@ -731,6 +755,7 @@ public class Environment implements IEnvironment
 	 */
 	public synchronized void saveHighscore()
 	{
+		OutputStreamWriter os = null;
 		try
 		{
 			String outputFile = "highscore.dmp";
@@ -741,15 +766,29 @@ public class Environment implements IEnvironment
 			//os.close();
 			
 			// write as xml file
-			OutputStreamWriter os = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
+			os = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
 			os.write(Nuggets.objectToXML(getHighscore(),this.getClass().getClassLoader()));
 			os.close();
 
+			System.out.println("Saved highscore.");
 		}
 		catch(Exception e)
 		{
 			System.out.println("Error writing hunterprey highscore 'highscore.dmp'.");
 			e.printStackTrace();
+		}
+		finally
+		{
+			if(os!=null)
+			{
+				try
+				{
+					os.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 	}
 
