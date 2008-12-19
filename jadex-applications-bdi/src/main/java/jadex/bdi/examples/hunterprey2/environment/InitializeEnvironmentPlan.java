@@ -47,18 +47,7 @@ public class InitializeEnvironmentPlan extends Plan
 											  this.getExternalAccess());
 		
 		b.getBelief("environment").setFact(env);
-		
-		
-		// start observer befor gui to use canvas 
-		IGoal observer = createGoal("start_observer_gui");
-		dispatchTopLevelGoal(observer);
-		
-		// after observer creation start gui
-		IGoal gui = createGoal("start_environment_gui");
-		dispatchTopLevelGoal(gui);	
-		
-		
-		
+
 		// create obstacles
 		int obstacleCount = ((Integer) b.getBelief("obstacle_count").getFact()).intValue();
 		for (int i = 0; i < obstacleCount; ++i)
@@ -78,6 +67,7 @@ public class InitializeEnvironmentPlan extends Plan
 			env.addFood(food);
 		}
 		
+		
 //		// Processes
 //		int maxFood = ((Integer) getBeliefbase().getBelief("max_food").getFact()).intValue();
 //		if (maxFood <= 0)
@@ -93,6 +83,10 @@ public class InitializeEnvironmentPlan extends Plan
 //		env.addEnvironmentProcess(new FoodSpawnProcess(maxFood, foodSpawnRate));
 		
 		
+		
+		// start gui
+		IGoal gui = createGoal("start_environment_gui");
+		dispatchTopLevelGoal(gui);	
 			
 		
 		

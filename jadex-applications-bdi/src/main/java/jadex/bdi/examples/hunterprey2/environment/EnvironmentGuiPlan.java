@@ -1,5 +1,6 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
+import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -30,11 +31,15 @@ public class  EnvironmentGuiPlan extends Plan
 		{
 			waitForFactChanged("environment", 2000);
 		}
-		
+
 		if (env == null)
 		{
 			fail();
 		}
+		
+		// start observer to use canvas 
+		IGoal initObserver = createGoal("obs_initialization");
+		dispatchSubgoalAndWait(initObserver);
 		
 		EnvironmentGui gui;
 		try {

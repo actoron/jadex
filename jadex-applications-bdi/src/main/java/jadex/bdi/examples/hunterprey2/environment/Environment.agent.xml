@@ -147,7 +147,7 @@
 		<achievegoal name="start_environment_gui" />
 		
 		<!-- observer capability window start goal -->
-		<achievegoal name="start_observer_gui" />
+		<achievegoal name="obs_initialization" />
 		
 		<!-- sim environment start goal -->
 		<achievegoalref name="sim_start_environment">
@@ -316,11 +316,9 @@
     	<!-- sim observer init Plan. -->
     	<plan name="obs_initialization">
       		<body class="InitializeObserverPlan"/>
-      		
       		<trigger>
-				<goal ref="start_observer_gui" />
+				<goal ref="obs_initialization" />
 			</trigger>
-			 
     	</plan>
     	
 	</plans>

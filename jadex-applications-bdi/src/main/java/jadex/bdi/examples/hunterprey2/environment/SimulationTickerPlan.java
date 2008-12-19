@@ -34,11 +34,13 @@ public class SimulationTickerPlan extends Plan
 		{
 			env = (Environment)getBeliefbase().getBelief("environment").getFact();
 			waitForFactChanged("environment", 1000);
+			//waitFor(100);
 		}
 
 		while(true)
 		{
-
+			System.out.println("simticker - round");
+			
 			waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
 			env.executeStep();
 			
