@@ -3,10 +3,7 @@ package jadex.bdi.examples.hunterprey2;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Int;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Long;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 
 /** Environment configuration.
  */

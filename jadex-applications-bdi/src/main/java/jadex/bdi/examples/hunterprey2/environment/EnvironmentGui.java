@@ -2,7 +2,6 @@ package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.examples.hunterprey2.CurrentVision;
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.Prey;
 import jadex.bdi.examples.hunterprey2.Vision;
 import jadex.bdi.runtime.AgentEvent;

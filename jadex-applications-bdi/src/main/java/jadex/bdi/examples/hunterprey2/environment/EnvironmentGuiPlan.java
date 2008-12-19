@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -29,15 +28,18 @@ public class  EnvironmentGuiPlan extends Plan
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		if (env == null)
 		{
-			fail();
+			waitForFactChanged("environment", 2000);
 		}
 		
+		if (env == null)
+		{
+			fail();
+		}
 		
 		EnvironmentGui gui;
 		try {
 			gui = new EnvironmentGui(getExternalAccess());
 			getBeliefbase().getBelief("gui").setFact(gui);
-			passed();
 		} catch (Exception e) {
 			fail(e);
 		}

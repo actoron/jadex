@@ -6,16 +6,16 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-0.96.xsd"
 	name="Observer"
-	package="jadex.examples.hunterprey2.environment.observer">
+	package="jadex.examples.hunterprey2.environment">
 
 	<imports>
-		<import>jadex.bdi.examples.hunterprey2.*</import>
-		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
-		<import>jadex.bdi.examples.hunterprey2.environment.observer.*</import>
+		<import>jadex.*</import>
 		<import>jadex.runtime.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
+		
+		<import>jadex.bdi.examples.hunterprey2.*</import>
+		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
 	</imports>
 
 	<capabilities>
@@ -69,13 +69,18 @@
 		</beliefref>
 		
 		<!-- The pre-layers -->
-		<beliefref name="prelayers">
-			<concrete ref="obscap.prelayers"/>
+		<beliefref name="prelayer_themes">
+			<concrete ref="obscap.prelayer_themes"/>
 		</beliefref>
 		
 		<!-- The post-layers -->
-		<beliefref name="postlayers">
-			<concrete ref="obscap.postlayers"/>
+		<beliefref name="postlayer_themes">
+			<concrete ref="obscap.postlayer_themes"/>
+		</beliefref>
+		
+		<!-- The selected start theme -->
+		<beliefref name="selected_theme">
+			<concrete ref="obscap.selected_theme"/>
 		</beliefref>
 		
 	</beliefs>

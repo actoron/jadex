@@ -1,7 +1,6 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.bdi.examples.hunterprey2.Creature;
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;

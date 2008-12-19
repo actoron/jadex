@@ -3,9 +3,7 @@ package jadex.bdi.examples.hunterprey2;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Int;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 import jadex.bridge.IAgentIdentifier;
 
 import java.util.ArrayList;
@@ -26,7 +24,7 @@ public abstract class Creature extends WorldObject
 	 */
 	public static final IVector1 CREATURE_VISUAL_RANGE = new Vector1Double(4.0);
 	public static final IVector2 CREATURE_SIZE = new Vector2Double(1.0);
-	public static final IVector1 CREATURE_SPEED = new Vector1Double(0.1);
+	public static final IVector1 CREATURE_SPEED = new Vector1Double(2.0);
 
 	/** All possible directions. */
 	public static final String[] alldirs = new String[]{RequestMove.DIRECTION_UP, RequestMove.DIRECTION_RIGHT, RequestMove.DIRECTION_DOWN, RequestMove.DIRECTION_LEFT};

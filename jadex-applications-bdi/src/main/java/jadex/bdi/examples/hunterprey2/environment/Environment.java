@@ -1,12 +1,25 @@
-package jadex.bdi.examples.hunterprey2;
+package jadex.bdi.examples.hunterprey2.environment;
 
+import jadex.bdi.examples.hunterprey2.Configuration;
+import jadex.bdi.examples.hunterprey2.Creature;
+import jadex.bdi.examples.hunterprey2.Food;
+import jadex.bdi.examples.hunterprey2.Hunter;
+import jadex.bdi.examples.hunterprey2.IEnvironment;
+import jadex.bdi.examples.hunterprey2.Location;
+import jadex.bdi.examples.hunterprey2.Observer;
+import jadex.bdi.examples.hunterprey2.Obstacle;
+import jadex.bdi.examples.hunterprey2.Prey;
+import jadex.bdi.examples.hunterprey2.RequestMove;
+import jadex.bdi.examples.hunterprey2.TaskInfo;
+import jadex.bdi.examples.hunterprey2.Vision;
+import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.impl.InternalEventFlyweight;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;
@@ -21,6 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,6 +84,9 @@ public class Environment implements IEnvironment
 
 	/** The list for move and eat requests. */
 	protected List tasklist;
+	
+	/** the Map for task -> sim-engine-goal mapping */
+	protected HashMap simgoals;
 
 	/** The helper object for bean events. */
 	protected SimplePropertyChangeSupport pcs;
@@ -85,8 +102,8 @@ public class Environment implements IEnvironment
 	/** The interval between saves of highscore (-1 for autosave off). */
 	protected long	saveinterval;
 	
-//	/** The foodrate determines how often new food pops up. */
-//	protected int foodrate;
+	/** The foodrate determines how often new food pops up. */
+	protected int foodrate;
 	
 	/** The world age. */
 	protected int age;
@@ -98,16 +115,15 @@ public class Environment implements IEnvironment
 	 */
 	public Environment(String title, IVector2 areaSize, IExternalAccess agent)
 	{
-
-		
 		
 		this.agent = agent;
-		
+		this.foodrate = 5;
 		this.creatures = new HashMap();
 		this.obstacles = new HashSet();
 		this.food = new HashSet();
 		this.world = new MultiCollection();
 		this.tasklist = new ArrayList();
+		this.simgoals = new HashMap();
 		this.pcs = new SimplePropertyChangeSupport(this);
 		
 		// Pre-declare object types
@@ -142,7 +158,7 @@ public class Environment implements IEnvironment
 	 * Create a sim object
 	 * @return the sim object with new sim id
 	 */
-	protected WorldObject createSimObject(WorldObject wo, String type, Map properties, List tasks, Boolean sigDes, Boolean listen)
+	private WorldObject createSimObject(WorldObject wo, String type, Map properties, List tasks, Boolean sigDes, Boolean listen)
 	{
 		Location l = wo.getLocation();
 		Map props = properties;
@@ -154,7 +170,8 @@ public class Environment implements IEnvironment
 		IGoal cg = agent.createGoal("sim_create_object");
 		cg.getParameter("type").setValue(type);
 		cg.getParameter("properties").setValue(props);
-		cg.getParameter("position").setValue(new Vector2Int(l.getX(), l.getY()));
+		cg.getParameter("position").setValue(new Vector2Double(l.getX(), l.getY()));
+		cg.getParameter("tasks").setValue(tasks);
 		
 		cg.getParameter("signal_destruction").setValue(sigDes);
 		cg.getParameter("listen").setValue(listen);
@@ -170,7 +187,7 @@ public class Environment implements IEnvironment
 	 * @param wo
 	 * @return
 	 */
-	protected WorldObject destroySimObject(WorldObject wo)
+	private WorldObject destroySimObject(WorldObject wo)
 	{
 
 		IGoal cg = agent.createGoal("sim_destroy_object");
@@ -353,11 +370,6 @@ public class Environment implements IEnvironment
 	 */
 	public void addFood(Food nfood)
 	{		
-//		Location l = nfood.getLocation();
-//		Map props = new HashMap();
-//		props.put(PROPERTY_ONTOLOGY, nfood);
-//		nfood.setSimId(super.createSimObject(OBJECT_TYPE_FOOD, props, null, new Vector2Int(l.getX(), l.getY()), false, null));
-		
 		WorldObject food = createSimObject(nfood, OBJECT_TYPE_FOOD, null, null, Boolean.TRUE, Boolean.FALSE);
 		
 		this.food.add(food);
@@ -370,8 +382,6 @@ public class Environment implements IEnvironment
 	 */
 	public boolean removeFood(Food nfood)
 	{
-
-		//super.destroySimObject(nfood.getSimId());
 		destroySimObject(nfood);
 		
 		this.world.remove(nfood.getLocation(), nfood);
@@ -384,12 +394,7 @@ public class Environment implements IEnvironment
 	 *  @param obstacle The new obstacle.
 	 */
 	public void addObstacle(Obstacle obstacle)
-	{
-//		Location l = obstacle.getLocation();
-//		Map props = new HashMap();
-//		props.put(PROPERTY_ONTOLOGY, obstacle);
-//		obstacle.setSimId(super.createSimObject(OBJECT_TYPE_OBSTACLE, props, null, new Vector2Int(l.getX(), l.getY()), false, null));
-		
+	{	
 		WorldObject wo = createSimObject(obstacle, OBJECT_TYPE_OBSTACLE, null, null, Boolean.TRUE, Boolean.FALSE);
 		
 		this.obstacles.add(wo);
@@ -402,7 +407,6 @@ public class Environment implements IEnvironment
 	 */
 	public boolean removeObstacle(Obstacle obstacle)
 	{
-		//super.destroySimObject(obstacle.getSimId());
 		destroySimObject(obstacle);
 		
 		this.world.remove(obstacle.getLocation(), obstacle);
@@ -437,10 +441,8 @@ public class Environment implements IEnvironment
 				props.put(PROPERTY_ONTOLOGY, copy);
 				
 				List tasks = new ArrayList();
-				tasks.add(new MoveObjectTask(new Vector2Double(0.1)));
+				tasks.add(new MoveObjectTask(new Vector2Double(0.0)));
 				
-				
-				//copy.setSimId(super.createSimObject(getSimObjectType(copy), props, tasks, new Vector2Int(copy.getLocation().getX(),copy.getLocation().getY()), true, null));
 				copy = (Creature) createSimObject(copy, getSimObjectType(copy), props, tasks, Boolean.TRUE, Boolean.TRUE);
 				
 				this.creatures.put(copy.getSimId(), copy);
@@ -476,7 +478,6 @@ public class Environment implements IEnvironment
 		if(this.world.containsKey(creature.getLocation()))
 			this.world.remove(creature.getLocation(), creature);
 		
-		//super.destroySimObject(creature.getSimId());
 		destroySimObject(creature);
 		return this.creatures.remove(creature.getSimId())!=null;
 
@@ -485,8 +486,10 @@ public class Environment implements IEnvironment
 	/**
 	 *  Execute a step.
 	 */
-	public synchronized void executeStep()
+	public /*synchronized*/ void executeStep()
 	{
+		
+		System.out.println("executing step " + age);
 		
 		// Creatures that already acted in this step.
 		Set	acted	= new HashSet();
@@ -501,55 +504,114 @@ public class Environment implements IEnvironment
 		}
 
 		// Perform eat/move tasks.
-		TaskInfo[]	tasks	= (TaskInfo[])tasklist.toArray(new TaskInfo[tasklist.size()]);
-		for(int i=0; i<tasks.length; i++)
+		synchronized (tasklist)
 		{
-			Object[] params = (Object[])tasks[i].getAction();
-			if(params[0].equals("eat"))
-			{
-				if(!acted.contains(params[1]))
+			TaskInfo[]	tasks	= (TaskInfo[])tasklist.toArray(new TaskInfo[tasklist.size()]);
+			
+			synchronized (simgoals)
+			{	
+				for(int i=0; i<tasks.length; i++)
 				{
-					tasks[i].setResult(new Boolean(eat((Creature)params[1], (WorldObject)params[2])));
-					acted.add(params[1]);
+					Object[] params = (Object[])tasks[i].getAction();
+					if(params[0].equals("eat"))
+					{
+						if(!acted.contains(params[1]) 
+							&& eat((Creature)params[1], (WorldObject)params[2]))
+						{
+							acted.add(params[1]);
+						}
+						else
+						{
+							tasks[i].setResult(new Boolean(false));
+						}
+						
+					}
 				}
-				else
+				for(int i=0; i<tasks.length; i++)
 				{
-					tasks[i].setResult(new Boolean(false));
+					Object[] params = (Object[])tasks[i].getAction();
+					if(params[0].equals("move"))
+					{
+						if(!acted.contains(params[1])
+							&& move((Creature)params[1], (String)params[2]))
+						{
+							
+							acted.add(params[1]);
+						}
+						else
+						{
+							tasks[i].setResult(new Boolean(false));
+						}
+					}
 				}
-			}
-		}
-		for(int i=0; i<tasks.length; i++)
-		{
-			Object[] params = (Object[])tasks[i].getAction();
-			if(params[0].equals("move"))
-			{
-				if(!acted.contains(params[1]))
+				
+				// set task results from simulation goals
+				while (!simgoals.isEmpty())
 				{
-					tasks[i].setResult(new Boolean(move((Creature)params[1], (String)params[2])));
-					acted.add(params[1]);
-				}
-				else
-				{
-					tasks[i].setResult(new Boolean(false));
-				}
-			}
-		}
+					System.out.println("simgoals size: " + simgoals.size());
+					
+					//Iterator it = simgoals.entrySet().iterator();
+					//while (it.hasNext())
+					Creature[] actors = (Creature[]) simgoals.keySet().toArray(new Creature[simgoals.size()]);
+					for (int i = 0; i < actors.length; i++)
+					{
+						//Creature actor = (Creature) ((Map.Entry)it.next()).getKey();
+						Creature actor = actors[i];
+						assert actor != null;
+						
+						IGoal simgoal = (IGoal)simgoals.get(actor);
+						if (simgoal == null)
+							simgoals.remove(actor);
 
-//		// Place new food.
-//		if(age%foodrate==0)
-//		{
-//			Location	loc	= getEmptyLocation();
-//			Location	test= getEmptyLocation();
-//			// Make sure there will be some empty location left.
-//			if(!loc.equals(test))
+						if (simgoal != null && simgoal.isFinished())
+						{
+							//it.remove();
+							simgoals.remove(actor);
+							System.out.println("removed goal");
+							
+							// find TaskInfo for actor
+							// TODO: change from list to map?
+							TaskInfo task = null;
+							for (int j = 0; task==null && j<tasks.length; j++)
+							{
+								Object[] params = (Object[])tasks[j].getAction();
+								if (actor.equals(params[1]))
+								{
+									task = tasks[j];
+								}
+							}
+
+							assert simgoal.isSucceeded() : "Sim-Engine-Goal failed - respect collision detection!?";
+							if (simgoal.isSucceeded())
+							{
+								task.setResult(new Boolean(true));
+							}
+						}
+					}
+					
+					// let agent finish the goals
+					// TODO: change to something agent specific
+					agent.waitFor(100);
+				};
+			}
+
+//			// Place new food.
+//			if(age%foodrate==0)
 //			{
-//				addFood(new Food(loc));
+//				Location	loc	= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+//				Location	test= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+//				// Make sure there will be some empty location left.
+//				if(!loc.equals(test))
+//				{
+//					addFood(new Food(loc));
+//				}
 //			}
-//		}
 
-		tasklist.clear();
-		this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
+			tasklist.clear();
+			this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
 
+		}
+		
 		// Save highscore.
 		long	time	= System.currentTimeMillis();
 		if(saveinterval>=0 && savetime+saveinterval<=time)
@@ -570,15 +632,15 @@ public class Environment implements IEnvironment
 	    return age;
 	}
 	
+	
+	
 	/**
 	 *  Get the foodrate.
 	 *  @return The foodrate.
 	 */
 	public int getFoodrate()
 	{
-		// TODO: implement belief get / process get
-	    //return foodrate;
-		return 1000;
+	    return foodrate;
 	}
 	
 	/**
@@ -587,8 +649,7 @@ public class Environment implements IEnvironment
 	 */
 	public void setFoodrate(int foodrate)
 	{
-		// TODO: implement belief change / process change
-	    //this.foodrate = foodrate;
+	    this.foodrate = foodrate;
 	}
 	
 	/**
@@ -596,9 +657,10 @@ public class Environment implements IEnvironment
 	 *  @param me The creature.
 	 *  @param dir The direction.
 	 */
-	public boolean move(Creature me, String dir)
+	private boolean move(Creature me, String dir)
 	{
-		boolean ret = true;
+		System.out.println("move called: " + me + " -> " + dir);
+		
 		me	= getCreature(me);
 		me.setLeaseticks(DEFAULT_LEASE_TICKS);
 		Location newloc = createLocation(me.getLocation(), dir);
@@ -606,26 +668,10 @@ public class Environment implements IEnvironment
 		Collection col = world.getCollection(newloc);
 		if(col!=null && col.size()==1 && col.iterator().next() instanceof Obstacle)
 		{
-			ret = false;
+			return false;
 		}
 		else
 		{
-			assert agent != null : this + " - no external access provided";
-
-			// request simulation engine move
-			IGoal goToDestination = agent.createGoal("sim_go_to_destination");
-			goToDestination.getParameter("object_id").setValue(me.getSimId());
-			goToDestination.getParameter("destination").setValue(new Vector2Int(newloc.getX(), newloc.getY()));
-			goToDestination.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
-			goToDestination.getParameter("tolerance").setValue(new Vector1Double(0.1));
-			agent.dispatchTopLevelGoalAndWait(goToDestination);
-			
-			// fail move if simulation engine goal has failed
-			if (!goToDestination.isSucceeded())
-			{
-				return false;
-			}
-
 			// Move creature in discrete world
 			try
 			{
@@ -638,12 +684,27 @@ public class Environment implements IEnvironment
 				//System.out.println("!!! "+me);
 				System.out.println(world+" "+me);
 				e.printStackTrace();
-				// ??
 				return false; 
 			}
+			
+			assert agent != null : this + " - no external access provided";
+
+			// request simulation engine move
+			IGoal goToDestination = agent.createGoal("sim_go_to_destination");
+			goToDestination.getParameter("object_id").setValue(me.getSimId());
+			goToDestination.getParameter("destination").setValue(new Vector2Double(newloc.getX(), newloc.getY()));
+			goToDestination.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
+			goToDestination.getParameter("tolerance").setValue(new Vector1Double(0.01));
+//			agent.dispatchTopLevelGoalAndWait(goToDestination);
+			agent.dispatchTopLevelGoal(goToDestination);
+			
+			System.out.println("top level goal dispatched: " + goToDestination);
+			
+			simgoals.put(me, goToDestination);
+
+			return true;
 		}
-		//block(); todo: make blocking for local case
-		return ret;
+
 	}
 
 	/**
@@ -653,28 +714,6 @@ public class Environment implements IEnvironment
 	public Creature[] getCreatures()
 	{
 		return (Creature[])creatures.values().toArray(new Creature[creatures.size()]);
-		
-//		ArrayList	al	= new ArrayList();		
-//		
-//		// lock in appropriate order to avoid deadlocks in simulation engine
-//		Map simObjects = super.getSimObjectAccess();
-//		synchronized (simObjects) 
-//		{
-//			Map typedAccess = super.getTypedSimObjectAccess();
-//			synchronized (typedAccess) 
-//			{
-//				al.addAll((Collection) typedAccess.get(OBJECT_TYPE_HUNTER));
-//				al.addAll((Collection) typedAccess.get(OBJECT_TYPE_PREY));
-//			}
-//		}
-//		// Convert to array and return.
-//		Creature[] ret = new Creature[al.size()];
-//		for (int i = 0; i < al.size(); i++) 
-//		{
-//			ret[i] = (Creature) ((SimObject) al.get(i)).getProperty(PROPERTY_ONTOLOGY);
-//		}
-//		return ret;
-		
 	}
 
 	/**
@@ -684,14 +723,6 @@ public class Environment implements IEnvironment
 	public Obstacle[] getObstacles()
 	{
 		return (Obstacle[])obstacles.toArray(new Obstacle[obstacles.size()]);
-		
-//		List	ret;
-//		Map typedAccess = super.getTypedSimObjectAccess();
-//		synchronized (typedAccess) {
-//			ret = (List) typedAccess.get(OBJECT_TYPE_OBSTACLE);
-//		}
-//		// Convert to array and return.
-//		return (Obstacle[])ret.toArray(new Obstacle[ret.size()]);
 	}
 
 	/**
@@ -701,14 +732,6 @@ public class Environment implements IEnvironment
 	public Food[] getFood()
 	{
 		return (Food[])food.toArray(new Food[food.size()]);
-		
-//		List	ret;
-//		Map typedAccess = super.getTypedSimObjectAccess();
-//		synchronized (typedAccess) {
-//			ret = (List) typedAccess.get(OBJECT_TYPE_FOOD);
-//		}
-//		// Convert to array and return.
-//		return (Food[])ret.toArray(new Obstacle[ret.size()]);
 	}
 
 	/**
@@ -716,7 +739,6 @@ public class Environment implements IEnvironment
 	 */
 	public WorldObject[]	getAllObjects()
 	{
-	
 		// Add obstacles and food to return set.
 		ArrayList	ret	= new ArrayList();
 		ret.addAll(obstacles);
@@ -727,25 +749,6 @@ public class Environment implements IEnvironment
 
 		// Convert to array and return.
 		return (WorldObject[])ret.toArray(new WorldObject[ret.size()]);
-			
-//		// Add obstacles and food to return set.
-//		ArrayList	al	= new ArrayList();
-//		
-//		Map typedAccess = super.getTypedSimObjectAccess();
-//		synchronized (typedAccess) {
-//			al.addAll((Collection) typedAccess.get(OBJECT_TYPE_FOOD));
-//			al.addAll((Collection) typedAccess.get(OBJECT_TYPE_OBSTACLE));
-//			al.addAll((Collection) typedAccess.get(OBJECT_TYPE_HUNTER));
-//			al.addAll((Collection) typedAccess.get(OBJECT_TYPE_PREY));
-//		}
-//		
-//		// Convert to array and return.
-//		WorldObject[] ret = new WorldObject[al.size()];
-//		for (int i = 0; i < al.size(); i++) {
-//			ret[i] = (WorldObject) ((SimObject) al.get(i)).getProperty(PROPERTY_ONTOLOGY);
-//		}
-		
-			
 	}
 	
 	protected String getSimObjectType(WorldObject wo) {
@@ -866,13 +869,6 @@ public class Environment implements IEnvironment
 	 */
 	protected Creature getCreature(Creature creature)
 	{
-		
-//		Creature ret = (Creature)creatures.get(creature);
-		
-//		Creature ret = null;
-//		if (creature.getSimId() != null)
-//			ret = (Creature) super.getSimulationObject(creature.getSimId()).getProperty(PROPERTY_ONTOLOGY);	
-		
 		Creature ret = (Creature)creatures.get(creature.getSimId());
 		
 		if(ret==null)

@@ -1,14 +1,8 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.adapter.base.fipa.Done;
-import jadex.bdi.examples.hunterprey2.Configuration;
-import jadex.bdi.examples.hunterprey2.Creature;
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.RequestMove;
 import jadex.bdi.examples.hunterprey2.TaskInfo;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Int;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
 /**

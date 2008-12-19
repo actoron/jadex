@@ -1,15 +1,11 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.bdi.examples.hunterprey2.Configuration;
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.Food;
 import jadex.bdi.examples.hunterprey2.Location;
 import jadex.bdi.examples.hunterprey2.Obstacle;
 import jadex.bdi.examples.hunterprey2.WorldObject;
-import jadex.bdi.examples.hunterprey2.engine.process.FoodSpawnProcess;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Int;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 import jadex.bdi.planlib.starter.StartAgentInfo;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
@@ -52,13 +48,7 @@ public class InitializeEnvironmentPlan extends Plan
 		
 		b.getBelief("environment").setFact(env);
 		
-		// start observer befor gui to use canvas 
-		//IGoal observer = createGoal("start_observer_gui");
-		//dispatchTopLevelGoal(observer);
 		
-		// after observer creation start gui
-		IGoal gui = createGoal("start_environment_gui");
-		dispatchTopLevelGoal(gui);
 
 		
 		
@@ -97,7 +87,13 @@ public class InitializeEnvironmentPlan extends Plan
 //		env.addEnvironmentProcess(new FoodSpawnProcess(maxFood, foodSpawnRate));
 		
 		
-				
+		// start observer befor gui to use canvas 
+		IGoal observer = createGoal("start_observer_gui");
+		dispatchTopLevelGoal(observer);
+		
+		// after observer creation start gui
+		IGoal gui = createGoal("start_environment_gui");
+		dispatchTopLevelGoal(gui);		
 		
 		
 	}

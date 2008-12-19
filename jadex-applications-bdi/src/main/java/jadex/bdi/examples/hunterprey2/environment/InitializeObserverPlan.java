@@ -1,13 +1,13 @@
-package jadex.bdi.examples.hunterprey2.environment.observer;
+package jadex.bdi.examples.hunterprey2.environment;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jadex.bdi.examples.hunterprey2.Configuration;
 import jadex.bdi.examples.hunterprey2.Creature;
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
@@ -32,7 +32,7 @@ public class InitializeObserverPlan extends Plan
 		
 		Map theme = new HashMap();
 		
-		String imgPath = this.getClass().getPackage().getName().replaceAll("environment\\.observer", "").concat("images.").replaceAll("\\.", "/");
+		String imgPath = this.getClass().getPackage().getName().replaceAll("environment", "").concat("images.").replaceAll("\\.", "/");
 		
 		DrawableCombiner hunterDrawable = new DrawableCombiner();
 		String hunterImage = imgPath.concat("hunter.png");
@@ -57,13 +57,16 @@ public class InitializeObserverPlan extends Plan
 		theme.put(Environment.OBJECT_TYPE_OBSTACLE, obstacleDrawable);
 		
 		
-		List themes = (List) b.getBelief("object_themes").getFact();
-		themes.add(theme);
+		Map themes = (Map) b.getBelief("object_themes").getFact();
+		themes.put("default",theme);
 		
 		ILayer background =  new TiledLayer(Configuration.BACKGROUND_TILE_SIZE,
 										    Configuration.BACKGROUND_TILE);
-		List preLayers = (List) b.getBelief("prelayers").getFact();
-		preLayers.add(background);
+		
+		List preLayerTheme = new ArrayList();
+		preLayerTheme.add(background);
+		Map preLayerThemes = (Map) b.getBelief("prelayer_themes").getFact();
+		preLayerThemes.put("default", preLayerTheme);
 		
 		System.out.println("Starting Observer");
 		IGoal start = createGoal("simobs_start");

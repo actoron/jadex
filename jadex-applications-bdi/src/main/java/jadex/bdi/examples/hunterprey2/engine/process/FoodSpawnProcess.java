@@ -1,9 +1,9 @@
 package jadex.bdi.examples.hunterprey2.engine.process;
 
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.Food;
 import jadex.bdi.examples.hunterprey2.Location;
 import jadex.bdi.examples.hunterprey2.WorldObject;
+import jadex.bdi.examples.hunterprey2.environment.Environment;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Int;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Int;

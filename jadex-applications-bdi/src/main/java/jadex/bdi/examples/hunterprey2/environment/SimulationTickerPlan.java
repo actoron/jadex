@@ -3,11 +3,17 @@ package jadex.bdi.examples.hunterprey2.environment;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.examples.hunterprey2.CurrentVision;
-import jadex.bdi.examples.hunterprey2.Environment;
+import jadex.bdi.examples.hunterprey2.TaskInfo;
 import jadex.bdi.examples.hunterprey2.Vision;
+import jadex.bdi.examples.hunterprey2.WorldObject;
+import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.MessageFailureException;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -19,6 +25,9 @@ import jadex.bridge.MessageFailureException;
  */
 public class SimulationTickerPlan extends Plan
 {
+	// The world environment
+	Environment env = null;
+	
 	//-------- methods --------
 
 	/**
@@ -26,17 +35,20 @@ public class SimulationTickerPlan extends Plan
 	 */
 	public void body()
 	{
-		Environment env = null;
+		
+		// wait for environment
 		while (env == null)
 		{
 			env = (Environment)getBeliefbase().getBelief("environment").getFact();
-			// HACK! Use condition to check environment creation
-			waitFor(1000);
+			waitForFactChanged("environment", 1000);
 		}
+
 		while(true)
 		{
+
 			waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
 			env.executeStep();
+			
 			//System.out.println("Actual tick cnt: "+getBeliefbase().getBelief("???").getFact("tickcnt"));
 
 			// Dispatch new visions.
@@ -61,4 +73,7 @@ public class SimulationTickerPlan extends Plan
 			}
 		}
 	}
+	
+	
+	
 }

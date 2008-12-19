@@ -1,7 +1,6 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.adapter.base.fipa.Done;
-import jadex.bdi.examples.hunterprey2.Environment;
 import jadex.bdi.examples.hunterprey2.RequestWorldSize;
 import jadex.bdi.runtime.Plan;
 
