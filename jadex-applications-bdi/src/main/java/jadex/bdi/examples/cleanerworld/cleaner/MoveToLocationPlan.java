@@ -45,7 +45,7 @@ public class MoveToLocationPlan extends Plan
 			//long	newtime	= getTime();
 			double speed = ((Double)getBeliefbase().getBelief("my_speed").getFact()).doubleValue();
 			double d = myloc.getDistance(target);
-			double r = speed*0.00004*1000;//(newtime-time);
+			double r = speed*0.00004*100;//(newtime-time);
 			double dx = target.getX()-myloc.getX();
 			double dy = target.getY()-myloc.getY();
 			//time	= newtime;
@@ -60,7 +60,7 @@ public class MoveToLocationPlan extends Plan
 			charge	-= r*0.075;
 			getBeliefbase().getBelief("my_chargestate").setFact(new Double(charge));
 
-			waitFor(1000); // wait for 0.01 seconds
+			waitFor(100); // wait for 0.01 seconds
 
 			// Ceck if location has changed in mean time.
 			myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
@@ -75,7 +75,9 @@ public class MoveToLocationPlan extends Plan
 	 *  Update the vision, when having moved.
 	 */
 	protected void	updateVision()
-	{
+	{		
+		long start = System.currentTimeMillis();
+		
 		// Create a representation of myself.
 		Cleaner cl = new Cleaner((Location)getBeliefbase().getBelief("my_location").getFact(),
 			getAgentName(),
@@ -207,5 +209,7 @@ public class MoveToLocationPlan extends Plan
 			//System.out.println("Error when updating vision! "+event.getGoal());
 			System.out.println(getAgentName()+" Error when updating vision! ");
 		}
+		
+//		System.out.println("update vision: "+(System.currentTimeMillis()-start));
 	}
 }

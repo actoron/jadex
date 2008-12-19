@@ -383,7 +383,8 @@ public class GoalProcessingRules
 //		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED));
 		IConstraint goalhastarget = new LiteralConstraint(target, null, IOperator.NOTEQUAL);
 		IConstraint planfail = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
-		plancon.addConstraint(new OrConstraint(new IConstraint[]{goalhastarget, planfail}));
+		IConstraint planabort = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
+		plancon.addConstraint(new OrConstraint(new IConstraint[]{goalhastarget, planfail, planabort}));
 
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
@@ -433,7 +434,8 @@ public class GoalProcessingRules
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED));
 		IConstraint goalhastarget = new LiteralConstraint(target, null, IOperator.NOTEQUAL);
 		IConstraint planfail = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
-		IConstraint orcon2 = new OrConstraint(new IConstraint[]{goalhastarget, planfail});
+		IConstraint planabort = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
+		IConstraint orcon2 = new OrConstraint(new IConstraint[]{goalhastarget, planfail, planabort});
 		plancon.addConstraint(orcon2);
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
