@@ -589,7 +589,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// is necessary.
 				if(!aborted)
 				{
-					PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan);
+					PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan, false);
 					// Hack!!! Should not change state?
 					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
 						this.throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
@@ -635,7 +635,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				}
 			}
 
-			PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan);
+			PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan, true);
 
 			// Set plan processing state.
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);

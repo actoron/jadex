@@ -357,7 +357,7 @@ public class PlanRules
 //			System.out.println("abort body: "+rplan);
 			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_GOALCLEANUP);
 		
-			endPlanPart(state, rcapa, rplan);
+			endPlanPart(state, rcapa, rplan, false);
 		}
 		else // if(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW.equals(ps))
 		{
@@ -369,11 +369,13 @@ public class PlanRules
 	/**
 	 *  End a part (i.e. body/passed/failed/aborted) of a plan.
 	 *  Cleanup wait abstraction and timers and drop all subgoals.
+	 *  Use cleanupwq flag to also remove elements from the waitqueue,
+	 *  when this is the final part of the plan (passed/failed/aborted). 
 	 */
-	public static void endPlanPart(IOAVState state, Object rcapa, Object rplan)
+	public static void endPlanPart(IOAVState state, Object rcapa, Object rplan, boolean cleanupwq)
 	{
 		// Cleanup wait abstraction and wait queue
-		cleanupPlanWait(state, rcapa, rplan, true);
+		cleanupPlanWait(state, rcapa, rplan, cleanupwq);
 		
 		// Drop subgoals
 		Collection	subgoals	= state.getAttributeValues(rplan, OAVBDIRuntimeModel.plan_has_subgoals);
@@ -2143,7 +2145,7 @@ public class PlanRules
 
 		if(cleanwq)
 		{
-			Object	wqwa	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction);
+			Object	wqwa	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa);
 			if(wqwa!=null)
 			{
 				cleanupWaitAbstraction(state, rcapa, wqwa);

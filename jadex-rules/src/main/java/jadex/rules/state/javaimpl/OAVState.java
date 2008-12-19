@@ -4,6 +4,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IdentityHashSet;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -303,6 +304,8 @@ public class OAVState	implements IOAVState
 		return createObject(type, true);
 	}
 	
+//	public MultiCollection	objectspertype	= new MultiCollection();
+	
 	/**
 	 *  Impl of root/non-root object creation.	
 	 */
@@ -314,6 +317,7 @@ public class OAVState	implements IOAVState
 		
 		Object	ret	= generator.createId(this, type);
 		objects.put(ret, new LinkedHashMap());
+//		objectspertype.put(type, ret);
 	
 		types.put(ret, type);
 //		System.out.println("Created object of type: "+type);
@@ -494,6 +498,7 @@ public class OAVState	implements IOAVState
 		//System.out.print("Removing: "+object+" "+types);
 		
 		// Notify listeners about removed object before removing references
+		// Object will be removed from types map in notifyEventListeners()
 		eventhandler.objectRemoved(id, (OAVObjectType)types.get(id));
 	}
 
@@ -508,6 +513,7 @@ public class OAVState	implements IOAVState
 
 		// Remove the object itself (needs to be done before removing its references to avoid recursion)
 		Map content	= (Map)objects.remove(id);
+//		objectspertype.remove(types.get(id), id);
 		if(content==null)
 			throw new RuntimeException("Object not found: "+id);
 		deletedobjects.put(id, content);
@@ -760,12 +766,10 @@ public class OAVState	implements IOAVState
 	 */
 	public int	getSize()
 	{
-		int	ret;
+		int	ret	= objects.size() + javaobjects.size();
 		
-		if(!eventhandler.notifying)
-			ret = objects.size();
-		else
-			ret = objects.size()+deletedobjects.size();
+		if(eventhandler.notifying)
+			ret += deletedobjects.size();
 		
 		if(substates!=null)
 			for(int i=0; i<substates.length; i++)

@@ -5,6 +5,7 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.AgentTerminatedException;
 
 /**
  *  Update the belief set containing the local agents.
@@ -33,32 +34,44 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 			{
 				public void agentAdded(final IAMSAgentDescription desc)
 				{
-					// Decouple threads to avoid deadlocks (e.g. with sync executor)
-					getExternalAccess().invokeLater(new Runnable()
+					try
 					{
-						public void run()
+						// Decouple threads to avoid deadlocks (e.g. with sync executor)
+						getExternalAccess().invokeLater(new Runnable()
 						{
-//							synchronized(mon)
+							public void run()
 							{
-								agents.addFact(desc);
+	//							synchronized(mon)
+								{
+									agents.addFact(desc);
+								}
 							}
-						}
-					});
+						});
+					}
+					catch(AgentTerminatedException ate)
+					{
+					}
 				}
 						
 				public void agentRemoved(final IAMSAgentDescription desc)
 				{
-					// Decouple threads to avoid deadlocks (e.g. with sync executor)
-					getExternalAccess().invokeLater(new Runnable()
+					try
 					{
-						public void run()
+						// Decouple threads to avoid deadlocks (e.g. with sync executor)
+						getExternalAccess().invokeLater(new Runnable()
 						{
-//							synchronized(mon)
+							public void run()
 							{
-								agents.removeFact(desc);
+	//							synchronized(mon)
+								{
+									agents.removeFact(desc);
+								}
 							}
-						}
-					});
+						});
+					}
+					catch(AgentTerminatedException ate)
+					{
+					}
 				}
 			};
 			

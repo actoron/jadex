@@ -507,7 +507,15 @@ public class ModelExplorer extends JTree
 //		}		
 
 		root.reset();
-		((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(root);
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				refreshmenu.setSelected(refresh);
+				((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(root);
+			}
+		});
 	}
 	
 	/**

@@ -18,6 +18,7 @@ import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
+import jadex.commons.Tuple;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
@@ -31,9 +32,14 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.javaimpl.OAVState;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -161,7 +167,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.kernelprops = kernelprops;
 		this.planexecutors = new HashMap();
-		this.volcache = new LRU(50);
+		this.volcache = new LRU(0);	// 50
 		this.stacache = new LRU(20);
 		this.microplansteps = true;
 
@@ -379,10 +385,10 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	//						frame.setVisible(true);
 	//					}
 	//				}
-					assert rulesystem.getState().getUnreferencedObjects().size()==0
-						: getAgentAdapter().getAgentIdentifier().getLocalName()
-						+ ", " + rulesystem.getAgenda().getLastActivation()
-						+ ", " + rulesystem.getState().getUnreferencedObjects();
+//					assert rulesystem.getState().getUnreferencedObjects().size()==0
+//						: getAgentAdapter().getAgentIdentifier().getLocalName()
+//						+ ", " + rulesystem.getAgenda().getLastActivation()
+//						+ ", " + rulesystem.getState().getUnreferencedObjects();
 					rulesystem.getAgenda().fireRule();
 				}
 			}
@@ -394,6 +400,71 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 			state.notifyEventListeners();
 			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 						
+			// The following code prints the number of objects in the state
+			// Prints the min values between two new max points for finding memory hogs.
+//			if(last==0 || last+100<System.currentTimeMillis())
+//			{
+//				last	= System.currentTimeMillis();
+//				if(state.getSize()>lastmax)
+//				{
+//					if(lastmsg!=null)
+//						System.out.println(lastmsg);
+//					
+//					lastmax	= state.getSize();
+//					lastmin	= lastmax;
+//				}
+//				else if(state.getSize()<lastmin)
+//				{
+//					lastmin	= state.getSize();
+//					StringBuffer	buf	= new StringBuffer();
+//					buf.append("OAVState objects: ");
+//					buf.append(getAgentAdapter().getAgentIdentifier().getLocalName());
+//					buf.append(", ");
+//					buf.append(state.getSize());
+//					buf.append("\n");
+//					Object[]	types	= ((OAVState)state).objectspertype.getKeys();
+//					Tuple[]	instances	= new Tuple[types.length];
+//					for(int i=0; i<types.length; i++)
+//						instances[i]	= new Tuple(types[i],
+//							new Integer(((OAVState)state).objectspertype.getCollection(types[i]).size()));
+//					Arrays.sort(instances, new Comparator()
+//					{
+//						public int compare(Object o1, Object o2)
+//						{
+//							int ret	= ((Integer)((Tuple)o1).get(1)).compareTo(((Tuple)o2).get(1));
+//							if(ret==0 && o1!=o2)
+//								ret	= ((OAVObjectType)((Tuple)o1).get(0)).getName()
+//									.compareTo(((OAVObjectType)((Tuple)o2).get(0)).getName());
+//							return ret;
+//						}
+//					});
+//					int cnt	= 0;
+//					for(int i=instances.length-1; i>=0 && i>=instances.length-5; i--)
+//					{
+//						Set	refs	= new HashSet();
+//						Collection	objects	= ((OAVState)state).objectspertype.getCollection(types[i]);
+//						for(Iterator it=objects.iterator(); it.hasNext(); )
+//						{
+//							refs.addAll(state.getReferencingObjects(it.next()));
+//						}
+//						
+//						buf.append("\t");
+//						buf.append(instances[i].get(0));
+//						buf.append(": ");
+//						buf.append(instances[i].get(1));
+//						buf.append(" references: ");
+//						buf.append(refs.size());
+//						buf.append(":");
+//						buf.append(refs);
+//						buf.append("\n");
+//						cnt	+= ((Integer)instances[i].get(1)).intValue();
+//					}
+//					buf.append("\t...: ");
+//					buf.append(state.getSize()-cnt);
+//					buf.append("\n");
+//					lastmsg	= buf.toString();
+//				}
+//			}
 			
 //			lock.unlock();
 			
@@ -418,6 +489,11 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 			this.agentthread = null;
 		}
 	}
+	
+	long last;
+	int lastmax;
+	int lastmin;
+	String	lastmsg;
 
 	/**
 	 *  Inform the agent that a message has arrived.
