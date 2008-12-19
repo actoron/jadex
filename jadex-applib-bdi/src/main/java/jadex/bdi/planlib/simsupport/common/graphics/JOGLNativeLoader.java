@@ -255,7 +255,7 @@ public class JOGLNativeLoader
             }
             catch (IOException e)
             {
-            	loadError();
+            	//loadError();
             }
         }
     	
