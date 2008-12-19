@@ -110,12 +110,7 @@ public class JOGLNativeLoader
      */
     private static void loadUnix(String pathPrefix)
     {
-        for (int i = 0; i < LIBNAMES.length; ++i)
-        {
-            String libPrefix = "lib" + LIBNAMES[i];
-            String libPath = pathPrefix + libPrefix + ".so";
-            loadLibrary(libPath, libPrefix, ".so");
-        }
+    	loadLibraries(pathPrefix, "lib", ".so");
     }
     
     /** Loads the libraries for 32bit Windows.
@@ -136,7 +131,7 @@ public class JOGLNativeLoader
      */
     private static void loadWindows(String pathPrefix)
     {
-    	loadLibrariesWindows(pathPrefix);
+    	loadLibraries(pathPrefix, "", ".dll");
     }
     
     /** Generalized Mac OS X library loader
@@ -144,74 +139,14 @@ public class JOGLNativeLoader
     private static void loadMacOSX()
     {
         String pathPrefix = "macosxuni/";
-        for (int i = 0; i < LIBNAMES.length; ++i)
-        {
-            String libPrefix = "lib" + LIBNAMES[i];
-            String libPath = pathPrefix + libPrefix + ".jnilib";
-            loadLibrary(libPath, libPrefix, ".jnilib");
-        }
+        loadLibraries(pathPrefix, "lib", ".jnilib");
     }
     
-    private static void loadLibrary(String path,
-                                    String prefix,
-                                    String suffix)
-    {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        String pckg = JOGLNativeLoader.class.getPackage().getName().replaceAll("\\.", "/");
-        URL libJarSrc = cl.getResource(pckg + "/nativelibs.jar");
-        if (libJarSrc == null)
-        {
-            loadError();
-        }
-        
-        InputStream libStream = null;
-        try
-        {
-        	JarInputStream jis = new JarInputStream(libJarSrc.openStream());
-        	JarEntry entry = null;
-        	do
-        	{
-        		entry = jis.getNextJarEntry();
-        	}
-        	while (!entry.getName().equals(path));
-        	
-        	libStream = jis;
-        }
-        catch (Exception e)
-        {
-        	loadError();
-		}
-        
-        File tmpLib = null;
-        try
-        {
-            tmpLib = File.createTempFile(prefix, suffix);
-            FileOutputStream tmpOut = new FileOutputStream(tmpLib);
-            byte[] buf = new byte[4096];
-            int len = 0;
-            while ((len = libStream.read(buf)) != -1)
-            {
-                tmpOut.write(buf, 0, len);
-            }
-            libStream.close();
-            tmpOut.close();
-        }
-        catch (IOException e)
-        {
-            loadError();
-        }
-        
-        System.load(tmpLib.getAbsolutePath());
-        
-        tmpLib.deleteOnExit();
-    }
-    
-    private static void loadLibrariesWindows(String libPath)
+    private static void loadLibraries(String libPath, String prefix, String suffix)
     {
     	for (int i = 0; i < LIBNAMES.length; ++i)
         {
-            String libPrefix = LIBNAMES[i];
-            String path = libPath + libPrefix + ".dll";
+            String path = libPath + prefix + LIBNAMES[i] + suffix;
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             String pckg = JOGLNativeLoader.class.getPackage().getName().replaceAll("\\.", "/");
             URL libJarSrc = cl.getResource(pckg + "/nativelibs.jar");
@@ -242,7 +177,7 @@ public class JOGLNativeLoader
             try
             {
             	String tmpDir=System.getProperty("java.io.tmpdir");
-            	tmpLib = new File(tmpDir + File.separator + LIBNAMES[i] + ".dll");
+            	tmpLib = new File(tmpDir + File.separator + prefix + LIBNAMES[i] + suffix);
             	FileOutputStream tmpOut = new FileOutputStream(tmpLib);
             	byte[] buf = new byte[4096];
             	int len = 0;
@@ -255,14 +190,13 @@ public class JOGLNativeLoader
             }
             catch (IOException e)
             {
-            	//loadError();
             }
         }
     	
     	for (int i = 0; i < LIBNAMES.length; ++i)
         {
     		String tmpDir=System.getProperty("java.io.tmpdir");
-    		File libFile = new File(tmpDir + File.separator + LIBNAMES[i] + ".dll");
+    		File libFile = new File(tmpDir + File.separator + prefix + LIBNAMES[i] + suffix);
     		System.load(libFile.getAbsolutePath());
         }
     }
