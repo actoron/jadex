@@ -402,69 +402,89 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 						
 			// The following code prints the number of objects in the state
 			// Prints the min values between two new max points for finding memory hogs.
-//			if(last==0 || last+100<System.currentTimeMillis())
-//			{
-//				last	= System.currentTimeMillis();
-//				if(state.getSize()>lastmax)
-//				{
-//					if(lastmsg!=null)
-//						System.out.println(lastmsg);
-//					
-//					lastmax	= state.getSize();
-//					lastmin	= lastmax;
-//				}
-//				else if(state.getSize()<lastmin)
-//				{
-//					lastmin	= state.getSize();
-//					StringBuffer	buf	= new StringBuffer();
-//					buf.append("OAVState objects: ");
-//					buf.append(getAgentAdapter().getAgentIdentifier().getLocalName());
-//					buf.append(", ");
-//					buf.append(state.getSize());
-//					buf.append("\n");
-//					Object[]	types	= ((OAVState)state).objectspertype.getKeys();
-//					Tuple[]	instances	= new Tuple[types.length];
-//					for(int i=0; i<types.length; i++)
-//						instances[i]	= new Tuple(types[i],
-//							new Integer(((OAVState)state).objectspertype.getCollection(types[i]).size()));
-//					Arrays.sort(instances, new Comparator()
-//					{
-//						public int compare(Object o1, Object o2)
-//						{
-//							int ret	= ((Integer)((Tuple)o1).get(1)).compareTo(((Tuple)o2).get(1));
-//							if(ret==0 && o1!=o2)
-//								ret	= ((OAVObjectType)((Tuple)o1).get(0)).getName()
-//									.compareTo(((OAVObjectType)((Tuple)o2).get(0)).getName());
-//							return ret;
-//						}
-//					});
-//					int cnt	= 0;
-//					for(int i=instances.length-1; i>=0 && i>=instances.length-5; i--)
-//					{
-//						Set	refs	= new HashSet();
-//						Collection	objects	= ((OAVState)state).objectspertype.getCollection(types[i]);
-//						for(Iterator it=objects.iterator(); it.hasNext(); )
-//						{
-//							refs.addAll(state.getReferencingObjects(it.next()));
-//						}
-//						
-//						buf.append("\t");
-//						buf.append(instances[i].get(0));
-//						buf.append(": ");
-//						buf.append(instances[i].get(1));
-//						buf.append(" references: ");
-//						buf.append(refs.size());
-//						buf.append(":");
-//						buf.append(refs);
-//						buf.append("\n");
-//						cnt	+= ((Integer)instances[i].get(1)).intValue();
-//					}
-//					buf.append("\t...: ");
-//					buf.append(state.getSize()-cnt);
-//					buf.append("\n");
-//					lastmsg	= buf.toString();
-//				}
-//			}
+			if(last==0 || last+100<System.currentTimeMillis())
+			{
+				last	= System.currentTimeMillis();
+				if(state.getSize()>lastmax)
+				{
+					if(lastmsg!=null)
+						System.out.println(lastmsg);
+					
+					lastmax	= state.getSize();
+					lastmin	= lastmax;
+					lastmsg	= null;
+				}
+				else if(state.getSize()<lastmin)
+				{
+					lastmin	= state.getSize();
+					StringBuffer	buf	= new StringBuffer();
+					buf.append("OAVState objects: ");
+					buf.append(getAgentAdapter().getAgentIdentifier().getLocalName());
+					buf.append(", ");
+					buf.append(state.getSize());
+					buf.append("\n");
+					Object[]	types	= ((OAVState)state).objectspertype.getKeys();
+					Tuple[]	instances	= new Tuple[types.length];
+					for(int i=0; i<types.length; i++)
+						instances[i]	= new Tuple(types[i],
+							new Integer(((OAVState)state).objectspertype.getCollection(types[i]).size()));
+					Arrays.sort(instances, new Comparator()
+					{
+						public int compare(Object o1, Object o2)
+						{
+							int ret	= ((Integer)((Tuple)o1).get(1)).compareTo(((Tuple)o2).get(1));
+							if(ret==0 && o1!=o2)
+								ret	= ((OAVObjectType)((Tuple)o1).get(0)).getName()
+									.compareTo(((OAVObjectType)((Tuple)o2).get(0)).getName());
+							return ret;
+						}
+					});
+					int cnt	= 0;
+					for(int i=instances.length-1; i>=0 && i>=instances.length-5; i--)
+					{
+						int	ucnt	= 0;
+						int	ecnt	= 0;
+						Set	refs	= new HashSet();
+						Collection	objects	= ((OAVState)state).objectspertype.getCollection(instances[i].get(0));
+						for(Iterator it=objects.iterator(); it.hasNext(); )
+						{
+							Collection	refobjs	= state.getReferencingObjects(it.next());
+							if(refobjs.isEmpty())
+							{
+								ucnt++;
+							}
+							else
+							{
+								for(Iterator it2=refobjs.iterator(); it2.hasNext();)
+								{
+									Object	ref	= it2.next();
+									if(ref instanceof String)
+										refs.add("external_ref_"+(++ecnt));
+									else
+										refs.add(ref);
+								}
+							}
+						}
+						
+						buf.append("\t");
+						buf.append(instances[i].get(0));
+						buf.append(": ");
+						buf.append(instances[i].get(1));
+						buf.append(" unused: ");
+						buf.append(ucnt);
+						buf.append(" references: ");
+						buf.append(refs.size());
+						buf.append(":");
+						buf.append(refs);
+						buf.append("\n");
+						cnt	+= ((Integer)instances[i].get(1)).intValue();
+					}
+					buf.append("\t...: ");
+					buf.append(state.getSize()-cnt);
+					buf.append("\n");
+					lastmsg	= buf.toString();
+				}
+			}
 			
 //			lock.unlock();
 			
