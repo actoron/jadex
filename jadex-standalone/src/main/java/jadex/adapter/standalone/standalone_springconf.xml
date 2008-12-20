@@ -259,9 +259,26 @@
 					<key><value>jcc</value></key>
 					<value type="java.lang.String">jadex/tools/jcc/JCC.agent.xml</value>
 				</entry>
+				
+				<!-- <entry>
+					<key><value>creation</value></key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">model</value>
+							</key>
+							<value type="java.lang.String">jadex/bdi/benchmarks/AgentCreation.agent.xml</value>
+						</entry>
+						<entry>
+							<key>
+								<value type="java.lang.String">max</value>
+							</key>
+							<value type="int">2000</value>
+						</entry>
+					</map>
+				</entry> -->
 			</map>
 		</property>
-		
 	</bean>
 	
 </beans>

@@ -12,6 +12,7 @@ import jadex.commons.concurrent.IThreadPool;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -202,7 +203,21 @@ public class SpringPlatform extends AbstractPlatform
 			for(Iterator it = daemagents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
-				createAgent(name, (String)daemagents.get(name), null, null, true);
+				String model;
+				String config = null;
+				Map args = null;
+				Object tmp = daemagents.get(name);
+				if(tmp instanceof String)
+				{
+					model = (String)tmp;
+				}
+				else
+				{
+					args = (Map)tmp;
+					model = (String)args.remove("model");
+					config = (String)args.remove("config");
+				}
+				createAgent(name, model, config, args, true);
 			}
 		}
 		
@@ -213,7 +228,21 @@ public class SpringPlatform extends AbstractPlatform
 			for(Iterator it = appagents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
-				createAgent(name, (String)appagents.get(name), null, null, false);
+				String model;
+				String config = null;
+				Map args = null;
+				Object tmp = appagents.get(name);
+				if(tmp instanceof String)
+				{
+					model = (String)tmp;
+				}
+				else
+				{
+					args = (Map)tmp;
+					model = (String)args.remove("model");
+					config = (String)args.remove("config");
+				}
+				createAgent(name, model, config, args, false);
 			}
 		}
 	}
