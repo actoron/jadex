@@ -9,10 +9,12 @@
       <includes>
         <include>jadex:*</include>
       </includes>
+      
       <binaries>
         <outputDirectory>lib</outputDirectory>
         <unpack>false</unpack>
       </binaries>
+      
       <sources>
         <includeModuleDirectory>false</includeModuleDirectory>
         <fileSets>
@@ -20,10 +22,18 @@
             <outputDirectory>${artifactId}</outputDirectory>
             <includes>
               <include>src/**</include>
+              <include>pom.xml</include>
+            </includes>
+          </fileSet>
+          <fileSet>
+            <outputDirectory>${artifactId}</outputDirectory>
+            <includes>
+              <include>lib/**</include>
             </includes>
           </fileSet>
         </fileSets>
       </sources>
+    
     </moduleSet>
   </moduleSets>
 </assembly>
