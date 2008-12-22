@@ -2061,22 +2061,29 @@ public class OAVState	implements IOAVState
 					{
 						if(synchronizator!=null)
 						{
-							synchronizator.invokeLater(new Runnable()
+							try
 							{
-								public void run()
+								synchronizator.invokeLater(new Runnable()
 								{
-									try
+									public void run()
 									{
-										OAVAttributeType attr = type.getAttributeType(evt.getPropertyName());
-										eventhandler.beanModified(evt.getSource(), type, attr, evt.getOldValue(), evt.getNewValue());
+										try
+										{
+											OAVAttributeType attr = type.getAttributeType(evt.getPropertyName());
+											eventhandler.beanModified(evt.getSource(), type, attr, evt.getOldValue(), evt.getNewValue());
+										}
+										catch(Exception e)
+										{
+											// Todo: use customizsble logger supplied from external.
+											e.printStackTrace();
+										}
 									}
-									catch(Exception e)
-									{
-										// Todo: use customizsble logger supplied from external.
-										e.printStackTrace();
-									}
-								}
-							});
+								});
+							}
+							catch(Exception e)
+							{
+								System.out.println("Synchronizer invalid: "+evt);
+							}
 						}
 						else
 						{

@@ -54,8 +54,8 @@
  				// ((Environment)$beliefbase.getBelief("env").getFact()).hasGarbage($scope.getAgentName())
 		
 				?agent = (agent (agent_has_localname ?agentname))
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
 				?mbel_env = (mbelief (element_has_name "env"))
+				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
  				?env = (jadex.bdi.examples.garbagecollector.Environment (hasGarbage (?agentname) ?ret))
 			</fact>
 		</belief>

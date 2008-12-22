@@ -406,13 +406,19 @@ public class EnvironmentGui	extends JFrame
 					{
 						// Hack!!! Should ignore remote cleaners.
 						IGoal	kill	= agent.createGoal("ams_destroy_agent");
+//						System.out.println("killing: "+cleaners[i].getName());
 						IAgentIdentifier aid = ((IAMS)agent.getPlatform().getService(IAMS.class))
 							.createAgentIdentifier(cleaners[i].getName(), true);
 						kill.getParameter("agentidentifier").setValue(aid);
 						agent.dispatchTopLevelGoalAndWait(kill);
 					}
 //					catch(GoalFailureException gfe) {}
-					catch(Exception gfe) {}
+					catch(Exception ex) 
+					{
+						// There might be old cleaner entries in the environment that can lead to exceptions
+						// because the agents cannot be killed.
+						//ex.printStackTrace();
+					}
 				}
 				agent.killAgent();
 			}

@@ -842,7 +842,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	 *  Add an action from external thread.
 	 *  The contract of this method is as follows:
 	 *  The agent ensures the execution of the external action, otherwise
-	 *  the method will throw a agent terminated sexception.
+	 *  the method will throw a agent terminated exception.
 	 *  @param action The action.
 	 */
 	public void invokeLater(Runnable action)
@@ -850,8 +850,10 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 		synchronized(ext_entries)
 		{
 			if(ext_forbidden)
+			{
 				throw new AgentTerminatedException("External actions cannot be accepted " +
 					"due to terminated agent state: "+ragent);
+			}
 			ext_entries.add(action);
 		}
 		adapter.wakeup();

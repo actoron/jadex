@@ -13,6 +13,10 @@
 		<import>java.util.logging.Level</import>
 	</imports>
 
+	<capabilities>
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+	</capabilities>
+
 	<beliefs>
 		<belief name="environment" class="Environment">
 			<!-- Use own environment for remote. -->
@@ -26,6 +30,12 @@
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>
+	
+	<goals>
+		<achievegoalref name="ams_destroy_agent">
+			<concrete ref="amscap.ams_destroy_agent"/>
+		</achievegoalref>
+	</goals>
 
 	<properties>
 <!--		<property name="logging.level">Level.INFO</property>-->

@@ -176,13 +176,19 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 */
 	public void removeTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		//System.out.println("Remove tuple called: "+this+" "+left);
+//		if(getNodeId()==3713)
+//			System.out.println("Remove tuple called: "+this+" "+left);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 
 		Collection omem = fetchObjectMemory(state, left, mem);
 		if(omem!=null)
 		{
+//			if(getNodeId()==3713)
+//			{
+//				System.out.println("omem: "+this+" "+omem);
+//				System.out.println("resultmem"+this+" "+mem.getNodeMemory(this));
+//			}
 			// Simply tries to remove all found entries
 			for(Iterator it=omem.iterator(); it.hasNext(); )
 			{
@@ -208,10 +214,15 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			BetaMemory bmem = (BetaMemory)mem.getNodeMemory(this);
 			for(Iterator it=bmem.getResultMemory().iterator(); it.hasNext(); )
 			{
-				assert !((Tuple)it.next()).getLastTuple().equals(left) : "Tuple not removed: "+left+", "+this;
+				Tuple next = (Tuple)it.next();
+//				if(next.getLastTuple().equals(left))
+//					System.out.println("driss: "+this+" "+next);
+				assert !next.getLastTuple().equals(left) : "Tuple not removed: "+left+", "+this;
 			}
 		}
 
+//		if(getNodeId()==3713)
+//			System.out.println("FINISHED Remove tuple called: "+this+" "+left);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}

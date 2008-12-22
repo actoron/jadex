@@ -28,7 +28,7 @@ public class AMSLocalDestroyAgentPlan extends Plan
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			fail(e); // Do not show exception on console. 
 		}
 	}

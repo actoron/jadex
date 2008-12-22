@@ -117,6 +117,8 @@ public class BetaNode extends AbstractBetaNode
 			Tuple result = mem.getTuple(state, left, right);
 			if(((BetaMemory)mem.getNodeMemory(this)).removeResultTuple(result))
 			{
+//				if(getNodeId()==3713)
+//					System.out.println("remmi: "+result);
 				ITupleConsumerNode[] tcs = tconsumers;
 				for(int j=0; tcs!=null && j<tcs.length; j++)
 					tcs[j].removeTuple(result, state, mem, agenda);
