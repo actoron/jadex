@@ -36,4 +36,30 @@
     
     </moduleSet>
   </moduleSets>
+  
+  <files>
+     <file>
+      <source>pom.xml</source>
+      <outputDirectory>/</outputDirectory>
+    </file>
+    <file>
+      <source>/src/main/config/jadex-settings-pom.xml</source>
+      <outputDirectory>/src/main/config/jadex-settings-pom.xml</outputDirectory>
+    </file>
+    <!-- <file>
+      <source>README.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>LICENSE.txt</source>
+      <outputDirectory>/</outputDirectory>
+    </file>
+    <file>
+      <source>NOTICE.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file> -->
+  </files>
+
 </assembly>
