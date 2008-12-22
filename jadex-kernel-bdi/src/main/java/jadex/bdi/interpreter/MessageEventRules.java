@@ -1052,9 +1052,11 @@ public class MessageEventRules
 	 */
 	public static void deregisterMessageEvent(IOAVState state,  Object rmevent, Object rscope)
 	{
-		Collection coll = state.getAttributeValues(rscope, OAVBDIRuntimeModel.capability_has_sentmessageevents);
-		if(!coll.remove(rmevent))
-			throw new RuntimeException("Registration of message event not found: "+rmevent+" "+rscope);
+		state.removeAttributeValue(rscope, OAVBDIRuntimeModel.capability_has_sentmessageevents, rmevent);
+
+//		Collection coll = state.getAttributeValues(rscope, OAVBDIRuntimeModel.capability_has_sentmessageevents);
+//		if(!coll.remove(rmevent))
+//			throw new RuntimeException("Registration of message event not found: "+rmevent+" "+rscope);
 			
 //		System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
 //			.getAgentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
