@@ -15,13 +15,23 @@ public class RequestSenderPlan extends Plan
 		int max	= ((Integer)getBeliefbase().getBelief("max").getFact()).intValue();
 		IAgentIdentifier	receiver	= (IAgentIdentifier) getBeliefbase().getBelief("receiver").getFact();
 		long	time	= System.currentTimeMillis();
+		long	lasttime	= System.currentTimeMillis();
 
 		for(int i=0; i<max || max==-1 ; i++)
 		{
 			if(i%50==0)
 			{
-				System.out.println("Starting protocol "+(i+1));
-				waitFor(1);
+				if(i==0)
+				{
+					System.out.println("Starting protocol "+(i+1));
+				}
+				else
+				{
+					long	newtime	= System.currentTimeMillis();
+					System.out.println("Starting protocol "+(i+1)+", "+(newtime-lasttime));
+					lasttime	= newtime;
+				}
+//				waitFor(1);
 			}
 
 				// Simple challenge response scheme allowing to check,

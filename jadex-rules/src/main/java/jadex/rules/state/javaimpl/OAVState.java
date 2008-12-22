@@ -304,7 +304,7 @@ public class OAVState	implements IOAVState
 		return createObject(type, true);
 	}
 	
-	public MultiCollection	objectspertype	= new MultiCollection();
+//	public MultiCollection	objectspertype	= new MultiCollection();
 	
 	/**
 	 *  Impl of root/non-root object creation.	
@@ -317,7 +317,7 @@ public class OAVState	implements IOAVState
 		
 		Object	ret	= generator.createId(this, type);
 		objects.put(ret, new LinkedHashMap());
-		objectspertype.put(type, ret);
+//		objectspertype.put(type, ret);
 	
 		types.put(ret, type);
 //		System.out.println("Created object of type: "+type);
@@ -513,7 +513,7 @@ public class OAVState	implements IOAVState
 
 		// Remove the object itself (needs to be done before removing its references to avoid recursion)
 		Map content	= (Map)objects.remove(id);
-		objectspertype.remove(types.get(id), id);
+//		objectspertype.remove(types.get(id), id);
 		if(content==null)
 			throw new RuntimeException("Object not found: "+id);
 		deletedobjects.put(id, content);
