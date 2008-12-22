@@ -402,7 +402,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 						
 			// The following code prints the number of objects in the state
 			// Prints the min values between two new max points for finding memory hogs.
-			if(last==0 || last+100<System.currentTimeMillis())
+			/*if(last==0 || last+100<System.currentTimeMillis())
 			{
 				last	= System.currentTimeMillis();
 				if(state.getSize()>lastmax)
@@ -484,7 +484,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 					buf.append("\n");
 					lastmsg	= buf.toString();
 				}
-			}
+			}*/
 			
 //			lock.unlock();
 			

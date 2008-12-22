@@ -770,7 +770,7 @@ public class Environment implements IEnvironment
 			os.write(Nuggets.objectToXML(getHighscore(),this.getClass().getClassLoader()));
 			os.close();
 
-			System.out.println("Saved highscore.");
+//			System.out.println("Saved highscore.");
 		}
 		catch(Exception e)
 		{
