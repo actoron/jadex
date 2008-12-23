@@ -1,11 +1,16 @@
 <assembly>
+  
   <id>dist</id>
+  
   <formats>
     <format>dir</format>
   </formats>
+  
   <includeBaseDirectory>false</includeBaseDirectory>
+  
   <moduleSets>
     <moduleSet>
+ 
       <includes>
         <include>jadex:*</include>
       </includes>
@@ -33,12 +38,21 @@
           </fileSet>
         </fileSets>
       </sources>
-    
+ 
     </moduleSet>
   </moduleSets>
+
+  <fileSets>
+    <fileSet>
+      <outputDirectory>apidocs</outputDirectory>
+      <includes>
+        <include>/site/apidocs/**</include>
+      </includes>
+    </fileSet>
+  </fileSets>
   
   <files>
-     <file>
+    <file>
       <source>pom.xml</source>
       <outputDirectory>/</outputDirectory>
     </file>
