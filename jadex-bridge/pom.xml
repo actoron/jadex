@@ -6,7 +6,7 @@
   <packaging>jar</packaging>
   <name>jadex-bridge</name>
   <version>1.0-SNAPSHOT</version>
-  <url>http://jadex.sourceforge.net</url>
+  <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>jadex</groupId>
     <artifactId>jadex-settings</artifactId>

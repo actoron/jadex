@@ -33,7 +33,14 @@ public class AgentListUpdatePlan extends Plan
 				Object[] agents = bagents.getFacts();
 				if(ctrl != null && agents != null)
 				{
-					ctrl.agentlist.updateAgents(agents, (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE));
+					try
+					{
+						ctrl.agentlist.updateAgents(agents, (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE));
+					}
+					catch(Exception ex)
+					{
+						// Could fail due to e.g. platform shutting
+					}
 				}
 			}
 		});
@@ -43,6 +50,11 @@ public class AgentListUpdatePlan extends Plan
 	}
 	
 	public void aborted()
+	{
+		timer.stop();
+	}
+	
+	public void failed()
 	{
 		timer.stop();
 	}
