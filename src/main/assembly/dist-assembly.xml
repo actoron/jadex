@@ -7,7 +7,6 @@
   </formats>
   
   <includeBaseDirectory>true</includeBaseDirectory>
-  <baseDirectory>jadexv2beta1</baseDirectory>
   
   <moduleSets>
     <moduleSet>
@@ -83,6 +82,14 @@
     <file>
       <source>docs/applications.jccproject.xml</source>
       <outputDirectory>/lib</outputDirectory>
+    </file>
+    <file>
+      <source>docs/jadex.bat</source>
+      <outputDirectory>/</outputDirectory>
+    </file>
+    <file>
+      <source>docs/howtostart.txt</source>
+      <outputDirectory>/</outputDirectory>
     </file>
   </files>
 
