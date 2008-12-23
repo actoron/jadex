@@ -275,12 +275,20 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	public void setProperties(Properties props)
 	{
 		Property[] ps = props.getProperties("cp");
+		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
 		for(int i=0; i<ps.length; i++)
 		{
-			ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
 			try
 			{
-				ls.addURL(new URL((String)ps[i].getValue()));
+				File	file = new File(ps[i].getValue());
+				if(file.exists())
+				{
+					ls.addURL(file.toURI().toURL());
+				}
+				else
+				{
+					ls.addURL(new URL(ps[i].getValue()));
+				}
 			}
 			catch(Exception e)
 			{
@@ -300,7 +308,18 @@ public class LibraryPlugin extends AbstractJCCPlugin
 
 		for(int i=0; i<urls.size(); i++)
 		{
-			props.addProperty(new Property("cp", urls.get(i).toString()));
+			URL	url	= (URL) urls.get(i);
+			String	urlstring;
+			if(url.getProtocol().equals("file"))
+			{
+				urlstring	= SUtil.convertPathToRelative(url.getPath());
+			}
+			else
+			{
+				urlstring	= url.toString();
+			}
+			
+			props.addProperty(new Property("cp", urlstring));
 		}
 		return props;
 	}

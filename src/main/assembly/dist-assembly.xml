@@ -60,6 +60,14 @@
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
+    <file>
+      <source>docs/jcc.project</source>
+      <outputDirectory>/lib</outputDirectory>
+    </file>
+    <file>
+      <source>docs/applications.jccproject.xml</source>
+      <outputDirectory>/lib</outputDirectory>
+    </file>
   </files>
 
 </assembly>

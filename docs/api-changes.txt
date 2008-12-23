@@ -1,0 +1,53 @@
+Changes from Jadex 0.96 to Jadex V2 beta1
+
+This is a short (probably incomplete) list of
+the major changes regarding the programming
+of Jadex V2 BDI agents. Please look at the
+example sources to learn more about the details.
+
+New Features:
+	- V2 supports direct referencing of elements from inner capabilities
+	  (e.g. "dfcap.df_search"). Old explicit references are still supported
+	- Instead of using AMS/DF capabilities, the services can be accessed
+	  directly using getScope().getPlatform().getService(IAMS.class / IDF.class).
+	  Nevertheless, using the capabilities is still equally supported.
+	- Calls to jadex.bdi.runtime.* objects are now automatically correctly
+	  synchronized depending on the caller thread (plan thread, swing thread, etc.). 
+	- ...
+
+XML Changes:
+	- Conditions and dynamic beliefs have to be written in a CLIPS-like
+	  rule language (also used in JESS). Have a look at the Jadex examples.
+	  Documentation for CLIPS can be found at (focus on LHS Syntax in sect. 5.4):
+	  http://clipsrules.sourceforge.net/documentation/v624/bpg.htm
+	- Along with the condition syntax, also the evaluation mode names have changed
+	  (from 'dynamic' to either 'push' or 'pull') and are no longer assigned to
+	  facts but to beliefs instead. The push mode requires a CLIPS condition,
+	  while the pull mode takes a Java expression as before.
+	  See examples for details.
+	- <beliefchange> and <beliefsetchange> triggers have been removed.
+	  Use <factadded/removed/changed> instead. 
+	- The plan body is no longer provided as Java expression ('new XYZPlan()'),
+	  but as class attribute ('class="XYZPlan"').
+	- The planlib has been restructured and capbilities have been moved (ams/df)
+	  and separated (protocols).
+	- ...?
+
+Java Changes:
+	- The classes from jadex.runtime.* have moved to jadex.bdi.runtime.*
+	- IMessageEvent.get/setContent() methods have been removed.
+	  Use getParameter(SFipa.CONTENT).get/setValue() instead.
+	- IMessageEvent.createReply() has been removed.
+	  Use getEventbase.createReply(messageevent) instead.
+	- Due to the rule based implementation there are some requirements for Java objects
+	  used as belief facts/parameter values etc.
+	    - Objects must not change their hashCode() during lifetime.
+	    - Objects, of which multiple equal instances exist (when the equals()
+	      method is overridden) must not differ in their attribute values
+	      and must not provide add/removePropertyChangeListener methods.
+	      As a rule of thumb: override equals only for immutable value types.
+	- Agent identifiers are now represente by jadex.bridge.IAgentIdentifier
+	- New agent identifiers have to be created using the AMS service.
+	- Package jadex.util has been renamed to jadex.common.
+	- The SFipa class has been moved to package jadex.adapter.base.fipa.
+	- ...?

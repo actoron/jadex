@@ -211,6 +211,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 						{
 							System.err.println("Error checking: "+node.getToolTipText());
 							e.printStackTrace();
+							newvalid	= false;
 						}
 					}
 				}

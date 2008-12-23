@@ -107,7 +107,7 @@
 	</plans>
 
 	<properties>
-		<property name="debugging">true</property>
+		<property name="debugging">false</property>
     </properties>
 
 	<configurations default="5x5 board (standard)">
