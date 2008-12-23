@@ -6,7 +6,8 @@
     <format>dir</format>
   </formats>
   
-  <includeBaseDirectory>false</includeBaseDirectory>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <baseDirectory>jadexv2beta1</baseDirectory>
   
   <moduleSets>
     <moduleSet>
