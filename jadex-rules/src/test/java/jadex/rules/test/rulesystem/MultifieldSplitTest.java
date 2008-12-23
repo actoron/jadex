@@ -18,7 +18,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class MultifieldSplitTest extends TestCase
 	 */
 	protected void setUp() throws Exception
 	{
-		state	= new OAVState(Numberbox.numberbox_type_model);
+		state	= OAVStateFactory.createOAVState(Numberbox.numberbox_type_model);
 		result	= new ArrayList();
 		
 		// Create rule system.

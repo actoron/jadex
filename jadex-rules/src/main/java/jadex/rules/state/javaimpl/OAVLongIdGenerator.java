@@ -65,7 +65,7 @@ public class OAVLongIdGenerator implements IOAVIdGenerator
 	 */
 	public static void main(String[] args)
 	{
-		IOAVState state = new OAVState(null);
+		IOAVState state = OAVStateFactory.createOAVState(null);
 		OAVLongIdGenerator gen = new OAVLongIdGenerator();
 		for(long i=0;; i++)
 		{

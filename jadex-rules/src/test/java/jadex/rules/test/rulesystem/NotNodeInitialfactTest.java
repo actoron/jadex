@@ -12,7 +12,7 @@ import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class NotNodeInitialfactTest extends TestCase
 	 */
 	protected void setUp() throws Exception
 	{
-		state	= new OAVState(Blocks.blocksworld_type_model);
+		state	= OAVStateFactory.createOAVState(Blocks.blocksworld_type_model);
 		list	= new ArrayList();
 		
 		// Matches, if no green block exists.

@@ -577,7 +577,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 			ret, new boolean[]{true,false,true}, 1);* /
 		
 		
-		IOAVState state = new OAVState();
+		IOAVState state = OAVStateFactory.createOAVState();
 		ReteMemory mem = new ReteMemory();
 		Object b1 = state.createObject(OAVBlockMetamodel.block_type);
 		Object b2 = state.createObject(OAVBlockMetamodel.block_type);

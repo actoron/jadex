@@ -23,7 +23,7 @@ import jadex.rules.rulesystem.rules.functions.Sub;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
 /**
@@ -42,7 +42,7 @@ public class JavaFibonacci
 		fibonacci_type_model.addTypeModel(OAVJavaType.java_type_model);
 		final OAVJavaType fibo_type = fibonacci_type_model.createJavaType(FibonacciNumber.class, OAVJavaType.KIND_BEAN);
 		
-		IOAVState state = new OAVState(fibonacci_type_model); // Create the production memory.
+		IOAVState state = OAVStateFactory.createOAVState(fibonacci_type_model); // Create the production memory.
 		Rulebase rb	= new Rulebase();
 		RuleSystem rete = new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb), new PriorityAgenda());
 			

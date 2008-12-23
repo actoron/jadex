@@ -2,6 +2,7 @@ package jadex.rules.test.state;
 
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +29,7 @@ public class CreateDropTest extends TestCase
 	{
 		// todo: make state impl customizable
 		
-		this.state = new OAVState(TestWorld.testworld_type_model);
+		this.state = OAVStateFactory.createOAVState(TestWorld.testworld_type_model);
 	}
 	
 	/**

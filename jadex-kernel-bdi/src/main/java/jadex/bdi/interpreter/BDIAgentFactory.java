@@ -1,16 +1,16 @@
 package jadex.bdi.interpreter;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IKernelAgent;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentModel;
+import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -113,7 +113,7 @@ public class BDIAgentFactory implements IAgentFactory
 		OAVTypeModel	tmodel	= new OAVTypeModel(adapter.getAgentIdentifier().getLocalName()+"_typemodel", loaded.getTypeModel().getClassLoader());
 		tmodel.addTypeModel(loaded.getTypeModel());
 		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-		IOAVState	state	= new OAVState(tmodel); 
+		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(loaded.getState());
 		return new BDIInterpreter(adapter, state, loaded, config, arguments, props);
 	}

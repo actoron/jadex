@@ -10,7 +10,7 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public class JavaConditionTest extends TestCase
 		Rule rule = new Rule("block_is_clear", cond, action);
 		Rulebase rb = new Rulebase();
 		RetePatternMatcherFunctionality pm = new RetePatternMatcherFunctionality(rb);
-		this.system = new RuleSystem(new OAVState(Blocks.blocksworld_type_model), rb, pm);
+		this.system = new RuleSystem(OAVStateFactory.createOAVState(Blocks.blocksworld_type_model), rb, pm);
 		
 		system.getRulebase().addRule(rule);
 		system.init();

@@ -21,7 +21,7 @@ import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.rulesystem.rules.functions.Sum;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +76,7 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("sum", cond, action);
 		Rulebase rb = new Rulebase();
-		RuleSystem system = new RuleSystem(new OAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
+		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
 		
 		system.getRulebase().addRule(rule);
 		system.init();
@@ -133,7 +133,7 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("length", cond, action);
 		Rulebase rb = new Rulebase();
-		RuleSystem system = new RuleSystem(new OAVState(Numberbox.numberbox_type_model), 
+		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), 
 			rb, new RetePatternMatcherFunctionality(rb));
 
 		system.getRulebase().addRule(rule);
@@ -190,7 +190,7 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("nested", cond, action);
 		Rulebase rb = new Rulebase();
-		RuleSystem system = new RuleSystem(new OAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
+		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
 		system.getRulebase().addRule(rule);
 		system.init();
 		
@@ -255,7 +255,7 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("beta", cond, action);
 		Rulebase rb = new Rulebase();
-		RuleSystem system = new RuleSystem(new OAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
+		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
 		system.getRulebase().addRule(rule);
 		system.init();
 		

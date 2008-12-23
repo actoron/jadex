@@ -15,7 +15,7 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class MethodCallTest2 extends TestCase
 	 */
 	protected void setUp() throws Exception
 	{		
-		state	= new OAVState(OAVJavaType.java_type_model);
+		state	= OAVStateFactory.createOAVState(OAVJavaType.java_type_model);
 		triggered	= new ArrayList();
 		
 		// test for two beans with same name:

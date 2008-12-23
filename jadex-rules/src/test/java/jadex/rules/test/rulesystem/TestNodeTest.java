@@ -18,7 +18,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class TestNodeTest extends TestCase
 		
 		Rule rule = new Rule("1==1", cond, action);
 		Rulebase rb = new Rulebase();
-		RuleSystem system = new RuleSystem(new OAVState(OAVJavaType.java_type_model),
+		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(OAVJavaType.java_type_model),
 			rb, new RetePatternMatcherFunctionality(rb));
 		system.getRulebase().addRule(rule);
 		system.init();
@@ -112,7 +112,7 @@ public class TestNodeTest extends TestCase
 		
 		Rule rule = new Rule("1==1", cond, action);
 		Rulebase rb = new Rulebase();
-		RuleSystem system = new RuleSystem(new OAVState(Numberbox.numberbox_type_model),
+		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model),
 			rb, new RetePatternMatcherFunctionality(rb));
 		system.getRulebase().addRule(rule);
 		system.init();

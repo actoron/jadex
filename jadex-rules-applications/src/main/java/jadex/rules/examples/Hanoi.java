@@ -22,7 +22,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
 import java.awt.Graphics;
@@ -194,7 +194,7 @@ public class Hanoi
 	 */
 	protected static IOAVState createState()
 	{
-		return new OAVState(hanoi_type_model);
+		return OAVStateFactory.createOAVState(hanoi_type_model);
 //		return new JenaOAVState();
 	}
 	

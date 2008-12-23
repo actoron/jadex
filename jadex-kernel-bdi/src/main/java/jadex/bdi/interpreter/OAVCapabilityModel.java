@@ -344,7 +344,7 @@ public class OAVCapabilityModel implements IAgentModel
 	protected void	copyContentFrom(OAVCapabilityModel model)
 	{
 //		// Todo: use state factory.
-//		this.state	= new OAVState(model.getTypeModel());
+//		this.state	= OAVStateFactory.createOAVState(model.getTypeModel());
 //		this.handle	= model.getState().cloneObject(model.getHandle(), this.state);
 //		this.types	= model.getTypes();
 //		this.rulebase	= model.getRulebase();

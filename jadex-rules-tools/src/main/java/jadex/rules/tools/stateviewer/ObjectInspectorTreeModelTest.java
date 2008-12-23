@@ -2,7 +2,7 @@ package jadex.rules.tools.stateviewer;
 
 import jadex.commons.TreeExpansionHandler;
 import jadex.rules.state.io.xml.Reader;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
@@ -25,7 +25,7 @@ public class ObjectInspectorTreeModelTest extends OAVTreeModel
 	public ObjectInspectorTreeModelTest()
 	{
 		
-		super(new OAVState(null));
+		super(OAVStateFactory.createOAVState(null));
 		
 		this.root = new ObjectInspectorNode(super.root,String.class,"default-name","default");
 		

@@ -6,7 +6,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,7 +74,7 @@ public class ReferenceManagementTest extends TestCase
 	{
 		// todo: make state impl customizable
 		
-		this.state = new OAVState(node_type_model);
+		this.state = OAVStateFactory.createOAVState(node_type_model);
 		
 		this.root	= state.createRootObject(node_type);
 		state.setAttributeValue(root, node_has_name, "root");

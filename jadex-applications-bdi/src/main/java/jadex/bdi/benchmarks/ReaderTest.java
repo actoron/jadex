@@ -6,7 +6,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +38,7 @@ public class ReaderTest
 //		Configuration.setFallbackConfiguration("../../../kernel/src/jadex/config/batch_conf.properties");
 
 		Reader	reader	= new Reader();
-		IOAVState	state	= new OAVState(OAVBDIMetaModel.bdimm_type_model);
+		IOAVState	state	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //		Properties kernelprops = new Properties("", "", "");
 //		kernelprops.addProperty(new Property("", "messagetype", "new jadex.adapter.base.fipa.FIPAMessageType()"));
 		Map kernelprops = new HashMap();

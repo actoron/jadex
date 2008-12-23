@@ -13,6 +13,6 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.adapter.standalone.Platform"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf ../jadex-applications-bdi/src/main/java/jadex/bdi/benchmarks/standalone_creationconf.xml&#13;&#10;puzzle:jadex/bdi/examples/puzzle/Benchmark.agent.xml"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf ../jadex-applications-bdi/src/main/java/jadex/bdi/benchmarks/standalone_benchmarkconf.xml&#13;&#10;puzzle:jadex/bdi/examples/puzzle/Benchmark.agent.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-launch"/>
 </launchConfiguration>

@@ -15,6 +15,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,7 +52,7 @@ public class EqualJoinTest extends TestCase
 	 */
 	protected void setUp() throws Exception
 	{
-		state	= new OAVState(Blocks.blocksworld_type_model);
+		state	= OAVStateFactory.createOAVState(Blocks.blocksworld_type_model);
 		blocks	= new ArrayList();
 		
 		// ?block <- (Block (color ?color))

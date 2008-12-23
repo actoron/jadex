@@ -6,6 +6,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,7 +36,7 @@ public class ReaderBenchmark
 		
 		// Do not measure first loading.
 		Reader	reader	= new Reader();
-		IOAVState	state	= new OAVState(OAVBDIMetaModel.bdimm_type_model);
+		IOAVState	state	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //		IOAVState	state	= new JenaOAVState();
 		
 //		Properties kernelprops = new Properties("", "", "");
@@ -82,7 +83,7 @@ public class ReaderBenchmark
 		IOAVState[] states	= new IOAVState[cnt];
 		for(int i=0; i<states.length; i++)
 		{
-			states[i]	= new OAVState(OAVBDIMetaModel.bdimm_type_model);
+			states[i]	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //			states[i]	= new JenaOAVState();
 			reader.read(new FileInputStream(arg), states[i], xmlmapping, new MultiCollection());
 		}

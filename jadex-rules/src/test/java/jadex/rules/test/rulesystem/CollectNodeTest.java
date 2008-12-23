@@ -25,7 +25,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +99,7 @@ public class CollectNodeTest extends TestCase
 	 */
 	protected void setUp() throws Exception
 	{		
-		state	= new OAVState(tmodel);
+		state	= OAVStateFactory.createOAVState(tmodel);
 		stores	= new ArrayList();
 		collections	= new ArrayList();
 		

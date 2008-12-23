@@ -73,7 +73,7 @@ public class JavaMultifieldTest extends TestCase
 		Rule rule = new Rule("table_blocks", cond, action);
 		Rulebase rb = new Rulebase();
 		RetePatternMatcherFunctionality pm = new RetePatternMatcherFunctionality(rb);
-		this.system = new RuleSystem(new OAVState(Blocks.blocksworld_type_model), rb, pm);
+		this.system = new RuleSystem(OAVStateFactory.createOAVState(Blocks.blocksworld_type_model), rb, pm);
 		
 		system.getRulebase().addRule(rule);
 		system.init();

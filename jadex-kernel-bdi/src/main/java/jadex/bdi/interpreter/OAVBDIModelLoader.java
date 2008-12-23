@@ -24,7 +24,7 @@ import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.io.xml.StackElement;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -273,7 +273,7 @@ public class OAVBDIModelLoader
 			OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", classloader);
 			// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
 			typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-			IOAVState	state	= new OAVState(typemodel);
+			IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
 			
 			final Set	types	= new HashSet();
 			IOAVStateListener	listener	= new IOAVStateListener()
@@ -808,7 +808,7 @@ public class OAVBDIModelLoader
 //							rinfo = getResourceInfo(filename, loader.getFilenameExtension(filename), null, null);
 //							OAVTypeModel	typemodel	= new OAVTypeModel(filename+"_typemodel", null);
 //							typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-//							loader.reader.read(rinfo.getInputStream(), new OAVState(typemodel), loader.mapping);
+//							loader.reader.read(rinfo.getInputStream(), OAVStateFactory.createOAVState(typemodel), loader.mapping);
 
 //							XMLReader	xmlreader	= factory.newSAXParser().getXMLReader();
 //							xmlreader.setContentHandler(new DefaultHandler()

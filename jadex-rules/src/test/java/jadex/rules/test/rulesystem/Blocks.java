@@ -23,7 +23,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 /**
  *  The blocks world meta model.
@@ -257,7 +257,7 @@ public class Blocks
 		IRule rule = new Rule("block", cond, action);
 		Rulebase rb = new Rulebase();
 		IPatternMatcherFunctionality pf = new RetePatternMatcherFunctionality(rb);
-		RuleSystem system = new RuleSystem(new OAVState(blocksworld_type_model), rb,  pf);
+		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(blocksworld_type_model), rb,  pf);
 		system.init();
 //		ReteNode node = system.getReteNode();
 	
