@@ -209,8 +209,8 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 						}
 						catch(Exception e)
 						{
-							System.err.println("Error checking: "+node.getToolTipText());
-							e.printStackTrace();
+//							System.err.println("Error checking: "+node.getToolTipText());
+//							e.printStackTrace();
 							newvalid	= false;
 						}
 					}

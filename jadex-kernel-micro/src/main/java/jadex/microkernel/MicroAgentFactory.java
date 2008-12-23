@@ -79,13 +79,18 @@ public class MicroAgentFactory implements IAgentFactory
 		// Hack! for extracting clear classname
 		if(clname.endsWith(".class"))
 			clname = model.substring(0, model.indexOf(".class"));
-		if(clname.indexOf("classes")!=-1)
-			clname = clname.substring(model.indexOf("classes")+8);
 		clname = clname.replace('\\', '.');
 		clname = clname.replace('/', '.');
 		
 		Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
 //		System.out.println(clname+" "+cma+" "+ret);
+		int idx;
+		while(cma==null && (idx=clname.indexOf('.'))!=-1)
+		{
+			clname	= clname.substring(idx+1);
+			cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
+//			System.out.println(clname+" "+cma+" "+ret);
+		}
 		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
 			throw new RuntimeException("No micro agent file: "+model);
 		ret = new MicroAgentModel(cma, model);

@@ -1255,7 +1255,7 @@ public class SUtil
 		for(int i=0; i<cps.size(); i++)
 		{
 			String cp = ((URL)cps.get(i)).getFile();
-			stok = new StringTokenizer(cp, "/");
+			stok = new StringTokenizer(cp, "/!");	// Exclamation mark to support jar files.
 
 			int cplen = stok.countTokens();
 			if(cplen<=toks.size())

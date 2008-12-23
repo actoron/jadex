@@ -1,5 +1,6 @@
 package jadex.microkernel;
 
+import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
@@ -152,7 +153,14 @@ public abstract class MicroAgent implements IMicroAgent
 		{
 			public void timeEventOccurred()
 			{
-				getAgentAdapter().wakeup();
+				try
+				{
+					getAgentAdapter().wakeup();
+				}
+				catch(AgentTerminatedException ate)
+				{
+					// ignored.
+				}
 //				interpreter.invokeLater(new Runnable()
 //				{
 //					public void run()
