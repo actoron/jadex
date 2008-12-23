@@ -20,9 +20,9 @@ currently the core component of the Jadex BDI reasoning
 engine. 
 
 - Jadex Rules cleanly separates between state and rule
-represntation. This allows the state implementation as
+representation. This allows the state implementation as
 well as the matcher to be flexibly exchanged. Some experiments
-have e.g. been conducted with a Jena represnetation. Regarding
+have e.g. been conducted with a Jena representation. Regarding
 the matcher, it is planned to support also the Treat algorithm,
 which has a lower memory footprint than Rete.
 
@@ -79,7 +79,7 @@ rete.getRulebase().addRule(new Rule("new_message", msgcon, new IAction()
 	}
 }));
 
-- Now facts can be added to state.
+- Now facts can be added to the state.
 
 // Add fact.
 Object m = state.createRootObject(message_type);
