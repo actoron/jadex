@@ -32,7 +32,8 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assembly/dist-assembly.xml</descriptor>
+            <!-- <descriptor>src/main/assembly/dist-assembly.xml</descriptor> -->
+            <descriptor>src/main/assembly/dist-assembly-rules.xml</descriptor>
           </descriptors>
         </configuration>
       </plugin>
