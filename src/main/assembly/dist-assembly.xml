@@ -44,22 +44,22 @@
     </file>
     <file>
       <source>/src/main/config/jadex-settings-pom.xml</source>
-      <outputDirectory>/src/main/config/jadex-settings-pom.xml</outputDirectory>
+      <outputDirectory>/src/main/config</outputDirectory>
     </file>
-    <!-- <file>
-      <source>README.txt</source>
+    <file>
+      <source>docs/readme.txt</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
     <file>
-      <source>LICENSE.txt</source>
+      <source>docs/license.txt</source>
       <outputDirectory>/</outputDirectory>
     </file>
     <file>
-      <source>NOTICE.txt</source>
+      <source>docs/changes.txt</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
-    </file> -->
+    </file>
   </files>
 
 </assembly>
