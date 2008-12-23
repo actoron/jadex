@@ -1,6 +1,4 @@
-jadex releases
-$Revision: 5277 $
-$Date: 2007-06-15 17:10:06 +0200 (Fr, 15 Jun 2007) $
+Jadex Releases Overview
 
 Release 2.0 beta1 (V2 Beta-Release 12/2008)
 	- Complete rebuilt of the BDI-kernel, on based on a rule engine
@@ -11,6 +9,7 @@ Release 2.0 beta1 (V2 Beta-Release 12/2008)
 	- Multiple platforms can be started in the same Java VM
 	- New comanalyzer tool for observing message exchanges
 	- New library service for managing the classpath at runtime via the JCC
+	- New examples (alarmclock, watchdog) 
 	- Enhanced platform and agent efficiency
 
 Release 0.96 (Protocols release 06/15/2007)
