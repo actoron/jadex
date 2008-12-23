@@ -44,9 +44,10 @@
 
   <fileSets>
     <fileSet>
-      <outputDirectory>apidocs</outputDirectory>
+      <directory>/target/site/</directory>
+      <outputDirectory>/</outputDirectory>
       <includes>
-        <include>/site/apidocs/**</include>
+        <include>apidocs/**</include>
       </includes>
     </fileSet>
   </fileSets>
