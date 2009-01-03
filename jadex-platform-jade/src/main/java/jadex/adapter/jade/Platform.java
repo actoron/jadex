@@ -83,7 +83,7 @@ public class Platform implements IPlatform
 	{
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
-		new Boot(new String[]{"platform:jadex.adapter.jade.PlatformAgent"});
+		new Boot(new String[]{"-gui", "platform:jadex.adapter.jade.PlatformAgent"});
 		IAMS ams = (IAMS)getService(IAMS.class);
 		ams.createAgent("jcc", "jadex/tools/jcc/JCC.agent.xml", null, null, null);
 	}

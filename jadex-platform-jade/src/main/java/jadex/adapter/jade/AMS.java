@@ -1,18 +1,5 @@
 package jadex.adapter.jade;
 
-import java.util.Map;
-
-import jade.core.AID;
-import jade.wrapper.AgentController;
-import jade.wrapper.StaleProxyException;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
-import jadex.adapter.base.fipa.ISearchConstraints;
-import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IPlatformService;
-import jadex.commons.concurrent.IResultListener;
-
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
