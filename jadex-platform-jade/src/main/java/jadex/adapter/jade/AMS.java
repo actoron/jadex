@@ -1,5 +1,6 @@
 package jadex.adapter.jade;
 
+import jade.wrapper.ControllerException;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
@@ -122,13 +123,27 @@ public class AMS implements IAMS, IPlatformService
 				}
 		
 				// Arguments must be isolated between agent instances.
-				agent = new JadeAgentAdapter(platform, aid, model, config, args==null? null: new HashMap(args));
-				adapters.put(aid, agent);
-				
-				ad	= new AMSAgentDescription(aid);
-				ad.setState(IAMSAgentDescription.STATE_INITIATED);
-				agent.setState(IAMSAgentDescription.STATE_INITIATED);
-				agentdescs.put(aid, ad);
+
+				List argus = args==null? new ArrayList(): new ArrayList(args.values());
+				argus.add(0, model);
+				argus.add(1, config);
+				try
+				{
+					platform.getPlatformController().createNewAgent(getShortName(model), "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
+				}
+				catch(ControllerException e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+//				agent = new JadeAgentAdapter(platform, aid, model, config, args==null? null: new HashMap(args));
+
+				// todo:!!!
+//				adapters.put(aid, agent);
+//				ad	= new AMSAgentDescription(aid);
+//				ad.setState(IAMSAgentDescription.STATE_INITIATED);
+//				agent.setState(IAMSAgentDescription.STATE_INITIATED);
+//				agentdescs.put(aid, ad);
 			}
 		}
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
@@ -141,7 +156,7 @@ public class AMS implements IAMS, IPlatformService
 		// todo: can be called after listener has (concurrently) deregistered
 		for(int i=0; i<alisteners.length; i++)
 		{
-			alisteners[i].agentAdded(ad);
+//			alisteners[i].agentAdded(ad);
 		}
 		
 		listener.resultAvailable(aid.clone());

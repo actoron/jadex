@@ -19,7 +19,7 @@ public interface IPlatform
 	 *  @param type The class.
 	 *  @return The corresponding platform services.
 	 */
-	public Collection getServices(Class type);
+//	public Collection getServices(Class type);
 	
 	/**
 	 *  Get a platform service.
