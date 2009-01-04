@@ -18,6 +18,7 @@ import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
@@ -83,6 +84,125 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutabl
 		this.aid	= aid;
 		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
 	}*/
+	
+	/**
+	 *  The setup method.
+	 *  Automatically called when agents is born.
+	 */
+	protected void setup()
+	{
+		// super "constructor"
+		super.setup();
+		this.agentthread	= Thread.currentThread();
+		
+//		this.platform	= platform;
+//		this.aid	= aid;
+//		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
+		
+		// Use Jadex class loader as default. (hack???)
+		// Might override jade specific settings (but unused in JADE 3.3)
+//        agentthread.setContextClassLoader(DynamicURLClassLoader.getInstance());
+
+        // Set fallback configuration to JADE.
+//        Configuration.setFallbackConfiguration("jadex/adapter/jade/jade_conf.properties");
+    	// Hack!!! Make platform name available to Jadex. (set always to override settings in properties)
+//    	String	name	= getName();
+//    	name	= name.substring(name.lastIndexOf("@")+1);
+//    	Configuration.getConfiguration().setProperty("platformname", name);
+
+		// Initialize evaluation parameters, hide first argument (model).
+		Object[] args = this.getArguments();
+		if(args==null || args.length<3)
+			throw new RuntimeException("Requires arguments (platform, model, configuration): "+SUtil.arrayToString(args));
+		Object[] args2	= new Object[args.length-3];
+		System.arraycopy(args, 3, args2, 0, args2.length);
+				
+		this.platform = (IPlatform)args[0];
+
+		// Initialize the agent from model.
+		if(args[1] instanceof String)
+		{
+			// Parse the arguments.
+			Map argsmap = SCollection.createHashMap();
+			IExpressionParser exp_parser = new JavaCCExpressionParser();
+			for(int i=1; i<args2.length; i++)
+			{
+				// JADE agents can be supplied from command-line or via ams message with string arguments
+				// They also can receive an object array via the inprocess interface (container controller)
+				// Is this case the first argument must be a map that can be passed directly to Jadex.
+				// Therefore arguments are interpreted when they are strings and contain a "=" character
+				if(args2[i] instanceof String)
+				{
+					String tmp = (String)args2[i];
+					int idx = tmp.indexOf("=");
+					if(idx!=-1)
+					{
+						String argname = tmp.substring(0, idx);
+						String argvalstr = tmp.substring(idx+1);
+						//System.out.println("Found arg: "+argname+" = "+argvalstr);
+						// Evaluate the argument value.
+						Object argval = null;
+						try
+						{
+							argval = exp_parser.parseExpression(argvalstr, null, null, 
+								((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader());
+//							argval = SParser.evaluateExpression(argvalstr, null, null);
+						}
+						catch(Exception e)
+						{
+							System.out.println("Cannot evaluate argument: "+argname+". Reason: "+e.getMessage());
+							//e.printStackTrace();
+						}
+						argsmap.put(argname, argval);
+					}
+				}
+				else if(args2[i] instanceof Map)
+				{
+					argsmap.putAll((Map)args2[i]);
+				}
+			}
+			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[1], (String)args[2], argsmap);
+		}
+		else //if(args[0] instanceof IMBDIAgent)
+		{
+			throw new RuntimeException("todo?");
+//			this.agent = JadexAgentFactory.createJadexAgent(getName(), getLocalName(),
+//				(IMBDIAgent)args[0], (String)args[1], params, this, "jadex.adapter.jade.jade_adapter");
+		}
+
+//		// Initialize Jade specific properties.
+//		String mmax = Configuration.getConfiguration().getProperty(MESSAGE_QUEUE_MAX);
+//		if(mmax==null)
+//		{
+//			//agent.getLogger().warning("Could not read default message queue size from agent properties.");
+//			System.out.println("Could not read default message queue size from agent properties.");
+//		}
+//		else
+//		{
+//			int qs = Integer.parseInt(mmax);
+//			if(qs>0)
+//				setQueueSize(qs);
+//		}
+//		initLanguagesOntologies();
+
+		//this.transports = new IMessageEventTransport[1];
+		//transports[0] =	new JadeMessageEventTransport(this);
+
+//		this.clock	= new JadeAgentClock("JADE clock for agent "+getLocalName());
+
+		// Start the required jade behaviours.
+		// Hack!!! Add action execution behaviour first,
+		// because it has to execute agent init action before other behaviours.
+		this.agendacontrol	= new ActionExecutionBehaviour(agent);
+		addBehaviour(agendacontrol);
+//		this.timing	= new TimingBehaviour(agent, clock);
+//		addBehaviour(timing);
+		this.mesrec	= new MessageReceiverBehaviour(agent, (IAMS)platform.getService(IAMS.class));
+		addBehaviour(mesrec);
+
+		//try{Thread.sleep(20000);}catch(Exception e){}
+		System.out.println("Agent is starting: "+this.getName());
+	}
 
 	//-------- IAgentAdapter methods --------
 	
@@ -164,7 +284,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutabl
 	 *  Return an agent-identifier that allows to send
 	 *  messages to this agent.
 	 *  Return a copy of the original.
-	 */
+	 * /
 	public IAgentIdentifier getAgentIdentifier()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
@@ -174,6 +294,16 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutabl
 		IAMS ams = (IAMS)platform.getService(IAMS.class);
 		return ((AMS)ams).refreshAgentIdentifier(aid);
 		//return (AgentIdentifier)aid.clone();
+	}*/
+	
+	/**
+	 *  Return an agent-identifier that allows to send
+	 *  messages to this agent.
+	 */
+	public IAgentIdentifier getAgentIdentifier()
+	{
+		System.out.println(getAID());
+		return SJade.convertAIDtoFipa(getAID(), (IAMS)getPlatform().getService(IAMS.class));
 	}
 	
 	/**
@@ -219,7 +349,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutabl
 	 */
 	public String toString()
 	{
-		return "JadeAgentAdapter("+aid.getName()+")";
+		return "JadeAgentAdapter("+getAgentIdentifier().getName()+")";
 	}
 
 	//-------- methods called by the standalone platform --------
@@ -338,125 +468,6 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutabl
 	
 	
 	//-------- overridings --------
-
-	/**
-	 *  The setup method.
-	 *  Automatically called when agents is born.
-	 */
-	protected void setup()
-	{
-		// super "constructor"
-		super.setup();
-		this.agentthread	= Thread.currentThread();
-		
-//		this.platform	= platform;
-//		this.aid	= aid;
-//		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
-		
-		// Use Jadex class loader as default. (hack???)
-		// Might override jade specific settings (but unused in JADE 3.3)
-//        agentthread.setContextClassLoader(DynamicURLClassLoader.getInstance());
-
-        // Set fallback configuration to JADE.
-//        Configuration.setFallbackConfiguration("jadex/adapter/jade/jade_conf.properties");
-    	// Hack!!! Make platform name available to Jadex. (set always to override settings in properties)
-//    	String	name	= getName();
-//    	name	= name.substring(name.lastIndexOf("@")+1);
-//    	Configuration.getConfiguration().setProperty("platformname", name);
-
-		// Initialize evaluation parameters, hide first argument (model).
-		Object[] args = this.getArguments();
-		if(args==null || args.length<3)
-			throw new RuntimeException("Requires arguments (platform, model, configuration).");
-		Object[] args2	= new Object[args.length-3];
-		System.arraycopy(args, 3, args2, 0, args2.length);
-				
-		this.platform = (IPlatform)args[0];
-
-		// Initialize the agent from model.
-		if(args[0] instanceof String)
-		{
-			// Parse the arguments.
-			Map argsmap = SCollection.createHashMap();
-			IExpressionParser exp_parser = new JavaCCExpressionParser();
-			for(int i=0; i<args2.length; i++)
-			{
-				// JADE agents can be supplied from command-line or via ams message with string arguments
-				// They also can receive an object array via the inprocess interface (container controller)
-				// Is this case the first argument must be a map that can be passed directly to Jadex.
-				// Therefore arguments are interpreted when they are strings and contain a "=" character
-				if(args2[i] instanceof String)
-				{
-					String tmp = (String)args2[i];
-					int idx = tmp.indexOf("=");
-					if(idx!=-1)
-					{
-						String argname = tmp.substring(0, idx);
-						String argvalstr = tmp.substring(idx+1);
-						//System.out.println("Found arg: "+argname+" = "+argvalstr);
-						// Evaluate the argument value.
-						Object argval = null;
-						try
-						{
-							argval = exp_parser.parseExpression(argvalstr, null, null, 
-								((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader());
-//							argval = SParser.evaluateExpression(argvalstr, null, null);
-						}
-						catch(Exception e)
-						{
-							System.out.println("Cannot evaluate argument: "+argname+". Reason: "+e.getMessage());
-							//e.printStackTrace();
-						}
-						argsmap.put(argname, argval);
-					}
-				}
-				else if(args2[i] instanceof Map)
-				{
-					argsmap.putAll((Map)args2[i]);
-				}
-			}
-			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[1], (String)args[2], argsmap);
-		}
-		else //if(args[0] instanceof IMBDIAgent)
-		{
-			throw new RuntimeException("todo?");
-//			this.agent = JadexAgentFactory.createJadexAgent(getName(), getLocalName(),
-//				(IMBDIAgent)args[0], (String)args[1], params, this, "jadex.adapter.jade.jade_adapter");
-		}
-
-//		// Initialize Jade specific properties.
-//		String mmax = Configuration.getConfiguration().getProperty(MESSAGE_QUEUE_MAX);
-//		if(mmax==null)
-//		{
-//			//agent.getLogger().warning("Could not read default message queue size from agent properties.");
-//			System.out.println("Could not read default message queue size from agent properties.");
-//		}
-//		else
-//		{
-//			int qs = Integer.parseInt(mmax);
-//			if(qs>0)
-//				setQueueSize(qs);
-//		}
-//		initLanguagesOntologies();
-
-		//this.transports = new IMessageEventTransport[1];
-		//transports[0] =	new JadeMessageEventTransport(this);
-
-//		this.clock	= new JadeAgentClock("JADE clock for agent "+getLocalName());
-
-		// Start the required jade behaviours.
-		// Hack!!! Add action execution behaviour first,
-		// because it has to execute agent init action before other behaviours.
-		this.agendacontrol	= new ActionExecutionBehaviour(agent);
-		addBehaviour(agendacontrol);
-//		this.timing	= new TimingBehaviour(agent, clock);
-//		addBehaviour(timing);
-		this.mesrec	= new MessageReceiverBehaviour(agent, (IAMS)platform.getService(IAMS.class));
-		addBehaviour(mesrec);
-
-		//try{Thread.sleep(20000);}catch(Exception e){}
-		//System.out.println("Agent is starting: "+this.getName());
-	}
 
 	/**
 	 *  Initialize Jade languages and ontologies.

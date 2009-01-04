@@ -1,5 +1,6 @@
 package jadex.adapter.jade;
 
+import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.execution.IExecutionService;
@@ -125,11 +126,13 @@ public class AMS implements IAMS, IPlatformService
 				// Arguments must be isolated between agent instances.
 
 				List argus = args==null? new ArrayList(): new ArrayList(args.values());
-				argus.add(0, model);
-				argus.add(1, config);
+				argus.add(0, platform);
+				argus.add(1, model);
+				argus.add(2, config);
 				try
 				{
-					platform.getPlatformController().createNewAgent(getShortName(model), "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
+					AgentController ac = platform.getPlatformController().createNewAgent(getShortName(model), "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
+					ac.start();
 				}
 				catch(ControllerException e)
 				{

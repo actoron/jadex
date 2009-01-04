@@ -6,6 +6,7 @@ import jade.core.Runtime;
 import jade.wrapper.ContainerController;
 import jade.wrapper.PlatformController;
 import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.fipa.IAMS;
@@ -69,6 +70,7 @@ public class Platform implements IPlatform
 		this.threadpool = ThreadPoolFactory.createThreadPool();
 		this.services = new HashMap();
 		services.put(ILibraryService.class, new LibraryService());
+		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));
 		services.put(IDF.class, new DF(this));
 		services.put(IClockService.class, new ClockService(new SystemClock("system", 1000, threadpool), this));
@@ -147,7 +149,7 @@ public class Platform implements IPlatform
 				Class execl = SReflect.findClass("jadex.bdi.runtime.JavaStandardPlanExecutor", 
 					null, ls.getClassLoader());
 				Constructor execon = execl.getConstructor(new Class[]{IThreadPool.class});
-				Object exe = execon.newInstance(new Object[]{this.getService(jadex.adapter.base.ThreadPoolService.class)});
+				Object exe = execon.newInstance(new Object[]{threadpool});
 				Map args = SUtil.createHashMap(
 					new String[]
 					{
