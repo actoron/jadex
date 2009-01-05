@@ -46,21 +46,24 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+  	<repository>
+  		<id>project</id>
+  		<name>Maven Project Repository</name>
+  		<url>file:///${basedir}/lib</url>
+  	</repository>
+  </repositories>
   <dependencies>
   	<dependency>
   		<groupId>jadex</groupId>
   		<artifactId>jadex-platform-base</artifactId>
   		<version>2.0-beta1</version>
   	</dependency>
-    <!-- <dependency>
-    	<groupId>org.springframework</groupId>
-    	<artifactId>spring-beans</artifactId>
-    	<version>2.5.6</version>
-	</dependency> 
-	<dependency>
-   		<groupId>org.springframework</groupId>
-    	<artifactId>spring-context</artifactId>
-    	<version>2.5.6</version>
-	</dependency> -->
+    <dependency>
+    	<groupId>jade</groupId>
+    	<artifactId>jade</artifactId>
+    	<version>3.6.1</version>
+    	<type>pom</type>
+	</dependency>
   </dependencies>
 </project>
