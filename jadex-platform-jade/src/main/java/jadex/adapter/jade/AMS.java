@@ -1,5 +1,16 @@
 package jadex.adapter.jade;
 
+import jade.content.onto.basic.Action;
+import jade.core.AID;
+import jade.core.ContainerID;
+import jade.core.behaviours.SimpleBehaviour;
+import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
+import jade.domain.FIPAAgentManagement.Modify;
+import jade.domain.JADEAgentManagement.CreateAgent;
+import jade.domain.JADEAgentManagement.JADEManagementOntology;
+import jade.lang.acl.ACLMessage;
+import jade.util.Event;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jadex.adapter.base.DefaultResultListener;
@@ -11,17 +22,18 @@ import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.jade.fipaimpl.AMSAgentDescription;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.adapter.jade.fipaimpl.SearchConstraints;
+import jadex.bridge.AgentCreationException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IAgentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatformService;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,10 +92,11 @@ public class AMS implements IAMS, IPlatformService
 	 *  @param confi The configuration.
 	 *  @param args The arguments map (name->value).
 	 */
-	public void	createAgent(String name, String model, String config, Map args, IResultListener listener)
+	public void	createAgent(final String name, final String model, String config, Map args, IResultListener lis)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
+		IAgentIdentifier aid = null;
+		AMSAgentDescription ad = null;
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
@@ -99,56 +112,142 @@ public class AMS implements IAMS, IPlatformService
 //			//throw new RuntimeException("No new agents may be created when platform is shutting down.");
 //		}
 
-		AgentIdentifier aid;
-		JadeAgentAdapter agent;
-		AMSAgentDescription	ad;
+//		AgentIdentifier aid;
+//		JadeAgentAdapter agent;
+//		AMSAgentDescription	ad;
 		synchronized(adapters)
 		{
 			synchronized(agentdescs)
 			{
-				if(name==null)
-				{
-					aid = generateAgentIdentifier(getShortName(model));
-				}
-				else
-				{
-					aid = new AgentIdentifier(name+"@"+platform.getName()); // Hack?!
-					if(adapters.containsKey(aid))
-					{
-						listener.exceptionOccurred(new RuntimeException("Agent name already exists on agent platform."));
-						return;
-					}
-					IMessageService	ms	= (IMessageService)platform.getService(IMessageService.class);
-					if(ms!=null)
-						aid.setAddresses(ms.getAddresses());
-				}
-		
-				// Arguments must be isolated between agent instances.
-
-				List argus = args==null? new ArrayList(): new ArrayList(args.values());
-				argus.add(0, platform);
-				argus.add(1, model);
-				argus.add(2, config);
+				final List argus = args==null? new ArrayList(): new ArrayList(args.values());
+				argus.add(0, model);
+				argus.add(1, config==null? "default": config);
+				
+//				Event e = new Event(-1, new SimpleBehaviour()
+//				{
+//					String convid = null;
+//					boolean done = false;
+//					
+//					public void action()
+//					{
+//						System.out.println("Create agent code started.");
+//
+//						if(convid!=null)
+//						{
+//							ACLMessage reply = myAgent.receive();
+//							if(reply==null)
+//							{
+//								block();
+//							}
+//							else
+//							{
+//								System.out.println("Reply received: "+reply);
+//								if(reply.getPerformative()==ACLMessage.INFORM)
+//								{
+//									IAMSListener[]	alisteners;
+//									synchronized(listeners)
+//									{
+//										alisteners	= (IAMSListener[])listeners.toArray(new IAMSListener[listeners.size()]);
+//									}
+//									// todo: can be called after listener has (concurrently) deregistered
+//									for(int i=0; i<alisteners.length; i++)
+//									{
+//										alisteners[i].agentAdded(null);
+//									}
+//									
+//									// Hack!!! Bug in JADE not returning created agent's AID.
+//									// Should do ams_search do get correct AID?
+//									AID aid = (AID)myAgent.getAMS().clone();
+//									int idx = aid.getName().indexOf("@");
+//									aid.setName(name + aid.getName().substring(idx));
+//									IAgentIdentifier ret = SJade.convertAIDtoFipa(aid, (IAMS)platform.getService(IAMS.class));
+//									
+//									listener.resultAvailable(ret);
+//								}
+//								else
+//								{
+//									listener.exceptionOccurred(new AgentCreationException(reply.getContent(), null));
+//								}
+//								done = true;
+//							}
+//						}
+//						else
+//						{
+//							try 
+//							{
+//								CreateAgent ca = new CreateAgent();
+//								ca.setAgentName(name!=null? name: getShortName(model));
+//								ca.setClassName("jadex.adapter.jade.JadeAgentAdapter");
+//								ca.setContainer(new ContainerID(myAgent.getContainerController().getContainerName(), null));
+//								if(argus!=null)
+//								{
+//									for(int i=0; i<argus.size(); i++)
+//									{
+//										Object arg = argus.get(i);
+////											System.out.println(arg);
+//										ca.addArguments(arg);
+//									}
+//								}
+//								Action ac = new Action();
+//								ac.setActor(myAgent.getAMS());
+//								ac.setAction(ca);
+//								ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+//								request.addReceiver(myAgent.getAMS());
+//								request.setSender(myAgent.getAID());
+//								request.setOntology(JADEManagementOntology.getInstance().getName());
+//								request.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+//								request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+//								
+//								convid = SUtil.createUniqueId(myAgent.getLocalName());
+//								request.setConversationId(convid);
+//								
+//								myAgent.getContentManager().fillContent(request, ac);
+//								// ACLMessage reply = FIPAService.doFipaRequestClient(this, request, 10000);
+//								myAgent.send(request);
+//								block();
+//							} 
+//							catch (Exception e) 
+//							{
+//								e.printStackTrace();
+//							}
+//						}
+//					}
+//					
+//					public boolean done()
+//					{
+//						return done;
+//					}
+//				});
+//				platform.getPlatformAgentController().putO2AObject(e, AgentController.ASYNC);
+				
 				try
 				{
 					AgentController ac = platform.getPlatformController().createNewAgent(getShortName(model), "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
-					ac.start();
+					// Hack!!! Bug in JADE not returning created agent's AID.
+					// Should do ams_search do get correct AID?
+					AID tmp = (AID)platform.getPlatformAgent().clone();
+					int idx = tmp.getName().indexOf("@");
+					tmp.setName(name + tmp.getName().substring(idx));
+					aid = SJade.convertAIDtoFipa(tmp, (IAMS)platform.getService(IAMS.class));
 				}
-				catch(ControllerException e)
+				catch(Exception e)
 				{
 					e.printStackTrace();
-					throw new RuntimeException(e);
+					listener.exceptionOccurred(e);
 				}
+				
 //				agent = new JadeAgentAdapter(platform, aid, model, config, args==null? null: new HashMap(args));
 
 				// todo:!!!
 //				adapters.put(aid, agent);
-//				ad	= new AMSAgentDescription(aid);
-//				ad.setState(IAMSAgentDescription.STATE_INITIATED);
+				
+				ad	= new AMSAgentDescription(aid);
+				ad.setState(IAMSAgentDescription.STATE_INITIATED);
 //				agent.setState(IAMSAgentDescription.STATE_INITIATED);
 //				agentdescs.put(aid, ad);
 			}
 		}
+		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 
 		IAMSListener[]	alisteners;
@@ -159,56 +258,114 @@ public class AMS implements IAMS, IPlatformService
 		// todo: can be called after listener has (concurrently) deregistered
 		for(int i=0; i<alisteners.length; i++)
 		{
-//			alisteners[i].agentAdded(ad);
+			alisteners[i].agentAdded(ad);
 		}
 		
-		listener.resultAvailable(aid.clone());
+		System.out.println("aid: "+aid);
+		listener.resultAvailable(aid); 
 	}
 
 	/**
 	 *  Start a previously created agent on the platform.
 	 *  @param agent The id of the previously created agent.
 	 */
-	public void	startAgent(IAgentIdentifier agent, IResultListener listener)
+	public void	startAgent(final IAgentIdentifier agent, IResultListener lis)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		if(agent==null)
+			throw new IllegalArgumentException("Agent identifier must not null.");
+		
+		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
 		synchronized(adapters)
 		{
 			synchronized(agentdescs)
 			{
-				AMSAgentDescription	desc	= (AMSAgentDescription)agentdescs.get(agent);
-				if(desc!=null && IAMSAgentDescription.STATE_INITIATED.equals(desc.getState()))
+				try
 				{
-					JadeAgentAdapter	adapter	= (JadeAgentAdapter)adapters.get(agent);
-					if(adapter!=null)
+					Event e = new Event(-1, new SimpleBehaviour()
 					{
-						desc.setState(IAMSAgentDescription.STATE_ACTIVE);
-						adapter.setState(IAMSAgentDescription.STATE_ACTIVE);
-						adapter.wakeup();
-					}
-					else
-					{
-						// Shouldn't happen?
-						listener.exceptionOccurred(new RuntimeException("Cannot start unknown agent: "+agent));
-						return;
-					}
+						String convid = null;
+						boolean done = false;
+						
+						public void action()
+						{
+							System.out.println("Start agent code started.");
+
+							if(convid!=null)
+							{
+								ACLMessage reply = myAgent.receive();
+								if(reply==null)
+								{
+									block();
+								}
+								else
+								{
+									System.out.println("Reply received: "+reply);
+									if(reply.getPerformative()==ACLMessage.INFORM)
+									{
+										listener.resultAvailable(null);
+									}
+									else
+									{
+										listener.exceptionOccurred(new RuntimeException("Cannot start agent "+agent+" "+reply.getContent()));
+									}
+									done = true;
+								}
+							}
+							else
+							{
+								try 
+								{
+									jade.domain.FIPAAgentManagement.AMSAgentDescription amsd = new jade.domain.FIPAAgentManagement.AMSAgentDescription();
+									amsd.setName(SJade.convertAIDtoJade(agent));
+									amsd.setState(jade.domain.FIPAAgentManagement.AMSAgentDescription.ACTIVE);
+									Modify m = new Modify();
+									m.setDescription(amsd);
+									Action ac = new Action();
+									ac.setActor(myAgent.getAMS());
+									ac.setAction(m);
+
+									ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+									request.addReceiver(myAgent.getAMS());
+									request.setSender(myAgent.getAID());
+									request.setOntology(FIPAManagementOntology.NAME);
+									request.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+									request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+							
+									convid = SUtil.createUniqueId(myAgent.getLocalName());
+									request.setConversationId(convid);
+									
+									myAgent.getContentManager().fillContent(request, ac);
+									// ACLMessage reply = FIPAService.doFipaRequestClient(this, request, 10000);
+									myAgent.send(request);
+									block();
+								} 
+								catch (Exception e) 
+								{
+									e.printStackTrace();
+								}
+							}
+						}
+						
+						public boolean done()
+						{
+							return done;
+						}
+					});
+					
+//					platform.getPlatformAgentController().putO2AObject(e, AgentController.ASYNC);
+					platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+					
+//					AgentController ac = platform.getPlatformController().createNewAgent(getShortName(model), "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
+//					ac.start();
 				}
-				else if(desc!=null)
+				catch(ControllerException e)
 				{
-					listener.exceptionOccurred(new RuntimeException("Cannot start agent "+agent+" in state: "+desc.getState()));
-					return;
-				}
-				else
-				{
-					listener.exceptionOccurred(new RuntimeException("Cannot start unknown agent: "+agent));
-					return;
+					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
 			}
 		}
-		
-		listener.resultAvailable(null);
 	}
 	
 	/**

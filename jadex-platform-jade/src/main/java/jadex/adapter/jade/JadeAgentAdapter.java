@@ -75,17 +75,6 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	//-------- constructors --------
 
 	/**
-	 *  Create a new StandaloneAgentAdapter.
-	 *  Uses the thread pool for executing the jadex agent.
-	 * /
-	public JadeAgentAdapter(IPlatform platform, IAgentIdentifier aid, String model, String state, Map args)
-	{
-		this.platform	= platform;
-		this.aid	= aid;
-		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
-	}*/
-	
-	/**
 	 *  The setup method.
 	 *  Automatically called when agents is born.
 	 */
@@ -112,20 +101,21 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 
 		// Initialize evaluation parameters, hide first argument (model).
 		Object[] args = this.getArguments();
-		if(args==null || args.length<3)
-			throw new RuntimeException("Requires arguments (platform, model, configuration): "+SUtil.arrayToString(args));
-		Object[] args2	= new Object[args.length-3];
-		System.arraycopy(args, 3, args2, 0, args2.length);
+		if(args==null || args.length<2)
+			throw new RuntimeException("Requires arguments (model, configuration): "+SUtil.arrayToString(args));
+		Object[] args2	= new Object[args.length-2];
+		System.arraycopy(args, 2, args2, 0, args2.length);
 				
-		this.platform = (IPlatform)args[0];
-
+//		this.platform = (IPlatform)args[0];
+		this.platform = Platform.getPlatform();
+		
 		// Initialize the agent from model.
-		if(args[1] instanceof String)
+		if(args[0] instanceof String)
 		{
 			// Parse the arguments.
 			Map argsmap = SCollection.createHashMap();
 			IExpressionParser exp_parser = new JavaCCExpressionParser();
-			for(int i=1; i<args2.length; i++)
+			for(int i=0; i<args2.length; i++)
 			{
 				// JADE agents can be supplied from command-line or via ams message with string arguments
 				// They also can receive an object array via the inprocess interface (container controller)
@@ -161,7 +151,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 					argsmap.putAll((Map)args2[i]);
 				}
 			}
-			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[1], (String)args[2], argsmap);
+			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[0], (String)args[1], argsmap);
 		}
 		else //if(args[0] instanceof IMBDIAgent)
 		{
