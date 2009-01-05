@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *  able to execute Jadex agents without any 3rd party
  *  agent platform.
  */
-public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutable, Serializable
+public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializable
 {
 	//-------- attributes --------
 
@@ -417,12 +417,10 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutabl
 		return  state;
 	}*/
 	
-	//-------- IExecutable interface --------
-
 	/**
 	 *  Executable code for running the agent
 	 *  in the platforms executor service.
-	 */
+	 * /
 	public boolean	execute()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
@@ -447,7 +445,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, IExecutabl
 		}
 		
 		return executed;
-	}
+	}*/
 	
 	//-------- test methods --------
 	

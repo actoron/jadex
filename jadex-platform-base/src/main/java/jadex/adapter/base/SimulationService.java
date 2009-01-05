@@ -1,22 +1,14 @@
-package jadex.adapter.standalone;
+package jadex.adapter.base;
 
-import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.base.clock.ClockService;
-import jadex.adapter.base.clock.ContinuousClock;
-import jadex.adapter.base.clock.ISimulationClock;
-import jadex.adapter.base.clock.SimulationEventClock;
-import jadex.adapter.base.clock.SimulationTickClock;
-import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
+import jadex.bridge.IPlatform;
 import jadex.bridge.ITimer;
 import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPoolFactory;
 
 import java.util.List;
 
@@ -33,7 +25,7 @@ public class SimulationService implements ISimulationService
 	//-------- attributes --------
 
 	/** The platform. */
-	protected AbstractPlatform platform;
+	protected IPlatform platform;
 	
 	/** The execution mode. */
 	protected String mode;
@@ -58,7 +50,7 @@ public class SimulationService implements ISimulationService
 	/**
 	 *  Create a new execution control.
 	 */
-	public SimulationService(AbstractPlatform platform)
+	public SimulationService(IPlatform platform)
 	{
 		this.platform = platform;
 //		this.mode = mode;

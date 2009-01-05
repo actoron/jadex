@@ -5,10 +5,13 @@ import jade.core.AgentContainer;
 import jade.core.Runtime;
 import jade.wrapper.ContainerController;
 import jade.wrapper.PlatformController;
+import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SimulationService;
 import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
+import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
@@ -22,9 +25,11 @@ import jadex.bridge.IPlatformService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.bridge.XMLPropertiesReader;
+import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
@@ -68,12 +73,60 @@ public class Platform implements IPlatform
 	{
 		this.logger = Logger.getLogger("Platform_" + getName());
 		this.threadpool = ThreadPoolFactory.createThreadPool();
-		this.services = new HashMap();
+		this.services = new LinkedHashMap();
 		services.put(ILibraryService.class, new LibraryService());
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));
 		services.put(IDF.class, new DF(this));
 		services.put(IClockService.class, new ClockService(new SystemClock("system", 1000, threadpool), this));
+		services.put(ISimulationService.class, new SimulationService(this));
+		// Dummy execution service required for simulation service.
+		services.put(IExecutionService.class, new IExecutionService()
+		{
+			public void addIdleCommand(ICommand command)
+			{
+				// nop
+			}
+			
+			public void removeIdleCommand(ICommand command)
+			{
+				// nop
+			}
+			
+			public boolean isIdle()
+			{
+				return true; // Hack!!!
+			}
+			
+			public void cancel(IExecutable task, IResultListener listener)
+			{
+				throw new UnsupportedOperationException(); 
+			}
+			
+			public void execute(IExecutable task)
+			{
+				throw new UnsupportedOperationException(); 
+			}
+			
+			public void shutdown(IResultListener listener)
+			{
+				// nop
+				if(listener!=null)
+					listener.resultAvailable(null);
+			}
+			
+			public void start()
+			{
+				// nop
+			}
+			
+			public void stop(IResultListener listener)
+			{
+				// nop
+				if(listener!=null)
+					listener.resultAvailable(null);
+			}
+		});
 	}
 
 	//-------- IPlatform methods --------
@@ -88,6 +141,12 @@ public class Platform implements IPlatform
 		new Boot(new String[]{"-gui", "platform:jadex.adapter.jade.PlatformAgent"});
 		IAMS ams = (IAMS)getService(IAMS.class);
 		ams.createAgent("jcc", "jadex/tools/jcc/JCC.agent.xml", null, null, null);
+		
+		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
+		{
+			IPlatformService	service	= (IPlatformService) services.get(it.next());
+			service.start();
+		}
 	}
 	
 	/**

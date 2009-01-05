@@ -61,7 +61,7 @@
 
 			<!-- Simulation service. -->
 			<property type="jadex.adapter.base.ISimulationService" name="simulation_service">
-				new jadex.adapter.standalone.SimulationService($platform)
+				new jadex.adapter.base.SimulationService($platform)
 			</property>
 		
 			<!-- Execution service. -->

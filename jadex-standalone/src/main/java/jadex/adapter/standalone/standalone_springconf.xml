@@ -214,7 +214,7 @@
 							<key>
 								<value type="java.lang.String">simulation_service</value>
 							</key>
-							<bean class="jadex.adapter.standalone.SimulationService">
+							<bean class="jadex.adapter.base.SimulationService">
 								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>

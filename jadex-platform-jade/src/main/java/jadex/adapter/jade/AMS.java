@@ -293,8 +293,8 @@ public class AMS implements IAMS, IPlatformService
 				
 				ad.setState(IAMSAgentDescription.STATE_SUSPENDED);
 				adapter.setState(IAMSAgentDescription.STATE_SUSPENDED);
-				IExecutionService exe = (IExecutionService)platform.getService(IExecutionService.class);
-				exe.cancel(adapter, listener);
+//				IExecutionService exe = (IExecutionService)platform.getService(IExecutionService.class);
+//				exe.cancel(adapter, listener);
 			}
 		}
 //		pcs.firePropertyChange("agents", null, adapters);
@@ -326,8 +326,9 @@ public class AMS implements IAMS, IPlatformService
 				
 				ad.setState(IAMSAgentDescription.STATE_ACTIVE);
 				adapter.setState(IAMSAgentDescription.STATE_ACTIVE);
-				IExecutionService exe = (IExecutionService)platform.getService(IExecutionService.class);
-				exe.execute(adapter);
+				adapter.wakeup();
+//				IExecutionService exe = (IExecutionService)platform.getService(IExecutionService.class);
+//				exe.execute(adapter);
 			}
 		}
 //		pcs.firePropertyChange("agents", null, adapters);
@@ -718,7 +719,7 @@ public class AMS implements IAMS, IPlatformService
 					agentdescs.remove(aid);
 					
 					// Stop execution of agent.
-					((IExecutionService)platform.getService(IExecutionService.class)).cancel(adapter, null);
+//					((IExecutionService)platform.getService(IExecutionService.class)).cancel(adapter, null);
 				}
 			}
 			
