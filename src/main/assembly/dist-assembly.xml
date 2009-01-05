@@ -71,7 +71,7 @@
       <outputDirectory>/</outputDirectory>
     </file>
     <file>
-      <source>docs/changes.txt</source>
+      <source>docs/api-changes.txt</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
