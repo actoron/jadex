@@ -20,7 +20,6 @@ import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -47,7 +46,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	protected transient IPlatform	platform;
 
 	/** The agent identifier. */
-	protected IAgentIdentifier	aid;
+//	protected IAgentIdentifier	aid;
 
 	/** The kernel agent. */
 	protected IKernelAgent	agent;
@@ -108,6 +107,8 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 				
 //		this.platform = (IPlatform)args[0];
 		this.platform = Platform.getPlatform();
+		AMS ams = (AMS)platform.getService(IAMS.class);
+		ams.getAgentAdapterMap().put(getAgentIdentifier(), this);
 		
 		// Initialize the agent from model.
 		if(args[0] instanceof String)
@@ -191,7 +192,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 		addBehaviour(mesrec);
 
 		//try{Thread.sleep(20000);}catch(Exception e){}
-		System.out.println("Agent is starting: "+this.getName());
+//		System.out.println("Agent is starting: "+this.getName());
 	}
 
 	//-------- IAgentAdapter methods --------
@@ -213,7 +214,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 		assert !IAMSAgentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(getAgentIdentifier().getName());
 		
 		// Resume execution of the agent (when active).
 		//System.out.println("wakeup called: "+state);
@@ -292,7 +293,6 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	 */
 	public IAgentIdentifier getAgentIdentifier()
 	{
-		System.out.println(getAID());
 		return SJade.convertAIDtoFipa(getAID(), (IAMS)getPlatform().getService(IAMS.class));
 	}
 	
@@ -303,7 +303,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public IPlatform	getPlatform()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 		return platform;
 	}
@@ -315,7 +315,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public IClockService getClock()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 //		return platform.getClock();
 		return (IClockService)platform.getService(IClockService.class);
@@ -350,7 +350,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	 */
 	public void killAgent()
 	{
-		((IAMS)platform.getService(IAMS.class)).destroyAgent(aid, null);
+		((IAMS)platform.getService(IAMS.class)).destroyAgent(getAgentIdentifier(), null);
 	}
 
 	/**
@@ -362,7 +362,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public void killAgent(IResultListener listener)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 		if(!fatalerror)
 			agent.killAgent(listener);
@@ -377,7 +377,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public void	receiveMessage(Map message, MessageType type)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 		// Add optional receival time.
 //		String rd = type.getReceiveDateIdentifier();
@@ -394,7 +394,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public void	setState(String state)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(this.state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 		this.state	= state;
 	}
@@ -445,15 +445,10 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public IKernelAgent	getKernelAgent()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 		return agent;
 	}
-	
-	
-	
-	
-	
 	
 	//-------- overridings --------
 
@@ -526,7 +521,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	 */
 	public void cleanupAgent()
 	{
-		agent	= null;
+		agent = null;
 		super.doDelete();
 	}
 

@@ -210,7 +210,7 @@ public class AMS implements IAMS, IPlatformService
 			{
 				//System.out.println("killing: "+aid);
 				
-				StandaloneAgentAdapter	agent	= (StandaloneAgentAdapter)adapters.get(aid);
+				StandaloneAgentAdapter agent = (StandaloneAgentAdapter)adapters.get(aid);
 				if(agent==null)
 				{
 					listener.exceptionOccurred(new RuntimeException("Agent "+aid+" does not exist."));

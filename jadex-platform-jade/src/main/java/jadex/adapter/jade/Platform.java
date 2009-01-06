@@ -1,10 +1,10 @@
 package jadex.adapter.jade;
 
 import jade.Boot;
-import jade.core.AgentContainer;
-import jade.core.Runtime;
-import jade.wrapper.ContainerController;
+import jade.core.AID;
+import jade.wrapper.AgentController;
 import jade.wrapper.PlatformController;
+import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.SimulationService;
@@ -13,35 +13,24 @@ import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.libraryservice.LibraryService;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
-import jadex.bridge.XMLPropertiesReader;
 import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
-import jadex.javaparser.SimpleValueFetcher;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.lang.reflect.Constructor;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,11 +55,21 @@ public class Platform implements IPlatform
 	/** The logger. */
 	protected Logger logger;
 	
+	/** The platform agent. */
+	protected AID platformagent;
+	
+	/** The platform agent controller. */
+	protected AgentController pacontroller;
+	
+	
 	/**
 	 *  Create a new Platform.
 	 */
 	public Platform()
 	{
+		// Hack!!!
+		platform = this;
+		
 		this.logger = Logger.getLogger("Platform_" + getName());
 		this.threadpool = ThreadPoolFactory.createThreadPool();
 		this.services = new LinkedHashMap();
@@ -139,8 +138,27 @@ public class Platform implements IPlatform
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
 		new Boot(new String[]{"-gui", "platform:jadex.adapter.jade.PlatformAgent"});
-		IAMS ams = (IAMS)getService(IAMS.class);
-		ams.createAgent("jcc", "jadex/tools/jcc/JCC.agent.xml", null, null, null);
+		// Hack! Busy waiting for platform agent init finished.
+		while(platformagent==null)
+		{
+			System.out.print(".");
+			try
+			{
+				Thread.currentThread().sleep(100);
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		final IAMS ams = (IAMS)getService(IAMS.class);
+		ams.createAgent("jcc", "jadex/tools/jcc/JCC.agent.xml", null, null, new DefaultResultListener(getLogger())
+		{
+			public void resultAvailable(Object result)
+			{
+				ams.startAgent((IAgentIdentifier)result, null);
+			}
+		});
 		
 		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 		{
@@ -269,9 +287,54 @@ public class Platform implements IPlatform
 	public void setPlatformController(PlatformController controller)
 	{
 		this.controller = controller;
-		System.out.println("platform controller available: "+controller);
+//		System.out.println("platform controller available: "+controller);
 	}
 	
+	/**
+	 *  Set the platformagent.
+	 *  @param platformagent The platform agent.
+	 */
+	public void setPlatformAgent(AID platformagent)
+	{
+		this.platformagent = platformagent;
+	}
+	
+	/**
+	 *  Get the platform agent.
+	 *  @return The platform agent.
+	 */
+	public AID getPlatformAgent()
+	{
+		return this.platformagent;
+	}
+	
+	/**
+	 *  Set the platformagent.
+	 *  @param platformagent The platform agent.
+	 * /
+	public void setPlatformAgentController(AgentController pacontroller)
+	{
+		this.pacontroller = pacontroller;
+	}*/
+	
+	/**
+	 *  Get the platform agent.
+	 *  @return The platform agent.
+	 * /
+	public AgentController getPlatformAgentController()
+	{
+		return this.pacontroller;
+	}*/
+
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger()
+	{
+		return this.logger;
+	}
+
 	/**
 	 *  Get platform.
 	 *  @param name The name.
