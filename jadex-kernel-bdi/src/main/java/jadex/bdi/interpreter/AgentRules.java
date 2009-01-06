@@ -1241,7 +1241,7 @@ public class AgentRules
 		final Object rbel = state.createObject(OAVBDIRuntimeModel.belief_type);
 		state.setAttributeValue(rbel, OAVBDIRuntimeModel.element_has_model, mbel);
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_beliefs, rbel);
-		Object	evamode = state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_evaluationmode);
+		Object evamode = state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_evaluationmode);
 		final Long update = (Long)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_updaterate);
 	
 		// Set a value if the belief is static (or first value for update rate).
@@ -1996,7 +1996,7 @@ public class AgentRules
 	 *  @param configfetcher The value fetcher for the config element scope (might differ from original scope).
 	 *  @param preparams The already initialized parameters.
 	 */
-	public static void initParameters(IOAVState state, Object rparamelem, Object configelem, IValueFetcher fetcher, IValueFetcher configfetcher, Set doneparams, Map bindings)
+	public static void initParameters(IOAVState state, Object rparamelem, Object configelem, IValueFetcher fetcher, IValueFetcher configfetcher, Set doneparams, Map bindings, Object rcapa)
 	{
 		// Set parameter(set) values.
 		if(doneparams==null)
@@ -2007,7 +2007,7 @@ public class AgentRules
 		// Initialize config parameter/set values.
 		if(configelem!=null)
 		{
-			Collection	coll	= state.getAttributeValues(configelem, OAVBDIMetaModel.configparameterelement_has_parameters);
+			Collection coll = state.getAttributeValues(configelem, OAVBDIMetaModel.configparameterelement_has_parameters);
 			if(coll!=null)
 			{
 				for(Iterator it=coll.iterator(); it.hasNext(); )
@@ -2018,21 +2018,22 @@ public class AgentRules
 					if(!doneparams.contains(pname))
 					{
 						Class clazz = (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
-						Object rparam = BeliefRules.createParameter(state, (String)pname, null, clazz, rparamelem);
-						doneparams.add(pname);
-
+						
+						Object value = null;
 						if(bindings!=null && bindings.containsKey(pname))
 						{
+							value = bindings.get(pname);
 //							System.out.println("Setting binding value: "+pname+" "+bindings.get(varname));
-							BeliefRules.setParameterValue(state, rparam, bindings.get(pname));
 						}
 						else
 						{
 							Object	pvalex	= state.getAttributeValue(cparam, OAVBDIMetaModel.parameter_has_value);
 							// Todo: use parameter assignments instead of map for generating flyweights on the fly.
-							Object	pvalue	= AgentRules.evaluateExpression(state, pvalex, configfetcher);
-							BeliefRules.setParameterValue(state, rparam, pvalue);
+							value	= AgentRules.evaluateExpression(state, pvalex, configfetcher);
 						}
+						
+						Object rparam = BeliefRules.createParameter(state, (String)pname, value, clazz, rparamelem, mparam, rcapa);
+						doneparams.add(pname);
 					}
 				}
 			}
@@ -2088,7 +2089,7 @@ public class AgentRules
 					if(bindings!=null && bindings.containsKey(pname))
 					{
 //						System.out.println("Setting binding value: "+pname+" "+bindings.get(varname));
-						BeliefRules.createParameter(state, pname, bindings.get(pname), clazz, rparamelem);
+						BeliefRules.createParameter(state, pname, bindings.get(pname), clazz, rparamelem, mparam, rcapa);
 						doneparams.add(pname);
 					}
 					else
@@ -2098,13 +2099,13 @@ public class AgentRules
 						if(mvalex!=null && (evamode==null || OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode)))
 						{
 							Object value = AgentRules.evaluateExpression(state, mvalex, fetcher);
-							BeliefRules.createParameter(state, pname, value, clazz, rparamelem);
+							BeliefRules.createParameter(state, pname, value, clazz, rparamelem, mparam, rcapa);
 							doneparams.add(pname);
 						}
 						// Hack! Add rparams for (query and meta-level) goals because query-rule needs params.
 						else if(state.getType(rparamelem).isSubtype(OAVBDIRuntimeModel.goal_type))
 						{
-							BeliefRules.createParameter(state, pname, null, clazz, rparamelem);
+							BeliefRules.createParameter(state, pname, null, clazz, rparamelem, mparam, rcapa);
 							doneparams.add(pname);
 						}
 					}

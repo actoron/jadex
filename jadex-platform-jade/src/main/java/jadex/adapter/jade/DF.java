@@ -1,6 +1,21 @@
 package jadex.adapter.jade;
 
+import jade.content.onto.basic.Action;
+import jade.content.onto.basic.Result;
+import jade.core.behaviours.SimpleBehaviour;
+import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.Deregister;
+import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
+import jade.domain.FIPAAgentManagement.Modify;
+import jade.domain.FIPAAgentManagement.Register;
+import jade.domain.FIPAAgentManagement.Search;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.util.Event;
+import jade.wrapper.AgentController;
 import jadex.adapter.base.DefaultResultListener;
+import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
@@ -14,6 +29,7 @@ import jadex.adapter.jade.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.bridge.IPlatformService;
+import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 
@@ -34,7 +50,7 @@ public class DF implements IDF, IPlatformService
 	protected Platform platform;
 	
 	/** The registered agents. */
-	protected IndexMap	agents;
+//	protected IndexMap	agents;
 	
 	/** The logger. */
 	//protected Logger logger;
@@ -47,7 +63,7 @@ public class DF implements IDF, IPlatformService
 	public DF(Platform platform)
 	{
 		this.platform = platform;
-		this.agents	= new IndexMap();
+//		this.agents	= new IndexMap();
 		//this.logger = Logger.getLogger("DF" + this);
 	}
 	
@@ -57,91 +73,299 @@ public class DF implements IDF, IPlatformService
 	 *  Register an agent description.
 	 *  @throws RuntimeException when the agent is already registered.
 	 */
-	public void	register(IDFAgentDescription adesc, IResultListener listener)
+	public void	register(final IDFAgentDescription adesc, IResultListener lis)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
-		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
-		IDFAgentDescription clone = SFipa.cloneDFAgentDescription(adesc, this);
-
-		// Add description, when valid.
-		IClockService clock = (IClockService)platform.getService(IClockService.class);
-		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clock.getTime())
+		Event e = new Event(-1, new SimpleBehaviour()
 		{
-			synchronized(agents)
+			String convid = null;
+			boolean done = false;
+			
+			public void action()
 			{
-				// Automatically throws exception, when key exists.
-				if(agents.containsKey(clone.getName()))
-					throw new RuntimeException("Agent already registered: "+adesc.getName());
-				agents.add(clone.getName(), clone);
-//				System.out.println("registered: "+clone.getName());
+				if(convid!=null)
+				{
+					ACLMessage reply = myAgent.receive(MessageTemplate.MatchConversationId(convid));
+					if(reply==null)
+					{
+						block();
+					}
+					else
+					{
+						System.out.println("Reply received: "+reply);
+						if(reply.getPerformative()==ACLMessage.INFORM)
+						{
+							try
+							{
+								Result res = (Result)myAgent.getContentManager().extractContent(reply);
+								jade.util.leap.List descs = res.getItems();
+								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
+								IAMS ams = (IAMS)platform.getService(IAMS.class);
+								for(int i=0; i<ret.length; i++)
+								{
+									ret[i] = SJade.convertAgentDescriptiontoFipa(
+										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
+								}
+								listener.resultAvailable(ret);
+							}
+							catch(Exception e)
+							{
+								listener.exceptionOccurred(e);
+							}
+						}
+						else
+						{
+							listener.exceptionOccurred(new RuntimeException("Search failed."));
+						}
+						done = true;
+					}
+				}
+				else
+				{
+					try 
+					{
+						Register r = new Register();
+						r.setDescription(SJade.convertAgentDescriptiontoJade(adesc));
+						Action ac = new Action();
+						ac.setActor(myAgent.getDefaultDF());
+						ac.setAction(r);
+
+						ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+						request.addReceiver(myAgent.getDefaultDF());
+						request.setSender(myAgent.getAID());
+						request.setOntology(FIPAManagementOntology.NAME);
+						request.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+						request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+				
+						convid = SUtil.createUniqueId(myAgent.getLocalName());
+						request.setConversationId(convid);
+						
+						myAgent.getContentManager().fillContent(request, ac);
+						// ACLMessage reply = FIPAService.doFipaRequestClient(this, request, 10000);
+						myAgent.send(request);
+						block();
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+					}
+				}
 			}
 			
-			listener.resultAvailable(clone);
-		}
-		else
+			public boolean done()
+			{
+				return done;
+			}
+		});
+		
+		try
 		{
-			listener.exceptionOccurred(new RuntimeException("Agent not registered: "+clone.getName()));
-			
-//			System.out.println("not registered: "+clone.getName());			
+			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
-		
-		
+		catch(Exception ex)
+		{
+			listener.exceptionOccurred(ex);
+		}
 	}
 
 	/**
 	 *  Deregister an agent description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	deregister(IDFAgentDescription adesc, IResultListener listener)
+	public void	deregister(final IDFAgentDescription adesc, IResultListener lis)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
-		synchronized(agents)
+		Event e = new Event(-1, new SimpleBehaviour()
 		{
-			if(!agents.containsKey(adesc.getName()))
+			String convid = null;
+			boolean done = false;
+			
+			public void action()
 			{
-				//throw new RuntimeException("Agent not registered: "+adesc.getName());
-				listener.exceptionOccurred(new RuntimeException("Agent not registered: "+adesc.getName()));
-				return;
+				if(convid!=null)
+				{
+					ACLMessage reply = myAgent.receive(MessageTemplate.MatchConversationId(convid));
+					if(reply==null)
+					{
+						block();
+					}
+					else
+					{
+						System.out.println("Reply received: "+reply);
+						if(reply.getPerformative()==ACLMessage.INFORM)
+						{
+							try
+							{
+								Result res = (Result)myAgent.getContentManager().extractContent(reply);
+								jade.util.leap.List descs = res.getItems();
+								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
+								IAMS ams = (IAMS)platform.getService(IAMS.class);
+								for(int i=0; i<ret.length; i++)
+								{
+									ret[i] = SJade.convertAgentDescriptiontoFipa(
+										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
+								}
+								listener.resultAvailable(ret);
+							}
+							catch(Exception e)
+							{
+								listener.exceptionOccurred(e);
+							}
+						}
+						else
+						{
+							listener.exceptionOccurred(new RuntimeException("Search failed."));
+						}
+						done = true;
+					}
+				}
+				else
+				{
+					try 
+					{
+						Deregister r = new Deregister();
+						r.setDescription(SJade.convertAgentDescriptiontoJade(adesc));
+						Action ac = new Action();
+						ac.setActor(myAgent.getDefaultDF());
+						ac.setAction(r);
+
+						ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+						request.addReceiver(myAgent.getDefaultDF());
+						request.setSender(myAgent.getAID());
+						request.setOntology(FIPAManagementOntology.NAME);
+						request.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+						request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+				
+						convid = SUtil.createUniqueId(myAgent.getLocalName());
+						request.setConversationId(convid);
+						
+						myAgent.getContentManager().fillContent(request, ac);
+						// ACLMessage reply = FIPAService.doFipaRequestClient(this, request, 10000);
+						myAgent.send(request);
+						block();
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+					}
+				}
 			}
-			agents.removeKey(adesc.getName());
-			//System.out.println("deregistered: "+adesc.getName());
-		}
+			
+			public boolean done()
+			{
+				return done;
+			}
+		});
 		
-		listener.resultAvailable(null);
+		try
+		{
+			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+		}
+		catch(Exception ex)
+		{
+			listener.exceptionOccurred(ex);
+		}
 	}
 
 	/**
 	 *  Modify an agent description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	modify(IDFAgentDescription adesc, IResultListener listener)
+	public void	modify(final IDFAgentDescription adesc, IResultListener lis)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
-		// Use clone to avoid caller manipulating object after insertion.
-		IDFAgentDescription clone = SFipa.cloneDFAgentDescription(adesc, this);
-
-		// Change description, when valid.
-		IClockService clock = (IClockService)platform.getService(IClockService.class);
-		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clock.getTime())
+		Event e = new Event(-1, new SimpleBehaviour()
 		{
-			// Automatically throws exception, when key does not exist.
-			synchronized(agents)
+			String convid = null;
+			boolean done = false;
+			
+			public void action()
 			{
-				agents.replace(clone.getName(), clone);
+				if(convid!=null)
+				{
+					ACLMessage reply = myAgent.receive(MessageTemplate.MatchConversationId(convid));
+					if(reply==null)
+					{
+						block();
+					}
+					else
+					{
+						System.out.println("Reply received: "+reply);
+						if(reply.getPerformative()==ACLMessage.INFORM)
+						{
+							try
+							{
+								Result res = (Result)myAgent.getContentManager().extractContent(reply);
+								jade.util.leap.List descs = res.getItems();
+								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
+								IAMS ams = (IAMS)platform.getService(IAMS.class);
+								for(int i=0; i<ret.length; i++)
+								{
+									ret[i] = SJade.convertAgentDescriptiontoFipa(
+										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
+								}
+								listener.resultAvailable(ret);
+							}
+							catch(Exception e)
+							{
+								listener.exceptionOccurred(e);
+							}
+						}
+						else
+						{
+							listener.exceptionOccurred(new RuntimeException("Search failed."));
+						}
+						done = true;
+					}
+				}
+				else
+				{
+					try 
+					{
+						Modify r = new Modify();
+						r.setDescription(SJade.convertAgentDescriptiontoJade(adesc));
+						Action ac = new Action();
+						ac.setActor(myAgent.getDefaultDF());
+						ac.setAction(r);
+
+						ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+						request.addReceiver(myAgent.getDefaultDF());
+						request.setSender(myAgent.getAID());
+						request.setOntology(FIPAManagementOntology.NAME);
+						request.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+						request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+				
+						convid = SUtil.createUniqueId(myAgent.getLocalName());
+						request.setConversationId(convid);
+						
+						myAgent.getContentManager().fillContent(request, ac);
+						// ACLMessage reply = FIPAService.doFipaRequestClient(this, request, 10000);
+						myAgent.send(request);
+						block();
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+					}
+				}
 			}
-			//System.out.println("modified: "+clone.getName());
-			listener.resultAvailable(clone);
-		}
-		else
+			
+			public boolean done()
+			{
+				return done;
+			}
+		});
+		
+		try
 		{
-			//throw new RuntimeException("Invalid lease time: "+clone.getLeaseTime());
-			listener.exceptionOccurred(new RuntimeException("Invalid lease time: "+clone.getLeaseTime()));
+			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+		}
+		catch(Exception ex)
+		{
+			listener.exceptionOccurred(ex);
 		}
 	}
 
@@ -149,63 +373,101 @@ public class DF implements IDF, IPlatformService
 	 *  Search for agents matching the given description.
 	 *  @return An array of matching agent descriptions. 
 	 */
-	public void	search(IDFAgentDescription adesc, ISearchConstraints con, IResultListener listener)
+	public void	search(final IDFAgentDescription adesc, final ISearchConstraints con, IResultListener lis)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
-		//System.out.println("Searching: "+adesc.getName());
-
-		List	ret	= new ArrayList();
-
-		// If name is supplied, just lookup description.
-		if(adesc.getName()!=null)
+		Event e = new Event(-1, new SimpleBehaviour()
 		{
-			synchronized(agents)
+			String convid = null;
+			boolean done = false;
+			
+			public void action()
 			{
-				if(agents.containsKey(adesc.getName()))
+				if(convid!=null)
 				{
-					DFAgentDescription ad = (DFAgentDescription)agents.get(adesc.getName());
-					// Remove description when invalid.
-					IClockService clock = (IClockService)platform.getService(IClockService.class);
-					if(ad.getLeaseTime()!=null && ad.getLeaseTime().getTime()<clock.getTime())
-						agents.removeKey(ad.getName());
-					else
-						ret.add(ad);
-				}
-			}
-		}
-
-		// Otherwise search for matching descriptions.
-		else
-		{
-			synchronized(agents)
-			{
-				DFAgentDescription[]	descs	= (DFAgentDescription[])agents.toArray(new DFAgentDescription[agents.size()]);
-				for(int i=0; (con==null || con.getMaxResults()==-1 || ret.size()<con.getMaxResults()) && i<descs.length; i++)
-				{
-					// Remove description when invalid.
-					IClockService clock = (IClockService)platform.getService(IClockService.class);
-					if(descs[i].getLeaseTime()!=null && descs[i].getLeaseTime().getTime()<clock.getTime())
+					ACLMessage reply = myAgent.receive(MessageTemplate.MatchConversationId(convid));
+					if(reply==null)
 					{
-						agents.removeKey(descs[i].getName());
+						block();
 					}
-					// Otherwise match against template.
 					else
 					{
-						if(match(descs[i] ,adesc))
+						System.out.println("Reply received: "+reply);
+						if(reply.getPerformative()==ACLMessage.INFORM)
 						{
-							ret.add(descs[i]);
+							try
+							{
+								Result res = (Result)myAgent.getContentManager().extractContent(reply);
+								jade.util.leap.List descs = res.getItems();
+								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
+								IAMS ams = (IAMS)platform.getService(IAMS.class);
+								for(int i=0; i<ret.length; i++)
+								{
+									ret[i] = SJade.convertAgentDescriptiontoFipa(
+										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
+								}
+								listener.resultAvailable(ret);
+							}
+							catch(Exception e)
+							{
+								listener.exceptionOccurred(e);
+							}
 						}
+						else
+						{
+							listener.exceptionOccurred(new RuntimeException("Search failed."));
+						}
+						done = true;
+					}
+				}
+				else
+				{
+					try 
+					{
+						Search s = new Search();
+						s.setDescription(SJade.convertAgentDescriptiontoJade(adesc));
+						s.setConstraints(SJade.convertSearchConstraintstoJade(con));
+						Action ac = new Action();
+						ac.setActor(myAgent.getDefaultDF());
+						ac.setAction(s);
+
+						ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+						request.addReceiver(myAgent.getDefaultDF());
+						request.setSender(myAgent.getAID());
+						request.setOntology(FIPAManagementOntology.NAME);
+						request.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+						request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+				
+						convid = SUtil.createUniqueId(myAgent.getLocalName());
+						request.setConversationId(convid);
+						
+						myAgent.getContentManager().fillContent(request, ac);
+						// ACLMessage reply = FIPAService.doFipaRequestClient(this, request, 10000);
+						myAgent.send(request);
+						block();
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
 					}
 				}
 			}
-		}
-
-		//System.out.println("Searched: "+ret);
-		//return (AgentDescription[])ret.toArray(new AgentDescription[ret.size()]);
+			
+			public boolean done()
+			{
+				return done;
+			}
+		});
 		
-		listener.resultAvailable(ret.toArray(new DFAgentDescription[ret.size()]));
+		try
+		{
+			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+		}
+		catch(Exception ex)
+		{
+			listener.exceptionOccurred(ex);
+		}
 	}
 
 	/**

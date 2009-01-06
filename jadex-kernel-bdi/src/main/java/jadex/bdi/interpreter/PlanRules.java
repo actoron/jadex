@@ -157,7 +157,7 @@ public class PlanRules
 				{
 					int pidx = paramref.lastIndexOf('.');
 					String paramname = paramref.substring(pidx+1);
-					generateParameterMapping(state, rplan, mparam, paramname, reason);
+					generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
 					continue;
 				}
 				
@@ -166,7 +166,7 @@ public class PlanRules
 				{
 					int pidx = paramref.lastIndexOf('.');
 					String paramname = paramref.substring(pidx+1);
-					generateParameterMapping(state, rplan, mparam, paramname, reason);
+					generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
 					continue;
 				}
 
@@ -175,7 +175,7 @@ public class PlanRules
 				{
 					int pidx = paramref.lastIndexOf('.');
 					String paramname = paramref.substring(pidx+1);
-					generateParameterMapping(state, rplan, mparam, paramname, reason);
+					generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
 					continue;
 				}
 			}
@@ -217,7 +217,7 @@ public class PlanRules
 		}
 		
 		// Bindings for plans are done with EventprocessingRules.createMPlanCandidate or via CREATION_ACTION
-		AgentRules.initParameters(state, rplan, cplan, fetcher, fetcher, doneparams, bindings);
+		AgentRules.initParameters(state, rplan, cplan, fetcher, fetcher, doneparams, bindings, rcap);
 		
 		// Initialize waitqueue (if defined in model).
 		Object	wqtrigger	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_waitqueue);
@@ -400,7 +400,7 @@ public class PlanRules
 	/**
 	 *  Create new parameter and copy value.
 	 */
-	protected static void generateParameterMapping(IOAVState state, Object rplan, Object mparam, String oname, Object reason)
+	protected static void generateParameterMapping(IOAVState state, Object rplan, Object mparam, String oname, Object reason, Object rcapa)
 	{
 		// Create a new rparameter
 		String pname = (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
@@ -412,7 +412,7 @@ public class PlanRules
 		if(roparam!=null)
 			roval = state.getAttributeValue(roparam, OAVBDIRuntimeModel.parameter_has_value);
 		
-		BeliefRules.createParameter(state, pname, roval, clazz, rplan);
+		BeliefRules.createParameter(state, pname, roval, clazz, rplan, mparam, rcapa);
 	}
 	
 	/**
@@ -1158,7 +1158,7 @@ public class PlanRules
 									{
 										Object mgoalparam = state.getAttributeValue(mreason, OAVBDIMetaModel.parameterelement_has_parameters, paramname);
 										Class clazz = (Class)state.getAttributeValue(mgoalparam, OAVBDIMetaModel.typedelement_has_class);
-										roparam = BeliefRules.createParameter(state, paramname, null, clazz, reason);
+										roparam = BeliefRules.createParameter(state, paramname, null, clazz, reason, mgoalparam, rcapa);
 									}								
 
 									Object roval = state.getAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_value);
@@ -1195,7 +1195,7 @@ public class PlanRules
 									{
 										Object mgoalparamset = state.getAttributeValue(mreason, OAVBDIMetaModel.parameterelement_has_parametersets, paramname);
 										Class clazz = (Class)state.getAttributeValue(mgoalparamset, OAVBDIMetaModel.typedelement_has_class);
-										roparamset = BeliefRules.createParameter(state, paramname, null, clazz, reason);
+										roparamset = BeliefRules.createParameterSet(state, paramname, null, clazz, reason);
 								
 									}
 									else

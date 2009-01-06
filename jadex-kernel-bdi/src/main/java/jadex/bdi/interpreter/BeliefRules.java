@@ -1,5 +1,9 @@
 package jadex.bdi.interpreter;
 
+import jadex.bdi.runtime.impl.InterpreterTimedObject;
+import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
+import jadex.bridge.IClockService;
+import jadex.bridge.ITimedObject;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -381,12 +385,12 @@ public class BeliefRules
 	/**
 	 *  Create a parameter.
 	 */
-	public static Object createParameter(IOAVState state, String name, Object value, Class clazz, Object rpe)
+	public static Object createParameter(final IOAVState state, String name, Object value, Class clazz, Object rpe, final Object mparam, final Object rcapa)
 	{
 		assert name!=null;
 		assert clazz!=null: name;
 		
-		Object	rparam	= state.createObject(OAVBDIRuntimeModel.parameter_type);
+		final Object rparam = state.createObject(OAVBDIRuntimeModel.parameter_type);
 		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_name, name);
 		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_type, clazz);
 		if(value==null)
@@ -395,6 +399,44 @@ public class BeliefRules
 			BeliefRules.setParameterValue(state, rparam, value);
 		if(rpe!=null)
 			state.addAttributeValue(rpe, OAVBDIRuntimeModel.parameterelement_has_parameters, rparam);
+		
+		if(mparam!=null)
+		{
+			final Long update = (Long)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_updaterate);
+		
+			if(update!=null)
+			{
+				final ITimedObject[]	to	= new ITimedObject[1];
+				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
+				to[0] = new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
+				{
+					public void run()
+					{
+						Object	exp = state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value);
+						try
+						{
+							Object value = AgentRules.evaluateExpression(state, exp, fet);
+							BeliefRules.setParameterValue(state, rparam, value);
+						}
+						catch(Exception e)
+						{
+							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getName();
+							AgentRules.getLogger(state, rcapa).severe("Could not evaluate parameter expression: "+name
+								+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+						}
+		//					// changed *.class to *.TYPE due to javaflow bug
+						state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
+							((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+							.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+					}
+				});
+				
+		//			// changed *.class to *.TYPE due to javaflow bug
+				state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
+					((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+					.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+			}
+		}
 		
 		return rparam;
 	}
@@ -407,7 +449,7 @@ public class BeliefRules
 		assert name!=null;
 		assert clazz!=null;
 		
-		Object	rparamset	= state.createObject(OAVBDIRuntimeModel.parameterset_type);
+		Object rparamset = state.createObject(OAVBDIRuntimeModel.parameterset_type);
 		state.setAttributeValue(rparamset, OAVBDIRuntimeModel.parameterset_has_name, name);
 		state.setAttributeValue(rparamset, OAVBDIRuntimeModel.parameterset_has_type, clazz);
 		if(values!=null)

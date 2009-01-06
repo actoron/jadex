@@ -8,6 +8,7 @@ import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
 import jade.domain.FIPAAgentManagement.Search;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.util.Event;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
@@ -511,7 +512,7 @@ public class AMS implements IAMS, IPlatformService
 			{
 				if(convid!=null)
 				{
-					ACLMessage reply = myAgent.receive();
+					ACLMessage reply = myAgent.receive(MessageTemplate.MatchConversationId(convid));
 					if(reply==null)
 					{
 						block();

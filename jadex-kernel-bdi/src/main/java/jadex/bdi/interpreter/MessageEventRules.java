@@ -78,7 +78,7 @@ public class MessageEventRules
 		// todo: adapter?
 		if(fetcher==null)
 			fetcher = new OAVBDIFetcher(state, rcapa);
-		AgentRules.initParameters(state, revent, cevent, fetcher, configfetcher, null, bindings);
+		AgentRules.initParameters(state, revent, cevent, fetcher, configfetcher, null, bindings, rcapa);
 		
 		return revent;
 	}
@@ -954,7 +954,7 @@ public class MessageEventRules
 			Object	msgvalue = getValue(msg, paramnames[i], scope);
 			if(msgvalue!=null)
 			{
-				BeliefRules.createParameter(state, paramnames[i], msgvalue, mt.getParameter(paramnames[i]).getClazz(), ret);
+				BeliefRules.createParameter(state, paramnames[i], msgvalue, mt.getParameter(paramnames[i]).getClazz(), ret, null, scope);
 				
 //				Object mparam = OAVBDIMetaModel.getElement(state, mevent, 
 //					OAVBDIMetaModel.parameterelement_has_parameters, paramnames[i], null);
@@ -970,7 +970,8 @@ public class MessageEventRules
 			Object	msgvalue = getValue(msg, paramsetnames[i], scope);
 			if(msgvalue!=null)
 			{
-				BeliefRules.createParameter(state, paramsetnames[i], SReflect.getIterator(msgvalue), mt.getParameter(paramsetnames[i]).getClazz(), ret);
+				BeliefRules.createParameter(state, paramsetnames[i], SReflect.getIterator(msgvalue), 
+					mt.getParameter(paramsetnames[i]).getClazz(), ret, null, scope);
 			}
 		}
 		
@@ -1217,7 +1218,7 @@ public class MessageEventRules
 						if(destparam==null)
 						{
 							Class clazz = mdestparam!=null? (Class)state.getAttributeValue(mdestparam, OAVBDIMetaModel.typedelement_has_class): params[i].getClazz();
-							destparam = BeliefRules.createParameter(state, params[i].getName(), null, clazz, rreply);
+							destparam = BeliefRules.createParameter(state, params[i].getName(), null, clazz, rreply, mdestparam, rscope);
 						}
 						BeliefRules.setParameterValue(state, destparam, sourceval);
 					}

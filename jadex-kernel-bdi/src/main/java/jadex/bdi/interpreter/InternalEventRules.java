@@ -45,7 +45,7 @@ public class InternalEventRules
 		if(fetcher==null)
 			fetcher = new OAVBDIFetcher(state, rcapa);
 		fetcher.setRInternalEvent(revent);
-		AgentRules.initParameters(state, revent, cevent, fetcher, configfetcher, null, bindings);
+		AgentRules.initParameters(state, revent, cevent, fetcher, configfetcher, null, bindings, rcapa);
 		
 		return revent;
 	}

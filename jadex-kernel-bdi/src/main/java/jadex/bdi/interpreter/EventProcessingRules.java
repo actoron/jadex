@@ -1607,7 +1607,7 @@ public class EventProcessingRules
 					String	name	= (String)it.next();
 					Object mparam = state.getAttributeValue(mplan, OAVBDIMetaModel.parameterelement_has_parameters, name);
 					Class clazz = (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
-					Object rparam = BeliefRules.createParameter(state, name, bindings.get(name), clazz, null);
+					Object rparam = BeliefRules.createParameter(state, name, bindings.get(name), clazz, null, mparam, rcapa);
 					state.addAttributeValue(mplancandidate, OAVBDIRuntimeModel.mplancandidate_has_bindings, rparam);
 				}
 			}

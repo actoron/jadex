@@ -68,7 +68,7 @@ public class GoalLifecycleRules
 		if(fetcher==null)
 			fetcher = new OAVBDIFetcher(state, rcapa);
 		fetcher.setRGoal(rgoal);
-		AgentRules.initParameters(state, rgoal, cgoal, fetcher, configfetcher, null, bindings);
+		AgentRules.initParameters(state, rgoal, cgoal, fetcher, configfetcher, null, bindings, rcapa);
 		
 //		System.out.println("Created goal: "+rcapa+" "+rgoal+" "+state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 		

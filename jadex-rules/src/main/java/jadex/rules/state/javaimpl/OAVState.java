@@ -544,6 +544,17 @@ public class OAVState	implements IOAVState
 			if(!rootobjects.contains(id))
 			{
 				Map	usages	= getObjectUsages(id);
+//				boolean instate = false;
+//				if(usages!=null && !usages.isEmpty())
+//				{
+//					for(Iterator it=usages.keySet().iterator(); it.hasNext() && !instate; )
+//					{
+//						OAVObjectUsage usage = (OAVObjectUsage)it.next();
+//						if(!usage.isExternal() && containsObject(usage.getObject()))
+//							instate = true;
+//					}
+//				}
+//				ret = usages==null || instate;
 				ret	= usages==null || !usages.isEmpty();
 			}
 		}
@@ -1039,6 +1050,8 @@ public class OAVState	implements IOAVState
 	{	
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
+		if(!checkValidStateObject(id))
+			System.out.println("here");
 		assert nocheck || checkValidStateObject(id): id+" "+attribute+" "+value;
 		assert nocheck || checkValidStateValue(value);
 		assert nocheck || checkTypeHasAttribute(id, attribute);
