@@ -7,6 +7,8 @@ import jadex.rules.rulesystem.RuleSystemExecutor;
 import jadex.rules.tools.stateviewer.OAVPanel;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -76,7 +78,15 @@ public class RuleEnginePanel extends JTabbedPane
 		f.getContentPane().setLayout(new BorderLayout());
 		f.add("Center", tabs);
 		f.setSize(800,600);
+		f.setLocation(SGUI.calculateMiddlePosition(f));
         f.setVisible(true);
+        f.addWindowListener(new WindowAdapter()
+        {
+        	public void windowClosing(WindowEvent e)
+        	{
+        		System.exit(0);
+        	}
+        });
 		return f;
 	}
 }

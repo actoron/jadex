@@ -6,7 +6,7 @@ be added for the final release.
 This document is meant as a starting point for developers
 that want to understand the basic concepts of Jadex rules
 to write rule programs. Basically, Jadex rules is a small 
-leightweigt rule engine, which employs the well-known Rete
+lightweight rule engine, which employs the well-known Rete
 algorithm for highly efficient rule matching. Jadex rules
 is therefore similar to other rule engines like JESS and
 Drools. Despite the similarities there are also important

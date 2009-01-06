@@ -1,4 +1,4 @@
-package jadex.rules.examples;
+package jadex.rules.examples.helloworld;
 
 /**
  *  Simple java bean for a message.

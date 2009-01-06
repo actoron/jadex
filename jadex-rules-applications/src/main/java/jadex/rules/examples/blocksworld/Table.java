@@ -1,4 +1,4 @@
-package jadex.rules.examples;
+package jadex.rules.examples.blocksworld;
 
 import jadex.commons.SUtil;
 

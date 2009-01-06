@@ -1,4 +1,4 @@
-package jadex.rules.examples;
+package jadex.rules.examples.blocksworld;
 
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -30,7 +30,7 @@ import jadex.rules.tools.reteviewer.RuleEnginePanel;
 /**
  *  The blocks world meta model.
  */
-public class Blocks
+public class Blocksworld
 {
 	//-------- OAV type definitions --------
 	

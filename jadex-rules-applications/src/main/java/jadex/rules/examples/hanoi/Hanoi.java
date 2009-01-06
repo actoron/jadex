@@ -1,5 +1,6 @@
-package jadex.rules.examples;
+package jadex.rules.examples.hanoi;
 
+import jadex.commons.SGUI;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IRule;
@@ -28,6 +29,8 @@ import jadex.rules.tools.reteviewer.RuleEnginePanel;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,14 +135,13 @@ public class Hanoi
 		int discs	= 15;
 		
 		// Implementation to use: 1=Rete, 2=Goals, 3=State, 4=Lists
-//		int	impl	= 1;
-//		boolean	show_oav	= false;
-//		boolean show_towers	= true;
-//		boolean show_rete	= true;
-//		test(discs, impl, show_oav, show_towers, show_rete);
+		int	impl	= 1;
+		boolean show_towers	= true;
+		boolean show_rete	= true;
+		test(discs, impl, show_towers, show_rete);
 		
 		// Run benchmark comparing all implementations.
-		benchmark(discs);
+//		benchmark(discs);
 	}
 	
 	/**
@@ -155,7 +157,7 @@ public class Hanoi
 				IOAVState state = createState();
 				RuleSystem	rete	= initializeRete(state, showrete);
 				Object agent = initState(discs, state, showtowers);
-				moveWithRete(state, agent, agent_has_tower_a, agent_has_tower_b, agent_has_tower_c, discs, rete, showrete);
+				moveWithRete(state, agent, agent_has_tower_a, agent_has_tower_c, agent_has_tower_b, discs, rete, showrete);
 				break;
 			}
 			// State with goals but without Rete.
@@ -163,7 +165,7 @@ public class Hanoi
 			{
 				IOAVState state = createState();
 				Object agent = initState(discs, state, showtowers);
-				moveWithoutRete(state, agent, agent_has_tower_a, agent_has_tower_b, agent_has_tower_c, discs);
+				moveWithoutRete(state, agent, agent_has_tower_a, agent_has_tower_c, agent_has_tower_b, discs);
 				break;
 			}
 			// Simple state based implementation
@@ -171,7 +173,7 @@ public class Hanoi
 			{
 				IOAVState state = createState();
 				Object agent = initState(discs, state, showtowers);
-				moveWithState(state, agent, agent_has_tower_a, agent_has_tower_b, agent_has_tower_c, discs);
+				moveWithState(state, agent, agent_has_tower_a, agent_has_tower_c, agent_has_tower_b, discs);
 				break;
 			}
 			// Simple list based implementation (no state involved).
@@ -478,7 +480,15 @@ public class Hanoi
 		final JComponent	comp	= new HanoiComponent(state, agent);
 		frame.getContentPane().add(comp);
 		frame.setSize(800, 250);
+		frame.setLocation(SGUI.calculateMiddlePosition(frame).x, 0);
 		frame.setVisible(true);
+		frame.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				System.exit(0);
+			}
+		});
 		
 		state.addStateListener(new IOAVStateListener()
 		{

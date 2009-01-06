@@ -1,4 +1,4 @@
-package jadex.rules.examples;
+package jadex.rules.examples.fibonacci;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

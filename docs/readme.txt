@@ -1,4 +1,4 @@
-Jadex - The BDI Reasoning Engine
+Jadex
 Copyright (C) 2002-2009 Lars Braubach, Alexander Pokahr
 University of Hamburg
 

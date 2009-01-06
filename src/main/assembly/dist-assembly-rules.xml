@@ -72,6 +72,11 @@
       <filtered>true</filtered>
     </file>
     <file>
+      <source>docs/rules-readme.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
       <source>docs/license.txt</source>
       <outputDirectory>/</outputDirectory>
     </file>
@@ -80,10 +85,6 @@
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>    
-    <file>
-      <source>docs/jadex.bat</source>
-      <outputDirectory>/</outputDirectory>
-    </file>
     <file>
       <source>docs/howtostart.txt</source>
       <outputDirectory>/</outputDirectory>
