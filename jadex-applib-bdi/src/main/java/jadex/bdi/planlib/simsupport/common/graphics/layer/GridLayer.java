@@ -13,8 +13,11 @@ import javax.media.opengl.GL;
  */
 public class GridLayer implements ILayer
 {
-	public GridLayer()
+	private IVector2 gridSize_;
+	
+	public GridLayer(IVector2 gridSize)
 	{
+		gridSize_ = gridSize.copy();
 	}
 	
 	/** Draws the layer to a Java2D viewport
@@ -36,13 +39,27 @@ public class GridLayer implements ILayer
      */
 	public void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
+		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		
+		gl.glBegin(gl.GL_LINES);
+		for (float x = 0.0f; x <= areaSize.getXAsFloat(); x = x + gridSize_.getXAsFloat())
+		{
+			gl.glVertex2f(x, 0.0f);
+			gl.glVertex2f(x, areaSize.getYAsFloat());
+		}
+		
+		for (float y = 0.0f; y <= areaSize.getYAsFloat(); y = y + gridSize_.getYAsFloat())
+		{
+			gl.glVertex2f(0.0f, y);
+			gl.glVertex2f(areaSize.getXAsFloat(), y);
+		}
+		gl.glEnd();
 	}
 	
 	/** Provides a copy of the layer.
      */
 	public ILayer copy()
 	{
-		return new GridLayer();
+		return new GridLayer(gridSize_);
 	}
 }
