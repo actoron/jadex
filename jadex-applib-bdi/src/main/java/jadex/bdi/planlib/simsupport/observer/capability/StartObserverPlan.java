@@ -47,7 +47,7 @@ public class StartObserverPlan extends Plan
 		IVector2 displaySize = (IVector2) b.getBelief("display_size").getFact();
 		if (displaySize == null)
 		{
-			engine.getAreaSize();
+			displaySize = engine.getAreaSize();
 		}
 		
 		//TODO: Remote case
