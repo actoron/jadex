@@ -17,11 +17,11 @@ public class GoToDestinationPlan extends Plan
 	{
 		Integer cleanerId = (Integer) getBeliefbase().getBelief("simobject_id").getFact();
 		IVector2 destination = (IVector2) getParameter("destination").getValue();
-		IGoal goToDestination = createGoal("sim_go_to_destination");
+		IGoal goToDestination = createGoal("sim_go_to_precise_destination");
 		goToDestination.getParameter("object_id").setValue(cleanerId);
 		goToDestination.getParameter("destination").setValue(destination);
 		goToDestination.getParameter("speed").setValue(Configuration.CLEANER_SPEED);
-		goToDestination.getParameter("tolerance").setValue(TOLERANCE.copy());
+		//goToDestination.getParameter("tolerance").setValue(TOLERANCE.copy());
 		dispatchSubgoalAndWait(goToDestination);
 		
 		if (!goToDestination.isSucceeded())

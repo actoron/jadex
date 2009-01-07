@@ -37,25 +37,25 @@ public class TexturedRectangle extends RotatingPrimitive
     public TexturedRectangle(String texturePath)
     {
         this(new Vector2Double(1.0),
-             texturePath,
-             false);
+             new Vector2Double(0.0),
+             false,
+             texturePath);
     }
     
     /** Creates a new TexturedRectangle drawable.
      *
      *  @param size initial size
-     *  @param texturePath resource path of the texture
+     *  @param shift shift from the centered position using scale(1.0, 1.0)
      *  @param rotating if true, the resulting drawable will rotate depending on
 	 *  	   the velocity
+	 *  @param texturePath resource path of the texture
      */
     public TexturedRectangle(IVector2 size,
-                                     String texturePath,
-                                     boolean rotating)
+    						 IVector2 shift,
+                             boolean rotating,
+                             String texturePath)
     {
-        setPosition(new Vector2Double(0.0));
-        setSize(size);
-        setVelocity(new Vector2Double(0.0));
-        setRotating(rotating);
+        super(size, shift, rotating);
         texturePath_ = texturePath;
         texture_ = null;
         image_ = null;
@@ -76,12 +76,7 @@ public class TexturedRectangle extends RotatingPrimitive
     public synchronized void draw(ViewportJ2D vp, Graphics2D g)
     {
         AffineTransform transform = g.getTransform();
-        g.translate(px_ - (w_ / 2), py_ - (w_ / 2));
-        g.scale(w_, h_);
-        if (rotating_)
-        {
-        	g.rotate(rot_);
-        }
+        setupMatrix(g);
         g.drawImage(image_, imageToUser_, null);
         g.setTransform(transform);
     }
@@ -91,12 +86,7 @@ public class TexturedRectangle extends RotatingPrimitive
         gl.glPushMatrix();
         gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_.getTexId());
-        gl.glTranslatef(px_, py_, 0.0f);
-        gl.glScalef(w_, h_, 1.0f);
-        if (rotating_)
-        {
-        	gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
-        }
+        setupMatrix(gl);
         
         gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         gl.glBegin(GL.GL_QUADS);

@@ -1,5 +1,9 @@
 package jadex.bdi.planlib.simsupport.common.graphics.drawable;
 
+import java.awt.Graphics2D;
+
+import javax.media.opengl.GL;
+
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 
@@ -30,6 +34,30 @@ public abstract class RotatingPrimitive implements IDrawable
     /** Height
      */
     protected float h_;
+    
+    /** x-shift
+     */
+    protected float shiftX_;
+    
+    /** y-shift
+     */
+    protected float shiftY_;
+    
+    /** Initializes the drawable.
+    *
+    *  @param size initial size
+    *  @param shift shift from the centered position using scale(1.0, 1.0)
+    *  @param rotating if true, the resulting drawable will rotate depending on
+	*  	   			   the velocity
+	*/
+    protected RotatingPrimitive(IVector2 size, IVector2 shift, boolean rotating)
+    {
+    	setPosition(new Vector2Double(0.0));
+        setSize(size);
+        setVelocity(new Vector2Double(0.0));
+        setRotating(rotating);
+        setShift(shift);
+    }
     
     /** Gets the position of the drawable.
      *
@@ -69,6 +97,16 @@ public abstract class RotatingPrimitive implements IDrawable
         h_ = size.getYAsFloat();
     }
     
+    /** Sets the shift away from the centered position using scale(1.0, 1.0).
+     *  
+     *  @param shift the shift from the centered position using scale(1.0, 1.0)
+     */
+    public synchronized void setShift(IVector2 shift)
+    {
+    	shiftX_ = shift.getXAsFloat();
+    	shiftY_ = shift.getYAsFloat();
+    }
+    
     /** Sets the velocity of the drawable.
      *  
      * 	@param velocity new velocity
@@ -94,5 +132,35 @@ public abstract class RotatingPrimitive implements IDrawable
     public void setRotating(boolean rotating)
     {
     	rotating_ = rotating;
+    }
+    
+    /** Sets up the transformation matrix before drawing.
+     * 
+     *  @param g graphics context
+     */
+    protected void setupMatrix(Graphics2D g)
+    {
+    	g.translate(px_ - (w_ / 2), py_ - (w_ / 2));
+        g.translate(shiftX_, shiftY_);
+        g.scale(w_, h_);
+        if (rotating_)
+        {
+        	g.rotate(rot_);
+        }
+    }
+    
+    /** Sets up the transformation matrix before drawing.
+     * 
+     *  @param gl OpenGL context
+     */
+    protected void setupMatrix(GL gl)
+    {
+    	gl.glTranslatef(px_, py_, 0.0f);
+        gl.glTranslatef(shiftX_, shiftY_, 0.0f);
+        gl.glScalef(w_, h_, 1.0f);
+        if (rotating_)
+        {
+        	gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
+        }
     }
 }

@@ -34,24 +34,21 @@ public class RegularPolygon extends ColoredPrimitive
 	 */
 	public RegularPolygon()
 	{
-		this(new Vector2Double(1.0), 3, Color.WHITE, false);
+		this(new Vector2Double(1.0), new Vector2Double(0.0), false, Color.WHITE, 3);
 	}
 	
 	/** Generates a new RegularPolygon.
 	 * 
 	 *  @param size size of the polygon
-	 *  @param vertices number of vertices (corners)
-	 *  @param c color of the polygon
+	 *  @param shift shift from the centered position using scale(1.0, 1.0)
 	 *  @param rotating if true, the resulting drawable will rotate depending on
 	 *  	   the velocity
+	 *  @param c color of the polygon
+	 *  @param vertices number of vertices (corners)
 	 */
-	public RegularPolygon(IVector2 size, int vertices, Color c, boolean rotating)
+	public RegularPolygon(IVector2 size, IVector2 shift, boolean rotating, Color c, int vertices)
 	{
-		setColor(c);
-		setPosition(new Vector2Double(0.0));
-        setSize(size);
-        setVelocity(new Vector2Double(0.0));
-        setRotating(rotating);
+		super(size, shift, rotating, c);
 		vertices_ = vertices;
 	}
 	
@@ -98,12 +95,7 @@ public class RegularPolygon extends ColoredPrimitive
 	public void draw(ViewportJ2D vp, Graphics2D g)
 	{
 		AffineTransform transform = g.getTransform();
-        g.translate(px_, py_);
-        g.scale(w_, h_);
-        if (rotating_)
-        {
-        	g.rotate(rot_);
-        }
+        setupMatrix(g);
         g.setColor(c_);
         g.fill(path_);
         g.setTransform(transform);
@@ -113,12 +105,7 @@ public class RegularPolygon extends ColoredPrimitive
 	{
 		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
-        gl.glTranslatef(px_, py_, 0.0f);
-        gl.glScalef(w_, h_, 1.0f);
-        if (rotating_)
-        {
-        	gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
-        }
+        setupMatrix(gl);
         
         gl.glCallList(dList_);
         

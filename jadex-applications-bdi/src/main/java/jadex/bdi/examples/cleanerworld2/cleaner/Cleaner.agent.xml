@@ -99,8 +99,8 @@
         	<concrete ref="simcap.sim_set_velocity"/>
     	</achievegoalref>
     	
-    	<performgoalref name="sim_go_to_destination">
-    		<concrete ref="simcap.sim_go_to_destination"/>
+    	<performgoalref name="sim_go_to_precise_destination">
+    		<concrete ref="simcap.sim_go_to_precise_destination"/>
 		</performgoalref>
 		
 		<achievegoalref name="sim_remove_task">

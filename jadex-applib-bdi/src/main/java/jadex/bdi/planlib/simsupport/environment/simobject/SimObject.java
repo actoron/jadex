@@ -216,6 +216,16 @@ public class SimObject
 		position_ = position.copy();
 	}
 	
+	/** Assigns a new position for the object.
+	 *  Unlike setPosition, this does not overwrite the position object.
+	 * 
+	 *  @param position new position
+	 */
+	public synchronized void assignPosition(IVector2 position)
+	{
+		position_.assign(position);
+	}
+	
 	/** Adds an event listener for this object.
 	 * 
 	 * @param listener the listener

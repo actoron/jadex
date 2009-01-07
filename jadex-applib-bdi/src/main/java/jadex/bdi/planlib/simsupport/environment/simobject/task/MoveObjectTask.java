@@ -21,6 +21,10 @@ public class MoveObjectTask implements ISimObjectTask
 	 */
 	private IVector2 velocity_;
 	
+	/** Last movement delta.
+	 */
+	private IVector2 lastMovementDelta_;
+	
 	/** Creates a new default MoveObjectTask.
 	 */
 	public MoveObjectTask()
@@ -44,6 +48,7 @@ public class MoveObjectTask implements ISimObjectTask
 	{
 		name_ = name;
 		velocity_ = velocity.copy();
+		lastMovementDelta_ = new Vector2Double(0.0);
 	}
 	
 	/** This method will be executed by the object before
@@ -75,8 +80,8 @@ public class MoveObjectTask implements ISimObjectTask
 		synchronized (object)
 		{
 			IVector2 position = object.getPositionAccess();
-			IVector2 pDelta = velocity_.copy().multiply(deltaT);
-			position.add(pDelta);
+			lastMovementDelta_ = velocity_.copy().multiply(deltaT);
+			position.add(lastMovementDelta_);
 		}
 	}
 	
@@ -87,5 +92,12 @@ public class MoveObjectTask implements ISimObjectTask
 	public synchronized String getName()
 	{
 		return name_;
+	}
+	
+	/** Returns the last movement delta that was added to the position. 
+	 */
+	public synchronized IVector2 getLastMovementDelta()
+	{
+		return lastMovementDelta_;
 	}
 }

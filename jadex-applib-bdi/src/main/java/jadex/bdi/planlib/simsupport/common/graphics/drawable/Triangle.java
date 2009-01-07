@@ -32,17 +32,14 @@ public class Triangle extends ColoredPrimitive
 	/** Generates a new Triangle
 	 * 
 	 *  @param size size of the triangle
-	 *  @param c color of the triangle
+	 *  @param shift shift from the centered position using scale(1.0, 1.0)
 	 *  @param rotating if true, the resulting drawable will rotate depending on
 	 *  	   the velocity
+	 *  @param c color of the triangle
 	 */
-	public Triangle(IVector2 size, Color c, boolean rotating)
+	public Triangle(IVector2 size, IVector2 shift, boolean rotating, Color c)
 	{
-		setColor(c);
-		setPosition(new Vector2Double(0.0));
-        setSize(size);
-        setVelocity(new Vector2Double(0.0));
-        setRotating(rotating);
+		super(size, shift, rotating, c);
 	}
 	
 	public void init(ViewportJ2D vp, Graphics2D g)
@@ -75,12 +72,7 @@ public class Triangle extends ColoredPrimitive
 	public void draw(ViewportJ2D vp, Graphics2D g)
 	{
 		AffineTransform transform = g.getTransform();
-        g.translate(px_, py_);
-        g.scale(w_, h_);
-        if (rotating_)
-        {
-        	g.rotate(rot_);
-        }
+        setupMatrix(g);
         g.setColor(c_);
         g.fill(J2D_TRIANGLE);
         g.setTransform(transform);
@@ -90,12 +82,7 @@ public class Triangle extends ColoredPrimitive
 	{
 		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
-        gl.glTranslatef(px_, py_, 0.0f);
-        gl.glScalef(w_, h_, 1.0f);
-        if (rotating_)
-        {
-        	gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
-        }
+        setupMatrix(gl);
         
         gl.glCallList(dList_);
         

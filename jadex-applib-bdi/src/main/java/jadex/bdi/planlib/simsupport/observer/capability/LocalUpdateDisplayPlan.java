@@ -118,9 +118,9 @@ public class LocalUpdateDisplayPlan extends Plan
 			viewport.refresh();
 			
 			// Waits for 1000/rate, assumes painting takes no time.
-			int fr =((Integer)getBeliefbase().getBelief("frame_rate").getFact()).intValue();
+			//int fr =((Integer)getBeliefbase().getBelief("frame_rate").getFact()).intValue();
 			// System.out.println((long)(1000.d/fr));
-			waitFor((long)(1000.d/fr));
+			//waitFor((long)(1000.d/fr));
 		}
 	}
 }

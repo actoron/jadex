@@ -132,7 +132,7 @@
 		</achievegoal>
 		
 		<!-- Attempts to reach a destination on a best-effort basis.
-			 The object will attempt to reach the destinatinn directly.
+			 The object will attempt to reach the destination directly.
 			 This may fail if another GoTo goal is set with a destination beyond the tolerance. -->
 		<performgoal name="sim_go_to_destination" exported="true">
 			<!-- ID of the object -->
@@ -144,6 +144,22 @@
 			<!-- The tolerated distance from the destination that is still
 				 considered to be within the destination -->
 			<parameter name="tolerance" class="IVector1"/>
+			<contextcondition>
+				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				?mbelief = (mbelief (element_has_name "connected"))
+			</contextcondition>
+		</performgoal>
+		
+		<!-- Attempts to reach a destination precisely, on a best-effort basis.
+			 The object will attempt to reach the precise destination, using sub-time steps if necessary.
+			 This may fail if another GoTo goal is set with a destination beyond the tolerance. -->
+		<performgoal name="sim_go_to_precise_destination" exported="true">
+			<!-- ID of the object -->
+			<parameter name="object_id" class="Integer"/>
+			<!-- The new destination. -->
+			<parameter name="destination" class="IVector2"/>
+			<!-- The speed the object will have. -->
+			<parameter name="speed" class="IVector1"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (element_has_name "connected"))
@@ -446,6 +462,22 @@
 			<body class="GoToDestinationPlan" />
 			<trigger>
 				<goal ref="sim_go_to_destination"/>
+			</trigger>
+		</plan>
+		
+		<plan name="go_to_precise_destination_plan">
+			<parameter name="object_id" class="Integer">
+ 				<goalmapping ref="sim_go_to_destination.object_id"/>
+			</parameter>
+			<parameter name="destination" class="IVector2">
+ 				<goalmapping ref="sim_go_to_destination.destination"/>
+			</parameter>
+			<parameter name="speed" class="IVector1">
+ 				<goalmapping ref="sim_go_to_destination.speed"/>
+			</parameter>
+			<body class="GoToPreciseDestinationPlan" />
+			<trigger>
+				<goal ref="sim_go_to_precise_destination"/>
 			</trigger>
 		</plan>
 		

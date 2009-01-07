@@ -38,24 +38,24 @@ public class InitializeObserverPlan extends Plan
 		
 		DrawableCombiner combiner = new DrawableCombiner();
 		String cleanerImage = imgPath.concat("cleaner.png");
-		combiner.addDrawable(new RegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false), -1);
-		combiner.addDrawable(new TexturedRectangle(new Vector2Double(1.0), cleanerImage, false), 0);
+		combiner.addDrawable(new RegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), new Vector2Double(0.0), false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
+		combiner.addDrawable(new TexturedRectangle(new Vector2Double(1.0), new Vector2Double(0.0), false, cleanerImage), 0);
 		//cleanerDrawable.addDrawable(new RotatingColoredTriangle(new Vector2Double(1.0), new Vector2Double(1.0), new Vector2Double(0.0), Color.BLUE));
 		theme.put("cleaner", combiner);
 		
 		combiner = new DrawableCombiner(new Vector2Double(0.5));
 		String wasteImage = imgPath.concat("waste.png");
-		IDrawable wasteDrawable = new TexturedRectangle(new Vector2Double(0.5), wasteImage, false);
+		IDrawable wasteDrawable = new TexturedRectangle(new Vector2Double(0.5), new Vector2Double(0.0), false, wasteImage);
 		combiner.addDrawable(wasteDrawable);
 		theme.put("waste", combiner);
 		
 		combiner = new DrawableCombiner(Configuration.WASTE_BIN_SIZE);
-		IDrawable wbDrawable = new TexturedRectangle(Configuration.WASTE_BIN_SIZE, imgPath + "wastebin.png", false);
+		IDrawable wbDrawable = new TexturedRectangle(Configuration.WASTE_BIN_SIZE, new Vector2Double(0.0), false, imgPath + "wastebin.png");
 		combiner.addDrawable(wbDrawable);
 		theme.put("waste_bin", combiner);
 		
 		combiner = new DrawableCombiner(Configuration.CHARGING_STATION_SIZE);
-		IDrawable csDrawable = new TexturedRectangle(Configuration.CHARGING_STATION_SIZE, imgPath + "chargingstation.png", false);
+		IDrawable csDrawable = new TexturedRectangle(Configuration.CHARGING_STATION_SIZE, new Vector2Double(0.0), false, imgPath + "chargingstation.png");
 		combiner.addDrawable(csDrawable);
 		theme.put("charging_station", combiner);
 		
@@ -64,22 +64,22 @@ public class InitializeObserverPlan extends Plan
 		
 		theme = new HashMap();
 		combiner = new DrawableCombiner();
-		combiner.addDrawable(new RegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false), -1);
-		combiner.addDrawable(new Triangle(new Vector2Double(1.0), Color.BLUE, true), 0);
+		combiner.addDrawable(new RegularPolygon(new Vector2Double(Configuration.CLEANER_VISUAL_RANGE.getAsDouble() * 2.0), new Vector2Double(0.0), false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
+		combiner.addDrawable(new Triangle(new Vector2Double(1.0), new Vector2Double(0.0), true, Color.BLUE), 0);
 		theme.put("cleaner", combiner);
 		
 		combiner = new DrawableCombiner(new Vector2Double(0.5));
-		wasteDrawable = new RegularPolygon(new Vector2Double(0.5), 24, Color.RED, false);
+		wasteDrawable = new RegularPolygon(new Vector2Double(0.5), new Vector2Double(0.0), false, Color.RED, 24);
 		combiner.addDrawable(wasteDrawable);
 		theme.put("waste", combiner);
 		
 		combiner = new DrawableCombiner(Configuration.WASTE_BIN_SIZE);
-		wbDrawable = new Rectangle(new Vector2Double(1.0), Color.GREEN, false);
+		wbDrawable = new Rectangle(new Vector2Double(1.0), new Vector2Double(0.0), false, Color.GREEN);
 		combiner.addDrawable(wbDrawable);
 		theme.put("waste_bin", combiner);
 		
 		combiner = new DrawableCombiner(Configuration.CHARGING_STATION_SIZE);
-		csDrawable = wbDrawable = new Rectangle(new Vector2Double(1.0), Color.YELLOW, false);
+		csDrawable = wbDrawable = new Rectangle(new Vector2Double(1.0), new Vector2Double(0.0), false, Color.YELLOW);
 		combiner.addDrawable(csDrawable);
 		theme.put("charging_station", combiner);
 		

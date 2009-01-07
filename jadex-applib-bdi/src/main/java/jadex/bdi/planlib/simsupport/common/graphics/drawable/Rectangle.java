@@ -26,17 +26,14 @@ public class Rectangle extends ColoredPrimitive
 	/** Generates a new Rectangle
 	 * 
 	 *  @param size size of the rectangle
-	 *  @param c color of the rectangle
+	 *  @param shift shift from the centered position using scale(1.0, 1.0)
 	 *  @param rotating if true, the resulting drawable will rotate depending on
 	 *  	   the velocity
+	 *  @param c color of the rectangle
 	 */
-	public Rectangle(IVector2 size, Color c, boolean rotating)
+	public Rectangle(IVector2 size, IVector2 shift, boolean rotating, Color c)
 	{
-		setColor(c);
-		setPosition(new Vector2Double(0.0));
-        setSize(size);
-        setVelocity(new Vector2Double(0.0));
-        setRotating(rotating);
+		super(size, shift, rotating, c);
 	}
 	
 	public void init(ViewportJ2D vp, Graphics2D g)
@@ -70,12 +67,7 @@ public class Rectangle extends ColoredPrimitive
 	public void draw(ViewportJ2D vp, Graphics2D g)
 	{
 		AffineTransform transform = g.getTransform();
-        g.translate(px_, py_);
-        g.scale(w_, h_);
-        if (rotating_)
-        {
-        	g.rotate(rot_);
-        }
+        setupMatrix(g);
         g.setColor(c_);
         g.fill(J2D_RECTANGLE);
         g.setTransform(transform);
@@ -85,12 +77,7 @@ public class Rectangle extends ColoredPrimitive
 	{
 		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
-        gl.glTranslatef(px_, py_, 0.0f);
-        gl.glScalef(w_, h_, 1.0f);
-        if (rotating_)
-        {
-        	gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
-        }
+        setupMatrix(gl);
         
         gl.glCallList(dList_);
         

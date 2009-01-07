@@ -61,4 +61,10 @@ public interface IDrawable
      *  @param size new size
      */
     public void setSize(IVector2 size);
+    
+    /** Sets the shift away from the centered position.
+     *  
+     *  @param shift the shift from the centered position
+     */
+    public void setShift(IVector2 shift);
 }
