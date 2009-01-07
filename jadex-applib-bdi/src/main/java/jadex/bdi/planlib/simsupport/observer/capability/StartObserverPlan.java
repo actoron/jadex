@@ -44,7 +44,11 @@ public class StartObserverPlan extends Plan
 		
 		b.getBelief("local_simulation_engine").setFact(engine);
 		b.getBelief("simulation_engine_access").setFact(engine);
-		IVector2 areaSize = engine.getAreaSize();
+		IVector2 displaySize = (IVector2) b.getBelief("display_size").getFact();
+		if (displaySize == null)
+		{
+			engine.getAreaSize();
+		}
 		
 		//TODO: Remote case
 		
@@ -107,7 +111,7 @@ public class StartObserverPlan extends Plan
 		}
 		
 		viewport.setPreserveAspectRation(preserveAR);
-		viewport.setSize(areaSize);
+		viewport.setSize(displaySize);
 		
 		// Register the drawables
 		Map themes = (Map) b.getBelief("object_themes").getFact();
