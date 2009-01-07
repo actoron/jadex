@@ -76,7 +76,13 @@ public class TexturedRectangle extends RotatingPrimitive
     public synchronized void draw(ViewportJ2D vp, Graphics2D g)
     {
         AffineTransform transform = g.getTransform();
-        setupMatrix(g);
+        g.translate(px_ - (w_ / 2), py_ - (h_ / 2));
+        g.translate(shiftX_, shiftY_);
+        g.scale(w_, h_);
+        if (rotating_)
+        {
+        	g.rotate(rot_);
+        }
         g.drawImage(image_, imageToUser_, null);
         g.setTransform(transform);
     }

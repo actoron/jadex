@@ -140,7 +140,7 @@ public abstract class RotatingPrimitive implements IDrawable
      */
     protected void setupMatrix(Graphics2D g)
     {
-    	g.translate(px_ - (w_ / 2), py_ - (w_ / 2));
+    	g.translate(px_, py_);
         g.translate(shiftX_, shiftY_);
         g.scale(w_, h_);
         if (rotating_)

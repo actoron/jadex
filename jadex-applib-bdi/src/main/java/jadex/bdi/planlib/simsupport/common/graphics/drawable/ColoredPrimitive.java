@@ -7,7 +7,7 @@ import java.awt.Color;
 
 public abstract class ColoredPrimitive extends RotatingPrimitive
 {
-	/** Color of the Polygon.
+	/** Color of the primitive.
 	 */
 	protected Color c_;
 	

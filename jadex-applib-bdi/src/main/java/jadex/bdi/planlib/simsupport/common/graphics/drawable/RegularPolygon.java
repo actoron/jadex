@@ -95,7 +95,14 @@ public class RegularPolygon extends ColoredPrimitive
 	public void draw(ViewportJ2D vp, Graphics2D g)
 	{
 		AffineTransform transform = g.getTransform();
-        setupMatrix(g);
+        //setupMatrix(g);
+		g.translate(px_, py_);
+        //g.translate(shiftX_, shiftY_);
+        g.scale(w_, h_);
+        if (rotating_)
+        {
+        	//g.rotate(rot_);
+        }
         g.setColor(c_);
         g.fill(path_);
         g.setTransform(transform);
