@@ -385,6 +385,8 @@ public class ViewportJOGL extends AbstractViewport
             {
             	synchronized(objectLayers_)
     			{
+            		gl.glPushMatrix();
+                	gl.glTranslatef(objShiftX_, objShiftY_, 0.0f);
     				for (Iterator it = objectLayers_.iterator(); it.hasNext(); )
     				{
     					Integer layer = (Integer) it.next();
@@ -407,6 +409,7 @@ public class ViewportJOGL extends AbstractViewport
     						d.draw(layer, ViewportJOGL.this, gl);
     					}
     				}
+    				gl.glPopMatrix();
     			}
             }
             

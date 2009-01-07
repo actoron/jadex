@@ -201,6 +201,8 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
         		{
         			synchronized(objectLayers_)
         			{
+        				AffineTransform tf = g.getTransform();
+        				g.translate(objShiftX_, objShiftY_);
         				for (Iterator it = objectLayers_.iterator(); it.hasNext(); )
         				{
         					Integer layer = (Integer) it.next();
@@ -223,6 +225,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
         						d.draw(layer, ViewportJ2D.this, g);
         					}
         				}
+        				g.setTransform(tf);
         			}
         		}
         		

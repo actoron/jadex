@@ -41,6 +41,14 @@ public abstract class AbstractViewport implements IViewport
 	 */
     protected float posY_;
     
+    /** Object shift x-coordinate.
+     */
+    protected float objShiftX_;
+    
+    /** Object shift y-coordinate.
+     */
+    protected float objShiftY_;
+    
     /** Flag aspect ratio preservation.
      */
     protected boolean preserveAR_;
@@ -205,6 +213,14 @@ public abstract class AbstractViewport implements IViewport
     {
     	preserveAR_ = preserveAR;
     	setSize(size_);
+    }
+    
+    /** Sets the shift of all objects.
+     */
+    public void setObjectShift(IVector2 objectShift)
+    {
+    	objShiftX_ = objectShift.getXAsFloat();
+    	objShiftY_ = objectShift.getYAsFloat();
     }
     
     /** Checks if this IViewport is showing on screen.

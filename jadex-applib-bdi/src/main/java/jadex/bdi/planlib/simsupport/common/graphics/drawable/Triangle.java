@@ -32,6 +32,18 @@ public class Triangle extends ColoredPrimitive
 	/** Generates a new Triangle
 	 * 
 	 *  @param size size of the triangle
+	 *  @param rotating if true, the resulting drawable will rotate depending on
+	 *  	   the velocity
+	 *  @param c color of the triangle
+	 */
+	public Triangle(IVector2 size, boolean rotating, Color c)
+	{
+		this(size, new Vector2Double(0.0), rotating, c);
+	}
+	
+	/** Generates a new Triangle
+	 * 
+	 *  @param size size of the triangle
 	 *  @param shift shift from the centered position using scale(1.0, 1.0)
 	 *  @param rotating if true, the resulting drawable will rotate depending on
 	 *  	   the velocity

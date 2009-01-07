@@ -31,6 +31,10 @@ public interface IViewport
      */
     public void setPreserveAspectRation(boolean preserveAR);
     
+    /** Sets the shift of all objects.
+     */
+    public void setObjectShift(IVector2 objectShift);
+    
     /** Sets the layers that are applied before the drawables are drawn.
      *  
      *  @param layers new layers

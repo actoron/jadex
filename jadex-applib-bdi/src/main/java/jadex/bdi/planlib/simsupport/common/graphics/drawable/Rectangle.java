@@ -26,6 +26,18 @@ public class Rectangle extends ColoredPrimitive
 	/** Generates a new Rectangle
 	 * 
 	 *  @param size size of the rectangle
+	 *  @param rotating if true, the resulting drawable will rotate depending on
+	 *  	   the velocity
+	 *  @param c color of the rectangle
+	 */
+	public Rectangle(IVector2 size, boolean rotating, Color c)
+	{
+		this(size, new Vector2Double(0.0), rotating, c);
+	}
+	
+	/** Generates a new Rectangle
+	 * 
+	 *  @param size size of the rectangle
 	 *  @param shift shift from the centered position using scale(1.0, 1.0)
 	 *  @param rotating if true, the resulting drawable will rotate depending on
 	 *  	   the velocity

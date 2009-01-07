@@ -40,6 +40,19 @@ public class RegularPolygon extends ColoredPrimitive
 	/** Generates a new RegularPolygon.
 	 * 
 	 *  @param size size of the polygon
+	 *  @param rotating if true, the resulting drawable will rotate depending on
+	 *  	   the velocity
+	 *  @param c color of the polygon
+	 *  @param vertices number of vertices (corners)
+	 */
+	public RegularPolygon(IVector2 size, boolean rotating, Color c, int vertices)
+	{
+		this(size, new Vector2Double(0.0), rotating, c, vertices);
+	}
+	
+	/** Generates a new RegularPolygon.
+	 * 
+	 *  @param size size of the polygon
 	 *  @param shift shift from the centered position using scale(1.0, 1.0)
 	 *  @param rotating if true, the resulting drawable will rotate depending on
 	 *  	   the velocity

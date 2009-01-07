@@ -51,7 +51,7 @@
 		</belief>
 		
 		<!-- Shift for the object marker -->
-		<belief name="marker_shift" class="IVector2" exported="true">
+		<belief name="object_shift" class="IVector2" exported="true">
 			<fact>new Vector2Double(0.0)</fact>
 		</belief>
 		

@@ -43,6 +43,20 @@ public class TexturedRectangle extends RotatingPrimitive
     }
     
     /** Creates a new TexturedRectangle drawable.
+    *
+    *  @param size initial size
+    *  @param rotating if true, the resulting drawable will rotate depending on
+	 *  	   the velocity
+	 *  @param texturePath resource path of the texture
+    */
+   public TexturedRectangle(IVector2 size,
+                            boolean rotating,
+                            String texturePath)
+   {
+       this(size, new Vector2Double(0.0), rotating, texturePath);
+   }
+    
+    /** Creates a new TexturedRectangle drawable.
      *
      *  @param size initial size
      *  @param shift shift from the centered position using scale(1.0, 1.0)
