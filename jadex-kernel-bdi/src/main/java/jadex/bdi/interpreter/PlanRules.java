@@ -192,7 +192,7 @@ public class PlanRules
 				{
 					int pidx = paramref.lastIndexOf('.');
 					String paramname = paramref.substring(pidx+1);
-					generateParameterSetMapping(state, rplan, mparamset, paramname, reason);
+					generateParameterSetMapping(state, rplan, mparamset, paramname, reason, rcap);
 					continue;
 				}
 				
@@ -201,7 +201,7 @@ public class PlanRules
 				{
 					int pidx = paramref.lastIndexOf('.');
 					String paramname = paramref.substring(pidx+1);
-					generateParameterSetMapping(state, rplan, mparamset, paramname, reason);
+					generateParameterSetMapping(state, rplan, mparamset, paramname, reason, rcap);
 					continue;
 				}
 				
@@ -210,7 +210,7 @@ public class PlanRules
 				{
 					int pidx = paramref.lastIndexOf('.');
 					String paramname = paramref.substring(pidx+1);
-					generateParameterSetMapping(state, rplan, mparamset, paramname, reason);
+					generateParameterSetMapping(state, rplan, mparamset, paramname, reason, rcap);
 					continue;
 				}
 			}
@@ -418,7 +418,7 @@ public class PlanRules
 	/**
 	 *  Create new parameter set and copy values.
 	 */
-	protected static void generateParameterSetMapping(IOAVState state, Object rplan, Object mparamset, String oname, Object reason)
+	protected static void generateParameterSetMapping(IOAVState state, Object rplan, Object mparamset, String oname, Object reason, Object rcapa)
 	{
 		// Create a new rparameterset
 		String psname = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.modelelement_has_name);
@@ -430,7 +430,7 @@ public class PlanRules
 		if(roparamset!=null)
 			rovals = state.getAttributeValues(roparamset, OAVBDIRuntimeModel.parameterset_has_values);
 		
-		BeliefRules.createParameterSet(state, psname, rovals, clazz, rplan);
+		BeliefRules.createParameterSet(state, psname, rovals, clazz, rplan, mparamset, rcapa);
 	}
 	
 	//-------- rule methods --------	
@@ -1195,7 +1195,7 @@ public class PlanRules
 									{
 										Object mgoalparamset = state.getAttributeValue(mreason, OAVBDIMetaModel.parameterelement_has_parametersets, paramname);
 										Class clazz = (Class)state.getAttributeValue(mgoalparamset, OAVBDIMetaModel.typedelement_has_class);
-										roparamset = BeliefRules.createParameterSet(state, paramname, null, clazz, reason);
+										roparamset = BeliefRules.createParameterSet(state, paramname, null, clazz, reason, mgoalparamset, rcapa);
 								
 									}
 									else

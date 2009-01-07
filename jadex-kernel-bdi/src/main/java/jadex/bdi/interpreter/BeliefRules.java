@@ -456,12 +456,13 @@ public class BeliefRules
 	/**
 	 *  Create a parameterset.
 	 */
-	public static Object createParameterSet(IOAVState state, String name, Collection values, Class clazz, Object rpe)
+	public static Object createParameterSet(final IOAVState state, String name, Collection values, 
+		Class clazz, Object rpe, final Object mparamset, final Object rcapa)
 	{
 		assert name!=null;
 		assert clazz!=null;
 		
-		Object rparamset = state.createObject(OAVBDIRuntimeModel.parameterset_type);
+		final Object rparamset = state.createObject(OAVBDIRuntimeModel.parameterset_type);
 		state.setAttributeValue(rparamset, OAVBDIRuntimeModel.parameterset_has_name, name);
 		state.setAttributeValue(rparamset, OAVBDIRuntimeModel.parameterset_has_type, clazz);
 		if(values!=null)
@@ -473,6 +474,49 @@ public class BeliefRules
 		}
 		if(rpe!=null)
 			state.addAttributeValue(rpe, OAVBDIRuntimeModel.parameterelement_has_parametersets, rparamset);
+		
+		if(mparamset!=null)
+		{
+			final Long update = (Long)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_updaterate);
+		
+			if(update!=null)
+			{
+				final ITimedObject[]	to	= new ITimedObject[1];
+				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
+				
+				to[0] = new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
+				{
+					public boolean isValid()
+					{
+						return state.containsObject(rparamset);
+					}
+					
+					public void run()
+					{
+						Object	exp = state.getAttributeValue(mparamset, OAVBDIMetaModel.parameterset_has_valuesexpression);
+						try
+						{
+							Object values	= AgentRules.evaluateExpression(state, exp, fet);
+							BeliefRules.updateBeliefSet(state, rparamset, values);
+						}
+						catch(Exception e)
+						{
+							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getName();
+							AgentRules.getLogger(state, rcapa).severe("Could not evaluate parameterset expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+						}
+						// changed *.class to *.TYPE due to javaflow bug
+						state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
+							((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+							.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+					}
+				});
+				
+				// changed *.class to *.TYPE due to javaflow bug
+				state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
+					((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+					.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+			}
+		}
 		
 		return rparamset;
 	}

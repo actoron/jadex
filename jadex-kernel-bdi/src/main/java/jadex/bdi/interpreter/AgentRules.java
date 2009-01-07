@@ -2048,7 +2048,7 @@ public class AgentRules
 					Object mparamset = state.getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, pname);
 					Class clazz = (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
 
-					Object rparamset = BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem);
+					Object rparamset = BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem, mparamset, rcapa);
 					doneparams.add(pname);
 	
 					Collection	pvalexs	= state.getAttributeValues(cparamset, OAVBDIMetaModel.parameterset_has_values);
@@ -2126,7 +2126,7 @@ public class AgentRules
 					if(pvalexs!=null)
 					{
 						Class clazz = (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
-						Object rparamset = BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem);
+						Object rparamset = BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem, mparamset, rcapa);
 						doneparams.add(pname);
 						
 						for(Iterator it2=pvalexs.iterator(); it2.hasNext(); )
@@ -2142,7 +2142,7 @@ public class AgentRules
 						if(pvalsex!=null)
 						{
 							Class clazz = (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
-							Object rparamset = BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem);
+							Object rparamset = BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem, mparamset, rcapa);
 							doneparams.add(pname);
 							
 							// Todo: use parameter assignments instead of map for generating flyweights on the fly.
@@ -2156,7 +2156,7 @@ public class AgentRules
 						else if(state.getType(rparamelem).isSubtype(OAVBDIRuntimeModel.goal_type))
 						{
 							Class clazz = (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
-							BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem);
+							BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem, mparamset, rcapa);
 							doneparams.add(pname);
 						}
 					}

@@ -664,7 +664,7 @@ public class EventProcessingRules
 			
 			Object rpe = assignments.getVariableValue("?rpe");
 			Object rcapa	= assignments.getVariableValue("?rcapa");
-			Object ragent	= assignments.getVariableValue("?ragent");
+//			Object ragent	= assignments.getVariableValue("?ragent");
 			Object mmetagoal = assignments.getVariableValue("?mmetagoal");
 			
 			String type = (String)state.getAttributeValue(mmetagoal, OAVBDIMetaModel.modelelement_has_name);
@@ -676,7 +676,7 @@ public class EventProcessingRules
 			{
 				Object mapp = state.getAttributeValue(mmetagoal, OAVBDIMetaModel.parameterelement_has_parameters, appname);
 				Class clazz = (Class)state.getAttributeValue(mapp, OAVBDIMetaModel.typedelement_has_class);
-				appparamset = BeliefRules.createParameterSet(state, appname, null, clazz, rmetagoal);
+				appparamset = BeliefRules.createParameterSet(state, appname, null, clazz, rmetagoal, null, rcapa);
 			}	
 			// Hack! Create result paramset for making querygoal valid :-(
 			String resultname = "result";
@@ -685,7 +685,7 @@ public class EventProcessingRules
 			{
 				Object res = state.getAttributeValue(mmetagoal, OAVBDIMetaModel.parameterelement_has_parameters, resultname);
 				Class clazz = (Class)state.getAttributeValue(res, OAVBDIMetaModel.typedelement_has_class);
-				appparamset = BeliefRules.createParameterSet(state, resultname, null, clazz, rmetagoal);
+				appparamset = BeliefRules.createParameterSet(state, resultname, null, clazz, rmetagoal, null, rcapa);
 			}	
 			
 			// Extract candidates from apl and add them all to the parameterset "applicables"

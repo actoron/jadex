@@ -83,7 +83,9 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 					}
 					if(getHandle()==null)
 					{
-						setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe));
+						Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
+						Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
+						setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe, mparamset, getScope()));
 					}
 					String	direction 	= resolveDirection();
 					if(OAVBDIMetaModel.PARAMETER_DIRECTION_FIXED.equals(direction)
@@ -106,7 +108,9 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			}
 			if(getHandle()==null)
 			{
-				setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe));
+				Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
+				Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
+				setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe, mparamset, getScope()));
 			}
 			String	direction 	= resolveDirection();
 			if(OAVBDIMetaModel.PARAMETER_DIRECTION_FIXED.equals(direction)
@@ -198,7 +202,9 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 					}
 					if(getHandle()==null)
 					{
-						setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe));
+						Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
+						Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
+						setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe, mparamset, getScope()));
 					}
 					
 					String	direction 	= resolveDirection();
@@ -223,7 +229,9 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			}
 			if(getHandle()==null)
 			{
-				setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe));
+				Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
+				Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
+				setHandle(BeliefRules.createParameterSet(getState(), name, null, resolveClazz(), pe, mparamset, getScope()));
 			}
 			String	direction 	= resolveDirection();
 			if(OAVBDIMetaModel.PARAMETER_DIRECTION_FIXED.equals(direction)

@@ -1170,7 +1170,7 @@ public class MessageEventRules
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public static Object initializeReply(IOAVState state, Object rscope, Object revent, Object rreply)
+	public static Object initializeReply(IOAVState state, Object rcapa, Object revent, Object rreply)
 	{
 		Object mevent = state.getAttributeValue(revent, OAVBDIRuntimeModel.element_has_model);		
 		Object mreply = state.getAttributeValue(rreply, OAVBDIRuntimeModel.element_has_model);
@@ -1218,7 +1218,7 @@ public class MessageEventRules
 						if(destparam==null)
 						{
 							Class clazz = mdestparam!=null? (Class)state.getAttributeValue(mdestparam, OAVBDIMetaModel.typedelement_has_class): params[i].getClazz();
-							destparam = BeliefRules.createParameter(state, params[i].getName(), null, clazz, rreply, mdestparam, rscope);
+							destparam = BeliefRules.createParameter(state, params[i].getName(), null, clazz, rreply, mdestparam, rcapa);
 						}
 						BeliefRules.setParameterValue(state, destparam, sourceval);
 					}
@@ -1253,7 +1253,7 @@ public class MessageEventRules
 						if(destparamset==null)
 						{
 							Class clazz = mdestparamset!=null? (Class)state.getAttributeValue(mdestparamset, OAVBDIMetaModel.typedelement_has_class): paramsets[i].getClazz();
-							destparamset = BeliefRules.createParameterSet(state, paramsets[i].getName(), null, clazz, rreply);
+							destparamset = BeliefRules.createParameterSet(state, paramsets[i].getName(), null, clazz, rreply, mdestparamset, rcapa);
 						}
 						else
 						{

@@ -1,6 +1,7 @@
 package jadex.adapter.jade;
 
 import jade.content.onto.basic.Action;
+import jade.content.onto.basic.Done;
 import jade.content.onto.basic.Result;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.FIPANames;
@@ -15,28 +16,22 @@ import jade.util.Event;
 import jade.wrapper.AgentController;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.IProperty;
 import jadex.adapter.base.fipa.ISearchConstraints;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.adapter.jade.fipaimpl.DFAgentDescription;
 import jadex.adapter.jade.fipaimpl.DFServiceDescription;
 import jadex.adapter.jade.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IClockService;
 import jadex.bridge.IPlatformService;
 import jadex.commons.SUtil;
-import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -49,9 +44,6 @@ public class DF implements IDF, IPlatformService
 	/** The platform. */
 	protected Platform platform;
 	
-	/** The registered agents. */
-//	protected IndexMap	agents;
-	
 	/** The logger. */
 	//protected Logger logger;
 	
@@ -63,7 +55,6 @@ public class DF implements IDF, IPlatformService
 	public DF(Platform platform)
 	{
 		this.platform = platform;
-//		this.agents	= new IndexMap();
 		//this.logger = Logger.getLogger("DF" + this);
 	}
 	
@@ -93,21 +84,16 @@ public class DF implements IDF, IPlatformService
 					}
 					else
 					{
-						System.out.println("Reply received: "+reply);
+//						System.out.println("Reply received: "+reply);
 						if(reply.getPerformative()==ACLMessage.INFORM)
 						{
 							try
 							{
-								Result res = (Result)myAgent.getContentManager().extractContent(reply);
-								jade.util.leap.List descs = res.getItems();
-								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
-								IAMS ams = (IAMS)platform.getService(IAMS.class);
-								for(int i=0; i<ret.length; i++)
-								{
-									ret[i] = SJade.convertAgentDescriptiontoFipa(
-										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
-								}
-								listener.resultAvailable(ret);
+								Done done = (Done)myAgent.getContentManager().extractContent(reply);
+								Register reg = (Register)((Action)done.getAction()).getAction();
+								listener.resultAvailable(SJade.convertAgentDescriptiontoFipa(
+									(jade.domain.FIPAAgentManagement.DFAgentDescription)reg.getDescription(), 
+									(IAMS)platform.getService(IAMS.class)));
 							}
 							catch(Exception e)
 							{
@@ -116,7 +102,7 @@ public class DF implements IDF, IPlatformService
 						}
 						else
 						{
-							listener.exceptionOccurred(new RuntimeException("Search failed."));
+							listener.exceptionOccurred(new RuntimeException("Register failed."));
 						}
 						done = true;
 					}
@@ -193,21 +179,12 @@ public class DF implements IDF, IPlatformService
 					}
 					else
 					{
-						System.out.println("Reply received: "+reply);
+//						System.out.println("Reply received: "+reply);
 						if(reply.getPerformative()==ACLMessage.INFORM)
 						{
 							try
 							{
-								Result res = (Result)myAgent.getContentManager().extractContent(reply);
-								jade.util.leap.List descs = res.getItems();
-								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
-								IAMS ams = (IAMS)platform.getService(IAMS.class);
-								for(int i=0; i<ret.length; i++)
-								{
-									ret[i] = SJade.convertAgentDescriptiontoFipa(
-										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
-								}
-								listener.resultAvailable(ret);
+								listener.resultAvailable(null);
 							}
 							catch(Exception e)
 							{
@@ -216,7 +193,7 @@ public class DF implements IDF, IPlatformService
 						}
 						else
 						{
-							listener.exceptionOccurred(new RuntimeException("Search failed."));
+							listener.exceptionOccurred(new RuntimeException("Deregister failed."));
 						}
 						done = true;
 					}
@@ -293,21 +270,16 @@ public class DF implements IDF, IPlatformService
 					}
 					else
 					{
-						System.out.println("Reply received: "+reply);
+//						System.out.println("Reply received: "+reply);
 						if(reply.getPerformative()==ACLMessage.INFORM)
 						{
 							try
 							{
-								Result res = (Result)myAgent.getContentManager().extractContent(reply);
-								jade.util.leap.List descs = res.getItems();
-								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
-								IAMS ams = (IAMS)platform.getService(IAMS.class);
-								for(int i=0; i<ret.length; i++)
-								{
-									ret[i] = SJade.convertAgentDescriptiontoFipa(
-										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
-								}
-								listener.resultAvailable(ret);
+								Done done = (Done)myAgent.getContentManager().extractContent(reply);
+								Modify mod = (Modify)((Action)done.getAction()).getAction();
+								listener.resultAvailable(SJade.convertAgentDescriptiontoFipa(
+									(jade.domain.FIPAAgentManagement.DFAgentDescription)mod.getDescription(), 
+									(IAMS)platform.getService(IAMS.class)));
 							}
 							catch(Exception e)
 							{
@@ -316,7 +288,7 @@ public class DF implements IDF, IPlatformService
 						}
 						else
 						{
-							listener.exceptionOccurred(new RuntimeException("Search failed."));
+							listener.exceptionOccurred(new RuntimeException("Modify failed."));
 						}
 						done = true;
 					}
@@ -393,7 +365,7 @@ public class DF implements IDF, IPlatformService
 					}
 					else
 					{
-						System.out.println("Reply received: "+reply);
+//						System.out.println("Reply received: "+reply);
 						if(reply.getPerformative()==ACLMessage.INFORM)
 						{
 							try
@@ -427,7 +399,8 @@ public class DF implements IDF, IPlatformService
 					{
 						Search s = new Search();
 						s.setDescription(SJade.convertAgentDescriptiontoJade(adesc));
-						s.setConstraints(SJade.convertSearchConstraintstoJade(con));
+						s.setConstraints(con!=null? SJade.convertSearchConstraintstoJade(con): 
+							new jade.domain.FIPAAgentManagement.SearchConstraints());
 						Action ac = new Action();
 						ac.setActor(myAgent.getDefaultDF());
 						ac.setAction(s);
