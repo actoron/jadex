@@ -37,7 +37,7 @@
 	</plans>
 
 	<properties>
-		<property name="debugging">false</property>
+		<property name="debugging">true</property>
 	</properties>
 
 	<configurations>

@@ -555,6 +555,8 @@ public class OAVState	implements IOAVState
 //					}
 //				}
 //				ret = usages==null || instate;
+				// Hack! usages==null means that a new object is automatically considered
+				// to be in state to be able to add attributes to it.
 				ret	= usages==null || !usages.isEmpty();
 			}
 		}

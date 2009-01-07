@@ -408,8 +408,14 @@ public class BeliefRules
 			{
 				final ITimedObject[]	to	= new ITimedObject[1];
 				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
+				
 				to[0] = new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
 				{
+					public boolean isValid()
+					{
+						return state.containsObject(rparam);
+					}
+					
 					public void run()
 					{
 						Object	exp = state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value);
@@ -429,6 +435,12 @@ public class BeliefRules
 							((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
 							.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 					}
+					
+					// Not possible because rparam is not in state any more
+//					public void cleanup()
+//					{
+//						state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, null);
+//					}
 				});
 				
 		//			// changed *.class to *.TYPE due to javaflow bug

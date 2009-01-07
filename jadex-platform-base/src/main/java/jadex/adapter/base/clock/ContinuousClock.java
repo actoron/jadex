@@ -33,10 +33,6 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	/** The threadpool. */
 	protected IThreadPool threadpool;
 	
-	/** Continuous notification generator. */
-	// Hack???
-//	protected Executor notificator;
-	
 	//-------- constructors --------
 	
 	/**
@@ -380,28 +376,6 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 			}
 		});
 	}
-	
-	/**
-	 *  Create a notificator thread for continuously informing listeners.
-	 * /
-	protected Executor	createNotificator()
-	{
-		return new Executor(threadpool, new IExecutable()
-		{
-			public boolean execute()
-			{
-				try
-				{
-					Thread.sleep(100);
-				}
-				catch(InterruptedException e) {}
-				
-				notifyListeners();
-
-				return hasListeners() && STATE_RUNNING.equals(state);
-			}
-		});		
-	}*/
 	
 	/**
 	 *  Main for testing.

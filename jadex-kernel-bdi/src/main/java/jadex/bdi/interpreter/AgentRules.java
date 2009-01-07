@@ -2659,17 +2659,22 @@ public class AgentRules
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, ((IClockService)interpreter.getAgentAdapter().getPlatform()
 			.getService(IClockService.TYPE)).createTimer(tt, new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
 			{
+				public boolean isValid()
+				{
+					return state.containsObject(ragent);
+				}
+				
 				public void run()
 				{
 					// todo: test if already canceled?!
-					if(state.containsObject(ragent))
-					{
+//					if(state.containsObject(ragent))
+//					{
 						// todo: cleanup? or in terminated action?
 						getLogger(state, ragent).info("Forcing termination (timeout): "+interpreter.getAgentAdapter().getAgentIdentifier().getLocalName());
 						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 							OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
 						interpreter.getAgentAdapter().wakeup();
-					}
+//					}
 				}
 			})));
 	}

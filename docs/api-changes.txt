@@ -42,6 +42,8 @@ XML Changes:
 	  via parameters to the plan.
 	- The planlib has been restructured and capbilities have been moved (ams/df)
 	  and separated (protocols).
+	- The content-class default parameter for message events has been removed.
+	  Use a match expression with instanceof instead.
 
 Java Changes:
 	- The classes from jadex.runtime.* have moved to jadex.bdi.runtime.*
