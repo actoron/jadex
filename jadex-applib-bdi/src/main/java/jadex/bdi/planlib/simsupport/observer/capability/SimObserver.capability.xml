@@ -50,6 +50,11 @@
 			<fact>new Boolean(false)</fact>
 		</belief>
 		
+		<!-- Shift for the object marker -->
+		<belief name="marker_shift" class="IVector2" exported="true">
+			<fact>new Vector2Double(0.0)</fact>
+		</belief>
+		
 		<!-- List of themes for displaying objects -->
 		<belief name="object_themes" class="Map" exported="true">
 			<fact>Collections.synchronizedMap(new HashMap())</fact>
