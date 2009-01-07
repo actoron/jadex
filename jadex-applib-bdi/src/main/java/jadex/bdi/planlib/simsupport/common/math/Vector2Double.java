@@ -184,8 +184,11 @@ public class Vector2Double implements IVector2, Cloneable
 	public IVector2 normalize()
 	{
 		double length = Math.sqrt((x_ * x_) + (y_ * y_));
-		x_ /= length;
-		y_ /= length;
+		if (length != 0.0)
+		{
+			x_ /= length;
+			y_ /= length;
+		}
 		return this;
 	}
 
