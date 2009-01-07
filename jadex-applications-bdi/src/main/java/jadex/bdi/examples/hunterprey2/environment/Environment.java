@@ -160,7 +160,7 @@ public class Environment implements IEnvironment
 	 * Create a sim object
 	 * @return the sim object with new sim id
 	 */
-	private WorldObject createSimObject(WorldObject wo, String type, Map properties, List tasks, Boolean sigDes, Boolean listen)
+	private synchronized WorldObject createSimObject(WorldObject wo, String type, Map properties, List tasks, Boolean sigDes, Boolean listen)
 	{
 		assert agent != null : this + " - no external access provided";
 		
@@ -191,7 +191,7 @@ public class Environment implements IEnvironment
 	 * @param wo
 	 * @return
 	 */
-	private WorldObject destroySimObject(WorldObject wo)
+	private synchronized WorldObject destroySimObject(WorldObject wo)
 	{
 		assert agent != null : this + " - no external access provided";
 		
@@ -208,12 +208,20 @@ public class Environment implements IEnvironment
 		assert agent != null : this + " - no external access provided";
 		
 		IVector2 destination = createLocation(me.getLocation(), dir).getAsIVector();
+		
+		System.out.println("Destination-Vector:"+destination);
+		
 		// request simulation engine move
-		IGoal goToDest = agent.createGoal("sim_go_to_destination");
+//		IGoal goToDest = agent.createGoal("sim_go_to_destination");
+//		goToDest.getParameter("object_id").setValue(me.getSimId());
+//		goToDest.getParameter("destination").setValue(destination);
+//		goToDest.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
+//		goToDest.getParameter("tolerance").setValue(new Vector1Double(0.01));
+//		
+		IGoal goToDest = agent.createGoal("sim_go_to_precise_destination");
 		goToDest.getParameter("object_id").setValue(me.getSimId());
 		goToDest.getParameter("destination").setValue(destination);
 		goToDest.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
-		goToDest.getParameter("tolerance").setValue(new Vector1Double(0.01));
 
 		return goToDest;
 	}
@@ -478,7 +486,7 @@ public class Environment implements IEnvironment
 	public synchronized Creature addCreature(Creature creature)
 	{
 		Creature copy;
-		
+				
 		if(!creatures.containsKey(creature))
 		{
 			copy = (Creature) creature.clone();
@@ -585,6 +593,7 @@ public class Environment implements IEnvironment
 			Object[] params = (Object[])tasks[i].getAction();
 			if(params[0].equals("move"))
 			{
+			
 				if(!acted.contains(params[1]) && move((Creature)params[1], (String)params[2]))
 				{
 					tasks[i].setResult(getMoveGoal((Creature)params[1], (String)params[2]));
@@ -860,7 +869,7 @@ public class Environment implements IEnvironment
 	 *  Get an empty location.
 	 *  @return The location.
 	 */
-	public Location getEmptyLocation(IVector2 edgedistance)
+	public synchronized Location getEmptyLocation(IVector2 edgedistance)
 	{
 		Location	ret	= null;
 		while(ret==null)

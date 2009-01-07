@@ -15,6 +15,7 @@
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.Vector1Int</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.Vector2Double</import>
 		<import>jadex.bdi.examples.hunterprey2.*</import>
 		<import>jadex.bdi.examples.hunterprey2.engine.*</import>
 		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
@@ -65,7 +66,7 @@
 			<concrete ref="procap.rp_filter"/>
 		</beliefref>
 
-		<!-- food spawn rate (in salads every x seconds) -->
+		<!-- food spawn rate (in salad every x rounds) -->
 		<belief name="food_spawn_rate" class="IVector1" exported="true">
 			<fact>new Vector1Int(10)</fact>
 		</belief>
@@ -123,6 +124,11 @@
 		</beliefref>
 		<beliefref name="worldmap">
 			<concrete ref="obscap.canvas"/>
+		</beliefref>
+		
+		<!-- Shift for the objects -->
+		<beliefref name="object_shift">
+			<concrete ref="obscap.object_shift"/>
 		</beliefref>
 	
 	</beliefs>
@@ -194,6 +200,10 @@
     	
     	<performgoalref name="sim_go_to_destination">
     		<concrete ref="simcap.sim_go_to_destination"/>
+		</performgoalref>
+		
+		<performgoalref name="sim_go_to_precise_destination">
+    		<concrete ref="simcap.sim_go_to_precise_destination"/>
 		</performgoalref>
 		
 		<achievegoalref name="sim_remove_task">
@@ -468,7 +478,13 @@
 					<fact>"default"</fact>
 				</initialbelief>
 				<initialbelief ref="custom_gui">
-					<fact>new Boolean(true)</fact>
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="force_java2d">
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="object_shift">
+					<fact>new Vector2Double(0.5)</fact>
 				</initialbelief>
 				
 			</beliefs>

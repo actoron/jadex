@@ -13,6 +13,7 @@ import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -51,7 +52,7 @@ public class EnvironmentGui	extends JFrame
 //	protected MapPanel	map;
 	
 	/** The canvas provided by observer capability */
-	protected JPanel map;
+	protected Component map;
 	
 	/** The round counter label. */
 	protected JLabel	roundcnt;
@@ -85,23 +86,19 @@ public class EnvironmentGui	extends JFrame
 		
 		if (worldmap != null)
 		{
-			// create JPanel container with world map
-			
-			this.map = new JPanel();
-			worldmap.setMinimumSize(new Dimension(300, 300));
-			worldmap.setPreferredSize(new Dimension(600, 600));
-			map.setMinimumSize(new Dimension(300, 300));
-			map.setPreferredSize(new Dimension(600, 600));
-			map.add(worldmap);
+			this.map = worldmap;
 		}
 		else
 		{
 			// Map panel.
 			this.map	= new MapPanel();
-			map.setMinimumSize(new Dimension(300, 300));
+			// only to use not the custom gui display
 			map.setPreferredSize(new Dimension(600, 600));
 		}
-		
+		map.setMinimumSize(new Dimension(300, 300));
+		map.setSize(new Dimension(600, 600));
+		// since 1.5 !
+		//map.setPreferredSize(new Dimension(600, 600));
 		
 		
 		JPanel options = createOptionsPanel(agent);

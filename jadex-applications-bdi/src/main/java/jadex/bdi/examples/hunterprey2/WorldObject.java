@@ -1,9 +1,7 @@
 package jadex.bdi.examples.hunterprey2;
 
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
+import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 
 
 /**
@@ -13,7 +11,7 @@ public class WorldObject
 {
 	//-------- static attributes --
 	
-	public static IVector2 WORLD_OBJECT_SIZE = new Vector2Int(1);
+	public static IVector2 WORLD_OBJECT_SIZE = new Vector2Double(1);
 	
 	//-------- attributes ----------
 
@@ -117,17 +115,17 @@ public class WorldObject
 	}
 	
 	// ---- sim support methods ----
-	/**
-	 * returns a IDrawable for a world object with image path
-	 * packageName + lowercase ClassName + ".png".
-	 */
-	public IDrawable getDrawable() {
-		String imgPath 	= 	WorldObject.class.getName();
-		imgPath			=	imgPath.replace(imgPath.substring(imgPath.lastIndexOf(".")), ".images.").replaceAll("\\.", "/");
-		
-		String className = this.getClass().getName();
-		String simpleClassName = className.substring(className.lastIndexOf("."));
-		
-		return new TexturedRectangle(WORLD_OBJECT_SIZE, imgPath + simpleClassName + ".png", false);
-	}
+//	/**
+//	 * returns a IDrawable for a world object with image path
+//	 * packageName + lowercase ClassName + ".png".
+//	 */
+//	public IDrawable getDrawable() {
+//		String imgPath 	= 	WorldObject.class.getName();
+//		imgPath			=	imgPath.replace(imgPath.substring(imgPath.lastIndexOf(".")), ".images.").replaceAll("\\.", "/");
+//		
+//		String className = this.getClass().getName();
+//		String simpleClassName = className.substring(className.lastIndexOf("."));
+//		
+//		return new TexturedRectangle(WORLD_OBJECT_SIZE, imgPath + simpleClassName + ".png", false);
+//	}
 }

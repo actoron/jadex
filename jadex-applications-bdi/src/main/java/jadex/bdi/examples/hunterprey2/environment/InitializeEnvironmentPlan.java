@@ -7,8 +7,10 @@ import jadex.bdi.examples.hunterprey2.Location;
 import jadex.bdi.examples.hunterprey2.Obstacle;
 import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
+import jadex.bdi.planlib.simsupport.common.graphics.drawable.Rectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RegularPolygon;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
+import jadex.bdi.planlib.simsupport.common.graphics.layer.GridLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
@@ -143,33 +145,61 @@ public class InitializeEnvironmentPlan extends Plan
 		// TODO: use beliefs and initial beliefs
 		getBeliefbase().getBelief("environment_name_obs").setFact(Configuration.ENVIRONMENT_NAME);
 		getBeliefbase().getBelief("preserve_aspect_ratio").setFact(Boolean.TRUE);
-		getBeliefbase().getBelief("force_java2d").setFact(Boolean.FALSE);
+		//getBeliefbase().getBelief("force_java2d").setFact(Boolean.FALSE);
 		
 		Map theme = new HashMap();
 		
 		String imgPath = this.getClass().getPackage().getName().replaceAll("environment", "").concat("images.").replaceAll("\\.", "/");
 		
-		DrawableCombiner hunterDrawable = new DrawableCombiner();
+//		DrawableCombiner hunterDrawable = new DrawableCombiner();
+//		String hunterImage = imgPath.concat("hunter.png");
+//		hunterDrawable.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false));
+//		hunterDrawable.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, hunterImage, false));
+//		theme.put(Environment.OBJECT_TYPE_HUNTER, hunterDrawable);
+//		
+		DrawableCombiner hunterCombiner = new DrawableCombiner();
 		String hunterImage = imgPath.concat("hunter.png");
-		hunterDrawable.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false));
-		hunterDrawable.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, hunterImage, false));
-		theme.put(Environment.OBJECT_TYPE_HUNTER, hunterDrawable);
+		//hunterCombiner.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
+		//hunterCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f)), -1);
+		for (int i=Creature.CREATURE_VISUAL_RANGE.getAsInteger()-1; i > 0 ; i--)
+		{
+			float alpha = (float) (0.1f + (0.5 * 1 / Creature.CREATURE_VISUAL_RANGE.getAsInteger()));
+			//hunterCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
+			hunterCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
+		}
+		hunterCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, false, hunterImage), 0);
+		theme.put(Environment.OBJECT_TYPE_HUNTER, hunterCombiner);
 		
-		DrawableCombiner preyDrawable = new DrawableCombiner();
+//		DrawableCombiner preyDrawable = new DrawableCombiner();
+//		String preyImage = imgPath.concat("prey.png");
+//		preyDrawable.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false));
+//		preyDrawable.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, preyImage, false));
+//		theme.put(Environment.OBJECT_TYPE_PREY, preyDrawable);
+		
+		DrawableCombiner preyCombiner = new DrawableCombiner();
 		String preyImage = imgPath.concat("prey.png");
-		preyDrawable.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false));
-		preyDrawable.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, preyImage, false));
-		theme.put(Environment.OBJECT_TYPE_PREY, preyDrawable);
+		//preyCombiner.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
+		//preyCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f)), -2);
+		for (int i=Creature.CREATURE_VISUAL_RANGE.getAsInteger()-1; i > 0 ; i--)
+		{
+			float alpha = (float) (0.1f + (0.5 * 1 / Creature.CREATURE_VISUAL_RANGE.getAsInteger()));
+			//hunterCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
+			preyCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
+		}
+		preyCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, Configuration.OBJECT_SHIFT, false, preyImage), 0);
+		theme.put(Environment.OBJECT_TYPE_PREY, preyCombiner);
 		
-		DrawableCombiner foodDrawable = new DrawableCombiner();
+		DrawableCombiner foodCombiner = new DrawableCombiner();
 		String foodImage = imgPath.concat("food.png");
-		//IDrawable foodDrawable = new ScalableTexturedRectangle(new Vector2Double(0.5), foodImage);
-		foodDrawable.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE, foodImage, false));
-		theme.put(Environment.OBJECT_TYPE_FOOD, foodDrawable);
+//		foodCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE, foodImage, false));
+		foodCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.7), false, foodImage), -1);
+		theme.put(Environment.OBJECT_TYPE_FOOD, foodCombiner);
 		
-		DrawableCombiner obstacleDrawable = new DrawableCombiner();
-		obstacleDrawable.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE, imgPath + "obstacle.png", false));
-		theme.put(Environment.OBJECT_TYPE_OBSTACLE, obstacleDrawable);
+		DrawableCombiner obstacleCombiner = new DrawableCombiner();
+		String obstacleImage = imgPath.concat("obstacle.png");
+//		obstacleDrawable.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE, imgPath + "obstacle.png", false));
+		obstacleCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.9), false, obstacleImage), 1);
+		theme.put(Environment.OBJECT_TYPE_OBSTACLE, obstacleCombiner);
 		
 		
 		Map themes = (Map) getBeliefbase().getBelief("object_themes").getFact();
@@ -180,6 +210,7 @@ public class InitializeEnvironmentPlan extends Plan
 		
 		List preLayerTheme = new ArrayList();
 		preLayerTheme.add(background);
+		preLayerTheme.add(new GridLayer(new Vector2Double(1.0), Color.BLACK));
 		Map preLayerThemes = (Map) getBeliefbase().getBelief("prelayer_themes").getFact();
 		preLayerThemes.put("default", preLayerTheme);
 		

@@ -20,5 +20,6 @@ public class Configuration
 	 */
 	public static final IVector1 REACH_DISTANCE = new Vector1Double(0.2);
 	
-	
+	/** The observer graphic object shift -> 0.5 */
+	public static final IVector2 OBJECT_SHIFT = new Vector2Double(0.5);
 }

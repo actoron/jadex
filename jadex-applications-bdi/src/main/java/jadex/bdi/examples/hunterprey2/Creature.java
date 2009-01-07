@@ -22,7 +22,7 @@ public abstract class Creature extends WorldObject
 	
 	/** Creature size
 	 */
-	public static final IVector1 CREATURE_VISUAL_RANGE = new Vector1Double(4.0);
+	public static final IVector1 CREATURE_VISUAL_RANGE = new Vector1Double(4.5);
 	public static final IVector2 CREATURE_SIZE = new Vector2Double(1.0);
 	public static final IVector1 CREATURE_SPEED = new Vector1Double(2.0);
 
