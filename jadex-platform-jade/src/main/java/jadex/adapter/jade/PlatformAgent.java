@@ -7,7 +7,9 @@ import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.wrapper.gateway.GatewayAgent;
 
 /**
- * 
+ *  Agent that is used by platform services to excute
+ *  agent-related functionalities like message sending.
+ *  Is used via the JADE gateway method.
  */
 public class PlatformAgent extends GatewayAgent
 {

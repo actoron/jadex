@@ -90,6 +90,7 @@ public class AMS implements IAMS, IPlatformService
 	 */
 	public void	createAgent(final String name, final String model, String config, Map args, IResultListener lis)
 	{
+//		System.out.println("Create agent: "+name);
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		IAgentIdentifier aid = null;
 		AMSAgentDescription ad = null;
@@ -211,7 +212,7 @@ public class AMS implements IAMS, IPlatformService
 				
 		try
 		{
-			AgentController ac = platform.getPlatformController().createNewAgent(getShortName(model), "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
+			AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
 			// Hack!!! Bug in JADE not returning created agent's AID.
 			// Should do ams_search do get correct AID?
 			AID tmp = (AID)platform.getPlatformAgent().clone();
@@ -242,6 +243,7 @@ public class AMS implements IAMS, IPlatformService
 			alisteners[i].agentAdded(ad);
 		}
 		
+//		System.out.println("Created agent: "+aid);
 		listener.resultAvailable(aid); 
 	}
 

@@ -166,7 +166,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	public abstract String getTimestampIdentifier();
 
 	/**
-	 *  Get the en/decode info (important ) for a parameter/set.
+	 *  Get the en/decode info (important) for a parameter/set.
 	 *  @param The name of the parameter/set.
 	 *  @return The en/decode infos.
 	 */
@@ -178,7 +178,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	 *  @param message	The message.
 	 *  @param param	The parameter to be (en/de)coded.
 	 */
-	public IContentCodec	findContentCodec(IContentCodec[] codecs, Map message, String param)
+	public IContentCodec findContentCodec(IContentCodec[] codecs, Map message, String param)
 	{
 		IContentCodec	ret	= null;
 		String[] infos = getCodecInfos(param);
@@ -192,6 +192,36 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 					props = new java.util.Properties();
 				props.put(infos[i], message.get(infos[i]));
 			}
+		}
+		
+		if(props!=null && codecs!=null)
+		{
+			for(int i=0; ret==null && i<codecs.length; i++)
+			{
+				if(codecs[i].match(props))
+					ret	= codecs[i];
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Find a matching content codec for a given message parameter.
+	 *  @param codecs	The available codecs.
+	 *  @param message	The message.
+	 *  @param param	The parameter to be (en/de)coded.
+	 */
+	public IContentCodec findContentCodec(IContentCodec[] codecs, IMessageAdapter message, String param)
+	{
+		IContentCodec	ret	= null;
+		String[] infos = getCodecInfos(param);
+		java.util.Properties props = null;
+		
+		props = new java.util.Properties();
+		for(int i=0; i<infos.length; i++)
+		{
+			props.put(infos[i], message.getValue(infos[i]));
 		}
 		
 		if(props!=null && codecs!=null)

@@ -7,6 +7,8 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -22,8 +24,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 	
 	protected IAMS ams;
 	
-	/** The Jadex agent is used to access the logger. */
-	//protected IJadexAgent	jadexagent;
+	protected Map decvals;
 
 	//-------- constructors --------
 
@@ -34,7 +35,6 @@ public class JadeMessageAdapter implements IMessageAdapter
 	{
 		this.message = message;
 		this.ams = ams;
-		//this.jadexagent	= agent;
 	}
 
 	//-------- methods --------
@@ -45,8 +45,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 	 */
 	public MessageType getMessageType()
 	{
-		// todo:!!!
-		return null; 
+		return SFipa.FIPA_MESSAGE_TYPE;
 	}
 	
 	/**
@@ -69,7 +68,11 @@ public class JadeMessageAdapter implements IMessageAdapter
 		Object ret = null;
 		ACLMessage message = (ACLMessage)getMessage();
 
-		if(name.equals(SFipa.ENCODING))
+		if(decvals!=null && decvals.containsKey(name))
+		{	
+			ret = decvals.get(name);
+		}
+		else if(name.equals(SFipa.ENCODING))
 		{
 			ret = message.getEncoding();
 		}
@@ -154,80 +157,21 @@ public class JadeMessageAdapter implements IMessageAdapter
 	 */
 	public Map getParameterMap()
 	{
-		return null;
+		// todo:
+		throw new UnsupportedOperationException();
 	}
-
-
+	
 	/**
-	 *  Get the value for a parameter, or the values
-	 *  for a parameter set from a native message.
-	 *  Parameter set values can be provided as array, collection,
-	 *  iterator or enumeration.
-	 * /
-	public Object	getValue(String name, RCapability scope)
+	 *  Set a decoded value (e.g. content).
+	 *  @param name The name.
+	 *  @param value The value.
+	 */
+	public void setDecodedValue(String name, Object value)
 	{
-		Object ret = super.getValue(name, scope);
-
-		// Treat action-class as parameter of jade message.
-		if(name.equals(SFipa.ACTION_CLASS) && ret instanceof Action)
-			ret = ((Action)ret).getAction().getClass();
-
-		return ret;
-	}*/
-
-	/**
-	 *  Get the value for a parameter, or the values
-	 *  for a parameter set from a native message.
-	 *  Parameter set values can be provided as array, collection,
-	 *  iterator or enumeration.
-	 * /
-	public Object	getValue(String name)
-	{
-		Object val;
-		// Todo: implement generically for all message types.
-		if(SFipa.CONTENT.equals(name))
-		{
-			if(content!=null)
-			{
-				val	= content;
-			}
-			else if((val=getRawValue(name)) != null)
-			{
-				String lang = (String)getValue(SFipa.LANGUAGE);
-				String onto = (String)getValue(SFipa.ONTOLOGY);
-				if(lang!=null && onto!=null)
-				{
-					try
-					{
-						Properties props = new Properties();
-						props.setProperty(SFipa.LANGUAGE, lang);
-						props.setProperty(SFipa.ONTOLOGY, onto);
-
-						IContentCodec codec = agent.getContentCodec(props);
-						val = codec.decode((String)val);
-					}
-					catch(Exception e)
-					{
-						try
-						{
-							val = jadeagent.getContentManager().extractContent((ACLMessage)getMessage());
-						}
-						catch(Exception e2)
-						{
-							val = new ContentException(e2.getMessage()+"\n"+getMessage(), e2);
-						}
-					}
-					content	= val;
-				}
-			}
-		}
-		else
-		{
-			val = getRawValue(name);
-		}
-
-		return val;
-	}*/
+		if(decvals==null)
+			decvals = new HashMap();
+		decvals.put(name, value);
+	}
 
 	/**
 	 *  Get the string representation.

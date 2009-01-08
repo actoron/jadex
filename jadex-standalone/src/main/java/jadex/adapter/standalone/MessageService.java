@@ -3,7 +3,6 @@ package jadex.adapter.standalone;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;

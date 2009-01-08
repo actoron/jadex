@@ -19,6 +19,7 @@ import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;
 import jadex.commons.ICommand;
@@ -79,6 +80,7 @@ public class Platform implements IPlatform
 		services.put(IDF.class, new DF(this));
 		services.put(IClockService.class, new ClockService(new SystemClock("system", 1000, threadpool), this));
 		services.put(ISimulationService.class, new SimulationService(this));
+		services.put(IMessageService.class, new MessageService(this));
 		// Dummy execution service required for simulation service.
 		services.put(IExecutionService.class, new IExecutionService()
 		{

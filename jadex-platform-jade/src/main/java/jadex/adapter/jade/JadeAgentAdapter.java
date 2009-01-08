@@ -43,7 +43,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	//-------- attributes --------
 
 	/** The platform. */
-	protected transient IPlatform	platform;
+	protected transient Platform	platform;
 
 	/** The agent identifier. */
 //	protected IAgentIdentifier	aid;
@@ -188,7 +188,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 		addBehaviour(agendacontrol);
 //		this.timing	= new TimingBehaviour(agent, clock);
 //		addBehaviour(timing);
-		this.mesrec	= new MessageReceiverBehaviour(agent, (IAMS)platform.getService(IAMS.class));
+		this.mesrec	= new MessageReceiverBehaviour(platform, agent, (IAMS)platform.getService(IAMS.class));
 		addBehaviour(mesrec);
 
 		//try{Thread.sleep(20000);}catch(Exception e){}

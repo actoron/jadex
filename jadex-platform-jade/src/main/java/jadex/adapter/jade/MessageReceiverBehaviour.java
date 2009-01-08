@@ -5,13 +5,18 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.MessageTemplate.MatchExpression;
 import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.bridge.DefaultMessageAdapter;
+import jadex.bridge.IContentCodec;
 import jadex.bridge.IKernelAgent;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 import nuggets.Nuggets;
 
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -31,8 +36,18 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	/** The message preprocessors property identifier. */
 //	public static final String	PROPERTY_TOOL_ADAPTERS	= "tooladapter";
 
+	/** The default codecs. */
+	protected static IContentCodec[]	DEFCODECS	= new IContentCodec[]
+	{
+		new jadex.adapter.base.JavaXMLContentCodec(),
+		new jadex.adapter.base.NuggetsXMLContentCodec()
+	};
+	
 	// -------- attributes --------
 
+	/** The platform. */
+	protected Platform platform;
+	
 	/** The jadex agent. */
 	protected IKernelAgent		agent;
 
@@ -54,8 +69,9 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	 * Create the message receiver behaviour.
 	 * @param agent The bdi agent.
 	 */
-	public MessageReceiverBehaviour(IKernelAgent agent, IAMS ams)
+	public MessageReceiverBehaviour(Platform platform, IKernelAgent agent, IAMS ams)
 	{
+		this.platform = platform;
 		this.agent = agent;
 		this.ams = ams;
 
@@ -118,7 +134,23 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 //				IMessageAdapter ma = new DefaultMessageAdapter();
 //				agent.messageArrived(ma);
 				
-				agent.messageArrived(new JadeMessageAdapter(msg, ams));
+				JadeMessageAdapter ma = new JadeMessageAdapter(msg, ams);
+				
+				// Conversion via platform specific codecs
+				String[] params = ma.getMessageType().getParameterNames();
+				for(int i=0; i<params.length; i++)
+				{
+					IContentCodec codec = ma.getMessageType().findContentCodec(DEFCODECS, ma, params[i]);
+					if(codec!=null)
+					{
+						// todo: use agent specific classloader
+						ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+						ma.setDecodedValue(params[i], codec.decode((String)ma.getValue(params[i]), cl));
+					}
+				}
+				// todo: sets?
+				
+				agent.messageArrived(ma);
 			}
 		}
 	}
