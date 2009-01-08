@@ -1,0 +1,86 @@
+<!--
+	<H3>TranslationAgent: Lesson F3.</H3>
+	Using the DF to register a service.
+	<H4>Explanation</H4>
+	This example shows how an agent description
+	can be registered at a directory facilitator (DF).
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-0.96.xsd"
+	name="TranslationF3"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>java.util.logging.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- Include the directory facilitator capability under the name dfcap. -->
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
+		<!-- Include the translation capability under the name transcap. -->
+		<capability name="transcap" file="jadex.bdi.tutorial.TranslationD1"/>
+	</capabilities>
+
+	<goals>
+		<!-- Make the keep registered goal available. -->
+		<maintaingoalref name="df_keep_registered">
+			<concrete ref="dfcap.df_keep_registered"/>
+		</maintaingoalref>
+
+		<!-- Make the register goal available. -->
+		<!-- <achievegoalref name="df_register">
+			<concrete ref="dfcap.df_register"/>
+		</achievegoalref> -->
+
+		<!-- Make the deregister goal available. -->
+		<!--  <achievegoalref name="df_deregister">
+			<concrete ref="dfcap.df_deregister"/>
+		</achievegoalref> -->
+	</goals>
+
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+		<property name="logging.level">Level.INFO</property>
+ 		<!-- The default parent handler prints out log messages on the console. -->
+		<property name="logging.useParentHandlers">true</property>
+		<!--<property name="debugging">true</property>-->
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="df_keep_registered">
+					<parameter ref="description">
+						<value>
+							((IDF)$scope.getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+								.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
+ 						</value>
+					</parameter>
+					<parameter ref="leasetime">
+						<value>20000</value>
+					</parameter>
+				</initialgoal>
+				 
+				<!-- Initial goal to register the agent at startup. - ->
+				<initialgoal ref="df_register">
+					<parameter ref="description">
+						<value>
+ 							SFipa.createAgentDescription(null,
+							SFipa.createServiceDescription("service_translate",
+			 				"translate english_german", "University of Hamburg"))
+ 						</value>
+					</parameter>
+				</initialgoal>-->
+				
+				<!-- End goal to deregister the agent at shutdown. - ->
+				<endgoal ref="df_deregister"/>-->
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+
