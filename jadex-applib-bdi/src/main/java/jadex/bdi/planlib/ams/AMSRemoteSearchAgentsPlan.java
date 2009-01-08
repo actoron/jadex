@@ -4,6 +4,7 @@ import jadex.adapter.base.fipa.AMSSearchAgents;
 import jadex.adapter.base.fipa.Done;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.ISearchConstraints;
+import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -25,6 +26,7 @@ public class AMSRemoteSearchAgentsPlan extends Plan
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("ams").getValue());
 		req.getParameter("action").setValue(sa);
+		req.getParameter("ontology").setValue(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME);
 		dispatchSubgoalAndWait(req);
 
 		getParameterSet("result").addValues(((AMSSearchAgents)((Done)req.getParameter("result")

@@ -71,8 +71,8 @@ public class Platform implements IPlatform
 		// Hack!!!
 		platform = this;
 		
-		this.logger = Logger.getLogger("Platform_" + getName());
 		this.threadpool = ThreadPoolFactory.createThreadPool();
+		this.logger = Logger.getLogger("JADE_Platform");
 		this.services = new LinkedHashMap();
 		services.put(ILibraryService.class, new LibraryService());
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
@@ -175,7 +175,7 @@ public class Platform implements IPlatform
 	 */
 	public String getName()
 	{
-		return "todo";
+		return platformagent.getHap();
 	}
 	
 	/**

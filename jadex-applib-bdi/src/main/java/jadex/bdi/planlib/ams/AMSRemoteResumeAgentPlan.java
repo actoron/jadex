@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.ams;
 
 import jadex.adapter.base.fipa.AMSResumeAgent;
+import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IAgentIdentifier;
@@ -22,6 +23,7 @@ public class AMSRemoteResumeAgentPlan extends Plan
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("ams").getValue());
 		req.getParameter("action").setValue(ra);
+		req.getParameter("ontology").setValue(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME);
 		dispatchSubgoalAndWait(req);
 	}
 }

@@ -1,7 +1,20 @@
 package jadex.adapter.jade;
 
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
+import jadex.adapter.base.fipa.AMSCreateAgent;
+import jadex.adapter.base.fipa.AMSDestroyAgent;
+import jadex.adapter.base.fipa.AMSResumeAgent;
+import jadex.adapter.base.fipa.AMSSearchAgents;
+import jadex.adapter.base.fipa.AMSShutdownPlatform;
+import jadex.adapter.base.fipa.AMSStartAgent;
+import jadex.adapter.base.fipa.AMSSuspendAgent;
+import jadex.adapter.base.fipa.DFDeregister;
+import jadex.adapter.base.fipa.DFModify;
+import jadex.adapter.base.fipa.DFRegister;
+import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
@@ -63,7 +76,7 @@ public class MessageService implements IMessageService
 	public MessageService(Platform platform)
 	{
 		this.platform = platform;
-		this.logger = Logger.getLogger("MessageService" + this);
+		this.logger = Logger.getLogger("JADE_Platform.mts");
 	}
 	
 	//-------- interface methods --------
@@ -107,6 +120,39 @@ public class MessageService implements IMessageService
 		if(receivers==null || receivers==new IAgentIdentifier[0])
 		{
 			throw new RuntimeException("Receivers must not be empty: "+message);
+		}
+
+		// Hack!!! Convert Jadex/Nuggets AMS/DF messages to FIPA.
+		if(type.equals(SFipa.FIPA_MESSAGE_TYPE))
+		{
+			if(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME.equals(message.get(SFipa.ONTOLOGY)))
+			{
+				IDFAgentDescription	dfadesc	= null;
+				if(message.get(SFipa.CONTENT) instanceof DFRegister)
+					dfadesc	= ((DFRegister)message.get(SFipa.CONTENT)).getAgentDescription();
+				else if(message.get(SFipa.CONTENT) instanceof DFModify)
+					dfadesc	= ((DFModify)message.get(SFipa.CONTENT)).getAgentDescription();
+				else if(message.get(SFipa.CONTENT) instanceof DFSearch)
+					dfadesc	= ((DFSearch)message.get(SFipa.CONTENT)).getAgentDescription();
+				else if(message.get(SFipa.CONTENT) instanceof DFDeregister)
+					dfadesc	= ((DFDeregister)message.get(SFipa.CONTENT)).getAgentDescription();
+				
+				if(dfadesc!=null)
+				{
+					DFAgentDescription	dfadesc_jade	= SJade.convertAgentDescriptiontoJade(dfadesc);
+				}
+			}
+			
+			if(message.get(SFipa.CONTENT) instanceof AMSCreateAgent
+				|| message.get(SFipa.CONTENT) instanceof AMSStartAgent
+				|| message.get(SFipa.CONTENT) instanceof AMSDestroyAgent
+				|| message.get(SFipa.CONTENT) instanceof AMSSuspendAgent
+				|| message.get(SFipa.CONTENT) instanceof AMSResumeAgent
+				|| message.get(SFipa.CONTENT) instanceof AMSSearchAgents
+				|| message.get(SFipa.CONTENT) instanceof AMSShutdownPlatform)
+			{
+				throw new RuntimeException("Not yet supported.");
+			}
 		}
 
 		// Conversion via platform specific codecs

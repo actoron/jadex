@@ -2,6 +2,7 @@ package jadex.bdi.planlib.ams;
 
 import jadex.adapter.base.fipa.AMSCreateAgent;
 import jadex.adapter.base.fipa.Done;
+import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -28,6 +29,7 @@ public class AMSRemoteCreateAgentPlan extends Plan
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("ams").getValue());
 		req.getParameter("action").setValue(ca);
+		req.getParameter("ontology").setValue(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME);
 		dispatchSubgoalAndWait(req);
 
 		getParameter("agentidentifier").setValue(((AMSCreateAgent)((Done)req.getParameter("result").getValue()).getAction()).getAgentIdentifier());

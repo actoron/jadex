@@ -73,11 +73,11 @@ public class AMS implements IAMS, IPlatformService
 		this.platform = platform;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 //		this.agentdescs = Collections.synchronizedMap(SCollection.createHashMap());
-		this.logger = Logger.getLogger(platform.getName()+".ams");
+		this.logger = Logger.getLogger("JADE_Platform.ams");
 		this.listeners = SCollection.createArrayList();
     }
 
-    //-------- IMAS interface methods --------
+    //-------- IAMS interface methods --------
     
 	/**
 	 *  Create a new agent on the platform.
@@ -88,7 +88,7 @@ public class AMS implements IAMS, IPlatformService
 	 *  @param confi The configuration.
 	 *  @param args The arguments map (name->value).
 	 */
-	public void	createAgent(final String name, final String model, String config, Map args, IResultListener lis)
+	public void	createAgent(String name, String model, String config, Map args, IResultListener lis)
 	{
 //		System.out.println("Create agent: "+name);
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
@@ -109,9 +109,16 @@ public class AMS implements IAMS, IPlatformService
 //			//throw new RuntimeException("No new agents may be created when platform is shutting down.");
 //		}
 
-		final List argus = args==null? new ArrayList(): new ArrayList(args.values());
-		argus.add(0, model);
-		argus.add(1, config==null? "default": config);
+		if(name==null)
+		{
+			name = generateAgentName(getShortName(model));
+		}
+
+		List argus = new ArrayList();
+		argus.add(model);
+		argus.add(config==null? "default": config);
+		if(args!=null)
+			argus.add(args);	// Jadex argument map is supplied as 3rd index in JADE argument array.  
 				
 //		Event e = new Event(-1, new SimpleBehaviour()
 //		{
@@ -903,11 +910,11 @@ public class AMS implements IAMS, IPlatformService
 	}
 	
 	/**
-	 *  Create an agent identifier that is allowed on the platform.
+	 *  Create an agent name that is not yet used on the platform.
 	 *  @param typename The type name.
-	 *  @return The agent identifier.
+	 *  @return The agent name.
 	 */
-	protected AgentIdentifier generateAgentIdentifier(String typename)
+	protected String generateAgentName(String typename)
 	{
 		AgentIdentifier ret = null;
 
@@ -920,11 +927,7 @@ public class AMS implements IAMS, IPlatformService
 			while(adapters.containsKey(ret));
 		}
 		
-		IMessageService	ms	= (IMessageService)platform.getService(IMessageService.class);
-		if(ms!=null)
-			ret.setAddresses(ms.getAddresses());
-
-		return ret;
+		return ret.getLocalName();
 	}
 	
 	//-------- listener methods --------

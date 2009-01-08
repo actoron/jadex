@@ -1,9 +1,11 @@
 package jadex.adapter.jade;
 
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.MessageTemplate.MatchExpression;
+import jadex.adapter.base.fipa.FIPAMessageType;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
@@ -149,6 +151,15 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 					}
 				}
 				// todo: sets?
+				
+				// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
+				if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
+				{
+					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
+					{
+						// todo...
+					}
+				}
 				
 				agent.messageArrived(ma);
 			}
