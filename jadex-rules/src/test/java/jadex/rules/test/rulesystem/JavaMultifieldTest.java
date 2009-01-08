@@ -1,24 +1,10 @@
 package jadex.rules.test.rulesystem;
 
-import jadex.rules.parser.conditions.ClipsJadexLexer;
-import jadex.rules.parser.conditions.ClipsJadexParser;
-import jadex.rules.rulesystem.IAction;
-import jadex.rules.rulesystem.ICondition;
-import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.RuleSystem;
-import jadex.rules.rulesystem.Rulebase;
-import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
-import jadex.rules.rulesystem.rules.Rule;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.javaimpl.OAVState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
 
 /**
  *  Test if conditions on Java objects are working.

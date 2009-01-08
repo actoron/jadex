@@ -1,7 +1,6 @@
 package jadex.rules.test.state;
 
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.javaimpl.OAVState;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;

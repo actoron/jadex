@@ -14,7 +14,6 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVState;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;

@@ -2,6 +2,7 @@ package jadex.rules.test;
 
 import jadex.rules.test.rulesystem.BetaTest2;
 import jadex.rules.test.rulesystem.CollectNodeTest;
+import jadex.rules.test.rulesystem.DuplicateActivationsTestFail;
 import jadex.rules.test.rulesystem.EqualJoinTest;
 import jadex.rules.test.rulesystem.FunctionTest;
 import jadex.rules.test.rulesystem.JavaConditionTest;
@@ -39,6 +40,7 @@ public class MicrokernelTestSuite
 		suite.addTestSuite(NotNodeJoinTest.class);
 		suite.addTestSuite(NotNodeInitialfactTest.class);
 		suite.addTestSuite(EqualJoinTest.class);
+		suite.addTestSuite(DuplicateActivationsTestFail.class);
 		suite.addTestSuite(FunctionTest.class);
 		suite.addTestSuite(MultifieldSplitTest.class);
 		suite.addTestSuite(TestNodeTest.class);
