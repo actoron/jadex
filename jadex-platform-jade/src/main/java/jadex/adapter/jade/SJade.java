@@ -12,8 +12,11 @@ import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -477,5 +480,43 @@ public class SJade
 		ret.setOwnership(desc.getOwnership());
 		ret.setState((String)STATES_MAP_TO_FIPA.get(desc.getState()));
 		return ret;
+	}
+	
+	/**
+	 *  Convert a message to a JADE ACLMessage.
+	 *  @param message The message.
+	 *  @return The acl message.
+	 */
+	public static ACLMessage convertMessagetoJade(Map message, MessageType mt)
+	{
+		if(!mt.equals(SFipa.FIPA_MESSAGE_TYPE))
+			throw new RuntimeException("Only message type FIPA supported using JADE infrastructure.");
+			
+		final ACLMessage msg = new ACLMessage(SJade.convertPerformativetoJade((String)message.get(SFipa.PERFORMATIVE)));
+		IAgentIdentifier[] receivers = null;
+		Object tmp = message.get(mt.getReceiverIdentifier());
+		if(tmp instanceof Collection)
+			receivers = (IAgentIdentifier[])((Collection)tmp).toArray(new IAgentIdentifier[0]);
+		else
+			receivers = (IAgentIdentifier[])tmp;
+		for(int i=0; i<receivers.length; i++)
+		{
+			msg.addReceiver(SJade.convertAIDtoJade(receivers[i]));
+		}
+		msg.setContent((String)message.get(SFipa.CONTENT));
+		msg.setConversationId((String)message.get(SFipa.CONVERSATION_ID));
+		msg.setReplyWith((String)message.get(SFipa.REPLY_WITH));
+		msg.setInReplyTo((String)message.get(SFipa.IN_REPLY_TO));
+		msg.setLanguage((String)message.get(SFipa.LANGUAGE));
+		msg.setOntology((String)message.get(SFipa.ONTOLOGY));
+		msg.setProtocol((String)message.get(SFipa.PROTOCOL));
+		msg.setSender(SJade.convertAIDtoJade((IAgentIdentifier)message.get(SFipa.SENDER)));
+		msg.setEncoding((String)message.get(SFipa.ENCODING));
+		Object date = message.get(SFipa.REPLY_BY);
+		if(date instanceof Long)
+			date = new Date(((Long)tmp).longValue());
+		msg.setReplyByDate((Date)date);
+		
+		return msg;
 	}
 }

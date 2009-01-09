@@ -247,26 +247,9 @@ public class MessageService implements IMessageService
 		}
 
 		// Prepare message for Jade.
-		if(!type.getName().equals(SFipa.MESSAGE_TYPE_NAME_FIPA))
-			throw new RuntimeException("Only message type FIPA supported using JADE infrastructure.");
-		
-		final ACLMessage msg = new ACLMessage(SJade.convertPerformativetoJade((String)message.get(SFipa.PERFORMATIVE)));
-		for(int i=0; i<receivers.length; i++)
-		{
-			msg.addReceiver(SJade.convertAIDtoJade(receivers[i]));
-		}
-		msg.setContent((String)message.get(SFipa.CONTENT));
-		msg.setConversationId((String)message.get(SFipa.CONVERSATION_ID));
-		msg.setReplyWith((String)message.get(SFipa.REPLY_WITH));
-		msg.setInReplyTo((String)message.get(SFipa.IN_REPLY_TO));
-		msg.setLanguage((String)message.get(SFipa.LANGUAGE));
-		msg.setOntology((String)message.get(SFipa.ONTOLOGY));
-		msg.setProtocol((String)message.get(SFipa.PROTOCOL));
-		msg.setSender(SJade.convertAIDtoJade((IAgentIdentifier)message.get(SFipa.SENDER)));
-		msg.setEncoding((String)message.get(SFipa.ENCODING));
+		final ACLMessage msg = SJade.convertMessagetoJade(message, type);
 		
 		// Send message over Jade.
-		
 		IAMS ams = (IAMS)platform.getService(IAMS.class);
 		ams.getAgentAdapter(sender, new IResultListener()
 		{

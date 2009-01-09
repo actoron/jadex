@@ -3,14 +3,47 @@ Jadex Rules
 This first beta release of Jadex Rules does not contain
 thorough documentation material. The documentation will
 be added for the final release.
-This document is meant as a starting point for developers
-that want to understand the basic concepts of Jadex rules
-to write rule programs. Basically, Jadex rules is a small 
-lightweight rule engine, which employs the well-known Rete
-algorithm for highly efficient rule matching. Jadex rules
-is therefore similar to other rule engines like JESS and
-Drools. Despite the similarities there are also important
-differences between these systems:
+
+A good starting point for exploring Jadex Rules is by
+starting and examining the examples. The examples are
+contained in separate folders in the jadex/rules/examples 
+directory. To start e.g. the helloworld example on a
+Windows machine you can switch to the corresponding folder
+and then start by invoking the oav_helloworld.bat file.
+For all examples similar .bat files can be found. Of course,
+the examples can also be started directly via Java. In order
+start the helloworld example you can use the following command:
+
+java -cp 
+antlr-runtime-3.0.1.jar;
+collections-generic-4.01.jar;
+colt-1.2.0.jar;concurrent-1.3.4.jar;
+jadex-commons-2.0-beta1.jar;
+jadex-rules-2.0-beta1.jar;
+jadex-rules-applications-2.0-beta1.jar;
+jadex-rules-tools-2.0-beta1.jar;
+jung-3d-2.0-beta1.jar;
+jung-algorithms-2.0-beta1.jar;
+jung-api-2.0-beta1.jar;
+jung-graph-impl-2.0-beta1.jar;
+jung-io-2.0-beta1.jar;
+jung-jai-2.0-beta1.jar;
+jung-visualization-2.0-beta1.jar;
+stringtemplate-3.1-b1.jar 
+jadex.rules.examples.helloworld.OAVHelloWorld
+
+Notes: 
+- write this command in one line 
+- replace the classpath separator ; with : on Unix machines
+
+This document should help developers that want to understand 
+the basic concepts of Jadex Rules to write rule programs. 
+Basically, Jadex rules is a small lightweight rule engine, 
+which employs the well-known Rete algorithm for highly 
+efficient rule matching. Jadex rules is therefore similar 
+to other rule engines like JESS and Drools. Despite the 
+similarities there are also important differences between 
+these systems:
 
 - Jadex Rules is very small and intended to be used as 
 component of other software. Even though rules can be 
