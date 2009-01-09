@@ -1,25 +1,39 @@
 package jadex.adapter.jade;
 
 import jade.content.Concept;
+import jade.content.ContentElementList;
 import jade.content.ContentManager;
+import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
 import jade.content.onto.basic.Done;
 import jade.content.onto.basic.Result;
+import jade.core.AID;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.Deregister;
 import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
 import jade.domain.FIPAAgentManagement.Modify;
 import jade.domain.FIPAAgentManagement.Register;
 import jade.domain.FIPAAgentManagement.Search;
+import jade.domain.JADEAgentManagement.CreateAgent;
+import jade.domain.JADEAgentManagement.JADEManagementOntology;
+import jade.domain.JADEAgentManagement.KillAgent;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.List;
+import jadex.adapter.base.fipa.AMSCreateAgent;
+import jadex.adapter.base.fipa.AMSDestroyAgent;
+import jadex.adapter.base.fipa.AMSResumeAgent;
+import jadex.adapter.base.fipa.AMSSearchAgents;
+import jadex.adapter.base.fipa.AMSSuspendAgent;
 import jadex.adapter.base.fipa.DFDeregister;
 import jadex.adapter.base.fipa.DFModify;
 import jadex.adapter.base.fipa.DFRegister;
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAgentAction;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
@@ -168,11 +182,12 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 				// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
 				if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
 				{
-					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
+					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)) || JADEManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
 					{
 						ContentManager	cm	= new ContentManager();
 						cm.registerLanguage(new SLCodec(0));
 						cm.registerOntology(FIPAManagementOntology.getInstance());
+						cm.registerOntology(JADEManagementOntology.getInstance());
 						try
 						{
 							Object	content	= cm.extractContent(msg);
@@ -194,8 +209,33 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								}
 								else if(request instanceof Modify)
 								{
-									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Modify)request).getDescription(), ams);
-									jadexaction	= new DFModify(dfadesc, dfadesc);
+									if(msg.getSender().getLocalName().toLowerCase().indexOf("ams")!=-1)
+									{
+										IAMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Modify)request).getDescription(), ams);
+										if(AMSAgentDescription.SUSPENDED.equals(amsadesc.getState()))
+											jadexaction	= new AMSSuspendAgent(amsadesc.getName());
+										else
+											jadexaction	= new AMSResumeAgent(amsadesc.getName());
+										// todo: AMSStartAgent ???
+									}
+									else
+									{
+										IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Modify)request).getDescription(), ams);
+										jadexaction	= new DFModify(dfadesc, dfadesc);
+									}
+								}
+								else if(request instanceof CreateAgent)
+								{
+									// Hack!!! Bug in JADE not returning created agent's AID.
+									// Should do ams_search do get correct AID?
+									AID tmp = (AID)msg.getSender();
+									int idx = tmp.getName().indexOf("@");
+									tmp.setName(((CreateAgent)request).getAgentName() + tmp.getName().substring(idx));
+									jadexaction	= new AMSCreateAgent(SJade.convertAIDtoFipa(tmp, ams));
+								}
+								else if(request instanceof KillAgent)
+								{
+									jadexaction	= new AMSDestroyAgent(SJade.convertAIDtoFipa(((KillAgent)request).getAgent(), ams));
 								}
 								else
 								{
@@ -210,12 +250,24 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								IAgentAction	jadexaction	= null;
 								if(request instanceof Search)
 								{
-									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Search)request).getDescription(), ams);
-									List	items	= ((Result)content).getItems();
-									IDFAgentDescription[]	results	= new IDFAgentDescription[items.size()];
-									for(int i=0; i<results.length; i++)
-										results[i]	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) items.get(i), ams);
-									jadexaction	= new DFSearch(dfadesc, results);
+									if(msg.getSender().getLocalName().toLowerCase().indexOf("ams")!=-1)
+									{
+										IAMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Search)request).getDescription(), ams);
+										List	items	= ((Result)content).getItems();
+										IAMSAgentDescription[]	results	= new IAMSAgentDescription[items.size()];
+										for(int i=0; i<results.length; i++)
+											results[i]	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription) items.get(i), ams);
+										jadexaction	= new AMSSearchAgents(amsadesc, results);
+									}
+									else
+									{
+										IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Search)request).getDescription(), ams);
+										List	items	= ((Result)content).getItems();
+										IDFAgentDescription[]	results	= new IDFAgentDescription[items.size()];
+										for(int i=0; i<results.length; i++)
+											results[i]	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) items.get(i), ams);
+										jadexaction	= new DFSearch(dfadesc, results);
+									}
 								}
 								else
 								{
@@ -223,11 +275,20 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								}
 								jadexcontent	= new jadex.adapter.base.fipa.Done(jadexaction);
 							}
+							else if(content instanceof ContentElementList)
+							{
+								// CEL is used to provide information about failures in the form {action, failure-reason}
+								// Todo: Failure reasons currently not used in Jadex
+//								Action	action	= (Action)((ContentElementList)content).get(0);
+//								Predicate	reason	= (Predicate)((ContentElementList)content).get(1);
+//								jadexcontent	= ...
+							}
 							else
 							{
 								throw new RuntimeException("Content not supported: "+content);
 							}
 							
+							System.out.println("Converted: "+jadexcontent+", "+msg.getContent());
 							ma.setDecodedValue(SFipa.CONTENT, jadexcontent);
 						}
 						catch(Exception e)
@@ -236,7 +297,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 						}
 					}
 				}
-								
+				
 				agent.messageArrived(ma);
 			}
 		}

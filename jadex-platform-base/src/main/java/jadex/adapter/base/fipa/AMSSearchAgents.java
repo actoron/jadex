@@ -32,6 +32,16 @@ public class AMSSearchAgents implements IAgentAction
 		this.agentdescriptions = new ArrayList();
 	}
 
+	/**
+	 * Create a new <code>DFSearch</code>.
+	 */
+	public AMSSearchAgents(IAMSAgentDescription agentdescription, IAMSAgentDescription[] results)
+	{
+		this();
+		this.agentdescription	= agentdescription;
+		setAgentDescriptions(results);
+	}
+
 	//-------- accessor methods --------
 
 	/**

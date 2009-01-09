@@ -38,6 +38,14 @@ public class AMSCreateAgent implements IAgentAction
 	{
 	}
 
+	/**
+	 *  Create a new <code>AMSCreateAgent</code>.
+	 */
+	public AMSCreateAgent(IAgentIdentifier result)
+	{
+		this.agentidentifier	= result;
+	}
+
 	//-------- accessor methods --------
 
 	/**

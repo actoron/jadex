@@ -2,25 +2,25 @@ package jadex.adapter.jade;
 
 import jade.content.Concept;
 import jade.content.ContentManager;
-import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
-import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
-import jade.domain.DFService;
+import jade.core.ContainerID;
 import jade.domain.FIPANames;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.Deregister;
 import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
 import jade.domain.FIPAAgentManagement.Modify;
 import jade.domain.FIPAAgentManagement.Register;
 import jade.domain.FIPAAgentManagement.Search;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
+import jade.domain.JADEAgentManagement.CreateAgent;
+import jade.domain.JADEAgentManagement.JADEManagementOntology;
+import jade.domain.JADEAgentManagement.KillAgent;
 import jade.lang.acl.ACLMessage;
 import jadex.adapter.base.fipa.AMSCreateAgent;
 import jadex.adapter.base.fipa.AMSDestroyAgent;
 import jadex.adapter.base.fipa.AMSResumeAgent;
 import jadex.adapter.base.fipa.AMSSearchAgents;
-import jadex.adapter.base.fipa.AMSShutdownPlatform;
 import jadex.adapter.base.fipa.AMSStartAgent;
 import jadex.adapter.base.fipa.AMSSuspendAgent;
 import jadex.adapter.base.fipa.DFDeregister;
@@ -142,88 +142,151 @@ public class MessageService implements IMessageService
 		{
 			if(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME.equals(message.get(SFipa.ONTOLOGY)))
 			{
-				// Extract agent description for DF message.
-				IDFAgentDescription	dfadesc	= null;
-				if(message.get(SFipa.CONTENT) instanceof DFRegister)
-					dfadesc	= ((DFRegister)message.get(SFipa.CONTENT)).getAgentDescription();
-				else if(message.get(SFipa.CONTENT) instanceof DFModify)
-					dfadesc	= ((DFModify)message.get(SFipa.CONTENT)).getAgentDescription();
-				else if(message.get(SFipa.CONTENT) instanceof DFSearch)
-					dfadesc	= ((DFSearch)message.get(SFipa.CONTENT)).getAgentDescription();
-				else if(message.get(SFipa.CONTENT) instanceof DFDeregister)
-					dfadesc	= ((DFDeregister)message.get(SFipa.CONTENT)).getAgentDescription();
+				Object	content	= message.get(SFipa.CONTENT);
+				Concept	request	= null;
+				String	ontology	= FIPAManagementOntology.NAME;	// Default for most AMS/DF requests
 				
-				// Handle DF message
-				if(dfadesc!=null)
+				if(content instanceof DFRegister)
 				{
-					Concept	request	= null;
-					DFAgentDescription	dfadesc_jade	= SJade.convertAgentDescriptiontoJade(dfadesc);
-					if(message.get(SFipa.CONTENT) instanceof DFRegister)
-					{
-						Register	register	= new Register();
-						register.setDescription(dfadesc_jade);
-						request	= register;
-					}
-					else if(message.get(SFipa.CONTENT) instanceof DFModify)
-					{
-						Modify	modify	= new Modify();
-						modify.setDescription(dfadesc_jade);
-						request	= modify;
-					}
-					else if(message.get(SFipa.CONTENT) instanceof DFSearch)
-					{
-						Search	search	= new Search();
-						search.setDescription(dfadesc_jade);
-						ISearchConstraints	cons	= ((DFSearch)message.get(SFipa.CONTENT)).getSearchConstraints();
-						if(cons!=null)
-						{
-							search.setConstraints(SJade.convertSearchConstraintstoJade(cons));
-						}
-						else
-						{
-							SearchConstraints	scon	= new SearchConstraints();
-							scon.setMaxResults(new Long(-1));
-							search.setConstraints(scon);
-						}
-						request	= search;
-					}
-					else if(message.get(SFipa.CONTENT) instanceof DFDeregister)
-					{
-						Deregister	deregister	= new Deregister();
-						deregister.setDescription(dfadesc_jade);
-						request	= deregister;
-					}
-
-					Action	action	= new Action(SJade.convertAIDtoJade(receivers[0]), request);
-					ContentManager	cm	= new ContentManager();
-					cm.registerLanguage(new SLCodec(0));
-					cm.registerOntology(FIPAManagementOntology.getInstance());
-					ACLMessage	dummy	= new ACLMessage(0);
-					dummy.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
-					dummy.setOntology(FIPAManagementOntology.NAME);
-					try
-					{
-						cm.fillContent(dummy, action);
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-					message.put(SFipa.CONTENT, dummy.getContent());
-					message.put(SFipa.LANGUAGE, FIPANames.ContentLanguage.FIPA_SL0);
-					message.put(SFipa.ONTOLOGY, FIPAManagementOntology.NAME);
+					IDFAgentDescription	dfadesc	= ((DFRegister)content).getAgentDescription();
+					Register	register	= new Register();
+					register.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
+					request	= register;
 				}
-			}
-			
-			if(message.get(SFipa.CONTENT) instanceof AMSCreateAgent
-				|| message.get(SFipa.CONTENT) instanceof AMSStartAgent
-				|| message.get(SFipa.CONTENT) instanceof AMSDestroyAgent
-				|| message.get(SFipa.CONTENT) instanceof AMSSuspendAgent
-				|| message.get(SFipa.CONTENT) instanceof AMSResumeAgent
-				|| message.get(SFipa.CONTENT) instanceof AMSSearchAgents
-				|| message.get(SFipa.CONTENT) instanceof AMSShutdownPlatform)
-			{
-//				throw new RuntimeException("Not yet supported.");
+				else if(content instanceof DFModify)
+				{
+					IDFAgentDescription	dfadesc	= ((DFModify)content).getAgentDescription();
+					Modify	modify	= new Modify();
+					modify.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
+					request	= modify;
+				}
+				else if(content instanceof DFSearch)
+				{
+					IDFAgentDescription	dfadesc	= ((DFSearch)content).getAgentDescription();
+					Search	search	= new Search();
+					search.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
+					ISearchConstraints	cons	= ((DFSearch)content).getSearchConstraints();
+					if(cons!=null)
+					{
+						search.setConstraints(SJade.convertSearchConstraintstoJade(cons));
+					}
+					else
+					{
+						SearchConstraints	scon	= new SearchConstraints();
+						scon.setMaxResults(new Long(-1));
+						search.setConstraints(scon);
+					}
+					request	= search;
+				}
+				else if(content instanceof DFDeregister)
+				{
+					IDFAgentDescription	dfadesc	= ((DFDeregister)content).getAgentDescription();
+					Deregister	deregister	= new Deregister();
+					deregister.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
+					request	= deregister;
+				}
+				if(content instanceof AMSCreateAgent)
+				{
+					AMSCreateAgent	aca	= (AMSCreateAgent)content;
+					if(aca.getName()==null)
+					{
+						AMS	ams	= (AMS)platform.getService(IAMS.class);
+						aca.setName(ams.generateAgentName(ams.getShortName(aca.getType())));
+					}
+					CreateAgent	create	= new CreateAgent();
+					create.setAgentName(aca.getName());
+					create.addArguments(aca.getType());
+					create.addArguments(aca.getConfiguration()!=null ? aca.getConfiguration() : "");
+					if(aca.getArguments()!=null)
+						create.addArguments(aca.getArguments());
+					create.setClassName(JadeAgentAdapter.class.getName());
+					if(!aca.isStart())
+						throw new RuntimeException("Delayed agent start not yet supported.");
+
+					create.setContainer(new ContainerID("Main-Container", null));
+					
+					request	= create;
+					ontology	= JADEManagementOntology.NAME;
+				}
+				else if(content instanceof AMSStartAgent)
+				{
+					IAgentIdentifier	amsaid	= ((AMSStartAgent)content).getAgentIdentifier();
+					Modify	start	= new Modify();
+					AMSAgentDescription	adesc	= new AMSAgentDescription();
+					adesc.setName(SJade.convertAIDtoJade(amsaid));
+					adesc.setState(AMSAgentDescription.ACTIVE);
+					start.setDescription(adesc);
+					request	= start;
+				}
+				else if(content instanceof AMSDestroyAgent)
+				{
+					IAgentIdentifier	amsaid	= ((AMSDestroyAgent)content).getAgentIdentifier();
+					KillAgent	destroy	= new KillAgent();
+					destroy.setAgent(SJade.convertAIDtoJade(amsaid));
+					request	= destroy;
+					ontology	= JADEManagementOntology.NAME;
+				}
+				else if(content instanceof AMSSuspendAgent)
+				{
+					IAgentIdentifier	amsaid	= ((AMSSuspendAgent)content).getAgentIdentifier();
+					Modify	suspend	= new Modify();
+					AMSAgentDescription	adesc	= new AMSAgentDescription();
+					adesc.setName(SJade.convertAIDtoJade(amsaid));
+					adesc.setState(AMSAgentDescription.SUSPENDED);
+					suspend.setDescription(adesc);
+					request	= suspend;
+				}
+				else if(content instanceof AMSResumeAgent)
+				{
+					IAgentIdentifier	amsaid	= ((AMSResumeAgent)content).getAgentIdentifier();
+					Modify	resume	= new Modify();
+					AMSAgentDescription	adesc	= new AMSAgentDescription();
+					adesc.setName(SJade.convertAIDtoJade(amsaid));
+					adesc.setState(AMSAgentDescription.ACTIVE);
+					resume.setDescription(adesc);
+					request	= resume;
+				}
+				else if(content instanceof AMSSearchAgents)
+				{
+					Search	search	= new Search();
+					search.setDescription(SJade.convertAMSAgentDescriptiontoJade(((AMSSearchAgents)content).getAgentDescription()));
+					ISearchConstraints	cons	= ((AMSSearchAgents)content).getSearchConstraints();
+					if(cons!=null)
+					{
+						search.setConstraints(SJade.convertSearchConstraintstoJade(cons));
+					}
+					else
+					{
+						SearchConstraints	scon	= new SearchConstraints();
+						scon.setMaxResults(new Long(-1));
+						search.setConstraints(scon);
+					}
+					request	= search;
+				}
+				else
+				{
+					throw new RuntimeException("Action not supported: "+content);
+				}
+
+				Action	action	= new Action(SJade.convertAIDtoJade(receivers[0]), request);
+				ContentManager	cm	= new ContentManager();
+				cm.registerLanguage(new SLCodec(0));
+				cm.registerOntology(FIPAManagementOntology.getInstance());
+				cm.registerOntology(JADEManagementOntology.getInstance());
+				ACLMessage	dummy	= new ACLMessage(0);
+				dummy.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+				dummy.setOntology(ontology);
+				try
+				{
+					cm.fillContent(dummy, action);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				message.put(SFipa.CONTENT, dummy.getContent());
+				message.put(SFipa.LANGUAGE, FIPANames.ContentLanguage.FIPA_SL0);
+				message.put(SFipa.ONTOLOGY, ontology);
 			}
 		}
 

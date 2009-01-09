@@ -22,6 +22,14 @@ public class AMSDestroyAgent implements IAgentAction
 	{
 	}
 
+	/**
+	 *  Create a new <code>AMSDestroyAgent</code>.
+	 */
+	public AMSDestroyAgent(IAgentIdentifier identifier)
+	{
+		this.agentidentifier	= identifier;
+	}
+
 	//-------- accessor methods --------
 
 	/**

@@ -44,7 +44,8 @@ public class AMSTestPlan extends Plan
 	public int performTests(int num, IAgentIdentifier ams)
 	{
 //		String agenttype = "jadex/bdi/examples/ping/Ping.agent.xml";
-		String agenttype = "jadex/bdi/tutorial/TranslationA1.agent.xml";
+//		String agenttype = "jadex/bdi/tutorial/TranslationA1.agent.xml";
+		String agenttype = "jadex/bdi/examples/puzzle/Sokrates.agent.xml";
 		
 		// Try to search the AMS.
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");

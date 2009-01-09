@@ -23,6 +23,14 @@ public class AMSResumeAgent implements IAgentAction
 	{
 	}
 
+	/**
+	 *  Create a new <code>AMSSuspendAgent</code>.
+	 */
+	public AMSResumeAgent(IAgentIdentifier agentidentifier)
+	{
+		this.agentidentifier	= agentidentifier;
+	}
+
 	//-------- accessor methods --------
 
 	/**

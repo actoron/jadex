@@ -1198,6 +1198,8 @@ public class AgentRules
 	{
 		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
 		String config = (String)state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_configuration);
+		if("".equals(config))
+			config	= null;	// Hack!!! Required for message based agent created in JADE.
 		Object	mconfig;
 		if(config==null)
 		{
@@ -2231,6 +2233,8 @@ public class AgentRules
 	{
 		// Get configuration.
 		String	config	= (String)state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_configuration);
+		if("".equals(config))
+			config	= null;	// Hack!!! Required for message based agent created in JADE.
 		Object	mcap	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
 		Object	mconfig;
 		if(config==null)
