@@ -4,6 +4,7 @@ import jade.content.Concept;
 import jade.content.ContentManager;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
+import jade.core.AID;
 import jade.core.ContainerID;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
@@ -249,7 +250,11 @@ public class MessageService implements IMessageService
 				else if(content instanceof AMSSearchAgents)
 				{
 					Search	search	= new Search();
-					search.setDescription(SJade.convertAMSAgentDescriptiontoJade(((AMSSearchAgents)content).getAgentDescription()));
+					AMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoJade(((AMSSearchAgents)content).getAgentDescription());
+					// Hack !!! Strip addresses/resolvers from aid before search (JADE doesn't store these in AMS and therefore finds no matches, grrr).
+					if(amsadesc.getName()!=null)
+						amsadesc.setName(new AID(amsadesc.getName().getName(), AID.ISGUID));
+					search.setDescription(amsadesc);
 					ISearchConstraints	cons	= ((AMSSearchAgents)content).getSearchConstraints();
 					if(cons!=null)
 					{

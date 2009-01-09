@@ -558,8 +558,12 @@ public class AMS implements IAMS, IPlatformService
 				{
 					try 
 					{
+						// Hack !!! Strip addresses/resolvers from aid before search (JADE doesn't store these in AMS and therefore finds no matches, grrr).
+						jade.domain.FIPAAgentManagement.AMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoJade(adesc);
+						if(amsadesc.getName()!=null)
+							amsadesc.setName(new AID(amsadesc.getName().getName(), AID.ISGUID));
 						Search search = new Search();
-						search.setDescription(SJade.convertAMSAgentDescriptiontoJade(adesc));
+						search.setDescription(amsadesc);
 						search.setConstraints(SJade.convertSearchConstraintstoJade(con));
 						Action ac = new Action();
 						ac.setActor(myAgent.getAMS());

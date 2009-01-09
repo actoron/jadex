@@ -532,7 +532,17 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	{
 		// Add agenda action to avoid threading issues
 		// super.doDelete() would interrupt agent thread (while e.g. waiting for plan).
-		agent.killAgent(null);
+		agent.killAgent(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				JadeAgentAdapter.super.doDelete();
+			}
+			public void exceptionOccurred(Exception e)
+			{
+				e.printStackTrace();
+			}
+		});
 	}
 
 	/**

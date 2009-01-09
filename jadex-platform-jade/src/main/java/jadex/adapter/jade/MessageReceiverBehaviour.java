@@ -288,7 +288,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								throw new RuntimeException("Content not supported: "+content);
 							}
 							
-							System.out.println("Converted: "+jadexcontent+", "+msg.getContent());
+//							System.out.println("Converted: "+jadexcontent+", "+msg.getContent());
 							ma.setDecodedValue(SFipa.CONTENT, jadexcontent);
 						}
 						catch(Exception e)
