@@ -22,6 +22,14 @@ public class DFDeregister implements IAgentAction
 	{
 	}
 
+	/**
+	 * Create a new <code>DFDeregister</code>.
+	 */
+	public DFDeregister(IDFAgentDescription dfagentdescription)
+	{
+		this.dfagentdescription	= dfagentdescription;
+	}
+
 	//-------- accessor methods --------
 
 	/**

@@ -1,6 +1,20 @@
 package jadex.adapter.jade;
 
+import jade.content.Concept;
+import jade.content.ContentManager;
+import jade.content.lang.Codec.CodecException;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.OntologyException;
+import jade.content.onto.basic.Action;
+import jade.domain.DFService;
+import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.Deregister;
+import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
+import jade.domain.FIPAAgentManagement.Modify;
+import jade.domain.FIPAAgentManagement.Register;
+import jade.domain.FIPAAgentManagement.Search;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jadex.adapter.base.fipa.AMSCreateAgent;
 import jadex.adapter.base.fipa.AMSDestroyAgent;
@@ -15,6 +29,7 @@ import jadex.adapter.base.fipa.DFRegister;
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
@@ -123,10 +138,11 @@ public class MessageService implements IMessageService
 		}
 
 		// Hack!!! Convert Jadex/Nuggets AMS/DF messages to FIPA.
-		if(type.equals(SFipa.FIPA_MESSAGE_TYPE))
+		if(type.equals(SFipa.FIPA_MESSAGE_TYPE) && receivers.length==1)
 		{
 			if(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME.equals(message.get(SFipa.ONTOLOGY)))
 			{
+				// Extract agent description for DF message.
 				IDFAgentDescription	dfadesc	= null;
 				if(message.get(SFipa.CONTENT) instanceof DFRegister)
 					dfadesc	= ((DFRegister)message.get(SFipa.CONTENT)).getAgentDescription();
@@ -137,9 +153,65 @@ public class MessageService implements IMessageService
 				else if(message.get(SFipa.CONTENT) instanceof DFDeregister)
 					dfadesc	= ((DFDeregister)message.get(SFipa.CONTENT)).getAgentDescription();
 				
+				// Handle DF message
 				if(dfadesc!=null)
 				{
+					Concept	request	= null;
 					DFAgentDescription	dfadesc_jade	= SJade.convertAgentDescriptiontoJade(dfadesc);
+					if(message.get(SFipa.CONTENT) instanceof DFRegister)
+					{
+						Register	register	= new Register();
+						register.setDescription(dfadesc_jade);
+						request	= register;
+					}
+					else if(message.get(SFipa.CONTENT) instanceof DFModify)
+					{
+						Modify	modify	= new Modify();
+						modify.setDescription(dfadesc_jade);
+						request	= modify;
+					}
+					else if(message.get(SFipa.CONTENT) instanceof DFSearch)
+					{
+						Search	search	= new Search();
+						search.setDescription(dfadesc_jade);
+						ISearchConstraints	cons	= ((DFSearch)message.get(SFipa.CONTENT)).getSearchConstraints();
+						if(cons!=null)
+						{
+							search.setConstraints(SJade.convertSearchConstraintstoJade(cons));
+						}
+						else
+						{
+							SearchConstraints	scon	= new SearchConstraints();
+							scon.setMaxResults(new Long(-1));
+							search.setConstraints(scon);
+						}
+						request	= search;
+					}
+					else if(message.get(SFipa.CONTENT) instanceof DFDeregister)
+					{
+						Deregister	deregister	= new Deregister();
+						deregister.setDescription(dfadesc_jade);
+						request	= deregister;
+					}
+
+					Action	action	= new Action(SJade.convertAIDtoJade(receivers[0]), request);
+					ContentManager	cm	= new ContentManager();
+					cm.registerLanguage(new SLCodec(0));
+					cm.registerOntology(FIPAManagementOntology.getInstance());
+					ACLMessage	dummy	= new ACLMessage(0);
+					dummy.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+					dummy.setOntology(FIPAManagementOntology.NAME);
+					try
+					{
+						cm.fillContent(dummy, action);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					message.put(SFipa.CONTENT, dummy.getContent());
+					message.put(SFipa.LANGUAGE, FIPANames.ContentLanguage.FIPA_SL0);
+					message.put(SFipa.ONTOLOGY, FIPAManagementOntology.NAME);
 				}
 			}
 			

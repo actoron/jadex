@@ -1,25 +1,31 @@
 package jadex.adapter.jade;
 
+import jade.content.Concept;
+import jade.content.ContentManager;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.basic.Action;
+import jade.content.onto.basic.Done;
+import jade.content.onto.basic.Result;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.Deregister;
 import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
+import jade.domain.FIPAAgentManagement.Modify;
+import jade.domain.FIPAAgentManagement.Register;
+import jade.domain.FIPAAgentManagement.Search;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.MessageTemplate.MatchExpression;
-import jadex.adapter.base.fipa.FIPAMessageType;
+import jade.util.leap.List;
+import jadex.adapter.base.fipa.DFDeregister;
+import jadex.adapter.base.fipa.DFModify;
+import jadex.adapter.base.fipa.DFRegister;
+import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
-import jadex.adapter.jade.fipaimpl.AgentIdentifier;
-import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILibraryService;
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.MessageType;
-import jadex.commons.collection.SCollection;
-import nuggets.Nuggets;
-
-import java.util.Iterator;
-import java.util.List;
 
 
 /**
@@ -138,16 +144,6 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 				
 				JadeMessageAdapter ma = new JadeMessageAdapter(msg, ams);
 				
-				// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
-				if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
-				{
-					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
-					{
-						// todo...
-						System.out.println("hier");
-					}
-				}
-
 				// Conversion via platform specific codecs
 				String[] params = ma.getMessageType().getParameterNames();
 				for(int i=0; i<params.length; i++)
@@ -168,6 +164,78 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 					}
 				}
 				// todo: sets?
+
+				// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
+				if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
+				{
+					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
+					{
+						ContentManager	cm	= new ContentManager();
+						cm.registerLanguage(new SLCodec(0));
+						cm.registerOntology(FIPAManagementOntology.getInstance());
+						try
+						{
+							Object	content	= cm.extractContent(msg);
+							Object	jadexcontent	= null;
+							if(content instanceof Done)
+							{
+								Action	action	= (Action)((Done)content).getAction();
+								Concept	request	= action.getAction();
+								IAgentAction	jadexaction	= null;
+								if(request instanceof Register)
+								{
+									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Register)request).getDescription(), ams);
+									jadexaction	= new DFRegister(dfadesc, dfadesc);
+								}
+								else if(request instanceof Deregister)
+								{
+									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Deregister)request).getDescription(), ams);
+									jadexaction	= new DFDeregister(dfadesc);
+								}
+								else if(request instanceof Modify)
+								{
+									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Modify)request).getDescription(), ams);
+									jadexaction	= new DFModify(dfadesc, dfadesc);
+								}
+								else
+								{
+									throw new RuntimeException("Action not supported: "+request);
+								}
+								jadexcontent	= new jadex.adapter.base.fipa.Done(jadexaction);
+							}
+							else if(content instanceof Result)
+							{
+								Action	action	= (Action)((Result)content).getAction();
+								Concept	request	= action.getAction();
+								IAgentAction	jadexaction	= null;
+								if(request instanceof Search)
+								{
+									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Search)request).getDescription(), ams);
+									List	items	= ((Result)content).getItems();
+									IDFAgentDescription[]	results	= new IDFAgentDescription[items.size()];
+									for(int i=0; i<results.length; i++)
+										results[i]	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) items.get(i), ams);
+									jadexaction	= new DFSearch(dfadesc, results);
+								}
+								else
+								{
+									throw new RuntimeException("Action not supported: "+request);
+								}
+								jadexcontent	= new jadex.adapter.base.fipa.Done(jadexaction);
+							}
+							else
+							{
+								throw new RuntimeException("Content not supported: "+content);
+							}
+							
+							ma.setDecodedValue(SFipa.CONTENT, jadexcontent);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}
 								
 				agent.messageArrived(ma);
 			}

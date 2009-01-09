@@ -25,6 +25,15 @@ public class DFModify implements IAgentAction
 	{
 	}
 
+	/**
+	 * Create a new <code>DFModify</code>.
+	 */
+	public DFModify(IDFAgentDescription dfagentdescription, IDFAgentDescription result)
+	{
+		this.dfagentdescription	= dfagentdescription;
+		this.result	= result;
+	}
+
 	//-------- accessor methods --------
 
 	/**

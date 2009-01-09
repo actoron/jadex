@@ -357,7 +357,8 @@ public class SJade
 	 */
 	public static jadex.adapter.jade.fipaimpl.DFAgentDescription convertAgentDescriptiontoFipa(DFAgentDescription desc, IAMS ams)
 	{
-		jadex.adapter.jade.fipaimpl.DFAgentDescription ret = new jadex.adapter.jade.fipaimpl.DFAgentDescription(SJade.convertAIDtoFipa(desc.getName(), ams));
+		IAgentIdentifier	aid	= desc.getName()!=null ? SJade.convertAIDtoFipa(desc.getName(), ams) : null;
+		jadex.adapter.jade.fipaimpl.DFAgentDescription ret = new jadex.adapter.jade.fipaimpl.DFAgentDescription(aid);
 		Iterator it = desc.getAllLanguages();
 		while(it.hasNext())
 			ret.addLanguage((String)it.next());

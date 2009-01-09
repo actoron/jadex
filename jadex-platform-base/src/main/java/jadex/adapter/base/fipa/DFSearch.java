@@ -32,6 +32,16 @@ public class DFSearch implements IAgentAction
 		this.results = new ArrayList();
 	}
 
+	/**
+	 * Create a new <code>DFSearch</code>.
+	 */
+	public DFSearch(IDFAgentDescription dfagentdescription, IDFAgentDescription[] results)
+	{
+		this();
+		this.dfagentdescription	= dfagentdescription;
+		setResults(results);
+	}
+
 	//-------- accessor methods --------
 
 	/**
