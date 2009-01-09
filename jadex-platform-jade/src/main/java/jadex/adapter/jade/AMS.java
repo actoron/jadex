@@ -116,7 +116,7 @@ public class AMS implements IAMS, IPlatformService
 
 		List argus = new ArrayList();
 		argus.add(model);
-		argus.add(config==null? "default": config);
+		argus.add(config);//==null? "default": config);
 		if(args!=null)
 			argus.add(args);	// Jadex argument map is supplied as 3rd index in JADE argument array.  
 				

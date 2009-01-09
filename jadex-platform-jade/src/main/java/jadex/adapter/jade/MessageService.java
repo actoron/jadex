@@ -151,7 +151,7 @@ public class MessageService implements IMessageService
 				|| message.get(SFipa.CONTENT) instanceof AMSSearchAgents
 				|| message.get(SFipa.CONTENT) instanceof AMSShutdownPlatform)
 			{
-				throw new RuntimeException("Not yet supported.");
+//				throw new RuntimeException("Not yet supported.");
 			}
 		}
 

@@ -138,6 +138,16 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 				
 				JadeMessageAdapter ma = new JadeMessageAdapter(msg, ams);
 				
+				// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
+				if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
+				{
+					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
+					{
+						// todo...
+						System.out.println("hier");
+					}
+				}
+
 				// Conversion via platform specific codecs
 				String[] params = ma.getMessageType().getParameterNames();
 				for(int i=0; i<params.length; i++)
@@ -145,22 +155,20 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 					IContentCodec codec = ma.getMessageType().findContentCodec(DEFCODECS, ma, params[i]);
 					if(codec!=null)
 					{
-						// todo: use agent specific classloader
-						ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
-						ma.setDecodedValue(params[i], codec.decode((String)ma.getValue(params[i]), cl));
+						try
+						{
+							// todo: use agent specific classloader
+							ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+							ma.setDecodedValue(params[i], codec.decode((String)ma.getValue(params[i]), cl));
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				}
 				// todo: sets?
-				
-				// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
-				if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
-				{
-					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
-					{
-						// todo...
-					}
-				}
-				
+								
 				agent.messageArrived(ma);
 			}
 		}

@@ -221,7 +221,9 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 		props = new java.util.Properties();
 		for(int i=0; i<infos.length; i++)
 		{
-			props.put(infos[i], message.getValue(infos[i]));
+			Object	val	= message.getValue(infos[i]);
+			if(val!=null)
+				props.put(infos[i], val);
 		}
 		
 		if(props!=null && codecs!=null)
