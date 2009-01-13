@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.SUtil;
 
 import java.util.StringTokenizer;
 
@@ -64,17 +65,11 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 				
 				// Create a service description to search for.
 				IDFServiceDescription sd = dfservice.createDFServiceDescription(null, "translate english_german", null);
-				IDFAgentDescription ad = dfservice.createDFAgentDescription(getAgentIdentifier(), sd);
-				
-				/*ServiceDescription sd = new ServiceDescription();
-				sd.setType("translate english_german");
-				AgentDescription ad = new AgentDescription();
-				dfadesc.addService(sd);*/
+				IDFAgentDescription ad = dfservice.createDFAgentDescription(null, sd);
 
 				// Use a subgoal to search for a translation agent
 				IGoal ft = createGoal("df_search");
                 ft.getParameter("description").setValue(ad);
-              	//ft.getParameter("df", null); //new AID("df@vsispro3:1099/JADE") mit "http://vsispro3.informatik.uni-hamburg.de:1521/acc")
 
 				dispatchSubgoalAndWait(ft);
                 //Object result = ft.getResult();
@@ -128,6 +123,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 
 			IMessageEvent rep = getEventbase().createReply(mevent, "inform");
 			rep.getParameter(SFipa.CONTENT).setValue(buf.toString());
+			System.out.println("Sending reply: "+SUtil.arrayToString(rep.getParameterSet(SFipa.RECEIVERS).getValues()));
 			sendMessage(rep);
 		}
 	}
