@@ -14,6 +14,8 @@
       <includes>
         <include>jadex:jadex-jade-launch</include>
         <include>jadex:jadex-platform-jade</include>
+        <include>jadex:jadex-applications-bdi</include>
+        <include>jadex:jadex-applications-micro</include>
       </includes>
       
       <binaries>
