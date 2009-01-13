@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>jadex</groupId>
-  <artifactId>jadex-launch</artifactId>
+  <artifactId>jadex-jade-launch</artifactId>
   <packaging>jar</packaging>
   <version>2.0-beta1</version>
-  <name>jadex-launch</name>
+  <name>jadex-jade-launch</name>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>jadex</groupId>
@@ -63,11 +63,6 @@
     </dependency>
     <dependency>
     	<groupId>jadex</groupId>
-    	<artifactId>jadex-standalone</artifactId>
-    	<version>2.0-beta1</version>
-    </dependency>
-    <dependency>
-    	<groupId>jadex</groupId>
     	<artifactId>jadex-runtimetools</artifactId>
     	<version>2.0-beta1</version>
     </dependency>
@@ -79,6 +74,11 @@
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-rules-tools</artifactId>
+    	<version>2.0-beta1</version>
+    </dependency>
+    <dependency>
+    	<groupId>jadex</groupId>
+    	<artifactId>jadex-platform-jade</artifactId>
     	<version>2.0-beta1</version>
     </dependency>
   </dependencies>
