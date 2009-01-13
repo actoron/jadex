@@ -15,7 +15,7 @@
   </parent>
   <build>
     <plugins>
-     <!-- Make jar executable (cannot do this in standalone, because maven claims cyclic reference) -->
+     <!-- Make jar executable (cannot do this in jade, because maven claims cyclic reference) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -23,7 +23,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>jadex.adapter.standalone.Platform</mainClass>
+              <mainClass>jadex.adapter.jade.Platform</mainClass>
             </manifest>
           </archive>
         </configuration>
