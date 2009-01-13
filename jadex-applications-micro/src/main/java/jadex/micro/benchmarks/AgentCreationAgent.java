@@ -20,77 +20,70 @@ public class AgentCreationAgent extends MicroAgent
 	//-------- attributes --------
 	
 	/** The step indicating what should the agent do. */
-	protected int step;
+//	protected int step;
 	
 	//-------- methods --------
 	
 	/**
 	 *  Execute an agent step.
 	 */
-	public boolean executeAction()
+	public void executeBody()
 	{
-		switch(step)
+		Map args = getArguments();	
+		if(args==null)
+			args = new HashMap();
+		
+		if(args.get("num")==null)
 		{
-			case 0:
-			step++;
-			
-			Map args = getArguments();	
-			if(args==null)
-				args = new HashMap();
-			
-			if(args.get("num")==null)
-			{
-				args.put("num", new Integer(1));
+			args.put("num", new Integer(1));
 //				args.put("max", new Integer(100000));
-				Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-				Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
-				args.put("startmem", startmem);
-				args.put("starttime", starttime);
-			}
-			
-			int num = ((Integer)args.get("num")).intValue();
-			int max = ((Integer)args.get("max")).intValue();
-			
-			System.out.println("Created peer: "+num);
-			
-			if(num<max)
-			{
-				args.put("num", new Integer(num+1));
-//				System.out.println("Args: "+num+" "+args);
-				final IAMS ams = (IAMS)getPlatform().getService(IAMS.class);
-				ams.createAgent(createPeerName(num+1), getClass().getName()+".class", null, args, 
-					createResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						ams.startAgent((IAgentIdentifier)result, null);
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-					}
-				}));				
-			}
-			else
-			{
-				Long startmem = (Long)args.get("startmem");
-				Long starttime = (Long)args.get("starttime");
-				long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-				long omem = (used-startmem.longValue())/1024;
-				double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
-				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-
-				long end = getTime();
-				System.out.println("Last peer created. "+max+" agents started.");
-				double dur = ((double)end-starttime.longValue())/1000.0;
-				double pera = dur/max;
-				System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-			
-				// Delete prior agents.
-				deletePeers(max-1, getTime(), dur, pera, omem, upera);
-			}
+			Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+			Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
+			args.put("startmem", startmem);
+			args.put("starttime", starttime);
 		}
-		return false;
+		
+		int num = ((Integer)args.get("num")).intValue();
+		int max = ((Integer)args.get("max")).intValue();
+		
+		System.out.println("Created peer: "+num);
+		
+		if(num<max)
+		{
+			args.put("num", new Integer(num+1));
+//				System.out.println("Args: "+num+" "+args);
+			final IAMS ams = (IAMS)getPlatform().getService(IAMS.class);
+			ams.createAgent(createPeerName(num+1), getClass().getName()+".class", null, args, 
+				createResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					ams.startAgent((IAgentIdentifier)result, null);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+				}
+			}));				
+		}
+		else
+		{
+			Long startmem = (Long)args.get("startmem");
+			Long starttime = (Long)args.get("starttime");
+			long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+			long omem = (used-startmem.longValue())/1024;
+			double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
+			System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+
+			long end = getTime();
+			System.out.println("Last peer created. "+max+" agents started.");
+			double dur = ((double)end-starttime.longValue())/1000.0;
+			double pera = dur/max;
+			System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+		
+			// Delete prior agents.
+			deletePeers(max-1, getTime(), dur, pera, omem, upera);
+		}
 	}
 	
 	/**

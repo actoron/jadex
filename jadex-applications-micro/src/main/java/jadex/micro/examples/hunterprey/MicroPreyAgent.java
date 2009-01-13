@@ -1,6 +1,5 @@
 package jadex.micro.examples.hunterprey;
 
-import jadex.adapter.base.fipa.FIPAMessageType;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
@@ -16,7 +15,6 @@ import jadex.bdi.examples.hunterprey.RequestMove;
 import jadex.bdi.examples.hunterprey.RequestVision;
 import jadex.bdi.examples.hunterprey.WorldObject;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
@@ -49,24 +47,18 @@ public class MicroPreyAgent extends MicroAgent
 	/**
 	 *  Execute a step.
 	 */
-	public boolean executeAction()
+	public void executeBody()
 	{
-		if(myself==null)
-		{
-			// Todo: getAgentName()
-			myself	= new Prey(getAgentAdapter().getAgentIdentifier().getLocalName(),
-				getAgentAdapter().getAgentIdentifier(), new Location(10,10));
+		// Todo: getAgentName()
+		myself	= new Prey(getAgentAdapter().getAgentIdentifier().getLocalName(),
+			getAgentAdapter().getAgentIdentifier(), new Location(10,10));
 
-			this.rand	= new Random(hashCode());
-		}
-		
+		this.rand	= new Random(hashCode());
 		
 		if(environment==null)
 		{
 			register();
 		}
-		
-		return false;
 	}
 	
 	/**
@@ -74,7 +66,7 @@ public class MicroPreyAgent extends MicroAgent
 	 */
 	public void messageArrived(Map msg, MessageType mt)
 	{
-		System.out.println("message arrived: "+msg);
+//		System.out.println("message arrived: "+msg);
 		Object content	= msg.get(SFipa.CONTENT);
 		if(content instanceof CurrentVision)
 		{

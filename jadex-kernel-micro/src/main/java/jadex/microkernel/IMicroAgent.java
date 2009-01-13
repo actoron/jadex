@@ -16,8 +16,18 @@ public interface IMicroAgent
 	 *  The platform guarantees that executeAction() will not be called in parallel. 
 	 *  @return True, when there are more actions waiting to be executed. 
 	 */
-	public boolean executeAction();
+//	public boolean executeAction();
 
+	/**
+	 *  Called once after agent creation.
+	 */
+	public void agentCreated();
+	
+	/**
+	 *  Called once after agent has been started.
+	 */
+	public void executeBody();
+	
 	/**
 	 *  Called, whenever a message is received.
 	 *  @param msg The message map.
@@ -29,5 +39,7 @@ public interface IMicroAgent
 	 *  Called just before the agent is removed from the platform.
 	 */
 	public void agentKilled();
+	
+	
 }
 

@@ -9,31 +9,22 @@ import jadex.microkernel.MicroAgentMetaInfo;
  */
 public class HelloWorldAgent extends MicroAgent
 {
-	//-------- attributes --------
-	
-	/** The state. */
-	protected int step;
-	
 	//-------- methods --------
 	
 	/**
 	 *  Execute an agent step.
 	 */
-	public boolean executeAction()
+	public void executeBody()
 	{
-		if(step==0)
-		{
-			System.out.println(getArgument("welcome text"));
-			waitFor(2000);
-			step++;
-		}
-		else if(step==1)
-		{
-			System.out.println("Good bye world.");
-			killAgent();
-			step++;
-		}
-		return false;
+		System.out.println(getArgument("welcome text"));
+		waitFor(2000, new Runnable()
+		{			
+			public void run()
+			{
+				System.out.println("Good bye world.");
+				killAgent();
+			}
+		});
 	}
 	
 	//-------- static methods --------

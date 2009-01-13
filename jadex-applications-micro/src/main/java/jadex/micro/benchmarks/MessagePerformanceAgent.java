@@ -17,9 +17,6 @@ public class MessagePerformanceAgent extends MicroAgent
 {
 	//-------- attributes --------
 	
-	/** The step indicating what should the agent do. */
-	protected boolean done;
-	
 	/** The received messages. */
 	protected int received;
 	
@@ -31,36 +28,41 @@ public class MessagePerformanceAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public boolean executeAction()
+	public void executeBody()
 	{
-		if(!done)
+		int msgcnt = ((Integer)getArgument("max")).intValue();
+		IAgentIdentifier receiver = getAgentIdentifier();
+		starttime = getTime();
+		
+		System.out.println("Now sending " + msgcnt + " messages to " + receiver);
+		
+		boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
+		System.out.println("Codec is: "+usecodec);
+		// Send messages.
+		for(int i=1; i<=msgcnt; i++)
 		{
-			done = true;
+			Map request = new HashMap();
+			request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+			request.put(SFipa.RECEIVERS, new IAgentIdentifier[]{receiver});
+			request.put(SFipa.REPLY_WITH, "some reply id");
 			
-			int msgcnt = ((Integer)getArgument("max")).intValue();
-			IAgentIdentifier receiver = getAgentIdentifier();
-			starttime = getTime();
-			
-			System.out.println("Now sending " + msgcnt + " messages to " + receiver);
-			
-			// Send messages.
-			for(int i=1; i<=msgcnt; i++)
-			{
-				Map request = new HashMap();
-				request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+			if(!usecodec)
+			{	
 				request.put(SFipa.CONTENT, "message: "+i);
-				request.put(SFipa.RECEIVERS, new IAgentIdentifier[]{receiver});
-				request.put(SFipa.REPLY_WITH, "some reply id");
-				sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
-				if(i % 10 == 0)
-				{
-					System.out.print('.');
-					// waitFor(0);
-				}
+			}
+			else
+			{
+				request.put(SFipa.LANGUAGE, SFipa.NUGGETS_XML);
+				request.put(SFipa.CONTENT, new Message("message: "+i, true));
+			}
+			
+			sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+			if(i % 10 == 0)
+			{
+				System.out.print('.');
+				// waitFor(0);
 			}
 		}
-		
-		return false;
 	}
 	
 	/**
@@ -112,6 +114,38 @@ public class MessagePerformanceAgent extends MicroAgent
 						try
 						{
 							Integer.parseInt(input);
+						}
+						catch(Exception e)
+						{
+							ret = false;
+						}
+						return ret;
+					}
+				},
+				new IArgument()
+				{
+					public Object getDefaultValue(String configname)
+					{
+						return Boolean.FALSE;
+					}
+					public String getDescription()
+					{
+						return "Use content codec for message content.";
+					}
+					public String getName()
+					{
+						return "codec";
+					}
+					public String getTypename()
+					{
+						return "boolean";
+					}
+					public boolean validate(String input)
+					{
+						boolean ret = true;
+						try
+						{
+							Boolean.parseBoolean(input);
 						}
 						catch(Exception e)
 						{

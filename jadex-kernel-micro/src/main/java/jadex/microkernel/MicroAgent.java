@@ -41,14 +41,28 @@ public abstract class MicroAgent implements IMicroAgent
 	//-------- interface methods --------
 	
 	/**
+	 *  Called once after agent creation.
+	 */
+	public void agentCreated()
+	{
+	}
+	
+	/**
 	 *  Called when the agent is born and whenever it wants to execute an action
 	 *  (e.g. calls wakeup() in one of the other methods).
 	 *  The platform guarantees that executeAction() will not be called in parallel. 
 	 *  @return True, when there are more actions waiting to be executed. 
-	 */
+	 * /
 	public boolean executeAction()
 	{
 		return false;
+	}*/
+	
+	/**
+	 * 
+	 */
+	public void executeBody()
+	{
 	}
 
 	/**
@@ -147,27 +161,13 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Wait for an secified amount of time.
 	 *  @param time The time.
 	 */
-	public void waitFor(long time)
+	public void waitFor(long time, final Runnable run)
 	{
 		((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
 		{
 			public void timeEventOccurred()
 			{
-				try
-				{
-					getAgentAdapter().wakeup();
-				}
-				catch(AgentTerminatedException ate)
-				{
-					// ignored.
-				}
-//				interpreter.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						executeAction();
-//					}
-//				});
+				interpreter.invokeLater(run);
 			}
 		});
 	}

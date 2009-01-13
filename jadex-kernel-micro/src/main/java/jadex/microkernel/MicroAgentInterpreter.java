@@ -45,6 +45,9 @@ public class MicroAgentInterpreter implements IKernelAgent
 	// Todo: need not be transient, because agent should only be serialized when no action is running?
 	protected transient Thread agentthread;
 	
+	/** Flag that indicates if the agent has been started. */
+	protected boolean started;
+	
 	//-------- constructors --------
 	
 	/**
@@ -64,6 +67,7 @@ public class MicroAgentInterpreter implements IKernelAgent
 		{
 			this.microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
 			this.microagent.init(this);
+			this.microagent.agentCreated();
 		}
 		catch(Exception e)
 		{
@@ -134,11 +138,14 @@ public class MicroAgentInterpreter implements IKernelAgent
 			}
 		}
 
-		boolean ret = microagent.executeAction();
+		if(!started)
+		{
+			microagent.executeBody();
+			started = true;
+		}
 		
 		this.agentthread = null;
-		
-		return ret;
+		return false;
 	}
 
 	/**
