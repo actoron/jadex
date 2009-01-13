@@ -186,7 +186,7 @@ public class MessageService implements IMessageService
 					deregister.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
 					request	= deregister;
 				}
-				if(content instanceof AMSCreateAgent)
+				else if(content instanceof AMSCreateAgent)
 				{
 					AMSCreateAgent	aca	= (AMSCreateAgent)content;
 					if(aca.getName()==null)

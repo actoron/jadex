@@ -564,7 +564,8 @@ public class AMS implements IAMS, IPlatformService
 							amsadesc.setName(new AID(amsadesc.getName().getName(), AID.ISGUID));
 						Search search = new Search();
 						search.setDescription(amsadesc);
-						search.setConstraints(SJade.convertSearchConstraintstoJade(con));
+						search.setConstraints(SJade.convertSearchConstraintstoJade(
+							con!=null ? con	: createSearchConstraints(-1, 0)));
 						Action ac = new Action();
 						ac.setActor(myAgent.getAMS());
 						ac.setAction(search);

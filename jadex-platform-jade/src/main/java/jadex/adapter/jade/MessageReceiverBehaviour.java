@@ -3,13 +3,11 @@ package jadex.adapter.jade;
 import jade.content.Concept;
 import jade.content.ContentElementList;
 import jade.content.ContentManager;
-import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
 import jade.content.onto.basic.Done;
 import jade.content.onto.basic.Result;
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -167,9 +165,13 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 					{
 						try
 						{
-							// todo: use agent specific classloader
-							ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
-							ma.setDecodedValue(params[i], codec.decode((String)ma.getValue(params[i]), cl));
+							String	val	= (String)ma.getValue(params[i]);
+							if(val!=null)
+							{
+								// todo: use agent specific classloader
+								ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+								ma.setDecodedValue(params[i], codec.decode(val, cl));
+							}
 						}
 						catch(Exception e)
 						{

@@ -294,9 +294,7 @@ public class SJade
 	public static int convertPerformativetoJade(String per)
 	{
 		Integer ret = (Integer)PERFORMATIVES_MAP_TO_JADE.get(per);
-		if(ret==null)
-			throw new RuntimeException("Unknown fipa performative: "+per);
-		return ret.intValue();
+		return ret!=null ? ret.intValue() : ACLMessage.UNKNOWN;
 	}
 
 	/**
