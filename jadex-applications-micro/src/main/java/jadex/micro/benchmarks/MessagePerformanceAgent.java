@@ -145,7 +145,7 @@ public class MessagePerformanceAgent extends MicroAgent
 						boolean ret = true;
 						try
 						{
-							Boolean.parseBoolean(input);
+							Boolean.valueOf(input);
 						}
 						catch(Exception e)
 						{

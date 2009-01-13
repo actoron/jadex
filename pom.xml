@@ -4,7 +4,7 @@
   <groupId>jadex</groupId>
   <artifactId>jadex</artifactId>
   <packaging>pom</packaging>
-  <version>2.0-beta1</version>
+  <version>2.0-beta2</version>
   <name>jadex</name>
   <profiles>
   	<profile>
@@ -32,9 +32,6 @@
   	</profile>
   	<profile>
   		<id>jadex-full-dist</id>
-	    <activation>
-    	    <activeByDefault>true</activeByDefault>
-    	</activation>
 		<modules>
 		    <module>jadex-commons</module>
 		    <module>jadex-javaparser</module>
@@ -55,10 +52,47 @@
 		</modules>
   	</profile>
   	<profile>
-  		<id>jadex-jade-dist</id>
+  		<id>jadex-eclipse-projects</id>
 	    <activation>
     	    <activeByDefault>true</activeByDefault>
     	</activation>
+		  <modules>
+		    <module>jadex-commons</module>
+		    <module>jadex-javaparser</module>
+		    <module>jadex-bridge</module>
+		    <module>jadex-platform-base</module>
+		    <module>jadex-nuggets</module>
+		    <module>jadex-kernel-bdi</module>
+		    <module>jadex-applib-bdi</module>
+		    <module>jadex-applications-bdi</module>
+		    <module>jadex-runtimetools</module>
+		    <module>jadex-kernel-micro</module>
+		    <module>jadex-applications-micro</module>
+		    <module>jadex-rules</module>
+		    <module>jadex-rules-applications</module>
+		    <module>jadex-rules-tools</module>
+		    <module>jadex-standalone</module>
+		    <module>jadex-launch</module>
+		    <module>jadex-jade-launch</module>
+			<module>jadex-platform-jade</module>
+		</modules>
+  	</profile>
+  	<profile>
+  		<id>jadex-jade-dist</id>
+  		<build>
+  			<finalName>jadex-jade-${project.version}</finalName>
+		    <plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <configuration>
+		          <descriptors>
+		            <descriptor>src/main/assembly/dist-assembly-jade.xml</descriptor>
+		          </descriptors>
+		        </configuration>
+		      </plugin>
+		    </plugins>
+  		</build>
 		<modules>
 		    <module>jadex-commons</module>
 		    <module>jadex-javaparser</module>
@@ -80,25 +114,6 @@
   	</profile>
   </profiles>
   <!-- <url>http://jadex.sourceforge.net</url> -->
-  <!-- <modules>
-    <module>jadex-commons</module>
-    <module>jadex-javaparser</module>
-    <module>jadex-bridge</module>
-    <module>jadex-platform-base</module>
-    <module>jadex-nuggets</module>
-    <module>jadex-standalone</module>
-    <module>jadex-kernel-bdi</module>
-    <module>jadex-applib-bdi</module>
-    <module>jadex-applications-bdi</module>
-    <module>jadex-runtimetools</module>
-    <module>jadex-launch</module>
-    <module>jadex-kernel-micro</module>
-    <module>jadex-applications-micro</module>
-	<module>jadex-platform-jade</module>
-    <module>jadex-rules</module>
-    <module>jadex-rules-applications</module>
-    <module>jadex-rules-tools</module>
-  </modules> -->
   <build>
     <plugins>
       <plugin>
