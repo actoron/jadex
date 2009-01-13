@@ -2009,12 +2009,8 @@ public class PlanRules
 		}
 				
 		final boolean[] to = new boolean[1];
-		if(ret!=null)
-		{
-			// Wait abstraction must be dropped to be released from state.
-			state.dropObject(wa);
-		}
-		else // if (ret==null)
+
+		if(ret==null)
 		{
 			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction, wa);
 

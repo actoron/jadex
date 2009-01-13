@@ -47,9 +47,10 @@ public class DealerGameRoundPlayerPlan extends Plan
 		// Ask player for her bet.
 		getLogger().info("Asking for bet from player: "+player);
 		RequestBet rb = new RequestBet();
-		IMessageEvent	msg	= createMessageEvent("request_bet");
+		IMessageEvent msg = createMessageEvent("request_bet");
 		msg.getParameter(SFipa.CONTENT).setValue(rb);
 		msg.getParameterSet(SFipa.RECEIVERS).addValue(player.getAgentID());
+		getWaitqueue().addReply(msg);
 		IMessageEvent betmsg = sendMessageAndWait(msg, timeout);
 
 		// When player does not provide a bet (e.g. declines to play), end plan.
@@ -79,7 +80,7 @@ public class DealerGameRoundPlayerPlan extends Plan
 //		fil.addValue(SFipa.CONVERSATION_ID, betmsg.getParameter(SFipa.CONVERSATION_ID).getValue());
 //		getWaitqueue().addFilter(fil);
 
-		getWaitqueue().addReply(msg);
+//		getWaitqueue().addReply(msg);
 		
 		// Wait for dealer to draw a card for itself.
 		getLogger().info("Waiting for dealer card: "+player);

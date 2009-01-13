@@ -340,6 +340,9 @@ public class OAVState	implements IOAVState
 	{
 //		System.out.println("drop: "+id);
 		
+		if(!checkValidStateObject(id))
+			System.out.println("here");
+		
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObject(id);
