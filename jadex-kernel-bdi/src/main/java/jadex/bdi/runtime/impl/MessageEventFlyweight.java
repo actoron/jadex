@@ -1,9 +1,11 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
+import jadex.bridge.MessageType;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -63,6 +65,31 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 		}
 	}
 
+	/**
+	 *  Get the message type.
+	 *  @return The message type.
+	 */
+	public MessageType getMessageType()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getState().getAttributeValue(getState().getAttributeValue(getHandle(), 
+						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.messageevent_has_type);
+				}
+			};
+			return (MessageType)invoc.object;
+		}
+		else
+		{
+			return (MessageType)getState().getAttributeValue(getState().getAttributeValue(getHandle(), 
+				OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.messageevent_has_type);
+		}
+	}
+	
 	/**
 	 *  Create a reply to this message event.
 	 *  @param msgeventtype	The message event type.

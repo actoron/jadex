@@ -1,5 +1,8 @@
 package jadex.bdi.runtime;
 
+import jadex.bdi.interpreter.MessageEventRules;
+import jadex.bdi.runtime.impl.MessageEventFlyweight;
+
 
 /**
  *  Interface for an event base.
@@ -74,6 +77,19 @@ public interface IEventbase extends IElement
 	 */
 //	public void deregisterEventReference(IMEventReference meventref);
 	
+	/**
+	 *  Register a conversation or reply_with to be able
+	 *  to send back answers to the source capability.
+	 *  @param msgevent The message event.
+	 *  todo: indexing for msgevents for speed.
+	 */
+	public void registerMessageEvent(IMessageEvent mevent);
+	
+	/**
+	 *  Remove a registered message event.
+	 *  @param msgevent The message event.
+	 */
+	public void deregisterMessageEvent(IMessageEvent mevent);
 	
 	//-------- listeners --------
 

@@ -36,9 +36,16 @@ public class DFLocalModifyPlan extends Plan
 
 		// Throws exception, when not registered.
 		SyncResultListener lis = new SyncResultListener();
-		((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE)).modify(desc, lis);
-		lis.waitForResult();
-
+		try
+		{
+			((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE)).modify(desc, lis);
+			lis.waitForResult();
+		}
+		catch(Exception e)
+		{
+			fail();
+		}
+		
 		// Todo: Need to use clone to avoid setting the same object causing no effect :-(
 		getParameter("result").setValue(desc);
 	}

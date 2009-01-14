@@ -1,8 +1,10 @@
 package jadex.tools.convcenter;
 
 import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.ContentException;
@@ -88,6 +90,9 @@ public class FipaConversationPanel extends JSplitPane
 	/** The list of received messages. */
 	protected JList	receivedmsgs;
 	
+	/** Registered message events. */
+	protected List regmsgs;
+	
 	//-------- constructors --------
 	
 	/**
@@ -100,6 +105,7 @@ public class FipaConversationPanel extends JSplitPane
 
 		this.agent	= agent;
 		this.receiver	= default_receiver;
+		this.regmsgs = new ArrayList();
 		
 		// Right side starts with initial send panel only.
 		IMessageEvent	msg	= agent.getEventbase().createMessageEvent("fipamsg");
@@ -117,7 +123,27 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				try
 				{
-					IMessageEvent msgevent = cloneMessage(sendpanel.getMessage());
+					// Hack! For handling conversations.
+					// If no replies are sent sentmessages are 
+					final IMessageEvent msgevent = cloneMessage(sendpanel.getMessage());
+					if(msgevent.getParameter(SFipa.CONVERSATION_ID).getValue()!=null
+						|| msgevent.getParameter(SFipa.REPLY_WITH).getValue()!=null)
+					{
+						agent.getEventbase().registerMessageEvent(msgevent);
+						regmsgs.add(msgevent);
+						
+						/*msgevent.addMessageEventListener(new IMessageEventListener()
+						{
+							public void messageEventReceived(AgentEvent ae)
+							{
+								agent.getEventbase().deregisterMessageEvent(msgevent);
+								msgevent.removeMessageEventListener(this);
+							}
+							public void messageEventSent(AgentEvent ae)
+							{
+							}
+						});*/
+					}
 					agent.getEventbase().sendMessage(msgevent);
 					((DefaultListModel)sentmsgs.getModel()).addElement(msgevent);
 				}
@@ -234,12 +260,7 @@ public class FipaConversationPanel extends JSplitPane
 					south.add(send);
 					south.add(reset);
 					msgtab.add(BorderLayout.SOUTH, south);
-					String	title	= ""+msg;
-					if(title.length()>25)
-					{
-						title	= title.substring(0, 21) + "...)";
-					}
-					tabs.addTab(title, icons.getIcon("sent_message"), scroll);
+					tabs.addTab(getMessageTitle(msg), icons.getIcon("sent_message"), scroll);
 					tabs.setSelectedComponent(scroll);
 					
 					SGUI.adjustComponentSizes(FipaConversationPanel.this);
@@ -264,8 +285,8 @@ public class FipaConversationPanel extends JSplitPane
 					if(idx!=-1)
 					{
 						final IMessageEvent	msg	= (IMessageEvent)receivedmsgs.getModel().getElementAt(idx);
-						final JPanel	msgtab	= new JPanel(new BorderLayout());
-						final FipaMessagePanel	msgpanel	= new FipaMessagePanel(msg, agent);
+						final JPanel msgtab	= new JPanel(new BorderLayout());
+						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent);
 						msgpanel.setEditable(false);
 						final JScrollPane	scroll	= new JScrollPane(msgtab);
 						scroll.setBorder(null);
@@ -302,12 +323,7 @@ public class FipaConversationPanel extends JSplitPane
 						south.add(reply);
 						south.add(reset);
 						msgtab.add(BorderLayout.SOUTH, south);
-						String	title	= ""+msg;
-						if(title.length()>25)
-						{
-							title	= title.substring(0, 21) + "...)";
-						}
-						tabs.addTab(title, icons.getIcon("received_message"), scroll);
+						tabs.addTab(getMessageTitle(msg), icons.getIcon("received_message"), scroll);
 						tabs.setSelectedComponent(scroll);
 						SGUI.adjustComponentSizes(FipaConversationPanel.this);
 					}
@@ -330,6 +346,13 @@ public class FipaConversationPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				for(int i=0; i<regmsgs.size(); i++)
+				{
+					IMessageEvent mevent = (IMessageEvent)regmsgs.get(i);
+					agent.getEventbase().deregisterMessageEvent(mevent);
+				}
+				regmsgs.clear();
+				
 				((DefaultListModel)sentmsgs.getModel()).removeAllElements();
 				((DefaultListModel)receivedmsgs.getModel()).removeAllElements();
 				while(tabs.getComponentCount()>1)
@@ -341,7 +364,6 @@ public class FipaConversationPanel extends JSplitPane
 		
 		this.tabs	= new JTabbedPane();
 		tabs.addTab("Send", icons.getIcon("new_message"), sendtab);
-		
 		
 		// Initialize split panel
 		this.add(lists);
@@ -360,6 +382,33 @@ public class FipaConversationPanel extends JSplitPane
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the message as a title.
+	 */
+	protected String getMessageTitle(IMessageEvent mevent)
+	{
+		String perf = (String)mevent.getParameter(SFipa.PERFORMATIVE).getValue();
+		String cont = (String)mevent.getParameter(SFipa.CONTENT).getValue();
+
+		StringBuffer title = new StringBuffer();
+		if(perf!=null)
+			title.append(perf);
+		else
+			title.append("unknown");
+		
+		title.append("(");
+		if(cont!=null)
+			title.append(cont);
+		title.append(")");
+		
+		String ret = title.toString();
+		
+		if(ret.length()>25)
+			ret	= ret.substring(0, 21) + "...)";
+
+		return ret;
+	}
 	
 	/**
 	 *  Add a received message.
@@ -561,18 +610,18 @@ public class FipaConversationPanel extends JSplitPane
 		Map	map	= (Map)Nuggets.objectFromXML(msg, cl);
 		IMessageEvent	message	= agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE));
 
-		IParameter[]	params	= message.getParameters();
+		String[] params	= message.getMessageType().getParameterNames();
 		for(int i=0; i<params.length; i++)
 		{
-			params[i].setValue(map.get(params[i].getName()));
+			message.getParameter(params[i]).setValue(map.get(params[i]));
 		}
-		IParameterSet[]	paramsets	= message.getParameterSets();
+		String[] paramsets	= message.getMessageType().getParameterSetNames();
 		for(int i=0; i<paramsets.length; i++)
 		{
-			if(map.get(paramsets[i].getName())!=null)
+			if(map.get(paramsets[i])!=null)
 			{
-				paramsets[i].removeValues();
-				paramsets[i].addValues((Object[])map.get(paramsets[i].getName()));
+				message.getParameterSet(paramsets[i]).removeValues();
+				message.getParameterSet(paramsets[i]).addValues((Object[])map.get(paramsets[i]));
 			}
 		}
 		return message;

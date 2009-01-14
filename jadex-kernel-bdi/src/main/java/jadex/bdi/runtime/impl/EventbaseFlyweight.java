@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl;
 
+import java.util.Collection;
+
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.InternalEventRules;
@@ -329,6 +331,28 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 			
 			addEventListener(listener, mevent);
 		}
+	}
+	
+	/**
+	 *  Register a conversation or reply_with to be able
+	 *  to send back answers to the source capability.
+	 *  @param msgevent The message event.
+	 *  todo: indexing for msgevents for speed.
+	 */
+	public void registerMessageEvent(IMessageEvent mevent)
+	{
+		MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
+		MessageEventRules.registerMessageEvent(getState(), mef.getHandle(), mef.getScope());
+	}
+	
+	/**
+	 *  Remove a registered message event.
+	 *  @param msgevent The message event.
+	 */
+	public void deregisterMessageEvent(IMessageEvent mevent)
+	{
+		MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
+		MessageEventRules.deregisterMessageEvent(getState(), mef.getHandle(), mef.getScope());
 	}
 	
 	/**

@@ -391,7 +391,6 @@ public class ListenerRules
 				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageFlyweight(state, rcapa, revent), 
 						state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 
-				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(cetype))
 					lis.messageEventReceived(ae);

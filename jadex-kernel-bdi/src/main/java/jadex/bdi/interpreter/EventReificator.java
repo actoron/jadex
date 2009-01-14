@@ -248,11 +248,22 @@ public class EventReificator implements IOAVStateListener
 	{
 		assert element!=null;
 		
-		boolean	create	= observed.containsKey(element);
+		boolean	create;
+		// Hack! Special case for message events.
+		if(state.getType(element).isSubtype(OAVBDIRuntimeModel.messageevent_type) 
+			&& state.getAttributeValue(element, OAVBDIRuntimeModel.messageevent_has_original)!=null)
+		{
+			create = observed.containsKey(state.getAttributeValue(element, OAVBDIRuntimeModel.messageevent_has_original));
+		}
+		else
+		{
+			create = observed.containsKey(element);
+		}
+		
 		if(!create)
 		{
-			Object	melement	= state.getAttributeValue(element, OAVBDIRuntimeModel.element_has_model);
-			create	= observed.containsKey(melement);
+			Object	melement = state.getAttributeValue(element, OAVBDIRuntimeModel.element_has_model);
+			create = observed.containsKey(melement);
 		}
 		
 		if(create)

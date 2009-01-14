@@ -79,6 +79,8 @@ public class FipaMessagePanel extends JPanel
 	protected IAgentIdentifier	replyto;
 	protected IAgentIdentifier[]	receivers;
 	
+	protected IExternalAccess agent;
+	
 	//-------- constructors --------
 
 	/**
@@ -88,6 +90,7 @@ public class FipaMessagePanel extends JPanel
 	{
 		super(new GridBagLayout());
 		this.editable	= true;
+		this.agent = agent;
 
 		performative = new JComboBox((String[])SUtil.joinArrays(new String[]{""}, SFipa.PERFORMATIVES.toArray()));
 //		performative.setEditable(true);	// Todo: support arbitrary performatives?
@@ -430,6 +433,8 @@ public class FipaMessagePanel extends JPanel
 	{
 		if(!editable)
 			return this.message;
+		else
+			this.message = agent.createMessageEvent("fipamsg");
 		
 		// Set parameter values.
 		setParameter(SFipa.PERFORMATIVE, (String)performative.getSelectedItem());
@@ -522,7 +527,7 @@ public class FipaMessagePanel extends JPanel
 	protected void	setParameter(String name, Object value)
 	{
 		// Replace empty string with null.
-		Object	oval	=	value==null || value.equals("") ? null : value;
+		Object oval = value==null || value.equals("") ? null : value;
 		
 		try
 		{
