@@ -97,7 +97,8 @@ public class TexturedRectangle extends RotatingPrimitive
         {
         	g.rotate(rot_);
         }
-        g.drawImage(image_, imageToUser_, null);
+        //g.drawImage(image_, imageToUser_, null);
+        g.drawImage(image_, vp.getImageTransform(image_.getWidth(), image_.getHeight()), null);
         g.setTransform(transform);
     }
     
@@ -108,19 +109,25 @@ public class TexturedRectangle extends RotatingPrimitive
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_.getTexId());
         setupMatrix(gl);
         
+        gl.glMatrixMode(GL.GL_TEXTURE);
+        gl.glPushMatrix();
+        vp.setupTexMatrix(gl, texture_.getMaxX(), texture_.getMaxY());
+        
         gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         gl.glBegin(GL.GL_QUADS);
         gl.glTexCoord2f(0.0f, 0.0f);
         gl.glVertex2f(-0.5f, -0.5f);
-        gl.glTexCoord2f(texture_.getMaxX(), 0.0f);
+        gl.glTexCoord2f(1.0f, 0.0f);
         gl.glVertex2f(0.5f, -0.5f);
-        gl.glTexCoord2f(texture_.getMaxX(), texture_.getMaxY());
+        gl.glTexCoord2f(1.0f, 1.0f);
         gl.glVertex2f(0.5f, 0.5f);
-        gl.glTexCoord2f(0.0f, texture_.getMaxY());
+        gl.glTexCoord2f(0.0f, 1.0f);
         gl.glVertex2f(-0.5f, 0.5f);
         gl.glEnd();
         
         gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glPopMatrix();
+        gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPopMatrix();
     }
 }

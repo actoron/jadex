@@ -14,6 +14,7 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -56,6 +57,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
     public ViewportJ2D(ILibraryService libService)
     {
     	super();
+    	
         libService_ = libService;
         imageCache_ = Collections.synchronizedMap(new HashMap());
         
@@ -93,6 +95,22 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
     public void refresh()
     {
     	EventQueue.invokeLater(renderFrameAction_);
+    }
+    
+    /** Sets up the image transform.
+     *  
+     *  @param sizeX image x-size
+     *  @param sizeY image y-size
+     *  @return the transform 
+     */
+    public AffineTransform getImageTransform(int sizeX, int sizeY)
+    {
+    	AffineTransform imageTransform = new AffineTransform();
+    	imageTransform.translate(1.0 * inversionFlag_.getXAsInteger(),
+    							 1.0 * inversionFlag_.getYAsInteger());
+    	imageTransform.scale(-((inversionFlag_.getXAsInteger() << 1) - 1) / (double) sizeX,
+    						 -((inversionFlag_.getYAsInteger() << 1) - 1) / (double) sizeY);
+        return imageTransform;
     }
     
     // Component events
@@ -260,9 +278,10 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
     	
         private void setupTransform(Graphics2D g)
         {
-            g.translate(0.0, backBuffer_.getHeight());
-            g.scale((backBuffer_.getWidth() / paddedSize_.getXAsDouble()),
-                    -(backBuffer_.getHeight() / paddedSize_.getYAsDouble()));
+            g.translate(backBuffer_.getWidth() * inversionFlag_.getXAsInteger(),
+            		   backBuffer_.getHeight() * (inversionFlag_.getYAsInteger() ^ 1));
+            g.scale((backBuffer_.getWidth() / paddedSize_.getXAsDouble()) * -((inversionFlag_.getXAsInteger() << 1) - 1),
+                    (backBuffer_.getHeight() / paddedSize_.getYAsDouble()) * ((inversionFlag_.getYAsInteger() << 1) - 1));
             g.translate(-posX_, -posY_);
         }
         

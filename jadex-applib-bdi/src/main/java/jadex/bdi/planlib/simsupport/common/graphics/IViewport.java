@@ -35,6 +35,30 @@ public interface IViewport
      */
     public void setObjectShift(IVector2 objectShift);
     
+    /**  Returns true if the x-axis is inverted (right-left instead of left-right).
+     *  
+     *  @return true, if the  x-axis is inverted
+     */
+    public boolean getInvertX();
+    
+    /**  Returns true if the y-axis is inverted (top-down instead of bottom-up).
+     *  
+     *  @return true, if the  y-axis is inverted
+     */
+    public boolean getInvertY();
+    
+    /** If set to true, inverts the x-axis (right-left instead of left-right).
+     *  
+     *  @param b if true, inverts the x-axis
+     */
+    public void setInvertX(boolean b);
+    
+    /** If set to true, inverts the y-axis (top-down instead of bottom-up).
+     *  
+     *  @param b if true, inverts the y-axis
+     */
+    public void setInvertY(boolean b);
+    
     /** Sets the layers that are applied before the drawables are drawn.
      *  
      *  @param layers new layers

@@ -6,6 +6,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.order.YOrder;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 import jadex.bridge.ILibraryService;
 
 import java.awt.AlphaComposite;
@@ -108,6 +109,7 @@ public class ViewportJOGL extends AbstractViewport
     public ViewportJOGL(ILibraryService libService)
     {
     	super();
+    	
     	registeredDrawables_ = Collections.synchronizedList(new ArrayList());
     	libService_ = libService;
         uninitialized_ = true;
@@ -227,11 +229,40 @@ public class ViewportJOGL extends AbstractViewport
     	displayLists_.put(listName, list);
     }
     
-    private void setupMatrix(GL gl)
-    { 
+    /** Configures the texture matrix for a specific texture.
+     *  Caller must ensure being in the correct matrix mode before calling this method.
+     * 
+     *  @param gl GL context
+     *  @param maxX maximum texture x-coordinate (for padded textures)
+     *  @param maxY maximum texture y-coordinate (for padded textures)
+     */
+    public void setupTexMatrix(GL gl, float maxX, float maxY)
+    {
         gl.glLoadIdentity();
-        gl.glOrtho(0.0, paddedSize_.getXAsDouble(),
-        		   0.0, paddedSize_.getYAsDouble(),
+        gl.glTranslatef(maxX * inversionFlag_.getXAsInteger(),
+        				maxY * inversionFlag_.getYAsInteger(),
+        				0.0f);
+        gl.glScalef(maxX * -((inversionFlag_.getXAsInteger() << 1) - 1),
+        			maxY * -((inversionFlag_.getYAsInteger() << 1) - 1),
+        			1.0f);
+    }
+    
+    private void setupMatrix(GL gl)
+    {
+    	gl.glMatrixMode(GL.GL_TEXTURE);
+        gl.glLoadIdentity();
+        /*gl.glOrtho(inversionFlag_.getXAsInteger(), (inversionFlag_.getXAsInteger() ^ 1),
+     		   	   inversionFlag_.getYAsInteger(), (inversionFlag_.getYAsInteger() ^ 1),
+     		   	   0.0, 1.0);*/
+        //gl.glTranslated(0.0, 1.0, 0.0);
+        //gl.glScaled(1.0, -1.0, 1.0);
+        
+        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glLoadIdentity();
+        gl.glOrtho(paddedSize_.getXAsDouble() * inversionFlag_.getXAsInteger(),
+        		   paddedSize_.getXAsDouble() * (inversionFlag_.getXAsInteger() ^ 1),
+        		   paddedSize_.getYAsDouble() * inversionFlag_.getYAsInteger(),
+        		   paddedSize_.getYAsDouble() * (inversionFlag_.getYAsInteger() ^ 1),
         		   -0.5, 0.5);
         gl.glTranslated(-posX_, -posY_, 0.0);
         
@@ -244,8 +275,6 @@ public class ViewportJOGL extends AbstractViewport
         int h = (int)Math.ceil(size_.getYAsDouble() * yFac);
         gl.glScissor(x, y, w, h);
     }
-    
-    
     
     /** Loads a Texture
      *
@@ -312,9 +341,9 @@ public class ViewportJOGL extends AbstractViewport
         
         // Fill up padded textures, may be wrong approach for
         // clamped textures.
-        g.drawImage(tmpImage, ow, 0, null);
-        g.drawImage(tmpImage, 0, oh, null);
-        g.drawImage(tmpImage, ow, oh, null);
+        //g.drawImage(tmpImage, ow, 0, null);
+        //g.drawImage(tmpImage, 0, oh, null);
+        //g.drawImage(tmpImage, ow, oh, null);
         
         g.dispose();
         tmpImage = null;
@@ -339,14 +368,22 @@ public class ViewportJOGL extends AbstractViewport
         gl.glTexParameteri(GL.GL_TEXTURE_2D,
                            GL.GL_TEXTURE_WRAP_T,
                            wrapMode);
-        GLU glu = new GLU();
-        glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D,
-        				      GL.GL_COMPRESSED_RGBA,
-        				      image.getWidth(),
-        				      image.getHeight(),
-        				      GL.GL_RGBA,
-        				      GL.GL_UNSIGNED_BYTE,
-        				      buffer);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D,
+        				   GL.GL_TEXTURE_MIN_FILTER,
+        				   GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D,
+				   		   GL.GL_TEXTURE_MAG_FILTER,
+				   		   GL.GL_LINEAR);
+        gl.glTexImage2D(GL.GL_TEXTURE_2D,
+        				0,
+        				GL.GL_COMPRESSED_RGBA,
+			      		image.getWidth(),
+			      		image.getHeight(),
+			      		0,
+			      		GL.GL_RGBA,
+			      		GL.GL_UNSIGNED_BYTE,
+			      		buffer);
+        
         gl.glDisable(GL.GL_TEXTURE_2D);
         
         
@@ -366,6 +403,8 @@ public class ViewportJOGL extends AbstractViewport
             	d.init(ViewportJOGL.this, gl);
             	registeredDrawables_.add(d);
             }
+            
+            setupMatrix(gl);
             
             gl.glClear(gl.GL_COLOR_BUFFER_BIT);
             

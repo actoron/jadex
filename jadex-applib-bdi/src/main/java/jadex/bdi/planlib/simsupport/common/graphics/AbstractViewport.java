@@ -4,6 +4,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
@@ -25,6 +26,10 @@ import javax.swing.JFrame;
 
 public abstract class AbstractViewport implements IViewport
 {
+	/** Axis inversion flag
+	 */
+	protected IVector2 inversionFlag_;
+	
 	/** Canvas for graphical output.
 	 */
 	protected Canvas canvas_;
@@ -87,6 +92,7 @@ public abstract class AbstractViewport implements IViewport
     
     public AbstractViewport()
     {
+    	inversionFlag_ = new Vector2Int(0);
         posX_ = 0.0f;
         posY_ = 0.0f;
         preserveAR_ = true;
@@ -215,6 +221,56 @@ public abstract class AbstractViewport implements IViewport
     	setSize(size_);
     }
     
+    /**  Returns true if the x-axis is inverted (right-left instead of left-right).
+     *  
+     *  @return true, if the  x-axis is inverted
+     */
+    public boolean getInvertX()
+    {
+    	return inversionFlag_.getXAsInteger() > 0;
+    }
+    
+    /**  Returns true if the y-axis is inverted (top-down instead of bottom-up).
+     *  
+     *  @return true, if the  y-axis is inverted
+     */
+    public boolean getInvertY()
+    {
+    	return inversionFlag_.getYAsInteger() > 0;
+    }
+    
+    /** If set to true, inverts the x-axis (right-left instead of left-right).
+     *  
+     *  @param b if true, inverts the x-axis
+     */
+    public void setInvertX(boolean b)
+    {
+    	if (b)
+    	{
+    		inversionFlag_ = new Vector2Int(1, inversionFlag_.getYAsInteger());
+    	}
+    	else
+    	{
+    		inversionFlag_ = new Vector2Int(0, inversionFlag_.getYAsInteger());
+    	}
+    }
+    
+    /** If set to true, inverts the y-axis (top-down instead of bottom-up).
+     *  
+     *  @param b if true, inverts the y-axis
+     */
+    public void setInvertY(boolean b)
+    {
+    	if (b)
+    	{
+    		inversionFlag_ = new Vector2Int(inversionFlag_.getXAsInteger(), 1);
+    	}
+    	else
+    	{
+    		inversionFlag_ = new Vector2Int(inversionFlag_.getXAsInteger(), 0);
+    	}
+    }
+    
     /** Sets the shift of all objects.
      */
     public void setObjectShift(IVector2 objectShift)
@@ -282,6 +338,32 @@ public abstract class AbstractViewport implements IViewport
     	}
     }
     
+    /** Converts pixel coordinates into world coordinates
+     *  
+     *  @param pixelX pixel x-coordinate
+     *  @param pixelY pixel y-coordinate
+     *  @return world coordinates
+     */
+    private IVector2 getWorldCoordinates(int pixelX, int pixelY)
+    {
+    	if (getInvertX())
+        {
+        	pixelX = canvas_.getWidth() - pixelX;
+        }
+    	
+    	if (getInvertY())
+        {
+    		pixelY = canvas_.getHeight() - pixelY;
+        }
+    	
+    	double xFac = (paddedSize_.getXAsDouble()) / canvas_.getWidth();
+        double yFac = (paddedSize_.getYAsDouble()) / canvas_.getHeight();
+        IVector2 position = new Vector2Double((xFac * pixelX) + posX_,
+        									  (yFac * (canvas_.getHeight() - pixelY)) + posY_);
+        
+        return position;
+    }
+    
     protected class MouseController implements MouseListener
     {
     	public void mouseClicked(MouseEvent e)
@@ -301,10 +383,7 @@ public abstract class AbstractViewport implements IViewport
     		if (e.getButton() == MouseEvent.BUTTON1)
     		{
     			Point p = e.getPoint();
-    			double xFac = (paddedSize_.getXAsDouble()) / canvas_.getWidth();
-    	        double yFac = (paddedSize_.getYAsDouble()) / canvas_.getHeight();
-    	        IVector2 position = new Vector2Double((xFac * p.x) + posX_,
-    	        									  (yFac * (canvas_.getHeight() - p.y)) + posY_);
+    			IVector2 position = getWorldCoordinates(p.x, p.y);
     	        
     	        if (e.getButton() == MouseEvent.BUTTON1)
     	        {

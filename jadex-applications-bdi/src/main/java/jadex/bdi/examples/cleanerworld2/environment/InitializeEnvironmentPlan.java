@@ -12,6 +12,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
+import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.EuclideanSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.runtime.IBeliefbase;
@@ -49,6 +50,8 @@ public class InitializeEnvironmentPlan extends Plan
 			IVector2 pos = engine.getRandomPosition(Configuration.CHARGING_STATION_SIZE);
 			engine.createSimObject("charging_station", null, null, pos, false, null);
 		}
+		
+		engine.createSimObject("charging_station", null, null, new Vector2Double(0.0), false, null);
 		
 		// Processes
 		int maxWastes = ((Integer) getBeliefbase().getBelief("max_wastes").getFact()).intValue();

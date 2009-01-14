@@ -19,9 +19,9 @@ public class Triangle extends ColoredPrimitive
 	private static final GeneralPath J2D_TRIANGLE = new GeneralPath();
 	static
 	{
-		J2D_TRIANGLE.moveTo(-0.5f, -0.5f);
-		J2D_TRIANGLE.lineTo(0.5f, -0.5f);
-		J2D_TRIANGLE.lineTo(0.0f, 0.5f);
+		J2D_TRIANGLE.moveTo(0.0f, 0.5f);
+		J2D_TRIANGLE.lineTo((float) -(0.25*Math.sqrt(3)), -0.25f);
+		J2D_TRIANGLE.lineTo((float) (0.25*Math.sqrt(3)), -0.25f);
 		J2D_TRIANGLE.closePath();
 	}
 	
@@ -68,9 +68,9 @@ public class Triangle extends ColoredPrimitive
 			gl.glNewList(newList, GL.GL_COMPILE);
 			
 			gl.glBegin(GL.GL_TRIANGLES);
-			gl.glVertex2d(-0.5, -0.5);
-			gl.glVertex2d(0.5, -0.5);
 			gl.glVertex2d(0.0, 0.5);
+			gl.glVertex2d(-(0.25*Math.sqrt(3)), -0.25f);
+			gl.glVertex2d((0.25*Math.sqrt(3)), -0.25f);
 			gl.glEnd();
 			gl.glEndList();
 			

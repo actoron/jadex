@@ -37,8 +37,12 @@ public class LocalUpdateDisplayPlan extends Plan
 			IViewport viewport = (IViewport) b.getBelief("viewport").getFact();
 			if (!viewport.isShowing())
 			{
-				return;
+				waitFor(100);
+				continue;
 			}
+			
+			viewport.setInvertX(((Boolean) b.getBelief("invert_x_axis").getFact()).booleanValue());
+			viewport.setInvertY(((Boolean) b.getBelief("invert_y_axis").getFact()).booleanValue());
 			
 			String themeId = (String) b.getBelief("selected_theme").getFact();
 			

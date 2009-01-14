@@ -67,29 +67,6 @@ public class ToolboxPlugin implements IObserverCenterPlugin
 		c.anchor = GridBagConstraints.CENTER;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		themePanel.add(toolScrollPane, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		mainPanel_.add(themePanel, c);
-		
-		JPanel statusPanel = new JPanel(new GridLayout(1, 2));
-		statusLabelDesc_ = new JLabel();
-		statusPanel.add(statusLabelDesc_);
-		statusLabel_ = new JLabel();
-		statusPanel.add(statusLabel_);
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.SOUTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		mainPanel_.add(statusPanel, c);
 	}
 	
 	/** Starts the plugin

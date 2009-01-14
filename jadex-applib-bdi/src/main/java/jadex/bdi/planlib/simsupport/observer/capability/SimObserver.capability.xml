@@ -40,6 +40,16 @@
 			<fact>new Boolean(true)</fact>
 		</belief>
 		
+		<!-- X-axis inversion (right-left instead of left-right) -->
+		<belief name="invert_x_axis" class="Boolean" exported="true">
+			<fact>new Boolean(false)</fact>
+		</belief>
+		
+		<!-- Y-axis inversion (top-down instead of bottom-up) -->
+		<belief name="invert_y_axis" class="Boolean" exported="true">
+			<fact>new Boolean(false)</fact>
+		</belief>
+		
 		<!-- The target frame rate -->
 		<belief name="frame_rate" class="Integer" exported="true">
 			<fact>30</fact>

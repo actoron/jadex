@@ -13,6 +13,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.Rectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RegularPolygon;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.Triangle;
+import jadex.bdi.planlib.simsupport.common.graphics.layer.GridLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.order.YOrder;
@@ -30,6 +31,7 @@ public class InitializeObserverPlan extends Plan
 		b.getBelief("environment_name").setFact(Configuration.ENVIRONMENT_NAME);
 		b.getBelief("preserve_aspect_ratio").setFact(Boolean.TRUE);
 		b.getBelief("force_java2d").setFact(Boolean.FALSE);
+		//b.getBelief("obscap.invert_y_axis").setFact(Boolean.TRUE);
 		b.getBelief("draw_order").setFact(new YOrder());
 		
 		Map theme = new HashMap();

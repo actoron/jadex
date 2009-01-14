@@ -422,7 +422,7 @@ public class Platform extends AbstractPlatform
 			}
 		});
 		gc.setDaemon(true);
-		gc.start();
+		//gc.start();
 	}
 
 	/**
