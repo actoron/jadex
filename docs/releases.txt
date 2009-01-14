@@ -1,5 +1,9 @@
 Jadex Releases Overview
 
+Release 2.0 beta2 (1/2009)
+	- JADE adapter included
+	- Some minor bugfixes
+
 Release 2.0 beta1 (V2 Beta-Release 12/2008)
 	- Complete rebuilt of the BDI-kernel, on based on a rule engine
 	- Exchangeable agent kernels for different agent architectures
