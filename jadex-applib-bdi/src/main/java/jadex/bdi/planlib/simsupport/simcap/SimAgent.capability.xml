@@ -94,7 +94,7 @@
 			<!-- ID of the object -->
 			<parameter name="object_id" class="Integer"/>
 			<!-- The position of the object. -->
-			<parameter name="position" class="IVector2" direction="out"/>
+			<parameter name="position" class="IVector2" direction="inout"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (element_has_name "connected"))
