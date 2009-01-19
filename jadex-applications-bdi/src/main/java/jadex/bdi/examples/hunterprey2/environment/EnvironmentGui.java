@@ -70,7 +70,7 @@ public class EnvironmentGui	extends JFrame
 
 	public EnvironmentGui(final IExternalAccess agent)
 	{
-		this(agent, null);
+		this(agent, null, false);
 	}
 	
 	/**
@@ -79,27 +79,28 @@ public class EnvironmentGui	extends JFrame
 	 *  @param world The displayable word canvas. If 'null' internal MapPanel is used.
 	 *  
 	 */
-	public EnvironmentGui(final IExternalAccess agent, Canvas worldmap)
+	public EnvironmentGui(final IExternalAccess agent, Canvas worldmap, boolean showmap)
 	{
 		super(agent.getAgentName());
-		
-		
-		if (worldmap != null)
+
+		if (showmap)
 		{
-			this.map = worldmap;
+			if (worldmap != null)
+			{
+				this.map = worldmap;
+			}
+			else
+			{
+				// Map panel.
+				this.map	= new MapPanel();
+				// only to use not the custom gui display
+				map.setPreferredSize(new Dimension(600, 600));
+			}
+			map.setMinimumSize(new Dimension(300, 300));
+			map.setSize(new Dimension(600, 600));
+			// since 1.5 !
+			//map.setPreferredSize(new Dimension(600, 600));
 		}
-		else
-		{
-			// Map panel.
-			this.map	= new MapPanel();
-			// only to use not the custom gui display
-			map.setPreferredSize(new Dimension(600, 600));
-		}
-		map.setMinimumSize(new Dimension(300, 300));
-		map.setSize(new Dimension(600, 600));
-		// since 1.5 !
-		//map.setPreferredSize(new Dimension(600, 600));
-		
 		
 		JPanel options = createOptionsPanel(agent);
 
@@ -113,15 +114,25 @@ public class EnvironmentGui	extends JFrame
 		tp.addTab("Observers", observers);
 		tp.addTab("Highscore", highscore);
 		tp.setMinimumSize(new Dimension(0, 0));
-		tp.setPreferredSize(new Dimension(243, 0));
-
+		// since 1.5 !
+		//tp.setPreferredSize(new Dimension(243, 0));
+		tp.setSize(new Dimension(243, 0));
+		
 		JPanel	east	= new JPanel(new BorderLayout());
 		east.add(BorderLayout.CENTER, tp);
 		east.add(BorderLayout.SOUTH, options);
 
 		// Show the gui.
 		JSplitPane	split	= new JSplitPane();
-		split.setLeftComponent(map);
+		if (showmap)
+		{
+			split.setLeftComponent(map);
+		}
+		else
+		{
+			// TODO: add a simple image instead of map?
+			split.setLeftComponent(null);
+		}
 		split.setRightComponent(east);
 		split.setResizeWeight(1);
 

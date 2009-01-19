@@ -19,11 +19,9 @@
 		<import>jadex.bdi.examples.hunterprey2.*</import>
 		<import>jadex.bdi.examples.hunterprey2.engine.*</import>
 		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
-		<import>jadex.bdi.examples.hunterprey2.environment.observer.*</import>
 	</imports>
 	
 	<capabilities>
-		<capability name="obscap" file="jadex.bdi.planlib.simsupport.observer.capability.SimObserver"/>
 		<capability name="simcap" file="jadex.bdi.planlib.simsupport.simcap.SimAgent"/>
 		
 		<capability name="startcap" file="jadex.bdi.planlib.starter.StartAgents"/>
@@ -66,14 +64,19 @@
 			<concrete ref="procap.rp_filter"/>
 		</beliefref>
 
-		<!-- food spawn rate (in salad every x rounds) -->
-		<belief name="food_spawn_rate" class="IVector1" exported="true">
-			<fact>new Vector1Int(10)</fact>
+		<!-- Initial number of food objects -->
+		<belief name="initial_food" class="Integer" exported="true">
+			<fact>new Integer(10)</fact>
 		</belief>
-		
+
 		<!-- Maximum number of food objects -->
 		<belief name="max_food" class="Integer" exported="true">
 			<fact>new Integer(50)</fact>
+		</belief>
+		
+		<!-- One food every X rounds -->
+		<belief name="food_spawn_rate" class="Integer" exported="true">
+			<fact>new Integer(5)</fact>
 		</belief>
 		
 		<!-- Number of obstacles -->
@@ -81,56 +84,6 @@
 			<fact>new Integer(100)</fact>
 		</belief>
 
-		<!-- this is an observer too  -->
-		
-		<!-- Name of the simulation environment -->
-		<beliefref name="environment_name_obs">
-			<concrete ref="obscap.environment_name"/>
-		</beliefref>
-		
-		<!-- Preservation of area aspect ratio in the window -->
-		<beliefref name="preserve_aspect_ratio">
-			<concrete ref="obscap.preserve_aspect_ratio"/>
-		</beliefref>
-		
-		<!-- Force the use of Java2D -->
-		<beliefref name="force_java2d">
-			<concrete ref="obscap.force_java2d"/>
-		</beliefref>
-		
-		<!-- List of themes for displaying objects -->
-		<beliefref name="object_themes">
-			<concrete ref="obscap.object_themes"/>
-		</beliefref>
-		
-		<!-- The pre-layers -->
-		<beliefref name="prelayer_themes">
-			<concrete ref="obscap.prelayer_themes"/>
-		</beliefref>
-		
-		<!-- The post-layers -->
-		<beliefref name="postlayer_themes">
-			<concrete ref="obscap.postlayer_themes"/>
-		</beliefref>
-		
-		<!-- The selected start theme -->
-		<beliefref name="selected_theme">
-			<concrete ref="obscap.selected_theme"/>
-		</beliefref>
-
-		<!-- Offer canvas access for building a custom GUI. -->
-		<beliefref name="custom_gui">
-			<concrete ref="obscap.custom_gui"/>
-		</beliefref>
-		<beliefref name="worldmap">
-			<concrete ref="obscap.canvas"/>
-		</beliefref>
-		
-		<!-- Shift for the objects -->
-		<beliefref name="object_shift">
-			<concrete ref="obscap.object_shift"/>
-		</beliefref>
-	
 	</beliefs>
 
 	<goals>
@@ -165,19 +118,15 @@
 		<!-- environment gui goal -->
 		<achievegoal name="start_environment_gui" />
 		
-		<!-- observer capability window start goal -->
-		<achievegoal name="obs_initialization" />
+		<!-- +++++++++++++++++++++++ -->
+		<!-- simulation engine goals -->
+		<!-- +++++++++++++++++++++++ -->
 		
 		<!-- sim environment start goal -->
 		<achievegoalref name="sim_start_environment">
         	<concrete ref="envcap.sim_start_environment"/>
     	</achievegoalref>
-    	
-    	<!-- sim observer start goal -->
-    	<achievegoalref name="simobs_start">
-        	<concrete ref="obscap.simobs_start"/>
-    	</achievegoalref>
-    	
+
 		<!-- +++++++++++++++++++++++ -->
 		<!-- object simulation goals -->
 		<!-- +++++++++++++++++++++++ -->
@@ -192,6 +141,10 @@
     	
     	<achievegoalref name="sim_get_position">
         	<concrete ref="simcap.sim_get_position"/>
+    	</achievegoalref>
+    	
+    	<achievegoalref name="sim_set_position">
+        	<concrete ref="simcap.sim_set_position"/>
     	</achievegoalref>
     	
     	<achievegoalref name="sim_set_velocity">
@@ -325,116 +278,9 @@
       		<body class="InitializeEnvironmentPlan"/>
     	</plan>
     	
-    	
-    	
-    	<!-- gui plan - ->
-    	<plan name="start_environment_gui">
-    		<body class="EnvironmentGuiPlan"/>
-    		<trigger>
-				<goal ref="start_environment_gui" />
-			</trigger>
-    	</plan>
-    	-->
-    	
-    	<!-- sim observer init Plan. - ->
-    	<plan name="obs_initialization">
-      		<body class="InitializeObserverPlan"/>
-      		<trigger>
-				<goal ref="obs_initialization" />
-			</trigger>
-    	</plan>
-    	-->
-    	
 	</plans>
 
 	<events>
-<!--		<messageevent name="request_vision" type="fipa" direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
- 			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>"HunterPreyOntology"</value>
- 			</parameter>
-			<parameter name="content-class" class="Class" direction="fixed">
-				<value>RequestVision.class</value>
-			</parameter>
-		</messageevent>
-
-		<messageevent name="request_worldsize" type="fipa" direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
- 			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>"HunterPreyOntology"</value>
- 			</parameter>
-			<parameter name="content-class" class="Class" direction="fixed">
-				<value>RequestWorldSize.class</value>
-			</parameter>
-		</messageevent>
-
-		<messageevent name="request_move" type="fipa" direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
- 			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>"HunterPreyOntology"</value>
- 			</parameter>
-			<parameter name="content-class" class="Class" direction="fixed">
-				<value>RequestMove.class</value>
-			</parameter>
-		</messageevent>
-
-		<messageevent name="request_eat" type="fipa" direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
- 			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>"HunterPreyOntology"</value>
- 			</parameter>
-			<parameter name="content-class" class="Class" direction="fixed">
-				<value>RequestEat.class</value>
-			</parameter>
-		</messageevent>
-
-		<messageevent name="inform_done" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
- 			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>"HunterPreyOntology"</value>
- 			</parameter>
-			<parameter name="content-class" class="Class" direction="fixed">
-				<value>Done.class</value>
-			</parameter>
-		</messageevent>
-
-		<messageevent name="failure" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.FAILURE</value>
-			</parameter>
-			<parameter name="language" class="String">
-<!- -				<value>"plain-text"</value>- ->
-			</parameter>
-			<parameter name="content-class" class="Class" direction="fixed">
-				<value>ContentElementList.class</value>
-			</parameter>
-		</messageevent>
--->
 		<messageevent name="inform_vision" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
@@ -465,7 +311,7 @@
 	</expressions>
 
 	<properties>
-<!--		<property name="logging.level">java.util.logging.Level.WARNING</property>-->
+		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
 	</properties>
 
 	<configurations>
@@ -474,19 +320,6 @@
 				<initialbelief ref="rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
-				<initialbelief ref="selected_theme">
-					<fact>"default"</fact>
-				</initialbelief>
-				<initialbelief ref="custom_gui">
-					<fact>new Boolean(false)</fact>
-				</initialbelief>
-				<initialbelief ref="force_java2d">
-					<fact>new Boolean(false)</fact>
-				</initialbelief>
-				<initialbelief ref="object_shift">
-					<fact>new Vector2Double(0.5)</fact>
-				</initialbelief>
-				
 			</beliefs>
 			<goals>
 				<initialgoal ref="df_register">
@@ -504,7 +337,6 @@
 			</goals>
 			<plans>
 				<initialplan ref="env_initialization"/>
-				<!-- <initialplan ref="obs_initialization"/> -->
 				<initialplan ref="simticker"/>
 			</plans>
 		</configuration>

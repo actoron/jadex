@@ -19,6 +19,7 @@ import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.TimeoutException;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;
@@ -33,8 +34,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import nuggets.Nuggets;
@@ -44,6 +47,11 @@ import nuggets.Nuggets;
  */
 public class Environment implements IEnvironment
 {
+	// The world behavior 
+	public static final int WORLD_BEHAVIOR_EUCLID = 0;
+	public static final int WORLD_BEHAVIOR_TORUS = 1;
+
+	// predefined object types and properties
 	public static final String OBJECT_TYPE_OBSTACLE 	= "obstacle"; 
 	public static final String OBJECT_TYPE_FOOD 		= "food"; 
 	public static final String OBJECT_TYPE_HUNTER 		= "hunter"; 
@@ -54,6 +62,9 @@ public class Environment implements IEnvironment
 	
 	/** The default number of lease ticks. */
 	public static int	DEFAULT_LEASE_TICKS	= 50;
+	
+	/** The behavior of the world */
+	public static int WORLD_BEHAVIOR = WORLD_BEHAVIOR_TORUS;
 
 	//-------- attributes --------
 	
@@ -106,6 +117,10 @@ public class Environment implements IEnvironment
 	/** The world age. */
 	protected int age;
 	
+	// HACK! Until simengine getRandomPosition goal returns always
+	/** The radnom number generator. */
+	protected Random	rand = new Random(System.currentTimeMillis());
+	
 	//-------- constructors --------
 
 	/**
@@ -115,7 +130,7 @@ public class Environment implements IEnvironment
 	{
 		
 		this.agent = agent;
-		this.foodrate = 5;
+		this.foodrate = 10;
 		this.creatures = new HashMap();
 		this.obstacles = new HashSet();
 		this.food = new HashSet();
@@ -180,8 +195,17 @@ public class Environment implements IEnvironment
 		cg.getParameter("signal_destruction").setValue(sigDes);
 		cg.getParameter("listen").setValue(listen);
 		
-		agent.dispatchTopLevelGoalAndWait(cg);
-		wo.setSimId((Integer) cg.getParameter("object_id").getValue());
+		try {
+			agent.dispatchTopLevelGoalAndWait(cg, 100);
+			wo.setSimId((Integer) cg.getParameter("object_id").getValue());
+		}
+		catch (TimeoutException e)
+		{
+			// TODO: implement handling
+			System.out.println("Caught TimeoutException during SimObject creation: "+e);
+			e.printStackTrace();
+		}
+		
 		
 		return wo;
 	}
@@ -203,25 +227,36 @@ public class Environment implements IEnvironment
 		return wo;
 	}
 	
-	private IGoal getMoveGoal(Creature me, String dir) 
+	private IGoal getMoveGoal(Creature me, Location dest) 
 	{
 		assert agent != null : this + " - no external access provided";
 		
-		IVector2 destination = createLocation(me.getLocation(), dir).getAsIVector();
+		IVector2 position = me.getLocation().getAsIVector();
+		IVector2 destination = dest.getAsIVector();
+		IGoal goToDest = null;
 		
-		System.out.println("Destination-Vector:"+destination);
-		
-		// request simulation engine move
-//		IGoal goToDest = agent.createGoal("sim_go_to_destination");
-//		goToDest.getParameter("object_id").setValue(me.getSimId());
-//		goToDest.getParameter("destination").setValue(destination);
-//		goToDest.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
-//		goToDest.getParameter("tolerance").setValue(new Vector1Double(0.01));
-//		
-		IGoal goToDest = agent.createGoal("sim_go_to_precise_destination");
-		goToDest.getParameter("object_id").setValue(me.getSimId());
-		goToDest.getParameter("destination").setValue(destination);
-		goToDest.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
+		// update useSetPosition on demand
+		boolean useSetPosition = true;
+		int dX = position.getX().subtract(destination.getX()).getAsInteger();
+		int dY = position.getY().subtract(destination.getY()).getAsInteger();
+		if (-1 <= dX && dX <= 1 && -1 <= dY && dY <= 1)
+		{
+			useSetPosition = false;
+		}
+
+		if (WORLD_BEHAVIOR == WORLD_BEHAVIOR_TORUS && useSetPosition)
+		{			
+			goToDest = agent.createGoal("sim_set_position");
+			goToDest.getParameter("object_id").setValue(me.getSimId());
+			goToDest.getParameter("position").setValue(destination);
+		}
+		else
+		{
+			goToDest = agent.createGoal("sim_go_to_precise_destination");
+			goToDest.getParameter("object_id").setValue(me.getSimId());
+			goToDest.getParameter("destination").setValue(destination);
+			goToDest.getParameter("speed").setValue(Creature.CREATURE_SPEED.copy());
+		}
 
 		return goToDest;
 	}
@@ -263,7 +298,16 @@ public class Environment implements IEnvironment
 	 */
 	public boolean moveUp(Creature me)
 	{
-		return move(me, RequestMove.DIRECTION_UP);
+		//return move(me, RequestMove.DIRECTION_UP);
+		try
+		{
+			IGoal mg = move(me, RequestMove.DIRECTION_UP);
+			agent.dispatchTopLevelGoalAndWait(mg);
+			return mg.isSucceeded();
+		} catch (LocationBlockedException e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -273,7 +317,16 @@ public class Environment implements IEnvironment
 	 */
 	public boolean moveDown(Creature me)
 	{
-		return move(me, RequestMove.DIRECTION_DOWN);
+		//return move(me, RequestMove.DIRECTION_DOWN);
+		try
+		{
+			IGoal mg = move(me, RequestMove.DIRECTION_DOWN);
+			agent.dispatchTopLevelGoalAndWait(mg);
+			return mg.isSucceeded();
+		} catch (LocationBlockedException e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -283,7 +336,16 @@ public class Environment implements IEnvironment
 	 */
 	public boolean moveLeft(Creature me)
 	{
-		return move(me, RequestMove.DIRECTION_LEFT);
+		//return move(me, RequestMove.DIRECTION_LEFT);
+		try
+		{
+			IGoal mg = move(me, RequestMove.DIRECTION_LEFT);
+			agent.dispatchTopLevelGoalAndWait(mg);
+			return mg.isSucceeded();
+		} catch (LocationBlockedException e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -293,7 +355,16 @@ public class Environment implements IEnvironment
 	 */
 	public boolean moveRight(Creature me)
 	{
-		return move(me, RequestMove.DIRECTION_RIGHT);
+		//return move(me, RequestMove.DIRECTION_RIGHT);
+		try
+		{
+			IGoal mg = move(me, RequestMove.DIRECTION_RIGHT);
+			agent.dispatchTopLevelGoalAndWait(mg);
+			return mg.isSucceeded();
+		} catch (LocationBlockedException e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -343,7 +414,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public TaskInfo addEatTask(Creature me, WorldObject obj)
+	public synchronized TaskInfo addEatTask(Creature me, WorldObject obj)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"eat", me, obj});
 		tasklist.add(ret);
@@ -354,7 +425,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public TaskInfo addMoveTask(Creature me, String dir)
+	public synchronized TaskInfo addMoveTask(Creature me, String dir)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"move", me, dir});
 		tasklist.add(ret);
@@ -528,25 +599,26 @@ public class Environment implements IEnvironment
 	 *  @param creature The creature.
 	 */
 	public synchronized boolean removeCreature(Creature creature)
-	{
+	{	
 		// Remove tasks of this creature.
 		int	tasks	= tasklist.size();
-		for(int i=0; i<tasks; i++)
+		for(Iterator it=tasklist.iterator(); it.hasNext(); )
 		{
-			Object[] params = (Object[])((TaskInfo)tasklist.get(i)).getAction();
+			TaskInfo	task	= (TaskInfo) it.next();
+			Object[] params = (Object[])task.getAction();
 			if(creature.equals(params[1]))
 			{
-				//System.out.println("Removed: "+tasklist.get(i));
-				tasklist.remove(i);
+				it.remove();
 			}
 		}
+		
 		this.pcs.firePropertyChange("taskSize", tasks, tasklist.size());
+		
 		if(this.world.containsKey(creature.getLocation()))
 			this.world.remove(creature.getLocation(), creature);
 		
 		destroySimObject(creature);
 		return this.creatures.remove(creature)!=null;
-
 	}
 
 	/**
@@ -554,7 +626,6 @@ public class Environment implements IEnvironment
 	 */
 	public synchronized void executeStep()
 	{
-		
 		System.out.println("executing step " + age);
 		
 		// Creatures that already acted in this step.
@@ -594,10 +665,17 @@ public class Environment implements IEnvironment
 			if(params[0].equals("move"))
 			{
 			
-				if(!acted.contains(params[1]) && move((Creature)params[1], (String)params[2]))
+				if(!acted.contains(params[1]))
 				{
-					tasks[i].setResult(getMoveGoal((Creature)params[1], (String)params[2]));
-					goaltasks.add(tasks[i]);
+					try
+					{
+						IGoal mg = move((Creature)params[1], (String)params[2]);
+						tasks[i].setResult(mg);
+						goaltasks.add(tasks[i]);
+					} catch (LocationBlockedException e)
+					{
+						tasks[i].setResult(new Boolean(false));
+					}
 					acted.add(params[1]);
 				}
 				else
@@ -610,12 +688,15 @@ public class Environment implements IEnvironment
 		// Place new food.
 		if(age%foodrate==0)
 		{
-			Location	loc	= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
-			Location	test= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
-			// Make sure there will be some empty location left.
-			if(!loc.equals(test))
+			if (food.size() < ((Integer) agent.getBeliefbase().getBelief("max_food").getFact()).intValue())
 			{
-				addFood(new Food(loc));
+				Location	loc	= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+				Location	test= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+				// Make sure there will be some empty location left.
+				if(!loc.equals(test))
+				{
+					addFood(new Food(loc));
+				}
 			}
 		}
 		
@@ -741,42 +822,43 @@ public class Environment implements IEnvironment
 	 *  @param me The creature.
 	 *  @param dir The direction.
 	 */
-	public boolean move(Creature me, String dir)
+	public IGoal move(Creature me, String dir) throws LocationBlockedException
 	{
-		
-		
 		me	= getCreature(me);
 		me.setLeaseticks(DEFAULT_LEASE_TICKS);
 		Location newloc = createLocation(me.getLocation(), dir);
 		
-		System.out.println("move called: " + me.getName()+" ("+dir+") -> "+newloc);
-		
 		Collection col = world.getCollection(newloc);
 		if(col!=null && col.size()==1 && col.iterator().next() instanceof Obstacle)
 		{
-			return false;
+			//return false;
+			throw new LocationBlockedException((WorldObject)col.iterator().next());
 		}
 		else
 		{
-			// Move creature in discrete world
+			// create move goal
+			IGoal mg = getMoveGoal(me, newloc);
+			
+			// move creature in discrete world
 			try
 			{
+				// TODO: maybe move to "updateLocation" method to set location after engine move
 				world.remove(me.getLocation(), me);
 				me.setLocation(newloc);
 				world.put(me.getLocation(), me);
 			}
 			catch(Exception e)
 			{
-				//System.out.println("!!! "+me);
 				System.out.println(world+" "+me);
 				e.printStackTrace();
-				return false; 
+				
+				//return false;
+				mg = null;
 			}
 
-			return true;
-
+			//return true;
+			return mg;
 		}
-
 	}
 
 	/**
@@ -833,33 +915,59 @@ public class Environment implements IEnvironment
 	 */
 	protected Location createLocation(Location loc, String dir)
 	{
-		// TO DO: respect world end, don't use sphere like behavior
-		// TO DO: flip over x to use sim engine (math) behavior
 		int sizey = getHeight();
 		int sizex = getWidth();
 		
 		int x = loc.getX();
 		int y = loc.getY();
+		
+		switch (WORLD_BEHAVIOR)
+		{
+		case WORLD_BEHAVIOR_EUCLID:
+		{
+			if(RequestMove.DIRECTION_UP.equals(dir))
+			{
+				y = (y-1 <= sizey ? y-1 : y);
+			}
+			else if(RequestMove.DIRECTION_DOWN.equals(dir))
+			{
+				y = (y+1 >= 0 ? y+1 : y);
+			}
+			else if(RequestMove.DIRECTION_LEFT.equals(dir))
+			{
+				x = (x-1 >= 0 ? x-1 : x);
+			}
+			else if(RequestMove.DIRECTION_RIGHT.equals(dir))
+			{
+				x = (x+1 <= sizex ? x+1 : x);
+			}
+		}
+			break;
+		
+		case WORLD_BEHAVIOR_TORUS:
+		{
+			if(RequestMove.DIRECTION_UP.equals(dir))
+			{
+				y = (sizey+y-1)%sizey;
+			}
+			else if(RequestMove.DIRECTION_DOWN.equals(dir))
+			{
+				y = (y+1)%sizey;
+			}
+			else if(RequestMove.DIRECTION_LEFT.equals(dir))
+			{
+				x = (sizex+x-1)%sizex;
+			}
+			else if(RequestMove.DIRECTION_RIGHT.equals(dir))
+			{
+				x = (x+1)%sizex;
+			}
+		}
+			break;
 
-		if(RequestMove.DIRECTION_UP.equals(dir))
-		{
-			y = (y+1 <= sizey ? y+1 : y);
-			//y = (sizey+y-1)%sizey;
-		}
-		else if(RequestMove.DIRECTION_DOWN.equals(dir))
-		{
-			y = (y-1 >= 0 ? y-1 : y);
-			//y = (y+1)%sizey;
-		}
-		else if(RequestMove.DIRECTION_LEFT.equals(dir))
-		{
-			x = (x-1 >= 0 ? x-1 : x);
-			//x = (sizex+x-1)%sizex;
-		}
-		else if(RequestMove.DIRECTION_RIGHT.equals(dir))
-		{
-			x = (x+1 <= sizex ? x+1 : x);
-			//x = (x+1)%sizex;
+		default:
+			// create no new location
+			break;
 		}
 
 		return new Location(x, y);
@@ -874,12 +982,25 @@ public class Environment implements IEnvironment
 		Location	ret	= null;
 		while(ret==null)
 		{
-			IGoal getPos = agent.createGoal("sim_get_random_position");
-			getPos.getParameter("distance").setValue(edgedistance.copy());
-			agent.dispatchTopLevelGoalAndWait(getPos);
-			IVector2 v = ((IVector2) getPos.getParameter("position").getValue()).copy();
+//			try
+//			{
+//				IGoal getPos = agent.createGoal("sim_get_random_position");
+//				getPos.getParameter("distance").setValue(edgedistance.copy());
+//				agent.dispatchTopLevelGoalAndWait(getPos, 10);
+//				IVector2 v = ((IVector2) getPos.getParameter("position").getValue()).copy();
+//				
+//				ret	= new Location(v.getXAsInteger(), v.getYAsInteger());
+//			}
+//			catch (TimeoutException e)
+//			{
+//				// TODO: implement handling
+//				System.out.println("Caught TimeoutException during SimObject creation: "+e);
+//				e.printStackTrace();
+//			}
 			
-			ret	= new Location(v.getXAsInteger(), v.getYAsInteger());
+			// HACK! Until simengine getRandomPosition goal returns always
+			ret	= new Location(rand.nextInt(getWidth()), rand.nextInt(getHeight()));
+			
 			if(world.containsKey(ret))
 			{
 				ret	= null;
@@ -941,8 +1062,6 @@ public class Environment implements IEnvironment
 	 */
 	protected WorldObject[] getNearObjects(Location loc, int range)
 	{
-		// TO DO: respect world end, don't use sphere like behavior
-		// TO DO: flip over x to use sim engine (math) behavior
 		
 		int sizey = getHeight();
 		int sizex = getWidth();
@@ -951,22 +1070,45 @@ public class Environment implements IEnvironment
 		int x = loc.getX();
 		int y = loc.getY();
 
-		int minx = (x-range>=0 ? x-range : 0 );
-		int maxx = (x+range<=sizex ? x+range : sizex);
-		
-		int miny = (y-range>=0 ? y-range : 0 );
-		int maxy = (y+range<=sizey ? y+range : sizey);
-		
-		//for(int i=x-range; i<=x+range; i++)
-		for(int i=minx; i<=maxx; i++)
+		switch (WORLD_BEHAVIOR)
 		{
-			//for(int j=y-range; j<=y+range; j++)
-			for(int j=miny; j<=maxy; j++)
+		case WORLD_BEHAVIOR_TORUS:
+		{
+			for(int i=x-range; i<=x+range; i++)
 			{
-				Collection tmp = world.getCollection(new Location(i, j));
-				if(tmp!=null)
-					ret.addAll(tmp);
+				for(int j=y-range; j<=y+range; j++)
+				{
+					Collection tmp = world.getCollection(new Location(i, j));
+					if(tmp!=null)
+						ret.addAll(tmp);
+				}
 			}
+		}
+			break;
+			
+		case WORLD_BEHAVIOR_EUCLID:
+		{
+			int minx = (x-range>=0 ? x-range : 0 );
+			int maxx = (x+range<=sizex ? x+range : sizex);
+			
+			int miny = (y-range>=0 ? y-range : 0 );
+			int maxy = (y+range<=sizey ? y+range : sizey);
+			
+			for(int i=minx; i<=maxx; i++)
+			{
+				for(int j=miny; j<=maxy; j++)
+				{
+					Collection tmp = world.getCollection(new Location(i, j));
+					if(tmp!=null)
+						ret.addAll(tmp);
+				}
+			}
+		}
+			break;
+			
+		default:
+			// no vision :-)
+			break;
 		}
 
 		return (WorldObject[])ret.toArray(new WorldObject[ret.size()]);
@@ -1117,5 +1259,43 @@ public class Environment implements IEnvironment
     public void removePropertyChangeListener(PropertyChangeListener listener)
 	{
 		pcs.removePropertyChangeListener(listener);
+    }
+    
+    // --- inner class ---
+    
+    /**
+     * Excetion to block a World {@link Location}
+     */
+    class LocationBlockedException extends Exception {
+
+    	// --- attributes ---
+    	/** The Object that blocks the location */
+    	protected WorldObject blockingObject;
+    	
+    	//--- constructor ---
+    	/**
+    	 * Default Constructor
+    	 * @param WorldObject that blocks the Location
+    	 */
+		public LocationBlockedException(WorldObject obj)
+		{
+			super();
+			this.blockingObject = obj;
+		}
+
+		//--- access methods ---
+		
+		/**
+		 * Access the blocking Object
+		 * @return {@link WorldObject} that blocks the requested location
+		 */
+		public WorldObject getBlockingObject()
+		{
+			return blockingObject;
+		}
+		
+		
+		
+    	
     }
 }

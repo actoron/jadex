@@ -8,19 +8,15 @@ import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.commons.SUtil;
 
+import java.awt.Canvas;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.StringBufferInputStream;
 
-import javax.security.auth.callback.TextInputCallback;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,11 +47,22 @@ public class ObserverGui	extends EnvironmentGui
 	 */
 	public ObserverGui(IExternalAccess agent)
 	{
-		super(agent);
+		super(agent, null, true);
+	}
+
+	/**
+	 * Create a GUI with provided worldmap
+	 * @param agent
+	 * @param worldmap
+	 * @param showmap
+	 */
+	public ObserverGui(IExternalAccess agent, Canvas worldmap)
+	{
+		super(agent, worldmap, true);
 	}
 
 	//-------- helper methods --------
-
+	
 	/**
 	 *  Create the options panel.
 	 */
@@ -99,6 +106,7 @@ public class ObserverGui	extends EnvironmentGui
 	protected void	refreshHighscore(IExternalAccess agent)
 	{
 		// Read highscore list from resource.
+		BufferedReader reader = null;
 		try
 		{
 			// read as serialized object
@@ -107,7 +115,7 @@ public class ObserverGui	extends EnvironmentGui
 			//Creature[]	hscreatures	= (Creature[])is.readObject();
 			
 			// read as xml file
-			BufferedReader reader = new BufferedReader(new InputStreamReader(SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader())));
+			reader = new BufferedReader(new InputStreamReader(SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader())));
 			StringBuffer fileData = new StringBuffer(1000);
 			char[] buf = new char[1024];
 			int numRead=0;
@@ -116,13 +124,26 @@ public class ObserverGui	extends EnvironmentGui
 			}
 			reader.close();
 			Creature[]	hscreatures	= (Creature[]) Nuggets.objectFromXML(fileData.toString(), this.getClass().getClassLoader());
-			
+		
 			highscore.update(hscreatures);
 		}
 		catch(Exception e)
 		{
 			System.out.print("Error loading highscore: ");
 			e.printStackTrace();
+		}
+		finally
+		{
+			if(reader!=null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 	}
 
@@ -131,6 +152,8 @@ public class ObserverGui	extends EnvironmentGui
 	 */
 	protected void	enableGuiUpdate(final IExternalAccess agent)
 	{
+		System.out.println("Activating ObsGUI update");
+		
 		agent.getBeliefbase().getBelief("vision").addBeliefListener(new IBeliefListener()
 		{
 			public void beliefChanged(AgentEvent ae)

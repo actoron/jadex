@@ -8,7 +8,6 @@ import jadex.bdi.examples.hunterprey2.Obstacle;
 import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.Rectangle;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.RegularPolygon;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.GridLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
@@ -16,7 +15,6 @@ import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.starter.StartAgentInfo;
-import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -44,14 +42,15 @@ public class InitializeEnvironmentPlan extends Plan
 	protected void createGUI()
 	{
 		Canvas worldmap = null;
-		if (initializeObserver() && ((Boolean) getBeliefbase().getBelief("custom_gui").getFact()).booleanValue())
-		{
-			worldmap = (Canvas) getBeliefbase().getBelief("worldmap").getFact();
-		}
+//		if (initializeObserver() && ((Boolean) getBeliefbase().getBelief("custom_gui").getFact()).booleanValue())
+//		{
+//			worldmap = (Canvas) getBeliefbase().getBelief("worldmap").getFact();
+//		}
 
 		EnvironmentGui gui;
 		try {
-			gui = new EnvironmentGui(getExternalAccess(), worldmap);
+//			gui = new EnvironmentGui(getExternalAccess(), worldmap, true);
+			gui = new EnvironmentGui(getExternalAccess(), null, true);
 			getBeliefbase().getBelief("gui").setFact(gui);
 		} catch (Exception e) {
 			fail(e);
@@ -115,7 +114,7 @@ public class InitializeEnvironmentPlan extends Plan
 		}
 		
 		// create initial food
-		int foodCount = ((IVector1) getBeliefbase().getBelief("food_spawn_rate").getFact()).getAsInteger();
+		int foodCount = ((Integer) getBeliefbase().getBelief("initial_food").getFact()).intValue();
 		for (int i = 0; i < foodCount; ++i)
 		{
 			Location l = env.getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
@@ -123,6 +122,9 @@ public class InitializeEnvironmentPlan extends Plan
 			Food food = new Food(l);
 			env.addFood(food);
 		}
+		
+		// Update spawn rate
+		env.setFoodrate(((Integer) getBeliefbase().getBelief("food_spawn_rate").getFact()).intValue());
 
 //		// Processes - IGNORE -its not step based!
 //		int maxFood = ((Integer) getBeliefbase().getBelief("max_food").getFact()).intValue();
@@ -140,85 +142,62 @@ public class InitializeEnvironmentPlan extends Plan
 		
 	}
 	
-	protected boolean initializeObserver()
-	{
-		// TODO: use beliefs and initial beliefs
-		getBeliefbase().getBelief("environment_name_obs").setFact(Configuration.ENVIRONMENT_NAME);
-		getBeliefbase().getBelief("preserve_aspect_ratio").setFact(Boolean.TRUE);
-		//getBeliefbase().getBelief("force_java2d").setFact(Boolean.FALSE);
-		
-		Map theme = new HashMap();
-		
-		String imgPath = this.getClass().getPackage().getName().replaceAll("environment", "").concat("images.").replaceAll("\\.", "/");
-		
-//		DrawableCombiner hunterDrawable = new DrawableCombiner();
-//		String hunterImage = imgPath.concat("hunter.png");
-//		hunterDrawable.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false));
-//		hunterDrawable.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, hunterImage, false));
-//		theme.put(Environment.OBJECT_TYPE_HUNTER, hunterDrawable);
+//	protected boolean initializeObserver()
+//	{
 //		
-		DrawableCombiner hunterCombiner = new DrawableCombiner();
-		String hunterImage = imgPath.concat("hunter.png");
-		//hunterCombiner.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
-		//hunterCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f)), -1);
-		for (int i=Creature.CREATURE_VISUAL_RANGE.getAsInteger()-1; i > 0 ; i--)
-		{
-			float alpha = (float) (0.1f + (0.5 * 1 / Creature.CREATURE_VISUAL_RANGE.getAsInteger()));
-			//hunterCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
-			hunterCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
-		}
-		hunterCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, false, hunterImage), 0);
-		theme.put(Environment.OBJECT_TYPE_HUNTER, hunterCombiner);
-		
-//		DrawableCombiner preyDrawable = new DrawableCombiner();
+//		getBeliefbase().getBelief("environment_name_obs").setFact(Configuration.ENVIRONMENT_NAME);
+//		
+//		Map theme = new HashMap();
+//		String imgPath = this.getClass().getPackage().getName().replaceAll("environment", "").concat("images.").replaceAll("\\.", "/");
+//
+//		DrawableCombiner hunterCombiner = new DrawableCombiner();
+//		String hunterImage = imgPath.concat("hunter.png");
+//		for (int i=Creature.CREATURE_VISUAL_RANGE.getAsInteger()-1; i > 0 ; i--)
+//		{
+//			float alpha = (float) (0.1f + (0.5 * 1 / Creature.CREATURE_VISUAL_RANGE.getAsInteger()));
+//			hunterCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
+//		}
+//		hunterCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, false, hunterImage), 0);
+//		theme.put(Environment.OBJECT_TYPE_HUNTER, hunterCombiner);
+//
+//		
+//		DrawableCombiner preyCombiner = new DrawableCombiner();
 //		String preyImage = imgPath.concat("prey.png");
-//		preyDrawable.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), 24, new Color(1.0f, 1.0f, 0.0f, 0.5f), false));
-//		preyDrawable.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, preyImage, false));
-//		theme.put(Environment.OBJECT_TYPE_PREY, preyDrawable);
-		
-		DrawableCombiner preyCombiner = new DrawableCombiner();
-		String preyImage = imgPath.concat("prey.png");
-		//preyCombiner.addDrawable(new RegularPolygon(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
-		//preyCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, 0.5f)), -2);
-		for (int i=Creature.CREATURE_VISUAL_RANGE.getAsInteger()-1; i > 0 ; i--)
-		{
-			float alpha = (float) (0.1f + (0.5 * 1 / Creature.CREATURE_VISUAL_RANGE.getAsInteger()));
-			//hunterCombiner.addDrawable(new Rectangle(new Vector2Double(Creature.CREATURE_VISUAL_RANGE.getAsDouble() * 2.0), Configuration.OBJECT_SHIFT, false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
-			preyCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
-		}
-		preyCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, Configuration.OBJECT_SHIFT, false, preyImage), 0);
-		theme.put(Environment.OBJECT_TYPE_PREY, preyCombiner);
-		
-		DrawableCombiner foodCombiner = new DrawableCombiner();
-		String foodImage = imgPath.concat("food.png");
-//		foodCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE, foodImage, false));
-		foodCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.7), false, foodImage), -1);
-		theme.put(Environment.OBJECT_TYPE_FOOD, foodCombiner);
-		
-		DrawableCombiner obstacleCombiner = new DrawableCombiner();
-		String obstacleImage = imgPath.concat("obstacle.png");
-//		obstacleDrawable.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE, imgPath + "obstacle.png", false));
-		obstacleCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.9), false, obstacleImage), 1);
-		theme.put(Environment.OBJECT_TYPE_OBSTACLE, obstacleCombiner);
-		
-		
-		Map themes = (Map) getBeliefbase().getBelief("object_themes").getFact();
-		themes.put("default",theme);
-		
-		ILayer background =  new TiledLayer(Configuration.BACKGROUND_TILE_SIZE,
-										    Configuration.BACKGROUND_TILE);
-		
-		List preLayerTheme = new ArrayList();
-		preLayerTheme.add(background);
-		preLayerTheme.add(new GridLayer(new Vector2Double(1.0), Color.BLACK));
-		Map preLayerThemes = (Map) getBeliefbase().getBelief("prelayer_themes").getFact();
-		preLayerThemes.put("default", preLayerTheme);
-		
-		//System.out.println("Starting Observer");
-		IGoal start = createGoal("simobs_start");
-		dispatchSubgoalAndWait(start);
-		
-		return start.isSucceeded();
-	}
+//		for (int i=Creature.CREATURE_VISUAL_RANGE.getAsInteger()-1; i > 0 ; i--)
+//		{
+//			float alpha = (float) (0.1f + (0.5 * 1 / Creature.CREATURE_VISUAL_RANGE.getAsInteger()));
+//			preyCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
+//		}
+//		preyCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, false, preyImage), 0);
+//		theme.put(Environment.OBJECT_TYPE_PREY, preyCombiner);
+//		
+//		DrawableCombiner foodCombiner = new DrawableCombiner();
+//		String foodImage = imgPath.concat("food.png");
+//		foodCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.7), false, foodImage), -1);
+//		theme.put(Environment.OBJECT_TYPE_FOOD, foodCombiner);
+//		
+//		DrawableCombiner obstacleCombiner = new DrawableCombiner();
+//		String obstacleImage = imgPath.concat("obstacle.png");
+//		obstacleCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.9), false, obstacleImage), 1);
+//		theme.put(Environment.OBJECT_TYPE_OBSTACLE, obstacleCombiner);
+//		
+//		
+//		Map themes = (Map) getBeliefbase().getBelief("object_themes").getFact();
+//		themes.put("default",theme);
+//		
+//		ILayer background =  new TiledLayer(Configuration.BACKGROUND_TILE_SIZE,
+//										    Configuration.BACKGROUND_TILE);
+//		
+//		List preLayerTheme = new ArrayList();
+//		preLayerTheme.add(background);
+//		preLayerTheme.add(new GridLayer(new Vector2Double(1.0), Color.BLACK));
+//		Map preLayerThemes = (Map) getBeliefbase().getBelief("prelayer_themes").getFact();
+//		preLayerThemes.put("default", preLayerTheme);
+//		
+//		IGoal start = createGoal("simobs_start");
+//		dispatchSubgoalAndWait(start);
+//		
+//		return start.isSucceeded();
+//	}
 	
 }

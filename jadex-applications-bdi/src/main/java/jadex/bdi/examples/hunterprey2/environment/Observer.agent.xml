@@ -14,7 +14,11 @@
 		<import>jadex.commons.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
 		
+		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.Vector1Int</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.Vector2Double</import>
 		<import>jadex.bdi.examples.hunterprey2.*</import>
+		<import>jadex.bdi.examples.hunterprey2.engine.*</import>
 		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
 	</imports>
 
@@ -38,24 +42,31 @@
 		<!-- The location of the highscore. -->
 		<belief name="highscore" class="String">
 			<fact>"highscore.dmp"</fact>
-			<!--<fact>"highscore.xml"</fact>-->
 		</belief>
 
 		<!-- The gui. -->
+		<belief name="gui" class="ObserverGui" />  
+		<!-- 
 		<belief name="gui" class="ObserverGui">
 			<fact>new ObserverGui($scope.getExternalAccess())</fact>
 		</belief>
+		-->
+
+		<!-- obscap beliefs  -->
 		
 		<!-- Name of the simulation environment -->
 		<beliefref name="environment_name_obs">
 			<concrete ref="obscap.environment_name"/>
 		</beliefref>
 		
-		<!-- Sim engine -->
-		
 		<!-- Preservation of area aspect ratio in the window -->
 		<beliefref name="preserve_aspect_ratio">
 			<concrete ref="obscap.preserve_aspect_ratio"/>
+		</beliefref>
+		
+		<!-- Y-axis inversion (top-down instead of bottom-up) -->
+		<beliefref name="invert_y_axis">
+			<concrete ref="obscap.invert_y_axis"/>
 		</beliefref>
 		
 		<!-- Force the use of Java2D -->
@@ -82,26 +93,41 @@
 		<beliefref name="selected_theme">
 			<concrete ref="obscap.selected_theme"/>
 		</beliefref>
+
+		<!-- Offer canvas access for building a custom GUI. -->
+		<beliefref name="custom_gui">
+			<concrete ref="obscap.custom_gui"/>
+		</beliefref>
+		<beliefref name="worldmap">
+			<concrete ref="obscap.canvas"/>
+		</beliefref>
+		
+		<!-- Shift for the objects -->
+		<beliefref name="object_shift">
+			<concrete ref="obscap.object_shift"/>
+		</beliefref>
 		
 	</beliefs>
 	
 	<goals>
 		<achievegoal name="end_agent" />
-		<!--  
-		<achievegoalref name="simobs_start">
+		
+		<!-- observer capability window start goal -->
+		<achievegoal name="obs_initialization" />
+    	
+    	<!-- sim observer start goal -->
+    	<achievegoalref name="simobs_start">
         	<concrete ref="obscap.simobs_start"/>
     	</achievegoalref>
-    	-->
+
 	</goals>
 	
-	<!--
 	<plans>
-    	<!- - Initialization Plan. - ->
-    	<plan name="initialization">
+    	<!-- Initialization Plan. -->
+    	<plan name="obs_initialization">
       		<body class="InitializeObserverPlan"/>
     	</plan>
     </plans>
-	-->
 	
 	<configurations>
 		<configuration name="default">
@@ -109,10 +135,28 @@
 				<initialbelief ref="my_self">
 					<fact>new Observer($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(0,0))</fact>
 				</initialbelief>
+				<initialbelief ref="selected_theme">
+					<fact>"default"</fact>
+				</initialbelief>
+				<initialbelief ref="custom_gui">
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="force_java2d">
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="preserve_aspect_ratio">
+					<fact>new Boolean(true)</fact>
+				</initialbelief>
+				<initialbelief ref="invert_y_axis">
+					<fact>new Boolean(true)</fact>
+				</initialbelief>
+				<initialbelief ref="object_shift">
+					<fact>new Vector2Double(0.5)</fact>
+				</initialbelief>
 			</beliefs>
 			<plans>
-        		<initialplan ref="initialization"/>
-      		</plans>
+				<initialplan ref="obs_initialization"/>
+			</plans>
 		</configuration>
 	</configurations>
 
