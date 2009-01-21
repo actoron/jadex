@@ -1,18 +1,11 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
-import jadex.bdi.examples.hunterprey2.Creature;
-import jadex.bdi.examples.hunterprey2.CurrentVision;
-import jadex.bdi.examples.hunterprey2.Prey;
 import jadex.bdi.examples.hunterprey2.Vision;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.planlib.simsupport.observer.capability.ObserverCenter;
+import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -20,19 +13,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -44,15 +32,9 @@ import javax.swing.border.TitledBorder;
 /*  @requires belief environment
  *  @requires belief roundtime
  */
-public class EnvironmentGui	extends JFrame
+public class EnvironmentObserverPlugin	implements IObserverCenterPlugin
 {
 	//-------- attributes --------
-	
-//	/** The panel showing the map. */
-//	protected MapPanel	map;
-	
-	/** The canvas provided by observer capability */
-	protected Component map;
 	
 	/** The round counter label. */
 	protected JLabel	roundcnt;
@@ -66,41 +48,21 @@ public class EnvironmentGui	extends JFrame
 	/** The panel displaying alltime highscores. */
 	protected CreaturePanel	highscore;
 	
+	/** The ObserverCenter */
+	protected ObserverCenter observerCenter;
+	
+	/** The frame for the observer view */
+	protected JPanel view;
+	
 	//-------- constructors --------
 
-	public EnvironmentGui(final IExternalAccess agent)
-	{
-		this(agent, null, false);
-	}
 	
 	/**
 	 *  Create a new gui plan.
-	 *  @param agent The agent created this GUI
-	 *  @param world The displayable word canvas. If 'null' internal MapPanel is used.
-	 *  
+	 *  @param agent The agent created this Plugin
 	 */
-	public EnvironmentGui(final IExternalAccess agent, Canvas worldmap, boolean showmap)
+	public EnvironmentObserverPlugin(final IExternalAccess agent)
 	{
-		super(agent.getAgentName());
-
-		if (showmap)
-		{
-			if (worldmap != null)
-			{
-				this.map = worldmap;
-			}
-			else
-			{
-				// Map panel.
-				this.map	= new MapPanel();
-				// only to use not the custom gui display
-				map.setPreferredSize(new Dimension(600, 600));
-			}
-			map.setMinimumSize(new Dimension(300, 300));
-			map.setSize(new Dimension(600, 600));
-			// since 1.5 !
-			//map.setPreferredSize(new Dimension(600, 600));
-		}
 		
 		JPanel options = createOptionsPanel(agent);
 
@@ -118,67 +80,12 @@ public class EnvironmentGui	extends JFrame
 		//tp.setPreferredSize(new Dimension(243, 0));
 		tp.setSize(new Dimension(243, 0));
 		
-		JPanel	east	= new JPanel(new BorderLayout());
-		east.add(BorderLayout.CENTER, tp);
-		east.add(BorderLayout.SOUTH, options);
-
-		// Show the gui.
-		JSplitPane	split	= new JSplitPane();
-		if (showmap)
-		{
-			split.setLeftComponent(map);
-		}
-		else
-		{
-			// TODO: add a simple image instead of map?
-			split.setLeftComponent(null);
-		}
-		split.setRightComponent(east);
-		split.setResizeWeight(1);
-
-		getContentPane().add(BorderLayout.CENTER, split);
-		pack();
-		setLocation(SGUI.calculateMiddlePosition(this));
-		setVisible(true);
+		view = new JPanel(new BorderLayout());
+		view.add(BorderLayout.CENTER, tp);
+		view.add(BorderLayout.SOUTH, options);
 
 		enableGuiUpdate(agent);
-		
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-			
-				dispose();
-				
-				try
-				{
-					IGoal eg = agent.createGoal("end_agent");
-					agent.dispatchTopLevelGoalAndWait(eg);
-				}
-				catch(GoalFailureException gfe) 
-				{
-					agent.killAgent();
-				}
 
-			}
-		});
-		
-		agent.addAgentListener(new IAgentListener()
-		{
-			public void agentTerminating(AgentEvent ae)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						EnvironmentGui.this.dispose();
-					}
-				});
-			}
-			public void agentTerminated(AgentEvent ae)
-			{
-			}
-		});
 	}
 
 	//-------- helper methods --------
@@ -261,29 +168,56 @@ public class EnvironmentGui	extends JFrame
 		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 		env.addPropertyChangeListener(new PropertyChangeListener()
 		{
-			// Hack!!! Dummy creature required for world size.
-			protected Creature	dummy	= new Prey();
+//			// Hack!!! Dummy creature required for world size.
+//			protected Creature	dummy	= new Prey();
 
 			public void propertyChange(PropertyChangeEvent evt)
 			{
 				roundcnt.setText(""+env.getWorldAge());
 	
-				dummy.setWorldWidth(env.getWidth());
-				dummy.setWorldHeight(env.getHeight());
+//				dummy.setWorldWidth(env.getWidth());
+//				dummy.setWorldHeight(env.getHeight());
 	
 				Vision	vision	= new Vision();
 				vision.setObjects(env.getAllObjects());
-	
-				if (map instanceof MapPanel)
-				{
-					((MapPanel)map).update(new CurrentVision(dummy, vision));
-				}
-				
+
 				creatures.update(env.getCreatures());
 				observers.update(env.getCreatures());
 				highscore.update(env.getHighscore());
 			}
 		});
+	}
+
+	public String getIconPath()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getName()
+	{
+		return "World Settings";
+	}
+
+	public Component getView()
+	{
+		return view;
+	}
+
+	public void refresh()
+	{
+		// ignore, get updates from agent
+	}
+
+	public void shutdown()
+	{
+		// ignore
+	}
+
+	public void start(ObserverCenter main)
+	{
+		observerCenter = main;
+		// TODO: implement some methods :-)
 	}
 }
 

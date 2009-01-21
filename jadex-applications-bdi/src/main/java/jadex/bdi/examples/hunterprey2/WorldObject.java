@@ -97,13 +97,10 @@ public class WorldObject
 	 */
 	public boolean equals(Object o)
 	{
-		
 		if (o == null)
 			return false;
-		// this can cause NullPointerException
-		return o.getClass() == this.getClass() && ((WorldObject)o).getLocation().equals(this.getLocation());
 		
-		//return (o != null ? (o instanceof WorldObject && this.getLocation().equals(((WorldObject) o).getLocation())) : false);
+		return o.getClass() == this.getClass() && ((WorldObject)o).getLocation().equals(this.getLocation());
 	}
 
 	/**
@@ -114,18 +111,27 @@ public class WorldObject
 		return getClass().hashCode() ^ getLocation().hashCode();
 	}
 	
-	// ---- sim support methods ----
-//	/**
-//	 * returns a IDrawable for a world object with image path
-//	 * packageName + lowercase ClassName + ".png".
-//	 */
-//	public IDrawable getDrawable() {
-//		String imgPath 	= 	WorldObject.class.getName();
-//		imgPath			=	imgPath.replace(imgPath.substring(imgPath.lastIndexOf(".")), ".images.").replaceAll("\\.", "/");
-//		
-//		String className = this.getClass().getName();
-//		String simpleClassName = className.substring(className.lastIndexOf("."));
-//		
-//		return new TexturedRectangle(WORLD_OBJECT_SIZE, imgPath + simpleClassName + ".png", false);
-//	}
+	/**
+	 * All WorldObjects has to implement the clone() method
+	 */
+	public Object clone()
+	{
+		WorldObject ret = null;
+		try
+		{
+			ret = (WorldObject)getClass().newInstance();
+			ret.setLocation(this.getLocation());
+			ret.setSimId(this.getSimId());
+		}
+		catch(InstantiationException e)
+		{
+			e.printStackTrace();
+		}
+		catch(IllegalAccessException e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
 }

@@ -23,6 +23,7 @@
 	
 	<capabilities>
 		<capability name="simcap" file="jadex.bdi.planlib.simsupport.simcap.SimAgent"/>
+		<capability name="obscap" file="jadex.bdi.planlib.simsupport.observer.capability.SimObserver"/>
 		
 		<capability name="startcap" file="jadex.bdi.planlib.starter.StartAgents"/>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
@@ -52,6 +53,10 @@
 		
 		<!-- the local gui -->
 		<belief name="gui" class="EnvironmentGui" />
+		<!-- show a worldmap representation of the world in -->
+		<belief name="gui_show_map" class="Boolean">
+			<fact>new Boolean(true)</fact>
+		</belief>
 		
 		<!-- the sim environment agent -->
 		<belief name="simagent" class="IAgentIdentifier" />
@@ -76,13 +81,78 @@
 		
 		<!-- One food every X rounds -->
 		<belief name="food_spawn_rate" class="Integer" exported="true">
-			<fact>new Integer(5)</fact>
+			<fact>new Integer(3)</fact>
 		</belief>
 		
 		<!-- Number of obstacles -->
 		<belief name="obstacle_count" class="Integer" exported="true">
 			<fact>new Integer(100)</fact>
 		</belief>
+		
+		
+		<!-- obscap beliefs  -->
+		
+		<!-- Custom plugins to load into the standard GUI. -->
+		<beliefsetref name="custom_plugins">
+			<concrete ref="obscap.custom_plugins"/>
+		</beliefsetref>
+		
+		<!-- Name of the simulation environment -->
+		<beliefref name="environment_name_obs">
+			<concrete ref="obscap.environment_name"/>
+		</beliefref>
+		
+		<!-- Preservation of area aspect ratio in the window -->
+		<beliefref name="preserve_aspect_ratio">
+			<concrete ref="obscap.preserve_aspect_ratio"/>
+		</beliefref>
+		
+		<!-- Y-axis inversion (top-down instead of bottom-up) -->
+		<beliefref name="invert_y_axis">
+			<concrete ref="obscap.invert_y_axis"/>
+		</beliefref>
+		
+		<!-- Force the use of Java2D -->
+		<beliefref name="force_java2d">
+			<concrete ref="obscap.force_java2d"/>
+		</beliefref>
+		
+		<!-- List of themes for displaying objects -->
+		<beliefref name="object_themes">
+			<concrete ref="obscap.object_themes"/>
+		</beliefref>
+		
+		<!-- The pre-layers -->
+		<beliefref name="prelayer_themes">
+			<concrete ref="obscap.prelayer_themes"/>
+		</beliefref>
+		
+		<!-- The post-layers -->
+		<beliefref name="postlayer_themes">
+			<concrete ref="obscap.postlayer_themes"/>
+		</beliefref>
+		
+		<!-- The selected start theme -->
+		<beliefref name="selected_theme">
+			<concrete ref="obscap.selected_theme"/>
+		</beliefref>
+
+		<!-- Offer canvas access for building a custom GUI. -->
+		<beliefref name="custom_gui">
+			<concrete ref="obscap.custom_gui"/>
+		</beliefref>
+		<beliefref name="worldmap">
+			<concrete ref="obscap.canvas"/>
+		</beliefref>
+		
+		<!-- Shift for the objects -->
+		<beliefref name="object_shift">
+			<concrete ref="obscap.object_shift"/>
+		</beliefref>
+		
+		
+		
+		
 
 	</beliefs>
 
@@ -182,6 +252,18 @@
 		<achievegoalref name="sim_connect_environment">
     		<concrete ref="simcap.sim_connect_environment"/>
 		</achievegoalref>
+		
+		<!-- +++++++++++++++++++++++ -->
+		<!-- observer sim goals      -->
+		<!-- +++++++++++++++++++++++ -->
+		
+		<!-- observer capability window start goal -->
+		<achievegoal name="obs_initialization" />
+    	
+    	<!-- sim observer start goal -->
+    	<achievegoalref name="simobs_start">
+        	<concrete ref="obscap.simobs_start"/>
+    	</achievegoalref>
     	
 	</goals>
 
@@ -278,6 +360,12 @@
       		<body class="InitializeEnvironmentPlan"/>
     	</plan>
     	
+    	
+    	<!-- Initialization Plan. -->
+    	<plan name="obs_initialization">
+      		<body class="InitializeObserverPlan"/>
+    	</plan>
+    	
 	</plans>
 
 	<events>
@@ -320,6 +408,32 @@
 				<initialbelief ref="rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
+				
+				
+				<initialbelief ref="my_self">
+					<fact>new Observer($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(0,0))</fact>
+				</initialbelief>
+				<initialbelief ref="selected_theme">
+					<fact>"default"</fact>
+				</initialbelief>
+				<initialbelief ref="custom_gui">
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="force_java2d">
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="preserve_aspect_ratio">
+					<fact>new Boolean(true)</fact>
+				</initialbelief>
+				<initialbelief ref="invert_y_axis">
+					<fact>new Boolean(true)</fact>
+				</initialbelief>
+				<initialbelief ref="object_shift">
+					<fact>new Vector2Double(0.5)</fact>
+				</initialbelief>
+				
+				
+				
 			</beliefs>
 			<goals>
 				<initialgoal ref="df_register">

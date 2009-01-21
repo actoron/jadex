@@ -37,6 +37,7 @@ public class  MovePlan extends Plan
 		// Wait until all tasks are processed by the environment.
 		waitForCondition("notasks");
 
+		// TODO: use goal listener
 		// perform move goal in sim engine
 		if(ti.getResult()!=null && ti.getResult() instanceof IGoal)
 		{
@@ -49,7 +50,7 @@ public class  MovePlan extends Plan
 			ti.setResult(new Boolean(moveGoal.isSucceeded()));
 		}
 		
-		// Wait until all sim goals are processed by other plans.
+		// Wait until all sim goals are processed.
 		waitForCondition("nogoaltasks");
 		
 		// Result is null, when creature died and action was not executed.

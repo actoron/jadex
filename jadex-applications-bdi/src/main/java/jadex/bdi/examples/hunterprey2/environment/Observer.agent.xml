@@ -54,6 +54,11 @@
 
 		<!-- obscap beliefs  -->
 		
+		<!-- Custom plugins to load into the standard GUI. -->
+		<beliefsetref name="custom_plugins">
+			<concrete ref="obscap.custom_plugins"/>
+		</beliefsetref>
+		
 		<!-- Name of the simulation environment -->
 		<beliefref name="environment_name_obs">
 			<concrete ref="obscap.environment_name"/>

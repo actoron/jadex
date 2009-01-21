@@ -35,4 +35,5 @@ public class Obstacle extends WorldObject
 	{
 		return "Obstacle(" + "location=" + getLocation() + ")";
 	}
+
 }

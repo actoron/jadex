@@ -14,6 +14,7 @@ import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
 import jadex.bdi.planlib.starter.StartAgentInfo;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -29,10 +30,20 @@ public class InitializeObserverPlan extends Plan
 {
 	public void body()
 	{
-		createGUI();
-
+		//createGUI();
+		
+		
+		insertPlugin();
+		initializeObserver();
+		
 	}
 	
+	
+	protected void insertPlugin()
+	{
+		IObserverCenterPlugin plugin = new EnvironmentObserverPlugin(getExternalAccess());
+		getBeliefbase().getBeliefSet("custom_plugins").addFact(plugin);
+	}
 	
 	protected void createGUI()
 	{
@@ -51,6 +62,8 @@ public class InitializeObserverPlan extends Plan
 		}
 		
 	}
+	
+	
 
 
 	
