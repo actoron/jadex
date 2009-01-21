@@ -24,7 +24,7 @@ public class GoToPreciseDestinationPlan extends Plan
 		
 		IGoal removeTask = createGoal("sim_remove_task");
 		removeTask.getParameter("object_id").setValue(objectId);
-		removeTask.getParameter("task_name").setValue(GoToDestinationTask.DEFAULT_NAME);
+		removeTask.getParameter("task_name").setValue(GoToPreciseDestinationTask.DEFAULT_NAME);
 		dispatchSubgoalAndWait(removeTask);
 		
 		ISimObjectTask task = new GoToPreciseDestinationTask(destination, speed);

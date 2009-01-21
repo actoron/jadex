@@ -5,13 +5,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -25,8 +29,10 @@ import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.ObjectIntrospectorPlugin;
+import jadex.bdi.planlib.simsupport.observer.capability.plugin.ToolboxPlugin;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.VisualsPlugin;
 import jadex.bdi.runtime.IExternalAccess;
+import jadex.bridge.ILibraryService;
 
 /** The default observer center
  */
@@ -201,12 +207,35 @@ public class ObserverCenter
 		plugins.add(plugin);
 		plugin = new VisualsPlugin();
 		plugins.add(plugin);
+		plugin = new ToolboxPlugin();
+		plugins.add(plugin);
 		
 		plugins_ = (IObserverCenterPlugin[]) plugins.toArray(new IObserverCenterPlugin[0]);
 		
 		for (int i = 0; i < plugins_.length; ++i)
 		{
-			mainWindow_.addToolbarItem(plugins_[i].getName(), new PluginAction(plugins_[i]));
+			String iconPath = plugins_[i].getIconPath();
+			if (iconPath == null)
+			{
+				mainWindow_.addToolbarItem(plugins_[i].getName(), new PluginAction(plugins_[i]));
+			}
+			else
+			{
+				ClassLoader cl = ((ILibraryService) agent_.getBeliefbase().getBelief("library_service").getFact()).getClassLoader();
+				try
+				{
+					System.out.println(iconPath);
+					System.out.println(cl.getResource(iconPath));
+					BufferedImage image = ImageIO.read(cl.getResource(iconPath));
+					ImageIcon icon = new ImageIcon(image);
+					mainWindow_.addToolbarItem(plugins_[i].getName(), icon, new PluginAction(plugins_[i]));
+				}
+				catch (Exception e)
+				{
+					System.err.println("Icon image " + iconPath + " not found.");
+					mainWindow_.addToolbarItem(plugins_[i].getName(), new PluginAction(plugins_[i]));
+				}
+			}
 		}
 		
 		activatePlugin(plugins_[0]);

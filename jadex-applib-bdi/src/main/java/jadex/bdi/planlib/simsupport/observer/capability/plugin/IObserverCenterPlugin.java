@@ -26,6 +26,12 @@ public interface IObserverCenterPlugin
 	 */
 	public String getName();
 	
+	/** Returns the path to the icon for the plugin in the toolbar.
+	 * 
+	 *  @return path to the icon
+	 */
+	public String getIconPath();
+	
 	/** Returns the viewable component of the plugin
 	 *  
 	 *  @return viewable component of the plugin

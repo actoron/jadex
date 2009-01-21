@@ -57,6 +57,7 @@ public class StartObserverPlan extends Plan
 		
 		ILibraryService libService = (ILibraryService) getScope().getPlatform().getService(ILibraryService.class,
 																						   ILibraryService.LIBRARY_SERVICE);
+		b.getBelief("library_service").setFact(libService);
 		
 		if (libService == null)
 		{

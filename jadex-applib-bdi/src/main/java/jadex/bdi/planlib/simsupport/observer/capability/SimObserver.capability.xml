@@ -13,6 +13,7 @@
 
 	<imports>
 		<import>java.util.*</import>
+		<import>jadex.bridge.ILibraryService</import>
 		<import>jadex.bdi.planlib.simsupport.environment.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.graphics.IViewport</import>
@@ -112,6 +113,8 @@
 		<belief name="simulation_engine_access" class="IExternalEngineAccess"/>
     	
 		<belief name="local_simulation_engine" class="ISimulationEngine"/>
+		
+		<belief name="library_service" class="ILibraryService"/>
 	</beliefs>
 
 	<goals>

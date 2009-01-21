@@ -13,6 +13,8 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -98,6 +100,20 @@ public class ObserverCenterWindow extends JFrame
 	{
 		JButton button = new JButton(action);
 		button.setText(name);
+		toolBar_.add(button);
+	}
+	
+	/** Adds a toolbar item with icon.
+	 *  
+	 *  @param name name of the toolbar item
+	 *  @param icon the icon of the item
+	 *  @param action toolbar item action
+	 */
+	public void addToolbarItem(String name, Icon icon, Action action)
+	{
+		JButton button = new JButton(action);
+		button.setIcon(icon);
+		button.setToolTipText(name);
 		toolBar_.add(button);
 	}
 	

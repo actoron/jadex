@@ -51,8 +51,6 @@ public class InitializeEnvironmentPlan extends Plan
 			engine.createSimObject("charging_station", null, null, pos, false, null);
 		}
 		
-		engine.createSimObject("charging_station", null, null, new Vector2Double(0.0), false, null);
-		
 		// Processes
 		int maxWastes = ((Integer) getBeliefbase().getBelief("max_wastes").getFact()).intValue();
 		if (maxWastes <= 0)

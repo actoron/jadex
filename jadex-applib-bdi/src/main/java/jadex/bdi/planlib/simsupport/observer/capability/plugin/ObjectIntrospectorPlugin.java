@@ -124,6 +124,15 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		return NAME;
 	}
 	
+	/** Returns the path to the icon for the plugin in the toolbar.
+	 * 
+	 *  @return path to the icon
+	 */
+	public String getIconPath()
+	{
+		return getClass().getPackage().getName().replaceAll("capability\\.plugin","").concat("images.").replaceAll("\\.", "/").concat("introspector_icon.png");
+	}
+	
 	public synchronized Component getView()
 	{
 		return mainPanel_;

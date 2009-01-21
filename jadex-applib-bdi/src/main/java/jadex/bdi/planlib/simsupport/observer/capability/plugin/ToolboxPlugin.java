@@ -55,8 +55,6 @@ public class ToolboxPlugin implements IObserverCenterPlugin
 		
 		mainPanel_.setMinimumSize(new Dimension(50, 50));
 		
-		JPanel themePanel = new JPanel(new GridBagLayout());
-		themePanel.setBorder(new TitledBorder("Tools"));
 		toolBar_ = new JToolBar("Tools", JToolBar.VERTICAL);
 		JScrollPane toolScrollPane = new JScrollPane(toolBar_);
 		GridBagConstraints c = new GridBagConstraints();
@@ -64,9 +62,9 @@ public class ToolboxPlugin implements IObserverCenterPlugin
 		c.gridy = 0;
 		c.weighty = 1.0;
 		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.CENTER;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		themePanel.add(toolScrollPane, c);
+		mainPanel_.add(toolScrollPane, c);
 	}
 	
 	/** Starts the plugin
@@ -91,6 +89,15 @@ public class ToolboxPlugin implements IObserverCenterPlugin
 	public String getName()
 	{
 		return NAME;
+	}
+	
+	/** Returns the path to the icon for the plugin in the toolbar.
+	 * 
+	 *  @return path to the icon
+	 */
+	public String getIconPath()
+	{
+		return null;
 	}
 	
 	/** Returns the viewable component of the plugin

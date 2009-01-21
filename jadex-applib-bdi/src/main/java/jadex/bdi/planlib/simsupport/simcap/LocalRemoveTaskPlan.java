@@ -19,6 +19,7 @@ public class LocalRemoveTaskPlan extends Plan
 		ISimulationEngine engine =
 			(ISimulationEngine) b.getBelief("local_simulation_engine").getFact();
 		String taskName = (String) getParameter("task_name").getValue();
+		// TODO: Don't use direct SimObject access
 		engine.getSimulationObject(objectId).removeTask(taskName);
 	}
 }
