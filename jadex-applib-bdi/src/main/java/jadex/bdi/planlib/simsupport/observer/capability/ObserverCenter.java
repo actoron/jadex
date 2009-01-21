@@ -1,40 +1,33 @@
 package jadex.bdi.planlib.simsupport.observer.capability;
 
+import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
+import jadex.bdi.planlib.simsupport.common.graphics.IViewportListener;
+import jadex.bdi.planlib.simsupport.common.math.IVector1;
+import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
+import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
+import jadex.bdi.planlib.simsupport.observer.capability.plugin.ObjectIntrospectorPlugin;
+import jadex.bdi.planlib.simsupport.observer.capability.plugin.VisualsPlugin;
+import jadex.bdi.runtime.IBeliefSet;
+import jadex.bdi.runtime.IExternalAccess;
+import jadex.bridge.ILibraryService;
+
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Timer;
-
-import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
-import jadex.bdi.planlib.simsupport.common.graphics.IViewportListener;
-import jadex.bdi.planlib.simsupport.common.math.IVector1;
-import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
-import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
-import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
-import jadex.bdi.planlib.simsupport.observer.capability.plugin.ObjectIntrospectorPlugin;
-import jadex.bdi.planlib.simsupport.observer.capability.plugin.ToolboxPlugin;
-import jadex.bdi.planlib.simsupport.observer.capability.plugin.VisualsPlugin;
-import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IExternalAccess;
-import jadex.bridge.ILibraryService;
 
 /** The default observer center
  */
@@ -64,6 +57,10 @@ public class ObserverCenter
 	 */
 	private Timer timer_;
 	
+	/** Selection controller
+	 */
+	private SelectionController selectionController_;
+	
 	/** Creates an observer center using the simulation viewport
 	 *  
 	 *  @param agent the observer agent
@@ -72,6 +69,7 @@ public class ObserverCenter
 	{
 		agent_ = agent;
 		activePlugin_ = null;
+		selectionController_ = new SelectionController();
 		EventQueue.invokeLater(new Runnable()
 			{
 				public void run()
@@ -163,7 +161,7 @@ public class ObserverCenter
 	
 	/** Marks an object.
 	 *  
-	 *  @param object to mark
+	 *  @param object to mark, null for deselection
 	 */
 	public void markObject(final Integer objectId)
 	{
@@ -196,6 +194,22 @@ public class ObserverCenter
 	public Integer getMarkedObject()
 	{
 		return (Integer) agent_.getBeliefbase().getBelief("marked_object").getFact();
+	}
+	
+	/** Enables and disables selection.
+	 *  
+	 *  @param enabled true to enable selection
+	 */
+	public void setEnableSelection(boolean enabled)
+	{
+		if (enabled)
+		{
+			getViewport().addViewportListener(selectionController_);
+		}
+		else
+		{
+			getViewport().removeViewportListener(selectionController_);
+		}
 	}
 	
 	/** Loads all available plugins
@@ -352,6 +366,21 @@ public class ObserverCenter
 		public void actionPerformed(ActionEvent e)
 		{
 			agent_.getBeliefbase().getBelief("frame_rate").setFact(new Integer(fps_));
+		}
+	}
+	
+	private class SelectionController implements IViewportListener
+	{
+		public void leftClicked(IVector2 position)
+		{
+			IVector1 maxDist = (IVector1) getAgentAccess().getBeliefbase().getBelief("selector_distance").getFact();
+			final Integer observedId = getEngineAccess().getNearestObjectId(position, maxDist);
+			
+			markObject(observedId);
+		}
+		
+		public void rightClicked(IVector2 position)
+		{
 		}
 	}
 	

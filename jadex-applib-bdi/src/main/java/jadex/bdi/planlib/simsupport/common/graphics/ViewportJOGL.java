@@ -522,6 +522,11 @@ public class ViewportJOGL extends AbstractViewport
     		super(caps);
 		}
     	
+    	public Dimension minimumSize()
+    	{
+    		return new Dimension(1, 1);
+    	}
+    	
     	public Dimension getMinimumSize()
     	{
     		return new Dimension(1, 1);

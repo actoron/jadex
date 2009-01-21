@@ -62,7 +62,6 @@ public class ObserverCenterWindow extends JFrame
 		
 		mainPane_.setLeftComponent(new JPanel());
 		
-//		simView.setMinimumSize(new Dimension(1, 1));	// Not in Java 1.4
 		mainPane_.setRightComponent(simView);
 
 		setResizable(true);

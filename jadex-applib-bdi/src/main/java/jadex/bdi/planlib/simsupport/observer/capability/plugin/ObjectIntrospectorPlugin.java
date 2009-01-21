@@ -60,10 +60,6 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	 */
 	private ObserverCenter observerCenter_;
 	
-	/** Selection controller
-	 */
-	private SelectionController selectionController_;
-	
 	public ObjectIntrospectorPlugin()
 	{
 		mainPanel_ = new JPanel(new GridBagLayout());
@@ -109,14 +105,13 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	public synchronized void start(ObserverCenter main)
 	{
 		observerCenter_ = main;
-		selectionController_ = new SelectionController();
-		observerCenter_.getViewport().addViewportListener(selectionController_);
+		observerCenter_.setEnableSelection(true);
 	}
 	
 	public synchronized void shutdown()
 	{
 		observerCenter_.markObject(null);
-		observerCenter_.getViewport().removeViewportListener(selectionController_);
+		observerCenter_.setEnableSelection(false);
 	}
 	
 	public synchronized String getName()
@@ -175,20 +170,5 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		DefaultTableModel model = (DefaultTableModel) propertyTable_.getModel();
 		model.setDataVector(dataSet, COLUMM_NAMES);
 		model.fireTableStructureChanged();
-	}
-	
-	private class SelectionController implements IViewportListener
-	{
-		public void leftClicked(IVector2 position)
-		{
-			IVector1 maxDist = (IVector1) observerCenter_.getAgentAccess().getBeliefbase().getBelief("selector_distance").getFact();
-			final Integer observedId = observerCenter_.getEngineAccess().getNearestObjectId(position, maxDist);
-			
-			observerCenter_.markObject(observedId);
-		}
-		
-		public void rightClicked(IVector2 position)
-		{
-		}
 	}
 }
