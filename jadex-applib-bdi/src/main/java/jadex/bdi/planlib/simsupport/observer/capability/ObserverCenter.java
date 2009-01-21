@@ -128,6 +128,8 @@ public class ObserverCenter
 					timer_.start();
 					
 					mainWindow_.addWindowListener(new ObserverWindowController());
+					
+					setEnableSelection(true);
 				}
 			});
 	}

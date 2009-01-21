@@ -105,13 +105,10 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	public synchronized void start(ObserverCenter main)
 	{
 		observerCenter_ = main;
-		observerCenter_.setEnableSelection(true);
 	}
 	
 	public synchronized void shutdown()
 	{
-		observerCenter_.markObject(null);
-		observerCenter_.setEnableSelection(false);
 	}
 	
 	public synchronized String getName()

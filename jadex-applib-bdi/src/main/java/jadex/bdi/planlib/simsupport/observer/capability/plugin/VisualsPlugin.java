@@ -95,7 +95,12 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		
 		themeList_.addListSelectionListener(themeController_);
 		
+		observerCenter_.markObject(null);
+		observerCenter_.setEnableSelection(false);
+		
 		refresh();
+		
+		
 	}
 	
 	/** Stops the plugin
@@ -105,6 +110,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	{
 		themeList_.removeListSelectionListener(themeController_);
 		((DefaultComboBoxModel) themeList_.getModel()).removeAllElements();
+		observerCenter_.setEnableSelection(true);
 	}
 	
 	/** Returns the name of the plugin
