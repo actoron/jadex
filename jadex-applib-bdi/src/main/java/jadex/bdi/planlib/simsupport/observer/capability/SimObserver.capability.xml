@@ -18,6 +18,7 @@
 		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
 		<import>jadex.bdi.planlib.simsupport.common.graphics.IViewport</import>
 		<import>jadex.bdi.planlib.simsupport.common.graphics.drawable.*</import>
+		<import>jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin</import>
 	</imports>
 
 	<beliefs>
