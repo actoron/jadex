@@ -201,6 +201,8 @@ public abstract class AbstractViewport implements IViewport
     	{
     		width = size.getXAsDouble();
     		height = size.getYAsDouble();
+    		posX_ = 0.0f;
+    		posY_ = 0.0f;
     	}
     	
     	paddedSize_ = new Vector2Double(width, height);

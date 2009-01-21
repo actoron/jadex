@@ -249,14 +249,6 @@ public class ViewportJOGL extends AbstractViewport
     
     private void setupMatrix(GL gl)
     {
-    	gl.glMatrixMode(GL.GL_TEXTURE);
-        gl.glLoadIdentity();
-        /*gl.glOrtho(inversionFlag_.getXAsInteger(), (inversionFlag_.getXAsInteger() ^ 1),
-     		   	   inversionFlag_.getYAsInteger(), (inversionFlag_.getYAsInteger() ^ 1),
-     		   	   0.0, 1.0);*/
-        //gl.glTranslated(0.0, 1.0, 0.0);
-        //gl.glScaled(1.0, -1.0, 1.0);
-        
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
         gl.glOrtho(paddedSize_.getXAsDouble() * inversionFlag_.getXAsInteger(),
