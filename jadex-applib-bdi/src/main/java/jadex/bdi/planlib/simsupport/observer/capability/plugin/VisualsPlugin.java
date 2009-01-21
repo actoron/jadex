@@ -122,7 +122,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	 */
 	public String getIconPath()
 	{
-		return null;
+		return getClass().getPackage().getName().replaceAll("capability\\.plugin","").concat("images.").replaceAll("\\.", "/").concat("visuals_icon.png");
 	}
 	
 	/** Returns the viewable component of the plugin

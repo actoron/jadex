@@ -31,6 +31,9 @@
 			<fact>new Boolean(false)</fact>
 		</belief>
 		
+		<!-- Custom plugins to load into the standard GUI. -->
+		<beliefset name="custom_plugins" class="IObserverCenterPlugin" exported="true"/>
+		
 		<!-- Size of the displayed area if different from the world area size -->
 		<belief name="display_size" class="IVector2" exported="true">
 			<fact>null</fact>

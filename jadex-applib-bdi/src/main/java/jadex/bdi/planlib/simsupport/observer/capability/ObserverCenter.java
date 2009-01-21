@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import javax.imageio.ImageIO;
@@ -31,6 +32,7 @@ import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPl
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.ObjectIntrospectorPlugin;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.ToolboxPlugin;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.VisualsPlugin;
+import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.ILibraryService;
 
@@ -202,43 +204,61 @@ public class ObserverCenter
 	{
 		ArrayList plugins = new ArrayList();
 		
-		// TODO: remove hard coding
 		IObserverCenterPlugin plugin = new ObjectIntrospectorPlugin();
+		// default plugins
+		// TODO: remove hard coding
 		plugins.add(plugin);
 		plugin = new VisualsPlugin();
 		plugins.add(plugin);
-		plugin = new ToolboxPlugin();
-		plugins.add(plugin);
+		//plugin = new ToolboxPlugin();
+		//plugins.add(plugin);
+		
+		// custom plugins
+		IBeliefSet customPluginBelSet = agent_.getBeliefbase().getBeliefSet("custom_plugins");
+		if (customPluginBelSet.size() > 0)
+		{
+			Object[] customPlugins = agent_.getBeliefbase().getBeliefSet("custom_plugins").getFacts();
+			plugins.addAll(Arrays.asList(customPlugins));
+		}
 		
 		plugins_ = (IObserverCenterPlugin[]) plugins.toArray(new IObserverCenterPlugin[0]);
 		
 		for (int i = 0; i < plugins_.length; ++i)
 		{
-			String iconPath = plugins_[i].getIconPath();
-			if (iconPath == null)
-			{
-				mainWindow_.addToolbarItem(plugins_[i].getName(), new PluginAction(plugins_[i]));
-			}
-			else
-			{
-				ClassLoader cl = ((ILibraryService) agent_.getBeliefbase().getBelief("library_service").getFact()).getClassLoader();
-				try
-				{
-					System.out.println(iconPath);
-					System.out.println(cl.getResource(iconPath));
-					BufferedImage image = ImageIO.read(cl.getResource(iconPath));
-					ImageIcon icon = new ImageIcon(image);
-					mainWindow_.addToolbarItem(plugins_[i].getName(), icon, new PluginAction(plugins_[i]));
-				}
-				catch (Exception e)
-				{
-					System.err.println("Icon image " + iconPath + " not found.");
-					mainWindow_.addToolbarItem(plugins_[i].getName(), new PluginAction(plugins_[i]));
-				}
-			}
+			addPluginButton(plugins_[i]);
 		}
 		
 		activatePlugin(plugins_[0]);
+	}
+	
+	/** Adds a plugin to the toolbar.
+	 * 
+	 *  @param plugin the plugin
+	 */
+	private void addPluginButton(IObserverCenterPlugin plugin)
+	{
+		String iconPath = plugin.getIconPath();
+		if (iconPath == null)
+		{
+			mainWindow_.addToolbarItem(plugin.getName(), new PluginAction(plugin));
+		}
+		else
+		{
+			ClassLoader cl = ((ILibraryService) agent_.getBeliefbase().getBelief("library_service").getFact()).getClassLoader();
+			try
+			{
+				System.out.println(iconPath);
+				System.out.println(cl.getResource(iconPath));
+				BufferedImage image = ImageIO.read(cl.getResource(iconPath));
+				ImageIcon icon = new ImageIcon(image);
+				mainWindow_.addToolbarItem(plugin.getName(), icon, new PluginAction(plugin));
+			}
+			catch (Exception e)
+			{
+				System.err.println("Icon image " + iconPath + " not found.");
+				mainWindow_.addToolbarItem(plugin.getName(), new PluginAction(plugin));
+			}
+		}
 	}
 	
 	private void activatePlugin(IObserverCenterPlugin plugin)
