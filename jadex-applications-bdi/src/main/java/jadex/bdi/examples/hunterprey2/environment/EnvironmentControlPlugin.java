@@ -32,7 +32,7 @@ import javax.swing.border.TitledBorder;
 /*  @requires belief environment
  *  @requires belief roundtime
  */
-public class EnvironmentObserverPlugin	implements IObserverCenterPlugin
+public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 {
 	//-------- attributes --------
 	
@@ -61,7 +61,7 @@ public class EnvironmentObserverPlugin	implements IObserverCenterPlugin
 	 *  Create a new gui plan.
 	 *  @param agent The agent created this Plugin
 	 */
-	public EnvironmentObserverPlugin(final IExternalAccess agent)
+	public EnvironmentControlPlugin(final IExternalAccess agent)
 	{
 		
 		JPanel options = createOptionsPanel(agent);

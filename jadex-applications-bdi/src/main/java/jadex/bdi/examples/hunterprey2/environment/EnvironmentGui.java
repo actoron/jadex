@@ -70,7 +70,7 @@ public class EnvironmentGui	extends JFrame
 
 	public EnvironmentGui(final IExternalAccess agent)
 	{
-		this(agent, null, false);
+		this(agent, false);
 	}
 	
 	/**
@@ -79,27 +79,17 @@ public class EnvironmentGui	extends JFrame
 	 *  @param world The displayable word canvas. If 'null' internal MapPanel is used.
 	 *  
 	 */
-	public EnvironmentGui(final IExternalAccess agent, Canvas worldmap, boolean showmap)
+	public EnvironmentGui(final IExternalAccess agent, boolean showmap)
 	{
 		super(agent.getAgentName());
 
 		if (showmap)
 		{
-			if (worldmap != null)
-			{
-				this.map = worldmap;
-			}
-			else
-			{
-				// Map panel.
-				this.map	= new MapPanel();
-				// only to use not the custom gui display
-				map.setPreferredSize(new Dimension(600, 600));
-			}
+			// Map panel.
+			this.map	= new MapPanel();
 			map.setMinimumSize(new Dimension(300, 300));
-			map.setSize(new Dimension(600, 600));
-			// since 1.5 !
-			//map.setPreferredSize(new Dimension(600, 600));
+			map.setPreferredSize(new Dimension(600, 600));
+			//map.setSize(new Dimension(600, 600));
 		}
 		
 		JPanel options = createOptionsPanel(agent);
@@ -115,28 +105,29 @@ public class EnvironmentGui	extends JFrame
 		tp.addTab("Highscore", highscore);
 		tp.setMinimumSize(new Dimension(0, 0));
 		// since 1.5 !
-		//tp.setPreferredSize(new Dimension(243, 0));
-		tp.setSize(new Dimension(243, 0));
+		tp.setPreferredSize(new Dimension(243, 0));
+		//tp.setSize(new Dimension(243, 0));
 		
 		JPanel	east	= new JPanel(new BorderLayout());
 		east.add(BorderLayout.CENTER, tp);
 		east.add(BorderLayout.SOUTH, options);
 
-		// Show the gui.
-		JSplitPane	split	= new JSplitPane();
+		
 		if (showmap)
 		{
+			// Show the gui with map
+			JSplitPane	split	= new JSplitPane();
 			split.setLeftComponent(map);
+			split.setRightComponent(east);
+			split.setResizeWeight(1);
+			getContentPane().add(BorderLayout.CENTER, split);
 		}
 		else
 		{
-			// TODO: add a simple image instead of map?
-			split.setLeftComponent(null);
+			// only show options panel
+			getContentPane().add(BorderLayout.CENTER, east);
 		}
-		split.setRightComponent(east);
-		split.setResizeWeight(1);
 
-		getContentPane().add(BorderLayout.CENTER, split);
 		pack();
 		setLocation(SGUI.calculateMiddlePosition(this));
 		setVisible(true);

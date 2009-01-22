@@ -30,46 +30,52 @@ public class InitializeObserverPlan extends Plan
 {
 	public void body()
 	{
-		//createGUI();
+		boolean use_old_gui = false;
+		try 
+		{
+			use_old_gui = ((Boolean) getBeliefbase().getBelief("use_old_gui").getFact()).booleanValue();
+		} 
+		catch (Exception e)
+		{
+			// ignore
+			e.printStackTrace();
+		}
 		
-		
-		insertPlugin();
-		initializeObserver();
-		
+		if (use_old_gui)
+		{
+			createGUI();
+		}
+		else
+		{
+			initializeObserver();
+		}
 	}
-	
-	
-	protected void insertPlugin()
-	{
-		IObserverCenterPlugin plugin = new EnvironmentObserverPlugin(getExternalAccess());
-		getBeliefbase().getBeliefSet("custom_plugins").addFact(plugin);
-	}
-	
+
+	/**
+	 * Create a "old-style" Observer GUI 
+	 * needed for remote observers.
+	 */
 	protected void createGUI()
 	{
-		Canvas worldmap = null;
-		if (initializeObserver() && ((Boolean) getBeliefbase().getBelief("custom_gui").getFact()).booleanValue())
-		{
-			worldmap = (Canvas) getBeliefbase().getBelief("worldmap").getFact();
-		}
-
 		ObserverGui gui;
 		try {
-			gui = new ObserverGui(getExternalAccess(), worldmap);
+			gui = new ObserverGui(getExternalAccess());
 			getBeliefbase().getBelief("gui").setFact(gui);
 		} catch (Exception e) {
 			fail(e);
 		}
-		
 	}
-	
-	
 
-
-	
-	
+	/**
+	 * Initialize the "new-style" OpenGL Observer
+	 * @return true if the observer goal succeded
+	 */
 	protected boolean initializeObserver()
 	{
+		// insert plugin - TODO: move to beliefset in ADF
+		//IObserverCenterPlugin plugin = new EnvironmentControlPlugin(getExternalAccess());
+		//getBeliefbase().getBeliefSet("custom_plugins").addFact(plugin);
+		
 		
 		getBeliefbase().getBelief("environment_name_obs").setFact(Configuration.ENVIRONMENT_NAME);
 		

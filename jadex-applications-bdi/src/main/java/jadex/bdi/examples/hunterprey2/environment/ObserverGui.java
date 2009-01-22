@@ -43,11 +43,11 @@ public class ObserverGui	extends EnvironmentGui
 	//-------- constructors --------
 
 	/**
-	 *  Create a new gui plan.
+	 *  Create a new gui.
 	 */
 	public ObserverGui(IExternalAccess agent)
 	{
-		super(agent, null, true);
+		super(agent, true);
 	}
 
 	/**
@@ -56,9 +56,9 @@ public class ObserverGui	extends EnvironmentGui
 	 * @param worldmap
 	 * @param showmap
 	 */
-	public ObserverGui(IExternalAccess agent, Canvas worldmap)
+	public ObserverGui(IExternalAccess agent, boolean show_map)
 	{
-		super(agent, worldmap, true);
+		super(agent, show_map);
 	}
 
 	//-------- helper methods --------

@@ -23,7 +23,6 @@
 	
 	<capabilities>
 		<capability name="simcap" file="jadex.bdi.planlib.simsupport.simcap.SimAgent"/>
-		<capability name="obscap" file="jadex.bdi.planlib.simsupport.observer.capability.SimObserver"/>
 		
 		<capability name="startcap" file="jadex.bdi.planlib.starter.StartAgents"/>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
@@ -32,13 +31,26 @@
 	</capabilities>
 
 	<beliefs>
+	
+		<!-- The filter for deciding which request messages are handled in this capability. -->
+		<beliefref name="rp_filter">
+			<concrete ref="procap.rp_filter"/>
+		</beliefref>
+
+		<!-- all registered observers -->
+		<beliefset name="observers" class="Observer" />
 		
 		<!-- the discrete hunterprey2 environment -->
-		<belief name="environment" class="Environment">
-			<!-- <fact>Environment.getInstance()</fact> -->
-			<!-- <fact>new Environment()</fact> -->
-		</belief>
+		<belief name="environment" class="Environment" />
 		
+		<!-- the local gui -->
+		<belief name="gui" class="EnvironmentGui" />
+		<!-- show a worldmap representation of the world in -->
+		<belief name="gui_show_map" class="Boolean">
+			<fact>new Boolean(true)</fact>
+		</belief>
+
+		<!-- initial round time -->
 		<belief name="roundtime" class="long">
 			<fact>1000</fact>
 		</belief>
@@ -47,36 +59,15 @@
 		<belief name="tick" class="Boolean">
 			<fact>new Boolean(false)</fact>
 		</belief>
-		
-		<!-- all registered observers -->
-		<beliefset name="observers" class="Observer" />
-		
-		<!-- the local gui -->
-		<belief name="gui" class="EnvironmentGui" />
-		<!-- show a worldmap representation of the world in -->
-		<belief name="gui_show_map" class="Boolean">
-			<fact>new Boolean(true)</fact>
-		</belief>
-		
-		<!-- the sim environment agent -->
-		<belief name="simagent" class="IAgentIdentifier" />
-		<belief name="simagent_info" class="StartAgentInfo" >
-			<fact>new StartAgentInfo("jadex/bdi/examples/hunterprey2/engine/SimEngine.agent.xml", "SimEngine", 0, null)</fact>
-		</belief>
 
-		<!-- The filter for deciding which request messages are handled in this capability. -->
-		<beliefref name="rp_filter">
-			<concrete ref="procap.rp_filter"/>
-		</beliefref>
-
-		<!-- Initial number of food objects -->
+		<!-- initial number of food objects -->
 		<belief name="initial_food" class="Integer" exported="true">
 			<fact>new Integer(10)</fact>
 		</belief>
 
 		<!-- Maximum number of food objects -->
 		<belief name="max_food" class="Integer" exported="true">
-			<fact>new Integer(50)</fact>
+			<fact>new Integer(100)</fact>
 		</belief>
 		
 		<!-- One food every X rounds -->
@@ -89,71 +80,12 @@
 			<fact>new Integer(100)</fact>
 		</belief>
 		
-		
-		<!-- obscap beliefs  -->
-		
-		<!-- Custom plugins to load into the standard GUI. -->
-		<beliefsetref name="custom_plugins">
-			<concrete ref="obscap.custom_plugins"/>
-		</beliefsetref>
-		
-		<!-- Name of the simulation environment -->
-		<beliefref name="environment_name_obs">
-			<concrete ref="obscap.environment_name"/>
-		</beliefref>
-		
-		<!-- Preservation of area aspect ratio in the window -->
-		<beliefref name="preserve_aspect_ratio">
-			<concrete ref="obscap.preserve_aspect_ratio"/>
-		</beliefref>
-		
-		<!-- Y-axis inversion (top-down instead of bottom-up) -->
-		<beliefref name="invert_y_axis">
-			<concrete ref="obscap.invert_y_axis"/>
-		</beliefref>
-		
-		<!-- Force the use of Java2D -->
-		<beliefref name="force_java2d">
-			<concrete ref="obscap.force_java2d"/>
-		</beliefref>
-		
-		<!-- List of themes for displaying objects -->
-		<beliefref name="object_themes">
-			<concrete ref="obscap.object_themes"/>
-		</beliefref>
-		
-		<!-- The pre-layers -->
-		<beliefref name="prelayer_themes">
-			<concrete ref="obscap.prelayer_themes"/>
-		</beliefref>
-		
-		<!-- The post-layers -->
-		<beliefref name="postlayer_themes">
-			<concrete ref="obscap.postlayer_themes"/>
-		</beliefref>
-		
-		<!-- The selected start theme -->
-		<beliefref name="selected_theme">
-			<concrete ref="obscap.selected_theme"/>
-		</beliefref>
-
-		<!-- Offer canvas access for building a custom GUI. -->
-		<beliefref name="custom_gui">
-			<concrete ref="obscap.custom_gui"/>
-		</beliefref>
-		<beliefref name="worldmap">
-			<concrete ref="obscap.canvas"/>
-		</beliefref>
-		
-		<!-- Shift for the objects -->
-		<beliefref name="object_shift">
-			<concrete ref="obscap.object_shift"/>
-		</beliefref>
-		
-		
-		
-		
-
+	
+		<belief name="simagent" class="IAgentIdentifier" />
+		<belief name="simagent_info" class="StartAgentInfo" >
+			<fact>new StartAgentInfo("jadex/bdi/examples/hunterprey2/engine/SimEngine.agent.xml", "SimEngine", 0, null)</fact>
+		</belief>
+	 
 	</beliefs>
 
 	<goals>
@@ -184,18 +116,6 @@
 			<!-- The agent to destroy. -->
 			<!-- <parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/> -->
 		</achievegoal>
-		
-		<!-- environment gui goal -->
-		<achievegoal name="start_environment_gui" />
-		
-		<!-- +++++++++++++++++++++++ -->
-		<!-- simulation engine goals -->
-		<!-- +++++++++++++++++++++++ -->
-		
-		<!-- sim environment start goal -->
-		<achievegoalref name="sim_start_environment">
-        	<concrete ref="envcap.sim_start_environment"/>
-    	</achievegoalref>
 
 		<!-- +++++++++++++++++++++++ -->
 		<!-- object simulation goals -->
@@ -252,19 +172,7 @@
 		<achievegoalref name="sim_connect_environment">
     		<concrete ref="simcap.sim_connect_environment"/>
 		</achievegoalref>
-		
-		<!-- +++++++++++++++++++++++ -->
-		<!-- observer sim goals      -->
-		<!-- +++++++++++++++++++++++ -->
-		
-		<!-- observer capability window start goal -->
-		<achievegoal name="obs_initialization" />
-    	
-    	<!-- sim observer start goal -->
-    	<achievegoalref name="simobs_start">
-        	<concrete ref="obscap.simobs_start"/>
-    	</achievegoalref>
-    	
+
 	</goals>
 
 	<plans>
@@ -347,11 +255,6 @@
 			<body class="SimulationEndPlan"/>
 			<trigger>
 				<goal ref="end_agent" />
-				<!--
-				<goal ref="rp_execute_request">
-					<match>$goal.getParameter("action").getValue() instanceof RequestEnd</match>
-				</goal>
-				-->
 			</trigger>
 		</plan>
 		
@@ -359,13 +262,6 @@
     	<plan name="env_initialization">
       		<body class="InitializeEnvironmentPlan"/>
     	</plan>
-    	
-    	
-    	<!-- Initialization Plan. -->
-    	<plan name="obs_initialization">
-      		<body class="InitializeObserverPlan"/>
-    	</plan>
-    	
 	</plans>
 
 	<events>
@@ -392,9 +288,15 @@
 			?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (taskSize 0))
 		</condition>
 		<condition name="nogoaltasks">
+			// $beliefbase.environment.getTaskSize()==0
+			
 			?rbel_env	= (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
 			?mbel_env	= (mbelief (element_has_name "environment"))
 			?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (goalTaskSize 0))
+			
+			//?rbel_env	= (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+			//?mbel_env	= (mbelief (element_has_name "environment"))
+			//?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (goalTaskSize 0))
 		</condition>
 	</expressions>
 
@@ -408,32 +310,6 @@
 				<initialbelief ref="rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
-				
-				
-				<initialbelief ref="my_self">
-					<fact>new Observer($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(0,0))</fact>
-				</initialbelief>
-				<initialbelief ref="selected_theme">
-					<fact>"default"</fact>
-				</initialbelief>
-				<initialbelief ref="custom_gui">
-					<fact>new Boolean(false)</fact>
-				</initialbelief>
-				<initialbelief ref="force_java2d">
-					<fact>new Boolean(false)</fact>
-				</initialbelief>
-				<initialbelief ref="preserve_aspect_ratio">
-					<fact>new Boolean(true)</fact>
-				</initialbelief>
-				<initialbelief ref="invert_y_axis">
-					<fact>new Boolean(true)</fact>
-				</initialbelief>
-				<initialbelief ref="object_shift">
-					<fact>new Vector2Double(0.5)</fact>
-				</initialbelief>
-				
-				
-				
 			</beliefs>
 			<goals>
 				<initialgoal ref="df_register">
@@ -447,7 +323,6 @@
  					</parameter>
 				</initialgoal>
 				<endgoal ref="df_deregister"/>
-				
 			</goals>
 			<plans>
 				<initialplan ref="env_initialization"/>

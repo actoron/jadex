@@ -34,25 +34,27 @@ public class  MovePlan extends Plan
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		TaskInfo ti = env.addMoveTask(rm.getCreature(), rm.getDirection());
 
+		System.out.println("waiting for condition notask " + this + "(size="+env.getTaskSize()+")");
+		
 		// Wait until all tasks are processed by the environment.
 		waitForCondition("notasks");
+		
+		System.out.println("condition notask fired " + this + "(size="+env.getTaskSize()+")");
 
-		// TODO: use goal listener
 		// perform move goal in sim engine
 		if(ti.getResult()!=null && ti.getResult() instanceof IGoal)
 		{
 			IGoal moveGoal = (IGoal) ti.getResult();
-			// is this is too late ?
 			dispatchSubgoalAndWait(moveGoal);
-			//waitForGoal(moveGoal);
-			env.removeGoalTask(ti);
 			assert moveGoal.isSucceeded() : "Sim-Engine Problem with move goal"+moveGoal; 
 			ti.setResult(new Boolean(moveGoal.isSucceeded()));
+			// remove task from list
+			env.removeGoalTask(ti);
 		}
 		
-		// Wait until all sim goals are processed.
+		// Wait until all sim goals where processed.
 		waitForCondition("nogoaltasks");
-		
+
 		// Result is null, when creature died and action was not executed.
 		if(ti.getResult()!=null && ((Boolean)ti.getResult()).booleanValue())
 		{

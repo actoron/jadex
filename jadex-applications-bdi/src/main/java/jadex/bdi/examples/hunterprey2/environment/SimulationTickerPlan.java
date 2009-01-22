@@ -54,8 +54,6 @@ public class SimulationTickerPlan extends Plan
 			{
 				env.executeStep();
 				
-				//System.out.println("Actual tick cnt: "+getBeliefbase().getBelief("???").getFact("tickcnt"));
-	
 				// Dispatch new visions.
 				Creature[]	creatures	= env.getCreatures();
 				//System.out.println("Knows creatures: "+creatures.length);
@@ -76,12 +74,13 @@ public class SimulationTickerPlan extends Plan
 						env.removeCreature(creatures[i]);
 					}
 				}
-				
+
 				// wait for next step
 				waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
-				
-				// ensure all goals from previous round are done
+
+				// wait for all goals from previous round
 				waitForCondition("nogoaltasks");
+				
 			}
 		}
 	}

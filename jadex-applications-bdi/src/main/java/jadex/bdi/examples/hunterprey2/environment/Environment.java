@@ -14,14 +14,14 @@ import jadex.bdi.examples.hunterprey2.TaskInfo;
 import jadex.bdi.examples.hunterprey2.Vision;
 import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
+import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.TimeoutException;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;
@@ -72,6 +72,9 @@ public class Environment implements IEnvironment
 	
 	/** The agent created this environment */
 	protected IExternalAccess agent;
+	
+//	/** The simulation environment to wrap on */
+//	protected ISimulationEngine engine;
 
 	/** All world object simulation id's accessible per location. */
 	public MultiCollection world;
@@ -112,14 +115,20 @@ public class Environment implements IEnvironment
 	/** The random number generator to create locations. */
 	protected Random	rand = new Random(System.currentTimeMillis());
 	
+	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new environment.
 	 */
-	public Environment(String title, IVector2 areaSize, IExternalAccess agent)
+	public Environment(IExternalAccess agent/*, ISimulationEngine engine*/)
 	{
+		assert agent != null : this + " - no external access provided";
+//		assert engine != null : this + " - no engine access provided";
+		
 		this.agent = agent;
+//		this.engine = engine;
+		
 		this.world = new MultiCollection();
 		this.creatures = new HashMap();
 		this.obstacles = new HashSet();
@@ -167,126 +176,103 @@ public class Environment implements IEnvironment
 	 * Create a sim object
 	 * @return the sim object with new sim id
 	 */
-	protected WorldObject createSimObject(final WorldObject wo, String type, Map properties, List tasks, Boolean sigDes, Boolean listen)
+	protected WorldObject createSimObject(WorldObject wo, String type, Map properties, List tasks, boolean signalDestruction, ISimulationEventListener listener)
 	{
-		assert agent != null : this + " - no external access provided";
-
-		//final WorldObject copy = wo ;//(WorldObject) wo.clone();
 		
 		Location l = wo.getLocation();
-		Map props = properties;
+		
 		if (properties == null)
-			props = new HashMap();
+			properties = new HashMap();
+		properties.put(PROPERTY_ONTOLOGY, wo);
 		
-		props.put(PROPERTY_ONTOLOGY, wo);
+//		wo.setSimId(engine.createSimObject(type, properties, tasks, l.getAsIVector(), signalDestruction, listener));
+//		return wo;
 		
+		final WorldObject fwo = wo;
 		final IGoal cg = agent.createGoal("sim_create_object");
 		cg.getParameter("type").setValue(type);
-		cg.getParameter("properties").setValue(props);
+		cg.getParameter("properties").setValue(properties);
 		cg.getParameter("position").setValue(l.getAsIVector());
 		cg.getParameter("tasks").setValue(tasks);
 		
-		cg.getParameter("signal_destruction").setValue(sigDes);
-		cg.getParameter("listen").setValue(listen);
+		cg.getParameter("signal_destruction").setValue(new Boolean(signalDestruction));
+		cg.getParameter("listen").setValue((listener!=null?new Boolean(true):new Boolean(false)));
 
-//		agent.dispatchTopLevelGoalAndWait(cg);
-//		wo.setSimId((Integer) cg.getParameter("object_id").getValue());
-//		return wo
-		
-		cg.addGoalListener(
-				new IGoalListener()
-				{
-					public void goalAdded(AgentEvent ae)
-					{
-					}
-		
-					public void goalFinished(AgentEvent ae)
-					{
-						IGoal g = (IGoal) ae.getSource();
-						if (g.isSucceeded())
-						{
-							wo.setSimId((Integer) cg.getParameter("object_id").getValue());
-						}
-						else
-						{
-							removeWorldObject(wo);
-						}
-					}
-				});
-
-		agent.dispatchTopLevelGoal(cg);
+		agent.dispatchTopLevelGoalAndWait(cg);
+		wo.setSimId((Integer) cg.getParameter("object_id").getValue());
 		return wo;
+		
+//		cg.addGoalListener(
+//				new IGoalListener()
+//				{
+//					public void goalAdded(AgentEvent ae)
+//					{
+//					}
+//		
+//					public void goalFinished(AgentEvent ae)
+//					{
+//						IGoal g = (IGoal) ae.getSource();
+//						if (g.isSucceeded())
+//						{
+//							fwo.setSimId((Integer) cg.getParameter("object_id").getValue());
+//						}
+//						else
+//						{
+//							// TODO: implement fail
+//						}
+//					}
+//				});
+//
+//		agent.dispatchTopLevelGoal(cg);
+//		return wo;
+		
 	}
-	
-	/**
-	 * Wrapper Method to remove a WorldObject, calls sub methods
-	 * removeCreature, removeObstacle, removeFood
-	 * @param wo
-	 */
-	protected void removeWorldObject(WorldObject wo)
-	{
-		if (wo instanceof Creature) 
-		{
-			removeCreature((Creature)wo);
-		}
-		else if (wo instanceof Obstacle)
-		{
-			removeObstacle((Obstacle)wo);
-		}
-		else if (wo instanceof Food)
-		{
-			removeFood((Food)wo);
-		}
-	}
-
 
 	/**
 	 * Destroy a sim object
 	 * @param wo
 	 * @return
 	 */
-	protected WorldObject destroySimObject(final WorldObject wo)
+	protected void destroySimObject(WorldObject wo)
 	{
-		assert agent != null : this + " - no external access provided";
-
+		assert wo.getSimId() == null : "WorldObject without SimId! " + wo;
 		
+//		engine.destroySimObject(wo.getSimId());
+		
+		final WorldObject fwo = wo;
 		final IGoal cg = agent.createGoal("sim_destroy_object");
 		cg.getParameter("object_id").setValue(wo.getSimId());
 		
-//		agent.dispatchTopLevelGoalAndWait(cg);
-//		wo.setSimId(null);
+		agent.dispatchTopLevelGoalAndWait(cg);
+		wo.setSimId(null);
 		
-		cg.addGoalListener(
-				new IGoalListener()
-				{
-					public void goalAdded(AgentEvent ae)
-					{
-					}
-		
-					public void goalFinished(AgentEvent ae)
-					{
-						IGoal g = (IGoal) ae.getSource();
-						if (g.isSucceeded())
-						{
-							wo.setSimId(null);
-						}
-						else
-						{
-							// TODO: implement failed 
-						}
-					}
-				});
-
-		agent.dispatchTopLevelGoal(cg);
-		
-		return wo;
+//		cg.addGoalListener(
+//				new IGoalListener()
+//				{
+//					public void goalAdded(AgentEvent ae)
+//					{
+//					}
+//		
+//					public void goalFinished(AgentEvent ae)
+//					{
+//						IGoal g = (IGoal) ae.getSource();
+//						if (g.isSucceeded())
+//						{
+//							fwo.setSimId(null);
+//						}
+//						else
+//						{
+//							// TODO: implement failed 
+//						}
+//					}
+//				});
+//
+//		agent.dispatchTopLevelGoal(cg);
 
 	}
 	
-	protected IGoal getMoveGoal(Creature me, Location dest) 
+	protected IGoal createMoveGoal(Creature me, Location dest) 
 	{
-		assert agent != null : this + " - no external access provided";
-		
 		IVector2 position = me.getLocation().getAsIVector();
 		IVector2 destination = dest.getAsIVector();
 		IGoal goToDest = null;
@@ -320,20 +306,20 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat goal to the queue.
 	 */
-	public void addGoalTask(TaskInfo task)
+	private synchronized void addGoalTask(TaskInfo task)
 	{
 		goaltasks.add(task);
-		//this.pcs.firePropertyChange("goaltasks", goaltasks.size()-1, goaltasks.size());
+		this.pcs.firePropertyChange("goalTaskSize", goaltasks.size()-1, goaltasks.size());	
 	}
 	
 	/**
 	 * Remove a goal from the queue
 	 * @param task
 	 */
-	public void removeGoalTask(TaskInfo task)
+	public synchronized void removeGoalTask(TaskInfo task)
 	{
 		goaltasks.remove(task);
-		//this.pcs.firePropertyChange("goaltasks", goaltasks.size()+1, goaltasks.size());
+		this.pcs.firePropertyChange("goalTaskSize", goaltasks.size()+1, goaltasks.size());
 	}
 	
 	/**
@@ -470,7 +456,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public TaskInfo addEatTask(Creature me, WorldObject obj)
+	public synchronized TaskInfo addEatTask(Creature me, WorldObject obj)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"eat", me, obj});
 		tasklist.add(ret);
@@ -481,23 +467,13 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public TaskInfo addMoveTask(Creature me, String dir)
+	public synchronized TaskInfo addMoveTask(Creature me, String dir)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"move", me, dir});
 		tasklist.add(ret);
 		this.pcs.firePropertyChange("taskSize", tasklist.size()-1, tasklist.size());
 		return ret;
 	}
-	
-//	/**
-//	 * Remove a task from the queue
-//	 * @param task
-//	 */
-//	public void removeTask(TaskInfo task)
-//	{
-//		tasklist.remove(task);
-//		this.pcs.firePropertyChange("taskSize", tasklist.size()+1, tasklist.size());
-//	}
 
 	/**
 	 *  Get the current vision (without updating the creatures leaseticks).
@@ -537,10 +513,10 @@ public class Environment implements IEnvironment
 	 */
 	public int	getWidth()
 	{
-//		return sizex;
+		// return sizex;
+		//return engine.getAreaSize().getXAsInteger();
 		
-//		return super.getAreaSize().getX().getAsInteger();
-		// HACK! use sim environment
+		// HACK!
 		return Configuration.AREA_SIZE.getXAsInteger();
 	}
 
@@ -549,13 +525,56 @@ public class Environment implements IEnvironment
 	 */
 	public int	getHeight()
 	{
-//		return sizey;
-//		return super.getAreaSize().getY().getAsInteger();
-		// HACK! use sim environment
+		// return sizey;
+		//return engine.getAreaSize().getYAsInteger();
+		
+		//HACK!
 		return Configuration.AREA_SIZE.getYAsInteger();
 	}
 
 	//-------- management methods --------
+	
+	/**
+	 * Wrapper Method to remove a WorldObject, calls sub methods
+	 * removeCreature, removeObstacle, removeFood
+	 * @param wo
+	 */
+	protected void removeWorldObject(WorldObject wo)
+	{
+		if (wo instanceof Creature) 
+		{
+			removeCreature((Creature)wo);
+		}
+		else if (wo instanceof Obstacle)
+		{
+			removeObstacle((Obstacle)wo);
+		}
+		else if (wo instanceof Food)
+		{
+			removeFood((Food)wo);
+		}
+	}
+	
+	/**
+	 * Wrapper Method to add a WorldObject, calls sub methods
+	 * addCreature, addObstacle, addFood
+	 * @param wo
+	 */
+	protected void addWorldObject(WorldObject wo)
+	{
+		if (wo instanceof Creature) 
+		{
+			addCreature((Creature)wo);
+		}
+		else if (wo instanceof Obstacle)
+		{
+			addObstacle((Obstacle)wo);
+		}
+		else if (wo instanceof Food)
+		{
+			addFood((Food)wo);
+		}
+	}
 
 	/**
 	 *  Add a new prey food to the world.
@@ -563,10 +582,10 @@ public class Environment implements IEnvironment
 	 */
 	public void addFood(Food nfood)
 	{		
-		WorldObject food = createSimObject(nfood, OBJECT_TYPE_FOOD, null, null, Boolean.TRUE, Boolean.FALSE);
+		WorldObject wo = createSimObject(nfood, OBJECT_TYPE_FOOD, null, null, true, null);
 		
-		this.food.add(food);
-		this.world.put(food.getLocation(), food);
+		this.food.add(wo);
+		this.world.put(wo.getLocation(), wo);
 	}
 
 	/**
@@ -588,7 +607,7 @@ public class Environment implements IEnvironment
 	 */
 	public void addObstacle(Obstacle obstacle)
 	{	
-		WorldObject wo = createSimObject(obstacle, OBJECT_TYPE_OBSTACLE, null, null, Boolean.TRUE, Boolean.FALSE);
+		WorldObject wo = createSimObject(obstacle, OBJECT_TYPE_OBSTACLE, null, null, true, null);
 		
 		this.obstacles.add(wo);
 		this.world.put(obstacle.getLocation(), wo);
@@ -610,19 +629,22 @@ public class Environment implements IEnvironment
 	 *  Add a new creature to the world.
 	 *  @param creature The creature.
 	 */
-	public synchronized Creature addCreature(Creature creature)
+	public /*synchronized*/ Creature addCreature(Creature creature)
 	{
 		Creature copy;
 		
-
 		if(!creatures.containsKey(creature))
 		{
 			copy = (Creature) creature.clone();
 			copy.setLeaseticks(DEFAULT_LEASE_TICKS);
 			copy.setWorldWidth(getWidth());
 			copy.setWorldHeight(getHeight());
-			this.creatures.put(copy, copy);
-
+			
+			synchronized (this)
+			{
+				this.creatures.put(copy, copy);
+			}
+			
 			if (!(copy instanceof Observer)) {			
 				copy.setAge(0);
 				copy.setPoints(0);
@@ -637,10 +659,13 @@ public class Environment implements IEnvironment
 				
 				List tasks = new ArrayList();
 				tasks.add(new MoveObjectTask(new Vector2Double(0.0)));
-				copy = (Creature) createSimObject(copy, getSimObjectType(copy), props, tasks, Boolean.TRUE, Boolean.TRUE);
+				copy = (Creature) createSimObject(copy, getSimObjectType(copy), props, tasks, true, null);
 
-				this.world.put(copy.getLocation(), copy);
-				this.highscore.add(copy);
+				synchronized (this)
+				{
+					this.world.put(copy.getLocation(), copy);
+					this.highscore.add(copy);
+				}
 			}
 			//System.out.println("Environment, creature added: "+copy.getName()+" "+copy.getLocation());
 		} else {
@@ -728,7 +753,8 @@ public class Environment implements IEnvironment
 						IGoal mg = move((Creature)params[1], (String)params[2]);
 						tasks[i].setResult(mg);
 						addGoalTask(tasks[i]);
-					} catch (LocationBlockedException e)
+					} 
+					catch (LocationBlockedException e)
 					{
 						tasks[i].setResult(new Boolean(false));
 					}
@@ -756,91 +782,17 @@ public class Environment implements IEnvironment
 			}
 			else
 			{
-				// hack for testing- remove old food
-				System.out.println("-- removing old food --");
-				for (int i = 0; i < 10; i++)
-				{
-					Food nfood = (Food) food.iterator().next();
-					System.out.println("remove: " +nfood+ " ? ->"+removeFood(nfood));
-					//removeFood(nfood);
-				}
+//				// hack for testing- remove old food
+//				System.out.println("-- removing old food --");
+//				for (int i = 0; i < 10; i++)
+//				{
+//					Food nfood = (Food) food.iterator().next();
+//					//System.out.println("remove: " +nfood+ " ? ->"+removeFood(nfood));
+//					removeFood(nfood);
+//				}
 			}
 		}
-		
-//		// set task results from simulation goals
-//		while (!simgoals.isEmpty())
-//		{
-//			System.out.println("simgoals size: " + simgoals.size());
-//			
-//			//Iterator it = simgoals.entrySet().iterator();
-//			//while (it.hasNext())
-//			Creature[] actors = (Creature[]) simgoals.keySet().toArray(new Creature[simgoals.size()]);
-//			for (int i = 0; i < actors.length; i++)
-//			{
-//				//Creature actor = (Creature) ((Map.Entry)it.next()).getKey();
-//				Creature actor = actors[i];
-//				assert actor != null;
-//				
-//				IGoal simgoal = (IGoal)simgoals.get(actor);
-//				if (simgoal == null)
-//					simgoals.remove(actor);
-//
-//				if (simgoal != null && simgoal.isFinished())
-//				{
-//					//it.remove();
-//					simgoals.remove(actor);
-//					System.out.println("removed goal");
-//					
-//					// find TaskInfo for actor
-//					// TO DO: change from list to map?
-//					TaskInfo task = null;
-//					for (int j = 0; task==null && j<tasks.length; j++)
-//					{
-//						Object[] params = (Object[])tasks[j].getAction();
-//						if (actor.equals(params[1]))
-//						{
-//							task = tasks[j];
-//						}
-//					}
-//
-//					assert simgoal.isSucceeded() : "Sim-Engine-Goal failed - respect collision detection!?";
-//					if (simgoal.isSucceeded())
-//					{
-//						task.setResult(new Boolean(true));
-//					}
-//				}
-//			}
-//			
-//			// let agent finish the goals
-//			// TO DO: change to something agent specific
-//			agent.waitFor(100);
-//			
-//		}
-		
-		
-		
-//		// let the goals finish
-//		agent.waitFor(500);
-//		// change finished move goals to boolean
-//		while (!goaltasks.isEmpty())
-//		{
-//			for (Iterator gt = goaltasks.iterator(); gt.hasNext();)
-//			{
-//				TaskInfo task = (TaskInfo) gt.next();
-//				IGoal goal = (IGoal) task.getResult();
-//				if (goal.isFinished())
-//				{
-//					gt.remove();
-//					assert goal.isSucceeded() : "difference between discrete and continous world";
-//					task.setResult(new Boolean(true));
-//				}
-//			}
-//			System.err.println("goaltasks:" +goaltasks.size());
-//			agent.waitFor(100);
-//			
-//		}
-		
-		
+
 		tasklist.clear();
 		this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
 		
@@ -904,7 +856,7 @@ public class Environment implements IEnvironment
 		else
 		{
 			// create move goal
-			IGoal mg = getMoveGoal(me, newloc);
+			IGoal mg = createMoveGoal(me, newloc);
 			
 			// move creature in discrete world
 			try
@@ -1047,19 +999,16 @@ public class Environment implements IEnvironment
 	public synchronized Location getEmptyLocation(IVector2 edgedistance)
 	{
 		Location	ret	= null;
+		
 		while(ret==null)
 		{
-			ret	= new Location(
-					edgedistance.getXAsInteger() + rand.nextInt(getWidth()), 
-					edgedistance.getXAsInteger() + rand.nextInt(getHeight())
-					);
-			
+			ret	= new Location(rand.nextInt(getWidth()), rand.nextInt(getHeight()));
 			if(world.containsKey(ret))
 			{
 				ret	= null;
 			}
 		}
-
+		
 		return ret;
 	}
 
