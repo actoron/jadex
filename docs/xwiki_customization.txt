@@ -1,0 +1,17 @@
+templates/global.vm
+	- Change "Main.WebHome" to "About.Overview" in companylogo link
+
+WEB-INF/web.xml
+	- Set homePage parameter of redirectHome servlet to "bin/view/About/Overview"
+
+WEB-INF/xwiki.cfg
+	- Set xwiki.store.attachment.versioning=0 to save memory when uploading attachments
+	- Add edu.uci.ics.mondego.wiki.plugin.map.MapPlugin to xwiki.plugins
+	  (also add googlemapplugin-1.0.jar to WEB-INF/lib)
+	- Enable/disable super admin by setting/unsetting xwiki.superadminpassword as required. 
+	  
+CATALINA_OPTS (environment variable)
+	- Set to, e.g.,  "-Xms64m -Xmx128m" as required
+	
+MySQL
+	- Set packet size to 32M !?  
