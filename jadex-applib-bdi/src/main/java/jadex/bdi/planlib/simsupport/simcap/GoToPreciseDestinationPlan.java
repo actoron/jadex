@@ -32,9 +32,6 @@ public class GoToPreciseDestinationPlan extends Plan
 		IGoal setTask = createGoal("sim_add_task");
 		setTask.getParameter("object_id").setValue(objectId);
 		setTask.getParameter("task").setValue(task);
-		
-		System.err.println("dispatching goto_task");
-		
 		dispatchSubgoalAndWait(setTask);
 		IInternalEvent evt = null;
 		do
@@ -42,9 +39,6 @@ public class GoToPreciseDestinationPlan extends Plan
 			evt = waitForInternalEvent("simulation_event");
 		}
 		while (!evt.getParameter("type").getValue().equals(SimulationEvent.GO_TO_PRECISE_DESTINATION_REACHED));
-		
-		System.err.println("goto_task finished");
-		
 		IVector2 position = (IVector2) evt.getParameter("position").getValue();
 		if (!position.equals(destination))
 		{
