@@ -124,6 +124,13 @@ public class InitializeEnvironmentPlan extends Plan
 		// update food spawn rate in discrete wrapper from belief
 		env.setFoodrate(((Integer) getBeliefbase().getBelief("food_spawn_rate").getFact()).intValue());
 
+		IGoal[] initGoals = env.getStepGoals();
+		for (int i = 0; i < initGoals.length; i++)
+		{
+			dispatchSubgoalAndWait(initGoals[i]);
+			env.removeStepGoal(initGoals[i]);
+		}
+		
 //		// Processes - IGNORE -its not step based!
 //		int maxFood = ((Integer) getBeliefbase().getBelief("max_food").getFact()).intValue();
 //		if (maxFood <= 0)

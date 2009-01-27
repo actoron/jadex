@@ -4,6 +4,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.examples.hunterprey2.CurrentVision;
 import jadex.bdi.examples.hunterprey2.Vision;
+import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
@@ -52,7 +53,56 @@ public class SimulationTickerPlan extends Plan
 			}
 			else
 			{
+				
+				// wait step time
+				waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
+				
 				env.executeStep();
+				
+				// dispatch all step goals
+				IGoal[] subgoals = env.getStepGoals();
+				System.out.println("dispatching -"+subgoals.length+"- subgoals");
+				for (int i = 0; i < subgoals.length; i++)
+				{
+					dispatchSubgoal(subgoals[i]);
+				}
+
+				// ensure all goals are finished
+				boolean finished = false;
+				while (!finished)
+				{
+					finished = true;
+					
+					for (int i = 0; i < subgoals.length; i++)
+					{
+						if (subgoals[i] != null)
+						{
+							if (!subgoals[i].isFinished())
+							{
+								System.out.println("subgoal -"+i+"- NOT FINISHED :" + subgoals[i].getLifecycleState());
+								finished = false;
+							}
+							else
+							{
+								System.out.println("subgoal -"+i+"- finished");
+								env.removeStepGoal(subgoals[i]);
+								subgoals[i] = null;
+							}
+						}
+					}
+					
+					if (!finished)
+					{
+						try 
+						{ 
+							waitFor(100); 
+						} 
+						catch (TimeoutException e ) 
+						{
+							// ignore
+						}
+					}
+				}
 				
 				// Dispatch new visions.
 				Creature[]	creatures	= env.getCreatures();
@@ -75,11 +125,6 @@ public class SimulationTickerPlan extends Plan
 					}
 				}
 
-				// wait for next step
-				waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
-
-				// wait for all goals from previous round
-				waitForCondition("nogoaltasks");
 				
 			}
 		}
