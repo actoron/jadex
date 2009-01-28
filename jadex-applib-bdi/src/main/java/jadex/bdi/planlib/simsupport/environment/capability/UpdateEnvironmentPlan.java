@@ -20,25 +20,31 @@ public class UpdateEnvironmentPlan extends Plan
 			{
 				if(IClock.STATE_RUNNING.equals(getClock().getState()))
 				{
-					ISimulationEngine engine = (ISimulationEngine) getBeliefbase().getBelief("simulation_engine").getFact();
-					long lastTime = ((Long) getBeliefbase().getBelief("sim_time").getFact()).longValue();
-					IVector1 timeCoeff = (IVector1)getBeliefbase().getBelief("time_coefficient").getFact();
-					
-					//long currentTime = ((Long) b.getBelief("time").getFact()).longValue();
-					// TODO: dynamic evaluation not working?
-					
-					long currentTime = getClock().getTime(); // ((IClockService) b.getBelief("clock_service").getFact()).getTime();
-	//				System.out.println("SimTime: " + lastTime);
-	//				System.out.println("Time: " + currentTime);
-					IVector1 deltaT = timeCoeff.copy().multiply(new Vector1Long(currentTime - lastTime));
-					
-					engine.simulateStep(deltaT);
-					getBeliefbase().getBelief("sim_time").setFact(new Long(currentTime));
+					getScope().getExternalAccess().invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							ISimulationEngine engine = (ISimulationEngine) getBeliefbase().getBelief("simulation_engine").getFact();
+							long lastTime = ((Long) getBeliefbase().getBelief("sim_time").getFact()).longValue();
+							IVector1 timeCoeff = (IVector1)getBeliefbase().getBelief("time_coefficient").getFact();
+							
+							//long currentTime = ((Long) b.getBelief("time").getFact()).longValue();
+							// TODO: dynamic evaluation not working?
+							
+							long currentTime = getClock().getTime(); // ((IClockService) b.getBelief("clock_service").getFact()).getTime();
+			//				System.out.println("SimTime: " + lastTime);
+			//				System.out.println("Time: " + currentTime);
+							IVector1 deltaT = timeCoeff.copy().multiply(new Vector1Long(currentTime - lastTime));
+							
+							engine.simulateStep(deltaT);
+							getBeliefbase().getBelief("sim_time").setFact(new Long(currentTime));
+						}
+					});
+	//				else
+	//				{
+	//					System.out.println("Clock paused.");
+	//				}
 				}
-//				else
-//				{
-//					System.out.println("Clock paused.");
-//				}
 			};
 		};
 		
