@@ -251,11 +251,14 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	 *  Add a timer.
 	 *  @param timer The timer.
 	 */
-	public synchronized void addTimer(ITimer timer)
+	public void addTimer(ITimer timer)
 	{
 		super.addTimer(timer);
 		
-		this.notify();
+		synchronized(this)
+		{
+			this.notify();	
+		}
 		executor.execute();
 	}
 	
@@ -263,11 +266,14 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	 *  Remove a timer.
 	 *  @param timer The timer.
 	 */
-	public synchronized void removeTimer(ITimer timer)
+	public void removeTimer(ITimer timer)
 	{
 		super.removeTimer(timer);
 		
-		this.notify();
+		synchronized(this)
+		{
+			this.notify();	
+		}
 		executor.execute();
 	}
 	
