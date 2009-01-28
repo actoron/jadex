@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.interpreter.GoalLifecycleRules;
 import jadex.bdi.interpreter.InternalEventRules;
 import jadex.bdi.interpreter.MessageEventRules;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
@@ -163,25 +164,26 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 *  @return The new intenal event.
 	 */
 	// changed signature for javaflow, removed final
-	public IInternalEvent createInternalEvent(String type)
+	public IInternalEvent createInternalEvent(final String ref)
 	{
 		if(getInterpreter().isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation(type)
+			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					Object	rinternalevent = InternalEventRules.createInternalEvent(getState(), getScope(), (String) arg);
-					object = InternalEventFlyweight.getInternalFlyweight(getState(), getScope(), rinternalevent);
+					Object[] scope = AgentRules.resolveCapability(ref, OAVBDIMetaModel.internalevent_type, getScope(), getState());
+					Object revent = InternalEventRules.createInternalEvent(getState(), scope[1], (String)scope[0]);
+					object = InternalEventFlyweight.getInternalFlyweight(getState(), scope[1], revent);
 				}
 			};
 			return (IInternalEvent)invoc.object;
 		}
 		else
 		{
-			Object	rinternalevent	= InternalEventRules.createInternalEvent(getState(), getScope(), type);
-			IInternalEvent ret = InternalEventFlyweight.getInternalFlyweight(getState(), getScope(), rinternalevent);
-			return ret;
+			Object[] scope = AgentRules.resolveCapability(ref, OAVBDIMetaModel.internalevent_type, getScope(), getState());
+			Object revent = InternalEventRules.createInternalEvent(getState(), scope[1], (String)scope[0]);
+			return InternalEventFlyweight.getInternalFlyweight(getState(), scope[1], revent);
 		}
 	}
 
