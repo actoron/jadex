@@ -1,6 +1,9 @@
 templates/global.vm
 	- Change "Main.WebHome" to "About.Overview" in companylogo link
 
+templates/htmlheader.vm
+	- Add "#if($isGuest) guestuser#end" to 'class' attribute of last body tag
+
 WEB-INF/web.xml
 	- Set homePage parameter of redirectHome servlet to "bin/view/About/Overview"
 
@@ -8,10 +11,14 @@ WEB-INF/xwiki.cfg
 	- Set xwiki.store.attachment.versioning=0 to save memory when uploading attachments
 	- Add edu.uci.ics.mondego.wiki.plugin.map.MapPlugin to xwiki.plugins
 	  (also add googlemapplugin-1.0.jar to WEB-INF/lib)
-	- Enable/disable super admin by setting/unsetting xwiki.superadminpassword as required. 
+	- Enable/disable super admin by setting/unsetting xwiki.superadminpassword as required.
+	- Set xwiki.servletpath=bin/ to fix bug in watchlist posting (see http://n2.nabble.com/WatchList-Email-Error-td2151183.html) 
 	  
-CATALINA_OPTS (environment variable)
-	- Set to, e.g.,  "-Xms64m -Xmx128m" as required
+Configure Tomcat (Windows App)
+	- Java / Maximum memory pool -> 512 (MB)
 	
 MySQL
-	- Set packet size to 32M !?  
+	- Set 'Max. packet size' to 64M (MySQL Administrator -> Start Variables -> Network)
+	
+XWiki
+	- Import lightbox plugin (.xar)  
