@@ -31,14 +31,9 @@ public class InitializeObserverPlan extends Plan
 	public void body()
 	{
 		boolean use_old_gui = false;
-		try 
+		if(getBeliefbase().containsBelief("use_old_gui"))
 		{
 			use_old_gui = ((Boolean) getBeliefbase().getBelief("use_old_gui").getFact()).booleanValue();
-		} 
-		catch (Exception e)
-		{
-			// ignore
-			e.printStackTrace();
 		}
 		
 		if (use_old_gui)

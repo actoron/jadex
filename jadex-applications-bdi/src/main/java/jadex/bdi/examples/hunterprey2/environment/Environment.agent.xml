@@ -22,6 +22,7 @@
 	</imports>
 	
 	<capabilities>
+		<capability name="envcap" file="jadex.bdi.planlib.simsupport.environment.capability.SimEnvironment"/>
 		<capability name="simcap" file="jadex.bdi.planlib.simsupport.simcap.SimAgent"/>
 		
 		<capability name="startcap" file="jadex.bdi.planlib.starter.StartAgents"/>
@@ -80,11 +81,32 @@
 			<fact>new Integer(100)</fact>
 		</belief>
 		
-	
+		<!-- +++++++++++++++++++++++ -->
+		<!-- sim engine beliefs      -->
+		<!-- +++++++++++++++++++++++ -->
+		
+			
 		<belief name="simagent" class="IAgentIdentifier" />
 		<belief name="simagent_info" class="StartAgentInfo" >
 			<fact>new StartAgentInfo("jadex/bdi/examples/hunterprey2/engine/SimEngine.agent.xml", "SimEngine", 0, null)</fact>
 		</belief>
+
+		
+		<!-- Name of the simulation environment -->
+		<beliefref name="environment_name">
+			<concrete ref="envcap.environment_name"/>
+		</beliefref>
+		
+		<!-- The clock service -->
+		<beliefref name="clock_service">
+			<concrete ref="envcap.clock_service"/>
+		</beliefref>
+		
+		<!-- The simulation engine -->
+		<beliefref name="simulation_engine">
+			<concrete ref="envcap.simulation_engine"/>
+		</beliefref>
+
 	 
 	</beliefs>
 
@@ -116,6 +138,15 @@
 			<!-- The agent to destroy. -->
 			<!-- <parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/> -->
 		</achievegoal>
+		
+		<!-- +++++++++++++++++++++++ -->
+		<!-- sim engine goals        -->
+		<!-- +++++++++++++++++++++++ -->
+		
+		<!-- sim environment start goal -->
+		<achievegoalref name="sim_start_environment">
+        	<concrete ref="envcap.sim_start_environment"/>
+    	</achievegoalref>
 
 		<!-- +++++++++++++++++++++++ -->
 		<!-- object simulation goals -->
@@ -277,6 +308,12 @@
 			</parameter>
 			<parameter name="content" class="CurrentVision"/>
 		</messageevent>
+
+		<!-- Generic simulation event event. -->
+		<internaleventref name="simulation_event">
+			<concrete ref="simcap.simulation_event"/>
+		</internaleventref>
+		
 	</events>
 	
 	<expressions>

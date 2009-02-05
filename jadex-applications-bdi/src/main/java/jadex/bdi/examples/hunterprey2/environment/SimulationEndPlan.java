@@ -27,17 +27,16 @@ public class SimulationEndPlan extends Plan {
 			}
 		}
 		
-		// end sim environment
-		try
-		{
-
-			IGoal kg = createGoal("ams_destroy_agent");
-			kg.getParameter("agentidentifier").setValue(getBeliefbase().getBelief("simagent").getFact());
-			dispatchSubgoalAndWait(kg);
-		}
-		catch(GoalFailureException gfe) 
-		{
-		}
+//		// end sim environment
+//		try
+//		{
+//			IGoal kg = createGoal("ams_destroy_agent");
+//			kg.getParameter("agentidentifier").setValue(getBeliefbase().getBelief("simagent").getFact());
+//			dispatchSubgoalAndWait(kg);
+//		}
+//		catch(GoalFailureException gfe) 
+//		{
+//		}
 		
 //		// kill via gui		
 //		// TO DO: How to suicide?

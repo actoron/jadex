@@ -1,37 +1,19 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.bdi.examples.hunterprey2.Configuration;
-import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.examples.hunterprey2.Food;
 import jadex.bdi.examples.hunterprey2.Location;
 import jadex.bdi.examples.hunterprey2.Obstacle;
 import jadex.bdi.examples.hunterprey2.WorldObject;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.Rectangle;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
-import jadex.bdi.planlib.simsupport.common.graphics.layer.GridLayer;
-import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
-import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
-import jadex.bdi.planlib.simsupport.common.math.IVector1;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.EuclideanSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
-import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
-import jadex.bdi.planlib.starter.StartAgentInfo;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-
-import java.awt.Canvas;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class InitializeEnvironmentPlan extends Plan
 {
 	
-	
+	ISimulationEngine simengine = null;
 	
 	public void body()
 	{
@@ -65,22 +47,38 @@ public class InitializeEnvironmentPlan extends Plan
 	protected boolean startSimEngine() {
 		
 		// start the sim-engine agent
-		StartAgentInfo simEnvironmentAgentInfo = (StartAgentInfo) getBeliefbase().getBelief("simagent_info").getFact();
-		IGoal sg = createGoal("start_agents");
-		sg.getParameterSet("agentinfos").addValue(simEnvironmentAgentInfo);
-		dispatchSubgoalAndWait(sg);
-		Object simAID = null;
-		if (sg.isSucceeded())
-		{
-			try
-			{
-				simAID = sg.getParameterSet("agentidentifiers").getValues()[0];
-			}
-			catch (Exception e) {
-				fail(e);
-			}
-		}
-		getBeliefbase().getBelief("simagent").setFact(simAID);
+//		StartAgentInfo simEnvironmentAgentInfo = (StartAgentInfo) getBeliefbase().getBelief("simagent_info").getFact();
+//		IGoal sg = createGoal("start_agents");
+//		sg.getParameterSet("agentinfos").addValue(simEnvironmentAgentInfo);
+//		dispatchSubgoalAndWait(sg);
+//		Object simAID = null;
+//		if (sg.isSucceeded())
+//		{
+//			try
+//			{
+//				simAID = sg.getParameterSet("agentidentifiers").getValues()[0];
+//			}
+//			catch (Exception e) {
+//				fail(e);
+//			}
+//		}
+//		getBeliefbase().getBelief("simagent").setFact(simAID);
+		
+		
+		// simengine in this agent
+		getBeliefbase().getBelief("environment_name").setFact(Configuration.ENVIRONMENT_NAME);
+		getBeliefbase().getBelief("clock_service").setFact(getClock());
+		ISimulationEngine engine  = new EuclideanSimulationEngine(
+						Configuration.ENVIRONMENT_NAME,
+						Configuration.AREA_SIZE);
+		
+		getBeliefbase().getBelief("simulation_engine").setFact(engine);
+		IGoal start = createGoal("sim_start_environment");
+		dispatchSubgoalAndWait(start);
+		getBeliefbase().getBelief("simagent").setFact(getAgentIdentifier());
+		// comment?
+		simengine = engine;
+		
 		
 		// connect the sim-engine
 		//String envName = (String) getBeliefbase().getBelief("environment_name").getFact();
@@ -99,7 +97,7 @@ public class InitializeEnvironmentPlan extends Plan
 	{
 
 		// now create the discrete simulation environment wrapper
-		Environment env  = new Environment(this.getExternalAccess());
+		Environment env  = new Environment(this.getExternalAccess(), simengine);
 
 		// create obstacles in discrete wrapper
 		int obstacleCount = ((Integer) getBeliefbase().getBelief("obstacle_count").getFact()).intValue();
