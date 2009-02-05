@@ -248,10 +248,16 @@ public class Environment implements IEnvironment
 		{
 			me.setPoints(me.getPoints()+points);
 		}
-		/*else
+		
 		{
-			System.out.println("Creature tried to cheat: "+me.getName());
-		}*/
+			// This happens if the creature compute the next step on the old vision.
+			// The "move" plan resumes execution on "notasks" condition trigger. The creature
+			// agent will be informed and the next step is computed. The current vision is updated
+			// via the SimTickerPlan AFTER the condition has triggered. In single core machines this
+			// seems to happen not very often. But in multicore machines this is a very bad race condition
+			// that happens very very very very often.
+			System.out.println("Creature tried to cheat: '"+me.getName()+"' Do we have a multicore problem?");
+		}
 		//block(); todo: make blocking for local case
 		return ret;
 	}
@@ -738,16 +744,22 @@ public class Environment implements IEnvironment
 	 */
 	public synchronized Creature[] getHighscore()
 	{
-		Collections.sort(highscore, new Comparator()
-		{
-			public int	compare(Object o1, Object o2)
+		try {
+			Collections.sort(highscore, new Comparator()
 			{
-				return ((Creature)o2).getPoints()
-						- ((Creature)o1).getPoints();
-			}
-		});
-		List copy = highscore.subList(0, Math.min(highscore.size(), 10));
-		return (Creature[])copy.toArray(new Creature[copy.size()]);
+				public int	compare(Object o1, Object o2)
+				{
+					return ((Creature)o2).getPoints()
+							- ((Creature)o1).getPoints();
+				}
+			});
+			List copy = highscore.subList(0, Math.min(highscore.size(), 10));
+			return (Creature[])copy.toArray(new Creature[copy.size()]);
+		}
+		catch (ClassCastException cce)
+		{
+			return new Creature[0];
+		}
 	}
 
 	/**
