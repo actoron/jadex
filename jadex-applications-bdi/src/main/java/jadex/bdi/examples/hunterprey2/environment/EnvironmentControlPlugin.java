@@ -17,12 +17,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.JTextComponent;
 
 
 /**
@@ -60,31 +64,58 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 	/**
 	 *  Create a new gui plan.
 	 *  @param agent The agent created this Plugin
+	 *  @require belief roundtime
+	 *  @require belief environment
 	 */
 	public EnvironmentControlPlugin(final IExternalAccess agent)
 	{
 		
-		JPanel options = createOptionsPanel(agent);
-
-		this.creatures = new CreaturePanel();
-		this.observers = new CreaturePanel(true);
-		this.highscore = new CreaturePanel();
-
-		JTabbedPane tp = new JTabbedPane();
-		//tp.addTab("Control", options);
-		tp.addTab("Living creatures", creatures);
-		tp.addTab("Observers", observers);
-		tp.addTab("Highscore", highscore);
-		tp.setMinimumSize(new Dimension(0, 0));
-		// since 1.5 !
-		//tp.setPreferredSize(new Dimension(243, 0));
-		tp.setSize(new Dimension(243, 0));
+		boolean reqBeliefsFound = 
+			agent.getBeliefbase().containsBelief("environment") &&
+			agent.getBeliefbase().containsBelief("roundtime");
 		
-		view = new JPanel(new BorderLayout());
-		view.add(BorderLayout.CENTER, tp);
-		view.add(BorderLayout.SOUTH, options);
-
-		enableGuiUpdate(agent);
+		if (reqBeliefsFound)
+		{
+			JPanel options = createOptionsPanel(agent);
+	
+			this.creatures = new CreaturePanel();
+			this.observers = new CreaturePanel(true);
+			this.highscore = new CreaturePanel();
+	
+			JTabbedPane tp = new JTabbedPane();
+			//tp.addTab("Control", options);
+			tp.addTab("Living creatures", creatures);
+			tp.addTab("Observers", observers);
+			tp.addTab("Highscore", highscore);
+			tp.setMinimumSize(new Dimension(0, 0));
+			// since 1.5 !
+			//tp.setPreferredSize(new Dimension(243, 0));
+			tp.setSize(new Dimension(243, 0));
+			
+			view = new JPanel(new BorderLayout());
+			view.add(BorderLayout.CENTER, tp);
+			view.add(BorderLayout.SOUTH, options);
+	
+			enableGuiUpdate(agent);
+		}
+		else
+		{	
+			JTextPane text = new JTextPane();
+			StringBuffer buf = new StringBuffer();
+			buf.append("Required beliefs not found in capability!\n\n");
+			buf.append("Need:\n");
+			buf.append("   Environment environment\n");
+			buf.append("   Integer roundtime\n");
+			buf.append("\n\nMaybe the problem is the provided scope:\n");
+			buf.append(agent.toString());
+			buf.append("\n\nBe sure to instantiate the plugin in the scope of the agent, not in the scope of the capability");
+			text.setText(buf.toString());
+			text.setEditable(false);
+			
+			view = new JPanel(new BorderLayout());
+			view.add(text);
+			view.setMinimumSize(new Dimension(200,100));
+		}
 
 	}
 
@@ -168,16 +199,10 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 		env.addPropertyChangeListener(new PropertyChangeListener()
 		{
-//			// Hack!!! Dummy creature required for world size.
-//			protected Creature	dummy	= new Prey();
-
 			public void propertyChange(PropertyChangeEvent evt)
 			{
 				roundcnt.setText(""+env.getWorldAge());
-	
-//				dummy.setWorldWidth(env.getWidth());
-//				dummy.setWorldHeight(env.getHeight());
-	
+
 				Vision	vision	= new Vision();
 				vision.setObjects(env.getAllObjects());
 
@@ -190,7 +215,7 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 
 	public String getIconPath()
 	{
-		// TODO Auto-generated method stub
+		// TODO: create icon and replace path
 		return null;
 	}
 
@@ -217,7 +242,7 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 	public void start(ObserverCenter main)
 	{
 		observerCenter = main;
-		// TODO: implement some methods :-)
+		// TODO: implement some markup methods :-)
 	}
 }
 

@@ -67,10 +67,15 @@ public class InitializeObserverPlan extends Plan
 	 */
 	protected boolean initializeObserver()
 	{
-		// insert plugin - TODO: move to beliefset in ADF
-		//IObserverCenterPlugin plugin = new EnvironmentControlPlugin(getExternalAccess());
-		//getBeliefbase().getBeliefSet("custom_plugins").addFact(plugin);
 		
+		if (getBeliefbase().getBelief("environment").getFact() == null)
+		{
+			waitForFactChanged("environment");
+		}
+		// insert plugin - this MUST get the agent scope, so don't use the
+		// capability belief reference in ADF for creation
+		IObserverCenterPlugin plugin = new EnvironmentControlPlugin(getExternalAccess());
+		getBeliefbase().getBeliefSet("custom_plugins").addFact(plugin);
 		
 		getBeliefbase().getBelief("environment_name_obs").setFact(Configuration.ENVIRONMENT_NAME);
 		

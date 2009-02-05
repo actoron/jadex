@@ -23,9 +23,8 @@
 	
 	<capabilities>
 		<capability name="envcap" file="jadex.bdi.planlib.simsupport.environment.capability.SimEnvironment"/>
-		<capability name="simcap" file="jadex.bdi.planlib.simsupport.simcap.SimAgent"/>
+		<capability name="obscap" file="jadex.bdi.planlib.simsupport.observer.capability.SimObserver"/>
 		
-		<capability name="startcap" file="jadex.bdi.planlib.starter.StartAgents"/>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
@@ -42,17 +41,18 @@
 		<beliefset name="observers" class="Observer" />
 		
 		<!-- the discrete hunterprey2 environment -->
-		<belief name="environment" class="Environment" />
+		<belief name="environment" class="Environment" exported="true"/>
 		
-		<!-- the local gui -->
+		<!-- uncomment the following two beliefs to enable the old gui -->
+		<!--
 		<belief name="gui" class="EnvironmentGui" />
-		<!-- show a worldmap representation of the world in -->
 		<belief name="gui_show_map" class="Boolean">
 			<fact>new Boolean(true)</fact>
 		</belief>
-
+		-->
+		
 		<!-- initial round time -->
-		<belief name="roundtime" class="long">
+		<belief name="roundtime" class="long" exported="true">
 			<fact>1000</fact>
 		</belief>
 		
@@ -85,13 +85,6 @@
 		<!-- sim engine beliefs      -->
 		<!-- +++++++++++++++++++++++ -->
 		
-			
-		<belief name="simagent" class="IAgentIdentifier" />
-		<belief name="simagent_info" class="StartAgentInfo" >
-			<fact>new StartAgentInfo("jadex/bdi/examples/hunterprey2/engine/SimEngine.agent.xml", "SimEngine", 0, null)</fact>
-		</belief>
-
-		
 		<!-- Name of the simulation environment -->
 		<beliefref name="environment_name">
 			<concrete ref="envcap.environment_name"/>
@@ -106,8 +99,69 @@
 		<beliefref name="simulation_engine">
 			<concrete ref="envcap.simulation_engine"/>
 		</beliefref>
+		
+		<!-- +++++++++++++++++++++++ -->
+		<!-- observer beliefs        -->
+		<!-- +++++++++++++++++++++++ -->
+		
+		<!-- Custom plugins to load into the standard GUI. -->
+		<beliefsetref name="custom_plugins">
+			<concrete ref="obscap.custom_plugins"/>
+		</beliefsetref>
+		
+		<!-- Name of the simulation environment -->
+		<beliefref name="environment_name_obs">
+			<concrete ref="obscap.environment_name"/>
+		</beliefref>
+		
+		<!-- Preservation of area aspect ratio in the window -->
+		<beliefref name="preserve_aspect_ratio">
+			<concrete ref="obscap.preserve_aspect_ratio"/>
+		</beliefref>
+		
+		<!-- Y-axis inversion (top-down instead of bottom-up) -->
+		<beliefref name="invert_y_axis">
+			<concrete ref="obscap.invert_y_axis"/>
+		</beliefref>
+		
+		<!-- Force the use of Java2D -->
+		<beliefref name="force_java2d">
+			<concrete ref="obscap.force_java2d"/>
+		</beliefref>
+		
+		<!-- List of themes for displaying objects -->
+		<beliefref name="object_themes">
+			<concrete ref="obscap.object_themes"/>
+		</beliefref>
+		
+		<!-- The pre-layers -->
+		<beliefref name="prelayer_themes">
+			<concrete ref="obscap.prelayer_themes"/>
+		</beliefref>
+		
+		<!-- The post-layers -->
+		<beliefref name="postlayer_themes">
+			<concrete ref="obscap.postlayer_themes"/>
+		</beliefref>
+		
+		<!-- The selected start theme -->
+		<beliefref name="selected_theme">
+			<concrete ref="obscap.selected_theme"/>
+		</beliefref>
 
-	 
+		<!-- Offer canvas access for building a custom GUI. -->
+		<beliefref name="custom_gui">
+			<concrete ref="obscap.custom_gui"/>
+		</beliefref>
+		<beliefref name="worldmap">
+			<concrete ref="obscap.canvas"/>
+		</beliefref>
+		
+		<!-- Shift for the objects -->
+		<beliefref name="object_shift">
+			<concrete ref="obscap.object_shift"/>
+		</beliefref>
+
 	</beliefs>
 
 	<goals>
@@ -139,70 +193,15 @@
 			<!-- <parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/> -->
 		</achievegoal>
 		
-		<!-- +++++++++++++++++++++++ -->
-		<!-- sim engine goals        -->
-		<!-- +++++++++++++++++++++++ -->
-		
 		<!-- sim environment start goal -->
 		<achievegoalref name="sim_start_environment">
         	<concrete ref="envcap.sim_start_environment"/>
     	</achievegoalref>
-
-		<!-- +++++++++++++++++++++++ -->
-		<!-- object simulation goals -->
-		<!-- +++++++++++++++++++++++ -->
-		
-		<achievegoalref name="sim_create_object">
-        	<concrete ref="simcap.sim_create_object"/>
-    	</achievegoalref>
     	
-    	<achievegoalref name="sim_destroy_object">
-        	<concrete ref="simcap.sim_destroy_object"/>
+    	<!-- sim observer start goal -->
+    	<achievegoalref name="simobs_start">
+        	<concrete ref="obscap.simobs_start"/>
     	</achievegoalref>
-    	
-    	<achievegoalref name="sim_get_position">
-        	<concrete ref="simcap.sim_get_position"/>
-    	</achievegoalref>
-    	
-    	<achievegoalref name="sim_set_position">
-        	<concrete ref="simcap.sim_set_position"/>
-    	</achievegoalref>
-    	
-    	<achievegoalref name="sim_set_velocity">
-        	<concrete ref="simcap.sim_set_velocity"/>
-    	</achievegoalref>
-    	
-    	<performgoalref name="sim_go_to_destination">
-    		<concrete ref="simcap.sim_go_to_destination"/>
-		</performgoalref>
-		
-		<performgoalref name="sim_go_to_precise_destination">
-    		<concrete ref="simcap.sim_go_to_precise_destination"/>
-		</performgoalref>
-		
-		<achievegoalref name="sim_remove_task">
-    		<concrete ref="simcap.sim_remove_task"/>
-		</achievegoalref>
-		
-		<performgoalref name="sim_perform_action">
-    		<concrete ref="simcap.sim_perform_action"/>
-		</performgoalref>
-		
-		<achievegoalref name="sim_get_random_position">
-    		<concrete ref="simcap.sim_get_random_position"/>
-		</achievegoalref>
-		
-		<achievegoalref name="sim_add_environment_process">
-    		<concrete ref="simcap.sim_add_environment_process"/>
-		</achievegoalref>
-		
-		<achievegoalref name="sim_remove_environment_process">
-    		<concrete ref="simcap.sim_remove_environment_process"/>
-		</achievegoalref>
-		
-		<achievegoalref name="sim_connect_environment">
-    		<concrete ref="simcap.sim_connect_environment"/>
-		</achievegoalref>
 
 	</goals>
 
@@ -293,6 +292,12 @@
     	<plan name="env_initialization">
       		<body class="InitializeEnvironmentPlan"/>
     	</plan>
+    	
+    	<!-- Initialization Plan. -->
+    	<plan name="obs_initialization">
+      		<body class="InitializeObserverPlan"/>
+    	</plan>
+    	
 	</plans>
 
 	<events>
@@ -310,13 +315,15 @@
 		</messageevent>
 
 		<!-- Generic simulation event event. -->
-		<internaleventref name="simulation_event">
-			<concrete ref="simcap.simulation_event"/>
-		</internaleventref>
+    	<internalevent name="simulation_event" posttoall="true">
+    		<parameter name="type" class="String"/>
+    		<parameter name="task" class="ISimObjectTask"/>
+    	</internalevent>
 		
 	</events>
 	
 	<expressions>
+
 		<condition name="notasks">
 			// $beliefbase.environment.getTaskSize()==0
 			
@@ -324,6 +331,14 @@
 			?mbel_env	= (mbelief (element_has_name "environment"))
 			?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (taskSize 0))
 		</condition>
+		<!--
+		<condition name="nosimtasks">
+			?rbel_env	= (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+			?mbel_env	= (mbelief (element_has_name "environment"))
+			?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (simTaskCounter 0))
+		</condition>
+		-->
+		<!--
 		<condition name="nostepgoals">
 			// $beliefbase.environment.getStepGoalSize()==0
 			
@@ -331,6 +346,7 @@
 			?mbel_env	= (mbelief (element_has_name "environment"))
 			?env	= (jadex.bdi.examples.hunterprey2.environment.Environment (stepGoalSize 0))
 		</condition>
+		-->
 	</expressions>
 
 	<properties>
@@ -343,7 +359,26 @@
 				<initialbelief ref="rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
+				<initialbelief ref="selected_theme">
+					<fact>"default"</fact>
+				</initialbelief>
+				<initialbelief ref="custom_gui">
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="force_java2d">
+					<fact>new Boolean(false)</fact>
+				</initialbelief>
+				<initialbelief ref="preserve_aspect_ratio">
+					<fact>new Boolean(true)</fact>
+				</initialbelief>
+				<initialbelief ref="invert_y_axis">
+					<fact>new Boolean(true)</fact>
+				</initialbelief>
+				<initialbelief ref="object_shift">
+					<fact>new Vector2Double(0.5)</fact>
+				</initialbelief>
 			</beliefs>
+			
 			<goals>
 				<initialgoal ref="df_register">
 					<parameter ref="description">
@@ -359,6 +394,7 @@
 			</goals>
 			<plans>
 				<initialplan ref="env_initialization"/>
+				<initialplan ref="obs_initialization"/>
 				<initialplan ref="simticker"/>
 			</plans>
 		</configuration>

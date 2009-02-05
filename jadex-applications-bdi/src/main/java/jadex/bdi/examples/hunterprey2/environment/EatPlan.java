@@ -35,8 +35,8 @@ public class  EatPlan extends Plan
 		TaskInfo ti = env.addEatTask(re.getCreature(), re.getObject());
 
 		// Wait until all tasks are processed by the environment.
-		//waitForCondition(getCondition("emptylist"));
 		waitForCondition("notasks");
+
 
 //		System.out.println("b) eat: "+getName());
 

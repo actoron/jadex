@@ -61,8 +61,6 @@
 						 
 						<!--<value>new StartAgentInfo("jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/LAHunter.agent.xml", "Willy_%n", 0, null)</value>-->
 						<!--<value>new StartAgentInfo("jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/LAHunter.agent.xml", "Wolfram_%n", 0, null)</value>-->
-						
-						<value>new StartAgentInfo("jadex/bdi/examples/hunterprey2/environment/Observer.agent.xml", "Observer_%n", 100, null)</value>
 						 
 					</parameterset>
 				</initialgoal>
