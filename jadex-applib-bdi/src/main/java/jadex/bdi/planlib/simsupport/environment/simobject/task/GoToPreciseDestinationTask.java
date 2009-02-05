@@ -93,10 +93,6 @@ public class GoToPreciseDestinationTask implements ISimObjectTask
 			IVector2 currentPosition = object.getPositionAccess();
 			IVector2 velocity = targetPosition_.copy().subtract(currentPosition).normalize().multiply(speed_);
 		
-			// FIXME: Race condition, especially in debug mode. (or in a long atomic action / wait or something else)
-			// This must trigger if the distance in the move direction is reached
-			// "a" -> "b" -----------> "c"   / goal: go from a to b, have a wait and we are in c, 
-			// go back to "b", have the same wait and we are in "a" 
 			if (currentPosition.getDistance(targetPosition_).less(moveTask_.getLastMovementDelta().getLength()))
 			{
 				// Destination reached, stop, set correct position and trigger event.
