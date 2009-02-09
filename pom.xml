@@ -75,6 +75,7 @@
 		    <module>jadex-launch</module>
 		    <module>jadex-jade-launch</module>
 			<module>jadex-platform-jade</module>
+			<module>jadex-xwiki</module>
 		</modules>
   	</profile>
   	<profile>
