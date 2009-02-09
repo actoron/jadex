@@ -21,4 +21,5 @@ MySQL
 	- Set 'Max. packet size' to 64M (MySQL Administrator -> Start Variables -> Network)
 	
 XWiki
-	- Import lightbox plugin (.xar)  
+	- Import lightbox plugin (.xar)
+	- Do not remove 'Admin' user as this causes watchlist problems: http://lists.xwiki.org/pipermail/users/2008-October/014116.html  
