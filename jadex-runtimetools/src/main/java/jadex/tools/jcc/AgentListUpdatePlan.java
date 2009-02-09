@@ -27,21 +27,28 @@ public class AgentListUpdatePlan extends Plan
 		this.timer	= new Timer(1000, new ActionListener()
 		{
 			IBeliefSet	bagents	= getExternalAccess().getBeliefbase().getBeliefSet("agents");
-			public void actionPerformed(ActionEvent e)
+			Runnable	runnable	= new Runnable()
 			{
-//				System.out.println("refreshing");
-				Object[] agents = bagents.getFacts();
-				if(ctrl != null && agents != null)
+				public void run()
 				{
-					try
+//					System.out.println("refreshing");
+					Object[] agents = bagents.getFacts();
+					if(ctrl != null && agents != null)
 					{
-						ctrl.agentlist.updateAgents(agents, (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE));
-					}
-					catch(Exception ex)
-					{
-						// Could fail due to e.g. platform shutting
+						try
+						{
+							ctrl.agentlist.updateAgents(agents, (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE));
+						}
+						catch(Exception ex)
+						{
+							// Could fail due to e.g. platform shutting
+						}
 					}
 				}
+			};
+			public void actionPerformed(ActionEvent e)
+			{
+				getExternalAccess().invokeLater(runnable);
 			}
 		});
 		timer.setRepeats(true);

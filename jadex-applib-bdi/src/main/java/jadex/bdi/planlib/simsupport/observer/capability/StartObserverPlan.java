@@ -24,6 +24,7 @@ import jadex.bridge.ILibraryService;
 
 import javax.media.opengl.GLException;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 public class StartObserverPlan extends Plan
 {
@@ -65,41 +66,52 @@ public class StartObserverPlan extends Plan
 			killAgent();
 		}
 		
-		JFrame frame = new JFrame(envName);
-		frame.setLayout(new BorderLayout());
-		frame.setUndecorated(true);
-		frame.pack();
-		frame.setSize(1, 1);
-		
 		boolean useOpenGl = false;
-		if (!forceJ2D)
 		{
-			// Try OpenGL...
-			try
+			final JFrame frame = new JFrame(envName);
+			frame.setLayout(new BorderLayout());
+			frame.setUndecorated(true);
+			frame.pack();
+			frame.setSize(1, 1);
+			
+			if (!forceJ2D)
 			{
-				ViewportJOGL vp = new ViewportJOGL(libService);
-				frame.add(vp.getCanvas());
-				frame.setVisible(true);
-				if (!((ViewportJOGL) vp).isValid())
+				// Try OpenGL...
+				try
 				{
-					System.err.println("OpenGL support insufficient, using Java2D fallback...");
+					ViewportJOGL vp = new ViewportJOGL(libService);
+					frame.add(vp.getCanvas());
+					frame.setVisible(true);
+					if (!((ViewportJOGL) vp).isValid())
+					{
+						System.err.println("OpenGL support insufficient, using Java2D fallback...");
+					}
+					else
+					{
+						useOpenGl = true;
+					}
 				}
-				else
+				catch (RuntimeException e0)
 				{
-					useOpenGl = true;
+					System.err.println("OpenGL initialization failed, using Java2D fallback...");
+				}
+				catch (Error e1)
+				{
+					System.err.println("OpenGL initialization failed, using Java2D fallback...");
 				}
 			}
-			catch (RuntimeException e0)
+			
+			// Todo: Frame.pack()/Frame.setVisible(true) should also be on AWT thread!
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-			}
-			catch (Error e1)
-			{
-				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-			}
+				public void run()
+				{
+					frame.dispose();
+//					frame = null;
+				}
+			});
 		}
-		frame.dispose();
-		frame = null;
+		
 		
 		IViewport viewport = null;
 		if (useOpenGl)
