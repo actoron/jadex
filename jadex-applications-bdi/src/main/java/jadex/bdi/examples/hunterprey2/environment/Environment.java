@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey2.environment;
 
-import jadex.bdi.examples.hunterprey2.Configuration;
 import jadex.bdi.examples.hunterprey2.Creature;
 import jadex.bdi.examples.hunterprey2.Food;
 import jadex.bdi.examples.hunterprey2.Hunter;
@@ -21,10 +20,7 @@ import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.GoToPreciseDestinationTask;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 import jadex.bdi.planlib.simsupport.simcap.LocalSimulationEventListener;
-import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;
@@ -142,7 +138,13 @@ public class Environment implements IEnvironment
 		assert agent != null : this + " - no external access provided";
 		
 		this.agent = agent;
+		
 		this.engine = engine;
+		// Pre-declare object types
+		engine.declareObjectType(OBJECT_TYPE_HUNTER);
+		engine.declareObjectType(OBJECT_TYPE_PREY);
+		engine.declareObjectType(OBJECT_TYPE_OBSTACLE);
+		engine.declareObjectType(OBJECT_TYPE_FOOD);
 		
 		this.world = new MultiCollection();
 		this.creatures = new HashMap();
@@ -188,10 +190,10 @@ public class Environment implements IEnvironment
 	}
 	
 	/**
-	 * Create a goal to instantiate a simobject
-	 * @return The goal that handles the creation
+	 * Instantiate a simobject
+	 * @return The new simId Integer
 	 */
-	protected Integer createSimObject(final WorldObject wo, String type, Map properties, List tasks, boolean signalDestruction, boolean listen)
+	protected Integer createSimObject(WorldObject wo, String type, Map properties, List tasks, boolean signalDestruction, boolean listen)
 	{
 		Location l = wo.getLocation();
 		
@@ -204,9 +206,11 @@ public class Environment implements IEnvironment
 			if (listener == null)
 				listener = new LocalSimulationEventListener(agent);
 		}
-		wo.setSimId(engine.createSimObject(type, properties, tasks, l.getAsIVector(), signalDestruction, listener));
 		
-		return wo.getSimId();
+		Integer simId = engine.createSimObject(type, properties, tasks, l.getAsIVector(), signalDestruction, listener);
+		wo.setSimId(simId);
+		
+		return simId;
 	}
 
 	/**
@@ -214,7 +218,7 @@ public class Environment implements IEnvironment
 	 * @param wo
 	 * @return The goal that handles the creation
 	 */
-	protected boolean destroySimObject(final WorldObject wo)
+	protected boolean destroySimObject(WorldObject wo)
 	{
 		assert wo.getSimId() != null : "WorldObject without SimId! " + wo;
 
@@ -400,8 +404,9 @@ public class Environment implements IEnvironment
 	
 	/**
 	 * Clear the TaskList
-	 * HACK! Shoukld be done in executeStep method, but that leads to problems with
-	 * other Agents. They compute their next step on the old vision. :-( 
+	 * HACK! Should be done in executeStep method, but that leads to problems with
+	 * other Agents. They compute their next step with the old vision. :-( 
+	 * This is a race condition too! Tasks can be lost.
 	 */
 	protected synchronized void clearTaskList()
 	{
@@ -448,7 +453,6 @@ public class Environment implements IEnvironment
 	 */
 	public int	getWidth()
 	{
-		// return sizex;
 		return engine.getAreaSize().getXAsInteger();
 	}
 
@@ -457,7 +461,6 @@ public class Environment implements IEnvironment
 	 */
 	public int	getHeight()
 	{
-		// return sizey;
 		return engine.getAreaSize().getYAsInteger();
 	}
 
@@ -531,7 +534,7 @@ public class Environment implements IEnvironment
 			if (!(copy instanceof Observer)) {			
 				copy.setAge(0);
 				copy.setPoints(0);
-				copy.setLocation(getEmptyLocation(Creature.CREATURE_SIZE.copy()));
+				copy.setLocation(getEmptyLocation());
 				//if(copy instanceof Hunter)
 				//	copy.setVisionRange(5);
 				//else
@@ -581,7 +584,7 @@ public class Environment implements IEnvironment
 		if(this.world.containsKey(creature.getLocation()))
 			this.world.remove(creature.getLocation(), creature);
 		
-		// create and queue destroy goal
+		// destroy simobject
 		destroySimObject(creature);
 		
 		return this.creatures.remove(creature)!=null;
@@ -653,8 +656,8 @@ public class Environment implements IEnvironment
 		{
 			if (food.size() < ((Integer) agent.getBeliefbase().getBelief("max_food").getFact()).intValue())
 			{
-				Location	loc	= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
-				Location	test= getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+				Location	loc	= getEmptyLocation();
+				Location	test= getEmptyLocation();
 				// Make sure there will be some empty location left.
 				if(!loc.equals(test))
 				{
@@ -878,7 +881,7 @@ public class Environment implements IEnvironment
 	 *  Get an empty location.
 	 *  @return The location.
 	 */
-	public synchronized Location getEmptyLocation(IVector2 edgedistance)
+	public synchronized Location getEmptyLocation()
 	{
 		Location	ret	= null;
 		
@@ -944,7 +947,7 @@ public class Environment implements IEnvironment
 			{
 				for(int j=y-range; j<=y+range; j++)
 				{
-					Collection tmp = world.getCollection(new Location(i, j));
+					Collection tmp = world.getCollection(new Location((i+sizex)%sizex, (j+sizey)%sizey));
 					if(tmp!=null)
 						ret.addAll(tmp);
 				}
@@ -973,7 +976,7 @@ public class Environment implements IEnvironment
 			break;
 			
 		default:
-			// no vision :-)
+			// ignore
 			break;
 		}
 

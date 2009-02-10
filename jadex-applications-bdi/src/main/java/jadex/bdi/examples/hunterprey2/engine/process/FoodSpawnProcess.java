@@ -92,7 +92,7 @@ public class FoodSpawnProcess implements IEnvironmentProcess
 		{
 			if (food_ < maxFood_)
 			{
-				Location loc = env.getEmptyLocation(WorldObject.WORLD_OBJECT_SIZE);
+				Location loc = env.getEmptyLocation();
 				Food food = new Food(loc);
 				env.addFood(food);
 				++food_;

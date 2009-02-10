@@ -13,9 +13,8 @@
 		<import>jadex.bridge.IAgentIdentifier</import>
 		<import>jadex.bdi.runtime.IFilter</import>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.bdi.planlib.simsupport.common.math.IVector1</import>
-		<import>jadex.bdi.planlib.simsupport.common.math.Vector1Int</import>
-		<import>jadex.bdi.planlib.simsupport.common.math.Vector2Double</import>
+		<import>jadex.bdi.planlib.simsupport.common.math.*</import>
+		<import>jadex.bdi.planlib.simsupport.environment.simobject.task.*</import>
 		<import>jadex.bdi.examples.hunterprey2.*</import>
 		<import>jadex.bdi.examples.hunterprey2.engine.*</import>
 		<import>jadex.bdi.examples.hunterprey2.environment.*</import>
@@ -41,9 +40,9 @@
 		<beliefset name="observers" class="Observer" />
 		
 		<!-- the discrete hunterprey2 environment -->
-		<belief name="environment" class="Environment" exported="true"/>
+		<belief name="environment" class="Environment"/>
 		
-		<!-- uncomment the following two beliefs to enable the old gui -->
+		<!-- uncomment the following 2 beliefs to enable the old gui -->
 		<!--
 		<belief name="gui" class="EnvironmentGui" />
 		<belief name="gui_show_map" class="Boolean">
@@ -52,7 +51,7 @@
 		-->
 		
 		<!-- initial round time -->
-		<belief name="roundtime" class="long" exported="true">
+		<belief name="roundtime" class="long">
 			<fact>1000</fact>
 		</belief>
 		
@@ -62,22 +61,22 @@
 		</belief>
 
 		<!-- initial number of food objects -->
-		<belief name="initial_food" class="Integer" exported="true">
+		<belief name="initial_food" class="Integer">
 			<fact>new Integer(10)</fact>
-		</belief>
-
-		<!-- Maximum number of food objects -->
-		<belief name="max_food" class="Integer" exported="true">
-			<fact>new Integer(100)</fact>
 		</belief>
 		
 		<!-- One food every X rounds -->
-		<belief name="food_spawn_rate" class="Integer" exported="true">
+		<belief name="initial_food_spawn_rate" class="Integer">
 			<fact>new Integer(3)</fact>
+		</belief>
+
+		<!-- Maximum number of food objects -->
+		<belief name="max_food" class="Integer">
+			<fact>new Integer(100)</fact>
 		</belief>
 		
 		<!-- Number of obstacles -->
-		<belief name="obstacle_count" class="Integer" exported="true">
+		<belief name="obstacle_count" class="Integer">
 			<fact>new Integer(100)</fact>
 		</belief>
 		
