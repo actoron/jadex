@@ -9,28 +9,28 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
-import java.io.Serializable;
 
 import javax.media.opengl.GL;
 
-/** A layer for displaying a grid.
+
+/**
+ * A layer for displaying a grid.
  */
 public class GridLayer implements ILayer
 {
-	private IVector2 gridSize_;
-	
-	/** Color of the grid.
-	 */
-	protected Color c_;
-	
-	/** OpenGL color cache.
-	 */
-	protected float[] oglColor_;
-	
-	/** Creates a new gridlayer.
+	private IVector2	gridSize_;
+
+	/** Color of the grid. */
+	protected Color		c_;
+
+	/** OpenGL color cache. */
+	protected float[]	oglColor_;
+
+	/**
+	 * Creates a new gridlayer.
 	 * 
-	 *  @param gridSize size of each grid rectangle
-	 *  @param c color of the grid
+	 * @param gridSize size of each grid rectangle
+	 * @param c color of the grid
 	 */
 	public GridLayer(IVector2 gridSize, Color c)
 	{
@@ -42,8 +42,9 @@ public class GridLayer implements ILayer
 		oglColor_[2] = c_.getBlue() / 255.0f;
 		oglColor_[3] = c_.getAlpha() / 255.0f;
 	}
-	
-	/** Draws the layer to a Java2D viewport
+
+	/**
+	 * Draws the layer to a Java2D viewport
 	 * 
 	 * @param areaSize size of the area this layer covers
 	 * @param vp the viewport
@@ -53,54 +54,62 @@ public class GridLayer implements ILayer
 	{
 		g.setColor(c_);
 		Stroke s = g.getStroke();
-		g.setStroke(new BasicStroke(areaSize.getXAsFloat() / vp.getCanvas().getWidth()));
+		g.setStroke(new BasicStroke(areaSize.getXAsFloat()
+				/ vp.getCanvas().getWidth()));
 		Line2D.Float line = new Line2D.Float();
 		line.y1 = 0.0f;
 		line.y2 = areaSize.getYAsFloat();
-		for (float x = 0.0f; x <= areaSize.getXAsFloat(); x = x + gridSize_.getXAsFloat())
+		for(float x = 0.0f; x <= areaSize.getXAsFloat(); x = x
+				+ gridSize_.getXAsFloat())
 		{
 			line.x1 = x;
 			line.x2 = x;
 			g.draw(line);
 		}
-		g.setStroke(new BasicStroke(areaSize.getYAsFloat() / vp.getCanvas().getHeight()));
+		g.setStroke(new BasicStroke(areaSize.getYAsFloat()
+				/ vp.getCanvas().getHeight()));
 		line.x1 = 0.0f;
 		line.x2 = areaSize.getXAsFloat();
-		for (float y = 0.0f; y <= areaSize.getYAsFloat(); y = y + gridSize_.getYAsFloat())
+		for(float y = 0.0f; y <= areaSize.getYAsFloat(); y = y
+				+ gridSize_.getYAsFloat())
 		{
 			line.y1 = y;
 			line.y2 = y;
 			g.draw(line);
 		}
 	}
-	
-	/** Draws the layer to an OpenGL viewport
-     * 
-     * @param areaSize size of the area this layer covers
-     * @param vp the viewport
-     * @param gl OpenGL context
-     */
+
+	/**
+	 * Draws the layer to an OpenGL viewport
+	 * 
+	 * @param areaSize size of the area this layer covers
+	 * @param vp the viewport
+	 * @param gl OpenGL context
+	 */
 	public void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
 		gl.glColor4fv(oglColor_, 0);
-		
+
 		gl.glBegin(gl.GL_LINES);
-		for (float x = 0.0f; x <= areaSize.getXAsFloat(); x = x + gridSize_.getXAsFloat())
+		for(float x = 0.0f; x <= areaSize.getXAsFloat(); x = x
+				+ gridSize_.getXAsFloat())
 		{
 			gl.glVertex2f(x, 0.0f);
 			gl.glVertex2f(x, areaSize.getYAsFloat());
 		}
-		
-		for (float y = 0.0f; y <= areaSize.getYAsFloat(); y = y + gridSize_.getYAsFloat())
+
+		for(float y = 0.0f; y <= areaSize.getYAsFloat(); y = y
+				+ gridSize_.getYAsFloat())
 		{
 			gl.glVertex2f(0.0f, y);
 			gl.glVertex2f(areaSize.getXAsFloat(), y);
 		}
 		gl.glEnd();
 	}
-	
-	/** Provides a copy of the layer.
-     */
+
+	/**
+	 * Provides a copy of the layer.
+	 */
 	public ILayer copy()
 	{
 		return new GridLayer(gridSize_, c_);

@@ -7,25 +7,29 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IClockService;
 
+
 public class StartEnvironmentPlan extends Plan
 {
 	public void body()
 	{
 		IBeliefbase b = getBeliefbase();
-		String name = ((String) b.getBelief("environment_name").getFact());
-		
-		IClockService clockService = (IClockService) b.getBelief("clock_service").getFact();
+		String name = ((String)b.getBelief("environment_name").getFact());
+
+		IClockService clockService = (IClockService)b
+				.getBelief("clock_service").getFact();
 		if(clockService == null)
 		{
 			clockService = getClock();
 			b.getBelief("clock_service").setFact(clockService);
 		}
 		b.getBelief("sim_time").setFact(new Long(clockService.getTime()));
-		
-		ISimulationEngine engine = (ISimulationEngine) b.getBelief("simulation_engine").getFact();
-		
-		SimulationEngineContainer.getInstance().addSimulationEngine(name, engine);
-		
+
+		ISimulationEngine engine = (ISimulationEngine)b.getBelief(
+				"simulation_engine").getFact();
+
+		SimulationEngineContainer.getInstance().addSimulationEngine(name,
+				engine);
+
 		IGoal updateGoal = createGoal("update_environment");
 		dispatchTopLevelGoal(updateGoal);
 	}

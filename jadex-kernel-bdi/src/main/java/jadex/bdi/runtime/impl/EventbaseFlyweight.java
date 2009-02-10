@@ -341,20 +341,49 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 *  @param msgevent The message event.
 	 *  todo: indexing for msgevents for speed.
 	 */
-	public void registerMessageEvent(IMessageEvent mevent)
+	public void registerMessageEvent(final IMessageEvent mevent)
 	{
-		MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
-		MessageEventRules.registerMessageEvent(getState(), mef.getHandle(), mef.getScope());
+		if(getInterpreter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
+					MessageEventRules.registerMessageEvent(getState(), mef.getHandle(), mef.getScope());
+				}
+			};
+		}
+		else
+		{
+			MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
+			MessageEventRules.registerMessageEvent(getState(), mef.getHandle(), mef.getScope());
+		}
 	}
 	
 	/**
 	 *  Remove a registered message event.
 	 *  @param msgevent The message event.
 	 */
-	public void deregisterMessageEvent(IMessageEvent mevent)
+	public void deregisterMessageEvent(final IMessageEvent mevent)
 	{
-		MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
-		MessageEventRules.deregisterMessageEvent(getState(), mef.getHandle(), mef.getScope());
+		if(getInterpreter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
+					MessageEventRules.deregisterMessageEvent(getState(), mef.getHandle(), mef.getScope());
+
+				}
+			};
+		}
+		else
+		{
+			MessageEventFlyweight mef = (MessageEventFlyweight)mevent;
+			MessageEventRules.deregisterMessageEvent(getState(), mef.getHandle(), mef.getScope());
+		}
 	}
 	
 	/**

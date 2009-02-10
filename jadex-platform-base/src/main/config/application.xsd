@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="applicationtype">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="applicationtype">
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="application">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="application">
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="applicationtype">
+		<xs:sequence>
+			<xs:element name="agentypes">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="agentype" type="agenttype"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="applications">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="application" type="application"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="agenttype">
+		<xs:annotation>
+			<xs:documentation>Defines an agent type</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="filename" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="application">
+		<xs:sequence>
+			<xs:element name="agents">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="agent" type="agent"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="agent">
+		<xs:sequence>
+			<xs:element name="parameters">
+				<xs:complexType>
+					<xs:sequence minOccurs="0">
+						<xs:element name="parameter" type="parameter" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="parameterset" type="parameterset" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="parameter">
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="value" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="parameterset">
+		<xs:sequence>
+			<xs:element name="value">
+				<xs:complexType mixed="true"/>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+</xs:schema>

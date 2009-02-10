@@ -5,44 +5,43 @@ import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
-/** Tasks that moves the object according to its velocity.
+
+/**
+ * Tasks that moves the object according to its velocity.
  */
 public class MoveObjectTask implements ISimObjectTask
 {
-	/** Default task name.
-	 */
-	public static final String DEFAULT_NAME = "move_obj";
-	
-	/** Name of the task.
-	 */
-	private String name_;
-	
-	/** Current object velocity.
-	 */
-	private IVector2 velocity_;
-	
-	/** Last movement delta.
-	 */
-	private IVector2 lastMovementDelta_;
-	
-	/** Creates a new default MoveObjectTask.
-	 */
+	/** Default task name. */
+	public static final String	DEFAULT_NAME	= "move_obj";
+
+	/** Name of the task. */
+	private String				name_;
+
+	/** Current object velocity. */
+	private IVector2			velocity_;
+
+	/** Last movement delta. */
+	private IVector2			lastMovementDelta_;
+
+	/** Creates a new default MoveObjectTask. */
 	public MoveObjectTask()
 	{
-		this(new Vector2Double(0.0));;
+		this(new Vector2Double(0.0));
 	}
-	
-	/** Creates a new default MoveObjectTask with the given start velocity.
+
+	/**
+	 * Creates a new default MoveObjectTask with the given start velocity.
 	 */
 	public MoveObjectTask(IVector2 velocity)
 	{
 		this(DEFAULT_NAME, velocity);
 	}
-	
-	/** Creates a special MoveObjectTask with a special name and velocity.
+
+	/**
+	 * Creates a special MoveObjectTask with a special name and velocity.
 	 * 
-	 *  @param name the name of the task
-	 *  @param velocity start velocity
+	 * @param name the name of the task
+	 * @param velocity start velocity
 	 */
 	public MoveObjectTask(String name, IVector2 velocity)
 	{
@@ -50,51 +49,56 @@ public class MoveObjectTask implements ISimObjectTask
 		velocity_ = velocity.copy();
 		lastMovementDelta_ = new Vector2Double(0.0);
 	}
-	
-	/** This method will be executed by the object before
-	 *  the task gets added to the execution queue.
-	 *  
-	 *  @param object the object that is executing the task
+
+	/**
+	 * This method will be executed by the object before the task gets added to
+	 * the execution queue.
+	 * 
+	 * @param object the object that is executing the task
 	 */
 	public synchronized void start(SimObject object)
 	{
 		object.setProperty("velocity", velocity_);
 	}
-	
-	/** This method will be executed by the object before
-	 *  the task is removed from the execution queue.
-	 *  
-	 *  @param object the object that is executing the task
+
+	/**
+	 * This method will be executed by the object before the task is removed
+	 * from the execution queue.
+	 * 
+	 * @param object the object that is executing the task
 	 */
 	public synchronized void shutdown(SimObject object)
 	{
 	}
-	
-	/** Moves the object.
+
+	/**
+	 * Moves the object.
 	 * 
-	 *  @param deltaT time passed
-	 *  @param object the object that is executing the task
+	 * @param deltaT time passed
+	 * @param object the object that is executing the task
 	 */
 	public synchronized void execute(IVector1 deltaT, SimObject object)
 	{
-		synchronized (object)
+		synchronized(object)
 		{
 			IVector2 position = object.getPositionAccess();
 			lastMovementDelta_ = velocity_.copy().multiply(deltaT);
 			position.add(lastMovementDelta_);
 		}
 	}
-	
-	/** Returns the name of the task.
+
+	/**
+	 * Returns the name of the task.
 	 * 
-	 *  @return name of the task.
+	 * @return name of the task.
 	 */
 	public synchronized String getName()
 	{
 		return name_;
 	}
-	
-	/** Returns the last movement delta that was added to the position. 
+
+	/**
+	 * Returns the last movement delta that was added to the position.
 	 */
 	public synchronized IVector2 getLastMovementDelta()
 	{

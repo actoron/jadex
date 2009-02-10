@@ -1,15 +1,11 @@
 package jadex.bdi.planlib.simsupport.environment;
 
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,46 +13,39 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.Map.Entry;
+
 
 public class EuclideanSimulationEngine implements ISimulationEngine
 {
-	/** The environment processes.
-	 */
-	private Map processes_;
-	
-	/** Available actions in the environment.
-	 */
-	private Map actions_;
-	
-	/** Integers/ObjectIDs (keys) and SimObject engine objects (values)
-	 */
-	private Map simObjects_;
-	
-	/** Strings (type of the SimObject) and Lists of SimObjects (typed view)
-	 */
-	private Map simObjectsByType_;
-	
-	/** Environment properties
-	 */
-	private Map environmentProperties_;
-	
-	/** Object ID counter for new IDs
-	 */
-	private AtomicCounter objectIdCounter_;
-	
-	/** Area size
-	 */
-	private IVector2 areaSize_;
-	
-	/** Creates a new DefaultSimulationEngine
+	/** The environment processes. */
+	private Map				processes_;
+
+	/** Available actions in the environment. */
+	private Map				actions_;
+
+	/** Integers/ObjectIDs (keys) and SimObject engine objects (values). */
+	private Map				simObjects_;
+
+	/** Strings (type of the SimObject) and Lists of SimObjects (typed view). */
+	private Map				simObjectsByType_;
+
+	/** Environment properties. */
+	private Map				environmentProperties_;
+
+	/** Object ID counter for new IDs. */
+	private AtomicCounter	objectIdCounter_;
+
+	/** Area size. */
+	private IVector2		areaSize_;
+
+	/**
+	 * Creates a new DefaultSimulationEngine
 	 * 
-	 *  @param title simulation title
-	 *  @param areaSize size of the simulated area
+	 * @param title simulation title
+	 * @param areaSize size of the simulated area
 	 */
-	public EuclideanSimulationEngine(String title,
-									 IVector2 areaSize)
+	public EuclideanSimulationEngine(String title, IVector2 areaSize)
 	{
 		objectIdCounter_ = new AtomicCounter();
 		processes_ = Collections.synchronizedMap(new HashMap());
@@ -66,45 +55,44 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		environmentProperties_ = Collections.synchronizedMap(new HashMap());
 		areaSize_ = areaSize.copy();
 	}
-	
-	/** Declares a type of object.
-	 *  
-	 *  @param type object type
+
+	/**
+	 * Declares a type of object.
+	 * 
+	 * @param type object type
 	 */
 	public void declareObjectType(String type)
 	{
 		List objectList = new LinkedList();
 		simObjectsByType_.put(type, objectList);
 	}
-	
-	/** Adds a new SimObject to the simulation.
-	 *  
-	 *  @param type type of the object
-	 *  @param properties properties of the object (may be null)
-	 *  @param tasks tasks of the object (may be null)
-	 *  @param position position of the object
-	 *  @param signalDestruction If set to true, all listeners will be notified when
-	 * 		   the object is destroyed.
-	 *  @param listeners listeners for the object
-	 *  @return the simulation object ID
+
+	/**
+	 * Adds a new SimObject to the simulation.
+	 * 
+	 * @param type type of the object
+	 * @param properties properties of the object (may be null)
+	 * @param tasks tasks of the object (may be null)
+	 * @param position position of the object
+	 * @param signalDestruction If set to true, all listeners will be notified
+	 *        when the object is destroyed.
+	 * @param listeners listeners for the object
+	 * @return the simulation object ID
 	 */
-	public Integer createSimObject(String type,
-								   Map properties,
-								   List tasks,
-								   IVector2 position,
-								   boolean signalDestruction,
-								   ISimulationEventListener listener)
+	public Integer createSimObject(String type, Map properties, List tasks,
+			IVector2 position, boolean signalDestruction,
+			ISimulationEventListener listener)
 	{
-		//default properties and tasks
-		if (properties == null)
+		// default properties and tasks
+		if(properties == null)
 		{
 			properties = new HashMap();
 		}
-		if (tasks == null)
+		if(tasks == null)
 		{
 			tasks = new LinkedList();
 		}
-		
+
 		synchronized(simObjects_)
 		{
 			synchronized(simObjectsByType_)
@@ -114,32 +102,34 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 				{
 					id = objectIdCounter_.getNext();
 				}
-				while (simObjects_.containsKey(id));
-				
-				SimObject simObject = new SimObject(id, type, properties, tasks, position, signalDestruction);
+				while(simObjects_.containsKey(id));
 
-				if (listener != null)
+				SimObject simObject = new SimObject(id, type, properties,
+						tasks, position, signalDestruction);
+
+				if(listener != null)
 				{
 					simObject.addListener(listener);
 				}
-				
-				List objectList = (List) simObjectsByType_.get(type);
-				if (objectList == null)
+
+				List objectList = (List)simObjectsByType_.get(type);
+				if(objectList == null)
 				{
 					declareObjectType(type);
-					objectList = (List) simObjectsByType_.get(type);
+					objectList = (List)simObjectsByType_.get(type);
 				}
 				objectList.add(simObject);
-				
+
 				simObjects_.put(id, simObject);
 				return id;
 			}
 		}
 	}
-	
-	/** Removes a SimObject from the simulation.
+
+	/**
+	 * Removes a SimObject from the simulation.
 	 * 
-	 *  @param objectId the simulation object ID
+	 * @param objectId the simulation object ID
 	 */
 	public void destroySimObject(Integer objectId)
 	{
@@ -147,146 +137,160 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		{
 			synchronized(simObjectsByType_)
 			{
-				SimObject obj = (SimObject) simObjects_.remove(objectId);
-				((List) simObjectsByType_.get(obj.getType())).remove(obj);
-				if (obj.signalDestruction())
+				SimObject obj = (SimObject)simObjects_.remove(objectId);
+				((List)simObjectsByType_.get(obj.getType())).remove(obj);
+				if(obj.signalDestruction())
 				{
-					SimulationEvent destEvt = new SimulationEvent(SimulationEvent.OBJECT_DESTROYED);
+					SimulationEvent destEvt = new SimulationEvent(
+							SimulationEvent.OBJECT_DESTROYED);
 					destEvt.setParameter("object_id", obj.getId());
 					obj.fireSimulationEvent(destEvt);
 				}
 			}
 		}
 	}
-	
-	/** Adds an environment process.
+
+	/**
+	 * Adds an environment process.
 	 * 
-	 *  @param process new environment process
+	 * @param process new environment process
 	 */
 	public void addEnvironmentProcess(IEnvironmentProcess process)
 	{
 		process.start(this);
 		processes_.put(process.getName(), process);
 	}
-	
-	/** Returns an environment process.
+
+	/**
+	 * Returns an environment process.
 	 * 
-	 *  @param processName name of the environment process
-	 *  @return the environment process or null if not found
+	 * @param processName name of the environment process
+	 * @return the environment process or null if not found
 	 */
 	public IEnvironmentProcess getEnvironmentProcess(String processName)
 	{
-		return (IEnvironmentProcess) processes_.get(processName);
+		return (IEnvironmentProcess)processes_.get(processName);
 	}
-	
-	/** Removes an environment process.
+
+	/**
+	 * Removes an environment process.
 	 * 
-	 *  @param process the environment process
+	 * @param process the environment process
 	 */
 	public void removeEnvironmentProcess(String processName)
 	{
-		IEnvironmentProcess process = (IEnvironmentProcess) processes_.remove(processName);
-		if (process != null)
+		IEnvironmentProcess process = (IEnvironmentProcess)processes_
+				.remove(processName);
+		if(process != null)
 		{
 			process.shutdown(this);
 		}
 	}
-	
-	/** Returns an environment property.
+
+	/**
+	 * Returns an environment property.
 	 * 
-	 *  @param name name of the property
-	 *  @return the property
+	 * @param name name of the property
+	 * @return the property
 	 */
 	public Object getEnvironmentProperty(String name)
 	{
 		return environmentProperties_.get(name);
 	}
-	
-	/** Sets an environment property.
+
+	/**
+	 * Sets an environment property.
 	 * 
-	 *  @param name name of the property
-	 *  @param property the property
+	 * @param name name of the property
+	 * @param property the property
 	 */
 	public void setEnvironmentProperty(String name, Object property)
 	{
 		environmentProperties_.put(name, property);
 	}
-	
-	/** Returns the position of an object.
-	 *  
-	 *  @param objectId the object ID
-	 *  @return the position of the object
+
+	/**
+	 * Returns the position of an object.
+	 * 
+	 * @param objectId the object ID
+	 * @return the position of the object
 	 */
 	public IVector2 getObjectPosition(Integer objectId)
 	{
 		SimObject object = getSimulationObject(objectId);
-		if (object == null)
+		if(object == null)
 		{
 			return null;
 		}
-		
+
 		return object.getPosition();
 	}
-	
-	/** Returns the type of an object.
-	 *  
-	 *  @param objectId the object ID
-	 *  @return the type of the object
+
+	/**
+	 * Returns the type of an object.
+	 * 
+	 * @param objectId the object ID
+	 * @return the type of the object
 	 */
 	public String getObjectType(Integer objectId)
 	{
 		SimObject object = getSimulationObject(objectId);
-		if (object == null)
+		if(object == null)
 		{
 			return null;
 		}
-		
+
 		return object.getType();
 	}
-	
-	/** Returns the properties of an object.
-	 *  
-	 *  @param objectId the object ID
-	 *  @return the properties
+
+	/**
+	 * Returns the properties of an object.
+	 * 
+	 * @param objectId the object ID
+	 * @return the properties
 	 */
 	public Map getObjectProperties(Integer objectId)
 	{
 		SimObject object = getSimulationObject(objectId);
-		if (object != null)
+		if(object != null)
 		{
 			return object.getProperties();
 		}
-		
+
 		return null;
 	}
-	
-	/** Adds a new executable action to the environment.
-	 *  
-	 *  @param action the new action
+
+	/**
+	 * Adds a new executable action to the environment.
+	 * 
+	 * @param action the new action
 	 */
 	public void addAction(ISimAction action)
 	{
 		actions_.put(action.getName(), action);
 	}
-	
-	/** Removes an action from the environment.
-	 *  
-	 *  @param actionName name of the action
+
+	/**
+	 * Removes an action from the environment.
+	 * 
+	 * @param actionName name of the action
 	 */
 	public void removeAction(String actionName)
 	{
 		actions_.remove(actionName);
 	}
-	
-	/** Executes an action.
+
+	/**
+	 * Executes an action.
 	 * 
-	 *  @param actionName name of the action
-	 *  @param actorId ID of the actor performing the action
-	 *  @param objectId ID of the object acted upon (may be null)
-	 *  @param parameters parameters for the action (may be null)
-	 *  @return true if the action was successful, false otherwise
+	 * @param actionName name of the action
+	 * @param actorId ID of the actor performing the action
+	 * @param objectId ID of the object acted upon (may be null)
+	 * @param parameters parameters for the action (may be null)
+	 * @return true if the action was successful, false otherwise
 	 */
-	public boolean performAction(String actionName, Integer actorId, Integer objectId, List parameters)
+	public boolean performAction(String actionName, Integer actorId,
+			Integer objectId, List parameters)
 	{
 		// Halt the engine
 		synchronized(simObjects_)
@@ -294,33 +298,35 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			// Block all other actions
 			synchronized(actions_)
 			{
-				SimObject actor = (SimObject) simObjects_.get(actorId);
+				SimObject actor = (SimObject)simObjects_.get(actorId);
 				SimObject object = null;
-				if (objectId != null)
+				if(objectId != null)
 				{
-					object = (SimObject) simObjects_.get(objectId);
+					object = (SimObject)simObjects_.get(objectId);
 				}
-				ISimAction action = (ISimAction) actions_.get(actionName);
+				ISimAction action = (ISimAction)actions_.get(actionName);
 				return action.perform(actor, object, parameters, this);
 			}
 		}
 	}
-	
-	/** Retrieves a simulation object.
-	 *  
-	 *  @param objectId the simulation object ID
-	 *  @return current the simulated object
+
+	/**
+	 * Retrieves a simulation object.
+	 * 
+	 * @param objectId the simulation object ID
+	 * @return current the simulated object
 	 */
 	public SimObject getSimulationObject(Integer objectId)
 	{
-		SimObject simObject = (SimObject) simObjects_.get(objectId);
+		SimObject simObject = (SimObject)simObjects_.get(objectId);
 		return simObject;
 	}
-	
-	/** Returns the nearest object to the given position.
+
+	/**
+	 * Returns the nearest object to the given position.
 	 * 
-	 *  @param position position the object should be nearest to
-	 *  @return nearest object
+	 * @param position position the object should be nearest to
+	 * @return nearest object
 	 */
 	public Integer getNearestObjectId(IVector2 position)
 	{
@@ -329,44 +335,47 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		{
 			Set objects = simObjects_.entrySet();
 			IVector1 distance = null;
-			for (Iterator it = objects.iterator(); it.hasNext(); )
+			for(Iterator it = objects.iterator(); it.hasNext();)
 			{
-				Map.Entry entry = (Entry) it.next();
-				SimObject currentObj = (SimObject) entry.getValue();
-				synchronized (currentObj)
+				Map.Entry entry = (Entry)it.next();
+				SimObject currentObj = (SimObject)entry.getValue();
+				synchronized(currentObj)
 				{
-					if ((nearest == null) ||
-						(currentObj.getPositionAccess().getDistance(position).less(distance)))
+					if((nearest == null)
+							|| (currentObj.getPositionAccess().getDistance(
+									position).less(distance)))
 					{
-						nearest = (Integer) entry.getKey();
-						distance = currentObj.getPositionAccess().getDistance(position);
+						nearest = (Integer)entry.getKey();
+						distance = currentObj.getPositionAccess().getDistance(
+								position);
 					}
 				}
 			}
 		}
 		return nearest;
 	}
-	
-	/** Returns the ID of the nearest object to the given position
-	 *  within a maximum distance from the position.
-	 *  
-	 *  @param position position the object should be nearest to
-	 *  @param distance maximum distance from the position
-	 *  @return nearest object's ID or null if none is found
+
+	/**
+	 * Returns the ID of the nearest object to the given position within a
+	 * maximum distance from the position.
+	 * 
+	 * @param position position the object should be nearest to
+	 * @param distance maximum distance from the position
+	 * @return nearest object's ID or null if none is found
 	 */
 	public Integer getNearestObjectId(IVector2 position, IVector1 distance)
 	{
 		synchronized(simObjects_)
 		{
 			SimObject obj = getNearestObject(position);
-			if (obj.getPosition().getDistance(position).less(distance))
+			if(obj.getPosition().getDistance(position).less(distance))
 			{
 				return obj.getId();
 			}
 			return null;
 		}
 	}
-	
+
 	public SimObject getNearestObject(IVector2 position)
 	{
 		synchronized(simObjects_)
@@ -374,12 +383,13 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			return getSimulationObject(getNearestObjectId(position));
 		}
 	}
-	
-	/** Returns the nearest object of a specific type to the given position.
+
+	/**
+	 * Returns the nearest object of a specific type to the given position.
 	 * 
-	 *  @param type type of the object
-	 *  @param position position the object should be nearest to
-	 *  @return nearest object of a specific type
+	 * @param type type of the object
+	 * @param position position the object should be nearest to
+	 * @return nearest object of a specific type
 	 */
 	public SimObject getNearestObject(String type, IVector2 position)
 	{
@@ -389,17 +399,19 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			synchronized(simObjectsByType_)
 			{
 				IVector1 distance = null;
-				List objectList = (List) simObjectsByType_.get(type);
-				for (Iterator it = objectList.iterator(); it.hasNext(); )
+				List objectList = (List)simObjectsByType_.get(type);
+				for(Iterator it = objectList.iterator(); it.hasNext();)
 				{
-					SimObject currentObj = (SimObject) it.next();
-					synchronized (currentObj)
+					SimObject currentObj = (SimObject)it.next();
+					synchronized(currentObj)
 					{
-						if ((nearest == null) ||
-							(currentObj.getPositionAccess().getDistance(position).less(distance)))
+						if((nearest == null)
+								|| (currentObj.getPositionAccess().getDistance(
+										position).less(distance)))
 						{
 							nearest = currentObj;
-							distance = currentObj.getPositionAccess().getDistance(position);
+							distance = currentObj.getPositionAccess()
+									.getDistance(position);
 						}
 					}
 				}
@@ -407,51 +419,54 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		}
 		return nearest;
 	}
-	
-	/** Returns the size of the simulated area.
-	 *  
-	 *  @return size of the simulated area
+
+	/**
+	 * Returns the size of the simulated area.
+	 * 
+	 * @return size of the simulated area
 	 */
 	public IVector2 getAreaSize()
 	{
 		return areaSize_.copy();
 	}
-	
-	/** Retrieves a random position within the simulation area with a minimum
-	 *  distance from the edge.
-	 *  
-	 *  @param distance minimum distance from the edge
+
+	/**
+	 * Retrieves a random position within the simulation area with a minimum
+	 * distance from the edge.
+	 * 
+	 * @param distance minimum distance from the edge
 	 */
 	public IVector2 getRandomPosition(IVector2 distance)
 	{
 		IVector2 position = areaSize_.copy();
 		position.subtract(distance);
-		position.randomX(distance.getX(),
-						 position.getX());
-		position.randomY(distance.getY(),
-						 position.getY());
+		position.randomX(distance.getX(), position.getX());
+		position.randomY(distance.getY(), position.getY());
 		return position;
 	}
-	
-	/** Returns direct access to the simulation objects.\
+
+	/**
+	 * Returns direct access to the simulation objects.\
 	 * 
-	 *  @return direct access to simulation objects
+	 * @return direct access to simulation objects
 	 */
 	public Map getSimObjectAccess()
 	{
 		return simObjects_;
 	}
-	
-	/** Returns direct access to the typed simulation object view.\
+
+	/**
+	 * Returns direct access to the typed simulation object view.\
 	 * 
-	 *  @return direct access to typed simulation object view
+	 * @return direct access to typed simulation object view
 	 */
 	public Map getTypedSimObjectAccess()
 	{
 		return simObjectsByType_;
 	}
-	
-	/** Progresses the simulation.
+
+	/**
+	 * Progresses the simulation.
 	 * 
 	 * @param deltaT time difference since the last step
 	 */
@@ -460,25 +475,27 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		updateObjects(deltaT);
 		executeEnvironmentProcesses(deltaT);
 	}
-	
-	/** Updates the positions of objects.
+
+	/**
+	 * Updates the positions of objects.
 	 * 
 	 * @param deltaT time difference since the last step
 	 */
 	private void updateObjects(IVector1 deltaT)
 	{
-		synchronized (simObjects_)
+		synchronized(simObjects_)
 		{
-			for (Iterator it = simObjects_.values().iterator(); it.hasNext(); )
+			for(Iterator it = simObjects_.values().iterator(); it.hasNext();)
 			{
-				SimObject simObject = (SimObject) it.next();
+				SimObject simObject = (SimObject)it.next();
 
 				simObject.updateObject(deltaT);
 			}
 		}
 	}
-	
-	/** Executes the environment processes.
+
+	/**
+	 * Executes the environment processes.
 	 * 
 	 * @param deltaT time difference since the last step
 	 */
@@ -487,24 +504,26 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 		synchronized(processes_)
 		{
 			Object[] processes = processes_.values().toArray();
-			for (int i = 0; i < processes.length; ++i)
+			for(int i = 0; i < processes.length; ++i)
 			{
-				IEnvironmentProcess process = (IEnvironmentProcess) processes[i];
+				IEnvironmentProcess process = (IEnvironmentProcess)processes[i];
 				process.execute(deltaT, this);
 			}
 		}
 	}
-	/** Synchronized counter class
+
+	/**
+	 * Synchronized counter class
 	 */
 	private class AtomicCounter
 	{
-		int count_;
-		
+		int	count_;
+
 		public AtomicCounter()
 		{
 			count_ = 0;
 		}
-		
+
 		public synchronized Integer getNext()
 		{
 			return new Integer(count_++);

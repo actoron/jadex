@@ -412,9 +412,9 @@ public class Platform extends AbstractPlatform
 				{
 					try
 					{
-						Thread.sleep(1100);
+						Thread.sleep(5000);
 						System.gc();
-						Thread.sleep(1100);
+						Thread.sleep(1000);
 						System.runFinalization();
 					}
 					catch(Exception e){}

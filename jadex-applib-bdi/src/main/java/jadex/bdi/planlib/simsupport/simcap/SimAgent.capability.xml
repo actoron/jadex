@@ -1,7 +1,5 @@
 <!--
-	Capability for agent management system (AMS) functionality.
-	Defines some services that should be available on any platform
-	(create/search/destroy agents).
+	Capability for simulation environment manegement.
 -->
 <capability xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -21,9 +19,6 @@
 		<import>jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask</import>
 		<import>jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess</import>
 	</imports>
-
-	<capabilities>
-	</capabilities>
 
 	<beliefs>
 		<!-- Internal Beliefs -->
