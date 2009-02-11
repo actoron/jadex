@@ -1,5 +1,9 @@
 package jadex.adapter.base;
 
+import jadex.adapter.base.appdescriptor.Application;
+import jadex.adapter.base.appdescriptor.ApplicationModel;
+import jadex.adapter.base.appdescriptor.ApplicationType;
+import jadex.adapter.base.appdescriptor.XMLApplicationReader;
 import jadex.bridge.AgentCreationException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IKernelAgent;
@@ -8,6 +12,8 @@ import jadex.bridge.IAgentModel;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +95,19 @@ public class MetaAgentFactory implements IAgentFactory
 		
 		if(filename!=null && filename.toLowerCase().endsWith(".application.xml"))
 		{
+			ApplicationType apptype = null;
+			try
+			{
+				// todo: classloader null?
+				apptype = XMLApplicationReader.readApplication(new FileInputStream(filename), null);
+				ret = new ApplicationModel(apptype, filename);
+				System.out.println("Loaded application type: "+apptype);
 			
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		for(int i=0; ret==null && i<factories.size(); i++)
