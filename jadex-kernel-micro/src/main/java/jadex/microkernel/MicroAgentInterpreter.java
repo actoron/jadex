@@ -182,7 +182,7 @@ public class MicroAgentInterpreter implements IKernelAgent
 			public void run()
 			{
 				microagent.agentKilled();
-				listener.resultAvailable(null);
+				listener.resultAvailable(adapter.getAgentIdentifier());
 			}
 		});
 	}

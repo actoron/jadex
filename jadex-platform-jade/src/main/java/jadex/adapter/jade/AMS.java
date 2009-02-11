@@ -1014,12 +1014,12 @@ public class AMS implements IAMS, IPlatformService
 			}
 			
 			if(listener!=null)
-				listener.resultAvailable(null);
+				listener.resultAvailable(result);
 		}
 		
 		public void exceptionOccurred(Exception exception)
 		{
-			resultAvailable(null);
+			resultAvailable(aid);
 		}
 	}
 }

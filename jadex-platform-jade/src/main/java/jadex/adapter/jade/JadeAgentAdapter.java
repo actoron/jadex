@@ -367,7 +367,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 		if(!fatalerror)
 			agent.killAgent(listener);
 		else if(listener!=null)
-			listener.resultAvailable(null);
+			listener.resultAvailable(getAgentIdentifier());
 			
 	}
 

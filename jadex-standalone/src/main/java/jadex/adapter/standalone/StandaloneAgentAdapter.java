@@ -220,7 +220,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 		if(!fatalerror)
 			agent.killAgent(listener);
 		else if(listener!=null)
-			listener.resultAvailable(null);
+			listener.resultAvailable(getAgentIdentifier());
 			
 	}
 

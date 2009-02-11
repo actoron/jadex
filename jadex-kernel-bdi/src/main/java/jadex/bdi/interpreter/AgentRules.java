@@ -198,6 +198,7 @@ public class AgentRules
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
+				BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
 //				System.out.println("Terminated agent: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
 
 				// Todo: no more rules should trigger -> No dropping of agent object!? 
@@ -209,8 +210,8 @@ public class AgentRules
 				// Cleanup timers.
 				cleanupCapability(state, ragent);
 
-				// Cleanup interpreter ressources
-				BDIInterpreter.getInterpreter(state).cleanup();
+				// Cleanup interpreter resources
+				interpreter.cleanup();
 				
 				// Remove kill listeners.
 				Collection	killlisteners	= state.getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_killlisteners);
@@ -218,7 +219,7 @@ public class AgentRules
 				{
 					for(Iterator it=killlisteners.iterator(); it.hasNext(); )
 					{
-						((IResultListener)it.next()).resultAvailable(null);
+						((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getAgentIdentifier());
 					}
 				}
 				
