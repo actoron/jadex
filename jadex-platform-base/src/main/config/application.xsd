@@ -70,6 +70,7 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="configuration" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="parameter" mixed="true">
 		<xs:attribute name="name" type="xs:string"/>

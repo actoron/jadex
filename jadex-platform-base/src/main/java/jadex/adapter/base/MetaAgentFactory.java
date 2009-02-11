@@ -1,24 +1,16 @@
 package jadex.adapter.base;
 
-import jadex.adapter.base.appdescriptor.Application;
-import jadex.adapter.base.appdescriptor.ApplicationModel;
-import jadex.adapter.base.appdescriptor.ApplicationType;
-import jadex.adapter.base.appdescriptor.XMLApplicationReader;
 import jadex.bridge.AgentCreationException;
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IKernelAgent;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentModel;
-import jadex.commons.SGUI;
+import jadex.bridge.IKernelAgent;
 import jadex.commons.SUtil;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
-import javax.swing.UIDefaults;
 
 /**
  *  Standard meta agent factory. Uses several sub
@@ -27,19 +19,6 @@ import javax.swing.UIDefaults;
  */
 public class MetaAgentFactory implements IAgentFactory
 {
-	//-------- constants --------
-	
-	/** The application agent file type. */
-	public static final String	FILETYPE_APPLICATION = "Agent Application";
-	
-	/**
-	 * The image icons.
-	 */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"application", SGUI.makeIcon(MetaAgentFactory.class, "/jadex/adapter/base/images/application.png"),
-	});
-	
 	//-------- attributes --------
 	
 	/** The sub agent factories. */
@@ -93,23 +72,6 @@ public class MetaAgentFactory implements IAgentFactory
 	{
 		IAgentModel ret = null;
 		
-		if(filename!=null && filename.toLowerCase().endsWith(".application.xml"))
-		{
-			ApplicationType apptype = null;
-			try
-			{
-				// todo: classloader null?
-				apptype = XMLApplicationReader.readApplication(new FileInputStream(filename), null);
-				ret = new ApplicationModel(apptype, filename);
-				System.out.println("Loaded application type: "+apptype);
-			
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		
 		for(int i=0; ret==null && i<factories.size(); i++)
 		{
 			IAgentFactory fac = (IAgentFactory)factories.get(i);
@@ -133,7 +95,6 @@ public class MetaAgentFactory implements IAgentFactory
 	{
 		boolean ret = false;
 		
-		ret = model!=null && model.toLowerCase().endsWith(".application.xml");
 		for(int i=0; !ret && i<factories.size(); i++)
 		{
 			IAgentFactory fac = (IAgentFactory)factories.get(i);
@@ -152,7 +113,6 @@ public class MetaAgentFactory implements IAgentFactory
 	{
 		boolean ret = false;
 		
-		ret = model!=null && model.toLowerCase().endsWith(".application.xml");
 		for(int i=0; !ret && i<factories.size(); i++)
 		{
 			IAgentFactory fac = (IAgentFactory)factories.get(i);
@@ -173,7 +133,6 @@ public class MetaAgentFactory implements IAgentFactory
 			IAgentFactory fac = (IAgentFactory)factories.get(i);
 			ret	= (String[])SUtil.joinArrays(ret, fac.getFileTypes());
 		}
-		ret	= (String[])SUtil.joinArrays(ret, new String[]{FILETYPE_APPLICATION});
 		return ret;
 	}
 
@@ -188,8 +147,6 @@ public class MetaAgentFactory implements IAgentFactory
 			IAgentFactory fac = (IAgentFactory)factories.get(i);
 			ret = fac.getFileTypeIcon(type);
 		}
-		if(type.equals(FILETYPE_APPLICATION))
-			ret = icons.getIcon("application");
 		return ret;
 	}
 
@@ -205,8 +162,6 @@ public class MetaAgentFactory implements IAgentFactory
 			IAgentFactory fac = (IAgentFactory)factories.get(i);
 			ret = fac.getFileType(model);
 		}
-		if(model.toLowerCase().endsWith(".application.xml"))
-			ret = FILETYPE_APPLICATION;
 		return ret;
 	}
 }

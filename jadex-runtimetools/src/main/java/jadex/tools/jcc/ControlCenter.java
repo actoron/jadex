@@ -710,14 +710,14 @@ public class ControlCenter implements IControlCenter
 					if(start.isSucceeded())
 					{
 						IAgentIdentifier aid = (IAgentIdentifier)start
-								.getParameter("agentidentifier").getValue();
+							.getParameter("agentidentifier").getValue();
 						setStatusText("Started agent: " + aid.getLocalName());
 					}
 				}
 			});
 
 			dispatchGoal(start, "Problem Starting Agent",
-					"Agent could not be started.");
+				"Agent could not be started.");
 		}
 		catch(AgentTerminatedException ex)
 		{

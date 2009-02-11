@@ -1,5 +1,6 @@
 package jadex.tools.starter;
 
+import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IArgument;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentModel;
@@ -333,17 +334,25 @@ public class StarterPanel extends JPanel
 					}
 					else
 					{
-						if(an==null) // i.e. name auto generate
+						if(model instanceof ApplicationModel)
 						{
-							int max = ((Integer)numagents.getValue()).intValue();
-							for(int i=0; i<max; i++)
-							{
-								starter.getJCC().createAgent(filename.getText(), an, configname, args);
-							}
+							IAgentFactory fac = starter.getJCC().getAgent().getPlatform().getAgentFactory();
+							fac.createKernelAgent(null, filename.getText(), configname, args);
 						}
 						else
 						{
-							starter.getJCC().createAgent(filename.getText(), an, configname, args);
+							if(an==null) // i.e. name auto generate
+							{
+								int max = ((Integer)numagents.getValue()).intValue();
+								for(int i=0; i<max; i++)
+								{
+									starter.getJCC().createAgent(filename.getText(), an, configname, args);
+								}
+							}
+							else
+							{
+								starter.getJCC().createAgent(filename.getText(), an, configname, args);
+							}
 						}
 					}
 				}
