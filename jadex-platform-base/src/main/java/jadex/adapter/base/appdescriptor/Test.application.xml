@@ -1,0 +1,26 @@
+<!--
+	Test application descriptor.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	name="Test">
+	
+	<agenttypes>
+		<agenttype name="Environment" filename="jadex/bdi/examples/cleanerworld/environment/Environment.agent.xml"/>
+		<agenttype name="Cleaner" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="2 cleaners">
+			<agents>
+				<agent name="environment" type="Environment" />
+				<agent name="cleaner1" type="Cleaner" />
+				<agent name="cleaner2" type="Cleaner" />
+			</agents>
+		</application>
+	</applications>
+
+</applicationtype>
