@@ -1,9 +1,8 @@
 package jadex.adapter.base.contextservice;
 
-import jadex.adapter.base.IContext;
-import jadex.adapter.base.IContextService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 
@@ -21,6 +20,9 @@ public class ContextService	implements IContextService
 {
 	//-------- attributes --------
 	
+	/** The platform. */
+	protected IPlatform platform;
+
 	/** All contexts on the platform (name->context). */
 	protected Map	contexts;
 	
@@ -32,9 +34,9 @@ public class ContextService	implements IContextService
 	/**
 	 *  Create a new context service.
 	 */
-	public ContextService()
+	public ContextService(IPlatform platform)
 	{
-		
+		this.platform = platform;
 	}
 	
 	//-------- IContextService interface --------
@@ -142,20 +144,29 @@ public class ContextService	implements IContextService
 		final IAgentIdentifier[]	agents	= context.getAgents();
 		if(agents!=null && agents.length>0)
 		{
+			// Create AMS result listener (l2), when listener is used.
+			// -> notifies listener, when last agent is killed.
 			IResultListener	l2	= listener!=null ? new IResultListener()
 			{
 				int tokill	= agents.length;
 				Exception	exception;
+				
 				public void resultAvailable(Object result)
 				{
 					result();
 				}
+				
 				public void exceptionOccurred(Exception exception)
 				{
 					if(this.exception==null)	// Only return first exception.
 						this.exception	= exception;
 					result();
 				}
+				
+				/**
+				 *  Called for each killed agent.
+				 *  Decrease counter and notify listener, when last agent is killed.
+				 */
 				protected void	result()
 				{
 					tokill--;
@@ -168,12 +179,18 @@ public class ContextService	implements IContextService
 					}
 				}
 			} : null;
-			IAMS	ams	= null;
-			ams.destroyAgent(null, l2);
+			
+			// Kill all agents in the context. 
+			IAMS	ams	= (IAMS) platform.getService(IAMS.class);
+			for(int i=0; i<agents.length; i++)
+			{
+				ams.destroyAgent(agents[i], l2);
+			}
 		}
 		else
 		{
-			
+			if(listener!=null)
+				listener.resultAvailable(context);
 		}
 	}
 

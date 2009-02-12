@@ -1,7 +1,8 @@
 package jadex.bdi.examples.blackjack.manager;
 
+import jadex.adapter.base.contextservice.IContext;
+import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
@@ -11,6 +12,7 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -85,6 +87,15 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	public ManagerFrame(final IExternalAccess access)
 	{
 		super("Blackjack Manager");
+		
+		access.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				IContext	context	= (IContext)access.getBeliefbase().getBelief("context").getFact();
+				context.addAgent(access.getAgentIdentifier());
+			}
+		});
 
 		// set the icon to be displayed for the frame
 		ImageIcon icon = GUIImageLoader.getImage("heart_small_m");
@@ -382,9 +393,12 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 			start.getParameter("name").setValue("BlackjackDealer");
 			agent.dispatchTopLevelGoalAndWait(start);
-			agent.getLogger().info("local DealerAgent started");
+			IAgentIdentifier	dealer	= (IAgentIdentifier)start.getParameter("agentidentifier").getValue();
+			agent.getLogger().info("local DealerAgent started: "+dealer);
 			//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
-			agent.getBeliefbase().getBelief("localDealerAID").setFact(start.getParameter("agentidentifier").getValue());
+			agent.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
+			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+			context.addAgent(dealer);
 		}
 		catch(Exception e)
 		{
@@ -404,6 +418,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			destroy.getParameter("agentidentifier").setValue(dealer);
 			agent.dispatchTopLevelGoalAndWait(destroy);
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(null);
+			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+			context.removeAgent(dealer);
 		}
 	}
 
@@ -414,23 +430,37 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	{
 		try
 		{
-			// Kill all Players
-			Player[] players = (Player[])agent.getBeliefbase().getBeliefSet("players").getFacts();
-			for(int i = 0; i<players.length; i++)
-			{
-				if(players[i].getAgentID()!=null)
-				{
-					IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
-					destroy.getParameter("agentidentifier").setValue(players[i].getAgentID());
-					agent.dispatchTopLevelGoalAndWait(destroy);
-				}
-			}
+//			// Kill all Players
+//			Player[] players = (Player[])agent.getBeliefbase().getBeliefSet("players").getFacts();
+//			for(int i = 0; i<players.length; i++)
+//			{
+//				if(players[i].getAgentID()!=null)
+//				{
+//					IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
+//					destroy.getParameter("agentidentifier").setValue(players[i].getAgentID());
+//					agent.dispatchTopLevelGoalAndWait(destroy);
+//				}
+//			}
+//
+//			// kill the Dealer
+//			stopLocalDealer();
+//			
+//			// kill the Manager
+//			agent.killAgent();
 
-			// kill the Dealer
-			stopLocalDealer();
-			
-			// kill the Manager
-			agent.killAgent();
+			final IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+			IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
+			cs.deleteContext(context, new IResultListener()
+			{
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+				}
+				public void resultAvailable(Object result)
+				{
+					System.out.println("Context deleted: "+context);
+				}
+			});
 		}
 		catch(Exception e)
 		{
@@ -586,7 +616,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				args.put("dealer", dealeraid);
 				start.getParameter("arguments").setValue(args);
 				agent.dispatchTopLevelGoalAndWait(start);
-				player.setAgentID((IAgentIdentifier)start.getParameter("agentidentifier").getValue());
+				IAgentIdentifier	playerid	= (IAgentIdentifier)start.getParameter("agentidentifier").getValue();
+				player.setAgentID(playerid);
+				IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+				context.addAgent(playerid);
 			}
 			catch(Exception e)
 			{
@@ -603,6 +636,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
 			destroy.getParameter("agentidentifier").setValue(player.getAgentID());
 			agent.dispatchTopLevelGoalAndWait(destroy);
+			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+			context.removeAgent(player.getAgentID());
 			player.setAgentID(null);
 		}
 	}

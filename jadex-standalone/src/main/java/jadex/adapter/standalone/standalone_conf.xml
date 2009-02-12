@@ -70,6 +70,11 @@
 				new jadex.adapter.base.execution.AsyncExecutionService(
 					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
 			</property>
+
+			<!-- Context service. -->
+			<property type="jadex.adapter.base.contextservice.IContextService" name="context_service">
+				new jadex.adapter.base.contextservice.ContextService($platform)
+			</property>
 		</properties>
 		
 		<!-- Agents. -->

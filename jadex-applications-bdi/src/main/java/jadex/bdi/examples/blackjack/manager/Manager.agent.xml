@@ -16,6 +16,7 @@
 		<import>java.awt.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.adapter.base.contextservice.*</import>
 		<import>java.util.logging.*</import>
 	</imports>
 	
@@ -43,6 +44,12 @@
 		
 		<!-- The id of a manually started local dealer. -->
 		<belief name="localDealerAID"  class="jadex.bridge.IAgentIdentifier" />
+		
+		<!-- The context for the manager, dealer and player agents. -->
+		<belief name="context" class="IContext">
+			<fact>((IContextService)$scope.getPlatform().getService(IContextService.class))
+				.createContext(null, "blackjack", null)</fact>
+		</belief>
 
 		<!-- The gui object. -->
 		<belief name="gui" class="ManagerFrame">

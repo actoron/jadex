@@ -1,6 +1,5 @@
 package jadex.adapter.base.contextservice;
 
-import jadex.adapter.base.IContext;
 import jadex.bridge.IAgentIdentifier;
 
 import java.util.ArrayList;
@@ -44,6 +43,8 @@ public class Context	implements IContext
 		this.name	= name;
 		this.type	= type;
 		this.parent	= parent;
+		
+		System.out.println("Created: "+this);
 	}
 
 	//-------- IContext interface --------
@@ -90,6 +91,8 @@ public class Context	implements IContext
 			agents	= new HashSet();
 		
 		agents.add(agent);
+		
+		System.out.println("Added agent: "+this);
 	}
 	
 	/**
@@ -122,6 +125,34 @@ public class Context	implements IContext
 	{
 		return agents==null ? null :
 			(IAgentIdentifier[])agents.toArray(new IAgentIdentifier[agents.size()]);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get a string representation of the context.
+	 */
+	public String	toString()
+	{
+		StringBuffer	ret	= new StringBuffer();
+		ret.append("Context(name=");
+		ret.append(name);
+		ret.append(", type=");
+		ret.append(type);
+		ret.append(", parent=");
+		ret.append(parent);
+		if(agents!=null)
+		{
+			ret.append(", agents=");
+			ret.append(agents);
+		}
+		if(children!=null)
+		{
+			ret.append(", children=");
+			ret.append(children);
+		}
+		ret.append(")");
+		return ret.toString();
 	}
 	
 	//-------- helper methods --------
