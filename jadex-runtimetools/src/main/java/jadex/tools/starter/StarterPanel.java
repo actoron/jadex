@@ -1,6 +1,7 @@
 package jadex.tools.starter;
 
 import jadex.adapter.base.appdescriptor.ApplicationModel;
+import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentModel;
@@ -110,6 +111,9 @@ public class StarterPanel extends JPanel
 	/** The agent factory. */
 	protected IAgentFactory agentfactory;
 	
+	/** The application factory. */
+	protected IApplicationFactory appfactory;
+	
 	/** The starter plugin. */
 	protected StarterPlugin	starter;
 
@@ -137,6 +141,7 @@ public class StarterPanel extends JPanel
 		// Create the filechooser.
 		// Hack!!! might trhow exception in applet / webstart
 		agentfactory = starter.getJCC().getAgent().getPlatform().getAgentFactory();
+		appfactory = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
 		try
 		{
 			filechooser = new JFileChooser(".");
@@ -150,13 +155,9 @@ public class StarterPanel extends JPanel
 
 				public boolean accept(File f)
 				{
-//					ClassLoader	oldcl	= Thread.currentThread().getContextClassLoader();
-//					if(starter.getModelExplorer().getClassLoader()!=null)
-//						Thread.currentThread().setContextClassLoader(starter.getModelExplorer().getClassLoader());
-
 					String name = f.getName();
 //					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
-					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name);
+					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
 
 //					Thread.currentThread().setContextClassLoader(oldcl);
 
@@ -336,8 +337,8 @@ public class StarterPanel extends JPanel
 					{
 						if(model instanceof ApplicationModel)
 						{
-							IAgentFactory fac = starter.getJCC().getAgent().getPlatform().getAgentFactory();
-							fac.createKernelAgent(null, filename.getText(), configname, args);
+							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
+							fac.createApplication(filename.getText(), configname, args);
 						}
 						else
 						{
@@ -546,7 +547,23 @@ public class StarterPanel extends JPanel
 
 			try
 			{
-				if(agentfactory.isStartable(adf))
+				if(appfactory.isLoadable(adf))
+				{
+					model = appfactory.loadModel(adf);
+//					System.out.println("Model loaded: "+adf);
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							updateGuiForNewModel(adf);
+						}
+					});
+					createArguments();
+					arguments.setVisible(true);
+					ap.setVisible(true);
+					start.setVisible(true);
+				}
+				else if(agentfactory.isStartable(adf))
 				{
 					model = agentfactory.loadModel(adf);
 	//				System.out.println("Model loaded: "+adf);

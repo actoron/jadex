@@ -1,6 +1,7 @@
 package jadex.tools.common.modeltree;
 
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IApplicationFactory;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.tools.common.plugin.IControlCenter;
@@ -174,10 +175,19 @@ public class	DefaultNodeFunctionality
 			else if (node instanceof FileNode)
 			{
 				FileNode fn = (FileNode)node;
-				IAgentFactory	fac	= jcc.getAgent().getPlatform().getAgentFactory();
-				String	type	= fac.getFileType(fn.getFile().getAbsolutePath());
+				
+				IAgentFactory agfac = jcc.getAgent().getPlatform().getAgentFactory();
+				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
 				if(type!=null)
-						icon	= fac.getFileTypeIcon(type);
+					icon = agfac.getFileTypeIcon(type);
+				
+				if(icon==null)
+				{
+					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
+					type = apfac.getFileType(fn.getFile().getAbsolutePath());
+					if(type!=null)
+						icon = apfac.getFileTypeIcon(type);
+				}
 			}
 		}
 		return icon;

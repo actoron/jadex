@@ -12,11 +12,13 @@
 		<property type="platform_shutdown_time">1000</property>
 		<property type="welcome">false</property>
 		<property type="autoshutdown">true</property>
+		
+		<property type="application_factory">new jadex.adapter.base.appdescriptor.ApplicationFactory($platform)</property>
+		
 		<!-- Message types. -->
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<!-- Kernels. -->
-		<propertiesref ref="kernel_app"/>
 		<propertiesref ref="kernel_v2_bdi"/>
 	 	<propertiesref ref="kernel_v2_micro"/>
 				
@@ -92,10 +94,6 @@
 		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
  		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	</properties>
-	
-	<properties type="kernel" id="kernel_app">
-		<property type="agent_factory">new jadex.adapter.base.appdescriptor.ApplicationFactory($platform)</property>
-	</properties> 
 	
 	<properties type="kernel" id="kernel_v2_bdi">
 		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(

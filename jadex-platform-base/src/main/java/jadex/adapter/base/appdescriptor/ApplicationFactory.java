@@ -1,13 +1,11 @@
 package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.AgentCreationException;
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IAgentModel;
+import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IKernelAgent;
-import jadex.bridge.IMessageAdapter;
+import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -22,7 +20,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating agent applications.
  */
-public class ApplicationFactory implements IAgentFactory
+public class ApplicationFactory implements IApplicationFactory
 {
 	//-------- constants --------
 	
@@ -55,14 +53,13 @@ public class ApplicationFactory implements IAgentFactory
 	//-------- IAgentFactory interface --------
 	
 	/**
-	 *  Create a kernel agent.
-	 *  @param adapter	The platform adapter for the agent. 
+	 *  Create a new agent application.
 	 *  @param model	The agent model file (i.e. the name of the XML file).
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
-	 *  @return	An instance of a kernel agent.
+	 *  @return	An instance of the application.
 	 */
-	public IKernelAgent createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
+	public Object createApplication(String model, String config, Map arguments)
 	{
 		IKernelAgent ret = null;
 		
@@ -71,8 +68,8 @@ public class ApplicationFactory implements IAgentFactory
 			ApplicationType apptype = null;
 			try
 			{
-				// todo: classloader null?
-				apptype = XMLApplicationReader.readApplication(new FileInputStream(model), null);
+				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				apptype = XMLApplicationReader.readApplication(new FileInputStream(model), cl);
 				List apps = apptype.getApplications();
 				
 				Application app = null;
@@ -111,23 +108,7 @@ public class ApplicationFactory implements IAgentFactory
 					});
 				}
 			
-				// todo: HACK, cannot return null because meta factory tests if sth. was created
-				ret = new IKernelAgent()
-				{
-					public boolean executeAction()
-					{
-						return false;
-					}
-					public void getExternalAccess(IResultListener listener)
-					{
-					}
-					public void killAgent(IResultListener listener)
-					{
-					}
-					public void messageArrived(IMessageAdapter message)
-					{
-					}
-				};
+				// todo: create application context as return value?!
 			}
 			catch(Exception e)
 			{

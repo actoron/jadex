@@ -262,6 +262,10 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					{
 						loadModel(model);
 					}
+					else if(getJCC().getAgent().getPlatform().getApplicationFactory().isLoadable(model))
+					{
+						loadModel(model);
+					}
 				}
 			}
 		});

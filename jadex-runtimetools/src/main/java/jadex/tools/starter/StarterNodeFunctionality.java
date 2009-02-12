@@ -196,23 +196,31 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 				else
 				{
 					String	file	= fn.getFile().getAbsolutePath();
-					if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+					try
 					{
-						try
+						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
 						{
 							IAgentModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();
 							}
-							// else unknown jadex file type -> ignore.
 						}
-						catch(Exception e)
+						else if(jcc.getAgent().getPlatform().getApplicationFactory().isLoadable(file))
 						{
-//							System.err.println("Error checking: "+node.getToolTipText());
-//							e.printStackTrace();
-							newvalid	= false;
+							IAgentModel model = jcc.getAgent().getPlatform().getApplicationFactory().loadModel(file);
+							if(model!=null)
+							{
+								newvalid	= model.getReport().isEmpty();
+							}
 						}
+						// else unknown jadex file type -> ignore.
+					}
+					catch(Exception e)
+					{
+						System.err.println("Error checking: "+node.getToolTipText());
+//							e.printStackTrace();
+						newvalid	= false;
 					}
 				}
 				

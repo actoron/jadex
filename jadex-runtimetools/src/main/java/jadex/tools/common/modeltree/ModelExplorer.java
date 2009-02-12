@@ -615,7 +615,10 @@ public class ModelExplorer extends JTree
 		refreshmenu.setState(this.refresh);
 		menu.add(refreshmenu);
 		
-		String[]	filetypes	= jcc.getAgent().getPlatform().getAgentFactory().getFileTypes();
+		String[] ft1 = jcc.getAgent().getPlatform().getAgentFactory().getFileTypes();
+		String[] ft2 = jcc.getAgent().getPlatform().getApplicationFactory().getFileTypes();
+		String[] filetypes = (String[])SUtil.joinArrays(ft1, ft2);
+		
 		if(filetypes!=null && filetypes.length>1)
 		{
 			filtermenu = new JMenu("File filter");
@@ -653,8 +656,9 @@ public class ModelExplorer extends JTree
 					{
 						public boolean accept(File file)
 						{
-							return file.isDirectory() || jcc.getAgent()
-								.getPlatform().getAgentFactory().isLoadable(file.getAbsolutePath());
+							return file.isDirectory() 
+								|| jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file.getAbsolutePath())
+								|| jcc.getAgent().getPlatform().getApplicationFactory().isLoadable(file.getAbsolutePath());
 						}
 					};
 				}

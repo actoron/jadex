@@ -9,6 +9,7 @@ import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.SimulationService;
 import jadex.adapter.base.ThreadPoolService;
+import jadex.adapter.base.appdescriptor.ApplicationFactory;
 import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.execution.IExecutionService;
@@ -17,6 +18,7 @@ import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.libraryservice.LibraryService;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageService;
@@ -53,6 +55,9 @@ public class Platform implements IPlatform
 	/** The agent factory. */
 	protected IAgentFactory agentfactory;
 	
+	/** The application factory. */
+	protected IApplicationFactory appfactory;
+	
 	/** The logger. */
 	protected Logger logger;
 	
@@ -74,6 +79,7 @@ public class Platform implements IPlatform
 		this.threadpool = ThreadPoolFactory.createThreadPool();
 		this.logger = Logger.getLogger("JADE_Platform");
 		this.services = new LinkedHashMap();
+		this.appfactory = new ApplicationFactory(this);
 		services.put(ILibraryService.class, new LibraryService());
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));
@@ -262,6 +268,16 @@ public class Platform implements IPlatform
 		return agentfactory;
 	}
 
+	/**
+	 *  Get the agent factory.
+	 *  @return The agent factory.
+	 */
+	// Todo: remove from external platform interface
+	public IApplicationFactory getApplicationFactory()
+	{
+		return appfactory;
+	}
+	
 	//-------- Static part --------
 
 	/** The container controller. */

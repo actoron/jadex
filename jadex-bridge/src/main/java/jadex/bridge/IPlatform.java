@@ -43,6 +43,13 @@ public interface IPlatform
 	public IAgentFactory getAgentFactory();
 	
 	/**
+	 *  Get the agent factory.
+	 *  @return The agent factory.
+	 */
+	// Todo: remove from external platform interface
+	public IApplicationFactory getApplicationFactory();
+	
+	/**
 	 *  Get the configuration.
 	 *  @return The configuration.
 	 */

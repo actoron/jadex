@@ -4,13 +4,13 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPoolFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +52,9 @@ public abstract class AbstractPlatform implements IPlatform
 	/** The agent factory. */
 	protected IAgentFactory agentfactory;
 
+	/** The application factory. */
+	protected IApplicationFactory appfactory;
+	
 	/** The platform name. */
 	protected String platformname;
 
@@ -197,6 +200,16 @@ public abstract class AbstractPlatform implements IPlatform
 	public IAgentFactory getAgentFactory()
 	{
 		return agentfactory;
+	}
+	
+	/**
+	 *  Get the agent factory.
+	 *  @return The agent factory.
+	 */
+	// Todo: remove from external platform interface
+	public IApplicationFactory getApplicationFactory()
+	{
+		return appfactory;
 	}
 
 	/**

@@ -37,12 +37,14 @@
 			</map>
 		</property>
 		
+		<property name="application_factory">
+			<bean id="app_fac" class="jadex.adapter.base.appdescriptor.ApplicationFactory">
+				<constructor-arg ref="platform"/>
+			</bean>
+		</property>
+			
 		<property name="agentFactories">
 			<list value-type="jadex.bridge.IJadexAgentFactory">
-				
-				<bean id="application_factory" class="jadex.adapter.base.appdescriptor.ApplicationFactory">
-					<constructor-arg ref="platform"/>
-				</bean>
 				
 				<bean id="kernel_v2_bdi_factory" class="jadex.bdi.interpreter.BDIAgentFactory">
 					<constructor-arg>

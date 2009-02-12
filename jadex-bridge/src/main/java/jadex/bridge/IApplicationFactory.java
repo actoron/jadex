@@ -6,15 +6,14 @@ import java.util.Map;
  *  Interface for an agent factory
  *  (a factory typically belongs to a specific kernel).
  */
-public interface IAgentFactory extends IElementFactory
+public interface IApplicationFactory extends IElementFactory
 {
 	/**
-	 *  Create a kernel agent.
-	 *  @param adapter	The platform adapter for the agent. 
+	 *  Create a new agent application.
 	 *  @param model	The agent model file (i.e. the name of the XML file).
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
-	 *  @return	An instance of a kernel agent.
+	 *  @return	An instance of the application.
 	 */
-	public IKernelAgent createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments);
+	public Object createApplication(String model, String config, Map arguments);
 }

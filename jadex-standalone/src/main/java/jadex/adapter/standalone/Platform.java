@@ -6,6 +6,7 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IApplicationFactory;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.Properties;
@@ -48,6 +49,9 @@ public class Platform extends AbstractPlatform
 	/** The agent factory. */
 	public static final String AGENT_FACTORY = "agent_factory";
 
+	/** The application factory. */
+	public static final String APPLICATION_FACTORY = "application_factory";
+	
 	/** The agent factory. */
 	public static final String MESSAGETYPE = "messagetype";
 
@@ -203,6 +207,8 @@ public class Platform extends AbstractPlatform
 
 		this.agentfactory = createAgentFactory(platconf, fetcher);
 		
+		this.appfactory = createApplicationFactory(platconf, fetcher);
+		
 		this.logger = Logger.getLogger("Platform_" + getName());
 
 		
@@ -321,6 +327,16 @@ public class Platform extends AbstractPlatform
 			factories.add(fac);
 		}
 		return new MetaAgentFactory(factories);
+	}
+	
+	/**
+	 *  Create the application factory.
+	 */
+	public IApplicationFactory createApplicationFactory(Properties platconf, SimpleValueFetcher fetcher)
+	{
+		Property af = platconf.getProperty(APPLICATION_FACTORY);
+		IApplicationFactory ret = (IApplicationFactory)af.getJavaObject(fetcher);
+		return ret;
 	}
 	
 	/**
