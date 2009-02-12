@@ -33,6 +33,10 @@ public class DefaultContext	implements IContext
 	/** The agents in the context. */
 	protected Set	agents;
 	
+	/** Flag to indicate that the context is about to be deleted
+	 * (no more agents can be added). */
+	protected boolean	terminating;
+	
 	//-------- constructors --------
 	
 	/**
@@ -105,6 +109,9 @@ public class DefaultContext	implements IContext
 	 */
 	public synchronized void	addAgent(IAgentIdentifier agent)
 	{
+		if(isTerminating())
+			throw new RuntimeException("Cannot add agent to terminating context: "+agent+", "+this);
+
 		if(agents==null)
 			agents	= new HashSet();
 		
@@ -170,5 +177,23 @@ public class DefaultContext	implements IContext
 		}
 		ret.append(")");
 		return ret.toString();
+	}
+
+	/**
+	 *  Get the flag indicating if the context is about to be deleted
+	 *  (no more agents can be added).
+	 */
+	public boolean	isTerminating()
+	{
+		return this.terminating;
+	}
+
+	/**
+	 *  Set the flag indicating if the context is about to be deleted
+	 *  (no more agents can be added).
+	 */
+	public void setTerminating(boolean terminating)
+	{
+		this.terminating	= terminating;
 	}
 }

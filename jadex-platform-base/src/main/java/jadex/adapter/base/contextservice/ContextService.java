@@ -1,8 +1,6 @@
 package jadex.adapter.base.contextservice;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IPlatform;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 
@@ -20,13 +18,11 @@ public class ContextService	implements IContextService
 {
 	//-------- attributes --------
 	
-	/** The platform. */
-	protected IPlatform platform;
-
 	/** All contexts on the platform (name->context). */
 	protected Map	contexts;
 	
-	/** The registered context factories (class->factory). */
+	/** The registered context factories (class->factory).
+	 *  Also contains factories of context instances (context_name->factory). */
 	protected Map	factories;
 	
 	/** The context counter for generating unique names. */
@@ -37,12 +33,20 @@ public class ContextService	implements IContextService
 	/**
 	 *  Create a new context service.
 	 */
-	public ContextService(IPlatform platform)
+	public ContextService(Class[] types, IContextFactory[] factories)
 	{
-		this.platform = platform;
-		
-		addContextFactory(IContext.class, new DefaultContextFactory());
-		addContextFactory(DefaultContext.class, new DefaultContextFactory());
+		if(types!=null)
+		{
+			if(factories==null || factories.length!=types.length)
+			{
+				throw new RuntimeException("Type and factory arrays do not match.");
+			}
+			
+			for(int i=0; i<types.length; i++)
+			{
+				addContextFactory(types[i], factories[i]);
+			}
+		}
 	}
 	
 	//-------- IContextService interface --------
@@ -117,7 +121,7 @@ public class ContextService	implements IContextService
 	 *  @param parent The parent context (if any).
 	 *  @param properties Initialization properties (if any).
 	 */
-	public IContext	createContext(String name, Class type, IContext parent, Map properties)
+	public synchronized IContext	createContext(String name, Class type, IContext parent, Map properties)
 	{
 		if(name!=null && contexts!=null && contexts.containsKey(name))
 			throw new RuntimeException("Context '"+name+"' already exists on the platform.");
@@ -141,6 +145,8 @@ public class ContextService	implements IContextService
 			throw new RuntimeException("No context factory for "+type);
 		}
 		IContext	context	= factory.createContext(name, parent, properties);
+		contexts.put(name, context);
+		factories.put(name, factory);
 		if(parent!=null)
 			((DefaultContext)parent).addSubContext(context);
 		
@@ -152,58 +158,20 @@ public class ContextService	implements IContextService
 	 *  @param listener Listener to be called, when the context is deleted
 	 *    (e.g. after all contained agents have been terminated).
 	 */
-	public synchronized void	deleteContext(final IContext context, final IResultListener listener)
+	public synchronized void	deleteContext(IContext context, IResultListener listener)
 	{
-		final IAgentIdentifier[]	agents	= context.getAgents();
-		if(agents!=null && agents.length>0)
+		if(contexts.remove(context.getName())!=null)
 		{
-			// Create AMS result listener (l2), when listener is used.
-			// -> notifies listener, when last agent is killed.
-			IResultListener	l2	= listener!=null ? new IResultListener()
+			IContextFactory	factory	= (IContextFactory)factories.remove(context.getName());
+			if(factories.isEmpty())
 			{
-				int tokill	= agents.length;
-				Exception	exception;
-				
-				public void resultAvailable(Object result)
-				{
-					result();
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					if(this.exception==null)	// Only return first exception.
-						this.exception	= exception;
-					result();
-				}
-				
-				/**
-				 *  Called for each killed agent.
-				 *  Decrease counter and notify listener, when last agent is killed.
-				 */
-				protected void	result()
-				{
-					tokill--;
-					if(tokill==0)
-					{
-						if(exception!=null)
-							listener.exceptionOccurred(exception);
-						else
-							listener.resultAvailable(context);
-					}
-				}
-			} : null;
-			
-			// Kill all agents in the context. 
-			IAMS	ams	= (IAMS) platform.getService(IAMS.class);
-			for(int i=0; i<agents.length; i++)
-			{
-				ams.destroyAgent(agents[i], l2);
+				factories	= null;
 			}
+			factory.deleteContext(context, listener);
 		}
 		else
 		{
-			if(listener!=null)
-				listener.resultAvailable(context);
+			throw new RuntimeException("Context does not exist: "+context);
 		}
 	}
 	

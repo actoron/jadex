@@ -73,7 +73,17 @@
 
 			<!-- Context service. -->
 			<property type="jadex.adapter.base.contextservice.IContextService" name="context_service">
-				new jadex.adapter.base.contextservice.ContextService($platform)
+				new jadex.adapter.base.contextservice.ContextService(
+					new Class[]
+					{
+						jadex.adapter.base.contextservice.IContext.class,
+						jadex.adapter.base.contextservice.DefaultContext.class
+					},
+					new jadex.adapter.base.contextservice.IContextFactory[]
+					{
+						new jadex.adapter.base.contextservice.DefaultContextFactory($platform),
+						new jadex.adapter.base.contextservice.DefaultContextFactory($platform)
+					})
 			</property>
 		</properties>
 		
