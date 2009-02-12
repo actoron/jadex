@@ -13,19 +13,24 @@ public interface IContext
 	public String	getName();
 	
 	/**
-	 *  Get the type of the context.
-	 */
-	public String	getType();
-	
-	/**
 	 *  Get the parent of the context (if any).
 	 */
-	public IContext	getParent();
+	public IContext	getParentContext();
 	
 	/**
-	 *  Get the children of the context (if any).
+	 *  Add a sub context.
 	 */
-	public IContext[]	getChildren();
+	public void	addSubContext(IContext context);
+	
+	/**
+	 *  Remove a sub context.
+	 */
+	public void	removeSubContext(IContext context);
+
+	/**
+	 *  Get the sub contexts of the context (if any).
+	 */
+	public IContext[]	getSubContexts();
 	
 	/**
 	 *  Add an agent to a context.

@@ -1,31 +1,31 @@
 package jadex.adapter.base.contextservice;
 
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- *  A context represents an abstract grouping of agents.
+ *  The default context provides a simple grouping mechanism for agents.
  */
-public class Context	implements IContext
+public class DefaultContext	implements IContext
 {
 	//-------- attributes --------
 	
 	/** The parent of the context (if any). */
 	protected IContext	parent;
 
-	/** The children of the context (if any). */
-	protected List	children;
+	/** The sub contexts of the context (if any). */
+	protected List	subcontexts;
 
 	/** The name of the context. */
 	protected String	name;
-
-	/** The type of the context. */
-	protected String	type;
 
 	/** The properties of the context. */
 	protected Map	properties;
@@ -38,11 +38,11 @@ public class Context	implements IContext
 	/**
 	 *  Create a new context.
 	 */
-	public Context(String name, String type, IContext parent)
+	public DefaultContext(String name, IContext parent, Map properties)
 	{
 		this.name	= name;
-		this.type	= type;
 		this.parent	= parent;
+		this.properties	= properties!=null ? new HashMap(properties) : null;
 		
 		System.out.println("Created: "+this);
 	}
@@ -56,30 +56,48 @@ public class Context	implements IContext
 	{
 		return name;
 	}
-	
-	/**
-	 *  Get the type of the context.
-	 */
-	public String	getType()
-	{
-		return type;
-	}
 
 	/**
 	 *  Get the parent of the context (if any).
 	 */
-	public IContext	getParent()
+	public IContext	getParentContext()
 	{
 		return parent;
 	}
 	
 	/**
-	 *  Get the children of the context (if any).
+	 *  Add a sub context.
 	 */
-	public synchronized IContext[]	getChildren()
+	public synchronized void	addSubContext(IContext context)
 	{
-		return children==null ? null :
-			(IContext[])children.toArray(new IContext[children.size()]);
+		if(subcontexts==null)
+			subcontexts	= new ArrayList();
+		
+		subcontexts.add(context);
+	}
+	
+	/**
+	 *  Remove a sub context.
+	 */
+	public synchronized void	removeSubContext(IContext context)
+	{
+		if(subcontexts!=null)
+		{
+			subcontexts.remove(context);
+			if(subcontexts.isEmpty())
+			{
+				subcontexts	= null;
+			}
+		}
+	}
+
+	/**
+	 *  Get the sub contexts of the context (if any).
+	 */
+	public synchronized IContext[]	getSubContexts()
+	{
+		return subcontexts==null ? null :
+			(IContext[])subcontexts.toArray(new IContext[subcontexts.size()]);
 	}
 	
 	/**
@@ -135,51 +153,22 @@ public class Context	implements IContext
 	public String	toString()
 	{
 		StringBuffer	ret	= new StringBuffer();
-		ret.append("Context(name=");
+		ret.append(SReflect.getInnerClassName(getClass()));
+		ret.append("(name=");
 		ret.append(name);
-		ret.append(", type=");
-		ret.append(type);
 		ret.append(", parent=");
 		ret.append(parent);
 		if(agents!=null)
 		{
 			ret.append(", agents=");
-			ret.append(agents);
+			ret.append(SUtil.arrayToString(getAgents()));
 		}
-		if(children!=null)
+		if(subcontexts!=null)
 		{
-			ret.append(", children=");
-			ret.append(children);
+			ret.append(", subcontexts=");
+			ret.append(SUtil.arrayToString(getSubContexts()));
 		}
 		ret.append(")");
 		return ret.toString();
-	}
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  Add a sub context.
-	 */
-	protected synchronized void	addChild(IContext context)
-	{
-		if(children==null)
-			children	= new ArrayList();
-		
-		children.add(context);
-	}
-	
-	/**
-	 *  Remove a sub context.
-	 */
-	protected synchronized void	removeChild(IContext context)
-	{
-		if(children!=null)
-		{
-			children.remove(context);
-			if(children.isEmpty())
-			{
-				children	= null;
-			}
-		}
 	}
 }

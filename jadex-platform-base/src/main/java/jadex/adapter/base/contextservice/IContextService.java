@@ -4,6 +4,8 @@ import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IPlatformService;
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.Map;
+
 /**
  *  Contexts are an abstract grouping mechanism for agents on a platform,
  *  which is managed using the context service.
@@ -18,7 +20,7 @@ public interface IContextService extends IPlatformService
 	/**
 	 *  Get all contexts with a given type (if any).
 	 */
-	public IContext[]	getContexts(String type);
+	public IContext[]	getContexts(Class type);
 
 	/**
 	 *  Get all direct contexts of an agent (if any).
@@ -32,8 +34,12 @@ public interface IContextService extends IPlatformService
 
 	/**
 	 *  Create a context.
+	 *  @param name	The name or null for auto-generation.
+	 *  @param type	The context type.
+	 *  @param parent The parent context (if any).
+	 *  @param properties Initialization properties (if any).
 	 */
-	public IContext	createContext(String name, String type, IContext parent);
+	public IContext	createContext(String name, Class type, IContext parent, Map properties);
 	
 	/**
 	 *  Delete a context.
@@ -41,4 +47,14 @@ public interface IContextService extends IPlatformService
 	 *    (e.g. after all contained agents have been terminated).
 	 */
 	public void	deleteContext(IContext context, IResultListener listener);
+	
+	/**
+	 *  Register a context factory for a given context type. 
+	 */
+	public void	addContextFactory(Class type, IContextFactory factory);
+
+	/**
+	 *  Deregister a context factory for a given context type. 
+	 */
+	public void	removeContextFactory(Class type);
 }
