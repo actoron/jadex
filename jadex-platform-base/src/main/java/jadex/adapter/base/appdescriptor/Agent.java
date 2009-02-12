@@ -18,6 +18,9 @@ public class Agent
 	/** The configuration. */
 	protected String configuration;
 
+	/** The start flag. */
+	protected boolean start;
+	
 	/** The list of contained parameters. */
 	protected List parameters;
 	
@@ -29,6 +32,7 @@ public class Agent
 	public Agent()
 	{
 		this.parameters = new ArrayList();
+		this.start = true;
 	}
 	
 	//-------- methods --------
@@ -82,6 +86,22 @@ public class Agent
 	}
 	
 	/**
+	 * @return the start
+	 */
+	public boolean isStart()
+	{
+		return this.start;
+	}
+
+	/**
+	 * @param start the start to set
+	 */
+	public void setStart(boolean start)
+	{
+		this.start = start;
+	}
+
+	/**
 	 * 
 	 */
 	public void addParameters(Parameter param)
@@ -110,21 +130,43 @@ public class Agent
 	 */
 	public Map getArguments()
 	{
-		Map ret = new HashMap();
-		for(int i=0; i<parameters.size(); i++)
+		Map ret = null;
+
+		if(parameters!=null)
 		{
-			Object tmp = parameters.get(i);
-			if(tmp instanceof Parameter)
+			ret = new HashMap();
+			for(int i=0; i<parameters.size(); i++)
 			{
-				
-			}
-			else
-			{
-				
+				Object tmp = parameters.get(i);
+				if(tmp instanceof Parameter)
+				{
+					Parameter p = (Parameter)tmp;
+					ret.put(p.getName(), p.getValue());
+				}
+				else //if(tmp instanceof ParameterSet)
+				{
+					ParameterSet ps = (ParameterSet)tmp;
+					ret.put(ps.getName(), ps.getValues());
+				}
 			}
 		}
 		
-		return null;
+		return ret;
 	}
 	
+	/**
+	 * 
+	 */
+	public String getModel(ApplicationType apptype)
+	{
+		String ret = null;
+		List agenttypes = apptype.getAgentTypes();
+		for(int i=0; ret==null && i<agenttypes.size(); i++)
+		{
+			AgentType at = (AgentType)agenttypes.get(i);
+			if(at.getName().equals(getType()))
+				ret = at.getFilename();
+		}
+		return ret;
+	}
 }

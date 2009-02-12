@@ -16,6 +16,7 @@
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<!-- Kernels. -->
+		<propertiesref ref="kernel_app"/>
 		<propertiesref ref="kernel_v2_bdi"/>
 	 	<propertiesref ref="kernel_v2_micro"/>
 				
@@ -77,8 +78,9 @@
  		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	</properties>
 	
-	<properties type="platform_jade" name="lars">
-	</properties>
+	<properties type="kernel" id="kernel_app">
+		<property type="agent_factory">new jadex.adapter.base.appdescriptor.ApplicationFactory($platform)</property>
+	</properties> 
 	
 	<properties type="kernel" id="kernel_v2_bdi">
 		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
@@ -100,7 +102,7 @@
 					Boolean.TRUE
 				}
 			), $platform)
-			</property>
+		</property>
 	</properties>
 	
 	<properties type="kernel" id="kernel_v2_micro">

@@ -40,6 +40,10 @@
 		<property name="agentFactories">
 			<list value-type="jadex.bridge.IJadexAgentFactory">
 				
+				<bean id="application_factory" class="jadex.adapter.base.appdescriptor.ApplicationFactory">
+					<constructor-arg ref="platform"/>
+				</bean>
+				
 				<bean id="kernel_v2_bdi_factory" class="jadex.bdi.interpreter.BDIAgentFactory">
 					<constructor-arg>
 						<map>

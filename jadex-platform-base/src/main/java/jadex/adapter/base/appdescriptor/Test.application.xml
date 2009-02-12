@@ -16,7 +16,15 @@
 	<applications>
 		<application name="2 cleaners">
 			<agents>
-				<agent name="environment" type="Environment" />
+				<agent name="environment" type="Environment">
+					<parameters>
+						<parameter name="p1" value="p1v">"p1value"</parameter>
+						<parameterset name="ps1">
+							<value>1</value>
+							<value>2</value>
+						</parameterset>
+					</parameters>
+				</agent>
 				<agent name="cleaner1" type="Cleaner" />
 				<agent name="cleaner2" type="Cleaner" />
 			</agents>

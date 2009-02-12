@@ -4,10 +4,13 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.AgentCreationException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IAgentModel;
 import jadex.bridge.IKernelAgent;
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 
 import java.io.FileInputStream;
 import java.util.List;
@@ -89,16 +92,42 @@ public class ApplicationFactory implements IAgentFactory
 				// todo: result listener?
 				
 				List agents = app.getAgents();
+				final IAMS ams = (IAMS)platform.getService(IAMS.class);
 				for(int i=0; i<agents.size(); i++)
 				{
-					Agent agent = (Agent)agents.get(i);
+					final Agent agent = (Agent)agents.get(i);
 					
-					IAMS ams = (IAMS)platform.getService(IAMS.class);
-//					ams.createAgent(agent.getName(), agent.getModel(), agent.getConfiguration(), agent.getArguments(), null);
+//					System.out.println("Create: "+agent.getName()+" "+agent.getModel(apptype)+" "+agent.getConfiguration()+" "+agent.getArguments());
+					ams.createAgent(agent.getName(), agent.getModel(apptype), agent.getConfiguration(), agent.getArguments(), new IResultListener()
+					{
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+						public void resultAvailable(Object result)
+						{
+							if(agent.isStart())
+								ams.startAgent((IAgentIdentifier)result, null);
+						}
+					});
 				}
-				
-				System.out.println("Loaded application type: "+apptype);
 			
+				// todo: HACK, cannot return null because meta factory tests if sth. was created
+				ret = new IKernelAgent()
+				{
+					public boolean executeAction()
+					{
+						return false;
+					}
+					public void getExternalAccess(IResultListener listener)
+					{
+					}
+					public void killAgent(IResultListener listener)
+					{
+					}
+					public void messageArrived(IMessageAdapter message)
+					{
+					}
+				};
 			}
 			catch(Exception e)
 			{
@@ -106,8 +135,6 @@ public class ApplicationFactory implements IAgentFactory
 			}
 		}
 		
-		if(ret==null)
-			throw new AgentCreationException(""+model, null);
 		return ret;
 	}
 	
@@ -127,7 +154,7 @@ public class ApplicationFactory implements IAgentFactory
 				// todo: classloader null?
 				apptype = XMLApplicationReader.readApplication(new FileInputStream(filename), null);
 				ret = new ApplicationModel(apptype, filename);
-				System.out.println("Loaded application type: "+apptype);
+//				System.out.println("Loaded application type: "+apptype);
 			
 			}
 			catch(Exception e)
@@ -147,7 +174,7 @@ public class ApplicationFactory implements IAgentFactory
 	 */
 	public boolean isLoadable(String model)
 	{
-		return true;
+		return model.endsWith(".application.xml");
 	}
 	
 	/**
@@ -157,7 +184,7 @@ public class ApplicationFactory implements IAgentFactory
 	 */
 	public boolean isStartable(String model)
 	{
-		return true;
+		return model.endsWith(".application.xml");
 	}
 
 	/**

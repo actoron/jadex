@@ -311,7 +311,7 @@ public class Platform extends AbstractPlatform
 		Properties[] kernel_props = platconf.getSubproperties(KERNEL);
 
 		List factories = new ArrayList();
-		for(int i = 0; i < kernel_props.length; i++)
+		for(int i=0; i<kernel_props.length; i++)
 		{
 			Property af = kernel_props[i].getProperty(AGENT_FACTORY);
 			if(af == null)

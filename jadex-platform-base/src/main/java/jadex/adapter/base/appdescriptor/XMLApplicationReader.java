@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 /**
  *  Read properties from xml.
@@ -15,13 +16,14 @@ public class XMLApplicationReader
 	
 	static
 	{
-		xstream = new XStream();
+		xstream = new XStream(new PureJavaReflectionProvider());
 		xstream.alias("application", Application.class);
 		xstream.alias("applicationtype", ApplicationType.class);
 		xstream.alias("agent", Agent.class);
 		xstream.alias("agenttype", AgentType.class);
-		xstream.alias("parameter", AgentType.class);
-		xstream.alias("parameterset", AgentType.class);
+		xstream.alias("parameter", Parameter.class);
+		xstream.alias("parameterset", ParameterSet.class);
+		xstream.alias("value", String.class);
 	}
 	
 	/**
@@ -46,6 +48,8 @@ public class XMLApplicationReader
 		xstream.useAttributeFor("name", String.class); 
 		xstream.useAttributeFor("filename", String.class); 
 		xstream.useAttributeFor("type", String.class); 
+		xstream.useAttributeFor("value", String.class); 
+		xstream.useAttributeFor("start", boolean.class); 
 		
 		ApplicationType apptype = (ApplicationType)xstream.fromXML(input);
 		
