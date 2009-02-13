@@ -88,7 +88,7 @@ public class AMS implements IAMS, IPlatformService
 	 *  @param confi The configuration.
 	 *  @param args The arguments map (name->value).
 	 */
-	public void	createAgent(String name, String model, String config, Map args, IResultListener lis)
+	public void	createAgent(String name, String model, String config, Map args, IResultListener lis, IAgentIdentifier creator)
 	{
 //		System.out.println("Create agent: "+name);
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();

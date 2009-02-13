@@ -166,7 +166,7 @@ public class Platform implements IPlatform
 			{
 				ams.startAgent((IAgentIdentifier)result, null);
 			}
-		});
+		}, null);
 		
 		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 		{

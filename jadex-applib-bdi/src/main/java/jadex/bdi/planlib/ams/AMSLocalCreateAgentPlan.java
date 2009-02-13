@@ -29,7 +29,7 @@ public class AMSLocalCreateAgentPlan extends Plan
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
-			((IAMS)plat.getService(IAMS.class, SFipa.AMS_SERVICE)).createAgent(name, type, config, args, lis);
+			((IAMS)plat.getService(IAMS.class, SFipa.AMS_SERVICE)).createAgent(name, type, config, args, lis, getAgentIdentifier());
 			IAgentIdentifier aid = (IAgentIdentifier)lis.waitForResult();
 			
 			getParameter("agentidentifier").setValue(aid);

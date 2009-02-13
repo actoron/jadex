@@ -66,7 +66,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				
 				SyncResultListener	listener	= new SyncResultListener();
 				IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
-				ams.createAgent(null, type, config, args[i], listener);
+				ams.createAgent(null, type, config, args[i], listener, getAgentIdentifier());
 				IAgentIdentifier aid = (IAgentIdentifier)listener.waitForResult();
 				listener = new SyncResultListener();	// Hack!!! Allow reuse of result listener?
 				ams.startAgent(aid, listener);

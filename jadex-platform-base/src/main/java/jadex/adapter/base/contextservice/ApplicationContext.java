@@ -8,7 +8,10 @@ import jadex.commons.concurrent.IResultListener;
 import java.util.Map;
 
 /**
- *  The base context provides a simple grouping mechanism for agents.
+ *  The application context provides a closed environment for agents.
+ *  If agents spawn other agents, these will automatically be added to
+ *  the context.
+ *  When the context is deleted all agents will be destroyed.
  */
 public class ApplicationContext	extends BaseContext
 {
@@ -45,27 +48,25 @@ public class ApplicationContext	extends BaseContext
 		super.addAgent(agent);
 	}
 		
-	//-------- methods --------
+	//-------- BaseContext template methods --------
 	
 	/**
-	 *  Get the flag indicating if the context is about to be deleted
-	 *  (no more agents can be added).
+	 *  Called by AMS when an agent has been created by another agent in this context.
+	 *  @param creator	The creator of the new agent.
+	 *  @param newagent	The newly created agent.
 	 */
-	public boolean	isTerminating()
+	public void	agentCreated(IAgentIdentifier creator, IAgentIdentifier newagent)
 	{
-		return this.terminating;
+		addAgent(newagent);
 	}
 
 	/**
-	 *  Set the flag indicating if the context is about to be deleted
-	 *  (no more agents can be added).
+	 *  Called by AMS when an agent has been created by another agent in this context.
+	 *  @param agent	The destroyed agent.
 	 */
-	public void setTerminating(boolean terminating)
+	public void	agentDestroyed(IAgentIdentifier agent)
 	{
-		if(!terminating || this.terminating)
-			throw new RuntimeException("Cannot terminate; illegal state: "+this.terminating+", "+terminating);
-			
-		this.terminating	= terminating;
+		removeAgent(agent);
 	}
 
 	/**
@@ -129,5 +130,28 @@ public class ApplicationContext	extends BaseContext
 			if(listener!=null)
 				listener.resultAvailable(this);
 		}
+	}
+
+	//-------- methods --------
+	
+	/**
+	 *  Get the flag indicating if the context is about to be deleted
+	 *  (no more agents can be added).
+	 */
+	public boolean	isTerminating()
+	{
+		return this.terminating;
+	}
+
+	/**
+	 *  Set the flag indicating if the context is about to be deleted
+	 *  (no more agents can be added).
+	 */
+	public void setTerminating(boolean terminating)
+	{
+		if(!terminating || this.terminating)
+			throw new RuntimeException("Cannot terminate; illegal state: "+this.terminating+", "+terminating);
+			
+		this.terminating	= terminating;
 	}
 }

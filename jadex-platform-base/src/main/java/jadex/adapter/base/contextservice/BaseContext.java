@@ -131,6 +131,8 @@ public class BaseContext	implements IContext
 				agents	= null;
 			}
 		}
+
+		System.out.println("Removed agent: "+this);
 	}
 
 	/**
@@ -162,6 +164,23 @@ public class BaseContext	implements IContext
 	{
 		if(listener!=null)
 			listener.resultAvailable(this);
+	}
+
+	/**
+	 *  Called by AMS when an agent has been created by another agent in this context.
+	 *  @param creator	The creator of the new agent.
+	 *  @param newagent	The newly created agent.
+	 */
+	public void	agentCreated(IAgentIdentifier creator, IAgentIdentifier newagent)
+	{
+	}
+
+	/**
+	 *  Called by AMS when an agent has been created by another agent in this context.
+	 *  @param agent	The destroyed agent.
+	 */
+	public void	agentDestroyed(IAgentIdentifier agent)
+	{
 	}
 	
 	//-------- methods --------

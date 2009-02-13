@@ -21,8 +21,10 @@ public interface IAMS
 	 *  @param model The model name.
 	 *  @param confi The configuration.
 	 *  @param args The arguments map (name->value).
+	 *  @param listener The result listener (if any).
+	 *  @param creator The creator (if any).
 	 */
-	public void	createAgent(String name, String model, String config, Map args, IResultListener listener);
+	public void	createAgent(String name, String model, String config, Map args, IResultListener listener, IAgentIdentifier creator);
 	
 	/**
 	 *  Start a previously created agent on the platform.

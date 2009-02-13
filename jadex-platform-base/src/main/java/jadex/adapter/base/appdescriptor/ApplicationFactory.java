@@ -108,7 +108,9 @@ public class ApplicationFactory implements IApplicationFactory
 								if(agent.isStart())
 									ams.startAgent((IAgentIdentifier)result, null);
 							}
-						});
+						}, null);
+						
+						// Todo: add agent to context.
 					}
 				}
 			

@@ -42,18 +42,19 @@ public class StartPlan extends Plan
 						"default",
 						environmentArgs,
 						new IResultListener()
+						{
+							public void resultAvailable(Object result)
 							{
-								public void resultAvailable(Object result)
-								{
-									IAgentIdentifier aid = (IAgentIdentifier) result;
-									ams.startAgent(aid, null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									exception.printStackTrace();
-								}
-							});
+								IAgentIdentifier aid = (IAgentIdentifier) result;
+								ams.startAgent(aid, null);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								exception.printStackTrace();
+							}
+						},
+						getAgentIdentifier());
 		ISimulationEngine engine = null;
 		while (engine == null)
 		{
@@ -86,7 +87,8 @@ public class StartPlan extends Plan
 						{
 							exception.printStackTrace();
 						}
-					});
+					},
+					getAgentIdentifier());
 			waitFor(100);
 		}
 		
@@ -96,18 +98,19 @@ public class StartPlan extends Plan
 				"default",
 				environmentArgs,
 				new IResultListener()
+				{
+					public void resultAvailable(Object result)
 					{
-						public void resultAvailable(Object result)
-						{
-							IAgentIdentifier aid = (IAgentIdentifier) result;
-							ams.startAgent(aid, null);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							exception.printStackTrace();
-						}
-					});
+						IAgentIdentifier aid = (IAgentIdentifier) result;
+						ams.startAgent(aid, null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				},
+				getAgentIdentifier());
 		
 		killAgent();
 	}

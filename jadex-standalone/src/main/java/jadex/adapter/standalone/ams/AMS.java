@@ -1,6 +1,9 @@
 package jadex.adapter.standalone.ams;
 
 import jadex.adapter.base.DefaultResultListener;
+import jadex.adapter.base.contextservice.BaseContext;
+import jadex.adapter.base.contextservice.IContext;
+import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
@@ -69,7 +72,7 @@ public class AMS implements IAMS, IPlatformService
 		this.listeners = SCollection.createArrayList();
     }
 
-    //-------- IMAS interface methods --------
+    //-------- IAMS interface methods --------
     
 	/**
 	 *  Create a new agent on the platform.
@@ -80,7 +83,7 @@ public class AMS implements IAMS, IPlatformService
 	 *  @param confi The configuration.
 	 *  @param args The arguments map (name->value).
 	 */
-	public void	createAgent(String name, String model, String config, Map args, IResultListener listener)
+	public void	createAgent(String name, String model, String config, Map args, IResultListener listener, IAgentIdentifier creator)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -134,6 +137,17 @@ public class AMS implements IAMS, IPlatformService
 			}
 		}
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
+		
+		// Register new agent at contexts.
+		IContextService	cs	= (IContextService) platform.getService(IContextService.class);
+		if(cs!=null)
+		{
+			IContext[]	contexts	= cs.getContexts(creator);
+			for(int i=0; contexts!=null && i<contexts.length; i++)
+			{
+				((BaseContext)contexts[i]).agentCreated(creator, aid);
+			}
+		}
 
 		IAMSListener[]	alisteners;
 		synchronized(listeners)
@@ -705,6 +719,17 @@ public class AMS implements IAMS, IPlatformService
 				}
 			}
 			
+			// Deregister killed agent at contexts.
+			IContextService	cs	= (IContextService) platform.getService(IContextService.class);
+			if(cs!=null)
+			{
+				IContext[]	contexts	= cs.getContexts(aid);
+				for(int i=0; contexts!=null && i<contexts.length; i++)
+				{
+					((BaseContext)contexts[i]).agentDestroyed(aid);
+				}
+			}
+
 			IAMSListener[]	alisteners;
 			synchronized(listeners)
 			{

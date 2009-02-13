@@ -31,7 +31,7 @@ public class StartAgentsPlan extends Plan
 				
 				SyncResultListener	listener	= new SyncResultListener();
 				IAMS	ams	= (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-				ams.createAgent(startinfos[i].getName(), startinfos[i].getType(), startinfos[i].getConfiguration(), startinfos[i].getArguments(), listener);
+				ams.createAgent(startinfos[i].getName(), startinfos[i].getType(), startinfos[i].getConfiguration(), startinfos[i].getArguments(), listener, getAgentIdentifier());
 				IAgentIdentifier	aid	= (IAgentIdentifier)listener.waitForResult();
 				listener	= new SyncResultListener();	// Hack!!! Allow reuse of result listener?
 				ams.startAgent(aid, listener);

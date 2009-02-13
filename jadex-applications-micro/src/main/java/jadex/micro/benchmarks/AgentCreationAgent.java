@@ -64,7 +64,7 @@ public class AgentCreationAgent extends MicroAgent
 				{
 					exception.printStackTrace();
 				}
-			}));				
+			}), getAgentIdentifier());				
 		}
 		else
 		{

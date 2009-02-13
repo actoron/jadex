@@ -21,7 +21,7 @@ public class RequestMasterPlan extends Plan
 		
 		IAMS	ams	= (IAMS) getScope().getPlatform().getService(IAMS.class);
 		SyncResultListener	srl	= new SyncResultListener();
-		ams.createAgent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, srl);
+		ams.createAgent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, srl, getAgentIdentifier());
 		IAgentIdentifier	slave	= (IAgentIdentifier) srl.waitForResult();
 		ams.startAgent(slave, null);
 	}	

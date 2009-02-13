@@ -161,7 +161,7 @@ public class StartPeerPlan extends Plan
 	{
 		final IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
 		SyncResultListener lis = new SyncResultListener();
-		ams.createAgent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, lis);
+		ams.createAgent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, lis, getAgentIdentifier());
 		IAgentIdentifier aid = (IAgentIdentifier)lis.waitForResult();
 		ams.startAgent(aid, null);
 		return aid;

@@ -439,7 +439,7 @@ public abstract class AbstractPlatform implements IPlatform
 			{
 				System.err.println("Exception occurred: " + exception);
 			}
-		});
+		}, null);
 	}
 
 	//-------- static part --------
@@ -522,7 +522,7 @@ public abstract class AbstractPlatform implements IPlatform
 							{
 								System.err.println("Exception occurred: " + exception);
 							}
-						});
+						}, null);
 					}
 					else
 					{

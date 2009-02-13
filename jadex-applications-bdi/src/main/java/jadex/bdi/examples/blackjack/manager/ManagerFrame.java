@@ -397,8 +397,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			agent.getLogger().info("local DealerAgent started: "+dealer);
 			//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
-			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-			context.addAgent(dealer);
+//			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+//			context.addAgent(dealer);
 		}
 		catch(Exception e)
 		{
@@ -418,8 +418,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			destroy.getParameter("agentidentifier").setValue(dealer);
 			agent.dispatchTopLevelGoalAndWait(destroy);
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(null);
-			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-			context.removeAgent(dealer);
+//			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+//			context.removeAgent(dealer);
 		}
 	}
 
@@ -618,8 +618,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				agent.dispatchTopLevelGoalAndWait(start);
 				IAgentIdentifier	playerid	= (IAgentIdentifier)start.getParameter("agentidentifier").getValue();
 				player.setAgentID(playerid);
-				IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-				context.addAgent(playerid);
+//				IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+//				context.addAgent(playerid);
 			}
 			catch(Exception e)
 			{
@@ -636,8 +636,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
 			destroy.getParameter("agentidentifier").setValue(player.getAgentID());
 			agent.dispatchTopLevelGoalAndWait(destroy);
-			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-			context.removeAgent(player.getAgentID());
+//			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
+//			context.removeAgent(player.getAgentID());
 			player.setAgentID(null);
 		}
 	}
