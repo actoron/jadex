@@ -48,7 +48,7 @@
 		<!-- The context for the manager, dealer and player agents. -->
 		<belief name="context" class="IContext">
 			<fact>((IContextService)$scope.getPlatform().getService(IContextService.class))
-				.createContext(null, IContext.class, null, null)</fact>
+				.createContext(null, ApplicationContext.class, null, null)</fact>
 		</belief>
 
 		<!-- The gui object. -->

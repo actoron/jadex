@@ -21,8 +21,7 @@ public class ContextService	implements IContextService
 	/** All contexts on the platform (name->context). */
 	protected Map	contexts;
 	
-	/** The registered context factories (class->factory).
-	 *  Also contains factories of context instances (context_name->factory). */
+	/** The registered context factories (class->factory). */
 	protected Map	factories;
 	
 	/** The context counter for generating unique names. */
@@ -146,9 +145,8 @@ public class ContextService	implements IContextService
 		}
 		IContext	context	= factory.createContext(name, parent, properties);
 		contexts.put(name, context);
-		factories.put(name, factory);
 		if(parent!=null)
-			((DefaultContext)parent).addSubContext(context);
+			((IContext)parent).addSubContext(context);
 		
 		return context;
 	}
@@ -162,12 +160,7 @@ public class ContextService	implements IContextService
 	{
 		if(contexts.remove(context.getName())!=null)
 		{
-			IContextFactory	factory	= (IContextFactory)factories.remove(context.getName());
-			if(factories.isEmpty())
-			{
-				factories	= null;
-			}
-			factory.deleteContext(context, listener);
+			((BaseContext)context).deleteContext(listener);
 		}
 		else
 		{

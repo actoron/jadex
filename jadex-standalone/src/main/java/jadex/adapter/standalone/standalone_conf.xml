@@ -79,12 +79,14 @@
 					new Class[]
 					{
 						jadex.adapter.base.contextservice.IContext.class,
-						jadex.adapter.base.contextservice.DefaultContext.class
+						jadex.adapter.base.contextservice.BaseContext.class,
+						jadex.adapter.base.contextservice.ApplicationContext.class
 					},
 					new jadex.adapter.base.contextservice.IContextFactory[]
 					{
-						new jadex.adapter.base.contextservice.DefaultContextFactory($platform),
-						new jadex.adapter.base.contextservice.DefaultContextFactory($platform)
+						new jadex.adapter.base.contextservice.DefaultContextFactory(),
+						new jadex.adapter.base.contextservice.DefaultContextFactory(),
+						new jadex.adapter.base.contextservice.ApplicationContextFactory($platform)
 					})
 			</property>
 		</properties>

@@ -3,6 +3,7 @@ package jadex.adapter.base.contextservice;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,9 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  The default context provides a simple grouping mechanism for agents.
+ *  The base context provides a simple grouping mechanism for agents.
  */
-public class DefaultContext	implements IContext
+public class BaseContext	implements IContext
 {
 	//-------- attributes --------
 	
@@ -42,7 +43,7 @@ public class DefaultContext	implements IContext
 	/**
 	 *  Create a new context.
 	 */
-	public DefaultContext(String name, IContext parent, Map properties)
+	public BaseContext(String name, IContext parent, Map properties)
 	{
 		this.name	= name;
 		this.parent	= parent;
@@ -109,9 +110,6 @@ public class DefaultContext	implements IContext
 	 */
 	public synchronized void	addAgent(IAgentIdentifier agent)
 	{
-		if(isTerminating())
-			throw new RuntimeException("Cannot add agent to terminating context: "+agent+", "+this);
-
 		if(agents==null)
 			agents	= new HashSet();
 		
@@ -152,8 +150,22 @@ public class DefaultContext	implements IContext
 			(IAgentIdentifier[])agents.toArray(new IAgentIdentifier[agents.size()]);
 	}
 	
-	//-------- methods --------
+	//-------- template methods --------
+
+	/**
+	 *  Delete a context. Called from context service before a context is
+	 *  removed from the platform. Default context behavior is to do nothing.
+	 *  @param context	The context to be deleted.
+	 *  @param listener	The listener to be notified when deletion is finished (if any).
+	 */
+	public void	deleteContext(IResultListener listener)
+	{
+		if(listener!=null)
+			listener.resultAvailable(this);
+	}
 	
+	//-------- methods --------
+
 	/**
 	 *  Get a string representation of the context.
 	 */
@@ -162,38 +174,22 @@ public class DefaultContext	implements IContext
 		StringBuffer	ret	= new StringBuffer();
 		ret.append(SReflect.getInnerClassName(getClass()));
 		ret.append("(name=");
-		ret.append(name);
+		ret.append(getName());
 		ret.append(", parent=");
-		ret.append(parent);
-		if(agents!=null)
+		ret.append(getParentContext());
+		IAgentIdentifier[]	aids	= getAgents(); 
+		if(aids!=null)
 		{
 			ret.append(", agents=");
-			ret.append(SUtil.arrayToString(getAgents()));
+			ret.append(SUtil.arrayToString(aids));
 		}
-		if(subcontexts!=null)
+		IContext[]	subcs	= getSubContexts(); 
+		if(subcs!=null)
 		{
 			ret.append(", subcontexts=");
-			ret.append(SUtil.arrayToString(getSubContexts()));
+			ret.append(SUtil.arrayToString(subcs));
 		}
 		ret.append(")");
 		return ret.toString();
-	}
-
-	/**
-	 *  Get the flag indicating if the context is about to be deleted
-	 *  (no more agents can be added).
-	 */
-	public boolean	isTerminating()
-	{
-		return this.terminating;
-	}
-
-	/**
-	 *  Set the flag indicating if the context is about to be deleted
-	 *  (no more agents can be added).
-	 */
-	public void setTerminating(boolean terminating)
-	{
-		this.terminating	= terminating;
 	}
 }
