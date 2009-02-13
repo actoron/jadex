@@ -106,6 +106,30 @@ public class ContextService	implements IContextService
 	}
 	
 	/**
+	 *  Get all direct contexts of an agent of a specific type (if any).
+	 */
+	public IContext[]	getContexts(IAgentIdentifier agent, Class type)
+	{
+		List	result	= null;
+		if(contexts!=null)
+		{
+			for(Iterator it=contexts.values().iterator(); it.hasNext(); )
+			{
+				IContext	context	= (IContext) it.next();
+				if(context.containsAgent(agent)
+					&& SReflect.isSupertype(type, context.getClass()))
+				{
+					if(result==null)
+						result	= new ArrayList();
+					result.add(context);
+				}
+			}
+		}
+		return result==null ? null :
+			(IContext[])result.toArray(new IContext[result.size()]);		
+	}
+
+	/**
 	 *  Get a context with a given name.
 	 */
 	public synchronized IContext	getContext(String name)

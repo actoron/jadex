@@ -402,13 +402,10 @@ public class EnvironmentGui	extends JFrame
 				IContextService	cs	= (IContextService)agent.getPlatform().getService(IContextService.class);
 				if(cs!=null)
 				{
-					IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier());
-					for(int i=0; contexts!=null && i<contexts.length; i++)
+					IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), ApplicationContext.class);
+					if(contexts!=null && contexts.length>0)
 					{
-						if(contexts[i] instanceof ApplicationContext)
-						{
-							cs.deleteContext(contexts[i], null);
-						}
+						cs.deleteContext(contexts[0], null);
 					}
 				}
 				else

@@ -18,15 +18,20 @@ public interface IContextService extends IPlatformService
 	public IContext[]	getContexts();
 
 	/**
-	 *  Get all contexts with a given type (if any).
-	 */
-	public IContext[]	getContexts(Class type);
-
-	/**
 	 *  Get all direct contexts of an agent (if any).
 	 */
 	public IContext[]	getContexts(IAgentIdentifier agent);
 	
+	/**
+	 *  Get all direct contexts of an agent of a specific type (if any).
+	 */
+	public IContext[]	getContexts(IAgentIdentifier agent, Class type);
+	
+	/**
+	 *  Get all contexts with a given type (if any).
+	 */
+	public IContext[]	getContexts(Class type);
+
 	/**
 	 *  Get a context with a given name.
 	 */

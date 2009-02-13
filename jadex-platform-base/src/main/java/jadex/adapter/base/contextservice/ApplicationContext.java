@@ -12,6 +12,7 @@ import java.util.Map;
  *  If agents spawn other agents, these will automatically be added to
  *  the context.
  *  When the context is deleted all agents will be destroyed.
+ *  An agent may only be in one application context.
  */
 public class ApplicationContext	extends BaseContext
 {
@@ -44,6 +45,11 @@ public class ApplicationContext	extends BaseContext
 	{
 		if(isTerminating())
 			throw new RuntimeException("Cannot add agent to terminating context: "+agent+", "+this);
+		
+		IContextService	cs	= (IContextService) platform.getService(IContextService.class);
+		IContext[]	appcontexts	= cs.getContexts(agent, ApplicationContext.class);
+		if(appcontexts!=null && appcontexts.length>0)
+			throw new RuntimeException("Cannot add agent to "+this+". Agent already belongs to "+appcontexts[0]);
 
 		super.addAgent(agent);
 	}
