@@ -72,6 +72,7 @@
 		<xs:attribute name="type" type="xs:string"/>
 		<xs:attribute name="configuration" type="xs:string"/>
 		<xs:attribute name="start" type="xs:boolean" default="true"/>
+		<xs:attribute name="number" type="xs:int" default="1"/>
 	</xs:complexType>
 	<xs:complexType name="parameter" mixed="true">
 		<xs:attribute name="name" type="xs:string"/>

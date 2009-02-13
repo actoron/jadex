@@ -1,7 +1,7 @@
 package jadex.bdi.interpreter;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IReport;
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.IRule;
@@ -21,7 +21,7 @@ import java.util.Set;
  *  The capability model contains the OAV capability model in a state
  *  and a type-specific compiled rulebase (matcher functionality).
  */
-public class OAVCapabilityModel implements IAgentModel
+public class OAVCapabilityModel implements ILoadableElementModel
 {
 	//-------- attributes --------
 	

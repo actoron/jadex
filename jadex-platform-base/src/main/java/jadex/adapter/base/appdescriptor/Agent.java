@@ -1,10 +1,15 @@
 package jadex.adapter.base.appdescriptor;
 
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  Agent instance representation. 
+ */
 public class Agent
 {
 	//-------- attributes --------
@@ -21,24 +26,32 @@ public class Agent
 	/** The start flag. */
 	protected boolean start;
 	
+	/** The number of agents. */
+	protected int number;
+	
 	/** The list of contained parameters. */
 	protected List parameters;
+	
+	/** The argument parser. */
+	protected JavaCCExpressionParser parser;
 	
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new agent.
 	 */
 	public Agent()
 	{
 		this.parameters = new ArrayList();
 		this.start = true;
+		this.number = 1;
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 * @return the name
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public String getName()
 	{
@@ -46,7 +59,8 @@ public class Agent
 	}
 
 	/**
-	 * @param name the name to set
+	 *  Set the name.
+	 *  @param name The name to set.
 	 */
 	public void setName(String name)
 	{
@@ -54,7 +68,8 @@ public class Agent
 	}
 
 	/**
-	 * @return the type
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -62,7 +77,8 @@ public class Agent
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
 	public void setType(String type)
 	{
@@ -70,7 +86,8 @@ public class Agent
 	}
 
 	/**
-	 * @return the configuration
+	 *  Get the configuration.
+	 *  @return The configuration.
 	 */
 	public String getConfiguration()
 	{
@@ -78,7 +95,8 @@ public class Agent
 	}
 
 	/**
-	 * @param configuration the configuration to set
+	 *  Set the configuration.
+	 *  @param configuration The configuration to set.
 	 */
 	public void setConfiguration(String configuration)
 	{
@@ -86,7 +104,8 @@ public class Agent
 	}
 	
 	/**
-	 * @return the start
+	 *  Test if agent should be started (not only created).
+	 *  @return True, if should be started.
 	 */
 	public boolean isStart()
 	{
@@ -94,15 +113,35 @@ public class Agent
 	}
 
 	/**
-	 * @param start the start to set
+	 *  Set if the agent should also be started.
+	 *  @param start The start flag to set.
 	 */
 	public void setStart(boolean start)
 	{
 		this.start = start;
 	}
+	
+	/**
+	 *  Get the number of agents to start.
+	 *  @return The number.
+	 */
+	public int getNumber()
+	{
+		return this.number;
+	}
 
 	/**
-	 * 
+	 *  Set the number of agents.
+	 *  @param number The number to set.
+	 */
+	public void setNumber(int number)
+	{
+		this.number = number;
+	}
+
+	/**
+	 *  Add a parameter.
+	 *  @param The parameter.
 	 */
 	public void addParameters(Parameter param)
 	{
@@ -110,15 +149,16 @@ public class Agent
 	}
 	
 	/**
-	 * 
+	 *  Add a parameter set.
 	 */
-	public void addParameters(ParameterSet paramset)
+	public void addParameterSet(ParameterSet paramset)
 	{
 		this.parameters.add(paramset);
 	}
 
 	/**
-	 * @return the parameters
+	 *  Get the list of paparameters and parameter sets.
+	 *  @return The parameters and parameter sets.
 	 */
 	public List getParameters()
 	{
@@ -126,9 +166,10 @@ public class Agent
 	}
 	
 	/**
-	 * 
+	 *  Get the arguments.
+	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments()
+	public Map getArguments(ClassLoader classloader)
 	{
 		Map ret = null;
 
@@ -141,12 +182,30 @@ public class Agent
 				if(tmp instanceof Parameter)
 				{
 					Parameter p = (Parameter)tmp;
-					ret.put(p.getName(), p.getValue());
+					String valtext = p.getValue();
+					
+					if(parser==null)
+						parser = new JavaCCExpressionParser();
+					
+					Object val = parser.parseExpression(valtext, null, null, classloader);
+					ret.put(p.getName(), val);
 				}
 				else //if(tmp instanceof ParameterSet)
 				{
 					ParameterSet ps = (ParameterSet)tmp;
-					ret.put(ps.getName(), ps.getValues());
+					List vals = new ArrayList();
+					List textvals = ps.getValues();
+					if(textvals!=null)
+					{
+						if(parser==null)
+							parser = new JavaCCExpressionParser();
+						for(int j=0; j<textvals.size(); j++)
+						{
+							Object val = parser.parseExpression((String)textvals.get(i), null, null, classloader);
+							vals.add(val);
+						}
+					}
+					ret.put(ps.getName(), vals);
 				}
 			}
 		}
@@ -155,7 +214,9 @@ public class Agent
 	}
 	
 	/**
-	 * 
+	 *  Get the model of the agent instance.
+	 *  @param apptype The application type this agent is used in.
+	 *  @return The name of the agent type.
 	 */
 	public String getModel(ApplicationType apptype)
 	{

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Application instance representation.
  */
 public class Application
 {
@@ -19,7 +19,7 @@ public class Application
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new application.
 	 */
 	public Application()
 	{
@@ -29,7 +29,8 @@ public class Application
 	//-------- methods --------
 	
 	/**
-	 * 
+	 *  Add an agent.
+	 *  @param agent The agent.
 	 */
 	public void addAgent(Agent agent)
 	{
@@ -37,7 +38,8 @@ public class Application
 	}
 	
 	/**
-	 * 
+	 *  Get all agents.
+	 *  @return The agents.
 	 */
 	public List getAgents()
 	{
@@ -45,7 +47,8 @@ public class Application
 	}
 
 	/**
-	 * @return the name
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public String getName()
 	{
@@ -53,7 +56,8 @@ public class Application
 	}
 
 	/**
-	 * @param name the name to set
+	 *  Set the name.
+	 *  @param name The name to set.
 	 */
 	public void setName(String name)
 	{

@@ -3,7 +3,7 @@ package jadex.tools.starter;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.commons.SGUI;
@@ -668,7 +668,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 						try
 						{
 							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
-							IAgentModel model = agentfactory.loadModel(type);
+							ILoadableElementModel model = agentfactory.loadModel(type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();

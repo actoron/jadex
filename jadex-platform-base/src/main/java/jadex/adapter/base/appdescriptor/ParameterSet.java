@@ -26,7 +26,8 @@ public class ParameterSet
 	//-------- methods --------
 
 	/**
-	 * @return the name
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public String getName()
 	{
@@ -34,7 +35,8 @@ public class ParameterSet
 	}
 
 	/**
-	 * @param name the name to set
+	 *  Set the name.
+	 *  @param name The name to set.
 	 */
 	public void setName(String name)
 	{
@@ -42,7 +44,8 @@ public class ParameterSet
 	}
 
 	/**
-	 * @return the value
+	 *  Get the values.
+	 *  @return The values.
 	 */
 	public List getValues()
 	{
@@ -50,7 +53,8 @@ public class ParameterSet
 	}
 
 	/**
-	 * @param value the value to add
+	 *  Add a value.
+	 *  @param value The values to add.
 	 */
 	public void addValue(String value)
 	{

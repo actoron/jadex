@@ -11,6 +11,8 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
  */
 public class XMLApplicationReader
 {
+	//-------- static initialization ----------
+	
 	/** The xstream. */
 	protected static XStream xstream;
 	
@@ -26,19 +28,7 @@ public class XMLApplicationReader
 		xstream.alias("value", String.class);
 	}
 	
-	/**
-	 * 
-	 * /
-	public XMLApplicationReader()
-	{
-		xstream = new XStream();
-		xstream.alias("application", Application.class);
-		xstream.alias("applicationtype", ApplicationType.class);
-		xstream.alias("agent", Agent.class);
-		xstream.alias("agenttype", AgentType.class);
-		xstream.alias("parameter", AgentType.class);
-		xstream.alias("parameterset", AgentType.class);
-	}*/
+	//-------- methods --------
 	
 	/**
 	 *  Read properties from xml.
@@ -48,8 +38,11 @@ public class XMLApplicationReader
 		xstream.useAttributeFor("name", String.class); 
 		xstream.useAttributeFor("filename", String.class); 
 		xstream.useAttributeFor("type", String.class); 
-		xstream.useAttributeFor("value", String.class); 
 		xstream.useAttributeFor("start", boolean.class); 
+		xstream.useAttributeFor("number", int.class);
+		
+		xstream.registerConverter(new ParameterConverter());
+		xstream.registerConverter(new ParameterSetConverter());
 		
 		ApplicationType apptype = (ApplicationType)xstream.fromXML(input);
 		
@@ -57,13 +50,10 @@ public class XMLApplicationReader
 	}
 	
 	/**
-	 * 
-	 *  @param args
-	 *  @throws Exception
+	 *  Main for testing. 
 	 */
 	public static void main(String[] args) throws Exception
 	{
-//		XMLApplicationReader reader = new XMLApplicationReader();
 		InputStream	input = new FileInputStream(args!=null && args.length==1? args[0]: "C:/projects/jadexv2/jadex-platform-base/src/main/java/jadex/adapter/base/appdescriptor/Test.application.xml");
 		ApplicationType props = readApplication(input, null);
 		System.out.println(props);

@@ -13,7 +13,7 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatformService;
 import jadex.commons.collection.SCollection;
@@ -668,7 +668,7 @@ public class AMS implements IAMS, IPlatformService
 	 */
 	public String getShortName(String filename)
 	{
-		IAgentModel	model	= platform.getAgentFactory().loadModel(filename);
+		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
 		return model.getName();
 	}
 

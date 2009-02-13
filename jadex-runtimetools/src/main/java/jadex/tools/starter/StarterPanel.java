@@ -4,7 +4,7 @@ import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IReport;
 import jadex.bridge.Properties;
@@ -73,7 +73,7 @@ public class StarterPanel extends JPanel
 	//-------- attributes --------
 
 	/** The model. */
-	protected IAgentModel model;
+	protected ILoadableElementModel model;
 
 	/** The last loaded filename. */
 	protected String lastfile;
@@ -92,6 +92,9 @@ public class StarterPanel extends JPanel
 	/** The agent type. */
 	protected JTextField agentname;
 
+	/** The application name. */
+	protected JTextField appname;
+	
 	/** The agent name generator flag. */
 	protected JCheckBox genagentname;
 
@@ -106,7 +109,10 @@ public class StarterPanel extends JPanel
 	protected ElementPanel modeldesc;
 
 	/** The agent specific panel. */
-	protected JPanel ap;
+	protected JPanel agentpanel;
+	
+	/** The application specific panel. */
+	protected JPanel apppanel;
 	
 	/** The agent factory. */
 	protected IAgentFactory agentfactory;
@@ -259,6 +265,9 @@ public class StarterPanel extends JPanel
 
 		// The agent name.
 		agentname = new JTextField();
+		
+		// The application name.
+		appname = new JTextField();
 
 		// The generate flag for the agentname;
 		genagentname = new JCheckBox("Auto generate", false);
@@ -296,7 +305,7 @@ public class StarterPanel extends JPanel
 
 		// The start button.
 		this.start = new JButton("Start");
-		start.setToolTipText("Start this agent");
+		start.setToolTipText("Start selected model");
 		start.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
@@ -304,7 +313,6 @@ public class StarterPanel extends JPanel
 				if(model!=null)
 				{
 					String configname = (String)config.getModel().getSelectedItem();
-					String an = genagentname.isSelected()?  null: agentname.getText();
 					Map args = SCollection.createHashMap();
 					String errortext = null;
 					for(int i=0; i<argelems.size(); i++)
@@ -338,10 +346,11 @@ public class StarterPanel extends JPanel
 						if(model instanceof ApplicationModel)
 						{
 							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
-							fac.createApplication(filename.getText(), configname, args);
+							fac.createApplication(appname.getText(), filename.getText(), configname, args);
 						}
 						else
 						{
+							String an = genagentname.isSelected()?  null: agentname.getText();
 							if(an==null) // i.e. name auto generate
 							{
 								int max = ((Integer)numagents.getValue()).intValue();
@@ -399,10 +408,9 @@ public class StarterPanel extends JPanel
 
 		int y = 0;
 	
-		ap = new JPanel(new GridBagLayout());
-		
+		agentpanel = new JPanel(new GridBagLayout());
 		JLabel agentnamel = new JLabel("Agent name");
-		ap.add(agentnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
+		agentpanel.add(agentnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
 		JPanel tmp = new JPanel(new BorderLayout());
 		tmp.add(agentname, BorderLayout.CENTER);
@@ -410,10 +418,14 @@ public class StarterPanel extends JPanel
 		tmp2.add(genagentname, BorderLayout.WEST);
 		tmp2.add(numagents, BorderLayout.EAST);
 		tmp.add(tmp2, BorderLayout.EAST);
+		agentpanel.add(tmp, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
+			GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
 		
-		//content.add(agentname, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.WEST,
-		//			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		ap.add(tmp, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
+		apppanel = new JPanel(new GridBagLayout());
+		JLabel appnamel = new JLabel("Application name");
+		apppanel.add(appnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
+		apppanel.add(appname, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
 		
 		JPanel upper = new JPanel(new GridBagLayout());
@@ -431,7 +443,10 @@ public class StarterPanel extends JPanel
 		upper.add(config, new GridBagConstraints(1, y, 4, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		y++;
-		upper.add(ap, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+		upper.add(agentpanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		y++;
+		upper.add(apppanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
 		y = 0;
@@ -441,8 +456,13 @@ public class StarterPanel extends JPanel
 		content.add(arguments, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-		agentnamel.setMinimumSize(conf.getMinimumSize());
-		agentnamel.setPreferredSize(conf.getPreferredSize());
+		agentnamel.setMinimumSize(appnamel.getMinimumSize());
+		agentnamel.setPreferredSize(appnamel.getPreferredSize());
+		conf.setMinimumSize(appnamel.getMinimumSize());
+		conf.setPreferredSize(appname.getPreferredSize());
+		
+//		agentnamel.setMinimumSize(conf.getMinimumSize());
+//		agentnamel.setPreferredSize(conf.getPreferredSize());
 
 		/*y++;
 		agentnamel = new JLabel("Agent name");
@@ -559,8 +579,9 @@ public class StarterPanel extends JPanel
 						}
 					});
 					createArguments();
-					arguments.setVisible(true);
-					ap.setVisible(true);
+					arguments.setVisible(false);
+					apppanel.setVisible(true);
+					agentpanel.setVisible(false);
 					start.setVisible(true);
 				}
 				else if(agentfactory.isStartable(adf))
@@ -575,8 +596,9 @@ public class StarterPanel extends JPanel
 						}
 					});
 					createArguments();
+					apppanel.setVisible(false);
 					arguments.setVisible(true);
-					ap.setVisible(true);
+					agentpanel.setVisible(true);
 					start.setVisible(true);
 				}
 				else if(agentfactory.isLoadable(adf))
@@ -589,8 +611,9 @@ public class StarterPanel extends JPanel
 							updateGuiForNewModel(adf);
 						}
 					});
+					apppanel.setVisible(false);
 					arguments.setVisible(false);
-					ap.setVisible(false);
+					agentpanel.setVisible(false);
 					start.setVisible(false);
 				}
 				else
@@ -618,10 +641,10 @@ public class StarterPanel extends JPanel
 		if(model==null)
 		{
 			start.setEnabled(false);
-			agentname.setText("");
 			config.removeAllItems();
 			clearArguments();
 			setAgentName("");
+			setApplicationName("");
 			filename.setText("");
 			if(error!=null)
 				modeldesc.addTextContent("Error", null, "No model loaded:\n"+error, "error");
@@ -648,7 +671,9 @@ public class StarterPanel extends JPanel
 		filename.setText(adf);
 
 //		if(model.getName()!=null && SXML.isAgentFilename(adf))
-		if(model.getName()!=null && model.isStartable())
+		if(model.getName()!=null && model instanceof ApplicationModel)
+			appname.setText(model.getName());
+		else if(model.isStartable())
 			agentname.setText(model.getName());
 		else
 			agentname.setText("");
@@ -992,6 +1017,24 @@ public class StarterPanel extends JPanel
 				public void run()
 				{
 					agentname.setText(name);
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Set the application name.
+	 *  @param name The name.
+	 */
+	protected void setApplicationName(final String name)
+	{
+		if(name!=null)
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					appname.setText(name);
 				}
 			});
 		}

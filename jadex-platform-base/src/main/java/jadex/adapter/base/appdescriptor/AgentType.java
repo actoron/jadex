@@ -1,7 +1,7 @@
 package jadex.adapter.base.appdescriptor;
 
 /**
- * 
+ *  Agent type representation.
  */
 public class AgentType
 {
@@ -16,7 +16,7 @@ public class AgentType
 	//-------- constructors --------
 
 	/**
-	 * 
+	 *  Create a new agent type.
 	 */
 	public AgentType()
 	{
@@ -25,7 +25,8 @@ public class AgentType
 	//-------- methods --------
 
 	/**
-	 * @return the name
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public String getName()
 	{
@@ -33,7 +34,8 @@ public class AgentType
 	}
 
 	/**
-	 * @param name the name to set
+	 *  Set the name.
+	 *  @param name The name to set.
 	 */
 	public void setName(String name)
 	{
@@ -41,7 +43,8 @@ public class AgentType
 	}
 
 	/**
-	 * @return the filename
+	 *  Get the filename.
+	 *  @return The filename.
 	 */
 	public String getFilename()
 	{
@@ -49,7 +52,8 @@ public class AgentType
 	}
 
 	/**
-	 * @param filename the filename to set
+	 *  Set the filename.
+	 *  @param filename The name to set.
 	 */
 	public void setFilename(String filename)
 	{

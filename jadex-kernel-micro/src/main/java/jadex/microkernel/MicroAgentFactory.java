@@ -3,7 +3,7 @@ package jadex.microkernel;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
@@ -68,10 +68,10 @@ public class MicroAgentFactory implements IAgentFactory
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public IAgentModel loadModel(String model)
+	public ILoadableElementModel loadModel(String model)
 	{
 //		System.out.println("loading micro: "+model);
-		IAgentModel ret = null;
+		ILoadableElementModel ret = null;
 		ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
 		
 		String clname = model;

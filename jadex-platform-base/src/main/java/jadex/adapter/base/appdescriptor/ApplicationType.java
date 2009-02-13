@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Application type representation.
  */
 public class ApplicationType
 {
@@ -22,7 +22,7 @@ public class ApplicationType
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new application type.
 	 */
 	public ApplicationType()
 	{
@@ -33,7 +33,8 @@ public class ApplicationType
 	//-------- methods --------
 	
 	/**
-	 * @return the name
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public String getName()
 	{
@@ -41,7 +42,8 @@ public class ApplicationType
 	}
 
 	/**
-	 * @param name the name to set
+	 *  Set the name.
+	 *  @param name The name to set.
 	 */
 	public void setName(String name)
 	{
@@ -49,7 +51,8 @@ public class ApplicationType
 	}
 	
 	/**
-	 * 
+	 *  Add an agent type.
+	 *  @param agenttype The agent type.
 	 */
 	public void addAgentType(AgentType agenttype)
 	{
@@ -57,7 +60,8 @@ public class ApplicationType
 	}
 
 	/**
-	 * 
+	 *  Add an application.
+	 *  @param application The application.
 	 */
 	public void addApplication(Application application)
 	{
@@ -65,7 +69,8 @@ public class ApplicationType
 	}
 
 	/**
-	 * @return the agenttypes
+	 *  Get the agenttypes.
+	 *  @return The agenttypes.
 	 */
 	public List getAgentTypes()
 	{
@@ -73,7 +78,8 @@ public class ApplicationType
 	}
 
 	/**
-	 * @return the applications
+	 *  Get the applications.
+	 *  @return The applications.
 	 */
 	public List getApplications()
 	{

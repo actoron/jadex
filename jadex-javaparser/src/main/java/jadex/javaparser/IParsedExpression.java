@@ -1,7 +1,6 @@
 package jadex.javaparser;
 
 
-
 /**
  *  An expression, that can be evaluated in a given state.
  */

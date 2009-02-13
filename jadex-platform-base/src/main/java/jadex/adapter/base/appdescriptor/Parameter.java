@@ -1,7 +1,7 @@
 package jadex.adapter.base.appdescriptor;
 
 /**
- * 
+ *  Parameter representation.
  */
 public class Parameter
 {
@@ -16,7 +16,7 @@ public class Parameter
 	//-------- constructors --------
 
 	/**
-	 * 
+	 *  Create a new parameter.
 	 */
 	public Parameter()
 	{
@@ -25,7 +25,8 @@ public class Parameter
 	//-------- methods --------
 
 	/**
-	 * @return the name
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public String getName()
 	{
@@ -33,7 +34,8 @@ public class Parameter
 	}
 
 	/**
-	 * @param name the name to set
+	 *  Set the name.
+	 *  @param name The name to set.
 	 */
 	public void setName(String name)
 	{
@@ -41,7 +43,8 @@ public class Parameter
 	}
 
 	/**
-	 * @return the value
+	 *  Get the value.
+	 *  @return The value.
 	 */
 	public String getValue()
 	{
@@ -49,7 +52,8 @@ public class Parameter
 	}
 
 	/**
-	 * @param value the value to set
+	 *  Set the value.
+	 *  @param value The value to set.
 	 */
 	public void setValue(String value)
 	{

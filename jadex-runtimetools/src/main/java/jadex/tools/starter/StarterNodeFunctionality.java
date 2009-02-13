@@ -1,6 +1,6 @@
 package jadex.tools.starter;
 
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.commons.SGUI;
 import jadex.tools.common.modeltree.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
@@ -200,7 +200,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 					{
 						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
 						{
-							IAgentModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();
@@ -208,7 +208,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 						}
 						else if(jcc.getAgent().getPlatform().getApplicationFactory().isLoadable(file))
 						{
-							IAgentModel model = jcc.getAgent().getPlatform().getApplicationFactory().loadModel(file);
+							ILoadableElementModel model = jcc.getAgent().getPlatform().getApplicationFactory().loadModel(file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();

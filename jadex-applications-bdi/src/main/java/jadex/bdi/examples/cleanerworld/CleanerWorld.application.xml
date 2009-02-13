@@ -9,16 +9,35 @@
 	name="CleanerWorld">
 	
 	<agenttypes>
-		<agenttype name="Environment" filename="jadex/bdi/examples/cleanerworld/environment/Environment.agent.xml"/>
-		<agenttype name="Cleaner" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
+		<agenttype name="EnvironmentLocal" filename="jadex/bdi/examples/cleanerworld/environment/EnvironmentLocal.agent.xml"/>
+		<agenttype name="CleanerLocal" filename="jadex/bdi/examples/cleanerworld/cleaner/CleanerLocal.agent.xml"/>
+		<agenttype name="EnvironmentRemote" filename="jadex/bdi/examples/cleanerworld/environment/Environment.agent.xml"/>
+		<agenttype name="CleanerRemote" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
 	</agenttypes>
 	
 	<applications>
-		<application name="2 cleaners">
+		<application name="Two cleaners local">
 			<agents>
-				<agent name="environment" type="Environment" />
-				<agent name="cleaner1" type="Cleaner" />
-				<agent name="cleaner2" type="Cleaner" />
+				<agent type="EnvironmentLocal" />
+				<agent type="CleanerLocal" number="2"/>
+			</agents>
+		</application>
+		<application name="One cleaner local">
+			<agents>
+				<agent type="EnvironmentLocal" />
+				<agent type="CleanerLocal"/>
+			</agents>
+		</application>
+		<application name="Two cleaners remote">
+			<agents>
+				<agent type="EnvironmentRemote" />
+				<agent type="CleanerRemote" number="2"/>
+			</agents>
+		</application>
+		<application name="One cleaner remote">
+			<agents>
+				<agent type="EnvironmentRemote" />
+				<agent type="CleanerRemote"/>
 			</agents>
 		</application>
 	</applications>

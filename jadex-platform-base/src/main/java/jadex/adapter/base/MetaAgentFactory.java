@@ -3,7 +3,7 @@ package jadex.adapter.base;
 import jadex.bridge.AgentCreationException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IKernelAgent;
 import jadex.commons.SUtil;
 
@@ -68,9 +68,9 @@ public class MetaAgentFactory implements IAgentFactory
 	 *  Load an agent model.
 	 *  @param filename The filename.
 	 */
-	public IAgentModel loadModel(String filename)
+	public ILoadableElementModel loadModel(String filename)
 	{
-		IAgentModel ret = null;
+		ILoadableElementModel ret = null;
 		
 		for(int i=0; ret==null && i<factories.size(); i++)
 		{

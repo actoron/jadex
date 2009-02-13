@@ -12,7 +12,7 @@ public interface IElementFactory
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public IAgentModel loadModel(String model);
+	public ILoadableElementModel loadModel(String model);
 
 	/**
 	 *  Test if a model can be loaded by the factory.

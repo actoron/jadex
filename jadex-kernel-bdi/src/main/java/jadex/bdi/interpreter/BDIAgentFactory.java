@@ -2,7 +2,7 @@ package jadex.bdi.interpreter;
 
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILibraryServiceListener;
@@ -122,7 +122,7 @@ public class BDIAgentFactory implements IAgentFactory
 	 *  Load an agent model.
 	 *  @param filename The filename.
 	 */
-	public IAgentModel loadModel(String filename)
+	public ILoadableElementModel loadModel(String filename)
 	{
 		init();
 		

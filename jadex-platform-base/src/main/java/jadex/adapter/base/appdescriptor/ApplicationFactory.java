@@ -2,7 +2,7 @@ package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILibraryService;
@@ -59,7 +59,7 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of the application.
 	 */
-	public Object createApplication(String model, String config, Map arguments)
+	public Object createApplication(String name, String model, String config, Map arguments)
 	{
 		IKernelAgent ret = null;
 		
@@ -95,17 +95,21 @@ public class ApplicationFactory implements IApplicationFactory
 					final Agent agent = (Agent)agents.get(i);
 					
 //					System.out.println("Create: "+agent.getName()+" "+agent.getModel(apptype)+" "+agent.getConfiguration()+" "+agent.getArguments());
-					ams.createAgent(agent.getName(), agent.getModel(apptype), agent.getConfiguration(), agent.getArguments(), new IResultListener()
+					int num = agent.getNumber();
+					for(int j=0; j<num; j++)
 					{
-						public void exceptionOccurred(Exception exception)
+						ams.createAgent(agent.getName(), agent.getModel(apptype), agent.getConfiguration(), agent.getArguments(cl), new IResultListener()
 						{
-						}
-						public void resultAvailable(Object result)
-						{
-							if(agent.isStart())
-								ams.startAgent((IAgentIdentifier)result, null);
-						}
-					});
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+							public void resultAvailable(Object result)
+							{
+								if(agent.isStart())
+									ams.startAgent((IAgentIdentifier)result, null);
+							}
+						});
+					}
 				}
 			
 				// todo: create application context as return value?!
@@ -123,9 +127,9 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  Load an agent model.
 	 *  @param filename The filename.
 	 */
-	public IAgentModel loadModel(String filename)
+	public ILoadableElementModel loadModel(String filename)
 	{
-		IAgentModel ret = null;
+		ILoadableElementModel ret = null;
 		
 		if(filename!=null && filename.toLowerCase().endsWith(".application.xml"))
 		{

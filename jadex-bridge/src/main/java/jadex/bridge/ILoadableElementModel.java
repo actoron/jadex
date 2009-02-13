@@ -2,12 +2,14 @@ package jadex.bridge;
 
 
 /**
- *  Agent model interface to be used (invoked) by tools and adapters.
- *  Implemented by kernels to represent an agent type.
+ *  This model interface to be used (invoked) by tools and adapters.
+ *  Can represent an application or an agent (also capability).
+ *  Applications can be loaded by the application factory.
+ *  @link{IApplicationFactory}
  *  Agent types can be loaded by the kernel's agent factory
  *  @link{IAgentFactory}. 
  */
-public interface IAgentModel
+public interface ILoadableElementModel
 {
 	/**
 	 *  Get the name.

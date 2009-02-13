@@ -1,16 +1,18 @@
 package jadex.adapter.base.appdescriptor;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bridge.IAgentModel;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IArgument;
 import jadex.bridge.IReport;
+import jadex.commons.SUtil;
 
 /**
- * 
+ *  Model representation of an application.
  */
-public class ApplicationModel implements IAgentModel
+public class ApplicationModel implements ILoadableElementModel
 {
 	//-------- attributes --------
 	
@@ -23,7 +25,7 @@ public class ApplicationModel implements IAgentModel
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new application model. 
 	 */
 	public ApplicationModel(ApplicationType apptype, String filename)
 	{
@@ -48,8 +50,63 @@ public class ApplicationModel implements IAgentModel
 	 */
 	public String getDescription()
 	{
-		// todo
-		return "n/a";
+		String ret = null;
+		try
+		{
+			// Try to extract first comment from file.
+			// todo: is context class loader correct?
+			InputStream is = SUtil.getResource(getFilename(), Thread.currentThread().getContextClassLoader());
+			int read;
+			while((read = is.read())!=-1)
+			{
+				if(read=='<')
+				{
+					read = is.read();
+					if(Character.isLetter((char)read))
+					{
+						// Found first tag, use whatever comment found up to now.
+						break;
+					}
+					else if(read=='!' && is.read()=='-' && is.read()=='-')
+					{
+						// Found comment.
+						StringBuffer comment = new StringBuffer();
+						while((read = is.read())!=-1)
+						{
+							if(read=='-')
+							{
+								if((read = is.read())=='-')
+								{
+									if((read = is.read())=='>')
+									{
+										// Finished reading <!-- ... --> statement
+										ret = comment.toString();
+										break;
+									}
+									comment.append("--");
+									comment.append((char)read);
+								}
+								else
+								{
+									comment.append('-');
+									comment.append((char)read);
+								}
+							}
+							else
+							{
+								comment.append((char)read);
+							}
+						}
+					}
+				}
+			}
+			is.close();
+		}
+		catch(Exception e)
+		{
+			ret = "No description available: "+e;
+		}
+		return ret;
 	}
 	
 	/**
