@@ -130,6 +130,8 @@ public class ApplicationContext	extends BaseContext
 			if(listener!=null)
 				listener.resultAvailable(this);
 		}
+
+		System.out.println("Deleted: "+this);
 	}
 
 	//-------- methods --------

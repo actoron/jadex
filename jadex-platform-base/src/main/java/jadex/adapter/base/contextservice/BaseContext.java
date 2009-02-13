@@ -162,6 +162,8 @@ public class BaseContext	implements IContext
 	 */
 	public void	deleteContext(IResultListener listener)
 	{
+		System.out.println("Deleted: "+this);
+
 		if(listener!=null)
 			listener.resultAvailable(this);
 	}

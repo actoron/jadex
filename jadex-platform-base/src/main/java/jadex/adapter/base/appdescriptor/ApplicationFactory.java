@@ -1,11 +1,14 @@
 package jadex.adapter.base.appdescriptor;
 
+import jadex.adapter.base.contextservice.ApplicationContext;
+import jadex.adapter.base.contextservice.IContext;
+import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -61,7 +64,7 @@ public class ApplicationFactory implements IApplicationFactory
 	 */
 	public Object createApplication(String name, String model, String config, Map arguments)
 	{
-		IKernelAgent ret = null;
+		IContext	context = null;
 		
 		if(model!=null && model.toLowerCase().endsWith(".application.xml"))
 		{
@@ -84,12 +87,26 @@ public class ApplicationFactory implements IApplicationFactory
 				}
 				
 				if(app==null)
-					throw new RuntimeException("Could not finded application name: "+config);
+					throw new RuntimeException("Could not find application name: "+config);
+
+				
+				// Create context for application.
+				IContextService	cs	= (IContextService)platform.getService(IContextService.class);
+				if(cs==null)
+				{
+					// Todo: use logger.
+					System.out.println("Warning: No context service found. Application '"+name+"' may not work properly.");
+				}
+				else
+				{
+					context	= cs.createContext(name, ApplicationContext.class, null, null);
+				}
 				
 				// todo: result listener?
 				
 				List agents = app.getAgents();
 				final IAMS ams = (IAMS)platform.getService(IAMS.class);
+				final IContext	appcontext	= context;
 				for(int i=0; i<agents.size(); i++)
 				{
 					final Agent agent = (Agent)agents.get(i);
@@ -105,12 +122,13 @@ public class ApplicationFactory implements IApplicationFactory
 							}
 							public void resultAvailable(Object result)
 							{
+								if(appcontext!=null)
+									appcontext.addAgent((IAgentIdentifier) result);
+								
 								if(agent.isStart())
 									ams.startAgent((IAgentIdentifier)result, null);
 							}
-						}, null);
-						
-						// Todo: add agent to context.
+						}, null);						
 					}
 				}
 			
@@ -122,7 +140,7 @@ public class ApplicationFactory implements IApplicationFactory
 			}
 		}
 		
-		return ret;
+		return context;
 	}
 	
 	/**
