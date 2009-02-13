@@ -91,9 +91,15 @@ public class StarterPanel extends JPanel
 
 	/** The agent type. */
 	protected JTextField agentname;
+	protected JLabel agentnamel;
 
 	/** The application name. */
 	protected JTextField appname;
+	protected JLabel appnamel;
+	
+	protected JLabel confl;
+	protected JLabel confdummy = new JLabel("Configuration"); // Hack! only for reading sizes
+	protected JLabel filenamel;
 	
 	/** The agent name generator flag. */
 	protected JCheckBox genagentname;
@@ -409,7 +415,7 @@ public class StarterPanel extends JPanel
 		int y = 0;
 	
 		agentpanel = new JPanel(new GridBagLayout());
-		JLabel agentnamel = new JLabel("Agent name");
+		agentnamel = new JLabel("Agent name");
 		agentpanel.add(agentnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
 		JPanel tmp = new JPanel(new BorderLayout());
@@ -422,7 +428,7 @@ public class StarterPanel extends JPanel
 			GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
 		
 		apppanel = new JPanel(new GridBagLayout());
-		JLabel appnamel = new JLabel("Application name");
+		appnamel = new JLabel("Application name");
 		apppanel.add(appnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
 		apppanel.add(appname, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
@@ -430,15 +436,16 @@ public class StarterPanel extends JPanel
 		
 		JPanel upper = new JPanel(new GridBagLayout());
 		upper.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Settings "));
-		upper.add(new JLabel("Filename"), new GridBagConstraints(0, y, 1, 1, 0, 0,
+		filenamel = new JLabel("Filename");
+		upper.add(filenamel, new GridBagConstraints(0, y, 1, 1, 0, 0,
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		upper.add(filename, new GridBagConstraints(1, y, 3, 1, 1, 0,
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		upper.add(browse, new GridBagConstraints(4, y, 1, 1, 0, 0,
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		y++;
-		JLabel conf = new JLabel("Configuration");
-		upper.add(conf, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+		confl = new JLabel("Configuration");
+		upper.add(confl, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		upper.add(config, new GridBagConstraints(1, y, 4, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
@@ -456,13 +463,8 @@ public class StarterPanel extends JPanel
 		content.add(arguments, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-		agentnamel.setMinimumSize(appnamel.getMinimumSize());
-		agentnamel.setPreferredSize(appnamel.getPreferredSize());
-		conf.setMinimumSize(appnamel.getMinimumSize());
-		conf.setPreferredSize(appname.getPreferredSize());
-		
-//		agentnamel.setMinimumSize(conf.getMinimumSize());
-//		agentnamel.setPreferredSize(conf.getPreferredSize());
+		agentnamel.setMinimumSize(confl.getMinimumSize());
+		agentnamel.setPreferredSize(confl.getPreferredSize());
 
 		/*y++;
 		agentnamel = new JLabel("Agent name");
@@ -583,6 +585,11 @@ public class StarterPanel extends JPanel
 					apppanel.setVisible(true);
 					agentpanel.setVisible(false);
 					start.setVisible(true);
+					
+					filenamel.setMinimumSize(appnamel.getMinimumSize());
+					filenamel.setPreferredSize(appnamel.getPreferredSize());
+					confl.setMinimumSize(appnamel.getMinimumSize());
+					confl.setPreferredSize(appname.getPreferredSize());
 				}
 				else if(agentfactory.isStartable(adf))
 				{
@@ -600,6 +607,11 @@ public class StarterPanel extends JPanel
 					arguments.setVisible(true);
 					agentpanel.setVisible(true);
 					start.setVisible(true);
+					
+					filenamel.setMinimumSize(confdummy.getMinimumSize());
+					filenamel.setPreferredSize(confdummy.getPreferredSize());
+					confl.setMinimumSize(confdummy.getMinimumSize());
+					confl.setPreferredSize(confdummy.getPreferredSize());
 				}
 				else if(agentfactory.isLoadable(adf))
 				{
@@ -615,6 +627,11 @@ public class StarterPanel extends JPanel
 					arguments.setVisible(false);
 					agentpanel.setVisible(false);
 					start.setVisible(false);
+					
+					agentnamel.setMinimumSize(confdummy.getMinimumSize());
+					agentnamel.setPreferredSize(confdummy.getPreferredSize());
+					confl.setMinimumSize(confdummy.getMinimumSize());
+					confl.setPreferredSize(confdummy.getPreferredSize());
 				}
 				else
 				{
