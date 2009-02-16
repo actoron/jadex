@@ -976,7 +976,7 @@ public class Environment implements IEnvironment
 			break;
 			
 		default:
-			// ignore
+			// ignore, no vision
 			break;
 		}
 
