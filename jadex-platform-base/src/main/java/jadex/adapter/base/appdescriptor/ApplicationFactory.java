@@ -35,7 +35,7 @@ public class ApplicationFactory implements IApplicationFactory
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"application", SGUI.makeIcon(ApplicationFactory.class, "/jadex/adapter/base/images/application1.png"),
+		"application", SGUI.makeIcon(ApplicationFactory.class, "/jadex/adapter/base/images/application.png"),
 	});
 	
 	//-------- attributes --------

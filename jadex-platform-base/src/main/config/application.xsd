@@ -7,9 +7,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
-				<xs:extension base="applicationtype">
-					<xs:attribute name="name" type="xs:string"/>
-				</xs:extension>
+				<xs:extension base="applicationtype"/>
 			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>
@@ -21,22 +19,26 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:complexType name="applicationtype">
-		<xs:sequence>
-			<xs:element name="agentypes">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="agentype" type="agenttype"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="applications">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="application" type="application"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
+		<xs:complexContent>
+			<xs:extension base="contexttype">
+				<xs:sequence>
+					<xs:element name="agentypes">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="agentype" type="agenttype" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="applications">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="application" type="application" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="agenttype">
 		<xs:annotation>
@@ -84,5 +86,22 @@
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="structuringtype">
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="contexttype">
+		<xs:sequence>
+			<xs:element name="structuringtypes">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="structuringtype" type="structuringtype" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="class" type="xs:string"/>
 	</xs:complexType>
 </xs:schema>
