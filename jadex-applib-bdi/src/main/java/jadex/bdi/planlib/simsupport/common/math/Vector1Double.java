@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.simsupport.common.math;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 /** Implementation of a 1-vector using a double value.
  */
@@ -129,6 +130,16 @@ public class Vector1Double implements IVector1
 	
 	public String toString()
 	{
-		return Double.toString(x_);
+		StringBuffer buffer = new StringBuffer();
+		DecimalFormat format = new DecimalFormat("####.####");
+		if ((x_ < 1000) || (x_ > 0.001))
+		{
+			buffer.append(format.format(x_));
+		}
+		else
+		{
+			buffer.append(Double.toString(x_));
+		}
+		return buffer.toString();
 	}
 }
