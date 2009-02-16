@@ -283,6 +283,19 @@ public class Environment implements IEnvironment
 		this.pcs.firePropertyChange("taskSize", tasklist.size()-1, tasklist.size());
 		return ret;
 	}
+	
+	/**
+	 * Clear the TaskList
+	 * HACK! Should be done in executeStep method, but that leads to problems with
+	 * other Agents. They compute their next step with the old vision. :-( 
+	 * This is a race condition too! Tasks can be lost.
+	 */
+	protected synchronized void clearTaskList()
+	{
+		int length = tasklist.size();
+		tasklist.clear();
+		this.pcs.firePropertyChange("taskSize", length, tasklist.size());
+	}
 
 	/**
 	 *  Get the current vision (without updating the creatures leaseticks).
