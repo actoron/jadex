@@ -138,13 +138,16 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			synchronized(simObjectsByType_)
 			{
 				SimObject obj = (SimObject)simObjects_.remove(objectId);
-				((List)simObjectsByType_.get(obj.getType())).remove(obj);
-				if(obj.signalDestruction())
+				// avoid NullPointerException for invalid simId
+				if (obj != null) 
 				{
-					SimulationEvent destEvt = new SimulationEvent(
-							SimulationEvent.OBJECT_DESTROYED);
-					destEvt.setParameter("object_id", obj.getId());
-					obj.fireSimulationEvent(destEvt);
+					((List) simObjectsByType_.get(obj.getType())).remove(obj);
+					if (obj.signalDestruction()) {
+						SimulationEvent destEvt = new SimulationEvent(
+								SimulationEvent.OBJECT_DESTROYED);
+						destEvt.setParameter("object_id", obj.getId());
+						obj.fireSimulationEvent(destEvt);
+					}
 				}
 			}
 		}
