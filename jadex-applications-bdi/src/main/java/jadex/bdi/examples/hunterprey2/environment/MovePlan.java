@@ -3,6 +3,7 @@ package jadex.bdi.examples.hunterprey2.environment;
 import jadex.adapter.base.fipa.Done;
 import jadex.bdi.examples.hunterprey2.RequestMove;
 import jadex.bdi.examples.hunterprey2.TaskInfo;
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -33,11 +34,16 @@ public class  MovePlan extends Plan
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		TaskInfo ti = env.addMoveTask(rm.getCreature(), rm.getDirection());
 
-		// Wait until all tasks are processed by the environment.
-		waitForCondition("notasks");
-
-		// Wait until all sim goals where processed.
-		//waitForCondition("nostepgoals");
+//		// Wait until all tasks are processed by the environment.
+//		waitForCondition("notasks");
+		
+		// Wait for tick from SimTickerPlan
+		IInternalEvent evt = null;
+		do
+		{
+			evt = waitForInternalEvent("simulation_event");
+		}
+		while (evt.getParameter("type").getValue().equals(SimulationTickerPlan.EVENT_TYPE_TICK));
 
 		// Result is null, when creature died and action was not executed.
 		if(ti.getResult()!=null && ((Boolean)ti.getResult()).booleanValue())

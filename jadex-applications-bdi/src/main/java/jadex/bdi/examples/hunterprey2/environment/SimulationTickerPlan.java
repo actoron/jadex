@@ -31,6 +31,13 @@ import java.util.Map;
  */
 public class SimulationTickerPlan extends Plan
 {
+	// ----- constants --------
+	
+	public final static String EVENT_TYPE_TICK = SimulationTickerPlan.class.getName() + ".EVENT_TYPE_TICK";
+	
+	
+	// ----- attributes -------
+	
 	// The world environment
 	private Environment env = null;
 	
@@ -72,23 +79,18 @@ public class SimulationTickerPlan extends Plan
 				// wait step time
 				waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
 				
-				synchronized (env)
-				{
-					
-				}
-				
 				env.executeStep();
 				
-//				// dispatch all step goals
-//				IGoal[] subgoals = env.getStepGoals();
-//				//System.out.println("dispatching -"+subgoals.length+"- subgoals");
-//				for (int i = 0; i < subgoals.length; i++)
-//				{
-//					dispatchSubgoal(subgoals[i]);
-//				}
-//				
-//				// ensure all goals are finished
-//				waitForGoals(subgoals);
+//					// dispatch all step goals
+//					IGoal[] subgoals = env.getStepGoals();
+//					//System.out.println("dispatching -"+subgoals.length+"- subgoals");
+//					for (int i = 0; i < subgoals.length; i++)
+//					{
+//						dispatchSubgoal(subgoals[i]);
+//					}
+//					
+//					// ensure all goals are finished
+//					waitForGoals(subgoals);
 				
 				// wait for all simulation events 
 				IInternalEvent evt = null;
@@ -130,8 +132,9 @@ public class SimulationTickerPlan extends Plan
 					}
 				}
 
-				// remove all Tasks from list, inform creatures
-				env.clearTaskList();
+				IInternalEvent event = createInternalEvent("simulation_event");
+				event.getParameter("type").setValue(EVENT_TYPE_TICK);
+				dispatchInternalEvent(event);
 				
 			}
 		}

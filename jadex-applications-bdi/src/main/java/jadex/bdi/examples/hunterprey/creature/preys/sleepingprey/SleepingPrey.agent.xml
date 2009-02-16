@@ -8,7 +8,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
-	name="LazyPrey"
+	name="SleepingPrey"
 	package="jadex.bdi.examples.hunterprey.creature.preys.lazyprey">
 
 	<imports>
