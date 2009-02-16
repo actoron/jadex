@@ -1,19 +1,15 @@
 package jadex.adapter.base.appdescriptor;
 
-import jadex.adapter.base.contextservice.ApplicationContext;
-import jadex.adapter.base.contextservice.IContext;
+import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.IContextService;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +60,7 @@ public class ApplicationFactory implements IApplicationFactory
 	 */
 	public Object createApplication(String name, String model, String config, Map arguments)
 	{
-		IContext	context = null;
+		ApplicationContext	context = null;
 		
 		if(model!=null && model.toLowerCase().endsWith(".application.xml"))
 		{
@@ -99,14 +95,14 @@ public class ApplicationFactory implements IApplicationFactory
 				}
 				else
 				{
-					context	= cs.createContext(name, ApplicationContext.class, null, null);
+					Map	props	= new HashMap();
+					props.put(ApplicationContext.PROPERTY_APPLICATION_TYPE, apptype);
+					context	= (ApplicationContext) cs.createContext(name, ApplicationContext.class, null, props);
 				}
 				
 				// todo: result listener?
 				
 				List agents = app.getAgents();
-				final IAMS ams = (IAMS)platform.getService(IAMS.class);
-				final IContext	appcontext	= context;
 				for(int i=0; i<agents.size(); i++)
 				{
 					final Agent agent = (Agent)agents.get(i);
@@ -115,20 +111,9 @@ public class ApplicationFactory implements IApplicationFactory
 					int num = agent.getNumber();
 					for(int j=0; j<num; j++)
 					{
-						ams.createAgent(agent.getName(), agent.getModel(apptype), agent.getConfiguration(), agent.getArguments(cl), new IResultListener()
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-							public void resultAvailable(Object result)
-							{
-								if(appcontext!=null)
-									appcontext.addAgent((IAgentIdentifier) result);
-								
-								if(agent.isStart())
-									ams.startAgent((IAgentIdentifier)result, null);
-							}
-						}, null);						
+						context.createAgent(agent.getName(), agent.getType(),
+							agent.getConfiguration(), agent.getArguments(cl), agent.isStart(),
+							DefaultResultListener.getInstance(), null);						
 					}
 				}
 			

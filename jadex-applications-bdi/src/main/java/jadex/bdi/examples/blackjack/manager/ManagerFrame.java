@@ -1,5 +1,7 @@
 package jadex.bdi.examples.blackjack.manager;
 
+import jadex.adapter.base.DefaultResultListener;
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.fipa.IAMS;
@@ -12,7 +14,6 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -88,15 +89,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	{
 		super("Blackjack Manager");
 		
-		access.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				IContext	context	= (IContext)access.getBeliefbase().getBelief("context").getFact();
-				context.addAgent(access.getAgentIdentifier());
-			}
-		});
-
 		// set the icon to be displayed for the frame
 		ImageIcon icon = GUIImageLoader.getImage("heart_small_m");
 		this.setIconImage(icon.getImage());
@@ -390,15 +382,17 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		try
 		{
 			IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
-			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
+			IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
+			IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), ApplicationContext.class);
+			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getAgentType("Dealer").getFilename();
+			start.getParameter("type").setValue(type);
+//			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 			start.getParameter("name").setValue("BlackjackDealer");
 			agent.dispatchTopLevelGoalAndWait(start);
 			IAgentIdentifier	dealer	= (IAgentIdentifier)start.getParameter("agentidentifier").getValue();
 			agent.getLogger().info("local DealerAgent started: "+dealer);
 			//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
-//			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-//			context.addAgent(dealer);
 		}
 		catch(Exception e)
 		{
@@ -418,8 +412,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			destroy.getParameter("agentidentifier").setValue(dealer);
 			agent.dispatchTopLevelGoalAndWait(destroy);
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(null);
-//			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-//			context.removeAgent(dealer);
 		}
 	}
 
@@ -448,19 +440,9 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			// kill the Manager
 //			agent.killAgent();
 
-			final IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
 			IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
-			cs.deleteContext(context, new IResultListener()
-			{
-				public void exceptionOccurred(Exception exception)
-				{
-					exception.printStackTrace();
-				}
-				public void resultAvailable(Object result)
-				{
-					System.out.println("Context deleted: "+context);
-				}
-			});
+			IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), ApplicationContext.class);
+			cs.deleteContext(contexts[0], new DefaultResultListener(agent.getLogger()));
 		}
 		catch(Exception e)
 		{
@@ -609,7 +591,11 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				agent.getLogger().info("starting playerAgent: "+player.getName());
 				IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
-				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
+				IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
+				IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), ApplicationContext.class);
+				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getAgentType("Player").getFilename();
+				start.getParameter("type").setValue(type);
+//				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
 				start.getParameter("name").setValue(player.getName());
 				Map args = new HashMap();
 				args.put("myself", player);
@@ -618,8 +604,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				agent.dispatchTopLevelGoalAndWait(start);
 				IAgentIdentifier	playerid	= (IAgentIdentifier)start.getParameter("agentidentifier").getValue();
 				player.setAgentID(playerid);
-//				IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-//				context.addAgent(playerid);
 			}
 			catch(Exception e)
 			{
@@ -636,8 +620,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
 			destroy.getParameter("agentidentifier").setValue(player.getAgentID());
 			agent.dispatchTopLevelGoalAndWait(destroy);
-//			IContext	context	= (IContext)agent.getBeliefbase().getBelief("context").getFact();
-//			context.removeAgent(player.getAgentID());
 			player.setAgentID(null);
 		}
 	}

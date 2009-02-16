@@ -78,6 +78,22 @@ public class ApplicationType
 	}
 
 	/**
+	 *  Get a named agenttype.
+	 *  @return The agenttype (if any).
+	 */
+	public AgentType getAgentType(String name)
+	{
+		AgentType	ret	= null;
+		for(int i=0; ret==null && i<agenttypes.size(); i++)
+		{
+			AgentType	at	= (AgentType)agenttypes.get(i);
+			if(at.getName().equals(name))
+				ret	= at;
+		}
+		return ret;
+	}
+
+	/**
 	 *  Get the applications.
 	 *  @return The applications.
 	 */

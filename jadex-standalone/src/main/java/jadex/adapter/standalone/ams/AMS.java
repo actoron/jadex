@@ -206,7 +206,7 @@ public class AMS implements IAMS, IPlatformService
 			}
 		}
 		
-		listener.resultAvailable(null);
+		listener.resultAvailable(agent);
 	}
 	
 	/**

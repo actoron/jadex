@@ -183,6 +183,7 @@ public class BaseContext	implements IContext
 	 */
 	public void	agentDestroyed(IAgentIdentifier agent)
 	{
+		removeAgent(agent);
 	}
 	
 	//-------- methods --------

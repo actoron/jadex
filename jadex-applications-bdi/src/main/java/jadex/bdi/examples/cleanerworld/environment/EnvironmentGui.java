@@ -1,6 +1,6 @@
 package jadex.bdi.examples.cleanerworld.environment;
 
-import jadex.adapter.base.contextservice.ApplicationContext;
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.fipa.IAMS;

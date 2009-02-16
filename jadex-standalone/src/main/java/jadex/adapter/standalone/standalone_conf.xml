@@ -80,13 +80,13 @@
 					{
 						jadex.adapter.base.contextservice.IContext.class,
 						jadex.adapter.base.contextservice.BaseContext.class,
-						jadex.adapter.base.contextservice.ApplicationContext.class
+						jadex.adapter.base.appdescriptor.ApplicationContext.class
 					},
 					new jadex.adapter.base.contextservice.IContextFactory[]
 					{
 						new jadex.adapter.base.contextservice.DefaultContextFactory(),
 						new jadex.adapter.base.contextservice.DefaultContextFactory(),
-						new jadex.adapter.base.contextservice.ApplicationContextFactory($platform)
+						new jadex.adapter.base.appdescriptor.ApplicationContextFactory($platform)
 					})
 			</property>
 		</properties>

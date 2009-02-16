@@ -1,5 +1,8 @@
-package jadex.adapter.base.contextservice;
+package jadex.adapter.base.appdescriptor;
 
+import jadex.adapter.base.contextservice.BaseContext;
+import jadex.adapter.base.contextservice.IContext;
+import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IPlatform;
@@ -12,14 +15,22 @@ import java.util.Map;
  *  If agents spawn other agents, these will automatically be added to
  *  the context.
  *  When the context is deleted all agents will be destroyed.
- *  An agent may only be in one application context.
+ *  An agent must only be in one application context.
  */
 public class ApplicationContext	extends BaseContext
 {
+	//-------- constants --------
+	
+	/** The application type property (required for context creation). */
+	public static final String	PROPERTY_APPLICATION_TYPE	= "application-type";
+	
 	//-------- attributes --------
 	
 	/** The platform. */
 	protected IPlatform	platform;
+	
+	/** The application type. */
+	protected ApplicationType	apptype;
 	
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more agents can be added). */
@@ -34,6 +45,9 @@ public class ApplicationContext	extends BaseContext
 	{
 		super(name, parent, properties);
 		this.platform	= platform;
+		this.apptype	= properties!=null ? (ApplicationType)properties.get(PROPERTY_APPLICATION_TYPE) : null;
+		if(apptype==null)
+			throw new RuntimeException("Property '"+PROPERTY_APPLICATION_TYPE+"' required.");
 	}
 
 	//-------- IContext interface --------
@@ -64,15 +78,6 @@ public class ApplicationContext	extends BaseContext
 	public void	agentCreated(IAgentIdentifier creator, IAgentIdentifier newagent)
 	{
 		addAgent(newagent);
-	}
-
-	/**
-	 *  Called by AMS when an agent has been created by another agent in this context.
-	 *  @param agent	The destroyed agent.
-	 */
-	public void	agentDestroyed(IAgentIdentifier agent)
-	{
-		removeAgent(agent);
 	}
 
 	/**
@@ -143,6 +148,54 @@ public class ApplicationContext	extends BaseContext
 	//-------- methods --------
 	
 	/**
+	 *  Get the applicattion type.
+	 */
+	public ApplicationType	getApplicationType()
+	{
+		return apptype;
+	}
+	
+	/**
+	 *  Create an agent in the context.
+	 *  @param name	The name of the newly created agent.
+	 *  @param type	The agent type as defined in the application type.
+	 *  @param configuration	The agent configuration.
+	 *  @param arguments	Arguments for the new agent.
+	 *  @param start	Should the new agent be started?
+	 *  @param istener	A listener to be notified, when the agent is created (if any).
+	 *  @param creator	The agent that wants to create a new agent (if any).	
+	 */
+	public void createAgent(String name, String type, String configuration,
+			Map arguments, final boolean start, final IResultListener listener, IAgentIdentifier creator)
+	{
+		AgentType	at	= apptype.getAgentType(type);
+		if(at==null)
+			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+apptype);
+		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
+		ams.createAgent(name, at.getFilename(), configuration, arguments, new IResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				if(listener!=null)
+					listener.exceptionOccurred(exception);
+			}
+			public void resultAvailable(Object result)
+			{
+				addAgent((IAgentIdentifier) result);
+				if(start)
+				{
+					ams.startAgent((IAgentIdentifier) result, listener);
+				}
+				else
+				{
+					if(listener!=null)
+						listener.resultAvailable(result);
+				}
+			}
+		}, creator);
+	}
+
+	/**
 	 *  Get the flag indicating if the context is about to be deleted
 	 *  (no more agents can be added).
 	 */
@@ -155,7 +208,7 @@ public class ApplicationContext	extends BaseContext
 	 *  Set the flag indicating if the context is about to be deleted
 	 *  (no more agents can be added).
 	 */
-	public void setTerminating(boolean terminating)
+	protected void setTerminating(boolean terminating)
 	{
 		if(!terminating || this.terminating)
 			throw new RuntimeException("Cannot terminate; illegal state: "+this.terminating+", "+terminating);

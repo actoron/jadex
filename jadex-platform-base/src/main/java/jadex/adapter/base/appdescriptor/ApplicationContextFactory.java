@@ -1,5 +1,8 @@
-package jadex.adapter.base.contextservice;
+package jadex.adapter.base.appdescriptor;
 
+import jadex.adapter.base.contextservice.BaseContext;
+import jadex.adapter.base.contextservice.IContext;
+import jadex.adapter.base.contextservice.IContextFactory;
 import jadex.bridge.IPlatform;
 
 import java.util.Map;
