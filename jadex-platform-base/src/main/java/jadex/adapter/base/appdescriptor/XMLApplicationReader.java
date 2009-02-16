@@ -19,10 +19,13 @@ public class XMLApplicationReader
 	static
 	{
 		xstream = new XStream(new PureJavaReflectionProvider());
-		xstream.alias("application", Application.class);
 		xstream.alias("applicationtype", ApplicationType.class);
-		xstream.alias("agent", Agent.class);
+		xstream.alias("structuringtype", StructuringType.class);
 		xstream.alias("agenttype", AgentType.class);
+		
+		xstream.alias("application", Application.class);
+		xstream.alias("structuring", Structuring.class);
+		xstream.alias("agent", Agent.class);
 		xstream.alias("parameter", Parameter.class);
 		xstream.alias("parameterset", ParameterSet.class);
 		xstream.alias("value", String.class);
@@ -43,6 +46,7 @@ public class XMLApplicationReader
 		
 		xstream.registerConverter(new ParameterConverter());
 		xstream.registerConverter(new ParameterSetConverter());
+		xstream.registerConverter(new StructuringTypeConverter());
 		
 		ApplicationType apptype = (ApplicationType)xstream.fromXML(input);
 		

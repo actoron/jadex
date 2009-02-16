@@ -111,6 +111,20 @@ public class ApplicationFactory implements IApplicationFactory
 					int num = agent.getNumber();
 					for(int j=0; j<num; j++)
 					{
+//						ams.createAgent(agent.getName(), agent.getModel(apptype).getFilename(), agent.getConfiguration(), agent.getArguments(cl), new IResultListener()
+//						{
+//							public void exceptionOccurred(Exception exception)
+//							{
+//							}
+//							public void resultAvailable(Object result)
+//							{
+//								if(appcontext!=null)
+//									appcontext.addAgent((IAgentIdentifier) result);
+//								
+//								if(agent.isStart())
+//									ams.startAgent((IAgentIdentifier)result, null);
+//							}
+//						}, null);						
 						context.createAgent(agent.getName(), agent.getType(),
 							agent.getConfiguration(), agent.getArguments(cl), agent.isStart(),
 							DefaultResultListener.getInstance(), null);						

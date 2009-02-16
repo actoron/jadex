@@ -56,6 +56,13 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="structurings">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="structuring"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 	</xs:complexType>
@@ -87,10 +94,6 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="structuringtype">
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="type" type="xs:string"/>
-	</xs:complexType>
 	<xs:complexType name="contexttype">
 		<xs:sequence>
 			<xs:element name="structuringtypes">
@@ -103,5 +106,20 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="class" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="structuringtype">
+		<xs:sequence>
+			<xs:element name="property" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="structuring">
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
 	</xs:complexType>
 </xs:schema>

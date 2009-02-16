@@ -13,6 +13,9 @@ public class ApplicationType
 	/** The name. */
 	protected String name;
 	
+	/** The list of contained structuring types. */
+	protected List structuringtypes;
+	
 	/** The list of contained agent types. */
 	protected List agenttypes;
 	
@@ -26,6 +29,7 @@ public class ApplicationType
 	 */
 	public ApplicationType()
 	{
+		this.structuringtypes = new ArrayList();
 		this.agenttypes = new ArrayList();
 		this.applications = new ArrayList();
 	}
@@ -58,6 +62,15 @@ public class ApplicationType
 	{
 		this.agenttypes.add(agenttype);
 	}
+	
+	/**
+	 *  Add a structuring type.
+	 *  @param agenttype The structuring type.
+	 */
+	public void addStructuringType(StructuringType structuringtype)
+	{
+		this.structuringtypes.add(structuringtype);
+	}
 
 	/**
 	 *  Add an application.
@@ -75,6 +88,15 @@ public class ApplicationType
 	public List getAgentTypes()
 	{
 		return this.agenttypes;
+	}
+	
+	/**
+	 *  Get the structuring types.
+	 *  @return The structuringtypes.
+	 */
+	public List getStructuringTypes()
+	{
+		return this.structuringtypes;
 	}
 
 	/**
@@ -101,4 +123,6 @@ public class ApplicationType
 	{
 		return this.applications;
 	}
+	
+	
 }

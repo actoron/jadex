@@ -1,13 +1,13 @@
 package jadex.adapter.base.appdescriptor;
 
+import jadex.bridge.IArgument;
+import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IReport;
+import jadex.commons.SUtil;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-
-import jadex.bridge.ILoadableElementModel;
-import jadex.bridge.IArgument;
-import jadex.bridge.IReport;
-import jadex.commons.SUtil;
 
 /**
  *  Model representation of an application.

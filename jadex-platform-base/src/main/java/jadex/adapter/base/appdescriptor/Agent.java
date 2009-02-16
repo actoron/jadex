@@ -218,15 +218,15 @@ public class Agent
 	 *  @param apptype The application type this agent is used in.
 	 *  @return The name of the agent type.
 	 */
-	public String getModel(ApplicationType apptype)
+	public AgentType getModel(ApplicationType apptype)
 	{
-		String ret = null;
+		AgentType ret = null;
 		List agenttypes = apptype.getAgentTypes();
 		for(int i=0; ret==null && i<agenttypes.size(); i++)
 		{
 			AgentType at = (AgentType)agenttypes.get(i);
 			if(at.getName().equals(getType()))
-				ret = at.getFilename();
+				ret = at;
 		}
 		return ret;
 	}

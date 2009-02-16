@@ -8,6 +8,12 @@
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
 	name="Test">
 	
+	<structuringtypes>
+		<structuringtype name="env_type" type="continuous_space">
+			<property name="size">100</property>
+		</structuringtype>
+	</structuringtypes>
+	
 	<agenttypes>
 		<agenttype name="Environment" filename="jadex/bdi/examples/cleanerworld/environment/Environment.agent.xml"/>
 		<agenttype name="Cleaner" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
@@ -15,6 +21,9 @@
 	
 	<applications>
 		<application name="2 cleaners">
+			<structurings>
+				<structuring name="env" type="env_type"/>
+			</structurings>
 			<agents>
 				<agent name="environment" type="Environment">
 					<parameters>

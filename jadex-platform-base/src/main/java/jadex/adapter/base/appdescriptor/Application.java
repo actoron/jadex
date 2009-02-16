@@ -13,6 +13,9 @@ public class Application
 	/** The name. */
 	protected String name;
 	
+	/** The list of structurings. */
+	protected List structurings;
+	
 	/** The list of contained agents. */
 	protected List agents;
 	
@@ -23,10 +26,29 @@ public class Application
 	 */
 	public Application()
 	{
+		this.structurings = new ArrayList();
 		this.agents = new ArrayList();
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Add an structuring.
+	 *  @param structuring The structuring.
+	 */
+	public void addstructuring(Structuring structuring)
+	{
+		this.structurings.add(structuring);
+	}
+	
+	/**
+	 *  Get all structurings.
+	 *  @return The structurings.
+	 */
+	public List getStructurings()
+	{
+		return structurings;
+	}
 	
 	/**
 	 *  Add an agent.
