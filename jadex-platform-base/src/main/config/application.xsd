@@ -44,6 +44,7 @@
 						</xs:complexType>
 					</xs:element>
 				</xs:sequence>
+				<xs:attribute name="package" type="xs:string"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
