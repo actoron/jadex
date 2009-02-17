@@ -13,6 +13,9 @@ public class ApplicationType
 	/** The name. */
 	protected String name;
 	
+	/** The imports. */
+	protected List imports;
+	
 	/** The list of contained structuring types. */
 	protected List structuringtypes;
 	
@@ -29,6 +32,7 @@ public class ApplicationType
 	 */
 	public ApplicationType()
 	{
+		this.imports = new ArrayList();
 		this.structuringtypes = new ArrayList();
 		this.agenttypes = new ArrayList();
 		this.applications = new ArrayList();
@@ -52,6 +56,15 @@ public class ApplicationType
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	/**
+	 *  Add an import.
+	 *  @param import The import.
+	 */
+	public void addImport(String importstr)
+	{
+		this.imports.add(importstr);
 	}
 	
 	/**
@@ -81,6 +94,15 @@ public class ApplicationType
 		this.applications.add(application);
 	}
 
+	/**
+	 *  Get the imports.
+	 *  @return The imports.
+	 */
+	public List getImports()
+	{
+		return this.imports;
+	}
+	
 	/**
 	 *  Get the agenttypes.
 	 *  @return The agenttypes.
@@ -123,6 +145,4 @@ public class ApplicationType
 	{
 		return this.applications;
 	}
-	
-	
 }

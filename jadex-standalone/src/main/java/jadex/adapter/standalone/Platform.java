@@ -7,7 +7,9 @@ import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationFactory;
+import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
@@ -16,6 +18,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -347,6 +350,8 @@ public class Platform extends AbstractPlatform
 	protected Map getArguments(Properties props)
 	{
 		Map arguments = new HashMap();
+		SimpleValueFetcher fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$platform", platform);
 		
 		Property[] args = props.getProperties(ARGUMENT);
 		for(int i = 0; i < args.length; i++)
@@ -355,7 +360,7 @@ public class Platform extends AbstractPlatform
 			try
 			{
 				ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
-				arg = new JavaCCExpressionParser().parseExpression(args[i].getValue(), null, null, ls.getClassLoader()).getValue(null);
+				arg = new JavaCCExpressionParser().parseExpression(args[i].getValue(), null, null, ls.getClassLoader()).getValue(fetcher);
 				arguments.put(args[i].getName(), arg);
 			}
 			catch(Exception e)
@@ -370,7 +375,7 @@ public class Platform extends AbstractPlatform
 			try
 			{
 				ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
-				arg = new JavaCCExpressionParser().parseExpression(argsets[i].getValue(), null, null, ls.getClassLoader()).getValue(null);
+				arg = new JavaCCExpressionParser().parseExpression(argsets[i].getValue(), null, null, ls.getClassLoader()).getValue(fetcher);
 				arguments.put(argsets[i].getName(), arg);
 			}
 			catch(Exception e)

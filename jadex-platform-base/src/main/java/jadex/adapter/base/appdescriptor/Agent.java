@@ -1,5 +1,7 @@
 package jadex.adapter.base.appdescriptor;
 
+import jadex.bridge.IPlatform;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
@@ -169,13 +171,17 @@ public class Agent
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(ClassLoader classloader)
+	public Map getArguments(IPlatform platform, ApplicationType apptype, ClassLoader classloader)
 	{
 		Map ret = null;
 
 		if(parameters!=null)
 		{
 			ret = new HashMap();
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$platform", platform);
+
+			String[] imports = (String[])apptype.getImports().toArray(new String[apptype.getImports().size()]);
 			for(int i=0; i<parameters.size(); i++)
 			{
 				Object tmp = parameters.get(i);
@@ -187,7 +193,7 @@ public class Agent
 					if(parser==null)
 						parser = new JavaCCExpressionParser();
 					
-					Object val = parser.parseExpression(valtext, null, null, classloader);
+					Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
 					ret.put(p.getName(), val);
 				}
 				else //if(tmp instanceof ParameterSet)
@@ -201,7 +207,7 @@ public class Agent
 							parser = new JavaCCExpressionParser();
 						for(int j=0; j<textvals.size(); j++)
 						{
-							Object val = parser.parseExpression((String)textvals.get(i), null, null, classloader);
+							Object val = parser.parseExpression((String)textvals.get(j), imports, null, classloader).getValue(fetcher);
 							vals.add(val);
 						}
 					}

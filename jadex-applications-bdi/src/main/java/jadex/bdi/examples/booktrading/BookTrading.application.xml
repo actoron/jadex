@@ -1,0 +1,76 @@
+<!--
+	<H3>The booktrading application descriptor</H3>
+
+	Can be used to start the booktrading example with different
+	initial configurations of buyer and seller agents.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	name="Booktrading">
+	
+	<imports>
+		<import>jadex.bdi.examples.booktrading.common.*</import>
+		<import>java.util.*</import>
+		<import>jadex.bridge.IClockService</import>
+	</imports>
+	
+	<agenttypes>
+		<agenttype name="Buyer" filename="jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml"/>
+		<agenttype name="Seller" filename="jadex/bdi/examples/booktrading/seller/Seller.agent.xml"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="One buyer and one seller">
+			<agents>
+				<agent type="Buyer" >
+					<parameters>
+						<parameterset name="initial_orders">
+							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))</value>
+							<value>new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)$platform.getService(IClockService.class))</value>
+							<value>new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class))</value>
+							<value>new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))</value>
+						</parameterset>
+					</parameters>
+				</agent>
+				<agent type="Seller">
+					<parameters>
+						<parameterset name="initial_orders">
+							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))</value>
+							<value>new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class))</value>
+							<value>new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class))</value>
+							<value>new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))</value>
+						</parameterset>
+					</parameters>
+				</agent>
+			</agents>
+		</application>
+		<application name="Two buyers and one seller">
+			<agents>
+				<agent type="Buyer" number="3">
+					<parameters>
+						<parameterset name="initial_orders">
+							<value>new Order("All about agents", new Date($scope.getTime()+60000), 100, 120, true, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+							<value>new Order("All about web services", new Date($scope.getTime()+60000), 40, 60, true, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+							<value>new Order("Harry Potter", new Date($scope.getTime()+60000), 5, 10, true, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+							<value>new Order("Agents in the real world", new Date($scope.getTime()+60000), 30, 65, true, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+						</parameterset>
+					</parameters>
+				</agent>
+				<agent type="Seller">
+					<parameters>
+						<parameterset name="initial_orders">
+							<value>new Order("All about agents", new Date($scope.getTime()+60000), 130, 110, false, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+							<value>new Order("All about web services", new Date($scope.getTime()+60000), 50, 30, false, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+							<value>new Order("Harry Potter", new Date($scope.getTime()+60000), 15, 9, false, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+							<value>new Order("Agents in the real world", new Date($scope.getTime()+60000), 100, 60, false, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+						</parameterset>
+					</parameters>
+				</agent>
+			</agents>
+		</application>
+	</applications>
+
+</applicationtype>

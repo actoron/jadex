@@ -22,6 +22,13 @@
 		<xs:complexContent>
 			<xs:extension base="contexttype">
 				<xs:sequence>
+					<xs:element name="imports">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="import" type="import" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
 					<xs:element name="agentypes">
 						<xs:complexType>
 							<xs:sequence>
@@ -122,4 +129,5 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
 	</xs:complexType>
+	<xs:complexType name="import" mixed="true"/>
 </xs:schema>

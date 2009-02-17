@@ -29,6 +29,7 @@ public class XMLApplicationReader
 		xstream.alias("parameter", Parameter.class);
 		xstream.alias("parameterset", ParameterSet.class);
 		xstream.alias("value", String.class);
+		xstream.alias("import", String.class);
 	}
 	
 	//-------- methods --------
