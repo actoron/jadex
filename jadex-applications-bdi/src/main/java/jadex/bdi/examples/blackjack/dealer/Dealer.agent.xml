@@ -487,7 +487,11 @@
 	<properties>
 		<!--  logging-properties, needed to debug the application.
  	     Start the Jadex-Logging-Agent to see whats going on behind the scenes -->
-		<!-- <property name="logging.level">Level.INFO</property> -->
+<!-- 	<property name="logging.level">Level.INFO</property>
+	 	<property name="logging.file">"./logs/"+$scope.getAgentName()+"_"
+	 		+new java.text.SimpleDateFormat("yyyy.MM.dd_HH.mm.ss")
+	 		.format(new java.util.Date())+".log"</property>
+	 	<property name="logging.useParentHandlers">false</property> -->
 	</properties>
 
 	<configurations>

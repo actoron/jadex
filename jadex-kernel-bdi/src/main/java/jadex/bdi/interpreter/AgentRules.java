@@ -26,6 +26,8 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,9 +37,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *  Static helper class for agent rules and actions.
@@ -2434,6 +2439,31 @@ public class AgentRules
             console.setLevel(Level.parse(prop.toString()));
             logger.addHandler(console);
         }
+		
+		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
+		// if logger should add a filehandler to capture log data in a file. 
+		// The user specifies the directory to contain the log file.
+		// $scope.getAgentName() can be used to have agent-specific log files 
+		//
+		// The directory name can use special patterns defined in the
+		// class, java.util.logging.FileHandler, 
+		// such as "%h" for the user's home directory.
+		// 
+		String logfile =	(String)AgentRules.getPropertyValue(state, rcapa, "logging.file");
+		if(logfile!=null)
+		{
+		    try
+		    {
+			    Handler fh	= new FileHandler(logfile);
+		    	fh.setFormatter(new SimpleFormatter());
+		    	logger.addHandler(fh);
+		    }
+		    catch (IOException e)
+		    {
+		    	System.err.println("I/O Error attempting to create logfile: "
+		    		+ logfile + "\n" + e.getMessage());
+		    }
+		}
 	}
 
 	/**
