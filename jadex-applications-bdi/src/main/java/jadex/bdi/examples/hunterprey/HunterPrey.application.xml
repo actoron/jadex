@@ -1,0 +1,56 @@
+<!--
+	<H3>The hunter prey application descriptor</H3>
+
+	The hunterprey scenario is run in a time-stepped simulation
+	which is controlled by the environment agent. This means that
+	the environment increases the simulation time in fixed (adjustable)
+	real-time intervals. The environment is represented by a grid-world
+	with different kinds of objects. Basically there are positions with
+	obstacles (trees) which cannot be entered by creatues. Additionally
+	the environment creates vegetarian food (salads) randomly at aarbitrary
+	positions. Two different kinds of creatues inhabit the environment.
+	Preys (sheeps) are creatures that search for salads and gain one point
+	for eating a piece of salad. Hunters (wolfs) search for preys and
+	try to eat them. They gain five points if they manage to eat a
+	prey. Consequently preys should try to free from hunters if they
+	see them. Every creature can see all objects and creatues in a
+	certain range around them.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	name="HunterPrey" package="jadex.bdi.examples.hunterprey">
+	
+	<agenttypes>
+		<agenttype name="Environment" filename="jadex/bdi/examples/hunterprey/environment/Environment.agent.xml"/>
+		
+		<agenttype name="SleepingPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/sleepingprey/SleepingPrey.agent.xml"/>
+		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/dumbprey/DumbPrey.agent.xml"/>
+		<agenttype name="LazyPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/lazyprey/LazyPrey.agent.xml"/>
+		<agenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/cleverprey/CleverPrey.agent.xml"/>
+		
+		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/DumbHunter.agent.xml"/>
+		<agenttype name="CleverHunter" filename="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/LAHunter.agent.xml"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="Some hunters and preys">
+			<agents>
+				<agent type="Environment" />
+				<agent type="DumbPrey" number="2"/>
+				<agent type="CleverPrey" number="2" />
+				<agent type="DumbHunter" number="2" />
+				<agent type="CleverHunter" number="1" />
+			</agents>
+		</application>
+		<application name="Willy">
+			<agents>
+				<agent type="Environment" />
+				<agent type="CleverHunter" number="1" />
+			</agents>
+		</application>
+	</applications>
+
+</applicationtype>
