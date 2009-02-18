@@ -186,6 +186,47 @@ public class BaseContext	implements IContext
 		removeAgent(agent);
 	}
 	
+	/**
+	 *  Add an agent property. 
+	 *  @param agent The agent.
+	 *  @param key The key.
+	 *  @param prop The property.
+	 */
+	public void addProperty(IAgentIdentifier agent, String key, Object prop)
+	{
+		if(!containsAgent(agent))
+			throw new RuntimeException("Agent not contained in context: "+agent+" "+this);
+			
+		Map agentprops = (Map)properties.get(agent);
+		if(agentprops==null)
+		{
+			agentprops = new HashMap();
+			properties.put(agent, agentprops);
+		}
+		
+		agentprops.put(key, prop);
+	}
+	
+	/**
+	 *  Get agent property. 
+	 *  @param agent The agent.
+	 *  @param key The key.
+	 *  @return The property. 
+	 */
+	public Object getProperty(IAgentIdentifier agent, String key)
+	{
+		Object ret = null;
+		
+		if(!containsAgent(agent))
+			throw new RuntimeException("Agent not contained in context: "+agent+" "+this);
+			
+		Map agentprops = (Map)properties.get(agent);
+		if(agentprops!=null)
+			ret = agentprops.get(key);
+		
+		return ret;
+	}
+	
 	//-------- methods --------
 
 	/**

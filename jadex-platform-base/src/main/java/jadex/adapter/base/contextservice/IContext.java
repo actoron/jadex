@@ -51,4 +51,20 @@ public interface IContext
 	 *  Get all agents directly contained in the context (if any).
 	 */
 	public IAgentIdentifier[]	getAgents();
+	
+	/**
+	 *  Add an agent property. 
+	 *  @param agent The agent.
+	 *  @param key The key.
+	 *  @param prop The property.
+	 */
+	public void addProperty(IAgentIdentifier agent, String key, Object prop);
+	
+	/**
+	 *  Get agent property. 
+	 *  @param agent The agent.
+	 *  @param key The key.
+	 *  @return The property. 
+	 */
+	public Object getProperty(IAgentIdentifier agent, String key);
 }

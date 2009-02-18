@@ -126,8 +126,8 @@ public class ApplicationFactory implements IApplicationFactory
 //							}
 //						}, null);						
 						context.createAgent(agent.getName(), agent.getType(),
-							agent.getConfiguration(), agent.getArguments(platform, apptype, cl), agent.isStart(),
-							DefaultResultListener.getInstance(), null);						
+							agent.getConfiguration(), agent.getArguments(platform, apptype, cl), agent.isStart(), agent.isMaster(),
+							DefaultResultListener.getInstance(), null);	
 					}
 				}
 			

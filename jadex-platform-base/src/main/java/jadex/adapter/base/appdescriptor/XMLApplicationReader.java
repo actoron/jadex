@@ -44,6 +44,7 @@ public class XMLApplicationReader
 		xstream.useAttributeFor("type", String.class); 
 		xstream.useAttributeFor("start", boolean.class); 
 		xstream.useAttributeFor("number", int.class);
+		xstream.useAttributeFor("master", boolean.class);
 		
 		xstream.registerConverter(new ParameterConverter());
 		xstream.registerConverter(new ParameterSetConverter());

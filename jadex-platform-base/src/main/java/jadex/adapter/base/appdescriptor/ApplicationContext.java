@@ -1,5 +1,6 @@
 package jadex.adapter.base.appdescriptor;
 
+import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.contextservice.IContextService;
@@ -23,6 +24,9 @@ public class ApplicationContext	extends BaseContext
 	
 	/** The application type property (required for context creation). */
 	public static final String	PROPERTY_APPLICATION_TYPE	= "application-type";
+	
+	/** The master flag. */
+	public static final String PROPERTY_AGENT_MASTER = "master";
 	
 	//-------- attributes --------
 	
@@ -162,11 +166,13 @@ public class ApplicationContext	extends BaseContext
 	 *  @param configuration	The agent configuration.
 	 *  @param arguments	Arguments for the new agent.
 	 *  @param start	Should the new agent be started?
+	 *  
 	 *  @param istener	A listener to be notified, when the agent is created (if any).
 	 *  @param creator	The agent that wants to create a new agent (if any).	
 	 */
 	public void createAgent(String name, String type, String configuration,
-			Map arguments, final boolean start, final IResultListener listener, IAgentIdentifier creator)
+			Map arguments, final boolean start, final boolean master, 
+			final IResultListener listener, IAgentIdentifier creator)
 	{
 		AgentType	at	= apptype.getAgentType(type);
 		if(at==null)
@@ -181,10 +187,15 @@ public class ApplicationContext	extends BaseContext
 			}
 			public void resultAvailable(Object result)
 			{
-				addAgent((IAgentIdentifier) result);
+				IAgentIdentifier aid = (IAgentIdentifier)result;
+				addAgent(aid);
+				if(master)
+				{
+					addProperty(aid, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
+				}
 				if(start)
 				{
-					ams.startAgent((IAgentIdentifier) result, listener);
+					ams.startAgent(aid, listener);
 				}
 				else
 				{
@@ -193,6 +204,19 @@ public class ApplicationContext	extends BaseContext
 				}
 			}
 		}, creator);
+	}
+	
+	/**
+	 *  Remove an agent from a context.
+	 */
+	public synchronized void removeAgent(IAgentIdentifier agent)
+	{
+		boolean master = isAgentMaster(agent);
+			
+		super.removeAgent(agent);
+		
+		if(master)
+			((IContextService)platform.getService(IContextService.class)).deleteContext(this, null);
 	}
 
 	/**
@@ -214,5 +238,26 @@ public class ApplicationContext	extends BaseContext
 			throw new RuntimeException("Cannot terminate; illegal state: "+this.terminating+", "+terminating);
 			
 		this.terminating	= terminating;
+	}
+
+	/**
+	 *  Set an agent as master (causes context to be terminated on its deletion).
+	 *  @param agent The agent.
+	 *  @param master The master.
+	 */
+	public synchronized void setAgentMaster(IAgentIdentifier agent, boolean master)
+	{
+		addProperty(agent, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
+	}
+	
+	/**
+	 *  Set an agent as master (causes context to be terminated on its deletion).
+	 *  @param agent The agent.
+	 *  @return True, if agent is master.
+	 */
+	public synchronized boolean isAgentMaster(IAgentIdentifier agent)
+	{
+		Boolean ret = (Boolean)getProperty(agent, PROPERTY_AGENT_MASTER);
+		return ret==null? false: ret.booleanValue();
 	}
 }

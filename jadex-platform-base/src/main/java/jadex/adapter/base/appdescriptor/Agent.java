@@ -31,6 +31,9 @@ public class Agent
 	/** The number of agents. */
 	protected int number;
 	
+	/** The master flag. */
+	protected boolean master;
+	
 	/** The list of contained parameters. */
 	protected List parameters;
 	
@@ -121,6 +124,24 @@ public class Agent
 	public void setStart(boolean start)
 	{
 		this.start = start;
+	}
+	
+	/**
+	 *  Get the master flag.
+	 *  @return True, if master.
+	 */
+	public boolean isMaster()
+	{
+		return this.master;
+	}
+
+	/**
+	 *  Set the master flag..
+	 *  @param start The master flag.
+	 */
+	public void setMaster(boolean master)
+	{
+		this.master = master;
 	}
 	
 	/**
