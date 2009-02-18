@@ -44,7 +44,7 @@ public interface IContextService extends IPlatformService
 	 *  @param parent The parent context (if any).
 	 *  @param properties Initialization properties (if any).
 	 */
-	public IContext	createContext(String name, Class type, IContext parent, Map properties);
+	public IContext	createContext(String name, Class type, /*IContext parent,*/ Map properties);
 	
 	/**
 	 *  Delete a context.

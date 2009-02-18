@@ -1,6 +1,5 @@
 package jadex.adapter.base.appdescriptor;
 
-import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.contextservice.IContextService;
@@ -45,9 +44,9 @@ public class ApplicationContext	extends BaseContext
 	/**
 	 *  Create a new context.
 	 */
-	public ApplicationContext(String name, IContext parent, Map properties, IPlatform platform)
+	public ApplicationContext(String name, /*IContext parent,*/ Map properties, IPlatform platform)
 	{
-		super(name, parent, properties);
+		super(name, /*parent,*/ properties);
 		this.platform	= platform;
 		this.apptype	= properties!=null ? (ApplicationType)properties.get(PROPERTY_APPLICATION_TYPE) : null;
 		if(apptype==null)
@@ -245,7 +244,7 @@ public class ApplicationContext	extends BaseContext
 	 *  @param agent The agent.
 	 *  @param master The master.
 	 */
-	public synchronized void setAgentMaster(IAgentIdentifier agent, boolean master)
+	public void setAgentMaster(IAgentIdentifier agent, boolean master)
 	{
 		addProperty(agent, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -255,7 +254,7 @@ public class ApplicationContext	extends BaseContext
 	 *  @param agent The agent.
 	 *  @return True, if agent is master.
 	 */
-	public synchronized boolean isAgentMaster(IAgentIdentifier agent)
+	public boolean isAgentMaster(IAgentIdentifier agent)
 	{
 		Boolean ret = (Boolean)getProperty(agent, PROPERTY_AGENT_MASTER);
 		return ret==null? false: ret.booleanValue();

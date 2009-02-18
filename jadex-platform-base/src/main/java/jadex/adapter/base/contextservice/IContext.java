@@ -14,23 +14,23 @@ public interface IContext
 	
 	/**
 	 *  Get the parent of the context (if any).
-	 */
-	public IContext	getParentContext();
+	 * /
+	public IContext	getParentContext();*/
 	
 	/**
 	 *  Add a sub context.
-	 */
-	public void	addSubContext(IContext context);
+	 * /
+	public void	addSubContext(IContext context);*/
 	
 	/**
 	 *  Remove a sub context.
-	 */
-	public void	removeSubContext(IContext context);
+	 * /
+	public void	removeSubContext(IContext context);*/
 
 	/**
 	 *  Get the sub contexts of the context (if any).
-	 */
-	public IContext[]	getSubContexts();
+	 * /
+	public IContext[]	getSubContexts();*/
 	
 	/**
 	 *  Add an agent to a context.

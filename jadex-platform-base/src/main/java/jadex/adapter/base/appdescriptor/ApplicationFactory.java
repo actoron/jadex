@@ -97,7 +97,7 @@ public class ApplicationFactory implements IApplicationFactory
 				{
 					Map	props	= new HashMap();
 					props.put(ApplicationContext.PROPERTY_APPLICATION_TYPE, apptype);
-					context	= (ApplicationContext) cs.createContext(name, ApplicationContext.class, null, props);
+					context	= (ApplicationContext) cs.createContext(name, ApplicationContext.class, props);
 				}
 				
 				// todo: result listener?

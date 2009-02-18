@@ -5,10 +5,8 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,11 +17,11 @@ public class BaseContext	implements IContext
 {
 	//-------- attributes --------
 	
-	/** The parent of the context (if any). */
-	protected IContext	parent;
+	/** The parent of the context (if any). * /
+	protected IContext	parent;*/
 
-	/** The sub contexts of the context (if any). */
-	protected List	subcontexts;
+	/** The sub contexts of the context (if any). * /
+	protected List	subcontexts;*/
 
 	/** The name of the context. */
 	protected String	name;
@@ -43,10 +41,10 @@ public class BaseContext	implements IContext
 	/**
 	 *  Create a new context.
 	 */
-	public BaseContext(String name, IContext parent, Map properties)
+	public BaseContext(String name, /*IContext parent,*/ Map properties)
 	{
 		this.name	= name;
-		this.parent	= parent;
+//		this.parent	= parent;
 		this.properties	= properties!=null ? new HashMap(properties) : null;
 		
 		System.out.println("Created: "+this);
@@ -64,7 +62,7 @@ public class BaseContext	implements IContext
 
 	/**
 	 *  Get the parent of the context (if any).
-	 */
+	 * /
 	public IContext	getParentContext()
 	{
 		return parent;
@@ -72,7 +70,7 @@ public class BaseContext	implements IContext
 	
 	/**
 	 *  Add a sub context.
-	 */
+	 * /
 	public synchronized void	addSubContext(IContext context)
 	{
 		if(subcontexts==null)
@@ -83,7 +81,7 @@ public class BaseContext	implements IContext
 	
 	/**
 	 *  Remove a sub context.
-	 */
+	 * /
 	public synchronized void	removeSubContext(IContext context)
 	{
 		if(subcontexts!=null)
@@ -98,12 +96,12 @@ public class BaseContext	implements IContext
 
 	/**
 	 *  Get the sub contexts of the context (if any).
-	 */
+	 * /
 	public synchronized IContext[]	getSubContexts()
 	{
 		return subcontexts==null ? null :
 			(IContext[])subcontexts.toArray(new IContext[subcontexts.size()]);
-	}
+	}*/
 	
 	/**
 	 *  Add an agent to a context.
@@ -192,7 +190,7 @@ public class BaseContext	implements IContext
 	 *  @param key The key.
 	 *  @param prop The property.
 	 */
-	public void addProperty(IAgentIdentifier agent, String key, Object prop)
+	public synchronized void addProperty(IAgentIdentifier agent, String key, Object prop)
 	{
 		if(!containsAgent(agent))
 			throw new RuntimeException("Agent not contained in context: "+agent+" "+this);
@@ -213,7 +211,7 @@ public class BaseContext	implements IContext
 	 *  @param key The key.
 	 *  @return The property. 
 	 */
-	public Object getProperty(IAgentIdentifier agent, String key)
+	public synchronized Object getProperty(IAgentIdentifier agent, String key)
 	{
 		Object ret = null;
 		
@@ -238,20 +236,20 @@ public class BaseContext	implements IContext
 		ret.append(SReflect.getInnerClassName(getClass()));
 		ret.append("(name=");
 		ret.append(getName());
-		ret.append(", parent=");
-		ret.append(getParentContext());
+//		ret.append(", parent=");
+//		ret.append(getParentContext());
 		IAgentIdentifier[]	aids	= getAgents(); 
 		if(aids!=null)
 		{
 			ret.append(", agents=");
 			ret.append(SUtil.arrayToString(aids));
 		}
-		IContext[]	subcs	= getSubContexts(); 
-		if(subcs!=null)
-		{
-			ret.append(", subcontexts=");
-			ret.append(SUtil.arrayToString(subcs));
-		}
+//		IContext[]	subcs	= getSubContexts(); 
+//		if(subcs!=null)
+//		{
+//			ret.append(", subcontexts=");
+//			ret.append(SUtil.arrayToString(subcs));
+//		}
 		ret.append(")");
 		return ret.toString();
 	}
