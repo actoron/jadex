@@ -25,7 +25,7 @@
 				<structuring name="env" type="env_type"/>
 			</structurings> -->
 			<agents>
-				<agent type="EnvironmentLocal" />
+				<agent type="EnvironmentLocal" master="true"/>
 				<agent type="CleanerLocal" number="2"/>
 			</agents>
 		</application>
@@ -34,7 +34,7 @@
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
 			<agents>
-				<agent type="EnvironmentLocal" />
+				<agent type="EnvironmentLocal" master="true"/>
 				<agent type="CleanerLocal"/>
 			</agents>
 		</application>
@@ -43,7 +43,7 @@
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
 			<agents>
-				<agent type="EnvironmentRemote" />
+				<agent type="EnvironmentRemote" master="true"/>
 				<agent type="CleanerRemote" number="2"/>
 			</agents>
 		</application>
@@ -52,7 +52,7 @@
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
 			<agents>
-				<agent type="EnvironmentRemote" />
+				<agent type="EnvironmentRemote" master="true"/>
 				<agent type="CleanerRemote"/>
 			</agents>
 		</application>

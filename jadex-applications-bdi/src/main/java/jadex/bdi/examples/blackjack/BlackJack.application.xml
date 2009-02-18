@@ -17,7 +17,7 @@
 	<applications>
 		<application name="Only Manager">
 			<agents>
-				<agent type="Manager" />
+				<agent type="Manager" master="true"/>
 			</agents>
 		</application>
 	</applications>

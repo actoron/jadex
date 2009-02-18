@@ -1,4 +1,4 @@
-package jadex.bdi.examples.marsworld.manager;
+package jadex.bdi.examples.marsworld.environment;
 
 import jadex.bdi.examples.marsworld.AgentInfo;
 import jadex.bdi.examples.marsworld.Environment;
@@ -98,7 +98,7 @@ public class MarsworldGui	extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				IAgentIdentifier[] as = (IAgentIdentifier[])agent.getBeliefbase().getBeliefSet("startedagents").getFacts();
+				/*IAgentIdentifier[] as = (IAgentIdentifier[])agent.getBeliefbase().getBeliefSet("startedagents").getFacts();
 				for(int i=0; i<as.length; i++)
 				{
 					try
@@ -108,7 +108,7 @@ public class MarsworldGui	extends JFrame
 						agent.dispatchTopLevelGoalAndWait(kg);
 					}
 					catch(GoalFailureException gfe) {}
-				}
+				}*/
 				agent.killAgent();
 			}
 		});

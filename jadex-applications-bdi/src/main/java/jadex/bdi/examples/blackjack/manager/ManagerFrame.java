@@ -295,10 +295,13 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(n==JOptionPane.YES_OPTION)
 			{
-				stopAllAgents();
+				agent.killAgent();
+//				stopAllAgents();
 			}
 			else
 			{
+				ApplicationContext ac = (ApplicationContext)((IContextService)agent.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0];
+				ac.setAgentMaster(agent.getAgentIdentifier(), false);
 				agent.killAgent();
 			}
 
@@ -417,7 +420,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 
 	/**
 	 * Kill all started agents.
-	 */
+	 * /
 	protected void stopAllAgents()
 	{
 		try
@@ -448,7 +451,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			agent.getLogger().warning("At least one agent could not be stopped: "+e);
 		}
-	}
+	}*/
 
 	/**
 	 *
