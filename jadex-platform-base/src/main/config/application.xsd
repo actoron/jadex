@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-appdescriptor" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-appdescriptor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-appdescriptor"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
+	elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="applicationtype">
 		<xs:annotation>
 			<xs:documentation>Comment describing your root element</xs:documentation>
@@ -29,10 +32,10 @@
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="agentypes">
+					<xs:element name="agenttypes">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element name="agentype" type="agenttype" minOccurs="0" maxOccurs="unbounded"/>
+								<xs:element name="agenttype" type="agenttype" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
@@ -56,22 +59,22 @@
 		<xs:attribute name="filename" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="application">
-		<xs:sequence>
-			<xs:element name="agents">
+		<xs:sequence>
+			<xs:element name="spaces" maxOccurs="1" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="agent" type="agent"/>
+						<xs:element name="space"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="structurings">
+            <xs:element name="agents" maxOccurs="1" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="structuring"/>
+						<xs:element name="agent" type="agent" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-		</xs:sequence>
+        </xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="agent">
@@ -105,10 +108,11 @@
 	</xs:complexType>
 	<xs:complexType name="contexttype">
 		<xs:sequence>
-			<xs:element name="structuringtypes">
+			<xs:element name="spacetypes">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="structuringtype" type="structuringtype" minOccurs="0" maxOccurs="unbounded"/>
+						<!-- <xs:element name="spacetype" type="spacetype" minOccurs="0" maxOccurs="unbounded"/> -->
+						<xs:any minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -116,7 +120,7 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="class" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="structuringtype">
+	<xs:complexType name="spacetype">
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType mixed="true">
@@ -127,7 +131,7 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="structuring">
+	<xs:complexType name="space">
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
 	</xs:complexType>

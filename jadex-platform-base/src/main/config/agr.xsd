@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agr"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:app="http://jadex.sourceforge.net/jadex-appdescriptor"
+	xmlns="http://jadex.sourceforge.net/jadex-agr"
+	elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+
+<!-- 	
+	<xs:import namespace="http://jadex.sourceforge.net/jadex-appdescriptor" schemaLocation="http://jadex.sourceforge.net/application.xsd"/>
+	
+	<xs:complexType name="spacetype">
+		<xs:complexContent>
+			<xs:extension base="app:spacetype">
+				<xs:sequence>
+					<xs:element name="grouptype" type="grouptype"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ -->
+ 
+	<xs:complexType name="spacetype">
+		<xs:sequence>
+			<xs:element name="grouptype" type="grouptype"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="grouptype">
+		<xs:sequence>
+			<xs:element name="roles">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="role"
+							type="roletype">
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="roletype">
+		<xs:attribute name="name" type="xs:string"></xs:attribute>
+		<xs:attribute name="min" type="xs:int"></xs:attribute>
+		<xs:attribute name="max" type="xs:int"></xs:attribute>
+	</xs:complexType>
+
+	<xs:element name="spacetypeel">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="spacetype"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
