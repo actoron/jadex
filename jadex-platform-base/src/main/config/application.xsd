@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-appdescriptor" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-appdescriptor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="applicationtype">
 		<xs:annotation>
 			<xs:documentation>Comment describing your root element</xs:documentation>
