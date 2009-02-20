@@ -77,8 +77,6 @@ public class SReflect
 	 */
 	public	static	Class	getWrappedType(Class clazz)
 	{
-		if(clazz==null)
-			System.out.println("wurst");
 		assert clazz!=null;
 
 		// (jls) there are the following primitive types:

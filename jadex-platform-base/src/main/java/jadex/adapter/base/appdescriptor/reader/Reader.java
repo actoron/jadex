@@ -20,7 +20,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * 
+ *  Stax XML reader.
  */
 public class Reader
 {
@@ -35,7 +35,8 @@ public class Reader
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new reader.
+	 *  @param handler The handler.
 	 */
 	public Reader(IObjectHandler handler)
 	{
@@ -47,6 +48,8 @@ public class Reader
 	
 	/**
 	 *  Read properties from xml.
+	 *  @param input The input stream.
+	 *  @param classloader The classloader.
  	 */
 	public Object read(InputStream input, ClassLoader classloader) throws Exception
 	{

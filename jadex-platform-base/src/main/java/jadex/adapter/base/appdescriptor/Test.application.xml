@@ -1,12 +1,11 @@
 <!--
 	Test application descriptor.
 -->
-
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="Test">
+	name="Test" package="jadex.example">
 	
 	<structuringtypes>
 		<structuringtype name="env_type" type="continuous_space">

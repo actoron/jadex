@@ -1,6 +1,8 @@
 package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.DefaultResultListener;
+import jadex.adapter.base.appdescriptor.reader.BeanObjectHandler;
+import jadex.adapter.base.appdescriptor.reader.Reader;
 import jadex.adapter.base.contextservice.IContextService;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.ILibraryService;
@@ -39,6 +41,9 @@ public class ApplicationFactory implements IApplicationFactory
 	/** The platform. */
 	protected IPlatform platform;
 	
+	/** The xml reader. */
+	protected Reader reader;
+	
 	//-------- constructors --------
 	
 	/**
@@ -47,6 +52,20 @@ public class ApplicationFactory implements IApplicationFactory
 	public ApplicationFactory(IPlatform platform)
 	{
 		this.platform = platform;
+		Map types = new HashMap();
+		types.put("applicationtype", ApplicationType.class);
+		types.put("structuringtype", StructuringType.class);
+		types.put("agenttype", AgentType.class);
+		types.put("application", Application.class);
+		types.put("structuring", Structuring.class);
+		types.put("agent", Agent.class);
+		types.put("parameter", Parameter.class);
+		types.put("parameterset", ParameterSet.class);
+		types.put("value", String.class);
+		types.put("import", String.class);
+		types.put("property", String.class);
+		
+		this.reader = new Reader(new BeanObjectHandler(types));
 	}
 	
 	//-------- IAgentFactory interface --------
@@ -68,7 +87,7 @@ public class ApplicationFactory implements IApplicationFactory
 			try
 			{
 				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
-				apptype = XMLApplicationReader.readApplication(new FileInputStream(model), cl);
+				apptype = (ApplicationType)reader.read(new FileInputStream(model), cl);
 				List apps = apptype.getApplications();
 				
 				Application app = null;
@@ -156,7 +175,7 @@ public class ApplicationFactory implements IApplicationFactory
 			try
 			{
 				// todo: classloader null?
-				apptype = XMLApplicationReader.readApplication(new FileInputStream(filename), null);
+				apptype = (ApplicationType)reader.read(new FileInputStream(filename), null);
 				ret = new ApplicationModel(apptype, filename);
 //				System.out.println("Loaded application type: "+apptype);
 			

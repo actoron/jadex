@@ -13,6 +13,9 @@ public class ApplicationType
 	/** The name. */
 	protected String name;
 	
+	/** The package. */
+	protected String packagename;
+	
 	/** The imports. */
 	protected List imports;
 	
@@ -58,6 +61,22 @@ public class ApplicationType
 		this.name = name;
 	}
 	
+	/**
+	 * @return the packagename
+	 */
+	public String getPackage()
+	{
+		return this.packagename;
+	}
+
+	/**
+	 * @param packagename the packagename to set
+	 */
+	public void setPackage(String packagename)
+	{
+		this.packagename = packagename;
+	}
+
 	/**
 	 *  Add an import.
 	 *  @param import The import.
