@@ -87,7 +87,7 @@ public class ApplicationFactory implements IApplicationFactory
 			try
 			{
 				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
-				apptype = (ApplicationType)reader.read(new FileInputStream(model), cl);
+				apptype = (ApplicationType)reader.read(new FileInputStream(model), cl, null);
 				List apps = apptype.getApplications();
 				
 				Application app = null;
@@ -175,7 +175,7 @@ public class ApplicationFactory implements IApplicationFactory
 			try
 			{
 				// todo: classloader null?
-				apptype = (ApplicationType)reader.read(new FileInputStream(filename), null);
+				apptype = (ApplicationType)reader.read(new FileInputStream(filename), null, null);
 				ret = new ApplicationModel(apptype, filename);
 //				System.out.println("Loaded application type: "+apptype);
 			

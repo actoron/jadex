@@ -144,19 +144,31 @@ public class OAVObjectType
 	 */
 	public OAVAttributeType	getAttributeType(String attribute)
 	{
+		OAVAttributeType ret = getAttributeType0(attribute);
+		
+		if(ret==null)
+			throw new RuntimeException("Attribute not found: "+this+", "+attribute);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get an attribute type description.
+	 *  @param attribute	The name of the attribute.
+	 *  @return The OAV attribute type.
+	 */
+	public OAVAttributeType	getAttributeType0(String attribute)
+	{
 		OAVAttributeType ret = (OAVAttributeType)(attributes!=null? attributes.get(attribute): null);
 		if(ret==null)
 		{
 			OAVObjectType	type	= this.getSupertype();
 			while(ret==null && type!=null)
 			{
-				ret = type.getAttributeType(attribute);
+				ret = type.getAttributeType0(attribute);
 				type = type.getSupertype();
 			}
 		}
-		
-		if(ret==null)
-			throw new RuntimeException("Attribute not found: "+this+", "+attribute);
 		
 		return ret;
 	}

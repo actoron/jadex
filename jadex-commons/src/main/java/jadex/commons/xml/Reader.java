@@ -14,9 +14,6 @@ public class Reader
 {
 	//-------- attributes --------
 	
-	/** The stack of elements. */
-	protected List stack;
-	
 	/** The object creator. */
 	protected IObjectHandler handler;
 	
@@ -29,7 +26,6 @@ public class Reader
 	public Reader(IObjectHandler handler)
 	{
 		this.handler = handler;
-		this.stack = new ArrayList();
 	}
 	
 	//-------- methods --------
@@ -38,8 +34,9 @@ public class Reader
 	 *  Read properties from xml.
 	 *  @param input The input stream.
 	 *  @param classloader The classloader.
+	 * 	@param context The context.
  	 */
-	public Object read(InputStream input, ClassLoader classloader) throws Exception
+	public Object read(InputStream input, ClassLoader classloader, Object context) throws Exception
 	{
 		XMLInputFactory	factory	= XMLInputFactory.newInstance();
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
@@ -59,7 +56,7 @@ public class Reader
 			
 			if(next==XMLStreamReader.START_ELEMENT)
 			{
-				Object elem = handler.createObject(parser, comment);
+				Object elem = handler.createObject(parser, comment, context, stack);
 				if(elem!=null)
 				{
 					stack.add(new Object[]{parser.getLocalName(), elem});
@@ -89,7 +86,7 @@ public class Reader
 						else
 						{
 							Object[] pse = (Object[])stack.get(stack.size()-1);
-							handler.linkObject(parser, se[1], pse[1]);
+							handler.linkObject(parser, se[1], pse[1], context, stack);
 						}
 					}
 				}

@@ -1,9 +1,13 @@
-package jadex.commons.xml;
+package jadex.rules.state.io.xml;
 
-import jadex.commons.SReflect;
+import jadex.commons.xml.IObjectHandler;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,9 +15,9 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- *  Handler for reading XML into Java beans.
+ *  Handler for reading XML into OAV objects.
  */
-public class BeanObjectHandler implements IObjectHandler
+public class OAVObjectHandler implements IObjectHandler
 {
 	//-------- static part --------
 	
@@ -47,18 +51,22 @@ public class BeanObjectHandler implements IObjectHandler
 	/** The type mappings. */
 	protected Map types;
 	
+	/** The ignored attribute types. */
+	protected Set ignored;
+	
 	/** The comment method name used for setting comments. */
-	protected String comname;
+//	protected String comname;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new bean object handler.
 	 */
-	public BeanObjectHandler(Map types, String comname)
+	public OAVObjectHandler(Map types, Set ignored)//, String comname)
 	{
 		this.types = types;
-		this.comname = comname;
+		this.ignored = ignored;
+//		this.comname = comname;
 	}
 	
 	//-------- methods --------
@@ -72,45 +80,68 @@ public class BeanObjectHandler implements IObjectHandler
 	public Object createObject(XMLStreamReader parser, String comment, Object context, List stack) throws Exception
 	{
 		Object ret = null;
+		IOAVState state = (IOAVState)context;
 		
-		Class clazz = (Class)types.get(parser.getLocalName());
-		if(clazz!=null)
+		OAVObjectType type = (OAVObjectType)types.get(parser.getLocalName());
+		if(type!=null)
 		{
-			if(isBuiltInType(clazz))
+//			if(isBuiltInType(clazz))
+//			{
+//				ret = convertBuiltInTypes(clazz, parser.getElementText());
+//			}
+//			else
 			{
-				ret = convertBuiltInTypes(clazz, parser.getElementText());
-			}
-			else
-			{
-				// Must have empty constructor.
-				ret = clazz.newInstance();
+				boolean root = stack.size()==0;
+				
+				if(root)
+				{
+					ret = state.createRootObject(type);
+				}
+				else
+				{
+					ret = state.createObject(type);
+				}
 				
 				// Handle attributes
 				for(int i=0; i<parser.getAttributeCount(); i++)
 				{
 					String attrname = parser.getAttributeLocalName(i);
-					String attrval = parser.getAttributeValue(i);
 					
-					String mname = "set"+attrname.substring(0,1).toUpperCase()+attrname.substring(1);
-					Method[] ms = SReflect.getMethods(clazz, mname);
-					for(int j=0; j<ms.length; j++)
+					if(ignored==null || !ignored.contains(attrname))
 					{
-						Class[] ps = ms[j].getParameterTypes();
-						if(ps.length==1)
+						String attrval = parser.getAttributeValue(i);
+						
+						String aname = type.getName()+"_has_"+attrname;
+						
+						OAVAttributeType atype = type.getAttributeType0(aname);
+						if(atype==null)
 						{
-							Object arg = convertBuiltInTypes(ps[0], attrval);
-							ms[j].invoke(ret, new Object[]{arg});
+							System.out.println("Could not find attribute: "+atype);
+						}
+						else	
+						{
+							Object arg = atype.getObjectType() instanceof OAVJavaType?
+								convertBuiltInTypes(((OAVJavaType)atype.getObjectType()).getClazz(), attrval): attrval;
+					
+							if(atype.getMultiplicity().equals(OAVAttributeType.NONE))
+							{
+								state.setAttributeValue(ret, atype, arg);
+							}
+							else
+							{
+								state.addAttributeValue(ret, atype, arg);
+							}
 						}
 					}
 				}
 				
 				// If comment method name is set, set the comment.
-				if(comname!=null)
-				{
-					Method m = SReflect.getMethod(clazz, comname, new Class[]{String.class});
-					if(m!=null)
-						m.invoke(ret, new Object[]{comment});
-				}
+//				if(comname!=null)
+//				{
+//					Method m = SReflect.getMethod(type, comname, new Class[]{String.class});
+//					if(m!=null)
+//						m.invoke(ret, new Object[]{comment});
+//				}
 			}
 		}
 		else
@@ -129,32 +160,64 @@ public class BeanObjectHandler implements IObjectHandler
 	 */
 	public void linkObject(XMLStreamReader parser, Object elem, Object parent, Object context, List stack) throws Exception
 	{
-		// Add object to its parent.
-		String clname = isBuiltInType(elem.getClass())?
-			parser.getLocalName().substring(0, 1).toUpperCase()+parser.getLocalName().substring(1)
-			:SReflect.getInnerClassName(elem.getClass());
+		IOAVState state = (IOAVState)context;
 		
-		String mname = "set"+clname;
-		Method[] ms = SReflect.getMethods(parent.getClass(), mname);
-		for(int i=0; i<ms.length; i++)
+		// Find attribute where to set/add the child element.
+		OAVObjectType elemtype = state.getType(elem);
+		OAVObjectType parenttype = state.getType(parent);
+		
+		// Try the tag name when basic type.
+	
+		boolean set = false;
+		if(elemtype instanceof OAVJavaType && isBuiltInType(((OAVJavaType)elemtype).getClazz()))
 		{
-			Class[] ps = ms[i].getParameterTypes();
-			if(ps.length==1 && ps[0].isAssignableFrom(elem.getClass()))
-			{
-				ms[i].invoke(parent, new Object[]{elem});
-			}
+			set = internalLinkObjects(parser.getLocalName(), elemtype, parenttype, state);	
 		}
 		
-		mname = "add"+clname;
-		ms = SReflect.getMethods(parent.getClass(), mname);
-		for(int i=0; i<ms.length; i++)
+		if(!set)
 		{
-			Class[] ps = ms[i].getParameterTypes();
-			if(ps.length==1 && ps[0].isAssignableFrom(elem.getClass()))
+			set = internalLinkObjects(state.getType(elem).getName(), elemtype, parenttype, state);	
+		}			
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean internalLinkObjects(String attrname, Object elem, Object parent, IOAVState state)
+	{
+		boolean ret = false;
+		OAVAttributeType attrtype = null;
+		OAVObjectType tmptype = state.getType(parent);
+		
+		while(attrtype==null && tmptype!=null)
+		{
+			String tmpname = tmptype.getName()+"_has_"+attrname;
+			
+			for(Iterator it=tmptype.getDeclaredAttributeTypes().iterator(); it.hasNext(); )
 			{
-				ms[i].invoke(parent, new Object[]{elem});
+				OAVAttributeType attr = (OAVAttributeType)it.next();
+				if(attr.getName().equals(tmpname))
+					attrtype = attr;
 			}
+			
+			if(attrtype==null)
+				tmptype = tmptype.getSupertype();
 		}
+		
+		if(attrtype!=null)
+		{
+			if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
+			{
+				state.setAttributeValue(parent, attrtype, elem);
+			}
+			else
+			{
+				state.addAttributeValue(parent, attrtype, elem);
+			}
+			ret = true;
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -219,4 +282,5 @@ public class BeanObjectHandler implements IObjectHandler
 	{
 		return builtintypes.contains(clazz);
 	}
+	
 }

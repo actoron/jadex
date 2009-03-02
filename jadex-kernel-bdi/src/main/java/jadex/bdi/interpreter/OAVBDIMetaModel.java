@@ -15,10 +15,14 @@ import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.io.xml.BasicValueConverter;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.IValueConverter;
+import jadex.rules.state.io.xml.OAVObjectHandler;
 import jadex.rules.state.io.xml.OAVXMLHelper;
 import jadex.rules.state.io.xml.OAVXMLMapping;
 import jadex.rules.state.io.xml.StackElement;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1919,5 +1923,4 @@ public class OAVBDIMetaModel
 			return ret;
 		}
 	}
-	
 }
