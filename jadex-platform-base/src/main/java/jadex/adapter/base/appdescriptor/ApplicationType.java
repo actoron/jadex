@@ -28,6 +28,9 @@ public class ApplicationType
 	/** The list of contained application descriptions. */
 	protected List applications;
 	
+	/** The description. */
+	protected String description;
+	
 	//-------- constructors --------
 	
 	/**
@@ -75,6 +78,24 @@ public class ApplicationType
 	public void setPackage(String packagename)
 	{
 		this.packagename = packagename;
+	}
+	
+	/**
+	 *  Get the model description.
+	 *  @return The model description.
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+	
+	/**
+	 *  Set the description.
+	 *  @param desc The description.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 
 	/**

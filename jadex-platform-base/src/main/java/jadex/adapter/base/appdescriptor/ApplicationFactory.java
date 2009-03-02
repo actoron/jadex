@@ -1,14 +1,14 @@
 package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.appdescriptor.reader.BeanObjectHandler;
-import jadex.adapter.base.appdescriptor.reader.Reader;
 import jadex.adapter.base.contextservice.IContextService;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
+import jadex.commons.xml.BeanObjectHandler;
+import jadex.commons.xml.Reader;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
@@ -65,7 +65,7 @@ public class ApplicationFactory implements IApplicationFactory
 		types.put("import", String.class);
 		types.put("property", String.class);
 		
-		this.reader = new Reader(new BeanObjectHandler(types));
+		this.reader = new Reader(new BeanObjectHandler(types, "setDescription"));
 	}
 	
 	//-------- IAgentFactory interface --------

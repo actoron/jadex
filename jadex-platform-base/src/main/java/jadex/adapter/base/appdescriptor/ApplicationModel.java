@@ -21,7 +21,7 @@ public class ApplicationModel implements ILoadableElementModel
 	
 	/** The filename. */
 	protected String filename;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -48,6 +48,15 @@ public class ApplicationModel implements ILoadableElementModel
 	 *  Get the model description.
 	 *  @return The model description.
 	 */
+	public String getDescription()
+	{
+		return apptype.getDescription();
+	}
+	
+	/**
+	 *  Get the model description.
+	 *  @return The model description.
+	 * /
 	public String getDescription()
 	{
 		String ret = null;
@@ -107,7 +116,7 @@ public class ApplicationModel implements ILoadableElementModel
 			ret = "No description available: "+e;
 		}
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the report.
