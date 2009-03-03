@@ -190,6 +190,13 @@ public class OAVObjectHandler implements IObjectHandler
 	{
 		IOAVState state = (IOAVState)context;
 		
+		// Call post-processor if any.
+		OAVMappingInfo mapinfo = (OAVMappingInfo)typeinfos.get(parser.getLocalName());
+		if(mapinfo!=null && mapinfo.getPostProcessor()!=null)
+		{
+			mapinfo.getPostProcessor().postProcess(state, elem, ((Object[])stack.get(0))[1]);
+		}
+
 		// Find attribute where to set/add the child element.
 		
 		boolean set = false;

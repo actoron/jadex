@@ -25,25 +25,29 @@ public class OAVMappingInfo
 	
 	/** The attribute mappings. */
 	protected Map attributes;
+
+	/** The post processor (if any). */
+	protected IPostProcessor	pproc;
 	
 	/**
 	 * 
 	 */
 	public OAVMappingInfo(String xmlpath, OAVObjectType type)
 	{
-		this(xmlpath, type, null, null, null);
+		this(xmlpath, type, null, null, null, null);
 	}
 	
 	/**
 	 * 
 	 */
-	public OAVMappingInfo(String xmlpath, OAVObjectType type, OAVAttributeType comment, OAVAttributeType content, Map attributes)
+	public OAVMappingInfo(String xmlpath, OAVObjectType type, OAVAttributeType comment, OAVAttributeType content, Map attributes, IPostProcessor pproc)
 	{
 		this.xmlpath = xmlpath;
 		this.type = type;
 		this.comment = comment;
 		this.content = content;
 		this.attributes = attributes;
+		this.pproc = pproc;
 	}
 
 	/**
@@ -127,4 +131,22 @@ public class OAVMappingInfo
 	{
 		return attributes==null? null: (OAVAttributeType)attributes.get(xmlname);
 	}
+
+	/**
+	 *  Get the post-processor.
+	 *  @return The post-processor
+	 */
+	public IPostProcessor	getPostProcessor()
+	{
+		return this.pproc;
+	}
+
+	/**
+	 *  Set the post-processor.
+	 *  @param pproc The post-processor.
+	 */
+	public void setPostProcessor(IPostProcessor pproc)
+	{
+		this.pproc = pproc;
+	}	
 }
