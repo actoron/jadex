@@ -59,21 +59,16 @@ public class OAVObjectHandler implements IObjectHandler
 	/** The ignored attribute types. */
 	protected Set ignoredattrs;
 	
-	/** The comment method name used for setting comments. */
-//	protected String comname;
-	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new bean object handler.
 	 */
-	public OAVObjectHandler(Set typeinfos, Map linkinfos, Set ignoredattrs)//, String comname)
+	public OAVObjectHandler(Set typeinfos, Map linkinfos, Set ignoredattrs)
 	{
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
 		this.linkinfos = linkinfos!=null? linkinfos: Collections.EMPTY_MAP;
 		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
-
-//		this.comname = comname;
 	}
 	
 	//-------- methods --------
@@ -166,12 +161,14 @@ public class OAVObjectHandler implements IObjectHandler
 				}
 				
 				// If comment method name is set, set the comment.
-//				if(comname!=null)
-//				{
-//					Method m = SReflect.getMethod(type, comname, new Class[]{String.class});
-//					if(m!=null)
-//						m.invoke(ret, new Object[]{comment});
-//				}
+				if(comment!=null)
+				{
+					OAVAttributeType comattr = mapinfo.getComment();
+					if(comattr!=null)
+					{
+						state.setAttributeValue(ret, comattr, comment);
+					}
+				}
 			}
 		}
 		else
