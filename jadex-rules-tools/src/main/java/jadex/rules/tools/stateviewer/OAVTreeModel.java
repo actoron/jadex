@@ -1118,8 +1118,6 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public List	getChildren()
 		{
-			if(toString().equals("imports"))
-				System.out.println("fsklu bgl");
 			if(children==null)
 			{
 				children 	= new ArrayList();
