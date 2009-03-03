@@ -198,6 +198,10 @@ public class OAVObjectHandler implements IObjectHandler
 			throw new RuntimeException("No information for handling content: "+parser.getLocalName());
 
 		OAVAttributeType attrtype = mapinfo.getContent();
+		
+		if(attrtype==null)
+			throw new RuntimeException("No content mapping: "+parser.getLocalName());
+		
 		setAttributeValue(state, elem, attrtype, content);
 	}
 	

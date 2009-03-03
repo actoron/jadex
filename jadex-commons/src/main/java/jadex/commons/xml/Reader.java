@@ -91,6 +91,7 @@ public class Reader
 					Object[] se = (Object[])objectstack.get(objectstack.size()-1);
 					
 					// Hack. Add content when it is element of its own.
+					content = content.trim();
 					if(content.length()>0 && !se[0].equals(parser.getLocalName()))
 					{
 						Object[] tmp = new Object[]{parser.getLocalName(), content, getDocumentPosition(xmlstack)};
@@ -102,7 +103,10 @@ public class Reader
 					if(se[0].equals(parser.getLocalName()))
 					{
 						if(content.length()>0)
+						{
 							handler.handleContent(parser, se[1], content, context, objectstack);
+							content = "";
+						}
 						
 						if(objectstack.size()==1)
 						{
