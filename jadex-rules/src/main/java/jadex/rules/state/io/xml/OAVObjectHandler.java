@@ -130,7 +130,9 @@ public class OAVObjectHandler implements IObjectHandler
 					{
 						String attrval = parser.getAttributeValue(i);
 						
-						OAVAttributeType attrtype = null;
+						OAVAttributeType attrtype = mapinfo.getAttributeType(attrname);
+						
+						// Search attribute in type and supertypes.
 						OAVObjectType tmptype = type;
 						while(attrtype==null && tmptype!=null)
 						{
@@ -178,6 +180,25 @@ public class OAVObjectHandler implements IObjectHandler
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Handle content for an object.
+	 *  @param parser The parser.
+	 *  @param comment The comment.
+	 *  @param context The context.
+	 *  @return The created object (or null for none).
+	 */
+	public void handleContent(XMLStreamReader parser, Object elem, String content, Object context, List stack) throws Exception
+	{
+		IOAVState state = (IOAVState)context;
+		OAVMappingInfo mapinfo = (OAVMappingInfo)typeinfos.get(parser.getLocalName());
+		
+		if(mapinfo==null)
+			throw new RuntimeException("No information for handling content: "+parser.getLocalName());
+
+		OAVAttributeType attrtype = mapinfo.getContent();
+		setAttributeValue(state, elem, attrtype, content);
 	}
 	
 	/**

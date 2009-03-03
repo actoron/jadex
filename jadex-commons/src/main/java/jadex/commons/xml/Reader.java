@@ -44,6 +44,7 @@ public class Reader
 		List objectstack = new ArrayList();
 		List xmlstack = new ArrayList();
 		String comment = null;
+		String content = null;
 		
 		while(parser.hasNext())
 		{
@@ -55,8 +56,17 @@ public class Reader
 				System.out.println("Found comment: "+comment);
 			}
 			
+			if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
+			{
+				content += parser.getText(); 
+				
+				System.out.println("content: "+parser.getLocalName()+" "+content+" "+xmlstack);
+			}
+			
 			if(next==XMLStreamReader.START_ELEMENT)
 			{
+				content = "";	
+
 				xmlstack.add(parser.getLocalName());
 				
 				Object elem = handler.createObject(parser, comment, context, objectstack);
@@ -79,8 +89,21 @@ public class Reader
 				{
 					// Pop element from stack if there is one for the tag.
 					Object[] se = (Object[])objectstack.get(objectstack.size()-1);
+					
+					// Hack. Add content when it is element of its own.
+					if(content.length()>0 && !se[0].equals(parser.getLocalName()))
+					{
+						Object[] tmp = new Object[]{parser.getLocalName(), content, getDocumentPosition(xmlstack)};
+						objectstack.add(tmp);
+						se = tmp;
+						content = "";
+					}
+					
 					if(se[0].equals(parser.getLocalName()))
 					{
+						if(content.length()>0)
+							handler.handleContent(parser, se[1], content, context, objectstack);
+						
 						if(objectstack.size()==1)
 						{
 							root = se[1];
@@ -90,7 +113,6 @@ public class Reader
 							Object[] pse = (Object[])objectstack.get(objectstack.size()-2);
 							handler.linkObject(parser, se[1], pse[1], context, objectstack);
 						}
-						
 						objectstack.remove(objectstack.size()-1);
 					}
 				}
