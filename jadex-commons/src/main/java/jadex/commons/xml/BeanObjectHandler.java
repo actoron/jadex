@@ -123,6 +123,18 @@ public class BeanObjectHandler implements IObjectHandler
 	}
 	
 	/**
+	 *  Handle content for an object.
+	 *  @param parser The parser.
+	 *  @param comment The comment.
+	 *  @param context The context.
+	 *  @return The created object (or null for none).
+	 */
+	public void handleContent(XMLStreamReader parser, Object elem, String content, Object context, List stack) throws Exception
+	{
+		throw new UnsupportedOperationException("Content not yet supported.");
+	}
+
+	/**
 	 *  Link an object to its parent.
 	 *  @param parser The parser.
 	 *  @param elem The element.

@@ -180,37 +180,6 @@ public class OAVBDIXMLReader
 //							report.put(se, e.toString());
 //							e.printStackTrace();
 						}
-						
-//						// Trigger reference has expression and referenced element
-//						if(state.getType(se.object).equals(triggerreference_type))
-//						{
-//							Collection	triggerelems	= null;
-//							Object trigger = ((StackElement)stack.get(stack.size()-3)).object;
-//							if(((StackElement)stack.get(stack.size()-2)).path.endsWith("goalfinished"))
-//							{
-//								triggerelems	= state.getAttributeValues(trigger, trigger_has_goalfinisheds);
-//							}
-//							else if(((StackElement)stack.get(stack.size()-2)).path.endsWith("internalevent"))
-//							{
-//								triggerelems	= state.getAttributeValues(trigger, trigger_has_internalevents);
-//							}
-//							else if(((StackElement)stack.get(stack.size()-2)).path.endsWith("messageevent"))
-//							{
-//								triggerelems	= state.getAttributeValues(trigger, trigger_has_messageevents);
-//							}
-//							else if(((StackElement)stack.get(stack.size()-2)).path.endsWith("goal"))
-//							{
-//								triggerelems	= state.getAttributeValues(trigger, plantrigger_has_goals);
-//							}
-//							
-//							// Find last element (hack???)
-//							Object	triggerelem	= null;
-//							if(triggerelems!=null)
-//								for(Iterator it=triggerelems.iterator(); it.hasNext();)
-//									triggerelem	= it.next();
-//
-//							state.setAttributeValue(se.object, triggerreference_has_ref, triggerelem);
-//						}
 					}
 					else if("clips".equals(lang))
 					{
