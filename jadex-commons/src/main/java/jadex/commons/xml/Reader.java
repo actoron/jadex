@@ -56,14 +56,14 @@ public class Reader
 				System.out.println("Found comment: "+comment);
 			}
 			
-			if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
+			else if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
 			{
 				content += parser.getText(); 
 				
 				System.out.println("content: "+parser.getLocalName()+" "+content+" "+xmlstack);
 			}
 			
-			if(next==XMLStreamReader.START_ELEMENT)
+			else if(next==XMLStreamReader.START_ELEMENT)
 			{
 				content = "";	
 
@@ -74,14 +74,14 @@ public class Reader
 				{
 					objectstack.add(new Object[]{parser.getLocalName(), elem, getDocumentPosition(xmlstack)});
 					// Stax spec requires reader to advance cursor when getElementText() is called :-(
-					next = parser.getEventType();
+//					next = parser.getEventType();
 					comment = null;
 				}
 				
 				System.out.println("start: "+parser.getLocalName()+" "+xmlstack);
 			}
 			
-			if(next==XMLStreamReader.END_ELEMENT)
+			else if(next==XMLStreamReader.END_ELEMENT)
 			{
 				System.out.println("end: "+parser.getLocalName()+" "+xmlstack);
 				

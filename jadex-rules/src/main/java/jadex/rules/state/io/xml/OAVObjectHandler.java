@@ -101,12 +101,12 @@ public class OAVObjectHandler implements IObjectHandler
 				if(parser.getAttributeCount()==1)
 				{	
 					strval = parser.getAttributeValue(0);
+					ret = convertBuiltInTypes(((OAVJavaType)type).getClazz(), strval);
 				}
-				else 
-				{	
-					strval = parser.getElementText();
-				}
-				ret = convertBuiltInTypes(((OAVJavaType)type).getClazz(), strval);
+//				else 
+//				{	
+//					strval = parser.getElementText();
+//				}
 			}
 			else
 			{
