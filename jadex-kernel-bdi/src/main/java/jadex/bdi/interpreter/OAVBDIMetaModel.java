@@ -1094,7 +1094,7 @@ public class OAVBDIMetaModel
 		capability_has_capabilityrefs = capability_type.createAttributeType("mcapability_has_mcapabilityrefs", capabilityref_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_beliefs = capability_type.createAttributeType("mcapability_has_mbeliefs", belief_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_beliefsets = capability_type.createAttributeType("mcapability_has_mbeliefsets", beliefset_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_beliefrefs = capability_type.createAttributeType("mcapability_has_beliefrefs", beliefreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_beliefrefs = capability_type.createAttributeType("mcapability_has_mbeliefrefs", beliefreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_beliefsetrefs = capability_type.createAttributeType("mcapability_has_mbeliefsetrefs", beliefsetreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_goals = capability_type.createAttributeType("mcapability_has_mgoals", goal_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_goalrefs = capability_type.createAttributeType("mcapability_has_mgoalrefs", goalreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);

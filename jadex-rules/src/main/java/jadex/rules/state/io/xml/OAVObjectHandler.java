@@ -6,6 +6,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,13 +49,13 @@ public class OAVObjectHandler implements IObjectHandler
 	//-------- attributes --------
 	
 	/** The type mappings. */
-	protected Map types;
-	
-	/** The ignored attribute types. */
-	protected Set ignored;
+	protected Map typeinfos;
 	
 	/** The link object infos. */
-	protected Map links;
+	protected Map linkinfos;
+	
+	/** The ignored attribute types. */
+	protected Set ignoredattrs;
 	
 	/** The comment method name used for setting comments. */
 //	protected String comname;
@@ -64,10 +65,12 @@ public class OAVObjectHandler implements IObjectHandler
 	/**
 	 *  Create a new bean object handler.
 	 */
-	public OAVObjectHandler(Map types, Set ignored, Map links)//, String comname)
+	public OAVObjectHandler(Map typeinfos, Map linkinfos, Set ignoredattrs)//, String comname)
 	{
-		this.types = types;
-		this.ignored = ignored;
+		this.typeinfos = typeinfos!=null? typeinfos: Collections.EMPTY_MAP;
+		this.linkinfos = linkinfos!=null? linkinfos: Collections.EMPTY_MAP;
+		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
+
 //		this.comname = comname;
 	}
 	
@@ -84,12 +87,21 @@ public class OAVObjectHandler implements IObjectHandler
 		Object ret = null;
 		IOAVState state = (IOAVState)context;
 		
-		OAVObjectType type = (OAVObjectType)types.get(parser.getLocalName());
+		OAVObjectType type = (OAVObjectType)typeinfos.get(parser.getLocalName());
 		if(type!=null)
 		{
 			if(type instanceof OAVJavaType && isBuiltInType(((OAVJavaType)type).getClazz()))
 			{
-				ret = convertBuiltInTypes(((OAVJavaType)type).getClazz(), parser.getElementText());
+				String strval;
+				if(parser.getAttributeCount()==1)
+				{	
+					strval = parser.getAttributeValue(0);
+				}
+				else 
+				{	
+					strval = parser.getElementText();
+				}
+				ret = convertBuiltInTypes(((OAVJavaType)type).getClazz(), strval);
 			}
 			else
 			{
@@ -109,7 +121,7 @@ public class OAVObjectHandler implements IObjectHandler
 				{
 					String attrname = parser.getAttributeLocalName(i);
 					
-					if(ignored==null || !ignored.contains(attrname))
+					if(!ignoredattrs.contains(attrname))
 					{
 						String attrval = parser.getAttributeValue(i);
 						
@@ -174,13 +186,25 @@ public class OAVObjectHandler implements IObjectHandler
 		IOAVState state = (IOAVState)context;
 		
 		// Find attribute where to set/add the child element.
-		OAVObjectType elemtype = state.getType(elem);
 		
 		boolean set = false;
 		
-		set = internalLinkObjects(parser.getLocalName(), elem, parent, state);
+		String linkinfo = (String)linkinfos.get(((Object[])stack.get(stack.size()-1))[2]);
+
+		if(linkinfo!=null)
+		{
+			OAVAttributeType attrtype = state.getType(parent).getAttributeType(linkinfo);
+			setAttributeValue(state, parent, attrtype, elem);
+			set= true;
+		}
 		
-		if(!set && !(elemtype instanceof OAVJavaType && isBuiltInType(((OAVJavaType)elemtype).getClazz())))
+		if(!set)
+		{
+			set = internalLinkObjects(parser.getLocalName(), elem, parent, state);
+		}
+		
+		if(!set && !(state.getType(elem) instanceof OAVJavaType 
+			&& isBuiltInType(((OAVJavaType)state.getType(elem)).getClazz())))
 		{
 			set = internalLinkObjects(state.getType(elem).getName(), elem, parent, state);	
 		}	
@@ -214,25 +238,33 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		if(attrtype!=null)
 		{
-			if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
-			{
-				state.setAttributeValue(parent, attrtype, elem);
-			}
-			else
-			{
-				try
-				{
-					state.addAttributeValue(parent, attrtype, elem);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
+			setAttributeValue(state, parent, attrtype, elem);
 			ret = true;
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void setAttributeValue(IOAVState state, Object parent, OAVAttributeType attrtype, Object elem)
+	{
+		if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
+		{
+			state.setAttributeValue(parent, attrtype, elem);
+		}
+		else
+		{
+			try
+			{
+				state.addAttributeValue(parent, attrtype, elem);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**

@@ -25,41 +25,65 @@ public class ReaderMain
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		Map types = new HashMap();
-		types.put("agent", OAVBDIMetaModel.agent_type);
-		types.put("capabilities/capability", OAVBDIMetaModel.capabilityref_type);
-		types.put("capability", OAVBDIMetaModel.capability_type);
-		types.put("import", OAVJavaType.java_string_type);
-		types.put("belief", OAVBDIMetaModel.belief_type);
-		types.put("beliefset", OAVBDIMetaModel.beliefset_type);
-		types.put("performgoal", OAVBDIMetaModel.performgoal_type);
-		types.put("achievegoal", OAVBDIMetaModel.achievegoal_type);
-		types.put("querygoal", OAVBDIMetaModel.querygoal_type);
-		types.put("maintaingoal", OAVBDIMetaModel.maintaingoal_type);
-		types.put("metagoal", OAVBDIMetaModel.metagoal_type);
-		types.put("plan", OAVBDIMetaModel.plan_type);
-		types.put("expression", OAVBDIMetaModel.expression_type);
-		types.put("property", OAVBDIMetaModel.expression_type);
-		types.put("fact", OAVBDIMetaModel.expression_type);
-		types.put("facts", OAVBDIMetaModel.expression_type);
-		types.put("value", OAVBDIMetaModel.expression_type);
-		types.put("values", OAVBDIMetaModel.expression_type);
-		types.put("configuration", OAVBDIMetaModel.configuration_type);
-		types.put("initialbelief", OAVBDIMetaModel.configbelief_type);
-		types.put("initialbeliefset", OAVBDIMetaModel.configbeliefset_type);
-		types.put("initialgoal", OAVBDIMetaModel.configelement_type);
-		types.put("initialplan", OAVBDIMetaModel.configelement_type);
-		types.put("initialinternalevent", OAVBDIMetaModel.configelement_type);
-		types.put("initialmessageevent", OAVBDIMetaModel.configelement_type);
-		types.put("endgoal", OAVBDIMetaModel.configelement_type);
-		types.put("endplan", OAVBDIMetaModel.configelement_type);
-		types.put("endinternalevent", OAVBDIMetaModel.configelement_type);
-		types.put("endmessageevent", OAVBDIMetaModel.configelement_type);
+		Map typeinfos = new HashMap();
+		typeinfos.put("agent", OAVBDIMetaModel.agent_type);
+		typeinfos.put("capabilities/capability", OAVBDIMetaModel.capabilityref_type);
+		typeinfos.put("capability", OAVBDIMetaModel.capability_type);
+		typeinfos.put("import", OAVJavaType.java_string_type);
+		typeinfos.put("belief", OAVBDIMetaModel.belief_type);
+		typeinfos.put("beliefref", OAVBDIMetaModel.beliefreference_type);
+		typeinfos.put("beliefset", OAVBDIMetaModel.beliefset_type);
+		typeinfos.put("beliefsetref", OAVBDIMetaModel.beliefsetreference_type);
+		typeinfos.put("performgoal", OAVBDIMetaModel.performgoal_type);
+		typeinfos.put("performgoalref", OAVBDIMetaModel.goalreference_type);
+		typeinfos.put("achievegoal", OAVBDIMetaModel.achievegoal_type);
+		typeinfos.put("achievegoalref", OAVBDIMetaModel.goalreference_type);
+		typeinfos.put("querygoal", OAVBDIMetaModel.querygoal_type);
+		typeinfos.put("querygoalref", OAVBDIMetaModel.goalreference_type);
+		typeinfos.put("maintaingoal", OAVBDIMetaModel.maintaingoal_type);
+		typeinfos.put("maintaingoalref", OAVBDIMetaModel.goalreference_type);
+		typeinfos.put("metagoal", OAVBDIMetaModel.metagoal_type);
+		typeinfos.put("metagoalref", OAVBDIMetaModel.goalreference_type);
+		typeinfos.put("plan", OAVBDIMetaModel.plan_type);
+		typeinfos.put("internalevent", OAVBDIMetaModel.internalevent_type);
+		typeinfos.put("internaleventref", OAVBDIMetaModel.internaleventreference_type);
+		typeinfos.put("messageevent", OAVBDIMetaModel.messageevent_type);
+		typeinfos.put("messageeventref", OAVBDIMetaModel.messageeventreference_type);
+		typeinfos.put("expression", OAVBDIMetaModel.expression_type);
+		typeinfos.put("property", OAVBDIMetaModel.expression_type);
+		typeinfos.put("fact", OAVBDIMetaModel.expression_type);
+		typeinfos.put("facts", OAVBDIMetaModel.expression_type);
+		typeinfos.put("value", OAVBDIMetaModel.expression_type);
+		typeinfos.put("values", OAVBDIMetaModel.expression_type);
+		typeinfos.put("configuration", OAVBDIMetaModel.configuration_type);
+		typeinfos.put("initialbelief", OAVBDIMetaModel.configbelief_type);
+		typeinfos.put("initialbeliefset", OAVBDIMetaModel.configbeliefset_type);
+		typeinfos.put("initialgoal", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("initialplan", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("initialinternalevent", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("initialmessageevent", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("endgoal", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("endplan", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("endinternalevent", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("endmessageevent", OAVBDIMetaModel.configelement_type);
+		typeinfos.put("concrete", OAVJavaType.java_string_type);
 
-		Set ignored = new HashSet();
-		ignored.add("schemaLocation");
+		Map linkinfos = new HashMap();
+		linkinfos.put("agent/properties/property", "mcapability_has_mproperties");
+		linkinfos.put("agent/goals/performgoal", "mcapability_has_mgoals");
+		linkinfos.put("agent/goals/achievegoal", "mcapability_has_mgoals");
+		linkinfos.put("agent/goals/querygoal", "mcapability_has_mgoals");
+		linkinfos.put("agent/goals/maintaingoal", "mcapability_has_mgoals");
+		linkinfos.put("agent/goals/metagoal", "mcapability_has_mgoals");
+		linkinfos.put("agent/goals/achievegoalref", "mcapability_has_mgoalrefs");
+		linkinfos.put("agent/goals/querygoalref", "mcapability_has_mgoalrefs");
+		linkinfos.put("agent/goals/maintaingoalref", "mcapability_has_mgoalrefs");
+		linkinfos.put("agent/goals/metagoalref", "mcapability_has_mgoalrefs");
 		
-		jadex.commons.xml.Reader reader = new jadex.commons.xml.Reader(new OAVObjectHandler(types, ignored));
+		Set ignoredattrs = new HashSet();
+		ignoredattrs.add("schemaLocation");
+		
+		jadex.commons.xml.Reader reader = new jadex.commons.xml.Reader(new OAVObjectHandler(typeinfos, linkinfos, ignoredattrs));
 		
 		OAVTypeModel typemodel	= new OAVTypeModel("test_typemodel", null);
 		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 

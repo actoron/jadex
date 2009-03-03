@@ -41,7 +41,8 @@ public class Reader
 		XMLInputFactory	factory	= XMLInputFactory.newInstance();
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
 		Object root = null;
-		List stack	= new ArrayList();
+		List objectstack = new ArrayList();
+		List xmlstack = new ArrayList();
 		String comment = null;
 		
 		while(parser.hasNext())
@@ -56,45 +57,65 @@ public class Reader
 			
 			if(next==XMLStreamReader.START_ELEMENT)
 			{
-				Object elem = handler.createObject(parser, comment, context, stack);
+				xmlstack.add(parser.getLocalName());
+				
+				Object elem = handler.createObject(parser, comment, context, objectstack);
 				if(elem!=null)
 				{
-					stack.add(new Object[]{parser.getLocalName(), elem});
+					objectstack.add(new Object[]{parser.getLocalName(), elem, getDocumentPosition(xmlstack)});
 					// Stax spec requires reader to advance cursor when getElementText() is called :-(
 					next = parser.getEventType();
 					comment = null;
 				}
 				
-				System.out.println("start: "+parser.getLocalName());
+				System.out.println("start: "+parser.getLocalName()+" "+xmlstack);
 			}
 			
 			if(next==XMLStreamReader.END_ELEMENT)
 			{
-				System.out.println("end: "+parser.getLocalName());
+				System.out.println("end: "+parser.getLocalName()+" "+xmlstack);
 				
-				if(stack.size()>0)
+				if(objectstack.size()>0)
 				{
 					// Pop element from stack if there is one for the tag.
-					Object[] se = (Object[])stack.get(stack.size()-1);
+					Object[] se = (Object[])objectstack.get(objectstack.size()-1);
 					if(se[0].equals(parser.getLocalName()))
 					{
-						stack.remove(stack.size()-1);
-						if(stack.size()==0)
+						if(objectstack.size()==1)
 						{
 							root = se[1];
 						}
 						else
 						{
-							Object[] pse = (Object[])stack.get(stack.size()-1);
-							handler.linkObject(parser, se[1], pse[1], context, stack);
+							Object[] pse = (Object[])objectstack.get(objectstack.size()-2);
+							handler.linkObject(parser, se[1], pse[1], context, objectstack);
 						}
+						
+						objectstack.remove(objectstack.size()-1);
 					}
 				}
+			
+				xmlstack.remove(xmlstack.size()-1);
 			}
 		}
 		parser.close();
 		
 		return root;
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getDocumentPosition(List xmlstack)
+	{
+		StringBuffer ret = new StringBuffer();
+		for(int i=0; i<xmlstack.size(); i++)
+		{
+			ret.append(xmlstack.get(i));
+			if(i<xmlstack.size()-1)
+				ret.append("/");
+		}
+		return ret.toString();
 	}
 	
 	/**
