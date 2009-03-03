@@ -2,13 +2,9 @@ package jadex.bdi.examples.cleanerworld2.cleaner.task;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
-import jadex.bdi.planlib.simsupport.environment.simobject.task.SetDestinationTask;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
-import jadex.bdi.planlib.simsupport.environment.simobject.task.MoveObjectTask;
 
 /** Task simulating the slow discharging of the cleaner's battery.
  */

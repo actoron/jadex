@@ -1,7 +1,5 @@
 package jadex.bdi.planlib.simsupport.observer.capability.plugin;
 
-import jadex.bdi.planlib.simsupport.common.graphics.IViewportListener;
-import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.observer.capability.ObserverCenter;

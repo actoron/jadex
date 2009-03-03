@@ -1,7 +1,5 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.interpreter.MessageEventRules;
-import jadex.bdi.runtime.impl.MessageEventFlyweight;
 
 
 /**

@@ -1,6 +1,5 @@
 package jadex.adapter.standalone.transport.codecs;
 
-import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 
 import java.lang.reflect.Field;

@@ -2,9 +2,6 @@ package jadex.bdi.examples.hunterprey2.environment;
 
 import jadex.bdi.examples.hunterprey2.Configuration;
 import jadex.bdi.examples.hunterprey2.Creature;
-import jadex.bdi.examples.hunterprey2.Food;
-import jadex.bdi.examples.hunterprey2.Location;
-import jadex.bdi.examples.hunterprey2.Obstacle;
 import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.Rectangle;
@@ -12,14 +9,11 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.GridLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
-import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.observer.capability.plugin.IObserverCenterPlugin;
-import jadex.bdi.planlib.starter.StartAgentInfo;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;

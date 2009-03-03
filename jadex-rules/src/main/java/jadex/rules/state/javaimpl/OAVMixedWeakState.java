@@ -4,7 +4,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IdentityHashSet;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;

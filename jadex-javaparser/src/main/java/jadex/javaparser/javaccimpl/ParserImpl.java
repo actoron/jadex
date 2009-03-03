@@ -3,8 +3,9 @@ package jadex.javaparser.javaccimpl;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import java.util.Map;
+
 import java.util.ArrayList;
+import java.util.Map;
 
 
 /**

@@ -33,7 +33,7 @@ public class ApplicationContext	extends BaseContext
 	protected IPlatform	platform;
 	
 	/** The application type. */
-	protected ApplicationType	apptype;
+	protected MApplicationType	apptype;
 	
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more agents can be added). */
@@ -48,7 +48,7 @@ public class ApplicationContext	extends BaseContext
 	{
 		super(name, /*parent,*/ properties);
 		this.platform	= platform;
-		this.apptype	= properties!=null ? (ApplicationType)properties.get(PROPERTY_APPLICATION_TYPE) : null;
+		this.apptype	= properties!=null ? (MApplicationType)properties.get(PROPERTY_APPLICATION_TYPE) : null;
 		if(apptype==null)
 			throw new RuntimeException("Property '"+PROPERTY_APPLICATION_TYPE+"' required.");
 	}
@@ -153,7 +153,7 @@ public class ApplicationContext	extends BaseContext
 	/**
 	 *  Get the applicattion type.
 	 */
-	public ApplicationType	getApplicationType()
+	public MApplicationType	getApplicationType()
 	{
 		return apptype;
 	}
@@ -173,7 +173,7 @@ public class ApplicationContext	extends BaseContext
 			Map arguments, final boolean start, final boolean master, 
 			final IResultListener listener, IAgentIdentifier creator)
 	{
-		AgentType	at	= apptype.getAgentType(type);
+		MAgentType	at	= apptype.getMAgentType(type);
 		if(at==null)
 			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+apptype);
 		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);

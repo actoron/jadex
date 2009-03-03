@@ -2,11 +2,8 @@ package jadex.bdi.examples.cleanerworld2.cleaner;
 
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.examples.cleanerworld2.environment.action.ChargeBatteryAction;
-import jadex.bdi.examples.cleanerworld2.environment.action.DisposeWasteAction;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
-import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;

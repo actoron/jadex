@@ -2,8 +2,8 @@ package jadex.adapter.standalone;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;

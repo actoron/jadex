@@ -1,14 +1,14 @@
 package jadex.micro.benchmarks;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.MessageType;
 import jadex.microkernel.MicroAgent;
 import jadex.microkernel.MicroAgentMetaInfo;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Test message performance. 

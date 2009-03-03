@@ -64,7 +64,7 @@ public class OAVTreeModel implements TreeModel
 		"value", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png"),
 		"javaobject", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaobject.png"),
 		"javaattribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaattribute.png"),
-		"javavalue", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javavalue.png")
+		"javavalue", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png")
 	});
 	
 	/**
@@ -1118,6 +1118,8 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public List	getChildren()
 		{
+			if(toString().equals("imports"))
+				System.out.println("fsklu bgl");
 			if(children==null)
 			{
 				children 	= new ArrayList();
@@ -1146,7 +1148,9 @@ public class OAVTreeModel implements TreeModel
 							else if(isInspectable(child))
 								// objectInspector Node
 								child = new ObjectInspectorNode(this, child.getClass(), null, child);
-							// else use plain value
+							else
+								// else use wrapped plain value, as JTree does not allow duplicates.
+								child	= new ObjectInspectorValueNode(this, null, child);
 							
 							children.add(child);
 						}
@@ -2051,7 +2055,7 @@ public class OAVTreeModel implements TreeModel
 		// --- constructor ----
 		
 		/** create a simple value node */
-		public ObjectInspectorValueNode(ObjectInspectorAttributeNode parent, String namePrefix, Object value)
+		public ObjectInspectorValueNode(Object parent, String namePrefix, Object value)
 		{
 			super.parent = parent;
 			

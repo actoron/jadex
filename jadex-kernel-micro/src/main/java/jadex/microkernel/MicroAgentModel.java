@@ -1,13 +1,13 @@
 package jadex.microkernel;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
 import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IReport;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+
+import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  *  The agent model contains the OAV agent model in a state and

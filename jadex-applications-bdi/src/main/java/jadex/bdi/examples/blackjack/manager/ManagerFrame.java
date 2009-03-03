@@ -1,6 +1,5 @@
 package jadex.bdi.examples.blackjack.manager;
 
-import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.contextservice.IContextService;
@@ -387,7 +386,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
 			IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
 			IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), ApplicationContext.class);
-			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getAgentType("Dealer").getFilename();
+			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
 			start.getParameter("type").setValue(type);
 //			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 			start.getParameter("name").setValue("BlackjackDealer");
@@ -596,7 +595,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
 				IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
 				IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), ApplicationContext.class);
-				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getAgentType("Player").getFilename();
+				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();
 				start.getParameter("type").setValue(type);
 //				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
 				start.getParameter("name").setValue(player.getName());

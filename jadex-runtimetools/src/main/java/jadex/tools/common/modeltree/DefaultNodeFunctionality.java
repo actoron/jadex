@@ -3,7 +3,6 @@ package jadex.tools.common.modeltree;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationFactory;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 import jadex.tools.common.plugin.IControlCenter;
 
 import java.io.File;

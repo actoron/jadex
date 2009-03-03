@@ -1,10 +1,7 @@
 package jadex.bdi.runtime.impl;
 
-import java.util.Collection;
-
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.GoalLifecycleRules;
 import jadex.bdi.interpreter.InternalEventRules;
 import jadex.bdi.interpreter.MessageEventRules;
 import jadex.bdi.interpreter.OAVBDIMetaModel;

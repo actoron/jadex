@@ -1,6 +1,5 @@
 package jadex.bdi.benchmarks;
 
-import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IAgentIdentifier;

@@ -1,7 +1,6 @@
 package jadex.adapter.base;
 
 import jadex.bridge.IPlatformService;
-import jadex.commons.concurrent.IResultListener;
 
 import javax.swing.event.ChangeListener;
 

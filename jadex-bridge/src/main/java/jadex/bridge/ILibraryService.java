@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Set;
 
 /** 
  *  Interface for the Library Service. It provides a platform service

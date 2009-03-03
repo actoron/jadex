@@ -6,20 +6,11 @@ import jadex.bdi.examples.hunterprey2.CurrentVision;
 import jadex.bdi.examples.hunterprey2.Vision;
 import jadex.bdi.examples.hunterprey2.engine.task.MoveTask;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.IParameter;
-import jadex.bdi.runtime.IParameterSet;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.MessageFailureException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**

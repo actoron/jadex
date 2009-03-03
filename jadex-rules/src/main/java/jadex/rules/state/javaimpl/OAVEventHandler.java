@@ -1,11 +1,9 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.commons.collection.CheckedCollection;
 import jadex.commons.collection.IdentityHashSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.ArrayList;

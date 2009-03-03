@@ -1,0 +1,64 @@
+<!--
+	<H3>The marsworld application descriptor</H3>
+
+	Can be used to launch the mars world example.<br>
+
+	It consists of three different kinds of agents:<br>
+	- <b>Sentry agents</b> are responsible for examining ore locations<br>
+		A ore capacity is shown on the map when an ore location was examined.<br>
+	- <b>Production agents</b> produce ore at available ore location.<br>
+	- <b>Carry agents</b> are able to carry ore to the base.<br><br>
+
+	Objective is to carry as much ore as possible to the<br>
+	homebase in a predefined mission time.<br>
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
+	xmlns:agr="http://jadex.sourceforge.net/jadex-agr"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/application.xsd"
+	name="MarsWorld" package="jadex.bdi.examples.marsworld">
+	
+	<spacetypes>
+		<!-- <spacetype xsi:type="spacetype"	name="marsspace"/> -->
+		<agr:agrspacetype name="marsagrspace">
+			<agr:grouptype name="marsteam">
+				<agr:roles>
+					<agr:role name="sentry" min="1" max="1" />
+					<agr:role name="producer" min="1" />
+					<agr:role name="carrier" min="1" max="-1" />
+				</agr:roles>
+			</agr:grouptype>
+		</agr:agrspacetype>
+	</spacetypes>
+	
+	<agenttypes>
+		<agenttype name="Environment" filename="jadex/bdi/examples/marsworld/environment/Environment.agent.xml"/>
+		<agenttype name="Carrier" filename="jadex/bdi/examples/marsworld/carrier/Carry.agent.xml"/>
+		<agenttype name="Producer" filename="jadex/bdi/examples/marsworld/producer/Production.agent.xml"/>
+		<agenttype name="Sentry" filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="1 Sentry / 2 Producers / 3 Carriers">
+			<!-- <agr:space type="marsagrspace">
+				<agr:group name="mymarsteam" type="marsteam"/>
+			</agr:space> -->
+			<agents>
+				<agent type="Environment"/>
+				<agent type="Sentry">
+					<!-- <agr:position role="sentry" group="mymarsteam"/> --> 
+					<!-- <two-d:position x="3" y="5"/> -->
+				</agent>
+				<agent type="Producer" number="2">
+					<!-- <agr:position role="producer" group="mymarsteam"/> -->
+				</agent>
+				<agent type="Carrier" number="3">
+					<!-- <agr:position role="carrier" group="mymarsteam"/> -->
+				</agent>
+			</agents>
+		</application>
+	</applications>	
+
+</applicationtype>

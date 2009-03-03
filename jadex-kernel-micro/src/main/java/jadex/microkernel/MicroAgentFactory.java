@@ -1,10 +1,10 @@
 package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IKernelAgent;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;

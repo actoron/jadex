@@ -4,6 +4,7 @@ import jadex.commons.SReflect;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -130,29 +131,53 @@ public class BeanObjectHandler implements IObjectHandler
 	public void linkObject(XMLStreamReader parser, Object elem, Object parent, Object context, List stack) throws Exception
 	{
 		// Add object to its parent.
-		String clname = isBuiltInType(elem.getClass())?
-			parser.getLocalName().substring(0, 1).toUpperCase()+parser.getLocalName().substring(1)
-			:SReflect.getInnerClassName(elem.getClass());
+		boolean	linked	= false;
+		List	classes	= new LinkedList();
+		classes.add(elem.getClass());
 		
-		String mname = "set"+clname;
-		Method[] ms = SReflect.getMethods(parent.getClass(), mname);
-		for(int i=0; i<ms.length; i++)
+		while(!linked && !classes.isEmpty())
 		{
-			Class[] ps = ms[i].getParameterTypes();
-			if(ps.length==1 && ps[0].isAssignableFrom(elem.getClass()))
+			Class	clazz	= (Class)classes.remove(0);
+			String clname = isBuiltInType(clazz)?
+				parser.getLocalName().substring(0, 1).toUpperCase()+parser.getLocalName().substring(1)
+				:SReflect.getInnerClassName(clazz);
+			
+			String mname = "set"+clname;
+			Method[] ms = SReflect.getMethods(parent.getClass(), mname);
+			for(int i=0; !linked && i<ms.length; i++)
 			{
-				ms[i].invoke(parent, new Object[]{elem});
+				Class[] ps = ms[i].getParameterTypes();
+				if(ps.length==1 && ps[0].isAssignableFrom(clazz))
+				{
+					ms[i].invoke(parent, new Object[]{elem});
+					linked	= true;
+				}
 			}
-		}
-		
-		mname = "add"+clname;
-		ms = SReflect.getMethods(parent.getClass(), mname);
-		for(int i=0; i<ms.length; i++)
-		{
-			Class[] ps = ms[i].getParameterTypes();
-			if(ps.length==1 && ps[0].isAssignableFrom(elem.getClass()))
+			
+			if(!linked)
 			{
-				ms[i].invoke(parent, new Object[]{elem});
+				mname = "add"+clname;
+				ms = SReflect.getMethods(parent.getClass(), mname);
+				for(int i=0; !linked && i<ms.length; i++)
+				{
+					Class[] ps = ms[i].getParameterTypes();
+					if(ps.length==1 && ps[0].isAssignableFrom(clazz))
+					{
+						ms[i].invoke(parent, new Object[]{elem});
+						linked	= true;
+					}
+				}
+			}
+			
+			if(!linked)
+			{
+				if(clazz.getSuperclass()!=null)
+					classes.add(clazz.getSuperclass());
+				Class[]	ifs	= clazz.getInterfaces();
+				for(int i=0; i<ifs.length; i++)
+				{
+					classes.add(ifs[i]);
+				}
 			}
 		}
 	}

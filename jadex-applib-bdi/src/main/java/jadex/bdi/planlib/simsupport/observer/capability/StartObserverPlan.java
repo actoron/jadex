@@ -1,12 +1,5 @@
 package jadex.bdi.planlib.simsupport.observer.capability;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJ2D;
 import jadex.bdi.planlib.simsupport.common.graphics.ViewportJOGL;
@@ -14,7 +7,6 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.environment.IExternalEngineAccess;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;
@@ -22,7 +14,11 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ILibraryService;
 
-import javax.media.opengl.GLException;
+import java.awt.BorderLayout;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 

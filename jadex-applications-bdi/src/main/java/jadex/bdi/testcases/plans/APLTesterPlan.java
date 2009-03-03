@@ -3,7 +3,6 @@ package jadex.bdi.testcases.plans;
 import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.TimeoutException;
 
 /**
  * 

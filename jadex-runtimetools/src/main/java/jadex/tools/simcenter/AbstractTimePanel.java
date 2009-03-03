@@ -1,7 +1,6 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
 

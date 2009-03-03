@@ -1,8 +1,8 @@
 package jadex.tools.common.modeltree;
 
-import javax.swing.JComponent;
-
 import jadex.commons.concurrent.IExecutable;
+
+import javax.swing.JComponent;
 
 /**
  *  A task to update some aspect of a node.

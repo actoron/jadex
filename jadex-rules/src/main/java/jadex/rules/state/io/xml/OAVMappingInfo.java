@@ -1,10 +1,10 @@
 package jadex.rules.state.io.xml;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 

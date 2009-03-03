@@ -1,27 +1,19 @@
 package jadex.bdi.planlib.simsupport.observer.capability;
 
+import jadex.commons.SGUI;
+
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.MenuBar;
-import java.lang.reflect.InvocationTargetException;
-
-import jadex.bdi.planlib.simsupport.common.graphics.IViewport;
-import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 
 /** Default GUI main window.

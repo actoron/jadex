@@ -19,10 +19,11 @@
 	</xs:complexType>
  -->
  
-	<xs:complexType name="spacetype">
+	<xs:complexType name="agrspacetype">
 		<xs:sequence>
 			<xs:element name="grouptype" type="grouptype"></xs:element>
 		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="grouptype">
@@ -31,7 +32,7 @@
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="role"
-							type="roletype">
+							type="role">
 						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
@@ -40,16 +41,16 @@
 		<xs:attribute name="name" type="xs:string"></xs:attribute>
 	</xs:complexType>
 
-	<xs:complexType name="roletype">
+	<xs:complexType name="role">
 		<xs:attribute name="name" type="xs:string"></xs:attribute>
 		<xs:attribute name="min" type="xs:int"></xs:attribute>
 		<xs:attribute name="max" type="xs:int"></xs:attribute>
 	</xs:complexType>
 
-	<xs:element name="spacetypeel">
+	<xs:element name="agrspacetype">
 		<xs:complexType>
 			<xs:complexContent>
-				<xs:extension base="spacetype"/>
+				<xs:extension base="agrspacetype" />
 			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>

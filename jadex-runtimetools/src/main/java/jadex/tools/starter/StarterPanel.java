@@ -1,11 +1,11 @@
 package jadex.tools.starter;
 
 import jadex.adapter.base.appdescriptor.ApplicationModel;
+import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IArgument;
-import jadex.bridge.IAgentFactory;
-import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IReport;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
@@ -18,7 +18,6 @@ import jadex.tools.common.ElementPanel;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.JValidatorTextField;
 import jadex.tools.common.ParserValidator;
-import jadex.tools.jcc.ControlCenterWindow;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

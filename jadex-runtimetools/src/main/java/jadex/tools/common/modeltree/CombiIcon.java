@@ -3,7 +3,6 @@ package jadex.tools.common.modeltree;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;

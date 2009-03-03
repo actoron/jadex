@@ -3,12 +3,8 @@ package jadex.tools.common.modeltree;
 import jadex.commons.SUtil;
 
 import java.io.File;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.Icon;
-import javax.swing.tree.TreeNode;
 
 /**
  *  A node representing a file.

@@ -3,8 +3,8 @@ package jadex.adapter.base;
 import jadex.bridge.AgentCreationException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IKernelAgent;
+import jadex.bridge.ILoadableElementModel;
 import jadex.commons.SUtil;
 
 import java.util.List;

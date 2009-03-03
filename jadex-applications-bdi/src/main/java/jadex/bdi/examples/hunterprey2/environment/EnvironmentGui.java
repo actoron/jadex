@@ -12,7 +12,6 @@ import jadex.bdi.runtime.IGoal;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

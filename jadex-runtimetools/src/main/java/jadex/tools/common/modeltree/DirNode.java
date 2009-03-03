@@ -1,14 +1,7 @@
 package jadex.tools.common.modeltree;
 
-import jadex.commons.SUtil;
-
 import java.io.File;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.List;
-
-import javax.swing.tree.TreeNode;
 
 /**
  *  A directory node.

@@ -18,7 +18,6 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPoolFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;

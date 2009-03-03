@@ -5,7 +5,6 @@ import jadex.bridge.ITimedObject;
 import jadex.bridge.ITimer;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  *  A timer for being notified at a specified timepoint.

@@ -1,11 +1,11 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import java.util.List;
-
 import jadex.bdi.examples.cleanerworld.Location;
 import jadex.bdi.examples.cleanerworld.MapPoint;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+
+import java.util.List;
 
 
 /**

@@ -1,6 +1,5 @@
 package jadex.microkernel;
 
-import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;

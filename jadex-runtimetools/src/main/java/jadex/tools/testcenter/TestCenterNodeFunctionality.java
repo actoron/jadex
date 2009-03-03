@@ -23,7 +23,6 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
-import javax.swing.tree.DefaultTreeModel;
 
 /**
  *  Model tree node functionality, specific for the test center plugin.

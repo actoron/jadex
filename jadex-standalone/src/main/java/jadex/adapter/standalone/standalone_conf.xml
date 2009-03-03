@@ -13,7 +13,10 @@
 		<property type="welcome">false</property>
 		<property type="autoshutdown">true</property>
 		
-		<property type="application_factory">new jadex.adapter.base.appdescriptor.ApplicationFactory($platform)</property>
+		<property type="application_factory">
+			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
+				new java.util.Map[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+		</property>
 		
 		<!-- Message types. -->
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>

@@ -1,10 +1,8 @@
 package jadex.tools.convcenter;
 
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.ContentException;

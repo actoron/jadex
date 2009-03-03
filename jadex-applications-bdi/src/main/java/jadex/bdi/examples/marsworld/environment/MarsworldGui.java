@@ -6,11 +6,8 @@ import jadex.bdi.examples.marsworld.Homebase;
 import jadex.bdi.examples.marsworld.Location;
 import jadex.bdi.examples.marsworld.Target;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SGUI;
 
 import java.awt.Color;

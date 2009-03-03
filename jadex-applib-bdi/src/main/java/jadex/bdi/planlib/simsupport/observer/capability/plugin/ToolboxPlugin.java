@@ -1,26 +1,17 @@
 package jadex.bdi.planlib.simsupport.observer.capability.plugin;
 
 import jadex.bdi.planlib.simsupport.observer.capability.ObserverCenter;
-import jadex.bdi.runtime.IExternalAccess;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 public class ToolboxPlugin implements IObserverCenterPlugin
 {

@@ -194,11 +194,11 @@ public class OAVXMLMapping implements IOAVXMLMapping
 	 */
 	protected void	buildMapping(String path, OAVObjectType type, OAVXMLHelper expansions)
 	{
-		String	typename	= type.getName();
-		if(typename.startsWith(typeprefix))
-			typename	= typename.substring(typeprefix.length());
     	if(path==null)
 		{
+    		String	typename	= type.getName();
+    		if(typename.startsWith(typeprefix))
+    			typename	= typename.substring(typeprefix.length());
 			path	= typename;
 			objecttypes.put(path, type);
 //			System.out.println("Mapping "+path+" to "+type);
@@ -244,6 +244,9 @@ public class OAVXMLMapping implements IOAVXMLMapping
 			else
 			{
 				String name	= attr.getName();
+//				if(name.startsWith(typeprefix))
+//					name	= name.substring(typeprefix.length());
+				String	typename	= type.getName();
 				String	prefix	= typename+"_has_";
 				if(name.startsWith(prefix))
 					name	= name.substring(prefix.length());

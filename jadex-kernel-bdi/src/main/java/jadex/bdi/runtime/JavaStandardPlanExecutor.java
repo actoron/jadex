@@ -6,7 +6,6 @@ import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.rules.state.OAVAttributeType;
 
 import java.io.Serializable;
 import java.util.Collections;

@@ -8,7 +8,6 @@ import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.commons.SUtil;
 
-import java.awt.Canvas;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;

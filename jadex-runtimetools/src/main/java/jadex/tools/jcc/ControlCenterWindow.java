@@ -1,7 +1,6 @@
 package jadex.tools.jcc;
 
 import jadex.commons.BrowserLauncher;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.tools.common.AboutDialog;
 import jadex.tools.common.ConfigurationDialog;

@@ -3,9 +3,7 @@ package jadex.adapter.base.appdescriptor;
 import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IReport;
-import jadex.commons.SUtil;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +15,7 @@ public class ApplicationModel implements ILoadableElementModel
 	//-------- attributes --------
 	
 	/** The application type. */
-	protected ApplicationType apptype;
+	protected MApplicationType apptype;
 	
 	/** The filename. */
 	protected String filename;
@@ -27,7 +25,7 @@ public class ApplicationModel implements ILoadableElementModel
 	/**
 	 *  Create a new application model. 
 	 */
-	public ApplicationModel(ApplicationType apptype, String filename)
+	public ApplicationModel(MApplicationType apptype, String filename)
 	{
 		this.apptype = apptype;
 		this.filename = filename;
@@ -150,11 +148,11 @@ public class ApplicationModel implements ILoadableElementModel
 	 */
 	public String[] getConfigurations()
 	{
-		List apps = apptype.getApplications();
+		List apps = apptype.getMApplicationInstances();
 		String[] ret = new String[apps.size()];
 		for(int i=0; i<ret.length; i++)
 		{
-			ret[i] = ((Application)apps.get(i)).getName();
+			ret[i] = ((MApplicationInstance)apps.get(i)).getName();
 		}
 		return ret;
 	}

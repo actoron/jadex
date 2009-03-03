@@ -4,6 +4,7 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.concurrent.ThreadPool;
+import jadex.commons.xml.Reader;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
@@ -21,8 +22,6 @@ import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.io.xml.IOAVXMLMapping;
-import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.io.xml.StackElement;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
@@ -73,7 +72,7 @@ public class OAVBDIModelLoader
 	protected Reader	reader;
 	
 	/** The xmlmapping (cached for speed, todo: weak for memory). */
-	protected IOAVXMLMapping	mapping;
+//	protected IOAVXMLMapping	mapping;
 		
 	/** The model cache (filename -> oav capability model). */
 	protected Map modelcache;
@@ -88,8 +87,8 @@ public class OAVBDIModelLoader
 	 */
 	public OAVBDIModelLoader(Map props)
 	{
-		this.reader	= new Reader();
-		this.mapping = OAVBDIMetaModel.getXMLMapping(props);
+		this.reader	= OAVBDIXMLReader.getReader();
+//		this.mapping = OAVBDIMetaModel.getXMLMapping(props);
 		this.modelcache	= new HashMap();	
 	}
 
@@ -299,7 +298,8 @@ public class OAVBDIModelLoader
 			try
 			{
 				state.addStateListener(listener, false);
-				Object handle = reader.read(info.getInputStream(), state, mapping, report.entries);
+				Object handle = reader.read(info.getInputStream(), classloader, state);
+//				Object handle = reader.read(info.getInputStream(), state, mapping, report.entries);
 				state.removeStateListener(listener);
 
 				if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
@@ -310,6 +310,11 @@ public class OAVBDIModelLoader
 				{
 					cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
 				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			finally
 			{

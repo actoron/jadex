@@ -1,9 +1,5 @@
 package jadex.bdi.examples.cleanerworld.environment;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.IContext;
-import jadex.adapter.base.contextservice.IContextService;
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.examples.cleanerworld.Chargingstation;
 import jadex.bdi.examples.cleanerworld.Cleaner;
 import jadex.bdi.examples.cleanerworld.Environment;
@@ -13,8 +9,6 @@ import jadex.bdi.examples.cleanerworld.Wastebin;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;

@@ -2,10 +2,6 @@ package jadex.bdi.examples.cleanerworld;
 
 import jadex.commons.SUtil;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 
 /**
  *  Editable Java class for concept Cleaner of cleaner-generated ontology.

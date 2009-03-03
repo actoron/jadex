@@ -2,10 +2,6 @@ package jadex.adapter.jade;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jadex.bridge.IKernelAgent;
-import jadex.bridge.ITimer;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  *  The jadex Timing Behaviour is responsible for

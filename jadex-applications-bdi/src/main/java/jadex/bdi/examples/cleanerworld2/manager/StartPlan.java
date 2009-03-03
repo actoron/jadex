@@ -1,25 +1,18 @@
 package jadex.bdi.examples.cleanerworld2.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.cleanerworld2.Configuration;
-import jadex.bdi.examples.cleanerworld2.environment.process.WasteGenerationProcess;
-import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
-import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Double;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEngineContainer;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class StartPlan extends Plan
 {

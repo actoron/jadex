@@ -1,22 +1,15 @@
 package jadex.bdi.examples.cleanerworld2.environment.process;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import jadex.bdi.examples.cleanerworld2.Configuration;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
-import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
-import jadex.bdi.planlib.simsupport.common.math.IVector2;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
-import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
 import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /** Simulates the waste sensor of a cleaner.
  */

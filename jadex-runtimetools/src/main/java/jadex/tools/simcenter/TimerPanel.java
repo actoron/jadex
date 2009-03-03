@@ -1,7 +1,6 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.clock.Timer;
-import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
 import jadex.bridge.ITimer;
 import jadex.commons.collection.SCollection;

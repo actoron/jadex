@@ -1,11 +1,5 @@
 package jadex.bdi.examples.cleanerworld2.observer;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.DrawableCombiner;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.IDrawable;
@@ -13,7 +7,6 @@ import jadex.bdi.planlib.simsupport.common.graphics.drawable.Rectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.RegularPolygon;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.TexturedRectangle;
 import jadex.bdi.planlib.simsupport.common.graphics.drawable.Triangle;
-import jadex.bdi.planlib.simsupport.common.graphics.layer.GridLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.ILayer;
 import jadex.bdi.planlib.simsupport.common.graphics.layer.TiledLayer;
 import jadex.bdi.planlib.simsupport.common.graphics.order.YOrder;
@@ -21,6 +14,12 @@ import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InitializeObserverPlan extends Plan
 {

@@ -5,7 +5,6 @@ import jadex.commons.collection.MultiCollection;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.Reader;
-import jadex.rules.state.javaimpl.OAVState;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.FileInputStream;

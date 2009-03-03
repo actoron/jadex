@@ -2,13 +2,10 @@ package jadex.tools.comanalyzer;
 
 import jadex.bdi.runtime.IFilter;
 import jadex.bridge.IAgentIdentifier;
-import jadex.commons.collection.SortedList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 
 /**

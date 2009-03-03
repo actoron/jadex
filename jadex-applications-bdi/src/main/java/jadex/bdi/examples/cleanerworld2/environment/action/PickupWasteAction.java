@@ -1,7 +1,5 @@
 package jadex.bdi.examples.cleanerworld2.environment.action;
 
-import java.util.List;
-
 import jadex.bdi.examples.cleanerworld2.Configuration;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.Vector1Long;
@@ -9,6 +7,8 @@ import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
+
+import java.util.List;
 
 public class PickupWasteAction implements ISimAction
 {

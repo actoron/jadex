@@ -47,23 +47,30 @@ public class ApplicationFactory implements IApplicationFactory
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new agent factory.
+	 *  Create a new application factory.
+	 *  @param platform	The agent platform.
+	 *  @param mappings	The XML reader mappings (if any).
 	 */
-	public ApplicationFactory(IPlatform platform)
+	public ApplicationFactory(IPlatform platform, Map[] mappings)
 	{
 		this.platform = platform;
 		Map types = new HashMap();
-		types.put("applicationtype", ApplicationType.class);
-		types.put("structuringtype", StructuringType.class);
-		types.put("agenttype", AgentType.class);
-		types.put("application", Application.class);
-		types.put("structuring", Structuring.class);
-		types.put("agent", Agent.class);
-		types.put("parameter", Parameter.class);
-		types.put("parameterset", ParameterSet.class);
+		types.put("applicationtype", MApplicationType.class);
+		types.put("spacetype", MSpaceType.class);
+		types.put("agenttype", MAgentType.class);
+		types.put("application", MApplicationInstance.class);
+		types.put("space", MSpaceInstance.class);
+		types.put("agent", MAgentInstance.class);
+		types.put("parameter", MArgument.class);
+		types.put("parameterset", MArgumentSet.class);
 		types.put("value", String.class);
 		types.put("import", String.class);
 		types.put("property", String.class);
+		
+		for(int i=0; mappings!=null && i<mappings.length; i++)
+		{
+			types.putAll(mappings[i]);
+		}
 		
 		this.reader = new Reader(new BeanObjectHandler(types, "setDescription"));
 	}
@@ -83,20 +90,20 @@ public class ApplicationFactory implements IApplicationFactory
 		
 		if(model!=null && model.toLowerCase().endsWith(".application.xml"))
 		{
-			ApplicationType apptype = null;
+			MApplicationType apptype = null;
 			try
 			{
 				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
-				apptype = (ApplicationType)reader.read(new FileInputStream(model), cl, null);
-				List apps = apptype.getApplications();
+				apptype = (MApplicationType)reader.read(new FileInputStream(model), cl, null);
+				List apps = apptype.getMApplicationInstances();
 				
-				Application app = null;
+				MApplicationInstance app = null;
 				if(config==null)
-					app = (Application)apps.get(0);
+					app = (MApplicationInstance)apps.get(0);
 				
 				for(int i=0; app==null && i<apps.size(); i++)
 				{
-					Application tmp = (Application)apps.get(i);
+					MApplicationInstance tmp = (MApplicationInstance)apps.get(i);
 					if(config.equals(tmp.getName()))
 						app = tmp;
 				}
@@ -121,10 +128,10 @@ public class ApplicationFactory implements IApplicationFactory
 				
 				// todo: result listener?
 				
-				List agents = app.getAgents();
+				List agents = app.getMAgentInstances();
 				for(int i=0; i<agents.size(); i++)
 				{
-					final Agent agent = (Agent)agents.get(i);
+					final MAgentInstance agent = (MAgentInstance)agents.get(i);
 					
 //					System.out.println("Create: "+agent.getName()+" "+agent.getModel(apptype)+" "+agent.getConfiguration()+" "+agent.getArguments());
 					int num = agent.getNumber();
@@ -171,11 +178,11 @@ public class ApplicationFactory implements IApplicationFactory
 		
 		if(filename!=null && filename.toLowerCase().endsWith(".application.xml"))
 		{
-			ApplicationType apptype = null;
+			MApplicationType apptype = null;
 			try
 			{
 				// todo: classloader null?
-				apptype = (ApplicationType)reader.read(new FileInputStream(filename), null, null);
+				apptype = (MApplicationType)reader.read(new FileInputStream(filename), null, null);
 				ret = new ApplicationModel(apptype, filename);
 //				System.out.println("Loaded application type: "+apptype);
 			

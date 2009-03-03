@@ -4,7 +4,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IdentityHashSet;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -1009,7 +1008,7 @@ public class OAVState	implements IOAVState
 	public Object	getAttributeValue(Object id, OAVAttributeType attribute)
 	{
 		// #ifndef MIDP
-		assert nocheck || generator.isId(id);
+		assert nocheck || generator.isId(id) : id;
 		assert nocheck || checkValidStateObjectRead(id) : id;
 		assert nocheck || checkTypeHasAttribute(id, attribute);
 		assert nocheck || checkMultiplicity(id, attribute, OAVAttributeType.NONE);

@@ -1,8 +1,8 @@
 package jadex.microkernel;
 
-import java.util.Map;
-
 import jadex.bridge.MessageType;
+
+import java.util.Map;
 
 /**
  *  This is a base interface for a minimal kernel agent.

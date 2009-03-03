@@ -9,6 +9,7 @@ import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.SimulationService;
 import jadex.adapter.base.ThreadPoolService;
+import jadex.adapter.base.agr.MAGRSpaceType;
 import jadex.adapter.base.appdescriptor.ApplicationFactory;
 import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
@@ -79,7 +80,7 @@ public class Platform implements IPlatform
 		this.threadpool = ThreadPoolFactory.createThreadPool();
 		this.logger = Logger.getLogger("JADE_Platform");
 		this.services = new LinkedHashMap();
-		this.appfactory = new ApplicationFactory(this);
+		this.appfactory = new ApplicationFactory(this, new Map[]{MAGRSpaceType.getXMLMapping()});
 		services.put(ILibraryService.class, new LibraryService());
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));

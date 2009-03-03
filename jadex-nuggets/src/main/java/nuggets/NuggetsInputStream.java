@@ -1,8 +1,5 @@
 package nuggets;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /*
  * NuggetsInputStream.java
