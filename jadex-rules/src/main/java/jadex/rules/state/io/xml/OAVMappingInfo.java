@@ -14,6 +14,12 @@ public class OAVMappingInfo
 	/** The xml tag/path. */
 	protected String xmlpath;
 	
+	/** The xml tag. */
+	protected String xmltag;
+	
+	/** The xml path depth. */
+	protected int xmlpathdepth;
+	
 	/** The type. */
 	protected OAVObjectType type;
 	
@@ -57,13 +63,48 @@ public class OAVMappingInfo
 	{
 		return this.xmlpath;
 	}
-
+	
+	/**
+	 * @return the xml tag
+	 */
+	public String getXMLTag()
+	{
+		if(xmltag==null)
+		{
+			int idx = xmlpath.lastIndexOf("/");
+			if(idx!=-1)
+				xmltag = xmlpath.substring(idx);
+			else
+				xmltag = xmlpath;
+		}
+		
+		return xmltag;
+	}
+	
 	/**
 	 * @param xmlpath the xmlpath to set
 	 */
 	public void setXMLPath(String xmlpath)
 	{
 		this.xmlpath = xmlpath;
+	}
+	
+	/**
+	 * 
+	 */
+	public int getXMLPathDepth()
+	{
+		if(xmlpathdepth==0)
+		{
+			int idx = xmlpath.indexOf("/");
+			while(idx!=-1)
+			{
+				xmlpathdepth++;
+				idx = xmlpath.indexOf("/", idx+1);
+			}
+		}
+		
+		return xmlpathdepth;
 	}
 	
 	/**

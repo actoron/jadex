@@ -6,13 +6,17 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -84,7 +88,8 @@ public class OAVObjectHandler implements IObjectHandler
 		Object ret = null;
 		IOAVState state = (IOAVState)context;
 		
-		OAVMappingInfo mapinfo = (OAVMappingInfo)typeinfos.get(parser.getLocalName());
+		String fullpath = stack.size()>0? (String)((Object[])stack.get(stack.size()-1))[2]+"/"+parser.getLocalName(): parser.getLocalName();
+		OAVMappingInfo mapinfo = getMappingInfo(parser.getLocalName(), fullpath);
 		
 		if(mapinfo!=null)
 		{
@@ -189,7 +194,8 @@ public class OAVObjectHandler implements IObjectHandler
 	public void handleContent(XMLStreamReader parser, Object elem, String content, Object context, List stack) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
-		OAVMappingInfo mapinfo = (OAVMappingInfo)typeinfos.get(parser.getLocalName());
+		String fullpath = stack.size()>0? (String)((Object[])stack.get(stack.size()-1))[2]+"/"+parser.getLocalName(): parser.getLocalName();
+		OAVMappingInfo mapinfo = getMappingInfo(parser.getLocalName(), fullpath);
 		
 		if(mapinfo==null)
 			throw new RuntimeException("No information for handling content: "+parser.getLocalName());
@@ -213,7 +219,8 @@ public class OAVObjectHandler implements IObjectHandler
 		IOAVState state = (IOAVState)context;
 		
 		// Call post-processor if any.
-		OAVMappingInfo mapinfo = (OAVMappingInfo)typeinfos.get(parser.getLocalName());
+		String fullpath = stack.size()>0? (String)((Object[])stack.get(stack.size()-1))[2]+"/"+parser.getLocalName(): parser.getLocalName();
+		OAVMappingInfo mapinfo = getMappingInfo(parser.getLocalName(), fullpath);
 		if(mapinfo!=null && mapinfo.getPostProcessor()!=null)
 		{
 			mapinfo.getPostProcessor().postProcess(state, elem, ((Object[])stack.get(0))[1]);
@@ -371,9 +378,47 @@ public class OAVObjectHandler implements IObjectHandler
 		for(Iterator it=typeinfos.iterator(); it.hasNext(); )
 		{
 			OAVMappingInfo mapinfo = (OAVMappingInfo)it.next();
-			ret.put(mapinfo.getXMLPath(), mapinfo);
+			TreeSet maps = (TreeSet)ret.get(mapinfo.getXMLTag());
+			if(maps==null)
+			{
+				maps = new TreeSet(new Comparator()
+				{
+					public int compare(Object arg0, Object arg1)
+					{
+						OAVMappingInfo m1 = (OAVMappingInfo)arg0;
+						OAVMappingInfo m2 = (OAVMappingInfo)arg1;
+						int ret = m1.getXMLPathDepth()-m2.getXMLPathDepth();
+						if(ret==0)
+							ret = m1.getXMLPath().compareTo(m2.getXMLPath());
+						if(ret==0)
+							throw new RuntimeException("MappingInfo should differ: "+m1+" "+m2);
+						return ret;
+					}
+				});
+				ret.put(mapinfo.getXMLTag(), maps);
+			}
+			maps.add(mapinfo);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected OAVMappingInfo getMappingInfo(String tag, String fullpath)
+	{
+		OAVMappingInfo ret = null;
+		Set maps = (Set)typeinfos.get(tag);
+		if(maps!=null)
+		{
+			for(Iterator it=maps.iterator(); it.hasNext(); )
+			{
+				OAVMappingInfo tmp = (OAVMappingInfo)it.next();
+				if(fullpath.endsWith(tmp.getXMLPath()))
+					ret = tmp;
+			}
+		}
 		return ret;
 	}
 }
