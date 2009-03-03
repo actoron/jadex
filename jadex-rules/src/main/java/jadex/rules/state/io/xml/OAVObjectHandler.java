@@ -49,7 +49,7 @@ public class OAVObjectHandler implements IObjectHandler
 	//-------- attributes --------
 	
 	/** The type mappings. */
-	protected Map typeinfos;
+	protected Set typeinfos;
 	
 	/** The link object infos. */
 	protected Map linkinfos;
@@ -65,9 +65,9 @@ public class OAVObjectHandler implements IObjectHandler
 	/**
 	 *  Create a new bean object handler.
 	 */
-	public OAVObjectHandler(Map typeinfos, Map linkinfos, Set ignoredattrs)//, String comname)
+	public OAVObjectHandler(Set typeinfos, Map linkinfos, Set ignoredattrs)//, String comname)
 	{
-		this.typeinfos = typeinfos!=null? typeinfos: Collections.EMPTY_MAP;
+		this.typeinfos = typeinfos!=null? typeinfos: Collections.EMPTY_SET;
 		this.linkinfos = linkinfos!=null? linkinfos: Collections.EMPTY_MAP;
 		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 
@@ -87,9 +87,12 @@ public class OAVObjectHandler implements IObjectHandler
 		Object ret = null;
 		IOAVState state = (IOAVState)context;
 		
-		OAVObjectType type = (OAVObjectType)typeinfos.get(parser.getLocalName());
-		if(type!=null)
+		OAVMappingInfo mapinfo = null;//typeinfos.get(parser.getLocalName());
+		
+		if(mapinfo!=null)
 		{
+			OAVObjectType type = mapinfo.getType();
+			
 			if(type instanceof OAVJavaType && isBuiltInType(((OAVJavaType)type).getClazz()))
 			{
 				String strval;
@@ -189,11 +192,10 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		boolean set = false;
 		
-		String linkinfo = (String)linkinfos.get(((Object[])stack.get(stack.size()-1))[2]);
+		OAVAttributeType attrtype = (OAVAttributeType)linkinfos.get(((Object[])stack.get(stack.size()-1))[2]);
 
-		if(linkinfo!=null)
+		if(attrtype!=null)
 		{
-			OAVAttributeType attrtype = state.getType(parent).getAttributeType(linkinfo);
 			setAttributeValue(state, parent, attrtype, elem);
 			set= true;
 		}
@@ -329,5 +331,5 @@ public class OAVObjectHandler implements IObjectHandler
 	{
 		return builtintypes.contains(clazz);
 	}
-	
+
 }
