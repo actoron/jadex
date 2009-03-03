@@ -47,6 +47,22 @@ public class OAVMappingInfo
 	}
 
 	/**
+	 * @return the xmlpath
+	 */
+	public String getXMLPath()
+	{
+		return this.xmlpath;
+	}
+
+	/**
+	 * @param xmlpath the xmlpath to set
+	 */
+	public void setXMLPath(String xmlpath)
+	{
+		this.xmlpath = xmlpath;
+	}
+	
+	/**
 	 * @return the type
 	 */
 	public OAVObjectType getType()

@@ -7,7 +7,9 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +51,7 @@ public class OAVObjectHandler implements IObjectHandler
 	//-------- attributes --------
 	
 	/** The type mappings. */
-	protected Set typeinfos;
+	protected Map typeinfos;
 	
 	/** The link object infos. */
 	protected Map linkinfos;
@@ -67,7 +69,7 @@ public class OAVObjectHandler implements IObjectHandler
 	 */
 	public OAVObjectHandler(Set typeinfos, Map linkinfos, Set ignoredattrs)//, String comname)
 	{
-		this.typeinfos = typeinfos!=null? typeinfos: Collections.EMPTY_SET;
+		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
 		this.linkinfos = linkinfos!=null? linkinfos: Collections.EMPTY_MAP;
 		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 
@@ -87,7 +89,7 @@ public class OAVObjectHandler implements IObjectHandler
 		Object ret = null;
 		IOAVState state = (IOAVState)context;
 		
-		OAVMappingInfo mapinfo = null;//typeinfos.get(parser.getLocalName());
+		OAVMappingInfo mapinfo = (OAVMappingInfo)typeinfos.get(parser.getLocalName());
 		
 		if(mapinfo!=null)
 		{
@@ -223,8 +225,6 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		String attrnameplu = attrname.endsWith("y")? attrname.substring(0, attrname.length()-1)+"ies": attrname+"s"; 
 		
-		System.out.println("test: "+attrnameplu);
-		
 		while(attrtype==null && tmptype!=null)
 		{
 			String tmpnamesin = tmptype.getName()+"_has_"+attrname;
@@ -332,4 +332,19 @@ public class OAVObjectHandler implements IObjectHandler
 		return builtintypes.contains(clazz);
 	}
 
+	/**
+	 * 
+	 */
+	protected Map createTypeInfos(Set typeinfos)
+	{
+		Map ret = new HashMap();
+		
+		for(Iterator it=typeinfos.iterator(); it.hasNext(); )
+		{
+			OAVMappingInfo mapinfo = (OAVMappingInfo)it.next();
+			ret.put(mapinfo.getXMLPath(), mapinfo);
+		}
+		
+		return ret;
+	}
 }
