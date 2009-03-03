@@ -7,7 +7,6 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +53,9 @@ public class OAVObjectHandler implements IObjectHandler
 	/** The ignored attribute types. */
 	protected Set ignored;
 	
+	/** The link object infos. */
+	protected Map links;
+	
 	/** The comment method name used for setting comments. */
 //	protected String comname;
 	
@@ -62,7 +64,7 @@ public class OAVObjectHandler implements IObjectHandler
 	/**
 	 *  Create a new bean object handler.
 	 */
-	public OAVObjectHandler(Map types, Set ignored)//, String comname)
+	public OAVObjectHandler(Map types, Set ignored, Map links)//, String comname)
 	{
 		this.types = types;
 		this.ignored = ignored;
@@ -85,11 +87,11 @@ public class OAVObjectHandler implements IObjectHandler
 		OAVObjectType type = (OAVObjectType)types.get(parser.getLocalName());
 		if(type!=null)
 		{
-//			if(isBuiltInType(clazz))
-//			{
-//				ret = convertBuiltInTypes(clazz, parser.getElementText());
-//			}
-//			else
+			if(type instanceof OAVJavaType && isBuiltInType(((OAVJavaType)type).getClazz()))
+			{
+				ret = convertBuiltInTypes(((OAVJavaType)type).getClazz(), parser.getElementText());
+			}
+			else
 			{
 				boolean root = stack.size()==0;
 				
@@ -111,26 +113,35 @@ public class OAVObjectHandler implements IObjectHandler
 					{
 						String attrval = parser.getAttributeValue(i);
 						
-						String aname = type.getName()+"_has_"+attrname;
-						
-						OAVAttributeType atype = type.getAttributeType0(aname);
-						if(atype==null)
+						OAVAttributeType attrtype = null;
+						OAVObjectType tmptype = type;
+						while(attrtype==null && tmptype!=null)
 						{
-							System.out.println("Could not find attribute: "+atype);
+							String tmpnamesin = tmptype.getName()+"_has_"+attrname;
+							
+							attrtype = tmptype.getDeclaredAttributeType0(tmpnamesin);
+							
+							if(attrtype==null)
+								tmptype = tmptype.getSupertype();
 						}
-						else	
+						
+						if(attrtype!=null)
 						{
-							Object arg = atype.getObjectType() instanceof OAVJavaType?
-								convertBuiltInTypes(((OAVJavaType)atype.getObjectType()).getClazz(), attrval): attrval;
+							Object arg = attrtype.getObjectType() instanceof OAVJavaType?
+								convertBuiltInTypes(((OAVJavaType)attrtype.getObjectType()).getClazz(), attrval): attrval;
 					
-							if(atype.getMultiplicity().equals(OAVAttributeType.NONE))
+							if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
 							{
-								state.setAttributeValue(ret, atype, arg);
+								state.setAttributeValue(ret, attrtype, arg);
 							}
 							else
 							{
-								state.addAttributeValue(ret, atype, arg);
+								state.addAttributeValue(ret, attrtype, arg);
 							}
+						}
+						else
+						{
+							System.out.println("Could not find attribute: "+attrtype);
 						}
 					}
 				}
@@ -164,20 +175,15 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		// Find attribute where to set/add the child element.
 		OAVObjectType elemtype = state.getType(elem);
-		OAVObjectType parenttype = state.getType(parent);
 		
-		// Try the tag name when basic type.
-	
 		boolean set = false;
-		if(elemtype instanceof OAVJavaType && isBuiltInType(((OAVJavaType)elemtype).getClazz()))
-		{
-			set = internalLinkObjects(parser.getLocalName(), elemtype, parenttype, state);	
-		}
 		
-		if(!set)
+		set = internalLinkObjects(parser.getLocalName(), elem, parent, state);
+		
+		if(!set && !(elemtype instanceof OAVJavaType && isBuiltInType(((OAVJavaType)elemtype).getClazz())))
 		{
-			set = internalLinkObjects(state.getType(elem).getName(), elemtype, parenttype, state);	
-		}			
+			set = internalLinkObjects(state.getType(elem).getName(), elem, parent, state);	
+		}	
 	}
 	
 	/**
@@ -189,16 +195,18 @@ public class OAVObjectHandler implements IObjectHandler
 		OAVAttributeType attrtype = null;
 		OAVObjectType tmptype = state.getType(parent);
 		
+		String attrnameplu = attrname.endsWith("y")? attrname.substring(0, attrname.length()-1)+"ies": attrname+"s"; 
+		
+		System.out.println("test: "+attrnameplu);
+		
 		while(attrtype==null && tmptype!=null)
 		{
-			String tmpname = tmptype.getName()+"_has_"+attrname;
+			String tmpnamesin = tmptype.getName()+"_has_"+attrname;
+			String tmpnameplu = tmptype.getName()+"_has_"+attrnameplu;
 			
-			for(Iterator it=tmptype.getDeclaredAttributeTypes().iterator(); it.hasNext(); )
-			{
-				OAVAttributeType attr = (OAVAttributeType)it.next();
-				if(attr.getName().equals(tmpname))
-					attrtype = attr;
-			}
+			attrtype = tmptype.getDeclaredAttributeType0(tmpnamesin);
+			if(attrtype==null)
+				attrtype = tmptype.getDeclaredAttributeType0(tmpnameplu);
 			
 			if(attrtype==null)
 				tmptype = tmptype.getSupertype();
@@ -212,7 +220,14 @@ public class OAVObjectHandler implements IObjectHandler
 			}
 			else
 			{
-				state.addAttributeValue(parent, attrtype, elem);
+				try
+				{
+					state.addAttributeValue(parent, attrtype, elem);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			ret = true;
 		}

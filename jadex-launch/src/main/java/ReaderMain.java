@@ -40,6 +40,21 @@ public class ReaderMain
 		types.put("plan", OAVBDIMetaModel.plan_type);
 		types.put("expression", OAVBDIMetaModel.expression_type);
 		types.put("property", OAVBDIMetaModel.expression_type);
+		types.put("fact", OAVBDIMetaModel.expression_type);
+		types.put("facts", OAVBDIMetaModel.expression_type);
+		types.put("value", OAVBDIMetaModel.expression_type);
+		types.put("values", OAVBDIMetaModel.expression_type);
+		types.put("configuration", OAVBDIMetaModel.configuration_type);
+		types.put("initialbelief", OAVBDIMetaModel.configbelief_type);
+		types.put("initialbeliefset", OAVBDIMetaModel.configbeliefset_type);
+		types.put("initialgoal", OAVBDIMetaModel.configelement_type);
+		types.put("initialplan", OAVBDIMetaModel.configelement_type);
+		types.put("initialinternalevent", OAVBDIMetaModel.configelement_type);
+		types.put("initialmessageevent", OAVBDIMetaModel.configelement_type);
+		types.put("endgoal", OAVBDIMetaModel.configelement_type);
+		types.put("endplan", OAVBDIMetaModel.configelement_type);
+		types.put("endinternalevent", OAVBDIMetaModel.configelement_type);
+		types.put("endmessageevent", OAVBDIMetaModel.configelement_type);
 
 		Set ignored = new HashSet();
 		ignored.add("schemaLocation");

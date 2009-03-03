@@ -15,14 +15,10 @@ import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.io.xml.BasicValueConverter;
 import jadex.rules.state.io.xml.IOAVXMLMapping;
 import jadex.rules.state.io.xml.IValueConverter;
-import jadex.rules.state.io.xml.OAVObjectHandler;
 import jadex.rules.state.io.xml.OAVXMLHelper;
 import jadex.rules.state.io.xml.OAVXMLMapping;
 import jadex.rules.state.io.xml.StackElement;
-import jadex.rules.state.javaimpl.OAVStateFactory;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -889,232 +885,232 @@ public class OAVBDIMetaModel
 		properties_type	= bdimm_type_model.createType("mproperties", modelelement_type);
 		
 		// model element
-		modelelement_has_name = modelelement_type.createAttributeType("element_has_name", OAVJavaType.java_string_type);
-		modelelement_has_description = modelelement_type.createAttributeType("element_has_description", OAVJavaType.java_string_type);
+		modelelement_has_name = modelelement_type.createAttributeType("melement_has_name", OAVJavaType.java_string_type);
+		modelelement_has_description = modelelement_type.createAttributeType("melement_has_description", OAVJavaType.java_string_type);
 		
 		// capability reference
-		capabilityref_has_file	= capabilityref_type.createAttributeType("capabilityref_has_file" , OAVJavaType.java_string_type);
-		capabilityref_has_capability	= capabilityref_type.createAttributeType("capabilityref_has_capability" , capability_type);
+		capabilityref_has_file	= capabilityref_type.createAttributeType("mcapabilityref_has_file" , OAVJavaType.java_string_type);
+		capabilityref_has_capability	= capabilityref_type.createAttributeType("mcapabilityref_has_capability" , capability_type);
 
 		// referenceable element
-		referenceableelement_has_exported	= referenceableelement_type.createAttributeType("referenceableelement_has_exported", OAVJavaType.java_string_type, OAVAttributeType.NONE, EXPORTED_FALSE);
+		referenceableelement_has_exported	= referenceableelement_type.createAttributeType("mreferenceableelement_has_exported", OAVJavaType.java_string_type, OAVAttributeType.NONE, EXPORTED_FALSE);
 //		referenceableelement_has_assignto	= referenceableelement_type.createAttributeType("referenceableelement_has_assignto", OAVJavaType.java_string_type, OAVAttributeType.LIST);
 		
 		// element reference
-		elementreference_has_concrete	= elementreference_type.createAttributeType("elementreference_has_concrete", OAVJavaType.java_string_type);
+		elementreference_has_concrete	= elementreference_type.createAttributeType("melementreference_has_concrete", OAVJavaType.java_string_type);
 //		elementreference_has_abstract	= elementreference_type.createAttributeType("elementreference_has_abstract", OAVJavaType.java_boolean_type);
 //		elementreference_has_required	= elementreference_type.createAttributeType("elementreference_has_required", OAVJavaType.java_boolean_type);
 		
 		// expression
-		expressionparameter_has_class = expressionparameter_type.createAttributeType("expressionparameter_has_class", OAVJavaType.java_class_type);
+		expressionparameter_has_class = expressionparameter_type.createAttributeType("mexpressionparameter_has_class", OAVJavaType.java_class_type);
 		
-		expressionrelevant_has_ref = expressionrelevant_type.createAttributeType("expressionrelevant_has_ref", OAVJavaType.java_string_type);
-		expressionrelevant_has_eventtype = expressionrelevant_type.createAttributeType("expressionrelevant_has_eventtype", OAVJavaType.java_string_type);
+		expressionrelevant_has_ref = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_ref", OAVJavaType.java_string_type);
+		expressionrelevant_has_eventtype = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_eventtype", OAVJavaType.java_string_type);
 
-		expression_has_language = expression_type.createAttributeType("expression_has_language", OAVJavaType.java_string_type, OAVAttributeType.NONE);//, "java");
-		expression_has_content = expression_type.createAttributeType("expression_has_content", OAVJavaType.java_object_type);// java_parsedexpression_type)
-		expression_has_class = expression_type.createAttributeType("expression_has_class", OAVJavaType.java_class_type);
-		expression_has_parameters = expression_type.createAttributeType("expression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
-		expression_has_relevants = expression_type.createAttributeType("expression_has_relevants",  expressionrelevant_type, OAVAttributeType.LIST);
-		expression_has_evaluationmode = expression_type.createAttributeType("expression_has_evaluationmode", OAVJavaType.java_string_type);
+		expression_has_language = expression_type.createAttributeType("mexpression_has_language", OAVJavaType.java_string_type, OAVAttributeType.NONE);//, "java");
+		expression_has_content = expression_type.createAttributeType("mexpression_has_content", OAVJavaType.java_object_type);// java_parsedexpression_type)
+		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
+		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
+		expression_has_relevants = expression_type.createAttributeType("mexpression_has_relevants",  expressionrelevant_type, OAVAttributeType.LIST);
+		expression_has_evaluationmode = expression_type.createAttributeType("mexpression_has_evaluationmode", OAVJavaType.java_string_type);
 				
 		// condition
 		// todo: separate conditions from expressions
-		condition_has_trigger = condition_type.createAttributeType("condition_has_trigger", OAVJavaType.java_string_type);
+		condition_has_trigger = condition_type.createAttributeType("mcondition_has_trigger", OAVJavaType.java_string_type);
 
 		// typed element
-		typedelement_has_class = typedelement_type.createAttributeType("typedelement_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
-		typedelement_has_updaterate = typedelement_type.createAttributeType("typedelement_has_updaterate", OAVJavaType.java_long_type);
-		typedelement_has_transient = typedelement_type.createAttributeType("typedelement_has_transient", OAVJavaType.java_boolean_type);
-		typedelement_has_evaluationmode = typedelement_type.createAttributeType("typedelement_has_evaluationmode", OAVJavaType.java_string_type, OAVAttributeType.NONE, EVALUATIONMODE_STATIC);
+		typedelement_has_class = typedelement_type.createAttributeType("mtypedelement_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
+		typedelement_has_updaterate = typedelement_type.createAttributeType("mtypedelement_has_updaterate", OAVJavaType.java_long_type);
+		typedelement_has_transient = typedelement_type.createAttributeType("mtypedelement_has_transient", OAVJavaType.java_boolean_type);
+		typedelement_has_evaluationmode = typedelement_type.createAttributeType("mtypedelement_has_evaluationmode", OAVJavaType.java_string_type, OAVAttributeType.NONE, EVALUATIONMODE_STATIC);
 		
 //		// typed element reference
 //		typedelementreference_has_class = typedelementreference_type.createAttributeType("typedelementreference_has_class", OAVJavaType.java_class_type);
 
 		// parameter
-		parameter_has_value = parameter_type.createAttributeType("parameter_has_value", expression_type);
-		parameter_has_direction = parameter_type.createAttributeType("parameter_has_direction", OAVJavaType.java_string_type, OAVAttributeType.NONE, "in");
-		parameter_has_optional = parameter_type.createAttributeType("parameter_has_optional", OAVJavaType.java_boolean_type);		
-		parameter_has_bindingoptions = parameter_type.createAttributeType("parameter_has_bindingoptions", expression_type);
+		parameter_has_value = parameter_type.createAttributeType("mparameter_has_value", expression_type);
+		parameter_has_direction = parameter_type.createAttributeType("mparameter_has_direction", OAVJavaType.java_string_type, OAVAttributeType.NONE, "in");
+		parameter_has_optional = parameter_type.createAttributeType("mparameter_has_optional", OAVJavaType.java_boolean_type);		
+		parameter_has_bindingoptions = parameter_type.createAttributeType("mparameter_has_bindingoptions", expression_type);
 		
 		// parameter set
-		parameterset_has_values = parameterset_type.createAttributeType("parameterset_has_values", expression_type, OAVAttributeType.LIST);
-		parameterset_has_valuesexpression = parameterset_type.createAttributeType("parameterset_has_valuesexpression", expression_type);
-		parameterset_has_direction = parameterset_type.createAttributeType("parameterset_has_direction", OAVJavaType.java_string_type, OAVAttributeType.NONE,  "in");
-		parameterset_has_optional = parameterset_type.createAttributeType("parameterset_has_optional", OAVJavaType.java_boolean_type);		
+		parameterset_has_values = parameterset_type.createAttributeType("mparameterset_has_values", expression_type, OAVAttributeType.LIST);
+		parameterset_has_valuesexpression = parameterset_type.createAttributeType("mparameterset_has_valuesexpression", expression_type);
+		parameterset_has_direction = parameterset_type.createAttributeType("mparameterset_has_direction", OAVJavaType.java_string_type, OAVAttributeType.NONE,  "in");
+		parameterset_has_optional = parameterset_type.createAttributeType("mparameterset_has_optional", OAVJavaType.java_boolean_type);		
 		
 		// parameter element
-		parameterelement_has_parameters = parameterelement_type.createAttributeType("parameterelement_has_parameters", parameter_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		parameterelement_has_parametersets = parameterelement_type.createAttributeType("parameterelement_has_parametersets", parameterset_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		parameterelement_has_parameters = parameterelement_type.createAttributeType("mparameterelement_has_mparameters", parameter_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		parameterelement_has_parametersets = parameterelement_type.createAttributeType("mparameterelement_has_mparametersets", parameterset_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 			
 		// processable element
-		processableelement_has_posttoall = processableelement_type.createAttributeType("processableelement_has_posttoall", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		processableelement_has_randomselection = processableelement_type.createAttributeType("processableelement_has_randomselection", OAVJavaType.java_boolean_type);
+		processableelement_has_posttoall = processableelement_type.createAttributeType("mprocessableelement_has_posttoall", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		processableelement_has_randomselection = processableelement_type.createAttributeType("mprocessableelement_has_randomselection", OAVJavaType.java_boolean_type);
 		
 //		// parameter element reference
 //		parameterelementreference_has_parameterrefs = parameterelementreference_type.createAttributeType("parameterelementreference_has_parameterrefs", typedelementreference_type, OAVAttributeType.LIST);
 //		parameterelementreference_has_parametersetrefs = parameterelementreference_type.createAttributeType("parameterelementreference_has_parametersetrefs", typedelementreference_type, OAVAttributeType.LIST);
 						
 		// trigger
-		triggerreference_has_ref = triggerreference_type.createAttributeType("triggerreference_has_ref", OAVJavaType.java_string_type);
-		triggerreference_has_match = triggerreference_type.createAttributeType("triggerreference_has_match", expression_type);
+		triggerreference_has_ref = triggerreference_type.createAttributeType("mtriggerreference_has_ref", OAVJavaType.java_string_type);
+		triggerreference_has_match = triggerreference_type.createAttributeType("mtriggerreference_has_match", expression_type);
 
-		trigger_has_internalevents = trigger_type.createAttributeType("trigger_has_internalevents", triggerreference_type, OAVAttributeType.LIST);
-		trigger_has_messageevents = trigger_type.createAttributeType("trigger_has_messageevents", triggerreference_type, OAVAttributeType.LIST);
-		trigger_has_goalfinisheds = trigger_type.createAttributeType("trigger_has_goalfinisheds", triggerreference_type, OAVAttributeType.LIST);
+		trigger_has_internalevents = trigger_type.createAttributeType("mtrigger_has_internalevents", triggerreference_type, OAVAttributeType.LIST);
+		trigger_has_messageevents = trigger_type.createAttributeType("mtrigger_has_messageevents", triggerreference_type, OAVAttributeType.LIST);
+		trigger_has_goalfinisheds = trigger_type.createAttributeType("mtrigger_has_goalfinisheds", triggerreference_type, OAVAttributeType.LIST);
 //		trigger_has_filter = trigger_type.createAttributeType("trigger_has_filter", expression_type);
 		// Todo: support match expression for fact changes/adds/removes also?
-		trigger_has_factaddeds = trigger_type.createAttributeType("trigger_has_factaddeds", OAVJavaType.java_string_type, OAVAttributeType.LIST);
-		trigger_has_factremoveds = trigger_type.createAttributeType("trigger_has_factremoveds", OAVJavaType.java_string_type, OAVAttributeType.LIST);
-		trigger_has_factchangeds = trigger_type.createAttributeType("trigger_has_factchangeds", OAVJavaType.java_string_type, OAVAttributeType.LIST);
+		trigger_has_factaddeds = trigger_type.createAttributeType("mtrigger_has_factaddeds", OAVJavaType.java_string_type, OAVAttributeType.LIST);
+		trigger_has_factremoveds = trigger_type.createAttributeType("mtrigger_has_factremoveds", OAVJavaType.java_string_type, OAVAttributeType.LIST);
+		trigger_has_factchangeds = trigger_type.createAttributeType("mtrigger_has_factchangeds", OAVJavaType.java_string_type, OAVAttributeType.LIST);
 		
 		// plan trigger
-		plantrigger_has_goals = plantrigger_type.createAttributeType("plantrigger_has_goals", triggerreference_type, OAVAttributeType.LIST);
-		plantrigger_has_condition = plantrigger_type.createAttributeType("plantrigger_has_condition", condition_type);
+		plantrigger_has_goals = plantrigger_type.createAttributeType("mplantrigger_has_goals", triggerreference_type, OAVAttributeType.LIST);
+		plantrigger_has_condition = plantrigger_type.createAttributeType("mplantrigger_has_condition", condition_type);
 		
 		// meta goal trigger
-		metagoaltrigger_has_goals = metagoaltrigger_type.createAttributeType("metagoaltrigger_has_goals", goal_type, OAVAttributeType.LIST);
+		metagoaltrigger_has_goals = metagoaltrigger_type.createAttributeType("mmetagoaltrigger_has_goals", goal_type, OAVAttributeType.LIST);
 		
 		// belief
 //		belief_has_dynamic = belief_type.createAttributeType("belief_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		belief_has_fact = belief_type.createAttributeType("belief_has_fact", expression_type);
+		belief_has_fact = belief_type.createAttributeType("mbelief_has_fact", expression_type);
 		
 		// belief set
 		// todo: make configurable belief store type (list, set, ...)
 //		beliefset_has_dynamic = beliefset_type.createAttributeType("beliefset_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		beliefset_has_facts = beliefset_type.createAttributeType("beliefset_has_facts", expression_type, OAVAttributeType.LIST);
-		beliefset_has_factsexpression = beliefset_type.createAttributeType("beliefset_has_factsexpression", expression_type);
+		beliefset_has_facts = beliefset_type.createAttributeType("mbeliefset_has_facts", expression_type, OAVAttributeType.LIST);
+		beliefset_has_factsexpression = beliefset_type.createAttributeType("mbeliefset_has_factsexpression", expression_type);
 		
 		// inhibit
-		inhibits_has_ref = inhibits_type.createAttributeType("inhibits_has_ref", OAVJavaType.java_string_type);
-		inhibits_has_inhibit = inhibits_type.createAttributeType("inhibits_has_inhibit", OAVJavaType.java_string_type, OAVAttributeType.NONE, INHIBITS_WHEN_ACTIVE);
+		inhibits_has_ref = inhibits_type.createAttributeType("minhibits_has_ref", OAVJavaType.java_string_type);
+		inhibits_has_inhibit = inhibits_type.createAttributeType("minhibits_has_inhibit", OAVJavaType.java_string_type, OAVAttributeType.NONE, INHIBITS_WHEN_ACTIVE);
 		
 		// goal
 		//goal_has_exported = new OAVAttributeType("goal_has_exported", java_boolean_type, Boolean.FALSE);
-		goal_has_creationcondition = goal_type.createAttributeType("goal_has_creationcondition", condition_type);
-		goal_has_contextcondition = goal_type.createAttributeType("goal_has_contextcondition", condition_type);
-		goal_has_dropcondition = goal_type.createAttributeType("goal_has_dropcondition", condition_type);
-		goal_has_retry = goal_type.createAttributeType("goal_has_retry", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.TRUE);
-		goal_has_retrydelay = goal_type.createAttributeType("goal_has_retrydelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, new Long(0));
-		goal_has_recur = goal_type.createAttributeType("goal_has_recur", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		goal_has_recurdelay = goal_type.createAttributeType("goal_has_recurdelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, new Long(0));
-		goal_has_recurcondition = goal_type.createAttributeType("goal_has_recurcondition", condition_type);
-		goal_has_exclude = goal_type.createAttributeType("goal_has_exclude", OAVJavaType.java_string_type, OAVAttributeType.NONE,  EXCLUDE_WHEN_TRIED);
-		goal_has_rebuild = goal_type.createAttributeType("goal_has_recalculate", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		goal_has_inhibits = goal_type.createAttributeType("goal_has_inhibits", inhibits_type, OAVAttributeType.LIST);
-//		goal_has_cardinality = goal_type.createAttributeType("goal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(-1));
-		goal_has_cardinality = goal_type.createAttributeType("goal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(Integer.MAX_VALUE));
-		goal_has_unique = goal_type.createAttributeType("goal_has_unique", OAVJavaType.java_boolean_type);
-		goal_has_excludedparameter = goal_type.createAttributeType("goal_has_excludedparameter", typedelement_type, OAVAttributeType.LIST);
+		goal_has_creationcondition = goal_type.createAttributeType("mgoal_has_creationcondition", condition_type);
+		goal_has_contextcondition = goal_type.createAttributeType("mgoal_has_contextcondition", condition_type);
+		goal_has_dropcondition = goal_type.createAttributeType("mgoal_has_dropcondition", condition_type);
+		goal_has_retry = goal_type.createAttributeType("mgoal_has_retry", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.TRUE);
+		goal_has_retrydelay = goal_type.createAttributeType("mgoal_has_retrydelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, new Long(0));
+		goal_has_recur = goal_type.createAttributeType("mgoal_has_recur", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		goal_has_recurdelay = goal_type.createAttributeType("mgoal_has_recurdelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, new Long(0));
+		goal_has_recurcondition = goal_type.createAttributeType("mgoal_has_recurcondition", condition_type);
+		goal_has_exclude = goal_type.createAttributeType("mgoal_has_exclude", OAVJavaType.java_string_type, OAVAttributeType.NONE,  EXCLUDE_WHEN_TRIED);
+		goal_has_rebuild = goal_type.createAttributeType("mgoal_has_recalculate", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		goal_has_inhibits = goal_type.createAttributeType("mgoal_has_inhibits", inhibits_type, OAVAttributeType.LIST);
+//		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(-1));
+		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(Integer.MAX_VALUE));
+		goal_has_unique = goal_type.createAttributeType("mgoal_has_unique", OAVJavaType.java_boolean_type);
+		goal_has_excludedparameter = goal_type.createAttributeType("mgoal_has_excludedparameter", typedelement_type, OAVAttributeType.LIST);
 		
 		// perform goal
 		
 		// achieve goal
-		achievegoal_has_targetcondition = achievegoal_type.createAttributeType("achievegoal_has_targetcondition", condition_type);
-		achievegoal_has_failurecondition = achievegoal_type.createAttributeType("achievegoal_has_failurecondition", condition_type);
+		achievegoal_has_targetcondition = achievegoal_type.createAttributeType("machievegoal_has_targetcondition", condition_type);
+		achievegoal_has_failurecondition = achievegoal_type.createAttributeType("machievegoal_has_failurecondition", condition_type);
 
 		// query goal
-		querygoal_has_failurecondition = querygoal_type.createAttributeType("querygoal_has_failurecondition", condition_type);
+		querygoal_has_failurecondition = querygoal_type.createAttributeType("mquerygoal_has_failurecondition", condition_type);
 	
 		// maintain goal
-		maintaingoal_has_maintaincondition = maintaingoal_type.createAttributeType("maintaingoal_has_maintaincondition", condition_type);
-		maintaingoal_has_targetcondition = maintaingoal_type.createAttributeType("maintaingoal_has_targetcondition", condition_type);
+		maintaingoal_has_maintaincondition = maintaingoal_type.createAttributeType("mmaintaingoal_has_maintaincondition", condition_type);
+		maintaingoal_has_targetcondition = maintaingoal_type.createAttributeType("mmaintaingoal_has_targetcondition", condition_type);
 
 		// meta goal
-		metagoal_has_trigger = metagoal_type.createAttributeType("metagoal_has_trigger", metagoaltrigger_type);
+		metagoal_has_trigger = metagoal_type.createAttributeType("mmetagoal_has_trigger", metagoaltrigger_type);
 		
 		// planparameters
 		// todo: multiplicity
-		planparameter_has_goalmapping	= planparameter_type.createAttributeType("planparameter_has_goalmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
-		planparameter_has_internaleventmapping	= planparameter_type.createAttributeType("planparameter_has_internaleventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
-		planparameter_has_messageeventmapping	= planparameter_type.createAttributeType("planparameter_has_messageeventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
+		planparameter_has_goalmapping	= planparameter_type.createAttributeType("mplanparameter_has_goalmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
+		planparameter_has_internaleventmapping	= planparameter_type.createAttributeType("mplanparameter_has_internaleventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
+		planparameter_has_messageeventmapping	= planparameter_type.createAttributeType("mplanparameter_has_messageeventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
 
-		planparameterset_has_goalmapping	= planparameterset_type.createAttributeType("planparameterset_has_goalmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
-		planparameterset_has_internaleventmapping	= planparameterset_type.createAttributeType("planparameterset_has_internaleventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
-		planparameterset_has_messageeventmapping	= planparameterset_type.createAttributeType("planparameterset_has_messageeventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
+		planparameterset_has_goalmapping	= planparameterset_type.createAttributeType("mplanparameterset_has_goalmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
+		planparameterset_has_internaleventmapping	= planparameterset_type.createAttributeType("mplanparameterset_has_internaleventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
+		planparameterset_has_messageeventmapping	= planparameterset_type.createAttributeType("mplanparameterset_has_messageeventmapping", OAVJavaType.java_string_type);//, OAVAttributeType.LIST);
 
 		// plan body
-		body_has_type = body_type.createAttributeType("body_has_type", OAVJavaType.java_string_type, OAVAttributeType.NONE,  "standard");
-		body_has_inline = body_type.createAttributeType("body_has_inline", OAVJavaType.java_boolean_type);
-		body_has_passed	= body_type.createAttributeType("body_has_passed", OAVJavaType.java_string_type);	// Todo: should be expression?
-		body_has_failed	= body_type.createAttributeType("body_has_failed", OAVJavaType.java_string_type);	// Todo: should be expression?
-		body_has_aborted	= body_type.createAttributeType("body_has_aborted", OAVJavaType.java_string_type);	// Todo: should be expression?
+		body_has_type = body_type.createAttributeType("mbody_has_type", OAVJavaType.java_string_type, OAVAttributeType.NONE,  "standard");
+		body_has_inline = body_type.createAttributeType("mbody_has_inline", OAVJavaType.java_boolean_type);
+		body_has_passed	= body_type.createAttributeType("mbody_has_passed", OAVJavaType.java_string_type);	// Todo: should be expression?
+		body_has_failed	= body_type.createAttributeType("mbody_has_failed", OAVJavaType.java_string_type);	// Todo: should be expression?
+		body_has_aborted	= body_type.createAttributeType("mbody_has_aborted", OAVJavaType.java_string_type);	// Todo: should be expression?
 
 		// plan
-		plan_has_body = plan_type.createAttributeType("plan_has_body", body_type);
-		plan_has_trigger = plan_type.createAttributeType("plan_has_trigger", plantrigger_type);
-		plan_has_precondition = plan_type.createAttributeType("plan_has_precondition", expression_type);
-		plan_has_contextcondition = plan_type.createAttributeType("plan_has_contextcondition", condition_type);
-		plan_has_priority = plan_type.createAttributeType("plan_has_priority", OAVJavaType.java_integer_type);
-		plan_has_waitqueue = plan_type.createAttributeType("plan_has_waitqueue", trigger_type);
+		plan_has_body = plan_type.createAttributeType("mplan_has_body", body_type);
+		plan_has_trigger = plan_type.createAttributeType("mplan_has_trigger", plantrigger_type);
+		plan_has_precondition = plan_type.createAttributeType("mplan_has_precondition", expression_type);
+		plan_has_contextcondition = plan_type.createAttributeType("mplan_has_contextcondition", condition_type);
+		plan_has_priority = plan_type.createAttributeType("mplan_has_priority", OAVJavaType.java_integer_type);
+		plan_has_waitqueue = plan_type.createAttributeType("mplan_has_waitqueue", trigger_type);
 				
 		// internal event
 		
 		// message event
-		messageevent_has_direction = messageevent_type.createAttributeType("messageevent_has_direction", OAVJavaType.java_string_type, OAVAttributeType.NONE, MESSAGE_DIRECTION_SEND_RECEIVE);
-		messageevent_has_type = messageevent_type.createAttributeType("messageevent_has_type", java_messagetype_type);
-		messageevent_has_match = messageevent_type.createAttributeType("messageevent_has_match", expression_type);
+		messageevent_has_direction = messageevent_type.createAttributeType("mmessageevent_has_direction", OAVJavaType.java_string_type, OAVAttributeType.NONE, MESSAGE_DIRECTION_SEND_RECEIVE);
+		messageevent_has_type = messageevent_type.createAttributeType("mmessageevent_has_type", java_messagetype_type);
+		messageevent_has_match = messageevent_type.createAttributeType("mmessageevent_has_match", expression_type);
 //		messageevent_has_degree = messageevent_type.createAttributeType("messageevent_has_degree", OAVJavaType.java_integer_type);
 		
 		// config elments
 		
 		// config parameter element
-		configparameterelement_has_parameters = configparameterelement_type.createAttributeType("configparameterelement_has_parameters", configparameter_type, OAVAttributeType.LIST);
-		configparameterelement_has_parametersets = configparameterelement_type.createAttributeType("configparameterelement_has_parametersets", configparameterset_type, OAVAttributeType.LIST);
+		configparameterelement_has_parameters = configparameterelement_type.createAttributeType("mconfigparameterelement_has_parameters", configparameter_type, OAVAttributeType.LIST);
+		configparameterelement_has_parametersets = configparameterelement_type.createAttributeType("mconfigparameterelement_has_parametersets", configparameterset_type, OAVAttributeType.LIST);
 		
-//		configelement_has_ref	= configelement_type.createAttributeType("configelement_has_ref", referenceableelement_type);
-//		configbelief_has_ref	= configbelief_type.createAttributeType("configbelief_has_ref", referenceableelement_type);
-//		configbeliefset_has_ref	= configbeliefset_type.createAttributeType("configbeliefset_has_ref", referenceableelement_type);
-//		configparameter_has_ref	= configparameter_type.createAttributeType("configparameter_has_ref", referenceableelement_type);
-//		configparameterset_has_ref	= configparameterset_type.createAttributeType("configparameterset_has_ref", referenceableelement_type);
+//		configelement_has_ref	= configelement_type.createAttributeType("mconfigelement_has_ref", referenceableelement_type);
+//		configbelief_has_ref	= configbelief_type.createAttributeType("mconfigbelief_has_ref", referenceableelement_type);
+//		configbeliefset_has_ref	= configbeliefset_type.createAttributeType("mconfigbeliefset_has_ref", referenceableelement_type);
+//		configparameter_has_ref	= configparameter_type.createAttributeType("mconfigparameter_has_ref", referenceableelement_type);
+//		configparameterset_has_ref	= configparameterset_type.createAttributeType("mconfigparameterset_has_ref", referenceableelement_type);
 		
-		configelement_has_ref	= configelement_type.createAttributeType("configelement_has_ref", OAVJavaType.java_string_type);
-		configbelief_has_ref	= configbelief_type.createAttributeType("configbelief_has_ref", OAVJavaType.java_string_type);
-		configbeliefset_has_ref	= configbeliefset_type.createAttributeType("configbeliefset_has_ref", OAVJavaType.java_string_type);
-		configparameter_has_ref	= configparameter_type.createAttributeType("configparameter_has_ref", OAVJavaType.java_string_type);
-		configparameterset_has_ref	= configparameterset_type.createAttributeType("configparameterset_has_ref", OAVJavaType.java_string_type);
+		configelement_has_ref	= configelement_type.createAttributeType("mconfigelement_has_ref", OAVJavaType.java_string_type);
+		configbelief_has_ref	= configbelief_type.createAttributeType("mconfigbelief_has_ref", OAVJavaType.java_string_type);
+		configbeliefset_has_ref	= configbeliefset_type.createAttributeType("mconfigbeliefset_has_ref", OAVJavaType.java_string_type);
+		configparameter_has_ref	= configparameter_type.createAttributeType("mconfigparameter_has_ref", OAVJavaType.java_string_type);
+		configparameterset_has_ref	= configparameterset_type.createAttributeType("mconfigparameterset_has_ref", OAVJavaType.java_string_type);
 		
 		// initial capability
-		initialcapability_has_ref	= initialcapability_type.createAttributeType("initialcapability_has_ref", capabilityref_type);
-		initialcapability_has_configuration	= initialcapability_type.createAttributeType("initialcapability_has_configuration", OAVJavaType.java_string_type);
+		initialcapability_has_ref	= initialcapability_type.createAttributeType("minitialcapability_has_ref", capabilityref_type);
+		initialcapability_has_configuration	= initialcapability_type.createAttributeType("minitialcapability_has_configuration", OAVJavaType.java_string_type);
 		
 		// configuration
-		configuration_has_initialcapabilities	= configuration_type.createAttributeType("configuration_has_initialcapabilities", initialcapability_type, OAVAttributeType.LIST);
-		configuration_has_initialbeliefs = configuration_type.createAttributeType("configuration_has_initialbeliefs", configbelief_type, OAVAttributeType.LIST);
-		configuration_has_initialbeliefsets = configuration_type.createAttributeType("configuration_has_initialbeliefsets", configbeliefset_type, OAVAttributeType.LIST);
-		configuration_has_initialgoals = configuration_type.createAttributeType("configuration_has_initialgoals", configelement_type, OAVAttributeType.LIST);
-		configuration_has_endgoals = configuration_type.createAttributeType("configuration_has_endgoals", configelement_type, OAVAttributeType.LIST);
-		configuration_has_initialplans = configuration_type.createAttributeType("configuration_has_initialplans", configelement_type, OAVAttributeType.LIST);
-		configuration_has_endplans = configuration_type.createAttributeType("configuration_has_endplans", configelement_type, OAVAttributeType.LIST);
-		configuration_has_initialinternalevents = configuration_type.createAttributeType("configuration_has_initialinternalevents", configelement_type, OAVAttributeType.LIST);
-		configuration_has_initialmessagevents = configuration_type.createAttributeType("configuration_has_initialmessageevents", configelement_type, OAVAttributeType.LIST);
-		configuration_has_endinternalevents = configuration_type.createAttributeType("configuration_has_endinternalevents", configelement_type, OAVAttributeType.LIST);
-		configuration_has_endmessageevents = configuration_type.createAttributeType("configuration_has_endmessageevents", configelement_type, OAVAttributeType.LIST);
+		configuration_has_initialcapabilities	= configuration_type.createAttributeType("mconfiguration_has_initialcapabilities", initialcapability_type, OAVAttributeType.LIST);
+		configuration_has_initialbeliefs = configuration_type.createAttributeType("mconfiguration_has_initialbeliefs", configbelief_type, OAVAttributeType.LIST);
+		configuration_has_initialbeliefsets = configuration_type.createAttributeType("mconfiguration_has_initialbeliefsets", configbeliefset_type, OAVAttributeType.LIST);
+		configuration_has_initialgoals = configuration_type.createAttributeType("mconfiguration_has_initialgoals", configelement_type, OAVAttributeType.LIST);
+		configuration_has_endgoals = configuration_type.createAttributeType("mconfiguration_has_endgoals", configelement_type, OAVAttributeType.LIST);
+		configuration_has_initialplans = configuration_type.createAttributeType("mconfiguration_has_initialplans", configelement_type, OAVAttributeType.LIST);
+		configuration_has_endplans = configuration_type.createAttributeType("mconfiguration_has_endplans", configelement_type, OAVAttributeType.LIST);
+		configuration_has_initialinternalevents = configuration_type.createAttributeType("mconfiguration_has_initialinternalevents", configelement_type, OAVAttributeType.LIST);
+		configuration_has_initialmessagevents = configuration_type.createAttributeType("mconfiguration_has_initialmessageevents", configelement_type, OAVAttributeType.LIST);
+		configuration_has_endinternalevents = configuration_type.createAttributeType("mconfiguration_has_endinternalevents", configelement_type, OAVAttributeType.LIST);
+		configuration_has_endmessageevents = configuration_type.createAttributeType("mconfiguration_has_endmessageevents", configelement_type, OAVAttributeType.LIST);
 				
 		// capability
-		capability_has_package = capability_type.createAttributeType("capability_has_package", OAVJavaType.java_string_type);
-		capability_has_abstract = capability_type.createAttributeType("capability_has_abstract", OAVJavaType.java_boolean_type);
-		capability_has_imports = capability_type.createAttributeType("capability_has_imports", OAVJavaType.java_string_type, OAVAttributeType.LIST);
-		capability_has_capabilityrefs = capability_type.createAttributeType("capability_has_capabilityrefs", capabilityref_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_beliefs = capability_type.createAttributeType("capability_has_beliefs", belief_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_beliefsets = capability_type.createAttributeType("capability_has_beliefsets", beliefset_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_beliefrefs = capability_type.createAttributeType("capability_has_beliefrefs", beliefreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_beliefsetrefs = capability_type.createAttributeType("capability_has_beliefsetrefs", beliefsetreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_goals = capability_type.createAttributeType("capability_has_goals", goal_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_goalrefs = capability_type.createAttributeType("capability_has_goalrefs", goalreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_plans = capability_type.createAttributeType("capability_has_plans", plan_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_messageevents = capability_type.createAttributeType("capability_has_messageevents", messageevent_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_internalevents = capability_type.createAttributeType("capability_has_internalevents", internalevent_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_messageeventrefs = capability_type.createAttributeType("capability_has_messageeventrefs", messageeventreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_internaleventrefs = capability_type.createAttributeType("capability_has_internaleventrefs", internaleventreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_expressions = capability_type.createAttributeType("capability_has_expressions", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_conditions = capability_type.createAttributeType("capability_has_conditions", condition_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_properties = capability_type.createAttributeType("capability_has_properties", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_defaultconfiguration = capability_type.createAttributeType("capability_has_defaultconfiguration", configuration_type);
-		capability_has_configurations = capability_type.createAttributeType("capability_has_configurations", configuration_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_package = capability_type.createAttributeType("mcapability_has_package", OAVJavaType.java_string_type);
+		capability_has_abstract = capability_type.createAttributeType("mcapability_has_abstract", OAVJavaType.java_boolean_type);
+		capability_has_imports = capability_type.createAttributeType("mcapability_has_imports", OAVJavaType.java_string_type, OAVAttributeType.LIST);
+		capability_has_capabilityrefs = capability_type.createAttributeType("mcapability_has_mcapabilityrefs", capabilityref_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_beliefs = capability_type.createAttributeType("mcapability_has_mbeliefs", belief_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_beliefsets = capability_type.createAttributeType("mcapability_has_mbeliefsets", beliefset_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_beliefrefs = capability_type.createAttributeType("mcapability_has_beliefrefs", beliefreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_beliefsetrefs = capability_type.createAttributeType("mcapability_has_mbeliefsetrefs", beliefsetreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_goals = capability_type.createAttributeType("mcapability_has_mgoals", goal_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_goalrefs = capability_type.createAttributeType("mcapability_has_mgoalrefs", goalreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_plans = capability_type.createAttributeType("mcapability_has_mplans", plan_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_messageevents = capability_type.createAttributeType("mcapability_has_mmessageevents", messageevent_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_internalevents = capability_type.createAttributeType("mcapability_has_minternalevents", internalevent_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_messageeventrefs = capability_type.createAttributeType("mcapability_has_mmessageeventrefs", messageeventreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_internaleventrefs = capability_type.createAttributeType("mcapability_has_minternaleventrefs", internaleventreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_expressions = capability_type.createAttributeType("mcapability_has_mexpressions", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_conditions = capability_type.createAttributeType("mcapability_has_mconditions", condition_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_properties = capability_type.createAttributeType("mcapability_has_mproperties", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_defaultconfiguration = capability_type.createAttributeType("mcapability_has_defaultconfiguration", configuration_type);
+		capability_has_configurations = capability_type.createAttributeType("mcapability_has_mconfigurations", configuration_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 
 		// agent
-		agent_has_propertyfile	= agent_type.createAttributeType("agent_has_propertyfile", OAVJavaType.java_string_type);
+		agent_has_propertyfile	= agent_type.createAttributeType("magent_has_propertyfile", OAVJavaType.java_string_type);
 		
 		// propertybase
 		properties_has_properties	= properties_type.createAttributeType("properties_has_properties", expression_type, OAVAttributeType.LIST);

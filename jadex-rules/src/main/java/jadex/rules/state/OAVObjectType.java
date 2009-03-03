@@ -174,6 +174,16 @@ public class OAVObjectType
 	}
 	
 	/**
+	 *  Get an attribute type description.
+	 *  @param attribute	The name of the attribute.
+	 *  @return The OAV attribute type.
+	 */
+	public OAVAttributeType	getDeclaredAttributeType0(String attribute)
+	{
+		return (OAVAttributeType)(attributes!=null? attributes.get(attribute): null);
+	}
+	
+	/**
 	 *  Get the declared attribute types (i.e. not those of super types).
 	 */
 	public Collection	getDeclaredAttributeTypes()
