@@ -44,7 +44,7 @@
 			<creationcondition>
 				// $beliefbase.trigger
 				?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
-				?mbel_trigger	= (mbelief (element_has_name "trigger"))
+				?mbel_trigger	= (mbelief (melement_has_name "trigger"))
 			</creationcondition>
 		</achievegoal>
 		<achievegoal name="endgoal">
@@ -71,7 +71,7 @@
 				<condition>
 					// $beliefbase.trigger
 					?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
-					?mbel_trigger	= (mbelief (element_has_name "trigger"))
+					?mbel_trigger	= (mbelief (melement_has_name "trigger"))
 				</condition>
 			</trigger>
 		</plan>
@@ -141,7 +141,7 @@
 				(and
 					?report	= (jadex.bdi.planlib.test.TestReport (succeeded false) (reason null))
 					?rbelset_reports	= (beliefset (element_has_model ?mbelset_reports) (beliefset_has_facts contains ?report))
-					?mbelset_reports	= (mbeliefset (element_has_name "reports"))
+					?mbelset_reports	= (mbeliefset (melement_has_name "reports"))
 				)
 			)
 		</condition>

@@ -56,19 +56,19 @@
  				// $beliefbase.creation
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "creation"))
+				?mbel	= (mbelief (melement_has_name "creation"))
  			</creationcondition>
  			<contextcondition>
  				// $beliefbase.context
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "context"))
+				?mbel	= (mbelief (melement_has_name "context"))
  			</contextcondition>
 			<dropcondition>
  				// $beliefbase.drop
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "drop"))
+				?mbel	= (mbelief (melement_has_name "drop"))
  			</dropcondition>
 		</performgoal>
 	</goals>

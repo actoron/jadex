@@ -45,7 +45,7 @@
 				<!-- <condition>$beliefbase.a</condition> -->
 				<condition>
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					?mbelief = (mbelief (element_has_name "a"))
+					?mbelief = (mbelief (melement_has_name "a"))
 				</condition>
 			</trigger>
 		</plan>

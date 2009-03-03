@@ -53,19 +53,19 @@
  				// $beliefbase.mycontext
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "mycontext"))
+				?mbel	= (mbelief (melement_has_name "mycontext"))
  			</contextcondition>
 			<targetcondition>
  				// $beliefbase.count==5
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
-				?mbel	= (mbelief (element_has_name "count"))
+				?mbel	= (mbelief (melement_has_name "count"))
  			</targetcondition>
 			<!-- <failurecondition>
  				// $beliefbase.myfailure
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "myfailure"))
+				?mbel	= (mbelief (melement_has_name "myfailure"))
  			</failurecondition> -->
 		</achievegoal>
 	</goals>

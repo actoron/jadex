@@ -47,7 +47,7 @@
 			<contextcondition>
 				// $beliefbase.context
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "context"))
+				?mbelief = (mbelief (melement_has_name "context"))
 			</contextcondition>
 		</plan>
 
@@ -74,7 +74,7 @@
 		<condition name="plan_context">
 			//!$beliefbase.context
 			?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-			?mbelief = (mbelief (element_has_name "context"))
+			?mbelief = (mbelief (melement_has_name "context"))
 		</condition>
 	</expressions>
 

@@ -51,7 +51,7 @@
 				// $beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "missionend"))
+				?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
 			<deliberation>
 				<inhibits ref="move.walk_around"/>

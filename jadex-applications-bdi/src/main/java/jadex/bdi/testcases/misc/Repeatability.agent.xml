@@ -94,7 +94,7 @@
 					// "test".equals($beliefbase.a)
 					
 					?rbel_a	= (belief (element_has_model ?mbel_a) (belief_has_fact "test"))
-					?mbel_a	= (mbelief (element_has_name "a"))
+					?mbel_a	= (mbelief (melement_has_name "a"))
 				</condition>
 			</trigger>
 		</plan>
@@ -111,7 +111,7 @@
 					// "test".equals($beliefbase.b)
 					
 					?rbel_b	= (belief (element_has_model ?mbel_b) (belief_has_fact "test"))
-					?mbel_b	= (mbelief (element_has_name "b"))
+					?mbel_b	= (mbelief (melement_has_name "b"))
 				</condition>
 			</trigger>
 		</plan>
@@ -128,7 +128,7 @@
 					// $beliefbase.c.length>0 &amp;&amp; "test".equals($beliefbase.c[0])
 					
 					?rbelset_c	= (beliefset (element_has_model ?mbelset_c) (beliefset_has_facts contains "test"))
-					?mbelset_c	= (mbeliefset (element_has_name "c"))
+					?mbelset_c	= (mbeliefset (melement_has_name "c"))
 				</condition>
 			</trigger>
 		</plan>
@@ -145,7 +145,7 @@
 					// $beliefbase.d.length>0 &amp;&amp; "test".equals($beliefbase.d[0])
 					
 					?rbelset_d	= (beliefset (element_has_model ?mbelset_d) (beliefset_has_facts contains "test"))
-					?mbelset_d	= (mbeliefset (element_has_name "d"))
+					?mbelset_d	= (mbeliefset (melement_has_name "d"))
 				</condition>
 			</trigger>
 		</plan>

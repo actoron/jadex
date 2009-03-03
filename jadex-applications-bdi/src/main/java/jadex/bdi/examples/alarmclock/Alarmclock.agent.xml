@@ -49,7 +49,7 @@
 				// alarm.isActive()
 				?alarm = (jadex.bdi.examples.alarmclock.Alarm (active true) (alarmtime != -2))
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
-				?mbeliefset = (mbeliefset (element_has_name "alarms"))
+				?mbeliefset = (mbeliefset (melement_has_name "alarms"))
 				(not
 					(and
 						?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
@@ -70,7 +70,7 @@
 				(not
 					(and
 						?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
-						?mbeliefset = (mbeliefset (element_has_name "alarms"))
+						?mbeliefset = (mbeliefset (melement_has_name "alarms"))
 					)
 				)
 			</dropcondition>

@@ -118,20 +118,20 @@
  				// $beliefbase.my_chargestate > 0.2
  				// Problem: tries to evaluate on all beliefs the >0.2 constraint
  				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 0.2))
-				//?mbelief = (mbelief (element_has_name "my_chargestate"))
+				//?mbelief = (mbelief (melement_has_name "my_chargestate"))
 				
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (element_has_name "my_chargestate"))
+				?mbelief = (mbelief (melement_has_name "my_chargestate"))
 				(test (> ?fact 0.2))
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
 			<targetcondition>
  				// $beliefbase.my_chargestate >= 1.0
 				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact >=0.3))
-				//?mbelief = (mbelief (element_has_name "my_chargestate"))
+				//?mbelief = (mbelief (melement_has_name "my_chargestate"))
 				
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (element_has_name "my_chargestate"))
+				?mbelief = (mbelief (melement_has_name "my_chargestate"))
 				(test (>= ?fact 0.3))
  			</targetcondition>
 		</maintaingoal>
@@ -147,7 +147,7 @@
 			<!-- todo: remove unique support? <unique/>--> 
 			<creationcondition>
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
-				?mbeliefset = (mbeliefset (element_has_name "wastes"))
+				?mbeliefset = (mbeliefset (melement_has_name "wastes"))
 				
 				// unique (?rcapa and ?mgoal are provided internally)
 				(not (and
@@ -162,7 +162,7 @@
 			<contextcondition>
 				// $beliefbase.daytime
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "daytime"))
+				?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
@@ -173,9 +173,9 @@
 				?rgoal = (goal (parameterelement_has_parameters $?x ?rparam $?y))
 				?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts excludes ?waste))
-				?mbeliefset = (mbeliefset (element_has_name "wastes"))
+				?mbeliefset = (mbeliefset (melement_has_name "wastes"))
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
-				?mbelief = (mbelief (element_has_name "carriedwaste"))
+				?mbelief = (mbelief (melement_has_name "carriedwaste"))
 				// todo: make sure that all elements are in same capa
  			</dropcondition>
 			<!--  <deliberation cardinality="1">-->
@@ -186,7 +186,7 @@
 					// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
 					
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (element_has_name "my_location"))
+					?mbelief = (mbelief (melement_has_name "my_location"))
 					
 					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
 					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
@@ -219,7 +219,7 @@
 			<contextcondition>
 				// $beliefbase.daytime
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "daytime"))
+				?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
@@ -228,7 +228,7 @@
 			<contextcondition>
 				// !$beliefbase.daytime
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				?mbelief = (mbelief (element_has_name "daytime"))
+				?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
@@ -281,9 +281,9 @@
 				<value language="clips">
 					?ret = (jadex.bdi.examples.cleanerworld.Wastebin (location ?loc) (isFull() false))
 					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
-					?mbeliefset = (mbeliefset (element_has_name "wastebins"))
+					?mbeliefset = (mbeliefset (melement_has_name "wastebins"))
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (element_has_name "my_location"))
+					?mbelief = (mbelief (melement_has_name "my_location"))
 					(not 
 						(and
 							?other = (jadex.bdi.examples.cleanerworld.Wastebin (location ?otherloc))
@@ -307,9 +307,9 @@
 				<value language="clips">
 					?ret = (jadex.bdi.examples.cleanerworld.Chargingstation (location ?loc))
 					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
-					?mbeliefset = (mbeliefset (element_has_name "chargingstations"))
+					?mbeliefset = (mbeliefset (melement_has_name "chargingstations"))
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (element_has_name "my_location"))
+					?mbelief = (mbelief (melement_has_name "my_location"))
 					(not 
 						(and
 							?other = (jadex.bdi.examples.cleanerworld.Chargingstation (location ?otherloc))

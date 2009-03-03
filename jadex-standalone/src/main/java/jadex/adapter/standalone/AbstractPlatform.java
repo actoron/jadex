@@ -188,7 +188,7 @@ public abstract class AbstractPlatform implements IPlatform
 	 *  @param type The type name.
 	 *  @return The message type.
 	 */
-	protected MessageType getMessageType(String type)
+	public MessageType getMessageType(String type)
 	{
 		return (MessageType)messagetypes.get(type);
 	}

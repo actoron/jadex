@@ -45,7 +45,7 @@
 			<body class="RequestMasterPlan" />
 			<trigger>
 				<condition>
-					?mbelief= (mbelief (element_has_name "master"))
+					?mbelief= (mbelief (melement_has_name "master"))
 					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact true))
 				</condition>
 			</trigger>
@@ -56,7 +56,7 @@
 			<body class="RequestSenderPlan" />
 			<trigger>
 				<condition>
-					?mbelief= (mbelief (element_has_name "receiver"))
+					?mbelief= (mbelief (melement_has_name "receiver"))
 					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact != null))
 				</condition>
 			</trigger>

@@ -58,7 +58,7 @@
 			<parameter name="object_id" class="Integer" direction="out"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -68,7 +68,7 @@
 			<parameter name="object_id" class="Integer" direction="in"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -80,7 +80,7 @@
 			<parameter name="position" class="IVector2" direction="out"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -92,7 +92,7 @@
 			<parameter name="position" class="IVector2" direction="inout"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -104,7 +104,7 @@
 			<parameter name="velocity" class="IVector2"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -122,7 +122,7 @@
 			<parameter name="tolerance" class="IVector1"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -141,7 +141,7 @@
 			<parameter name="tolerance" class="IVector1"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</performgoal>
 		
@@ -157,7 +157,7 @@
 			<parameter name="speed" class="IVector1"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</performgoal>
 		
@@ -169,7 +169,7 @@
 			<parameter name="task" class="ISimObjectTask"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -181,7 +181,7 @@
 			<parameter name="task_name" class="String"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -197,7 +197,7 @@
 			<parameter name="parameters" class="List"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</performgoal>
 		
@@ -210,7 +210,7 @@
 			<parameter name="position" class="IVector2" direction="out"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -220,7 +220,7 @@
 			<parameter name="process" class="IEnvironmentProcess"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -230,7 +230,7 @@
 			<parameter name="process_name" class="String"/>
 			<contextcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</contextcondition>
 		</achievegoal>
 		
@@ -240,7 +240,7 @@
 			<parameter name="environment_name" class="String"/>
 			<targetcondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (element_has_name "connected"))
+				?mbelief = (mbelief (melement_has_name "connected"))
 			</targetcondition>
 		</achievegoal>
 		

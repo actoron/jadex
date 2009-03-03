@@ -1,6 +1,7 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.interpreter.MessageEventRules;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IMessageEvent;
@@ -77,16 +78,16 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 			{
 				public void run()
 				{
-					object = getState().getAttributeValue(getState().getAttributeValue(getHandle(), 
-						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.messageevent_has_type);
+					object	= MessageEventRules.getMessageEventType(getState(),
+						getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model));
 				}
 			};
 			return (MessageType)invoc.object;
 		}
 		else
 		{
-			return (MessageType)getState().getAttributeValue(getState().getAttributeValue(getHandle(), 
-				OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.messageevent_has_type);
+			return MessageEventRules.getMessageEventType(getState(),
+				getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model));
 		}
 	}
 	

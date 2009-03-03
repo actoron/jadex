@@ -48,9 +48,9 @@
 		<performgoal name="update_environment"> <!-- retry="true" retrydelay="0" exclude="never"-->
 			<!-- <maintaincondition>
 				?st_rbelief = (belief (element_has_model ?st_mbelief) (belief_has_fact ?sim_time))
-				?st_mbelief = (mbelief (element_has_name "sim_time"))
+				?st_mbelief = (mbelief (melement_has_name "sim_time"))
 				?t_rbelief = (belief (element_has_model ?t_mbelief) (belief_has_fact ?sim_time))
-				?t_mbelief = (mbelief (element_has_name "time"))
+				?t_mbelief = (mbelief (melement_has_name "time"))
 			</maintaincondition> -->
 		</performgoal>
 	</goals>

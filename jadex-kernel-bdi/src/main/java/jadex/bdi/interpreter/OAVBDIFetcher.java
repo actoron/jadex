@@ -144,7 +144,7 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 				Object	mpe	= state.getAttributeValue(pehandle, OAVBDIRuntimeModel.element_has_model);
 				if(state.getType(mpe).isSubtype(OAVBDIMetaModel.messageevent_type))
 				{
-					MessageType	mtype	= (MessageType)state.getAttributeValue(mpe, OAVBDIMetaModel.messageevent_has_type);
+					MessageType	mtype	= MessageEventRules.getMessageEventType(state, mpe);
 					MessageType.ParameterSpecification	spec	= mtype.getParameter(name);
 					if(spec!=null)
 					{

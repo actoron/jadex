@@ -43,13 +43,13 @@
  				// $beliefbase.context
  				
  				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "context"))
+				?mbel	= (mbelief (melement_has_name "context"))
 			</contextcondition>
 			<maintaincondition>
  				// $beliefbase.count==5
  				
  				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
-				?mbel	= (mbelief (element_has_name "count"))
+				?mbel	= (mbelief (melement_has_name "count"))
 			</maintaincondition>
 		</maintaingoal>
 	</goals>

@@ -1,5 +1,6 @@
 package jadex.bdi.interpreter;
 
+import jadex.commons.SUtil;
 import jadex.commons.xml.Reader;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -36,9 +37,9 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("capabilities/capability", OAVBDIMetaModel.capabilityref_type));
 		typeinfos.add(new OAVMappingInfo("capability", OAVBDIMetaModel.capability_type));
 		typeinfos.add(new OAVMappingInfo("import", OAVJavaType.java_string_type));
-		typeinfos.add(new OAVMappingInfo("belief", OAVBDIMetaModel.belief_type));
+		typeinfos.add(new OAVMappingInfo("belief", OAVBDIMetaModel.belief_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.typedelement_has_classname}), null));
 		typeinfos.add(new OAVMappingInfo("beliefref", OAVBDIMetaModel.beliefreference_type));
-		typeinfos.add(new OAVMappingInfo("beliefset", OAVBDIMetaModel.beliefset_type));
+		typeinfos.add(new OAVMappingInfo("beliefset", OAVBDIMetaModel.beliefset_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.typedelement_has_classname}), null));
 		typeinfos.add(new OAVMappingInfo("beliefsetref", OAVBDIMetaModel.beliefsetreference_type));
 		typeinfos.add(new OAVMappingInfo("performgoal", OAVBDIMetaModel.performgoal_type));
 		typeinfos.add(new OAVMappingInfo("performgoalref", OAVBDIMetaModel.goalreference_type));
@@ -133,7 +134,7 @@ public class OAVBDIXMLReader
 						catch(Exception e)
 						{
 //							report.put(se, e.toString());
-//							e.printStackTrace();
+							e.printStackTrace();
 						}
 //						if(!errors.isEmpty())
 //						{
@@ -143,11 +144,11 @@ public class OAVBDIXMLReader
 //							}
 //						}
 					}
-//					else
-//					{
+					else
+					{
 //						report.put(se, "Unknown condition language: "+lang);
-////						throw new RuntimeException("Unknown condition language: "+lang);
-//					}	
+						throw new RuntimeException("Unknown condition language: "+lang);
+					}	
 //					System.out.println(ret);
 					
 				}
@@ -180,7 +181,7 @@ public class OAVBDIXMLReader
 						catch(Exception e)
 						{
 //							report.put(se, e.toString());
-//							e.printStackTrace();
+							e.printStackTrace();
 						}
 					}
 					else if("clips".equals(lang))
@@ -193,20 +194,21 @@ public class OAVBDIXMLReader
 						catch(Exception e)
 						{
 //							report.put(se, e.toString());
-//							e.printStackTrace();
+							e.printStackTrace();
 						}
-//						if(!errors.isEmpty())
-//						{
+						if(!errors.isEmpty())
+						{
 //							for(int i=0; i<errors.size(); i++)
 //							{
 //								report.put(se, errors.get(i));
 //							}
-//						}
+							throw new RuntimeException("Parse errors: "+errors);
+						}
 					}
 					else
 					{
 //						report.put(se, "Unknown condition language: "+lang);
-//						throw new RuntimeException("Unknown condition language: "+lang);
+						throw new RuntimeException("Unknown condition language: "+lang);
 					}
 				}
 			}

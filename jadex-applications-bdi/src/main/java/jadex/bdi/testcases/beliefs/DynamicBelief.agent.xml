@@ -31,7 +31,7 @@
 			<fact language="clips">
 				// $beliefbase.string.length()
 				?rbel = (belief (element_has_model ?mbel) (belief_has_fact ?fact) (belief_has_fact !=null) ((jadex.rules.rulesystem.rules.functions.MethodCallFunction "java.lang.String" "length" ?fact) ?ret))
-				?mbel = (mbelief (element_has_name "string"))
+				?mbel = (mbelief (melement_has_name "string"))
 			</fact>
 		</belief>
 		<belief name="string" class="String"/>

@@ -44,7 +44,7 @@
 				// $beliefbase.count&lt;4
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact &lt; 4))
-				?mbel	= (mbelief (element_has_name "count"))
+				?mbel	= (mbelief (melement_has_name "count"))
 			</maintaincondition>
 		</maintaingoal>
 	</goals>
@@ -87,11 +87,11 @@
 	<expressions>
 		<condition name="countis5">
 			?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
-			?mbel	= (mbelief (element_has_name "count"))
+			?mbel	= (mbelief (melement_has_name "count"))
 		</condition>
 		<condition name="countis6">
 			?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 6))
-			?mbel	= (mbelief (element_has_name "count"))
+			?mbel	= (mbelief (melement_has_name "count"))
 		</condition>
 	</expressions>
 	

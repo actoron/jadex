@@ -33,7 +33,7 @@
 				// select $g.getParameter("order").getValue()
 				// from IGoal $g in $goalbase.getGoals("purchase_book")
 				
-				?mgoal = (mgoal (element_has_name "purchase_book"))
+				?mgoal = (mgoal (melement_has_name "purchase_book"))
 				$?ret = (collect 
 					?order = (jadex.bdi.examples.booktrading.common.Order)
 					?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
@@ -65,22 +65,22 @@
 				// $beliefbase.initial_orders!=null
 				?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?x ?order $?y))
 				?order = (jadex.bdi.examples.booktrading.common.Order (state "open"))
-				?mbelset = (mbeliefset (element_has_name "initial_orders"))
+				?mbelset = (mbeliefset (melement_has_name "initial_orders"))
 				(not
 					(and
 						?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
 						?rgoal = (goal (parameterelement_has_parameters contains ?rparam) (element_has_model ?mgoal))
-						?mgoal = (mgoal (element_has_name "purchase_book"))
+						?mgoal = (mgoal (melement_has_name "purchase_book"))
 					)
 				)
 				//?rbelief = (belief (belief_has_fact $?orders))
-				//?mbelset = (mbelief (element_has_name "initial_orders"))
+				//?mbelset = (mbelief (melement_has_name "initial_orders"))
 			</creationcondition>
 			<dropcondition>
 				// $beliefbase.time > $goal.order.getDeadline().getTime()
 				
 				// ?rbelief = (belief (belief_has_fact ?time))
-				// ?mbelief = (mbelief (element_has_name "time"))
+				// ?mbelief = (mbelief (melement_has_name "time"))
 				// ?rparam = (parameter (parameter_has_name "order"))
 				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 				// ?order = (jadex.bdi.examples.booktrading.common.Order (getDeadline() ?deadline))

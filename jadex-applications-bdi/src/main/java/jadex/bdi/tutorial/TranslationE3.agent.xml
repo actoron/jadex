@@ -50,13 +50,13 @@
 			<!-- <maintaincondition>$beliefbase.egwords.length &lt;= $beliefbase.maxstorage</maintaincondition> -->
 			<maintaincondition>
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?maxstorage))
-				?mbelief = (mbelief (element_has_name "maxstorage"))
+				?mbelief = (mbelief (melement_has_name "maxstorage"))
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?facts &amp;
 					:(&lt; ?maxstorage (jadex.rules.rulesystem.rules.functions.Length $?facts))))
-				?mbeliefset = (mbeliefset (element_has_name "egwords"))
+				?mbeliefset = (mbeliefset (melement_has_name "egwords"))
 			
 				?rgoal = (goal (element_has_model ?mgoal))
-				?mgoal = (mmaintaingoal (element_has_name "keepstorage"))
+				?mgoal = (mmaintaingoal (melement_has_name "keepstorage"))
 			</maintaincondition>
 		</maintaingoal>
 	</goals>

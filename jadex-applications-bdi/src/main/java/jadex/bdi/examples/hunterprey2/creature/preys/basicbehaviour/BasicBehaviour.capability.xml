@@ -59,7 +59,7 @@
 				// where $object instanceof Hunter).size()>0
 				
 				?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
-				?mbel_vision	= (mbelief (element_has_name "vision"))
+				?mbel_vision	= (mbelief (melement_has_name "vision"))
 				?hunter	= (jadex.bdi.examples.hunterprey2.Hunter)
 				?vision	= (jadex.bdi.examples.hunterprey2.Vision (objects contains ?hunter))
 			</fact>
@@ -86,7 +86,7 @@
 				(not
 					(and
 						?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
-						?mbel_vision	= (mbelief (element_has_name "vision"))
+						?mbel_vision	= (mbelief (melement_has_name "vision"))
 						?hunter	= (jadex.bdi.examples.hunterprey2.Hunter)
 						?vision	= (jadex.bdi.examples.hunterprey2.Vision (objects contains ?hunter))
 					)
@@ -105,13 +105,13 @@
  				// !$beliefbase.getBeliefSet("forbidden_food").containsFact($food)
 
 				?rbel_eating_allowed	= (belief (element_has_model ?mbel_eating_allowed) (belief_has_fact true))
-				?mbel_eating_allowed	= (mbelief (element_has_name "eating_allowed"))
+				?mbel_eating_allowed	= (mbelief (melement_has_name "eating_allowed"))
 
 				?rbelset_food	= (beliefset (element_has_model ?mbelset_food) (beliefset_has_facts $?x ?food $?y))
-				?mbelset_food	= (mbeliefset (element_has_name "food"))
+				?mbelset_food	= (mbeliefset (melement_has_name "food"))
 
 				?rbelset_forbidden_food	= (beliefset (element_has_model ?mbelset_forbidden_food) (beliefset_has_facts excludes ?food))
-				?mbelset_forbidden_food	= (mbeliefset (element_has_name "forbidden_food"))
+				?mbelset_forbidden_food	= (mbeliefset (melement_has_name "forbidden_food"))
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="wander_around"/>
@@ -120,7 +120,7 @@
 					// &lt; $beliefbase.my_self.getDistance($ref.$food)
 					
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myself))
-					?mbelief = (mbelief (element_has_name "my_self"))
+					?mbelief = (mbelief (melement_has_name "my_self"))
 					
 					?rparam = (parameter (parameter_has_name "$food") (parameter_has_value ?food))
 					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))

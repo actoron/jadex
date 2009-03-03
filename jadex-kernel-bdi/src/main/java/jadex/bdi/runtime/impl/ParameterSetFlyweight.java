@@ -2,6 +2,7 @@ package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.BeliefRules;
+import jadex.bdi.interpreter.MessageEventRules;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IParameterSet;
@@ -593,7 +594,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		}
 		else if(getState().getType(mparamelem).isSubtype(OAVBDIMetaModel.messageevent_type))
 		{
-			MessageType mt = (MessageType)getState().getAttributeValue(mparamelem, OAVBDIMetaModel.messageevent_has_type);
+			MessageType mt = MessageEventRules.getMessageEventType(getState(), mparamelem);
 			ParameterSpecification ps = mt.getParameter(name);
 			clazz = ps.getClazz();
 		}

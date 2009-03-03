@@ -51,7 +51,7 @@
 					//$beliefbase.text!=null
 					
 					?rbel_text	= (belief (element_has_model ?mbel_text) (belief_has_fact != null))
-					?mbel_txt	= (mbelief (element_has_name "text"))
+					?mbel_txt	= (mbelief (melement_has_name "text"))
 				</condition>
 			</trigger>
 		</plan>

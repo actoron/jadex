@@ -72,7 +72,7 @@
 				// $beliefbase.my_self.getLeaseticks()>10
 				
 				?rbel_myself	= (belief (element_has_model ?mbel_myself) (belief_has_fact ?myself)) 
-				?mbel_myself	= (mbelief (element_has_name "my_self"))
+				?mbel_myself	= (mbelief (melement_has_name "my_self"))
 				?myself	= (jadex.bdi.examples.hunterprey.Creature (leaseticks > 10)) 
 			</maintaincondition>
 		</maintaingoal>

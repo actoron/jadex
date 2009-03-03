@@ -44,7 +44,7 @@
 		<achievegoal name="init" retry="false">
 			<creationcondition>
 				//$beliefbase.cnt&lt;4
-				?mbelief = (mbelief (element_has_name "cnt"))
+				?mbelief = (mbelief (melement_has_name "cnt"))
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?val) (belief_has_fact &lt; 4))
 				// The (belief_has_fact ?val) term must be used, because otherwise the condition would only trigger once.
 			</creationcondition>

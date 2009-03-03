@@ -53,7 +53,7 @@
 				<condition>
 					// $beliefbase.a 
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					?mbelief = (mbelief (element_has_name "a"))
+					?mbelief = (mbelief (melement_has_name "a"))
 				</condition>
 			</trigger>
 		</plan>
@@ -66,7 +66,7 @@
 				<condition>
 					// $beliefbase.b 
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					?mbelief = (mbelief (element_has_name "b"))
+					?mbelief = (mbelief (melement_has_name "b"))
 				</condition>
 			</trigger>
 		</plan>
@@ -79,9 +79,9 @@
 				<condition>
 					// $beliefbase.a &amp;&amp; $beliefbase.b
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					?mbelief = (mbelief (element_has_name "a"))
+					?mbelief = (mbelief (melement_has_name "a"))
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					?mbelief = (mbelief (element_has_name "b"))
+					?mbelief = (mbelief (melement_has_name "b"))
 				</condition>
 			</trigger>
 		</plan>

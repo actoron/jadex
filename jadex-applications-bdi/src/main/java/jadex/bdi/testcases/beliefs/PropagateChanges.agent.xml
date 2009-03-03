@@ -39,7 +39,7 @@
 				(belief (element_has_model ?mbel)
 							(belief_has_fact "magic") (belief_has_fact ?ret))
 				//		  	(belief_has_fact != "magic") ((jadex.rules.rulesystem.rules.functions.Identity "n/a") ?ret))
-				?mbel = (mbelief (element_has_name "my_value"))
+				?mbel = (mbelief (melement_has_name "my_value"))
 			</fact>
 		</belief>
 
@@ -56,7 +56,7 @@
 				(beliefset (element_has_model ?mbelset)
 					(beliefset_has_facts ?$facts &amp;:(== (jadex.rules.rulesystem.rules.functions.Length ?$facts) 2)) 
 					((jadex.rules.rulesystem.rules.functions.Identity "magic") ?ret))
-				?mbelset = (mbeliefset (element_has_name "my_values"))
+				?mbelset = (mbeliefset (melement_has_name "my_values"))
 			</fact>
 		</belief>
 	</beliefs>

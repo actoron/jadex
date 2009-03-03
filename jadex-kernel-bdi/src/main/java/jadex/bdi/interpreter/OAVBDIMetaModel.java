@@ -187,6 +187,10 @@ public class OAVBDIMetaModel
 	/** Typed element has class attribute. */
 	public static OAVAttributeType typedelement_has_class;
 	
+	/** Typed element has classname attribute. */
+	// Required for XML loading. Todo: remove?
+	public static OAVAttributeType typedelement_has_classname;
+	
 	/** Typed element has update rate attribute. */
 	public static OAVAttributeType typedelement_has_updaterate;
 	
@@ -919,6 +923,7 @@ public class OAVBDIMetaModel
 		condition_has_trigger = condition_type.createAttributeType("mcondition_has_trigger", OAVJavaType.java_string_type);
 
 		// typed element
+		typedelement_has_classname = typedelement_type.createAttributeType("mtypedelement_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		typedelement_has_class = typedelement_type.createAttributeType("mtypedelement_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 		typedelement_has_updaterate = typedelement_type.createAttributeType("mtypedelement_has_updaterate", OAVJavaType.java_long_type);
 		typedelement_has_transient = typedelement_type.createAttributeType("mtypedelement_has_transient", OAVJavaType.java_boolean_type);
@@ -1048,7 +1053,7 @@ public class OAVBDIMetaModel
 		
 		// message event
 		messageevent_has_direction = messageevent_type.createAttributeType("mmessageevent_has_direction", OAVJavaType.java_string_type, OAVAttributeType.NONE, MESSAGE_DIRECTION_SEND_RECEIVE);
-		messageevent_has_type = messageevent_type.createAttributeType("mmessageevent_has_type", java_messagetype_type);
+		messageevent_has_type = messageevent_type.createAttributeType("mmessageevent_has_type", OAVJavaType.java_string_type);
 		messageevent_has_match = messageevent_type.createAttributeType("mmessageevent_has_match", expression_type);
 //		messageevent_has_degree = messageevent_type.createAttributeType("messageevent_has_degree", OAVJavaType.java_integer_type);
 		

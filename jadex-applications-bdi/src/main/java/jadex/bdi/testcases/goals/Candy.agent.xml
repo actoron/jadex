@@ -42,7 +42,7 @@
  				// $beliefbase.candyeaten
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "candyeaten"))
+				?mbel	= (mbelief (melement_has_name "candyeaten"))
  			</targetcondition>
 		</achievegoal>
 	</goals>

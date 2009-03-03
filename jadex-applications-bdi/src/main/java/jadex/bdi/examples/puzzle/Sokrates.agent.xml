@@ -56,7 +56,7 @@
 			<targetcondition>
 				// $beliefbase.getBelief("board").getFact().isSolution()
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?board))
-				?mbelief = (mbelief (element_has_name "board"))
+				?mbelief = (mbelief (melement_has_name "board"))
 				?board = (jadex.bdi.examples.puzzle.IBoard (solution true))
 			</targetcondition>
  		</achievegoal>

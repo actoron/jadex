@@ -101,7 +101,7 @@
 			<contextcondition>
 				// $beliefbase.players.length > 0
 				?rbeliefset = (beliefset (beliefset_has_facts $?facts) (element_has_model ?mbeliefset))
-				?mbeliefset = (mbeliefset (element_has_name "players"))
+				?mbeliefset = (mbeliefset (melement_has_name "players"))
 				(test (> (jadex.rules.rulesystem.rules.functions.Length $?facts) 0))
 			</contextcondition>
 		</performgoal>
@@ -358,12 +358,12 @@
 			
 			// ?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
 			// ?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
-			// ?mbelief = (mbelief (element_has_name "myself"))
+			// ?mbelief = (mbelief (melement_has_name "myself"))
 			// (not
 			// 	(and
 			// 		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
 			//		?rbeliefset = (beliefset (belief_has_facts contains ?player) (element_has_model ?mbeliefset))
-			//		?mbeliefset = (mbeliefset (element_has_name "players"))
+			//		?mbeliefset = (mbeliefset (melement_has_name "players"))
 			//	)
 			// )
 			// ||
@@ -371,7 +371,7 @@
 			//	(and
 			//		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
 			//		?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-			//		?mbeliefset = (mbeliefset (element_has_name "players"))
+			//		?mbeliefset = (mbeliefset (melement_has_name "players"))
 			//	)
 			//)
 			
@@ -381,12 +381,12 @@
 						(and
 							?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
 							?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
-							?mbelief = (mbelief (element_has_name "myself"))
+							?mbelief = (mbelief (melement_has_name "myself"))
 							(not
 								(and
 									?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
 									?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-									?mbeliefset = (mbeliefset (element_has_name "players"))
+									?mbeliefset = (mbeliefset (melement_has_name "players"))
 								)
 							)
 						)
@@ -394,7 +394,7 @@
 				
 					?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (element_has_name "players"))
+					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
 			)
 		</condition>-->
@@ -403,12 +403,12 @@
 		<condition name="dealers_first_turn">
 			?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
 			?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
-			?mbelief = (mbelief (element_has_name "myself"))
+			?mbelief = (mbelief (melement_has_name "myself"))
 			(not
 				(and
 			 		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (element_has_name "players"))
+					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
 			)
 		</condition>
@@ -419,7 +419,7 @@
 				(and
 					?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (element_has_name "players"))
+					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
 			)
 		</condition>
@@ -446,7 +446,7 @@
 				(and
 					?p = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "playing") (playingstate != "finished"))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (element_has_name "players"))
+					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
 			)
 			
@@ -458,7 +458,7 @@
 				(and
 					?p = (jadex.bdi.examples.blackjack.Player (playingstate "playing") (cardCnt ?cc&amp;:(&lt; ?cc ?cardcnt)))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (element_has_name "players"))
+					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
 			)
 		</condition>
@@ -469,7 +469,7 @@
 			
 			?player = (jadex.bdi.examples.blackjack.Player (cardCnt 1))
 			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
-			?mbelief = (mbelief (element_has_name "myself"))
+			?mbelief = (mbelief (melement_has_name "myself"))
 		</condition>
 
 		<!-- Check if the dealer has finished drawing cards. -->
@@ -479,7 +479,7 @@
 			
 			?player = (jadex.bdi.examples.blackjack.Player (playingstate "idle" | "finished"))
 			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
-			?mbelief = (mbelief (element_has_name "myself"))
+			?mbelief = (mbelief (melement_has_name "myself"))
 		</condition>
 
 	</expressions>

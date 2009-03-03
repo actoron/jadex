@@ -40,7 +40,7 @@
 			<targetcondition>
 				// $beliefbase.count&gt;3
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 3))
-				?mbelief = (mbelief (element_has_name "count"))
+				?mbelief = (mbelief (melement_has_name "count"))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal succeeds without plan -->

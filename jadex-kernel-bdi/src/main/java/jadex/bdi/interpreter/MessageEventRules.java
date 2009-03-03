@@ -631,7 +631,7 @@ public class MessageEventRules
 				
 				// Transform message event to map.
 				Object mme = state.getAttributeValue(rme, OAVBDIRuntimeModel.element_has_model);
-				MessageType mtype = (MessageType)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
+				MessageType mtype = getMessageEventType(state, mme);
 //				MessageType type = Configuration.getConfiguration().getMessageType(mtype);
 				
 				// todo: check if used parameters are available in type specification
@@ -783,7 +783,7 @@ public class MessageEventRules
 		if(mt==null)
 			throw new RuntimeException("Message has no message type: "+message);
 		
-		MessageType mt2 = (MessageType)state.getAttributeValue(mevent, OAVBDIMetaModel.messageevent_has_type);
+		MessageType mt2 = getMessageEventType(state, mevent);
 		boolean	match	= mt.equals(mt2);
 		final IValueFetcher fetcher = new OAVBDIFetcher(state, scope);
 		
@@ -861,7 +861,7 @@ public class MessageEventRules
 		if(match && matchexp!=null)
 		{
 			//System.out.println("Matchexp: "+msgevent.getMatchExpression()+" "+msgevent.getName());
-			final MessageType mtype = (MessageType)state.getAttributeValue(mevent, OAVBDIMetaModel.messageevent_has_type);
+			final MessageType mtype = getMessageEventType(state, mevent);
 			
 			IValueFetcher fetcher2 = new IValueFetcher()
 			{
@@ -1108,7 +1108,7 @@ public class MessageEventRules
 			boolean	fullmatch = true; // Does the message match all convid parameters?
 			boolean	contains = false; // Does the message contains at least one (non-null) convid parameter?
 			Object msmes = state.getAttributeValue(smes[i], OAVBDIRuntimeModel.element_has_model);
-			MessageType mt2 = (MessageType)state.getAttributeValue(msmes, OAVBDIMetaModel.messageevent_has_type);
+			MessageType mt2 = getMessageEventType(state, msmes);
 			
 			if(mt.equals(mt2))
 			{
@@ -1174,8 +1174,8 @@ public class MessageEventRules
 	{
 		Object mevent = state.getAttributeValue(revent, OAVBDIRuntimeModel.element_has_model);		
 		Object mreply = state.getAttributeValue(rreply, OAVBDIRuntimeModel.element_has_model);
-		MessageType mtreply = (MessageType)state.getAttributeValue(mreply, OAVBDIMetaModel.messageevent_has_type);
-		MessageType mtevent = (MessageType)state.getAttributeValue(mevent, OAVBDIMetaModel.messageevent_has_type);
+		MessageType mtreply = getMessageEventType(state, mreply);
+		MessageType mtevent = getMessageEventType(state, mevent);
 
 		// Check if events are of same type.
 		if(!SUtil.equals(mtreply, mtevent))
@@ -1300,5 +1300,16 @@ public class MessageEventRules
 		}
 
 		return ret!=null? (IContentCodec[])ret.toArray(new IContentCodec[ret.size()]): null;
+	}
+
+	/**
+	 *  Get the message event type of a message event.
+	 */
+	public static MessageType getMessageEventType(IOAVState state, Object mme)
+	{
+		String	mtype	= (String)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
+		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+		MessageType ret	= bdii.getAgentAdapter().getPlatform().getMessageType(mtype);
+		return ret;
 	}
 }

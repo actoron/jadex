@@ -26,7 +26,7 @@
 				
 				?agent = (agent (agent_has_localname ?agentname))
 				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (element_has_name "env"))
+				?mbel_env = (mbelief (melement_has_name "env"))
 				?env = (jadex.bdi.examples.garbagecollector.Environment (getPosition (?agentname) ?ret))
 			</fact>
  		</belief>
@@ -37,9 +37,9 @@
 				// ((Environment)$beliefbase.getBelief("env").getFact()).getGarbages($beliefbase.getBelief("pos").getFact())
 				
 				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (element_has_name "env"))
+				?mbel_env = (mbelief (melement_has_name "env"))
 				?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				?mbel_pos = (mbelief (element_has_name "pos"))
+				?mbel_pos = (mbelief (melement_has_name "pos"))
  				?env = (jadex.bdi.examples.garbagecollector.Environment (getGarbages (?pos) $?ret))
 			</facts>
 		</beliefset>
@@ -70,7 +70,7 @@
 			<!-- <creationcondition>
 				?garbage = (String)
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?garbage))
-				?mbeliefset = (mbeliefset (element_has_name "garbages"))
+				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
 			</creationcondition>-->
 			<creationcondition>
 				// unique (?rcapa and ?mgoal are provided internally)
@@ -80,7 +80,7 @@
 				))
 
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?garbage $?y))
-				?mbeliefset = (mbeliefset (element_has_name "garbages"))
+				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
 			</creationcondition>
 			<deliberation cardinality="1"/>
 		</achievegoal>

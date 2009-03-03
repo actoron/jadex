@@ -160,7 +160,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 				// Drools Syntax
 				$block	: Block(clear == true)
 				$param	: parameter(parameter_has_name == "block", parameter_has_value == $block)
-				$mgoal	: mgoal(modelelement_has_name == "clear")
+				$mgoal	: mgoal(modelmelement_has_name == "clear")
 				$rgoal	: goal(element_has_model == $mgoal, parameterelement_has_parameters contains $param)
 			 -->
 				</targetcondition>
@@ -190,7 +190,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 			<targetcondition>
 				<!-- $beliefbase.table.configurationEquals($goal.configuration)
 				<relevantbeliefset ref="blocks"/> -->
-				?mbelief = (mbelief (element_has_name "table"))
+				?mbelief = (mbelief (melement_has_name "table"))
 				?belief = (belief (element_has_model ?mbelief) (belief_has_fact ?table))
 				?param = (parameter (parameter_has_name "configuration") (parameter_has_value ?conf))
 				?rgoal = (goal (parameterelement_has_parameters contains ?param))				

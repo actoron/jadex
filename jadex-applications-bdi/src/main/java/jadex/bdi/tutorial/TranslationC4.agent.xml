@@ -59,9 +59,9 @@
 					?rbelief = (belief (element_has_model ?mbelief) 
 						(belief_has_fact ?fact) (belief_has_fact > 0 &amp; 
 							:(== 0 (jadex.rules.rulesystem.rules.functions.Modulo ?fact 10))))
-					?mbelief = (mbelief (element_has_name "transcnt"))
+					?mbelief = (mbelief (melement_has_name "transcnt"))
 					
-					?mplan = (mplan (element_has_name "thankyou"))
+					?mplan = (mplan (melement_has_name "thankyou"))
 					?rcapa = (capability (capability_has_beliefs contains ?rbelief))
 				</condition>
 			</trigger>

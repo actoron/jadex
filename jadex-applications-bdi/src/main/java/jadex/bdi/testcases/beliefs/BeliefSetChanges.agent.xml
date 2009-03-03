@@ -56,7 +56,7 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 		<beliefset name="belset" class="String"  evaluationmode="push">
 			<facts language="clips">
 				// $beliefbase.bel
-				?mbel = (mbelief (element_has_name "bel"))
+				?mbel = (mbelief (melement_has_name "bel"))
 				?rbel = (belief (element_has_model ?mbel) (belief_has_fact ?bca))
 				?bca = (jadex.bdi.testcases.beliefs.BeanChangesArrayList (toArray() $?ret))
 			</facts>

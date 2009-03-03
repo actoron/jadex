@@ -60,7 +60,7 @@
 			<dropcondition>
 				// $beliefbase.missionend
 				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "missionend"))
+				?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
 		</performgoal>
 
@@ -69,7 +69,7 @@
  			<dropcondition>
 				// $beliefbase.missionend
 				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "missionend"))
+				?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
 		</performgoal>
 
@@ -84,19 +84,19 @@
 				// &amp;&amp; !$beliefbase.my_location.isNear($beliefbase.my_home)
 
 				(belief (element_has_model ?mbel_missionend) (belief_has_fact true))
-				?mbel_missionend = (mbelief (element_has_name "missionend"))
+				?mbel_missionend = (mbelief (melement_has_name "missionend"))
 				
 				(belief (element_has_model ?mbel_myhome) (belief_has_fact ?myhome))
-				?mbel_myhome = (mbelief (element_has_name "my_home"))
+				?mbel_myhome = (mbelief (melement_has_name "my_home"))
 				
 				(belief (element_has_model ?mbel_mylocation) (belief_has_fact ?mylocation))
-				?mbel_mylocation = (mbelief (element_has_name "my_location"))
+				?mbel_mylocation = (mbelief (melement_has_name "my_location"))
 				
 				// Ensure uniques.
 				(not 
 					(and 
 						?rgoal = (goal (element_has_model ?mgoal))
-						?mgoal = (mgoal (element_has_name "missionend"))
+						?mgoal = (mgoal (melement_has_name "missionend"))
 					)
 				)
 

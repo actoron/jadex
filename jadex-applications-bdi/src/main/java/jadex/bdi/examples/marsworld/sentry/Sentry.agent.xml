@@ -44,7 +44,7 @@
 				// $beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "missionend"))
+				?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
 		</achievegoal>
 
@@ -68,16 +68,16 @@
 				// !$beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel_missionend) (belief_has_fact false))
-				?mbel_missionend	= (mbelief (element_has_name "missionend"))
+				?mbel_missionend	= (mbelief (melement_has_name "missionend"))
 
 				// select $target from $beliefbase.my_targets
 				// where !$beliefbase.getBeliefSet("analysed_targets").containsFact($target)
 				(beliefset (element_has_model ?mbel_mytargets) (beliefset_has_facts $?x ?target $?y))
-				?mbel_mytargets = (mbeliefset (element_has_name "my_targets"))
+				?mbel_mytargets = (mbeliefset (melement_has_name "my_targets"))
 				(not
 					(and
 						(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
-						?mbel_analysedtargets = (mbeliefset (element_has_name "analysed_targets"))
+						?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
 					)
 				)
 			</creationcondition>
@@ -92,7 +92,7 @@
 				// $beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (element_has_name "missionend"))
+				?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
 
 			<deliberation>
@@ -103,7 +103,7 @@
 				?rgoal	= (goal (parameterelement_has_parameters ?param_target))
 				?param_target	= (parameter (parameter_has_value ?target))
 				(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
-				?mbel_analysedtargets = (mbeliefset (element_has_name "analysed_targets"))
+				?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
  			</targetcondition>
 		</achievegoal>
 	</goals>
