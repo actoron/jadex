@@ -52,14 +52,14 @@ public class Reader
 			if(next==XMLStreamReader.COMMENT)
 			{
 				comment = parser.getText();
-				System.out.println("Found comment: "+comment);
+//				System.out.println("Found comment: "+comment);
 			}
 			
 			else if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
 			{
 				content += parser.getText(); 
 				
-				System.out.println("content: "+parser.getLocalName()+" "+content);
+//				System.out.println("content: "+parser.getLocalName()+" "+content);
 			}
 			
 			else if(next==XMLStreamReader.START_ELEMENT)
@@ -78,15 +78,15 @@ public class Reader
 //					
 //				}
 				
-				System.out.println("start: "+parser.getLocalName());
+//				System.out.println("start: "+parser.getLocalName());
 			}
 			
 			else if(next==XMLStreamReader.END_ELEMENT)
 			{
-				System.out.println("end: "+parser.getLocalName());
+//				System.out.println("end: "+parser.getLocalName());
 				
-				if(parser.getLocalName().equals("capability"))
-					System.out.println("test");
+//				if(parser.getLocalName().equals("capability"))
+//					System.out.println("test");
 					
 				// Pop element from stack if there is one for the tag.
 				Object[] se = (Object[])stack.get(stack.size()-1);

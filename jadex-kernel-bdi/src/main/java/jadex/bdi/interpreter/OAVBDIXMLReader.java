@@ -69,6 +69,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("dropcondition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new OAVMappingInfo("targetcondition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new OAVMappingInfo("maintaincondition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
+		typeinfos.add(new OAVMappingInfo("metagoal/trigger", OAVBDIMetaModel.metagoaltrigger_type));
 
 		typeinfos.add(new OAVMappingInfo("plan", OAVBDIMetaModel.plan_type));
 		typeinfos.add(new OAVMappingInfo("body", OAVBDIMetaModel.body_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.body_has_classname}), bopost));
@@ -102,6 +103,9 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("parameterset", OAVBDIMetaModel.parameterset_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.typedelement_has_classname}), tepost));
 		typeinfos.add(new OAVMappingInfo("value", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new OAVMappingInfo("values", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
+		typeinfos.add(new OAVMappingInfo("goalmapping", OAVJavaType.java_string_type));
+		typeinfos.add(new OAVMappingInfo("messageeventmapping", OAVJavaType.java_string_type));
+		typeinfos.add(new OAVMappingInfo("internaleventmapping", OAVJavaType.java_string_type));
 				
 		typeinfos.add(new OAVMappingInfo("concrete", OAVJavaType.java_string_type));
 
