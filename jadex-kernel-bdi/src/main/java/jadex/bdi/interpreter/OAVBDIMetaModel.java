@@ -980,7 +980,7 @@ public class OAVBDIMetaModel
 		plantrigger_has_condition = plantrigger_type.createAttributeType("mplantrigger_has_condition", condition_type);
 		
 		// meta goal trigger
-		metagoaltrigger_has_goals = metagoaltrigger_type.createAttributeType("mmetagoaltrigger_has_goals", goal_type, OAVAttributeType.LIST);
+		metagoaltrigger_has_goals = metagoaltrigger_type.createAttributeType("mmetagoaltrigger_has_goals", triggerreference_type, OAVAttributeType.LIST);
 		
 		// belief
 //		belief_has_dynamic = belief_type.createAttributeType("belief_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
