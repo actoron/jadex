@@ -440,7 +440,7 @@
 			// &amp;&amp; $p.getCards().length&lt;=$player.getCards().length
  			// order by $p.getCards().length)
 			// == $player
-			// <parameter name="$player" class="Player"/>
+			// <!-- <parameter name="$player" class="Player"/> -->
 			
 			(not
 				(and

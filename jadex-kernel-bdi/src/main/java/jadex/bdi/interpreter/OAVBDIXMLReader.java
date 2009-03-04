@@ -112,6 +112,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("concrete", OAVJavaType.java_string_type));
 
 		typeinfos.add(new OAVMappingInfo("configuration", OAVBDIMetaModel.configuration_type));
+		typeinfos.add(new OAVMappingInfo("initialcapability", OAVBDIMetaModel.initialcapability_type));
 		typeinfos.add(new OAVMappingInfo("initialbelief", OAVBDIMetaModel.configbelief_type));
 		typeinfos.add(new OAVMappingInfo("initialbeliefset", OAVBDIMetaModel.configbeliefset_type));
 		typeinfos.add(new OAVMappingInfo("initialgoal", OAVBDIMetaModel.configelement_type));

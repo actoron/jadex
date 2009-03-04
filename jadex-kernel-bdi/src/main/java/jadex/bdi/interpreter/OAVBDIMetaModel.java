@@ -1084,7 +1084,7 @@ public class OAVBDIMetaModel
 		configparameterset_has_ref	= configparameterset_type.createAttributeType("mconfigparameterset_has_ref", OAVJavaType.java_string_type);
 		
 		// initial capability
-		initialcapability_has_ref	= initialcapability_type.createAttributeType("minitialcapability_has_ref", capabilityref_type);
+		initialcapability_has_ref	= initialcapability_type.createAttributeType("minitialcapability_has_ref", OAVJavaType.java_string_type);
 		initialcapability_has_configuration	= initialcapability_type.createAttributeType("minitialcapability_has_configuration", OAVJavaType.java_string_type);
 		
 		// configuration

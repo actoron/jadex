@@ -894,7 +894,9 @@ public class AgentRules
 						for(Iterator it2=inicaps.iterator(); inicap==null && it2.hasNext(); )
 						{
 							Object	tmp	= it2.next();
-							if(state.getAttributeValue(tmp, OAVBDIMetaModel.initialcapability_has_ref)==mcaparef)
+							String	refname	= (String)state.getAttributeValue(tmp, OAVBDIMetaModel.initialcapability_has_ref);
+							Object	iniref	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, refname);
+							if(iniref==mcaparef)
 							{
 								inicap	= tmp;
 							}
