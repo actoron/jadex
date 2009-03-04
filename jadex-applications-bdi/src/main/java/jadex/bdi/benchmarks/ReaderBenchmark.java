@@ -1,10 +1,9 @@
 package jadex.bdi.benchmarks;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.commons.collection.MultiCollection;
+import jadex.bdi.interpreter.OAVBDIXMLReader;
+import jadex.commons.xml.Reader;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.io.xml.IOAVXMLMapping;
-import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.FileInputStream;
@@ -23,7 +22,7 @@ public class ReaderBenchmark
 	 *  Main for testing.
 	 *  @throws IOException 
 	 */
-	public static void	main(String[] args) throws IOException
+	public static void	main(String[] args) throws Exception
 	{
 		if(args.length!=1)
 		{
@@ -34,7 +33,7 @@ public class ReaderBenchmark
 	//	Configuration.setFallbackConfiguration("jadex/config/batch_conf.properties");
 		
 		// Do not measure first loading.
-		Reader	reader	= new Reader();
+		Reader	reader	= OAVBDIXMLReader.getReader(); 
 		IOAVState	state	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //		IOAVState	state	= new JenaOAVState();
 		
@@ -43,8 +42,7 @@ public class ReaderBenchmark
 		Map kernelprops = new HashMap();
 		kernelprops.put("messagetype_fipa", new jadex.adapter.base.fipa.FIPAMessageType());
 		
-		IOAVXMLMapping	xmlmapping	= OAVBDIMetaModel.getXMLMapping(kernelprops);
-		Object	obj	= reader.read(new FileInputStream(args[0]), state, xmlmapping, new MultiCollection());
+		Object	obj	= reader.read(new FileInputStream(args[0]), null, state);
 		
 		// Start tests.
 		int cnt	= 100;
@@ -53,7 +51,7 @@ public class ReaderBenchmark
 
 		// Load OAV models.
 		long	starttime	= System.currentTimeMillis();
-		IOAVState[]	states	= loadOAVModels(args[0], reader, xmlmapping, cnt);
+		IOAVState[]	states	= loadOAVModels(args[0], reader, cnt);
 		long	statetime	= System.currentTimeMillis() - starttime;
 		gc();
 		long	statemem	= Runtime.getRuntime().totalMemory() - startmem - Runtime.getRuntime().freeMemory();
@@ -77,14 +75,14 @@ public class ReaderBenchmark
 	}
 
 
-	protected static IOAVState[] loadOAVModels(String arg, Reader reader, IOAVXMLMapping xmlmapping, int cnt) throws IOException, FileNotFoundException
+	protected static IOAVState[] loadOAVModels(String arg, Reader reader, int cnt) throws Exception
 	{
 		IOAVState[] states	= new IOAVState[cnt];
 		for(int i=0; i<states.length; i++)
 		{
 			states[i]	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //			states[i]	= new JenaOAVState();
-			reader.read(new FileInputStream(arg), states[i], xmlmapping, new MultiCollection());
+			reader.read(new FileInputStream(arg), null, states[i]);
 		}
 		return states;
 	}

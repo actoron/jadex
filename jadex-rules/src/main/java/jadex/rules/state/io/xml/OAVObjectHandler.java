@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.IObjectHandler;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
@@ -8,7 +9,6 @@ import jadex.rules.state.OAVObjectType;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,30 +24,8 @@ public class OAVObjectHandler implements IObjectHandler
 {
 	//-------- static part --------
 	
-	/** The built-in types. */
-	protected static Set builtintypes;
-	
-	static
-	{
-		builtintypes = new HashSet();
-		builtintypes.add(String.class);
-		builtintypes.add(int.class);
-		builtintypes.add(Integer.class);
-		builtintypes.add(long.class);
-		builtintypes.add(Long.class);
-		builtintypes.add(float.class);
-		builtintypes.add(Float.class);
-		builtintypes.add(double.class);
-		builtintypes.add(Double.class);
-		builtintypes.add(boolean.class);
-		builtintypes.add(Boolean.class);
-		builtintypes.add(short.class);
-		builtintypes.add(Short.class);
-		builtintypes.add(byte.class);
-		builtintypes.add(Byte.class);
-		builtintypes.add(char.class);
-		builtintypes.add(Character.class);
-	}
+	/** The debug flag. */
+	public static boolean DEBUG = false;
 	
 	//-------- attributes --------
 	
@@ -93,13 +71,13 @@ public class OAVObjectHandler implements IObjectHandler
 			Object	object	= null;
 			OAVObjectType type = mapinfo.getType();
 			
-			if(type instanceof OAVJavaType && isBuiltInType(((OAVJavaType)type).getClazz()))
+			if(type instanceof OAVJavaType && BasicTypeConverter.isBuiltInType(((OAVJavaType)type).getClazz()))
 			{
 				String strval;
 				if(parser.getAttributeCount()==1)
 				{	
 					strval = parser.getAttributeValue(0);
-					ret = convertBuiltInTypes(((OAVJavaType)type).getClazz(), strval);
+					ret = BasicTypeConverter.convertBuiltInTypes(((OAVJavaType)type).getClazz(), strval);
 				}
 //				else 
 //				{	
@@ -157,7 +135,7 @@ public class OAVObjectHandler implements IObjectHandler
 						if(attrtype!=null)
 						{
 							Object arg = attrtype.getType() instanceof OAVJavaType?
-								convertBuiltInTypes(((OAVJavaType)attrtype.getType()).getClazz(), attrval): attrval;
+								BasicTypeConverter.convertBuiltInTypes(((OAVJavaType)attrtype.getType()).getClazz(), attrval): attrval;
 					
 							if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
 							{
@@ -170,7 +148,8 @@ public class OAVObjectHandler implements IObjectHandler
 						}
 						else
 						{
-							System.out.println("Could not find attribute: "+attrname);
+							if(DEBUG)
+								System.out.println("Could not find attribute: "+attrname);
 						}
 					}
 				}
@@ -188,7 +167,8 @@ public class OAVObjectHandler implements IObjectHandler
 		}
 		else
 		{
-			System.out.println("No mapping found: "+parser.getLocalName());
+			if(DEBUG)
+				System.out.println("No mapping found: "+parser.getLocalName());
 		}
 		
 		return ret;
@@ -238,36 +218,36 @@ public class OAVObjectHandler implements IObjectHandler
 
 		// Find attribute where to set/add the child element.
 		
-		boolean set = false;
+		boolean linked = false;
 		
 		OAVAttributeType attrtype = null;
-		OAVLinkInfo	linkinfo	= getLinkInfo(parser.getLocalName(), fullpath);
+		OAVLinkInfo	linkinfo = getLinkInfo(parser.getLocalName(), fullpath);
 		if(linkinfo!=null)
 			attrtype	= linkinfo.getLinkAttribute();
 
 		if(attrtype!=null)
 		{
 			setAttributeValue(state, parent, attrtype, elem);
-			set= true;
+			linked= true;
 		}
 		
-		if(!set)
+		if(!linked)
 		{
-			set = internalLinkObjects(parser.getLocalName(), elem, parent, state);
+			linked = internalLinkObjects(parser.getLocalName(), elem, parent, state);
 		}
 		
-		if(!set && !(state.getType(elem) instanceof OAVJavaType 
-			&& isBuiltInType(((OAVJavaType)state.getType(elem)).getClazz())))
+		if(!linked && !(state.getType(elem) instanceof OAVJavaType 
+			&& BasicTypeConverter.isBuiltInType(((OAVJavaType)state.getType(elem)).getClazz())))
 		{
-			set = internalLinkObjects(state.getType(elem).getName(), elem, parent, state);	
+			linked = internalLinkObjects(state.getType(elem).getName(), elem, parent, state);	
 		}	
 		
-		if(!set)
+		if(!linked)
 			throw new RuntimeException("Could not link: "+elem+" "+parent+" "+getXMLPath(stack));
 	}
 	
 	/**
-	 * 
+	 *  Internal method for linking objects.
 	 */
 	protected boolean internalLinkObjects(String attrname, Object elem, Object parent, IOAVState state)
 	{
@@ -300,7 +280,7 @@ public class OAVObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 * 
+	 *  Set/add an attribute value.
 	 */
 	protected void setAttributeValue(IOAVState state, Object parent, OAVAttributeType attrtype, Object elem)
 	{
@@ -322,70 +302,9 @@ public class OAVObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 *  Convert a string value to a built-in type.
-	 *  @param clazz The target clazz.
-	 *  @param val The string valut to convert.
-	 */
-	protected Object convertBuiltInTypes(Class clazz, String val)
-	{
-		Object ret;
-		
-		if(clazz.equals(String.class))
-		{
-			ret = val;
-		}
-		else if(clazz.equals(int.class) || clazz.equals(Integer.class))
-		{
-			ret = new Integer(val);
-		}
-		else if(clazz.equals(long.class) || clazz.equals(Long.class))
-		{
-			ret = new Long(val);
-		}
-		else if(clazz.equals(float.class) || clazz.equals(Float.class))
-		{
-			ret = new Float(val);
-		}
-		else if(clazz.equals(double.class) || clazz.equals(Double.class))
-		{
-			ret = new Double(val);
-		}
-		else if(clazz.equals(boolean.class) || clazz.equals(Boolean.class))
-		{
-			ret = new Boolean(val);
-		}
-		else if(clazz.equals(short.class) || clazz.equals(Short.class))
-		{
-			ret = new Short(val);
-		}
-		else if(clazz.equals(byte.class) || clazz.equals(Byte.class))
-		{
-			ret = new Byte(val);
-		}
-		else if(clazz.equals(char.class) || clazz.equals(Character.class))
-		{
-			ret = new Character(val.charAt(0)); // ?
-		}
-		else
-		{
-			throw new RuntimeException("Unknown argument type: "+clazz);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Test if a clazz is a built-in type.
-	 *  @param clazz The clazz.
-	 *  @return True, if built-in type.
-	 */
-	protected boolean isBuiltInType(Class clazz)
-	{
-		return builtintypes.contains(clazz);
-	}
-
-	/**
-	 * 
+	 *  Create type infos for each tag sorted by specificity.
+	 *  @param linkinfos The mapping infos.
+	 *  @return Map of mapping infos.
 	 */
 	protected Map createTypeInfos(Set typeinfos)
 	{
@@ -408,6 +327,8 @@ public class OAVObjectHandler implements IObjectHandler
 	
 	/**
 	 *  Create link infos for each tag sorted by specificity.
+	 *  @param linkinfos The link infos.
+	 *  @return Map of link infos.
 	 */
 	protected Map createLinkInfos(Set linkinfos)
 	{
@@ -429,7 +350,10 @@ public class OAVObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 * 
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
 	 */
 	protected OAVMappingInfo getMappingInfo(String tag, String fullpath)
 	{
@@ -449,6 +373,9 @@ public class OAVObjectHandler implements IObjectHandler
 	
 	/**
 	 *  Get the most specific link info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific link info.
 	 */
 	protected OAVLinkInfo getLinkInfo(String tag, String fullpath)
 	{
@@ -467,7 +394,9 @@ public class OAVObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 * 
+	 *  Get the xml path for a stack.
+	 *  @param stack The stack.
+	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
 	 */
 	protected String getXMLPath(List stack)
 	{

@@ -5,6 +5,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.xml.Reader;
+import jadex.commons.xml.StackElement;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
@@ -22,7 +23,6 @@ import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.io.xml.StackElement;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.File;
@@ -565,9 +565,9 @@ public class OAVBDIModelLoader
 				model.addSubcapabilityModel(cmodel);
 				if(!cmodel.getReport().isEmpty())
 				{
-					StackElement	se	= new StackElement();
-					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
-					se.object	= mcaparef;
+					StackElement se	= new StackElement("capability", mcaparef);
+//					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
+//					se.object	= mcaparef;
 					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
 					report.addDocument(cmodel.getFilename(), cmodel.getReport().toHTMLString());
 				}

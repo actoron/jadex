@@ -5,7 +5,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
-import jadex.rules.state.io.xml.StackElement;
+import jadex.commons.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -127,7 +127,7 @@ public class Report implements IReport, Cloneable
 			StackElement[]	elements	= getElements();
 			for(int i=0; i<elements.length; i++)
 			{
-				buf.append(elements[i].path);
+//				buf.append(elements[i].path);
 				buf.append(":\n");
 				String[]	messages	= 	getMessages(elements[i]);
 				for(int j=0; j<messages.length; j++)
@@ -232,10 +232,10 @@ public class Report implements IReport, Cloneable
 		StackElement[]	elements	= getElements();			
 		for(int i=0; i<elements.length; i++)
 		{
-			if(elements[i].path.indexOf(basetag)!=-1)
-			{
-				errors.add(elements[i]);
-			}
+//			if(elements[i].path.indexOf(basetag)!=-1)
+//			{
+//				errors.add(elements[i]);
+//			}
 		}
 		return (StackElement[])errors.toArray(new StackElement[errors.size()]);
 	}
@@ -252,7 +252,7 @@ public class Report implements IReport, Cloneable
 			boolean	add	= true;
 			for(int j=0; add && j<excludes.length; j++)
 			{
-				add	= elements[i].path.indexOf(excludes[j])==-1;
+//				add	= elements[i].path.indexOf(excludes[j])==-1;
 			}
 			if(add)
 				errors.add(elements[i]);
@@ -269,10 +269,10 @@ public class Report implements IReport, Cloneable
 		StackElement[]	elements	= getElements();			
 		for(int i=0; i<elements.length; i++)
 		{
-			if(elements[i].path.startsWith(ancestor.path))
-			{
-				errors.add(elements[i]);
-			}
+//			if(elements[i].path.startsWith(ancestor.path))
+//			{
+//				errors.add(elements[i]);
+//			}
 		}
 		return (StackElement[])errors.toArray(new StackElement[errors.size()]);
 	}
@@ -321,9 +321,9 @@ public class Report implements IReport, Cloneable
 			for(int i=0; i<elements.length; i++)
 			{
 				buf.append("<li><a href=\"#");
-				buf.append(SUtil.makeConform(""+elements[i].path));
+//				buf.append(SUtil.makeConform(""+elements[i].path));
 				buf.append("\">");
-				buf.append(SUtil.makeConform(""+elements[i].path));
+//				buf.append(SUtil.makeConform(""+elements[i].path));
 				buf.append("</a> has errors.</li>\n");
 			}
 			buf.append("</ul>\n</li>\n");
@@ -343,9 +343,9 @@ public class Report implements IReport, Cloneable
 			for(int i=0; i<elements.length; i++)
 			{
 				buf.append("<li><a name=\"");
-				buf.append(SUtil.makeConform(""+elements[i].path));
+//				buf.append(SUtil.makeConform(""+elements[i].path));
 				buf.append("\">");
-				buf.append(SUtil.makeConform(""+elements[i].path));
+//				buf.append(SUtil.makeConform(""+elements[i].path));
 				// Add name of configuration (hack???)
 //				if(elements[i] instanceof IMConfigElement)
 //				{
@@ -363,7 +363,7 @@ public class Report implements IReport, Cloneable
 				for(int j=0; j<errors.length; j++)
 				{
 					buf.append("<dt>");
-					buf.append(errors[j].path);
+//					buf.append(errors[j].path);
 //					SourceLocation	loc	= errors[j].getSourceLocation();
 //					if(loc!=null)
 //					{

@@ -67,7 +67,8 @@ public class Reader
 				content = "";	
 
 				Object elem = handler.createObject(parser, comment, context, stack);
-				stack.add(new Object[]{parser.getLocalName(), elem});
+				stack.add(new StackElement(parser.getLocalName(), elem));
+				
 				comment = null;
 				
 //				System.out.println("start: "+parser.getLocalName());
@@ -78,29 +79,28 @@ public class Reader
 //				System.out.println("end: "+parser.getLocalName());
 				
 				// Pop element from stack if there is one for the tag.
-				Object[] se = (Object[])stack.get(stack.size()-1);
+				StackElement se = (StackElement)stack.get(stack.size()-1);
 				
 				// Hack. Add content when it is element of its own.
-				content = content.trim();
-				if(content.length()>0 && se[1]==null)
+				if(content.trim().length()>0 && se.getObject()==null)
 				{
-					Object[] tmp = new Object[]{parser.getLocalName(), content};
+					StackElement tmp = new StackElement(parser.getLocalName(), content);
 					stack.set(stack.size()-1, tmp);
 					se = tmp;
 					content = "";
 				}
 				
-				if(se[1]!=null)
+				if(se.getObject()!=null)
 				{
-					if(content.length()>0)
+					if(content.trim().length()>0)
 					{
-						handler.handleContent(parser, se[1], content, context, stack);
+						handler.handleContent(parser, se.getObject(), content, context, stack);
 						content = "";
 					}
 					
 					if(stack.size()==1)
 					{
-						root = se[1];
+						root = se.getObject();
 					}
 					else
 					{
@@ -110,7 +110,7 @@ public class Reader
 							pse = (Object[])stack.get(i);
 						}
 						
-						handler.linkObject(parser, se[1], pse[1], context, stack);
+						handler.linkObject(parser, se.getObject(), pse[1], context, stack);
 					}
 				}
 				

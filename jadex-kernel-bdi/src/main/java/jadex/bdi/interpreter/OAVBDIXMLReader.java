@@ -156,6 +156,8 @@ public class OAVBDIXMLReader
 		linkinfos.add(new OAVLinkInfo("goals/querygoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.add(new OAVLinkInfo("goals/maintaingoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.add(new OAVLinkInfo("goals/metagoalref", OAVBDIMetaModel.capability_has_goalrefs));
+		linkinfos.add(new OAVLinkInfo("events/messageeventref", OAVBDIMetaModel.capability_has_messageeventrefs));
+		linkinfos.add(new OAVLinkInfo("events/internaleventref", OAVBDIMetaModel.capability_has_internaleventrefs));
 		linkinfos.add(new OAVLinkInfo("plan/parameter", OAVBDIMetaModel.parameterelement_has_parameters));
 		linkinfos.add(new OAVLinkInfo("plan/parameterset", OAVBDIMetaModel.parameterelement_has_parametersets));
 		linkinfos.add(new OAVLinkInfo("initialplan/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));

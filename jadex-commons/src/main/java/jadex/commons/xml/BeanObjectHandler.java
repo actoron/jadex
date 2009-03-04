@@ -3,11 +3,9 @@ package jadex.commons.xml;
 import jadex.commons.SReflect;
 
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -16,32 +14,8 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class BeanObjectHandler implements IObjectHandler
 {
-	//-------- static part --------
-	
-	/** The built-in types. */
-	protected static Set builtintypes;
-	
-	static
-	{
-		builtintypes = new HashSet();
-		builtintypes.add(String.class);
-		builtintypes.add(int.class);
-		builtintypes.add(Integer.class);
-		builtintypes.add(long.class);
-		builtintypes.add(Long.class);
-		builtintypes.add(float.class);
-		builtintypes.add(Float.class);
-		builtintypes.add(double.class);
-		builtintypes.add(Double.class);
-		builtintypes.add(boolean.class);
-		builtintypes.add(Boolean.class);
-		builtintypes.add(short.class);
-		builtintypes.add(Short.class);
-		builtintypes.add(byte.class);
-		builtintypes.add(Byte.class);
-		builtintypes.add(char.class);
-		builtintypes.add(Character.class);
-	}
+	/** The debug flag. */
+	public static boolean DEBUG = false;
 	
 	//-------- attributes --------
 	
@@ -77,11 +51,7 @@ public class BeanObjectHandler implements IObjectHandler
 		Class clazz = (Class)types.get(parser.getLocalName());
 		if(clazz!=null)
 		{
-			if(isBuiltInType(clazz))
-			{
-				ret = convertBuiltInTypes(clazz, parser.getElementText());
-			}
-			else
+			if(!BasicTypeConverter.isBuiltInType(clazz))
 			{
 				// Must have empty constructor.
 				ret = clazz.newInstance();
@@ -99,7 +69,7 @@ public class BeanObjectHandler implements IObjectHandler
 						Class[] ps = ms[j].getParameterTypes();
 						if(ps.length==1)
 						{
-							Object arg = convertBuiltInTypes(ps[0], attrval);
+							Object arg = BasicTypeConverter.convertBuiltInTypes(ps[0], attrval);
 							ms[j].invoke(ret, new Object[]{arg});
 						}
 					}
@@ -116,7 +86,8 @@ public class BeanObjectHandler implements IObjectHandler
 		}
 		else
 		{
-			System.out.println("No mapping found: "+parser.getLocalName());
+			if(DEBUG)
+				System.out.println("No mapping found: "+parser.getLocalName());
 		}
 		
 		return ret;
@@ -144,41 +115,23 @@ public class BeanObjectHandler implements IObjectHandler
 	{
 		// Add object to its parent.
 		boolean	linked	= false;
-		List	classes	= new LinkedList();
+		List classes	= new LinkedList();
 		classes.add(elem.getClass());
 		
 		while(!linked && !classes.isEmpty())
 		{
-			Class	clazz	= (Class)classes.remove(0);
-			String clname = isBuiltInType(clazz)?
-				parser.getLocalName().substring(0, 1).toUpperCase()+parser.getLocalName().substring(1)
-				:SReflect.getInnerClassName(clazz);
+			Class clazz = (Class)classes.remove(0);
 			
-			String mname = "set"+clname;
-			Method[] ms = SReflect.getMethods(parent.getClass(), mname);
-			for(int i=0; !linked && i<ms.length; i++)
+			if(!BasicTypeConverter.isBuiltInType(clazz))
 			{
-				Class[] ps = ms[i].getParameterTypes();
-				if(ps.length==1 && ps[0].isAssignableFrom(clazz))
-				{
-					ms[i].invoke(parent, new Object[]{elem});
-					linked	= true;
-				}
+				String name = SReflect.getInnerClassName(clazz);
+				linked = internalLinkObjects(clazz, name, elem, parent);
 			}
 			
 			if(!linked)
 			{
-				mname = "add"+clname;
-				ms = SReflect.getMethods(parent.getClass(), mname);
-				for(int i=0; !linked && i<ms.length; i++)
-				{
-					Class[] ps = ms[i].getParameterTypes();
-					if(ps.length==1 && ps[0].isAssignableFrom(clazz))
-					{
-						ms[i].invoke(parent, new Object[]{elem});
-						linked	= true;
-					}
-				}
+				String name = parser.getLocalName().substring(0, 1).toUpperCase()+parser.getLocalName().substring(1);
+				linked = internalLinkObjects(clazz, name, elem, parent);
 			}
 			
 			if(!linked)
@@ -195,65 +148,40 @@ public class BeanObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 *  Convert a string value to a built-in type.
-	 *  @param clazz The target clazz.
-	 *  @param val The string valut to convert.
+	 * Internal link objects method.
 	 */
-	protected Object convertBuiltInTypes(Class clazz, String val)
+	protected boolean internalLinkObjects(Class clazz, String name, Object elem, Object parent) throws Exception
 	{
-		Object ret;
+		boolean ret = false;
 		
-		if(clazz.equals(String.class))
+		String mname = "set"+name;
+		Method[] ms = SReflect.getMethods(parent.getClass(), mname);
+		for(int i=0; !ret && i<ms.length; i++)
 		{
-			ret = val;
+			Class[] ps = ms[i].getParameterTypes();
+			if(ps.length==1 && ps[0].isAssignableFrom(clazz))
+			{
+				ms[i].invoke(parent, new Object[]{elem});
+				ret	= true;
+			}
 		}
-		else if(clazz.equals(int.class) || clazz.equals(Integer.class))
+		
+		if(!ret)
 		{
-			ret = new Integer(val);
-		}
-		else if(clazz.equals(long.class) || clazz.equals(Long.class))
-		{
-			ret = new Long(val);
-		}
-		else if(clazz.equals(float.class) || clazz.equals(Float.class))
-		{
-			ret = new Float(val);
-		}
-		else if(clazz.equals(double.class) || clazz.equals(Double.class))
-		{
-			ret = new Double(val);
-		}
-		else if(clazz.equals(boolean.class) || clazz.equals(Boolean.class))
-		{
-			ret = new Boolean(val);
-		}
-		else if(clazz.equals(short.class) || clazz.equals(Short.class))
-		{
-			ret = new Short(val);
-		}
-		else if(clazz.equals(byte.class) || clazz.equals(Byte.class))
-		{
-			ret = new Byte(val);
-		}
-		else if(clazz.equals(char.class) || clazz.equals(Character.class))
-		{
-			ret = new Character(val.charAt(0)); // ?
-		}
-		else
-		{
-			throw new RuntimeException("Unknown argument type: "+clazz);
+			mname = "add"+name;
+			ms = SReflect.getMethods(parent.getClass(), mname);
+			for(int i=0; !ret && i<ms.length; i++)
+			{
+				Class[] ps = ms[i].getParameterTypes();
+				if(ps.length==1 && ps[0].isAssignableFrom(clazz))
+				{
+					ms[i].invoke(parent, new Object[]{elem});
+					ret = true;
+				}
+			}
 		}
 		
 		return ret;
 	}
 	
-	/**
-	 *  Test if a clazz is a built-in type.
-	 *  @param clazz The clazz.
-	 *  @return True, if built-in type.
-	 */
-	protected boolean isBuiltInType(Class clazz)
-	{
-		return builtintypes.contains(clazz);
-	}
 }
