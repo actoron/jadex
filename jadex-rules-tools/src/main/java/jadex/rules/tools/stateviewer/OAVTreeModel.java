@@ -62,7 +62,7 @@ public class OAVTreeModel implements TreeModel
 		"object", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/object.png"),
 		"attribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/attribute.png"),
 		"value", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png"),
-		"javaobject", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaobject.png"),
+		"javaobject", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/bean.png"),
 		"javaattribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaattribute.png"),
 		"javavalue", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png")
 	});
