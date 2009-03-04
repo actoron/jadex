@@ -2,6 +2,8 @@ package jadex.bdi.examples;
 
 import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
+import jadex.adapter.base.fipa.FIPAMessageType;
+import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIModelLoader;
@@ -12,6 +14,7 @@ import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IClockService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
+import jadex.bridge.MessageType;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
@@ -128,6 +131,11 @@ public class InterpreterTest
 						public Object getService(Class type)
 						{
 							return type==IClockService.class ? clock : null;
+						}
+						
+						public MessageType getMessageType(String type)
+						{
+							return SFipa.FIPA_MESSAGE_TYPE.getName().equals(type)? SFipa.FIPA_MESSAGE_TYPE: null;
 						}
 					};
 				}

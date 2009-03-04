@@ -16,6 +16,7 @@ import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
+import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.base.libraryservice.LibraryService;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
@@ -25,6 +26,7 @@ import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;
+import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -277,6 +279,17 @@ public class Platform implements IPlatform
 	public IApplicationFactory getApplicationFactory()
 	{
 		return appfactory;
+	}
+	
+	/**
+	 *  Get the message type.
+	 *  @param type The type name.
+	 *  @return The message type.
+	 */
+	// Todo: move to message service?
+	public MessageType getMessageType(String type)
+	{
+		return SFipa.FIPA_MESSAGE_TYPE.getName().equals(type)? SFipa.FIPA_MESSAGE_TYPE: null;
 	}
 	
 	//-------- Static part --------
