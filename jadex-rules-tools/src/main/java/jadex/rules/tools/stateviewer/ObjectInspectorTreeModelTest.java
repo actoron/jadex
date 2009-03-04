@@ -1,7 +1,6 @@
 package jadex.rules.tools.stateviewer;
 
 import jadex.commons.TreeExpansionHandler;
-import jadex.rules.state.io.xml.Reader;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.awt.BorderLayout;
@@ -142,7 +141,7 @@ class ObjectInspectorTreeModelExample {
 	public Object[] objectArrayAttribute = new Object[]{
 			new String("string object in array")
 			,new Boolean(true)
-			,new Reader()
+//			,new Reader()
 			,new Object()
 			,null
 			,null
@@ -197,8 +196,8 @@ class ObjectInspectorTreeModelExample {
 			this.secondObjectArray[0] = "Buhuuuu >5";
 		else if (x < 5)
 			this.secondObjectArray[0] = Thread.currentThread();
-		else if (x < 10)
-			this.secondObjectArray[0] = new Reader();
+//		else if (x < 10)
+//			this.secondObjectArray[0] = new Reader();
 		else if (x < 40)
 		{
 			
