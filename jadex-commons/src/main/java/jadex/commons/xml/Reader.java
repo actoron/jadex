@@ -104,13 +104,13 @@ public class Reader
 					}
 					else
 					{
-						Object[] pse = (Object[])stack.get(stack.size()-2);
-						for(int i=stack.size()-3; i>=0 && pse[1]==null; i--)
+						StackElement	pse = (StackElement)stack.get(stack.size()-2);
+						for(int i=stack.size()-3; i>=0 && pse.getObject()==null; i--)
 						{
-							pse = (Object[])stack.get(i);
+							pse = (StackElement)stack.get(i);
 						}
 						
-						handler.linkObject(parser, se.getObject(), pse[1], context, stack);
+						handler.linkObject(parser, se.getObject(), pse.getObject(), context, stack);
 					}
 				}
 				

@@ -2,6 +2,7 @@ package jadex.rules.state.io.xml;
 
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.IObjectHandler;
+import jadex.commons.xml.StackElement;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -102,7 +103,7 @@ public class OAVObjectHandler implements IObjectHandler
 				{
 					int	i	= stack.size()-1;
 					while(i>=0 && object==null)
-						object	= ((Object[])stack.get(i))[1];
+						object	= ((StackElement)stack.get(i)).getObject();
 					
 					if(object==null)
 						throw new RuntimeException("No element on stack for "+mapinfo);
@@ -213,7 +214,7 @@ public class OAVObjectHandler implements IObjectHandler
 		OAVMappingInfo mapinfo = getMappingInfo(parser.getLocalName(), fullpath);
 		if(mapinfo!=null && mapinfo.getPostProcessor()!=null)
 		{
-			mapinfo.getPostProcessor().postProcess(state, elem, ((Object[])stack.get(0))[1]);
+			mapinfo.getPostProcessor().postProcess(state, elem, ((StackElement)stack.get(0)).getObject());
 		}
 
 		// Find attribute where to set/add the child element.
@@ -403,7 +404,7 @@ public class OAVObjectHandler implements IObjectHandler
 		StringBuffer ret = new StringBuffer();
 		for(int i=0; i<stack.size(); i++)
 		{
-			ret.append(((Object[])stack.get(i))[0]);
+			ret.append(((StackElement)stack.get(i)).getTag());
 			if(i<stack.size()-1)
 				ret.append("/");
 		}
