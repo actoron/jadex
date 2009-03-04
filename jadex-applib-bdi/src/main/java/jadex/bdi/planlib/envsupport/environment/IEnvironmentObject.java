@@ -1,6 +1,8 @@
 package jadex.bdi.planlib.envsupport.environment;
 
 import jadex.bdi.planlib.envsupport.environment.task.IObjectTask;
+import jadex.bdi.planlib.envsupport.math.IVector1;
+import jadex.bridge.IClock;
 
 import java.util.Map;
 
@@ -63,6 +65,14 @@ public interface IEnvironmentObject
 	 * 
 	 */
 	public void clearTasks();
+	
+	/**
+	 * Updates the object to the current time.
+	 * 
+	 * @param clock the clock	
+	 * @param deltaT the time difference that has passed
+	 */
+	public void updateObject(IClock clock, IVector1 deltaT);
 	
 	/**
 	 * Fires an ObjectEvent.

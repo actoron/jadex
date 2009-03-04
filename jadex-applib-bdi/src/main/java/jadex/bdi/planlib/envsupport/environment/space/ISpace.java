@@ -3,12 +3,47 @@ package jadex.bdi.planlib.envsupport.environment.space;
 import jadex.bdi.planlib.envsupport.environment.Environment;
 import jadex.bdi.planlib.envsupport.environment.IEnvironmentObject;
 import jadex.bdi.planlib.envsupport.math.IVector1;
+import jadex.bridge.IClock;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ISpace
 {
+	/**
+	 * This method gets executed when the space is added to an environment.
+	 * 
+	 * @param engine the environment engine
+	 */
+	public void start(Environment engine);
+	
+	/**
+	 * This method gets executed when the space is removed from an environment.
+	 */
+	public void shutdown();
+	
+	/**
+	 * Adds a space process.
+	 * 
+	 * @param process new space process
+	 */
+	public void addSpaceProcess(ISpaceProcess process);
+
+	/**
+	 * Returns a space process.
+	 * 
+	 * @param processId ID of the space process
+	 * @return the space process or null if not found
+	 */
+	public ISpaceProcess getSpaceProcess(Object processId);
+
+	/**
+	 * Removes a space process.
+	 * 
+	 * @param processId ID of the space process
+	 */
+	public void removeSpaceProcess(Object processId);
+	
 	/** 
 	 * Adds an object to this space.
 	 * 
@@ -34,25 +69,13 @@ public interface ISpace
 	 */
 	public IEnvironmentObject getEnvironmentObject(Long objectId);
 	
-	/**
-	 * This method gets executed when the space is added to an environment.
-	 * 
-	 * @param engine the environment engine
-	 */
-	public void start(Environment engine);
-	
-	/**
-	 * This method gets executed when the space is removed from an environment.
-	 */
-	public void shutdown();
-	
 	/** 
 	 * Steps the time of the space. May be non-functional in spaces that do not have
 	 * a concept of time. See hasTime().
-	 *  
-	 * @param deltaT the time difference of the step.
+	 * 
+	 * @param clock the clock
 	 */
-	public void timeStep(IVector1 deltaT);
+	public void timeStep(IClock clock);
 	
 	/**
 	 * Returns whether this space has a concept of time.

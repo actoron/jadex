@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.envsupport.environment;
 
 import jadex.bdi.planlib.envsupport.environment.space.ISpace;
+import jadex.bridge.IClock;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,6 +142,23 @@ public class Environment
 	public Object getObjectType(Long objectId)
 	{
 		return objects_.get(objectId);
+	}
+	
+	/**
+	 * Steps the time for all time-aware spaces.
+	 * 
+	 * @param clock the clock
+	 */
+	public void timeStep(IClock clock)
+	{
+		synchronized (timeSpaces_)
+		{
+			for (Iterator it = timeSpaces_.iterator(); it.hasNext(); )
+			{
+				ISpace space = (ISpace) it.next();
+				space.timeStep(clock);
+			}
+		}
 	}
 	
 	/**

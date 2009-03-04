@@ -6,6 +6,7 @@ import jadex.bdi.planlib.envsupport.environment.IObjectListener;
 import jadex.bdi.planlib.envsupport.environment.ObjectEvent;
 import jadex.bdi.planlib.envsupport.environment.task.IObjectTask;
 import jadex.bdi.planlib.envsupport.math.IVector1;
+import jadex.bridge.IClock;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +18,8 @@ import java.util.Map;
 
 public abstract class AbstractSpace implements ISpace
 {
-	/** The environment engine */
-	protected Environment	engine_;
+	/** The environment */
+	protected Environment	environment_;
 	
 	/** Available actions in the space. */
 	protected Map			actions_;
@@ -61,9 +62,9 @@ public abstract class AbstractSpace implements ISpace
 	 * 
 	 * @param engine the environment engine
 	 */
-	public void start(Environment engine)
+	public void start(Environment environment)
 	{
-		engine_ = engine;
+		environment_ = environment;
 	}
 	
 	/**
@@ -71,6 +72,37 @@ public abstract class AbstractSpace implements ISpace
 	 */
 	public void shutdown()
 	{
+	}
+	
+	/**
+	 * Adds a space process.
+	 * 
+	 * @param process new space process
+	 */
+	public void addSpaceProcess(ISpaceProcess process)
+	{
+		processes_.put(process.getId(), process);
+	}
+
+	/**
+	 * Returns a space process.
+	 * 
+	 * @param processId ID of the space process
+	 * @return the space process or null if not found
+	 */
+	public ISpaceProcess getSpaceProcess(Object processId)
+	{
+		return (ISpaceProcess) processes_.get(processId);
+	}
+
+	/**
+	 * Removes a space process.
+	 * 
+	 * @param processId ID of the space process
+	 */
+	public void removeSpaceProcess(Object processId)
+	{
+		processes_.remove(processId);
 	}
 	
 	/** 
@@ -212,7 +244,7 @@ public abstract class AbstractSpace implements ISpace
 		 */
 		public Object getType()
 		{
-			return engine_.getObjectType(objectId_);
+			return environment_.getObjectType(objectId_);
 		}
 		
 		/**
@@ -304,6 +336,22 @@ public abstract class AbstractSpace implements ISpace
 		}
 		
 		/**
+		 * Updates the object to the current time.
+		 * 
+		 * @param clock the clock	
+		 * @param deltaT the time difference that has passed
+		 */
+		public void updateObject(IClock clock, IVector1 deltaT)
+		{
+			Object[] tasks = ((Map) objectTasks_.get(objectId_)).values().toArray();
+			for(int i = 0; i < tasks.length; ++i)
+			{
+				IObjectTask task = (IObjectTask) tasks[i];
+				task.execute(clock, deltaT, this);
+			}
+		}
+		
+		/**
 		 * Fires an ObjectEvent.
 		 * 
 		 * @param event the ObjectEvent
@@ -324,7 +372,7 @@ public abstract class AbstractSpace implements ISpace
 					listener.dispatchObjectEvent(event);
 				}
 			}
-			engine_.fireObjectEvent(objectId_, event);
+			environment_.fireObjectEvent(objectId_, event);
 		}
 	}
 }
