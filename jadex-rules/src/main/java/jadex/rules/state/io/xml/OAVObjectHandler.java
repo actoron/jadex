@@ -146,8 +146,8 @@ public class OAVObjectHandler implements IObjectHandler
 						
 						if(attrtype!=null)
 						{
-							Object arg = attrtype.getObjectType() instanceof OAVJavaType?
-								convertBuiltInTypes(((OAVJavaType)attrtype.getObjectType()).getClazz(), attrval): attrval;
+							Object arg = attrtype.getType() instanceof OAVJavaType?
+								convertBuiltInTypes(((OAVJavaType)attrtype.getType()).getClazz(), attrval): attrval;
 					
 							if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
 							{
