@@ -41,8 +41,7 @@ public class Reader
 		XMLInputFactory	factory	= XMLInputFactory.newInstance();
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
 		Object root = null;
-		List objectstack = new ArrayList();
-		List xmlstack = new ArrayList();
+		List stack = new ArrayList();
 		String comment = null;
 		String content = null;
 		
@@ -60,116 +59,77 @@ public class Reader
 			{
 				content += parser.getText(); 
 				
-				System.out.println("content: "+parser.getLocalName()+" "+content+" "+xmlstack);
+				System.out.println("content: "+parser.getLocalName()+" "+content);
 			}
 			
 			else if(next==XMLStreamReader.START_ELEMENT)
 			{
 				content = "";	
 
-				xmlstack.add(parser.getLocalName());
+//				xmlstack.add(parser.getLocalName());
 				
-				Object elem = handler.createObject(parser, comment, context, objectstack);
-				if(elem!=null)
-				{
-					objectstack.add(new Object[]{parser.getLocalName(), elem, getDocumentPosition(xmlstack)});
-					// Stax spec requires reader to advance cursor when getElementText() is called :-(
-//					next = parser.getEventType();
-					comment = null;
-				}
+				Object elem = handler.createObject(parser, comment, context, stack);
+				stack.add(new Object[]{parser.getLocalName(), elem});
+				comment = null;
+//				if(elem!=null)
+//				{
+//					// Stax spec requires reader to advance cursor when getElementText() is called :-(
+////					next = parser.getEventType();
+//					
+//				}
 				
-				System.out.println("start: "+parser.getLocalName()+" "+xmlstack);
+				System.out.println("start: "+parser.getLocalName());
 			}
 			
 			else if(next==XMLStreamReader.END_ELEMENT)
 			{
-				System.out.println("end: "+parser.getLocalName()+" "+xmlstack);
+				System.out.println("end: "+parser.getLocalName());
 				
-				if(objectstack.size()>0)
-				{
-					// Pop element from stack if there is one for the tag.
-					Object[] se = (Object[])objectstack.get(objectstack.size()-1);
+				if(parser.getLocalName().equals("capability"))
+					System.out.println("test");
 					
-					// Hack. Add content when it is element of its own.
-					content = content.trim();
-					if(content.length()>0 && !se[0].equals(parser.getLocalName()))
+				// Pop element from stack if there is one for the tag.
+				Object[] se = (Object[])stack.get(stack.size()-1);
+				
+				// Hack. Add content when it is element of its own.
+				content = content.trim();
+				if(content.length()>0 && se[1]==null)
+				{
+					Object[] tmp = new Object[]{parser.getLocalName(), content};
+					stack.set(stack.size()-1, tmp);
+					se = tmp;
+					content = "";
+				}
+				
+				if(se[1]!=null)
+				{
+					if(content.length()>0)
 					{
-						Object[] tmp = new Object[]{parser.getLocalName(), content, getDocumentPosition(xmlstack)};
-						objectstack.add(tmp);
-						se = tmp;
+						handler.handleContent(parser, se[1], content, context, stack);
 						content = "";
 					}
 					
-					if(se[0].equals(parser.getLocalName()))
+					if(stack.size()==1)
 					{
-						if(content.length()>0)
+						root = se[1];
+					}
+					else
+					{
+						Object[] pse = (Object[])stack.get(stack.size()-2);
+						for(int i=stack.size()-3; i>=0 && pse[1]==null; i--)
 						{
-							handler.handleContent(parser, se[1], content, context, objectstack);
-							content = "";
+							pse = (Object[])stack.get(i);
 						}
 						
-						if(objectstack.size()==1)
-						{
-							root = se[1];
-						}
-						else
-						{
-							Object[] pse = (Object[])objectstack.get(objectstack.size()-2);
-							handler.linkObject(parser, se[1], pse[1], context, objectstack);
-						}
-						objectstack.remove(objectstack.size()-1);
+						handler.linkObject(parser, se[1], pse[1], context, stack);
 					}
 				}
-			
-				xmlstack.remove(xmlstack.size()-1);
+				
+				stack.remove(stack.size()-1);
 			}
 		}
 		parser.close();
 		
 		return root;
 	}
-	
-	/**
-	 * 
-	 */
-	protected String getDocumentPosition(List xmlstack)
-	{
-		StringBuffer ret = new StringBuffer();
-		for(int i=0; i<xmlstack.size(); i++)
-		{
-			ret.append(xmlstack.get(i));
-			if(i<xmlstack.size()-1)
-				ret.append("/");
-		}
-		return ret.toString();
-	}
-	
-	/**
-	 *  Main for testing.
-	 *  @param args
-	 *  @throws Exception
-	 * /
-	public static void main(String[] args) throws Exception
-	{
-		Map types = new HashMap();
-		types.put("applicationtype", ApplicationType.class);
-		types.put("structuringtype", StructuringType.class);
-		types.put("agenttype", AgentType.class);
-		types.put("application", Application.class);
-		types.put("structuring", Structuring.class);
-		types.put("agent", Agent.class);
-		types.put("parameter", Parameter.class);
-		types.put("parameterset", ParameterSet.class);
-		types.put("value", String.class);
-		types.put("import", String.class);
-		types.put("property", String.class);
-		
-		Reader reader = new Reader(new BeanObjectHandler(types, "setDescription"));
-		
-//		InputStream	input = new FileInputStream(args!=null && args.length==1? args[0]: "C:/projects/jadexv2/jadex-platform-base/src/main/java/jadex/adapter/base/appdescriptor/Test.application.xml");
-		InputStream	input = new FileInputStream(args!=null && args.length==1? args[0]: "C:/projects/jadexv2/jadex-applications-bdi/src/main/java/jadex/bdi/examples/booktrading/BookTrading.application.xml");
-		Object o = reader.read(input, null);
-		System.out.println(o);
-	}*/
-	
 }

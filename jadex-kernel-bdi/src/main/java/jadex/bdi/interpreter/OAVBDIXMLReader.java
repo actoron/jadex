@@ -64,6 +64,17 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("internaleventref", OAVBDIMetaModel.internaleventreference_type));
 		typeinfos.add(new OAVMappingInfo("messageevent", OAVBDIMetaModel.messageevent_type));
 		typeinfos.add(new OAVMappingInfo("messageeventref", OAVBDIMetaModel.messageeventreference_type));
+<<<<<<< .mine
+		typeinfos.add(new OAVMappingInfo("expression", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, null));//new ExpressionProcessor()));
+		typeinfos.add(new OAVMappingInfo("condition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, null));//new ExpressionProcessor()));
+		typeinfos.add(new OAVMappingInfo("property", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, null));//new ExpressionProcessor()));
+		typeinfos.add(new OAVMappingInfo("fact", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, null));//new ExpressionProcessor()));
+		typeinfos.add(new OAVMappingInfo("facts", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, null));//new ExpressionProcessor()));
+		typeinfos.add(new OAVMappingInfo("value", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, null));//new ExpressionProcessor()));
+		typeinfos.add(new OAVMappingInfo("values", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, null));//new ExpressionProcessor()));
+		typeinfos.add(new OAVMappingInfo("parameter", OAVBDIMetaModel.parameter_type));
+		typeinfos.add(new OAVMappingInfo("parameterset", OAVBDIMetaModel.parameterset_type));
+=======
 		typeinfos.add(new OAVMappingInfo("expression", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new OAVMappingInfo("condition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new OAVMappingInfo("property", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
@@ -73,6 +84,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("values", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new OAVMappingInfo("parameter", OAVBDIMetaModel.parameter_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.typedelement_has_classname}), tepost));
 		typeinfos.add(new OAVMappingInfo("parameterset", OAVBDIMetaModel.parameterset_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.typedelement_has_classname}), tepost));
+>>>>>>> .r399
 		typeinfos.add(new OAVMappingInfo("configuration", OAVBDIMetaModel.configuration_type));
 		typeinfos.add(new OAVMappingInfo("initialbelief", OAVBDIMetaModel.configbelief_type));
 		typeinfos.add(new OAVMappingInfo("initialbeliefset", OAVBDIMetaModel.configbeliefset_type));

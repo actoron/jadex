@@ -73,7 +73,7 @@ public class OAVMappingInfo
 		{
 			int idx = xmlpath.lastIndexOf("/");
 			if(idx!=-1)
-				xmltag = xmlpath.substring(idx);
+				xmltag = xmlpath.substring(idx+1);
 			else
 				xmltag = xmlpath;
 		}
