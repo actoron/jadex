@@ -424,7 +424,7 @@ public class OAVObjectHandler implements IObjectHandler
 		Set maps = (Set)typeinfos.get(tag);
 		if(maps!=null)
 		{
-			for(Iterator it=maps.iterator(); it.hasNext(); )
+			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
 			{
 				OAVMappingInfo tmp = (OAVMappingInfo)it.next();
 				if(fullpath.endsWith(tmp.getXMLPath()))
@@ -440,10 +440,10 @@ public class OAVObjectHandler implements IObjectHandler
 	protected OAVLinkInfo getLinkInfo(String tag, String fullpath)
 	{
 		OAVLinkInfo ret = null;
-		Set maps = (Set)linkinfos.get(tag);
-		if(maps!=null)
+		Set links = (Set)linkinfos.get(tag);
+		if(links!=null)
 		{
-			for(Iterator it=maps.iterator(); it.hasNext(); )
+			for(Iterator it=links.iterator(); ret==null && it.hasNext(); )
 			{
 				OAVLinkInfo tmp = (OAVLinkInfo)it.next();
 				if(fullpath.endsWith(tmp.getXMLPath()))

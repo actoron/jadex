@@ -1,5 +1,7 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.SReflect;
+
 import java.util.Comparator;
 
 
@@ -81,6 +83,19 @@ public class AbstractOAVInfo
 		
 		return xmlpathdepth;
 	}
+	
+	/**
+	 *  Get a string representation of this mapping.
+	 */
+	public String	toString()
+	{
+		StringBuffer	sbuf	= new StringBuffer();
+		sbuf.append(SReflect.getInnerClassName(getClass()));
+		sbuf.append("(path=");
+		sbuf.append(xmlpath);
+		sbuf.append(")");
+		return sbuf.toString();
+	}
 
 	//-------- helper classes --------
 	
@@ -94,9 +109,11 @@ public class AbstractOAVInfo
 		{
 			AbstractOAVInfo m1 = (AbstractOAVInfo)arg0;
 			AbstractOAVInfo m2 = (AbstractOAVInfo)arg1;
-			int ret = m1.getXMLPathDepth()-m2.getXMLPathDepth();
+			int ret = m2.getXMLPathDepth() - m1.getXMLPathDepth();
 			if(ret==0)
-				ret = m1.getXMLPath().compareTo(m2.getXMLPath());
+				ret = m2.getXMLPath().length() - m1.getXMLPath().length();
+			if(ret==0)
+				ret = m2.getXMLPath().compareTo(m1.getXMLPath());
 			if(ret==0)
 				throw new RuntimeException("Info should differ: "+m1+" "+m2);
 			return ret;
