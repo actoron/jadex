@@ -48,7 +48,7 @@
 			<parameter name="ping_reply" class="String">
 				<bindingoptions>new String[]{"alive", "alaaf"}</bindingoptions>
 			</parameter>
-			<body class="AnswerPingPlan"/></body>
+			<body class="AnswerPingPlan"/>
 			<trigger>
 				<messageevent ref="query_ref_ping"/>
 			</trigger>

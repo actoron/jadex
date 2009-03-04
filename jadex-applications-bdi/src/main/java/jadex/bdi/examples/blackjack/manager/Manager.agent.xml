@@ -81,7 +81,7 @@
 		</plan>
 		<!-- Plan to update the GUI, when informed by dealer changes. -->
 		<plan name="guiManager">
-			<body>new ManagerGuiUpdatePlan()</body>
+			<body class="ManagerGuiUpdatePlan"/>
 			<trigger>
 				<messageevent ref="inform_playerplaying"/>
 			</trigger>

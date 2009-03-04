@@ -46,7 +46,6 @@
  			Reacts on translate sentence requests. -->
 		<plan name="egtrans">
 			<body class="EnglishGermanTranslateSentencePlanF4"/>
-			<!-- <body>new EnglishGermanTranslateSentencePlanF4()</body> -->
 			<waitqueue>
  				<messageevent ref="request_translatesentence"/>
 			</waitqueue>
