@@ -158,7 +158,7 @@ public class OAVObjectHandler implements IObjectHandler
 						}
 						else
 						{
-							System.out.println("Could not find attribute: "+attrtype);
+							System.out.println("Could not find attribute: "+attrname);
 						}
 					}
 				}
@@ -246,6 +246,9 @@ public class OAVObjectHandler implements IObjectHandler
 		{
 			set = internalLinkObjects(state.getType(elem).getName(), elem, parent, state);	
 		}	
+		
+		if(!set)
+			throw new RuntimeException("Could not link: "+elem+" "+parent+" "+getXMLPath(stack));
 	}
 	
 	/**

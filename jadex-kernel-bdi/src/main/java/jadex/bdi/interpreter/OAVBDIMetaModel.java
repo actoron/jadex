@@ -326,7 +326,7 @@ public class OAVBDIMetaModel
 //	public static OAVAttributeType expression_has_class;
 	
 	/** Expression has parameters attribute. */
-//	public static OAVAttributeType expression_has_parameters;
+	public static OAVAttributeType expression_has_parameters;
 	
 	/** Expression has relevants attribute. */
 	public static OAVAttributeType expression_has_relevants;
@@ -337,10 +337,10 @@ public class OAVBDIMetaModel
 	//-------- expression parameter --------
 
 	/** The expression parameter type. */
-//	public static OAVObjectType expressionparameter_type;
+	public static OAVObjectType expressionparameter_type;
 	
 	/** Expression parameter has class attribute. */
-//	public static OAVAttributeType expressionparameter_has_class;
+	public static OAVAttributeType expressionparameter_has_class;
 	
 	//-------- expression relevants --------
 
@@ -834,7 +834,7 @@ public class OAVBDIMetaModel
 		referenceableelement_type	= bdimm_type_model.createType("mreferenceableelement", modelelement_type);
 		expressionrelevant_type = bdimm_type_model.createType("mexpressionrelevant", modelelement_type);
 		elementreference_type	= bdimm_type_model.createType("melementreference", referenceableelement_type);
-//		expressionparameter_type = bdimm_type_model.createType("mexpressionparameter", modelelement_type);
+		expressionparameter_type = bdimm_type_model.createType("mexpressionparameter", modelelement_type);
 		expression_type = bdimm_type_model.createType("mexpression", referenceableelement_type);
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
 		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
@@ -920,7 +920,7 @@ public class OAVBDIMetaModel
 		expression_has_language = expression_type.createAttributeType("mexpression_has_language", OAVJavaType.java_string_type, OAVAttributeType.NONE);//, "java");
 		expression_has_content = expression_type.createAttributeType("mexpression_has_content", OAVJavaType.java_object_type);// java_parsedexpression_type)
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
-//		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
+		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
 		expression_has_relevants = expression_type.createAttributeType("mexpression_has_relevants",  expressionrelevant_type, OAVAttributeType.LIST);
 		expression_has_evaluationmode = expression_type.createAttributeType("mexpression_has_evaluationmode", OAVJavaType.java_string_type);
 				

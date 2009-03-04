@@ -55,7 +55,7 @@ public class Reader
 //				System.out.println("Found comment: "+comment);
 			}
 			
-			else if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
+			else if(next==XMLStreamReader.CHARACTERS)// || next==XMLStreamReader.CDATA)
 			{
 				content += parser.getText(); 
 				
@@ -66,17 +66,9 @@ public class Reader
 			{
 				content = "";	
 
-//				xmlstack.add(parser.getLocalName());
-				
 				Object elem = handler.createObject(parser, comment, context, stack);
 				stack.add(new Object[]{parser.getLocalName(), elem});
 				comment = null;
-//				if(elem!=null)
-//				{
-//					// Stax spec requires reader to advance cursor when getElementText() is called :-(
-////					next = parser.getEventType();
-//					
-//				}
 				
 //				System.out.println("start: "+parser.getLocalName());
 			}
@@ -85,9 +77,6 @@ public class Reader
 			{
 //				System.out.println("end: "+parser.getLocalName());
 				
-//				if(parser.getLocalName().equals("capability"))
-//					System.out.println("test");
-					
 				// Pop element from stack if there is one for the tag.
 				Object[] se = (Object[])stack.get(stack.size()-1);
 				
