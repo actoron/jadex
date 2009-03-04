@@ -323,10 +323,10 @@ public class OAVBDIMetaModel
 	public static OAVAttributeType expression_has_content;
 	
 	/** Expression has class attribute. */
-	public static OAVAttributeType expression_has_class;
+//	public static OAVAttributeType expression_has_class;
 	
 	/** Expression has parameters attribute. */
-	public static OAVAttributeType expression_has_parameters;
+//	public static OAVAttributeType expression_has_parameters;
 	
 	/** Expression has relevants attribute. */
 	public static OAVAttributeType expression_has_relevants;
@@ -337,10 +337,10 @@ public class OAVBDIMetaModel
 	//-------- expression parameter --------
 
 	/** The expression parameter type. */
-	public static OAVObjectType expressionparameter_type;
+//	public static OAVObjectType expressionparameter_type;
 	
 	/** Expression parameter has class attribute. */
-	public static OAVAttributeType expressionparameter_has_class;
+//	public static OAVAttributeType expressionparameter_has_class;
 	
 	//-------- expression relevants --------
 
@@ -589,17 +589,23 @@ public class OAVBDIMetaModel
 	/** Body has type attribute. */
 	public static OAVAttributeType body_has_type;
 
-	/** Body has inline attribute. */
-	public static OAVAttributeType body_has_inline;
+	/** Body has class attribute. */
+	public static OAVAttributeType body_has_class;
 
-	/** Body has passed attribute. */
-	public static OAVAttributeType body_has_passed;
-	
-	/** Body has failed attribute. */
-	public static OAVAttributeType body_has_failed;
-	
-	/** Body has aborted attribute. */
-	public static OAVAttributeType body_has_aborted;
+	/** Body has class name attribute. */
+	public static OAVAttributeType body_has_classname;
+
+//	/** Body has inline attribute. */
+//	public static OAVAttributeType body_has_inline;
+//
+//	/** Body has passed attribute. */
+//	public static OAVAttributeType body_has_passed;
+//	
+//	/** Body has failed attribute. */
+//	public static OAVAttributeType body_has_failed;
+//	
+//	/** Body has aborted attribute. */
+//	public static OAVAttributeType body_has_aborted;
 	
 	//-------- plan parameters --------
 	
@@ -828,7 +834,7 @@ public class OAVBDIMetaModel
 		referenceableelement_type	= bdimm_type_model.createType("mreferenceableelement", modelelement_type);
 		expressionrelevant_type = bdimm_type_model.createType("mexpressionrelevant", modelelement_type);
 		elementreference_type	= bdimm_type_model.createType("melementreference", referenceableelement_type);
-		expressionparameter_type = bdimm_type_model.createType("mexpressionparameter", modelelement_type);
+//		expressionparameter_type = bdimm_type_model.createType("mexpressionparameter", modelelement_type);
 		expression_type = bdimm_type_model.createType("mexpression", referenceableelement_type);
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
 		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
@@ -906,15 +912,15 @@ public class OAVBDIMetaModel
 //		elementreference_has_required	= elementreference_type.createAttributeType("elementreference_has_required", OAVJavaType.java_boolean_type);
 		
 		// expression
-		expressionparameter_has_class = expressionparameter_type.createAttributeType("mexpressionparameter_has_class", OAVJavaType.java_class_type);
+//		expressionparameter_has_class = expressionparameter_type.createAttributeType("mexpressionparameter_has_class", OAVJavaType.java_class_type);
 		
 		expressionrelevant_has_ref = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_ref", OAVJavaType.java_string_type);
 		expressionrelevant_has_eventtype = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_eventtype", OAVJavaType.java_string_type);
 
 		expression_has_language = expression_type.createAttributeType("mexpression_has_language", OAVJavaType.java_string_type, OAVAttributeType.NONE);//, "java");
 		expression_has_content = expression_type.createAttributeType("mexpression_has_content", OAVJavaType.java_object_type);// java_parsedexpression_type)
-		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
-		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
+//		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
+//		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
 		expression_has_relevants = expression_type.createAttributeType("mexpression_has_relevants",  expressionrelevant_type, OAVAttributeType.LIST);
 		expression_has_evaluationmode = expression_type.createAttributeType("mexpression_has_evaluationmode", OAVJavaType.java_string_type);
 				
@@ -1036,10 +1042,12 @@ public class OAVBDIMetaModel
 
 		// plan body
 		body_has_type = body_type.createAttributeType("mbody_has_type", OAVJavaType.java_string_type, OAVAttributeType.NONE,  "standard");
-		body_has_inline = body_type.createAttributeType("mbody_has_inline", OAVJavaType.java_boolean_type);
-		body_has_passed	= body_type.createAttributeType("mbody_has_passed", OAVJavaType.java_string_type);	// Todo: should be expression?
-		body_has_failed	= body_type.createAttributeType("mbody_has_failed", OAVJavaType.java_string_type);	// Todo: should be expression?
-		body_has_aborted	= body_type.createAttributeType("mbody_has_aborted", OAVJavaType.java_string_type);	// Todo: should be expression?
+		body_has_class = body_type.createAttributeType("mbody_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
+		body_has_classname = body_type.createAttributeType("mbody_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+//		body_has_inline = body_type.createAttributeType("mbody_has_inline", OAVJavaType.java_boolean_type);
+//		body_has_passed	= body_type.createAttributeType("mbody_has_passed", OAVJavaType.java_string_type);	// Todo: should be expression?
+//		body_has_failed	= body_type.createAttributeType("mbody_has_failed", OAVJavaType.java_string_type);	// Todo: should be expression?
+//		body_has_aborted	= body_type.createAttributeType("mbody_has_aborted", OAVJavaType.java_string_type);	// Todo: should be expression?
 
 		// plan
 		plan_has_body = plan_type.createAttributeType("mplan_has_body", body_type);

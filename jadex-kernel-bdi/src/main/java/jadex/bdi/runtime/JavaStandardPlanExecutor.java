@@ -66,7 +66,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 
 		Object	mplan	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
 		Object	mbody	= interpreter.getState().getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
-		Class	clazz	= (Class)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.expression_has_class);
+		Class	clazz	= (Class)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_class);
 		
 		Object	body = null;
 		if(clazz!=null)
