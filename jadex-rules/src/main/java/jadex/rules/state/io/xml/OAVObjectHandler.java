@@ -90,6 +90,7 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		if(mapinfo!=null)
 		{
+			Object	object	= null;
 			OAVObjectType type = mapinfo.getType();
 			
 			if(type instanceof OAVJavaType && isBuiltInType(((OAVJavaType)type).getClazz()))
@@ -111,11 +112,23 @@ public class OAVObjectHandler implements IObjectHandler
 				
 				if(root)
 				{
-					ret = state.createRootObject(type);
+					object	= state.createRootObject(type);
+					ret	= object;
 				}
-				else
+				else if(type!=null)
 				{
-					ret = state.createObject(type);
+					object	= state.createObject(type);
+					ret	= object;
+				}
+				else	// If no type use last element from stack to map attributes.
+				{
+					int	i	= stack.size()-1;
+					while(i>=0 && object==null)
+						object	= ((Object[])stack.get(i))[1];
+					
+					if(object==null)
+						throw new RuntimeException("No element on stack for "+mapinfo);
+						
 				}
 				
 				// Handle attributes
@@ -130,7 +143,7 @@ public class OAVObjectHandler implements IObjectHandler
 						OAVAttributeType attrtype = mapinfo.getAttributeType(attrname);
 						
 						// Search attribute in type and supertypes.
-						OAVObjectType tmptype = type;
+						OAVObjectType tmptype = state.getType(object);
 						while(attrtype==null && tmptype!=null)
 						{
 							String tmpnamesin = tmptype.getName()+"_has_"+attrname;
@@ -148,11 +161,11 @@ public class OAVObjectHandler implements IObjectHandler
 					
 							if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
 							{
-								state.setAttributeValue(ret, attrtype, arg);
+								state.setAttributeValue(object, attrtype, arg);
 							}
 							else
 							{
-								state.addAttributeValue(ret, attrtype, arg);
+								state.addAttributeValue(object, attrtype, arg);
 							}
 						}
 						else
@@ -168,7 +181,7 @@ public class OAVObjectHandler implements IObjectHandler
 					OAVAttributeType comattr = mapinfo.getComment();
 					if(comattr!=null)
 					{
-						state.setAttributeValue(ret, comattr, comment);
+						state.setAttributeValue(object, comattr, comment);
 					}
 				}
 			}

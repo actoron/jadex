@@ -71,6 +71,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("recurcondition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new OAVMappingInfo("metagoal/trigger", OAVBDIMetaModel.metagoaltrigger_type));
 		typeinfos.add(new OAVMappingInfo("inhibits", OAVBDIMetaModel.inhibits_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
+		typeinfos.add(new OAVMappingInfo("deliberation", null));
 
 		typeinfos.add(new OAVMappingInfo("plan", OAVBDIMetaModel.plan_type));
 		typeinfos.add(new OAVMappingInfo("body", OAVBDIMetaModel.body_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.body_has_classname}), bopost));
