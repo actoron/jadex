@@ -7,18 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  Mapping from tag (or path fragment) to OAV type.
  */
-public class OAVMappingInfo
+public class OAVMappingInfo	extends AbstractOAVInfo
 {
-	/** The xml tag/path. */
-	protected String xmlpath;
-	
-	/** The xml tag. */
-	protected String xmltag;
-	
-	/** The xml path depth. */
-	protected int xmlpathdepth;
+	//-------- attributes -------- 
 	
 	/** The type. */
 	protected OAVObjectType type;
@@ -35,6 +28,8 @@ public class OAVMappingInfo
 	/** The post processor (if any). */
 	protected IPostProcessor	pproc;
 	
+	//-------- constructors --------
+	
 	/**
 	 * 
 	 */
@@ -48,65 +43,16 @@ public class OAVMappingInfo
 	 */
 	public OAVMappingInfo(String xmlpath, OAVObjectType type, OAVAttributeType comment, OAVAttributeType content, Map attributes, IPostProcessor pproc)
 	{
-		this.xmlpath = xmlpath;
+		super(xmlpath);
 		this.type = type;
 		this.comment = comment;
 		this.content = content;
 		this.attributes = attributes;
 		this.pproc = pproc;
 	}
+	
+	//-------- methods --------
 
-	/**
-	 * @return the xmlpath
-	 */
-	public String getXMLPath()
-	{
-		return this.xmlpath;
-	}
-	
-	/**
-	 * @return the xml tag
-	 */
-	public String getXMLTag()
-	{
-		if(xmltag==null)
-		{
-			int idx = xmlpath.lastIndexOf("/");
-			if(idx!=-1)
-				xmltag = xmlpath.substring(idx+1);
-			else
-				xmltag = xmlpath;
-		}
-		
-		return xmltag;
-	}
-	
-	/**
-	 * @param xmlpath the xmlpath to set
-	 */
-	public void setXMLPath(String xmlpath)
-	{
-		this.xmlpath = xmlpath;
-	}
-	
-	/**
-	 * 
-	 */
-	public int getXMLPathDepth()
-	{
-		if(xmlpathdepth==0)
-		{
-			int idx = xmlpath.indexOf("/");
-			while(idx!=-1)
-			{
-				xmlpathdepth++;
-				idx = xmlpath.indexOf("/", idx+1);
-			}
-		}
-		
-		return xmlpathdepth;
-	}
-	
 	/**
 	 * @return the type
 	 */

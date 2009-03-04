@@ -23,6 +23,9 @@ public class ReaderMain
 	 */
 	public static void main(String[] args) throws Exception
 	{
+		String	testfile	= "../jadex-applications-bdi/src/main/java/jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml";
+//		String	testfile	= "../jadex-applib-bdi/src/main/java/jadex/bdi/planlib/protocols/cancelmeta/CancelMeta.capability.xml";
+		
 		Reader reader = OAVBDIXMLReader.getReader();
 		File	classes	= new File("../jadex-applications-bdi/target/classes");
 		ClassLoader	cl	= new URLClassLoader(new URL[]{classes.toURI().toURL()});
@@ -32,7 +35,7 @@ public class ReaderMain
 		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState state	= OAVStateFactory.createOAVState(typemodel);
 		
-		InputStream	input = new FileInputStream(args!=null && args.length==1? args[0]: "../jadex-applications-bdi/src/main/java/jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml");
+		InputStream	input = new FileInputStream(args!=null && args.length==1? args[0]: testfile);
 		Object o = reader.read(input, null, state);
 		JFrame frame = OAVPanel.createOAVFrame("test", state);
 		frame.setVisible(true);

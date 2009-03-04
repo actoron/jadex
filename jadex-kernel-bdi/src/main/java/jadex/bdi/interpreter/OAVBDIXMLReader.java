@@ -10,15 +10,14 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.io.xml.IPostProcessor;
+import jadex.rules.state.io.xml.OAVLinkInfo;
 import jadex.rules.state.io.xml.OAVMappingInfo;
 import jadex.rules.state.io.xml.OAVObjectHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -124,17 +123,17 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("endinternalevent", OAVBDIMetaModel.configelement_type));
 		typeinfos.add(new OAVMappingInfo("endmessageevent", OAVBDIMetaModel.configelement_type));
 
-		Map linkinfos = new HashMap();
-		linkinfos.put("agent/properties/property", OAVBDIMetaModel.capability_has_properties);
-		linkinfos.put("agent/goals/performgoal", OAVBDIMetaModel.capability_has_goals);
-		linkinfos.put("agent/goals/achievegoal", OAVBDIMetaModel.capability_has_goals);
-		linkinfos.put("agent/goals/querygoal", OAVBDIMetaModel.capability_has_goals);
-		linkinfos.put("agent/goals/maintaingoal", OAVBDIMetaModel.capability_has_goals);
-		linkinfos.put("agent/goals/metagoal", OAVBDIMetaModel.capability_has_goals);
-		linkinfos.put("agent/goals/achievegoalref", OAVBDIMetaModel.capability_has_goalrefs);
-		linkinfos.put("agent/goals/querygoalref", OAVBDIMetaModel.capability_has_goalrefs);
-		linkinfos.put("agent/goals/maintaingoalref", OAVBDIMetaModel.capability_has_goalrefs);
-		linkinfos.put("agent/goals/metagoalref", OAVBDIMetaModel.capability_has_goalrefs);
+		Set linkinfos = new HashSet();
+		linkinfos.add(new OAVLinkInfo("properties/property", OAVBDIMetaModel.capability_has_properties));
+		linkinfos.add(new OAVLinkInfo("goals/performgoal", OAVBDIMetaModel.capability_has_goals));
+		linkinfos.add(new OAVLinkInfo("goals/achievegoal", OAVBDIMetaModel.capability_has_goals));
+		linkinfos.add(new OAVLinkInfo("goals/querygoal", OAVBDIMetaModel.capability_has_goals));
+		linkinfos.add(new OAVLinkInfo("goals/maintaingoal", OAVBDIMetaModel.capability_has_goals));
+		linkinfos.add(new OAVLinkInfo("goals/metagoal", OAVBDIMetaModel.capability_has_goals));
+		linkinfos.add(new OAVLinkInfo("goals/achievegoalref", OAVBDIMetaModel.capability_has_goalrefs));
+		linkinfos.add(new OAVLinkInfo("goals/querygoalref", OAVBDIMetaModel.capability_has_goalrefs));
+		linkinfos.add(new OAVLinkInfo("goals/maintaingoalref", OAVBDIMetaModel.capability_has_goalrefs));
+		linkinfos.add(new OAVLinkInfo("goals/metagoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.put("agent/plans/plan/parameter", OAVBDIMetaModel.parameterelement_has_parameters);
 		linkinfos.put("agent/plans/plan/parameterset", OAVBDIMetaModel.parameterelement_has_parametersets);
 		

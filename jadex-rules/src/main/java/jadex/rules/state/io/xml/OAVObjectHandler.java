@@ -7,7 +7,6 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,10 +65,10 @@ public class OAVObjectHandler implements IObjectHandler
 	/**
 	 *  Create a new bean object handler.
 	 */
-	public OAVObjectHandler(Set typeinfos, Map linkinfos, Set ignoredattrs)
+	public OAVObjectHandler(Set typeinfos, Set linkinfos, Set ignoredattrs)
 	{
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
-		this.linkinfos = linkinfos!=null? linkinfos: Collections.EMPTY_MAP;
+		this.linkinfos = linkinfos!=null? createLinkInfos(linkinfos): Collections.EMPTY_MAP;
 		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 	}
 	
@@ -228,7 +227,10 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		boolean set = false;
 		
-		OAVAttributeType attrtype = (OAVAttributeType)linkinfos.get(getXMLPath(stack));
+		OAVAttributeType attrtype = null;
+		OAVLinkInfo	linkinfo	= getLinkInfo(parser.getLocalName(), fullpath);
+		if(linkinfo!=null)
+			attrtype	= linkinfo.getLinkAttribute();
 
 		if(attrtype!=null)
 		{
@@ -382,23 +384,32 @@ public class OAVObjectHandler implements IObjectHandler
 			TreeSet maps = (TreeSet)ret.get(mapinfo.getXMLTag());
 			if(maps==null)
 			{
-				maps = new TreeSet(new Comparator()
-				{
-					public int compare(Object arg0, Object arg1)
-					{
-						OAVMappingInfo m1 = (OAVMappingInfo)arg0;
-						OAVMappingInfo m2 = (OAVMappingInfo)arg1;
-						int ret = m1.getXMLPathDepth()-m2.getXMLPathDepth();
-						if(ret==0)
-							ret = m1.getXMLPath().compareTo(m2.getXMLPath());
-						if(ret==0)
-							throw new RuntimeException("MappingInfo should differ: "+m1+" "+m2);
-						return ret;
-					}
-				});
+				maps = new TreeSet(new AbstractOAVInfo.SpecificityComparator());
 				ret.put(mapinfo.getXMLTag(), maps);
 			}
 			maps.add(mapinfo);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create link infos for each tag sorted by specificity.
+	 */
+	protected Map createLinkInfos(Set linkinfos)
+	{
+		Map ret = new HashMap();
+		
+		for(Iterator it=linkinfos.iterator(); it.hasNext(); )
+		{
+			OAVLinkInfo linkinfo = (OAVLinkInfo)it.next();
+			TreeSet links = (TreeSet)ret.get(linkinfo.getXMLTag());
+			if(links==null)
+			{
+				links = new TreeSet(new AbstractOAVInfo.SpecificityComparator());
+				ret.put(linkinfo.getXMLTag(), links);
+			}
+			links.add(linkinfo);
 		}
 		
 		return ret;
@@ -416,6 +427,25 @@ public class OAVObjectHandler implements IObjectHandler
 			for(Iterator it=maps.iterator(); it.hasNext(); )
 			{
 				OAVMappingInfo tmp = (OAVMappingInfo)it.next();
+				if(fullpath.endsWith(tmp.getXMLPath()))
+					ret = tmp;
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the most specific link info.
+	 */
+	protected OAVLinkInfo getLinkInfo(String tag, String fullpath)
+	{
+		OAVLinkInfo ret = null;
+		Set maps = (Set)linkinfos.get(tag);
+		if(maps!=null)
+		{
+			for(Iterator it=maps.iterator(); it.hasNext(); )
+			{
+				OAVLinkInfo tmp = (OAVLinkInfo)it.next();
 				if(fullpath.endsWith(tmp.getXMLPath()))
 					ret = tmp;
 			}
