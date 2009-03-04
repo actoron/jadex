@@ -6,8 +6,11 @@ import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.rules.tools.stateviewer.OAVPanel;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import javax.swing.JFrame;
 
@@ -21,8 +24,10 @@ public class ReaderMain
 	public static void main(String[] args) throws Exception
 	{
 		Reader reader = OAVBDIXMLReader.getReader();
-		
-		OAVTypeModel typemodel	= new OAVTypeModel("test_typemodel", null);
+		File	classes	= new File("../jadex-applications-bdi/target/classes");
+		ClassLoader	cl	= new URLClassLoader(new URL[]{classes.toURI().toURL()});
+
+		OAVTypeModel typemodel	= new OAVTypeModel("test_typemodel", cl);
 		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
 		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState state	= OAVStateFactory.createOAVState(typemodel);
