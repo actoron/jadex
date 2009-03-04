@@ -131,6 +131,14 @@ public class OAVBDIXMLReader
 		typeinfos.add(new OAVMappingInfo("initialinternalevent/parameterset", OAVBDIMetaModel.configparameterset_type));
 		typeinfos.add(new OAVMappingInfo("initialmessageevent/parameter", OAVBDIMetaModel.configparameter_type));
 		typeinfos.add(new OAVMappingInfo("initialmessageevent/parameterset", OAVBDIMetaModel.configparameterset_type));
+		typeinfos.add(new OAVMappingInfo("endgoal/parameter", OAVBDIMetaModel.configparameter_type));
+		typeinfos.add(new OAVMappingInfo("endgoal/parameterset", OAVBDIMetaModel.configparameterset_type));
+		typeinfos.add(new OAVMappingInfo("endplan/parameter", OAVBDIMetaModel.configparameter_type));
+		typeinfos.add(new OAVMappingInfo("endplan/parameterset", OAVBDIMetaModel.configparameterset_type));
+		typeinfos.add(new OAVMappingInfo("endinternalevent/parameter", OAVBDIMetaModel.configparameter_type));
+		typeinfos.add(new OAVMappingInfo("endinternalevent/parameterset", OAVBDIMetaModel.configparameterset_type));
+		typeinfos.add(new OAVMappingInfo("endmessageevent/parameter", OAVBDIMetaModel.configparameter_type));
+		typeinfos.add(new OAVMappingInfo("endmessageevent/parameterset", OAVBDIMetaModel.configparameterset_type));
 
 		Set linkinfos = new HashSet();
 		linkinfos.add(new OAVLinkInfo("properties/property", OAVBDIMetaModel.capability_has_properties));
