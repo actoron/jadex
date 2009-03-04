@@ -18,6 +18,11 @@
 		<!-- Kernels. -->
 		<propertiesref ref="kernel_v2_bdi"/>
 		
+		<property type="application_factory">
+			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
+				new java.util.Map[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+		</property>
+		
 		<!-- Platform services. -->
 		<properties type="services">			
 			<!-- Library service. -->

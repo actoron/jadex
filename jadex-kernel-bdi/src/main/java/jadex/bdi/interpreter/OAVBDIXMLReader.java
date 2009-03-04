@@ -130,13 +130,16 @@ public class OAVBDIXMLReader
 		linkinfos.add(new OAVLinkInfo("goals/querygoal", OAVBDIMetaModel.capability_has_goals));
 		linkinfos.add(new OAVLinkInfo("goals/maintaingoal", OAVBDIMetaModel.capability_has_goals));
 		linkinfos.add(new OAVLinkInfo("goals/metagoal", OAVBDIMetaModel.capability_has_goals));
+		linkinfos.add(new OAVLinkInfo("goals/performgoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.add(new OAVLinkInfo("goals/achievegoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.add(new OAVLinkInfo("goals/querygoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.add(new OAVLinkInfo("goals/maintaingoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.add(new OAVLinkInfo("goals/metagoalref", OAVBDIMetaModel.capability_has_goalrefs));
 		linkinfos.add(new OAVLinkInfo("plan/parameter", OAVBDIMetaModel.parameterelement_has_parameters));
 		linkinfos.add(new OAVLinkInfo("plan/parameterset", OAVBDIMetaModel.parameterelement_has_parametersets));
-		
+		linkinfos.add(new OAVLinkInfo("beliefref", OAVBDIMetaModel.capability_has_beliefrefs));
+		linkinfos.add(new OAVLinkInfo("beliefsetref", OAVBDIMetaModel.capability_has_beliefsetrefs));
+			
 		Set ignoredattrs = new HashSet();
 		ignoredattrs.add("schemaLocation");
 		
