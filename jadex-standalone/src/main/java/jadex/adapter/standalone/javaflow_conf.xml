@@ -5,21 +5,41 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
 	                    http://jadex.sourceforge.net/configuration.xsd"
-	name="javaflow_conf">
+	name="standalone_conf">
 	
-	<properties type="platform_standalone" name="claas">
-		<property type="platformname">claas</property>
+	<properties type="platform_standalone" name="lars">
+		<property type="platformname">lars</property>
 		<property type="platform_shutdown_time">1000</property>
 		<property type="welcome">false</property>
-		<property type="autoshutdown">false</property>
+		<property type="autoshutdown">true</property>
+		
+		<property type="application_factory">
+			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
+				new java.util.Map[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+		</property>
+		
 		<!-- Message types. -->
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<!-- Kernels. -->
-		<propertiesref ref="kernel_v2"/>
-		
+		<propertiesref ref="kernel_v2_bdi"/>
+	 	<propertiesref ref="kernel_v2_micro"/>
+				
 		<!-- Platform services. -->
 		<properties type="services">
+			<!-- Library service. -->
+			<property type="jadex.bridge.ILibraryService" name="library_service">
+				new jadex.adapter.base.libraryservice.LibraryService()
+			</property>
+			
+			<!-- Threadpool service. -->
+			<property type="jadex.adapter.base.ThreadPoolService" name="threadpool_service">
+				new jadex.adapter.base.ThreadPoolService(
+					//new jadex.commons.concurrent.java5.JavaThreadPool()
+					new jadex.commons.concurrent.ThreadPool(
+						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
+			</property>
+			
 			<!-- AMS service. -->
 			<property type="jadex.adapter.base.fipa.IAMS" name="ams_service">new jadex.adapter.standalone.ams.AMS($platform)</property> 
 			
@@ -38,10 +58,11 @@
 			
 			<!-- Clock service. -->
 			<property type="jadex.bridge.IClockService" name="clock_service">
-				new jadex.adapter.base.clock.SystemClock("system_clock", 1,
-					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+				new jadex.adapter.base.clock.ClockService(
+					new jadex.adapter.base.clock.SystemClock("system_clock", 1,
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class)), $platform)
 //				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
-//					System.currentTimeMillis(), 100)
+//					System.currentTimeMillis(), 100))
 			</property>
 
 			<!-- Simulation service. -->
@@ -52,22 +73,57 @@
 			<!-- Execution service. -->
 			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
 				new jadex.adapter.base.execution.AsyncExecutionService(
-					jadex.commons.concurrent.ThreadPoolFactory.getThreadPool($platformname))
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
+			</property>
+
+			<!-- Context service. -->
+			<property type="jadex.adapter.base.contextservice.IContextService" name="context_service">
+				new jadex.adapter.base.contextservice.ContextService(
+					new Class[]
+					{
+						jadex.adapter.base.contextservice.IContext.class,
+						jadex.adapter.base.contextservice.BaseContext.class,
+						jadex.adapter.base.appdescriptor.ApplicationContext.class
+					},
+					new jadex.adapter.base.contextservice.IContextFactory[]
+					{
+						new jadex.adapter.base.contextservice.DefaultContextFactory(),
+						new jadex.adapter.base.contextservice.DefaultContextFactory(),
+						new jadex.adapter.base.appdescriptor.ApplicationContextFactory($platform)
+					})
 			</property>
 		</properties>
 		
 		<!-- Agents. -->
- 		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
-		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
-		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
+  		<!-- <property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property> -->
+		<!-- <property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property> -->
+ 		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	</properties>
 	
-	<properties type="kernel" id="kernel_v2">
-		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(jadex.commons.SUtil.createHashMap(
-			new String[]{"messagetype_fipa", "planexecutor_standard"},
-			new Object[]{new jadex.adapter.base.fipa.FIPAMessageType(), 
-			new jadex.bdi.runtime.JavaFlowPlanExecutor()}))
-			</property>
+	<properties type="kernel" id="kernel_v2_bdi">
+		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
+			jadex.commons.SUtil.createHashMap(
+				new String[]
+				{
+					"messagetype_fipa", 
+					"planexecutor_standard", 
+					"standard.timeout", 
+					"tooladapter.introspector",
+					"microplansteps"
+				},
+				new Object[]
+				{
+					new jadex.adapter.base.fipa.FIPAMessageType(), 
+					new jadex.bdi.runtime.FlowPlanExecutor(),
+					new java.lang.Long(10000),
+					jadex.tools.introspector.IntrospectorAdapter.class,
+					Boolean.FALSE
+				}
+			), $platform)
+		</property>
 	</properties>
 	
+	<properties type="kernel" id="kernel_v2_micro">
+		<property type="agent_factory">new jadex.microkernel.MicroAgentFactory($platform)</property>
+	</properties> 
 </properties>
