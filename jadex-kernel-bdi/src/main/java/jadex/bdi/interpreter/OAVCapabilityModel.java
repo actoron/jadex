@@ -9,7 +9,6 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -112,13 +111,9 @@ public class OAVCapabilityModel implements ILoadableElementModel
 		if(configs!=null)
 		{
 			List tmp = new ArrayList();
-			Object defconfig = state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_defaultconfiguration);
-			String defname = null;
-			if(defconfig!=null)
-			{
-				defname = (String)state.getAttributeValue(defconfig, OAVBDIMetaModel.modelelement_has_name);
+			String	defname = (String)state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_defaultconfiguration);
+			if(defname!=null)
 				tmp.add(defname);
-			}
 			
 			for(Iterator it=configs.iterator(); it.hasNext(); )
 			{

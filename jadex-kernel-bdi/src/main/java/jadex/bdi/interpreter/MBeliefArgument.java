@@ -77,14 +77,23 @@ public class MBeliefArgument	implements IArgument
 		Object ret = null;
 		boolean found = false;
 		
-		Object config;
+		Object	config	= null;
+
 		if(configname==null)
 		{
-			config = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_defaultconfiguration);
+			configname = (String)state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_defaultconfiguration);
+		}
+		if(configname!=null)
+		{
+			config	= state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_configurations, configname);
 		}
 		else
 		{
-			config = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_configurations, configname);
+			Collection	mconfigs	= state.getAttributeValues(scope, OAVBDIMetaModel.capability_has_configurations);
+			if(mconfigs!=null)
+			{
+				config	= mconfigs.iterator().next();
+			}
 		}
 		
 		if(config!=null)

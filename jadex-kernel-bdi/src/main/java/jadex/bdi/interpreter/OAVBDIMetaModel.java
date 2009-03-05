@@ -1098,7 +1098,7 @@ public class OAVBDIMetaModel
 		capability_has_expressions = capability_type.createAttributeType("mcapability_has_mexpressions", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_conditions = capability_type.createAttributeType("mcapability_has_mconditions", condition_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_properties = capability_type.createAttributeType("mcapability_has_mproperties", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_defaultconfiguration = capability_type.createAttributeType("mcapability_has_defaultconfiguration", configuration_type);
+		capability_has_defaultconfiguration = capability_type.createAttributeType("mcapability_has_defaultconfiguration", OAVJavaType.java_string_type);
 		capability_has_configurations = capability_type.createAttributeType("mcapability_has_mconfigurations", configuration_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 
 		// agent

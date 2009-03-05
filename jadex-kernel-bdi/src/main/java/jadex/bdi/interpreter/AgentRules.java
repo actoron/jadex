@@ -1203,28 +1203,27 @@ public class AgentRules
 	 */
 	protected static Object getConfiguration(IOAVState state, Object rcapa)
 	{
-		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		String config = (String)state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_configuration);
+		// Get configuration.
+		String	config	= (String)state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_configuration);
 		if("".equals(config))
 			config	= null;	// Hack!!! Required for message based agent created in JADE.
+		Object	mcap	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
+		if(config==null)
+			config	= (String)state.getAttributeValue(mcap, OAVBDIMetaModel.capability_has_defaultconfiguration);
 		Object	mconfig;
 		if(config==null)
 		{
-			mconfig	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_defaultconfiguration);
-			if(mconfig==null)
-			{
-				Collection	mconfigs	= state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_configurations);
-				if(mconfigs!=null)
-					mconfig	= mconfigs.iterator().next();
-				else
-					mconfig	= null;
-			}
+			Collection	mconfigs	= state.getAttributeValues(mcap, OAVBDIMetaModel.capability_has_configurations);
+			if(mconfigs!=null)
+				mconfig	= mconfigs.iterator().next();
+			else
+				mconfig	= null;
 		}
 		else
 		{
-			if(!state.containsKey(mcapa, OAVBDIMetaModel.capability_has_configurations, config))
+			if(!state.containsKey(mcap, OAVBDIMetaModel.capability_has_configurations, config))
 				throw new RuntimeException("No such configuration: "+config);
-			mconfig	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, config);
+			mconfig	= state.getAttributeValue(mcap, OAVBDIMetaModel.capability_has_configurations, config);
 		}
 		
 		return mconfig;
@@ -2041,7 +2040,7 @@ public class AgentRules
 							value	= AgentRules.evaluateExpression(state, pvalex, configfetcher);
 						}
 						
-						Object rparam = BeliefRules.createParameter(state, (String)pname, value, clazz, rparamelem, mparam, rcapa);
+						BeliefRules.createParameter(state, (String)pname, value, clazz, rparamelem, mparam, rcapa);
 						doneparams.add(pname);
 					}
 				}
@@ -2238,30 +2237,7 @@ public class AgentRules
 	 */
 	protected static void activateEndState(final IOAVState state, final Object rcapa)
 	{
-		// Get configuration.
-		String	config	= (String)state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_configuration);
-		if("".equals(config))
-			config	= null;	// Hack!!! Required for message based agent created in JADE.
-		Object	mcap	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		Object	mconfig;
-		if(config==null)
-		{
-			mconfig	= state.getAttributeValue(mcap, OAVBDIMetaModel.capability_has_defaultconfiguration);
-			if(mconfig==null)
-			{
-				Collection	mconfigs	= state.getAttributeValues(mcap, OAVBDIMetaModel.capability_has_configurations);
-				if(mconfigs!=null)
-					mconfig	= mconfigs.iterator().next();
-				else
-					mconfig	= null;
-			}
-		}
-		else
-		{
-			if(!state.containsKey(mcap, OAVBDIMetaModel.capability_has_configurations, config))
-				throw new RuntimeException("No such configuration: "+config);
-			mconfig	= state.getAttributeValue(mcap, OAVBDIMetaModel.capability_has_configurations, config);
-		}
+		Object	mconfig	= getConfiguration(state, rcapa);
 		
 		// Initialize subcapabilities.
 		Collection subcapas = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities);
@@ -2294,6 +2270,7 @@ public class AgentRules
 			Collection	cplans	= state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_endplans);
 			if(cplans!=null)
 			{
+				Object	mcap	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
 				for(Iterator it=cplans.iterator(); it.hasNext(); )
 				{
 					createConfigPlan(state, rcapa, mcap, it.next(), fetcher);

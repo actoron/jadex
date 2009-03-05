@@ -115,6 +115,7 @@ public class OAVBDIXMLReader
 				
 //		typeinfos.add(new TypeInfo("concrete", OAVJavaType.java_string_type));
 
+		typeinfos.add(new TypeInfo("configurations", null, null, null, SUtil.createHashMap(new String[]{"default"}, new Object[]{OAVBDIMetaModel.capability_has_defaultconfiguration}), null));
 		typeinfos.add(new TypeInfo("configuration", OAVBDIMetaModel.configuration_type));
 		typeinfos.add(new TypeInfo("initialcapability", OAVBDIMetaModel.initialcapability_type));
 		typeinfos.add(new TypeInfo("initialbelief", OAVBDIMetaModel.configbelief_type));
