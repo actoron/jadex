@@ -18,8 +18,9 @@ public class OAVObjectHandler implements IObjectHandler
 	
 	/**
 	 *  Create an object for the current tag.
-	 *  @param parser The parser.
-	 *  @param comment The preceding xml comment.
+	 *  @param type The object type to create.
+	 *  @param root Flag, if object should be root object.
+	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
 	public Object createObject(XMLStreamReader parser, Object type, boolean root, Object context) throws Exception
@@ -56,10 +57,12 @@ public class OAVObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 *  Create an object for the current tag.
-	 *  @param parser The parser.
+	 *  Handle the attribute of an object.
+	 *  @param object The object.
+	 *  @param attrname The attribute name.
+	 *  @param attrval The attribute value.
+	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
-	 *  @return The created object (or null for none).
 	 */
 	public void handleAttributeValue(Object object, String attrname, String attrval, Object attrinfo, Object context) throws Exception
 	{
@@ -98,9 +101,11 @@ public class OAVObjectHandler implements IObjectHandler
 	
 	/**
 	 *  Link an object to its parent.
-	 *  @param parser The parser.
-	 *  @param elem The element.
-	 *  @param paranet The parent element.
+	 *  @param object The object.
+	 *  @param parent The parent object.
+	 *  @param linkinfo The link info.
+	 *  @param tagname The current tagname (for name guessing).
+	 *  @param context The context.
 	 */
 	public void linkObject(Object elem, Object parent, Object linkinfo, String tagname, Object context) throws Exception
 	{
@@ -132,6 +137,8 @@ public class OAVObjectHandler implements IObjectHandler
 		if(!linked)
 			throw new RuntimeException("Could not link: "+elem+" "+parent);
 	}
+	
+	//-------- helper methods --------
 	
 	/**
 	 *  Internal method for linking objects.

@@ -1,7 +1,5 @@
 package jadex.commons.xml;
 
-import java.util.List;
-
 import javax.xml.stream.XMLStreamReader;
 
 /**
@@ -13,43 +11,29 @@ public interface IObjectHandler
 {
 	/**
 	 *  Create an object for the current tag.
-	 *  @param parser The parser.
-	 *  @param comment The comment.
+	 *  @param type The object type to create.
+	 *  @param root Flag, if object should be root object.
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
 	public Object createObject(XMLStreamReader parser, Object type, boolean root, Object context) throws Exception;
 	
 	/**
-	 *  Create an object for the current tag.
-	 *  @param parser The parser.
+	 *  Handle the attribute of an object.
+	 *  @param object The object.
+	 *  @param attrname The attribute name.
+	 *  @param attrval The attribute value.
+	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
-	 *  @return The created object (or null for none).
 	 */
 	public void handleAttributeValue(Object object, String attrname, String attrval, Object attrinfo, Object context) throws Exception;
 	
 	/**
-	 *  Create an object for the current tag.
-	 *  @param parser The parser.
-	 *  @param context The context.
-	 *  @return The created object (or null for none).
-	 */
-//	public void handleComment(Object object, String comment, Object commentinfo, Object context) throws Exception;
-	
-	/**
-	 *  Handle content for an object.
-	 *  @param parser The parser.
-	 *  @param comment The comment.
-	 *  @param context The context.
-	 *  @return The created object (or null for none).
-	 */
-//	public void handleContent(Object object, String content, Object contentinfo, Object context) throws Exception;
-	
-	/**
 	 *  Link an object to its parent.
-	 *  @param parser The parser.
-	 *  @param elem The element.
-	 *  @param parent The parent element.
+	 *  @param object The object.
+	 *  @param parent The parent object.
+	 *  @param linkinfo The link info.
+	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, Object context) throws Exception;

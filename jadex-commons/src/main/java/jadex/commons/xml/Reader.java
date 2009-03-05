@@ -277,18 +277,6 @@ public class Reader
 	}
 	
 	/**
-	 * 
-	 */
-//	protected Object findObject(Stack stack)
-//	{
-//		Object object = ((StackElement)stack.get(stack.size()-1)).getObject();
-//		for(int i=stack.size()-2; object==null && i>=0 ; i--)
-//		{
-//			object = ((StackElement)stack.get(i)).getObject();
-//		}
-//	}
-	
-	/**
 	 *  Create type infos for each tag sorted by specificity.
 	 *  @param linkinfos The mapping infos.
 	 *  @return Map of mapping infos.
