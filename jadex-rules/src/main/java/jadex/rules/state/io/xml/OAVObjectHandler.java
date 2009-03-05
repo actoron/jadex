@@ -7,6 +7,8 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamReader;
 
 /**
@@ -23,34 +25,18 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(XMLStreamReader parser, Object type, boolean root, Object context) throws Exception
+	public Object createObject(Object type, boolean root, Object context) throws Exception
 	{
 		Object ret = null;
 		IOAVState state = (IOAVState)context;
 		
-		Object	object	= null;
-		
-		if(type instanceof OAVJavaType && BasicTypeConverter.isBuiltInType(((OAVJavaType)type).getClazz()))
+		if(root)
 		{
-			String strval;
-			if(parser.getAttributeCount()==1)
-			{	
-				strval = parser.getAttributeValue(0);
-				ret = BasicTypeConverter.convertBuiltInTypes(((OAVJavaType)type).getClazz(), strval);
-			}
+			ret	= state.createRootObject((OAVObjectType)type);
 		}
-		else
+		else if(type!=null)
 		{
-			if(root)
-			{
-				object	= state.createRootObject((OAVObjectType)type);
-				ret	= object;
-			}
-			else if(type!=null)
-			{
-				object	= state.createObject((OAVObjectType)type);
-				ret	= object;
-			}
+			ret	= state.createObject((OAVObjectType)type);
 		}
 		
 		return ret;
@@ -64,22 +50,40 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, String attrval, Object attrinfo, Object context) throws Exception
+	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, Object attrinfo, Object context) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
 
 		OAVAttributeType attrtype = (OAVAttributeType)attrinfo;
 			
 		// Search attribute in type and supertypes.
-		OAVObjectType tmptype = state.getType(object);
-		while(attrtype==null && tmptype!=null)
+		if(attrtype==null)
 		{
-			String tmpnamesin = tmptype.getName()+"_has_"+attrname;
-			
-			attrtype = tmptype.getDeclaredAttributeType0(tmpnamesin);
-			
-			if(attrtype==null)
-				tmptype = tmptype.getSupertype();
+			int	pathidx	= 0;
+			String	tmpname	= attrname;
+			do
+			{
+//				System.out.println("tmpname: "+tmpname);
+				String attrnameplu = tmpname.endsWith("y")? tmpname.substring(0, tmpname.length()-1)+"ies": tmpname+"s"; 
+				OAVObjectType tmptype = state.getType(object);
+				while(attrtype==null && tmptype!=null)
+				{
+					String tmpnamesin = tmptype.getName()+"_has_"+tmpname;
+					String tmpnameplu = tmptype.getName()+"_has_"+attrnameplu;
+					
+					attrtype = tmptype.getDeclaredAttributeType0(tmpnamesin);
+					if(attrtype==null)
+						attrtype = tmptype.getDeclaredAttributeType0(tmpnameplu);
+					
+					if(attrtype==null)
+						tmptype = tmptype.getSupertype();
+				}
+				
+				if(attrpath!=null && attrpath.size()>pathidx)
+					tmpname	= (String)attrpath.get(pathidx);
+				pathidx++;
+			}
+			while(attrtype==null && attrpath!=null && attrpath.size()>=pathidx);
 		}
 		
 		if(attrtype!=null)
@@ -96,6 +100,10 @@ public class OAVObjectHandler implements IObjectHandler
 			{
 				state.addAttributeValue(object, attrtype, arg);
 			}
+		}
+		else
+		{
+			System.out.println("Unhandled attribute: "+object+", "+attrname+", "+attrpath);
 		}
 	}
 	

@@ -13,6 +13,9 @@ public class StackElement
 	/** The created object. */
 	public Object object;
 	
+	/** The collected content. */
+	public String content;
+	
 	//-------- constructors --------
 	
 	/**
@@ -44,4 +47,24 @@ public class StackElement
 		return this.object;
 	}
 	
+	/**
+	 *  Get the content (if any).
+	 *  @return The content or null for empty elements.
+	 */
+	public String getContent()
+	{
+		return this.content;
+	}
+
+	/**
+	 *  Add content to the already collected content (if any).
+	 *  @param content	The content to add.
+	 */
+	public void	addContent(String content)
+	{
+		if(this.content==null)
+			this.content	= content;
+		else
+			this.content	+= content;
+	}
 }

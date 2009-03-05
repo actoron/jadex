@@ -22,7 +22,7 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(XMLStreamReader parser, Object type, boolean root, Object context) throws Exception
+	public Object createObject(Object type, boolean root, Object context) throws Exception
 	{
 		Object ret = null;
 		Class clazz = (Class)type;
@@ -42,7 +42,7 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, String attrval, Object attrinfo, Object context) throws Exception
+	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, Object attrinfo, Object context) throws Exception
 	{
 		String mname = attrinfo!=null? (String)attrinfo: "set"+attrname.substring(0,1).toUpperCase()+attrname.substring(1);
 		

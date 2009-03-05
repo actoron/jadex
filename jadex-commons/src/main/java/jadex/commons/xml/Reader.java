@@ -65,8 +65,8 @@ public class Reader
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
 		Object root = null;
 		List stack = new ArrayList();
+		StackElement	topse	= null;
 		String comment = null;
-		String content = null;
 		
 		while(parser.hasNext())
 		{
@@ -78,17 +78,14 @@ public class Reader
 //				System.out.println("Found comment: "+comment);
 			}
 			
-			else if(next==XMLStreamReader.CHARACTERS)// || next==XMLStreamReader.CDATA)
+			else if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
 			{
-				content += parser.getText(); 
-				
+				topse.addContent(parser.getText()); 				
 //				System.out.println("content: "+parser.getLocalName()+" "+content);
 			}
 			
 			else if(next==XMLStreamReader.START_ELEMENT)
 			{
-				content = "";	
-
 				String fullpath = getXMLPath(stack)+"/"+parser.getLocalName();
 				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath);
 				
@@ -96,24 +93,34 @@ public class Reader
 				Object object = null;
 				if(typeinfo!=null && typeinfo.getTypeInfo()!=null)
 				{
-					object = handler.createObject(parser, typeinfo.getTypeInfo(), stack.isEmpty(), context);
+					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context);
 				}
 				else
 				{
 					if(DEBUG)
 						System.out.println("No mapping found: "+parser.getLocalName());
 				}
-				stack.add(new StackElement(parser.getLocalName(), object));
-				
+				topse	= new StackElement(parser.getLocalName(), object);
+				stack.add(topse);
+				if(stack.size()==1)
+				{
+					root = object;
+				}
+
 				// Handle attributes.
 				if(parser.getAttributeCount()>0)
 				{
+					List	attrpath	= null;
 					// If no type use last element from stack to map attributes.
 					if(object==null)	
 					{
-						for(int i=stack.size()-1; i>=0 && object==null; i--)
+						attrpath	= new ArrayList();
+						attrpath.add(topse.getTag());
+						for(int i=stack.size()-2; i>=0 && object==null; i--)
 						{
-							object = ((StackElement)stack.get(i)).getObject();
+							StackElement	pse	= (StackElement)stack.get(i);
+							attrpath.add(pse.getTag());
+							object = pse.getObject();
 						}
 						
 						if(object==null)
@@ -128,7 +135,8 @@ public class Reader
 						
 						if(!ignoredattrs.contains(attrname))
 						{
-							handler.handleAttributeValue(object, attrname, attrval, typeinfo==null? null: typeinfo.getAttributeInfo(attrname), context);
+							Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
+							handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context);
 						}
 					}
 				}
@@ -139,7 +147,7 @@ public class Reader
 					Object commentinfo = typeinfo.getCommentInfo();
 					if(commentinfo!=null)
 					{
-						handler.handleAttributeValue(object, null, comment, commentinfo, context);
+						handler.handleAttributeValue(object, null, null, comment, commentinfo, context);
 					}
 				}
 				
@@ -152,61 +160,56 @@ public class Reader
 			{
 //				System.out.println("end: "+parser.getLocalName());
 				
-				// Pop element from stack if there is one for the tag.
-				StackElement se = (StackElement)stack.get(stack.size()-1);
-				
-				// Hack. Add content when it is element of its own.
-				if(content.trim().length()>0 && se.getObject()==null)
+				// Hack. Change object to content when it is element of its own.
+				if(topse.getContent()!=null && topse.getContent().trim().length()>0 && topse.getObject()==null)
 				{
-					StackElement tmp = new StackElement(parser.getLocalName(), content);
-					stack.set(stack.size()-1, tmp);
-					se = tmp;
-					content = "";
+					topse = new StackElement(topse.getTag(), topse.getContent());
+					stack.set(stack.size()-1, topse);
 				}
 				
-				if(se.getObject()!=null)
+				// Link current object to parent
+				if(topse.getObject()!=null)
 				{
 					TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack));
 
-					if(content.trim().length()>0)
+					// Handle content.
+					if(topse.getContent()!=null && topse.getContent().trim().length()>0)
 					{
-						if(typeinfo.getContentInfo()!=null) 
+						if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
 						{
-							handler.handleAttributeValue(se.getObject(), null, content, typeinfo.getContentInfo(), context);
+							handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), context);
 						}
 						else
 						{
 							throw new RuntimeException("No content mapping for: "+stack);
 						}
-						content = "";
 					}
 					
-					if(stack.size()==1)
+					// Handle post-processing
+					if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
 					{
-						root = se.getObject();
+						typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root);
 					}
-					else
+
+					// Handle linking
+					if(stack.size()>1)
 					{
 						StackElement	pse = (StackElement)stack.get(stack.size()-2);
 						for(int i=stack.size()-3; i>=0 && pse.getObject()==null; i--)
 						{
 							pse = (StackElement)stack.get(i);
 						}
-												
-						// Handle postprocessing
-						IPostProcessor postprocessor = typeinfo.getPostProcessor();
-						if(postprocessor!=null)
-						{
-							postprocessor.postProcess(context, se.getObject(), ((StackElement)stack.get(0)).getObject());
-						}
 						
-						// Handle linking
 						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack));
-						handler.linkObject(se.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context);
+						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context);
 					}
 				}
 				
 				stack.remove(stack.size()-1);
+				if(stack.size()>0)
+					topse	= (StackElement)stack.get(stack.size()-1);
+				else
+					topse	= null;
 			}
 		}
 		parser.close();

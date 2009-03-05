@@ -1,6 +1,6 @@
 package jadex.commons.xml;
 
-import javax.xml.stream.XMLStreamReader;
+import java.util.List;
 
 /**
  *  Interface for object handler.
@@ -16,7 +16,7 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(XMLStreamReader parser, Object type, boolean root, Object context) throws Exception;
+	public Object createObject(Object type, boolean root, Object context) throws Exception;
 	
 	/**
 	 *  Handle the attribute of an object.
@@ -26,7 +26,7 @@ public interface IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, String attrval, Object attrinfo, Object context) throws Exception;
+	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, Object attrinfo, Object context) throws Exception;
 	
 	/**
 	 *  Link an object to its parent.

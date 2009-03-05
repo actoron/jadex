@@ -24,7 +24,8 @@ public class ReaderMain
 	public static void main(String[] args) throws Exception
 	{
 //		String	testfile	= "../jadex-applications-bdi/src/main/java/jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml";
-		String	testfile	= "../jadex-applications-bdi/src/main/java/jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml";
+//		String	testfile	= "../jadex-applications-bdi/src/main/java/jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml";
+		String	testfile	= "../jadex-applications-bdi/src/main/java/jadex/bdi/testcases/beliefs/BeanChanges.agent.xml";
 //		String	testfile	= "../jadex-applications-bdi/src/main/java/jadex/bdi/testcases/beliefs/WaitForFactAdded.agent.xml";
 //		String	testfile	= "../jadex-applib-bdi/src/main/java/jadex/bdi/planlib/protocols/cancelmeta/CancelMeta.capability.xml";
 		

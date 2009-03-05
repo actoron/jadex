@@ -42,7 +42,7 @@ public class OAVBDIXMLReader
 
 		typeinfos.add(new TypeInfo("agent", OAVBDIMetaModel.agent_type, OAVBDIMetaModel.modelelement_has_description, null));
 
-		typeinfos.add(new TypeInfo("import", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("import", OAVJavaType.java_string_type));
 
 		typeinfos.add(new TypeInfo("capabilities/capability", OAVBDIMetaModel.capabilityref_type));
 		typeinfos.add(new TypeInfo("capability", OAVBDIMetaModel.capability_type, OAVBDIMetaModel.modelelement_has_description, null));
@@ -82,9 +82,9 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo("trigger/messageevent", OAVBDIMetaModel.triggerreference_type));
 		typeinfos.add(new TypeInfo("trigger/goalfinished", OAVBDIMetaModel.triggerreference_type));
 		typeinfos.add(new TypeInfo("trigger/goal", OAVBDIMetaModel.triggerreference_type));
-		typeinfos.add(new TypeInfo("trigger/factadded", OAVJavaType.java_string_type));
-		typeinfos.add(new TypeInfo("trigger/factremoved", OAVJavaType.java_string_type));
-		typeinfos.add(new TypeInfo("trigger/factchanged", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("trigger/factadded", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("trigger/factremoved", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("trigger/factchanged", OAVJavaType.java_string_type));
 		typeinfos.add(new TypeInfo("waitqueue", OAVBDIMetaModel.trigger_type));
 		typeinfos.add(new TypeInfo("waitqueue/internalevent", OAVBDIMetaModel.triggerreference_type));
 		typeinfos.add(new TypeInfo("waitqueue/messageevent", OAVBDIMetaModel.triggerreference_type));
@@ -108,12 +108,12 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo("plan/parameterset", OAVBDIMetaModel.planparameterset_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.typedelement_has_classname}), tepost));
 		typeinfos.add(new TypeInfo("value", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new TypeInfo("values", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
-		typeinfos.add(new TypeInfo("goalmapping", OAVJavaType.java_string_type));
-		typeinfos.add(new TypeInfo("messageeventmapping", OAVJavaType.java_string_type));
-		typeinfos.add(new TypeInfo("internaleventmapping", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("goalmapping", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("messageeventmapping", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("internaleventmapping", OAVJavaType.java_string_type));
 		typeinfos.add(new TypeInfo("bindingoptions", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 				
-		typeinfos.add(new TypeInfo("concrete", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo("concrete", OAVJavaType.java_string_type));
 
 		typeinfos.add(new TypeInfo("configuration", OAVBDIMetaModel.configuration_type));
 		typeinfos.add(new TypeInfo("initialcapability", OAVBDIMetaModel.initialcapability_type));
