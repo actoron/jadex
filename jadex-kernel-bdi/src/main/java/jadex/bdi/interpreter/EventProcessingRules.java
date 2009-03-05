@@ -12,15 +12,18 @@ import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
+import jadex.rules.rulesystem.rules.LiteralReturnValueConstraint;
 import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVJavaType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -498,50 +501,59 @@ public class EventProcessingRules
 	{
 		Variable mmetagoal = new Variable("?mmetagoal", OAVBDIMetaModel.metagoal_type);
 		Variable mgoaltrigger = new Variable("?mgoaltrigger", OAVBDIMetaModel.metagoaltrigger_type);
+		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
-		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+		Variable rtargetcapa = new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
+
+		Variable triggerref = new Variable("?triggerref", OAVBDIMetaModel.triggerreference_type);
+		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
 		
-		// There is a ?mmetagoal
+		// There is a ?mmetagoal with a trigger (?mgoaltrigger)
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
 		metagoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoal_has_trigger, mgoaltrigger));
 		
-		// There is a ?processable element that needs processing
+		// The ?mmetagoal is in a capability (?mcapa)
+		ObjectCondition	mcapacon	= new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, 
+			mmetagoal, IOperator.CONTAINS));
+
+		// The ?mcapa has an instance (?rcapa)
+		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+
+		// There is a processable element (?rpe) that needs processing
 		ObjectCondition	pecon	= new ObjectCondition(OAVBDIRuntimeModel.processableelement_type);
 		pecon.addConstraint(new BoundConstraint(null, rpe));
 		pecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_state, 
 			OAVBDIRuntimeModel.PROCESSABLEELEMENT_APLAVAILABLE));
 		pecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
 		
-		// Bind capability $capability
-		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capacon.addConstraint(new BoundConstraint(null, rcapa));
-		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
-		
-		// Agent should be processing the rpe
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
-//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-//		{
-//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-//		}));
-		
-		// Specific part for goals
-		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, 
+		// The ?rpe is in a capability (?rtargetcapa)
+		ObjectCondition	targetcapacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		targetcapacon.addConstraint(new BoundConstraint(null, rtargetcapa));
+		targetcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, 
 			rpe, IOperator.CONTAINS));
 		
-		// The ?mmetagoal is responsible for the ?mgoal (model of ?rgoal) 
+		// There is a trigger reference (?triggerref) that maps to the ?rpe.
+		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
+		trcon.addConstraint(new BoundConstraint(null, triggerref));
+		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
+		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
+
+		// The ?triggerref belongs to the metagoal trigger.
 		ObjectCondition	metagoaltriggercon	= new ObjectCondition(OAVBDIMetaModel.metagoaltrigger_type);
 		metagoaltriggercon.addConstraint(new BoundConstraint(null, mgoaltrigger));
 		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoaltrigger_has_goals, 
-			mpe, IOperator.CONTAINS));
+			triggerref, IOperator.CONTAINS));
 			
 		Rule metalevel_reasoning = new Rule("metalevel_reasoning_for_goal", 
-			new AndCondition(new ICondition[]{metagoalcon, pecon, metagoaltriggercon, capacon, agentcon}), METALEVEL_ACTION);
+			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, trcon, metagoaltriggercon}), METALEVEL_ACTION);
 		return metalevel_reasoning;
 	}
 	
@@ -552,51 +564,59 @@ public class EventProcessingRules
 	{
 		Variable mmetagoal = new Variable("?mmetagoal", OAVBDIMetaModel.metagoal_type);
 		Variable mgoaltrigger = new Variable("?mgoaltrigger", OAVBDIMetaModel.metagoaltrigger_type);
+		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
-		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+		Variable rtargetcapa = new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
+
+		Variable triggerref = new Variable("?triggerref", OAVBDIMetaModel.triggerreference_type);
+		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
 		
-		// There is a ?mmetagoal
+		// There is a ?mmetagoal with a trigger (?mgoaltrigger)
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
 		metagoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoal_has_trigger, mgoaltrigger));
 		
-		// There is a ?processable element that needs processing
+		// The ?mmetagoal is in a capability (?mcapa)
+		ObjectCondition	mcapacon	= new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, 
+			mmetagoal, IOperator.CONTAINS));
+
+		// The ?mcapa has an instance (?rcapa)
+		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+
+		// There is a processable element (?rpe) that needs processing
 		ObjectCondition	pecon	= new ObjectCondition(OAVBDIRuntimeModel.processableelement_type);
 		pecon.addConstraint(new BoundConstraint(null, rpe));
 		pecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_state, 
 			OAVBDIRuntimeModel.PROCESSABLEELEMENT_APLAVAILABLE));
 		pecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
 		
-		// Bind capability $capability
-		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capacon.addConstraint(new BoundConstraint(null, rcapa));
-		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
-		
-		// Agent should be processing the pe
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
-//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-//		{
-//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-//		}));
-
-		// Specific part for goals
-		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, 
+		// The ?rpe is in a capability (?rtargetcapa)
+		ObjectCondition	targetcapacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		targetcapacon.addConstraint(new BoundConstraint(null, rtargetcapa));
+		targetcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, 
 			rpe, IOperator.CONTAINS));
 		
-		// The ?mmetagoal is responsible for the ?mpe (model of ?rpe) 
-		// Todo: reasoning across scopes
+		// There is a trigger reference (?triggerref) that maps to the ?rpe.
+		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
+		trcon.addConstraint(new BoundConstraint(null, triggerref));
+		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
+		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
+
+		// The ?triggerref belongs to the metagoal trigger.
 		ObjectCondition	metagoaltriggercon	= new ObjectCondition(OAVBDIMetaModel.metagoaltrigger_type);
 		metagoaltriggercon.addConstraint(new BoundConstraint(null, mgoaltrigger));
 		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_internalevents, 
-			mpe, IOperator.CONTAINS));
+			triggerref, IOperator.CONTAINS));
 			
 		Rule metalevel_reasoning = new Rule("metalevel_reasoning_for_internalevent", 
-			new AndCondition(new ICondition[]{metagoalcon, pecon, metagoaltriggercon, capacon, agentcon}), METALEVEL_ACTION);
+			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, trcon, metagoaltriggercon}), METALEVEL_ACTION);
 		return metalevel_reasoning;
 	}
 	
@@ -607,50 +627,59 @@ public class EventProcessingRules
 	{
 		Variable mmetagoal = new Variable("?mmetagoal", OAVBDIMetaModel.metagoal_type);
 		Variable mgoaltrigger = new Variable("?mgoaltrigger", OAVBDIMetaModel.metagoaltrigger_type);
+		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
-		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+		Variable rtargetcapa = new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
+
+		Variable triggerref = new Variable("?triggerref", OAVBDIMetaModel.triggerreference_type);
+		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
 		
-		// There is a ?mmetagoal
+		// There is a ?mmetagoal with a trigger (?mgoaltrigger)
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
 		metagoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoal_has_trigger, mgoaltrigger));
 		
-		// There is a ?processable element that needs processing
+		// The ?mmetagoal is in a capability (?mcapa)
+		ObjectCondition	mcapacon	= new ObjectCondition(OAVBDIMetaModel.capability_type);
+		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, 
+			mmetagoal, IOperator.CONTAINS));
+
+		// The ?mcapa has an instance (?rcapa)
+		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
+		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+
+		// There is a processable element (?rpe) that needs processing
 		ObjectCondition	pecon	= new ObjectCondition(OAVBDIRuntimeModel.processableelement_type);
 		pecon.addConstraint(new BoundConstraint(null, rpe));
 		pecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_state, 
 			OAVBDIRuntimeModel.PROCESSABLEELEMENT_APLAVAILABLE));
 		pecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
-
-		// Bind capability $capability
-		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capcon.addConstraint(new BoundConstraint(null, rcapa));
-		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
 		
-		// Agent should be processing the pe
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
-//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-//		{
-//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-//		}));
-
-		// Specific part for goals
-		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, 
+		// The ?rpe is in a capability (?rtargetcapa)
+		ObjectCondition	targetcapacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		targetcapacon.addConstraint(new BoundConstraint(null, rtargetcapa));
+		targetcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, 
 			rpe, IOperator.CONTAINS));
-			
-		// The ?mmetagoal is responsible for the ?mpe (model of ?rpe) 
+		
+		// There is a trigger reference (?triggerref) that maps to the ?rpe.
+		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
+		trcon.addConstraint(new BoundConstraint(null, triggerref));
+		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
+		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
+
+		// The ?triggerref belongs to the metagoal trigger.
 		ObjectCondition	metagoaltriggercon	= new ObjectCondition(OAVBDIMetaModel.metagoaltrigger_type);
 		metagoaltriggercon.addConstraint(new BoundConstraint(null, mgoaltrigger));
 		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_messageevents, 
-			mpe, IOperator.CONTAINS));
-		
+			triggerref, IOperator.CONTAINS));
+			
 		Rule metalevel_reasoning = new Rule("metalevel_reasoning_for_messageevent", 
-			new AndCondition(new ICondition[]{metagoalcon, pecon, metagoaltriggercon, capcon, agentcon}), METALEVEL_ACTION);
+			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, trcon, metagoaltriggercon}), METALEVEL_ACTION);
 		return metalevel_reasoning;
 	}
 	
@@ -670,21 +699,23 @@ public class EventProcessingRules
 			
 			String appname = "applicables";
 			Object appparamset = state.getAttributeValue(rmetagoal, OAVBDIRuntimeModel.parameterelement_has_parametersets, appname);
-			if(appparamset==null)
-			{
-				Object mapp = state.getAttributeValue(mmetagoal, OAVBDIMetaModel.parameterelement_has_parameters, appname);
-				Class clazz = (Class)state.getAttributeValue(mapp, OAVBDIMetaModel.typedelement_has_class);
-				appparamset = BeliefRules.createParameterSet(state, appname, null, clazz, rmetagoal, null, rcapa);
-			}	
+			// Todo: create parameter in runtime if not declared in model.
+//			if(appparamset==null)
+//			{
+//				Object mapp = state.getAttributeValue(mmetagoal, OAVBDIMetaModel.parameterelement_has_parameters, appname);
+//				Class clazz = (Class)state.getAttributeValue(mapp, OAVBDIMetaModel.typedelement_has_class);
+//				appparamset = BeliefRules.createParameterSet(state, appname, null, clazz, rmetagoal, null, rcapa);
+//			}	
 			// Hack! Create result paramset for making querygoal valid :-(
-			String resultname = "result";
-			Object resultparamset = state.getAttributeValue(rmetagoal, OAVBDIRuntimeModel.parameterelement_has_parametersets, resultname);
-			if(resultparamset==null)
-			{
-				Object res = state.getAttributeValue(mmetagoal, OAVBDIMetaModel.parameterelement_has_parameters, resultname);
-				Class clazz = (Class)state.getAttributeValue(res, OAVBDIMetaModel.typedelement_has_class);
-				appparamset = BeliefRules.createParameterSet(state, resultname, null, clazz, rmetagoal, null, rcapa);
-			}	
+//			String resultname = "result";
+//			Object resultparamset = state.getAttributeValue(rmetagoal, OAVBDIRuntimeModel.parameterelement_has_parametersets, resultname);
+			// Todo: create parameter in runtime if not declared in model.
+//			if(resultparamset==null)
+//			{
+//				Object res = state.getAttributeValue(mmetagoal, OAVBDIMetaModel.parameterelement_has_parameters, resultname);
+//				Class clazz = (Class)state.getAttributeValue(res, OAVBDIMetaModel.typedelement_has_class);
+//				appparamset = BeliefRules.createParameterSet(state, resultname, null, clazz, rmetagoal, null, rcapa);
+//			}	
 			
 			// Extract candidates from apl and add them all to the parameterset "applicables"
 			Object apl = state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
@@ -784,50 +815,48 @@ public class EventProcessingRules
 						OAVBDIRuntimeModel.PROCESSABLEELEMENT_NOCANDIDATES);
 					AgentRules.getLogger(state, rcapa).severe("Meta-level reasoning did not return a result.");
 				}
-				
-				Collection coll = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
-				if(coll==null)
-					throw new RuntimeException("No plan for goal (problem in rules!?).");
-				
-				for(Iterator it=result.iterator(); it.hasNext(); )
+				else
 				{
-					ICandidateInfo ci = (ICandidateInfo)it.next();
-					Object rplan = ((PlanFlyweight)ci.getPlan()).getHandle();
-					PlanRules.adoptPlan(state, rcapa, rplan);
-					
-					if(ci instanceof PlanInfoFlyweight)
+					for(Iterator it=result.iterator(); it.hasNext(); )
 					{
-						// Save candidate in plan for later apl removal and exclude list management.
-						if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
-							state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_plancandidate, ((PlanInfoFlyweight)ci).getHandle());
-					}
-					else if(ci instanceof PlanInstanceInfoFlyweight)
-					{
-						// Save candidate in plan for later apl removal and exclude list management.
-						if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
+						ICandidateInfo ci = (ICandidateInfo)it.next();
+						Object rplan = ((PlanFlyweight)ci.getPlan()).getHandle();
+						PlanRules.adoptPlan(state, rcapa, rplan);
+						
+						if(ci instanceof PlanInfoFlyweight)
 						{
-							Object plan = ((PlanInstanceInfoFlyweight)ci).getHandle();
-							state.setAttributeValue(plan, OAVBDIRuntimeModel.plan_has_planinstancecandidate, plan);
+							// Save candidate in plan for later apl removal and exclude list management.
+							if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
+								state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_plancandidate, ((PlanInfoFlyweight)ci).getHandle());
 						}
+						else if(ci instanceof PlanInstanceInfoFlyweight)
+						{
+							// Save candidate in plan for later apl removal and exclude list management.
+							if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
+							{
+								Object plan = ((PlanInstanceInfoFlyweight)ci).getHandle();
+								state.setAttributeValue(plan, OAVBDIRuntimeModel.plan_has_planinstancecandidate, plan);
+							}
+						}
+						
+//						boolean isgoal = state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type);
+//						if(isgoal)
+//						{
+//							Object candidate = ((ElementFlyweight)ci).getHandle();
+//							removeAPLCandidate(state, rpe, candidate);
+//						}
 					}
+			
+					state.setAttributeValue(apl, OAVBDIRuntimeModel.apl_has_metagoal, null);
+					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, 
+						OAVBDIRuntimeModel.PROCESSABLEELEMENT_CANDIDATESSELECTED);
 					
-//					boolean isgoal = state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type);
-//					if(isgoal)
-//					{
-//						Object candidate = ((ElementFlyweight)ci).getHandle();
-//						removeAPLCandidate(state, rpe, candidate);
-//					}
+//					Collection mpcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
+//					Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
+//					Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
+//					if(mpcs==null && pics==null && wqcs==null)
+//						state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
 				}
-		
-				state.setAttributeValue(apl, OAVBDIRuntimeModel.apl_has_metagoal, null);
-				state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, 
-					OAVBDIRuntimeModel.PROCESSABLEELEMENT_CANDIDATESSELECTED);
-				
-				Collection mpcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates);
-				Collection pics = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates);
-				Collection wqcs = state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates);
-				if(mpcs==null && pics==null && wqcs==null)
-					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
 			}
 		};
 		Rule metalevel_reasoning_fini = new Rule("metalevel_reasoning_finished", 

@@ -10,8 +10,8 @@ import java.util.Set;
 /**
  *  Test if a reference string resolves to a given element.
  *  E.g. dfcap.register resolves to any register goal in a dfcap subcapability.
- *  Requires three parameters: local scope, reference string and runtime element.
- *  Example: (ResolvesTo ?rcapa "dfcap.register" ?rgoal)
+ *  Requires four parameters: local scope, reference string, target runtime element and target scope.
+ *  Example: (ResolvesTo ?rcapa "dfcap.register" ?rgoal ?rtargetscope)
  *  Also supports elements in local scope. 
  */
 public class ResolvesTo implements IFunction
