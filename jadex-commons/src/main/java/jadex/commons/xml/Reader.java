@@ -135,7 +135,7 @@ public class Reader
 				}
 				
 				// Handle comment.
-				if(comment!=null)
+				if(comment!=null && typeinfo!=null)
 				{
 					Object commentinfo = typeinfo.getComment();
 					if(commentinfo!=null)
@@ -198,7 +198,7 @@ public class Reader
 						IPostProcessor postprocessor = typeinfo.getPostProcessor();
 						if(postprocessor!=null)
 						{
-							postprocessor.postProcess(context, se.getObject(), stack.get(0));
+							postprocessor.postProcess(context, se.getObject(), ((StackElement)stack.get(0)).getObject());
 						}
 						
 						// Handle linking

@@ -178,8 +178,8 @@ public class OAVBDIXMLReader
 		linkinfos.add(new LinkInfo("endmessageevent/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
 		linkinfos.add(new LinkInfo("beliefref", OAVBDIMetaModel.capability_has_beliefrefs));
 		linkinfos.add(new LinkInfo("beliefsetref", OAVBDIMetaModel.capability_has_beliefsetrefs));
-		linkinfos.add(new OAVLinkInfo("values", OAVBDIMetaModel.parameterset_has_valuesexpression));
-		linkinfos.add(new OAVLinkInfo("facts", OAVBDIMetaModel.beliefset_has_factsexpression));
+		linkinfos.add(new LinkInfo("values", OAVBDIMetaModel.parameterset_has_valuesexpression));
+		linkinfos.add(new LinkInfo("facts", OAVBDIMetaModel.beliefset_has_factsexpression));
 			
 		Set ignoredattrs = new HashSet();
 		ignoredattrs.add("schemaLocation");

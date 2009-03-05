@@ -136,7 +136,7 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		boolean linked = false;
 		
-		OAVAttributeType attrtype = null;
+		OAVAttributeType attrtype = (OAVAttributeType)linkinfo;
 
 		if(attrtype!=null)
 		{
@@ -203,14 +203,7 @@ public class OAVObjectHandler implements IObjectHandler
 		}
 		else
 		{
-			try
-			{
-				state.addAttributeValue(parent, attrtype, elem);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
+			state.addAttributeValue(parent, attrtype, elem);
 		}
 	}
 	
