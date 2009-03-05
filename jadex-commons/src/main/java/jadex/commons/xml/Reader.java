@@ -2,7 +2,13 @@ package jadex.commons.xml;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -12,20 +18,37 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class Reader
 {
+	//-------- static part --------
+	
+	/** The debug flag. */
+	public static boolean DEBUG = false;
+	
 	//-------- attributes --------
 	
 	/** The object creator. */
 	protected IObjectHandler handler;
 	
-	//-------- constructors --------
+	/** The type mappings. */
+	protected Map typeinfos;
 	
+	/** The link object infos. */
+	protected Map linkinfos;
+	
+	/** The ignored attribute types. */
+	protected Set ignoredattrs;
+	
+	//-------- constructors --------
+
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Reader(IObjectHandler handler)
+	public Reader(IObjectHandler handler, Set typeinfos, Set linkinfos, Set ignoredattrs)
 	{
 		this.handler = handler;
+		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
+		this.linkinfos = linkinfos!=null? createLinkInfos(linkinfos): Collections.EMPTY_MAP;
+		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 	}
 	
 	//-------- methods --------
@@ -66,8 +89,60 @@ public class Reader
 			{
 				content = "";	
 
-				Object elem = handler.createObject(parser, comment, context, stack);
-				stack.add(new StackElement(parser.getLocalName(), elem));
+				String fullpath = getXMLPath(stack)+"/"+parser.getLocalName();
+				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath);
+				
+				// Create object.
+				Object object = null;
+				if(typeinfo!=null && typeinfo.getType()!=null)
+				{
+					object = handler.createObject(parser, typeinfo.getType(), stack.isEmpty(), context);
+				}
+				else
+				{
+					if(DEBUG)
+						System.out.println("No mapping found: "+parser.getLocalName());
+				}
+				stack.add(new StackElement(parser.getLocalName(), object));
+				
+				// Handle attributes.
+				if(parser.getAttributeCount()>0)
+				{
+					// If no type use last element from stack to map attributes.
+					if(object==null)	
+					{
+						for(int i=stack.size()-1; i>=0 && object==null; i--)
+						{
+							object = ((StackElement)stack.get(i)).getObject();
+						}
+						
+						if(object==null)
+							throw new RuntimeException("No element on stack for attributes"+stack);
+					}
+					
+					// Handle attributes
+					for(int i=0; i<parser.getAttributeCount(); i++)
+					{
+						String attrname = parser.getAttributeLocalName(i);
+						String attrval = parser.getAttributeValue(i);
+						
+						if(!ignoredattrs.contains(attrname))
+						{
+							Object attrinfo = typeinfo.getAttributeType(attrname);
+							handler.handleAttributeValue(object, attrname, attrval, attrinfo, context);
+						}
+					}
+				}
+				
+				// Handle comment.
+				if(comment!=null)
+				{
+					Object commentinfo = typeinfo.getComment();
+					if(commentinfo!=null)
+					{
+						handler.handleComment(object, comment, commentinfo, context);
+					}
+				}
 				
 				comment = null;
 				
@@ -92,9 +167,18 @@ public class Reader
 				
 				if(se.getObject()!=null)
 				{
+					TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack));
+
 					if(content.trim().length()>0)
 					{
-						handler.handleContent(parser, se.getObject(), content, context, stack);
+						if(typeinfo.getContent()!=null) 
+						{
+							handler.handleContent(se.getObject(), content, typeinfo.getContent(), context);
+						}
+						else
+						{
+							throw new RuntimeException("No content mapping for: "+stack);
+						}
 						content = "";
 					}
 					
@@ -109,8 +193,17 @@ public class Reader
 						{
 							pse = (StackElement)stack.get(i);
 						}
+												
+						// Handle postprocessing
+						IPostProcessor postprocessor = typeinfo.getPostProcessor();
+						if(postprocessor!=null)
+						{
+							postprocessor.postProcess(context, se.getObject(), stack.get(0));
+						}
 						
-						handler.linkObject(parser, se.getObject(), pse.getObject(), context, stack);
+						// Handle linking
+						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack));
+						handler.linkObject(se.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkAttribute(), parser.getLocalName(), context);
 					}
 				}
 				
@@ -120,5 +213,126 @@ public class Reader
 		parser.close();
 		
 		return root;
+	}
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	protected TypeInfo getTypeInfo(String tag, String fullpath)
+	{
+		TypeInfo ret = null;
+		Set maps = (Set)typeinfos.get(tag);
+		if(maps!=null)
+		{
+			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
+			{
+				TypeInfo tmp = (TypeInfo)it.next();
+				if(fullpath.endsWith(tmp.getXMLPath()))
+					ret = tmp;
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the most specific link info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific link info.
+	 */
+	protected LinkInfo getLinkInfo(String tag, String fullpath)
+	{
+		LinkInfo ret = null;
+		Set links = (Set)linkinfos.get(tag);
+		if(links!=null)
+		{
+			for(Iterator it=links.iterator(); ret==null && it.hasNext(); )
+			{
+				LinkInfo tmp = (LinkInfo)it.next();
+				if(fullpath.endsWith(tmp.getXMLPath()))
+					ret = tmp;
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the xml path for a stack.
+	 *  @param stack The stack.
+	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
+	 */
+	protected String getXMLPath(List stack)
+	{
+		StringBuffer ret = new StringBuffer();
+		for(int i=0; i<stack.size(); i++)
+		{
+			ret.append(((StackElement)stack.get(i)).getTag());
+			if(i<stack.size()-1)
+				ret.append("/");
+		}
+		return ret.toString();
+	}
+	
+	/**
+	 * 
+	 */
+//	protected Object findObject(Stack stack)
+//	{
+//		Object object = ((StackElement)stack.get(stack.size()-1)).getObject();
+//		for(int i=stack.size()-2; object==null && i>=0 ; i--)
+//		{
+//			object = ((StackElement)stack.get(i)).getObject();
+//		}
+//	}
+	
+	/**
+	 *  Create type infos for each tag sorted by specificity.
+	 *  @param linkinfos The mapping infos.
+	 *  @return Map of mapping infos.
+	 */
+	protected Map createTypeInfos(Set typeinfos)
+	{
+		Map ret = new HashMap();
+		
+		for(Iterator it=typeinfos.iterator(); it.hasNext(); )
+		{
+			TypeInfo mapinfo = (TypeInfo)it.next();
+			TreeSet maps = (TreeSet)ret.get(mapinfo.getXMLTag());
+			if(maps==null)
+			{
+				maps = new TreeSet(new AbstractInfo.SpecificityComparator());
+				ret.put(mapinfo.getXMLTag(), maps);
+			}
+			maps.add(mapinfo);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create link infos for each tag sorted by specificity.
+	 *  @param linkinfos The link infos.
+	 *  @return Map of link infos.
+	 */
+	protected Map createLinkInfos(Set linkinfos)
+	{
+		Map ret = new HashMap();
+		
+		for(Iterator it=linkinfos.iterator(); it.hasNext(); )
+		{
+			LinkInfo linkinfo = (LinkInfo)it.next();
+			TreeSet links = (TreeSet)ret.get(linkinfo.getXMLTag());
+			if(links==null)
+			{
+				links = new TreeSet(new AbstractInfo.SpecificityComparator());
+				ret.put(linkinfo.getXMLTag(), links);
+			}
+			links.add(linkinfo);
+		}
+		
+		return ret;
 	}
 }

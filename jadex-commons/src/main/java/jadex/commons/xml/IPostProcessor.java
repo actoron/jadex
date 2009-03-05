@@ -1,6 +1,4 @@
-package jadex.rules.state.io.xml;
-
-import jadex.rules.state.IOAVState;
+package jadex.commons.xml;
 
 /**
  *  Post-processes OAV objects after an XML has been loaded.
@@ -13,5 +11,5 @@ public interface IPostProcessor
 	 *  @param object	The object to post process.
 	 *  @param root	The root object in the state.
 	 */
-	public void	postProcess(IOAVState state, Object object, Object root);
+	public void	postProcess(Object context, Object object, Object root);
 }

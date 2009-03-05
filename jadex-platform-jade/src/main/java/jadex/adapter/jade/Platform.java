@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -82,7 +83,7 @@ public class Platform implements IPlatform
 		this.threadpool = ThreadPoolFactory.createThreadPool();
 		this.logger = Logger.getLogger("JADE_Platform");
 		this.services = new LinkedHashMap();
-		this.appfactory = new ApplicationFactory(this, new Map[]{MAGRSpaceType.getXMLMapping()});
+		this.appfactory = new ApplicationFactory(this, new Set[]{MAGRSpaceType.getXMLMapping()});
 		services.put(ILibraryService.class, new LibraryService());
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));

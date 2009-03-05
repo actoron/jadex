@@ -5,7 +5,6 @@ import jadex.commons.SReflect;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -14,83 +13,67 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class BeanObjectHandler implements IObjectHandler
 {
-	/** The debug flag. */
-	public static boolean DEBUG = false;
-	
-	//-------- attributes --------
-	
-	/** The type mappings. */
-	protected Map types;
-	
-	/** The comment method name used for setting comments. */
-	protected String comname;
-	
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new bean object handler.
+	 *  Create an object for the current tag.
+	 *  @param parser The parser.
+	 *  @param comment The comment.
+	 *  @param context The context.
+	 *  @return The created object (or null for none).
 	 */
-	public BeanObjectHandler(Map types, String comname)
+	public Object createObject(XMLStreamReader parser, Object type, boolean root, Object context) throws Exception
 	{
-		this.types = types;
-		this.comname = comname;
+		Object ret = null;
+		Class clazz = (Class)type;
+		if(!BasicTypeConverter.isBuiltInType(clazz))
+		{
+			// Must have empty constructor.
+			ret = clazz.newInstance();
+		}
+		return ret;
 	}
-	
-	//-------- methods --------
 	
 	/**
 	 *  Create an object for the current tag.
 	 *  @param parser The parser.
-	 *  @param comment The preceding xml comment.
+	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(XMLStreamReader parser, String comment, Object context, List stack) throws Exception
+	public void handleAttributeValue(Object object, String attrname, String attrval, Object attrinfo, Object context) throws Exception
 	{
-		Object ret = null;
+		String mname = attrinfo!=null? (String)attrinfo: "set"+attrname.substring(0,1).toUpperCase()+attrname.substring(1);
 		
-		Class clazz = (Class)types.get(parser.getLocalName());
-		if(clazz!=null)
+		Method[] ms = SReflect.getMethods(object.getClass(), mname);
+		boolean set = false;
+		for(int j=0; j<ms.length && !set; j++)
 		{
-			if(!BasicTypeConverter.isBuiltInType(clazz))
+			Class[] ps = ms[j].getParameterTypes();
+			if(ps.length==1)
 			{
-				// Must have empty constructor.
-				ret = clazz.newInstance();
-				
-				// Handle attributes
-				for(int i=0; i<parser.getAttributeCount(); i++)
+				Object arg = BasicTypeConverter.convertBuiltInTypes(ps[0], attrval);
+				try
 				{
-					String attrname = parser.getAttributeLocalName(i);
-					String attrval = parser.getAttributeValue(i);
-					
-					String mname = "set"+attrname.substring(0,1).toUpperCase()+attrname.substring(1);
-					Method[] ms = SReflect.getMethods(clazz, mname);
-					for(int j=0; j<ms.length; j++)
-					{
-						Class[] ps = ms[j].getParameterTypes();
-						if(ps.length==1)
-						{
-							Object arg = BasicTypeConverter.convertBuiltInTypes(ps[0], attrval);
-							ms[j].invoke(ret, new Object[]{arg});
-						}
-					}
+					ms[j].invoke(object, new Object[]{arg});
+					set = true;
 				}
-				
-				// If comment method name is set, set the comment.
-				if(comname!=null)
+				catch(Exception e)
 				{
-					Method m = SReflect.getMethod(clazz, comname, new Class[]{String.class});
-					if(m!=null)
-						m.invoke(ret, new Object[]{comment});
 				}
 			}
 		}
-		else
-		{
-			if(DEBUG)
-				System.out.println("No mapping found: "+parser.getLocalName());
-		}
-		
-		return ret;
+	}
+	
+	/**
+	 *  Create an object for the current tag.
+	 *  @param parser The parser.
+	 *  @param context The context.
+	 *  @return The created object (or null for none).
+	 */
+	public void handleComment(Object object, String comment, Object commentinfo, Object context) throws Exception
+	{
+		Method m = SReflect.getMethod(object.getClass(), (String)commentinfo, new Class[]{String.class});
+		m.invoke(object, new Object[]{comment});
 	}
 	
 	/**
@@ -100,23 +83,32 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public void handleContent(XMLStreamReader parser, Object elem, String content, Object context, List stack) throws Exception
+	public void handleContent(Object object, String content, Object contentinfo, Object context) throws Exception
 	{
-		throw new UnsupportedOperationException("Content not yet supported.");
+		Method m = SReflect.getMethod(object.getClass(), (String)contentinfo, new Class[]{String.class});
+		m.invoke(object, new Object[]{content});
 	}
-
+	
 	/**
 	 *  Link an object to its parent.
 	 *  @param parser The parser.
 	 *  @param elem The element.
-	 *  @param paranet The parent element.
+	 *  @param parent The parent element.
+	 *  @param context The context.
 	 */
-	public void linkObject(XMLStreamReader parser, Object elem, Object parent, Object context, List stack) throws Exception
+	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, Object context) throws Exception
 	{
 		// Add object to its parent.
 		boolean	linked	= false;
 		List classes	= new LinkedList();
-		classes.add(elem.getClass());
+		classes.add(object.getClass());
+		
+		if(linkinfo!=null)
+		{
+			linked = internalLinkObjects(parent.getClass(), (String)linkinfo, object, parent);
+			if(!linked)
+				throw new RuntimeException("Failure in link info: "+linkinfo);
+		}
 		
 		while(!linked && !classes.isEmpty())
 		{
@@ -125,13 +117,17 @@ public class BeanObjectHandler implements IObjectHandler
 			if(!BasicTypeConverter.isBuiltInType(clazz))
 			{
 				String name = SReflect.getInnerClassName(clazz);
-				linked = internalLinkObjects(clazz, name, elem, parent);
+				linked = internalLinkObjects(clazz, "set"+name, object, parent);
+				if(!linked)
+					linked = internalLinkObjects(clazz, "add"+name, object, parent);
 			}
 			
 			if(!linked)
 			{
-				String name = parser.getLocalName().substring(0, 1).toUpperCase()+parser.getLocalName().substring(1);
-				linked = internalLinkObjects(clazz, name, elem, parent);
+				String name = tagname.substring(0, 1).toUpperCase()+tagname.substring(1);
+				linked = internalLinkObjects(clazz, "set"+name, object, parent);
+				if(!linked)
+					linked = internalLinkObjects(clazz, "add"+name, object, parent);
 			}
 			
 			if(!linked)
@@ -146,42 +142,31 @@ public class BeanObjectHandler implements IObjectHandler
 			}
 		}
 	}
-	
+		
 	/**
 	 * Internal link objects method.
 	 */
-	protected boolean internalLinkObjects(Class clazz, String name, Object elem, Object parent) throws Exception
+	protected boolean internalLinkObjects(Class clazz, String name, Object object, Object parent) throws Exception
 	{
 		boolean ret = false;
 		
-		String mname = "set"+name;
-		Method[] ms = SReflect.getMethods(parent.getClass(), mname);
+		Method[] ms = SReflect.getMethods(parent.getClass(), name);
 		for(int i=0; !ret && i<ms.length; i++)
 		{
 			Class[] ps = ms[i].getParameterTypes();
 			if(ps.length==1 && ps[0].isAssignableFrom(clazz))
 			{
-				ms[i].invoke(parent, new Object[]{elem});
-				ret	= true;
-			}
-		}
-		
-		if(!ret)
-		{
-			mname = "add"+name;
-			ms = SReflect.getMethods(parent.getClass(), mname);
-			for(int i=0; !ret && i<ms.length; i++)
-			{
-				Class[] ps = ms[i].getParameterTypes();
-				if(ps.length==1 && ps[0].isAssignableFrom(clazz))
+				try
 				{
-					ms[i].invoke(parent, new Object[]{elem});
-					ret = true;
+					ms[i].invoke(parent, new Object[]{object});
+					ret	= true;
+				}
+				catch(Exception e)
+				{
 				}
 			}
 		}
 		
 		return ret;
 	}
-	
 }

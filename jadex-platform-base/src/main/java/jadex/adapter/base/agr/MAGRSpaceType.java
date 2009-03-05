@@ -2,11 +2,12 @@ package jadex.adapter.base.agr;
 
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
+import jadex.commons.xml.TypeInfo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * An AGR space description.
@@ -79,12 +80,12 @@ public class MAGRSpaceType	extends MSpaceType
 	/**
 	 *  Get the XML mapping.
 	 */
-	public static Map	getXMLMapping()
+	public static Set getXMLMapping()
 	{
-		Map types = new HashMap();
-		types.put("agrspacetype", MAGRSpaceType.class);
-		types.put("grouptype", MGroupType.class);
-		types.put("role", MRoleType.class);
+		Set types = new HashSet();
+		types.add(new TypeInfo("agrspacetype", MAGRSpaceType.class));
+		types.add(new TypeInfo("grouptype", MGroupType.class));
+		types.add(new TypeInfo("role", MRoleType.class));
 		return types;
 	}
 }

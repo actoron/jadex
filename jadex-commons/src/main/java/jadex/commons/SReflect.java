@@ -418,7 +418,7 @@ public class SReflect
 			methodcache.put(clazz, map);
 		}
 
-		Method[]	ret	= (Method[])map.get(name);
+		Method[] ret = (Method[])map.get(name);
 		if(ret==null)
 		{
 			Method[]	ms	= clazz.getMethods();

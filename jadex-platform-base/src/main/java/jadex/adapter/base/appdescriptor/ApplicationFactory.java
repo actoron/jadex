@@ -9,11 +9,14 @@ import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.Reader;
+import jadex.commons.xml.TypeInfo;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
@@ -51,28 +54,28 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings (if any).
 	 */
-	public ApplicationFactory(IPlatform platform, Map[] mappings)
+	public ApplicationFactory(IPlatform platform, Set[] mappings)
 	{
 		this.platform = platform;
-		Map types = new HashMap();
-		types.put("applicationtype", MApplicationType.class);
-		types.put("spacetype", MSpaceType.class);
-		types.put("agenttype", MAgentType.class);
-		types.put("application", MApplicationInstance.class);
-		types.put("space", MSpaceInstance.class);
-		types.put("agent", MAgentInstance.class);
-		types.put("parameter", MArgument.class);
-		types.put("parameterset", MArgumentSet.class);
-		types.put("value", String.class);
-		types.put("import", String.class);
-		types.put("property", String.class);
+		Set types = new HashSet();
+		types.add(new TypeInfo("applicationtype", MApplicationType.class));
+		types.add(new TypeInfo("spacetype", MSpaceType.class));
+		types.add(new TypeInfo("agenttype", MAgentType.class));
+		types.add(new TypeInfo("application", MApplicationInstance.class));
+		types.add(new TypeInfo("space", MSpaceInstance.class));
+		types.add(new TypeInfo("agent", MAgentInstance.class));
+		types.add(new TypeInfo("parameter", MArgument.class));
+		types.add(new TypeInfo("parameterset", MArgumentSet.class));
+		types.add(new TypeInfo("value", String.class));
+		types.add(new TypeInfo("import", String.class));
+		types.add(new TypeInfo("property", String.class));
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
-			types.putAll(mappings[i]);
+			types.addAll(mappings[i]);
 		}
 		
-		this.reader = new Reader(new BeanObjectHandler(types, "setDescription"));
+		this.reader = new Reader(new BeanObjectHandler(), types, null, null);
 	}
 	
 	//-------- IAgentFactory interface --------

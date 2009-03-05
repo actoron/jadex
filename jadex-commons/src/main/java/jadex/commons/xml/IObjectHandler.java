@@ -18,7 +18,23 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(XMLStreamReader parser, String comment, Object context, List stack) throws Exception;
+	public Object createObject(XMLStreamReader parser, Object type, boolean root, Object context) throws Exception;
+	
+	/**
+	 *  Create an object for the current tag.
+	 *  @param parser The parser.
+	 *  @param context The context.
+	 *  @return The created object (or null for none).
+	 */
+	public void handleAttributeValue(Object object, String attrname, String attrval, Object attrinfo, Object context) throws Exception;
+	
+	/**
+	 *  Create an object for the current tag.
+	 *  @param parser The parser.
+	 *  @param context The context.
+	 *  @return The created object (or null for none).
+	 */
+	public void handleComment(Object object, String comment, Object commentinfo, Object context) throws Exception;
 	
 	/**
 	 *  Handle content for an object.
@@ -27,7 +43,7 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public void handleContent(XMLStreamReader parser, Object elem, String content, Object context, List stack) throws Exception;
+	public void handleContent(Object object, String content, Object contentinfo, Object context) throws Exception;
 	
 	/**
 	 *  Link an object to its parent.
@@ -36,5 +52,5 @@ public interface IObjectHandler
 	 *  @param parent The parent element.
 	 *  @param context The context.
 	 */
-	public void linkObject(XMLStreamReader parser, Object elem, Object parent, Object context, List stack) throws Exception;
+	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, Object context) throws Exception;
 }

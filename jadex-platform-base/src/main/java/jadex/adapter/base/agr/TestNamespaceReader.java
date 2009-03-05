@@ -10,11 +10,14 @@ import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.Reader;
+import jadex.commons.xml.TypeInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Test loading of an xml with differennt name spaces (app + agr).
@@ -47,27 +50,27 @@ public class TestNamespaceReader
 		// Jadex StAX XML reader code
 		try
 		{
-			Map types = new HashMap();
+			Set types = new HashSet();
 			
 			// App types
-			types.put("applicationtype", MApplicationType.class);
-			types.put("spacetype", MSpaceType.class);
-			types.put("agenttype", MAgentType.class);
-			types.put("application", MApplicationInstance.class);
-			types.put("space", MSpaceInstance.class);
-			types.put("agent", MAgentInstance.class);
-			types.put("parameter", MArgument.class);
-			types.put("parameterset", MArgumentSet.class);
-			types.put("value", String.class);
-			types.put("import", String.class);
-			types.put("property", String.class);
+			types.add(new TypeInfo("applicationtype", MApplicationType.class));
+			types.add(new TypeInfo("spacetype", MSpaceType.class));
+			types.add(new TypeInfo("agenttype", MAgentType.class));
+			types.add(new TypeInfo("application", MApplicationInstance.class));
+			types.add(new TypeInfo("space", MSpaceInstance.class));
+			types.add(new TypeInfo("agent", MAgentInstance.class));
+			types.add(new TypeInfo("parameter", MArgument.class));
+			types.add(new TypeInfo("parameterset", MArgumentSet.class));
+			types.add(new TypeInfo("value", String.class));
+			types.add(new TypeInfo("import", String.class));
+			types.add(new TypeInfo("property", String.class));
 			
 			// AGR types
-			types.put("agrspacetype", MAGRSpaceType.class);
-			types.put("grouptype", MGroupType.class);
-			types.put("role", MRoleType.class);
+			types.add(new TypeInfo("agrspacetype", MAGRSpaceType.class));
+			types.add(new TypeInfo("grouptype", MGroupType.class));
+			types.add(new TypeInfo("role", MRoleType.class));
 			
-			Reader	reader = new Reader(new BeanObjectHandler(types, "setDescription"));
+			Reader	reader = new Reader(new BeanObjectHandler(), types, null, null);
 			Object	ret	= reader.read(new FileInputStream(file), null, null);
 			System.out.println(ret);
 		}

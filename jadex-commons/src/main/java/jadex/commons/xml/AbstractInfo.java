@@ -1,4 +1,4 @@
-package jadex.rules.state.io.xml;
+package jadex.commons.xml;
 
 import jadex.commons.SReflect;
 
@@ -6,9 +6,9 @@ import java.util.Comparator;
 
 
 /**
- *  Superclass for XML OAV mapping/link infos.
+ *  Superclass for XML object type/link infos.
  */
-public class AbstractOAVInfo
+public class AbstractInfo
 {
 	//-------- attributes --------
 	
@@ -26,7 +26,7 @@ public class AbstractOAVInfo
 	/**
 	 *  Create an abstract OAV info.
 	 */
-	public AbstractOAVInfo(String xmlpath)
+	public AbstractInfo(String xmlpath)
 	{
 		this.xmlpath = xmlpath;
 	}
@@ -107,8 +107,8 @@ public class AbstractOAVInfo
 	{
 		public int compare(Object arg0, Object arg1)
 		{
-			AbstractOAVInfo m1 = (AbstractOAVInfo)arg0;
-			AbstractOAVInfo m2 = (AbstractOAVInfo)arg1;
+			AbstractInfo m1 = (AbstractInfo)arg0;
+			AbstractInfo m2 = (AbstractInfo)arg1;
 			int ret = m2.getXMLPathDepth() - m1.getXMLPathDepth();
 			if(ret==0)
 				ret = m2.getXMLPath().length() - m1.getXMLPath().length();

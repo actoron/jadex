@@ -1,7 +1,4 @@
-package jadex.rules.state.io.xml;
-
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVObjectType;
+package jadex.commons.xml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,18 +6,18 @@ import java.util.Map;
 /**
  *  Mapping from tag (or path fragment) to OAV type.
  */
-public class OAVMappingInfo	extends AbstractOAVInfo
+public class TypeInfo	extends AbstractInfo
 {
 	//-------- attributes -------- 
 	
 	/** The type. */
-	protected OAVObjectType type;
+	protected Object type;
 	
 	/** The comment mapping. */
-	protected OAVAttributeType comment;
+	protected Object comment;
 	
 	/** The content mapping. */
-	protected OAVAttributeType content;
+	protected Object content;
 	
 	/** The attribute mappings. */
 	protected Map attributes;
@@ -33,7 +30,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * 
 	 */
-	public OAVMappingInfo(String xmlpath, OAVObjectType type)
+	public TypeInfo(String xmlpath, Object type)
 	{
 		this(xmlpath, type, null, null, null, null);
 	}
@@ -41,7 +38,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * 
 	 */
-	public OAVMappingInfo(String xmlpath, OAVObjectType type, OAVAttributeType comment, OAVAttributeType content, Map attributes, IPostProcessor pproc)
+	public TypeInfo(String xmlpath, Object type, Object comment, Object content, Map attributes, IPostProcessor pproc)
 	{
 		super(xmlpath);
 		this.type = type;
@@ -56,7 +53,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * @return the type
 	 */
-	public OAVObjectType getType()
+	public Object getType()
 	{
 		return this.type;
 	}
@@ -64,7 +61,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(OAVObjectType type)
+	public void setType(Object type)
 	{
 		this.type = type;
 	}
@@ -72,7 +69,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * @return the comment
 	 */
-	public OAVAttributeType getComment()
+	public Object getComment()
 	{
 		return this.comment;
 	}
@@ -80,7 +77,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * @param comment the comment to set
 	 */
-	public void setComment(OAVAttributeType comment)
+	public void setComment(Object comment)
 	{
 		this.comment = comment;
 	}
@@ -88,7 +85,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * @return the content
 	 */
-	public OAVAttributeType getContent()
+	public Object getContent()
 	{
 		return this.content;
 	}
@@ -96,7 +93,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * @param content the content to set
 	 */
-	public void setContent(OAVAttributeType content)
+	public void setContent(Object content)
 	{
 		this.content = content;
 	}
@@ -104,7 +101,7 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * 
 	 */
-	public void addAttribute(String xmlname, OAVAttributeType attrtype)
+	public void addAttribute(String xmlname, Object attrtype)
 	{
 		if(attributes==null)
 			attributes = new HashMap();
@@ -114,9 +111,9 @@ public class OAVMappingInfo	extends AbstractOAVInfo
 	/**
 	 * 
 	 */
-	public OAVAttributeType getAttributeType(String xmlname)
+	public Object getAttributeType(String xmlname)
 	{
-		return attributes==null? null: (OAVAttributeType)attributes.get(xmlname);
+		return attributes==null? null: attributes.get(xmlname);
 	}
 
 	/**
