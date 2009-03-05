@@ -3,6 +3,9 @@ package jadex.commons.xml;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ *  Converter for basic types.
+ */
 public class BasicTypeConverter
 {
 	//-------- static part --------

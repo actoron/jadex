@@ -40,12 +40,12 @@ public class OAVBDIXMLReader
 		
 		Set typeinfos = new HashSet();
 
-		typeinfos.add(new TypeInfo("agent", OAVBDIMetaModel.agent_type));
+		typeinfos.add(new TypeInfo("agent", OAVBDIMetaModel.agent_type, OAVBDIMetaModel.modelelement_has_description, null));
 
 		typeinfos.add(new TypeInfo("import", OAVJavaType.java_string_type));
 
 		typeinfos.add(new TypeInfo("capabilities/capability", OAVBDIMetaModel.capabilityref_type));
-		typeinfos.add(new TypeInfo("capability", OAVBDIMetaModel.capability_type));
+		typeinfos.add(new TypeInfo("capability", OAVBDIMetaModel.capability_type, OAVBDIMetaModel.modelelement_has_description, null));
 		
 		typeinfos.add(new TypeInfo("belief", OAVBDIMetaModel.belief_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.typedelement_has_classname}), tepost));
 		typeinfos.add(new TypeInfo("beliefref", OAVBDIMetaModel.beliefreference_type));

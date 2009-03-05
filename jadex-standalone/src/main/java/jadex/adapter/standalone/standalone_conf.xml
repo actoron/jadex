@@ -15,7 +15,7 @@
 		
 		<property type="application_factory">
 			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
-				new java.util.Map[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+				new java.util.Set[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
 		</property>
 		
 		<!-- Message types. -->

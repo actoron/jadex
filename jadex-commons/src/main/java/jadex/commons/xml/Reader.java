@@ -94,9 +94,9 @@ public class Reader
 				
 				// Create object.
 				Object object = null;
-				if(typeinfo!=null && typeinfo.getType()!=null)
+				if(typeinfo!=null && typeinfo.getTypeInfo()!=null)
 				{
-					object = handler.createObject(parser, typeinfo.getType(), stack.isEmpty(), context);
+					object = handler.createObject(parser, typeinfo.getTypeInfo(), stack.isEmpty(), context);
 				}
 				else
 				{
@@ -128,8 +128,7 @@ public class Reader
 						
 						if(!ignoredattrs.contains(attrname))
 						{
-							Object attrinfo = typeinfo.getAttributeType(attrname);
-							handler.handleAttributeValue(object, attrname, attrval, attrinfo, context);
+							handler.handleAttributeValue(object, attrname, attrval, typeinfo==null? null: typeinfo.getAttributeInfo(attrname), context);
 						}
 					}
 				}
@@ -137,7 +136,7 @@ public class Reader
 				// Handle comment.
 				if(comment!=null && typeinfo!=null)
 				{
-					Object commentinfo = typeinfo.getComment();
+					Object commentinfo = typeinfo.getCommentInfo();
 					if(commentinfo!=null)
 					{
 						handler.handleAttributeValue(object, null, comment, commentinfo, context);
@@ -171,9 +170,9 @@ public class Reader
 
 					if(content.trim().length()>0)
 					{
-						if(typeinfo.getContent()!=null) 
+						if(typeinfo.getContentInfo()!=null) 
 						{
-							handler.handleAttributeValue(se.getObject(), null, content, typeinfo.getContent(), context);
+							handler.handleAttributeValue(se.getObject(), null, content, typeinfo.getContentInfo(), context);
 						}
 						else
 						{
@@ -203,7 +202,7 @@ public class Reader
 						
 						// Handle linking
 						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack));
-						handler.linkObject(se.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkAttribute(), parser.getLocalName(), context);
+						handler.linkObject(se.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context);
 					}
 				}
 				

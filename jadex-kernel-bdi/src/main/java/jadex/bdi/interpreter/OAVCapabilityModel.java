@@ -87,63 +87,8 @@ public class OAVCapabilityModel implements ILoadableElementModel
 	 */
 	public String getDescription()
 	{
-		String ret = null;
-		try
-		{
-			// Try to extract first comment from file.
-			// todo: is context class loader correct?
-			InputStream is = SUtil.getResource(getFilename(), Thread.currentThread().getContextClassLoader());
-			int read;
-			while((read = is.read())!=-1)
-			{
-				if(read=='<')
-				{
-					read = is.read();
-					if(Character.isLetter((char)read))
-					{
-						// Found first tag, use whatever comment found up to now.
-						break;
-					}
-					else if(read=='!' && is.read()=='-' && is.read()=='-')
-					{
-						// Found comment.
-						StringBuffer comment = new StringBuffer();
-						while((read = is.read())!=-1)
-						{
-							if(read=='-')
-							{
-								if((read = is.read())=='-')
-								{
-									if((read = is.read())=='>')
-									{
-										// Finished reading <!-- ... --> statement
-										ret = comment.toString();
-										break;
-									}
-									comment.append("--");
-									comment.append((char)read);
-								}
-								else
-								{
-									comment.append('-');
-									comment.append((char)read);
-								}
-							}
-							else
-							{
-								comment.append((char)read);
-							}
-						}
-					}
-				}
-			}
-			is.close();
-		}
-		catch(Exception e)
-		{
-			ret = "No description available: "+e;
-		}
-		return ret;
+		String ret = (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description);
+		return ret!=null? ret: "No description available."; 
 	}
 	
 	/**

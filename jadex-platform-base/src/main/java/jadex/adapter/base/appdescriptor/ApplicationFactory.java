@@ -58,7 +58,7 @@ public class ApplicationFactory implements IApplicationFactory
 	{
 		this.platform = platform;
 		Set types = new HashSet();
-		types.add(new TypeInfo("applicationtype", MApplicationType.class));
+		types.add(new TypeInfo("applicationtype", MApplicationType.class, "setDescription", null));
 		types.add(new TypeInfo("spacetype", MSpaceType.class));
 		types.add(new TypeInfo("agenttype", MAgentType.class));
 		types.add(new TypeInfo("application", MApplicationInstance.class));

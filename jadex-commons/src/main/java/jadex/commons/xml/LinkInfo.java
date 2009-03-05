@@ -8,34 +8,38 @@ public class LinkInfo	extends AbstractInfo
 	//-------- attributes -------- 
 	
 	/** The link attribute. */
-	protected Object link;
+	protected Object linkinfo;
 	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a link info.  
+	 *  Create a link info. 
+	 *  @param xmlpath The xmlpath.
+	 *  @param linkinfo The link info.
 	 */
-	public LinkInfo(String xmlpath, Object link)
+	public LinkInfo(String xmlpath, Object linkinfo)
 	{
 		super(xmlpath);
-		this.link = link;
+		this.linkinfo = linkinfo;
 	}
 	
 	//-------- methods --------
 
 	/**
-	 * Get the link attribute.
+	 *  Get the link info.
+	 *  @return The link info.
 	 */
-	public Object getLinkAttribute()
+	public Object getLinkInfo()
 	{
-		return this.link;
+		return this.linkinfo;
 	}
 
 	/**
-	 *  Set the link attribute.
+	 *  Set the link info.
+	 *  @param linkinfo The link info.
 	 */
-	public void setLinkAttribute(Object link)
+	public void setLinkInfo(Object linkinfo)
 	{
-		this.link = link;
+		this.linkinfo = linkinfo;
 	}
 }

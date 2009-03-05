@@ -10,119 +10,149 @@ public class TypeInfo	extends AbstractInfo
 {
 	//-------- attributes -------- 
 	
-	/** The type. */
-	protected Object type;
+	/** The type info. */
+	protected Object typeinfo;
 	
-	/** The comment mapping. */
-	protected Object comment;
+	/** The comment info. */
+	protected Object commentinfo;
 	
-	/** The content mapping. */
-	protected Object content;
+	/** The content info. */
+	protected Object contentinfo;
 	
-	/** The attribute mappings. */
-	protected Map attributes;
+	/** The attributes info. */
+	protected Map attributesinfo;
 
 	/** The post processor (if any). */
-	protected IPostProcessor	pproc;
+	protected IPostProcessor postproc;
 	
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param typeinfo The type of object to create.
 	 */
-	public TypeInfo(String xmlpath, Object type)
+	public TypeInfo(String xmlpath, Object typeinfo)
 	{
-		this(xmlpath, type, null, null, null, null);
+		this(xmlpath, typeinfo, null, null, null, null);
 	}
 	
 	/**
-	 * 
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param type The type of object to create.
+	 *  @param commentinfo The commnentinfo.
+	 *  @param contentinfo The contentinfo.
 	 */
-	public TypeInfo(String xmlpath, Object type, Object comment, Object content, Map attributes, IPostProcessor pproc)
+	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo)
+	{
+		this(xmlpath, typeinfo, commentinfo, contentinfo, null, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param typeinfo The type of object to create.
+	 *  @param commentinfo The commnent.
+	 *  @param contentinfo The content.
+	 *  @param attributesinfo The attributes map.
+	 *  @param postproc The post processor. 
+	 */
+	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, Map attributesinfo, IPostProcessor postproc)
 	{
 		super(xmlpath);
-		this.type = type;
-		this.comment = comment;
-		this.content = content;
-		this.attributes = attributes;
-		this.pproc = pproc;
+		this.typeinfo = typeinfo;
+		this.commentinfo = commentinfo;
+		this.contentinfo = contentinfo;
+		this.attributesinfo = attributesinfo;
+		this.postproc = postproc;
 	}
 	
 	//-------- methods --------
 
 	/**
-	 * @return the type
+	 *  Get the type info.
+	 *  @return The type.
 	 */
-	public Object getType()
+	public Object getTypeInfo()
 	{
-		return this.type;
+		return this.typeinfo;
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type info.
+	 *  @param type The type to set.
 	 */
-	public void setType(Object type)
+	public void setTypeInfo(Object type)
 	{
-		this.type = type;
+		this.typeinfo = typeinfo;
 	}
 
 	/**
-	 * @return the comment
+	 *  Get the comment info.
+	 *  @return The comment
 	 */
-	public Object getComment()
+	public Object getCommentInfo()
 	{
-		return this.comment;
+		return this.commentinfo;
 	}
 
 	/**
-	 * @param comment the comment to set
+	 *  Set the comment info.
+	 *  @param commentinfo The comment to set.
 	 */
-	public void setComment(Object comment)
+	public void setCommentInfo(Object commentinfo)
 	{
-		this.comment = comment;
+		this.commentinfo = commentinfo;
 	}
 
 	/**
-	 * @return the content
+	 *  Get the content info.
+	 *  @return The content info.
 	 */
-	public Object getContent()
+	public Object getContentInfo()
 	{
-		return this.content;
+		return this.contentinfo;
 	}
 
 	/**
-	 * @param content the content to set
+	 *  Set the content info.
+	 *  @param contentinfo The content info to set.
 	 */
-	public void setContent(Object content)
+	public void setContentInfo(Object content)
 	{
-		this.content = content;
+		this.contentinfo = contentinfo;
 	}
 	
 	/**
-	 * 
+	 *  Add an attribute info.
+	 *  @param xmlname The xml attribute name.
+	 *  @param attrinfo The attribute info.
 	 */
-	public void addAttribute(String xmlname, Object attrtype)
+	public void addAttributeInfo(String xmlname, Object attrinfo)
 	{
-		if(attributes==null)
-			attributes = new HashMap();
-		attributes.put(xmlname, attrtype);
+		if(attributesinfo==null)
+			attributesinfo = new HashMap();
+		attributesinfo.put(xmlname, attrinfo);
 	}
 	
 	/**
-	 * 
+	 *  Get the attribute info.
+	 *  @param xmlname The xml name of the attribute.
+	 *  @return The attribute info.
 	 */
-	public Object getAttributeType(String xmlname)
+	public Object getAttributeInfo(String xmlname)
 	{
-		return attributes==null? null: attributes.get(xmlname);
+		return attributesinfo==null? null: attributesinfo.get(xmlname);
 	}
 
 	/**
 	 *  Get the post-processor.
 	 *  @return The post-processor
 	 */
-	public IPostProcessor	getPostProcessor()
+	public IPostProcessor getPostProcessor()
 	{
-		return this.pproc;
+		return this.postproc;
 	}
 
 	/**
@@ -131,6 +161,6 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public void setPostProcessor(IPostProcessor pproc)
 	{
-		this.pproc = pproc;
+		this.postproc = pproc;
 	}	
 }
