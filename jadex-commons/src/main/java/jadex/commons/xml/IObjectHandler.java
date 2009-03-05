@@ -34,7 +34,7 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public void handleComment(Object object, String comment, Object commentinfo, Object context) throws Exception;
+//	public void handleComment(Object object, String comment, Object commentinfo, Object context) throws Exception;
 	
 	/**
 	 *  Handle content for an object.
@@ -43,7 +43,7 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public void handleContent(Object object, String content, Object contentinfo, Object context) throws Exception;
+//	public void handleContent(Object object, String content, Object contentinfo, Object context) throws Exception;
 	
 	/**
 	 *  Link an object to its parent.

@@ -81,7 +81,8 @@ public class OAVObjectHandler implements IObjectHandler
 		
 		if(attrtype!=null)
 		{
-			Object arg = attrtype.getType() instanceof OAVJavaType?
+			Object arg = attrtype.getType() instanceof OAVJavaType 
+				&& BasicTypeConverter.isBuiltInType(((OAVJavaType)attrtype.getType()).getClazz())?
 				BasicTypeConverter.convertBuiltInTypes(((OAVJavaType)attrtype.getType()).getClazz(), attrval): attrval;
 	
 			if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
@@ -93,33 +94,6 @@ public class OAVObjectHandler implements IObjectHandler
 				state.addAttributeValue(object, attrtype, arg);
 			}
 		}
-	}
-	
-	/**
-	 *  Create an object for the current tag.
-	 *  @param parser The parser.
-	 *  @param context The context.
-	 *  @return The created object (or null for none).
-	 */
-	public void handleComment(Object object, String comment, Object commentinfo, Object context) throws Exception
-	{
-		IOAVState state = (IOAVState)context;
-		OAVAttributeType comattr = (OAVAttributeType)commentinfo;
-		state.setAttributeValue(object, comattr, comment);
-	}
-	
-	/**
-	 *  Handle content for an object.
-	 *  @param parser The parser.
-	 *  @param comment The comment.
-	 *  @param context The context.
-	 *  @return The created object (or null for none).
-	 */
-	public void handleContent(Object elem, String content, Object contentinfo, Object context) throws Exception
-	{
-		IOAVState state = (IOAVState)context;
-		OAVAttributeType attrtype = (OAVAttributeType)contentinfo;
-		setAttributeValue(state, elem, attrtype, content);
 	}
 	
 	/**

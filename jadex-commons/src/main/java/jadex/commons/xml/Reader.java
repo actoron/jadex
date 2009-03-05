@@ -140,7 +140,7 @@ public class Reader
 					Object commentinfo = typeinfo.getComment();
 					if(commentinfo!=null)
 					{
-						handler.handleComment(object, comment, commentinfo, context);
+						handler.handleAttributeValue(object, null, comment, commentinfo, context);
 					}
 				}
 				
@@ -173,7 +173,7 @@ public class Reader
 					{
 						if(typeinfo.getContent()!=null) 
 						{
-							handler.handleContent(se.getObject(), content, typeinfo.getContent(), context);
+							handler.handleAttributeValue(se.getObject(), null, content, typeinfo.getContent(), context);
 						}
 						else
 						{
