@@ -2,6 +2,7 @@ package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.IContextService;
+import jadex.adapter.base.contextservice.ISpace;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILoadableElementModel;
@@ -98,10 +99,12 @@ public class ApplicationFactory implements IApplicationFactory
 			MApplicationType apptype = null;
 			try
 			{
+				// Load application type.
 				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
 				apptype = (MApplicationType)reader.read(new FileInputStream(model), cl, null);
 				List apps = apptype.getMApplicationInstances();
 				
+				// Select application instance according to configuraion.
 				MApplicationInstance app = null;
 				if(config==null)
 					app = (MApplicationInstance)apps.get(0);
@@ -116,7 +119,7 @@ public class ApplicationFactory implements IApplicationFactory
 				if(app==null)
 					throw new RuntimeException("Could not find application name: "+config);
 
-				
+
 				// Create context for application.
 				IContextService	cs	= (IContextService)platform.getService(IContextService.class);
 				if(cs==null)
@@ -134,6 +137,16 @@ public class ApplicationFactory implements IApplicationFactory
 				// todo: result listener?
 				
 				List agents = app.getMAgentInstances();
+				
+				// Count the number of agents 
+				int numofagents = 0;
+				for(int i=0; i<agents.size(); i++)
+				{
+					MAgentInstance agent = (MAgentInstance)agents.get(i);
+					numofagents += agent.getNumber();
+				}
+				
+//				CounterListener cl = new CounterListener();
 				for(int i=0; i<agents.size(); i++)
 				{
 					final MAgentInstance agent = (MAgentInstance)agents.get(i);
@@ -163,6 +176,21 @@ public class ApplicationFactory implements IApplicationFactory
 				}
 			
 				// todo: create application context as return value?!
+			
+				// Create spaces for context.
+				if(cs!=null)
+				{
+					List spaces = app.getMSpaceInstances();
+					if(spaces!=null)
+					{
+						for(int i=0; i<spaces.size(); i++)
+						{
+							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
+							ISpace space = si.createSpace();
+							context.addSpace(space);
+						}
+					}
+				}
 			}
 			catch(Exception e)
 			{

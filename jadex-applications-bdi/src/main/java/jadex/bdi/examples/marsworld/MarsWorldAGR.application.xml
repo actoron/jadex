@@ -49,13 +49,13 @@
 				<agent type="Carrier" number="3"/>
 			</agents>
 			
-			<agr:space name="myagrspace" type="marsagrspace">
+			<agr:agrspace name="myagrspace" type="marsagrspace">
 				<agr:group name="mymarsteam" type="marsteam">
 					<agr:position role="sentry" agenttype="Sentry" />
 					<agr:position role="producer" agenttype="Producer" />
 					<agr:position role="carrier" agenttype="carrier" />
 				</agr:group>
-			</agr:space>
+			</agr:agrspace>
 			
 			<!--  <twod:space type="mars2dspace">
 				<twod:position agenttype="Sentry" x="1" y="1"/>

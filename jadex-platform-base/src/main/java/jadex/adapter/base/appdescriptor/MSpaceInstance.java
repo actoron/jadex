@@ -1,11 +1,13 @@
 package jadex.adapter.base.appdescriptor;
 
+import jadex.adapter.base.contextservice.ISpace;
+
 import java.util.List;
 
 /**
  *  Space instance representation.
  */
-public class MSpaceInstance
+public abstract class MSpaceInstance
 {
 	//-------- attributes --------
 
@@ -81,4 +83,8 @@ public class MSpaceInstance
 		return ret;
 	}
 	
+	/**
+	 *  Create a space.
+	 */
+	public abstract ISpace createSpace();
 }

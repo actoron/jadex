@@ -30,6 +30,8 @@ public class MAGRSpaceType	extends MSpaceType
 		return grouptypes==null ? null :
 			(MGroupType[])grouptypes.toArray(new MGroupType[grouptypes.size()]);
 	}
+	
+	
 
 	/**
 	 *  Add a group type to this space type.
@@ -86,6 +88,9 @@ public class MAGRSpaceType	extends MSpaceType
 		types.add(new TypeInfo("agrspacetype", MAGRSpaceType.class));
 		types.add(new TypeInfo("grouptype", MGroupType.class));
 		types.add(new TypeInfo("role", MRoleType.class));
+		types.add(new TypeInfo("agrspace", MAGRSpaceInstance.class));
+		types.add(new TypeInfo("group", MGroupInstance.class));
+		types.add(new TypeInfo("position", MPosition.class));
 		return types;
 	}
 }
