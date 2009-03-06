@@ -53,15 +53,12 @@ public class InformNewTargetPlanAGR extends Plan
 //		AGRGroup group = agrs.getGroup("mymarsteam");
 //		group.sendMessage("sentry");
 		
-		if(sentries.length>0)
-		{
-			IMessageEvent mevent = createMessageEvent("inform_target");
-//			for(int i=0; i<sentries.length; i++)
-//				mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i].getName());
-			mevent.getParameter(SFipa.CONTENT).setValue(target);
+		IMessageEvent mevent = createMessageEvent("inform_target");
+//		for(int i=0; i<sentries.length; i++)
+//			mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i].getName());
+		mevent.getParameter(SFipa.CONTENT).setValue(target);
 //			sendMessage(mevent);
 //			group.sendMessage("sentry", mevent);
-			//System.out.println("Informing sentries: "+getScope().getPlatformAgent().getLocalName());
-		}
+		//System.out.println("Informing sentries: "+getScope().getPlatformAgent().getLocalName());
 	}
 }
