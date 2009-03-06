@@ -19,25 +19,25 @@ import java.util.Map.Entry;
 public class EuclideanSimulationEngine implements ISimulationEngine
 {
 	/** The environment processes. */
-	private Map				processes_;
+	protected Map				processes_;
 
 	/** Available actions in the environment. */
-	private Map				actions_;
+	protected Map				actions_;
 
 	/** Integers/ObjectIDs (keys) and SimObject engine objects (values). */
-	private Map				simObjects_;
+	protected Map				simObjects_;
 
 	/** Strings (type of the SimObject) and Lists of SimObjects (typed view). */
-	private Map				simObjectsByType_;
+	protected Map				simObjectsByType_;
 
 	/** Environment properties. */
-	private Map				environmentProperties_;
+	protected Map				environmentProperties_;
 
 	/** Object ID counter for new IDs. */
-	private AtomicCounter	objectIdCounter_;
+	protected AtomicCounter	objectIdCounter_;
 
 	/** Area size. */
-	private IVector2		areaSize_;
+	protected IVector2		areaSize_;
 
 	/**
 	 * Creates a new DefaultSimulationEngine
@@ -301,6 +301,7 @@ public class EuclideanSimulationEngine implements ISimulationEngine
 			// Block all other actions
 			synchronized(actions_)
 			{
+				// TODO: add null test for actor?
 				SimObject actor = (SimObject)simObjects_.get(actorId);
 				SimObject object = null;
 				if(objectId != null)

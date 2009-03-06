@@ -6,6 +6,7 @@ import jadex.bdi.examples.hunterprey2.CurrentVision;
 import jadex.bdi.examples.hunterprey2.Vision;
 import jadex.bdi.examples.hunterprey2.engine.task.MoveTask;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
+import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
@@ -90,15 +91,15 @@ public class SimulationTickerPlan extends Plan
 					do
 					{
 						evt = waitForInternalEvent("simulation_event");
-					} while (!evt.getParameter("type").getValue().equals(MoveTask.MOVE_TASK_FINISHED));
+					} while (!evt.getParameter("type").getValue().equals(SimulationEvent.DESTINATION_REACHED));
 					
 					
-					MoveTask task = (MoveTask) evt.getParameter("task").getValue();
-					if(!task.getDestLocation().getAsIVector().equals((IVector2) evt.getParameter("position").getValue()))
-					{
-						// TODO: reset position for creature!
-						getLogger().warning("Creature doesn't reached destination position! " + task.getCreature());
-					}
+//					MoveTask task = (MoveTask) evt.getParameter("task").getValue();
+//					if(!task.getDestLocation().getAsIVector().equals((IVector2) evt.getParameter("position").getValue()))
+//					{
+//						// TODO: reset position for creature!
+//						getLogger().warning("Creature doesn't reached destination position! " + task.getCreature());
+//					}
 					env.decreaseSimTaskCounter();
 				}
 

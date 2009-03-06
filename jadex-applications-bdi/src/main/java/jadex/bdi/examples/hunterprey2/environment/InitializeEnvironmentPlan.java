@@ -4,8 +4,8 @@ import jadex.bdi.examples.hunterprey2.Configuration;
 import jadex.bdi.examples.hunterprey2.Food;
 import jadex.bdi.examples.hunterprey2.Location;
 import jadex.bdi.examples.hunterprey2.Obstacle;
-import jadex.bdi.planlib.simsupport.environment.EuclideanSimulationEngine;
-import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
+import jadex.bdi.planlib.simsupport.environment.grid.GridSimulationEngine;
+import jadex.bdi.planlib.simsupport.environment.grid.IGridSimulationEngine;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -65,9 +65,13 @@ public class InitializeEnvironmentPlan extends Plan
 	{
 		getBeliefbase().getBelief("environment_name").setFact(Configuration.ENVIRONMENT_NAME);
 		getBeliefbase().getBelief("clock_service").setFact(getClock());
-		ISimulationEngine engine  = new EuclideanSimulationEngine(
-						Configuration.ENVIRONMENT_NAME,
-						Configuration.AREA_SIZE);
+//		ISimulationEngine engine  = new EuclideanSimulationEngine(
+//						Configuration.ENVIRONMENT_NAME,
+//						Configuration.AREA_SIZE);
+		
+		IGridSimulationEngine engine  = new GridSimulationEngine(
+				Configuration.ENVIRONMENT_NAME,
+				Configuration.AREA_SIZE);
 		
 		getBeliefbase().getBelief("simulation_engine").setFact(engine);
 		IGoal start = createGoal("sim_start_environment");

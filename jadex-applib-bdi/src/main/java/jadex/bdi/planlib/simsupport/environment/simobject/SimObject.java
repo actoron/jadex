@@ -116,6 +116,9 @@ public class SimObject
 		{
 			ISimObjectTask task = (ISimObjectTask)tasks[i];
 			task.execute(deltaT, this);
+			// debug
+			if (Double.isNaN(position_.getXAsDouble()))
+				System.err.println("Ups");
 		}
 	}
 
