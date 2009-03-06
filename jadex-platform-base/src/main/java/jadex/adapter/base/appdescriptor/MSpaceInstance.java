@@ -46,36 +46,36 @@ public class MSpaceInstance
 	}
 
 	/**
-	 *  Get the type.
-	 *  @return The type. 
+	 *  Get the type name.
+	 *  @return The type name. 
 	 */
-	public String getType()
+	public String getTypeName()
 	{
 		return this.type;
 	}
 
 	/**
-	 *  Set the type.
-	 *  @param type The type to set.
+	 *  Set the type name.
+	 *  @param type The type name to set.
 	 */
-	public void setType(String type)
+	public void setTypeName(String type)
 	{
 		this.type = type;
 	}
 	
 	/**
-	 *  Get the model of this element.
+	 *  Get the type of this element.
 	 *  @param apptype The application type this element is used in.
 	 *  @return The structure type.
 	 */
-	public MSpaceType getModel(MApplicationType apptype)
+	public MSpaceType getType(MApplicationType apptype)
 	{
 		MSpaceType ret = null;
 		List structuretypes = apptype.getMSpaceTypes();
 		for(int i=0; ret==null && i<structuretypes.size(); i++)
 		{
 			MSpaceType st = (MSpaceType)structuretypes.get(i);
-			if(st.getName().equals(getType()))
+			if(st.getName().equals(getTypeName()))
 				ret = st;
 		}
 		return ret;

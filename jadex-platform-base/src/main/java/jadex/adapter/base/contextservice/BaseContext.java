@@ -32,6 +32,9 @@ public class BaseContext	implements IContext
 	/** The agents in the context. */
 	protected Set	agents;
 	
+	/** The contained spaces. */
+	protected Map spaces;
+	
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more agents can be added). */
 	protected boolean	terminating;
@@ -131,6 +134,48 @@ public class BaseContext	implements IContext
 		}
 
 		System.out.println("Removed agent: "+this);
+	}
+	
+	/**
+	 *  Add a space to the context.
+	 *  @param space The space.
+	 */
+	public synchronized void addSpace(ISpace space)
+	{
+		if(spaces==null)
+			spaces = new HashMap();
+		
+		spaces.put(space.getName(), space);
+		
+		System.out.println("Added space: "+space);
+	}
+	
+	/**
+	 *  Add a space to the context.
+	 *  @param name The space name.
+	 */
+	public synchronized void removeSpace(String name)
+	{
+		if(spaces!=null)
+		{
+			spaces.remove(name);
+			if(spaces.isEmpty())
+			{
+				spaces = null;
+			}
+		}
+
+		System.out.println("Removed space: "+name);
+	}
+	
+	/**
+	 *  Get a space by name.
+	 *  @param name The name.
+	 *  @return The space.
+	 */
+	public synchronized ISpace getSpace(String name)
+	{
+		return spaces==null? null: (ISpace)spaces.get(name);
 	}
 
 	/**

@@ -19,8 +19,8 @@ public class MAgentInstance
 	/** The name. */
 	protected String name;
 	
-	/** The type. */
-	protected String type;
+	/** The type name. */
+	protected String typename;
 	
 	/** The configuration. */
 	protected String configuration;
@@ -73,21 +73,21 @@ public class MAgentInstance
 	}
 
 	/**
-	 *  Get the type.
-	 *  @return The type.
+	 *  Get the type name.
+	 *  @return The type name.
 	 */
-	public String getType()
+	public String getTypeName()
 	{
-		return this.type;
+		return this.typename;
 	}
 
 	/**
-	 *  Set the type.
-	 *  @param type The type to set.
+	 *  Set the type name.
+	 *  @param type The type name to set.
 	 */
-	public void setType(String type)
+	public void setTypeName(String typename)
 	{
-		this.type = type;
+		this.typename = typename;
 	}
 
 	/**
@@ -245,14 +245,14 @@ public class MAgentInstance
 	 *  @param apptype The application type this agent is used in.
 	 *  @return The name of the agent type.
 	 */
-	public MAgentType getModel(MApplicationType apptype)
+	public MAgentType getType(MApplicationType apptype)
 	{
 		MAgentType ret = null;
 		List agenttypes = apptype.getMAgentTypes();
 		for(int i=0; ret==null && i<agenttypes.size(); i++)
 		{
 			MAgentType at = (MAgentType)agenttypes.get(i);
-			if(at.getName().equals(getType()))
+			if(at.getName().equals(getTypeName()))
 				ret = at;
 		}
 		return ret;

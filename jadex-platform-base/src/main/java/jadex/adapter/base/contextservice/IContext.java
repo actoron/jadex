@@ -53,6 +53,25 @@ public interface IContext
 	public IAgentIdentifier[]	getAgents();
 	
 	/**
+	 *  Add a space to the context.
+	 *  @param space The space.
+	 */
+	public void addSpace(ISpace space);
+	
+	/**
+	 *  Add a space to the context.
+	 *  @param name The space name.
+	 */
+	public void removeSpace(String name);
+	
+	/**
+	 *  Get a space by name.
+	 *  @param name The name.
+	 *  @return The space.
+	 */
+	public ISpace getSpace(String name);
+	
+	/**
 	 *  Add an agent property. 
 	 *  @param agent The agent.
 	 *  @param key The key.

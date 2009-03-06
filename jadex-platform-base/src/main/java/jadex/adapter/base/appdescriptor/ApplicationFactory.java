@@ -58,12 +58,14 @@ public class ApplicationFactory implements IApplicationFactory
 	{
 		this.platform = platform;
 		Set types = new HashSet();
+		Map attrs = new HashMap();
+		attrs.put("type", "setTypeName");
 		types.add(new TypeInfo("applicationtype", MApplicationType.class, "setDescription", null));
 		types.add(new TypeInfo("spacetype", MSpaceType.class));
 		types.add(new TypeInfo("agenttype", MAgentType.class));
-		types.add(new TypeInfo("application", MApplicationInstance.class));
+		types.add(new TypeInfo("application", MApplicationInstance.class, null, null, attrs, null));
 		types.add(new TypeInfo("space", MSpaceInstance.class));
-		types.add(new TypeInfo("agent", MAgentInstance.class));
+		types.add(new TypeInfo("agent", MAgentInstance.class, null, null, attrs, null));
 		types.add(new TypeInfo("parameter", MArgument.class));
 		types.add(new TypeInfo("parameterset", MArgumentSet.class));
 		types.add(new TypeInfo("value", String.class));
@@ -154,7 +156,7 @@ public class ApplicationFactory implements IApplicationFactory
 //									ams.startAgent((IAgentIdentifier)result, null);
 //							}
 //						}, null);						
-						context.createAgent(agent.getName(), agent.getType(),
+						context.createAgent(agent.getName(), agent.getTypeName(),
 							agent.getConfiguration(), agent.getArguments(platform, apptype, cl), agent.isStart(), agent.isMaster(),
 							DefaultResultListener.getInstance(), null);	
 					}

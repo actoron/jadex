@@ -13,7 +13,7 @@ public class MGroupType
 	//-------- attributes --------
 	
 	/** The name. */
-	protected String	name;
+	protected String name;
 	
 	/** The roles. */
 	protected List	roles;
