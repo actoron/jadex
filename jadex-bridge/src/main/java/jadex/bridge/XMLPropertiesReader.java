@@ -1,19 +1,18 @@
 package jadex.bridge;
 
-import jadex.commons.SUtil;
+import jadex.commons.xml.BeanObjectHandler;
+import jadex.commons.xml.LinkInfo;
+import jadex.commons.xml.Reader;
+import jadex.commons.xml.TypeInfo;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
@@ -21,16 +20,46 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class XMLPropertiesReader
 {
+//-------- attributes --------
+	
+	/** The singleton reader instance. */
+	protected static Reader	reader;
+	
+	// Initialize reader instance.
+	static
+	{
+		Set typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo("property", Property.class, null, "setValue"));
+		typeinfos.add(new TypeInfo("properties", Properties.class));
+		
+		Set linkinfos = new HashSet();
+		linkinfos.add(new LinkInfo("properties", "addSubproperties"));
+		
+		Set ignoredattrs = new HashSet();
+		ignoredattrs.add("schemaLocation");
+		
+		reader = new Reader(new BeanObjectHandler(), typeinfos, linkinfos, ignoredattrs);
+	}
+	
 	/**
 	 *  Read properties from xml.
  	 */
+	public static Properties readProperties(InputStream input, ClassLoader classloader) throws Exception
+	{
+		Properties ret = (Properties)reader.read(input, classloader, null);
+		return ret;
+	}
+	
+	/**
+	 *  Read properties from xml.
+ 	 * /
 	public static Properties readProperties(InputStream input, ClassLoader classloader) throws Exception
 	{
 		XMLInputFactory	factory	= XMLInputFactory.newInstance();
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
 		Properties	root	= null;
 		Map idprops = new HashMap();
-		List	stack	= new ArrayList();
+		List stack = new ArrayList();
 		List refs = new ArrayList();
 		
 		while(parser.hasNext())
@@ -114,7 +143,7 @@ public class XMLPropertiesReader
 		}
 		
 		return root;
-	}
+	}*/
 	
 	/**
 	 *  Write properties to XML.

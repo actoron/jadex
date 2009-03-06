@@ -119,6 +119,9 @@ public class BeanObjectHandler implements IObjectHandler
 				}
 			}
 		}
+		
+		if(!linked)
+			throw new RuntimeException("Could not link: "+object+" "+parent);
 	}
 		
 	/**

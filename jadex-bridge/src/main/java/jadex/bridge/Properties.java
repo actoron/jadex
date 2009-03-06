@@ -60,6 +60,14 @@ public class Properties
 	{
 		return name;
 	}
+	
+	/**
+	 *  Set the name of the properties.
+	 */
+	public void setName(String name)
+	{
+		this.name	= name;
+	}
 
 	/**
 	 *  Get the type.
@@ -69,6 +77,14 @@ public class Properties
 	{
 		return type;
 	}
+
+	/**
+	 *  Set the type of the properties.
+	 */
+	public void setType(String type)
+	{
+		this.type	= type;
+	}
 	
 	/**
 	 *  Get the id.
@@ -77,6 +93,14 @@ public class Properties
 	public String getId()
 	{
 		return id;
+	}
+	
+	/**
+	 *  Set the id.
+	 */
+	public void setId(String id)
+	{
+		this.id	= id;
 	}
 	
 	/**
@@ -175,22 +199,6 @@ public class Properties
 	public void	addProperty(Property prop)
 	{
 		properties.add(prop);
-	}
-	
-	/**
-	 *  Set the name of the properties.
-	 */
-	public void setName(String name)
-	{
-		this.name	= name;
-	}
-	
-	/**
-	 *  Set the type of the properties.
-	 */
-	public void setType(String type)
-	{
-		this.type	= type;
 	}
 	
 	//-------- convenience methods --------

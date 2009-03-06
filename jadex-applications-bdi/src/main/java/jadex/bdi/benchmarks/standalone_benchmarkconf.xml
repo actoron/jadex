@@ -16,11 +16,11 @@
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<!-- Kernels. -->
-		<propertiesref ref="kernel_v2_bdi"/>
+		<!-- <propertiesref ref="kernel_v2_bdi"/>-->
 		
 		<property type="application_factory">
 			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
-				new java.util.Map[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+				new java.util.Set[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
 		</property>
 		
 		<!-- Platform services. -->
@@ -80,29 +80,29 @@
  		<!--  <property type="daemonagent" name="ams">jadex/amsagent/AMS.agent.xml</property>
 		<property type="daemonagent" name="df">jadex/dfagent/DF.agent.xml</property>
 		<property type="agent" name="jcc">jadex/tools/jccv2/JCC.agent.xml</property>-->
-	</properties>
 	
-	<properties type="kernel" id="kernel_v2_bdi">
-		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
-			jadex.commons.SUtil.createHashMap(
-				new String[]
-				{
-					"messagetype_fipa", 
-					"planexecutor_standard", 
-					"standard.timeout", 
-					"tooladapter.introspector",
-					"microplansteps"
-				},
-				new Object[]
-				{
-					new jadex.adapter.base.fipa.FIPAMessageType(), 
-					new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
-					new java.lang.Long(10000),
-					jadex.tools.introspector.IntrospectorAdapter.class,
-					Boolean.FALSE
-				}
-			), $platform)
+		<properties type="kernel" id="kernel_v2_bdi">
+			<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
+				jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"messagetype_fipa", 
+						"planexecutor_standard", 
+						"standard.timeout", 
+						"tooladapter.introspector",
+						"microplansteps"
+					},
+					new Object[]
+					{
+						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
+						new java.lang.Long(10000),
+						jadex.tools.introspector.IntrospectorAdapter.class,
+						Boolean.FALSE
+					}
+				), $platform)
 			</property>
+		</properties>
 	</properties>
  
 </properties>

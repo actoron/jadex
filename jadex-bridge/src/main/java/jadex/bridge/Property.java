@@ -28,6 +28,13 @@ public class Property
 	/**
 	 *  Create a new property.
 	 */
+	public Property()
+	{
+	}
+	
+	/**
+	 *  Create a new property.
+	 */
 	public Property(String type, String value)
 	{
 		this(null, type, value);
@@ -55,6 +62,15 @@ public class Property
 	}
 
 	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
 	 *  Get the type.
 	 *  @return The type.
 	 */
@@ -63,6 +79,15 @@ public class Property
 		return type;
 	}
 
+	/**
+	 *  Set the type.
+	 *  @param type The type to set.
+	 */
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+	
 	/**
 	 *  Get the value.
 	 *  @return The value.

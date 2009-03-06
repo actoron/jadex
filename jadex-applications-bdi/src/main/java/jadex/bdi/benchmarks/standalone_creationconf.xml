@@ -16,11 +16,11 @@
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<!-- Kernels. -->
-		<propertiesref ref="kernel_v2_bdi"/>
+		<!-- <propertiesref ref="kernel_v2_bdi"/>-->
 		
 		<property type="application_factory">
 			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
-				new java.util.Map[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+				new java.util.Set[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
 		</property>
 		
 		<!-- Platform services. -->
@@ -87,29 +87,29 @@
 			<property type="model">jadex/bdi/benchmarks/AgentCreation.agent.xml</property>
 			<property type="argument" name="max">2000</property>
 		</properties>
-	</properties>
-	
-	<properties type="kernel" id="kernel_v2_bdi">
-		<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
-			jadex.commons.SUtil.createHashMap(
-				new String[]
-				{
-					"messagetype_fipa", 
-					"planexecutor_standard", 
-					"standard.timeout", 
-					"tooladapter.introspector",
-					"microplansteps"
-				},
-				new Object[]
-				{
-					new jadex.adapter.base.fipa.FIPAMessageType(), 
-					new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
-					new java.lang.Long(10000),
-					jadex.tools.introspector.IntrospectorAdapter.class,
-					Boolean.FALSE
-				}
-			), $platform)
+		
+		<properties type="kernel" id="kernel_v2_bdi">
+			<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
+				jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"messagetype_fipa", 
+						"planexecutor_standard", 
+						"standard.timeout", 
+						"tooladapter.introspector",
+						"microplansteps"
+					},
+					new Object[]
+					{
+						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
+						new java.lang.Long(10000),
+						jadex.tools.introspector.IntrospectorAdapter.class,
+						Boolean.FALSE
+					}
+				), $platform)
 			</property>
+		</properties>
 	</properties>
  
 </properties>
