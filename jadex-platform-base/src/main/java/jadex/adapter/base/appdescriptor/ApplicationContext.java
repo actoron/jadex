@@ -8,6 +8,7 @@ import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IPlatform;
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,6 +39,9 @@ public class ApplicationContext	extends BaseContext
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more agents can be added). */
 	protected boolean	terminating;
+	
+	/** The agent types (aid -> typename). */
+	protected Map	agenttypes;
 	
 	//-------- constructors --------
 	
@@ -169,7 +173,7 @@ public class ApplicationContext	extends BaseContext
 	 *  @param istener	A listener to be notified, when the agent is created (if any).
 	 *  @param creator	The agent that wants to create a new agent (if any).	
 	 */
-	public void createAgent(String name, String type, String configuration,
+	public void createAgent(String name, final String type, String configuration,
 			Map arguments, final boolean start, final boolean master, 
 			final IResultListener listener, IAgentIdentifier creator)
 	{
@@ -187,7 +191,14 @@ public class ApplicationContext	extends BaseContext
 			public void resultAvailable(Object result)
 			{
 				IAgentIdentifier aid = (IAgentIdentifier)result;
-				addAgent(aid);
+				synchronized(ApplicationContext.this)
+				{
+					if(agenttypes==null)
+						agenttypes	= new HashMap();
+					agenttypes.put(aid, type);
+				}
+				
+//				addAgent(aid);	// agentCreated() called from AMS.
 				if(master)
 				{
 					addProperty(aid, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
@@ -258,5 +269,15 @@ public class ApplicationContext	extends BaseContext
 	{
 		Boolean ret = (Boolean)getProperty(agent, PROPERTY_AGENT_MASTER);
 		return ret==null? false: ret.booleanValue();
+	}
+	
+	/**
+	 *  Get the agent type for an agent id.
+	 *  @param aid	The agent id.
+	 *  @return The agent type name.
+	 */
+	public synchronized String	getAgentType(IAgentIdentifier aid)
+	{
+		return agenttypes!=null ? (String)agenttypes.get(aid) : null;
 	}
 }
