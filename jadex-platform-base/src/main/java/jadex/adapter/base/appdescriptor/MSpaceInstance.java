@@ -86,5 +86,5 @@ public abstract class MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public abstract ISpace createSpace();
+	public abstract ISpace createSpace(ApplicationContext app);
 }

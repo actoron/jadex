@@ -1,16 +1,14 @@
 package jadex.bdi.examples.marsworld.carrier;
 
+import jadex.adapter.base.agr.AGRSpace;
+import jadex.adapter.base.agr.Group;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.contextservice.IContextService;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld.Target;
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SUtil;
 
 /**
@@ -39,26 +37,27 @@ public class InformNewTargetPlanAGR extends Plan
 	}
 
 	/**
-	 *  Sending a locaton to the Production Agent.
-	 *  Therefore it has first to be looked up in the DF.
-	 *  @param target
+	 *  Sending a location to the agents with the sentry role.
 	 */
 	private void informSentryAgents(Target target)
 	{
 		//System.out.println("Informing all sentry agents.");
 		
-//		IContextService cs = (IContextService)getScope().getPlatform().getService(IContextService.class);
-//		ApplicationContext ac = (ApplicationContext)cs.getContexts(ApplicationContext.class)[0];
-//		AGRSpace agrs = (AGRSpace)ac.getSpace(AGRSpace.class);
-//		AGRGroup group = agrs.getGroup("mymarsteam");
-//		group.sendMessage("sentry");
-		
-		IMessageEvent mevent = createMessageEvent("inform_target");
+		IContextService cs = (IContextService)getScope().getPlatform().getService(IContextService.class);
+		ApplicationContext ac = (ApplicationContext)cs.getContexts(ApplicationContext.class)[0];
+		AGRSpace agrs = (AGRSpace)ac.getSpace("myagrspace");
+		Group group = agrs.getGroup("mymarsteam");
+//		IAgentIdentifier[]	sentries	= group.getAgents("sentry");
+//				
+//		IMessageEvent mevent = createMessageEvent("inform_target");
 //		for(int i=0; i<sentries.length; i++)
-//			mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i].getName());
-		mevent.getParameter(SFipa.CONTENT).setValue(target);
-//			sendMessage(mevent);
-//			group.sendMessage("sentry", mevent);
+//			mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i]);
+//		mevent.getParameter(SFipa.CONTENT).setValue(target);
+//		sendMessage(mevent);
+
+		// todo?
+		// group.sendMessage("sentry", mevent);
+		
 		//System.out.println("Informing sentries: "+getScope().getPlatformAgent().getLocalName());
 	}
 }

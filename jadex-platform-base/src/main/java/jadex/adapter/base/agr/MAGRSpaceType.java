@@ -2,6 +2,7 @@ package jadex.adapter.base.agr;
 
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.xml.TypeInfo;
 
 import java.util.ArrayList;
@@ -59,6 +60,21 @@ public class MAGRSpaceType	extends MSpaceType
 	}
 	
 	/**
+	 *  Get a group type by name.
+	 */
+	public MGroupType getGroupType(String name)
+	{
+		MGroupType ret = null;
+		for(int i=0; ret==null && grouptypes!=null && i<grouptypes.size(); i++)
+		{
+			MGroupType	gt	= (MGroupType)grouptypes.get(i);
+			if(gt.getName().equals(name))
+				ret = gt;
+		}
+		return ret;
+	}
+
+	/**
 	 *  Get a string representation of this AGR space type.
 	 *  @return A string representation of this AGR space type.
 	 */
@@ -89,8 +105,10 @@ public class MAGRSpaceType	extends MSpaceType
 		types.add(new TypeInfo("grouptype", MGroupType.class));
 		types.add(new TypeInfo("role", MRoleType.class));
 		types.add(new TypeInfo("agrspace", MAGRSpaceInstance.class));
-		types.add(new TypeInfo("group", MGroupInstance.class));
-		types.add(new TypeInfo("position", MPosition.class));
+		types.add(new TypeInfo("group", MGroupInstance.class, null, null,
+			SUtil.createHashMap(new String[]{"type"}, new String[]{"setTypeName"}), null));
+		types.add(new TypeInfo("position", MPosition.class, null, null,
+			SUtil.createHashMap(new String[]{"agenttype", "role"}, new String[]{"setAgentType", "setRoleType"}), null));
 		return types;
 	}
 }

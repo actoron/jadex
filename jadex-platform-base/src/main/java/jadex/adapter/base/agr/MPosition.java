@@ -1,50 +1,80 @@
 package jadex.adapter.base.agr;
 
 import jadex.adapter.base.appdescriptor.MAgentType;
+import jadex.adapter.base.appdescriptor.MApplicationType;
+import jadex.commons.SReflect;
 
 /**
- * 
+ *  A positions represents an instance of a role in a group instance.
  */
 public class MPosition
 {
-	/** The role. */
-	protected MRoleType role;
+	/** The role type. */
+	protected String	role;
 	
 	/** The agent type. */
-	protected MAgentType agenttype;
+	protected String	agenttype;
 
 	//-------- methods --------
 	
 	/**
-	 * @return the role
+	 *  Get the role type.
+	 *  @return	The role type.
 	 */
-	public MRoleType getMRoleType()
+	public String	getRoleType()
 	{
 		return this.role;
 	}
 
 	/**
-	 * @param role the role to set
+	 *  Set the role type.
+	 *  @param role The role type to set.
 	 */
-	public void setMRoleType(MRoleType role)
+	public void setRoleType(String	role)
 	{
 		this.role = role;
 	}
 
 	/**
-	 * @return the agenttype
+	 *  Get the agent type.
+	 *  @return The agent type.
 	 */
-	public MAgentType getMAgentType()
+	public String	getAgentType()
 	{
 		return this.agenttype;
 	}
 
 	/**
-	 * @param agenttype the agenttype to set
+	 *  Set the agent type.
+	 *  @param agenttype The agent type to set.
 	 */
-	public void setMAgentType(MAgentType agenttype)
+	public void setAgentType(String	agenttype)
 	{
 		this.agenttype = agenttype;
 	}
 	
+	/**
+	 *  Get the agent type.
+	 *  @return The agent type.
+	 */
+	public MAgentType	getMAgentType(MApplicationType apptype)
+	{
+		return apptype.getMAgentType(agenttype);
+	}
+	
+	/**
+	 *  Get a string representation of this AGR position.
+	 *  @return A string representation of this AGR position.
+	 */
+	public String	toString()
+	{
+		StringBuffer	sbuf	= new StringBuffer();
+		sbuf.append(SReflect.getInnerClassName(getClass()));
+		sbuf.append("(roletype=");
+		sbuf.append(getRoleType());
+		sbuf.append(", agenttype=");
+		sbuf.append(getAgentType());
+		sbuf.append(")");
+		return sbuf.toString();
+	}
 }

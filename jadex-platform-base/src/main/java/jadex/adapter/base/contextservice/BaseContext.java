@@ -7,6 +7,7 @@ import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -116,6 +117,14 @@ public class BaseContext	implements IContext
 		
 		agents.add(agent);
 		
+		if(spaces!=null)
+		{
+			for(Iterator it=spaces.values().iterator(); it.hasNext(); )
+			{
+				((ISpace)it.next()).agentAdded(agent);
+			}
+		}
+		
 		System.out.println("Added agent: "+this);
 	}
 	
@@ -133,6 +142,14 @@ public class BaseContext	implements IContext
 			}
 		}
 
+		if(spaces!=null)
+		{
+			for(Iterator it=spaces.values().iterator(); it.hasNext(); )
+			{
+				((ISpace)it.next()).agentRemoved(agent);
+			}
+		}
+
 		System.out.println("Removed agent: "+this);
 	}
 	
@@ -146,6 +163,14 @@ public class BaseContext	implements IContext
 			spaces = new HashMap();
 		
 		spaces.put(space.getName(), space);
+
+		if(agents!=null)
+		{
+			for(Iterator it=agents.iterator(); it.hasNext(); )
+			{
+				space.agentAdded((IAgentIdentifier)it.next());
+			}
+		}
 		
 		System.out.println("Added space: "+space);
 	}

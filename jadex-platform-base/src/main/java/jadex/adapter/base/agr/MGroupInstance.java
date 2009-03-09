@@ -1,6 +1,6 @@
 package jadex.adapter.base.agr;
 
-import jadex.adapter.base.appdescriptor.MAgentType;
+import jadex.commons.SReflect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,9 +62,9 @@ public class MGroupInstance
 	/**
 	 *  Get the positions.
 	 */
-	public List getMPositions()
+	public MPosition[]	getMPositions()
 	{
-		return positions;
+		return positions==null ? null : (MPosition[])positions.toArray(new MPosition[positions.size()]);
 	}
 	
 	/**
@@ -80,17 +80,30 @@ public class MGroupInstance
 	
 	/**
 	 *  Get the group type.
-	 * /
-	public MGroupType getType(MAGRSpaceType)
+	 */
+	public MGroupType getGroupType(MAGRSpaceType spacetype)
 	{
-		MAgentType ret = null;
-		List agenttypes = apptype.getMAgentTypes();
-		for(int i=0; ret==null && i<agenttypes.size(); i++)
+		return spacetype.getGroupType(getTypeName());
+	}
+	
+	/**
+	 *  Get a string representation of this AGR group instance.
+	 *  @return A string representation of this AGR group instance.
+	 */
+	public String	toString()
+	{
+		StringBuffer	sbuf	= new StringBuffer();
+		sbuf.append(SReflect.getInnerClassName(getClass()));
+		sbuf.append("(name=");
+		sbuf.append(getName());
+		sbuf.append(", typename=");
+		sbuf.append(getTypeName());
+		if(positions!=null)
 		{
-			MAgentType at = (MAgentType)agenttypes.get(i);
-			if(at.getName().equals(getTypeName()))
-				ret = at;
+			sbuf.append(", positions=");
+			sbuf.append(positions);
 		}
-		return ret;
-	}*/
+		sbuf.append(")");
+		return sbuf.toString();
+	}
 }

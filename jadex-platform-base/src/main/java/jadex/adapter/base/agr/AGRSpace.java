@@ -1,23 +1,42 @@
 package jadex.adapter.base.agr;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
+import jadex.adapter.base.appdescriptor.MAgentType;
+import jadex.adapter.base.contextservice.ISpace;
+import jadex.bridge.IAgentIdentifier;
+
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import jadex.adapter.base.contextservice.ISpace;
-
 /**
- * 
+ *  An AGR (agent-group-role) space.
  */
 public class AGRSpace implements ISpace
 {
+	//-------- attributes --------
+	
+	/** The application context. */
+	protected ApplicationContext	context;
+	
+	/** The name of the space. */
+	protected String	name;
+	
 	/** The groups. */
 	protected Map groups;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new AGR space.
 	 */
-	public AGRSpace()
+	public AGRSpace(String name, ApplicationContext context)
 	{
+		this.name	= name;
+		this.context	= context;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the space name.
@@ -25,26 +44,63 @@ public class AGRSpace implements ISpace
 	 */
 	public String getName()
 	{
-		return null;
+		return name;
 	}
 	
 	/**
-	 * 
+	 *  Add a group to the space.
+	 *  @param group	The group to add. 
 	 */
-	public void addGroup(Group group)
+	public synchronized	void addGroup(Group group)
 	{
+		if(groups==null)
+			groups	= new HashMap();
 		
+//		groups.put(group.getName(), group);
 	}
 	
 	/**
-	 * 
+	 *  Get a group by name.
+	 *  @param name	The name of the group.
+	 *  @return	The group (if any).
 	 */
-	public Group getGroup(String name)
+	public synchronized Group	getGroup(String name)
 	{
-		return null;
+		return groups!=null ? (Group)groups.get(name) : null;
+	}	
+
+	/**
+	 *  Called from application context, when an agent was added.
+	 *  Also called once for all agents in the context, when a space
+	 *  is newly added to the context.
+	 *  @param aid	The id of the added agent.
+	 */
+	public synchronized void	agentAdded(IAgentIdentifier aid)
+	{
+		if(groups!=null)
+		{
+//			MAgentType	type	= context.getMAgentType(aid);
+//			for(Iterator it=groups.values().iterator(); it.hasNext(); )
+//			{
+//				Group	group	= (Group)it.next();
+//				MPosition[]	pos	= group.getMGroupInstance()!=null
+//					? group.getMGroupInstance().getMPositions() : null;
+//				for(int p=0; pos!=null && p<pos.length; p++)
+//				{
+//					if(pos[p].getAgentType().equals(type.getName()))
+//					{
+//						// Todo: number?
+//					}
+//				}
+//			}
+		}
 	}
-	
-	
-	
-	
+
+	/**
+	 *  Called from application context, when an agent was removed.
+	 *  @param aid	The id of the removed agent.
+	 */
+	public void	agentRemoved(IAgentIdentifier aid)
+	{
+	}
 }
