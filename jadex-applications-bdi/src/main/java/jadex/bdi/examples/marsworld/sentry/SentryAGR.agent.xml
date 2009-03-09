@@ -119,7 +119,7 @@
 			<parameter name="target" class="Target">
 				<goalmapping ref="analyse_target.target"/>
 			</parameter>
-			<body class="AnalyseTargetPlan"/>
+			<body class="AnalyseTargetPlanAGR"/>
 			<trigger>
 				<goal ref="analyse_target"/>
 			</trigger>

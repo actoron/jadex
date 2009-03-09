@@ -136,17 +136,25 @@ public class ApplicationFactory implements IApplicationFactory
 				
 				// todo: result listener?
 				
-				List agents = app.getMAgentInstances();
+				// todo: create application context as return value?!
 				
-				// Count the number of agents 
-				int numofagents = 0;
-				for(int i=0; i<agents.size(); i++)
+				// Create spaces for context.
+				if(cs!=null)
 				{
-					MAgentInstance agent = (MAgentInstance)agents.get(i);
-					numofagents += agent.getNumber();
+					List spaces = app.getMSpaceInstances();
+					if(spaces!=null)
+					{
+						for(int i=0; i<spaces.size(); i++)
+						{
+							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
+							ISpace space = si.createSpace(context);
+							context.addSpace(space);
+						}
+					}
 				}
 				
-//				CounterListener cl = new CounterListener();
+				List agents = app.getMAgentInstances();
+				
 				for(int i=0; i<agents.size(); i++)
 				{
 					final MAgentInstance agent = (MAgentInstance)agents.get(i);
@@ -175,22 +183,7 @@ public class ApplicationFactory implements IApplicationFactory
 					}
 				}
 			
-				// todo: create application context as return value?!
-			
-				// Create spaces for context.
-				if(cs!=null)
-				{
-					List spaces = app.getMSpaceInstances();
-					if(spaces!=null)
-					{
-						for(int i=0; i<spaces.size(); i++)
-						{
-							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
-							ISpace space = si.createSpace(context);
-							context.addSpace(space);
-						}
-					}
-				}
+				
 			}
 			catch(Exception e)
 			{
