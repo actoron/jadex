@@ -1,5 +1,12 @@
 package jadex.adapter.base.agr;
 
+import jadex.bridge.IAgentIdentifier;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  *  An AGR group hold information about agent instances
  *  and their positions (i.e. role instances).
@@ -8,42 +15,77 @@ public class Group
 {
 	//-------- attributes --------
 	
-	/** The group type. */
-	protected MGroupType	type;
+	/** The group name. */
+	protected String	name; 
 	
-	/** The group instance model (if any). */
-	protected MGroupInstance	instance;
+	/** The positions (role name -> Set{aids}). */
+	protected Map	positions;
+	
+	/** The roles (agent type name -> Set{role names}). */
+	protected Map	roles;
 	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new group from a type.
+	 *  Create a new group.
 	 *  @param type	The group type.
 	 */
-	public Group(MGroupType type)
+	public Group(String name)
 	{
-		this(type, null);
-	}
-
-	/**
-	 *  Create a new group from an instance model.
-	 *  @param type	The group type.
-	 *  @param instance	The instance model.
-	 */
-	public Group(MGroupType type, MGroupInstance instance)
-	{
-		this.type	= type;
-		this.instance	= instance;
+		this.name	= name;
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 *  Get the instance model (if any).
-	 *  @return The instance model or null.
+	 *  Get the name of the group.
+	 *  @return The group name.
 	 */
-	public MGroupInstance	getMGroupInstance()
+	public String	getName()
 	{
-		return instance;
+		return name;
+	}
+	
+	/**
+	 *  Get the role names for an agent type name.
+	 *  @param typename	The agent type name.
+	 *  @return The role names (if any).
+	 */
+	public synchronized String[]	getRolesForType(String typename)
+	{
+		Set	ret	= roles!=null ? (Set)roles.get(typename) : null;
+		return ret!=null ? (String[])ret.toArray(new String[ret.size()]) : null;
+	}
+	
+	/**
+	 *  Add a position for an agent.
+	 *  @param aid	The agent id.
+	 *  @param rolename	The role name.
+	 */
+	public synchronized void	addPosition(IAgentIdentifier aid, String rolename)
+	{
+		if(positions==null)
+			positions	= new HashMap();
+		
+		Set	rpos	= (Set)positions.get(rolename);
+		
+		if(rpos==null)
+		{
+			rpos	= new HashSet();
+			positions.put(rolename, rpos);
+		}
+		
+		rpos.add(aid);
+	}
+
+	
+	/**
+	 *  Get the agents with a given role.
+	 *  @param rolename	The role name.
+	 */
+	public synchronized IAgentIdentifier[]	getAgentsForRole(String rolename)
+	{
+		Set	ret	= positions!=null ? (Set)positions.get(rolename) : null;
+		return ret!=null ? (IAgentIdentifier[])ret.toArray(new IAgentIdentifier[ret.size()]) : null;
 	}
 }

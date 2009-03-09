@@ -1,7 +1,6 @@
 package jadex.adapter.base.agr;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.appdescriptor.MAgentType;
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.bridge.IAgentIdentifier;
 
@@ -56,7 +55,7 @@ public class AGRSpace implements ISpace
 		if(groups==null)
 			groups	= new HashMap();
 		
-//		groups.put(group.getName(), group);
+		groups.put(group.getName(), group);
 	}
 	
 	/**
@@ -79,20 +78,16 @@ public class AGRSpace implements ISpace
 	{
 		if(groups!=null)
 		{
-//			MAgentType	type	= context.getMAgentType(aid);
-//			for(Iterator it=groups.values().iterator(); it.hasNext(); )
-//			{
-//				Group	group	= (Group)it.next();
-//				MPosition[]	pos	= group.getMGroupInstance()!=null
-//					? group.getMGroupInstance().getMPositions() : null;
-//				for(int p=0; pos!=null && p<pos.length; p++)
-//				{
-//					if(pos[p].getAgentType().equals(type.getName()))
-//					{
-//						// Todo: number?
-//					}
-//				}
-//			}
+			String	type	= context.getAgentType(aid);
+			for(Iterator it=groups.values().iterator(); it.hasNext(); )
+			{
+				Group	group	= (Group)it.next();
+				String[]	roles	= group.getRolesForType(type);
+				for(int r=0; roles!=null && r<roles.length; r++)
+				{
+					group.addPosition(aid, roles[r]);
+				}
+			}
 		}
 	}
 
