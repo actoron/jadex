@@ -35,9 +35,9 @@
 	
 	<agenttypes>
 		<agenttype name="Environment" filename="jadex/bdi/examples/marsworld/environment/Environment.agent.xml"/>
-		<agenttype name="Carrier" filename="jadex/bdi/examples/marsworld/carrier/Carry.agent.xml"/>
-		<agenttype name="Producer" filename="jadex/bdi/examples/marsworld/producer/Production.agent.xml"/>
-		<agenttype name="Sentry" filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml"/>
+		<agenttype name="Carrier" filename="jadex/bdi/examples/marsworld/carrier/CarryAGR.agent.xml"/>
+		<agenttype name="Producer" filename="jadex/bdi/examples/marsworld/producer/ProductionAGR.agent.xml"/>
+		<agenttype name="Sentry" filename="jadex/bdi/examples/marsworld/sentry/SentryAGR.agent.xml"/>
 	</agenttypes>
 	
 	<applications>
@@ -53,7 +53,7 @@
 				<agr:group name="mymarsteam" type="marsteam">
 					<agr:position role="sentry" agenttype="Sentry" />
 					<agr:position role="producer" agenttype="Producer" />
-					<agr:position role="carrier" agenttype="carrier" />
+					<agr:position role="carrier" agenttype="Carrier" />
 				</agr:group>
 			</agr:agrspace>
 			

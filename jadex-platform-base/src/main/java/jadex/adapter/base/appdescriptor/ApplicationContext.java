@@ -198,7 +198,8 @@ public class ApplicationContext	extends BaseContext
 					agenttypes.put(aid, type);
 				}
 				
-//				addAgent(aid);	// agentCreated() called from AMS.
+				if(!containsAgent(aid))
+					addAgent(aid);	// Hack??? agentCreated() may be called from AMS.
 				if(master)
 				{
 					addProperty(aid, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
