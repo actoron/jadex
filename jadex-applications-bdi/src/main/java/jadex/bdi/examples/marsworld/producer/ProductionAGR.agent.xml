@@ -46,7 +46,7 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="produce">
-			<body class="ProductionPlan"/>
+			<body class="ProductionPlanAGR"/>
 			<waitqueue>
 				<messageevent ref="request_production"/>
 			</waitqueue>
