@@ -58,11 +58,11 @@ public class Group
 	}
 	
 	/**
-	 *  Add a position for an agent.
+	 *  Assign an agent to a role. 
 	 *  @param aid	The agent id.
 	 *  @param rolename	The role name.
 	 */
-	public synchronized void	addPosition(IAgentIdentifier aid, String rolename)
+	public synchronized void	assignRole(IAgentIdentifier aid, String rolename)
 	{
 		if(positions==null)
 			positions	= new HashMap();
@@ -78,6 +78,30 @@ public class Group
 		rpos.add(aid);
 	}
 
+	
+	/**
+	 *  Remove an agent from a role. 
+	 *  @param aid	The agent id.
+	 *  @param rolename	The role name.
+	 */
+	public synchronized void	unassignRole(IAgentIdentifier aid, String rolename)
+	{
+		if(positions!=null)
+		{
+			Set	rpos	= (Set)positions.get(rolename);
+			if(rpos!=null)
+			{
+				rpos.remove(aid);
+
+				if(rpos.isEmpty())
+				{
+					positions.remove(rolename);
+					if(positions.isEmpty())
+						positions	= null;
+				}
+			}
+		}		
+	}
 	
 	/**
 	 *  Get the agents with a given role.

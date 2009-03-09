@@ -85,7 +85,7 @@ public class AGRSpace implements ISpace
 				String[]	roles	= group.getRolesForType(type);
 				for(int r=0; roles!=null && r<roles.length; r++)
 				{
-					group.addPosition(aid, roles[r]);
+					group.assignRole(aid, roles[r]);
 				}
 			}
 		}
