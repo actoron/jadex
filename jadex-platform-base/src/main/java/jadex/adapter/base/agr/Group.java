@@ -47,6 +47,52 @@ public class Group
 	}
 	
 	/**
+	 *  Add a role name for an agent type name.
+	 *  @param typename	The agent type name.
+	 *  @param rolename The role name.
+	 */
+	public synchronized void	addRoleForType(String typename, String rolename)
+	{
+		if(roles==null)
+			roles	= new HashMap();
+		
+		Set	set	= (Set)roles.get(typename);
+		
+		if(set==null)
+		{
+			set	= new HashSet();
+			roles.put(typename, set);
+		}
+		
+		set.add(rolename);
+	}
+	
+	
+	/**
+	 *  Remove a role name for an agent type name.
+	 *  @param typename	The agent type name.
+	 *  @param rolename The role name.
+	 */
+	public synchronized void	removeRoleForType(String typename, String rolename)
+	{
+		if(roles!=null)
+		{
+			Set	set	= (Set)roles.get(typename);
+			if(set!=null)
+			{
+				set.remove(rolename);
+				
+				if(set.isEmpty())
+				{
+					roles.remove(typename);
+					if(roles.isEmpty())
+						roles	= null;
+				}
+			}
+		}
+	}
+	
+	/**
 	 *  Get the role names for an agent type name.
 	 *  @param typename	The agent type name.
 	 *  @return The role names (if any).

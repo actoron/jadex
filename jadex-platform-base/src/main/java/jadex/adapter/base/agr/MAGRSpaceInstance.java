@@ -1,12 +1,8 @@
 package jadex.adapter.base.agr;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.appdescriptor.MAgentType;
-import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
-import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.contextservice.ISpace;
-import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
@@ -65,30 +61,23 @@ public class MAGRSpaceInstance extends MSpaceInstance
 	 */
 	public ISpace createSpace(ApplicationContext app)
 	{
-		MAGRSpaceType	type	= (MAGRSpaceType)getType(app.getApplicationType());
-//		AGRSpace	ret	= new AGRSpace(type);
-//		for(int g=0; groups!=null && g<groups.size(); g++)
-//		{
-//			MGroupInstance	mgroupi	= (MGroupInstance)groups.get(g);
-//			MGroupType	mgroupt	=  mgroupi.getGroupType((MAGRSpaceType)type);
-//			Group	group	= new Group(mgroupi.getName(), mgroupt);
-//			ret.addGroup(group);
-//			
-//			MPosition[]	positions	= mgroupi.getMPositions();
-//			for(int p=0; positions!=null && p<positions.length; p++)
-//			{
-//				MAgentType	at	= positions[p].getMAgentType(app.getApplicationType());
-//				MRoleType	rt	= positions[p].getRoleType((MAGRSpaceType)type);
-//				IAgentIdentifier[]	agents	= app.getAgents(at);
-//				// todo: position.getNumber()
-//				for(int a=0; agents!=null && a<agents.length; a++)
-//				{
-//					group.addPosition(agents[a], rt);
-//				}
-//			}
-//		}
+		AGRSpace	ret	= new AGRSpace(getName(), app);
+		for(int g=0; groups!=null && g<groups.size(); g++)
+		{
+			MGroupInstance	mgroupi	= (MGroupInstance)groups.get(g);
+			Group	group	= new Group(mgroupi.getName());
+			ret.addGroup(group);
+			
+			MPosition[]	positions	= mgroupi.getMPositions();
+			for(int p=0; positions!=null && p<positions.length; p++)
+			{
+				String	at	= positions[p].getAgentType();
+				String	rt	= positions[p].getRoleType();
+				group.addRoleForType(at, rt);
+			}
+		}
 		
-		return null;
+		return ret;
 	}
 
 	
