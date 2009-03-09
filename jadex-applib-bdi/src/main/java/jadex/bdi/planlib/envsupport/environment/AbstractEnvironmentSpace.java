@@ -1,0 +1,161 @@
+package jadex.bdi.planlib.envsupport.environment;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
+{
+	/** Available actions in the space. */
+	protected Map			actions_;
+	
+	/** The environment processes. */
+	protected Map			processes_;
+
+	/** Long/ObjectIDs (keys) and environment objects (values). */
+	protected Map			spaceObjects_;
+	
+	/** Types of EnvironmentObjects and Lists of EnvironmentObjects of that type (typed view). */
+	protected Map			spaceObjectsByType_;
+	
+	/** Space properties. */
+	protected Map			spaceProperties_;
+	
+	/** Object ID counter for new IDs. */
+	private AtomicCounter	objectIdCounter_;
+	
+	public AbstractEnvironmentSpace()
+	{
+		actions_ = Collections.synchronizedMap(new HashMap());
+		processes_ = Collections.synchronizedMap(new HashMap());
+		spaceObjects_ = Collections.synchronizedMap(new HashMap());
+		spaceObjectsByType_ = Collections.synchronizedMap(new HashMap());
+		spaceProperties_ = Collections.synchronizedMap(new HashMap());
+		objectIdCounter_ = new AtomicCounter();
+	}
+	
+	/**
+	 * Adds a space process.
+	 * 
+	 * @param process new space process
+	 */
+	public void addSpaceProcess(ISpaceProcess process)
+	{
+		processes_.put(process.getId(), process);
+	}
+
+	/**
+	 * Returns a space process.
+	 * 
+	 * @param processId ID of the space process
+	 * @return the space process or null if not found
+	 */
+	public ISpaceProcess getSpaceProcess(Object processId)
+	{
+		return (ISpaceProcess) processes_.get(processId);
+	}
+
+	/**
+	 * Removes a space process.
+	 * 
+	 * @param processId ID of the space process
+	 */
+	public void removeSpaceProcess(Object processId)
+	{
+		processes_.remove(processId);
+	}
+	
+	/** 
+	 * Creates an object in this space.
+	 * 
+	 * @param type the object's type
+	 * @param properties initial properties (may be null)
+	 * @param tasks initial task list (may be null)
+	 * @param listeners initial listeners (may be null)
+	 * @return the object's ID
+	 */
+	public Long createSpaceObject(Object type, Map properties, List tasks, List listeners)
+	{
+		Long objectId = null;
+		synchronized(spaceObjects_)
+		{
+			synchronized(spaceObjectsByType_)
+			{
+				do
+				{
+					objectId = objectIdCounter_.getNext();
+				}
+				while (spaceObjects_.containsKey(objectId));
+				
+				ISpaceObject obj = new EnvironmentObject(objectId, type, properties, tasks, listeners);
+				spaceObjects_.put(objectId, obj);
+				List typeObjects = (List) spaceObjectsByType_.get(obj.getType());
+				if (typeObjects == null)
+				{
+					typeObjects = Collections.synchronizedList(new ArrayList());
+					spaceObjectsByType_.put(obj.getType(), typeObjects);
+				}
+				typeObjects.add(obj);
+			}
+		}
+		return objectId;
+	}
+	
+	/** 
+	 * Destroys an object in this space.
+	 * 
+	 * @param objectId the object's ID
+	 */
+	public void destroySpaceObject(Long objectId)
+	{
+		synchronized(spaceObjects_)
+		{
+			synchronized(spaceObjectsByType_)
+			{
+				ISpaceObject obj = (ISpaceObject) spaceObjects_.get(objectId);
+				// shutdown and jettison tasks
+				obj.clearTasks();
+
+				// remove object
+				spaceObjects_.remove(objectId);
+				((List) spaceObjectsByType_.get(obj.getType())).remove(obj);
+
+				// signal removal
+				ObjectEvent event = new ObjectEvent(ObjectEvent.OBJECT_REMOVED);
+				event.setParameter("space_id", getId());
+				obj.fireObjectEvent(event);
+			}
+		}
+	}
+	
+	/**
+	 * Returns an object in this space.
+	 * 
+	 * @param objectId the object's ID
+	 * @return the object in this space
+	 */
+	public ISpaceObject getSpaceObject(Long objectId)
+	{
+		return (ISpaceObject) spaceObjects_.get(objectId);
+	}
+	
+	/**
+	 * Synchronized counter class
+	 */
+	private class AtomicCounter
+	{
+		long count_;
+		
+		public AtomicCounter()
+		{
+			count_ = 0;
+		}
+		
+		public synchronized Long getNext()
+		{
+			return new Long(count_++);
+		}
+	}
+}
