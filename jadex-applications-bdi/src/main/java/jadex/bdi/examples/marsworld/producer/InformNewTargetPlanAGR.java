@@ -1,4 +1,4 @@
-package jadex.bdi.examples.marsworld.carrier;
+package jadex.bdi.examples.marsworld.producer;
 
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;

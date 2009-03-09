@@ -123,7 +123,6 @@ public class Group
 		
 		rpos.add(aid);
 	}
-
 	
 	/**
 	 *  Remove an agent from a role. 
