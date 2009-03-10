@@ -30,7 +30,7 @@
 				?agent = (agent (agent_has_localname ?agentname))
 				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
 				?mbel_env = (mbelief (melement_has_name "env"))
-				?env = (jadex.bdi.examples.garbagecollector.Environment (getPosition (?agentname) ?ret))
+				?env = (Environment (getPosition (?agentname) ?ret))
 			</fact>
  		</belief>
 
@@ -44,7 +44,7 @@
 				?mbel_env = (mbelief (melement_has_name "env"))
 				?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
 				?mbel_pos = (mbelief (melement_has_name "pos"))
- 				?env = (jadex.bdi.examples.garbagecollector.Environment (isDirty (?pos) ?ret))
+ 				?env = (Environment (isDirty (?pos) ?ret))
  			</fact>
 		</belief>
 		
@@ -56,7 +56,7 @@
 				?agent = (agent (agent_has_localname ?agentname))
 				?mbel_env = (mbelief (melement_has_name "env"))
 				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
- 				?env = (jadex.bdi.examples.garbagecollector.Environment (hasGarbage (?agentname) ?ret))
+ 				?env = (Environment (hasGarbage (?agentname) ?ret))
 			</fact>
 		</belief>
 	</beliefs>

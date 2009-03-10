@@ -14,6 +14,7 @@
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>java.util.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 	
 	<capabilities>
@@ -96,34 +97,34 @@
 										
 					(not
 						(and
-							?proposal = (jadex.bdi.planlib.protocols.ParticipantProposal (evaluation null))
+							?proposal = (ParticipantProposal (evaluation null))
 							?proposals = (parameterset (parameterset_has_name "proposals") (parameterset_has_values contains ?proposal))
 							
 							?acceptables = (parameterset (parameterset_has_name "acceptables") (parameterset_has_values $?accs))
-							(test (== (jadex.rules.rulesystem.rules.functions.Length $?accs) 0))
+							(test (== (Length $?accs) 0))
 
 							?rpe	= (goal (parameterelement_has_parametersets contains ?proposals) (parameterelement_has_parametersets contains ?acceptables))
 						)
 					)
-					?rpe = (goal ((jadex.rules.rulesystem.rules.functions.Identity true) ?ret))
+					?rpe = (goal ((Identity true) ?ret))
 				
 										// alternative implementation
 					//(not
 					//	(and
-					//		?proposal = (jadex.bdi.planlib.protocols.ParticipantProposal (evaluation null))
+					//		?proposal = (ParticipantProposal (evaluation null))
 					//		?proposals = (parameterset (parameterset_has_name "proposals") (parameterset_has_values contains ?proposal))
 					//		?rpe = (goal (parameterelement_has_parametersets contains ?proposals))
 					//
 					//		(not
 					//			(and
-					//				?accproposal = (jadex.bdi.planlib.protocols.ParticipantProposal)
+					//				?accproposal = (ParticipantProposal)
 					//				?acceptables = (parameterset (parameterset_has_name "acceptables") (parameterset_has_values contains ?accproposal))
 					//				?rpe = (goal (parameterelement_has_parametersets contains ?acceptables))
 					//			)
 					//		)
 					//	)
 					//)
-					//?rpe = (goal ((jadex.rules.rulesystem.rules.functions.Identity true) ?ret))
+					//?rpe = (goal ((Identity true) ?ret))
 				</value>
 			</parameter>
 			<!-- The received proposals. -->
@@ -219,16 +220,16 @@
 					
 					(not
 						(and
-							?proposal	= (jadex.bdi.planlib.protocols.ParticipantProposal (evaluation null))
+							?proposal	= (ParticipantProposal (evaluation null))
 							?proposals	= (parameterset (parameterset_has_name "proposals") (parameterset_has_values contains ?proposal))
 
 							?acceptables	= (parameterset (parameterset_has_name "acceptables") (parameterset_has_values $?acceptables))
-							(test (== (jadex.rules.rulesystem.rules.functions.Length $?acceptables) 0))
+							(test (== (Length $?acceptables) 0))
 
 							?rgoal	= (goal (parameterelement_has_parametersets contains ?proposals) (parameterelement_has_parametersets contains ?acceptables))
 						)
 					)
-					?rgoal = (goal ((jadex.rules.rulesystem.rules.functions.Identity true) ?ret))
+					?rgoal = (goal ((Identity true) ?ret))
 				</value>
 			</parameter>
 			<!-- The received proposals -->

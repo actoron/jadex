@@ -61,8 +61,8 @@
 				
 				?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
 				?mbel_vision	= (mbelief (melement_has_name "vision"))
-				?hunter	= (jadex.bdi.examples.hunterprey.Hunter)
-				?vision	= (jadex.bdi.examples.hunterprey.Vision (objects contains ?hunter))
+				?hunter	= (Hunter)
+				?vision	= (Vision (objects contains ?hunter))
 			</fact>
 		</belief>-->
 

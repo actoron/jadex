@@ -16,6 +16,10 @@
 	name="PropagateChanges"
 	package="jadex.bdi.testcases.beliefs">
 
+	<imports>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
+	</imports>
+	
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
 	</capabilities>
@@ -54,8 +58,8 @@
  				// Todo: set to "n/a" instead of leaving null
 
 				(beliefset (element_has_model ?mbelset)
-					(beliefset_has_facts ?$facts &amp;:(== (jadex.rules.rulesystem.rules.functions.Length ?$facts) 2)) 
-					((jadex.rules.rulesystem.rules.functions.Identity "magic") ?ret))
+					(beliefset_has_facts ?$facts &amp;:(== (Length ?$facts) 2)) 
+					((Identity "magic") ?ret))
 				?mbelset = (mbeliefset (melement_has_name "my_values"))
 			</fact>
 		</belief>

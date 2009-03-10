@@ -35,7 +35,7 @@
 				
 				?mgoal = (mgoal (melement_has_name "sell_book"))
 				$?ret = (collect 
-					?order = (jadex.bdi.examples.booktrading.common.Order)
+					?order = (Order)
 					?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
 					?rgoal = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
 				)
