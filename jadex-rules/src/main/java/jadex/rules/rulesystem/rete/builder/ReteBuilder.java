@@ -1289,6 +1289,18 @@ public class ReteBuilder
 			
 			ret = new ChainedExtractor(extrs);
 		}
+		else if(valuesource instanceof List)
+		{
+			List sources = (List)valuesource;
+			IValueExtractor[] extrs = new IValueExtractor[sources.size()];  
+			extrs[0] = createValueExtractor(tupleindex, sources.get(0), subindex, context);
+			for(int i=1; i<sources.size(); i++)
+			{
+				extrs[i] = createValueExtractor(-1, sources.get(i), -1, context);
+			}
+			
+			ret = new ChainedExtractor(extrs);
+		}
 		else if(valuesource==null || valuesource instanceof OAVAttributeType)
 		{
 			OAVAttributeType attr = (OAVAttributeType)valuesource;

@@ -16,7 +16,7 @@ public class OAVAttributeType
 {
 	//-------- constants --------
 	
-	public static final OAVAttributeType OBJECTTYPE = new OAVAttributeType();
+	public static final OAVAttributeType OBJECTTYPE = new OAVAttributeType("OBJECTTYPE");
 	
 	/** Constants for queue multiplicity. */
 	public static final String NONE = "none";
@@ -94,8 +94,9 @@ public class OAVAttributeType
 	/**
 	 *  Create a new OAV attribute type.
 	 */
-	private OAVAttributeType()
+	private OAVAttributeType(String name)
 	{
+		this.name = name;
 		this.hashcode = hashCode();
 	}
 	

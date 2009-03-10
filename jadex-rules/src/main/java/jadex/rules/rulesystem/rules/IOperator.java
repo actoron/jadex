@@ -33,6 +33,10 @@ public interface IOperator
 	/** The excludes operator. */
 	public static IOperator EXCLUDES = new Operator.Excludes();
 	
+	/** The instanceof operator. */
+	public static IOperator INSTANCEOF = new Operator.InstanceOf();
+
+	
 	//-------- string operators --------
 	
 	/** The matches operator. */

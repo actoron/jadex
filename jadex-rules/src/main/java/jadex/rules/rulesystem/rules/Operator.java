@@ -1,6 +1,8 @@
 package jadex.rules.rulesystem.rules;
 
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
 
 import java.util.Collection;
 import java.util.Enumeration;
@@ -311,6 +313,43 @@ public class Operator
 		public String toString()
 		{
 			return "excludes";
+		}
+	}
+	
+	/**
+	 *  Test if an object is instanceof a class.
+	 */
+	public static class InstanceOf implements IOperator
+	{
+		/**
+		 *  Evaluate two objects with respect to the
+		 *  operator semantics.
+		 *  @param state The state.
+		 *  @param val1 The first object.
+		 *  @param val2 The second object.
+		 *  @return True, if objects fit wrt. the operator semantics.
+		 */
+		public boolean evaluate(IOAVState state, Object val1, Object val2)
+		{
+			boolean ret;
+			if(val2 instanceof Class)
+			{
+				ret = ((Class)val2).isAssignableFrom(val2.getClass());
+			}
+			else //if(val2 instanceof OAVObjectType)
+			{
+				ret = state.getType(val1).isSubtype((OAVObjectType)val2);
+			}
+			return ret;
+		}
+		
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String toString()
+		{
+			return "instanceof";
 		}
 	}
 	

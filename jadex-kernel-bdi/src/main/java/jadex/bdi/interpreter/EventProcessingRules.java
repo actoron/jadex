@@ -895,6 +895,7 @@ public class EventProcessingRules
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
 		metagoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoal_has_trigger, mgoaltrigger));
+		
 		ObjectCondition	metagoaltriggercon	= new ObjectCondition(OAVBDIMetaModel.metagoaltrigger_type);
 		metagoaltriggercon.addConstraint(new BoundConstraint(null, mgoaltrigger));
 		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoaltrigger_has_goals, 
@@ -1013,11 +1014,6 @@ public class EventProcessingRules
 				
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-//		{
-//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-//		}));
 
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
@@ -1112,11 +1108,6 @@ public class EventProcessingRules
 				
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-//		{
-//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-//		}));
 
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));
