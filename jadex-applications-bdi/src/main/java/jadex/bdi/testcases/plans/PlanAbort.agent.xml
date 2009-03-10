@@ -17,6 +17,7 @@
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.bdi.planlib.test.TestReport</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<capabilities>
@@ -47,14 +48,14 @@
 		<achievegoal name="successgoal">
 			<targetcondition>
 				// true
-				(test (jadex.rules.rulesystem.rules.functions.Identity true))
+				(test (Identity true))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal fails without plan -->
 		<achievegoal name="failuregoal">
 			<targetcondition>
 				// false
-				(test (jadex.rules.rulesystem.rules.functions.Identity false))
+				(test (Identity false))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal succeeds after plan -->

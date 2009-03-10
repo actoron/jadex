@@ -20,13 +20,14 @@ public class ParserHelper
 	 *  @param model The model.
 	 *  @return The condition.
 	 */
-	public static ICondition parseCondition(String text, OAVTypeModel model, List errors)
+	public static ICondition parseCondition(String text, OAVTypeModel model, String[] imports, List errors)
 	{
 		ICondition	ret	= null;
 		ANTLRStringStream exp = new ANTLRStringStream(text);
 		ClipsJadexLexer lexer = new ClipsJadexLexer(exp);			
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ClipsJadexParser parser = new ClipsJadexParser(tokens);
+		parser.setImports(imports);
 		parser.setErrorList(errors);
 		try
 		{

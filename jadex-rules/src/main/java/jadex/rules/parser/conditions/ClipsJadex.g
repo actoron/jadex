@@ -189,6 +189,12 @@ protected static OAVObjectType getValueSourceType(OAVTypeModel tmodel, Object va
     {
         return errors;
     }
+    
+    protected String[]	imports;
+    public void	setImports(String[] imports)
+    {
+    	this.imports	= imports;
+    }
 }
 
 // Parser
@@ -284,15 +290,15 @@ objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
 	'(' 
 	tn=typename 
 	
-	(acs=attributeConstraint[tmodel, tmodel.getObjectType(tn), vars]
+	(acs=attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
 	{
 		consts.addAll(acs);
 	}
-	| mcs=methodConstraint[tmodel, tmodel.getObjectType(tn), vars]
+	| mcs=methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
 	{
 		consts.addAll(mcs);
 	}
-	| fcs=functionConstraint[tmodel, tmodel.getObjectType(tn), vars]
+	| fcs=functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
 	{
 		consts.addAll(fcs);
 	}
@@ -301,9 +307,9 @@ objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
 	{
 		// Set variable type if still unknown/unprecise
 		if(sfv!=null)
-			SConditions.adaptConditionType(sfv, tmodel.getObjectType(tn));
+			SConditions.adaptConditionType(sfv, SConditions.getObjectType(tmodel, tn, imports));
 		
-		OAVObjectType otype = tmodel.getObjectType(tn);
+		OAVObjectType otype = SConditions.getObjectType(tmodel, tn, imports);
 		ObjectCondition ocond = new ObjectCondition(otype, consts);
 		if(sfv!=null)
 			ocond.addConstraint(new BoundConstraint(null, sfv));
@@ -487,37 +493,40 @@ functionCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]
 	}
 	)* ')'
 	{
-		IFunction func = null;
-               if("jadex.rules.rulesystem.rules.functions.MethodCallFunction".equals(fn))
-               {
-                   String clazzname = (String)exps.remove(0);
-                   String methodname = (String)exps.remove(0);
-                   Class clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
-                   Method[] methods    = SReflect.getMethods(clazz, methodname);
-                   Method    method = null;
-                                  // Find one matching regardless of param types (hack???).
-                   // First param is object on which function will be called.
-                   for(int i=0; i<methods.length && method==null; i++)
-                   {
-                      if(methods[i].getParameterTypes().length==exps.size()-1)
-                       {
-                           method    = methods[i];
-                       }
-                   }
-                   if(method!=null)                      
-                        func = new MethodCallFunction(method);
-               }
-               else
-               {
-               		try
-               		{
-	                   func = (IFunction)SReflect.classForName0(fn, tmodel.getClassLoader()).newInstance();
-	                }
-	                catch(Exception e){}
-               }
-               if(func==null)
-                   throw new RuntimeException("Function not found: "+fn);
-               fc = new FunctionCall(func, exps); 
+				Class	clazz	= SReflect.findClass0(fn, imports, tmodel.getClassLoader());
+            	IFunction func = null;
+				if(MethodCallFunction.class.equals(clazz))
+				{
+					String clazzname = (String)exps.remove(0);
+					String methodname = (String)exps.remove(0);
+					clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
+					Method[] methods = SReflect.getMethods(clazz, methodname);
+					Method method = null;
+					// Find one matching regardless of param types (hack???).
+					// First param is object on which function will be called.
+					for(int i = 0; i < methods.length && method == null; i++)
+					{
+						if(methods[i].getParameterTypes().length == exps.size() - 1)
+						{
+							method = methods[i];
+						}
+					}
+					if(method != null)
+						func = new MethodCallFunction(method);
+				}
+				else
+				{
+					try
+					{
+						func = (IFunction)clazz.newInstance();
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				if(func == null)
+					throw new RuntimeException("Function not found: " + fn);
+				fc = new FunctionCall(func, exps); 
 	}
 	;
 

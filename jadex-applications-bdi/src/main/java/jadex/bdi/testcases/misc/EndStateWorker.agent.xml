@@ -139,7 +139,7 @@
 			
 			(not
 				(and
-					?report	= (jadex.bdi.planlib.test.TestReport (succeeded false) (reason null))
+					?report	= (TestReport (succeeded false) (reason null))
 					?rbelset_reports	= (beliefset (element_has_model ?mbelset_reports) (beliefset_has_facts contains ?report))
 					?mbelset_reports	= (mbeliefset (melement_has_name "reports"))
 				)

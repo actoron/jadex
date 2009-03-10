@@ -99,8 +99,8 @@ public class MovePlan extends Plan
 	 */
 	protected void print(String text, int indent)
     {
-        for(int x=0; x<indent; x++)
-            System.out.print(" ");
-        System.out.println(text);
+//        for(int x=0; x<indent; x++)
+//            System.out.print(" ");
+//        System.out.println(text);
     }
 }

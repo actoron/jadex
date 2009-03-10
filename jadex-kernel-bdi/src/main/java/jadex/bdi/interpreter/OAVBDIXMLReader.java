@@ -225,10 +225,10 @@ public class OAVBDIXMLReader
 
 					if(lang==null || "clips".equals(lang))
 					{
-						List	errors	= new ArrayList();
+						List	errors	= null;//new ArrayList();
 						try
 						{
-							ret = ParserHelper.parseCondition(value, state.getTypeModel(), errors);
+							ret = ParserHelper.parseCondition(value, state.getTypeModel(), getImports(state, root), errors);
 						}
 						catch(Exception e)
 						{
@@ -258,24 +258,7 @@ public class OAVBDIXMLReader
 					{
 						try
 						{
-							Collection	coll	= state.getAttributeValues(root, OAVBDIMetaModel.capability_has_imports);
-							String[] imports	= coll!=null ? (String[])coll.toArray(new String[coll.size()]) : null;
-							String	pkg	= (String)state.getAttributeValue(root, OAVBDIMetaModel.capability_has_package);
-							if(pkg!=null)
-							{
-								if(imports!=null)
-								{
-									String[]	newimports	= new String[imports.length+1];
-									System.arraycopy(imports, 0, newimports, 1, imports.length);
-									imports	= newimports;
-								}
-								else
-								{
-									imports	= new String[1];
-								}
-								imports[0]	= pkg+".*";
-							}
-							ret = exp_parser.parseExpression(value, imports, null, state.getTypeModel().getClassLoader());
+							ret = exp_parser.parseExpression(value, getImports(state, root), null, state.getTypeModel().getClassLoader());
 						}
 						catch(Exception e)
 						{
@@ -288,7 +271,7 @@ public class OAVBDIXMLReader
 						List	errors	= new ArrayList();
 						try
 						{
-							ret = ParserHelper.parseCondition(value, state.getTypeModel(), errors);
+							ret = ParserHelper.parseCondition(value, state.getTypeModel(), getImports(state, root), errors);
 						}
 						catch(Exception e)
 						{
@@ -354,24 +337,7 @@ public class OAVBDIXMLReader
 			{
 				try
 				{
-					Collection	coll	= state.getAttributeValues(root, OAVBDIMetaModel.capability_has_imports);
-					String[] imports	= coll!=null ? (String[])coll.toArray(new String[coll.size()]) : null;
-					String	pkg	= (String)state.getAttributeValue(root, OAVBDIMetaModel.capability_has_package);
-					if(pkg!=null)
-					{
-						if(imports!=null)
-						{
-							String[]	newimports	= new String[imports.length+1];
-							System.arraycopy(imports, 0, newimports, 1, imports.length);
-							imports	= newimports;
-						}
-						else
-						{
-							imports	= new String[1];
-						}
-						imports[0]	= pkg+".*";
-					}
-					Class	clazz = SReflect.findClass(value, imports, state.getTypeModel().getClassLoader());
+					Class	clazz = SReflect.findClass(value, getImports(state, root), state.getTypeModel().getClassLoader());
 					state.setAttributeValue(object, classattr, clazz);
 				}
 				catch(Exception e)
@@ -381,5 +347,30 @@ public class OAVBDIXMLReader
 				}
 			}
 		}
+	}
+
+	/**
+	 *  Extract imports from ADF.
+	 */
+	protected static String[] getImports(IOAVState state, Object root)
+	{
+		Collection	coll	= state.getAttributeValues(root, OAVBDIMetaModel.capability_has_imports);
+		String[] imports	= coll!=null ? (String[])coll.toArray(new String[coll.size()]) : null;
+		String	pkg	= (String)state.getAttributeValue(root, OAVBDIMetaModel.capability_has_package);
+		if(pkg!=null)
+		{
+			if(imports!=null)
+			{
+				String[]	newimports	= new String[imports.length+1];
+				System.arraycopy(imports, 0, newimports, 1, imports.length);
+				imports	= newimports;
+			}
+			else
+			{
+				imports	= new String[1];
+			}
+			imports[0]	= pkg+".*";
+		}
+		return imports;
 	}
 }

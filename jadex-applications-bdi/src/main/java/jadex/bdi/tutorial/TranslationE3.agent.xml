@@ -17,6 +17,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.commons.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<!-- <capabilities>
@@ -52,7 +53,7 @@
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?maxstorage))
 				?mbelief = (mbelief (melement_has_name "maxstorage"))
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?facts &amp;
-					:(&lt; ?maxstorage (jadex.rules.rulesystem.rules.functions.Length $?facts))))
+					:(&lt; ?maxstorage (Length $?facts))))
 				?mbeliefset = (mbeliefset (melement_has_name "egwords"))
 			
 				?rgoal = (goal (element_has_model ?mgoal))

@@ -11,6 +11,7 @@
 
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<capabilities>
@@ -66,9 +67,9 @@
 				?rgoal	= (goal (parameterelement_has_parameters contains ?param_result)
 								(parameterelement_has_parameters contains ?param_curtime)
 								(parameterelement_has_parameters contains ?param_buftime))
-				?result	= (jadex.adapter.base.fipa.IDFAgentDescription (leaseTime ?leasedate)
-					((jadex.rules.rulesystem.rules.functions.MethodCallFunction "java.util.Date" "getTime" ?leasedate) ?leastime))
-				(test (> (jadex.rules.rulesystem.rules.functions.Sub ?leastime ?curtime ?buftime) 0))
+				?result	= (IDFAgentDescription (leaseTime ?leasedate)
+					((MethodCallFunction "java.util.Date" "getTime" ?leasedate) ?leastime))
+				(test (> (Sub ?leastime ?curtime ?buftime) 0))
 			</maintaincondition>
 		</maintaingoal>
 

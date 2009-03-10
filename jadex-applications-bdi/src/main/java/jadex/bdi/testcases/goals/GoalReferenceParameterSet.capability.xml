@@ -11,6 +11,10 @@
 	name="GoalReferenceParameterSet"
 	package="jadex.bdi.testcases.goals">
 	
+	<imports>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>		
+	</imports>
+	
 	<goals>
 		<achievegoal name="testgoal" exported="true">
 			<parameterset name="paramset" class="String" direction="inout">
@@ -19,8 +23,8 @@
 			</parameterset>
 			<targetcondition>
 				// $goal.paramset.length>1 &amp;&amp; $goal.paramset[1].equals("result")
-				?rparamset = (parameterset (parameterset_has_name "paramset") (parameterset_has_values $?vals &amp; 
-					:(&gt; (jadex.rules.rulesystem.rules.functions.Length $?vals) 1))
+				?rparamset = (parameterset (parameterset_has_name "paramset")
+					(parameterset_has_values $?vals &amp; :(&gt; (Length $?vals) 1))
 					(parameterset_has_values ?val1 ?val2 $?x &amp; :(== ?val2 "result")))
 			</targetcondition>
 		</achievegoal>

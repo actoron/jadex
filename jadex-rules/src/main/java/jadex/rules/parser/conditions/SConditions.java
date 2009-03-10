@@ -235,4 +235,33 @@ public class SConditions
     	}
     	return ret;
     }
+    
+    /**
+     *  Get an object type while considering imports for Java types.
+     *  @param tmodel	The type model.
+     *  @param typename	The name of the type to search for.
+     *  @param imports	The imports (if any).
+     *  @param loader	The class loader.
+     *  @return	The type.
+     */
+    protected static OAVObjectType	getObjectType(OAVTypeModel tmodel, String typename, String[] imports)
+    {
+    	OAVObjectType	ret	= null;
+    	try
+    	{
+    		ret	= tmodel.getObjectType(typename);
+    	}
+    	catch(Exception e){}
+    	
+    	// If not found, search for class in imports.
+    	if(ret==null)
+    	{
+    		Class	clazz	= SReflect.findClass0(typename, imports, tmodel.getClassLoader());
+    		if(clazz==null)
+    			throw new RuntimeException("Type not found in type model: "+typename);
+    		ret	= tmodel.getJavaType(clazz);
+    	}
+    	
+    	return ret;
+    }
 }
