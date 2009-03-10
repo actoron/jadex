@@ -73,7 +73,7 @@
 				
 				?rbel_myself	= (belief (element_has_model ?mbel_myself) (belief_has_fact ?myself)) 
 				?mbel_myself	= (mbelief (melement_has_name "my_self"))
-				?myself	= (jadex.bdi.examples.hunterprey.Creature (leaseticks > 10)) 
+				?myself	= (Creature (leaseticks > 10)) 
 			</maintaincondition>
 		</maintaingoal>
 

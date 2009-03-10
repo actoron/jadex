@@ -19,6 +19,7 @@
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>java.util.logging.*</import>
 		<import>java.util.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<capabilities>
@@ -102,7 +103,7 @@
 				// $beliefbase.players.length > 0
 				?rbeliefset = (beliefset (beliefset_has_facts $?facts) (element_has_model ?mbeliefset))
 				?mbeliefset = (mbeliefset (melement_has_name "players"))
-				(test (> (jadex.rules.rulesystem.rules.functions.Length $?facts) 0))
+				(test (> (Length $?facts) 0))
 			</contextcondition>
 		</performgoal>
 
@@ -160,7 +161,7 @@
 				// $beliefbase.getBeliefSet("players").containsFact($plan.player)
 				// &amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
 			
-				?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle"))
+				?player = (Player (playingstate != "idle"))
 				?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player))
 				?rplan = (plan (parameterelement_has_parameters contains ?rparam))
 			</contextcondition>
@@ -401,12 +402,12 @@
 		
 		<!-- Check if it is the dealer's first turn. -->
 		<condition name="dealers_first_turn">
-			?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
+			?dealer = (Player (cardCnt 0))
 			?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
 			?mbelief = (mbelief (melement_has_name "myself"))
 			(not
 				(and
-			 		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
+			 		?player = (Player (playingstate != "idle") (cardCnt != 2))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
 					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
@@ -417,7 +418,7 @@
 		<condition name="dealers_second_turn">
 			(not
 				(and
-					?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
+					?player = (Player (playingstate != "idle") (playingstate != "finished"))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
 					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
@@ -444,19 +445,19 @@
 			
 			(not
 				(and
-					?p = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "playing") (playingstate != "finished"))
+					?p = (Player (playingstate != "idle") (playingstate != "playing") (playingstate != "finished"))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
 					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
 			)
 			
-			?player = (jadex.bdi.examples.blackjack.Player (playingstate "playing") (cardCnt ?cardcnt))
+			?player = (Player (playingstate "playing") (cardCnt ?cardcnt))
 			?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player)) 
 			?rplan = (plan (parameterelement_has_parameters contains ?rparam))
 			
 			(not
 				(and
-					?p = (jadex.bdi.examples.blackjack.Player (playingstate "playing") (cardCnt ?cc&amp;:(&lt; ?cc ?cardcnt)))
+					?p = (Player (playingstate "playing") (cardCnt ?cc&amp;:(&lt; ?cc ?cardcnt)))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
 					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
@@ -467,7 +468,7 @@
 		<condition name="dealer_card">
 			// $beliefbase.myself.getCards().length==1
 			
-			?player = (jadex.bdi.examples.blackjack.Player (cardCnt 1))
+			?player = (Player (cardCnt 1))
 			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
 			?mbelief = (mbelief (melement_has_name "myself"))
 		</condition>
@@ -477,7 +478,7 @@
 			// $beliefbase.myself.getState().equals(Player.STATE_FINISHED)
 			// || $beliefbase.myself.getState().equals(Player.STATE_IDLE)
 			
-			?player = (jadex.bdi.examples.blackjack.Player (playingstate "idle" | "finished"))
+			?player = (Player (playingstate "idle" | "finished"))
 			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
 			?mbelief = (mbelief (melement_has_name "myself"))
 		</condition>

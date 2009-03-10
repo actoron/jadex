@@ -499,7 +499,7 @@ functionCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]
 				{
 					String clazzname = (String)exps.remove(0);
 					String methodname = (String)exps.remove(0);
-					clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
+					clazz = SReflect.findClass0(clazzname, imports, tmodel.getClassLoader());
 					Method[] methods = SReflect.getMethods(clazz, methodname);
 					Method method = null;
 					// Find one matching regardless of param types (hack???).

@@ -20,6 +20,7 @@
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<capabilities>
@@ -64,7 +65,7 @@
 			<creationcondition>
 				// $beliefbase.initial_orders!=null
 				?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?x ?order $?y))
-				?order = (jadex.bdi.examples.booktrading.common.Order (state "open"))
+				?order = (Order (state "open"))
 				?mbelset = (mbeliefset (melement_has_name "initial_orders"))
 				(not
 					(and
@@ -83,17 +84,17 @@
 				// ?mbelief = (mbelief (melement_has_name "time"))
 				// ?rparam = (parameter (parameter_has_name "order"))
 				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-				// ?order = (jadex.bdi.examples.booktrading.common.Order (getDeadline() ?deadline))
-				// (test (?time &gt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction "java.util.Date" "getTime" ?deadline)))
+				// ?order = (Order (getDeadline() ?deadline))
+				// (test (?time &gt; (MethodCallFunction "Date" "getTime" ?deadline)))
 			
-				?order = (jadex.bdi.examples.booktrading.common.Order (state "failed"))
+				?order = (Order (state "failed"))
 				?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
 			<targetcondition>
 				// Order.DONE.equals($goal.order.getState())
 				?rparam =(parameter (parameter_has_name "order") (parameter_has_value ?order)) 
-				?order = (jadex.bdi.examples.booktrading.common.Order (state "done"))
+				?order = (Order (state "done"))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</targetcondition>
 		</achievegoal>

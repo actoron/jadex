@@ -21,6 +21,7 @@
 		<import>jadex.bdi.examples.cleanerworld.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.commons.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<capabilities>
@@ -206,16 +207,14 @@
 					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?inwaste))
 					?ringoal = (goal (parameterelement_has_parameters contains ?rinparam))
 					
-					?inwaste = (jadex.bdi.examples.cleanerworld.Waste (location ?inwasteloc &amp; 
-						:(&lt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction 
-							"jadex.bdi.examples.cleanerworld.Location" "getDistance" ?myloc ?wasteloc)
-							(jadex.rules.rulesystem.rules.functions.MethodCallFunction 
-							"jadex.bdi.examples.cleanerworld.Location" "getDistance" ?myloc ?inwasteloc)  
+					?inwaste = (Waste (location ?inwasteloc &amp; 
+						:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
+							(MethodCallFunction "Location" "getDistance" ?myloc ?inwasteloc)  
 					)))
 	
 					// Does not work because Locations are not directly in state.
-					// ?wasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) ?wastedist))
-					// ?inwasteloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &lt; ?wastedist))				
+					// ?wasteloc = (Location (getDistance(?myloc) ?wastedist))
+					// ?inwasteloc = (Location (getDistance(?myloc) &lt; ?wastedist))				
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. - ->
@@ -264,9 +263,8 @@
 				// $goal.wastebin.isFull()
 				
 				?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
-				?wastebin = (jadex.bdi.examples.cleanerworld.Wastebin (isFull() true)) 
-					//&amp; :(jadex.rules.rulesystem.rules.functions.MethodCallFunction 
-					//	"jadex.bdi.examples.cleanerworld.Wastebin" "isFull" ?wastebin)))
+				?wastebin = (Wastebin (isFull() true)) 
+					//&amp; :(MethodCallFunction "Wastebin" "isFull" ?wastebin)))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
 		</achievegoal>
@@ -292,7 +290,7 @@
 					order by $beliefbase.getBelief("my_location").getFact().getDistance($wastebin.getLocation())
 				</value> -->
 				<value language="clips">
-					?ret = (jadex.bdi.examples.cleanerworld.Wastebin (location ?loc) (isFull() false))
+					?ret = (Wastebin (location ?loc) (isFull() false))
 					
 					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
 					?mbeliefset = (mbeliefset (melement_has_name "wastebins"))
@@ -302,9 +300,9 @@
 					
 					(not 
 						(and
-							?other = (jadex.bdi.examples.cleanerworld.Wastebin (location ?otherloc))
-							?otherloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) ?otherdist))
-							?loc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &gt; ?otherdist))
+							?other = (Wastebin (location ?otherloc))
+							?otherloc = (Location (getDistance(?myloc) ?otherdist))
+							?loc = (Location (getDistance(?myloc) &gt; ?otherdist))
 						)
 					)
 				</value>
@@ -320,16 +318,16 @@
 					order by $beliefbase.getBelief("my_location").getFact().getDistance($station.getLocation())
 				</value>-->
 				<value language="clips">
-					?ret = (jadex.bdi.examples.cleanerworld.Chargingstation (location ?loc))
+					?ret = (Chargingstation (location ?loc))
 					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
 					?mbeliefset = (mbeliefset (melement_has_name "chargingstations"))
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
 					?mbelief = (mbelief (melement_has_name "my_location"))
 					(not 
 						(and
-							?other = (jadex.bdi.examples.cleanerworld.Chargingstation (location ?otherloc))
-							?otherloc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) ?otherdist))
-							?loc = (jadex.bdi.examples.cleanerworld.Location (getDistance(?myloc) &gt; ?otherdist))
+							?other = (Chargingstation (location ?otherloc))
+							?otherloc = (Location (getDistance(?myloc) ?otherdist))
+							?loc = (Location (getDistance(?myloc) &gt; ?otherdist))
 						)
 					)
 				</value>

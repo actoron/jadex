@@ -100,7 +100,7 @@
 					)
 				)
 
-				?mylocation	= (jadex.bdi.examples.marsworld.Location (isNear(?myhome) false))
+				?mylocation	= (Location (isNear(?myhome) false))
 			</creationcondition>
 		</achievegoal>
 	</goals>

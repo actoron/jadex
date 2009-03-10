@@ -153,7 +153,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 			<targetcondition>
 				?param = (parameter (parameter_has_name "block") (parameter_has_value ?block))
 				?rgoal = (goal (parameterelement_has_parameters contains ?param))
-				?block = (jadex.bdi.examples.blocksworld.Block (clear true))
+				?block = (Block (clear true))
 	
 				<!-- // $goal.block.isClear()
 				
@@ -176,7 +176,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 				$target	: Block()
 				$block	: Block(lower == $target)-->
 				
-				?block	= (jadex.bdi.examples.blocksworld.Block (lower ?target))
+				?block	= (Block (lower ?target))
 				?param2	= (parameter (parameter_has_name "block") (parameter_has_value ?block))
 				?param1	= (parameter (parameter_has_name "target") (parameter_has_value ?target))
 				?rgoal	= (goal (parameterelement_has_parameters contains ?param1) (parameterelement_has_parameters contains ?param2))
@@ -196,36 +196,36 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 				?rgoal = (goal (parameterelement_has_parameters contains ?param))				
 				(not
 					(and
-						?block1	= (jadex.bdi.examples.blocksworld.Block (color ?colorb))
-						?table	= (jadex.bdi.examples.blocksworld.Table (allBlocks contains ?block1))
+						?block1	= (Block (color ?colorb))
+						?table	= (Table (allBlocks contains ?block1))
 						(not
 							(and
-								?block2	= (jadex.bdi.examples.blocksworld.Block (color ?colorb))
-								?conf	= (jadex.bdi.examples.blocksworld.Table (allBlocks contains ?block2))
+								?block2	= (Block (color ?colorb))
+								?conf	= (Table (allBlocks contains ?block2))
 							)
 						)
 					)
 				)
 				(not
 					(and
-						?block1	= (jadex.bdi.examples.blocksworld.Block (color ?colorb))
-						?conf	= (jadex.bdi.examples.blocksworld.Table (allBlocks contains ?block1))
+						?block1	= (Block (color ?colorb))
+						?conf	= (Table (allBlocks contains ?block1))
 						(not
 							(and
-								?block2	= (jadex.bdi.examples.blocksworld.Block (color ?colorb))
-								?table	= (jadex.bdi.examples.blocksworld.Table (allBlocks contains ?block2))
+								?block2	= (Block (color ?colorb))
+								?table	= (Table (allBlocks contains ?block2))
 							)
 						)
 					)
 				)
 				(not
 					(and
-						?block1	= (jadex.bdi.examples.blocksworld.Block (lower ?lower1) (color ?colorb))
-						?table	= (jadex.bdi.examples.blocksworld.Table (allBlocks contains ?block1))
-						?block2	= (jadex.bdi.examples.blocksworld.Block (lower ?lower2) (color ?colorb))
-						?conf	= (jadex.bdi.examples.blocksworld.Table (allBlocks contains ?block2))
-						?lower1	= (jadex.bdi.examples.blocksworld.Block (color ?colorl))
-						?lower2	= (jadex.bdi.examples.blocksworld.Block (color != ?colorl))
+						?block1	= (Block (lower ?lower1) (color ?colorb))
+						?table	= (Table (allBlocks contains ?block1))
+						?block2	= (Block (lower ?lower2) (color ?colorb))
+						?conf	= (Table (allBlocks contains ?block2))
+						?lower1	= (Block (color ?colorl))
+						?lower2	= (Block (color != ?colorl))
 					)
 				)
 			</targetcondition>

@@ -47,7 +47,7 @@
 			<!-- <unique/> -->
 			<creationcondition>
 				// alarm.isActive()
-				?alarm = (jadex.bdi.examples.alarmclock.Alarm (active true) (alarmtime != -2))
+				?alarm = (Alarm (active true) (alarmtime != -2))
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
 				?mbeliefset = (mbeliefset (melement_has_name "alarms"))
 				(not
@@ -59,7 +59,7 @@
 			</creationcondition>
 			<contextcondition>
 				// $goal.alarm.isActive()
-				?alarm = (jadex.bdi.examples.alarmclock.Alarm (active true))
+				?alarm = (Alarm (active true))
 				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</contextcondition>
@@ -76,7 +76,7 @@
 			</dropcondition>
 			<targetcondition>
 				// $goal.alarm.getAlarmtime()==Alarm.NO_ALARM
-				?alarm = (jadex.bdi.examples.alarmclock.Alarm (alarmtime -2))
+				?alarm = (Alarm (alarmtime -2))
 				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</targetcondition>

@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-03-10 16:44:34
+// $ANTLR 3.0.1 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-03-10 17:41:48
 
 package jadex.rules.parser.conditions;
 
@@ -6992,7 +6992,7 @@ public class ClipsJadexParser extends Parser {
             				{
             					String clazzname = (String)exps.remove(0);
             					String methodname = (String)exps.remove(0);
-            					clazz = SReflect.classForName0(clazzname, tmodel.getClassLoader());
+            					clazz = SReflect.findClass0(clazzname, imports, tmodel.getClassLoader());
             					Method[] methods = SReflect.getMethods(clazz, methodname);
             					Method method = null;
             					// Find one matching regardless of param types (hack???).

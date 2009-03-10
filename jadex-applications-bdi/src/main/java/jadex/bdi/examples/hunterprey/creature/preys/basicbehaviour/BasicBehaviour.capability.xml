@@ -15,6 +15,7 @@
 
 	<imports>
 		<import>jadex.bdi.examples.hunterprey.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<capabilities>
@@ -87,8 +88,8 @@
 					(and
 						?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
 						?mbel_vision	= (mbelief (melement_has_name "vision"))
-						?hunter	= (jadex.bdi.examples.hunterprey.Hunter)
-						?vision	= (jadex.bdi.examples.hunterprey.Vision (objects contains ?hunter))
+						?hunter	= (Hunter)
+						?vision	= (Vision (objects contains ?hunter))
 					)
 				)
 			</maintaincondition>
@@ -127,10 +128,8 @@
 					
 					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?infood))
 					?ringoal = (goal (parameterelement_has_parameters contains ?rinparam &amp;
-						:(&lt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction 
-							"jadex.bdi.examples.hunterprey.Creature" "getDistance" ?myself ?food)
-							(jadex.rules.rulesystem.rules.functions.MethodCallFunction 
-							"jadex.bdi.examples.hunterprey.Creature" "getDistance" ?myself ?infood)  
+						:(&lt; (MethodCallFunction "Creature" "getDistance" ?myself ?food)
+							(MethodCallFunction "Creature" "getDistance" ?myself ?infood)  
 					)))
 				</inhibits>
 			</deliberation>
