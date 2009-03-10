@@ -386,15 +386,16 @@ public class GoalProcessingRules
 		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
 		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.goal_has_recur, Boolean.FALSE));
 		mgoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.achievegoal_has_targetcondition, target));
-		mgoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_rebuild, retry));
-		mgoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_retry, rebuild));
+		mgoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_rebuild, rebuild));
+		mgoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_retry, retry));
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finishedplans, fplans));
-		IConstraint rebapl = new AndConstraint(new IConstraint[]{new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_apl, null, IOperator.EQUAL), new LiteralConstraint(rebuild, Boolean.FALSE)});
+		IConstraint rebapl = new AndConstraint(new IConstraint[]{new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_apl, null, 
+			IOperator.EQUAL), new LiteralConstraint(rebuild, Boolean.FALSE)});
 		IConstraint nomoreplan = new OrConstraint(new IConstraint[]{new LiteralConstraint(retry, Boolean.FALSE), rebapl});
 		goalcon.addConstraint(nomoreplan);
 		

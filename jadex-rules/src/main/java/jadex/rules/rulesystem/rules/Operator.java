@@ -334,11 +334,12 @@ public class Operator
 			boolean ret;
 			if(val2 instanceof Class)
 			{
-				ret = ((Class)val2).isAssignableFrom(val2.getClass());
+				ret = ((Class)val2).isAssignableFrom(val2 instanceof Class? (Class)val2: val2.getClass());
 			}
 			else //if(val2 instanceof OAVObjectType)
 			{
-				ret = state.getType(val1).isSubtype((OAVObjectType)val2);
+				ret = val1 instanceof OAVObjectType? ((OAVObjectType)val1).isSubtype((OAVObjectType)val2)
+					:state.getType(val1).isSubtype((OAVObjectType)val2);
 			}
 			return ret;
 		}
