@@ -891,11 +891,6 @@ public class EventProcessingRules
 
 		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
 		agentcon.addConstraint(new BoundConstraint(null, ragent));
-//		agentcon.addConstraint(new OrConstraint(new IConstraint[]
-//		{
-//			new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, rpe),
-//			new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null)
-//		}));
 				
 		ObjectCondition	metagoalcon	= new ObjectCondition(OAVBDIMetaModel.metagoal_type);
 		metagoalcon.addConstraint(new BoundConstraint(null, mmetagoal));

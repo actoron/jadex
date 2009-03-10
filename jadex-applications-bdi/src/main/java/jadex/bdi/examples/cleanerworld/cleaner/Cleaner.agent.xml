@@ -174,13 +174,20 @@
 			<dropcondition>
 				// $beliefbase.carriedwaste==null &amp;&amp;
 				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
+				
 				// ?rgoal and ?mgoal are provided internally
-				?rgoal = (goal (parameterelement_has_parameters $?x ?rparam $?y))
 				?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				
+				//?rgoal = (goal (parameterelement_has_parameters $?x ?rparam $?y))
+				//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+				
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts excludes ?waste))
 				?mbeliefset = (mbeliefset (melement_has_name "wastes"))
+				
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
 				?mbelief = (mbelief (melement_has_name "carriedwaste"))
+				
 				// todo: make sure that all elements are in same capa
  			</dropcondition>
 			<deliberation cardinality="1">
@@ -198,6 +205,7 @@
 					
 					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?inwaste))
 					?ringoal = (goal (parameterelement_has_parameters contains ?rinparam))
+					
 					?inwaste = (jadex.bdi.examples.cleanerworld.Waste (location ?inwasteloc &amp; 
 						:(&lt; (jadex.rules.rulesystem.rules.functions.MethodCallFunction 
 							"jadex.bdi.examples.cleanerworld.Location" "getDistance" ?myloc ?wasteloc)
@@ -253,6 +261,8 @@
 				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
 			</failurecondition> -->
 			<dropcondition>
+				// $goal.wastebin.isFull()
+				
 				?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
 				?wastebin = (jadex.bdi.examples.cleanerworld.Wastebin (isFull() true)) 
 					//&amp; :(jadex.rules.rulesystem.rules.functions.MethodCallFunction 
@@ -283,10 +293,13 @@
 				</value> -->
 				<value language="clips">
 					?ret = (jadex.bdi.examples.cleanerworld.Wastebin (location ?loc) (isFull() false))
+					
 					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
 					?mbeliefset = (mbeliefset (melement_has_name "wastebins"))
+					
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
 					?mbelief = (mbelief (melement_has_name "my_location"))
+					
 					(not 
 						(and
 							?other = (jadex.bdi.examples.cleanerworld.Wastebin (location ?otherloc))

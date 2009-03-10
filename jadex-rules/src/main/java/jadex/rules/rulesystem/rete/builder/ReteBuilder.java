@@ -8,6 +8,7 @@ import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
 import jadex.rules.rulesystem.rete.constraints.NotConstraintEvaluator;
 import jadex.rules.rulesystem.rete.constraints.OrConstraintEvaluator;
+import jadex.rules.rulesystem.rete.extractors.ChainedExtractor;
 import jadex.rules.rulesystem.rete.extractors.ConstantExtractor;
 import jadex.rules.rulesystem.rete.extractors.FunctionExtractor;
 import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
@@ -1275,7 +1276,20 @@ public class ReteBuilder
 	{
 		IValueExtractor ret = null;
 		
-		if(valuesource==null || valuesource instanceof OAVAttributeType)
+		if(valuesource instanceof OAVAttributeType[])
+		{
+			OAVAttributeType[] sources = (OAVAttributeType[])valuesource;
+			
+			IValueExtractor[] extrs = new IValueExtractor[sources.length];  
+			extrs[0] = createValueExtractor(tupleindex, sources[0], subindex, context);
+			for(int i=1; i<sources.length; i++)
+			{
+				extrs[i] = createObjectExtractor(sources[i]);
+			}
+			
+			ret = new ChainedExtractor(extrs);
+		}
+		else if(valuesource==null || valuesource instanceof OAVAttributeType)
 		{
 			OAVAttributeType attr = (OAVAttributeType)valuesource;
 			if(tupleindex!=-1 && subindex==-1)

@@ -19,6 +19,7 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -178,19 +179,25 @@ public class BeliefRules
 		Variable mbelief = new Variable("?mbelief", OAVBDIMetaModel.belief_type);
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
 			
-		ObjectCondition	mbelcon = new ObjectCondition(OAVBDIMetaModel.belief_type);
-		mbelcon.addConstraint(new BoundConstraint(null, mbelief));
-		mbelcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, btname));
-		
 		ObjectCondition	belcon	= new ObjectCondition(OAVBDIRuntimeModel.belief_type);
 		belcon.addConstraint(new BoundConstraint(null, rbelief));
 		belcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mbelief));
 		
+//		belcon.addConstraint(new AttributeConstraint(OAVBDIRuntimeModel.element_has_model, new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, btname)));
+//		belcon.addConstraint(new VariableConstraint(mbelief, new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, btname));
+		belcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, btname));
+		
+//		ObjectCondition	mbelcon = new ObjectCondition(OAVBDIMetaModel.belief_type);
+//		mbelcon.addConstraint(new BoundConstraint(null, mbelief));
+//		mbelcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, btname));
+		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
 
-		Rule dynamic_belief = new Rule(btname+"_dynamicfact", new AndCondition(new ICondition[]{mbelcon, belcon, capcon, usercond}), 
+		Rule dynamic_belief = new Rule(btname+"_dynamicfact", new AndCondition(new ICondition[]{belcon, capcon, usercond}), 
 			DYNAMIC_BELIEF_CHANGED);
+//		Rule dynamic_belief = new Rule(btname+"_dynamicfact", new AndCondition(new ICondition[]{mbelcon, belcon, capcon, usercond}), 
+//			DYNAMIC_BELIEF_CHANGED);
 		return dynamic_belief;
 	}
 	
