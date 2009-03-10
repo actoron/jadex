@@ -313,7 +313,7 @@ objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
 
 // Constraints
 attributeConstraint [OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints]	
-	: '(' sn=slotname cs=constraint[tmodel, otype.getAttributeType(sn), vars] ')'
+	: '(' sn=slotname cs=constraint[tmodel, SConditions.convertAttributeTypes(otype, sn), vars] ')'
 	{
 		$constraints = cs;
 	}
@@ -599,8 +599,24 @@ typename returns [String id]
 	;
 
 slotname returns [String id]
-	: tmp=identifier {$id = tmp.getText();}
+	: 
+	{
+		StringBuffer buf = new StringBuffer();
+	}
+	tmp=identifier 
+	{
+		buf.append(tmp.getText());
+	}
+	('.' tmp=identifier
+	{
+		buf.append(".").append(tmp.getText());
+	}
+	)*
+	{
+		$id = buf.toString();
+	}
 	;
+
 	
 methodname returns [String id]
 	: tmp=identifier {$id = tmp.getText();}

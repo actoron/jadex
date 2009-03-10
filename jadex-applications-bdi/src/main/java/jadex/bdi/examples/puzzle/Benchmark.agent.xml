@@ -47,8 +47,15 @@
 			<parameter name="depth" class="int"/>
 			<targetcondition>
 				// $beliefbase.getBelief("board").getFact().isSolution()
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?board))
-				?mbelief = (mbelief (melement_has_name "board"))
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?board))
+				// ?mbelief = (mbelief (melement_has_name "board"))
+				// ?board = (jadex.bdi.examples.puzzle.IBoard (solution true))
+
+				// ?rbelief = (belief
+				//	(element_has_model.melement_has_name "board")
+				//	(((jadex.bdi.examples.puzzle.IBoard)belief_has_fact).solution true))
+
+				?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact ?board))
 				?board = (jadex.bdi.examples.puzzle.IBoard (solution true))
 			</targetcondition>
  		</achievegoal>

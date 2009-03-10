@@ -11,6 +11,7 @@ import jadex.rules.state.OAVTypeModel;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.antlr.runtime.TokenStream;
 
@@ -205,6 +206,33 @@ public class SConditions
 //    		+"'"+input.LT(1).getText()+"' "
 //    		+"'"+input.LT(2).getText()+"' "
 //    		+"'"+input.LT(3).getText()+"'");
+    	return ret;
+    }
+    
+    /**
+     *  Convert slot name(s) to attribute(s) types.
+     *  @param otype	The object type.
+     *  @param slotname	The slotname string.
+     *  @return The attribute type or an array of attribute types. 
+     */
+    protected static Object	convertAttributeTypes(OAVObjectType otype, String slotname)
+    {
+    	Object	ret;
+    	if(slotname.indexOf(".")!=-1)
+    	{
+    		StringTokenizer	stok	= new StringTokenizer(slotname, ".");
+    		OAVAttributeType[]	aret	= new OAVAttributeType[stok.countTokens()];
+    		for(int i=0; i<aret.length; i++)
+    		{
+    			aret[i]	= otype.getAttributeType(stok.nextToken());
+    			otype	= aret[i].getType();
+    		}
+    		ret	= aret;
+    	}
+    	else
+    	{
+    		ret	= otype.getAttributeType(slotname);
+    	}
     	return ret;
     }
 }
