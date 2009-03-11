@@ -65,8 +65,10 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	 *  Create a new node.
 	 *  @param state The state.
 	 */
-	public SplitNode(IValueExtractor extractor, OAVAttributeType attr, String[] splitpattern)
+	public SplitNode(int nodeid, IValueExtractor extractor, OAVAttributeType attr, String[] splitpattern)
 	{
+		super(nodeid);
+		
 		assert extractor!=null;
 		assert attr!=null;
 		assert !OAVAttributeType.NONE.equals(attr.getMultiplicity());

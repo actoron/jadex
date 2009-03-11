@@ -26,9 +26,9 @@ public class NotNode extends AbstractBetaNode
 	/**
 	 *  Create a new not node.
 	 */
-	public NotNode(IConstraintEvaluator[] evaluators, ConstraintIndexer[] indexers)
+	public NotNode(int nodeid, IConstraintEvaluator[] evaluators, ConstraintIndexer[] indexers)
 	{
-		super(evaluators, indexers);
+		super(nodeid, evaluators, indexers);
 	}
 	
 	//-------- tuple consumer interface (left) --------

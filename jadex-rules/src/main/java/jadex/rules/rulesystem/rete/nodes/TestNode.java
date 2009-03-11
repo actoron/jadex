@@ -39,8 +39,9 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	 *  Create a new test node.
 	 *  @param evaluator The evaluator.
 	 */
-	public TestNode(IConstraintEvaluator evaluator)
+	public TestNode(int nodeid, IConstraintEvaluator evaluator)
 	{
+		super(nodeid);
 		this.evaluator = evaluator;
 	}
 	

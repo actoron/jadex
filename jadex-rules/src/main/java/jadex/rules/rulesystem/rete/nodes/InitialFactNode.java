@@ -41,6 +41,14 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	//-------- methods --------
 	
 	/**
+	 *  Create a new node. 
+	 */
+	public InitialFactNode(int nodeid)
+	{
+		super(nodeid);
+	}
+	
+	/**
 	 *  Initialize the pattern matcher.
 	 *  Called before the agenda is accessed
 	 *  to perform any initialization, if necessary.

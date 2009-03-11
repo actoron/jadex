@@ -545,7 +545,7 @@ public class ReteBuilder
 	 *  @param source The source node.
 	 *  @param consumer The consumer node.
 	 */
-	protected void connectLeft(INode source, INode consumer)
+	protected void connectLeft(INode source, INode consumer, BuildContext context)
 	{
 		// Connect compatible nodes directly.
 		if(source instanceof ITupleSourceNode && consumer instanceof ITupleConsumerNode)
@@ -577,7 +577,7 @@ public class ReteBuilder
 			// If not found create and connect new adapter.
 			if(lia==null)
 			{
-				lia	= new LeftInputAdapterNode();
+				lia	= new LeftInputAdapterNode(context.getRootNode().getNextNodeId());
 				lia.setObjectSource(s);
 				s.addObjectConsumer(lia);
 			}
@@ -599,7 +599,7 @@ public class ReteBuilder
 	 *  @param source The source node.
 	 *  @param consumer The consumer node.
 	 */
-	protected void connectRight(INode source, INode consumer)
+	protected void connectRight(INode source, INode consumer, BuildContext context)
 	{
 		// Connect compatible nodes directly.
 		if(source instanceof IObjectSourceNode && consumer instanceof IObjectConsumerNode)
@@ -630,7 +630,7 @@ public class ReteBuilder
 			// If not found create and connect new adapter.
 			if(ria==null)
 			{
-				ria	= new RightInputAdapterNode();
+				ria	= new RightInputAdapterNode(context.getRootNode().getNextNodeId());
 				ria.setTupleSource(tsource);
 				tsource.addTupleConsumer(ria);
 			}
@@ -946,8 +946,8 @@ public class ReteBuilder
 		INode node = context.getRootNode().getTypeNode(type);
 		if(node==null)
 		{
-			node = new TypeNode(type);
-			connectRight(context.getRootNode(), node);
+			node = new TypeNode(context.getRootNode().getNextNodeId(), type);
+			connectRight(context.getRootNode(), node, context);
 		}
 		context.setLastAlphaNode(node);
 	}	
@@ -981,8 +981,8 @@ public class ReteBuilder
 		// If not found create new node.
 		if(node==null)
 		{
-			node	= new AlphaNode(evas);
-			connectRight(context.getLastAlphaNode(), node);
+			node	= new AlphaNode(context.getRootNode().getNextNodeId(), evas);
+			connectRight(context.getLastAlphaNode(), node, context);
 		}
 
 		context.setLastAlphaNode(node);
@@ -1019,8 +1019,8 @@ public class ReteBuilder
 		// If not found create new node.
 		if(node==null)
 		{
-			node = new SplitNode(createValueExtractor(-1, attr, -1, context), attr, binds);
-			connectRight(context.getLastAlphaNode(), node);
+			node = new SplitNode(context.getRootNode().getNextNodeId(), createValueExtractor(-1, attr, -1, context), attr, binds);
+			connectRight(context.getLastAlphaNode(), node, context);
 		}
 
 		context.setLastAlphaNode(node);
@@ -1090,9 +1090,9 @@ public class ReteBuilder
 		// If not found create new node.
 		if(node==null)
 		{
-			node = new BetaNode(evas, ids);
-			connectRight(context.getLastAlphaNode(), node);
-			connectLeft(context.getLastBetaNode(), node);
+			node = new BetaNode(context.getRootNode().getNextNodeId(), evas, ids);
+			connectRight(context.getLastAlphaNode(), node, context);
+			connectLeft(context.getLastBetaNode(), node, context);
 		}
 
 		context.setLastBetaNode(node);
@@ -1146,9 +1146,9 @@ public class ReteBuilder
 		
 		if(node==null)
 		{
-			node = new NotNode(evas, ids);
-			connectRight(context.getLastAlphaNode(), node);
-			connectLeft(context.getLastBetaNode(), node);
+			node = new NotNode(context.getRootNode().getNextNodeId(), evas, ids);
+			connectRight(context.getLastAlphaNode(), node, context);
+			connectLeft(context.getLastBetaNode(), node, context);
 			//context.setLastBetaNode(nn);
 			//context.setTupleCount(tuplecnt);
 		}
@@ -1167,8 +1167,8 @@ public class ReteBuilder
 		InitialFactNode node	= context.getRootNode().getInitialFactNode();
 		if(node==null)
 		{
-			node	= new InitialFactNode();
-			connectRight(context.getRootNode(), node);
+			node	= new InitialFactNode(context.getRootNode().getNextNodeId());
+			connectRight(context.getRootNode(), node, context);
 		}
 
 		// Update the context.
@@ -1183,8 +1183,8 @@ public class ReteBuilder
 	 */
 	protected void addTestNode(IConstraintEvaluator eva, BuildContext context)
 	{
-		INode node = new TestNode(eva);
-		connectLeft(context.getLastBetaNode(), node);
+		INode node = new TestNode(context.getRootNode().getNextNodeId(), eva);
+		connectLeft(context.getLastBetaNode(), node, context);
 		context.setLastBetaNode(node);
 	}
 	
@@ -1195,8 +1195,8 @@ public class ReteBuilder
 	 */
 	protected void addCollectNode(IConstraintEvaluator[] evas, int tuplecnt, BuildContext context)
 	{
-		INode node = new CollectNode(tuplecnt, evas);
-		connectLeft(context.getLastBetaNode(), node);
+		INode node = new CollectNode(context.getRootNode().getNextNodeId(), tuplecnt, evas);
+		connectLeft(context.getLastBetaNode(), node, context);
 		context.setLastBetaNode(node);
 	}
 
@@ -1217,8 +1217,8 @@ public class ReteBuilder
 			extractors.put(var.getName(), getLeftVariableExtractor(context, var));
 		}
 		
-		TerminalNode tnode = new TerminalNode(rule, extractors);
-		connectLeft(context.getLastBetaNode(), tnode);
+		TerminalNode tnode = new TerminalNode(context.getRootNode().getNextNodeId(), rule, extractors);
+		connectLeft(context.getLastBetaNode(), tnode, context);
 		
 		// Save the terminal node for later removal
 		context.getRootNode().putTerminalNode(tnode);

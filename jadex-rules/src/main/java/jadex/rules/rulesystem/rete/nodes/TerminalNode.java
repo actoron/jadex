@@ -45,8 +45,9 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	/**
 	 *  Create a new node.
 	 */
-	public TerminalNode(IRule rule, Map extractors)
+	public TerminalNode(int nodeid, IRule rule, Map extractors)
 	{
+		super(nodeid);
 		this.rule = rule;
 		this.extractors = extractors;
 	}

@@ -38,8 +38,9 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	 *  Create a new node.
 	 *  @param evaluators The evaluators.
 	 */
-	public AlphaNode(IConstraintEvaluator[] evaluators)
+	public AlphaNode(int nodeid, IConstraintEvaluator[] evaluators)
 	{
+		super(nodeid);
 		this.evaluators	= evaluators;
 	}
 

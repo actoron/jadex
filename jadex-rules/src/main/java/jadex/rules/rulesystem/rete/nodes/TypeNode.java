@@ -18,9 +18,9 @@ public class TypeNode extends AlphaNode
 	/**
 	 *  Create a new node.
 	 */
-	public TypeNode(OAVObjectType type)
+	public TypeNode(int nodeid, OAVObjectType type)
 	{
-		super(null); // Need no constraint check as this is already done in the rete node
+		super(nodeid, null); // Need no constraint check as this is already done in the rete node
 
 		this.type = type;
 	}

@@ -28,6 +28,14 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 	//-------- ITupleConsumer interface --------
 
 	/**
+	 *  Create a new node. 
+	 */
+	public RightInputAdapterNode(int nodeid)
+	{
+		super(nodeid);
+	}
+	
+	/**
 	 *  Add a new tuple to this node.
 	 *  @param tuple The tuple.
 	 */

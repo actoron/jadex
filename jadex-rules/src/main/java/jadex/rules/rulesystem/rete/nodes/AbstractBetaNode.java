@@ -47,8 +47,9 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	/**
 	 *  Create a new beta node.
 	 */
-	public AbstractBetaNode(IConstraintEvaluator[] evaluators, ConstraintIndexer[] xevaluators)
+	public AbstractBetaNode(int nodeid, IConstraintEvaluator[] evaluators, ConstraintIndexer[] xevaluators)
 	{
+		super(nodeid);
 		this.evaluators	= evaluators;
 		this.indexers = xevaluators;
 	}

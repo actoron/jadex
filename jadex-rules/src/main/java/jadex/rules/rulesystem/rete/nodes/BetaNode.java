@@ -22,9 +22,9 @@ public class BetaNode extends AbstractBetaNode
 	/**
 	 *  Create a new beta node.
 	 */
-	public BetaNode(IConstraintEvaluator[] evaluators, ConstraintIndexer[] xevaluators)
+	public BetaNode(int nodeid, IConstraintEvaluator[] evaluators, ConstraintIndexer[] xevaluators)
 	{
-		super(evaluators, xevaluators);
+		super(nodeid, evaluators, xevaluators);
 	}
 	
 	//-------- tuple consumer interface (left) --------

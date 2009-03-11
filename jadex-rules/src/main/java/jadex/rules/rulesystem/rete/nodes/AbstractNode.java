@@ -9,28 +9,20 @@ import java.util.HashMap;
  *  Abstract super class for all kinds of nodes.
  */
 public abstract class AbstractNode implements INode
-{
-	//-------- static part --------
-	
-	/** The static node id counter. */
-	protected static int idcounter = 0;
-	
+{	
 	//-------- attributes --------
 	
 	/** The node id. */
-	protected final int nodeid;
-	
-	/** The use count. */
-	//protected int usecount;
+	protected int nodeid;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new node.
 	 */
-	public AbstractNode()
+	public AbstractNode(int nodeid)
 	{
-		this.nodeid = idcounter++;
+		this.nodeid = nodeid;
 	}
 	
 	//-------- methods --------
@@ -44,31 +36,6 @@ public abstract class AbstractNode implements INode
 		return nodeid;
 	}
 
-	/**
-	 *  Get the use count.
-	 *  @return The number of rules that use this node.
-	 * /
-	public int getUseCount()
-	{
-		return usecount;
-	}*/
-	
-	/**
-	 *  Increment use count.
-	 * /
-	public void incrementUseCount()
-	{
-		usecount++;
-	}*/
-	
-	/**
-	 *  Decrement use count.
-	 * /
-	public void decrementUseCount()
-	{
-		usecount--;
-	}*/
-	
 	/**
 	 *  Get the hashcode.
 	 *  @return The hash code.

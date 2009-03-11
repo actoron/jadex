@@ -48,8 +48,9 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	/**
 	 *  Create a new beta node.
 	 */
-	public CollectNode(int tupleindex, IConstraintEvaluator[] evaluators)
+	public CollectNode(int nodeid, int tupleindex, IConstraintEvaluator[] evaluators)
 	{
+		super(nodeid);
 //		System.out.println("Collect Node created");
 //		Thread.dumpStack();
 		this.tupleindex = tupleindex;

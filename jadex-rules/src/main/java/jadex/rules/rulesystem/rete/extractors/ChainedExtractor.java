@@ -39,7 +39,7 @@ public class ChainedExtractor implements IValueExtractor
 	public Object getValue(Tuple left, Object right, IOAVState state)
 	{
 		Object ret = extractors[0].getValue(left, right, state);
-		for(int i=1; i<extractors.length; i++)
+		for(int i=1; ret!=null && i<extractors.length; i++)
 		{
 			ret = extractors[i].getValue(null, ret, state);
 		}

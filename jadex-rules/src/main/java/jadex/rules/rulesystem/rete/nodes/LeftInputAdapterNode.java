@@ -30,6 +30,14 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 	//-------- object consumer node --------
 	
 	/**
+	 *  Create a new node. 
+	 */
+	public LeftInputAdapterNode(int nodeid)
+	{
+		super(nodeid);
+	}
+	
+	/**
 	 *  Send an object to this node.
 	 *  @param object The object.
 	 */

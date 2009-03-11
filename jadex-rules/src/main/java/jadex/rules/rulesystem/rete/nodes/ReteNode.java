@@ -47,6 +47,9 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	/** Do a consistency check after each state change (requires asserts). */
 	protected boolean	check;
 	
+	/** The node counter in this network. */
+	protected int nodecounter;
+	
 	//-------- constructors --------
 	
 	/**
@@ -55,6 +58,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public ReteNode()
 	{
+		super(0);
+		this.nodecounter = 1;
 		this.typenodes = new LinkedHashMap();		
 		this.terminalnodes = new LinkedHashMap();
 
@@ -511,5 +516,14 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		checked.clear();
 		
 		return consistent;
+	}
+	
+	/**
+	 *  Get the next nodecounter.
+	 *  @return The id for the next node.
+	 */
+	public int getNextNodeId()
+	{
+		return nodecounter++;
 	}
 }
