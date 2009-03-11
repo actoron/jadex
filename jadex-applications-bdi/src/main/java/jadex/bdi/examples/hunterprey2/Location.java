@@ -2,6 +2,7 @@ package jadex.bdi.examples.hunterprey2;
 
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
+import jadex.bdi.planlib.simsupport.environment.grid.GridPosition;
 
 
 /**
@@ -101,10 +102,13 @@ public class Location
 	
 	
 	/** 
-	 * simulation-engine convenience method
-	 * @return
+	 * Simulation-engine method
+	 * <p><strong>
+	 * This is a {@link Vector2Double} to ensure smooth movements
+	 * </strong></p>
+	 * @return A IVector2 for the SimObject Position
 	 */
-	public IVector2 getAsIVector() {
+	public IVector2 getAsIVector2() {
 		return new Vector2Double(this.x, this.y);
 	}
 	

@@ -21,7 +21,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	// ------ fields --------
 	
 	/** The behavior of the world */
-	public int world_behavior_ = WORLD_BEHAVIOR_TORUS;
+	public int area_behavior_ = AREA_BEHAVIOR_TORUS;
 	
 	/** All simobject id's accessible per position. */
 	protected MultiCollection simObjectsByGridPosition_;
@@ -37,7 +37,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	 */
 	public GridSimulationEngine(String title, IVector2 areaSize)
 	{
-		this(title, areaSize, WORLD_BEHAVIOR_TORUS);
+		this(title, areaSize, AREA_BEHAVIOR_TORUS);
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	public GridSimulationEngine(String title, IVector2 areaSize, int world_behavior)
 	{
 		super(title, areaSize);
-		this.world_behavior_ = world_behavior;
+		this.area_behavior_ = world_behavior;
 		this.simObjectsByGridPosition_ = new MultiCollection();
 		this.gridPositionBySimObjectId_ = Collections.synchronizedMap(new HashMap());
 	}
@@ -56,15 +56,15 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	/** 
 	 * Retrieve the world behavior
 	 */
-	public int getWorldBehavior()
+	public int getAreaBehavior()
 	{
-		return world_behavior_;
+		return area_behavior_;
 	}
 	
 	/**
 	 * Get all SimObjects at a specific grid position
 	 */
-	public SimObject[] getSimulationObjectsByGridPosition(IVector2 position)
+	public SimObject[] getSimulationObjectsByGridPosition(GridPosition position)
 	{
 		return getSimulationObjectsByGridPosition(position, null);
 	}
@@ -72,7 +72,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	/**
 	 * Get all SimObjects from a specific type at a specific grid position
 	 */
-	public SimObject[] getSimulationObjectsByGridPosition(IVector2 position, String type)
+	public SimObject[] getSimulationObjectsByGridPosition(GridPosition position, String type)
 	{
 		SimObject[] ret = null;
 		synchronized(simObjects_)
@@ -114,14 +114,14 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	 * @param objectId
 	 * @return IVector2 position
 	 */
-	public IVector2 getSimulationObjectGridPosition(Integer objectId)
+	public GridPosition getSimulationObjectGridPosition(Integer objectId)
 	{
 		SimObject object = getSimulationObject(objectId);
 		if(object == null)
 		{
 			return null;
 		}
-		return (IVector2) gridPositionBySimObjectId_.get(objectId);
+		return (GridPosition) gridPositionBySimObjectId_.get(objectId);
 	}
 	
 	/**
@@ -130,7 +130,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	 * @param distance
 	 * @return {@link SimObject}[] 
 	 */
-	public SimObject[] getNearObjects(IVector2 position, IVector1 distance)
+	public SimObject[] getNearObjects(GridPosition position, IVector1 distance)
 	{
 		Collection ret = new ArrayList();
 		
@@ -144,16 +144,16 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 
 		synchronized (simObjectsByGridPosition_)
 		{
-			switch (world_behavior_)
+			switch (area_behavior_)
 			{
-				case WORLD_BEHAVIOR_TORUS:
+				case AREA_BEHAVIOR_TORUS:
 				{
 					for (int i = x - range; i <= x + range; i++)
 					{
 						for (int j = y - range; j <= y + range; j++)
 						{
 							Collection tmp = simObjectsByGridPosition_.getCollection(
-									new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
+									new GridPosition((i + sizex) % sizex, (j + sizey) % sizey));
 							if (tmp != null)
 								ret.addAll(tmp);
 						}
@@ -161,7 +161,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 				}
 					break;
 
-				case WORLD_BEHAVIOR_EUCLID:
+				case AREA_BEHAVIOR_EUCLID:
 				{
 					int minx = (x - range >= 0 ? x - range : 0);
 					int maxx = (x + range <= sizex ? x + range : sizex);
@@ -174,7 +174,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 						for (int j = miny; j <= maxy; j++)
 						{
 							Collection tmp = simObjectsByGridPosition_.getCollection(
-									new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
+									new GridPosition((i + sizex) % sizex, (j + sizey) % sizey));
 							if (tmp != null)
 								ret.addAll(tmp);
 						}
@@ -195,7 +195,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	 *  Get an empty position in the grid.
 	 *  @return Empty {@link IVector2} position.
 	 */
-	public IVector2 getEmptyGridPosition()
+	public GridPosition getEmptyGridPosition()
 	{
 		return getEmptyGridPosition(new Vector2Int(0));
 	}
@@ -205,15 +205,15 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	 *  @param distance the minimum edge distance
 	 *  @return Empty {@link IVector2} position.
 	 */
-	public IVector2 getEmptyGridPosition(IVector2 distance)
+	public GridPosition getEmptyGridPosition(IVector2 distance)
 	{
-		IVector2 ret = null;
+		GridPosition ret = null;
 		
 		synchronized (simObjectsByGridPosition_)
 		{
 			while (ret == null)
 			{
-				ret = new Vector2Int(getRandomPosition(distance));
+				ret = new GridPosition(getRandomPosition(distance));
 				if (simObjectsByGridPosition_.containsKey(ret))
 				{
 					ret = null;
@@ -251,9 +251,9 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 						newSimobjectId = super.createSimObject(type, properties, tasks, position, signalDestruction, listener);
 						
 						// ensure discrete position in maps
-						IVector2 discretePosition = new Vector2Int(position);
-						simObjectsByGridPosition_.put(discretePosition, getSimulationObject(newSimobjectId));
-						gridPositionBySimObjectId_.put(newSimobjectId, discretePosition);
+						GridPosition gridPosition = new GridPosition(position);
+						simObjectsByGridPosition_.put(gridPosition, getSimulationObject(newSimobjectId));
+						gridPositionBySimObjectId_.put(newSimobjectId, gridPosition);
 					}
 				}
 			}
@@ -277,10 +277,10 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 					synchronized (gridPositionBySimObjectId_)
 					{
 						// remove the object from grid
-						IVector2 lastPosition = (IVector2) gridPositionBySimObjectId_.remove(objectId);
-						if (null != lastPosition)
+						GridPosition lastGridPosition = (GridPosition) gridPositionBySimObjectId_.remove(objectId);
+						if (null != lastGridPosition)
 						{
-							simObjectsByGridPosition_.remove(lastPosition, simObjects_.get(objectId));
+							simObjectsByGridPosition_.remove(lastGridPosition, simObjects_.get(objectId));
 						}
 						
 						super.destroySimObject(objectId);
@@ -296,7 +296,7 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	public boolean performAction(String actionName, Integer actorId,
 			Integer objectId, List parameters)
 	{
-		// TODO: implement grid position update
+		// TODO: implement grid position update?
 		return super.performAction(actionName, actorId, objectId, parameters);
 	}
 	
@@ -330,19 +330,21 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 							SimObject simObject = (SimObject)it.next();
 							simObject.updateObject(deltaT);
 							
-							// TODO: maybe only assign position to discretePosition vector?
+							// TODO: maybe only assign position to GridPosition?
 							
 							// update position map when needed
 							
-							IVector2 gridPosition = (IVector2) gridPositionBySimObjectId_.get(simObject.getId());
-
+							GridPosition gridPosition = (GridPosition) gridPositionBySimObjectId_.get(simObject.getId());
+							
+							// TODO: round simObject.getPosition() vector? 
+							// 19->18 switches immediately, 18->19 on the last simulation step.
 							if (! gridPosition.equals(simObject.getPosition())) 
 							{
 								simObjectsByGridPosition_.remove(gridPosition, simObject);
 								// ensure new discrete position
-								IVector2 discretePosition = new Vector2Int(simObject.getPosition());
-								simObjectsByGridPosition_.put(discretePosition, simObject);
-								gridPositionBySimObjectId_.put(simObject.getId(), discretePosition);
+								gridPosition = new GridPosition(simObject.getPosition());
+								simObjectsByGridPosition_.put(gridPosition, simObject);
+								gridPositionBySimObjectId_.put(simObject.getId(), gridPosition);
 							}
 						}
 					}

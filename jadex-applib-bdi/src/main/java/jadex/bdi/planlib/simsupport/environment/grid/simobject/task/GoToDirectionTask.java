@@ -7,12 +7,13 @@ import jadex.bdi.planlib.simsupport.common.math.IVector1;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.common.math.Vector2Int;
 import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
+import jadex.bdi.planlib.simsupport.environment.grid.GridPosition;
 import jadex.bdi.planlib.simsupport.environment.grid.IGridSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
 
 /**
- * @author claas
+ * @author Claas
  *
  */
 public abstract class GoToDirectionTask implements ISimObjectTask
@@ -160,16 +161,16 @@ public abstract class GoToDirectionTask implements ISimObjectTask
 	/**
 	 * Create target position for GoToDirection tasks 
 	 */
-	public static IVector2 createTargetPosition(IVector2 position, IVector2 direction, IVector2 areaSize, int area_behavior)
+	public static GridPosition createTargetPosition(IVector2 position, IVector2 direction, IVector2 areaSize, int area_behavior)
 	{
 		IVector2 targetPosition = null;
 		switch (area_behavior)
 		{
-			case IGridSimulationEngine.WORLD_BEHAVIOR_TORUS:
+			case IGridSimulationEngine.AREA_BEHAVIOR_TORUS:
 				targetPosition = position.copy().add(direction).mod(areaSize);
 				break;
 				
-			case IGridSimulationEngine.WORLD_BEHAVIOR_EUCLID:
+			case IGridSimulationEngine.AREA_BEHAVIOR_EUCLID:
 				targetPosition = position.copy().add(direction);
 				int x = targetPosition.getXAsInteger();
 				int y = targetPosition.getYAsInteger();
@@ -186,7 +187,7 @@ public abstract class GoToDirectionTask implements ISimObjectTask
 		}
 		
 		// ensure targets are Int vectors
-		return new Vector2Int(targetPosition);
+		return new GridPosition(targetPosition);
 	}
 	
 }

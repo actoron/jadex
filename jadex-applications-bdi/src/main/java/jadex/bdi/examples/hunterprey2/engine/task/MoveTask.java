@@ -9,6 +9,9 @@ import jadex.bdi.planlib.simsupport.environment.simobject.SimObject;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.GoToPreciseDestinationTask;
 import jadex.bdi.planlib.simsupport.environment.simobject.task.ISimObjectTask;
 
+/**
+ * @deprecated
+ */
 public class MoveTask extends GoToPreciseDestinationTask
 {
 	// ------- constants -------
@@ -34,7 +37,7 @@ public class MoveTask extends GoToPreciseDestinationTask
 	 */
 	public MoveTask(Creature me, Location targetLocation, IVector1 speed)
 	{
-		super(targetLocation.getAsIVector(), speed);
+		super(targetLocation.getAsIVector2(), speed);
 		this.me = me;
 		this.startPosition = me.getLocation();
 		this.destPosition = targetLocation;

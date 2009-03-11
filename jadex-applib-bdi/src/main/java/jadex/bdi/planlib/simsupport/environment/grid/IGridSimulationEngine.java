@@ -11,36 +11,36 @@ public interface IGridSimulationEngine extends ISimulationEngine
 	// ------ constants --------
 	
 	/** Euclidean plane behavior */
-	public static final int WORLD_BEHAVIOR_EUCLID = 0;
+	public static final int AREA_BEHAVIOR_EUCLID = 0;
 	/** Torus behavior */
-	public static final int WORLD_BEHAVIOR_TORUS = 1;
+	public static final int AREA_BEHAVIOR_TORUS = 1;
 
 	// ------ grid specific methods --------
 	
 	/** 
 	 * Retrieve the world behavior
 	 */
-	public abstract int getWorldBehavior();
+	public abstract int getAreaBehavior();
 	
 	
 	/**
 	 * Get all SimObjects at a specific grid position
 	 */
 	public abstract SimObject[] getSimulationObjectsByGridPosition(
-			IVector2 position);
+			GridPosition position);
 
 	/**
 	 * Get all SimObjects from a specific type at a specific grid position
 	 */
 	public abstract SimObject[] getSimulationObjectsByGridPosition(
-			IVector2 position, String type);
+			GridPosition position, String type);
 
 	/**
 	 * Get the last known grid position for a simobject id
 	 * @param objectId
 	 * @return IVector2 position
 	 */
-	public abstract IVector2 getSimulationObjectGridPosition(Integer objectId);
+	public abstract GridPosition getSimulationObjectGridPosition(Integer objectId);
 
 	/**
 	 * Retrieve all objects in the distance for a position
@@ -48,20 +48,20 @@ public interface IGridSimulationEngine extends ISimulationEngine
 	 * @param distance
 	 * @return {@link SimObject}[] 
 	 */
-	public abstract SimObject[] getNearObjects(IVector2 position,
+	public abstract SimObject[] getNearObjects(GridPosition position,
 			IVector1 distance);
 
 	/**
 	 *  Get an empty position in the grid.
 	 *  @return Empty {@link IVector2} position.
 	 */
-	public abstract IVector2 getEmptyGridPosition();
+	public abstract GridPosition getEmptyGridPosition();
 
 	/**
 	 *  Get an empty position in the grid.
 	 *  @param distance the minimum edge distance
 	 *  @return Empty {@link IVector2} position.
 	 */
-	public abstract IVector2 getEmptyGridPosition(IVector2 distance);
+	public abstract GridPosition getEmptyGridPosition(IVector2 distance);
 
 }

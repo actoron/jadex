@@ -84,7 +84,7 @@ public class InitializeObserverPlan extends Plan
 			hunterCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
 		}
 		hunterCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, false, hunterImage), 0);
-		theme.put(Environment.OBJECT_TYPE_HUNTER, hunterCombiner);
+		theme.put(Environment.SIM_OBJECT_TYPE_HUNTER, hunterCombiner);
 
 		
 		DrawableCombiner preyCombiner = new DrawableCombiner();
@@ -95,17 +95,17 @@ public class InitializeObserverPlan extends Plan
 			preyCombiner.addDrawable(new Rectangle(new Vector2Double((Creature.CREATURE_VISUAL_RANGE.getAsDouble()-i) * 2.0), false, new Color(1.0f, 1.0f, 0.0f, alpha)), -2);
 		}
 		preyCombiner.addDrawable(new TexturedRectangle(Creature.CREATURE_SIZE, false, preyImage), 0);
-		theme.put(Environment.OBJECT_TYPE_PREY, preyCombiner);
+		theme.put(Environment.SIM_OBJECT_TYPE_PREY, preyCombiner);
 		
 		DrawableCombiner foodCombiner = new DrawableCombiner();
 		String foodImage = imgPath.concat("food.png");
 		foodCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.7), false, foodImage), -1);
-		theme.put(Environment.OBJECT_TYPE_FOOD, foodCombiner);
+		theme.put(Environment.SIM_OBJECT_TYPE_FOOD, foodCombiner);
 		
 		DrawableCombiner obstacleCombiner = new DrawableCombiner();
 		String obstacleImage = imgPath.concat("obstacle.png");
 		obstacleCombiner.addDrawable(new TexturedRectangle(WorldObject.WORLD_OBJECT_SIZE.copy().multiply(0.9), false, obstacleImage), 1);
-		theme.put(Environment.OBJECT_TYPE_OBSTACLE, obstacleCombiner);
+		theme.put(Environment.SIM_OBJECT_TYPE_OBSTACLE, obstacleCombiner);
 		
 		
 		Map themes = (Map) getBeliefbase().getBelief("object_themes").getFact();

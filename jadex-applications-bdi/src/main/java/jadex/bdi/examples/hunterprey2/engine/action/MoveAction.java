@@ -7,6 +7,7 @@ import jadex.bdi.examples.hunterprey2.environment.Environment;
 import jadex.bdi.planlib.simsupport.common.math.IVector2;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
+import jadex.bdi.planlib.simsupport.environment.grid.GridPosition;
 import jadex.bdi.planlib.simsupport.environment.grid.IGridSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.grid.simobject.task.GoDownTask;
 import jadex.bdi.planlib.simsupport.environment.grid.simobject.task.GoLeftTask;
@@ -41,16 +42,26 @@ public class MoveAction implements ISimAction
 			{
 				IGridSimulationEngine gridengine = (IGridSimulationEngine) engine;
 				IVector2 direction = (IVector2) parameters.get(0);
-				IVector2 destinationPosition = gridengine
-						.getSimulationObjectGridPosition(actor.getId()).copy()
-						.add(direction);
+				
+				System.out.println(direction + " --- " +actor.getProperty(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY));
+				
+				//IVector2 destinationPosition = gridengine
+				//		.getSimulationObjectGridPosition(actor.getId()).copy()
+				//		.add(direction);
+				GridPosition destinationPosition = GoToDirectionTask.createTargetPosition(
+					 gridengine.getSimulationObjectGridPosition(actor.getId()).copy(),
+					 direction, 
+					 gridengine.getAreaSize(), 
+					 gridengine.getAreaBehavior());
+						
+				// check target position for obstacles
 				if ((
-						Environment.OBJECT_TYPE_PREY.equals(actor.getType()) || 
-						Environment.OBJECT_TYPE_HUNTER.equals(actor.getType())
+						Environment.SIM_OBJECT_TYPE_PREY.equals(actor.getType()) || 
+						Environment.SIM_OBJECT_TYPE_HUNTER.equals(actor.getType())
 					)
 					&& 
 					gridengine.getSimulationObjectsByGridPosition(destinationPosition,
-								Environment.OBJECT_TYPE_OBSTACLE).length == 0)
+								Environment.SIM_OBJECT_TYPE_OBSTACLE).length == 0)
 				{
 					actor.removeTask(GoToDirectionTask.DEFAULT_NAME);
 					ISimObjectTask task = null;
@@ -60,40 +71,36 @@ public class MoveAction implements ISimAction
 						task = new GoUpTask(
 								Creature.CREATURE_SPEED.copy(), 
 								gridengine.getAreaSize().copy(), 
-								gridengine.getWorldBehavior());
+								gridengine.getAreaBehavior());
 					}
 					else if (GoToDirectionTask.DIRECTION_DOWN.equals(direction))
 					{
 						task = new GoDownTask(
 								Creature.CREATURE_SPEED.copy(), 
 								gridengine.getAreaSize().copy(), 
-								gridengine.getWorldBehavior());
+								gridengine.getAreaBehavior());
 					}
 					else if (GoToDirectionTask.DIRECTION_RIGHT.equals(direction))
 					{
 						task = new GoRightTask(
 								Creature.CREATURE_SPEED.copy(), 
 								gridengine.getAreaSize().copy(),
-								gridengine.getWorldBehavior());
+								gridengine.getAreaBehavior());
 					}
 					else if (GoToDirectionTask.DIRECTION_LEFT.equals(direction))
 					{
 						task = new GoLeftTask(
 								Creature.CREATURE_SPEED.copy(), 
 								gridengine.getAreaSize().copy(), 
-								gridengine.getWorldBehavior());
+								gridengine.getAreaBehavior());
 					}
 					
 					if (task != null)
 					{
 						actor.addTask(task);
-						WorldObject wo = (WorldObject) actor.getProperty(Environment.PROPERTY_ONTOLOGY);
-						IVector2 tPosition = GoToDirectionTask.createTargetPosition(
-								actor.getPosition().copy(), 
-								direction, 
-								gridengine.getAreaSize(), 
-								gridengine.getWorldBehavior());
-						wo.setLocation(new Location(tPosition.getXAsInteger(), tPosition.getYAsInteger()));
+						WorldObject wo = (WorldObject) actor.getProperty(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY);
+						
+						wo.setLocation(new Location(destinationPosition.getXAsInteger(), destinationPosition.getYAsInteger()));
 						return true;
 					}
 				}

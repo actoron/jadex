@@ -4,56 +4,33 @@ import jadex.bdi.examples.hunterprey2.Food;
 import jadex.bdi.examples.hunterprey2.Location;
 import jadex.bdi.examples.hunterprey2.environment.Environment;
 import jadex.bdi.planlib.simsupport.common.math.IVector1;
-import jadex.bdi.planlib.simsupport.common.math.Vector1Int;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEventListener;
 import jadex.bdi.planlib.simsupport.environment.SimulationEvent;
+import jadex.bdi.planlib.simsupport.environment.grid.GridPosition;
+import jadex.bdi.planlib.simsupport.environment.grid.IGridSimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.process.IEnvironmentProcess;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FoodSpawnProcess implements IEnvironmentProcess
 {
-	public final static String FOOD_TYPE = "food";
-	
-	public final static String DEFAULT_NAME = "FoodGeneration";
+
+	public final static String DEFAULT_NAME = "food_generation_process";
 	
 	/** Process name
 	 */
 	private String name_;
-	
-	/** Waste spawn rate
-	 */
-	IVector1 spawnRate_;
-	
-	/** Time since last spawn
-	 */
-	IVector1 spawnDelay_;
-	
-	/** Maximum number of waste objects.
-	 */
-	private int maxFood_;
-	
-	/** Current number of waste objects.
-	 */
-	private int food_;
-	
-	/** Creates a a new WasteGenerationProcess with the target of 10 objects of waste.
-	 */
-	public FoodSpawnProcess()
-	{
-		this(10, new Vector1Int(10));
-	}
-	
+
 	/** Creates a a new WasteGenerationProcess with a user-defined amount of waste.
 	 * 
 	 *  @param maxFood maximum amount of food
-	 *  @param spawnRate spawn rate of food
+	 *  @param foodrate spawn rate of food in one food every X rounds
 	 */
-	public FoodSpawnProcess(int maxFood, IVector1 spawnRate)
+	public FoodSpawnProcess()
 	{
-		maxFood_ = maxFood;
-		food_ = 0;
-		spawnRate_ = spawnRate.copy();
-		spawnDelay_ = spawnRate.copy().zero();
 		name_ = DEFAULT_NAME;
 	}
 	
@@ -82,21 +59,58 @@ public class FoodSpawnProcess implements IEnvironmentProcess
 	 */
 	public synchronized void execute(IVector1 deltaT, ISimulationEngine engine)
 	{
-		assert engine instanceof Environment;
-		Environment env = (Environment) engine;
 		
-		spawnDelay_.add(deltaT);
-		if (spawnRate_.less(spawnDelay_))
+		assert engine instanceof IGridSimulationEngine;
+		IGridSimulationEngine gridengine = (IGridSimulationEngine) engine;
+		
+		int age = ((IVector1) gridengine.getEnvironmentProperty(Environment.ENV_PROPERTY_AGE)).getAsInteger();
+		int foodrate = ((IVector1) gridengine.getEnvironmentProperty(Environment.ENV_PROPERTY_FOODRATE)).getAsInteger();
+		
+		
+		// Place new food.
+		if (age % foodrate == 0)
 		{
-			if (food_ < maxFood_)
+			int foodCount = ((List) engine.getTypedSimObjectAccess().get(Environment.SIM_OBJECT_TYPE_FOOD)).size();
+			int maxfood = ((IVector1) gridengine.getEnvironmentProperty(Environment.ENV_PROPERTY_MAXFOOD)).getAsInteger();
+			
+			if (foodCount < maxfood)
 			{
-				Location loc = env.getEmptyLocation();
-				Food food = new Food(loc);
-				env.addFood(food);
-				++food_;
+				GridPosition pos = gridengine.getEmptyGridPosition();
+				GridPosition test = gridengine.getEmptyGridPosition();
+
+				// Make sure there will be some empty location left.
+				if (!pos.equals(test))
+				{
+					Food food = new Food(new Location(pos.getXAsInteger(), pos.getYAsInteger()));
+					
+					Map properties = new HashMap();
+					properties.put(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY, food);
+					
+					Integer simId = gridengine.createSimObject(Environment.SIM_OBJECT_TYPE_FOOD, properties, null, pos, true, new FoodListener());
+					food.setSimId(simId);
+				}
 			}
-			spawnDelay_.subtract(spawnRate_);
+			else
+			{
+				// TODO: implement old food removal
+				
+//				// HACK for testing- remove old food
+//				System.out.println("-- removing old food --");
+//				WorldObject[] f = (WorldObject[]) food.toArray(new WorldObject[food.size()]);
+//				int count = 0;
+//				for (int i = 0; i < f.length && count < 10; i++)
+//				{
+//					if (f[i].getSimId() != null)
+//					{
+//						removeFood((Food) f[i]);
+//						count++;
+//					}
+//				}
+			}
 		}
+		
+		
+		
 	}
 	
 	/** Returns the name of the process.
@@ -117,7 +131,8 @@ public class FoodSpawnProcess implements IEnvironmentProcess
 			{
 				if (event.getType().equals("simobj_destroyed"))
 				{
-					--food_;
+					// Do something usefull ?
+					//--food_;
 				}
 			}
 		}

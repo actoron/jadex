@@ -213,7 +213,7 @@ public class Environment_BackupCopy implements IEnvironment
 		}
 
 		Integer simId = engine.createSimObject(type, properties, tasks, l
-				.getAsIVector(), signalDestruction, listener);
+				.getAsIVector2(), signalDestruction, listener);
 		wo.setSimId(simId);
 
 		return simId;
@@ -262,8 +262,8 @@ public class Environment_BackupCopy implements IEnvironment
 			return 0;
 		}
 
-		IVector2 position = me.getLocation().getAsIVector();
-		IVector2 destination = dest.getAsIVector();
+		IVector2 position = me.getLocation().getAsIVector2();
+		IVector2 destination = dest.getAsIVector2();
 
 		// update useSetPosition on demand
 		boolean useSetPosition = true;
