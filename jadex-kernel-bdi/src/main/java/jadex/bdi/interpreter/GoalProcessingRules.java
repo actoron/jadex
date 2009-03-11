@@ -448,6 +448,7 @@ public class GoalProcessingRules
 //		IConstraint conrecalc = new VariableReturnValueConstraint(recalc, new FunctionCall(new Identity(), new Object[]{new Boolean(true)}));
 		OrConstraint orcon = new OrConstraint(new IConstraint[]{conaplnotnull, conrecalc});
 		goalcon.addConstraint(orcon);
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finishedplans, rplan, IOperator.CONTAINS));
 
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
@@ -463,7 +464,7 @@ public class GoalProcessingRules
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.EXCLUDES));
 	
-		Rule achievegoal_retry	= new Rule("achievegoal_retry", new AndCondition(new ICondition[]{mgoalcon, goalcon, plancon, capcon}), GOAL_RETRY);
+		Rule achievegoal_retry	= new Rule("achievegoal_retry", new AndCondition(new ICondition[]{mgoalcon, plancon, goalcon, capcon}), GOAL_RETRY);
 		return achievegoal_retry;
 	}
 	
