@@ -215,7 +215,7 @@ public class SConditions
      *  @param slotname	The slotname string.
      *  @return The attribute type or an array of attribute types. 
      */
-    protected static Object	convertAttributeTypes(OAVObjectType otype, String slotname)
+    protected static Object	convertAttributeTypes(OAVTypeModel tmodel, OAVObjectType otype, String slotname, String[] imports)
     {
     	Object	ret;
     	if(slotname.indexOf(".")!=-1)
@@ -224,7 +224,16 @@ public class SConditions
     		OAVAttributeType[]	aret	= new OAVAttributeType[stok.countTokens()];
     		for(int i=0; i<aret.length; i++)
     		{
-    			aret[i]	= otype.getAttributeType(stok.nextToken());
+    			String attrname = stok.nextToken();
+    			int idx = attrname.indexOf(":");
+    			if(idx!=-1)
+    			{
+    				String typename = attrname.substring(0, idx);
+    				attrname = attrname.substring(idx+1);
+//    				System.out.println("Found type: "+typename+" "+attrname);
+    				otype = getObjectType(tmodel, typename, imports);
+    			}
+    			aret[i]	= otype.getAttributeType(attrname);
     			otype	= aret[i].getType();
     		}
     		ret	= aret;

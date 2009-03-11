@@ -319,7 +319,7 @@ objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
 
 // Constraints
 attributeConstraint [OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints]	
-	: '(' sn=slotname cs=constraint[tmodel, SConditions.convertAttributeTypes(otype, sn), vars] ')'
+	: '(' sn=slotname cs=constraint[tmodel, SConditions.convertAttributeTypes(tmodel, otype, sn, imports), vars] ')'
 	{
 		$constraints = cs;
 	}
@@ -619,6 +619,10 @@ slotname returns [String id]
 	('.' tmp=identifier
 	{
 		buf.append(".").append(tmp.getText());
+	}
+	|':' tmp=identifier
+	{
+		buf.append(":").append(tmp.getText());
 	}
 	)*
 	{

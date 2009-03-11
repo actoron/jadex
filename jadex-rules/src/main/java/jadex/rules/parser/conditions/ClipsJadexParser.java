@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-03-10 17:41:48
+// $ANTLR 3.0.1 C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-03-11 17:41:15
 
 package jadex.rules.parser.conditions;
 
@@ -51,7 +51,7 @@ public class ClipsJadexParser extends Parser {
         
 
     public String[] getTokenNames() { return tokenNames; }
-    public String getGrammarFileName() { return "C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g"; }
+    public String getGrammarFileName() { return "C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g"; }
 
     
     protected static void adaptConditionType(Variable var, OAVObjectType type)
@@ -229,7 +229,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start rhs
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:202:1: rhs[OAVTypeModel tmodel] returns [ICondition condition] : (c= ce[tmodel, vars] )+ EOF ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:202:1: rhs[OAVTypeModel tmodel] returns [ICondition condition] : (c= ce[tmodel, vars] )+ EOF ;
     public final ICondition rhs(OAVTypeModel tmodel) throws RecognitionException {
         ICondition condition = null;
 
@@ -237,15 +237,15 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:203:2: ( (c= ce[tmodel, vars] )+ EOF )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:204:2: (c= ce[tmodel, vars] )+ EOF
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:203:2: ( (c= ce[tmodel, vars] )+ EOF )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:204:2: (c= ce[tmodel, vars] )+ EOF
             {
             
             		List conds = new ArrayList();
             		Map vars = new HashMap();
             		
             	
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:209:2: (c= ce[tmodel, vars] )+
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:209:2: (c= ce[tmodel, vars] )+
             int cnt1=0;
             loop1:
             do {
@@ -259,7 +259,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt1) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:209:3: c= ce[tmodel, vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:209:3: c= ce[tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_ce_in_rhs53);
             	    c=ce(tmodel,  vars);
@@ -304,7 +304,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start ce
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:223:1: ce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:223:1: ce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] );
     public final ICondition ce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -312,12 +312,12 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:224:2: (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:224:2: (tmp= andce[tmodel, vars] | tmp= notce[tmodel, vars] | tmp= testce[tmodel, vars] | tmp= collectce[tmodel, vars] | {...}?tmp= objectce[tmodel, vars] )
             int alt2=5;
             alt2 = dfa2.predict(input);
             switch (alt2) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:224:4: tmp= andce[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:224:4: tmp= andce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_andce_in_ce89);
                     tmp=andce(tmodel,  vars);
@@ -328,7 +328,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:225:4: tmp= notce[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:225:4: tmp= notce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_notce_in_ce101);
                     tmp=notce(tmodel,  vars);
@@ -339,7 +339,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:4: tmp= testce[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:226:4: tmp= testce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_testce_in_ce113);
                     tmp=testce(tmodel,  vars);
@@ -350,7 +350,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:227:4: tmp= collectce[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:227:4: tmp= collectce[tmodel, vars]
                     {
                     pushFollow(FOLLOW_collectce_in_ce125);
                     tmp=collectce(tmodel,  vars);
@@ -361,7 +361,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:228:4: {...}?tmp= objectce[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:228:4: {...}?tmp= objectce[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "ce", "SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)");
@@ -389,7 +389,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start andce
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:231:1: andce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'and' (c= ce[$tmodel, vars] )+ ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:231:1: andce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'and' (c= ce[$tmodel, vars] )+ ')' ;
     public final ICondition andce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -397,15 +397,15 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:232:2: ( '(' 'and' (c= ce[$tmodel, vars] )+ ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:233:2: '(' 'and' (c= ce[$tmodel, vars] )+ ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:232:2: ( '(' 'and' (c= ce[$tmodel, vars] )+ ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:233:2: '(' 'and' (c= ce[$tmodel, vars] )+ ')'
             {
             
             		List conds = new ArrayList();
             	
             match(input,25,FOLLOW_25_in_andce163); 
             match(input,26,FOLLOW_26_in_andce165); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:236:12: (c= ce[$tmodel, vars] )+
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:236:12: (c= ce[$tmodel, vars] )+
             int cnt3=0;
             loop3:
             do {
@@ -419,7 +419,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt3) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:236:13: c= ce[$tmodel, vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:236:13: c= ce[$tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_ce_in_andce170);
             	    c=ce(tmodel,  vars);
@@ -461,7 +461,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start notce
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:246:1: notce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'not' c= ce[$tmodel, vars] ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:246:1: notce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'not' c= ce[$tmodel, vars] ')' ;
     public final ICondition notce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -469,8 +469,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:247:2: ( '(' 'not' c= ce[$tmodel, vars] ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:247:4: '(' 'not' c= ce[$tmodel, vars] ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:247:2: ( '(' 'not' c= ce[$tmodel, vars] ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:247:4: '(' 'not' c= ce[$tmodel, vars] ')'
             {
             match(input,25,FOLLOW_25_in_notce199); 
             match(input,28,FOLLOW_28_in_notce201); 
@@ -498,7 +498,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start testce
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:253:1: testce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:253:1: testce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' ;
     public final ICondition testce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -506,20 +506,20 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:2: ( '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:4: '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:2: ( '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:4: '(' 'test' ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] ) ')'
             {
             match(input,25,FOLLOW_25_in_testce227); 
             match(input,29,FOLLOW_29_in_testce229); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:15: ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:15: ( ({...}?call= functionCall[tmodel, vars] ) | call= operatorCall[tmodel, vars] )
             int alt4=2;
             alt4 = dfa4.predict(input);
             switch (alt4) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:16: ({...}?call= functionCall[tmodel, vars] )
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:16: ({...}?call= functionCall[tmodel, vars] )
                     {
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:16: ({...}?call= functionCall[tmodel, vars] )
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:17: {...}?call= functionCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:16: ({...}?call= functionCall[tmodel, vars] )
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:17: {...}?call= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "testce", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -535,7 +535,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:119: call= operatorCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:254:119: call= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_testce246);
                     call=operatorCall(tmodel,  vars);
@@ -567,7 +567,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start collectce
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:260:1: collectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:260:1: collectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' ;
     public final ICondition collectce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -579,13 +579,13 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:261:2: ( (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:262:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:261:2: ( (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:262:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )? '(' 'collect' (c= ce[$tmodel, vars] )+ (pc= predicateConstraint[$tmodel, null, vars] )? ')'
             {
             
             		List conds = new ArrayList();
             	
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:265:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:265:2: (mfv= multiFieldVariable[null, vars] ( '<-' | '=' ) )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -594,7 +594,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:265:3: mfv= multiFieldVariable[null, vars] ( '<-' | '=' )
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:265:3: mfv= multiFieldVariable[null, vars] ( '<-' | '=' )
                     {
                     pushFollow(FOLLOW_multiFieldVariable_in_collectce277);
                     mfv=multiFieldVariable(null,  vars);
@@ -618,7 +618,7 @@ public class ClipsJadexParser extends Parser {
 
             match(input,25,FOLLOW_25_in_collectce292); 
             match(input,32,FOLLOW_32_in_collectce294); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:266:16: (c= ce[$tmodel, vars] )+
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:266:16: (c= ce[$tmodel, vars] )+
             int cnt6=0;
             loop6:
             do {
@@ -632,7 +632,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt6) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:266:17: c= ce[$tmodel, vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:266:17: c= ce[$tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_ce_in_collectce299);
             	    c=ce(tmodel,  vars);
@@ -654,7 +654,7 @@ public class ClipsJadexParser extends Parser {
                 cnt6++;
             } while (true);
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:270:8: (pc= predicateConstraint[$tmodel, null, vars] )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:270:8: (pc= predicateConstraint[$tmodel, null, vars] )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -663,7 +663,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:270:8: pc= predicateConstraint[$tmodel, null, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:270:8: pc= predicateConstraint[$tmodel, null, vars]
                     {
                     pushFollow(FOLLOW_predicateConstraint_in_collectce312);
                     pc=predicateConstraint(tmodel,  null,  vars);
@@ -702,7 +702,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start objectce
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:284:1: objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )* ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:284:1: objectce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] : (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )* ')' ;
     public final ICondition objectce(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         ICondition condition = null;
 
@@ -718,13 +718,13 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:285:2: ( (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )* ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:286:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )* ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:285:2: ( (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )* ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:286:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )? '(' tn= typename (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )* ')'
             {
             
             		List consts = new ArrayList();
             	
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:289:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:289:2: (sfv= singleFieldVariable[null, vars] ( '<-' | '=' ) )?
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -733,7 +733,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt8) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:289:3: sfv= singleFieldVariable[null, vars] ( '<-' | '=' )
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:289:3: sfv= singleFieldVariable[null, vars] ( '<-' | '=' )
                     {
                     pushFollow(FOLLOW_singleFieldVariable_in_objectce345);
                     sfv=singleFieldVariable(null,  vars);
@@ -760,7 +760,7 @@ public class ClipsJadexParser extends Parser {
             tn=typename();
             _fsp--;
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:293:2: (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )*
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:293:2: (acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] | fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars] )*
             loop9:
             do {
                 int alt9=4;
@@ -772,11 +772,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA9_3 = input.LA(3);
 
-                        if ( (LA9_3==25) ) {
-                            alt9=2;
-                        }
-                        else if ( ((LA9_3>=CharacterLiteral && LA9_3<=DecimalLiteral)||(LA9_3>=33 && LA9_3<=48)) ) {
+                        if ( ((LA9_3>=CharacterLiteral && LA9_3<=DecimalLiteral)||(LA9_3>=33 && LA9_3<=48)) ) {
                             alt9=1;
+                        }
+                        else if ( (LA9_3==25) ) {
+                            alt9=2;
                         }
 
 
@@ -800,11 +800,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA9_5 = input.LA(3);
 
-                        if ( (LA9_5==25) ) {
-                            alt9=2;
-                        }
-                        else if ( ((LA9_5>=CharacterLiteral && LA9_5<=DecimalLiteral)||(LA9_5>=33 && LA9_5<=48)) ) {
+                        if ( ((LA9_5>=CharacterLiteral && LA9_5<=DecimalLiteral)||(LA9_5>=33 && LA9_5<=48)) ) {
                             alt9=1;
+                        }
+                        else if ( (LA9_5==25) ) {
+                            alt9=2;
                         }
 
 
@@ -842,11 +842,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA9_8 = input.LA(3);
 
-                        if ( ((LA9_8>=CharacterLiteral && LA9_8<=DecimalLiteral)||(LA9_8>=33 && LA9_8<=48)) ) {
-                            alt9=1;
-                        }
-                        else if ( (LA9_8==25) ) {
+                        if ( (LA9_8==25) ) {
                             alt9=2;
+                        }
+                        else if ( ((LA9_8>=CharacterLiteral && LA9_8<=DecimalLiteral)||(LA9_8>=33 && LA9_8<=48)) ) {
+                            alt9=1;
                         }
 
 
@@ -865,7 +865,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt9) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:293:3: acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:293:3: acs= attributeConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
             	    {
             	    pushFollow(FOLLOW_attributeConstraint_in_objectce375);
             	    acs=attributeConstraint(tmodel,  SConditions.getObjectType(tmodel,  tn,  imports),  vars);
@@ -878,7 +878,7 @@ public class ClipsJadexParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:297:4: mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:297:4: mcs= methodConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
             	    {
             	    pushFollow(FOLLOW_methodConstraint_in_objectce386);
             	    mcs=methodConstraint(tmodel,  SConditions.getObjectType(tmodel,  tn,  imports),  vars);
@@ -891,7 +891,7 @@ public class ClipsJadexParser extends Parser {
             	    }
             	    break;
             	case 3 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:301:4: fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:301:4: fcs= functionConstraint[tmodel, SConditions.getObjectType(tmodel, tn, imports), vars]
             	    {
             	    pushFollow(FOLLOW_functionConstraint_in_objectce397);
             	    fcs=functionConstraint(tmodel,  SConditions.getObjectType(tmodel,  tn,  imports),  vars);
@@ -937,7 +937,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start attributeConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:321:1: attributeConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' sn= slotname cs= constraint[tmodel, SConditions.convertAttributeTypes(otype, sn), vars] ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:321:1: attributeConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' sn= slotname cs= constraint[tmodel, SConditions.convertAttributeTypes(tmodel, otype, sn, imports), vars] ')' ;
     public final List attributeConstraint(OAVTypeModel tmodel, OAVObjectType otype, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -947,8 +947,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:322:2: ( '(' sn= slotname cs= constraint[tmodel, SConditions.convertAttributeTypes(otype, sn), vars] ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:322:4: '(' sn= slotname cs= constraint[tmodel, SConditions.convertAttributeTypes(otype, sn), vars] ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:322:2: ( '(' sn= slotname cs= constraint[tmodel, SConditions.convertAttributeTypes(tmodel, otype, sn, imports), vars] ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:322:4: '(' sn= slotname cs= constraint[tmodel, SConditions.convertAttributeTypes(tmodel, otype, sn, imports), vars] ')'
             {
             match(input,25,FOLLOW_25_in_attributeConstraint431); 
             pushFollow(FOLLOW_slotname_in_attributeConstraint435);
@@ -956,7 +956,7 @@ public class ClipsJadexParser extends Parser {
             _fsp--;
 
             pushFollow(FOLLOW_constraint_in_attributeConstraint439);
-            cs=constraint(tmodel,  SConditions.convertAttributeTypes(otype,  sn),  vars);
+            cs=constraint(tmodel,  SConditions.convertAttributeTypes(tmodel,  otype,  sn,  imports),  vars);
             _fsp--;
 
             match(input,27,FOLLOW_27_in_attributeConstraint442); 
@@ -979,7 +979,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start methodConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:328:1: methodConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:328:1: methodConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' ;
     public final List methodConstraint(OAVTypeModel tmodel, OAVObjectType otype, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -991,8 +991,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:329:2: ( '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:330:2: '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:329:2: ( '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:330:2: '(' mn= methodname '(' (exp= parameter[tmodel, vars] )* ')' cs= constraint[tmodel, SConditions.createMethodCall(otype, mn, exps), vars] ')'
             {
             
             		List exps = new ArrayList();
@@ -1003,7 +1003,7 @@ public class ClipsJadexParser extends Parser {
             _fsp--;
 
             match(input,25,FOLLOW_25_in_methodConstraint475); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:333:23: (exp= parameter[tmodel, vars] )*
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:333:23: (exp= parameter[tmodel, vars] )*
             loop10:
             do {
                 int alt10=2;
@@ -1016,7 +1016,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt10) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:333:24: exp= parameter[tmodel, vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:333:24: exp= parameter[tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_parameter_in_methodConstraint479);
             	    exp=parameter(tmodel,  vars);
@@ -1059,7 +1059,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start functionConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:343:1: functionConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:343:1: functionConstraint[OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints] : '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' ;
     public final List functionConstraint(OAVTypeModel tmodel, OAVObjectType otype, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -1069,8 +1069,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:344:2: ( '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:345:2: '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:344:2: ( '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:345:2: '(' fc= functionCall[tmodel, vars] cs= constraint[tmodel, fc, vars] ')'
             {
             
             		List exps = new ArrayList();
@@ -1104,7 +1104,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start constraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:354:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:354:1: constraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [List constraints] : ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* );
     public final List constraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         List constraints = null;
 
@@ -1115,7 +1115,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:355:2: ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:355:2: ( '?' | '$?' | last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )* )
             int alt12=3;
             switch ( input.LA(1) ) {
             case 33:
@@ -1187,21 +1187,21 @@ public class ClipsJadexParser extends Parser {
 
             switch (alt12) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:359:2: '?'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:359:2: '?'
                     {
                     match(input,33,FOLLOW_33_in_constraint565); 
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:360:4: '$?'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:360:4: '$?'
                     {
                     match(input,34,FOLLOW_34_in_constraint571); 
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:361:4: last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:361:4: last= singleConstraint[tmodel, valuesource, vars] ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
                     {
                     pushFollow(FOLLOW_singleConstraint_in_constraint579);
                     last=singleConstraint(tmodel,  valuesource,  vars);
@@ -1216,7 +1216,7 @@ public class ClipsJadexParser extends Parser {
                     		else
                     			consts.add(last);
                     	
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:371:2: ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:371:2: ( ConstraintOperator next= singleConstraint[tmodel, valuesource, vars] )*
                     loop11:
                     do {
                         int alt11=2;
@@ -1229,7 +1229,7 @@ public class ClipsJadexParser extends Parser {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:371:3: ConstraintOperator next= singleConstraint[tmodel, valuesource, vars]
+                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:371:3: ConstraintOperator next= singleConstraint[tmodel, valuesource, vars]
                     	    {
                     	    ConstraintOperator1=(Token)input.LT(1);
                     	    match(input,ConstraintOperator,FOLLOW_ConstraintOperator_in_constraint588); 
@@ -1300,7 +1300,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start singleConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:411:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:411:1: singleConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] );
     public final IConstraint singleConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -1308,7 +1308,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:412:2: (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:412:2: (tmp= literalConstraint[valuesource] | tmp= boundConstraint[tmodel, valuesource, vars] | tmp= multiBoundConstraint[tmodel, valuesource, vars] | tmp= predicateConstraint[tmodel, valuesource, vars] | tmp= returnValueConstraint[tmodel, valuesource, vars] )
             int alt13=5;
             switch ( input.LA(1) ) {
             case 48:
@@ -1328,6 +1328,11 @@ public class ClipsJadexParser extends Parser {
                     alt13=1;
                     }
                     break;
+                case 25:
+                    {
+                    alt13=5;
+                    }
+                    break;
                 case 33:
                     {
                     switch ( input.LA(3) ) {
@@ -1371,11 +1376,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1407,11 +1412,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1425,11 +1430,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1455,11 +1460,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1473,11 +1478,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1491,11 +1496,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1509,11 +1514,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1566,11 +1571,6 @@ public class ClipsJadexParser extends Parser {
                         throw nvae;
                     }
 
-                    }
-                    break;
-                case 25:
-                    {
-                    alt13=5;
                     }
                     break;
                 default:
@@ -1585,6 +1585,20 @@ public class ClipsJadexParser extends Parser {
             case 40:
                 {
                 switch ( input.LA(2) ) {
+                case CharacterLiteral:
+                case StringLiteral:
+                case BooleanLiteral:
+                case FloatingPointLiteral:
+                case HexLiteral:
+                case OctalLiteral:
+                case DecimalLiteral:
+                case 37:
+                case 38:
+                case 39:
+                    {
+                    alt13=1;
+                    }
+                    break;
                 case 33:
                     {
                     switch ( input.LA(3) ) {
@@ -1628,11 +1642,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1664,11 +1678,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1682,11 +1696,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1712,11 +1726,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1730,11 +1744,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1748,11 +1762,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1766,11 +1780,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1823,20 +1837,6 @@ public class ClipsJadexParser extends Parser {
                         throw nvae;
                     }
 
-                    }
-                    break;
-                case CharacterLiteral:
-                case StringLiteral:
-                case BooleanLiteral:
-                case FloatingPointLiteral:
-                case HexLiteral:
-                case OctalLiteral:
-                case DecimalLiteral:
-                case 37:
-                case 38:
-                case 39:
-                    {
-                    alt13=1;
                     }
                     break;
                 default:
@@ -1894,11 +1894,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1930,11 +1930,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1948,11 +1948,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1978,11 +1978,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -1996,11 +1996,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2014,11 +2014,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2032,11 +2032,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2160,11 +2160,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2196,11 +2196,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2214,11 +2214,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2244,11 +2244,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2262,11 +2262,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2280,11 +2280,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2298,11 +2298,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2426,11 +2426,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2462,11 +2462,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2480,11 +2480,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2510,11 +2510,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2528,11 +2528,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2546,11 +2546,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2564,11 +2564,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2649,20 +2649,6 @@ public class ClipsJadexParser extends Parser {
             case 44:
                 {
                 switch ( input.LA(2) ) {
-                case CharacterLiteral:
-                case StringLiteral:
-                case BooleanLiteral:
-                case FloatingPointLiteral:
-                case HexLiteral:
-                case OctalLiteral:
-                case DecimalLiteral:
-                case 37:
-                case 38:
-                case 39:
-                    {
-                    alt13=1;
-                    }
-                    break;
                 case 33:
                     {
                     switch ( input.LA(3) ) {
@@ -2706,11 +2692,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2742,11 +2728,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2760,11 +2746,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2790,11 +2776,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2808,11 +2794,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2826,11 +2812,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2844,11 +2830,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -2901,6 +2887,20 @@ public class ClipsJadexParser extends Parser {
                         throw nvae;
                     }
 
+                    }
+                    break;
+                case CharacterLiteral:
+                case StringLiteral:
+                case BooleanLiteral:
+                case FloatingPointLiteral:
+                case HexLiteral:
+                case OctalLiteral:
+                case DecimalLiteral:
+                case 37:
+                case 38:
+                case 39:
+                    {
+                    alt13=1;
                     }
                     break;
                 default:
@@ -2915,20 +2915,6 @@ public class ClipsJadexParser extends Parser {
             case 45:
                 {
                 switch ( input.LA(2) ) {
-                case CharacterLiteral:
-                case StringLiteral:
-                case BooleanLiteral:
-                case FloatingPointLiteral:
-                case HexLiteral:
-                case OctalLiteral:
-                case DecimalLiteral:
-                case 37:
-                case 38:
-                case 39:
-                    {
-                    alt13=1;
-                    }
-                    break;
                 case 33:
                     {
                     switch ( input.LA(3) ) {
@@ -2972,11 +2958,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3008,11 +2994,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3026,11 +3012,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3056,11 +3042,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3074,11 +3060,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3092,11 +3078,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3110,11 +3096,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3167,6 +3153,20 @@ public class ClipsJadexParser extends Parser {
                         throw nvae;
                     }
 
+                    }
+                    break;
+                case CharacterLiteral:
+                case StringLiteral:
+                case BooleanLiteral:
+                case FloatingPointLiteral:
+                case HexLiteral:
+                case OctalLiteral:
+                case DecimalLiteral:
+                case 37:
+                case 38:
+                case 39:
+                    {
+                    alt13=1;
                     }
                     break;
                 default:
@@ -3224,11 +3224,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3260,11 +3260,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3278,11 +3278,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3308,11 +3308,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3326,11 +3326,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3344,11 +3344,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3362,11 +3362,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3490,11 +3490,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_17 = input.LA(4);
 
-                        if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                        if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3526,11 +3526,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_19 = input.LA(4);
 
-                        if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                        if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3544,11 +3544,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_20 = input.LA(4);
 
-                        if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                        if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3574,11 +3574,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_21 = input.LA(4);
 
-                        if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                            alt13=3;
-                        }
-                        else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                        if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                             alt13=2;
+                        }
+                        else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                            alt13=3;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3592,11 +3592,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_22 = input.LA(4);
 
-                        if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                        if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3610,11 +3610,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_23 = input.LA(4);
 
-                        if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                        if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3628,11 +3628,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA13_24 = input.LA(4);
 
-                        if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                            alt13=2;
-                        }
-                        else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                        if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                             alt13=3;
+                        }
+                        else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                            alt13=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -3767,11 +3767,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA13_17 = input.LA(3);
 
-                    if ( ((LA13_17>=33 && LA13_17<=34)) ) {
-                        alt13=3;
-                    }
-                    else if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
+                    if ( (LA13_17==ConstraintOperator||LA13_17==27) ) {
                         alt13=2;
+                    }
+                    else if ( ((LA13_17>=33 && LA13_17<=34)) ) {
+                        alt13=3;
                     }
                     else {
                         NoViableAltException nvae =
@@ -3803,11 +3803,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA13_19 = input.LA(3);
 
-                    if ( ((LA13_19>=33 && LA13_19<=34)) ) {
-                        alt13=3;
-                    }
-                    else if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
+                    if ( (LA13_19==ConstraintOperator||LA13_19==27) ) {
                         alt13=2;
+                    }
+                    else if ( ((LA13_19>=33 && LA13_19<=34)) ) {
+                        alt13=3;
                     }
                     else {
                         NoViableAltException nvae =
@@ -3821,11 +3821,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA13_20 = input.LA(3);
 
-                    if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
-                        alt13=2;
-                    }
-                    else if ( ((LA13_20>=33 && LA13_20<=34)) ) {
+                    if ( ((LA13_20>=33 && LA13_20<=34)) ) {
                         alt13=3;
+                    }
+                    else if ( (LA13_20==ConstraintOperator||LA13_20==27) ) {
+                        alt13=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -3851,11 +3851,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA13_21 = input.LA(3);
 
-                    if ( ((LA13_21>=33 && LA13_21<=34)) ) {
-                        alt13=3;
-                    }
-                    else if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
+                    if ( (LA13_21==ConstraintOperator||LA13_21==27) ) {
                         alt13=2;
+                    }
+                    else if ( ((LA13_21>=33 && LA13_21<=34)) ) {
+                        alt13=3;
                     }
                     else {
                         NoViableAltException nvae =
@@ -3869,11 +3869,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA13_22 = input.LA(3);
 
-                    if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
-                        alt13=2;
-                    }
-                    else if ( ((LA13_22>=33 && LA13_22<=34)) ) {
+                    if ( ((LA13_22>=33 && LA13_22<=34)) ) {
                         alt13=3;
+                    }
+                    else if ( (LA13_22==ConstraintOperator||LA13_22==27) ) {
+                        alt13=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -3887,11 +3887,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA13_23 = input.LA(3);
 
-                    if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
-                        alt13=2;
-                    }
-                    else if ( ((LA13_23>=33 && LA13_23<=34)) ) {
+                    if ( ((LA13_23>=33 && LA13_23<=34)) ) {
                         alt13=3;
+                    }
+                    else if ( (LA13_23==ConstraintOperator||LA13_23==27) ) {
+                        alt13=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -3905,11 +3905,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA13_24 = input.LA(3);
 
-                    if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
-                        alt13=2;
-                    }
-                    else if ( ((LA13_24>=33 && LA13_24<=34)) ) {
+                    if ( ((LA13_24>=33 && LA13_24<=34)) ) {
                         alt13=3;
+                    }
+                    else if ( (LA13_24==ConstraintOperator||LA13_24==27) ) {
+                        alt13=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -3978,7 +3978,7 @@ public class ClipsJadexParser extends Parser {
 
             switch (alt13) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:412:4: tmp= literalConstraint[valuesource]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:412:4: tmp= literalConstraint[valuesource]
                     {
                     pushFollow(FOLLOW_literalConstraint_in_singleConstraint624);
                     tmp=literalConstraint(valuesource);
@@ -3989,7 +3989,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:413:4: tmp= boundConstraint[tmodel, valuesource, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:413:4: tmp= boundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_boundConstraint_in_singleConstraint635);
                     tmp=boundConstraint(tmodel,  valuesource,  vars);
@@ -4000,7 +4000,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:414:4: tmp= multiBoundConstraint[tmodel, valuesource, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:414:4: tmp= multiBoundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_multiBoundConstraint_in_singleConstraint645);
                     tmp=multiBoundConstraint(tmodel,  valuesource,  vars);
@@ -4011,7 +4011,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:415:4: tmp= predicateConstraint[tmodel, valuesource, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:415:4: tmp= predicateConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_predicateConstraint_in_singleConstraint655);
                     tmp=predicateConstraint(tmodel,  valuesource,  vars);
@@ -4022,7 +4022,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:416:4: tmp= returnValueConstraint[tmodel, valuesource, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:416:4: tmp= returnValueConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_returnValueConstraint_in_singleConstraint665);
                     tmp=returnValueConstraint(tmodel,  valuesource,  vars);
@@ -4047,7 +4047,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start literalConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:419:1: literalConstraint[Object valuesource] returns [IConstraint constraint] : (op= operator )? val= constant ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:419:1: literalConstraint[Object valuesource] returns [IConstraint constraint] : (op= operator )? val= constant ;
     public final IConstraint literalConstraint(Object valuesource) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -4057,10 +4057,10 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:2: ( (op= operator )? val= constant )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:4: (op= operator )? val= constant
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:2: ( (op= operator )? val= constant )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:4: (op= operator )? val= constant
             {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:6: (op= operator )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:6: (op= operator )?
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -4069,7 +4069,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt14) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:6: op= operator
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:420:6: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_literalConstraint687);
                     op=operator();
@@ -4107,7 +4107,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start someBoundConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:429:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:429:1: someBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] );
     public final IConstraint someBoundConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -4117,7 +4117,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:430:2: (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:430:2: (bc= boundConstraint[tmodel, valuesource, vars] | mbc= multiBoundConstraint[tmodel, valuesource, vars] )
             int alt15=2;
             switch ( input.LA(1) ) {
             case 48:
@@ -4130,11 +4130,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4184,11 +4184,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4302,11 +4302,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4378,11 +4378,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4432,11 +4432,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4550,11 +4550,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4626,11 +4626,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4680,11 +4680,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4798,11 +4798,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4874,11 +4874,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -4928,11 +4928,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5046,11 +5046,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5122,11 +5122,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5176,11 +5176,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5294,11 +5294,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5370,11 +5370,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5424,11 +5424,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5542,11 +5542,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5618,11 +5618,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5672,11 +5672,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5790,11 +5790,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5866,11 +5866,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -5920,11 +5920,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -6038,11 +6038,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -6114,11 +6114,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_12 = input.LA(4);
 
-                        if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_12==EOF) ) {
+                        if ( (LA15_12==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -6168,11 +6168,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_15 = input.LA(4);
 
-                        if ( (LA15_15==EOF) ) {
-                            alt15=1;
-                        }
-                        else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                        if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                             alt15=2;
+                        }
+                        else if ( (LA15_15==EOF) ) {
+                            alt15=1;
                         }
                         else {
                             NoViableAltException nvae =
@@ -6286,11 +6286,11 @@ public class ClipsJadexParser extends Parser {
                         {
                         int LA15_21 = input.LA(4);
 
-                        if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                            alt15=2;
-                        }
-                        else if ( (LA15_21==EOF) ) {
+                        if ( (LA15_21==EOF) ) {
                             alt15=1;
+                        }
+                        else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                            alt15=2;
                         }
                         else {
                             NoViableAltException nvae =
@@ -6359,11 +6359,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA15_12 = input.LA(3);
 
-                    if ( ((LA15_12>=33 && LA15_12<=34)) ) {
-                        alt15=2;
-                    }
-                    else if ( (LA15_12==EOF) ) {
+                    if ( (LA15_12==EOF) ) {
                         alt15=1;
+                    }
+                    else if ( ((LA15_12>=33 && LA15_12<=34)) ) {
+                        alt15=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -6413,11 +6413,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA15_15 = input.LA(3);
 
-                    if ( (LA15_15==EOF) ) {
-                        alt15=1;
-                    }
-                    else if ( ((LA15_15>=33 && LA15_15<=34)) ) {
+                    if ( ((LA15_15>=33 && LA15_15<=34)) ) {
                         alt15=2;
+                    }
+                    else if ( (LA15_15==EOF) ) {
+                        alt15=1;
                     }
                     else {
                         NoViableAltException nvae =
@@ -6533,11 +6533,11 @@ public class ClipsJadexParser extends Parser {
                     {
                     int LA15_21 = input.LA(3);
 
-                    if ( ((LA15_21>=33 && LA15_21<=34)) ) {
-                        alt15=2;
-                    }
-                    else if ( (LA15_21==EOF) ) {
+                    if ( (LA15_21==EOF) ) {
                         alt15=1;
+                    }
+                    else if ( ((LA15_21>=33 && LA15_21<=34)) ) {
+                        alt15=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -6601,7 +6601,7 @@ public class ClipsJadexParser extends Parser {
 
             switch (alt15) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:430:4: bc= boundConstraint[tmodel, valuesource, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:430:4: bc= boundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_boundConstraint_in_someBoundConstraint715);
                     bc=boundConstraint(tmodel,  valuesource,  vars);
@@ -6614,7 +6614,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:434:4: mbc= multiBoundConstraint[tmodel, valuesource, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:434:4: mbc= multiBoundConstraint[tmodel, valuesource, vars]
                     {
                     pushFollow(FOLLOW_multiBoundConstraint_in_someBoundConstraint728);
                     mbc=multiBoundConstraint(tmodel,  valuesource,  vars);
@@ -6641,7 +6641,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start boundConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:440:1: boundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:440:1: boundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] ;
     public final IConstraint boundConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6651,10 +6651,10 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:4: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars]
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:4: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars]
             {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:6: (op= operator )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:6: (op= operator )?
             int alt16=2;
             int LA16_0 = input.LA(1);
 
@@ -6663,7 +6663,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt16) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:6: op= operator
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:441:6: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_boundConstraint751);
                     op=operator();
@@ -6701,7 +6701,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start multiBoundConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:450:1: multiBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:450:1: multiBoundConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ ;
     public final IConstraint multiBoundConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6713,13 +6713,13 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:451:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:452:2: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:451:2: ( (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+ )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:452:2: (op= operator )? var= variable[op==null || op.equals(IOperator.EQUAL)? SConditions.getValueSourceType(tmodel, valuesource): null, vars] (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
             {
             
             		List vs = new ArrayList();
             	
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:455:4: (op= operator )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:455:4: (op= operator )?
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -6728,7 +6728,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt17) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:455:4: op= operator
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:455:4: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_multiBoundConstraint784);
                     op=operator();
@@ -6747,7 +6747,7 @@ public class ClipsJadexParser extends Parser {
             
             		vs.add(var);
             	
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:459:2: (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:459:2: (varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars] )+
             int cnt18=0;
             loop18:
             do {
@@ -6761,7 +6761,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt18) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:459:3: varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:459:3: varn= variable[SConditions.getValueSourceType(tmodel, valuesource), vars]
             	    {
             	    pushFollow(FOLLOW_variable_in_multiBoundConstraint799);
             	    varn=variable(SConditions.getValueSourceType(tmodel,  valuesource),  vars);
@@ -6805,7 +6805,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start predicateConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:472:1: predicateConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:472:1: predicateConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
     public final IConstraint predicateConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6815,16 +6815,16 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:2: ( ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:4: ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:2: ( ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:4: ':' ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             {
             match(input,35,FOLLOW_35_in_predicateConstraint827); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:8: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:8: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             int alt19=2;
             alt19 = dfa19.predict(input);
             switch (alt19) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:9: {...}?fc= functionCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:473:9: {...}?fc= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "predicateConstraint", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -6838,7 +6838,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:474:4: oc= operatorCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:474:4: oc= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_predicateConstraint845);
                     oc=operatorCall(tmodel,  vars);
@@ -6867,7 +6867,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start returnValueConstraint
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:479:1: returnValueConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:479:1: returnValueConstraint[OAVTypeModel tmodel, Object valuesource, Map vars] returns [IConstraint constraint] : equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) ;
     public final IConstraint returnValueConstraint(OAVTypeModel tmodel, Object valuesource, Map vars) throws RecognitionException {
         IConstraint constraint = null;
 
@@ -6877,19 +6877,19 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:2: ( equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:4: equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:2: ( equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] ) )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:4: equalOperator ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             {
             pushFollow(FOLLOW_equalOperator_in_returnValueConstraint869);
             equalOperator();
             _fsp--;
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:18: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:18: ({...}?fc= functionCall[tmodel, vars] | oc= operatorCall[tmodel, vars] )
             int alt20=2;
             alt20 = dfa20.predict(input);
             switch (alt20) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:19: {...}?fc= functionCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:480:19: {...}?fc= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "returnValueConstraint", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -6903,7 +6903,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:481:4: oc= operatorCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:481:4: oc= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_returnValueConstraint887);
                     oc=operatorCall(tmodel,  vars);
@@ -6932,7 +6932,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start functionCall
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:485:1: functionCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:485:1: functionCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' ;
     public final FunctionCall functionCall(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         FunctionCall fc = null;
 
@@ -6942,8 +6942,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:486:2: ( '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:487:2: '(' fn= functionName (exp= parameter[tmodel, vars] )* ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:486:2: ( '(' fn= functionName (exp= parameter[tmodel, vars] )* ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:487:2: '(' fn= functionName (exp= parameter[tmodel, vars] )* ')'
             {
             
             		List exps = new ArrayList();
@@ -6953,7 +6953,7 @@ public class ClipsJadexParser extends Parser {
             fn=functionName();
             _fsp--;
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:490:22: (exp= parameter[tmodel, vars] )*
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:490:22: (exp= parameter[tmodel, vars] )*
             loop21:
             do {
                 int alt21=2;
@@ -6966,7 +6966,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt21) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:490:23: exp= parameter[tmodel, vars]
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:490:23: exp= parameter[tmodel, vars]
             	    {
             	    pushFollow(FOLLOW_parameter_in_functionCall926);
             	    exp=parameter(tmodel,  vars);
@@ -7037,7 +7037,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start operatorCall
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:533:1: operatorCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:533:1: operatorCall[OAVTypeModel tmodel, Map vars] returns [FunctionCall fc] : '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' ;
     public final FunctionCall operatorCall(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         FunctionCall fc = null;
 
@@ -7049,11 +7049,11 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:2: ( '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:4: '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')'
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:2: ( '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:4: '(' (op= operator )? exp1= parameter[tmodel, vars] exp2= parameter[tmodel, vars] ')'
             {
             match(input,25,FOLLOW_25_in_operatorCall957); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:11: (op= operator )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:11: (op= operator )?
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -7062,7 +7062,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt22) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:11: op= operator
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:11: op= operator
                     {
                     pushFollow(FOLLOW_operator_in_operatorCall962);
                     op=operator();
@@ -7103,7 +7103,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start parameter
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:541:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:541:1: parameter[OAVTypeModel tmodel, Map vars] returns [Object val] : (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] );
     public final Object parameter(OAVTypeModel tmodel, Map vars) throws RecognitionException {
         Object val = null;
 
@@ -7117,7 +7117,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:542:2: (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:542:2: (tmp1= constant | tmp2= variable[null, vars] | {...}?tmp3= functionCall[tmodel, vars] | tmp4= operatorCall[tmodel, vars] )
             int alt23=4;
             switch ( input.LA(1) ) {
             case CharacterLiteral:
@@ -7229,7 +7229,7 @@ public class ClipsJadexParser extends Parser {
 
             switch (alt23) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:542:4: tmp1= constant
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:542:4: tmp1= constant
                     {
                     pushFollow(FOLLOW_constant_in_parameter998);
                     tmp1=constant();
@@ -7240,7 +7240,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:543:4: tmp2= variable[null, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:543:4: tmp2= variable[null, vars]
                     {
                     pushFollow(FOLLOW_variable_in_parameter1008);
                     tmp2=variable(null,  vars);
@@ -7251,7 +7251,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:544:4: {...}?tmp3= functionCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:544:4: {...}?tmp3= functionCall[tmodel, vars]
                     {
                     if ( !(SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)) ) {
                         throw new FailedPredicateException(input, "parameter", "SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)");
@@ -7265,7 +7265,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:545:4: tmp4= operatorCall[tmodel, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:545:4: tmp4= operatorCall[tmodel, vars]
                     {
                     pushFollow(FOLLOW_operatorCall_in_parameter1030);
                     tmp4=operatorCall(tmodel,  vars);
@@ -7290,7 +7290,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start constant
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:548:1: constant returns [Object val] : tmp= literal ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:548:1: constant returns [Object val] : tmp= literal ;
     public final Object constant() throws RecognitionException {
         Object val = null;
 
@@ -7298,8 +7298,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:2: (tmp= literal )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:4: tmp= literal
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:2: (tmp= literal )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:549:4: tmp= literal
             {
             pushFollow(FOLLOW_literal_in_constant1051);
             tmp=literal();
@@ -7322,7 +7322,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start variable
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:552:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:552:1: variable[OAVObjectType type, Map vars] returns [Variable var] : (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] );
     public final Variable variable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7330,7 +7330,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:553:2: (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:553:2: (tmp= singleFieldVariable[type, vars] | tmp= multiFieldVariable[type, vars] )
             int alt24=2;
             int LA24_0 = input.LA(1);
 
@@ -7348,7 +7348,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt24) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:553:4: tmp= singleFieldVariable[type, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:553:4: tmp= singleFieldVariable[type, vars]
                     {
                     pushFollow(FOLLOW_singleFieldVariable_in_variable1074);
                     tmp=singleFieldVariable(type,  vars);
@@ -7359,7 +7359,7 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:554:4: tmp= multiFieldVariable[type, vars]
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:554:4: tmp= multiFieldVariable[type, vars]
                     {
                     pushFollow(FOLLOW_multiFieldVariable_in_variable1084);
                     tmp=multiFieldVariable(type,  vars);
@@ -7384,7 +7384,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start singleFieldVariable
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:557:1: singleFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '?' id= identifier ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:557:1: singleFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '?' id= identifier ;
     public final Variable singleFieldVariable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7392,8 +7392,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:558:2: ( '?' id= identifier )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:558:4: '?' id= identifier
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:558:2: ( '?' id= identifier )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:558:4: '?' id= identifier
             {
             match(input,33,FOLLOW_33_in_singleFieldVariable1104); 
             pushFollow(FOLLOW_identifier_in_singleFieldVariable1108);
@@ -7429,7 +7429,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start multiFieldVariable
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:574:1: multiFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '$?' id= identifier ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:574:1: multiFieldVariable[OAVObjectType type, Map vars] returns [Variable var] : '$?' id= identifier ;
     public final Variable multiFieldVariable(OAVObjectType type, Map vars) throws RecognitionException {
         Variable var = null;
 
@@ -7437,8 +7437,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:575:2: ( '$?' id= identifier )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:575:4: '$?' id= identifier
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:575:2: ( '$?' id= identifier )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:575:4: '$?' id= identifier
             {
             match(input,34,FOLLOW_34_in_multiFieldVariable1130); 
             pushFollow(FOLLOW_identifier_in_multiFieldVariable1134);
@@ -7474,7 +7474,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start typename
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:591:1: typename returns [String id] : tmp= identifier ( '.' tmp= identifier )* ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:591:1: typename returns [String id] : tmp= identifier ( '.' tmp= identifier )* ;
     public final String typename() throws RecognitionException {
         String id = null;
 
@@ -7482,8 +7482,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:592:2: (tmp= identifier ( '.' tmp= identifier )* )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:2: tmp= identifier ( '.' tmp= identifier )*
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:592:2: (tmp= identifier ( '.' tmp= identifier )* )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:593:2: tmp= identifier ( '.' tmp= identifier )*
             {
             
             		StringBuffer buf = new StringBuffer();
@@ -7495,7 +7495,7 @@ public class ClipsJadexParser extends Parser {
             
             		buf.append(tmp.getText());
             	
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:600:2: ( '.' tmp= identifier )*
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:600:2: ( '.' tmp= identifier )*
             loop25:
             do {
                 int alt25=2;
@@ -7508,7 +7508,7 @@ public class ClipsJadexParser extends Parser {
 
                 switch (alt25) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:600:3: '.' tmp= identifier
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:600:3: '.' tmp= identifier
             	    {
             	    match(input,36,FOLLOW_36_in_typename1168); 
             	    pushFollow(FOLLOW_identifier_in_typename1172);
@@ -7546,7 +7546,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start slotname
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:1: slotname returns [String id] : tmp= identifier ( '.' tmp= identifier )* ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:610:1: slotname returns [String id] : tmp= identifier ( '.' tmp= identifier | ':' tmp= identifier )* ;
     public final String slotname() throws RecognitionException {
         String id = null;
 
@@ -7554,8 +7554,8 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:611:2: (tmp= identifier ( '.' tmp= identifier )* )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:612:2: tmp= identifier ( '.' tmp= identifier )*
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:611:2: (tmp= identifier ( '.' tmp= identifier | ':' tmp= identifier )* )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:612:2: tmp= identifier ( '.' tmp= identifier | ':' tmp= identifier )*
             {
             
             		StringBuffer buf = new StringBuffer();
@@ -7567,20 +7567,29 @@ public class ClipsJadexParser extends Parser {
             
             		buf.append(tmp.getText());
             	
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:2: ( '.' tmp= identifier )*
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:2: ( '.' tmp= identifier | ':' tmp= identifier )*
             loop26:
             do {
-                int alt26=2;
+                int alt26=3;
                 int LA26_0 = input.LA(1);
 
-                if ( (LA26_0==36) ) {
+                if ( (LA26_0==35) ) {
+                    int LA26_2 = input.LA(2);
+
+                    if ( (LA26_2==Identifiertoken||LA26_2==26||(LA26_2>=28 && LA26_2<=29)||(LA26_2>=46 && LA26_2<=47)) ) {
+                        alt26=2;
+                    }
+
+
+                }
+                else if ( (LA26_0==36) ) {
                     alt26=1;
                 }
 
 
                 switch (alt26) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:3: '.' tmp= identifier
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:619:3: '.' tmp= identifier
             	    {
             	    match(input,36,FOLLOW_36_in_slotname1212); 
             	    pushFollow(FOLLOW_identifier_in_slotname1216);
@@ -7589,6 +7598,20 @@ public class ClipsJadexParser extends Parser {
 
             	    
             	    		buf.append(".").append(tmp.getText());
+            	    	
+
+            	    }
+            	    break;
+            	case 2 :
+            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:623:3: ':' tmp= identifier
+            	    {
+            	    match(input,35,FOLLOW_35_in_slotname1223); 
+            	    pushFollow(FOLLOW_identifier_in_slotname1227);
+            	    tmp=identifier();
+            	    _fsp--;
+
+            	    
+            	    		buf.append(":").append(tmp.getText());
             	    	
 
             	    }
@@ -7618,7 +7641,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start methodname
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:630:1: methodname returns [String id] : tmp= identifier ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:634:1: methodname returns [String id] : tmp= identifier ;
     public final String methodname() throws RecognitionException {
         String id = null;
 
@@ -7626,10 +7649,10 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:631:2: (tmp= identifier )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:631:4: tmp= identifier
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:635:2: (tmp= identifier )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:635:4: tmp= identifier
             {
-            pushFollow(FOLLOW_identifier_in_methodname1245);
+            pushFollow(FOLLOW_identifier_in_methodname1256);
             tmp=identifier();
             _fsp--;
 
@@ -7650,7 +7673,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start functionName
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:634:1: functionName returns [String id] : tmp= typename ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:638:1: functionName returns [String id] : tmp= typename ;
     public final String functionName() throws RecognitionException {
         String id = null;
 
@@ -7658,10 +7681,10 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:635:2: (tmp= typename )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:635:4: tmp= typename
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:639:2: (tmp= typename )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:639:4: tmp= typename
             {
-            pushFollow(FOLLOW_typename_in_functionName1264);
+            pushFollow(FOLLOW_typename_in_functionName1275);
             tmp=typename();
             _fsp--;
 
@@ -7682,7 +7705,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start literal
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:638:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:642:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
     public final Object literal() throws RecognitionException {
         Object val = null;
 
@@ -7693,7 +7716,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:639:2: (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:643:2: (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
             int alt27=6;
             switch ( input.LA(1) ) {
             case 38:
@@ -7709,7 +7732,7 @@ public class ClipsJadexParser extends Parser {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("638:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 27, 1, input);
+                        new NoViableAltException("642:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 27, 1, input);
 
                     throw nvae;
                 }
@@ -7749,16 +7772,16 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("638:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 27, 0, input);
+                    new NoViableAltException("642:1: literal returns [Object val] : (lit= floatingPointLiteral | lit= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );", 27, 0, input);
 
                 throw nvae;
             }
 
             switch (alt27) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:639:4: lit= floatingPointLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:643:4: lit= floatingPointLiteral
                     {
-                    pushFollow(FOLLOW_floatingPointLiteral_in_literal1284);
+                    pushFollow(FOLLOW_floatingPointLiteral_in_literal1295);
                     lit=floatingPointLiteral();
                     _fsp--;
 
@@ -7767,9 +7790,9 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:640:4: lit= integerLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:644:4: lit= integerLiteral
                     {
-                    pushFollow(FOLLOW_integerLiteral_in_literal1293);
+                    pushFollow(FOLLOW_integerLiteral_in_literal1304);
                     lit=integerLiteral();
                     _fsp--;
 
@@ -7778,36 +7801,36 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:641:4: CharacterLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:645:4: CharacterLiteral
                     {
                     CharacterLiteral2=(Token)input.LT(1);
-                    match(input,CharacterLiteral,FOLLOW_CharacterLiteral_in_literal1300); 
+                    match(input,CharacterLiteral,FOLLOW_CharacterLiteral_in_literal1311); 
                     val = new Character(CharacterLiteral2.getText().charAt(0));
 
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:642:4: StringLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:646:4: StringLiteral
                     {
                     StringLiteral3=(Token)input.LT(1);
-                    match(input,StringLiteral,FOLLOW_StringLiteral_in_literal1307); 
+                    match(input,StringLiteral,FOLLOW_StringLiteral_in_literal1318); 
                     val = StringLiteral3.getText().substring(1, StringLiteral3.getText().length()-1);
 
                     }
                     break;
                 case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:643:4: BooleanLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:4: BooleanLiteral
                     {
                     BooleanLiteral4=(Token)input.LT(1);
-                    match(input,BooleanLiteral,FOLLOW_BooleanLiteral_in_literal1314); 
+                    match(input,BooleanLiteral,FOLLOW_BooleanLiteral_in_literal1325); 
                     val = BooleanLiteral4.getText().equals("true")? Boolean.TRUE: Boolean.FALSE;
 
                     }
                     break;
                 case 6 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:644:4: 'null'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:648:4: 'null'
                     {
-                    match(input,37,FOLLOW_37_in_literal1321); 
+                    match(input,37,FOLLOW_37_in_literal1332); 
                     val = null;
 
                     }
@@ -7827,7 +7850,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start floatingPointLiteral
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:647:1: floatingPointLiteral returns [Object val] : (sign= ( '+' | '-' ) )? FloatingPointLiteral ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:1: floatingPointLiteral returns [Object val] : (sign= ( '+' | '-' ) )? FloatingPointLiteral ;
     public final Object floatingPointLiteral() throws RecognitionException {
         Object val = null;
 
@@ -7835,10 +7858,10 @@ public class ClipsJadexParser extends Parser {
         Token FloatingPointLiteral5=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:648:2: ( (sign= ( '+' | '-' ) )? FloatingPointLiteral )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:648:4: (sign= ( '+' | '-' ) )? FloatingPointLiteral
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:2: ( (sign= ( '+' | '-' ) )? FloatingPointLiteral )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:4: (sign= ( '+' | '-' ) )? FloatingPointLiteral
             {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:648:8: (sign= ( '+' | '-' ) )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:8: (sign= ( '+' | '-' ) )?
             int alt28=2;
             int LA28_0 = input.LA(1);
 
@@ -7847,7 +7870,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt28) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:648:8: sign= ( '+' | '-' )
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:8: sign= ( '+' | '-' )
                     {
                     sign=(Token)input.LT(1);
                     if ( (input.LA(1)>=38 && input.LA(1)<=39) ) {
@@ -7857,7 +7880,7 @@ public class ClipsJadexParser extends Parser {
                     else {
                         MismatchedSetException mse =
                             new MismatchedSetException(null,input);
-                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_floatingPointLiteral1340);    throw mse;
+                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_floatingPointLiteral1351);    throw mse;
                     }
 
 
@@ -7867,7 +7890,7 @@ public class ClipsJadexParser extends Parser {
             }
 
             FloatingPointLiteral5=(Token)input.LT(1);
-            match(input,FloatingPointLiteral,FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1347); 
+            match(input,FloatingPointLiteral,FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1358); 
             val = sign!=null && "-".equals(sign.getText())? new Double("-"+FloatingPointLiteral5.getText()): new Double(FloatingPointLiteral5.getText());
 
             }
@@ -7885,7 +7908,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start integerLiteral
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:651:1: integerLiteral returns [Object val] : (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:655:1: integerLiteral returns [Object val] : (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) ;
     public final Object integerLiteral() throws RecognitionException {
         Object val = null;
 
@@ -7895,10 +7918,10 @@ public class ClipsJadexParser extends Parser {
         Token DecimalLiteral8=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:2: ( (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:4: (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:656:2: ( (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral ) )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:656:4: (sign= ( '+' | '-' ) )? ( HexLiteral | OctalLiteral | DecimalLiteral )
             {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:8: (sign= ( '+' | '-' ) )?
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:656:8: (sign= ( '+' | '-' ) )?
             int alt29=2;
             int LA29_0 = input.LA(1);
 
@@ -7907,7 +7930,7 @@ public class ClipsJadexParser extends Parser {
             }
             switch (alt29) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:8: sign= ( '+' | '-' )
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:656:8: sign= ( '+' | '-' )
                     {
                     sign=(Token)input.LT(1);
                     if ( (input.LA(1)>=38 && input.LA(1)<=39) ) {
@@ -7917,7 +7940,7 @@ public class ClipsJadexParser extends Parser {
                     else {
                         MismatchedSetException mse =
                             new MismatchedSetException(null,input);
-                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_integerLiteral1367);    throw mse;
+                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_integerLiteral1378);    throw mse;
                     }
 
 
@@ -7926,7 +7949,7 @@ public class ClipsJadexParser extends Parser {
 
             }
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:20: ( HexLiteral | OctalLiteral | DecimalLiteral )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:656:20: ( HexLiteral | OctalLiteral | DecimalLiteral )
             int alt30=3;
             switch ( input.LA(1) ) {
             case HexLiteral:
@@ -7946,35 +7969,35 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("652:20: ( HexLiteral | OctalLiteral | DecimalLiteral )", 30, 0, input);
+                    new NoViableAltException("656:20: ( HexLiteral | OctalLiteral | DecimalLiteral )", 30, 0, input);
 
                 throw nvae;
             }
 
             switch (alt30) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:652:21: HexLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:656:21: HexLiteral
                     {
                     HexLiteral6=(Token)input.LT(1);
-                    match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1375); 
+                    match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1386); 
                     val = sign!=null && "-".equals(sign.getText())? new Integer("-"+HexLiteral6.getText()): new Integer(HexLiteral6.getText());
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:653:4: OctalLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:657:4: OctalLiteral
                     {
                     OctalLiteral7=(Token)input.LT(1);
-                    match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1382); 
+                    match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1393); 
                     val = sign!=null && "-".equals(sign.getText())? new Integer("-"+OctalLiteral7.getText()): new Integer(OctalLiteral7.getText());
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:654:4: DecimalLiteral
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:658:4: DecimalLiteral
                     {
                     DecimalLiteral8=(Token)input.LT(1);
-                    match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1389); 
+                    match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1400); 
                     val = sign!=null && "-".equals(sign.getText())? new Integer("-"+DecimalLiteral8.getText()): new Integer(DecimalLiteral8.getText());
 
                     }
@@ -7998,7 +8021,7 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start operator
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:657:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:661:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );
     public final IOperator operator() throws RecognitionException {
         IOperator operator = null;
 
@@ -8006,7 +8029,7 @@ public class ClipsJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:658:2: (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:662:2: (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' )
             int alt31=9;
             switch ( input.LA(1) ) {
             case 48:
@@ -8056,16 +8079,16 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("657:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );", 31, 0, input);
+                    new NoViableAltException("661:1: operator returns [IOperator operator] : (tmp= equalOperator | '!=' | '~' | '>' | '<' | '>=' | '<=' | 'contains' | 'excludes' );", 31, 0, input);
 
                 throw nvae;
             }
 
             switch (alt31) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:658:4: tmp= equalOperator
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:662:4: tmp= equalOperator
                     {
-                    pushFollow(FOLLOW_equalOperator_in_operator1409);
+                    pushFollow(FOLLOW_equalOperator_in_operator1420);
                     tmp=equalOperator();
                     _fsp--;
 
@@ -8074,65 +8097,65 @@ public class ClipsJadexParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:659:4: '!='
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:663:4: '!='
                     {
-                    match(input,40,FOLLOW_40_in_operator1417); 
+                    match(input,40,FOLLOW_40_in_operator1428); 
                     operator = IOperator.NOTEQUAL;
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:660:4: '~'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:664:4: '~'
                     {
-                    match(input,41,FOLLOW_41_in_operator1424); 
+                    match(input,41,FOLLOW_41_in_operator1435); 
                     operator = IOperator.NOTEQUAL;
 
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:661:4: '>'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:665:4: '>'
                     {
-                    match(input,42,FOLLOW_42_in_operator1431); 
+                    match(input,42,FOLLOW_42_in_operator1442); 
                     operator = IOperator.GREATER;
 
                     }
                     break;
                 case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:662:4: '<'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:666:4: '<'
                     {
-                    match(input,43,FOLLOW_43_in_operator1438); 
+                    match(input,43,FOLLOW_43_in_operator1449); 
                     operator = IOperator.LESS;
 
                     }
                     break;
                 case 6 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:663:4: '>='
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:667:4: '>='
                     {
-                    match(input,44,FOLLOW_44_in_operator1445); 
+                    match(input,44,FOLLOW_44_in_operator1456); 
                     operator = IOperator.GREATEROREQUAL;
 
                     }
                     break;
                 case 7 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:664:4: '<='
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:668:4: '<='
                     {
-                    match(input,45,FOLLOW_45_in_operator1452); 
+                    match(input,45,FOLLOW_45_in_operator1463); 
                     operator = IOperator.LESSOREQUAL;
 
                     }
                     break;
                 case 8 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:665:4: 'contains'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:669:4: 'contains'
                     {
-                    match(input,46,FOLLOW_46_in_operator1459); 
+                    match(input,46,FOLLOW_46_in_operator1470); 
                     operator = IOperator.CONTAINS;
 
                     }
                     break;
                 case 9 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:666:4: 'excludes'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:670:4: 'excludes'
                     {
-                    match(input,47,FOLLOW_47_in_operator1466); 
+                    match(input,47,FOLLOW_47_in_operator1477); 
                     operator = IOperator.EXCLUDES;
 
                     }
@@ -8152,15 +8175,15 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start equalOperator
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:669:1: equalOperator returns [IOperator operator] : '==' ;
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:1: equalOperator returns [IOperator operator] : '==' ;
     public final IOperator equalOperator() throws RecognitionException {
         IOperator operator = null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:670:2: ( '==' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:670:4: '=='
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:2: ( '==' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:4: '=='
             {
-            match(input,48,FOLLOW_48_in_equalOperator1483); 
+            match(input,48,FOLLOW_48_in_equalOperator1494); 
             operator = IOperator.EQUAL;
 
             }
@@ -8178,14 +8201,14 @@ public class ClipsJadexParser extends Parser {
 
 
     // $ANTLR start identifier
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:673:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );
+    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:677:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );
     public final Token identifier() throws RecognitionException {
         Token identifier = null;
 
         Token tmp=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:2: (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' )
+            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:678:2: (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' )
             int alt32=6;
             switch ( input.LA(1) ) {
             case Identifiertoken:
@@ -8220,62 +8243,62 @@ public class ClipsJadexParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("673:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );", 32, 0, input);
+                    new NoViableAltException("677:1: identifier returns [Token identifier] : (tmp= Identifiertoken | tmp= 'test' | tmp= 'not' | tmp= 'and' | tmp= 'contains' | tmp= 'excludes' );", 32, 0, input);
 
                 throw nvae;
             }
 
             switch (alt32) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:674:4: tmp= Identifiertoken
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:678:4: tmp= Identifiertoken
                     {
                     tmp=(Token)input.LT(1);
-                    match(input,Identifiertoken,FOLLOW_Identifiertoken_in_identifier1503); 
+                    match(input,Identifiertoken,FOLLOW_Identifiertoken_in_identifier1514); 
                     identifier = tmp;
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:675:4: tmp= 'test'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:4: tmp= 'test'
                     {
                     tmp=(Token)input.LT(1);
-                    match(input,29,FOLLOW_29_in_identifier1512); 
+                    match(input,29,FOLLOW_29_in_identifier1523); 
                     identifier = tmp;
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:676:4: tmp= 'not'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:680:4: tmp= 'not'
                     {
                     tmp=(Token)input.LT(1);
-                    match(input,28,FOLLOW_28_in_identifier1521); 
+                    match(input,28,FOLLOW_28_in_identifier1532); 
                     identifier = tmp;
 
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:677:4: tmp= 'and'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:681:4: tmp= 'and'
                     {
                     tmp=(Token)input.LT(1);
-                    match(input,26,FOLLOW_26_in_identifier1530); 
+                    match(input,26,FOLLOW_26_in_identifier1541); 
                     identifier = tmp;
 
                     }
                     break;
                 case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:678:4: tmp= 'contains'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:682:4: tmp= 'contains'
                     {
                     tmp=(Token)input.LT(1);
-                    match(input,46,FOLLOW_46_in_identifier1539); 
+                    match(input,46,FOLLOW_46_in_identifier1550); 
                     identifier = tmp;
 
                     }
                     break;
                 case 6 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:679:4: tmp= 'excludes'
+                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:683:4: tmp= 'excludes'
                     {
                     tmp=(Token)input.LT(1);
-                    match(input,47,FOLLOW_47_in_identifier1548); 
+                    match(input,47,FOLLOW_47_in_identifier1559); 
                     identifier = tmp;
 
                     }
@@ -8304,21 +8327,22 @@ public class ClipsJadexParser extends Parser {
         "\u00c2\uffff";
     static final String DFA2_minS =
         "\1\31\1\14\2\uffff\2\31\1\0\1\5\1\14\3\uffff\2\5\1\0\4\5\1\0\1\5"+
-        "\1\0\3\5\1\14\1\10\10\4\2\14\2\0\2\14\1\10\10\4\4\0\1\5\1\14\7\5"+
-        "\1\31\30\4\1\0\1\10\10\5\2\14\6\5\2\0\4\14\1\10\10\5\2\14\10\0\14"+
-        "\5\30\4\15\5\14\0\1\31\1\0";
+        "\1\0\3\5\3\14\1\10\10\4\2\0\1\10\10\4\2\14\4\0\1\5\1\14\7\5\14\4"+
+        "\1\31\14\4\1\0\1\10\10\5\2\14\6\5\1\0\2\14\1\0\2\14\1\10\10\5\2"+
+        "\14\10\0\14\5\30\4\15\5\14\0\1\31\1\0";
     static final String DFA2_maxS =
         "\1\42\1\57\2\uffff\2\44\1\0\1\60\1\57\3\uffff\2\60\1\0\4\60\1\0"+
-        "\1\60\1\0\3\60\1\57\1\13\10\47\2\57\2\0\2\57\1\13\10\47\4\0\1\60"+
-        "\2\57\6\60\1\33\30\47\1\0\1\13\10\47\2\57\6\60\2\0\4\57\1\13\10"+
-        "\47\2\57\10\0\44\47\1\60\14\47\14\0\1\33\1\0";
+        "\1\60\1\0\3\60\3\57\1\13\10\47\2\0\1\13\10\47\2\57\4\0\1\60\2\57"+
+        "\6\60\14\47\1\33\14\47\1\0\1\13\10\47\2\57\6\60\1\0\2\57\1\0\2\57"+
+        "\1\13\10\47\2\57\10\0\44\47\1\60\14\47\14\0\1\33\1\0";
     static final String DFA2_acceptS =
         "\2\uffff\1\4\1\5\5\uffff\1\1\1\2\1\3\u00b6\uffff";
     static final String DFA2_specialS =
-        "\6\uffff\1\4\7\uffff\1\1\4\uffff\1\10\1\uffff\1\5\17\uffff\1\2\1"+
-        "\3\13\uffff\1\14\1\13\1\12\1\11\42\uffff\1\0\21\uffff\1\41\1\7\17"+
-        "\uffff\1\15\1\16\1\17\1\20\1\21\1\22\1\23\1\24\61\uffff\1\25\1\26"+
-        "\1\27\1\30\1\31\1\32\1\33\1\34\1\35\1\36\1\37\1\40\1\uffff\1\6}>";
+        "\6\uffff\1\24\7\uffff\1\34\4\uffff\1\25\1\uffff\1\31\17\uffff\1"+
+        "\27\1\30\13\uffff\1\41\1\40\1\37\1\36\42\uffff\1\26\21\uffff\1\35"+
+        "\2\uffff\1\33\15\uffff\1\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7\61\uffff"+
+        "\1\10\1\11\1\12\1\13\1\14\1\15\1\16\1\17\1\20\1\21\1\22\1\23\1\uffff"+
+        "\1\32}>";
     static final String[] DFA2_transitionS = {
             "\1\1\7\uffff\1\3\1\2",
             "\1\3\15\uffff\1\5\1\uffff\1\6\1\4\2\uffff\1\2\15\uffff\2\3",
@@ -8334,19 +8358,19 @@ public class ClipsJadexParser extends Parser {
             "",
             "",
             "",
-            "\1\37\1\40\1\41\1\33\1\34\1\35\1\36\15\uffff\1\45\1\uffff\1"+
-            "\13\5\uffff\1\43\1\44\1\3\1\31\1\42\2\32\11\3",
-            "\1\37\1\40\1\41\1\33\1\34\1\35\1\36\15\uffff\1\46\1\uffff\1"+
-            "\13\5\uffff\1\43\1\44\1\3\1\31\1\42\2\32\11\3",
+            "\1\41\1\42\1\43\1\35\1\36\1\37\1\40\15\uffff\1\45\1\uffff\1"+
+            "\13\5\uffff\1\32\1\33\1\3\1\31\1\44\2\34\11\3",
+            "\1\41\1\42\1\43\1\35\1\36\1\37\1\40\15\uffff\1\46\1\uffff\1"+
+            "\13\5\uffff\1\32\1\33\1\3\1\31\1\44\2\34\11\3",
             "\1\uffff",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\62\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\63\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\64\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\65\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\62\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\63\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\64\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\65\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
             "\1\uffff",
             "\7\3\15\uffff\1\66\1\uffff\1\11\5\uffff\3\3\1\67\14\3",
             "\1\uffff",
@@ -8354,46 +8378,46 @@ public class ClipsJadexParser extends Parser {
             "\7\3\15\uffff\1\70\1\uffff\1\11\5\uffff\3\3\1\67\14\3",
             "\7\3\15\uffff\1\70\1\uffff\1\11\5\uffff\3\3\1\67\14\3",
             "\1\71\15\uffff\1\74\1\uffff\1\73\1\72\20\uffff\1\75\1\76",
-            "\1\33\1\34\1\35\1\36",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\77\15\uffff\1\102\1\3\1\101\1\100\20\uffff\1\103\1\104",
+            "\1\105\15\uffff\1\110\1\3\1\107\1\106\20\uffff\1\111\1\112",
+            "\1\35\1\36\1\37\1\40",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
             "\13",
-            "\1\100\15\uffff\1\103\1\3\1\102\1\101\20\uffff\1\104\1\105",
-            "\1\106\15\uffff\1\111\1\3\1\110\1\107\20\uffff\1\112\1\113",
             "\1\uffff",
             "\1\uffff",
+            "\1\50\1\51\1\52\1\53",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\2\13\2\uffff\3"+
+            "\13",
             "\1\114\15\uffff\1\117\1\3\1\116\1\115\20\uffff\1\120\1\121",
             "\1\122\15\uffff\1\125\1\3\1\124\1\123\20\uffff\1\126\1\127",
-            "\1\52\1\53\1\54\1\55",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\2\13\2\uffff\3"+
-            "\13",
             "\1\uffff",
             "\1\uffff",
             "\1\uffff",
@@ -8403,67 +8427,67 @@ public class ClipsJadexParser extends Parser {
             "\1\144\15\uffff\1\147\1\uffff\1\146\1\145\20\uffff\1\150\1\151",
             "\7\3\1\11\14\uffff\1\152\1\11\1\3\2\11\3\uffff\2\3\2\uffff\3"+
             "\3\6\uffff\2\11",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\13\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\13\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\13\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\13\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\13\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\56\1\57\1\60\1\52\1\53\1\54\1\55\15\uffff\1\13\1\uffff\1"+
-            "\13\5\uffff\1\47\1\50\1\3\1\31\1\61\2\51\11\3",
-            "\1\3\1\uffff\1\153",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\154\1\155\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\13\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\13\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\13\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\13\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\13\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\54\1\55\1\56\1\50\1\51\1\52\1\53\15\uffff\1\13\1\uffff\1"+
+            "\13\5\uffff\1\60\1\61\1\3\1\31\1\57\2\47\11\3",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\153\1\154\2"+
+            "\uffff\3\13",
+            "\1\3\1\uffff\1\155",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
             "\1\uffff",
             "\1\132\1\133\1\134\1\135",
             "\1\165\1\166\1\167\1\161\1\162\1\163\1\164\15\uffff\1\173\1"+
@@ -8493,11 +8517,11 @@ public class ClipsJadexParser extends Parser {
             "\7\3\15\uffff\1\11\1\uffff\1\11\5\uffff\3\3\1\67\14\3",
             "\7\3\15\uffff\1\11\1\uffff\1\11\5\uffff\3\3\1\67\14\3",
             "\1\uffff",
-            "\1\uffff",
             "\1\u008f\15\uffff\1\u0092\1\uffff\1\u0091\1\u0090\20\uffff\1"+
             "\u0093\1\u0094",
             "\1\u0095\15\uffff\1\u0098\1\uffff\1\u0097\1\u0096\20\uffff\1"+
             "\u0099\1\u009a",
+            "\1\uffff",
             "\1\u009b\15\uffff\1\u009e\1\uffff\1\u009d\1\u009c\20\uffff\1"+
             "\u009f\1\u00a0",
             "\1\u00a1\15\uffff\1\u00a4\1\uffff\1\u00a3\1\u00a2\20\uffff\1"+
@@ -8571,30 +8595,30 @@ public class ClipsJadexParser extends Parser {
             "\2\uffff\3\13",
             "\1\3\7\13\15\uffff\1\13\1\uffff\1\u00c0\5\uffff\1\156\1\157"+
             "\2\uffff\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
-            "\1\3\7\13\15\uffff\1\13\1\uffff\1\77\5\uffff\1\156\1\157\2\uffff"+
-            "\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
+            "\1\3\7\13\15\uffff\1\13\1\uffff\1\113\5\uffff\1\156\1\157\2"+
+            "\uffff\3\13",
             "\7\3\17\uffff\1\11\5\uffff\3\3\1\uffff\14\3",
             "\7\3\15\uffff\1\3\1\uffff\1\u00a7\5\uffff\2\3\2\uffff\3\3",
             "\7\3\15\uffff\1\3\1\uffff\1\u00a7\5\uffff\2\3\2\uffff\3\3",
@@ -8660,201 +8684,6 @@ public class ClipsJadexParser extends Parser {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA2_88 = input.LA(1);
-
-                         
-                        int index2_88 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 9;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_88);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 : 
-                        int LA2_14 = input.LA(1);
-
-                         
-                        int index2_14 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_14);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 2 : 
-                        int LA2_37 = input.LA(1);
-
-                         
-                        int index2_37 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_37);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 3 : 
-                        int LA2_38 = input.LA(1);
-
-                         
-                        int index2_38 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_38);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 : 
-                        int LA2_6 = input.LA(1);
-
-                         
-                        int index2_6 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 10;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_6);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 5 : 
-                        int LA2_21 = input.LA(1);
-
-                         
-                        int index2_21 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 9;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_21);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 6 : 
-                        int LA2_193 = input.LA(1);
-
-                         
-                        int index2_193 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_193);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 7 : 
-                        int LA2_107 = input.LA(1);
-
-                         
-                        int index2_107 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_107);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 8 : 
-                        int LA2_19 = input.LA(1);
-
-                         
-                        int index2_19 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 9;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_19);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 9 : 
-                        int LA2_53 = input.LA(1);
-
-                         
-                        int index2_53 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_53);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 10 : 
-                        int LA2_52 = input.LA(1);
-
-                         
-                        int index2_52 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_52);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 11 : 
-                        int LA2_51 = input.LA(1);
-
-                         
-                        int index2_51 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_51);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 12 : 
-                        int LA2_50 = input.LA(1);
-
-                         
-                        int index2_50 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
-
-                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
-
-                         
-                        input.seek(index2_50);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 13 : 
                         int LA2_123 = input.LA(1);
 
                          
@@ -8869,7 +8698,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_123);
                         if ( s>=0 ) return s;
                         break;
-                    case 14 : 
+                    case 1 : 
                         int LA2_124 = input.LA(1);
 
                          
@@ -8884,7 +8713,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_124);
                         if ( s>=0 ) return s;
                         break;
-                    case 15 : 
+                    case 2 : 
                         int LA2_125 = input.LA(1);
 
                          
@@ -8899,7 +8728,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_125);
                         if ( s>=0 ) return s;
                         break;
-                    case 16 : 
+                    case 3 : 
                         int LA2_126 = input.LA(1);
 
                          
@@ -8914,7 +8743,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_126);
                         if ( s>=0 ) return s;
                         break;
-                    case 17 : 
+                    case 4 : 
                         int LA2_127 = input.LA(1);
 
                          
@@ -8929,7 +8758,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_127);
                         if ( s>=0 ) return s;
                         break;
-                    case 18 : 
+                    case 5 : 
                         int LA2_128 = input.LA(1);
 
                          
@@ -8944,7 +8773,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_128);
                         if ( s>=0 ) return s;
                         break;
-                    case 19 : 
+                    case 6 : 
                         int LA2_129 = input.LA(1);
 
                          
@@ -8959,7 +8788,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_129);
                         if ( s>=0 ) return s;
                         break;
-                    case 20 : 
+                    case 7 : 
                         int LA2_130 = input.LA(1);
 
                          
@@ -8974,7 +8803,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_130);
                         if ( s>=0 ) return s;
                         break;
-                    case 21 : 
+                    case 8 : 
                         int LA2_180 = input.LA(1);
 
                          
@@ -8989,7 +8818,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_180);
                         if ( s>=0 ) return s;
                         break;
-                    case 22 : 
+                    case 9 : 
                         int LA2_181 = input.LA(1);
 
                          
@@ -9004,7 +8833,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_181);
                         if ( s>=0 ) return s;
                         break;
-                    case 23 : 
+                    case 10 : 
                         int LA2_182 = input.LA(1);
 
                          
@@ -9019,7 +8848,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_182);
                         if ( s>=0 ) return s;
                         break;
-                    case 24 : 
+                    case 11 : 
                         int LA2_183 = input.LA(1);
 
                          
@@ -9034,7 +8863,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_183);
                         if ( s>=0 ) return s;
                         break;
-                    case 25 : 
+                    case 12 : 
                         int LA2_184 = input.LA(1);
 
                          
@@ -9049,7 +8878,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_184);
                         if ( s>=0 ) return s;
                         break;
-                    case 26 : 
+                    case 13 : 
                         int LA2_185 = input.LA(1);
 
                          
@@ -9064,7 +8893,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_185);
                         if ( s>=0 ) return s;
                         break;
-                    case 27 : 
+                    case 14 : 
                         int LA2_186 = input.LA(1);
 
                          
@@ -9079,7 +8908,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_186);
                         if ( s>=0 ) return s;
                         break;
-                    case 28 : 
+                    case 15 : 
                         int LA2_187 = input.LA(1);
 
                          
@@ -9094,7 +8923,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_187);
                         if ( s>=0 ) return s;
                         break;
-                    case 29 : 
+                    case 16 : 
                         int LA2_188 = input.LA(1);
 
                          
@@ -9109,7 +8938,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_188);
                         if ( s>=0 ) return s;
                         break;
-                    case 30 : 
+                    case 17 : 
                         int LA2_189 = input.LA(1);
 
                          
@@ -9124,7 +8953,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_189);
                         if ( s>=0 ) return s;
                         break;
-                    case 31 : 
+                    case 18 : 
                         int LA2_190 = input.LA(1);
 
                          
@@ -9139,7 +8968,7 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_190);
                         if ( s>=0 ) return s;
                         break;
-                    case 32 : 
+                    case 19 : 
                         int LA2_191 = input.LA(1);
 
                          
@@ -9154,7 +8983,142 @@ public class ClipsJadexParser extends Parser {
                         input.seek(index2_191);
                         if ( s>=0 ) return s;
                         break;
-                    case 33 : 
+                    case 20 : 
+                        int LA2_6 = input.LA(1);
+
+                         
+                        int index2_6 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 10;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_6);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 21 : 
+                        int LA2_19 = input.LA(1);
+
+                         
+                        int index2_19 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 9;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_19);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 22 : 
+                        int LA2_88 = input.LA(1);
+
+                         
+                        int index2_88 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 9;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_88);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 23 : 
+                        int LA2_37 = input.LA(1);
+
+                         
+                        int index2_37 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_37);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 24 : 
+                        int LA2_38 = input.LA(1);
+
+                         
+                        int index2_38 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_38);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 25 : 
+                        int LA2_21 = input.LA(1);
+
+                         
+                        int index2_21 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 9;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_21);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 26 : 
+                        int LA2_193 = input.LA(1);
+
+                         
+                        int index2_193 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_193);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 27 : 
+                        int LA2_109 = input.LA(1);
+
+                         
+                        int index2_109 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_109);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 28 : 
+                        int LA2_14 = input.LA(1);
+
+                         
+                        int index2_14 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_14);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 29 : 
                         int LA2_106 = input.LA(1);
 
                          
@@ -9167,6 +9131,66 @@ public class ClipsJadexParser extends Parser {
 
                          
                         input.seek(index2_106);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 30 : 
+                        int LA2_53 = input.LA(1);
+
+                         
+                        int index2_53 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_53);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 31 : 
+                        int LA2_52 = input.LA(1);
+
+                         
+                        int index2_52 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_52);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 32 : 
+                        int LA2_51 = input.LA(1);
+
+                         
+                        int index2_51 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_51);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 33 : 
+                        int LA2_50 = input.LA(1);
+
+                         
+                        int index2_50 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(SConditions.lookaheadObjectCE(ClipsJadexParser.this.input))) ) {s = 11;}
+
+                        else if ( (SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)) ) {s = 3;}
+
+                         
+                        input.seek(index2_50);
                         if ( s>=0 ) return s;
                         break;
             }
@@ -9528,38 +9552,40 @@ public class ClipsJadexParser extends Parser {
     public static final BitSet FOLLOW_identifier_in_typename1160 = new BitSet(new long[]{0x0000001000000002L});
     public static final BitSet FOLLOW_36_in_typename1168 = new BitSet(new long[]{0x0000C00034001000L});
     public static final BitSet FOLLOW_identifier_in_typename1172 = new BitSet(new long[]{0x0000001000000002L});
-    public static final BitSet FOLLOW_identifier_in_slotname1204 = new BitSet(new long[]{0x0000001000000002L});
+    public static final BitSet FOLLOW_identifier_in_slotname1204 = new BitSet(new long[]{0x0000001800000002L});
     public static final BitSet FOLLOW_36_in_slotname1212 = new BitSet(new long[]{0x0000C00034001000L});
-    public static final BitSet FOLLOW_identifier_in_slotname1216 = new BitSet(new long[]{0x0000001000000002L});
-    public static final BitSet FOLLOW_identifier_in_methodname1245 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typename_in_functionName1264 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_floatingPointLiteral_in_literal1284 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_integerLiteral_in_literal1293 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CharacterLiteral_in_literal1300 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_StringLiteral_in_literal1307 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BooleanLiteral_in_literal1314 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_37_in_literal1321 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_floatingPointLiteral1340 = new BitSet(new long[]{0x0000000000000100L});
-    public static final BitSet FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1347 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_integerLiteral1367 = new BitSet(new long[]{0x0000000000000E00L});
-    public static final BitSet FOLLOW_HexLiteral_in_integerLiteral1375 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OctalLiteral_in_integerLiteral1382 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DecimalLiteral_in_integerLiteral1389 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_equalOperator_in_operator1409 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_40_in_operator1417 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_41_in_operator1424 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_42_in_operator1431 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_43_in_operator1438 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_44_in_operator1445 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_45_in_operator1452 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_46_in_operator1459 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_47_in_operator1466 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_48_in_equalOperator1483 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_Identifiertoken_in_identifier1503 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_29_in_identifier1512 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_28_in_identifier1521 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_26_in_identifier1530 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_46_in_identifier1539 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_47_in_identifier1548 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_identifier_in_slotname1216 = new BitSet(new long[]{0x0000001800000002L});
+    public static final BitSet FOLLOW_35_in_slotname1223 = new BitSet(new long[]{0x0000C00034001000L});
+    public static final BitSet FOLLOW_identifier_in_slotname1227 = new BitSet(new long[]{0x0000001800000002L});
+    public static final BitSet FOLLOW_identifier_in_methodname1256 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typename_in_functionName1275 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_floatingPointLiteral_in_literal1295 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_integerLiteral_in_literal1304 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CharacterLiteral_in_literal1311 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_StringLiteral_in_literal1318 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BooleanLiteral_in_literal1325 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_37_in_literal1332 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_floatingPointLiteral1351 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1358 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_integerLiteral1378 = new BitSet(new long[]{0x0000000000000E00L});
+    public static final BitSet FOLLOW_HexLiteral_in_integerLiteral1386 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_OctalLiteral_in_integerLiteral1393 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DecimalLiteral_in_integerLiteral1400 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_equalOperator_in_operator1420 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_40_in_operator1428 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_41_in_operator1435 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_42_in_operator1442 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_43_in_operator1449 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_44_in_operator1456 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_45_in_operator1463 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_46_in_operator1470 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_47_in_operator1477 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_48_in_equalOperator1494 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_Identifiertoken_in_identifier1514 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_29_in_identifier1523 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_28_in_identifier1532 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_26_in_identifier1541 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_46_in_identifier1550 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_47_in_identifier1559 = new BitSet(new long[]{0x0000000000000002L});
 
 }
