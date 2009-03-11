@@ -145,9 +145,9 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		
 		if(getRelevantAttributes().contains(attr))
 		{
-			Set	tns	= getTypeNodes(type);
+			Set	tns	= getRelevantNodes(attr);
 			
-			if(tns!=null)
+			if(tns!=null && !tns.isEmpty())
 			{
 				for(Iterator it=tns.iterator(); it.hasNext(); )
 				{
@@ -386,6 +386,35 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 					{
 						TypeNode	tnode	= (TypeNode)it.next();
 						if(type.isSubtype(tnode.getObjectType()))
+							ret.add(tnode);
+					}
+					typenodesets.put(type, ret);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the set of relevant nodes for an attribute type.
+	 *  @param type The attribute type.
+	 *  @return The set of type nodes for that attribute type.
+	 */
+	protected Set	getRelevantNodes(OAVAttributeType type)
+	{
+		Set	ret	= (Set)typenodesets.get(type);
+		if(ret==null)
+		{
+			synchronized(this)
+			{
+				ret	= (Set)typenodesets.get(type);
+				if(ret==null)
+				{
+					ret	= new HashSet();
+					for(Iterator it=typenodes.values().iterator(); it.hasNext(); )
+					{
+						TypeNode	tnode	= (TypeNode)it.next();
+						if(tnode.getRelevantAttributes().contains(type))
 							ret.add(tnode);
 					}
 					typenodesets.put(type, ret);

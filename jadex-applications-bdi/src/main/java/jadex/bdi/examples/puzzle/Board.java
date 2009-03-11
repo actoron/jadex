@@ -147,11 +147,14 @@ public class Board implements IBoard, Serializable
 	 */
 	public boolean move(Move move)
 	{
+		boolean	oldsolution;
+		
 		synchronized(this)
 		{
 			if(!isPossibleMove(move))
 				return false;
 	
+			oldsolution	= isSolution();
 			Piece piece = getPiece(move.getStart());
 			pieces.remove(move.getStart());
 			pieces.put(move.getEnd(), piece);
@@ -161,7 +164,9 @@ public class Board implements IBoard, Serializable
 		
 		// Fire property change outside of synchronization to avoid deadlocks.
 //		pcs.firePropertyChange(MOVE, null, move);
-		pcs.firePropertyChange("solution", null, move);
+		if(isSolution())
+			System.out.println("solved");
+		pcs.firePropertyChange("solution", new Boolean(oldsolution), new Boolean(isSolution()));
 		return true;
 	}
 
@@ -170,12 +175,14 @@ public class Board implements IBoard, Serializable
 	 */
 	public boolean takeback()
 	{
+		boolean	oldsolution;
 		Move move;
 		synchronized(this)
 		{
 			if(moves.size()==0)
 				return false;
 	
+			oldsolution	= isSolution();
 			move = (Move)moves.get(moves.size()-1);
 			Piece piece = getPiece(move.getEnd());
 			pieces.remove(move.getEnd());
@@ -186,7 +193,7 @@ public class Board implements IBoard, Serializable
 		
 		// Fire property change outside of synchronization to avoid deadlocks.
 //		pcs.firePropertyChange(TAKEBACK, null, move);
-		pcs.firePropertyChange("solution", null, move);
+		pcs.firePropertyChange("solution", new Boolean(oldsolution), new Boolean(isSolution()));
 		return true;
 	}
 
