@@ -43,7 +43,7 @@ public class MoveAction implements ISimAction
 				IGridSimulationEngine gridengine = (IGridSimulationEngine) engine;
 				IVector2 direction = (IVector2) parameters.get(0);
 				
-				System.out.println(direction + " --- " +actor.getProperty(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY));
+				//System.out.println(direction + " --- " +actor.getProperty(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY));
 				
 				//IVector2 destinationPosition = gridengine
 				//		.getSimulationObjectGridPosition(actor.getId()).copy()

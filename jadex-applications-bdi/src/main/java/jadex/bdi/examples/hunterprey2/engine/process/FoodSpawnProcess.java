@@ -23,6 +23,11 @@ public class FoodSpawnProcess implements IEnvironmentProcess
 	/** Process name
 	 */
 	private String name_;
+	
+	/**
+	 * The world age of last food creation
+	 */
+	private int lastFoodCreation_ = 0;
 
 	/** Creates a a new WasteGenerationProcess with a user-defined amount of waste.
 	 * 
@@ -64,48 +69,62 @@ public class FoodSpawnProcess implements IEnvironmentProcess
 		IGridSimulationEngine gridengine = (IGridSimulationEngine) engine;
 		
 		int age = ((IVector1) gridengine.getEnvironmentProperty(Environment.ENV_PROPERTY_AGE)).getAsInteger();
-		int foodrate = ((IVector1) gridengine.getEnvironmentProperty(Environment.ENV_PROPERTY_FOODRATE)).getAsInteger();
 		
 		
-		// Place new food.
-		if (age % foodrate == 0)
+		if (age != lastFoodCreation_)
 		{
-			int foodCount = ((List) engine.getTypedSimObjectAccess().get(Environment.SIM_OBJECT_TYPE_FOOD)).size();
-			int maxfood = ((IVector1) gridengine.getEnvironmentProperty(Environment.ENV_PROPERTY_MAXFOOD)).getAsInteger();
-			
-			if (foodCount < maxfood)
+			int foodrate = ((IVector1) gridengine
+					.getEnvironmentProperty(Environment.ENV_PROPERTY_FOODRATE))
+					.getAsInteger();
+			// Place new food.
+			if (age > 0 && age % foodrate == 0)
 			{
-				GridPosition pos = gridengine.getEmptyGridPosition();
-				GridPosition test = gridengine.getEmptyGridPosition();
-
-				// Make sure there will be some empty location left.
-				if (!pos.equals(test))
-				{
-					Food food = new Food(new Location(pos.getXAsInteger(), pos.getYAsInteger()));
-					
-					Map properties = new HashMap();
-					properties.put(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY, food);
-					
-					Integer simId = gridengine.createSimObject(Environment.SIM_OBJECT_TYPE_FOOD, properties, null, pos, true, new FoodListener());
-					food.setSimId(simId);
-				}
-			}
-			else
-			{
-				// TODO: implement old food removal
+				lastFoodCreation_ = age;
 				
-//				// HACK for testing- remove old food
-//				System.out.println("-- removing old food --");
-//				WorldObject[] f = (WorldObject[]) food.toArray(new WorldObject[food.size()]);
-//				int count = 0;
-//				for (int i = 0; i < f.length && count < 10; i++)
-//				{
-//					if (f[i].getSimId() != null)
-//					{
-//						removeFood((Food) f[i]);
-//						count++;
-//					}
-//				}
+				int foodCount = ((List) engine.getTypedSimObjectAccess().get(
+						Environment.SIM_OBJECT_TYPE_FOOD)).size();
+				int maxfood = ((IVector1) gridengine
+						.getEnvironmentProperty(Environment.ENV_PROPERTY_MAXFOOD))
+						.getAsInteger();
+
+				if (foodCount < maxfood)
+				{
+					GridPosition pos = gridengine.getEmptyGridPosition();
+					GridPosition test = gridengine.getEmptyGridPosition();
+
+					// Make sure there will be some empty location left.
+					if (!pos.equals(test))
+					{
+						Food food = new Food(new Location(pos.getXAsInteger(),
+								pos.getYAsInteger()));
+
+						Map properties = new HashMap();
+						properties.put(
+								Environment.SIM_OBJECT_PROPERTY_ONTOLOGY, food);
+
+						Integer simId = gridengine.createSimObject(
+								Environment.SIM_OBJECT_TYPE_FOOD, properties,
+								null, pos, true, new FoodListener());
+						food.setSimId(simId);
+					}
+				}
+				else
+				{
+					// TODO: implement old food removal
+
+					//				// HACK for testing- remove old food
+					//				System.out.println("-- removing old food --");
+					//				WorldObject[] f = (WorldObject[]) food.toArray(new WorldObject[food.size()]);
+					//				int count = 0;
+					//				for (int i = 0; i < f.length && count < 10; i++)
+					//				{
+					//					if (f[i].getSimId() != null)
+					//					{
+					//						removeFood((Food) f[i]);
+					//						count++;
+					//					}
+					//				}
+				}
 			}
 		}
 		

@@ -296,8 +296,22 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 	public boolean performAction(String actionName, Integer actorId,
 			Integer objectId, List parameters)
 	{
-		// TODO: implement grid position update?
-		return super.performAction(actionName, actorId, objectId, parameters);
+		// TODO: Need all locks?
+		
+		synchronized(simObjects_)
+		{
+			synchronized(simObjectsByType_)
+			{
+				synchronized (simObjectsByGridPosition_)
+				{
+					synchronized (gridPositionBySimObjectId_)
+					{
+						// TODO: implement grid position update?
+						return super.performAction(actionName, actorId, objectId, parameters);
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -354,5 +368,9 @@ public class GridSimulationEngine extends EuclideanSimulationEngine implements I
 			
 		}
 	}
+	
+	
+	
+	
 
 }

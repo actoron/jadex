@@ -71,28 +71,15 @@ public class Environment implements IEnvironment
 	public static int DEFAULT_LEASE_TICKS = 50;
 
 	//-------- attributes --------
-//
-//	/** The behavior of the world */
-//	public int world_bahavior = AREA_BEHAVIOR_TORUS;
 
 	/** The agent created this environment */
 	protected IExternalAccess agent;
 
 	/** The simulation environment to wrap on */
-//	protected ISimulationEngine engine;
 	protected IGridSimulationEngine engine;
-
-//	/** All world object simulation id's accessible per location. */
-//	protected MultiCollection world;
 
 	/** The creatures simId's */
 	protected Map creatureSimIds;
-
-//	/** The obstacles simId's */
-//	protected Set obstacles;
-
-//	/** The prey food simId's */
-//	protected Set food;
 
 	/** The list for move and eat requests. */
 	protected List tasklist;
@@ -115,15 +102,6 @@ public class Environment implements IEnvironment
 	/** The interval between saves of highscore (-1 for autosave off). */
 	protected long saveinterval;
 
-//	/** The foodrate determines how often new food pops up. */
-//	protected int foodrate;
-
-//	/** The world age. */
-//	protected int age;
-
-//	/** The random number generator to create locations. */
-//	protected Random rand = new Random(System.currentTimeMillis());
-
 	//-------- constructors --------
 
 	/**
@@ -132,7 +110,6 @@ public class Environment implements IEnvironment
 	public Environment(IExternalAccess agent)
 	{
 		this(agent, null);
-
 	}
 
 	/**
@@ -155,24 +132,18 @@ public class Environment implements IEnvironment
 		engine.addAction(new EatAction());
 		engine.addAction(new MoveAction());
 		
-		engine.setEnvironmentProperty(ENV_PROPERTY_AGE, new Vector1Int(0));
+		engine.setEnvironmentProperty(ENV_PROPERTY_AGE, new Vector1Int(1));
 		engine.setEnvironmentProperty(ENV_PROPERTY_FOODRATE, new Vector1Int(5));
 		engine.setEnvironmentProperty(ENV_PROPERTY_MAXFOOD, new Vector1Int(50));
 		
 		engine.addEnvironmentProcess(new FoodSpawnProcess());
-		
-		
-//		this.world = new MultiCollection();
-		this.creatureSimIds = new HashMap();
-//		this.obstacles = new HashSet();
-//		this.food = new HashSet();
 
+		this.creatureSimIds = new HashMap();
 		this.tasklist = new ArrayList();
 		this.simtaskcounter = 0;
 
 		this.pcs = new SimplePropertyChangeSupport(this);
 
-//		this.foodrate = 5;
 		this.saveinterval = 5000;
 		highscore = loadHighscore();
 
@@ -347,8 +318,6 @@ public class Environment implements IEnvironment
 			removeCreature(creat);
 			
 		}
-
-		
 
 		return ret;
 
@@ -594,16 +563,17 @@ public class Environment implements IEnvironment
 
 		this.pcs.firePropertyChange("taskSize", tasks, tasklist.size());
 
-//		if (this.world.containsKey(creature.getLocation()))
-//			this.world.remove(creature.getLocation(), creature);
-
-		Integer removedSimId = (Integer) this.creatureSimIds.put(creature, null);
-		// if creature was in mapping and simId was not set to null already
-		// remove creature from simengine
+		Integer removedSimId = (Integer) this.creatureSimIds.remove(creature);
+		// if creature was in mapping and simId was not 
+		// null remove creature from simengine
 		if (removedSimId != null)
 		{
 			// destroy simobject
 			engine.destroySimObject(removedSimId);
+			return true;
+		}
+		else if (creature instanceof Observer)
+		{
 			return true;
 		}
 
@@ -829,29 +799,33 @@ public class Environment implements IEnvironment
 	 *  Get the creatures.
 	 *  @return The creatures.
 	 */
-	public Creature[] getCreatures()
+	public synchronized Creature[] getCreatures()
 	{
 
 		// Add hunters and preys to return set.
 		Collection ret = new ArrayList();
 
 		// halt the engine
-		Map simObjectAccess = engine.getSimObjectAccess();
-		synchronized (simObjectAccess)
+		Object simObjectccess = engine.getSimObjectAccess();
+		synchronized (simObjectccess)
 		{
-			//ret.addAll(getOntologyObjects(OBJECT_TYPE_HUNTER));
-			//ret.addAll(getOntologyObjects(OBJECT_TYPE_PREY));
-			
-			Integer[] simIds = (Integer[]) creatureSimIds.values().toArray(new Integer[creatureSimIds.size()]);
-			for (int i = 0; i < simIds.length; i++)
+			Map simObjectAccess = engine.getSimObjectAccess();
+			synchronized (simObjectAccess)
 			{
-				ret.add(engine.getSimulationObject(simIds[i]).getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY));
+				//ret.addAll(getOntologyObjects(OBJECT_TYPE_HUNTER));
+				//ret.addAll(getOntologyObjects(OBJECT_TYPE_PREY));
+				
+				Integer[] simIds = (Integer[]) creatureSimIds.values().toArray(new Integer[creatureSimIds.size()]);
+				for (int i = 0; i < simIds.length; i++)
+				{
+					if (simIds[i] != null)
+						ret.add(engine.getSimulationObject(simIds[i]).getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY));
+				}
+				
 			}
-			
 		}
-
-		return (Creature[]) ret.toArray(new Creature[ret.size()]);
 		
+		return (Creature[]) ret.toArray(new Creature[ret.size()]);
 
 	}
 
@@ -959,27 +933,32 @@ public class Environment implements IEnvironment
 	/**
 	 *  Get the internal representation of a creature.
 	 *  If the creature is unknown it gets added to the environment.
+	 *  If the creature was killed befor, e.g. a key exists with a null value
+	 *  this method returns null!
 	 *  @param creature The creature.
-	 *  @return The creature as known in the environment.
+	 *  @return The creature as known in the environment. Null if the creature was killed!
 	 */
 	protected Creature getCreature(Creature creature)
 	{
-
 		Creature ret = null;
-		Integer id = (Integer) creatureSimIds.get(creature);
-
 		
-		if (id != null)
+		if (creatureSimIds.containsKey(creature))
 		{
-			ret = (Creature) engine.getSimulationObject(id).getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY);
+			
+			Integer id = (Integer) creatureSimIds.get(creature);
+
+			if (id != null)
+			{
+				ret = (Creature) engine.getSimulationObject(id).getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY);
+			}
+
 		}
 		else
 		{
 			ret = addCreature(creature);
 		}
-
+		
 		return ret;
-
 	}
 
 	/**
