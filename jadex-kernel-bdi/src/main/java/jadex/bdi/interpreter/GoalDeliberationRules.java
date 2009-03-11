@@ -22,6 +22,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.Length;
 import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 
 /**
@@ -186,14 +187,11 @@ public class GoalDeliberationRules
 		Variable inmode = new Variable("?inmode", OAVJavaType.java_string_type);
 		Variable rinhibitors = new Variable("?rinhibitors", OAVBDIRuntimeModel.goal_type, true);
 
-		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mingoal));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
-		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, ringoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_inhibitors, rinhibitors));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mingoal));
+		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
 		
 		ObjectCondition rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		rcapacon.addConstraint(new BoundConstraint(null, rincapa));
@@ -235,7 +233,7 @@ public class GoalDeliberationRules
 			}
 		};
 		return new Rule("2deliberate_goal_addinstanceinhibition_"+gtname,
-			new AndCondition(new ICondition[]{mgoalcon, goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon, usercond}), 
+			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon, usercond}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
 	

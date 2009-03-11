@@ -29,6 +29,7 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
@@ -487,18 +488,21 @@ public class PlanRules
 	 */
 	protected static Rule createPlanBodyExecutionRule()
 	{
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
-		plancon.addConstraint(new BoundConstraint(null, new Variable("?rplan", OAVBDIRuntimeModel.plan_type)));
+		plancon.addConstraint(new BoundConstraint(null, rplan));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
 		plancon.addConstraint(new OrConstraint(new IConstraint[]{
 			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW),
 			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY)
 		}));
+		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capcon.addConstraint(new BoundConstraint(null, new Variable("?rcapa", OAVBDIRuntimeModel.capability_type)));
-		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
-			new Variable("?rplan", OAVBDIRuntimeModel.plan_type), IOperator.CONTAINS));
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
 		IAction	action	= new IAction()
 		{
@@ -573,16 +577,20 @@ public class PlanRules
 	 */
 	protected static Rule createPlanPassedExecutionRule()
 	{
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
-		plancon.addConstraint(new BoundConstraint(null, new Variable("?rplan", OAVBDIRuntimeModel.plan_type)));
+		plancon.addConstraint(new BoundConstraint(null, rplan));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
 			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED));
+		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capcon.addConstraint(new BoundConstraint(null, new Variable("?rcapa", OAVBDIRuntimeModel.capability_type)));
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
-			new Variable("?rplan", OAVBDIRuntimeModel.plan_type), IOperator.CONTAINS));
+			rplan, IOperator.CONTAINS));
 		
 		IAction	action	= new IAction()
 		{
@@ -729,16 +737,19 @@ public class PlanRules
 	 */
 	protected static Rule createPlanAbortedExecutionRule()
 	{
+		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
-		plancon.addConstraint(new BoundConstraint(null, new Variable("?rplan", OAVBDIRuntimeModel.plan_type)));
+		plancon.addConstraint(new BoundConstraint(null, rplan));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
 			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED));
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capcon.addConstraint(new BoundConstraint(null, new Variable("?rcapa", OAVBDIRuntimeModel.capability_type)));
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
-			new Variable("?rplan", OAVBDIRuntimeModel.plan_type), IOperator.CONTAINS));
+			rplan, IOperator.CONTAINS));
 		
 		IAction	action	= new IAction()
 		{
@@ -967,14 +978,12 @@ public class PlanRules
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
-		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.maintaingoal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
-
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS, IOperator.NOTEQUAL));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
-
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.maintaingoal_type, IOperator.INSTANCEOF));
+		
 		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
 		wacon.addConstraint(new BoundConstraint(null, wa));
 		IConstraint co1 = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal, IOperator.CONTAINS);
@@ -1009,7 +1018,7 @@ public class PlanRules
 			}
 		};
 		
-		Rule maintain_subgoal_finished = new Rule("planinstance_maintaingoalfinished", new AndCondition(new ICondition[]{mgoalcon, goalcon, wacon, plancon, capcon}), action);
+		Rule maintain_subgoal_finished = new Rule("planinstance_maintaingoalfinished", new AndCondition(new ICondition[]{goalcon, wacon, plancon, capcon}), action);
 		return maintain_subgoal_finished;
 	}
 	
@@ -1292,16 +1301,18 @@ public class PlanRules
 		mplancon.addConstraint(new BoundConstraint(null, mplan));
 		mplancon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, ptname));
 		
-		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
-		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
-		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
+//		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
+//		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
+//		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
 		
 		ObjectCondition	rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
 		rcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+		rcapacon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.capability_has_plans}, mplan, IOperator.CONTAINS));
 		
 		Rule plan_creation = new Rule(ptname+"_creation", new AndCondition(
-			new ICondition[]{ragentcon, mplancon, mcapacon, rcapacon, usercond}), PLAN_CREATION);
+//			new ICondition[]{ragentcon, mplancon, mcapacon, rcapacon, usercond}), PLAN_CREATION);
+			new ICondition[]{ragentcon, mplancon, rcapacon, usercond}), PLAN_CREATION);
 		return plan_creation;
 	}
 	

@@ -278,20 +278,18 @@ public class GoalLifecycleRules
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 
-		ObjectCondition	mgoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
-		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED));
-
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		ICondition goalcond = new AndCondition(new ICondition[]{mgoalcon, goalcon, capcon, usercond});
+		ICondition goalcond = new AndCondition(new ICondition[]{goalcon, capcon, usercond});
 		
 		Rule goal_optionize	= new Rule(gtname+"_option", goalcond, GOAL_OPTION_ACTION);
 		return goal_optionize;
@@ -308,20 +306,18 @@ public class GoalLifecycleRules
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 	
-		ObjectCondition	mgoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
-		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED, IOperator.NOTEQUAL));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		ICondition goalcond = new AndCondition(new ICondition[]{mgoalcon, goalcon, capcon, new NotCondition(usercond)});
+		ICondition goalcond = new AndCondition(new ICondition[]{goalcon, capcon, new NotCondition(usercond)});
 		
 		Rule goal_dropping = new Rule(gtname+"_suspend", goalcond, GOAL_SUSPEND_ACTION);
 		return goal_dropping;
@@ -335,10 +331,6 @@ public class GoalLifecycleRules
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 
-		ObjectCondition mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVAttributeType.OBJECTTYPE, OAVBDIMetaModel.maintaingoal_type, IOperator.NOTEQUAL));
-		
 		// Todo: Not MGoal.recur
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -349,12 +341,13 @@ public class GoalLifecycleRules
 		goalcon.addConstraint(new OrConstraint(
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_SUCCEEDED),
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_FAILED)));
-		
+		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVAttributeType.OBJECTTYPE}, OAVBDIMetaModel.maintaingoal_type, IOperator.NOTEQUAL));
+
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
 		// Hack!!! Higher priority required to avoid deliberation activating goal that is already finished in option state (e.g. due to immediately fulfilled target condition)
-		Rule goal_dropping	= new Rule("goal_dropping", new AndCondition(new ICondition[]{mgoalcon, goalcon, capcon}), GOAL_DROPPING_ACTION, IPriorityEvaluator.PRIORITY_1);
+		Rule goal_dropping	= new Rule("goal_dropping", new AndCondition(new ICondition[]{goalcon, capcon}), GOAL_DROPPING_ACTION, IPriorityEvaluator.PRIORITY_1);
 		return goal_dropping;
 	}
 
@@ -368,19 +361,15 @@ public class GoalLifecycleRules
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
-		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
-		
 		ObjectCondition	rgoalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		rgoalcon.addConstraint(new BoundConstraint(null, rgoal));
 		rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
 		rgoalcon.addConstraint(new AndConstraint(
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPING, IOperator.NOTEQUAL),
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED, IOperator.NOTEQUAL)));
-		ICondition goalcond = new AndCondition(new ICondition[]{mgoalcon, rgoalcon, usercond});
+		rgoalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
 		
-		Rule goal_dropping = new Rule(gtname+"_drop", goalcond, GOAL_DROPPING_ACTION);
+		Rule goal_dropping = new Rule(gtname+"_drop", new AndCondition(new ICondition[]{rgoalcon, usercond}), GOAL_DROPPING_ACTION);
 		return goal_dropping;
 	}
 	
