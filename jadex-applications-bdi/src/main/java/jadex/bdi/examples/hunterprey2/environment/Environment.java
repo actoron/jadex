@@ -819,7 +819,11 @@ public class Environment implements IEnvironment
 				for (int i = 0; i < simIds.length; i++)
 				{
 					if (simIds[i] != null)
-						ret.add(engine.getSimulationObject(simIds[i]).getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY));
+					{
+						SimObject simObj = engine.getSimulationObject(simIds[i]);
+						ret.add(simObj.getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY));
+					}
+						
 				}
 				
 			}

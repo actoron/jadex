@@ -212,8 +212,7 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 
 	public String getIconPath()
 	{
-		// TODO: create icon and replace path
-		return null;
+		return getClass().getPackage().getName().replaceAll("environment","images").replaceAll("\\.", "/").concat("/hunterprey_plugin32x32.png");
 	}
 
 	public String getName()
