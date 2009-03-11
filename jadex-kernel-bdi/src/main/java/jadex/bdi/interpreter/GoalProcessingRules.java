@@ -607,7 +607,6 @@ public class GoalProcessingRules
 	 */
 	protected static Rule createQuerygoalSucceededRule()
 	{
-		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.querygoal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mparams = new Variable("$?mparams", OAVBDIMetaModel.parameter_type, true);
 		Variable mparamsets = new Variable("$?mparamsets", OAVBDIMetaModel.parameterset_type, true);
@@ -619,17 +618,14 @@ public class GoalProcessingRules
 		// A query goal is succeeded when all (in)out parameters have been supplied with a value
 		// and all (in)out parametersets have at least one value
 
-		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.querygoal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
-		mgoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.parameterelement_has_parameters, mparams));
-		mgoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.parameterelement_has_parametersets, mparamsets));
-		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parameters, rparams));		
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parametersets, rparamsets));		
-
+		goalcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.parameterelement_has_parameters}, mparams));
+		goalcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.parameterelement_has_parametersets}, mparamsets));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.querygoal_type, IOperator.INSTANCEOF));
+		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 
@@ -670,7 +666,7 @@ public class GoalProcessingRules
 		NotCondition noemptyparamset = new NotCondition(emptyparamset);
 		
 		Rule querygoal_succeeded = new Rule("querygoal_succeeded", new AndCondition(
-			new ICondition[]{mgoalcon, goalcon, capcon, noemptyparam, noemptyparamset}), GOAL_SUCCEEDED, IPriorityEvaluator.PRIORITY_1);
+			new ICondition[]{goalcon, capcon, noemptyparam, noemptyparamset}), GOAL_SUCCEEDED, IPriorityEvaluator.PRIORITY_1);
 		return querygoal_succeeded;
 	}
 
