@@ -87,6 +87,16 @@ public class MovePlan extends Plan
 	 */
 	public void aborted()
 	{
+		if(getBeliefbase().containsBelief("endmem"))
+		{
+			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
+			if(endmem==null)
+			{
+				endmem	= new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+				getBeliefbase().getBelief("endmem").setFact(endmem);
+			}
+		}
+		
 		print("Aborted "+move, depth);
 //		print("Aborted "+(isAbortedOnSuccess()?
 //			"on success: ": "on failure: ")+move, depth);

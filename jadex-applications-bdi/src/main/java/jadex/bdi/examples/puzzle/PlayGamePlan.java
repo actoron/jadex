@@ -15,7 +15,8 @@ public class PlayGamePlan extends Plan
 	public void body()
 	{
 		System.out.println("Now puzzling:");
-		long start = getTime();
+		long	start	= getTime();
+		long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 		IGoal play = createGoal("makemove");
 		play.getParameter("depth").setValue(new Integer(0));
 		try
@@ -32,6 +33,15 @@ public class PlayGamePlan extends Plan
 		
 		long end = getTime();
 		System.out.println("Needed: "+(end-start)+" millis.");
+		if(getBeliefbase().containsBelief("endmem"))
+		{
+			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
+			if(endmem!=null)
+			{
+				System.out.println("Needed: "+(((endmem.longValue()-startmem)*10/1024)/1024)/10.0+" Mb.");
+			}
+		}
+
 
 		killAgent();
 	}
