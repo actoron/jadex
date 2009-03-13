@@ -67,9 +67,6 @@ public class TupleExtractor implements IValueExtractor
 		if(object instanceof VirtualFact)
 			object = ((VirtualFact)object).getObject();
 		
-		if(key!=null)
-			System.out.println("here");
-
 		Object ret;
 		if(attr==OAVAttributeType.OBJECTTYPE)
 		{
@@ -80,7 +77,7 @@ public class TupleExtractor implements IValueExtractor
 			ret = attr==null?  object: 
 				OAVAttributeType.NONE.equals(attr.getMultiplicity())?
 					state.getAttributeValue(object, attr):
-					key!=null? state.getAttributeValue(right, attr, key):
+					key!=null? state.getAttributeValue(object, attr, key):
 					state.getAttributeValues(object, attr);
 		}
 		

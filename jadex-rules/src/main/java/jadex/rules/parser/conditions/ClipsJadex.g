@@ -482,32 +482,20 @@ slotname returns [String id]
 	}
 	('.' tmp=identifier
 	{
-		buf.append(".");
-		if(tmp!=null)
-			buf.append(tmp.getText());
+		buf.append(".").append(tmp.getText());
 	}
 	|':' tmp=identifier
 	{
-		buf.append(":");
-		if(tmp!=null)
-			buf.append(tmp.getText());
+		buf.append(":").append(tmp.getText());
 	}
-	|'[' tmp=identifier
+	|('[' tmp=identifier ']') 
 	{
-		buf.append("[");
-		if(tmp!=null)
-			buf.append(tmp.getText());
+		buf.append("[").append(tmp.getText()).append("]");
 	}
-	|']' tmp=identifier
+	|('[' StringLiteral ']') 
 	{
-		buf.append("]");
-		if(tmp!=null)
-			buf.append(tmp.getText());
+		buf.append("[").append($StringLiteral.text.substring(1, $StringLiteral.text.length()-1)).append("]");
 	}
-	/*|'"' tmp=identifier
-	{
-		buf.append("\"").append(tmp.getText());
-	}*/
 	)*
 	{
 		$id = buf.toString();

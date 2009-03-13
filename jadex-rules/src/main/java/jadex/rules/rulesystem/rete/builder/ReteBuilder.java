@@ -1383,10 +1383,16 @@ public class ReteBuilder
 	{
 		IValueExtractor ret;
 		if(attr instanceof OAVJavaAttributeType)
-			// todo: support for Java?
+		{
 			ret = new JavaObjectExtractor((OAVJavaAttributeType)attr);
+		}
 		else
+		{
+			// todo: support for Java?
+			if(key!=null)
+				throw new RuntimeException("Map attribute access not yet implemented for Java objects.");
 			ret = new ObjectExtractor(attr, key);
+		}
 		return ret;
 	}
 	
@@ -1399,10 +1405,16 @@ public class ReteBuilder
 	{
 		IValueExtractor ret;
 		if(attr instanceof OAVJavaAttributeType)
-			// todo: support for Java?
+		{
 			ret = new JavaTupleExtractor(tupleindex, attr);
+		}
 		else
+		{
+			// todo: support for Java?
+			if(key!=null)
+				throw new RuntimeException("Map attribute access not yet implemented for Java objects.");
 			ret = new TupleExtractor(tupleindex, attr, key);
+		}
 		return ret;
 	}
 }

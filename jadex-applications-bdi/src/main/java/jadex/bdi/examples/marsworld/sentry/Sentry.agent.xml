@@ -104,7 +104,7 @@
 				// (beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
 				// ?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
  
-				?rgoal	= (goal (parameterelement_has_parameters[target].parameter_has_value ?target))
+				?rgoal	= (goal (parameterelement_has_parameters["target"].parameter_has_value ?target))
 				(beliefset (element_has_model.melement_has_name "analysed_targets") (beliefset_has_facts contains ?target))
  			</targetcondition>
 		</achievegoal>
