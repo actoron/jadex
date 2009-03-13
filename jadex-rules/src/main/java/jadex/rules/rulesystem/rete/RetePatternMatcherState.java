@@ -96,8 +96,6 @@ public class RetePatternMatcherState implements IPatternMatcherState, IOAVStateL
 	public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, 
 		Object oldvalue, Object newvalue)
 	{
-//		if(running)
-//			System.out.println("grumpflmpf");
 		assert !running;
 		running	= true;
 		

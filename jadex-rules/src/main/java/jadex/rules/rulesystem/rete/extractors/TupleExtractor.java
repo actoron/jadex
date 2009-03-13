@@ -22,6 +22,9 @@ public class TupleExtractor implements IValueExtractor
 	/** The attribute type. */
 	protected OAVAttributeType attr;
 	
+	/** The key value. */
+	protected Object key;
+	
 	//-------- constructors --------
 	
 	/**
@@ -29,8 +32,17 @@ public class TupleExtractor implements IValueExtractor
 	 */
 	public TupleExtractor(int tupleindex, OAVAttributeType attr)
 	{
+		this(tupleindex, attr, null);
+	}
+	
+	/**
+	 *  Create a new extractor.
+	 */
+	public TupleExtractor(int tupleindex, OAVAttributeType attr, Object key)
+	{
 		this.tupleindex = tupleindex;
 		this.attr = attr;
+		this.key = key;
 	}
 
 	//-------- methods --------
@@ -55,6 +67,9 @@ public class TupleExtractor implements IValueExtractor
 		if(object instanceof VirtualFact)
 			object = ((VirtualFact)object).getObject();
 		
+		if(key!=null)
+			System.out.println("here");
+
 		Object ret;
 		if(attr==OAVAttributeType.OBJECTTYPE)
 		{
@@ -65,6 +80,7 @@ public class TupleExtractor implements IValueExtractor
 			ret = attr==null?  object: 
 				OAVAttributeType.NONE.equals(attr.getMultiplicity())?
 					state.getAttributeValue(object, attr):
+					key!=null? state.getAttributeValue(right, attr, key):
 					state.getAttributeValues(object, attr);
 		}
 		
@@ -118,7 +134,7 @@ public class TupleExtractor implements IValueExtractor
 	 */
 	public String toString()
 	{
-		return "["+tupleindex+"]"+"."+(attr==null? "object": attr.getName());
+		return "["+tupleindex+"]"+"."+(attr==null? "object": attr.getName())+(key==null? "": "["+key+"]");
 	}
 
 	/**

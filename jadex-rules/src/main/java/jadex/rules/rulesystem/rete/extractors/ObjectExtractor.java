@@ -19,6 +19,9 @@ public class ObjectExtractor implements IValueExtractor
 	/** The attribute type. */
 	protected OAVAttributeType attr;
 	
+	/** The key value. */
+	protected Object key;
+	
 	//-------- constructors --------
 	
 	/**
@@ -27,6 +30,15 @@ public class ObjectExtractor implements IValueExtractor
 	public ObjectExtractor(OAVAttributeType attr)
 	{
 		this.attr = attr;
+	}
+	
+	/**
+	 *  Create a new extractor.
+	 */
+	public ObjectExtractor(OAVAttributeType attr, Object key)
+	{
+		this.attr = attr;
+		this.key = key;
 	}
 	
 	//-------- methods --------
@@ -55,8 +67,9 @@ public class ObjectExtractor implements IValueExtractor
 		else
 		{
 			ret = attr==null? right: 
-			OAVAttributeType.NONE.equals(attr.getMultiplicity())?
+				OAVAttributeType.NONE.equals(attr.getMultiplicity())?
 				state.getAttributeValue(right, attr):
+				key!=null? state.getAttributeValue(right, attr, key):
 				state.getAttributeValues(right, attr);
 		}
 		return ret;
@@ -100,7 +113,7 @@ public class ObjectExtractor implements IValueExtractor
 	 */
 	public String toString()
 	{
-		return ""+(attr==null? "object": attr.getName());
+		return ""+(attr==null? "object": attr.getName())+(key==null? "": "["+key+"]");
 	}
 
 

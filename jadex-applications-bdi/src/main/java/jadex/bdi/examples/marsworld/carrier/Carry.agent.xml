@@ -41,18 +41,19 @@
 		<!-- The targets sent to the sentries. -->
 		<beliefset name="finished_targets" class="Target"/>
 		
+		<beliefref name="missionend">
+			<concrete ref="move.missionend"/>
+		</beliefref>
 	</beliefs>
 
 	<goals>
 		<!-- Carry ore home from a target. -->
 		<achievegoal name="carry_ore">
 			<parameter name="destination" class="Location"/>
-			<dropcondition>
+			<!-- <dropcondition>
 				// $beliefbase.missionend
-				// Hack should not access subcapability directly!!! 
-				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "missionend"))
-			</dropcondition>
+				(belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
+			</dropcondition>-->
 			<deliberation>
 				<inhibits ref="move.walk_around"/>
 			</deliberation>

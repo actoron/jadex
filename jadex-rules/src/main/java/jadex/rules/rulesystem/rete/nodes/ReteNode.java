@@ -133,13 +133,16 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	
 	/**
 	 *  Tell the condition system about a
-	 *  new object in the state.
+	 *  modified object in the state.
 	 *  @param object The new object.
 	 */
 	public void modifyObject(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, 
 		Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
 //		System.out.println("Value set: "+id+" "+type+" "+value);
+		if(id.getClass().getName().indexOf("IBoard")!=-1)
+			System.out.println("here");
+		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		

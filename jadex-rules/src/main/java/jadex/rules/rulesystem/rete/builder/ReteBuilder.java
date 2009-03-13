@@ -1275,6 +1275,13 @@ public class ReteBuilder
 	public IValueExtractor createValueExtractor(int tupleindex, Object valuesource, int subindex, BuildContext context)
 	{
 		IValueExtractor ret = null;
+		Object key = null;
+		
+		if(valuesource instanceof Object[] && !(valuesource instanceof OAVAttributeType[]))
+		{
+			key = ((Object[])valuesource)[1];
+			valuesource = ((Object[])valuesource)[0];
+		}
 		
 		if(valuesource instanceof OAVAttributeType[])
 		{
@@ -1284,7 +1291,7 @@ public class ReteBuilder
 			extrs[0] = createValueExtractor(tupleindex, sources[0], subindex, context);
 			for(int i=1; i<sources.length; i++)
 			{
-				extrs[i] = createObjectExtractor(sources[i]);
+				extrs[i] = createObjectExtractor(sources[i], key);
 			}
 			
 			ret = new ChainedExtractor(extrs);
@@ -1292,7 +1299,7 @@ public class ReteBuilder
 		else if(valuesource instanceof List)
 		{
 			List sources = (List)valuesource;
-			IValueExtractor[] extrs = new IValueExtractor[sources.size()];  
+			IValueExtractor[] extrs = new IValueExtractor[sources.size()]; 
 			extrs[0] = createValueExtractor(tupleindex, sources.get(0), subindex, context);
 			for(int i=1; i<sources.size(); i++)
 			{
@@ -1306,11 +1313,11 @@ public class ReteBuilder
 			OAVAttributeType attr = (OAVAttributeType)valuesource;
 			if(tupleindex!=-1 && subindex==-1)
 			{
-				ret = createTupleExtractor(tupleindex, attr);
+				ret = createTupleExtractor(tupleindex, attr, key);
 			}
 			else if(tupleindex==-1 && subindex==-1)
 			{
-				ret = createObjectExtractor(attr);
+				ret = createObjectExtractor(attr, key);
 			}
 			else
 			{
@@ -1372,13 +1379,14 @@ public class ReteBuilder
 	 *  @param attr	The attribute.
 	 *  @return The extractor.
 	 */
-	protected IValueExtractor createObjectExtractor(OAVAttributeType attr)
+	protected IValueExtractor createObjectExtractor(OAVAttributeType attr, Object key)
 	{
 		IValueExtractor ret;
 		if(attr instanceof OAVJavaAttributeType)
+			// todo: support for Java?
 			ret = new JavaObjectExtractor((OAVJavaAttributeType)attr);
 		else
-			ret = new ObjectExtractor(attr);
+			ret = new ObjectExtractor(attr, key);
 		return ret;
 	}
 	
@@ -1387,13 +1395,14 @@ public class ReteBuilder
 	 *  @param attr	The attribute.
 	 *  @return The extractor.
 	 */
-	protected IValueExtractor createTupleExtractor(int tupleindex, OAVAttributeType attr)
+	protected IValueExtractor createTupleExtractor(int tupleindex, OAVAttributeType attr, Object key)
 	{
 		IValueExtractor ret;
 		if(attr instanceof OAVJavaAttributeType)
+			// todo: support for Java?
 			ret = new JavaTupleExtractor(tupleindex, attr);
 		else
-			ret = new TupleExtractor(tupleindex, attr);
+			ret = new TupleExtractor(tupleindex, attr, key);
 		return ret;
 	}
 }

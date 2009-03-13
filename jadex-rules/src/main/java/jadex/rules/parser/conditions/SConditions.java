@@ -10,6 +10,7 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -20,6 +21,11 @@ import org.antlr.runtime.TokenStream;
  */
 public class SConditions
 {
+	/**
+	 * 
+	 * @param var
+	 * @param type
+	 */
     protected static void adaptConditionType(Variable var, OAVObjectType type)
     {
     	if(type==null)
@@ -66,6 +72,13 @@ public class SConditions
         	}
     }
     
+    /**
+     * 
+     * @param otype
+     * @param name
+     * @param params
+     * @return
+     */
     protected static MethodCall	createMethodCall(OAVObjectType otype, String name, List params)
     {
     	if(!(otype instanceof OAVJavaType))
@@ -146,6 +159,12 @@ public class SConditions
     	return new MethodCall(jtype, method, params);
     }
     
+    /**
+     * 
+     * @param tmodel
+     * @param valuesource
+     * @return
+     */
     protected static OAVObjectType getValueSourceType(OAVTypeModel tmodel, Object valuesource)
     {
     	OAVObjectType ret = null;
@@ -221,8 +240,9 @@ public class SConditions
     	if(slotname.indexOf(".")!=-1)
     	{
     		StringTokenizer	stok	= new StringTokenizer(slotname, ".");
-    		OAVAttributeType[]	aret	= new OAVAttributeType[stok.countTokens()];
-    		for(int i=0; i<aret.length; i++)
+    		List aret = new ArrayList();
+    		int num = stok.countTokens();
+    		for(int i=0; i<num; i++)
     		{
     			String attrname = stok.nextToken();
     			int idx = attrname.indexOf(":");
@@ -233,8 +253,22 @@ public class SConditions
 //    				System.out.println("Found type: "+typename+" "+attrname);
     				otype = getObjectType(tmodel, typename, imports);
     			}
-    			aret[i]	= otype.getAttributeType(attrname);
-    			otype	= aret[i].getType();
+    			idx = attrname.indexOf("[");
+    			if(idx!=-1)
+    			{
+    				String key = attrname.substring(idx+1, attrname.indexOf("]"));
+    				attrname = attrname.substring(0, idx);
+    				OAVAttributeType attr = otype.getAttributeType(attrname);
+    				aret.add(new Object[]{attr, key});
+    				otype	= attr.getType();
+    			}
+    			else
+    			{
+    				OAVAttributeType attr = otype.getAttributeType(attrname);
+    				aret.add(attr);
+    				otype	= attr.getType();
+    			}
+    			
     		}
     		ret	= aret;
     	}
