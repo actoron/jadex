@@ -65,8 +65,7 @@
 			<maintaincondition>
 				// $beliefbase.dealer!=null
 				
-				?rbelief = (belief (belief_has_fact != null) (element_has_model ?mbelief))
-				?mbelief = (mbelief (melement_has_name "dealer"))
+				?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
 			</maintaincondition>
 		</maintaingoal>
 
@@ -74,22 +73,19 @@
 			<creationcondition>
 				// $beliefbase.dealer!=null
 				
-				?rbelief = (belief (belief_has_fact != null) (element_has_model ?mbelief))
-				?mbelief = (mbelief (melement_has_name "dealer"))
+				?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
 			</creationcondition>
 			<contextcondition>
 				// $beliefbase.myself.getAccount()>0
 				
 				?myself = (Player (account > 0))
-				?rbelief = (belief (belief_has_fact ?myself) (element_has_model ?mbelief))
-				?mbelief = (mbelief (melement_has_name "myself"))
+				?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?myself))
 			</contextcondition>
 			<targetcondition>
 				// $beliefbase.myself.getState().equals(Player.STATE_IDLE)
 				
 				?myself = (Player (playingstate "idle"))
-				?rbelief = (belief (belief_has_fact != null) (element_has_model ?mbelief))
-				?mbelief = (mbelief (melement_has_name "myself"))
+				?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact != null))
 			</targetcondition>
 		</achievegoal>
 
@@ -287,14 +283,12 @@
 			// &amp;&amp; $beliefbase.gamestate.getDealer().getCards().length==1
 		
 			?player = (Player (cardCnt 2))
-			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
-			?mbelief = (mbelief (melement_has_name "myself"))
+			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 
-			?rbelief2 = (belief (belief_has_fact ?gamestate) (element_has_model ?mbelief2))
+			?rbelief2 = (belief (element_has_model.melement_has_name "gamestate") (belief_has_fact ?gamestate))
 			?gamestate = (GameState (dealer ?dealer &amp; 
 				:(== 1 (MethodCallFunction "Player" "getCardCnt" ?dealer))))
 			//?dealer = (Player (cardCnt 1))			
-			?mbelief2 = (mbelief (melement_has_name "gamestate"))
 		</condition>
 	</expressions>
 

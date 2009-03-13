@@ -659,7 +659,10 @@ public class ReteBuilder
 		if(c instanceof BoundConstraint 
 			&& IOperator.EQUAL.equals(((BoundConstraint)c).getOperator())
 			&& !(((BoundConstraint)c).getValueSource() instanceof MethodCall)
-			&& !(((BoundConstraint)c).getValueSource() instanceof FunctionCall))
+			&& !(((BoundConstraint)c).getValueSource() instanceof FunctionCall)
+			&& !(((BoundConstraint)c).getValueSource() instanceof List)
+			&& !(((BoundConstraint)c).getValueSource() instanceof OAVAttributeType)
+		)
 		{
 			BoundConstraint bc = (BoundConstraint)c;
 

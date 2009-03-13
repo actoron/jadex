@@ -101,9 +101,11 @@
 		<performgoal name="play_game" exclude="never">
 			<contextcondition>
 				// $beliefbase.players.length > 0
-				?rbeliefset = (beliefset (beliefset_has_facts $?facts) (element_has_model ?mbeliefset))
-				?mbeliefset = (mbeliefset (melement_has_name "players"))
-				(test (> (Length $?facts) 0))
+				// ?rbeliefset = (beliefset (beliefset_has_facts $?facts) (element_has_model ?mbeliefset))
+				// ?mbeliefset = (mbeliefset (melement_has_name "players"))
+				// (test (> (Length $?facts) 0))
+				
+				?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts $?facts &amp; :(> (Length $?facts) 0) ))
 			</contextcondition>
 		</performgoal>
 
@@ -164,6 +166,9 @@
 				?player = (Player (playingstate != "idle"))
 				?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player))
 				?rplan = (plan (parameterelement_has_parameters contains ?rparam))
+				
+				// ?player = (Player (playingstate != "idle"))
+				// ?rplan = (plan (parameterelement_has_parameters["player"].parameter_has_value ?player))
 			</contextcondition>
 		</plan>
 
@@ -403,8 +408,11 @@
 		<!-- Check if it is the dealer's first turn. -->
 		<condition name="dealers_first_turn">
 			?dealer = (Player (cardCnt 0))
-			?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
-			?mbelief = (mbelief (melement_has_name "myself"))
+			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?dealer))
+			
+			//?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
+			//?mbelief = (mbelief (melement_has_name "myself"))
+			
 			(not
 				(and
 			 		?player = (Player (playingstate != "idle") (cardCnt != 2))
@@ -412,6 +420,16 @@
 					?mbeliefset = (mbeliefset (melement_has_name "players"))
 				)
 			)
+			
+			// ?dealer = (Player (cardCnt 0))
+			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?dealer))
+			// 
+			// (not
+			//	(and
+			// 		?player = (Player (playingstate != "idle") (cardCnt != 2))
+			//		?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?player))
+			//	)
+			//)
 		</condition>
 		
 		<!-- Check if it is the dealer's first turn. -->
@@ -421,6 +439,9 @@
 					?player = (Player (playingstate != "idle") (playingstate != "finished"))
 					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
 					?mbeliefset = (mbeliefset (melement_has_name "players"))
+					
+					//?player = (Player (playingstate != "idle") (playingstate != "finished"))
+					//?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?player))
 				)
 			)
 		</condition>
@@ -446,8 +467,7 @@
 			(not
 				(and
 					?p = (Player (playingstate != "idle") (playingstate != "playing") (playingstate != "finished"))
-					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (melement_has_name "players"))
+					?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?p))
 				)
 			)
 			
@@ -458,8 +478,7 @@
 			(not
 				(and
 					?p = (Player (playingstate "playing") (cardCnt ?cc&amp;:(&lt; ?cc ?cardcnt)))
-					?rbeliefset = (beliefset (beliefset_has_facts contains ?p) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (melement_has_name "players"))
+					?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?p))
 				)
 			)
 		</condition>
@@ -469,8 +488,7 @@
 			// $beliefbase.myself.getCards().length==1
 			
 			?player = (Player (cardCnt 1))
-			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
-			?mbelief = (mbelief (melement_has_name "myself"))
+			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 		</condition>
 
 		<!-- Check if the dealer has finished drawing cards. -->
@@ -479,8 +497,7 @@
 			// || $beliefbase.myself.getState().equals(Player.STATE_IDLE)
 			
 			?player = (Player (playingstate "idle" | "finished"))
-			?rbelief = (belief (belief_has_fact ?player) (element_has_model ?mbelief))
-			?mbelief = (mbelief (melement_has_name "myself"))
+			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 		</condition>
 
 	</expressions>
