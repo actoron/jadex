@@ -389,6 +389,7 @@ public class GoalProcessingRules
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true);
+		Variable target = new Variable("?target", OAVBDIMetaModel.condition_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -400,12 +401,13 @@ public class GoalProcessingRules
 		goalcon.addConstraint(nomoreplan);
 		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_recur}, Boolean.FALSE));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_type, IOperator.INSTANCEOF));
+		goalcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_has_targetcondition}, target));
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
 		plancon.addConstraint(new BoundConstraint(null, fplans, IOperator.CONTAINS));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED));
-		IConstraint goalhastarget = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_reason, OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_has_targetcondition}, null, IOperator.NOTEQUAL);
+		IConstraint goalhastarget = new LiteralConstraint(target, null, IOperator.NOTEQUAL);
 		IConstraint planfail = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
 		IConstraint planabort = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
 		plancon.addConstraint(new OrConstraint(new IConstraint[]{goalhastarget, planfail, planabort}));
@@ -465,7 +467,7 @@ public class GoalProcessingRules
 	
 		Rule achievegoal_retry	= new Rule("achievegoal_retry", new AndCondition(new ICondition[]{mgoalcon, plancon, goalcon, capcon}), GOAL_RETRY);
 		return achievegoal_retry;
-	}*/
+	}
 	
 	/**
 	 *  Create the achievegoal retry rule.
@@ -477,6 +479,7 @@ public class GoalProcessingRules
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true);
+		Variable target = new Variable("?target", OAVBDIMetaModel.condition_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -485,16 +488,17 @@ public class GoalProcessingRules
 		IConstraint conrecalc = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_rebuild}, Boolean.TRUE);
 		OrConstraint orcon = new OrConstraint(new IConstraint[]{conaplnotnull, conrecalc});
 		goalcon.addConstraint(orcon);
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finishedplans, rplan, IOperator.CONTAINS));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finishedplans, fplans));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_type, IOperator.INSTANCEOF));
 		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_retry}, Boolean.TRUE));
 		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.processableelement_has_posttoall}, Boolean.FALSE));
-		
+		goalcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_has_targetcondition}, target));
+
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
 		plancon.addConstraint(new BoundConstraint(null, fplans, IOperator.CONTAINS));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED));
-		IConstraint goalhastarget = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_reason, OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_has_targetcondition}, null, IOperator.NOTEQUAL);
+		IConstraint goalhastarget = new LiteralConstraint(target, null, IOperator.NOTEQUAL);
 		IConstraint planfail = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
 		IConstraint planabort = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
 		IConstraint orcon2 = new OrConstraint(new IConstraint[]{goalhastarget, planfail, planabort});
@@ -504,7 +508,7 @@ public class GoalProcessingRules
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.EXCLUDES));
 	
-		Rule achievegoal_retry	= new Rule("achievegoal_retry", new AndCondition(new ICondition[]{plancon, goalcon, capcon}), GOAL_RETRY);
+		Rule achievegoal_retry	= new Rule("achievegoal_retry", new AndCondition(new ICondition[]{goalcon, plancon, capcon}), GOAL_RETRY);
 		return achievegoal_retry;
 	}
 	
