@@ -67,10 +67,8 @@
 				))
 
 				// !$beliefbase.missionend
-				// Hack should not access subcapability directly!!! 
-				(belief (element_has_model ?mbel_missionend) (belief_has_fact false))
-				?mbel_missionend	= (mbelief (melement_has_name "missionend"))
-
+				(belief (element_has_model.melement_has_name "missionend") (belief_has_fact false))
+				
 				// select $target from $beliefbase.my_targets
 				// where !$beliefbase.getBeliefSet("analysed_targets").containsFact($target)
 				(beliefset (element_has_model ?mbel_mytargets) (beliefset_has_facts $?x ?target $?y))
