@@ -42,6 +42,9 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	/** The set of relevant attributes. */
 	protected Set	relevants;
 
+	/** The set of indirect attributes. */
+	protected Set	indirects;
+
 	//-------- constructors --------
 	
 	/**
@@ -486,12 +489,24 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 					}
 				}
 			}			
-		}		
+		}
+		
+		// else
+		// propagation of unaffected nodes is handled by subtypes.
 
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
 	
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
 	/**
 	 *  Set the object source of this node.
 	 *  @param node The object source node.
@@ -711,6 +726,35 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			}
 		}
 		return relevants;
+	}
+	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		if(indirects==null)
+		{
+			synchronized(this)
+			{
+				if(indirects==null)
+				{
+					indirects	= new HashSet();
+					for(int i=0; indexers!=null && i<indexers.length; i++)
+					{
+						indirects.addAll(indexers[i].getIndirectAttributes());
+					}
+					for(int i=0; evaluators!=null && i<evaluators.length; i++)
+					{
+						indirects.addAll(evaluators[i].getIndirectAttributes());
+					}
+				}
+			}
+		}
+		return indirects;
 	}
 	
 //	/**

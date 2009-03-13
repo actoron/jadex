@@ -1,7 +1,9 @@
 package jadex.rules.rulesystem.rete.nodes;
 
 
+import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
 import java.util.Set;
@@ -39,6 +41,14 @@ public interface INode extends Cloneable
 	public Set	getRelevantAttributes();
 	
 	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes();
+
+	/**
 	 *  Create the node memory.
 	 *  @param state	The state.
 	 *  @return The node memory.
@@ -51,6 +61,12 @@ public interface INode extends Cloneable
 	 */
 	public Collection getNodeMemory(ReteMemory mem);
 	
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda);
+
 	//-------- cloneable --------
 	
 	/**

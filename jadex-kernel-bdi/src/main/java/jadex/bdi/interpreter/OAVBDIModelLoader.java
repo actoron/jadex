@@ -457,7 +457,6 @@ public class OAVBDIModelLoader
 			for(Iterator it=mplans.iterator(); it.hasNext(); )
 			{
 				Object mplan = it.next();
-				String ptname = (String)state.getAttributeValue(mplan, OAVBDIMetaModel.modelelement_has_name);
 				
 				// Create rules for plans
 				
@@ -469,7 +468,7 @@ public class OAVBDIModelLoader
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
-							rb.addRule(PlanRules.createPlanCreationUserRule(usercond, ptname));
+							rb.addRule(PlanRules.createPlanCreationUserRule(usercond, mplan));
 					}
 				}
 				
@@ -478,7 +477,7 @@ public class OAVBDIModelLoader
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
-						rb.addRule(PlanRules.createPlanContextInvalidUserRule(usercond, ptname));
+						rb.addRule(PlanRules.createPlanContextInvalidUserRule(usercond, mplan));
 				}
 				
 				// Create rules for dynamic parameter values.
@@ -636,8 +635,7 @@ public class OAVBDIModelLoader
 						Object usercond = state.getAttributeValue(value, OAVBDIMetaModel.expression_has_content);
 						if(usercond instanceof ICondition)
 						{
-							String mpename = (String)state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name);
-							rb.addRule(BeliefRules.createDynamicParameterUserRule(mpename, (ICondition)usercond, ptname));
+							rb.addRule(BeliefRules.createDynamicParameterUserRule(mpe, (ICondition)usercond, ptname));
 						}
 					}
 				}
@@ -672,8 +670,7 @@ public class OAVBDIModelLoader
 						Object usercond = state.getAttributeValue(values, OAVBDIMetaModel.expression_has_content);
 						if(usercond instanceof ICondition)
 						{
-							String rpename = (String)state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name);
-							rb.addRule(BeliefRules.createDynamicParameterSetUserRule(rpename, (ICondition)usercond, ptname));
+							rb.addRule(BeliefRules.createDynamicParameterSetUserRule(mpe, (ICondition)usercond, ptname));
 						}
 					}
 				}

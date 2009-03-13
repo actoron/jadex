@@ -40,6 +40,7 @@ import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.AndConstraint;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
+import jadex.rules.rulesystem.rules.Constant;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
@@ -1338,6 +1339,10 @@ public class ReteBuilder
 		else if(valuesource instanceof Variable)
 		{
 			ret = buildVariableExtractor((Variable)valuesource, context);
+		}
+		else if(valuesource instanceof Constant)
+		{
+			ret = new ConstantExtractor(((Constant)valuesource).getValue());
 		}
 		
 		if(ret==null)

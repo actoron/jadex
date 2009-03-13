@@ -301,37 +301,24 @@ public class BeliefRules
 	
 	/**
 	 *  Create a rule for a dynamic parameter value.
-	 *  @param mpename The processable model element name.
+	 *  @param mpe The paremeter model element.
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Rule createDynamicParameterUserRule(String mpename, ICondition usercond, String ptname)
+	protected static Rule createDynamicParameterUserRule(Object mpe, ICondition usercond, String ptname)
 	{
-		Variable mparam = new Variable("?mparameter", OAVBDIMetaModel.parameter_type);
 		Variable rparam = new Variable("?rparameter", OAVBDIRuntimeModel.parameter_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
-		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.parameterelement_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	rparamcon	= new ObjectCondition(OAVBDIRuntimeModel.parameter_type);
 		rparamcon.addConstraint(new BoundConstraint(null, rparam));
 		rparamcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.parameter_has_name, ptname));
-//		belcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mparam));
 		
 		ObjectCondition	rparamelemcon = new ObjectCondition(OAVBDIRuntimeModel.parameterelement_type);
 		rparamelemcon.addConstraint(new BoundConstraint(null, rpe));
-		rparamelemcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
+		rparamelemcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
 		rparamelemcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parameters, rparam, IOperator.CONTAINS));
-
-		ObjectCondition	mparamcon = new ObjectCondition(OAVBDIMetaModel.parameter_type);
-		mparamcon.addConstraint(new BoundConstraint(null, mparam));
-		mparamcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, ptname));
-		
-		ObjectCondition	mparamelemcon = new ObjectCondition(OAVBDIMetaModel.parameterelement_type);
-		mparamelemcon.addConstraint(new BoundConstraint(null, mpe));
-//		mparamelemcon.addConstraint(new LiteralConstraint(null, mparamelem));
-		mparamelemcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, mpename));
-		mparamelemcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.parameterelement_has_parameters, mparam, IOperator.CONTAINS));
 
 		ObjectCondition	rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
@@ -339,8 +326,8 @@ public class BeliefRules
 		IConstraint con2 = new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rpe, IOperator.CONTAINS);
 		rcapacon.addConstraint(new OrConstraint(new IConstraint[]{con1, con2}));
 		
-		Rule dynamic_param = new Rule(mpename+"_"+ptname+"_dynamicvalue", new AndCondition(new ICondition[]{rparamcon, rparamelemcon,
-			mparamcon, mparamelemcon, rcapacon, usercond}), DYNAMIC_VALUE_CHANGED, IPriorityEvaluator.PRIORITY_1);
+		Rule dynamic_param = new Rule(mpe.toString()+"_"+ptname+"_dynamicvalue",
+			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon, usercond}), DYNAMIC_VALUE_CHANGED, IPriorityEvaluator.PRIORITY_1);
 		return dynamic_param;
 	}
 	
@@ -518,37 +505,24 @@ public class BeliefRules
 	
 	/**
 	 *  Create a rule for a dynamic values expression.
-	 *  @param mpename The processable model element name.
-	 *  @param usercond	The ADF part of the target condition.
+	 *  @param mpe The parameter model element.
+	 *  @param usercond	The ADF part of the dynamic condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Rule createDynamicParameterSetUserRule(String mpename, ICondition usercond, String ptname)
+	protected static Rule createDynamicParameterSetUserRule(Object mpe, ICondition usercond, String ptname)
 	{
-		Variable mparam = new Variable("?mparameterset", OAVBDIMetaModel.parameterset_type);
 		Variable rparam = new Variable("?rparameterset", OAVBDIRuntimeModel.parameterset_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
-		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.parameterelement_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	rparamcon	= new ObjectCondition(OAVBDIRuntimeModel.parameterset_type);
 		rparamcon.addConstraint(new BoundConstraint(null, rparam));
 		rparamcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.parameterset_has_name, ptname));
-//		belcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mparam));
 		
 		ObjectCondition	rparamelemcon = new ObjectCondition(OAVBDIRuntimeModel.parameterelement_type);
 		rparamelemcon.addConstraint(new BoundConstraint(null, rpe));
-		rparamelemcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
+		rparamelemcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mpe));
 		rparamelemcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parametersets, rparam, IOperator.CONTAINS));
-
-		ObjectCondition	mparamcon = new ObjectCondition(OAVBDIMetaModel.parameterset_type);
-		mparamcon.addConstraint(new BoundConstraint(null, mparam));
-		mparamcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, ptname));
-		
-		ObjectCondition	mparamelemcon = new ObjectCondition(OAVBDIMetaModel.parameterelement_type);
-		mparamelemcon.addConstraint(new BoundConstraint(null, mpe));
-//		mparamelemcon.addConstraint(new LiteralConstraint(null, mparamelem));
-		mparamelemcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, mpename));
-		mparamelemcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.parameterelement_has_parametersets, mparam, IOperator.CONTAINS));
 
 		ObjectCondition	rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
@@ -556,8 +530,8 @@ public class BeliefRules
 		IConstraint con2 = new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rpe, IOperator.CONTAINS);
 		rcapacon.addConstraint(new OrConstraint(new IConstraint[]{con1, con2}));
 		
-		Rule dynamic_paramset = new Rule(mpename+"_"+ptname+"_dynamicvalues", new AndCondition(new ICondition[]{rparamcon, rparamelemcon, 
-			mparamcon, mparamelemcon, rcapacon, usercond}), DYNAMIC_VALUES_CHANGED, IPriorityEvaluator.PRIORITY_1);
+		Rule dynamic_paramset = new Rule(mpe.toString()+"_"+ptname+"_dynamicvalues",
+			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon, usercond}), DYNAMIC_VALUES_CHANGED, IPriorityEvaluator.PRIORITY_1);
 		return dynamic_paramset;
 	}
 	

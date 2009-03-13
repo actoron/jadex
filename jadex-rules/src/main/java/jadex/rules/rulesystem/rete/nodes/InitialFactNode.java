@@ -96,6 +96,16 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	}
 
 	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		// Should never be called.
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
+	/**
 	 *  Set the object source of this node.
 	 *  @param node The object source node.
 	 */
@@ -216,6 +226,17 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 			}
 		}
 		return relevants;
+	}
+
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		return Collections.EMPTY_SET;
 	}
 
 	//-------- cloneable --------

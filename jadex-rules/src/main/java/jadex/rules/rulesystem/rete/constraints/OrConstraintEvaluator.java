@@ -80,6 +80,22 @@ public class OrConstraintEvaluator implements IConstraintEvaluator
 	}
 	
 	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		Set	ret	= new HashSet();
+		for(int i=0; i<evaluators.length; i++)
+		{
+			ret.addAll(evaluators[i].getIndirectAttributes());
+		}
+		return ret;
+	}
+
+	/**
 	 *  Get the string representation.
 	 *  @return The string representation. 
 	 */

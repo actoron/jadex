@@ -191,7 +191,8 @@
 				
 				// todo: make sure that all elements are in same capa
  			</dropcondition>
-			<deliberation cardinality="1">
+			<deliberation>
+			<!-- <deliberation cardinality="1"> -->
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">
 					// $beliefbase.my_location.getDistance($goal.waste.getLocation())

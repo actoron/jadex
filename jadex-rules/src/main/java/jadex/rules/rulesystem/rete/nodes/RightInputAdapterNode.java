@@ -6,6 +6,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,6 +76,16 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 		}
 	}
 	
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		// Should never be called.
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
 	/**
 	 *  Set the tuple source of this node.
 	 *  @param node The tuple source node.
@@ -200,6 +211,17 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		return Collections.EMPTY_SET;
+	}
+
 	//-------- cloneable --------
 	
 	/**

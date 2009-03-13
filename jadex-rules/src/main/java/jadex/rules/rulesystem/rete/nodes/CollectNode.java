@@ -40,6 +40,9 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	/** The set of relevant attributes. */
 	protected Set relevants;
 	
+	/** The set of indirect attributes. */
+	protected Set indirects;
+	
 	/** The tuple index to collect. */
 	protected int tupleindex;
 
@@ -322,6 +325,15 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	}
 
 	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
+	/**
 	 *  Set the tuple source of this node.
 	 *  @param node The tuple source node.
 	 */
@@ -401,6 +413,31 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		if(indirects==null)
+		{
+			synchronized(this)
+			{
+				if(indirects==null)
+				{
+					indirects	= new HashSet();
+					for(int i=0; evaluators!=null && i<evaluators.length; i++)
+					{
+						indirects.addAll(evaluators[i].getIndirectAttributes());
+					}
+				}
+			}
+		}
+		return indirects;
+	}
+
 	/**
 	 *  Get the tuple index.
 	 *  @return The tuple index.

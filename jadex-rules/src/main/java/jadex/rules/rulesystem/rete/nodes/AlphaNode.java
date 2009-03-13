@@ -9,6 +9,7 @@ import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -31,6 +32,9 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	
 	/** The set of relevant attributes. */
 	protected Set	relevants;
+
+	/** The set of indirect attributes. */
+	protected Set	indirects;
 
 	//-------- constructors --------
 	
@@ -144,6 +148,40 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param id The changed object.
+	 */
+	public void modifyIndirectObject(Object id, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		Collection	oldmem	= getNodeMemory(mem);
+		Collection	input	= getObjectSource().getNodeMemory(mem);
+		if(input!=null)
+		{
+			// Todo: Use index for avoiding the need for checking all objects.
+			for(Iterator it=input.iterator(); it.hasNext(); )
+			{
+				Object	object	= it.next();
+				boolean	contains	= oldmem!=null && oldmem.contains(object);		
+				boolean check = checkConstraints(object, state);
+
+				// Object no longer valid -> remove
+				if(contains && !check)
+				{
+					((Collection)mem.getNodeMemory(this)).remove(object);
+					propagateRemovalToObjectConsumers(object, state, mem, agenda);
+				}
+
+				// Object newly valid -> add
+				else if(!contains && check)
+				{
+					((Collection)mem.getNodeMemory(this)).add(object);
+					propagateAdditionToObjectConsumers(object, state, mem, agenda);
+				}
+			}
+		}
 	}
 
 	/**
@@ -336,6 +374,31 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		if(indirects==null)
+		{
+			synchronized(this)
+			{
+				if(indirects==null)
+				{
+					indirects	= new HashSet();
+					for(int i=0; evaluators!=null && i<evaluators.length; i++)
+					{
+						indirects.addAll(evaluators[i].getIndirectAttributes());
+					}
+				}
+			}
+		}
+		return indirects;
+	}
+
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation. 

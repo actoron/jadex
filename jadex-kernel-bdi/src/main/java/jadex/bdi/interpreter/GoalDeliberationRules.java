@@ -100,7 +100,7 @@ public class GoalDeliberationRules
 				state.addAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("2deliberate_goal_addtypeinhibition",
+		return new Rule("deliberate_goal_addtypeinhibition",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
@@ -164,7 +164,7 @@ public class GoalDeliberationRules
 				state.removeAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("2deliberate_goal_removetypeinhibition",
+		return new Rule("deliberate_goal_removetypeinhibition",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
@@ -232,7 +232,7 @@ public class GoalDeliberationRules
 				state.addAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("2deliberate_goal_addinstanceinhibition_"+gtname,
+		return new Rule("deliberate_goal_addinstanceinhibition_"+gtname,
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon, usercond}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
@@ -244,24 +244,25 @@ public class GoalDeliberationRules
 	protected static Rule createRemoveInhibitionLinkUserRule(ICondition usercond, String gtname)
 	{
 		Variable ringoal = new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
-		Variable mingoal = new Variable("?mingoal", OAVBDIMetaModel.goal_type);
+//		Variable mingoal = new Variable("?mingoal", OAVBDIMetaModel.goal_type);
 		Variable rincapa = new Variable("?rincapa", OAVBDIRuntimeModel.capability_type);
 		Variable inhibits = new Variable("?inhibits", OAVBDIMetaModel.inhibits_type);
 		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
-		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
+//		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		Variable inmode = new Variable("?inmode", OAVJavaType.java_string_type);
 		Variable rinhibitors = new Variable("?rinhibitors", OAVBDIRuntimeModel.goal_type, true);
 
-		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, mingoal));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
+//		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
+//		mgoalcon.addConstraint(new BoundConstraint(null, mingoal));
+//		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, ringoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_inhibitors, rinhibitors));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mingoal));
+//		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mingoal));
+		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
 		
 		ObjectCondition rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		rcapacon.addConstraint(new BoundConstraint(null, rincapa));
@@ -273,14 +274,15 @@ public class GoalDeliberationRules
 		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_ref, ref));
 		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_inhibit, inmode));
 	
-		ObjectCondition	mingoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mingoalcon.addConstraint(new BoundConstraint(null, mgoal));
-		mingoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_inhibits, inhibits, IOperator.CONTAINS));
+//		ObjectCondition	mingoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
+//		mingoalcon.addConstraint(new BoundConstraint(null, mgoal));
+//		mingoalcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.goal_has_inhibits, inhibits, IOperator.CONTAINS));
 		
 		ObjectCondition	ingoalcon = new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		ingoalcon.addConstraint(new BoundConstraint(null, rgoal));
 		ingoalcon.addConstraint(new BoundConstraint(null, rinhibitors, IOperator.CONTAINS));
-		ingoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+//		ingoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+		ingoalcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_inhibits}, inhibits, IOperator.CONTAINS));
 //		ingoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
 		ingoalcon.addConstraint(new OrConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, 
 			OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE, IOperator.NOTEQUAL), 
@@ -304,14 +306,14 @@ public class GoalDeliberationRules
 				state.removeAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("2deliberate_goal_removeinstanceinhibition_"+gtname,
-			new AndCondition(new ICondition[]{mgoalcon, goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon, new NotCondition(usercond)}), 
+		return new Rule("deliberate_goal_removeinstanceinhibition_"+gtname,
+			new AndCondition(new ICondition[]{/*mgoalcon, */goalcon, rcapacon, inhicon, /*mingoalcon,*/ ingoalcon, capcon, new NotCondition(usercond)}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
 	
 	/**
 	 *  Rule for activating a non-inhibited goal.
-	 */
+	 * /
 	protected static Rule createActivateGoalRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -365,8 +367,60 @@ public class GoalDeliberationRules
 				GoalProcessingRules.changeProcessingState(state, rgoal, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE);
 			}
 		};
-		return new Rule("2deliberate_goal_activation",
+		// Not-Node required, because rule would otherwise not trigger if no goals are active.
+		return new Rule("deliberate_goal_activation",
 			new AndCondition(new ICondition[]{mgoalcon, goalcon, rcapacon, new NotCondition(cardcon)}), action);
+	}*/
+	
+	/**
+	 *  Rule for activating a non-inhibited goal.
+	 */
+	protected static Rule createActivateGoalRule()
+	{
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable samegoals = new Variable("$?same_goals", OAVBDIRuntimeModel.goal_type, true);
+		Variable cardinality = new Variable("?cardinality", OAVJavaType.java_integer_type);
+
+		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+		goalcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_cardinality}, cardinality));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_inhibitors, null));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION));
+		
+		ObjectCondition rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
+		rcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+		
+		// The cardinality allows activation.
+		// Collect number of same goals (same model) and ensure that not (number of same goals)>=cardinality 
+		ObjectCondition	samegoalcon = new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+		samegoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+		samegoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
+		
+		CollectCondition cardcon = new CollectCondition(samegoalcon, null);
+		cardcon.addConstraint(new BoundConstraint(null, samegoals));
+		FunctionCall fc_num = new FunctionCall(new Length(), new Object[]{samegoals});
+		FunctionCall fc_numcard = new FunctionCall(new OperatorFunction(IOperator.GREATEROREQUAL), new Object[]{fc_num, cardinality});
+		cardcon.addConstraint(new PredicateConstraint(fc_numcard));
+		
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object rgoal = assignments.getVariableValue("?rgoal");
+//				String name = (String)state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
+//				if(name.indexOf("get_v")==-1)
+//					System.out.println("Deliberate goal activation: "+rgoal+" "+name);
+				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE);
+				GoalProcessingRules.changeProcessingState(state, rgoal, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE);
+			}
+		};
+		// Not-Node required, because rule would otherwise not trigger if no goals are active.
+		return new Rule("deliberate_goal_activation",
+			new AndCondition(new ICondition[]{goalcon, rcapacon, new NotCondition(cardcon)}), action);
 	}
 	
 	/**
@@ -397,7 +451,7 @@ public class GoalDeliberationRules
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION);
 			}
 		};
-		return new Rule("2deliberate_goal_deactivation",
+		return new Rule("deliberate_goal_deactivation",
 			new AndCondition(new ICondition[]{goalcon, rcapacon}), action);
 	}
 	

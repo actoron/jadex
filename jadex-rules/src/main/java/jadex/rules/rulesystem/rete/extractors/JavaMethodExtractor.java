@@ -7,6 +7,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -121,6 +122,17 @@ public class JavaMethodExtractor implements IValueExtractor
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		return Collections.EMPTY_SET;
+	}
+
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation. 

@@ -32,6 +32,8 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	/** The set of relevant attributes. */
 	protected Set	relevants;
 	
+	/** The set of indirect attributes. */
+	protected Set	indirects;
 	
 	//-------- constructors --------
 	
@@ -148,6 +150,15 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	}
 	
 	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
+	/**
 	 *  Set the tuple source of this node.
 	 *  @param node The tuple source node.
 	 */
@@ -252,12 +263,38 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 				{
 					relevants	= new HashSet();
 					relevants.addAll(evaluator.getRelevantAttributes());
+					for(int i=0; tconsumers!=null && i<tconsumers.length; i++)
+					{
+						relevants.addAll(tconsumers[i].getRelevantAttributes());
+					}
 				}
 			}
 		}
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		if(indirects==null)
+		{
+			synchronized(this)
+			{
+				if(indirects==null)
+				{
+					indirects	= new HashSet();
+					indirects.addAll(evaluator.getIndirectAttributes());
+				}
+			}
+		}
+		return indirects;
+	}
+
 	/**
 	 *  Create the node memory.
 	 *  @param state	The state.

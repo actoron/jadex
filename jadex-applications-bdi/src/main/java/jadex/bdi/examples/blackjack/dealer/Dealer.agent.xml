@@ -163,12 +163,14 @@
 				// $beliefbase.getBeliefSet("players").containsFact($plan.player)
 				// &amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
 			
-				?player = (Player (playingstate != "idle"))
-				?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player))
-				?rplan = (plan (parameterelement_has_parameters contains ?rparam))
+				// ?player = (Player (playingstate != "idle"))
+				// ?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player))
+				// ?rplan = (plan (parameterelement_has_parameters contains ?rparam))
 				
 				// ?player = (Player (playingstate != "idle"))
 				// ?rplan = (plan (parameterelement_has_parameters["player"].parameter_has_value ?player))
+
+				?rplan = (plan (parameterelement_has_parameters["player"].parameter_has_value.Player:playingstate != "idle"))
 			</contextcondition>
 		</plan>
 

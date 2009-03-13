@@ -46,6 +46,9 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	/** The set of relevant attributes. */
 	protected Set	relevants;
 	
+	/** The set of indirect attributes. */
+	protected Set	indirects;
+
 	/** The values extractor. */
 	// Needed as long as multifield extractor is based on attribute
 	protected OAVAttributeType attr;
@@ -222,6 +225,15 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		throw new UnsupportedOperationException("Unsupported method.");
 	}
 
 	/**
@@ -404,6 +416,28 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		if(indirects==null)
+		{
+			synchronized(this)
+			{
+				if(indirects==null)
+				{
+					indirects	= new HashSet();
+					indirects.addAll(extractor.getIndirectAttributes());
+				}
+			}
+		}
+		return indirects;
+	}
+
 	/**
 	 *  Get the attribute.
 	 *  @return The attribute.

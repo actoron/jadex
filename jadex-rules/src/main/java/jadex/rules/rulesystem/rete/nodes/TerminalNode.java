@@ -40,6 +40,9 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	/** The set of relevant attributes. */
 	protected Set	relevants;
 
+	/** The set of indirect attributes. */
+	protected Set	indirects;
+
 	//-------- constructors --------
 	
 	/**
@@ -144,6 +147,15 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	}
 
 	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
+	/**
 	 *  Set the tuple source of this node.
 	 *  @param node The tuple source node.
 	 */
@@ -225,6 +237,41 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		if(indirects==null)
+		{
+			synchronized(this)
+			{
+				if(indirects==null)
+				{
+					if(extractors.isEmpty())
+					{
+						indirects	= Collections.EMPTY_SET;
+					}
+					else
+					{
+						indirects	= new HashSet();
+						for(Iterator it=extractors.values().iterator(); it.hasNext(); )
+						{
+							IValueExtractor ex = (IValueExtractor)it.next();
+							if(ex==null)
+								System.out.println("here");
+							indirects.addAll(ex.getIndirectAttributes());
+						}
+					}
+				}
+			}
+		}
+		return indirects;
+	}
+
 	/**
 	 *  Get the rule.
 	 *  @return The rule.

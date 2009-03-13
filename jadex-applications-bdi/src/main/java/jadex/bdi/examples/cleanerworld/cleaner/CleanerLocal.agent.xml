@@ -179,7 +179,7 @@
 				?mbelief = (mbelief (melement_has_name "carriedwaste"))
 				// todo: make sure that all elements are in same capa
  			</dropcondition>
-			<!--  <deliberation cardinality="1">-->
+			<!-- <deliberation cardinality="1"> -->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">

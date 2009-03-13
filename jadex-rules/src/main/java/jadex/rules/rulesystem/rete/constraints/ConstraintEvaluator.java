@@ -97,6 +97,20 @@ public class ConstraintEvaluator implements IConstraintEvaluator
 		ret.addAll(extractor2.getRelevantAttributes());
 		return ret;
 	}
+	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		Set	ret	= new HashSet();
+		ret.addAll(extractor1.getIndirectAttributes());
+		ret.addAll(extractor2.getIndirectAttributes());
+		return ret;
+	}
 
 	/**
 	 *  Get the string representation.

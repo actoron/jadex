@@ -32,6 +32,9 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	/** Matching nodes for each (sub)type (cached for speed). */
 	protected Map typenodesets;
 	
+	/** Indirectly affected nodes for an attribute type (cached for speed). */
+	protected Map indirectnodesets;
+	
 	/** The initial fact node (if any). */
 	protected InitialFactNode	initialfact;
 	
@@ -148,7 +151,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		
 		if(getRelevantAttributes().contains(attr))
 		{
-			Set	tns	= getRelevantNodes(attr);
+			Set	tns	= getTypeNodes(type);
 			
 			if(tns!=null && !tns.isEmpty())
 			{
@@ -166,11 +169,29 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 			//else
 //				System.out.println("No typenode(s) available for: "+value);
 		}
+		
+		Set	ins	= getIndirectNodes(attr);
+		if(ins!=null)
+		{
+			for(Iterator it=ins.iterator(); it.hasNext(); )
+			{
+				((INode)it.next()).modifyIndirectObject(id, attr, oldvalue, newvalue, state, mem, agenda);
+			}
+		}
 
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
 		
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
 	/**
 	 *  Add a rule to the network.
 	 *  @param rule The rule to add.
@@ -359,6 +380,17 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	}
 	
 	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		return Collections.EMPTY_SET;
+	}
+
+	/**
 	 *  Get the builder.
 	 *  @return The rete builder.
 	 */
@@ -399,32 +431,71 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	}
 	
 	/**
-	 *  Get the set of relevant nodes for an attribute type.
+	 *  Get the set of indirectly affected nodes for an attribute type.
 	 *  @param type The attribute type.
-	 *  @return The set of type nodes for that attribute type.
+	 *  @return The set of indirectly affected nodes for that attribute type.
 	 */
-	protected Set	getRelevantNodes(OAVAttributeType type)
+	protected Set	getIndirectNodes(OAVAttributeType type)
 	{
-		Set	ret	= (Set)typenodesets.get(type);
-		if(ret==null)
+		if(indirectnodesets==null)
 		{
 			synchronized(this)
 			{
-				ret	= (Set)typenodesets.get(type);
-				if(ret==null)
+				if(indirectnodesets==null)
 				{
-					ret	= new HashSet();
-					for(Iterator it=typenodes.values().iterator(); it.hasNext(); )
+					indirectnodesets	= new HashMap();
+					List	nodelist	= new ArrayList();
+					List	nodeset	= new ArrayList();
+					nodelist.addAll(typenodes.values());
+					nodeset.addAll(nodelist);
+					
+					for(int i=0; i<nodelist.size(); i++)
 					{
-						TypeNode	tnode	= (TypeNode)it.next();
-						if(tnode.getRelevantAttributes().contains(type))
-							ret.add(tnode);
+						INode	node	= (INode)nodelist.get(i);
+						if(!node.getIndirectAttributes().isEmpty())
+						{
+							for(Iterator it=node.getIndirectAttributes().iterator(); it.hasNext(); )
+							{
+								Object	attr	= it.next();
+								Set	indinodes	= (Set)indirectnodesets.get(attr);
+								if(indinodes==null)
+								{
+									indinodes	= new HashSet();
+									indirectnodesets.put(attr, indinodes);
+								}
+								indinodes.add(node);
+							}
+						}
+						
+						if(node instanceof IObjectSourceNode)
+						{
+							INode[]	subs	= ((IObjectSourceNode)node).getObjectConsumers();
+							for(int n=0; subs!=null && n<subs.length; n++)
+							{
+								if(!nodeset.contains(subs[n]))
+								{
+									nodelist.add(subs[n]);
+									nodeset.add(subs[n]);
+								}
+							}
+						}
+						if(node instanceof ITupleSourceNode)
+						{
+							INode[]	subs	= ((ITupleSourceNode)node).getTupleConsumers();
+							for(int n=0; subs!=null && n<subs.length; n++)
+							{
+								if(!nodeset.contains(subs[n]))
+								{
+									nodelist.add(subs[n]);
+									nodeset.add(subs[n]);
+								}
+							}
+						}
 					}
-					typenodesets.put(type, ret);
 				}
 			}
 		}
-		return ret;
+		return (Set)indirectnodesets.get(type);
 	}
 	
 	//-------- cloneable --------

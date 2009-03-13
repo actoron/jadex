@@ -7,6 +7,7 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -105,6 +106,16 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	}
+
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		// Should never be called.
+		throw new UnsupportedOperationException("Unsupported method.");
 	}
 
 	/**
@@ -231,6 +242,17 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 		return relevants;
 	}
 	
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		return Collections.EMPTY_SET;
+	}
+
 	//-------- cloneable --------
 	
 	/**

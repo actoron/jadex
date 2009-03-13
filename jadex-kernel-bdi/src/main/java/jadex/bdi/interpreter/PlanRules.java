@@ -17,6 +17,7 @@ import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.Constant;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
@@ -28,6 +29,8 @@ import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.rulesystem.rules.VariableReturnValueConstraint;
+import jadex.rules.rulesystem.rules.functions.Identity;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -1284,35 +1287,26 @@ public class PlanRules
 	/**
 	 *  Create the plan creation rule.
 	 *  @param usercond	The ADF part of the target condition.
-	 *  @param ptname	The plan type name (e.g. "walk").
+	 *  @param mplan	The plan model element.
 	 */
-	protected static Rule createPlanCreationUserRule(ICondition usercond, String ptname)
+	protected static Rule createPlanCreationUserRule(ICondition usercond, Object mplan)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
-		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);
-		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+		Variable mplanvar = new Variable("?mplan", OAVBDIMetaModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 			
 		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
 		ragentcon.addConstraint(new BoundConstraint(null, ragent));
 		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE));
 		
-		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
-		mplancon.addConstraint(new BoundConstraint(null, mplan));
-		mplancon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, ptname));
-		
-//		ObjectCondition	mcapacon = new ObjectCondition(OAVBDIMetaModel.capability_type);
-//		mcapacon.addConstraint(new BoundConstraint(null, mcapa));
-//		mcapacon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_plans, mplan, IOperator.CONTAINS));
-		
 		ObjectCondition	rcapacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		rcapacon.addConstraint(new BoundConstraint(null, rcapa));
-		rcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
-		rcapacon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.capability_has_plans}, mplan, IOperator.CONTAINS));
+		rcapacon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.capability_has_plans}, mplan, IOperator.CONTAINS));
+		// Hack??? How to pass mplan to action!?
+		rcapacon.addConstraint(new BoundConstraint(new Constant(mplan), mplanvar));
 		
-		Rule plan_creation = new Rule(ptname+"_creation", new AndCondition(
-//			new ICondition[]{ragentcon, mplancon, mcapacon, rcapacon, usercond}), PLAN_CREATION);
-			new ICondition[]{ragentcon, mplancon, rcapacon, usercond}), PLAN_CREATION);
+		Rule plan_creation = new Rule(mplan.toString()+"_creation", new AndCondition(
+			new ICondition[]{ragentcon, rcapacon, usercond}), PLAN_CREATION);
 		return plan_creation;
 	}
 	
@@ -1786,28 +1780,23 @@ public class PlanRules
 	/**
 	 *  Create the plan context invalid rule.
 	 *  @param usercond	The ADF part of the target condition.
-	 *  @param ptname	The plan type name (e.g. "walk").
+	 *  @param mplan	The plan model element.
 	 */
-	protected static Rule createPlanContextInvalidUserRule(ICondition usercond, String ptname)
+	protected static Rule createPlanContextInvalidUserRule(ICondition usercond, Object mplan)
 	{
-		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
-		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
-		mplancon.addConstraint(new BoundConstraint(null, mplan));
-		mplancon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, ptname));
-		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mplan));
+		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mplan));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
-		Rule plancontext_invalid = new Rule(ptname+"_context", new AndCondition(new ICondition[]{mplancon, plancon, 
-			capcon, new NotCondition(usercond)}), PLAN_ABORT);
+		Rule plancontext_invalid = new Rule(mplan.toString()+"_context",
+			new AndCondition(new ICondition[]{plancon, capcon, new NotCondition(usercond)}), PLAN_ABORT);
 		
 		return plancontext_invalid;
 	}	

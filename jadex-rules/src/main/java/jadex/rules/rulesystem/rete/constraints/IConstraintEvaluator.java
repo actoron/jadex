@@ -34,4 +34,12 @@ public interface IConstraintEvaluator
 	 *  Get the set of relevant attribute types.
 	 */
 	public Set	getRelevantAttributes();
+
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes();
 }

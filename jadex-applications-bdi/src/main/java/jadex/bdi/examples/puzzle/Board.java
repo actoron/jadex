@@ -161,8 +161,6 @@ public class Board implements IBoard, Serializable
 		
 		// Fire property change outside of synchronization to avoid deadlocks.
 //		pcs.firePropertyChange(MOVE, null, move);
-		if(isSolution())
-			System.out.println("solved");
 		pcs.firePropertyChange("solution", null, move);	// Hack!!! Change for every move required for GUI.
 		return true;
 	}
