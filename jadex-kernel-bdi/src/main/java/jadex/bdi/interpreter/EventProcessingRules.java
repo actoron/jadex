@@ -223,7 +223,7 @@ public class EventProcessingRules
 		aplconpi2.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.apl_has_waitqueuecandidates, null, IOperator.NOTEQUAL));
 		
 		// Rules for plan instances
-		Rule add_rplan_to_apl	= new Rule("add_rplan_to_apl",
+		Rule apl_add_rplan	= new Rule("apl_add_rplan",
 			new AndCondition(new ICondition[]{
 				rpecon, capcon, wacon, planconwa,
 				new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
@@ -255,7 +255,7 @@ public class EventProcessingRules
 		candconwc.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitqueuecandidate_has_plan, rplan));
 		
 		// Rules for waitqueue candidates
-		Rule add_waitqueuecand_to_apl = new Rule("add_waitqueuecand_to_apl",
+		Rule apl_add_waitqueuecand = new Rule("apl_add_waitqueuecand",
 			new AndCondition(new ICondition[]{
 				rpecon, capcon, 
 				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa})),
@@ -263,7 +263,7 @@ public class EventProcessingRules
 				new NotCondition(aplconwc)}),
 				ADD_WAITQUEUECAND_TO_APL);
 
-		Rule no_waitqueuecands_for_apl	= new Rule("make_apl_available",
+		Rule apl_make_available	= new Rule("apl_make_available",
 			new AndCondition(new ICondition[]{
 				rpecon, capcon, 
 				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa, 
@@ -275,7 +275,7 @@ public class EventProcessingRules
 				}))}),
 				MAKE_APL_AVAILABLE);
 		
-		return new Rule[]{add_rplan_to_apl, add_waitqueuecand_to_apl, no_waitqueuecands_for_apl};		
+		return new Rule[]{apl_add_rplan, apl_add_waitqueuecand, apl_make_available};		
 	}
 	
 	//-------- APL Building finished rule --------
@@ -983,9 +983,9 @@ public class EventProcessingRules
 			}
 		};
 		
-		Rule select_candidates = new Rule("select_candidates_for_goal", 
+		Rule rule = new Rule("candidates_select_for_goal", 
 			new AndCondition(new ICondition[]{rpecon, capcon, nometacon, agentcon}), action);
-		return select_candidates;
+		return rule;
 	}
 	
 	/**
@@ -1077,9 +1077,9 @@ public class EventProcessingRules
 			}
 		};
 		
-		Rule select_candidates = new Rule("select_candidates_for_internalevent", 
+		Rule rule = new Rule("candidates_select_for_internalevent", 
 			new AndCondition(new ICondition[]{rpecon, capcon, nometacon, agentcon}), action);
-		return select_candidates;
+		return rule;
 	}
 	
 	/**
@@ -1172,9 +1172,9 @@ public class EventProcessingRules
 			}
 		};
 		
-		Rule select_candidates = new Rule("select_candidates_for_messageevent", 
+		Rule rule = new Rule("candidates_select_for_messageevent", 
 			new AndCondition(new ICondition[]{rpecon, capcon, nometacon, agentcon}), action);
-		return select_candidates;
+		return rule;
 	}
 	
 	/*protected static IAction SELECT_CANDIDATE_ACTION	= new IAction()
@@ -1268,9 +1268,9 @@ public class EventProcessingRules
 //		}));
 		
 		
-		Rule dispatch_element = new Rule("dispatch_messageevent_from_waitqueue", 
+		Rule rule = new Rule("waitqueue_dispatch_messageevent", 
 			new AndCondition(new ICondition[]{rpecon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
-		return dispatch_element;
+		return rule;
 	}
 	
 	/**
@@ -1313,9 +1313,9 @@ public class EventProcessingRules
 //		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, 
 //			mpe, IOperator.CONTAINS));
 		
-		Rule dispatch_element = new Rule("dispatch_internalevent_from_waitqueue", 
+		Rule rule = new Rule("waitqueue_dispatch_internalevent", 
 			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
-		return dispatch_element;
+		return rule;
 	}
 	
 	/**
@@ -1399,9 +1399,9 @@ public class EventProcessingRules
 //		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
-		Rule dispatch_element = new Rule("dispatch_factadded_from_waitqueue", 
+		Rule rule = new Rule("waitqueue_dispatch_factadded", 
 			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
-		return dispatch_element;
+		return rule;
 	}
 	
 	/**
@@ -1442,9 +1442,9 @@ public class EventProcessingRules
 //		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
-		Rule dispatch_element = new Rule("dispatch_factremoved_from_waitqueue", 
+		Rule rule = new Rule("waitqueue_dispatch_factremoved", 
 			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
-		return dispatch_element;
+		return rule;
 	}
 	
 	/**
@@ -1485,9 +1485,9 @@ public class EventProcessingRules
 //		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
-		Rule dispatch_element = new Rule("dispatch_factchanged_from_waitqueue", 
+		Rule rule = new Rule("waitqueue_dispatch_factchanged", 
 			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
-		return dispatch_element;
+		return rule;
 	}
 	
 	protected static IAction DISPATCH_WAITQUEUE_ELEMENT_ACTION = new IAction()

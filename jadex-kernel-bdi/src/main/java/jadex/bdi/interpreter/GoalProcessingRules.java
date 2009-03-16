@@ -254,7 +254,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param gtname	The goal type name (e.g. "achievecleanup").
 	 */
-	protected static Rule createAchievegoalSucceededUserRule(ICondition usercond, String gtname)
+	protected static Rule createAchievegoalSucceededUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -267,7 +267,7 @@ public class GoalProcessingRules
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		Rule achievegoal_succeeded	= new Rule(gtname+"_target", new AndCondition(new ICondition[]{goalcon, capacon, usercond}), GOAL_SUCCEEDED, IPriorityEvaluator.PRIORITY_1);
+		Rule achievegoal_succeeded	= new Rule(rulename, new AndCondition(new ICondition[]{goalcon, capacon, usercond}), GOAL_SUCCEEDED, IPriorityEvaluator.PRIORITY_1);
 		return achievegoal_succeeded;
 	}
 	
@@ -536,7 +536,7 @@ public class GoalProcessingRules
 
 	/**
 	 *  Create the querygoal succeeded rule.
-	 * /
+	 */
 	protected static Rule createQuerygoalSucceededRule()
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.querygoal_type);
@@ -604,11 +604,11 @@ public class GoalProcessingRules
 		Rule querygoal_succeeded = new Rule("querygoal_succeeded", new AndCondition(
 			new ICondition[]{mgoalcon, goalcon, capcon, noemptyparam, noemptyparamset}), GOAL_SUCCEEDED, IPriorityEvaluator.PRIORITY_1);
 		return querygoal_succeeded;
-	}*/
+	}
 
 	/**
 	 *  Create the querygoal succeeded rule.
-	 */
+	 * /
 	protected static Rule createQuerygoalSucceededRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -672,7 +672,7 @@ public class GoalProcessingRules
 		Rule querygoal_succeeded = new Rule("querygoal_succeeded", new AndCondition(
 			new ICondition[]{goalcon, capcon, noemptyparam, noemptyparamset}), GOAL_SUCCEEDED, IPriorityEvaluator.PRIORITY_1);
 		return querygoal_succeeded;
-	}
+	}*/
 
 	
 	/**
@@ -801,7 +801,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the maintain condition (will be negated to trigger maintenance).
 	 *  @param gtname	The goal type name (e.g. "maintainbatteryloaded").
 	 */
-	protected static Rule createMaintaingoalProcessingUserRule(ICondition usercond, String gtname)
+	protected static Rule createMaintaingoalProcessingUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -816,7 +816,7 @@ public class GoalProcessingRules
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		Rule maintaingoal_processing = new Rule(gtname+"_maintain", new AndCondition(new ICondition[]{goalcon, capacon, 
+		Rule maintaingoal_processing = new Rule(rulename, new AndCondition(new ICondition[]{goalcon, capacon, 
 			new NotCondition(usercond)}), GOAL_PROCESSING, IPriorityEvaluator.PRIORITY_1);
 		return maintaingoal_processing;
 	}
@@ -826,7 +826,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param gtname	The goal type name (e.g. "maintainbatteryloaded").
 	 */
-	protected static Rule createMaintaingoalSucceededUserRule(ICondition usercond, String gtname)
+	protected static Rule createMaintaingoalSucceededUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -839,7 +839,7 @@ public class GoalProcessingRules
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		Rule maintaingoal_succeeded	= new Rule(gtname+"_target", new AndCondition(new ICondition[]{goalcon, capacon, usercond}), GOAL_IDLE, IPriorityEvaluator.PRIORITY_1);
+		Rule maintaingoal_succeeded	= new Rule(rulename, new AndCondition(new ICondition[]{goalcon, capacon, usercond}), GOAL_IDLE, IPriorityEvaluator.PRIORITY_1);
 		return maintaingoal_succeeded;
 	}
 	
@@ -1358,7 +1358,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the context condition.
 	 *  @param gtname	The goal type name (e.g. "achievecleanup").
 	 */
-	protected static Rule createGoalRecurUserRule(ICondition usercond, String gtname)
+	protected static Rule createGoalRecurUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -1370,7 +1370,7 @@ public class GoalProcessingRules
 		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_PAUSED));
 		rgoalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
 
-		Rule goal_recur = new Rule(gtname+"_recur", new AndCondition(new ICondition[]{rgoalcon, usercond}), new IAction()
+		Rule goal_recur = new Rule(rulename, new AndCondition(new ICondition[]{rgoalcon, usercond}), new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{

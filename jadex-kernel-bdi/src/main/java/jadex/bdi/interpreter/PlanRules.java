@@ -1289,7 +1289,7 @@ public class PlanRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param mplan	The plan model element.
 	 */
-	protected static Rule createPlanCreationUserRule(ICondition usercond, Object mplan)
+	protected static Rule createPlanCreationUserRule(String rulename, ICondition usercond, Object mplan)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable mplanvar = new Variable("?mplan", OAVBDIMetaModel.plan_type);
@@ -1305,7 +1305,7 @@ public class PlanRules
 		// Hack??? How to pass mplan to action!?
 		rcapacon.addConstraint(new BoundConstraint(new Constant(mplan), mplanvar));
 		
-		Rule plan_creation = new Rule(mplan.toString()+"_creation", new AndCondition(
+		Rule plan_creation = new Rule(rulename, new AndCondition(
 			new ICondition[]{ragentcon, rcapacon, usercond}), PLAN_CREATION);
 		return plan_creation;
 	}
@@ -1782,7 +1782,7 @@ public class PlanRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param mplan	The plan model element.
 	 */
-	protected static Rule createPlanContextInvalidUserRule(ICondition usercond, Object mplan)
+	protected static Rule createPlanContextInvalidUserRule(String rulename, ICondition usercond, Object mplan)
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -1795,7 +1795,7 @@ public class PlanRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
-		Rule plancontext_invalid = new Rule(mplan.toString()+"_context",
+		Rule plancontext_invalid = new Rule(rulename,
 			new AndCondition(new ICondition[]{plancon, capcon, new NotCondition(usercond)}), PLAN_ABORT);
 		
 		return plancontext_invalid;

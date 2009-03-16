@@ -240,7 +240,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF part of the creation condition.
 	 *  @param gtname	The goal type name (e.g. "achievecleanup").
 	 */
-	protected static Rule createGoalCreationUserRule(ICondition usercond, String gtname)
+	protected static Rule createGoalCreationUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -263,7 +263,7 @@ public class GoalLifecycleRules
 		mcapcon.addConstraint(new BoundConstraint(null, mcapa));
 		mcapcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, mgoal, IOperator.CONTAINS));
 		
-		Rule rule = new Rule(gtname+"_create", new AndCondition(new ICondition[]{ragentcon, capcon, mgoalcon, mcapcon, usercond}), GOAL_CREATION_ACTION);
+		Rule rule = new Rule(rulename, new AndCondition(new ICondition[]{ragentcon, capcon, mgoalcon, mcapcon, usercond}), GOAL_CREATION_ACTION);
 		return rule;
 	}
 	
@@ -272,7 +272,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF condition part.
 	 *  @param gtname	The goal type name (e.g. "achievecleanup").
 	 */
-	protected static Rule createGoalOptionUserRule(ICondition usercond, String gtname)
+	protected static Rule createGoalOptionUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -291,7 +291,7 @@ public class GoalLifecycleRules
 		
 		ICondition goalcond = new AndCondition(new ICondition[]{goalcon, capcon, usercond});
 		
-		Rule goal_optionize	= new Rule(gtname+"_option", goalcond, GOAL_OPTION_ACTION);
+		Rule goal_optionize	= new Rule(rulename, goalcond, GOAL_OPTION_ACTION);
 		return goal_optionize;
 	}
 
@@ -300,7 +300,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF part of the context condition (will be negated automatically).
 	 *  @param gtname	The goal type name (e.g. "achievecleanup").
 	 */
-	protected static Rule createGoalSuspendUserRule(ICondition usercond, String gtname)
+	protected static Rule createGoalSuspendUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -319,7 +319,7 @@ public class GoalLifecycleRules
 		
 		ICondition goalcond = new AndCondition(new ICondition[]{goalcon, capcon, new NotCondition(usercond)});
 		
-		Rule goal_dropping = new Rule(gtname+"_suspend", goalcond, GOAL_SUSPEND_ACTION);
+		Rule goal_dropping = new Rule(rulename, goalcond, GOAL_SUSPEND_ACTION);
 		return goal_dropping;
 	}
 
@@ -356,7 +356,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF part of the context condition.
 	 *  @param gtname	The goal type name (e.g. "achievecleanup").
 	 */
-	protected static Rule createGoalDroppingUserRule(ICondition usercond, String gtname)
+	protected static Rule createGoalDroppingUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -369,7 +369,7 @@ public class GoalLifecycleRules
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED, IOperator.NOTEQUAL)));
 		rgoalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
 		
-		Rule goal_dropping = new Rule(gtname+"_drop", new AndCondition(new ICondition[]{rgoalcon, usercond}), GOAL_DROPPING_ACTION);
+		Rule goal_dropping = new Rule(rulename, new AndCondition(new ICondition[]{rgoalcon, usercond}), GOAL_DROPPING_ACTION);
 		return goal_dropping;
 	}
 	

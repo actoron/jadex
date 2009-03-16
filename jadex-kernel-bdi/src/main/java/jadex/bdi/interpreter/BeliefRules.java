@@ -174,7 +174,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param btname	The belief type name (e.g. "location").
 	 */
-	protected static Rule createDynamicBeliefUserRule(ICondition usercond, String btname)
+	protected static Rule createDynamicBeliefUserRule(String rulename, ICondition usercond, String btname)
 	{
 		Variable mbelief = new Variable("?mbelief", OAVBDIMetaModel.belief_type);
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
@@ -187,7 +187,7 @@ public class BeliefRules
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
 
-		Rule dynamic_belief = new Rule(btname+"_dynamicfact", new AndCondition(new ICondition[]{belcon, capcon, usercond}), 
+		Rule dynamic_belief = new Rule(rulename, new AndCondition(new ICondition[]{belcon, capcon, usercond}), 
 			DYNAMIC_BELIEF_CHANGED);
 		return dynamic_belief;
 	}
@@ -211,7 +211,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param btname	The belief type name (e.g. "location").
 	 */
-	protected static Rule createDynamicBeliefSetUserRule(ICondition usercond, String btname)
+	protected static Rule createDynamicBeliefSetUserRule(String rulename, ICondition usercond, String btname)
 	{
 		Variable mbeliefset = new Variable("?mbeliefset", OAVBDIMetaModel.beliefset_type);
 //		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
@@ -225,7 +225,7 @@ public class BeliefRules
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
 
-		Rule dynamic_belief = new Rule(btname+"_dynamicfacts", new AndCondition(new ICondition[]{belsetcon, capcon, usercond}), 
+		Rule dynamic_belief = new Rule(rulename, new AndCondition(new ICondition[]{belsetcon, capcon, usercond}), 
 			DYNAMIC_BELIEFSET_CHANGED);
 		return dynamic_belief;
 	}
@@ -249,7 +249,7 @@ public class BeliefRules
 	 *  @param usercond The user condition.
 	 *  @param mcond The condition's model element. 
 	 */
-	protected static Rule createConditionUserRule(ICondition usercond, Object mcondition, String name)
+	protected static Rule createConditionUserRule(String rulename, ICondition usercond, Object mcondition, String name)
 	{
 		Variable mcond = new Variable("?mcondition", OAVBDIMetaModel.condition_type);
 		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -272,7 +272,7 @@ public class BeliefRules
 		capacon.addConstraint(new BoundConstraint(null, rcapa));
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 
-		Rule cond = new Rule(name+"_condition", new AndCondition(new ICondition[]{mcondcon, wacon, plancon, capacon, usercond}),
+		Rule cond = new Rule(rulename, new AndCondition(new ICondition[]{mcondcon, wacon, plancon, capacon, usercond}),
 			PLAN_WAIT_FOR_CONDITION);
 		
 		return cond;
@@ -305,7 +305,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Rule createDynamicParameterUserRule(Object mpe, ICondition usercond, String ptname)
+	protected static Rule createDynamicParameterUserRule(String rulename, Object mpe, ICondition usercond, String ptname)
 	{
 		Variable rparam = new Variable("?rparameter", OAVBDIRuntimeModel.parameter_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
@@ -326,7 +326,7 @@ public class BeliefRules
 		IConstraint con2 = new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rpe, IOperator.CONTAINS);
 		rcapacon.addConstraint(new OrConstraint(new IConstraint[]{con1, con2}));
 		
-		Rule dynamic_param = new Rule(mpe.toString()+"_"+ptname+"_dynamicvalue",
+		Rule dynamic_param = new Rule(rulename,
 			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon, usercond}), DYNAMIC_VALUE_CHANGED, IPriorityEvaluator.PRIORITY_1);
 		return dynamic_param;
 	}
@@ -509,7 +509,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the dynamic condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Rule createDynamicParameterSetUserRule(Object mpe, ICondition usercond, String ptname)
+	protected static Rule createDynamicParameterSetUserRule(String rulename, Object mpe, ICondition usercond, String ptname)
 	{
 		Variable rparam = new Variable("?rparameterset", OAVBDIRuntimeModel.parameterset_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
@@ -530,7 +530,7 @@ public class BeliefRules
 		IConstraint con2 = new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rpe, IOperator.CONTAINS);
 		rcapacon.addConstraint(new OrConstraint(new IConstraint[]{con1, con2}));
 		
-		Rule dynamic_paramset = new Rule(mpe.toString()+"_"+ptname+"_dynamicvalues",
+		Rule dynamic_paramset = new Rule(rulename,
 			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon, usercond}), DYNAMIC_VALUES_CHANGED, IPriorityEvaluator.PRIORITY_1);
 		return dynamic_paramset;
 	}

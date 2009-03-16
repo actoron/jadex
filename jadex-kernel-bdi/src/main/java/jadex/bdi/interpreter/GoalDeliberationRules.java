@@ -100,7 +100,7 @@ public class GoalDeliberationRules
 				state.addAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("deliberate_goal_addtypeinhibition",
+		return new Rule("goal_deliberate_addtypeinhibition",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
@@ -164,7 +164,7 @@ public class GoalDeliberationRules
 				state.removeAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("deliberate_goal_removetypeinhibition",
+		return new Rule("goal_deliberate_removetypeinhibition",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
@@ -174,7 +174,7 @@ public class GoalDeliberationRules
 	 *  a) there is an inhibiting rgoal on type level
 	 *  b) the inhibition condition triggers.
 	 */
-	protected static Rule createAddInhibitionLinkUserRule(ICondition usercond, String gtname)
+	protected static Rule createAddInhibitionLinkUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable ringoal = new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
 		Variable mingoal = new Variable("?mingoal", OAVBDIMetaModel.goal_type);
@@ -232,7 +232,7 @@ public class GoalDeliberationRules
 				state.addAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("deliberate_goal_addinstanceinhibition_"+gtname,
+		return new Rule(rulename,
 			new AndCondition(new ICondition[]{goalcon, rcapacon, inhicon, mingoalcon, ingoalcon, capcon, usercond}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
@@ -241,7 +241,7 @@ public class GoalDeliberationRules
 	 *  Remove an inhibition entry (the inhibitor) from a goal when
 	 *  b) the negated inhibition condition triggers.
 	 */
-	protected static Rule createRemoveInhibitionLinkUserRule(ICondition usercond, String gtname)
+	protected static Rule createRemoveInhibitionLinkUserRule(String rulename, ICondition usercond, String gtname)
 	{
 		Variable ringoal = new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
 //		Variable mingoal = new Variable("?mingoal", OAVBDIMetaModel.goal_type);
@@ -306,7 +306,7 @@ public class GoalDeliberationRules
 				state.removeAttributeValue(ringoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule("deliberate_goal_removeinstanceinhibition_"+gtname,
+		return new Rule(rulename,
 			new AndCondition(new ICondition[]{/*mgoalcon, */goalcon, rcapacon, inhicon, /*mingoalcon,*/ ingoalcon, capcon, new NotCondition(usercond)}), 
 			action, IPriorityEvaluator.PRIORITY_1);
 	}
@@ -419,7 +419,7 @@ public class GoalDeliberationRules
 			}
 		};
 		// Not-Node required, because rule would otherwise not trigger if no goals are active.
-		return new Rule("deliberate_goal_activation",
+		return new Rule("goal_deliberate_activation",
 			new AndCondition(new ICondition[]{goalcon, rcapacon, new NotCondition(cardcon)}), action);
 	}
 	
@@ -451,7 +451,7 @@ public class GoalDeliberationRules
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION);
 			}
 		};
-		return new Rule("deliberate_goal_deactivation",
+		return new Rule("goal_deliberate_deactivation",
 			new AndCondition(new ICondition[]{goalcon, rcapacon}), action);
 	}
 	
@@ -487,6 +487,6 @@ public class GoalDeliberationRules
 		
 //		System.out.println("exit active: "+rgoal);
 		
-		return new Rule("exit_active_state", new AndCondition(new ICondition[]{goalcon, capcon}), action, IPriorityEvaluator.PRIORITY_1);
+		return new Rule("goal_exit_active_state", new AndCondition(new ICondition[]{goalcon, capcon}), action, IPriorityEvaluator.PRIORITY_1);
 	}
 }

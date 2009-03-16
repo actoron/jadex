@@ -92,8 +92,8 @@ public class AgentRules
 					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
 			}
 		};
-		Rule start_agent = new Rule("start_agent", ragentcon, action);
-		return start_agent;
+		Rule rule = new Rule("agent_start", ragentcon, action);
+		return rule;
 	}
 
 	/**
@@ -385,8 +385,8 @@ public class AgentRules
 			}
 		};
 		
-		Rule remove_changeevent = new Rule("remove_changeevent", new AndCondition(new ICondition[]{changecon, ragentcon}), action);
-		return remove_changeevent;
+		Rule rule = new Rule("changeevent_remove", new AndCondition(new ICondition[]{changecon, ragentcon}), action);
+		return rule;
 	}
 
 	

@@ -1,5 +1,7 @@
 package jadex.rules.rulesystem;
 
+import jadex.rules.rulesystem.rules.Rule;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -118,5 +120,26 @@ public class Rulebase implements IRulebase
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get a unique rulename for a given rulename.
+	 *  @param rb The rulebase.
+	 *  @param rulename The rulename.
+	 *  @return The (possibly modified) rulename.
+	 */
+	public static String getUniqueRuleName(IRulebase rb, String rulename)
+	{
+		int count = 1;
+		String suffix = "";
+		Rule testrule = new Rule(rulename+suffix, null, null);
+		
+		while(rb.getRules().contains(testrule))
+		{
+			suffix = "_"+count;
+			testrule = new Rule(rulename+suffix, null, null);
+		}
+		
+		return testrule.getName();
 	}
 }

@@ -359,7 +359,10 @@ public class OAVBDIModelLoader
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
-						rb.addRule(GoalLifecycleRules.createGoalCreationUserRule(usercond, gtname));
+					{
+						String rulename = Rulebase.getUniqueRuleName(rb, "goal_create_"+gtname);
+						rb.addRule(GoalLifecycleRules.createGoalCreationUserRule(rulename, usercond, gtname));
+					}
 				}
 				
 				Object context = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_contextcondition);
@@ -369,8 +372,10 @@ public class OAVBDIModelLoader
 					ICondition usercond = (ICondition)state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
 					{
-						rb.addRule(GoalLifecycleRules.createGoalOptionUserRule(usercond, gtname));
-						rb.addRule(GoalLifecycleRules.createGoalSuspendUserRule(usercond, gtname));
+						String rulename = Rulebase.getUniqueRuleName(rb, "goal_option_"+gtname);
+						rb.addRule(GoalLifecycleRules.createGoalOptionUserRule(rulename, usercond, gtname));
+						rulename = Rulebase.getUniqueRuleName(rb, "goal_suspend_"+gtname);
+						rb.addRule(GoalLifecycleRules.createGoalSuspendUserRule(rulename, usercond, gtname));
 					}
 				}
 				
@@ -379,7 +384,10 @@ public class OAVBDIModelLoader
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(drop, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
-						rb.addRule(GoalLifecycleRules.createGoalDroppingUserRule(usercond, gtname));
+					{
+						String rulename = Rulebase.getUniqueRuleName(rb, "goal_drop_"+gtname);
+						rb.addRule(GoalLifecycleRules.createGoalDroppingUserRule(rulename, usercond, gtname));
+					}
 				}
 				
 				// Create recur condition
@@ -388,7 +396,10 @@ public class OAVBDIModelLoader
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(recur, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
-						rb.addRule(GoalProcessingRules.createGoalRecurUserRule(usercond, gtname));
+					{
+						String rulename = Rulebase.getUniqueRuleName(rb, "goal_recur_"+gtname);
+						rb.addRule(GoalProcessingRules.createGoalRecurUserRule(rulename, usercond, gtname));
+					}
 				}
 				
 				// Create deliberation rules
@@ -401,8 +412,10 @@ public class OAVBDIModelLoader
 						ICondition usercond = (ICondition)state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
-							rb.addRule(GoalDeliberationRules.createAddInhibitionLinkUserRule(usercond, gtname));
-							rb.addRule(GoalDeliberationRules.createRemoveInhibitionLinkUserRule(usercond, gtname));
+							String rulename = Rulebase.getUniqueRuleName(rb, "goal_deliberate_addinstanceinhibition_"+gtname);
+							rb.addRule(GoalDeliberationRules.createAddInhibitionLinkUserRule(rulename, usercond, gtname));
+							rulename = Rulebase.getUniqueRuleName(rb, "goal_deliberate_removeinstanceinhibition_"+gtname);
+							rb.addRule(GoalDeliberationRules.createRemoveInhibitionLinkUserRule(rulename, usercond, gtname));
 						}
 					}
 				}
@@ -416,7 +429,10 @@ public class OAVBDIModelLoader
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
-							rb.addRule(GoalProcessingRules.createAchievegoalSucceededUserRule(usercond, gtname));
+						{
+							String rulename = Rulebase.getUniqueRuleName(rb, "achievegoal_target_"+gtname);
+							rb.addRule(GoalProcessingRules.createAchievegoalSucceededUserRule(rulename, usercond, gtname));
+						}
 					}
 				}
 				
@@ -429,7 +445,10 @@ public class OAVBDIModelLoader
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(maintain, OAVBDIMetaModel.expression_has_content);						if(usercond!=null)
 						if(usercond!=null)
-							rb.addRule(GoalProcessingRules.createMaintaingoalProcessingUserRule(usercond, gtname));
+						{
+							String rulename = Rulebase.getUniqueRuleName(rb, "maintaingoal_maintain_"+gtname);
+							rb.addRule(GoalProcessingRules.createMaintaingoalProcessingUserRule(rulename, usercond, gtname));
+						}
 					}
 					
 					Object target = state.getAttributeValue(mgoal, OAVBDIMetaModel.maintaingoal_has_targetcondition);
@@ -438,7 +457,10 @@ public class OAVBDIModelLoader
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
-							rb.addRule(GoalProcessingRules.createMaintaingoalSucceededUserRule(usercond, gtname));
+						{
+							String rulename = Rulebase.getUniqueRuleName(rb, "maintaingoal_target_"+gtname);
+							rb.addRule(GoalProcessingRules.createMaintaingoalSucceededUserRule(rulename, usercond, gtname));
+						}
 					}
 				}
 				
@@ -468,7 +490,10 @@ public class OAVBDIModelLoader
 					{
 						ICondition usercond = (ICondition)state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
-							rb.addRule(PlanRules.createPlanCreationUserRule(usercond, mplan));
+						{
+							String rulename = Rulebase.getUniqueRuleName(rb, "plan_create_"+mplan.toString());
+							rb.addRule(PlanRules.createPlanCreationUserRule(rulename, usercond, mplan));
+						}
 					}
 				}
 				
@@ -477,7 +502,10 @@ public class OAVBDIModelLoader
 				{
 					ICondition usercond = (ICondition)state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
-						rb.addRule(PlanRules.createPlanContextInvalidUserRule(usercond, mplan));
+					{
+						String rulename = Rulebase.getUniqueRuleName(rb, "plan_context_"+mplan.toString());
+						rb.addRule(PlanRules.createPlanContextInvalidUserRule(rulename, usercond, mplan));
+					}
 				}
 				
 				// Create rules for dynamic parameter values.
@@ -507,7 +535,10 @@ public class OAVBDIModelLoader
 						String btname = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
 						Object usercond = state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_content);
 						if(usercond instanceof ICondition)
-							rb.addRule(BeliefRules.createDynamicBeliefUserRule((ICondition)usercond, btname));
+						{
+							String rulename = Rulebase.getUniqueRuleName(rb, "belief_dynamicfact_"+btname);
+							rb.addRule(BeliefRules.createDynamicBeliefUserRule(rulename, (ICondition)usercond, btname));
+						}
 					}
 				}
 			}
@@ -532,7 +563,10 @@ public class OAVBDIModelLoader
 						String btname = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
 						Object usercond = state.getAttributeValue(facts, OAVBDIMetaModel.expression_has_content);
 						if(usercond instanceof ICondition)
-							rb.addRule(BeliefRules.createDynamicBeliefSetUserRule((ICondition)usercond, btname));
+						{
+							String rulename = Rulebase.getUniqueRuleName(rb, "beliefset_dynamicfacts_"+btname);
+							rb.addRule(BeliefRules.createDynamicBeliefSetUserRule(rulename, (ICondition)usercond, btname));
+						}
 					}
 				}
 			}
@@ -548,7 +582,10 @@ public class OAVBDIModelLoader
 				String name = (String)state.getAttributeValue(mcond, OAVBDIMetaModel.modelelement_has_name);
 				Object usercond = state.getAttributeValue(mcond, OAVBDIMetaModel.expression_has_content);
 				if(usercond instanceof ICondition)
-					rb.addRule(BeliefRules.createConditionUserRule((ICondition)usercond, mcond, name));
+				{
+					String rulename = Rulebase.getUniqueRuleName(rb, "condition_"+name);
+					rb.addRule(BeliefRules.createConditionUserRule(rulename, (ICondition)usercond, mcond, name));
+				}
 			}
 		}
 
@@ -635,7 +672,8 @@ public class OAVBDIModelLoader
 						Object usercond = state.getAttributeValue(value, OAVBDIMetaModel.expression_has_content);
 						if(usercond instanceof ICondition)
 						{
-							rb.addRule(BeliefRules.createDynamicParameterUserRule(mpe, (ICondition)usercond, ptname));
+							String rulename = Rulebase.getUniqueRuleName(rb, "parameter_dynamicvalue_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
+							rb.addRule(BeliefRules.createDynamicParameterUserRule(rulename, mpe, (ICondition)usercond, ptname));
 						}
 					}
 				}
@@ -670,7 +708,8 @@ public class OAVBDIModelLoader
 						Object usercond = state.getAttributeValue(values, OAVBDIMetaModel.expression_has_content);
 						if(usercond instanceof ICondition)
 						{
-							rb.addRule(BeliefRules.createDynamicParameterSetUserRule(mpe, (ICondition)usercond, ptname));
+							String rulename = Rulebase.getUniqueRuleName(rb, "parameterset_dynamicvalues_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
+							rb.addRule(BeliefRules.createDynamicParameterSetUserRule(rulename, mpe, (ICondition)usercond, ptname));
 						}
 					}
 				}
