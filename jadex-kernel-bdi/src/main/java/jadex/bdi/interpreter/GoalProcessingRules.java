@@ -738,7 +738,6 @@ public class GoalProcessingRules
 			new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_rebuild}, Boolean.FALSE)});
 		IConstraint nomoreplan = new OrConstraint(new IConstraint[]{new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_retry}, Boolean.FALSE), rebapl});
 		goalcon.addConstraint(nomoreplan);
-		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_rebuild));
 		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_recur}, Boolean.FALSE));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.querygoal_type, IOperator.INSTANCEOF));
 		
