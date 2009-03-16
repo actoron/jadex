@@ -47,6 +47,24 @@
 				</agent>
 			</agents>
 		</application>
+		<application name="One buyer and one seller (one order)">
+			<agents>
+				<agent type="Buyer" >
+					<parameters>
+						<parameterset name="initial_orders">
+							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))</value>
+						</parameterset>
+					</parameters>
+				</agent>
+				<agent type="Seller">
+					<parameters>
+						<parameterset name="initial_orders">
+							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))</value>
+						</parameterset>
+					</parameters>
+				</agent>
+			</agents>
+		</application>
 		<application name="Two buyers and one seller">
 			<agents>
 				<agent type="Buyer" number="3">
