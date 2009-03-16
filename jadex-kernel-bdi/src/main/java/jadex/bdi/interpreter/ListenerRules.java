@@ -29,6 +29,7 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 
 
 /**
@@ -296,10 +297,11 @@ public class ListenerRules
 		cecon.addConstraint(new BoundConstraint(null, ce));
 		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED));
 		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, revent));
-		
-		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.internalevent_type);
-		eventcon.addConstraint(new BoundConstraint(null, revent));
-		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mevent));
+		cecon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.changeevent_has_element, OAVBDIRuntimeModel.element_has_model}, mevent));
+
+//		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.internalevent_type);
+//		eventcon.addConstraint(new BoundConstraint(null, revent));
+//		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mevent));
 		
 		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
 		liscon.addConstraint(new BoundConstraint(null, listenerentry));
@@ -336,7 +338,7 @@ public class ListenerRules
 			}
 		};
 		
-		Rule listener_event = new Rule("listener_internaleventoccurred", new AndCondition(new ICondition[]{cecon, eventcon, liscon}), //, capacon, mcapacon}),
+		Rule listener_event = new Rule("listener_internaleventoccurred", new AndCondition(new ICondition[]{cecon, liscon}), //, capacon, mcapacon}),
 			action, IPriorityEvaluator.PRIORITY_1);
 		return listener_event;
 	}
@@ -359,10 +361,11 @@ public class ListenerRules
 		IConstraint msgsent = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT);
 		cecon.addConstraint(new OrConstraint(new IConstraint[]{msgrec, msgsent}));
 		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, revent));
+		cecon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.changeevent_has_element, OAVBDIRuntimeModel.element_has_model}, mevent));
 		
-		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.messageevent_type);
-		eventcon.addConstraint(new BoundConstraint(null, revent));
-		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mevent));
+//		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.messageevent_type);
+//		eventcon.addConstraint(new BoundConstraint(null, revent));
+//		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mevent));
 		
 		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
 		liscon.addConstraint(new BoundConstraint(null, listenerentry));
@@ -401,7 +404,7 @@ public class ListenerRules
 			}
 		};
 		
-		Rule listener_message = new Rule("listener_messageevent", new AndCondition(new ICondition[]{cecon, eventcon, liscon}),// , capacon, mcapacon}),
+		Rule listener_message = new Rule("listener_messageevent", new AndCondition(new ICondition[]{cecon, liscon}),// , capacon, mcapacon}),
 			action, IPriorityEvaluator.PRIORITY_1);
 		return listener_message;
 	}
@@ -424,10 +427,11 @@ public class ListenerRules
 		IConstraint msgsent = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED);
 		cecon.addConstraint(new OrConstraint(new IConstraint[]{msgrec, msgsent}));
 		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rgoal));
+		cecon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.changeevent_has_element, OAVBDIRuntimeModel.element_has_model}, mgoal));
 		
-		ObjectCondition goalcon = new ObjectCondition(OAVBDIRuntimeModel.goal_type);
-		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
+//		ObjectCondition goalcon = new ObjectCondition(OAVBDIRuntimeModel.goal_type);
+//		goalcon.addConstraint(new BoundConstraint(null, rgoal));
+//		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
 		
 		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
 		liscon.addConstraint(new BoundConstraint(null, listenerentry));
@@ -467,7 +471,7 @@ public class ListenerRules
 			}
 		};
 		
-		Rule listener_goal = new Rule("listener_goal", new AndCondition(new ICondition[]{cecon, goalcon, liscon}), //, capacon, mcapacon}),
+		Rule listener_goal = new Rule("listener_goal", new AndCondition(new ICondition[]{cecon, liscon}), //, capacon, mcapacon}),
 			action, IPriorityEvaluator.PRIORITY_1);
 		return listener_goal;
 	}
@@ -490,10 +494,11 @@ public class ListenerRules
 		IConstraint msgsent = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED);
 		cecon.addConstraint(new OrConstraint(new IConstraint[]{msgrec, msgsent}));
 		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rplan));
+		cecon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.changeevent_has_element, OAVBDIRuntimeModel.element_has_model}, mplan));
 		
-		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
-		eventcon.addConstraint(new BoundConstraint(null, rplan));
-		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mplan));
+//		ObjectCondition eventcon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
+//		eventcon.addConstraint(new BoundConstraint(null, rplan));
+//		eventcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mplan));
 		
 		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
 		liscon.addConstraint(new BoundConstraint(null, listenerentry));
@@ -532,7 +537,7 @@ public class ListenerRules
 			}
 		};
 		
-		Rule listener_plan = new Rule("listener_plan", new AndCondition(new ICondition[]{cecon, eventcon, liscon}), //, capacon, mcapacon}),
+		Rule listener_plan = new Rule("listener_plan", new AndCondition(new ICondition[]{cecon, liscon}), //, capacon, mcapacon}),
 			action, IPriorityEvaluator.PRIORITY_1);
 		return listener_plan;
 	}

@@ -497,15 +497,6 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
-	
-	/**
-	 *  Propagate an indirect object change to this node.
-	 *  @param object The changed object.
-	 */
-	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
-	{
-		throw new UnsupportedOperationException("Unsupported method.");
-	}
 
 	/**
 	 *  Set the object source of this node.

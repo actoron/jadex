@@ -59,6 +59,47 @@ public class BetaNode extends AbstractBetaNode
 		}
 	}
 
+	
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param id The changed object.
+	 */
+	public void modifyIndirectObject(Object id, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		Collection	linput	= getTupleSource().getNodeMemory(mem);
+		if(linput!=null)
+		{
+			// Todo: Use index for avoiding the need for checking all tuple/object pairs.
+			for(Iterator it=linput.iterator(); it.hasNext(); )
+			{
+				Tuple	left	= (Tuple)it.next();
+				// Get indexed objects for tuple.
+				Collection omem = fetchObjectMemory(state, left, mem);
+				if(omem!=null)
+				{
+					for(Iterator it2=omem.iterator(); it2.hasNext(); )
+					{
+						Object	right	= it2.next();
+						boolean	contains	= isMatchContained(state, left, right, mem);
+						boolean check = checkNonindexedConstraints(left, right, state);
+		
+						// Object no longer valid -> remove
+						if(contains && !check)
+						{
+							removeMatch(left, right, state, mem, agenda);
+						}
+		
+						// Object newly valid -> add
+						else if(!contains && check)
+						{
+							addMatch(left, right, state, mem, agenda);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	//-------- object consumer interface (right) --------
 	
 	/**

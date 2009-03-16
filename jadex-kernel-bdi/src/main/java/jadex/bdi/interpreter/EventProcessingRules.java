@@ -23,6 +23,7 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 
 import java.util.ArrayList;
@@ -1227,9 +1228,9 @@ public class EventProcessingRules
 		Variable orig = new Variable("?orig", OAVBDIRuntimeModel.messageevent_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.messageevent_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+//		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		
 		ObjectCondition rpecon = new ObjectCondition(OAVBDIRuntimeModel.messageevent_type);
 		rpecon.addConstraint(new BoundConstraint(null, rpe));
@@ -1242,28 +1243,33 @@ public class EventProcessingRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueueelements, 
 			rpe, IOperator.CONTAINS));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new OrConstraint(new IConstraint[]
+		{
+			new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes}, mpe, IOperator.CONTAINS), 
+			new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageevents}, orig, IOperator.CONTAINS) 
+		}));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
+//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
+//		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 
-		// special condition for message elements
-		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-			new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS), 
-			new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, orig, IOperator.CONTAINS) 
-		}));
+//		// special condition for message elements
+//		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//			new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS), 
+//			new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, orig, IOperator.CONTAINS) 
+//		}));
 		
 		
 		Rule dispatch_element = new Rule("dispatch_messageevent_from_waitqueue", 
-			new AndCondition(new ICondition[]{rpecon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{rpecon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}
 	
@@ -1276,9 +1282,9 @@ public class EventProcessingRules
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.internalevent_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+//		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		
 		ObjectCondition wqcon = new ObjectCondition(rpe.getType());
 		wqcon.addConstraint(new BoundConstraint(null, rpe));
@@ -1290,24 +1296,25 @@ public class EventProcessingRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueueelements, 
 			rpe, IOperator.CONTAINS));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes}, mpe, IOperator.CONTAINS));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
+//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
+//		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 
 		// special condition for internal events
-		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, 
-			mpe, IOperator.CONTAINS));
+//		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, 
+//			mpe, IOperator.CONTAINS));
 		
 		Rule dispatch_element = new Rule("dispatch_internalevent_from_waitqueue", 
-			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}
 	
@@ -1321,7 +1328,7 @@ public class EventProcessingRules
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rcapa = new Variable("?capability", OAVBDIRuntimeModel.capability_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+//		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		
 		ObjectCondition wqcon = new ObjectCondition(OAVBDIRuntimeModel.processableelement_type);
 		wqcon.addConstraint(new BoundConstraint(null, rpe));
@@ -1339,9 +1346,9 @@ public class EventProcessingRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
-		agentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
+//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
+//		agentcon.addConstraint(new BoundConstraint(null, ragent));
+//		agentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 
 		// special condition for goal
 		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
@@ -1350,7 +1357,7 @@ public class EventProcessingRules
 			rpe, IOperator.CONTAINS));
 		
 		Rule dispatch_element = new Rule("dispatch_goal_from_waitqueue", 
-			new AndCondition(new ICondition[]{wqcon, plancon, capcon, agentcon, wacon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}*/
 	
@@ -1363,8 +1370,8 @@ public class EventProcessingRules
 		Variable rbelset = new Variable("?rbelset", OAVBDIRuntimeModel.beliefset_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		
 		ObjectCondition wqcon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
 		wqcon.addConstraint(new BoundConstraint(null, change));
@@ -1377,22 +1384,23 @@ public class EventProcessingRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueueelements, 
 			change, IOperator.CONTAINS));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_factaddeds}, rbelset, IOperator.CONTAINS));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 
-		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rbelset));
+//		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rbelset));
 
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
+//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
+//		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
 		Rule dispatch_element = new Rule("dispatch_factadded_from_waitqueue", 
-			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}
 	
@@ -1405,8 +1413,8 @@ public class EventProcessingRules
 		Variable rbelset = new Variable("?rbelset", OAVBDIRuntimeModel.beliefset_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		
 		ObjectCondition wqcon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
 		wqcon.addConstraint(new BoundConstraint(null, change));
@@ -1419,22 +1427,23 @@ public class EventProcessingRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueueelements, 
 			change, IOperator.CONTAINS));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_factremoveds}, rbelset, IOperator.CONTAINS));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 
-		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbelset));
+//		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbelset));
 
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
+//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
+//		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
 		Rule dispatch_element = new Rule("dispatch_factremoved_from_waitqueue", 
-			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}
 	
@@ -1447,8 +1456,8 @@ public class EventProcessingRules
 		Variable rbelset = new Variable("?rbelset", OAVBDIRuntimeModel.beliefset_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		
 		ObjectCondition wqcon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
 		wqcon.addConstraint(new BoundConstraint(null, change));
@@ -1461,22 +1470,23 @@ public class EventProcessingRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueueelements, 
 			change, IOperator.CONTAINS));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_factchangeds}, rbelset, IOperator.CONTAINS));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 
-		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rbelset));
+//		ObjectCondition wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rbelset));
 
-		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
-		agentcon.addConstraint(new BoundConstraint(null, ragent));
+//		ObjectCondition	agentcon	= new ObjectCondition(ragent.getType());
+//		agentcon.addConstraint(new BoundConstraint(null, ragent));
 //		agentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_eventprocessing, null));
 		
 		Rule dispatch_element = new Rule("dispatch_factchanged_from_waitqueue", 
-			new AndCondition(new ICondition[]{wqcon, plancon, capcon, wacon, agentcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
+			new AndCondition(new ICondition[]{wqcon, plancon, capcon}), DISPATCH_WAITQUEUE_ELEMENT_ACTION);
 		return dispatch_element;
 	}
 	

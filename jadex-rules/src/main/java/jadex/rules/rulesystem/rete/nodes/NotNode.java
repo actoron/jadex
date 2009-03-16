@@ -174,6 +174,16 @@ public class NotNode extends AbstractBetaNode
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
 
+	
+	/**
+	 *  Propagate an indirect object change to this node.
+	 *  @param object The changed object.
+	 */
+	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
+	{
+		throw new UnsupportedOperationException("Unsupported method.");
+	}
+
 	//-------- template methods --------
 	
 	/**
