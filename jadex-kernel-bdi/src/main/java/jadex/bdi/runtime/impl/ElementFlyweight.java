@@ -284,6 +284,7 @@ public abstract class ElementFlyweight implements IElement
 		{
 			le = getState().createObject(OAVBDIRuntimeModel.listenerentry_type);
 			getState().setAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener, listener);
+			getState().setAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_scope, getScope());
 			getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, le);
 		}			
 		getState().addAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);

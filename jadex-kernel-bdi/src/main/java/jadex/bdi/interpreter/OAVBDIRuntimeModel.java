@@ -688,6 +688,9 @@ public class OAVBDIRuntimeModel
 	/** The listener has a listener object. */
 	public static OAVAttributeType listenerentry_has_listener;
 	
+	/** The listener has a scope. */
+	public static OAVAttributeType listenerentry_has_scope;
+	
 	/** The listener has relevants (runtime and/or modelelements). */
 	public static OAVAttributeType listenerentry_has_relevants;
 	
@@ -859,6 +862,7 @@ public class OAVBDIRuntimeModel
 
 		// listener
 		listenerentry_has_listener = listenerentry_type.createAttributeType("listenerentry_has_listener", OAVJavaType.java_object_type);
+		listenerentry_has_scope = listenerentry_type.createAttributeType("listenerentry_has_scope", OAVBDIRuntimeModel.capability_type);
 //		listenerentry_has_modelelement = listenerentry_type.createAttributeType("listenerentry_has_modelelement", OAVBDIMetaModel.modelelement_type);
 //		listenerentry_has_runtimeelement = listenerentry_type.createAttributeType("listenerentry_has_runtimeelement", element_type);
 		listenerentry_has_relevants = listenerentry_type.createAttributeType("listenerentry_has_relevants", OAVBDIMetaModel.object_type, OAVAttributeType.SET);

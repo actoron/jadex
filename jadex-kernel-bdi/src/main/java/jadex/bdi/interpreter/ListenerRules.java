@@ -94,7 +94,7 @@ public class ListenerRules
 	{
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
 		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
-		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+//		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
 		
 		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
@@ -107,19 +107,20 @@ public class ListenerRules
 		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, 
 			rbelief, IOperator.CONTAINS));
 		
-		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capacon.addConstraint(new BoundConstraint(null, rcapa));
-		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
+//		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+//		capacon.addConstraint(new BoundConstraint(null, rcapa));
+//		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
 		
 		IAction	action	= new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
-				Object rcapa = assignments.getVariableValue("?rcapa");
+//				Object rcapa = assignments.getVariableValue("?rcapa");
 				Object le	= assignments.getVariableValue("?listenerentry");
 				Object ce = assignments.getVariableValue("?ce");
 				Object rbelief	= assignments.getVariableValue("?rbelief");
 				
+				Object rcapa = state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_scope);
 				IBeliefListener lis	= (IBeliefListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
 //				AgentEvent	ae	= new AgentEvent(BeliefFlyweight.getBeliefFlyweight(state, rcapa, rbelief), ce);
 				AgentEvent	ae	= new AgentEvent(BeliefFlyweight.getBeliefFlyweight(state, rcapa, rbelief), 
@@ -128,7 +129,7 @@ public class ListenerRules
 			}
 		};
 		
-		Rule listener_belief_changed = new Rule("listener_belief_changed", new AndCondition(new ICondition[]{cecon, liscon, capacon}),
+		Rule listener_belief_changed = new Rule("listener_belief_changed", new AndCondition(new ICondition[]{cecon, liscon}),
 			action, IPriorityEvaluator.PRIORITY_1);
 		return listener_belief_changed;
 	}
@@ -230,7 +231,7 @@ public class ListenerRules
 	{
 		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
 		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
-		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+//		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		Variable ce = new Variable("?ce", OAVBDIRuntimeModel.changeevent_type);
 		
 		ObjectCondition	cecon = new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
@@ -245,19 +246,20 @@ public class ListenerRules
 		liscon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.listenerentry_has_relevants, 
 			rbeliefset, IOperator.CONTAINS));
 		
-		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
-		capacon.addConstraint(new BoundConstraint(null, rcapa));
-		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
+//		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+//		capacon.addConstraint(new BoundConstraint(null, rcapa));
+//		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
 		
 		IAction	action	= new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
-				Object rcapa = assignments.getVariableValue("?rcapa");
+//				Object rcapa = assignments.getVariableValue("?rcapa");
 				Object ce = assignments.getVariableValue("?ce");
 				Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
 				Object le	= assignments.getVariableValue("?listenerentry");
 			
+				Object rcapa = state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_scope);
 				IBeliefSetListener lis	= (IBeliefSetListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
 //				AgentEvent	ae	= new AgentEvent(BeliefSetFlyweight.getBeliefSetFlyweight(state, rcapa, rbeliefset), ce);
 				AgentEvent	ae	= new AgentEvent(BeliefSetFlyweight.getBeliefSetFlyweight(state, rcapa, rbeliefset), 
@@ -273,7 +275,7 @@ public class ListenerRules
 			}
 		};
 		
-		Rule listener_beliefset = new Rule("listener_beliefset", new AndCondition(new ICondition[]{cecon, liscon, capacon}),
+		Rule listener_beliefset = new Rule("listener_beliefset", new AndCondition(new ICondition[]{cecon, liscon}),
 			action, IPriorityEvaluator.PRIORITY_1);
 		return listener_beliefset;
 	}
