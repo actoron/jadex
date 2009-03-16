@@ -57,9 +57,48 @@ public interface IEnvironmentSpace
 	public ISpaceObject getSpaceObject(Long objectId);
 	
 	/**
-	 * Returns the space's ID.
+	 * Gets a space property
 	 * 
-	 * @return the space's ID.
+	 * @param id the property's ID
+	 * @return the property
 	 */
-	public Object getId();
+	public Object getSpaceProperty(Object id);
+	
+	/**
+	 * Sets a space property
+	 * 
+	 * @param id the property's ID
+	 * @param property the property
+	 */
+	public void setSpaceProperty(Object id, Object property);
+	
+	/**
+	 * Adds an environment action.
+	 * 
+	 * @param action the action
+	 */
+	public void addAction(ISpaceAction action);
+	
+	/**
+	 * Removes an environment action.
+	 * 
+	 * @param actionId the action ID
+	 */
+	public void removeAction(Object actionIs);
+	
+	/**
+	 * Performs an environment action.
+	 * 
+	 * @param actionId ID of the action
+	 * @param parameters parameters for the action (may be null)
+	 * @return return value of the action
+	 */
+	public Object performAction(Object actionId, Map parameters);
+	
+	/**
+	 * Returns the space's name.
+	 * 
+	 * @return the space's name.
+	 */
+	public String getName();
 }

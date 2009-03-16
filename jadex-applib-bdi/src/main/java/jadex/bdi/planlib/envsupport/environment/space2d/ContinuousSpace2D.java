@@ -16,13 +16,10 @@ import jadex.bdi.planlib.envsupport.math.Vector2Double;
 public class ContinuousSpace2D extends Space2D
 {
 	/** The default ID for this space */
-	public static final Object DEFAULT_ID = ContinuousSpace2D.class;
-	
-	/** The space's ID */
-	private Object id_;
+	public static final String DEFAULT_NAME = "ContinuousSpace2D";
 	
 	/**
-	 * Creates a new {@link ContinuousSpace2D} with the default ID.
+	 * Creates a new {@link ContinuousSpace2D} with the default name.
 	 * 
 	 * @param startTime the start time
 	 * @param timeCoefficient the time coefficient for time differences.
@@ -30,7 +27,7 @@ public class ContinuousSpace2D extends Space2D
 	 */
 	public ContinuousSpace2D(long startTime, IVector1 timeCoefficient, IVector2 areaSize)
 	{
-		this(startTime, timeCoefficient, areaSize, DEFAULT_ID);
+		this(startTime, timeCoefficient, areaSize, DEFAULT_NAME);
 	}
 	
 	/**
@@ -39,45 +36,16 @@ public class ContinuousSpace2D extends Space2D
 	 * @param startTime the start time
 	 * @param timeCoefficient the time coefficient for time differences.
 	 * @param areaSize the size of the 2D area
-	 * @param spaceId the ID of this space
+	 * @param spaceName the name of this space
 	 */
 	public ContinuousSpace2D(long startTime,
 							 IVector1 timeCoefficient,
 							 IVector2 areaSize,
-							 Object spaceId)
+							 Object spaceName)
 	{
 		super(startTime, timeCoefficient, areaSize);
-		id_ = spaceId;
+		spaceProperties_.put("name", spaceName);
 	}
-	
-	// FIXME
-	/** 
-	 * Adds an object to this space.
-	 * 
-	 * @param objectId the object's ID
-	 */
-	/*public void addEnvironmentObject(Long objectId, Map properties, List tasks, List listeners)
-	{
-		if (properties == null)
-		{
-			properties = new HashMap();
-		}
-		
-		if (!properties.containsKey("position"))
-		{
-			properties.put("position", new SynchronizedVector2Wrapper(getRandomPosition(Vector2Double.ZERO)));
-		}
-		else
-		{
-			IVector2 position = (IVector2) properties.get("position");
-			if (!(position instanceof SynchronizedVector2Wrapper))
-			{
-				properties.put("position", new SynchronizedVector2Wrapper(position));
-			}
-		}
-		
-		super.addEnvironmentObject(objectId, properties, tasks, listeners);
-	}*/
 	
 	/**
 	 * Retrieves a random position within the simulation area with a minimum
@@ -134,12 +102,12 @@ public class ContinuousSpace2D extends Space2D
 	}
 	
 	/**
-	 * Returns the space's ID.
+	 * Returns the space's name.
 	 * 
-	 * @return the space's ID.
+	 * @return the space's name.
 	 */
-	public Object getId()
+	public String getName()
 	{
-		return id_;
+		return (String) spaceProperties_.get("name");
 	}
 }

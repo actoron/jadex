@@ -124,7 +124,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 
 				// signal removal
 				ObjectEvent event = new ObjectEvent(ObjectEvent.OBJECT_REMOVED);
-				event.setParameter("space_id", getId());
+				event.setParameter("space_name", getName());
 				obj.fireObjectEvent(event);
 			}
 		}
@@ -139,6 +139,64 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	public ISpaceObject getSpaceObject(Long objectId)
 	{
 		return (ISpaceObject) spaceObjects_.get(objectId);
+	}
+	
+	/**
+	 * Gets a space property
+	 * 
+	 * @param id the property's ID
+	 * @return the property
+	 */
+	public Object getSpaceProperty(Object id)
+	{
+		return spaceProperties_.get(id);
+	}
+	
+	/**
+	 * Sets a space property
+	 * 
+	 * @param id the property's ID
+	 * @param property the property
+	 */
+	public void setSpaceProperty(Object id, Object property)
+	{
+		spaceProperties_.put(id, property);
+	}
+	
+	/**
+	 * Adds an environment action.
+	 * 
+	 * @param action the action
+	 */
+	public void addAction(ISpaceAction action)
+	{
+		actions_.put(action.getId(), action);
+	}
+	
+	/**
+	 * Removes an environment action.
+	 * 
+	 * @param actionId the action ID
+	 */
+	public void removeAction(Object actionId)
+	{
+		actions_.remove(actionId);
+	}
+	
+	/**
+	 * Performs an environment action.
+	 * 
+	 * @param actionId ID of the action
+	 * @param parameters parameters for the action (may be null)
+	 * @return return value of the action
+	 */
+	public Object performAction(Object actionId, Map parameters)
+	{
+		ISpaceAction action = (ISpaceAction) actions_.get(actionId);
+		
+		assert action != null;
+		
+		return action.perform(new HashMap(parameters), this);
 	}
 	
 	/**
