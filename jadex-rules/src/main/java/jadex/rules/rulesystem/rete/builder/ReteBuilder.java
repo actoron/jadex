@@ -122,7 +122,7 @@ public class ReteBuilder
 	 */
 	public ReteNode addRule(ReteNode root, IRule rule)
 	{
-//		if(rule.getName().equals("apl_add_waitqueuecand"))
+//		if(rule.getName().equals("planwaitqueue_goalfinished"))
 //			System.out.println("ysfk lk");
 		
 		// todo: or, exists conditions
@@ -913,7 +913,8 @@ public class ReteBuilder
 	
 	/**
 	 *  Test if all needed variables are available from the condition directly.
-	 *  All variables must be declared as BoundConstraints in this object condition. 
+	 *  All variables must be declared as BoundConstraints with equal operator
+	 *  in this object condition. 
 	 *  @return True, if can be evaluated in alpha network.
 	 */
 	protected boolean isAlphaExecutable(ICondition cond, IConstraint c)
@@ -925,13 +926,15 @@ public class ReteBuilder
 			ObjectCondition ocond = (ObjectCondition)cond;
 			List vars = c.getVariables();
 			
-			// todo: what about bound constraints with multiplicity (attr1 contains ?v)
 			List consts = ocond.getBoundConstraints();
 			for(int i = 0; i < consts.size(); i++)
 			{
-				IConstraint bc = (IConstraint)consts.get(i);
-				List vs = bc.getVariables();
-				vars.removeAll(vs);
+				BoundConstraint bc = (BoundConstraint)consts.get(i);
+				if(bc.getOperator().equals(IOperator.EQUAL))
+				{
+					List vs = bc.getVariables();
+					vars.removeAll(vs);
+				}
 			}
 			ret = vars.isEmpty();
 		}

@@ -102,6 +102,7 @@ public class ListenerRules
 		cecon.addConstraint(new BoundConstraint(null, ce));
 		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED));
 		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rbelief));
+		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_element, OAVBDIRuntimeModel.belief_type, IOperator.INSTANCEOF));
 		
 		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
 		liscon.addConstraint(new BoundConstraint(null, listenerentry));
@@ -239,8 +240,10 @@ public class ListenerRules
 		cecon.addConstraint(new BoundConstraint(null, ce));
 		IConstraint add = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED);
 		IConstraint rem = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED);
-		cecon.addConstraint(new OrConstraint(new IConstraint[]{add, rem}));
+		IConstraint change = new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED);
+		cecon.addConstraint(new OrConstraint(new IConstraint[]{add, rem, change}));
 		cecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rbeliefset));
+		cecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_element, OAVBDIRuntimeModel.beliefset_type, IOperator.INSTANCEOF));
 		
 		ObjectCondition	liscon	= new ObjectCondition(OAVBDIRuntimeModel.listenerentry_type);
 		liscon.addConstraint(new BoundConstraint(null, listenerentry));

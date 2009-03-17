@@ -16,6 +16,7 @@ import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.AndConstraint;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.Constant;
 import jadex.rules.rulesystem.rules.FunctionCall;
@@ -920,18 +921,25 @@ public class PlanRules
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
-		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true);
-		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true);
+//		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true);
+//		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true);
 //		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable wa2 = new Variable("?wa2", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable wa2 = new Variable("?wa2", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
+		Variable rplans = new Variable("$?rplans", OAVBDIRuntimeModel.plan_type, true);
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa2));
+		IConstraint co1 = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, null);
+		IConstraint co2a = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_goals}, rgoal, IOperator.EXCLUDES);
+		IConstraint co2b = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds}, mgoal, IOperator.EXCLUDES);
+		plancon.addConstraint(new OrConstraint(co1, new AndConstraint(co2a, co2b)));
+		plancon.addConstraint(new BoundConstraint(null, rplans, IOperator.EXCLUDES));
 //		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wa));
-		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_goals}, rgoals));
-		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds}, mgoals));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa2));
+		IConstraint co3 = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_goals}, rgoal, IOperator.CONTAINS);
+		IConstraint co4 = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds}, mgoal, IOperator.CONTAINS);
+		plancon.addConstraint(new OrConstraint(co3, co4));
 		
 //		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
 //		wacon.addConstraint(new BoundConstraint(null, wa));
@@ -942,16 +950,17 @@ public class PlanRules
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finisheddispatchedplans, rplan, IOperator.EXCLUDES));
-		IConstraint	co1	= new BoundConstraint(null, rgoals, IOperator.CONTAINS);
-		IConstraint	co2	= new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoals, IOperator.CONTAINS);
-		goalcon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
+//		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finisheddispatchedplans, rplan, IOperator.EXCLUDES));
+		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finisheddispatchedplans, rplans));
+//		IConstraint	co1	= new BoundConstraint(null, rgoals, IOperator.CONTAINS);
+//		IConstraint	co2	= new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoals, IOperator.CONTAINS);
+//		goalcon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
 	
-		ObjectCondition	wacon2 = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon2.addConstraint(new BoundConstraint(null, wa2));
-		IConstraint co1a = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal, IOperator.CONTAINS);
-		IConstraint co2a = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal, IOperator.CONTAINS);
-		wacon2.addConstraint(new OrConstraint(new IConstraint[]{co1a, co2a}));
+//		ObjectCondition	wacon2 = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon2.addConstraint(new BoundConstraint(null, wa2));
+//		IConstraint co1a = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal, IOperator.CONTAINS);
+//		IConstraint co2a = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal, IOperator.CONTAINS);
+//		wacon2.addConstraint(new OrConstraint(new IConstraint[]{co1a, co2a}));
 
 		IAction	action	= new IAction()
 		{
@@ -967,7 +976,8 @@ public class PlanRules
 		};
 		
 		Rule	planwaitqueue_goalfinished	= new Rule("planwaitqueue_goalfinished",
-			new AndCondition(new ICondition[]{plancon, goalcon, new NotCondition(wacon2)}),
+			//new AndCondition(new ICondition[]{plancon, goalcon, new NotCondition(wacon2)}),
+			new AndCondition(new ICondition[]{goalcon, plancon}),
 			action, IPriorityEvaluator.PRIORITY_1);	// Hack!!! works, because goal will still be referenced in change event
 		return planwaitqueue_goalfinished;
 	}
