@@ -122,6 +122,9 @@ public class ReteBuilder
 	 */
 	public ReteNode addRule(ReteNode root, IRule rule)
 	{
+//		if(rule.getName().equals("apl_add_waitqueuecand"))
+//			System.out.println("ysfk lk");
+		
 		// todo: or, exists conditions
 		
 		// System.nanoTime() : @since 1.5
@@ -258,11 +261,9 @@ public class ReteBuilder
 		
 		// When a single join was created, replace with not join node.
 		
-		if(notjoin &&
-			// todo: !!!!!!!!
-			//context.getLastBetaNode().getUseCount()==0
-			//&& 
-			context.getLastBetaNode() instanceof BetaNode
+		if(notjoin
+			&& context.getLastBetaNode() instanceof BetaNode
+			&& ((ITupleSourceNode)context.getLastBetaNode()).getTupleConsumers()==null
 			&&!(context.getLastBetaNode() instanceof NotNode)
 			&& (((BetaNode)context.getLastBetaNode()).getTupleSource()==leftnode
 				|| ((BetaNode)context.getLastBetaNode()).getTupleSource() instanceof LeftInputAdapterNode

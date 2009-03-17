@@ -152,7 +152,15 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	 */
 	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		throw new UnsupportedOperationException("Unsupported method.");
+		// Recheck all tuples
+		Collection	input	= getTupleSource().getNodeMemory(mem);
+		if(input!=null)
+		{
+			for(Iterator it=input.iterator(); it.hasNext(); )
+			{
+				modifyTuple((Tuple)it.next(), -1, null, null, null, state, mem, agenda);
+			}
+		}
 	}
 
 	/**

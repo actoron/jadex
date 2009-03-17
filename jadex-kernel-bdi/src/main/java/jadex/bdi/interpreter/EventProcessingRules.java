@@ -169,8 +169,8 @@ public class EventProcessingRules
 		Variable	mpe	= new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
 		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
 		
 		// Shared conditions
 		ObjectCondition	rpecon	= new ObjectCondition(rpe.getType());
@@ -190,22 +190,29 @@ public class EventProcessingRules
   				new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, rpe, IOperator.CONTAINS)
   		}));
 
-		ObjectCondition	wacon	= new ObjectCondition(wa.getType());
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new OrConstraint(new IConstraint[]
-		{
-				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
-				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, org, IOperator.CONTAINS),
-				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, mpe, IOperator.CONTAINS),
-				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS),
-		}));
+//		ObjectCondition	wacon	= new ObjectCondition(wa.getType());
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
+//				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, org, IOperator.CONTAINS),
+//				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, mpe, IOperator.CONTAINS),
+//				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS),
+//		}));
 		
 		// Conditions for plan instances
 		ObjectCondition	planconwa	= new ObjectCondition(rplan.getType());
 		planconwa.addConstraint(new BoundConstraint(null, rplan));
-		planconwa.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		planconwa.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
 		planconwa.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
+		planconwa.addConstraint(new OrConstraint(new IConstraint[]
+ 		{
+ 				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
+ 				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageevents}, org, IOperator.CONTAINS),
+ 				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes}, mpe, IOperator.CONTAINS),
+ 				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes}, mpe, IOperator.CONTAINS),
+ 		}));
 		
 		ObjectCondition	candconpi	= new ObjectCondition(candpi.getType());
 		candconpi.addConstraint(new BoundConstraint(null, candpi));
@@ -225,26 +232,34 @@ public class EventProcessingRules
 		// Rules for plan instances
 		Rule apl_add_rplan	= new Rule("apl_add_rplan",
 			new AndCondition(new ICondition[]{
-				rpecon, capcon, wacon, planconwa,
+//				rpecon, capcon, wacon, planconwa,
+				rpecon, capcon, planconwa,
 				new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
 				new NotCondition(aplconpi2)}),
 			ADD_RPLAN_TO_APL);
 		
 		// Conditions for waitqueue candidates
 		
-		ObjectCondition	waconwq	= new ObjectCondition(wqwa.getType());
-		waconwq.addConstraint(new BoundConstraint(null, wqwa));
-		waconwq.addConstraint(new OrConstraint(new IConstraint[]
-		{
-				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
-				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, org, IOperator.CONTAINS),
-				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, mpe, IOperator.CONTAINS),
-				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS),
-		}));
+//		ObjectCondition	waconwq	= new ObjectCondition(wqwa.getType());
+//		waconwq.addConstraint(new BoundConstraint(null, wqwa));
+//		waconwq.addConstraint(new OrConstraint(new IConstraint[]
+//		{
+//				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
+//				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageevents, org, IOperator.CONTAINS),
+//				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, mpe, IOperator.CONTAINS),
+//				new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, mpe, IOperator.CONTAINS),
+//		}));
 		
 		ObjectCondition	planconwq	= new ObjectCondition(rplan.getType());
 		planconwq.addConstraint(new BoundConstraint(null, rplan));
-		planconwq.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+//		planconwq.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+		planconwq.addConstraint(new OrConstraint(new IConstraint[]
+		{
+				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
+				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_messageevents}, org, IOperator.CONTAINS),
+				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes}, mpe, IOperator.CONTAINS),
+				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes}, mpe, IOperator.CONTAINS),
+		}));
 		
 		ObjectCondition	aplconwc	= new ObjectCondition(apl.getType());
 		aplconwc.addConstraint(new BoundConstraint(null, apl));
@@ -258,18 +273,22 @@ public class EventProcessingRules
 		Rule apl_add_waitqueuecand = new Rule("apl_add_waitqueuecand",
 			new AndCondition(new ICondition[]{
 				rpecon, capcon, 
-				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa})),
-				waconwq, planconwq,
+//				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa})),
+				new NotCondition(planconwa),
+//				waconwq, planconwq,
+				planconwq,
 				new NotCondition(aplconwc)}),
 				ADD_WAITQUEUECAND_TO_APL);
 
 		Rule apl_make_available	= new Rule("apl_make_available",
 			new AndCondition(new ICondition[]{
 				rpecon, capcon, 
-				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa, 
+//				new NotCondition(new AndCondition(new ICondition[]{wacon, planconwa, 
+				new NotCondition(new AndCondition(new ICondition[]{planconwa, 
 					new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
 					new NotCondition(new AndCondition(new ICondition[]{candconwc, aplconwc}))})),
-				new NotCondition(new AndCondition(new ICondition[]{waconwq, planconwq, 
+//				new NotCondition(new AndCondition(new ICondition[]{waconwq, planconwq, 
+				new NotCondition(new AndCondition(new ICondition[]{planconwq, 
 					new NotCondition(new AndCondition(new ICondition[]{candconpi, aplconpi})),
 					new NotCondition(new AndCondition(new ICondition[]{candconwc, aplconwc}))
 				}))}),

@@ -847,20 +847,22 @@ public class PlanRules
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true);
 		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_goals}, rgoals));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds}, mgoals));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate,
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 
-		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoals));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoals));
+//		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoals));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoals));
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -906,7 +908,7 @@ public class PlanRules
 			}
 		};
 		
-		Rule	subgoal_finished	= new Rule("planinstance_goalfinished", new AndCondition(new ICondition[]{plancon, wacon, goalcon, capcon}), action);
+		Rule	subgoal_finished	= new Rule("planinstance_goalfinished", new AndCondition(new ICondition[]{plancon, goalcon, capcon}), action);
 		return subgoal_finished;
 	}
 	
@@ -920,19 +922,21 @@ public class PlanRules
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true);
 		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable wa2 = new Variable("?wa2", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wa));
+//		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wa));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_goals}, rgoals));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds}, mgoals));
 		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa2));
 		
-		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoals));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoals));
+//		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoals));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoals));
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -963,7 +967,7 @@ public class PlanRules
 		};
 		
 		Rule	planwaitqueue_goalfinished	= new Rule("planwaitqueue_goalfinished",
-			new AndCondition(new ICondition[]{plancon, wacon, goalcon, new NotCondition(wacon2)}),
+			new AndCondition(new ICondition[]{plancon, goalcon, new NotCondition(wacon2)}),
 			action, IPriorityEvaluator.PRIORITY_1);	// Hack!!! works, because goal will still be referenced in change event
 		return planwaitqueue_goalfinished;
 	}
@@ -975,7 +979,7 @@ public class PlanRules
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.maintaingoal_type);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
@@ -985,17 +989,20 @@ public class PlanRules
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.maintaingoal_type, IOperator.INSTANCEOF));
 		
-		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		IConstraint co1 = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal, IOperator.CONTAINS);
-		IConstraint co2 = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal, IOperator.CONTAINS);
-		wacon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
+//		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		IConstraint co1 = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal, IOperator.CONTAINS);
+//		IConstraint co2 = new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal, IOperator.CONTAINS);
+//		wacon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate,
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
+		IConstraint co1 = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_goals}, rgoal, IOperator.CONTAINS);
+		IConstraint co2 = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds}, mgoal, IOperator.CONTAINS);
+		plancon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
@@ -1019,7 +1026,7 @@ public class PlanRules
 			}
 		};
 		
-		Rule maintain_subgoal_finished = new Rule("planinstance_maintaingoalfinished", new AndCondition(new ICondition[]{goalcon, wacon, plancon, capcon}), action);
+		Rule maintain_subgoal_finished = new Rule("planinstance_maintaingoalfinished", new AndCondition(new ICondition[]{goalcon, plancon, capcon}), action);
 		return maintain_subgoal_finished;
 	}
 	
@@ -1419,33 +1426,38 @@ public class PlanRules
 	protected static Rule createPlanWaitqueueFactAddedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
 		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 			
 		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		rplancon.addConstraint(new BoundConstraint(null, rplan));
-		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
-		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+		rplancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds}, rtel, IOperator.CONTAINS));
+//		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		IConstraint co1 = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, null);
+		IConstraint co2 = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_factaddeds}, rtel, IOperator.EXCLUDES);
+		rplancon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
 
-		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
-		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rtels));
+//		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
+//		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rtels));
 
 		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
 		changecon.addConstraint(new BoundConstraint(null, change));
 		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED));
 		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
-		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+//		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
 
-		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rtel, IOperator.CONTAINS));
+//		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rtel, IOperator.CONTAINS));
 		
 		Rule factadded_planwaitqueuetrigger = new Rule("planwaitqueuetrigger_factadded",
-			new AndCondition(new ICondition[]{rplancon, wqwacon, changecon, new NotCondition(wacon)}),
+//			new AndCondition(new ICondition[]{rplancon, changecon, new NotCondition(wacon)}),
+			new AndCondition(new ICondition[]{changecon, rplancon}),
 			PLAN_CHANGEWAITQUEUE, IPriorityEvaluator.PRIORITY_1);
 		return factadded_planwaitqueuetrigger;
 	}	
@@ -1457,33 +1469,38 @@ public class PlanRules
 	protected static Rule createPlanWaitqueueFactRemovedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
 		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 			
 		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		rplancon.addConstraint(new BoundConstraint(null, rplan));
-		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
-		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+		rplancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds}, rtel, IOperator.CONTAINS));
+//		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		IConstraint co1 = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, null);
+		IConstraint co2 = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_factremoveds}, rtel, IOperator.EXCLUDES);
+		rplancon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
 
-		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
-		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rtels));
+//		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
+//		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rtels));
 
 		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
 		changecon.addConstraint(new BoundConstraint(null, change));
-		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED));
 		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
-		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+//		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
 
-		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rtel, IOperator.CONTAINS));
+//		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rtel, IOperator.CONTAINS));
 		
 		Rule factremoved_planwaitqueuetrigger = new Rule("planwaitqueuetrigger_factremoved",
-			new AndCondition(new ICondition[]{rplancon, wqwacon, changecon, new NotCondition(wacon)}),
+//			new AndCondition(new ICondition[]{rplancon, changecon, new NotCondition(wacon)}),
+			new AndCondition(new ICondition[]{changecon, rplancon}),
 			PLAN_CHANGEWAITQUEUE, IPriorityEvaluator.PRIORITY_1);
 		return factremoved_planwaitqueuetrigger;
 	}	
@@ -1495,33 +1512,38 @@ public class PlanRules
 	protected static Rule createPlanWaitqueueFactChangedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
 		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 			
 		ObjectCondition	rplancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		rplancon.addConstraint(new BoundConstraint(null, rplan));
-		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
-		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitqueuewa, wqwa));
+		rplancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitqueuewa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds}, rtel, IOperator.CONTAINS));
+//		rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		IConstraint co1 = new LiteralConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, null);
+		IConstraint co2 = new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_factchangeds}, rtel, IOperator.EXCLUDES);
+		rplancon.addConstraint(new OrConstraint(new IConstraint[]{co1, co2}));
 
-		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
-		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rtels));
+//		ObjectCondition	wqwacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wqwacon.addConstraint(new BoundConstraint(null, wqwa));
+//		wqwacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rtels));
 
 		ObjectCondition	changecon	= new ObjectCondition(OAVBDIRuntimeModel.changeevent_type);
 		changecon.addConstraint(new BoundConstraint(null, change));
-		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED));
+		changecon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.changeevent_has_type, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED));
 		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtel));
-		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
+//		changecon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.changeevent_has_element, rtels, IOperator.CONTAINS));
 
-		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rtel, IOperator.CONTAINS));
+//		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rtel, IOperator.CONTAINS));
 		
 		Rule factchanged_planwaitqueuetrigger = new Rule("planwaitqueuetrigger_factchanged",
-			new AndCondition(new ICondition[]{rplancon, wqwacon, changecon, new NotCondition(wacon)}),
+//			new AndCondition(new ICondition[]{rplancon, changecon, new NotCondition(wacon)}),
+			new AndCondition(new ICondition[]{changecon, rplancon}),
 			PLAN_CHANGEWAITQUEUE, IPriorityEvaluator.PRIORITY_1);
 		return factchanged_planwaitqueuetrigger;
 	}	
