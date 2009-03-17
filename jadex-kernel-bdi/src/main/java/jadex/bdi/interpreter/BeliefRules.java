@@ -252,7 +252,7 @@ public class BeliefRules
 	protected static Rule createConditionUserRule(String rulename, ICondition usercond, Object mcondition, String name)
 	{
 		Variable mcond = new Variable("?mcondition", OAVBDIMetaModel.condition_type);
-		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
+//		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
@@ -260,19 +260,20 @@ public class BeliefRules
 		mcondcon.addConstraint(new BoundConstraint(null, mcond));
 		mcondcon.addConstraint(new LiteralConstraint(null, mcondition));
 		
-		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
-		wacon.addConstraint(new BoundConstraint(null, wa));
-		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_conditiontypes, mcond, IOperator.CONTAINS));
+//		ObjectCondition	wacon = new ObjectCondition(OAVBDIRuntimeModel.waitabstraction_type);
+//		wacon.addConstraint(new BoundConstraint(null, wa));
+//		wacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.waitabstraction_has_conditiontypes, mcond, IOperator.CONTAINS));
 		
 		ObjectCondition plancon = new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
-		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+//		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_waitabstraction, wa));
+		plancon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_conditiontypes}, mcond, IOperator.CONTAINS));
 
 		ObjectCondition capacon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(null, rcapa));
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 
-		Rule cond = new Rule(rulename, new AndCondition(new ICondition[]{mcondcon, wacon, plancon, capacon, usercond}),
+		Rule cond = new Rule(rulename, new AndCondition(new ICondition[]{mcondcon, plancon, capacon, usercond}),
 			PLAN_WAIT_FOR_CONDITION);
 		
 		return cond;
