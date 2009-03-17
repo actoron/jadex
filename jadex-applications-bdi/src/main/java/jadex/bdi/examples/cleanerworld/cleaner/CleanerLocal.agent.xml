@@ -193,16 +193,16 @@
 					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 					?waste = (Waste (location ?wasteloc))
 					
-					?rinparam = (parameter (parameter_has_name "waste") (parameter_has_value ?inwaste))
-					?ringoal = (goal (parameterelement_has_parameters contains ?rinparam))
-					?inwaste = (Waste (location ?inwasteloc &amp; 
+					?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
+					?refgoal = (goal (parameterelement_has_parameters contains ?refparam))
+					?refwaste = (Waste (location ?refwasteloc &amp; 
 						:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
-							(MethodCallFunction "Location" "getDistance" ?myloc ?inwasteloc)  
+							(MethodCallFunction "Location" "getDistance" ?myloc ?refwasteloc)  
 					)))
 	
 					// Does not work because Locations are not directly in state.
 					// ?wasteloc = (Location (getDistance(?myloc) ?wastedist))
-					// ?inwasteloc = (Location (getDistance(?myloc) &lt; ?wastedist))				
+					// ?refwasteloc = (Location (getDistance(?myloc) &lt; ?wastedist))				
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. - ->

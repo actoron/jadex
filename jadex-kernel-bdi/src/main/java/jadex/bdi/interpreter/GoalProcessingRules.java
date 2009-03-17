@@ -22,7 +22,6 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVMixedWeakState;
 
 import java.util.Collection;
 
@@ -60,7 +59,7 @@ public class GoalProcessingRules
 			}
 			
 			// Reset event processing.
-			BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+//			BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
 //			if(rgoal.equals(state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing)))
 //				state.setAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 			
@@ -252,17 +251,16 @@ public class GoalProcessingRules
 	/**
 	 *  Create the achievegoal succeeded rule (for goals with target condition).
 	 *  @param usercond	The ADF part of the target condition.
-	 *  @param gtname	The goal type name (e.g. "achievecleanup").
+	 *  @param model The goal model element.
 	 */
-	protected static Rule createAchievegoalSucceededUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createAchievegoalSucceededUserRule(String rulename, ICondition usercond, Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_type, IOperator.INSTANCEOF));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{
-			OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+//		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_type, IOperator.INSTANCEOF));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
@@ -799,9 +797,9 @@ public class GoalProcessingRules
 	 *  Create maintaingoal processing rule.
 	 *  Start processing when maintain condition gets violated.
 	 *  @param usercond	The ADF part of the maintain condition (will be negated to trigger maintenance).
-	 *  @param gtname	The goal type name (e.g. "maintainbatteryloaded").
+	 *  @param model The goal model element.
 	 */
-	protected static Rule createMaintaingoalProcessingUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createMaintaingoalProcessingUserRule(String rulename, ICondition usercond, Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -809,9 +807,8 @@ public class GoalProcessingRules
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE));
-		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.maintaingoal_type, IOperator.INSTANCEOF));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{
-			OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+//		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.maintaingoal_type, IOperator.INSTANCEOF));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
@@ -824,17 +821,16 @@ public class GoalProcessingRules
 	/**
 	 *  Create the maintaingoal succeeded rule.
 	 *  @param usercond	The ADF part of the target condition.
-	 *  @param gtname	The goal type name (e.g. "maintainbatteryloaded").
+	 *  @param model The goal model element.
 	 */
-	protected static Rule createMaintaingoalSucceededUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createMaintaingoalSucceededUserRule(String rulename, ICondition usercond, Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.maintaingoal_type, IOperator.INSTANCEOF));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{
-			OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+//		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.maintaingoal_type, IOperator.INSTANCEOF));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
@@ -1356,9 +1352,9 @@ public class GoalProcessingRules
 	/**
 	 *  Start recurring a goal, when the ADF recur condition triggers.
 	 *  @param usercond	The ADF part of the context condition.
-	 *  @param gtname	The goal type name (e.g. "achievecleanup").
+	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalRecurUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createGoalRecurUserRule(String rulename, ICondition usercond, Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -1368,7 +1364,7 @@ public class GoalProcessingRules
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPING, IOperator.NOTEQUAL),
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED, IOperator.NOTEQUAL)));
 		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_PAUSED));
-		rgoalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 
 		Rule goal_recur = new Rule(rulename, new AndCondition(new ICondition[]{rgoalcon, usercond}), new IAction()
 		{

@@ -126,10 +126,10 @@
 					?rparam = (parameter (parameter_has_name "$food") (parameter_has_value ?food))
 					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 					
-					?rinparam = (parameter (parameter_has_name "food") (parameter_has_value ?infood))
-					?ringoal = (goal (parameterelement_has_parameters contains ?rinparam &amp;
+					?refparam = (parameter (parameter_has_name "food") (parameter_has_value ?reffood))
+					?refgoal = (goal (parameterelement_has_parameters contains ?refparam &amp;
 						:(&lt; (MethodCallFunction "Creature" "getDistance" ?myself ?food)
-							(MethodCallFunction "Creature" "getDistance" ?myself ?infood)  
+							(MethodCallFunction "Creature" "getDistance" ?myself ?reffood)  
 					)))
 				</inhibits>
 			</deliberation>

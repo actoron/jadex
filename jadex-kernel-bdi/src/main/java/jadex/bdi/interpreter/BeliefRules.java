@@ -172,17 +172,15 @@ public class BeliefRules
 	/**
 	 *  Create a rule for a dynamic fact.
 	 *  @param usercond	The ADF part of the target condition.
-	 *  @param btname	The belief type name (e.g. "location").
+	 *  @param model The belief model element.
 	 */
-	protected static Rule createDynamicBeliefUserRule(String rulename, ICondition usercond, String btname)
+	protected static Rule createDynamicBeliefUserRule(String rulename, ICondition usercond, Object model)
 	{
-		Variable mbelief = new Variable("?mbelief", OAVBDIMetaModel.belief_type);
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
 			
 		ObjectCondition	belcon	= new ObjectCondition(OAVBDIRuntimeModel.belief_type);
 		belcon.addConstraint(new BoundConstraint(null, rbelief));
-		belcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mbelief));
-		belcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, btname));
+		belcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
@@ -209,18 +207,15 @@ public class BeliefRules
 	/**
 	 *  Create a rule for a dynamic facts expression.
 	 *  @param usercond	The ADF part of the target condition.
-	 *  @param btname	The belief type name (e.g. "location").
+	 *  @param model The belief set model element.
 	 */
-	protected static Rule createDynamicBeliefSetUserRule(String rulename, ICondition usercond, String btname)
+	protected static Rule createDynamicBeliefSetUserRule(String rulename, ICondition usercond, Object model)
 	{
-		Variable mbeliefset = new Variable("?mbeliefset", OAVBDIMetaModel.beliefset_type);
-//		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
 		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
 			
 		ObjectCondition	belsetcon	= new ObjectCondition(OAVBDIRuntimeModel.beliefset_type);
 		belsetcon.addConstraint(new BoundConstraint(null, rbeliefset));
-		belsetcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mbeliefset));
-		belsetcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, btname));
+		belsetcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
@@ -249,7 +244,7 @@ public class BeliefRules
 	 *  @param usercond The user condition.
 	 *  @param mcond The condition's model element. 
 	 */
-	protected static Rule createConditionUserRule(String rulename, ICondition usercond, Object mcondition, String name)
+	protected static Rule createConditionUserRule(String rulename, ICondition usercond, Object mcondition)
 	{
 		Variable mcond = new Variable("?mcondition", OAVBDIMetaModel.condition_type);
 //		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);

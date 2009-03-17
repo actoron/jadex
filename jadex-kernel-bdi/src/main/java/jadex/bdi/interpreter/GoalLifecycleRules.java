@@ -238,13 +238,13 @@ public class GoalLifecycleRules
 	/**
 	 *  Create a goal, when the ADF creation condition triggers.
 	 *  @param usercond	The ADF part of the creation condition.
-	 *  @param gtname	The goal type name (e.g. "achievecleanup").
+	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalCreationUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createGoalCreationUserRule(String rulename, ICondition usercond, Object model)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
+//		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		
 		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
@@ -253,37 +253,35 @@ public class GoalLifecycleRules
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
-		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+//		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
+		capcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.capability_has_goals}, mgoal, IOperator.CONTAINS));
 		
 		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
 		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, gtname));
+		mgoalcon.addConstraint(new LiteralConstraint(null, model));
 		
-		ObjectCondition	mcapcon	= new ObjectCondition(OAVBDIMetaModel.capability_type);
-		mcapcon.addConstraint(new BoundConstraint(null, mcapa));
-		mcapcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, mgoal, IOperator.CONTAINS));
+//		ObjectCondition	mcapcon	= new ObjectCondition(OAVBDIMetaModel.capability_type);
+//		mcapcon.addConstraint(new BoundConstraint(null, mcapa));
+//		mcapcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, mgoal, IOperator.CONTAINS));
 		
-		Rule rule = new Rule(rulename, new AndCondition(new ICondition[]{ragentcon, capcon, mgoalcon, mcapcon, usercond}), GOAL_CREATION_ACTION);
+		Rule rule = new Rule(rulename, new AndCondition(new ICondition[]{ragentcon, mgoalcon, capcon, usercond}), GOAL_CREATION_ACTION);
 		return rule;
 	}
 	
 	/**
 	 *  Set a suspended goal to option state, when the ADF suspension condition triggers.
 	 *  @param usercond	The ADF condition part.
-	 *  @param gtname	The goal type name (e.g. "achievecleanup").
+	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalOptionUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createGoalOptionUserRule(String rulename, ICondition usercond, Object model)
 	{
-		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
@@ -298,20 +296,17 @@ public class GoalLifecycleRules
 	/**
 	 *  Set a goal to suspended state, when the ADF context condition triggers. 
 	 *  @param usercond	The ADF part of the context condition (will be negated automatically).
-	 *  @param gtname	The goal type name (e.g. "achievecleanup").
+	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalSuspendUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createGoalSuspendUserRule(String rulename, ICondition usercond, Object model)
 	{
-		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 	
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED, IOperator.NOTEQUAL));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
@@ -354,20 +349,18 @@ public class GoalLifecycleRules
 	/**
 	 *  Start dropping a goal, when the ADF context condition triggers.
 	 *  @param usercond	The ADF part of the context condition.
-	 *  @param gtname	The goal type name (e.g. "achievecleanup").
+	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalDroppingUserRule(String rulename, ICondition usercond, String gtname)
+	protected static Rule createGoalDroppingUserRule(String rulename, ICondition usercond, Object model)
 	{
-		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
 		ObjectCondition	rgoalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		rgoalcon.addConstraint(new BoundConstraint(null, rgoal));
-		rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
 		rgoalcon.addConstraint(new AndConstraint(
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPING, IOperator.NOTEQUAL),
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED, IOperator.NOTEQUAL)));
-		rgoalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.modelelement_has_name}, gtname));
+		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		Rule goal_dropping = new Rule(rulename, new AndCondition(new ICondition[]{rgoalcon, usercond}), GOAL_DROPPING_ACTION);
 		return goal_dropping;
