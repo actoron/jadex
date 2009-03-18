@@ -1,4 +1,4 @@
-grammar clips;
+grammar Clips;
 
 //options {k=2; backtrack=true; memoize=true;}
 

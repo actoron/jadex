@@ -38,15 +38,26 @@ public class ClipsParserTest
 //				+ "?rgoal = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?param))";
 //			
 			
-			String c	= "?a = (java.lang.Object (wait(1) \"A\"))";
+//			String c	= "?a = (java.lang.Object (wait(1) \"A\"))";
+//			
+//			ANTLRStringStream exp = new ANTLRStringStream(c);
+//			ClipsJadexLexer lexer = new ClipsJadexLexer(exp);
+//			CommonTokenStream tokens = new CommonTokenStream(lexer);
+//			ClipsJadexParser parser = new ClipsJadexParser(tokens);
+//		
+//			ICondition cond = parser.rhs(OAVJavaType.java_type_model);
+//			System.out.println(cond);
+			
+			String c	= "$beliefbase.chargestate > 0.2";
 			
 			ANTLRStringStream exp = new ANTLRStringStream(c);
-			ClipsJadexLexer lexer = new ClipsJadexLexer(exp);
+			JadexJavaRulesLexer lexer = new JadexJavaRulesLexer(exp);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			ClipsJadexParser parser = new ClipsJadexParser(tokens);
+			JadexJavaRulesParser parser = new JadexJavaRulesParser(tokens);
 		
-			ICondition cond = parser.rhs(OAVJavaType.java_type_model);
-			System.out.println(cond);
+			parser.setContext(new JavaRulesContext(null));
+			parser.rhs();
+//			System.out.println(cond);
 			
 		}
 		catch(Exception ex)

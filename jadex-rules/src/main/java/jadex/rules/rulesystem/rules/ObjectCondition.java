@@ -50,6 +50,15 @@ public class ObjectCondition implements ICondition
 	{
 		return type;
 	}
+	
+	/**
+	 *  Get the object type.
+	 *  @return The object type.
+	 */
+	public void setObjectType(OAVObjectType type)
+	{
+		this.type = type;
+	}
 
 	/**
 	 *  Add a constraint.
