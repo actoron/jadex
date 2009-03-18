@@ -61,15 +61,20 @@ public class InitializeObserverPlan extends Plan
 	 */
 	protected boolean initializeObserver()
 	{
-		
-		if (getBeliefbase().getBelief("environment").getFact() == null)
+		// check for local environment wrapper and activate
+		// plugin when this is the main observer for the world
+		if (getBeliefbase().containsBelief("environment"))
 		{
-			waitForFactChanged("environment");
+			if (getBeliefbase().getBelief("environment").getFact() == null)
+			{
+				waitForFactChanged("environment");
+			}
+		
+			// insert plugin - this MUST get the agent scope, so don't use the
+			// capability belief reference in ADF for creation
+			IObserverCenterPlugin plugin = new EnvironmentControlPlugin(getExternalAccess());
+			getBeliefbase().getBeliefSet("custom_plugins").addFact(plugin);
 		}
-		// insert plugin - this MUST get the agent scope, so don't use the
-		// capability belief reference in ADF for creation
-		IObserverCenterPlugin plugin = new EnvironmentControlPlugin(getExternalAccess());
-		getBeliefbase().getBeliefSet("custom_plugins").addFact(plugin);
 		
 		getBeliefbase().getBelief("environment_name_obs").setFact(Configuration.ENVIRONMENT_NAME);
 		

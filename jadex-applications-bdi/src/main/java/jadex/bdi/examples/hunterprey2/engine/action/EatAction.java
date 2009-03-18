@@ -1,6 +1,7 @@
 package jadex.bdi.examples.hunterprey2.engine.action;
 
 import jadex.bdi.examples.hunterprey2.Creature;
+import jadex.bdi.examples.hunterprey2.WorldObject;
 import jadex.bdi.examples.hunterprey2.environment.Environment;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.planlib.simsupport.environment.action.ISimAction;
@@ -61,6 +62,8 @@ public class EatAction implements ISimAction
 			if (isEatAllowed)
 			{
 				engine.destroySimObject(object.getId());
+				WorldObject eaten = (WorldObject) object.getProperty(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY);
+				eaten.setSimId(null);
 				me = (Creature) actor.getProperty(Environment.SIM_OBJECT_PROPERTY_ONTOLOGY);
 				me.setPoints(me.getPoints()+points);
 				return true;

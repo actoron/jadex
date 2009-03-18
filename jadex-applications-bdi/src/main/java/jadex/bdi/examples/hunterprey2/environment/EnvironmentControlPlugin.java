@@ -84,10 +84,10 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 			tp.addTab("Living creatures", creatures);
 			tp.addTab("Observers", observers);
 			tp.addTab("Highscore", highscore);
-			tp.setMinimumSize(new Dimension(0, 0));
+			tp.setMinimumSize(new Dimension(240, 200));
 			// since 1.5 !
 			//tp.setPreferredSize(new Dimension(243, 0));
-			tp.setSize(new Dimension(243, 0));
+			tp.setSize(new Dimension(240, 200));
 			
 			view = new JPanel(new BorderLayout());
 			view.add(BorderLayout.CENTER, tp);
@@ -111,7 +111,7 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 			
 			view = new JPanel(new BorderLayout());
 			view.add(text);
-			view.setMinimumSize(new Dimension(200,100));
+			view.setMinimumSize(new Dimension(200,200));
 		}
 
 	}
@@ -128,7 +128,9 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 		JPanel	options	= new JPanel(new GridBagLayout());
 		options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
 		this.roundcnt = new JLabel("0");
+		
 		final JTextField roundtimetf = new JTextField(""+agent.getBeliefbase().getBelief("roundtime").getFact(), 5);
+		roundtimetf.setToolTipText("millis");
 		roundtimetf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -138,7 +140,9 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 				//roundtimesl.setValue((int)Math.log(val.intValue()));
 			}
 		});
+		
 		final JTextField saveintervaltf = new JTextField(""+env.getSaveInterval(), 5);
+		saveintervaltf.setToolTipText("millis, -1 for off");
 		saveintervaltf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -146,6 +150,7 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 				env.setSaveInterval(Long.parseLong(saveintervaltf.getText()));
 			}
 		});
+		
 		final JButton hs = new JButton("Save highscore");
 		hs.addActionListener(new ActionListener()
 		{
@@ -155,7 +160,9 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 				env.saveHighscore();
 			}
 		});
+		
 		final JTextField foodrate = new JTextField(""+env.getFoodrate(), 4);
+		foodrate.setToolTipText("every n ticks");
 		foodrate.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent ae)
@@ -168,23 +175,22 @@ public class EnvironmentControlPlugin	implements IObserverCenterPlugin
 		options.add(new JLabel("Round number:"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
 			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 		options.add(roundcnt, new GridBagConstraints(1, 0, 3, 1, 1, 0,
+			GridBagConstraints.WEST,  GridBagConstraints.VERTICAL, insets, 0 , 0));
+		options.add(new JLabel("Round time:"), new GridBagConstraints(0, 1, 1, 1, 0, 0,
 			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
-		options.add(new JLabel("Round time [millis]:"), new GridBagConstraints(0, 1, 1, 1, 0, 0,
-			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
-		//options.add(roundtimesl, new GridBagConstraints(1, 1, 1, 1, 0, 0,
-		//	GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 		options.add(roundtimetf, new GridBagConstraints(1, 1, 1, 1, 0, 0,
-			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
-		options.add(new JLabel("Autosave highscore [millis, -1 for off]"), new GridBagConstraints(0, 2, 1, 1, 0, 0,
+			GridBagConstraints.WEST,  GridBagConstraints.VERTICAL, insets, 0 , 0));
+		options.add(new JLabel("Autosave highscore:"), new GridBagConstraints(0, 2, 1, 1, 0, 0,
 			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 		options.add(saveintervaltf, new GridBagConstraints(1, 2, 3, 1, 1, 0,
-			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
-		options.add(new JLabel("Food rate [every n ticks]"), new GridBagConstraints(0, 3, 1, 1, 0, 0,
+			GridBagConstraints.WEST,  GridBagConstraints.VERTICAL, insets, 0 , 0));
+		options.add(new JLabel("Food rate"), new GridBagConstraints(0, 3, 1, 1, 0, 0,
 			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 		options.add(foodrate, new GridBagConstraints(1, 3, 1, 1, 0, 0,
 			GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 		options.add(hs, new GridBagConstraints(0, 4, 1, 1, 0, 0,
 				GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+		
 		return options;
 	}
 

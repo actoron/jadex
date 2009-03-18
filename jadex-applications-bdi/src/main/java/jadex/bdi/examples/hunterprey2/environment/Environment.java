@@ -55,16 +55,26 @@ public class Environment implements IEnvironment
 	//-------- constants --------
 
 	// predefined object types
+	
+	/** SimObject type obstacle */
 	public static final String SIM_OBJECT_TYPE_OBSTACLE = "obstacle";
+	/** SimObject type food */
 	public static final String SIM_OBJECT_TYPE_FOOD = "food";
+	/** SimObject type hunter */
 	public static final String SIM_OBJECT_TYPE_HUNTER = "hunter";
+	/** SimObject type prey */
 	public static final String SIM_OBJECT_TYPE_PREY = "prey";
 
 	// predefined properties
+	
+	/** SimObject key to store the hunterprey ontology object property*/
 	public static final String SIM_OBJECT_PROPERTY_ONTOLOGY = "ontologyObj";
 	
+	/** Environment key to store the hunterprey world age property*/
 	public static final String ENV_PROPERTY_AGE = "world_age";
+	/** Environment key to set the hunterprey food rate property*/
 	public static final String ENV_PROPERTY_FOODRATE = "world_food_rate";
+	/** Environment key to set the hunterprey max food property */
 	public static final String ENV_PROPERTY_MAXFOOD = "world_max_food";
 
 	/** The default number of lease ticks. */
@@ -78,13 +88,13 @@ public class Environment implements IEnvironment
 	/** The simulation environment to wrap on */
 	protected IGridSimulationEngine engine;
 
-	/** The creatures simId's */
-	protected Map creatureSimIds;
+	/** The local creature/observer representation */
+	protected Map creatures;
 
 	/** The list for move and eat requests. */
 	protected List tasklist;
 
-	/** The counter for move and ??? sim engine tasks. */
+	/** The counter for move tasks. */
 	protected int simtaskcounter;
 
 	/** The helper object for bean events. */
@@ -138,7 +148,7 @@ public class Environment implements IEnvironment
 		
 		engine.addEnvironmentProcess(new FoodSpawnProcess());
 
-		this.creatureSimIds = new HashMap();
+		this.creatures = new HashMap();
 		this.tasklist = new ArrayList();
 		this.simtaskcounter = 0;
 
@@ -185,25 +195,31 @@ public class Environment implements IEnvironment
 			Map properties, List tasks, boolean signalDestruction,
 			boolean listen)
 	{
+//		// halt the engine
+//		Object simObjectAccess = engine.getSimObjectAccess();
+//		synchronized (simObjectAccess)
+//		{
+			Location l = wo.getLocation();
 
-		Location l = wo.getLocation();
+			if (properties == null)
+			{
+				properties = new HashMap();
+			}
+			
+			properties.put(SIM_OBJECT_PROPERTY_ONTOLOGY, wo);
 
-		if (properties == null)
-			properties = new HashMap();
-		properties.put(SIM_OBJECT_PROPERTY_ONTOLOGY, wo);
-
-		if (listen)
-		{
-			if (listener == null)
+			if (listen && listener == null)
+			{
 				listener = new LocalSimulationEventListener(agent);
-		}
+			}
 
-		Integer simId = engine.createSimObject(type, properties, tasks, l
-				.getAsIVector2(), signalDestruction, listener);
-		
-		wo.setSimId(simId);
+			Integer simId = engine.createSimObject(type, properties, tasks, l
+					.getAsIVector2(), signalDestruction, (listen?listener:null));
+			
+			wo.setSimId(simId);
 
-		return simId;
+			return simId;
+//		}
 
 	}
 
@@ -215,35 +231,38 @@ public class Environment implements IEnvironment
 	protected boolean destroySimObject(WorldObject wo)
 	{
 
-		if (wo.getSimId() == null)
-		{
-			agent.getLogger().warning(
-					"Try to destroy WorldObject without SimId! " + wo);
+//		Object simObjectAccess = engine.getSimObjectAccess();
+//		synchronized (simObjectAccess)
+//		{
+			if (wo.getSimId() == null)
+			{
+				agent.getLogger().warning(
+						"Try to destroy WorldObject without SimId! " + wo);
 
-			return false;
-		}
+				return false;
+			}
 
-		engine.destroySimObject(wo.getSimId());
-		wo.setSimId(null);
+			engine.destroySimObject(wo.getSimId());
+			wo.setSimId(null);
 
-		return true;
-
+			return true;
+//		}
 	}
-
-
+	
 	/**
-	 * Decrease the SimTaskCounter by one
+	 * Increase / Decrease the SimTaskCounter by diff
 	 */
-	protected synchronized void decreaseSimTaskCounter()
+	protected synchronized void updateSimTaskCounter(int diff)
 	{
-		this.pcs.firePropertyChange("simTaskCounter", simtaskcounter, simtaskcounter--);
+		simtaskcounter =+ diff;
+		this.pcs.firePropertyChange("simTaskCounter", simtaskcounter-diff, simtaskcounter);
 	}
 
 	/**
 	 * Get the number of current active sim tasks
 	 * @return The counter for sim tasks
 	 */
-	protected int getSimTaskCounter()
+	public int getSimTaskCounter()
 	{
 		return simtaskcounter;
 	}
@@ -355,20 +374,20 @@ public class Environment implements IEnvironment
 
 	}
 
-	/**
-	 * Clear the TaskList
-	 * HACK! Should be done in executeStep method, but that leads to problems with
-	 * other Agents. They compute their next step with the old vision. :-( 
-	 * This is a race condition too! Tasks can be lost.
-	 */
-	protected synchronized void clearTaskList()
-	{
-
-		int length = tasklist.size();
-		tasklist.clear();
-		this.pcs.firePropertyChange("taskSize", length, tasklist.size());
-
-	}
+//	/**
+//	 * Clear the TaskList
+//	 * HACK! Should be done in executeStep method, but that leads to problems with
+//	 * other Agents. They compute their next step with the old vision. :-( 
+//	 * This is a race condition too! Tasks can be lost.
+//	 */
+//	protected synchronized void clearTaskList()
+//	{
+//
+//		int length = tasklist.size();
+//		tasklist.clear();
+//		this.pcs.firePropertyChange("taskSize", length, tasklist.size());
+//
+//	}
 
 	/**
 	 *  Get the current vision (without updating the creatures leaseticks).
@@ -414,9 +433,7 @@ public class Environment implements IEnvironment
 	 */
 	public int getWidth()
 	{
-
 		return engine.getAreaSize().getXAsInteger();
-
 	}
 
 	/**
@@ -424,9 +441,7 @@ public class Environment implements IEnvironment
 	 */
 	public int getHeight()
 	{
-
 		return engine.getAreaSize().getYAsInteger();
-
 	}
 
 	//-------- management methods --------
@@ -437,12 +452,7 @@ public class Environment implements IEnvironment
 	 */
 	public void addFood(Food nfood)
 	{
-
 		createSimObject(nfood, SIM_OBJECT_TYPE_FOOD, null, null, false, false);
-
-//		this.food.add(nfood);
-//		this.world.put(nfood.getLocation(), nfood);
-
 	}
 
 	/**
@@ -451,14 +461,7 @@ public class Environment implements IEnvironment
 	 */
 	public boolean removeFood(Food nfood)
 	{
-
-		if (engine.getSimulationObject(nfood.getSimId()) != null)
-		{
-			destroySimObject(nfood);
-			return true;
-		}
-		return false;
-
+		return destroySimObject(nfood);
 	}
 
 	/**
@@ -467,9 +470,7 @@ public class Environment implements IEnvironment
 	 */
 	public void addObstacle(Obstacle obstacle)
 	{
-
 		createSimObject(obstacle, SIM_OBJECT_TYPE_OBSTACLE, null, null, false, false);
-
 	}
 
 	/**
@@ -478,14 +479,7 @@ public class Environment implements IEnvironment
 	 */
 	public boolean removeObstacle(Obstacle obstacle)
 	{
-
-		if (engine.getSimulationObject(obstacle.getSimId()) != null)
-		{
-			destroySimObject(obstacle);
-			return true;
-		}
-		return false;
-
+		return destroySimObject(obstacle);
 	}
 
 	/**
@@ -497,7 +491,7 @@ public class Environment implements IEnvironment
 
 		Creature copy;
 
-		if (!creatureSimIds.containsKey(creature))
+		if (!creatures.containsKey(creature))
 		{
 			copy = (Creature) creature.clone();
 			copy.setLeaseticks(DEFAULT_LEASE_TICKS);
@@ -505,7 +499,7 @@ public class Environment implements IEnvironment
 			copy.setWorldHeight(getHeight());
 
 			// observers does not have an simid?!
-			this.creatureSimIds.put(copy, null);
+			this.creatures.put(copy, copy);
 
 			if (!(copy instanceof Observer))
 			{
@@ -524,8 +518,8 @@ public class Environment implements IEnvironment
 				tasks.add(new MoveObjectTask(new Vector2Double(0.0), engine.getAreaSize().copy()));
 				Integer simId = createSimObject(copy, getSimObjectType(copy), props, tasks,
 						true, true);
-
-				this.creatureSimIds.put(copy, simId);
+				copy.setSimId(simId);
+				
 				this.highscore.add(copy);
 
 			}
@@ -561,22 +555,17 @@ public class Environment implements IEnvironment
 			}
 		}
 
+		// remove creature from local representation
+		creature = (Creature) this.creatures.remove(creature);
+		
 		this.pcs.firePropertyChange("taskSize", tasks, tasklist.size());
 
-		Integer removedSimId = (Integer) this.creatureSimIds.remove(creature);
-		// if creature was in mapping and simId was not 
-		// null remove creature from simengine
-		if (removedSimId != null)
+		// if creature was in mapping and not an observer
+		if (creature != null && creature.getSimId() != null)
 		{
-			// destroy simobject
-			engine.destroySimObject(removedSimId);
-			return true;
+			return destroySimObject(creature);
 		}
-		else if (creature instanceof Observer)
-		{
-			return true;
-		}
-
+		
 		return false;
 
 	}
@@ -588,14 +577,14 @@ public class Environment implements IEnvironment
 	{
 
 		
-//		StringBuffer b = new StringBuffer();
-//		b.append("executing step " + age + "\n");
-//		b.append("WorldSize=\t" + world.size() + "\n");
-//		b.append("CreatureSize=\t" + creatures.size() + "\n");
+		StringBuffer b = new StringBuffer();
+		b.append("executing step " + engine.getEnvironmentProperty(ENV_PROPERTY_AGE) + "\n");
+//		b.append("WorldSize=\t" + engine. + "\n");
+		b.append("CreatureSize=\t" + creatures.size() + "\n");
 //		b.append("FoodSize=\t" + food.size() + "\n");
-//		b.append("TaskSize=\t" + tasklist.size() + "\n");
-//		b.append("-------------------------------------");
-//		System.out.println(b.toString());
+		b.append("TaskSize=\t" + tasklist.size() + "\n");
+		b.append("SimtaskCounter=\t" + simtaskcounter + "\n");
+		
 		
 		if (simtaskcounter != 0)
 		{
@@ -657,44 +646,12 @@ public class Environment implements IEnvironment
 				}
 			}
 
-			// TO DO: move food creation to engine process?
-			
-//			// Place new food.
-//			if (age % foodrate == 0)
-//			{
-//				int foodCount = ((List) engine.getTypedSimObjectAccess().get(SIM_OBJECT_TYPE_FOOD)).size();
-//				
-//				if (foodCount < ((Integer) agent.getBeliefbase().getBelief(
-//						"max_food").getFact()).intValue())
-//				{
-//					IVector2 pos = engine.getEmptyGridPosition();
-//					IVector2 test = engine.getEmptyGridPosition();
-//
-//					// Make sure there will be some empty location left.
-//					if (!pos.equals(test))
-//					{
-//						addFood(new Food(new Location(pos.getXAsInteger(), pos.getYAsInteger())));
-//					}
-//				}
-//				else
-//				{
-////					// hack for testing- remove old food
-////					System.out.println("-- removing old food --");
-////					WorldObject[] f = (WorldObject[]) food.toArray(new WorldObject[food.size()]);
-////					int count = 0;
-////					for (int i = 0; i < f.length && count < 10; i++)
-////					{
-////						if (f[i].getSimId() != null)
-////						{
-////							removeFood((Food) f[i]);
-////							count++;
-////						}
-////					}
-//				}
-//			}
-
 			tasklist.clear();
 			this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
+			
+			b.append("MoveTasks=\t" + simtaskcounter + "\n");
+			b.append("-------------------------------------");
+			System.out.println(b.toString());
 			
 		}
 
@@ -718,7 +675,6 @@ public class Environment implements IEnvironment
 	 */
 	public int getWorldAge()
 	{
-//		return age;
 		return ((IVector1) engine.getEnvironmentProperty(ENV_PROPERTY_AGE)).getAsInteger();
 	}
 
@@ -728,7 +684,6 @@ public class Environment implements IEnvironment
 	 */
 	public int getFoodrate()
 	{
-//		return foodrate;
 		return ((IVector1) engine.getEnvironmentProperty(ENV_PROPERTY_FOODRATE)).getAsInteger();
 	}
 
@@ -738,7 +693,6 @@ public class Environment implements IEnvironment
 	 */
 	public void setFoodrate(int foodrate)
 	{
-//		this.foodrate = foodrate;
 		engine.setEnvironmentProperty(ENV_PROPERTY_FOODRATE, new Vector1Int(foodrate));
 	}
 
@@ -787,7 +741,7 @@ public class Environment implements IEnvironment
 		if (ret)
 		{
 			// we need to count the tasks to wait for in this round
-			simtaskcounter++;
+			updateSimTaskCounter(+1);
 			return true;
 		}
 		
@@ -806,24 +760,29 @@ public class Environment implements IEnvironment
 		Collection ret = new ArrayList();
 
 		// halt the engine
-		Object simObjectccess = engine.getSimObjectAccess();
-		synchronized (simObjectccess)
+		Map simObjectAccess = engine.getSimObjectAccess();
+		synchronized (simObjectAccess)
 		{
-			Map simObjectAccess = engine.getSimObjectAccess();
-			synchronized (simObjectAccess)
+			Map typedAccess = engine.getTypedSimObjectAccess();
+			synchronized (typedAccess)
 			{
 				//ret.addAll(getOntologyObjects(OBJECT_TYPE_HUNTER));
 				//ret.addAll(getOntologyObjects(OBJECT_TYPE_PREY));
 				
-				Integer[] simIds = (Integer[]) creatureSimIds.values().toArray(new Integer[creatureSimIds.size()]);
-				for (int i = 0; i < simIds.length; i++)
+				Creature[] creat = (Creature[]) creatures.values().toArray(new Creature[creatures.size()]);
+				for (int i = 0; i < creat.length; i++)
 				{
-					if (simIds[i] != null)
+					if (creat[i].getSimId() != null)
 					{
-						SimObject simObj = engine.getSimulationObject(simIds[i]);
-						ret.add(simObj.getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY));
+						SimObject simObj = engine.getSimulationObject(creat[i].getSimId());
+						if (simObj != null)
+							ret.add(simObj.getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY));
 					}
-						
+					else
+					{
+						// this is an observer, add it to the list.
+						ret.add(creat[i]);
+					}
 				}
 				
 			}
@@ -946,14 +905,22 @@ public class Environment implements IEnvironment
 	{
 		Creature ret = null;
 		
-		if (creatureSimIds.containsKey(creature))
+		if (creatures.containsKey(creature))
 		{
 			
-			Integer id = (Integer) creatureSimIds.get(creature);
-
-			if (id != null)
+			Creature creat = (Creature) creatures.get(creature);
+			
+			if (creat != null )
 			{
-				ret = (Creature) engine.getSimulationObject(id).getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY);
+				if (creat.getSimId() != null)
+				{
+					ret = (Creature) engine.getSimulationObject(creat.getSimId()).getProperty(SIM_OBJECT_PROPERTY_ONTOLOGY);
+				}
+				else
+				{
+					// observer
+					ret = creat;
+				}
 			}
 
 		}

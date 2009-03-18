@@ -9,7 +9,6 @@
 	package="jadex.bdi.examples.hunterprey2.environment">
 
 	<imports>
-		<import>jadex.bdi.planlib.starter.StartAgentInfo</import>
 		<import>jadex.bridge.IAgentIdentifier</import>
 		<import>jadex.bdi.runtime.IFilter</import>
 		<import>jadex.adapter.base.fipa.*</import>
@@ -182,10 +181,6 @@
 			<concrete ref="procap.rp_execute_request"/>
 		</achievegoalref>
 		
-		<achievegoalref name="start_agents">
-			<concrete ref="startcap.start_agents"/>
-		</achievegoalref>
-		
 		<!-- Destroy the Environment Agent. -->
 		<achievegoal name="end_agent">
 			<!-- The agent to destroy. -->
@@ -312,13 +307,12 @@
 			</parameter>
 			<parameter name="content" class="CurrentVision"/>
 		</messageevent>
-
+		
 		<!-- Generic simulation event event. -->
     	<internalevent name="simulation_event" posttoall="true">
     		<parameter name="type" class="String"/>
     		<parameter name="task" class="ISimObjectTask"/>
     	</internalevent>
-		
 	</events>
 	
 	<expressions>
@@ -335,15 +329,6 @@
 			?rbel_env	= (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
 			?mbel_env	= (mbelief (melement_has_name "environment"))
 			?env	= (Environment (simTaskCounter 0))
-		</condition>
-		-->
-		<!--
-		<condition name="nostepgoals">
-			// $beliefbase.environment.getStepGoalSize()==0
-			
-			?rbel_env	= (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-			?mbel_env	= (mbelief (melement_has_name "environment"))
-			?env	= (Environment (stepGoalSize 0))
 		</condition>
 		-->
 	</expressions>
