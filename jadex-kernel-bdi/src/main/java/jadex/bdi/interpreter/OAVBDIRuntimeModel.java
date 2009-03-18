@@ -10,6 +10,7 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -701,6 +702,9 @@ public class OAVBDIRuntimeModel
 //	public static OAVAttributeType listenerentry_has_runtimeelement;
 	
 	
+	/** The runtime element to model element mapping (OAV type -> OAV type). */
+	protected static Map	modelmap;
+	
 	static
 	{
 		bdi_rt_model = new OAVTypeModel("bdi_rt_model");
@@ -924,6 +928,29 @@ public class OAVBDIRuntimeModel
 		externalaccess_has_timer = externalaccess_type.createAttributeType("externalaccess_has_timer", java_timer_type);
 		externalaccess_has_waitabstraction = externalaccess_type.createAttributeType("externalaccess_has_waitabstraction", waitabstraction_type);
 		externalaccess_has_wakeupaction = externalaccess_type.createAttributeType("externalaccess_has_wakeupaction", OAVJavaType.java_object_type);
+
+		
+		// Mapping from runtime element to their models.
+		// Used for optimizing rule loader to exclude unused rules.
+		// Todo: synchronized Map required for concurrent read access?
+		modelmap	= new HashMap();
+		modelmap.put(element_type, OAVBDIMetaModel.modelelement_type);
+		modelmap.put(typedelement_type, OAVBDIMetaModel.typedelement_type);
+		modelmap.put(parameter_type, OAVBDIMetaModel.parameter_type);
+		modelmap.put(parameterset_type, OAVBDIMetaModel.parameterset_type);
+		modelmap.put(parameterelement_type, OAVBDIMetaModel.parameterelement_type);
+		modelmap.put(processableelement_type, OAVBDIMetaModel.processableelement_type);
+		modelmap.put(messageevent_type, OAVBDIMetaModel.messageevent_type);
+		modelmap.put(internalevent_type, OAVBDIMetaModel.internalevent_type);
+		modelmap.put(goal_type, OAVBDIMetaModel.goal_type);
+		modelmap.put(plan_type, OAVBDIMetaModel.plan_type);
+		modelmap.put(belief_type, OAVBDIMetaModel.belief_type);
+		modelmap.put(beliefset_type, OAVBDIMetaModel.beliefset_type);
+		modelmap.put(goal_type, OAVBDIMetaModel.goal_type);
+		modelmap.put(capabilityreference_type, OAVBDIMetaModel.capabilityref_type);
+		modelmap.put(capability_type, OAVBDIMetaModel.capability_type);
+		modelmap.put(agent_type, OAVBDIMetaModel.agent_type);
+		modelmap.put(capabilityreference_type, OAVBDIMetaModel.capabilityref_type);
 	}
 
 	/**

@@ -4,9 +4,5 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
-	<classpathentry kind="var" path="JMF/customizer.jar"/>
-	<classpathentry kind="var" path="JMF/jmf.jar"/>
-	<classpathentry kind="var" path="JMF/mediaplayer.jar"/>
-	<classpathentry kind="var" path="JMF/multiplayer.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

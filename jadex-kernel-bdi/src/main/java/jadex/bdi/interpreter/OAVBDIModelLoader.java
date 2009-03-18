@@ -14,6 +14,7 @@ import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rete.builder.ReteBuilder;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.Constraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.ObjectCondition;
@@ -743,9 +744,57 @@ public class OAVBDIModelLoader
 			// Check object conditions, if some object is available.
 			if(conditions.get(i) instanceof ObjectCondition)
 			{
+				ObjectCondition	oc	= (ObjectCondition)conditions.get(i);
 				// Only ignore rule, when type is part of agent meta(!) model.
-				OAVObjectType	type	= ((ObjectCondition)conditions.get(i)).getObjectType();
-				check	= types.contains(type) || !OAVBDIMetaModel.bdimm_type_model.contains(type);
+				OAVObjectType	type	= oc.getObjectType();
+				OAVObjectType	mtype	= (OAVObjectType)OAVBDIRuntimeModel.modelmap.get(type);
+				check	= types.contains(type)
+					|| mtype!=null && types.contains(mtype)
+					|| mtype==null && !OAVBDIMetaModel.bdimm_type_model.contains(type);
+				
+				if(check)
+				{
+					// Check for navigating constraints.
+					List	cons	= oc.getConstraints();
+					for(int c=0; check && cons!=null && c<cons.size(); c++)
+					{
+						if(cons.get(c) instanceof Constraint)
+						{
+							Object	source	= ((Constraint)cons.get(c)).getValueSource();
+							if(source instanceof OAVAttributeType[])
+							{
+								OAVAttributeType[]	attrs	= (OAVAttributeType[])source;
+								// Contraint fails if some intermediate value (0..length-1) is not accessible.
+								for(int a=0; check && a<attrs.length-1; a++)
+								{
+									type	= attrs[a].getType();
+									mtype	= (OAVObjectType)OAVBDIRuntimeModel.modelmap.get(type);
+									check	= types.contains(type)
+										|| mtype!=null && types.contains(mtype)
+										|| mtype==null && !OAVBDIMetaModel.bdimm_type_model.contains(type);
+								}
+							}
+						}
+
+//						if(cons.get(c) instanceof BoundConstraint)
+//						{
+//							BoundConstraint	bc	= (BoundConstraint)cons.get(c);
+//							if(IOperator.EQUAL.equals(bc.getOperator()))
+//							{
+//								List	vars	= bc.getBindVariables();
+//								for(int v=0; check && v<vars.size(); v++)
+//								{
+//									type	= ((Variable)vars.get(v)).getType();
+//									mtype	= (OAVObjectType)OAVBDIRuntimeModel.modelmap.get(type);
+//									check	= types.contains(type)
+//										|| mtype!=null && types.contains(mtype)
+//										|| mtype==null && (!OAVBDIMetaModel.bdimm_type_model.contains(type) || OAVJavaType.java_type_model.contains(type));
+//								}
+//							}
+//						}
+					}
+				}
+				
 				if(DEBUG && !check)
 					System.out.println("Ignored rule "+rule.getName()+" due to missing objects of type "+type);
 			}
