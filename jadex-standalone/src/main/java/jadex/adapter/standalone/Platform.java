@@ -420,7 +420,6 @@ public class Platform extends AbstractPlatform
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");
 		
-		
 		Thread	gc	= new Thread(new Runnable()
 		{
 			public void run()

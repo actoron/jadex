@@ -149,30 +149,30 @@ public class OAVState	implements IOAVState
 //		this.generator = new OAVObjectIdGenerator();
 				
 //		this.nocheck = true;
-//		new Thread(new Runnable()
-//		{
-//			public void run()
-//			{
+		new Thread(new Runnable()
+		{
+			public void run()
+			{
 //				int old_dsize	= 0;
-//				int old_esize	= 0;
+				int old_esize	= 0;
 //				int old_osize	= 0;
 //				int old_ousize	= 0;
 //				int old_psize	= 0;
 //				int old_rsize	= 0;
 //				int old_tsize	= 0;
 //
-//				while(true)
-//				{
-//					try
-//					{
-//						Thread.sleep(10000);
-//					}
-//					catch(InterruptedException e)
-//					{
-//					}
+				while(true)
+				{
+					try
+					{
+						Thread.sleep(10000);
+					}
+					catch(InterruptedException e)
+					{
+					}
 //					
 //					int dsize	= deletedobjects.size();
-//					int esize	= externalusages.size();
+					int esize	= externalusages.size();
 //					int osize	= objects.size();
 //					int ousize	= objectusages.size();
 //					int psize	= pcls!=null ? pcls.size() : 0;
@@ -181,8 +181,8 @@ public class OAVState	implements IOAVState
 //					
 //					if(dsize>old_dsize)
 //						System.out.println("dsize@"+OAVState.this.hashCode()+": "+dsize);
-//					if(esize>old_esize)
-//						System.out.println("esize@"+OAVState.this.hashCode()+": "+esize);
+					if(esize!=old_esize)
+						System.out.println("esize@"+OAVState.this.hashCode()+": "+esize);
 //					if(osize>old_osize)
 //						System.out.println("osize@"+OAVState.this.hashCode()+": "+osize);
 //					if(ousize>old_ousize)
@@ -236,15 +236,15 @@ public class OAVState	implements IOAVState
 //						cmd.run();
 //					
 //					old_dsize	= Math.max(old_dsize, dsize);
-//					old_esize	= Math.max(old_esize, esize);
+					old_esize	= esize;//Math.max(old_esize, esize);
 //					old_osize	= Math.max(old_osize, osize);
 //					old_ousize	= Math.max(old_ousize, ousize);
 //					old_psize	= Math.max(old_psize, psize);
 //					old_rsize	= Math.max(old_rsize, rsize);
 //					old_tsize	= Math.max(old_tsize, tsize);
-//				}
-//			}
-//		}).start();
+				}
+			}
+		});//.start();
 	}
 	
 	/**
@@ -1054,8 +1054,6 @@ public class OAVState	implements IOAVState
 	{	
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
-		if(!checkValidStateObject(id))
-			System.out.println("here");
 		assert nocheck || checkValidStateObject(id): id+" "+attribute+" "+value;
 		assert nocheck || checkValidStateValue(value);
 		assert nocheck || checkTypeHasAttribute(id, attribute);

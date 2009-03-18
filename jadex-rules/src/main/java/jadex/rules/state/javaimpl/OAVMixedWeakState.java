@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -30,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.WeakHashMap;
 
 /**
@@ -148,58 +150,58 @@ public class OAVMixedWeakState	implements IOAVState
 //		this.generator = new OAVObjectIdGenerator();
 				
 //		this.nocheck = true;
-//		new Thread(new Runnable()
-//		{
-//			public void run()
-//			{
-//				int old_dsize	= 0;
-//				int old_esize	= 0;
-//				int old_osize	= 0;
-//				int old_ousize	= 0;
-//				int old_psize	= 0;
-//				int old_rsize	= 0;
-//				int old_tsize	= 0;
-//
-//				while(true)
-//				{
-//					try
-//					{
-//						Thread.sleep(10000);
-//					}
-//					catch(InterruptedException e)
-//					{
-//					}
-//					
+		new Thread(new Runnable()
+		{
+			public void run()
+			{
+				int old_dsize	= 0;
+				int old_wsize	= 0;
+				int old_osize	= 0;
+				int old_ousize	= 0;
+				int old_psize	= 0;
+				int old_rsize	= 0;
+				int old_tsize	= 0;
+
+				while(true)
+				{
+					try
+					{
+						Thread.sleep(10000);
+					}
+					catch(InterruptedException e)
+					{
+					}
+					
 //					int dsize	= deletedobjects.size();
-//					int esize	= externalusages.size();
+					int wsize	= weakobjects.size();
 //					int osize	= objects.size();
 //					int ousize	= objectusages.size();
 //					int psize	= pcls!=null ? pcls.size() : 0;
 //					int rsize	= rootobjects.size();
 //					int tsize	= types.size();
-//					
+					
 //					if(dsize>old_dsize)
-//						System.out.println("dsize@"+OAVState.this.hashCode()+": "+dsize);
-//					if(esize>old_esize)
-//						System.out.println("esize@"+OAVState.this.hashCode()+": "+esize);
+//						System.out.println("dsize@"+OAVMixedWeakState.this.hashCode()+": "+dsize);
+					if(wsize!=old_wsize)
+						System.out.println("wsize@"+OAVMixedWeakState.this.hashCode()+": "+wsize);
 //					if(osize>old_osize)
-//						System.out.println("osize@"+OAVState.this.hashCode()+": "+osize);
+//						System.out.println("osize@"+OAVMixedWeakState.this.hashCode()+": "+osize);
 //					if(ousize>old_ousize)
-//						System.out.println("ousize@"+OAVState.this.hashCode()+": "+ousize);
+//						System.out.println("ousize@"+OAVMixedWeakState.this.hashCode()+": "+ousize);
 //					if(psize>old_psize)
-//						System.out.println("psize@"+OAVState.this.hashCode()+": "+psize);
+//						System.out.println("psize@"+OAVMixedWeakState.this.hashCode()+": "+psize);
 //					if(rsize>old_rsize)
-//						System.out.println("rsize@"+OAVState.this.hashCode()+": "+rsize);
+//						System.out.println("rsize@"+OAVMixedWeakState.this.hashCode()+": "+rsize);
 //					if(tsize>old_tsize)
-//						System.out.println("tsize@"+OAVState.this.hashCode()+": "+tsize);
-//						
-//					// Calculate number of objects per type.
-//					// Run on synchronizator to avoid concurrent modification.
-//					Runnable	cmd	= new Runnable()
-//					{
-//						public void run()
-//						{
-//							// Sum up occurrences of types.
+//						System.out.println("tsize@"+OAVMixedWeakState.this.hashCode()+": "+tsize);
+						
+					// Calculate number of objects per type.
+					// Run on synchronizator to avoid concurrent modification.
+					Runnable	cmd	= new Runnable()
+					{
+						public void run()
+						{
+							// Sum up occurrences of types.
 //							final Map	cnts	= new HashMap();
 //							for(Iterator it=types.values().iterator(); it.hasNext(); )
 //							{
@@ -211,8 +213,20 @@ public class OAVMixedWeakState	implements IOAVState
 //									cnt	= new Integer(1);
 //								cnts.put(type, cnt);
 //							}
-//							
-//							// Sort types by number.
+							
+//							final Map	cnts	= new HashMap();
+//							for(Iterator it=weakobjects.keySet().iterator(); it.hasNext(); )
+//							{
+//								Object	id	= it.next();
+//								Integer	cnt	= (Integer)cnts.get(getType());
+//								if(cnt!=null)
+//									cnt	= new Integer(cnt.intValue()+1);
+//								else
+//									cnt	= new Integer(1);
+//								cnts.put(type, cnt);
+//							}
+							
+							// Sort types by number.
 //							Map	sorted	= new TreeMap(new Comparator()
 //							{
 //								public int compare(Object t2, Object t1)
@@ -224,26 +238,26 @@ public class OAVMixedWeakState	implements IOAVState
 //								}
 //							});
 //							sorted.putAll(cnts);
-//							
-//							System.out.println("objects@"+OAVState.this.hashCode()+": "+sorted);
-//							
-//						}
-//					};
-//					if(synchronizator!=null)
-//						synchronizator.invokeLater(cmd);
-//					else
-//						cmd.run();
-//					
+							
+//							System.out.println("objects@"+OAVMixedWeakState.this.hashCode()+": "+sorted);
+							
+						}
+					};
+					if(synchronizator!=null)
+						synchronizator.invokeLater(cmd);
+					else
+						cmd.run();
+					
 //					old_dsize	= Math.max(old_dsize, dsize);
-//					old_esize	= Math.max(old_esize, esize);
+					old_wsize	= wsize;//Math.max(old_wsize, wsize);
 //					old_osize	= Math.max(old_osize, osize);
 //					old_ousize	= Math.max(old_ousize, ousize);
 //					old_psize	= Math.max(old_psize, psize);
 //					old_rsize	= Math.max(old_rsize, rsize);
 //					old_tsize	= Math.max(old_tsize, tsize);
-//				}
-//			}
-//		}).start();
+				}
+			}
+		}).start();
 	}
 	
 	/**
@@ -1539,12 +1553,6 @@ public class OAVMixedWeakState	implements IOAVState
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		// #endif
-		
-//		if(id.toString().indexOf("waitabstraction")!=-1)
-//		{
-//			System.err.println("Add ex: "+id/*+" "+external*/+" "+cnt);
-//			Thread.dumpStack();
-//		}
 	}
 	
 	/**
