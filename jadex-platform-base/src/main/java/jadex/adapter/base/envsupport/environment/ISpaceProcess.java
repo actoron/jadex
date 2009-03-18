@@ -1,6 +1,6 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
 
-import jadex.bdi.planlib.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.bridge.IClock;
 
 /**
@@ -28,11 +28,11 @@ public interface ISpaceProcess
 	/**
 	 * Executes the environment process
 	 * 
-	 * @param clock the clock
+	 * @param time the current time
 	 * @param deltaT time passed during this step
 	 * @param space the space this process is running in
 	 */
-	public void execute(IClock clock, IVector1 deltaT, IEnvironmentSpace space);
+	public void execute(long time, IVector1 deltaT, IEnvironmentSpace space);
 
 	/**
 	 * Returns the ID of the process.

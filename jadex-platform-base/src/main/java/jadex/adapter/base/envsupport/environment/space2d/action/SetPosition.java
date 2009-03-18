@@ -1,10 +1,10 @@
-package jadex.bdi.planlib.envsupport.environment.space2d.action;
+package jadex.adapter.base.envsupport.environment.space2d.action;
 
 import java.util.Map;
 
-import jadex.bdi.planlib.envsupport.environment.IEnvironmentSpace;
-import jadex.bdi.planlib.envsupport.environment.ISpaceObject;
-import jadex.bdi.planlib.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.math.IVector2;
 
 public class SetPosition extends AbstractSpace2dAction
 {

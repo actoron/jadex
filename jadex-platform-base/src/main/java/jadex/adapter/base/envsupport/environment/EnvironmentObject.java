@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bdi.planlib.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.bridge.IClock;
 
 
@@ -158,16 +158,16 @@ public class EnvironmentObject implements ISpaceObject
 	/**
 	 * Updates the object to the current time.
 	 * 
-	 * @param clock the clock	
+	 * time the current time	
 	 * @param deltaT the time difference that has passed
 	 */
-	public synchronized void updateObject(IClock clock, IVector1 deltaT)
+	public synchronized void updateObject(long time, IVector1 deltaT)
 	{
 		Object[] tasks = tasks_.values().toArray();
 		for(int i = 0; i < tasks.length; ++i)
 		{
 			IObjectTask task = (IObjectTask) tasks[i];
-			task.execute(clock, deltaT, this);
+			task.execute(time, deltaT, this);
 		}
 	}
 	

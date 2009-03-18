@@ -1,6 +1,6 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
 
-import jadex.bdi.planlib.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.bridge.IClock;
 
 import java.util.Map;
@@ -68,10 +68,10 @@ public interface ISpaceObject
 	/**
 	 * Updates the object to the current time.
 	 * 
-	 * @param clock the clock	
+	 * @param time the current time
 	 * @param deltaT the time difference that has passed
 	 */
-	public void updateObject(IClock clock, IVector1 deltaT);
+	public void updateObject(long time, IVector1 deltaT);
 	
 	/**
 	 * Fires an ObjectEvent.

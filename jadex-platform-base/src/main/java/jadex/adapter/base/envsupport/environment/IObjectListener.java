@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
 
 public interface IObjectListener
 {

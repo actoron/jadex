@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
 
 import java.io.Serializable;
 import java.util.Collections;

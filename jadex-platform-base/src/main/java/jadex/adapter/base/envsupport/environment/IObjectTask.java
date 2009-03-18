@@ -1,6 +1,6 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
 
-import jadex.bdi.planlib.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.bridge.IClock;
 
 
@@ -25,11 +25,11 @@ public interface IObjectTask
 	/**
 	 * Executes the task.
 	 * 
-	 * @param clock the clock
+	 * @param time the current time
 	 * @param deltaT time passed
 	 * @param obj to the environment object that is executing the task
 	 */
-	public void execute(IClock clock, IVector1 deltaT, ISpaceObject obj);
+	public void execute(long time, IVector1 deltaT, ISpaceObject obj);
 
 	/**
 	 * Returns the ID of the task.

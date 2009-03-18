@@ -1,12 +1,12 @@
-package jadex.bdi.planlib.envsupport.environment;
 
-import jadex.bdi.planlib.envsupport.math.IVector1;
-import jadex.bridge.IClock;
+package jadex.adapter.base.envsupport.environment;
+
+import jadex.adapter.base.contextservice.ISpace;
 
 import java.util.List;
 import java.util.Map;
 
-public interface IEnvironmentSpace
+public interface IEnvironmentSpace extends ISpace
 {
 	/**
 	 * Adds a space process.

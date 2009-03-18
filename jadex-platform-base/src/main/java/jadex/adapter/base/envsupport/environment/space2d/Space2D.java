@@ -1,8 +1,9 @@
-package jadex.bdi.planlib.envsupport.environment.space2d;
+package jadex.adapter.base.envsupport.environment.space2d;
 
-import jadex.bdi.planlib.envsupport.environment.EnvironmentSpaceTime;
-import jadex.bdi.planlib.envsupport.math.IVector1;
-import jadex.bdi.planlib.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
+import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.bridge.IClockService;
 
 
 public abstract class Space2D extends EnvironmentSpaceTime
@@ -12,13 +13,13 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	
 	/**
 	 * Initializes the TimeSpace.
-	 * @param startTime the start time
+	 * @param clockService the clock service
 	 * @param timeCoefficient the time coefficient for time differences.
 	 * @param areaSize the size of the 2D area
 	 */
-	protected Space2D(long startTime, IVector1 timeCoefficient, IVector2 areaSize)
+	protected Space2D(IClockService clockService, IVector1 timeCoefficient, IVector2 areaSize)
 	{
-		super(startTime, timeCoefficient);
+		super(clockService, timeCoefficient);
 		areaSize_ = areaSize;
 	}
 	

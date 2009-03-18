@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.envsupport.math;
+package jadex.adapter.base.envsupport.math;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;

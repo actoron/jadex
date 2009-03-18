@@ -1,49 +1,47 @@
-package jadex.bdi.planlib.envsupport.environment.space2d;
+package jadex.adapter.base.envsupport.environment.space2d;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import jadex.bdi.planlib.envsupport.environment.ISpaceObject;
-import jadex.bdi.planlib.envsupport.math.IVector1;
-import jadex.bdi.planlib.envsupport.math.IVector2;
-import jadex.bdi.planlib.envsupport.math.SynchronizedVector2Wrapper;
-import jadex.bdi.planlib.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.bridge.IClockService;
 
 public class ContinuousSpace2D extends Space2D
 {
 	/** The default ID for this space */
-	public static final String DEFAULT_NAME = "ContinuousSpace2D";
+	public static final String DEFAULT_NAME = ContinuousSpace2D.class.getName();
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with the default name.
 	 * 
-	 * @param startTime the start time
+	 * @param clockService the clock service
 	 * @param timeCoefficient the time coefficient for time differences.
 	 * @param areaSize the size of the 2D area
 	 */
-	public ContinuousSpace2D(long startTime, IVector1 timeCoefficient, IVector2 areaSize)
+	public ContinuousSpace2D(IClockService clockService, IVector1 timeCoefficient, IVector2 areaSize)
 	{
-		this(startTime, timeCoefficient, areaSize, DEFAULT_NAME);
+		this(clockService, timeCoefficient, areaSize, DEFAULT_NAME);
 	}
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with a special ID.
 	 * 
-	 * @param startTime the start time
+	 * @param clockService the clock service
 	 * @param timeCoefficient the time coefficient for time differences.
 	 * @param areaSize the size of the 2D area
 	 * @param spaceName the name of this space
 	 */
-	public ContinuousSpace2D(long startTime,
+	public ContinuousSpace2D(IClockService clockService,
 							 IVector1 timeCoefficient,
 							 IVector2 areaSize,
 							 Object spaceName)
 	{
-		super(startTime, timeCoefficient, areaSize);
+		super(clockService, timeCoefficient, areaSize);
 		spaceProperties_.put("name", spaceName);
 	}
 	

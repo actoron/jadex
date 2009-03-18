@@ -1,4 +1,6 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
+
+import jadex.bridge.IAgentIdentifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -197,6 +199,14 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 		assert action != null;
 		
 		return action.perform(new HashMap(parameters), this);
+	}
+	
+	public void agentAdded(IAgentIdentifier aid)
+	{
+	}
+	
+	public void agentRemoved(IAgentIdentifier aid)
+	{
 	}
 	
 	/**

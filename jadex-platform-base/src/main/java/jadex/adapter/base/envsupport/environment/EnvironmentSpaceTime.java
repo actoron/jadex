@@ -1,30 +1,40 @@
-package jadex.bdi.planlib.envsupport.environment;
+package jadex.adapter.base.envsupport.environment;
 
 import java.util.Iterator;
 
-import jadex.bdi.planlib.envsupport.math.IVector1;
-import jadex.bdi.planlib.envsupport.math.Vector1Long;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClock;
+import jadex.bridge.IClockService;
 
 /** An environment space with a notion of time. */
 public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
+										   implements ChangeListener
 {
 	/** The current time coefficient */
 	protected IVector1 timeCoefficient_;
+	
+	/** The clock server */
+	protected IClockService clockService_;
 	
 	/** The last time stamp */
 	private long timeStamp_;
 	
 	/**
-	 * Initializes the TimeSpace.
-	 * @param startTime the start time
+	 * Initializes the SpaceTime.
+	 * @param clockService the clock service
 	 * @param timeCoefficient the time coefficient for time differences.
 	 */
-	protected EnvironmentSpaceTime(long startTime, IVector1 timeCoefficient)
+	protected EnvironmentSpaceTime(IClockService clockService, IVector1 timeCoefficient)
 	{
 		super();
-		timeStamp_ = startTime;
+		clockService_ = clockService;
+		timeStamp_ = clockService_.getTime();
 		timeCoefficient_ = timeCoefficient;
+		clockService_.addChangeListener(this);
 	}
 	
 	/**
@@ -41,11 +51,10 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 	 * Steps the time of the space. May be non-functional in spaces that do not have
 	 * a concept of time. See hasTime().
 	 * 
-	 * @param clock the clock
+	 * @param currentTime the current time
 	 */
-	public void timeStep(IClock clock)
+	public void timeStep(long currentTime)
 	{
-		long currentTime = clock.getTime();
 		IVector1 deltaT = timeCoefficient_.copy().multiply(new Vector1Long(currentTime - timeStamp_));
 		timeStamp_ = currentTime;
 		
@@ -54,7 +63,7 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 			for (Iterator it = spaceObjects_.values().iterator(); it.hasNext(); )
 			{
 				ISpaceObject obj = (ISpaceObject) it.next();
-				obj.updateObject(clock, deltaT);
+				obj.updateObject(currentTime, deltaT);
 			}
 		}
 		
@@ -64,8 +73,13 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 			for(int i = 0; i < processes.length; ++i)
 			{
 				ISpaceProcess process = (ISpaceProcess) processes[i];
-				process.execute(clock, deltaT, this);
+				process.execute(currentTime, deltaT, this);
 			}
 		}
+	}
+	
+	public void stateChanged(ChangeEvent e)
+	{
+		timeStep(clockService_.getTime());
 	}
 }
