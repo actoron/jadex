@@ -55,9 +55,10 @@ public class ClipsParserTest
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			JadexJavaRulesParser parser = new JadexJavaRulesParser(tokens);
 		
-			parser.setContext(new JavaRulesContext(null));
+			JavaRulesContext	jrc	= new JavaRulesContext(null);
+			parser.setContext(jrc);
 			parser.rhs();
-//			System.out.println(cond);
+			System.out.println(jrc);
 			
 		}
 		catch(Exception ex)

@@ -1,399 +1,118 @@
-grammar JadexJavaRules;
+grammar JavaJadex;
 
 //options {k=2; backtrack=true; memoize=true;}
 
 @header 
 {
-package jadex.rules.parser.conditions;
-
-import jadex.rules.rulesystem.rules.*;
-import jadex.rules.rulesystem.rules.functions.*;
-import jadex.rules.rulesystem.*;
-import jadex.rules.state.*;
-import jadex.commons.SReflect;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+package jadex.rules.parser.conditions.javagrammar;
 }
 
 @lexer::header 
 {
-package jadex.rules.parser.conditions;
+package jadex.rules.parser.conditions.javagrammar;
 }
 
 @members
 {
-    protected List	errors;
-    public void displayRecognitionError(String[] tokenNames, RecognitionException e)
-    {
-        if(errors!=null)
-        {
-            String hdr = getErrorHeader(e);
-            String msg = getErrorMessage(e, tokenNames);
-        	errors.add(hdr + " " + msg);
-        }
-        else
-        {
-        	super.displayRecognitionError(tokenNames, e);
-        }
-    }
-    public void setErrorList(List errors)
-    {
-        this.errors	= errors;
-    }
-    public List getErrorList()
-    {
-        return errors;
-    }
-    
-    protected String[]	imports;
-    public void	setImports(String[] imports)
-    {
-    	this.imports	= imports;
-    }
-    
-    protected JavaRulesContext context;
-    public void	setContext(JavaRulesContext context)
-    {
-    	this.context	= context;
-    }
 }
 
 // Parser
 
+/**
+ *  Right hand side. Start rule for parser.
+ */
 rhs
 	: expression EOF
 	;
-	
+
+/**
+ *  An expression is some Java code that can be evaluated to
+ *  a value (left hand side of an assignment).
+ */
 expression
-	: conditionalExpression
-        //(assignmentOperator expression
-        //)?
-	;
-
-conditionalExpression
-	: conditionalOrExpression
-    	('?' expression ':' conditionalExpression)?
-	;
-
-conditionalOrExpression
-	: conditionalAndExpression
-        ('||' conditionalAndExpression)*
-	;
-
-conditionalAndExpression 
-	: inclusiveOrExpression
-        ('&&' inclusiveOrExpression)*
-	;
-
-inclusiveOrExpression 
-    	: exclusiveOrExpression
-        ('|' exclusiveOrExpression)*
-	;
-
-exclusiveOrExpression 
-	: andExpression
-        ('^' andExpression)*
-	;
-
-andExpression
-	: equalityExpression
-        ('&' equalityExpression)*
-	;
-
-equalityExpression 
-    	: instanceOfExpression
-        ( ('==' 
-	{
-		System.out.println("Found: ==");
-        }
-        | '!=')
-	{
-		System.out.println("Found: !=");
-	}		
-            instanceOfExpression
-        )*
-	;
-
-instanceOfExpression
 	: relationalExpression
-        ('instanceof' type)?
-	;
-
-relationalExpression
-	: additiveExpression //shiftExpression
-        (relationalOp additiveExpression //shiftExpression 
-        )*
-	;
-
-relationalOp 
-	:    '<' '='
-	{
-		System.out.println("Found: <=");
-	}
-	|    '>' '='
-	{
-		System.out.println("Found: >=");
-	}
-	|   '<'
-	{
-		System.out.println("Found: <");
-	}
-	|   '>'
-	{
-		System.out.println("Found: >");
-	}
-	;
-
-/*shiftExpression 
-    :   additiveExpression
-        (shiftOp additiveExpression
-        )*
-    ;
-
-shiftOp 
-    :    '<' '<'
-    |    '>' '>' '>'
-    |    '>' '>'
-    ;*/
-
-additiveExpression
-	: multiplicativeExpression
-        (   
-            (   '+'
-            |   '-'
-            )
-            multiplicativeExpression
-        )*
-        ;
-
-multiplicativeExpression
-	: unaryExpression
-        (   
-            (   '*'
-            |   '/'
-            |   '%'
-            )
-            unaryExpression
-        )*
-	;
-
-//parExpression 
- //   :   '(' expression ')'
-  //  ;
-
-expressionList 
-	: expression
-        (',' expression)*
 	;
 
 /**
- * NOTE: for '+' and '-', if the next token is int or long interal, then it's not a unary expression.
- *       it's a literal with signed value. INTLTERAL AND LONG LITERAL are added here for this.
+ *  A comparison between two values.
  */
-unaryExpression
-	:   '+' unaryExpression
-	|   '-' unaryExpression
-	|   '++' unaryExpression
-	|   '--' unaryExpression
-	|   unaryExpressionNotPlusMinus
-	;
-
-unaryExpressionNotPlusMinus 
-	:   //'~' unaryExpression
-	//|   '!' unaryExpression
-	//|   
-	//castExpression
-	//|
-	primary
-        (selector)*
-        (   '++'
-        |   '--'
+relationalExpression returns [Constraint constraint]
+	: left = unaryExpression
+        (('<'|'<''='|'>'|'>''=') right = unaryExpression
+        {
+        	$constraint = new Constraint(left, right, "blurps");
+        }
         )?
 	;
-
-castExpression
-	:
-	 '(' primitiveType | type ')' unaryExpression
-    	//:   '(' primitiveType ')' unaryExpression
-    	//|   '(' type ')' unaryExpressionNotPlusMinus
+	
+/**
+ *  An unary expression produces a single value
+ */
+unaryExpression returns [UnaryExpression exp]
+	: prim = primary (suffix)*
+	{
+		$exp	= new UnaryExpression(prim, null);
+	}
 	;
 
 /**
- * have to use scope here, parameter passing isn't well supported in antlr.
+ *  Primary part of a expression, i.e. a direct representation of a value.
  */
-primary  
-	:   //expression//parExpression            
-	//|   
-    	'this' /* ('.' IDENTIFIER)* */ (identifierSuffix)?
-	| IDENTIFIER /* ('.' IDENTIFIER)* */ (identifierSuffix)?
-	| 'super' superSuffix
-	| literal
-	| creator
-	| primitiveType ('[' ']')* '.' 'class'
-	| 'void' '.' 'class'
-	;
-    
-
-superSuffix 
-	: arguments
-	| '.' (typeArguments)? IDENTIFIER (arguments)?
+primary returns [Primary prim]
+	: '(' expression ')'
+	| lit = literal {$prim = new Literal(lit);}
+	| var= variable {$prim = new Variable(var);}
 	;
 
-identifierSuffix
-	: ('[' ']')+
-        '.' 'class'
-	//|   ('[' expression ']')+
-	| arguments
-	| '.' 'class'
-	// |   '.' nonWildcardTypeArguments IDENTIFIER arguments
-	| '.' 'this'
-	//|   '.' 'super' arguments
-	// |   innerCreator
+/**
+ *  Continuations on a value, i.e. field or method access.
+ */
+suffix
+	: fieldAccess
+	| methodAccess
 	;
 
-
-selector
-	: '.' IDENTIFIER (arguments)?
-	| '.' 'this'
-	| '.' 'super' superSuffix
-	// |   innerCreator
-	| '[' expression ']'
+/**
+ *  Read a field of an object.
+ */
+fieldAccess
+	: '.' IDENTIFIER
 	;
 
-creator 
-	:   //'new' nonWildcardTypeArguments classOrInterfaceType classCreatorRest
-	//|
-	'new' classOrInterfaceType classCreatorRest
-	//|   arrayCreator
+/**
+ *  Invoke a method on an object.
+ */
+methodAccess
+	: '.' IDENTIFIER '(' ')'
+	| '.' IDENTIFIER '(' expression (',' expression)* ')'
 	;
 
-
-typeList 
-	: type (',' type)*
+/**
+ *  A variable represents a value provided from the outside.
+ */
+variable returns [String name]
+	: tmp = IDENTIFIER {$name = tmp.getText();}
 	;
 
-classCreatorRest  
-	: arguments
-        //(classBody
-        //)?
+literal	returns [Object val]
+	: lit=floatingPointLiteral {$val = lit;}
+	| lit=integerLiteral {$val = lit;}
+	| CharacterLiteral {$val = new Character($CharacterLiteral.text.charAt(0));}
+	| StringLiteral {$val = $StringLiteral.text.substring(1, $StringLiteral.text.length()-1);}
+	| BooleanLiteral {$val = $BooleanLiteral.text.equals("true")? Boolean.TRUE: Boolean.FALSE;}
+	| 'null' {$val = null;}
 	;
 
-/*arrayCreator 
-    :   'new' createdName
-        '[' ']'
-        ('[' ']'
-        )*
-        arrayInitializer
-
-    |   'new' createdName
-        '[' expression
-        ']'
-        (   '[' expression
-            ']'
-        )*
-        ('[' ']'
-        )*
-    ;*/
-
-variableInitializer 
-	:   //arrayInitializer
-	//|  
-	expression
+floatingPointLiteral returns [Object val]
+	: sign=('+'|'-')? FloatingPointLiteral {$val = sign!=null && "-".equals(sign.getText())? new Double("-"+$FloatingPointLiteral.text): new Double($FloatingPointLiteral.text);}
+	;
+	
+integerLiteral returns [Object val]
+	: sign=('+'|'-')? (HexLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$HexLiteral.text): new Integer($HexLiteral.text);}
+	| OctalLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$OctalLiteral.text): new Integer($OctalLiteral.text);}
+	| DecimalLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$DecimalLiteral.text): new Integer($DecimalLiteral.text);})
 	;
 
-/*arrayInitializer 
-    :   '{' 
-            (variableInitializer
-                (',' variableInitializer
-                )*
-            )? 
-            (',')? 
-        '}'             //Yang's fix, position change.
-    ;*/
-
-
-createdName 
-	: classOrInterfaceType
-	| primitiveType
-	;
-
-/*innerCreator  
-    :   '.' 'new'
-        (nonWildcardTypeArguments
-        )?
-        IDENTIFIER
-        (typeArguments
-        )?
-        classCreatorRest
-    ;*/
-
-
-/*classCreatorRest 
-    :   arguments
-        (classBody
-        )?
-    ;*/
-
-
-/*nonWildcardTypeArguments 
-    :   '<' typeList
-        '>'
-    ;*/
-
-arguments 
-	: '(' (expressionList)? ')'
-	;
-
-type 
-	: classOrInterfaceType ('[' ']' )*
-	|   primitiveType ('[' ']')*
-	;
-
-
-classOrInterfaceType 
-	: IDENTIFIER (typeArguments)? ('.' IDENTIFIER (typeArguments)?)*
-	;
-
-typeArguments 
-	: '<' typeArgument (',' typeArgument)* '>'
-	;
-
-typeArgument 
-	:   type
-	|   '?'
-        (
-            ('extends'
-            |'super'
-            )
-            type
-        )?
-	;
-
-
-primitiveType  
-	:   'boolean'
-	|   'char'
-	|   'byte'
-	|   'short'
-	|   'int'
-	|   'long'
-	|   'float'
-	|   'double'
-	;
-
-literal 
-	:   INTLITERAL
-	|   LONGLITERAL
-	|   FLOATLITERAL
-	|   DOUBLELITERAL
-	|   CHARLITERAL
-	|   STRINGLITERAL
-	|   TRUE
-	|   FALSE
-	|   NULL
- 	;
 
 // Lexxer
 /********************************************************************************************
@@ -878,8 +597,9 @@ IntegerTypeSuffix
 FloatingPointLiteral
     	:   ('0'..'9')+ '.' ('0'..'9')* Exponent? FloatTypeSuffix?
  	|   '.' ('0'..'9')+ Exponent? FloatTypeSuffix?
- 	|   ('0'..'9')+ Exponent FloatTypeSuffix?
-	|   ('0'..'9')+ Exponent? FloatTypeSuffix
+ 	|   ('0'..'9')+ Exponent 
+	|   ('0'..'9')+ FloatTypeSuffix
+	|   ('0'..'9')+ Exponent FloatTypeSuffix
 	;
 
 fragment

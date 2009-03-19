@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g 2009-03-18 14:42:53
+// $ANTLR 3.0.1 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g 2009-03-19 13:07:56
 
 package jadex.rules.parser.conditions;
 
@@ -155,7 +155,7 @@ public class JadexJavaRulesParser extends Parser {
         
 
     public String[] getTokenNames() { return tokenNames; }
-    public String getGrammarFileName() { return "C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g"; }
+    public String getGrammarFileName() { return "C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g"; }
 
     
         protected List	errors;
@@ -196,20 +196,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start rhs
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:65:1: rhs : expression EOF ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:65:1: rhs : expression EOF ;
     public final void rhs() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:66:2: ( expression EOF )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:66:4: expression EOF
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:66:2: ( expression EOF )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:66:4: expression EOF
             {
             pushFollow(FOLLOW_expression_in_rhs38);
             expression();
             _fsp--;
 
             match(input,EOF,FOLLOW_EOF_in_rhs40); 
-            
-            		System.out.println("rhs");
-            	
 
             }
 
@@ -226,13 +223,13 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start expression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:72:1: expression : conditionalExpression ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:69:1: expression : conditionalExpression ;
     public final void expression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:73:2: ( conditionalExpression )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:73:4: conditionalExpression
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:70:2: ( conditionalExpression )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:70:4: conditionalExpression
             {
-            pushFollow(FOLLOW_conditionalExpression_in_expression55);
+            pushFollow(FOLLOW_conditionalExpression_in_expression52);
             conditionalExpression();
             _fsp--;
 
@@ -252,17 +249,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start conditionalExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:78:1: conditionalExpression : conditionalOrExpression ( '?' expression ':' conditionalExpression )? ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:75:1: conditionalExpression : conditionalOrExpression ( '?' expression ':' conditionalExpression )? ;
     public final void conditionalExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:79:2: ( conditionalOrExpression ( '?' expression ':' conditionalExpression )? )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:79:4: conditionalOrExpression ( '?' expression ':' conditionalExpression )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:76:2: ( conditionalOrExpression ( '?' expression ':' conditionalExpression )? )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:76:4: conditionalOrExpression ( '?' expression ':' conditionalExpression )?
             {
-            pushFollow(FOLLOW_conditionalOrExpression_in_conditionalExpression84);
+            pushFollow(FOLLOW_conditionalOrExpression_in_conditionalExpression81);
             conditionalOrExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:80:6: ( '?' expression ':' conditionalExpression )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:77:6: ( '?' expression ':' conditionalExpression )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -271,15 +268,15 @@ public class JadexJavaRulesParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:80:7: '?' expression ':' conditionalExpression
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:77:7: '?' expression ':' conditionalExpression
                     {
-                    match(input,QUES,FOLLOW_QUES_in_conditionalExpression92); 
-                    pushFollow(FOLLOW_expression_in_conditionalExpression94);
+                    match(input,QUES,FOLLOW_QUES_in_conditionalExpression89); 
+                    pushFollow(FOLLOW_expression_in_conditionalExpression91);
                     expression();
                     _fsp--;
 
-                    match(input,COLON,FOLLOW_COLON_in_conditionalExpression96); 
-                    pushFollow(FOLLOW_conditionalExpression_in_conditionalExpression98);
+                    match(input,COLON,FOLLOW_COLON_in_conditionalExpression93); 
+                    pushFollow(FOLLOW_conditionalExpression_in_conditionalExpression95);
                     conditionalExpression();
                     _fsp--;
 
@@ -305,17 +302,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start conditionalOrExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:83:1: conditionalOrExpression : conditionalAndExpression ( '||' conditionalAndExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:80:1: conditionalOrExpression : conditionalAndExpression ( '||' conditionalAndExpression )* ;
     public final void conditionalOrExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:84:2: ( conditionalAndExpression ( '||' conditionalAndExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:84:4: conditionalAndExpression ( '||' conditionalAndExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:81:2: ( conditionalAndExpression ( '||' conditionalAndExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:81:4: conditionalAndExpression ( '||' conditionalAndExpression )*
             {
-            pushFollow(FOLLOW_conditionalAndExpression_in_conditionalOrExpression111);
+            pushFollow(FOLLOW_conditionalAndExpression_in_conditionalOrExpression108);
             conditionalAndExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:85:9: ( '||' conditionalAndExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:82:9: ( '||' conditionalAndExpression )*
             loop2:
             do {
                 int alt2=2;
@@ -328,10 +325,10 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt2) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:85:10: '||' conditionalAndExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:82:10: '||' conditionalAndExpression
             	    {
-            	    match(input,BARBAR,FOLLOW_BARBAR_in_conditionalOrExpression122); 
-            	    pushFollow(FOLLOW_conditionalAndExpression_in_conditionalOrExpression124);
+            	    match(input,BARBAR,FOLLOW_BARBAR_in_conditionalOrExpression119); 
+            	    pushFollow(FOLLOW_conditionalAndExpression_in_conditionalOrExpression121);
             	    conditionalAndExpression();
             	    _fsp--;
 
@@ -360,17 +357,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start conditionalAndExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:88:1: conditionalAndExpression : inclusiveOrExpression ( '&&' inclusiveOrExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:85:1: conditionalAndExpression : inclusiveOrExpression ( '&&' inclusiveOrExpression )* ;
     public final void conditionalAndExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:89:2: ( inclusiveOrExpression ( '&&' inclusiveOrExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:89:4: inclusiveOrExpression ( '&&' inclusiveOrExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:86:2: ( inclusiveOrExpression ( '&&' inclusiveOrExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:86:4: inclusiveOrExpression ( '&&' inclusiveOrExpression )*
             {
-            pushFollow(FOLLOW_inclusiveOrExpression_in_conditionalAndExpression138);
+            pushFollow(FOLLOW_inclusiveOrExpression_in_conditionalAndExpression135);
             inclusiveOrExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:90:9: ( '&&' inclusiveOrExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:87:9: ( '&&' inclusiveOrExpression )*
             loop3:
             do {
                 int alt3=2;
@@ -383,10 +380,10 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt3) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:90:10: '&&' inclusiveOrExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:87:10: '&&' inclusiveOrExpression
             	    {
-            	    match(input,AMPAMP,FOLLOW_AMPAMP_in_conditionalAndExpression149); 
-            	    pushFollow(FOLLOW_inclusiveOrExpression_in_conditionalAndExpression151);
+            	    match(input,AMPAMP,FOLLOW_AMPAMP_in_conditionalAndExpression146); 
+            	    pushFollow(FOLLOW_inclusiveOrExpression_in_conditionalAndExpression148);
             	    inclusiveOrExpression();
             	    _fsp--;
 
@@ -415,17 +412,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start inclusiveOrExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:93:1: inclusiveOrExpression : exclusiveOrExpression ( '|' exclusiveOrExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:90:1: inclusiveOrExpression : exclusiveOrExpression ( '|' exclusiveOrExpression )* ;
     public final void inclusiveOrExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:94:6: ( exclusiveOrExpression ( '|' exclusiveOrExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:94:8: exclusiveOrExpression ( '|' exclusiveOrExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:91:6: ( exclusiveOrExpression ( '|' exclusiveOrExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:91:8: exclusiveOrExpression ( '|' exclusiveOrExpression )*
             {
-            pushFollow(FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression169);
+            pushFollow(FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression166);
             exclusiveOrExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:95:9: ( '|' exclusiveOrExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:92:9: ( '|' exclusiveOrExpression )*
             loop4:
             do {
                 int alt4=2;
@@ -438,10 +435,10 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt4) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:95:10: '|' exclusiveOrExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:92:10: '|' exclusiveOrExpression
             	    {
-            	    match(input,BAR,FOLLOW_BAR_in_inclusiveOrExpression180); 
-            	    pushFollow(FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression182);
+            	    match(input,BAR,FOLLOW_BAR_in_inclusiveOrExpression177); 
+            	    pushFollow(FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression179);
             	    exclusiveOrExpression();
             	    _fsp--;
 
@@ -470,17 +467,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start exclusiveOrExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:98:1: exclusiveOrExpression : andExpression ( '^' andExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:95:1: exclusiveOrExpression : andExpression ( '^' andExpression )* ;
     public final void exclusiveOrExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:99:2: ( andExpression ( '^' andExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:99:4: andExpression ( '^' andExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:96:2: ( andExpression ( '^' andExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:96:4: andExpression ( '^' andExpression )*
             {
-            pushFollow(FOLLOW_andExpression_in_exclusiveOrExpression196);
+            pushFollow(FOLLOW_andExpression_in_exclusiveOrExpression193);
             andExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:100:9: ( '^' andExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:97:9: ( '^' andExpression )*
             loop5:
             do {
                 int alt5=2;
@@ -493,10 +490,10 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt5) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:100:10: '^' andExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:97:10: '^' andExpression
             	    {
-            	    match(input,CARET,FOLLOW_CARET_in_exclusiveOrExpression207); 
-            	    pushFollow(FOLLOW_andExpression_in_exclusiveOrExpression209);
+            	    match(input,CARET,FOLLOW_CARET_in_exclusiveOrExpression204); 
+            	    pushFollow(FOLLOW_andExpression_in_exclusiveOrExpression206);
             	    andExpression();
             	    _fsp--;
 
@@ -525,17 +522,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start andExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:103:1: andExpression : equalityExpression ( '&' equalityExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:100:1: andExpression : equalityExpression ( '&' equalityExpression )* ;
     public final void andExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:104:2: ( equalityExpression ( '&' equalityExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:104:4: equalityExpression ( '&' equalityExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:101:2: ( equalityExpression ( '&' equalityExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:101:4: equalityExpression ( '&' equalityExpression )*
             {
-            pushFollow(FOLLOW_equalityExpression_in_andExpression222);
+            pushFollow(FOLLOW_equalityExpression_in_andExpression219);
             equalityExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:105:9: ( '&' equalityExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:102:9: ( '&' equalityExpression )*
             loop6:
             do {
                 int alt6=2;
@@ -548,10 +545,10 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt6) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:105:10: '&' equalityExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:102:10: '&' equalityExpression
             	    {
-            	    match(input,AMP,FOLLOW_AMP_in_andExpression233); 
-            	    pushFollow(FOLLOW_equalityExpression_in_andExpression235);
+            	    match(input,AMP,FOLLOW_AMP_in_andExpression230); 
+            	    pushFollow(FOLLOW_equalityExpression_in_andExpression232);
             	    equalityExpression();
             	    _fsp--;
 
@@ -580,17 +577,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start equalityExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:108:1: equalityExpression : instanceOfExpression ( ( '==' | '!=' ) instanceOfExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:105:1: equalityExpression : instanceOfExpression ( ( '==' | '!=' ) instanceOfExpression )* ;
     public final void equalityExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:109:6: ( instanceOfExpression ( ( '==' | '!=' ) instanceOfExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:109:8: instanceOfExpression ( ( '==' | '!=' ) instanceOfExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:106:6: ( instanceOfExpression ( ( '==' | '!=' ) instanceOfExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:106:8: instanceOfExpression ( ( '==' | '!=' ) instanceOfExpression )*
             {
-            pushFollow(FOLLOW_instanceOfExpression_in_equalityExpression253);
+            pushFollow(FOLLOW_instanceOfExpression_in_equalityExpression250);
             instanceOfExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:110:9: ( ( '==' | '!=' ) instanceOfExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:107:9: ( ( '==' | '!=' ) instanceOfExpression )*
             loop8:
             do {
                 int alt8=2;
@@ -603,9 +600,9 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt8) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:110:11: ( '==' | '!=' ) instanceOfExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:107:11: ( '==' | '!=' ) instanceOfExpression
             	    {
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:110:11: ( '==' | '!=' )
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:107:11: ( '==' | '!=' )
             	    int alt7=2;
             	    int LA7_0 = input.LA(1);
 
@@ -617,15 +614,15 @@ public class JadexJavaRulesParser extends Parser {
             	    }
             	    else {
             	        NoViableAltException nvae =
-            	            new NoViableAltException("110:11: ( '==' | '!=' )", 7, 0, input);
+            	            new NoViableAltException("107:11: ( '==' | '!=' )", 7, 0, input);
 
             	        throw nvae;
             	    }
             	    switch (alt7) {
             	        case 1 :
-            	            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:110:12: '=='
+            	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:107:12: '=='
             	            {
-            	            match(input,EQEQ,FOLLOW_EQEQ_in_equalityExpression266); 
+            	            match(input,EQEQ,FOLLOW_EQEQ_in_equalityExpression263); 
             	            
             	            		System.out.println("Found: ==");
             	                    
@@ -633,9 +630,9 @@ public class JadexJavaRulesParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:114:11: '!='
+            	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:111:11: '!='
             	            {
-            	            match(input,BANGEQ,FOLLOW_BANGEQ_in_equalityExpression282); 
+            	            match(input,BANGEQ,FOLLOW_BANGEQ_in_equalityExpression279); 
 
             	            }
             	            break;
@@ -645,7 +642,7 @@ public class JadexJavaRulesParser extends Parser {
             	    
             	    		System.out.println("Found: !=");
             	    	
-            	    pushFollow(FOLLOW_instanceOfExpression_in_equalityExpression302);
+            	    pushFollow(FOLLOW_instanceOfExpression_in_equalityExpression299);
             	    instanceOfExpression();
             	    _fsp--;
 
@@ -674,17 +671,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start instanceOfExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:122:1: instanceOfExpression : relationalExpression ( 'instanceof' type )? ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:119:1: instanceOfExpression : relationalExpression ( 'instanceof' type )? ;
     public final void instanceOfExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:123:2: ( relationalExpression ( 'instanceof' type )? )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:123:4: relationalExpression ( 'instanceof' type )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:120:2: ( relationalExpression ( 'instanceof' type )? )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:120:4: relationalExpression ( 'instanceof' type )?
             {
-            pushFollow(FOLLOW_relationalExpression_in_instanceOfExpression324);
+            pushFollow(FOLLOW_relationalExpression_in_instanceOfExpression321);
             relationalExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:124:9: ( 'instanceof' type )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:121:9: ( 'instanceof' type )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -693,10 +690,10 @@ public class JadexJavaRulesParser extends Parser {
             }
             switch (alt9) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:124:10: 'instanceof' type
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:121:10: 'instanceof' type
                     {
-                    match(input,INSTANCEOF,FOLLOW_INSTANCEOF_in_instanceOfExpression335); 
-                    pushFollow(FOLLOW_type_in_instanceOfExpression337);
+                    match(input,INSTANCEOF,FOLLOW_INSTANCEOF_in_instanceOfExpression332); 
+                    pushFollow(FOLLOW_type_in_instanceOfExpression334);
                     type();
                     _fsp--;
 
@@ -722,17 +719,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start relationalExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:127:1: relationalExpression : additiveExpression ( relationalOp additiveExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:124:1: relationalExpression : additiveExpression ( relationalOp additiveExpression )* ;
     public final void relationalExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:128:2: ( additiveExpression ( relationalOp additiveExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:128:4: additiveExpression ( relationalOp additiveExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:125:2: ( additiveExpression ( relationalOp additiveExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:125:4: additiveExpression ( relationalOp additiveExpression )*
             {
-            pushFollow(FOLLOW_additiveExpression_in_relationalExpression350);
+            pushFollow(FOLLOW_additiveExpression_in_relationalExpression347);
             additiveExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:129:9: ( relationalOp additiveExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:126:9: ( relationalOp additiveExpression )*
             loop10:
             do {
                 int alt10=2;
@@ -745,13 +742,13 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt10) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:129:10: relationalOp additiveExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:126:10: relationalOp additiveExpression
             	    {
-            	    pushFollow(FOLLOW_relationalOp_in_relationalExpression362);
+            	    pushFollow(FOLLOW_relationalOp_in_relationalExpression359);
             	    relationalOp();
             	    _fsp--;
 
-            	    pushFollow(FOLLOW_additiveExpression_in_relationalExpression364);
+            	    pushFollow(FOLLOW_additiveExpression_in_relationalExpression361);
             	    additiveExpression();
             	    _fsp--;
 
@@ -780,10 +777,10 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start relationalOp
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:133:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:130:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );
     public final void relationalOp() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:134:2: ( '<' '=' | '>' '=' | '<' | '>' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:131:2: ( '<' '=' | '>' '=' | '<' | '>' )
             int alt11=4;
             int LA11_0 = input.LA(1);
 
@@ -793,12 +790,12 @@ public class JadexJavaRulesParser extends Parser {
                 if ( (LA11_1==EQ) ) {
                     alt11=1;
                 }
-                else if ( (LA11_1==EOF||(LA11_1>=IDENTIFIER && LA11_1<=NULL)||LA11_1==BOOLEAN||LA11_1==BYTE||LA11_1==CHAR||LA11_1==DOUBLE||LA11_1==FLOAT||(LA11_1>=INSTANCEOF && LA11_1<=INT)||LA11_1==LONG||LA11_1==NEW||LA11_1==SHORT||LA11_1==SUPER||LA11_1==THIS||LA11_1==VOID||LA11_1==RPAREN||(LA11_1>=LBRACKET && LA11_1<=RBRACKET)||(LA11_1>=COMMA && LA11_1<=DOT)||(LA11_1>=QUES && LA11_1<=PERCENT)||(LA11_1>=BANGEQ && LA11_1<=LT)) ) {
+                else if ( ((LA11_1>=IDENTIFIER && LA11_1<=NULL)||LA11_1==BOOLEAN||LA11_1==BYTE||LA11_1==CHAR||LA11_1==DOUBLE||LA11_1==FLOAT||LA11_1==INT||LA11_1==LONG||LA11_1==NEW||LA11_1==SHORT||LA11_1==SUPER||LA11_1==THIS||LA11_1==VOID||(LA11_1>=PLUSPLUS && LA11_1<=SUB)) ) {
                     alt11=3;
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("133:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );", 11, 1, input);
+                        new NoViableAltException("130:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );", 11, 1, input);
 
                     throw nvae;
                 }
@@ -809,28 +806,28 @@ public class JadexJavaRulesParser extends Parser {
                 if ( (LA11_2==EQ) ) {
                     alt11=2;
                 }
-                else if ( (LA11_2==EOF||(LA11_2>=IDENTIFIER && LA11_2<=NULL)||LA11_2==BOOLEAN||LA11_2==BYTE||LA11_2==CHAR||LA11_2==DOUBLE||LA11_2==FLOAT||(LA11_2>=INSTANCEOF && LA11_2<=INT)||LA11_2==LONG||LA11_2==NEW||LA11_2==SHORT||LA11_2==SUPER||LA11_2==THIS||LA11_2==VOID||LA11_2==RPAREN||(LA11_2>=LBRACKET && LA11_2<=RBRACKET)||(LA11_2>=COMMA && LA11_2<=DOT)||(LA11_2>=QUES && LA11_2<=PERCENT)||(LA11_2>=BANGEQ && LA11_2<=LT)) ) {
+                else if ( ((LA11_2>=IDENTIFIER && LA11_2<=NULL)||LA11_2==BOOLEAN||LA11_2==BYTE||LA11_2==CHAR||LA11_2==DOUBLE||LA11_2==FLOAT||LA11_2==INT||LA11_2==LONG||LA11_2==NEW||LA11_2==SHORT||LA11_2==SUPER||LA11_2==THIS||LA11_2==VOID||(LA11_2>=PLUSPLUS && LA11_2<=SUB)) ) {
                     alt11=4;
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("133:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );", 11, 2, input);
+                        new NoViableAltException("130:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );", 11, 2, input);
 
                     throw nvae;
                 }
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("133:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );", 11, 0, input);
+                    new NoViableAltException("130:1: relationalOp : ( '<' '=' | '>' '=' | '<' | '>' );", 11, 0, input);
 
                 throw nvae;
             }
             switch (alt11) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:134:7: '<' '='
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:131:7: '<' '='
                     {
-                    match(input,LT,FOLLOW_LT_in_relationalOp391); 
-                    match(input,EQ,FOLLOW_EQ_in_relationalOp393); 
+                    match(input,LT,FOLLOW_LT_in_relationalOp388); 
+                    match(input,EQ,FOLLOW_EQ_in_relationalOp390); 
                     
                     		System.out.println("Found: <=");
                     	
@@ -838,10 +835,10 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:138:7: '>' '='
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:135:7: '>' '='
                     {
-                    match(input,GT,FOLLOW_GT_in_relationalOp404); 
-                    match(input,EQ,FOLLOW_EQ_in_relationalOp406); 
+                    match(input,GT,FOLLOW_GT_in_relationalOp401); 
+                    match(input,EQ,FOLLOW_EQ_in_relationalOp403); 
                     
                     		System.out.println("Found: >=");
                     	
@@ -849,9 +846,9 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:142:6: '<'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:139:6: '<'
                     {
-                    match(input,LT,FOLLOW_LT_in_relationalOp416); 
+                    match(input,LT,FOLLOW_LT_in_relationalOp413); 
                     
                     		System.out.println("Found: <");
                     	
@@ -859,9 +856,9 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:146:6: '>'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:143:6: '>'
                     {
-                    match(input,GT,FOLLOW_GT_in_relationalOp426); 
+                    match(input,GT,FOLLOW_GT_in_relationalOp423); 
                     
                     		System.out.println("Found: >");
                     	
@@ -883,17 +880,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start additiveExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:164:1: additiveExpression : multiplicativeExpression ( ( '+' | '-' ) multiplicativeExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:161:1: additiveExpression : multiplicativeExpression ( ( '+' | '-' ) multiplicativeExpression )* ;
     public final void additiveExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:165:2: ( multiplicativeExpression ( ( '+' | '-' ) multiplicativeExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:165:4: multiplicativeExpression ( ( '+' | '-' ) multiplicativeExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:162:2: ( multiplicativeExpression ( ( '+' | '-' ) multiplicativeExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:162:4: multiplicativeExpression ( ( '+' | '-' ) multiplicativeExpression )*
             {
-            pushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression443);
+            pushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression440);
             multiplicativeExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:166:9: ( ( '+' | '-' ) multiplicativeExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:163:9: ( ( '+' | '-' ) multiplicativeExpression )*
             loop12:
             do {
                 int alt12=2;
@@ -906,7 +903,7 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt12) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:167:13: ( '+' | '-' ) multiplicativeExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:164:13: ( '+' | '-' ) multiplicativeExpression
             	    {
             	    if ( (input.LA(1)>=PLUS && input.LA(1)<=SUB) ) {
             	        input.consume();
@@ -915,10 +912,10 @@ public class JadexJavaRulesParser extends Parser {
             	    else {
             	        MismatchedSetException mse =
             	            new MismatchedSetException(null,input);
-            	        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_additiveExpression470);    throw mse;
+            	        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_additiveExpression467);    throw mse;
             	    }
 
-            	    pushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression520);
+            	    pushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression517);
             	    multiplicativeExpression();
             	    _fsp--;
 
@@ -947,17 +944,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start multiplicativeExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:174:1: multiplicativeExpression : unaryExpression ( ( '*' | '/' | '%' ) unaryExpression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:171:1: multiplicativeExpression : unaryExpression ( ( '*' | '/' | '%' ) unaryExpression )* ;
     public final void multiplicativeExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:175:2: ( unaryExpression ( ( '*' | '/' | '%' ) unaryExpression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:175:4: unaryExpression ( ( '*' | '/' | '%' ) unaryExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:172:2: ( unaryExpression ( ( '*' | '/' | '%' ) unaryExpression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:172:4: unaryExpression ( ( '*' | '/' | '%' ) unaryExpression )*
             {
-            pushFollow(FOLLOW_unaryExpression_in_multiplicativeExpression549);
+            pushFollow(FOLLOW_unaryExpression_in_multiplicativeExpression546);
             unaryExpression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:176:9: ( ( '*' | '/' | '%' ) unaryExpression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:173:9: ( ( '*' | '/' | '%' ) unaryExpression )*
             loop13:
             do {
                 int alt13=2;
@@ -970,7 +967,7 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt13) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:177:13: ( '*' | '/' | '%' ) unaryExpression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:174:13: ( '*' | '/' | '%' ) unaryExpression
             	    {
             	    if ( (input.LA(1)>=STAR && input.LA(1)<=SLASH)||input.LA(1)==PERCENT ) {
             	        input.consume();
@@ -979,10 +976,10 @@ public class JadexJavaRulesParser extends Parser {
             	    else {
             	        MismatchedSetException mse =
             	            new MismatchedSetException(null,input);
-            	        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_multiplicativeExpression576);    throw mse;
+            	        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_multiplicativeExpression573);    throw mse;
             	    }
 
-            	    pushFollow(FOLLOW_unaryExpression_in_multiplicativeExpression644);
+            	    pushFollow(FOLLOW_unaryExpression_in_multiplicativeExpression641);
             	    unaryExpression();
             	    _fsp--;
 
@@ -1011,17 +1008,17 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start expressionList
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:189:1: expressionList : expression ( ',' expression )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:186:1: expressionList : expression ( ',' expression )* ;
     public final void expressionList() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:190:2: ( expression ( ',' expression )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:190:4: expression ( ',' expression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:187:2: ( expression ( ',' expression )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:187:4: expression ( ',' expression )*
             {
-            pushFollow(FOLLOW_expression_in_expressionList674);
+            pushFollow(FOLLOW_expression_in_expressionList671);
             expression();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:191:9: ( ',' expression )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:188:9: ( ',' expression )*
             loop14:
             do {
                 int alt14=2;
@@ -1034,10 +1031,10 @@ public class JadexJavaRulesParser extends Parser {
 
                 switch (alt14) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:191:10: ',' expression
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:188:10: ',' expression
             	    {
-            	    match(input,COMMA,FOLLOW_COMMA_in_expressionList685); 
-            	    pushFollow(FOLLOW_expression_in_expressionList687);
+            	    match(input,COMMA,FOLLOW_COMMA_in_expressionList682); 
+            	    pushFollow(FOLLOW_expression_in_expressionList684);
             	    expression();
             	    _fsp--;
 
@@ -1066,10 +1063,10 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start unaryExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:194:1: unaryExpression : ( '+' unaryExpression | '-' unaryExpression | '++' unaryExpression | '--' unaryExpression | unaryExpressionNotPlusMinus );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:191:1: unaryExpression : ( '+' unaryExpression | '-' unaryExpression | '++' unaryExpression | '--' unaryExpression | unaryExpressionNotPlusMinus );
     public final void unaryExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:199:2: ( '+' unaryExpression | '-' unaryExpression | '++' unaryExpression | '--' unaryExpression | unaryExpressionNotPlusMinus )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:196:2: ( '+' unaryExpression | '-' unaryExpression | '++' unaryExpression | '--' unaryExpression | unaryExpressionNotPlusMinus )
             int alt15=5;
             switch ( input.LA(1) ) {
             case PLUS:
@@ -1092,7 +1089,6 @@ public class JadexJavaRulesParser extends Parser {
                 alt15=4;
                 }
                 break;
-            case EOF:
             case IDENTIFIER:
             case INTLITERAL:
             case LONGLITERAL:
@@ -1108,7 +1104,6 @@ public class JadexJavaRulesParser extends Parser {
             case CHAR:
             case DOUBLE:
             case FLOAT:
-            case INSTANCEOF:
             case INT:
             case LONG:
             case NEW:
@@ -1116,42 +1111,23 @@ public class JadexJavaRulesParser extends Parser {
             case SUPER:
             case THIS:
             case VOID:
-            case RPAREN:
-            case LBRACKET:
-            case RBRACKET:
-            case COMMA:
-            case DOT:
-            case QUES:
-            case COLON:
-            case EQEQ:
-            case AMPAMP:
-            case BARBAR:
-            case STAR:
-            case SLASH:
-            case AMP:
-            case BAR:
-            case CARET:
-            case PERCENT:
-            case BANGEQ:
-            case GT:
-            case LT:
                 {
                 alt15=5;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("194:1: unaryExpression : ( '+' unaryExpression | '-' unaryExpression | '++' unaryExpression | '--' unaryExpression | unaryExpressionNotPlusMinus );", 15, 0, input);
+                    new NoViableAltException("191:1: unaryExpression : ( '+' unaryExpression | '-' unaryExpression | '++' unaryExpression | '--' unaryExpression | unaryExpressionNotPlusMinus );", 15, 0, input);
 
                 throw nvae;
             }
 
             switch (alt15) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:199:6: '+' unaryExpression
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:196:6: '+' unaryExpression
                     {
-                    match(input,PLUS,FOLLOW_PLUS_in_unaryExpression704); 
-                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression706);
+                    match(input,PLUS,FOLLOW_PLUS_in_unaryExpression701); 
+                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression703);
                     unaryExpression();
                     _fsp--;
 
@@ -1159,10 +1135,10 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:200:6: '-' unaryExpression
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:197:6: '-' unaryExpression
                     {
-                    match(input,SUB,FOLLOW_SUB_in_unaryExpression713); 
-                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression715);
+                    match(input,SUB,FOLLOW_SUB_in_unaryExpression710); 
+                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression712);
                     unaryExpression();
                     _fsp--;
 
@@ -1170,10 +1146,10 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:201:6: '++' unaryExpression
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:198:6: '++' unaryExpression
                     {
-                    match(input,PLUSPLUS,FOLLOW_PLUSPLUS_in_unaryExpression722); 
-                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression724);
+                    match(input,PLUSPLUS,FOLLOW_PLUSPLUS_in_unaryExpression719); 
+                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression721);
                     unaryExpression();
                     _fsp--;
 
@@ -1181,10 +1157,10 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:202:6: '--' unaryExpression
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:199:6: '--' unaryExpression
                     {
-                    match(input,SUBSUB,FOLLOW_SUBSUB_in_unaryExpression731); 
-                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression733);
+                    match(input,SUBSUB,FOLLOW_SUBSUB_in_unaryExpression728); 
+                    pushFollow(FOLLOW_unaryExpression_in_unaryExpression730);
                     unaryExpression();
                     _fsp--;
 
@@ -1192,9 +1168,9 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:203:6: unaryExpressionNotPlusMinus
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:200:6: unaryExpressionNotPlusMinus
                     {
-                    pushFollow(FOLLOW_unaryExpressionNotPlusMinus_in_unaryExpression740);
+                    pushFollow(FOLLOW_unaryExpressionNotPlusMinus_in_unaryExpression737);
                     unaryExpressionNotPlusMinus();
                     _fsp--;
 
@@ -1216,208 +1192,63 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start unaryExpressionNotPlusMinus
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:206:1: unaryExpressionNotPlusMinus : ( | primary ( selector )* ( '++' | '--' )? );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:203:1: unaryExpressionNotPlusMinus : primary ( selector )* ( '++' | '--' )? ;
     public final void unaryExpressionNotPlusMinus() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:207:2: ( | primary ( selector )* ( '++' | '--' )? )
-            int alt18=2;
-            switch ( input.LA(1) ) {
-            case STAR:
-            case SLASH:
-            case PERCENT:
-                {
-                alt18=1;
-                }
-                break;
-            case PLUS:
-            case SUB:
-                {
-                alt18=1;
-                }
-                break;
-            case LT:
-                {
-                alt18=1;
-                }
-                break;
-            case GT:
-                {
-                alt18=1;
-                }
-                break;
-            case INSTANCEOF:
-                {
-                alt18=1;
-                }
-                break;
-            case EQEQ:
-                {
-                alt18=1;
-                }
-                break;
-            case BANGEQ:
-                {
-                alt18=1;
-                }
-                break;
-            case AMP:
-                {
-                alt18=1;
-                }
-                break;
-            case CARET:
-                {
-                alt18=1;
-                }
-                break;
-            case BAR:
-                {
-                alt18=1;
-                }
-                break;
-            case AMPAMP:
-                {
-                alt18=1;
-                }
-                break;
-            case BARBAR:
-                {
-                alt18=1;
-                }
-                break;
-            case QUES:
-                {
-                alt18=1;
-                }
-                break;
-            case EOF:
-                {
-                alt18=1;
-                }
-                break;
-            case COLON:
-                {
-                alt18=1;
-                }
-                break;
-            case COMMA:
-                {
-                alt18=1;
-                }
-                break;
-            case RPAREN:
-                {
-                alt18=1;
-                }
-                break;
-            case RBRACKET:
-                {
-                alt18=1;
-                }
-                break;
-            case IDENTIFIER:
-            case INTLITERAL:
-            case LONGLITERAL:
-            case FLOATLITERAL:
-            case DOUBLELITERAL:
-            case CHARLITERAL:
-            case STRINGLITERAL:
-            case TRUE:
-            case FALSE:
-            case NULL:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case VOID:
-            case LBRACKET:
-            case DOT:
-            case PLUSPLUS:
-            case SUBSUB:
-                {
-                alt18=2;
-                }
-                break;
-            default:
-                NoViableAltException nvae =
-                    new NoViableAltException("206:1: unaryExpressionNotPlusMinus : ( | primary ( selector )* ( '++' | '--' )? );", 18, 0, input);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:204:2: ( primary ( selector )* ( '++' | '--' )? )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:209:2: primary ( selector )* ( '++' | '--' )?
+            {
+            pushFollow(FOLLOW_primary_in_unaryExpressionNotPlusMinus761);
+            primary();
+            _fsp--;
 
-                throw nvae;
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:210:9: ( selector )*
+            loop16:
+            do {
+                int alt16=2;
+                int LA16_0 = input.LA(1);
+
+                if ( (LA16_0==LBRACKET||LA16_0==DOT) ) {
+                    alt16=1;
+                }
+
+
+                switch (alt16) {
+            	case 1 :
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:210:10: selector
+            	    {
+            	    pushFollow(FOLLOW_selector_in_unaryExpressionNotPlusMinus772);
+            	    selector();
+            	    _fsp--;
+
+
+            	    }
+            	    break;
+
+            	default :
+            	    break loop16;
+                }
+            } while (true);
+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:211:9: ( '++' | '--' )?
+            int alt17=2;
+            int LA17_0 = input.LA(1);
+
+            if ( ((LA17_0>=PLUSPLUS && LA17_0<=SUBSUB)) ) {
+                alt17=1;
             }
-
-            switch (alt18) {
+            switch (alt17) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:211:2: 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:
                     {
+                    if ( (input.LA(1)>=PLUSPLUS && input.LA(1)<=SUBSUB) ) {
+                        input.consume();
+                        errorRecovery=false;
                     }
-                    break;
-                case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:211:4: primary ( selector )* ( '++' | '--' )?
-                    {
-                    pushFollow(FOLLOW_primary_in_unaryExpressionNotPlusMinus764);
-                    primary();
-                    _fsp--;
-
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:212:9: ( selector )*
-                    loop16:
-                    do {
-                        int alt16=2;
-                        int LA16_0 = input.LA(1);
-
-                        if ( (LA16_0==LBRACKET||LA16_0==DOT) ) {
-                            alt16=1;
-                        }
-
-
-                        switch (alt16) {
-                    	case 1 :
-                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:212:10: selector
-                    	    {
-                    	    pushFollow(FOLLOW_selector_in_unaryExpressionNotPlusMinus775);
-                    	    selector();
-                    	    _fsp--;
-
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop16;
-                        }
-                    } while (true);
-
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:213:9: ( '++' | '--' )?
-                    int alt17=2;
-                    int LA17_0 = input.LA(1);
-
-                    if ( ((LA17_0>=PLUSPLUS && LA17_0<=SUBSUB)) ) {
-                        alt17=1;
-                    }
-                    switch (alt17) {
-                        case 1 :
-                            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:
-                            {
-                            if ( (input.LA(1)>=PLUSPLUS && input.LA(1)<=SUBSUB) ) {
-                                input.consume();
-                                errorRecovery=false;
-                            }
-                            else {
-                                MismatchedSetException mse =
-                                    new MismatchedSetException(null,input);
-                                recoverFromMismatchedSet(input,mse,FOLLOW_set_in_unaryExpressionNotPlusMinus787);    throw mse;
-                            }
-
-
-                            }
-                            break;
-
+                    else {
+                        MismatchedSetException mse =
+                            new MismatchedSetException(null,input);
+                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_unaryExpressionNotPlusMinus784);    throw mse;
                     }
 
 
@@ -1425,6 +1256,10 @@ public class JadexJavaRulesParser extends Parser {
                     break;
 
             }
+
+
+            }
+
         }
         catch (RecognitionException re) {
             reportError(re);
@@ -1438,31 +1273,31 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start castExpression
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:218:1: castExpression : ( '(' primitiveType | type ')' unaryExpression );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:216:1: castExpression : ( '(' primitiveType | type ')' unaryExpression );
     public final void castExpression() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:219:2: ( '(' primitiveType | type ')' unaryExpression )
-            int alt19=2;
-            int LA19_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:217:2: ( '(' primitiveType | type ')' unaryExpression )
+            int alt18=2;
+            int LA18_0 = input.LA(1);
 
-            if ( (LA19_0==LPAREN) ) {
-                alt19=1;
+            if ( (LA18_0==LPAREN) ) {
+                alt18=1;
             }
-            else if ( (LA19_0==IDENTIFIER||LA19_0==BOOLEAN||LA19_0==BYTE||LA19_0==CHAR||LA19_0==DOUBLE||LA19_0==FLOAT||LA19_0==INT||LA19_0==LONG||LA19_0==SHORT) ) {
-                alt19=2;
+            else if ( (LA18_0==IDENTIFIER||LA18_0==BOOLEAN||LA18_0==BYTE||LA18_0==CHAR||LA18_0==DOUBLE||LA18_0==FLOAT||LA18_0==INT||LA18_0==LONG||LA18_0==SHORT) ) {
+                alt18=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("218:1: castExpression : ( '(' primitiveType | type ')' unaryExpression );", 19, 0, input);
+                    new NoViableAltException("216:1: castExpression : ( '(' primitiveType | type ')' unaryExpression );", 18, 0, input);
 
                 throw nvae;
             }
-            switch (alt19) {
+            switch (alt18) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:220:3: '(' primitiveType
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:218:3: '(' primitiveType
                     {
-                    match(input,LPAREN,FOLLOW_LPAREN_in_castExpression829); 
-                    pushFollow(FOLLOW_primitiveType_in_castExpression831);
+                    match(input,LPAREN,FOLLOW_LPAREN_in_castExpression826); 
+                    pushFollow(FOLLOW_primitiveType_in_castExpression828);
                     primitiveType();
                     _fsp--;
 
@@ -1470,14 +1305,14 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:220:23: type ')' unaryExpression
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:218:23: type ')' unaryExpression
                     {
-                    pushFollow(FOLLOW_type_in_castExpression835);
+                    pushFollow(FOLLOW_type_in_castExpression832);
                     type();
                     _fsp--;
 
-                    match(input,RPAREN,FOLLOW_RPAREN_in_castExpression837); 
-                    pushFollow(FOLLOW_unaryExpression_in_castExpression839);
+                    match(input,RPAREN,FOLLOW_RPAREN_in_castExpression834); 
+                    pushFollow(FOLLOW_unaryExpression_in_castExpression836);
                     unaryExpression();
                     _fsp--;
 
@@ -1499,25 +1334,25 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start primary
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:225:1: primary : ( 'this' ( '.' IDENTIFIER )* ( identifierSuffix )? | IDENTIFIER ( '.' IDENTIFIER )* ( identifierSuffix )? | 'super' superSuffix | literal | creator | primitiveType ( '[' ']' )* '.' 'class' | 'void' '.' 'class' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:223:1: primary : ( 'this' ( identifierSuffix )? | IDENTIFIER ( identifierSuffix )? | 'super' superSuffix | literal | creator | primitiveType ( '[' ']' )* '.' 'class' | 'void' '.' 'class' );
     public final void primary() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:229:2: ( 'this' ( '.' IDENTIFIER )* ( identifierSuffix )? | IDENTIFIER ( '.' IDENTIFIER )* ( identifierSuffix )? | 'super' superSuffix | literal | creator | primitiveType ( '[' ']' )* '.' 'class' | 'void' '.' 'class' )
-            int alt25=7;
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:227:2: ( 'this' ( identifierSuffix )? | IDENTIFIER ( identifierSuffix )? | 'super' superSuffix | literal | creator | primitiveType ( '[' ']' )* '.' 'class' | 'void' '.' 'class' )
+            int alt22=7;
             switch ( input.LA(1) ) {
             case THIS:
                 {
-                alt25=1;
+                alt22=1;
                 }
                 break;
             case IDENTIFIER:
                 {
-                alt25=2;
+                alt22=2;
                 }
                 break;
             case SUPER:
                 {
-                alt25=3;
+                alt22=3;
                 }
                 break;
             case INTLITERAL:
@@ -1530,37 +1365,12 @@ public class JadexJavaRulesParser extends Parser {
             case FALSE:
             case NULL:
                 {
-                alt25=4;
+                alt22=4;
                 }
                 break;
-            case EOF:
-            case INSTANCEOF:
             case NEW:
-            case RPAREN:
-            case LBRACKET:
-            case RBRACKET:
-            case COMMA:
-            case DOT:
-            case QUES:
-            case COLON:
-            case EQEQ:
-            case AMPAMP:
-            case BARBAR:
-            case PLUSPLUS:
-            case SUBSUB:
-            case PLUS:
-            case SUB:
-            case STAR:
-            case SLASH:
-            case AMP:
-            case BAR:
-            case CARET:
-            case PERCENT:
-            case BANGEQ:
-            case GT:
-            case LT:
                 {
-                alt25=5;
+                alt22=5;
                 }
                 break;
             case BOOLEAN:
@@ -1572,66 +1382,59 @@ public class JadexJavaRulesParser extends Parser {
             case LONG:
             case SHORT:
                 {
-                alt25=6;
+                alt22=6;
                 }
                 break;
             case VOID:
                 {
-                alt25=7;
+                alt22=7;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("225:1: primary : ( 'this' ( '.' IDENTIFIER )* ( identifierSuffix )? | IDENTIFIER ( '.' IDENTIFIER )* ( identifierSuffix )? | 'super' superSuffix | literal | creator | primitiveType ( '[' ']' )* '.' 'class' | 'void' '.' 'class' );", 25, 0, input);
+                    new NoViableAltException("223:1: primary : ( 'this' ( identifierSuffix )? | IDENTIFIER ( identifierSuffix )? | 'super' superSuffix | literal | creator | primitiveType ( '[' ']' )* '.' 'class' | 'void' '.' 'class' );", 22, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt25) {
+            switch (alt22) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:231:6: 'this' ( '.' IDENTIFIER )* ( identifierSuffix )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:229:6: 'this' ( identifierSuffix )?
                     {
-                    match(input,THIS,FOLLOW_THIS_in_primary876); 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:231:13: ( '.' IDENTIFIER )*
-                    loop20:
-                    do {
-                        int alt20=2;
-                        int LA20_0 = input.LA(1);
-
-                        if ( (LA20_0==DOT) ) {
-                            int LA20_2 = input.LA(2);
-
-                            if ( (LA20_2==IDENTIFIER) ) {
-                                alt20=1;
-                            }
-
-
-                        }
-
-
-                        switch (alt20) {
-                    	case 1 :
-                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:231:14: '.' IDENTIFIER
-                    	    {
-                    	    match(input,DOT,FOLLOW_DOT_in_primary879); 
-                    	    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_primary881); 
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop20;
-                        }
-                    } while (true);
-
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:231:31: ( identifierSuffix )?
-                    int alt21=2;
-                    alt21 = dfa21.predict(input);
-                    switch (alt21) {
-                        case 1 :
-                            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:231:32: identifierSuffix
+                    match(input,THIS,FOLLOW_THIS_in_primary873); 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:229:37: ( identifierSuffix )?
+                    int alt19=2;
+                    switch ( input.LA(1) ) {
+                        case LBRACKET:
                             {
-                            pushFollow(FOLLOW_identifierSuffix_in_primary886);
+                            int LA19_1 = input.LA(2);
+
+                            if ( (LA19_1==RBRACKET) ) {
+                                alt19=1;
+                            }
+                            }
+                            break;
+                        case LPAREN:
+                            {
+                            alt19=1;
+                            }
+                            break;
+                        case DOT:
+                            {
+                            int LA19_3 = input.LA(2);
+
+                            if ( (LA19_3==CLASS||LA19_3==THIS) ) {
+                                alt19=1;
+                            }
+                            }
+                            break;
+                    }
+
+                    switch (alt19) {
+                        case 1 :
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:229:38: identifierSuffix
+                            {
+                            pushFollow(FOLLOW_identifierSuffix_in_primary878);
                             identifierSuffix();
                             _fsp--;
 
@@ -1645,49 +1448,45 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:232:4: IDENTIFIER ( '.' IDENTIFIER )* ( identifierSuffix )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:230:4: IDENTIFIER ( identifierSuffix )?
                     {
-                    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_primary893); 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:232:15: ( '.' IDENTIFIER )*
-                    loop22:
-                    do {
-                        int alt22=2;
-                        int LA22_0 = input.LA(1);
-
-                        if ( (LA22_0==DOT) ) {
-                            int LA22_2 = input.LA(2);
-
-                            if ( (LA22_2==IDENTIFIER) ) {
-                                alt22=1;
-                            }
-
-
-                        }
-
-
-                        switch (alt22) {
-                    	case 1 :
-                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:232:16: '.' IDENTIFIER
-                    	    {
-                    	    match(input,DOT,FOLLOW_DOT_in_primary896); 
-                    	    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_primary898); 
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop22;
-                        }
-                    } while (true);
-
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:232:33: ( identifierSuffix )?
-                    int alt23=2;
-                    alt23 = dfa23.predict(input);
-                    switch (alt23) {
-                        case 1 :
-                            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:232:34: identifierSuffix
+                    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_primary885); 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:230:39: ( identifierSuffix )?
+                    int alt20=2;
+                    switch ( input.LA(1) ) {
+                        case LBRACKET:
                             {
-                            pushFollow(FOLLOW_identifierSuffix_in_primary903);
+                            int LA20_1 = input.LA(2);
+
+                            if ( (LA20_1==RBRACKET) ) {
+                                alt20=1;
+                            }
+                            }
+                            break;
+                        case LPAREN:
+                            {
+                            alt20=1;
+                            }
+                            break;
+                        case DOT:
+                            {
+                            int LA20_3 = input.LA(2);
+
+                            if ( (LA20_3==CLASS) ) {
+                                alt20=1;
+                            }
+                            else if ( (LA20_3==THIS) ) {
+                                alt20=1;
+                            }
+                            }
+                            break;
+                    }
+
+                    switch (alt20) {
+                        case 1 :
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:230:40: identifierSuffix
+                            {
+                            pushFollow(FOLLOW_identifierSuffix_in_primary890);
                             identifierSuffix();
                             _fsp--;
 
@@ -1701,10 +1500,10 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:233:4: 'super' superSuffix
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:231:4: 'super' superSuffix
                     {
-                    match(input,SUPER,FOLLOW_SUPER_in_primary910); 
-                    pushFollow(FOLLOW_superSuffix_in_primary912);
+                    match(input,SUPER,FOLLOW_SUPER_in_primary897); 
+                    pushFollow(FOLLOW_superSuffix_in_primary899);
                     superSuffix();
                     _fsp--;
 
@@ -1712,9 +1511,9 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:234:4: literal
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:232:4: literal
                     {
-                    pushFollow(FOLLOW_literal_in_primary917);
+                    pushFollow(FOLLOW_literal_in_primary904);
                     literal();
                     _fsp--;
 
@@ -1722,9 +1521,9 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:235:4: creator
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:233:4: creator
                     {
-                    pushFollow(FOLLOW_creator_in_primary922);
+                    pushFollow(FOLLOW_creator_in_primary909);
                     creator();
                     _fsp--;
 
@@ -1732,49 +1531,49 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:236:4: primitiveType ( '[' ']' )* '.' 'class'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:234:4: primitiveType ( '[' ']' )* '.' 'class'
                     {
-                    pushFollow(FOLLOW_primitiveType_in_primary927);
+                    pushFollow(FOLLOW_primitiveType_in_primary914);
                     primitiveType();
                     _fsp--;
 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:236:18: ( '[' ']' )*
-                    loop24:
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:234:18: ( '[' ']' )*
+                    loop21:
                     do {
-                        int alt24=2;
-                        int LA24_0 = input.LA(1);
+                        int alt21=2;
+                        int LA21_0 = input.LA(1);
 
-                        if ( (LA24_0==LBRACKET) ) {
-                            alt24=1;
+                        if ( (LA21_0==LBRACKET) ) {
+                            alt21=1;
                         }
 
 
-                        switch (alt24) {
+                        switch (alt21) {
                     	case 1 :
-                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:236:19: '[' ']'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:234:19: '[' ']'
                     	    {
-                    	    match(input,LBRACKET,FOLLOW_LBRACKET_in_primary930); 
-                    	    match(input,RBRACKET,FOLLOW_RBRACKET_in_primary932); 
+                    	    match(input,LBRACKET,FOLLOW_LBRACKET_in_primary917); 
+                    	    match(input,RBRACKET,FOLLOW_RBRACKET_in_primary919); 
 
                     	    }
                     	    break;
 
                     	default :
-                    	    break loop24;
+                    	    break loop21;
                         }
                     } while (true);
 
-                    match(input,DOT,FOLLOW_DOT_in_primary936); 
-                    match(input,CLASS,FOLLOW_CLASS_in_primary938); 
+                    match(input,DOT,FOLLOW_DOT_in_primary923); 
+                    match(input,CLASS,FOLLOW_CLASS_in_primary925); 
 
                     }
                     break;
                 case 7 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:237:4: 'void' '.' 'class'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:235:4: 'void' '.' 'class'
                     {
-                    match(input,VOID,FOLLOW_VOID_in_primary943); 
-                    match(input,DOT,FOLLOW_DOT_in_primary945); 
-                    match(input,CLASS,FOLLOW_CLASS_in_primary947); 
+                    match(input,VOID,FOLLOW_VOID_in_primary930); 
+                    match(input,DOT,FOLLOW_DOT_in_primary932); 
+                    match(input,CLASS,FOLLOW_CLASS_in_primary934); 
 
                     }
                     break;
@@ -1793,30 +1592,30 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start superSuffix
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:241:1: superSuffix : ( arguments | '.' ( typeArguments )? IDENTIFIER ( arguments )? );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:239:1: superSuffix : ( arguments | '.' ( typeArguments )? IDENTIFIER ( arguments )? );
     public final void superSuffix() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:242:2: ( arguments | '.' ( typeArguments )? IDENTIFIER ( arguments )? )
-            int alt28=2;
-            int LA28_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:240:2: ( arguments | '.' ( typeArguments )? IDENTIFIER ( arguments )? )
+            int alt25=2;
+            int LA25_0 = input.LA(1);
 
-            if ( (LA28_0==LPAREN) ) {
-                alt28=1;
+            if ( (LA25_0==LPAREN) ) {
+                alt25=1;
             }
-            else if ( (LA28_0==DOT) ) {
-                alt28=2;
+            else if ( (LA25_0==DOT) ) {
+                alt25=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("241:1: superSuffix : ( arguments | '.' ( typeArguments )? IDENTIFIER ( arguments )? );", 28, 0, input);
+                    new NoViableAltException("239:1: superSuffix : ( arguments | '.' ( typeArguments )? IDENTIFIER ( arguments )? );", 25, 0, input);
 
                 throw nvae;
             }
-            switch (alt28) {
+            switch (alt25) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:242:4: arguments
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:240:4: arguments
                     {
-                    pushFollow(FOLLOW_arguments_in_superSuffix964);
+                    pushFollow(FOLLOW_arguments_in_superSuffix951);
                     arguments();
                     _fsp--;
 
@@ -1824,21 +1623,21 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:243:4: '.' ( typeArguments )? IDENTIFIER ( arguments )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:241:4: '.' ( typeArguments )? IDENTIFIER ( arguments )?
                     {
-                    match(input,DOT,FOLLOW_DOT_in_superSuffix969); 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:243:8: ( typeArguments )?
-                    int alt26=2;
-                    int LA26_0 = input.LA(1);
+                    match(input,DOT,FOLLOW_DOT_in_superSuffix956); 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:241:8: ( typeArguments )?
+                    int alt23=2;
+                    int LA23_0 = input.LA(1);
 
-                    if ( (LA26_0==LT) ) {
-                        alt26=1;
+                    if ( (LA23_0==LT) ) {
+                        alt23=1;
                     }
-                    switch (alt26) {
+                    switch (alt23) {
                         case 1 :
-                            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:243:9: typeArguments
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:241:9: typeArguments
                             {
-                            pushFollow(FOLLOW_typeArguments_in_superSuffix972);
+                            pushFollow(FOLLOW_typeArguments_in_superSuffix959);
                             typeArguments();
                             _fsp--;
 
@@ -1848,19 +1647,19 @@ public class JadexJavaRulesParser extends Parser {
 
                     }
 
-                    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_superSuffix976); 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:243:36: ( arguments )?
-                    int alt27=2;
-                    int LA27_0 = input.LA(1);
+                    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_superSuffix963); 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:241:36: ( arguments )?
+                    int alt24=2;
+                    int LA24_0 = input.LA(1);
 
-                    if ( (LA27_0==LPAREN) ) {
-                        alt27=1;
+                    if ( (LA24_0==LPAREN) ) {
+                        alt24=1;
                     }
-                    switch (alt27) {
+                    switch (alt24) {
                         case 1 :
-                            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:243:37: arguments
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:241:37: arguments
                             {
-                            pushFollow(FOLLOW_arguments_in_superSuffix979);
+                            pushFollow(FOLLOW_arguments_in_superSuffix966);
                             arguments();
                             _fsp--;
 
@@ -1888,35 +1687,35 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start identifierSuffix
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:246:1: identifierSuffix : ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:244:1: identifierSuffix : ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' );
     public final void identifierSuffix() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:247:2: ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' )
-            int alt30=4;
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:245:2: ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' )
+            int alt27=4;
             switch ( input.LA(1) ) {
             case LBRACKET:
                 {
-                alt30=1;
+                alt27=1;
                 }
                 break;
             case LPAREN:
                 {
-                alt30=2;
+                alt27=2;
                 }
                 break;
             case DOT:
                 {
-                int LA30_3 = input.LA(2);
+                int LA27_3 = input.LA(2);
 
-                if ( (LA30_3==CLASS) ) {
-                    alt30=3;
+                if ( (LA27_3==THIS) ) {
+                    alt27=4;
                 }
-                else if ( (LA30_3==THIS) ) {
-                    alt30=4;
+                else if ( (LA27_3==CLASS) ) {
+                    alt27=3;
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("246:1: identifierSuffix : ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' );", 30, 3, input);
+                        new NoViableAltException("244:1: identifierSuffix : ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' );", 27, 3, input);
 
                     throw nvae;
                 }
@@ -1924,55 +1723,55 @@ public class JadexJavaRulesParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("246:1: identifierSuffix : ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' );", 30, 0, input);
+                    new NoViableAltException("244:1: identifierSuffix : ( ( '[' ']' )+ '.' 'class' | arguments | '.' 'class' | '.' 'this' );", 27, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt30) {
+            switch (alt27) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:247:4: ( '[' ']' )+ '.' 'class'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:245:4: ( '[' ']' )+ '.' 'class'
                     {
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:247:4: ( '[' ']' )+
-                    int cnt29=0;
-                    loop29:
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:245:4: ( '[' ']' )+
+                    int cnt26=0;
+                    loop26:
                     do {
-                        int alt29=2;
-                        int LA29_0 = input.LA(1);
+                        int alt26=2;
+                        int LA26_0 = input.LA(1);
 
-                        if ( (LA29_0==LBRACKET) ) {
-                            alt29=1;
+                        if ( (LA26_0==LBRACKET) ) {
+                            alt26=1;
                         }
 
 
-                        switch (alt29) {
+                        switch (alt26) {
                     	case 1 :
-                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:247:5: '[' ']'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:245:5: '[' ']'
                     	    {
-                    	    match(input,LBRACKET,FOLLOW_LBRACKET_in_identifierSuffix993); 
-                    	    match(input,RBRACKET,FOLLOW_RBRACKET_in_identifierSuffix995); 
+                    	    match(input,LBRACKET,FOLLOW_LBRACKET_in_identifierSuffix980); 
+                    	    match(input,RBRACKET,FOLLOW_RBRACKET_in_identifierSuffix982); 
 
                     	    }
                     	    break;
 
                     	default :
-                    	    if ( cnt29 >= 1 ) break loop29;
+                    	    if ( cnt26 >= 1 ) break loop26;
                                 EarlyExitException eee =
-                                    new EarlyExitException(29, input);
+                                    new EarlyExitException(26, input);
                                 throw eee;
                         }
-                        cnt29++;
+                        cnt26++;
                     } while (true);
 
-                    match(input,DOT,FOLLOW_DOT_in_identifierSuffix1007); 
-                    match(input,CLASS,FOLLOW_CLASS_in_identifierSuffix1009); 
+                    match(input,DOT,FOLLOW_DOT_in_identifierSuffix994); 
+                    match(input,CLASS,FOLLOW_CLASS_in_identifierSuffix996); 
 
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:250:4: arguments
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:248:4: arguments
                     {
-                    pushFollow(FOLLOW_arguments_in_identifierSuffix1016);
+                    pushFollow(FOLLOW_arguments_in_identifierSuffix1003);
                     arguments();
                     _fsp--;
 
@@ -1980,18 +1779,18 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:251:4: '.' 'class'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:249:4: '.' 'class'
                     {
-                    match(input,DOT,FOLLOW_DOT_in_identifierSuffix1021); 
-                    match(input,CLASS,FOLLOW_CLASS_in_identifierSuffix1023); 
+                    match(input,DOT,FOLLOW_DOT_in_identifierSuffix1008); 
+                    match(input,CLASS,FOLLOW_CLASS_in_identifierSuffix1010); 
 
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:253:4: '.' 'this'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:251:4: '.' 'this'
                     {
-                    match(input,DOT,FOLLOW_DOT_in_identifierSuffix1030); 
-                    match(input,THIS,FOLLOW_THIS_in_identifierSuffix1032); 
+                    match(input,DOT,FOLLOW_DOT_in_identifierSuffix1017); 
+                    match(input,THIS,FOLLOW_THIS_in_identifierSuffix1019); 
 
                     }
                     break;
@@ -2010,65 +1809,65 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start selector
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:259:1: selector : ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:257:1: selector : ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' );
     public final void selector() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:260:2: ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' )
-            int alt32=4;
-            int LA32_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:258:2: ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' )
+            int alt29=4;
+            int LA29_0 = input.LA(1);
 
-            if ( (LA32_0==DOT) ) {
+            if ( (LA29_0==DOT) ) {
                 switch ( input.LA(2) ) {
                 case THIS:
                     {
-                    alt32=2;
-                    }
-                    break;
-                case SUPER:
-                    {
-                    alt32=3;
+                    alt29=2;
                     }
                     break;
                 case IDENTIFIER:
                     {
-                    alt32=1;
+                    alt29=1;
+                    }
+                    break;
+                case SUPER:
+                    {
+                    alt29=3;
                     }
                     break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("259:1: selector : ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' );", 32, 1, input);
+                        new NoViableAltException("257:1: selector : ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' );", 29, 1, input);
 
                     throw nvae;
                 }
 
             }
-            else if ( (LA32_0==LBRACKET) ) {
-                alt32=4;
+            else if ( (LA29_0==LBRACKET) ) {
+                alt29=4;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("259:1: selector : ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' );", 32, 0, input);
+                    new NoViableAltException("257:1: selector : ( '.' IDENTIFIER ( arguments )? | '.' 'this' | '.' 'super' superSuffix | '[' expression ']' );", 29, 0, input);
 
                 throw nvae;
             }
-            switch (alt32) {
+            switch (alt29) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:260:4: '.' IDENTIFIER ( arguments )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:258:4: '.' IDENTIFIER ( arguments )?
                     {
-                    match(input,DOT,FOLLOW_DOT_in_selector1048); 
-                    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_selector1050); 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:260:19: ( arguments )?
-                    int alt31=2;
-                    int LA31_0 = input.LA(1);
+                    match(input,DOT,FOLLOW_DOT_in_selector1035); 
+                    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_selector1037); 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:258:19: ( arguments )?
+                    int alt28=2;
+                    int LA28_0 = input.LA(1);
 
-                    if ( (LA31_0==LPAREN) ) {
-                        alt31=1;
+                    if ( (LA28_0==LPAREN) ) {
+                        alt28=1;
                     }
-                    switch (alt31) {
+                    switch (alt28) {
                         case 1 :
-                            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:260:20: arguments
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:258:20: arguments
                             {
-                            pushFollow(FOLLOW_arguments_in_selector1053);
+                            pushFollow(FOLLOW_arguments_in_selector1040);
                             arguments();
                             _fsp--;
 
@@ -2082,19 +1881,19 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:261:4: '.' 'this'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:259:4: '.' 'this'
                     {
-                    match(input,DOT,FOLLOW_DOT_in_selector1060); 
-                    match(input,THIS,FOLLOW_THIS_in_selector1062); 
+                    match(input,DOT,FOLLOW_DOT_in_selector1047); 
+                    match(input,THIS,FOLLOW_THIS_in_selector1049); 
 
                     }
                     break;
                 case 3 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:262:4: '.' 'super' superSuffix
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:260:4: '.' 'super' superSuffix
                     {
-                    match(input,DOT,FOLLOW_DOT_in_selector1067); 
-                    match(input,SUPER,FOLLOW_SUPER_in_selector1069); 
-                    pushFollow(FOLLOW_superSuffix_in_selector1071);
+                    match(input,DOT,FOLLOW_DOT_in_selector1054); 
+                    match(input,SUPER,FOLLOW_SUPER_in_selector1056); 
+                    pushFollow(FOLLOW_superSuffix_in_selector1058);
                     superSuffix();
                     _fsp--;
 
@@ -2102,14 +1901,14 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:264:4: '[' expression ']'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:262:4: '[' expression ']'
                     {
-                    match(input,LBRACKET,FOLLOW_LBRACKET_in_selector1078); 
-                    pushFollow(FOLLOW_expression_in_selector1080);
+                    match(input,LBRACKET,FOLLOW_LBRACKET_in_selector1065); 
+                    pushFollow(FOLLOW_expression_in_selector1067);
                     expression();
                     _fsp--;
 
-                    match(input,RBRACKET,FOLLOW_RBRACKET_in_selector1082); 
+                    match(input,RBRACKET,FOLLOW_RBRACKET_in_selector1069); 
 
                     }
                     break;
@@ -2128,48 +1927,24 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start creator
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:267:1: creator : ( | 'new' classOrInterfaceType classCreatorRest );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:265:1: creator : 'new' classOrInterfaceType classCreatorRest ;
     public final void creator() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:268:2: ( | 'new' classOrInterfaceType classCreatorRest )
-            int alt33=2;
-            int LA33_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:266:2: ( 'new' classOrInterfaceType classCreatorRest )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:268:2: 'new' classOrInterfaceType classCreatorRest
+            {
+            match(input,NEW,FOLLOW_NEW_in_creator1087); 
+            pushFollow(FOLLOW_classOrInterfaceType_in_creator1089);
+            classOrInterfaceType();
+            _fsp--;
 
-            if ( (LA33_0==EOF||LA33_0==INSTANCEOF||LA33_0==RPAREN||(LA33_0>=LBRACKET && LA33_0<=RBRACKET)||(LA33_0>=COMMA && LA33_0<=DOT)||(LA33_0>=QUES && LA33_0<=PERCENT)||(LA33_0>=BANGEQ && LA33_0<=LT)) ) {
-                alt33=1;
-            }
-            else if ( (LA33_0==NEW) ) {
-                alt33=2;
-            }
-            else {
-                NoViableAltException nvae =
-                    new NoViableAltException("267:1: creator : ( | 'new' classOrInterfaceType classCreatorRest );", 33, 0, input);
+            pushFollow(FOLLOW_classCreatorRest_in_creator1091);
+            classCreatorRest();
+            _fsp--;
 
-                throw nvae;
-            }
-            switch (alt33) {
-                case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:269:2: 
-                    {
-                    }
-                    break;
-                case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:269:6: 'new' classOrInterfaceType classCreatorRest
-                    {
-                    match(input,NEW,FOLLOW_NEW_in_creator1102); 
-                    pushFollow(FOLLOW_classOrInterfaceType_in_creator1104);
-                    classOrInterfaceType();
-                    _fsp--;
-
-                    pushFollow(FOLLOW_classCreatorRest_in_creator1106);
-                    classCreatorRest();
-                    _fsp--;
-
-
-                    }
-                    break;
 
             }
+
         }
         catch (RecognitionException re) {
             reportError(re);
@@ -2183,33 +1958,33 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start typeList
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:274:1: typeList : type ( ',' type )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:273:1: typeList : type ( ',' type )* ;
     public final void typeList() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:275:2: ( type ( ',' type )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:275:4: type ( ',' type )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:274:2: ( type ( ',' type )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:274:4: type ( ',' type )*
             {
-            pushFollow(FOLLOW_type_in_typeList1121);
+            pushFollow(FOLLOW_type_in_typeList1106);
             type();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:275:9: ( ',' type )*
-            loop34:
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:274:9: ( ',' type )*
+            loop30:
             do {
-                int alt34=2;
-                int LA34_0 = input.LA(1);
+                int alt30=2;
+                int LA30_0 = input.LA(1);
 
-                if ( (LA34_0==COMMA) ) {
-                    alt34=1;
+                if ( (LA30_0==COMMA) ) {
+                    alt30=1;
                 }
 
 
-                switch (alt34) {
+                switch (alt30) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:275:10: ',' type
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:274:10: ',' type
             	    {
-            	    match(input,COMMA,FOLLOW_COMMA_in_typeList1124); 
-            	    pushFollow(FOLLOW_type_in_typeList1126);
+            	    match(input,COMMA,FOLLOW_COMMA_in_typeList1109); 
+            	    pushFollow(FOLLOW_type_in_typeList1111);
             	    type();
             	    _fsp--;
 
@@ -2218,7 +1993,7 @@ public class JadexJavaRulesParser extends Parser {
             	    break;
 
             	default :
-            	    break loop34;
+            	    break loop30;
                 }
             } while (true);
 
@@ -2238,13 +2013,13 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start classCreatorRest
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:278:1: classCreatorRest : arguments ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:277:1: classCreatorRest : arguments ;
     public final void classCreatorRest() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:279:2: ( arguments )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:279:4: arguments
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:278:2: ( arguments )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:278:4: arguments
             {
-            pushFollow(FOLLOW_arguments_in_classCreatorRest1141);
+            pushFollow(FOLLOW_arguments_in_classCreatorRest1126);
             arguments();
             _fsp--;
 
@@ -2264,13 +2039,13 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start variableInitializer
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:301:1: variableInitializer : expression ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:300:1: variableInitializer : expression ;
     public final void variableInitializer() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:302:2: ( expression )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:304:2: expression
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:301:2: ( expression )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:303:2: expression
             {
-            pushFollow(FOLLOW_expression_in_variableInitializer1180);
+            pushFollow(FOLLOW_expression_in_variableInitializer1165);
             expression();
             _fsp--;
 
@@ -2290,30 +2065,30 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start createdName
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:318:1: createdName : ( classOrInterfaceType | primitiveType );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:317:1: createdName : ( classOrInterfaceType | primitiveType );
     public final void createdName() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:319:2: ( classOrInterfaceType | primitiveType )
-            int alt35=2;
-            int LA35_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:318:2: ( classOrInterfaceType | primitiveType )
+            int alt31=2;
+            int LA31_0 = input.LA(1);
 
-            if ( (LA35_0==IDENTIFIER) ) {
-                alt35=1;
+            if ( (LA31_0==IDENTIFIER) ) {
+                alt31=1;
             }
-            else if ( (LA35_0==BOOLEAN||LA35_0==BYTE||LA35_0==CHAR||LA35_0==DOUBLE||LA35_0==FLOAT||LA35_0==INT||LA35_0==LONG||LA35_0==SHORT) ) {
-                alt35=2;
+            else if ( (LA31_0==BOOLEAN||LA31_0==BYTE||LA31_0==CHAR||LA31_0==DOUBLE||LA31_0==FLOAT||LA31_0==INT||LA31_0==LONG||LA31_0==SHORT) ) {
+                alt31=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("318:1: createdName : ( classOrInterfaceType | primitiveType );", 35, 0, input);
+                    new NoViableAltException("317:1: createdName : ( classOrInterfaceType | primitiveType );", 31, 0, input);
 
                 throw nvae;
             }
-            switch (alt35) {
+            switch (alt31) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:319:4: classOrInterfaceType
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:318:4: classOrInterfaceType
                     {
-                    pushFollow(FOLLOW_classOrInterfaceType_in_createdName1196);
+                    pushFollow(FOLLOW_classOrInterfaceType_in_createdName1181);
                     classOrInterfaceType();
                     _fsp--;
 
@@ -2321,9 +2096,9 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:320:4: primitiveType
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:319:4: primitiveType
                     {
-                    pushFollow(FOLLOW_primitiveType_in_createdName1201);
+                    pushFollow(FOLLOW_primitiveType_in_createdName1186);
                     primitiveType();
                     _fsp--;
 
@@ -2345,28 +2120,25 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start arguments
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:346:1: arguments : '(' ( expressionList )? ')' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:345:1: arguments : '(' ( expressionList )? ')' ;
     public final void arguments() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:347:2: ( '(' ( expressionList )? ')' )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:347:4: '(' ( expressionList )? ')'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:346:2: ( '(' ( expressionList )? ')' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:346:4: '(' ( expressionList )? ')'
             {
-            match(input,LPAREN,FOLLOW_LPAREN_in_arguments1224); 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:347:8: ( expressionList )?
-            int alt36=2;
-            int LA36_0 = input.LA(1);
+            match(input,LPAREN,FOLLOW_LPAREN_in_arguments1209); 
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:346:8: ( expressionList )?
+            int alt32=2;
+            int LA32_0 = input.LA(1);
 
-            if ( (LA36_0==INSTANCEOF||LA36_0==COMMA||LA36_0==QUES||(LA36_0>=EQEQ && LA36_0<=PERCENT)||(LA36_0>=BANGEQ && LA36_0<=LT)) ) {
-                alt36=1;
+            if ( ((LA32_0>=IDENTIFIER && LA32_0<=NULL)||LA32_0==BOOLEAN||LA32_0==BYTE||LA32_0==CHAR||LA32_0==DOUBLE||LA32_0==FLOAT||LA32_0==INT||LA32_0==LONG||LA32_0==NEW||LA32_0==SHORT||LA32_0==SUPER||LA32_0==THIS||LA32_0==VOID||(LA32_0>=PLUSPLUS && LA32_0<=SUB)) ) {
+                alt32=1;
             }
-            else if ( ((LA36_0>=IDENTIFIER && LA36_0<=NULL)||LA36_0==BOOLEAN||LA36_0==BYTE||LA36_0==CHAR||LA36_0==DOUBLE||LA36_0==FLOAT||LA36_0==INT||LA36_0==LONG||LA36_0==NEW||LA36_0==SHORT||LA36_0==SUPER||LA36_0==THIS||LA36_0==VOID||LA36_0==RPAREN||LA36_0==LBRACKET||LA36_0==DOT) ) {
-                alt36=1;
-            }
-            switch (alt36) {
+            switch (alt32) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:347:9: expressionList
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:346:9: expressionList
                     {
-                    pushFollow(FOLLOW_expressionList_in_arguments1227);
+                    pushFollow(FOLLOW_expressionList_in_arguments1212);
                     expressionList();
                     _fsp--;
 
@@ -2376,7 +2148,7 @@ public class JadexJavaRulesParser extends Parser {
 
             }
 
-            match(input,RPAREN,FOLLOW_RPAREN_in_arguments1231); 
+            match(input,RPAREN,FOLLOW_RPAREN_in_arguments1216); 
 
             }
 
@@ -2393,47 +2165,83 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start type
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:350:1: type : ( classOrInterfaceType ( '[' ']' )* | primitiveType ( '[' ']' )* );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:349:1: type : ( classOrInterfaceType ( '[' ']' )* | primitiveType ( '[' ']' )* );
     public final void type() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:351:2: ( classOrInterfaceType ( '[' ']' )* | primitiveType ( '[' ']' )* )
-            int alt39=2;
-            int LA39_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:350:2: ( classOrInterfaceType ( '[' ']' )* | primitiveType ( '[' ']' )* )
+            int alt35=2;
+            int LA35_0 = input.LA(1);
 
-            if ( (LA39_0==IDENTIFIER) ) {
-                alt39=1;
+            if ( (LA35_0==IDENTIFIER) ) {
+                alt35=1;
             }
-            else if ( (LA39_0==BOOLEAN||LA39_0==BYTE||LA39_0==CHAR||LA39_0==DOUBLE||LA39_0==FLOAT||LA39_0==INT||LA39_0==LONG||LA39_0==SHORT) ) {
-                alt39=2;
+            else if ( (LA35_0==BOOLEAN||LA35_0==BYTE||LA35_0==CHAR||LA35_0==DOUBLE||LA35_0==FLOAT||LA35_0==INT||LA35_0==LONG||LA35_0==SHORT) ) {
+                alt35=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("350:1: type : ( classOrInterfaceType ( '[' ']' )* | primitiveType ( '[' ']' )* );", 39, 0, input);
+                    new NoViableAltException("349:1: type : ( classOrInterfaceType ( '[' ']' )* | primitiveType ( '[' ']' )* );", 35, 0, input);
 
                 throw nvae;
             }
-            switch (alt39) {
+            switch (alt35) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:351:4: classOrInterfaceType ( '[' ']' )*
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:350:4: classOrInterfaceType ( '[' ']' )*
                     {
-                    pushFollow(FOLLOW_classOrInterfaceType_in_type1243);
+                    pushFollow(FOLLOW_classOrInterfaceType_in_type1228);
                     classOrInterfaceType();
                     _fsp--;
 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:351:25: ( '[' ']' )*
-                    loop37:
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:350:25: ( '[' ']' )*
+                    loop33:
                     do {
-                        int alt37=2;
-                        int LA37_0 = input.LA(1);
+                        int alt33=2;
+                        int LA33_0 = input.LA(1);
 
-                        if ( (LA37_0==LBRACKET) ) {
-                            alt37=1;
+                        if ( (LA33_0==LBRACKET) ) {
+                            alt33=1;
                         }
 
 
-                        switch (alt37) {
+                        switch (alt33) {
                     	case 1 :
-                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:351:26: '[' ']'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:350:26: '[' ']'
+                    	    {
+                    	    match(input,LBRACKET,FOLLOW_LBRACKET_in_type1231); 
+                    	    match(input,RBRACKET,FOLLOW_RBRACKET_in_type1233); 
+
+                    	    }
+                    	    break;
+
+                    	default :
+                    	    break loop33;
+                        }
+                    } while (true);
+
+
+                    }
+                    break;
+                case 2 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:351:6: primitiveType ( '[' ']' )*
+                    {
+                    pushFollow(FOLLOW_primitiveType_in_type1243);
+                    primitiveType();
+                    _fsp--;
+
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:351:20: ( '[' ']' )*
+                    loop34:
+                    do {
+                        int alt34=2;
+                        int LA34_0 = input.LA(1);
+
+                        if ( (LA34_0==LBRACKET) ) {
+                            alt34=1;
+                        }
+
+
+                        switch (alt34) {
+                    	case 1 :
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:351:21: '[' ']'
                     	    {
                     	    match(input,LBRACKET,FOLLOW_LBRACKET_in_type1246); 
                     	    match(input,RBRACKET,FOLLOW_RBRACKET_in_type1248); 
@@ -2442,43 +2250,7 @@ public class JadexJavaRulesParser extends Parser {
                     	    break;
 
                     	default :
-                    	    break loop37;
-                        }
-                    } while (true);
-
-
-                    }
-                    break;
-                case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:352:6: primitiveType ( '[' ']' )*
-                    {
-                    pushFollow(FOLLOW_primitiveType_in_type1258);
-                    primitiveType();
-                    _fsp--;
-
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:352:20: ( '[' ']' )*
-                    loop38:
-                    do {
-                        int alt38=2;
-                        int LA38_0 = input.LA(1);
-
-                        if ( (LA38_0==LBRACKET) ) {
-                            alt38=1;
-                        }
-
-
-                        switch (alt38) {
-                    	case 1 :
-                    	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:352:21: '[' ']'
-                    	    {
-                    	    match(input,LBRACKET,FOLLOW_LBRACKET_in_type1261); 
-                    	    match(input,RBRACKET,FOLLOW_RBRACKET_in_type1263); 
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop38;
+                    	    break loop34;
                         }
                     } while (true);
 
@@ -2500,25 +2272,25 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start classOrInterfaceType
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:1: classOrInterfaceType : IDENTIFIER ( typeArguments )? ( '.' IDENTIFIER ( typeArguments )? )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:355:1: classOrInterfaceType : IDENTIFIER ( typeArguments )? ( '.' IDENTIFIER ( typeArguments )? )* ;
     public final void classOrInterfaceType() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:2: ( IDENTIFIER ( typeArguments )? ( '.' IDENTIFIER ( typeArguments )? )* )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:4: IDENTIFIER ( typeArguments )? ( '.' IDENTIFIER ( typeArguments )? )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:2: ( IDENTIFIER ( typeArguments )? ( '.' IDENTIFIER ( typeArguments )? )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:4: IDENTIFIER ( typeArguments )? ( '.' IDENTIFIER ( typeArguments )? )*
             {
-            match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_classOrInterfaceType1278); 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:15: ( typeArguments )?
-            int alt40=2;
-            int LA40_0 = input.LA(1);
+            match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_classOrInterfaceType1263); 
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:15: ( typeArguments )?
+            int alt36=2;
+            int LA36_0 = input.LA(1);
 
-            if ( (LA40_0==LT) ) {
-                alt40=1;
+            if ( (LA36_0==LT) ) {
+                alt36=1;
             }
-            switch (alt40) {
+            switch (alt36) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:16: typeArguments
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:16: typeArguments
                     {
-                    pushFollow(FOLLOW_typeArguments_in_classOrInterfaceType1281);
+                    pushFollow(FOLLOW_typeArguments_in_classOrInterfaceType1266);
                     typeArguments();
                     _fsp--;
 
@@ -2528,35 +2300,35 @@ public class JadexJavaRulesParser extends Parser {
 
             }
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:32: ( '.' IDENTIFIER ( typeArguments )? )*
-            loop42:
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:32: ( '.' IDENTIFIER ( typeArguments )? )*
+            loop38:
             do {
-                int alt42=2;
-                int LA42_0 = input.LA(1);
+                int alt38=2;
+                int LA38_0 = input.LA(1);
 
-                if ( (LA42_0==DOT) ) {
-                    alt42=1;
+                if ( (LA38_0==DOT) ) {
+                    alt38=1;
                 }
 
 
-                switch (alt42) {
+                switch (alt38) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:33: '.' IDENTIFIER ( typeArguments )?
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:33: '.' IDENTIFIER ( typeArguments )?
             	    {
-            	    match(input,DOT,FOLLOW_DOT_in_classOrInterfaceType1286); 
-            	    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_classOrInterfaceType1288); 
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:48: ( typeArguments )?
-            	    int alt41=2;
-            	    int LA41_0 = input.LA(1);
+            	    match(input,DOT,FOLLOW_DOT_in_classOrInterfaceType1271); 
+            	    match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_classOrInterfaceType1273); 
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:48: ( typeArguments )?
+            	    int alt37=2;
+            	    int LA37_0 = input.LA(1);
 
-            	    if ( (LA41_0==LT) ) {
-            	        alt41=1;
+            	    if ( (LA37_0==LT) ) {
+            	        alt37=1;
             	    }
-            	    switch (alt41) {
+            	    switch (alt37) {
             	        case 1 :
-            	            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:357:49: typeArguments
+            	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:356:49: typeArguments
             	            {
-            	            pushFollow(FOLLOW_typeArguments_in_classOrInterfaceType1291);
+            	            pushFollow(FOLLOW_typeArguments_in_classOrInterfaceType1276);
             	            typeArguments();
             	            _fsp--;
 
@@ -2571,7 +2343,7 @@ public class JadexJavaRulesParser extends Parser {
             	    break;
 
             	default :
-            	    break loop42;
+            	    break loop38;
                 }
             } while (true);
 
@@ -2591,34 +2363,34 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start typeArguments
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:360:1: typeArguments : '<' typeArgument ( ',' typeArgument )* '>' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:359:1: typeArguments : '<' typeArgument ( ',' typeArgument )* '>' ;
     public final void typeArguments() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:361:2: ( '<' typeArgument ( ',' typeArgument )* '>' )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:361:4: '<' typeArgument ( ',' typeArgument )* '>'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:360:2: ( '<' typeArgument ( ',' typeArgument )* '>' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:360:4: '<' typeArgument ( ',' typeArgument )* '>'
             {
-            match(input,LT,FOLLOW_LT_in_typeArguments1307); 
-            pushFollow(FOLLOW_typeArgument_in_typeArguments1309);
+            match(input,LT,FOLLOW_LT_in_typeArguments1292); 
+            pushFollow(FOLLOW_typeArgument_in_typeArguments1294);
             typeArgument();
             _fsp--;
 
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:361:21: ( ',' typeArgument )*
-            loop43:
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:360:21: ( ',' typeArgument )*
+            loop39:
             do {
-                int alt43=2;
-                int LA43_0 = input.LA(1);
+                int alt39=2;
+                int LA39_0 = input.LA(1);
 
-                if ( (LA43_0==COMMA) ) {
-                    alt43=1;
+                if ( (LA39_0==COMMA) ) {
+                    alt39=1;
                 }
 
 
-                switch (alt43) {
+                switch (alt39) {
             	case 1 :
-            	    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:361:22: ',' typeArgument
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:360:22: ',' typeArgument
             	    {
-            	    match(input,COMMA,FOLLOW_COMMA_in_typeArguments1312); 
-            	    pushFollow(FOLLOW_typeArgument_in_typeArguments1314);
+            	    match(input,COMMA,FOLLOW_COMMA_in_typeArguments1297); 
+            	    pushFollow(FOLLOW_typeArgument_in_typeArguments1299);
             	    typeArgument();
             	    _fsp--;
 
@@ -2627,11 +2399,11 @@ public class JadexJavaRulesParser extends Parser {
             	    break;
 
             	default :
-            	    break loop43;
+            	    break loop39;
                 }
             } while (true);
 
-            match(input,GT,FOLLOW_GT_in_typeArguments1318); 
+            match(input,GT,FOLLOW_GT_in_typeArguments1303); 
 
             }
 
@@ -2648,30 +2420,30 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start typeArgument
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:364:1: typeArgument : ( type | '?' ( ( 'extends' | 'super' ) type )? );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:363:1: typeArgument : ( type | '?' ( ( 'extends' | 'super' ) type )? );
     public final void typeArgument() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:365:2: ( type | '?' ( ( 'extends' | 'super' ) type )? )
-            int alt45=2;
-            int LA45_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:364:2: ( type | '?' ( ( 'extends' | 'super' ) type )? )
+            int alt41=2;
+            int LA41_0 = input.LA(1);
 
-            if ( (LA45_0==IDENTIFIER||LA45_0==BOOLEAN||LA45_0==BYTE||LA45_0==CHAR||LA45_0==DOUBLE||LA45_0==FLOAT||LA45_0==INT||LA45_0==LONG||LA45_0==SHORT) ) {
-                alt45=1;
+            if ( (LA41_0==IDENTIFIER||LA41_0==BOOLEAN||LA41_0==BYTE||LA41_0==CHAR||LA41_0==DOUBLE||LA41_0==FLOAT||LA41_0==INT||LA41_0==LONG||LA41_0==SHORT) ) {
+                alt41=1;
             }
-            else if ( (LA45_0==QUES) ) {
-                alt45=2;
+            else if ( (LA41_0==QUES) ) {
+                alt41=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("364:1: typeArgument : ( type | '?' ( ( 'extends' | 'super' ) type )? );", 45, 0, input);
+                    new NoViableAltException("363:1: typeArgument : ( type | '?' ( ( 'extends' | 'super' ) type )? );", 41, 0, input);
 
                 throw nvae;
             }
-            switch (alt45) {
+            switch (alt41) {
                 case 1 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:365:6: type
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:364:6: type
                     {
-                    pushFollow(FOLLOW_type_in_typeArgument1332);
+                    pushFollow(FOLLOW_type_in_typeArgument1317);
                     type();
                     _fsp--;
 
@@ -2679,19 +2451,19 @@ public class JadexJavaRulesParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:366:6: '?' ( ( 'extends' | 'super' ) type )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:365:6: '?' ( ( 'extends' | 'super' ) type )?
                     {
-                    match(input,QUES,FOLLOW_QUES_in_typeArgument1339); 
-                    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:367:9: ( ( 'extends' | 'super' ) type )?
-                    int alt44=2;
-                    int LA44_0 = input.LA(1);
+                    match(input,QUES,FOLLOW_QUES_in_typeArgument1324); 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:366:9: ( ( 'extends' | 'super' ) type )?
+                    int alt40=2;
+                    int LA40_0 = input.LA(1);
 
-                    if ( (LA44_0==EXTENDS||LA44_0==SUPER) ) {
-                        alt44=1;
+                    if ( (LA40_0==EXTENDS||LA40_0==SUPER) ) {
+                        alt40=1;
                     }
-                    switch (alt44) {
+                    switch (alt40) {
                         case 1 :
-                            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:368:13: ( 'extends' | 'super' ) type
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:367:13: ( 'extends' | 'super' ) type
                             {
                             if ( input.LA(1)==EXTENDS||input.LA(1)==SUPER ) {
                                 input.consume();
@@ -2700,10 +2472,10 @@ public class JadexJavaRulesParser extends Parser {
                             else {
                                 MismatchedSetException mse =
                                     new MismatchedSetException(null,input);
-                                recoverFromMismatchedSet(input,mse,FOLLOW_set_in_typeArgument1363);    throw mse;
+                                recoverFromMismatchedSet(input,mse,FOLLOW_set_in_typeArgument1348);    throw mse;
                             }
 
-                            pushFollow(FOLLOW_type_in_typeArgument1407);
+                            pushFollow(FOLLOW_type_in_typeArgument1392);
                             type();
                             _fsp--;
 
@@ -2731,11 +2503,11 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start primitiveType
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:376:1: primitiveType : ( 'boolean' | 'char' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:375:1: primitiveType : ( 'boolean' | 'char' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' );
     public final void primitiveType() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:377:2: ( 'boolean' | 'char' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:376:2: ( 'boolean' | 'char' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:
             {
             if ( input.LA(1)==BOOLEAN||input.LA(1)==BYTE||input.LA(1)==CHAR||input.LA(1)==DOUBLE||input.LA(1)==FLOAT||input.LA(1)==INT||input.LA(1)==LONG||input.LA(1)==SHORT ) {
                 input.consume();
@@ -2763,11 +2535,11 @@ public class JadexJavaRulesParser extends Parser {
 
 
     // $ANTLR start literal
-    // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:387:1: literal : ( INTLITERAL | LONGLITERAL | FLOATLITERAL | DOUBLELITERAL | CHARLITERAL | STRINGLITERAL | TRUE | FALSE | NULL );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:386:1: literal : ( INTLITERAL | LONGLITERAL | FLOATLITERAL | DOUBLELITERAL | CHARLITERAL | STRINGLITERAL | TRUE | FALSE | NULL );
     public final void literal() throws RecognitionException {
         try {
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:388:2: ( INTLITERAL | LONGLITERAL | FLOATLITERAL | DOUBLELITERAL | CHARLITERAL | STRINGLITERAL | TRUE | FALSE | NULL )
-            // C:\\projects\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:387:2: ( INTLITERAL | LONGLITERAL | FLOATLITERAL | DOUBLELITERAL | CHARLITERAL | STRINGLITERAL | TRUE | FALSE | NULL )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\JadexJavaRules.g:
             {
             if ( (input.LA(1)>=INTLITERAL && input.LA(1)<=NULL) ) {
                 input.consume();
@@ -2794,275 +2566,147 @@ public class JadexJavaRulesParser extends Parser {
     // $ANTLR end literal
 
 
-    protected DFA21 dfa21 = new DFA21(this);
-    protected DFA23 dfa23 = new DFA23(this);
-    static final String DFA21_eotS =
-        "\10\uffff";
-    static final String DFA21_eofS =
-        "\1\4\4\uffff\1\4\2\uffff";
-    static final String DFA21_minS =
-        "\1\60\1\4\1\uffff\1\4\1\uffff\1\60\1\uffff\1\4";
-    static final String DFA21_maxS =
-        "\2\160\1\uffff\1\101\1\uffff\1\160\1\uffff\1\101";
-    static final String DFA21_acceptS =
-        "\2\uffff\1\1\1\uffff\1\2\1\uffff\1\1\1\uffff";
-    static final String DFA21_specialS =
-        "\10\uffff}>";
-    static final String[] DFA21_transitionS = {
-            "\1\4\30\uffff\1\2\1\4\2\uffff\1\1\1\4\1\uffff\1\4\1\3\4\uffff"+
-            "\17\4\11\uffff\3\4",
-            "\12\4\13\uffff\1\4\1\uffff\1\4\2\uffff\1\4\5\uffff\1\4\5\uffff"+
-            "\1\4\5\uffff\2\4\1\uffff\1\4\1\uffff\1\4\5\uffff\1\4\2\uffff"+
-            "\1\4\2\uffff\1\4\4\uffff\1\4\6\uffff\1\4\1\5\2\uffff\1\4\4\uffff"+
-            "\1\4\1\uffff\15\4\11\uffff\3\4",
-            "",
-            "\1\4\32\uffff\1\6\36\uffff\1\4\2\uffff\1\6",
-            "",
-            "\1\4\31\uffff\1\4\2\uffff\1\1\1\4\1\uffff\1\4\1\7\4\uffff\17"+
-            "\4\11\uffff\3\4",
-            "",
-            "\1\4\32\uffff\1\6\36\uffff\1\4\2\uffff\1\4"
-    };
-
-    static final short[] DFA21_eot = DFA.unpackEncodedString(DFA21_eotS);
-    static final short[] DFA21_eof = DFA.unpackEncodedString(DFA21_eofS);
-    static final char[] DFA21_min = DFA.unpackEncodedStringToUnsignedChars(DFA21_minS);
-    static final char[] DFA21_max = DFA.unpackEncodedStringToUnsignedChars(DFA21_maxS);
-    static final short[] DFA21_accept = DFA.unpackEncodedString(DFA21_acceptS);
-    static final short[] DFA21_special = DFA.unpackEncodedString(DFA21_specialS);
-    static final short[][] DFA21_transition;
-
-    static {
-        int numStates = DFA21_transitionS.length;
-        DFA21_transition = new short[numStates][];
-        for (int i=0; i<numStates; i++) {
-            DFA21_transition[i] = DFA.unpackEncodedString(DFA21_transitionS[i]);
-        }
-    }
-
-    class DFA21 extends DFA {
-
-        public DFA21(BaseRecognizer recognizer) {
-            this.recognizer = recognizer;
-            this.decisionNumber = 21;
-            this.eot = DFA21_eot;
-            this.eof = DFA21_eof;
-            this.min = DFA21_min;
-            this.max = DFA21_max;
-            this.accept = DFA21_accept;
-            this.special = DFA21_special;
-            this.transition = DFA21_transition;
-        }
-        public String getDescription() {
-            return "231:31: ( identifierSuffix )?";
-        }
-    }
-    static final String DFA23_eotS =
-        "\10\uffff";
-    static final String DFA23_eofS =
-        "\1\4\4\uffff\1\4\2\uffff";
-    static final String DFA23_minS =
-        "\1\60\1\4\1\uffff\1\4\1\uffff\1\60\1\uffff\1\4";
-    static final String DFA23_maxS =
-        "\2\160\1\uffff\1\101\1\uffff\1\160\1\uffff\1\101";
-    static final String DFA23_acceptS =
-        "\2\uffff\1\1\1\uffff\1\2\1\uffff\1\1\1\uffff";
-    static final String DFA23_specialS =
-        "\10\uffff}>";
-    static final String[] DFA23_transitionS = {
-            "\1\4\30\uffff\1\2\1\4\2\uffff\1\1\1\4\1\uffff\1\4\1\3\4\uffff"+
-            "\17\4\11\uffff\3\4",
-            "\12\4\13\uffff\1\4\1\uffff\1\4\2\uffff\1\4\5\uffff\1\4\5\uffff"+
-            "\1\4\5\uffff\2\4\1\uffff\1\4\1\uffff\1\4\5\uffff\1\4\2\uffff"+
-            "\1\4\2\uffff\1\4\4\uffff\1\4\6\uffff\1\4\1\5\2\uffff\1\4\4\uffff"+
-            "\1\4\1\uffff\15\4\11\uffff\3\4",
-            "",
-            "\1\4\32\uffff\1\6\36\uffff\1\4\2\uffff\1\6",
-            "",
-            "\1\4\31\uffff\1\4\2\uffff\1\1\1\4\1\uffff\1\4\1\7\4\uffff\17"+
-            "\4\11\uffff\3\4",
-            "",
-            "\1\4\32\uffff\1\6\36\uffff\1\4\2\uffff\1\4"
-    };
-
-    static final short[] DFA23_eot = DFA.unpackEncodedString(DFA23_eotS);
-    static final short[] DFA23_eof = DFA.unpackEncodedString(DFA23_eofS);
-    static final char[] DFA23_min = DFA.unpackEncodedStringToUnsignedChars(DFA23_minS);
-    static final char[] DFA23_max = DFA.unpackEncodedStringToUnsignedChars(DFA23_maxS);
-    static final short[] DFA23_accept = DFA.unpackEncodedString(DFA23_acceptS);
-    static final short[] DFA23_special = DFA.unpackEncodedString(DFA23_specialS);
-    static final short[][] DFA23_transition;
-
-    static {
-        int numStates = DFA23_transitionS.length;
-        DFA23_transition = new short[numStates][];
-        for (int i=0; i<numStates; i++) {
-            DFA23_transition[i] = DFA.unpackEncodedString(DFA23_transitionS[i]);
-        }
-    }
-
-    class DFA23 extends DFA {
-
-        public DFA23(BaseRecognizer recognizer) {
-            this.recognizer = recognizer;
-            this.decisionNumber = 23;
-            this.eot = DFA23_eot;
-            this.eof = DFA23_eof;
-            this.min = DFA23_min;
-            this.max = DFA23_max;
-            this.accept = DFA23_accept;
-            this.special = DFA23_special;
-            this.transition = DFA23_transition;
-        }
-        public String getDescription() {
-            return "232:33: ( identifierSuffix )?";
-        }
-    }
  
 
     public static final BitSet FOLLOW_expression_in_rhs38 = new BitSet(new long[]{0x0000000000000000L});
     public static final BitSet FOLLOW_EOF_in_rhs40 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_conditionalExpression_in_expression55 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_conditionalOrExpression_in_conditionalExpression84 = new BitSet(new long[]{0x0000000000000002L,0x0000000000400000L});
-    public static final BitSet FOLLOW_QUES_in_conditionalExpression92 = new BitSet(new long[]{0x482B04104A003FF0L,0x0001C01FFFC22042L});
-    public static final BitSet FOLLOW_expression_in_conditionalExpression94 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_COLON_in_conditionalExpression96 = new BitSet(new long[]{0x482B04104A003FF0L,0x0001C01FFF422042L});
-    public static final BitSet FOLLOW_conditionalExpression_in_conditionalExpression98 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_conditionalAndExpression_in_conditionalOrExpression111 = new BitSet(new long[]{0x0000000000000002L,0x0000000004000000L});
-    public static final BitSet FOLLOW_BARBAR_in_conditionalOrExpression122 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C01FFF022042L});
-    public static final BitSet FOLLOW_conditionalAndExpression_in_conditionalOrExpression124 = new BitSet(new long[]{0x0000000000000002L,0x0000000004000000L});
-    public static final BitSet FOLLOW_inclusiveOrExpression_in_conditionalAndExpression138 = new BitSet(new long[]{0x0000000000000002L,0x0000000002000000L});
-    public static final BitSet FOLLOW_AMPAMP_in_conditionalAndExpression149 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C01FFB022042L});
-    public static final BitSet FOLLOW_inclusiveOrExpression_in_conditionalAndExpression151 = new BitSet(new long[]{0x0000000000000002L,0x0000000002000000L});
-    public static final BitSet FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression169 = new BitSet(new long[]{0x0000000000000002L,0x0000000400000000L});
-    public static final BitSet FOLLOW_BAR_in_inclusiveOrExpression180 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C01FF9022042L});
-    public static final BitSet FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression182 = new BitSet(new long[]{0x0000000000000002L,0x0000000400000000L});
-    public static final BitSet FOLLOW_andExpression_in_exclusiveOrExpression196 = new BitSet(new long[]{0x0000000000000002L,0x0000000800000000L});
-    public static final BitSet FOLLOW_CARET_in_exclusiveOrExpression207 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C01BF9022042L});
-    public static final BitSet FOLLOW_andExpression_in_exclusiveOrExpression209 = new BitSet(new long[]{0x0000000000000002L,0x0000000800000000L});
-    public static final BitSet FOLLOW_equalityExpression_in_andExpression222 = new BitSet(new long[]{0x0000000000000002L,0x0000000200000000L});
-    public static final BitSet FOLLOW_AMP_in_andExpression233 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C013F9022042L});
-    public static final BitSet FOLLOW_equalityExpression_in_andExpression235 = new BitSet(new long[]{0x0000000000000002L,0x0000000200000000L});
-    public static final BitSet FOLLOW_instanceOfExpression_in_equalityExpression253 = new BitSet(new long[]{0x0000000000000002L,0x0000400001000000L});
-    public static final BitSet FOLLOW_EQEQ_in_equalityExpression266 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C011F9022042L});
-    public static final BitSet FOLLOW_BANGEQ_in_equalityExpression282 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C011F9022042L});
-    public static final BitSet FOLLOW_instanceOfExpression_in_equalityExpression302 = new BitSet(new long[]{0x0000000000000002L,0x0000400001000000L});
-    public static final BitSet FOLLOW_relationalExpression_in_instanceOfExpression324 = new BitSet(new long[]{0x0001000000000002L});
-    public static final BitSet FOLLOW_INSTANCEOF_in_instanceOfExpression335 = new BitSet(new long[]{0x080A04104A000010L});
-    public static final BitSet FOLLOW_type_in_instanceOfExpression337 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_additiveExpression_in_relationalExpression350 = new BitSet(new long[]{0x0000000000000002L,0x0001800000000000L});
-    public static final BitSet FOLLOW_relationalOp_in_relationalExpression362 = new BitSet(new long[]{0x482A04104A003FF2L,0x00018011F8022042L});
-    public static final BitSet FOLLOW_additiveExpression_in_relationalExpression364 = new BitSet(new long[]{0x0000000000000002L,0x0001800000000000L});
-    public static final BitSet FOLLOW_LT_in_relationalOp391 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_EQ_in_relationalOp393 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GT_in_relationalOp404 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_EQ_in_relationalOp406 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LT_in_relationalOp416 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GT_in_relationalOp426 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_multiplicativeExpression_in_additiveExpression443 = new BitSet(new long[]{0x0000000000000002L,0x0000000060000000L});
-    public static final BitSet FOLLOW_set_in_additiveExpression470 = new BitSet(new long[]{0x482A04104A003FF2L,0x00000011F8022042L});
-    public static final BitSet FOLLOW_multiplicativeExpression_in_additiveExpression520 = new BitSet(new long[]{0x0000000000000002L,0x0000000060000000L});
-    public static final BitSet FOLLOW_unaryExpression_in_multiplicativeExpression549 = new BitSet(new long[]{0x0000000000000002L,0x0000001180000000L});
-    public static final BitSet FOLLOW_set_in_multiplicativeExpression576 = new BitSet(new long[]{0x482A04104A003FF2L,0x00000011F8022042L});
-    public static final BitSet FOLLOW_unaryExpression_in_multiplicativeExpression644 = new BitSet(new long[]{0x0000000000000002L,0x0000001180000000L});
-    public static final BitSet FOLLOW_expression_in_expressionList674 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
-    public static final BitSet FOLLOW_COMMA_in_expressionList685 = new BitSet(new long[]{0x482B04104A003FF2L,0x0001C01FFF432042L});
-    public static final BitSet FOLLOW_expression_in_expressionList687 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
-    public static final BitSet FOLLOW_PLUS_in_unaryExpression704 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078022042L});
-    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression706 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SUB_in_unaryExpression713 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078022042L});
-    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression715 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PLUSPLUS_in_unaryExpression722 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078022042L});
-    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression724 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SUBSUB_in_unaryExpression731 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078022042L});
-    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression733 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_unaryExpressionNotPlusMinus_in_unaryExpression740 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_primary_in_unaryExpressionNotPlusMinus764 = new BitSet(new long[]{0x0000000000000002L,0x0000000018022000L});
-    public static final BitSet FOLLOW_selector_in_unaryExpressionNotPlusMinus775 = new BitSet(new long[]{0x0000000000000002L,0x0000000018022000L});
-    public static final BitSet FOLLOW_set_in_unaryExpressionNotPlusMinus787 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_castExpression829 = new BitSet(new long[]{0x080A04104A000000L});
-    public static final BitSet FOLLOW_primitiveType_in_castExpression831 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_castExpression835 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_RPAREN_in_castExpression837 = new BitSet(new long[]{0x482A04104A003FF2L,0x0000000078022042L});
-    public static final BitSet FOLLOW_unaryExpression_in_castExpression839 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_THIS_in_primary876 = new BitSet(new long[]{0x0000000000000002L,0x0000000000022200L});
-    public static final BitSet FOLLOW_DOT_in_primary879 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_primary881 = new BitSet(new long[]{0x0000000000000002L,0x0000000000022200L});
-    public static final BitSet FOLLOW_identifierSuffix_in_primary886 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_primary893 = new BitSet(new long[]{0x0000000000000002L,0x0000000000022200L});
-    public static final BitSet FOLLOW_DOT_in_primary896 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_primary898 = new BitSet(new long[]{0x0000000000000002L,0x0000000000022200L});
-    public static final BitSet FOLLOW_identifierSuffix_in_primary903 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SUPER_in_primary910 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020200L});
-    public static final BitSet FOLLOW_superSuffix_in_primary912 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_literal_in_primary917 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_creator_in_primary922 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_primitiveType_in_primary927 = new BitSet(new long[]{0x0000000000000000L,0x0000000000022000L});
-    public static final BitSet FOLLOW_LBRACKET_in_primary930 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
-    public static final BitSet FOLLOW_RBRACKET_in_primary932 = new BitSet(new long[]{0x0000000000000000L,0x0000000000022000L});
-    public static final BitSet FOLLOW_DOT_in_primary936 = new BitSet(new long[]{0x0000000080000000L});
-    public static final BitSet FOLLOW_CLASS_in_primary938 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VOID_in_primary943 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020000L});
-    public static final BitSet FOLLOW_DOT_in_primary945 = new BitSet(new long[]{0x0000000080000000L});
-    public static final BitSet FOLLOW_CLASS_in_primary947 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_arguments_in_superSuffix964 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_superSuffix969 = new BitSet(new long[]{0x0000000000000010L,0x0001000000000000L});
-    public static final BitSet FOLLOW_typeArguments_in_superSuffix972 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_superSuffix976 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000200L});
-    public static final BitSet FOLLOW_arguments_in_superSuffix979 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACKET_in_identifierSuffix993 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
-    public static final BitSet FOLLOW_RBRACKET_in_identifierSuffix995 = new BitSet(new long[]{0x0000000000000000L,0x0000000000022000L});
-    public static final BitSet FOLLOW_DOT_in_identifierSuffix1007 = new BitSet(new long[]{0x0000000080000000L});
-    public static final BitSet FOLLOW_CLASS_in_identifierSuffix1009 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_arguments_in_identifierSuffix1016 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_identifierSuffix1021 = new BitSet(new long[]{0x0000000080000000L});
-    public static final BitSet FOLLOW_CLASS_in_identifierSuffix1023 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_identifierSuffix1030 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000002L});
-    public static final BitSet FOLLOW_THIS_in_identifierSuffix1032 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_selector1048 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_selector1050 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000200L});
-    public static final BitSet FOLLOW_arguments_in_selector1053 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_selector1060 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000002L});
-    public static final BitSet FOLLOW_THIS_in_selector1062 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_selector1067 = new BitSet(new long[]{0x4000000000000000L});
-    public static final BitSet FOLLOW_SUPER_in_selector1069 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020200L});
-    public static final BitSet FOLLOW_superSuffix_in_selector1071 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACKET_in_selector1078 = new BitSet(new long[]{0x482B04104A003FF0L,0x0001C01FFF426042L});
-    public static final BitSet FOLLOW_expression_in_selector1080 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
-    public static final BitSet FOLLOW_RBRACKET_in_selector1082 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NEW_in_creator1102 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_classOrInterfaceType_in_creator1104 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000200L});
-    public static final BitSet FOLLOW_classCreatorRest_in_creator1106 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_typeList1121 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
-    public static final BitSet FOLLOW_COMMA_in_typeList1124 = new BitSet(new long[]{0x080A04104A000010L});
-    public static final BitSet FOLLOW_type_in_typeList1126 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
-    public static final BitSet FOLLOW_arguments_in_classCreatorRest1141 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_variableInitializer1180 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_classOrInterfaceType_in_createdName1196 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_primitiveType_in_createdName1201 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_arguments1224 = new BitSet(new long[]{0x482B04104A003FF0L,0x0001C01FFF432442L});
-    public static final BitSet FOLLOW_expressionList_in_arguments1227 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_RPAREN_in_arguments1231 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_classOrInterfaceType_in_type1243 = new BitSet(new long[]{0x0000000000000002L,0x0000000000002000L});
+    public static final BitSet FOLLOW_conditionalExpression_in_expression52 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_conditionalOrExpression_in_conditionalExpression81 = new BitSet(new long[]{0x0000000000000002L,0x0000000000400000L});
+    public static final BitSet FOLLOW_QUES_in_conditionalExpression89 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_expression_in_conditionalExpression91 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+    public static final BitSet FOLLOW_COLON_in_conditionalExpression93 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_conditionalExpression_in_conditionalExpression95 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_conditionalAndExpression_in_conditionalOrExpression108 = new BitSet(new long[]{0x0000000000000002L,0x0000000004000000L});
+    public static final BitSet FOLLOW_BARBAR_in_conditionalOrExpression119 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_conditionalAndExpression_in_conditionalOrExpression121 = new BitSet(new long[]{0x0000000000000002L,0x0000000004000000L});
+    public static final BitSet FOLLOW_inclusiveOrExpression_in_conditionalAndExpression135 = new BitSet(new long[]{0x0000000000000002L,0x0000000002000000L});
+    public static final BitSet FOLLOW_AMPAMP_in_conditionalAndExpression146 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_inclusiveOrExpression_in_conditionalAndExpression148 = new BitSet(new long[]{0x0000000000000002L,0x0000000002000000L});
+    public static final BitSet FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression166 = new BitSet(new long[]{0x0000000000000002L,0x0000000400000000L});
+    public static final BitSet FOLLOW_BAR_in_inclusiveOrExpression177 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_exclusiveOrExpression_in_inclusiveOrExpression179 = new BitSet(new long[]{0x0000000000000002L,0x0000000400000000L});
+    public static final BitSet FOLLOW_andExpression_in_exclusiveOrExpression193 = new BitSet(new long[]{0x0000000000000002L,0x0000000800000000L});
+    public static final BitSet FOLLOW_CARET_in_exclusiveOrExpression204 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_andExpression_in_exclusiveOrExpression206 = new BitSet(new long[]{0x0000000000000002L,0x0000000800000000L});
+    public static final BitSet FOLLOW_equalityExpression_in_andExpression219 = new BitSet(new long[]{0x0000000000000002L,0x0000000200000000L});
+    public static final BitSet FOLLOW_AMP_in_andExpression230 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_equalityExpression_in_andExpression232 = new BitSet(new long[]{0x0000000000000002L,0x0000000200000000L});
+    public static final BitSet FOLLOW_instanceOfExpression_in_equalityExpression250 = new BitSet(new long[]{0x0000000000000002L,0x0000400001000000L});
+    public static final BitSet FOLLOW_EQEQ_in_equalityExpression263 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_BANGEQ_in_equalityExpression279 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_instanceOfExpression_in_equalityExpression299 = new BitSet(new long[]{0x0000000000000002L,0x0000400001000000L});
+    public static final BitSet FOLLOW_relationalExpression_in_instanceOfExpression321 = new BitSet(new long[]{0x0001000000000002L});
+    public static final BitSet FOLLOW_INSTANCEOF_in_instanceOfExpression332 = new BitSet(new long[]{0x080A04104A000010L});
+    public static final BitSet FOLLOW_type_in_instanceOfExpression334 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_additiveExpression_in_relationalExpression347 = new BitSet(new long[]{0x0000000000000002L,0x0001800000000000L});
+    public static final BitSet FOLLOW_relationalOp_in_relationalExpression359 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_additiveExpression_in_relationalExpression361 = new BitSet(new long[]{0x0000000000000002L,0x0001800000000000L});
+    public static final BitSet FOLLOW_LT_in_relationalOp388 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_EQ_in_relationalOp390 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GT_in_relationalOp401 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_EQ_in_relationalOp403 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LT_in_relationalOp413 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GT_in_relationalOp423 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_multiplicativeExpression_in_additiveExpression440 = new BitSet(new long[]{0x0000000000000002L,0x0000000060000000L});
+    public static final BitSet FOLLOW_set_in_additiveExpression467 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_multiplicativeExpression_in_additiveExpression517 = new BitSet(new long[]{0x0000000000000002L,0x0000000060000000L});
+    public static final BitSet FOLLOW_unaryExpression_in_multiplicativeExpression546 = new BitSet(new long[]{0x0000000000000002L,0x0000001180000000L});
+    public static final BitSet FOLLOW_set_in_multiplicativeExpression573 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_unaryExpression_in_multiplicativeExpression641 = new BitSet(new long[]{0x0000000000000002L,0x0000001180000000L});
+    public static final BitSet FOLLOW_expression_in_expressionList671 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
+    public static final BitSet FOLLOW_COMMA_in_expressionList682 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_expression_in_expressionList684 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
+    public static final BitSet FOLLOW_PLUS_in_unaryExpression701 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression703 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SUB_in_unaryExpression710 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression712 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PLUSPLUS_in_unaryExpression719 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression721 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SUBSUB_in_unaryExpression728 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_unaryExpression_in_unaryExpression730 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_unaryExpressionNotPlusMinus_in_unaryExpression737 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_primary_in_unaryExpressionNotPlusMinus761 = new BitSet(new long[]{0x0000000000000002L,0x0000000018022000L});
+    public static final BitSet FOLLOW_selector_in_unaryExpressionNotPlusMinus772 = new BitSet(new long[]{0x0000000000000002L,0x0000000018022000L});
+    public static final BitSet FOLLOW_set_in_unaryExpressionNotPlusMinus784 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_castExpression826 = new BitSet(new long[]{0x080A04104A000000L});
+    public static final BitSet FOLLOW_primitiveType_in_castExpression828 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_castExpression832 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_RPAREN_in_castExpression834 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_unaryExpression_in_castExpression836 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_THIS_in_primary873 = new BitSet(new long[]{0x0000000000000002L,0x0000000000022200L});
+    public static final BitSet FOLLOW_identifierSuffix_in_primary878 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_primary885 = new BitSet(new long[]{0x0000000000000002L,0x0000000000022200L});
+    public static final BitSet FOLLOW_identifierSuffix_in_primary890 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SUPER_in_primary897 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020200L});
+    public static final BitSet FOLLOW_superSuffix_in_primary899 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_literal_in_primary904 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_creator_in_primary909 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_primitiveType_in_primary914 = new BitSet(new long[]{0x0000000000000000L,0x0000000000022000L});
+    public static final BitSet FOLLOW_LBRACKET_in_primary917 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_RBRACKET_in_primary919 = new BitSet(new long[]{0x0000000000000000L,0x0000000000022000L});
+    public static final BitSet FOLLOW_DOT_in_primary923 = new BitSet(new long[]{0x0000000080000000L});
+    public static final BitSet FOLLOW_CLASS_in_primary925 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VOID_in_primary930 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020000L});
+    public static final BitSet FOLLOW_DOT_in_primary932 = new BitSet(new long[]{0x0000000080000000L});
+    public static final BitSet FOLLOW_CLASS_in_primary934 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_arguments_in_superSuffix951 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_superSuffix956 = new BitSet(new long[]{0x0000000000000010L,0x0001000000000000L});
+    public static final BitSet FOLLOW_typeArguments_in_superSuffix959 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_superSuffix963 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000200L});
+    public static final BitSet FOLLOW_arguments_in_superSuffix966 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACKET_in_identifierSuffix980 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_RBRACKET_in_identifierSuffix982 = new BitSet(new long[]{0x0000000000000000L,0x0000000000022000L});
+    public static final BitSet FOLLOW_DOT_in_identifierSuffix994 = new BitSet(new long[]{0x0000000080000000L});
+    public static final BitSet FOLLOW_CLASS_in_identifierSuffix996 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_arguments_in_identifierSuffix1003 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_identifierSuffix1008 = new BitSet(new long[]{0x0000000080000000L});
+    public static final BitSet FOLLOW_CLASS_in_identifierSuffix1010 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_identifierSuffix1017 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000002L});
+    public static final BitSet FOLLOW_THIS_in_identifierSuffix1019 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_selector1035 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_selector1037 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000200L});
+    public static final BitSet FOLLOW_arguments_in_selector1040 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_selector1047 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000002L});
+    public static final BitSet FOLLOW_THIS_in_selector1049 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_selector1054 = new BitSet(new long[]{0x4000000000000000L});
+    public static final BitSet FOLLOW_SUPER_in_selector1056 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020200L});
+    public static final BitSet FOLLOW_superSuffix_in_selector1058 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACKET_in_selector1065 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000042L});
+    public static final BitSet FOLLOW_expression_in_selector1067 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_RBRACKET_in_selector1069 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NEW_in_creator1087 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_classOrInterfaceType_in_creator1089 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000200L});
+    public static final BitSet FOLLOW_classCreatorRest_in_creator1091 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_typeList1106 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
+    public static final BitSet FOLLOW_COMMA_in_typeList1109 = new BitSet(new long[]{0x080A04104A000010L});
+    public static final BitSet FOLLOW_type_in_typeList1111 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
+    public static final BitSet FOLLOW_arguments_in_classCreatorRest1126 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_variableInitializer1165 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_classOrInterfaceType_in_createdName1181 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_primitiveType_in_createdName1186 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_arguments1209 = new BitSet(new long[]{0x482A04104A003FF0L,0x0000000078000442L});
+    public static final BitSet FOLLOW_expressionList_in_arguments1212 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_RPAREN_in_arguments1216 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_classOrInterfaceType_in_type1228 = new BitSet(new long[]{0x0000000000000002L,0x0000000000002000L});
+    public static final BitSet FOLLOW_LBRACKET_in_type1231 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_RBRACKET_in_type1233 = new BitSet(new long[]{0x0000000000000002L,0x0000000000002000L});
+    public static final BitSet FOLLOW_primitiveType_in_type1243 = new BitSet(new long[]{0x0000000000000002L,0x0000000000002000L});
     public static final BitSet FOLLOW_LBRACKET_in_type1246 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
     public static final BitSet FOLLOW_RBRACKET_in_type1248 = new BitSet(new long[]{0x0000000000000002L,0x0000000000002000L});
-    public static final BitSet FOLLOW_primitiveType_in_type1258 = new BitSet(new long[]{0x0000000000000002L,0x0000000000002000L});
-    public static final BitSet FOLLOW_LBRACKET_in_type1261 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
-    public static final BitSet FOLLOW_RBRACKET_in_type1263 = new BitSet(new long[]{0x0000000000000002L,0x0000000000002000L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_classOrInterfaceType1278 = new BitSet(new long[]{0x0000000000000002L,0x0001000000020000L});
-    public static final BitSet FOLLOW_typeArguments_in_classOrInterfaceType1281 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
-    public static final BitSet FOLLOW_DOT_in_classOrInterfaceType1286 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_classOrInterfaceType1288 = new BitSet(new long[]{0x0000000000000002L,0x0001000000020000L});
-    public static final BitSet FOLLOW_typeArguments_in_classOrInterfaceType1291 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
-    public static final BitSet FOLLOW_LT_in_typeArguments1307 = new BitSet(new long[]{0x080A04104A000010L,0x0000000000400000L});
-    public static final BitSet FOLLOW_typeArgument_in_typeArguments1309 = new BitSet(new long[]{0x0000000000000000L,0x0000800000010000L});
-    public static final BitSet FOLLOW_COMMA_in_typeArguments1312 = new BitSet(new long[]{0x080A04104A000010L,0x0000000000400000L});
-    public static final BitSet FOLLOW_typeArgument_in_typeArguments1314 = new BitSet(new long[]{0x0000000000000000L,0x0000800000010000L});
-    public static final BitSet FOLLOW_GT_in_typeArguments1318 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_typeArgument1332 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QUES_in_typeArgument1339 = new BitSet(new long[]{0x4000008000000002L});
-    public static final BitSet FOLLOW_set_in_typeArgument1363 = new BitSet(new long[]{0x080A04104A000010L});
-    public static final BitSet FOLLOW_type_in_typeArgument1407 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_classOrInterfaceType1263 = new BitSet(new long[]{0x0000000000000002L,0x0001000000020000L});
+    public static final BitSet FOLLOW_typeArguments_in_classOrInterfaceType1266 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_DOT_in_classOrInterfaceType1271 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_classOrInterfaceType1273 = new BitSet(new long[]{0x0000000000000002L,0x0001000000020000L});
+    public static final BitSet FOLLOW_typeArguments_in_classOrInterfaceType1276 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_LT_in_typeArguments1292 = new BitSet(new long[]{0x080A04104A000010L,0x0000000000400000L});
+    public static final BitSet FOLLOW_typeArgument_in_typeArguments1294 = new BitSet(new long[]{0x0000000000000000L,0x0000800000010000L});
+    public static final BitSet FOLLOW_COMMA_in_typeArguments1297 = new BitSet(new long[]{0x080A04104A000010L,0x0000000000400000L});
+    public static final BitSet FOLLOW_typeArgument_in_typeArguments1299 = new BitSet(new long[]{0x0000000000000000L,0x0000800000010000L});
+    public static final BitSet FOLLOW_GT_in_typeArguments1303 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_typeArgument1317 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QUES_in_typeArgument1324 = new BitSet(new long[]{0x4000008000000002L});
+    public static final BitSet FOLLOW_set_in_typeArgument1348 = new BitSet(new long[]{0x080A04104A000010L});
+    public static final BitSet FOLLOW_type_in_typeArgument1392 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_primitiveType0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_literal0 = new BitSet(new long[]{0x0000000000000002L});
 
