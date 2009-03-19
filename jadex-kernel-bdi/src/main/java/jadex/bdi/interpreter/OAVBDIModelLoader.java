@@ -775,23 +775,6 @@ public class OAVBDIModelLoader
 								}
 							}
 						}
-
-//						if(cons.get(c) instanceof BoundConstraint)
-//						{
-//							BoundConstraint	bc	= (BoundConstraint)cons.get(c);
-//							if(IOperator.EQUAL.equals(bc.getOperator()))
-//							{
-//								List	vars	= bc.getBindVariables();
-//								for(int v=0; check && v<vars.size(); v++)
-//								{
-//									type	= ((Variable)vars.get(v)).getType();
-//									mtype	= (OAVObjectType)OAVBDIRuntimeModel.modelmap.get(type);
-//									check	= types.contains(type)
-//										|| mtype!=null && types.contains(mtype)
-//										|| mtype==null && (!OAVBDIMetaModel.bdimm_type_model.contains(type) || OAVJavaType.java_type_model.contains(type));
-//								}
-//							}
-//						}
 					}
 				}
 				
