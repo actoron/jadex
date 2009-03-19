@@ -46,6 +46,9 @@ public class OAVMixedWeakState	implements IOAVState
 	/** The argument types for property change listener adding/removal (cached for speed). */
 	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
 	
+	/** The type identifier. */
+	protected static String TYPE = ":::INTERNAL_TYPE";
+	
 	// #endif
 	
 	//-------- attributes --------
@@ -63,7 +66,7 @@ public class OAVMixedWeakState	implements IOAVState
 	protected Map deletedobjects;
 	
 	/** The object types (oid -> type). */
-	protected Map types;
+//	protected Map types;
 	
 	/** The java objects set. */
 	protected Set javaobjects;
@@ -130,7 +133,6 @@ public class OAVMixedWeakState	implements IOAVState
 		
 		// OID data structures
 		this.deletedobjects	= new LinkedHashMap();
-		this.types = new LinkedHashMap();
 		this.objects	= new LinkedHashMap();
 		this.weakobjects	= new WeakHashMap();
 //		this.objects	= new CheckedMap(new LinkedHashMap());
@@ -214,33 +216,34 @@ public class OAVMixedWeakState	implements IOAVState
 //								cnts.put(type, cnt);
 //							}
 							
-//							final Map	cnts	= new HashMap();
-//							for(Iterator it=weakobjects.keySet().iterator(); it.hasNext(); )
-//							{
-//								Object	id	= it.next();
-//								Integer	cnt	= (Integer)cnts.get(getType());
-//								if(cnt!=null)
-//									cnt	= new Integer(cnt.intValue()+1);
-//								else
-//									cnt	= new Integer(1);
-//								cnts.put(type, cnt);
-//							}
+							final Map	cnts	= new HashMap();
+							for(Iterator it=weakobjects.keySet().iterator(); it.hasNext(); )
+							{
+								Object	id	= it.next();
+								Object type = getType(id);
+								Integer	cnt	= (Integer)cnts.get(type);
+								if(cnt!=null)
+									cnt	= new Integer(cnt.intValue()+1);
+								else
+									cnt	= new Integer(1);
+								cnts.put(type, cnt);
+							}
 							
 							// Sort types by number.
-//							Map	sorted	= new TreeMap(new Comparator()
-//							{
-//								public int compare(Object t2, Object t1)
-//								{
-//									int ret	= ((Integer)cnts.get(t1)).intValue() - ((Integer)cnts.get(t2)).intValue();
-//									if(ret==0 && t1!=t2)
-//										ret	= t1.hashCode() - t2.hashCode();
-//									return ret;
-//								}
-//							});
-//							sorted.putAll(cnts);
+							Map	sorted	= new TreeMap(new Comparator()
+							{
+								public int compare(Object t2, Object t1)
+								{
+									int ret	= ((Integer)cnts.get(t1)).intValue() - ((Integer)cnts.get(t2)).intValue();
+									if(ret==0 && t1!=t2)
+										ret	= t1.hashCode() - t2.hashCode();
+									return ret;
+								}
+							});
+							sorted.putAll(cnts);
 							
-//							System.out.println("objects@"+OAVMixedWeakState.this.hashCode()+": "+sorted);
-							
+							if(cnts.size()>0)
+								System.out.println("objects@"+OAVMixedWeakState.this.hashCode()+": "+sorted);
 						}
 					};
 					if(synchronizator!=null)
@@ -328,10 +331,12 @@ public class OAVMixedWeakState	implements IOAVState
 		// #endif
 		
 		Object	ret	= generator.createId(this, type);
-		objects.put(ret, new LinkedHashMap());
+		Map content = new LinkedHashMap();
+		objects.put(ret, content);
 //		objectspertype.put(type, ret);
 	
-		types.put(ret, type);
+//		types.put(ret, type);
+		content.put(TYPE, type);
 //		System.out.println("Created object of type: "+type);
 		
 		eventhandler.objectAdded(ret, type, root);
@@ -463,7 +468,11 @@ public class OAVMixedWeakState	implements IOAVState
 		Map	content	= (Map)objects.get(id);
 		for(Iterator it=content.keySet().iterator(); it.hasNext(); )
 		{
-			OAVAttributeType attribute = (OAVAttributeType)it.next();
+			Object tmp = it.next();
+			if(tmp.equals(TYPE))
+				continue;
+			
+			OAVAttributeType attribute = (OAVAttributeType)tmp;
 			Object value = content.get(attribute);
 			if(value!=null)
 			{
@@ -502,7 +511,8 @@ public class OAVMixedWeakState	implements IOAVState
 		
 		// Notify listeners about removed object before removing references
 		// Object will be removed from types map in notifyEventListeners()
-		eventhandler.objectRemoved(id, (OAVObjectType)types.get(id));
+//		eventhandler.objectRemoved(id, (OAVObjectType)types.get(id));
+		eventhandler.objectRemoved(id, (OAVObjectType)content.get(TYPE));
 	}
 
 	/**
@@ -577,7 +587,10 @@ public class OAVMixedWeakState	implements IOAVState
 		OAVObjectType ret=null;
 		if(generator.isId(object))
 		{
-			ret = (OAVObjectType)types.get(object);
+//			ret = (OAVObjectType)types.get(object);
+			Map content = (Map)getObject0(object);
+			ret = content!=null? (OAVObjectType)content.get(TYPE): null; 
+//			ret = (OAVObjectType)types.get(object);
 			if(ret==null && substates!=null)
 			{
 				for(int i=0; ret==null && i<substates.length; i++)
@@ -1458,8 +1471,8 @@ public class OAVMixedWeakState	implements IOAVState
 	public void notifyEventListeners()
 	{
 		eventhandler.notifyEventListeners();
-		for(Iterator it=deletedobjects.keySet().iterator(); it.hasNext(); )
-			types.remove(it.next());
+//		for(Iterator it=deletedobjects.keySet().iterator(); it.hasNext(); )
+//			types.remove(it.next());
 
 		deletedobjects.clear();
 	}
@@ -1623,16 +1636,33 @@ public class OAVMixedWeakState	implements IOAVState
 		assert nocheck || generator.isId(id);
 		// #endif
 
-		Map	ret	= (Map)objects.get(id);
-		
-		if(ret==null && eventhandler.notifying && deletedobjects.containsKey(id))
-			ret = (Map)deletedobjects.get(id);
-
-		if(ret==null)
-			ret = (Map)weakobjects.get(id);
+		Map ret = getObject0(id);
 		
 		if(ret==null)
 			throw new IllegalArgumentException("Object "+id+" does not exist.");
+		return ret;
+	}
+	
+	/**
+	 *  Get an object map for its id.
+	 *  @param id The id.
+	 *  @return The object map.
+	 */
+	protected Map getObject0(Object id)
+	{
+		Map	ret = null;
+		
+		if(generator.isId(id))
+		{
+			ret	= (Map)objects.get(id);
+		
+			if(ret==null && eventhandler.notifying && deletedobjects.containsKey(id))
+				ret = (Map)deletedobjects.get(id);
+
+			if(ret==null)
+				ret = (Map)weakobjects.get(id);
+		}
+		
 		return ret;
 	}
 	

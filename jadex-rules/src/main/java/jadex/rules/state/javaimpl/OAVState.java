@@ -42,7 +42,7 @@ public class OAVState	implements IOAVState
 	
 	/** The argument types for property change listener adding/removal (cached for speed). */
 	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
-	
+		
 	// #endif
 	
 	//-------- attributes --------

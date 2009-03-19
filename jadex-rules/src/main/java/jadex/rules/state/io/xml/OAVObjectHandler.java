@@ -9,8 +9,6 @@ import jadex.rules.state.OAVObjectType;
 
 import java.util.List;
 
-import javax.xml.stream.XMLStreamReader;
-
 /**
  *  Handler for reading XML into OAV objects.
  */
