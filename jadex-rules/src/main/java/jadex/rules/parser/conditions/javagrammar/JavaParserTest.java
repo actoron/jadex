@@ -18,14 +18,15 @@ public class JavaParserTest
 		{
 //			String c	= "$beliefbase.chargestate > 0.2";
 			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2";
+//			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2==7";
 			
 			ANTLRStringStream exp = new ANTLRStringStream(c);
 			JavaJadexLexer lexer = new JavaJadexLexer(exp);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			JavaJadexParser parser = new JavaJadexParser(tokens);
 		
-			Constraint	con	= parser.relationalExpression();
-			System.out.println("done: "+con);
+			parser.rhs();
+			System.out.println("done: "+parser.getStack());
 		}
 		catch(Exception ex)
 		{

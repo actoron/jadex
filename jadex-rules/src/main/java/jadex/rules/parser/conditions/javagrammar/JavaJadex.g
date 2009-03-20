@@ -14,14 +14,24 @@ package jadex.rules.parser.conditions.javagrammar;
 
 @members
 {
+	/** The stack of elements generated during parsing. */
+	protected List	stack	= new ArrayList();
+	
+	/**
+	 *  Get the elements from the stack.
+	 */
+	public List	getStack()
+	{
+		return stack;
+	}
 }
 
 // Parser
 
 /**
- *  Right hand side. Start rule for parser.
+ *  Left hand side. Start rule for parser.
  */
-rhs
+lhs
 	: expression EOF
 	;
 
@@ -30,38 +40,93 @@ rhs
  *  a value (left hand side of an assignment).
  */
 expression
+	: logicalAndExpression
+	;
+
+
+/**
+ *  An equality comparison between two values.
+ */
+logicalAndExpression
+	: equalityExpression
+        (
+        	'&''&' equalityExpression
+        )*
+	;
+	
+/**
+ *  An equality comparison between two values.
+ */
+equalityExpression
 	: relationalExpression
+        (
+		{
+			String	operator	= null;
+		}
+	        ('=''=' {operator="==";}
+        	|'!''=' {operator="!=";}
+        	) relationalExpression
+	        {
+	        	// Pop values from stack and add constraint.
+	        	UnaryExpression	right	= (UnaryExpression)stack.remove(stack.size()-1);
+	        	UnaryExpression	left	= (UnaryExpression)stack.remove(stack.size()-1);
+	        	stack.add(new Constraint(left, right, operator));
+	        }
+	)?
 	;
 
 /**
  *  A comparison between two values.
  */
-relationalExpression returns [Constraint constraint]
-	: left = unaryExpression
-        (('<'|'<''='|'>'|'>''=') right = unaryExpression
-        {
-        	$constraint = new Constraint(left, right, "blurps");
-        }
+relationalExpression
+	: unaryExpression
+        (
+		{
+			String	operator	= null;
+		}
+        	('<' {operator="<";}
+        	|'<''=' {operator="<=";}
+        	|'>' {operator=">";}
+        	|'>''=' {operator=">=";}
+        	) unaryExpression
+	        {
+	        	// Pop values from stack and add constraint.
+	        	UnaryExpression	right	= (UnaryExpression)stack.remove(stack.size()-1);
+	        	UnaryExpression	left	= (UnaryExpression)stack.remove(stack.size()-1);
+	        	stack.add(new Constraint(left, right, operator));
+	        }
         )?
 	;
 	
 /**
  *  An unary expression produces a single value
  */
-unaryExpression returns [UnaryExpression exp]
-	: prim = primary (suffix)*
+unaryExpression
+	:
+	primary
+	(suffix
+	)*
 	{
-		$exp	= new UnaryExpression(prim, null);
+		List	suffs	= null;
+		while(stack.get(stack.size()-1) instanceof Suffix)
+		{
+			if(suffs==null)
+				suffs	= new ArrayList();
+			suffs.add(0, stack.remove(stack.size()-1));
+		}
+		Primary	prim	= (Primary)stack.remove(stack.size()-1);
+		stack.add(new UnaryExpression(prim, suffs==null ? null
+			: (Suffix[])suffs.toArray(new Suffix[suffs.size()])));
 	}
 	;
 
 /**
  *  Primary part of a expression, i.e. a direct representation of a value.
  */
-primary returns [Primary prim]
-	: '(' expression ')'
-	| lit = literal {$prim = new Literal(lit);}
-	| var= variable {$prim = new Variable(var);}
+primary
+	: /*'(' expression ')'	// Todo
+	|*/ literal
+	| variable
 	;
 
 /**
@@ -76,498 +141,63 @@ suffix
  *  Read a field of an object.
  */
 fieldAccess
-	: '.' IDENTIFIER
+	: '.' tmp = IDENTIFIER {stack.add(new FieldAccess(tmp.getText()));}
 	;
 
 /**
  *  Invoke a method on an object.
  */
 methodAccess
-	: '.' IDENTIFIER '(' ')'
-	| '.' IDENTIFIER '(' expression (',' expression)* ')'
+	: '.' tmp = IDENTIFIER '(' ')' {stack.add(new MethodAccess(tmp.getText(), null));}
+	| '.' tmp = IDENTIFIER '(' unaryExpression	// Todo: expression
+	(',' unaryExpression	// Todo: expression
+	)* ')'
+	{
+		List	parexs	= null;
+		while(stack.get(stack.size()-1) instanceof UnaryExpression)
+		{
+			if(parexs==null)
+				parexs	= new ArrayList();
+			parexs.add(0, stack.remove(stack.size()-1));
+		}
+		stack.add(new MethodAccess(tmp.getText(), (UnaryExpression[])parexs.toArray(new UnaryExpression[parexs.size()])));
+	}
 	;
 
 /**
  *  A variable represents a value provided from the outside.
  */
-variable returns [String name]
-	: tmp = IDENTIFIER {$name = tmp.getText();}
+variable
+	: tmp = IDENTIFIER {stack.add(new Variable(tmp.getText()));}
 	;
 
-literal	returns [Object val]
-	: lit=floatingPointLiteral {$val = lit;}
-	| lit=integerLiteral {$val = lit;}
-	| CharacterLiteral {$val = new Character($CharacterLiteral.text.charAt(0));}
-	| StringLiteral {$val = $StringLiteral.text.substring(1, $StringLiteral.text.length()-1);}
-	| BooleanLiteral {$val = $BooleanLiteral.text.equals("true")? Boolean.TRUE: Boolean.FALSE;}
-	| 'null' {$val = null;}
+literal
+	: lit=floatingPointLiteral
+	| lit=integerLiteral
+	| CharacterLiteral {stack.add(new Literal(new Character($CharacterLiteral.text.charAt(0))));}
+	| StringLiteral {stack.add(new Literal($StringLiteral.text.substring(1, $StringLiteral.text.length()-1)));}
+	| BooleanLiteral {stack.add(new Literal($BooleanLiteral.text.equals("true")? Boolean.TRUE: Boolean.FALSE));}
+	| 'null' {stack.add(new Literal(null));}
 	;
 
-floatingPointLiteral returns [Object val]
-	: sign=('+'|'-')? FloatingPointLiteral {$val = sign!=null && "-".equals(sign.getText())? new Double("-"+$FloatingPointLiteral.text): new Double($FloatingPointLiteral.text);}
+floatingPointLiteral
+	: sign=('+'|'-')? FloatingPointLiteral {stack.add(new Literal(sign!=null && "-".equals(sign.getText())? new Double("-"+$FloatingPointLiteral.text): new Double($FloatingPointLiteral.text)));}
 	;
-	
-integerLiteral returns [Object val]
-	: sign=('+'|'-')? (HexLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$HexLiteral.text): new Integer($HexLiteral.text);}
-	| OctalLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$OctalLiteral.text): new Integer($OctalLiteral.text);}
-	| DecimalLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$DecimalLiteral.text): new Integer($DecimalLiteral.text);})
+
+integerLiteral
+	 returns [Object val]
+	: sign=('+'|'-')? (HexLiteral {stack.add(new Literal(sign!=null && "-".equals(sign.getText())? new Integer("-"+$HexLiteral.text): new Integer($HexLiteral.text)));}
+	| OctalLiteral {stack.add(new Literal((sign!=null && "-".equals(sign.getText())? new Integer("-"+$OctalLiteral.text): new Integer($OctalLiteral.text))));}
+	| DecimalLiteral {stack.add(new Literal(sign!=null && "-".equals(sign.getText())? new Integer("-"+$DecimalLiteral.text): new Integer($DecimalLiteral.text)));})
 	;
+
 
 
 // Lexxer
-/********************************************************************************************
-                  Lexer section
-*********************************************************************************************/
 
-LONGLITERAL
-    :   IntegerNumber LongSuffix
-    ;
-
-    
-INTLITERAL
-    :   IntegerNumber 
-    ;
-    
-fragment
-IntegerNumber
-    :   '0' 
-    |   '1'..'9' ('0'..'9')*    
-    |   '0' ('0'..'7')+         
-    |   HexPrefix HexDigit+        
-    ;
-
-fragment
-HexPrefix
-    :   '0x' | '0X'
-    ;
-
-fragment
-LongSuffix
-    :   'l' | 'L'
-    ;
-
-
-fragment
-NonIntegerNumber
-    :   ('0' .. '9')+ '.' ('0' .. '9')* Exponent?  
-    |   '.' ( '0' .. '9' )+ Exponent?  
-    |   ('0' .. '9')+ Exponent  
-    |   ('0' .. '9')+ 
-    |   
-        HexPrefix (HexDigit )* 
-        (    () 
-        |    ('.' (HexDigit )* ) 
-        ) 
-        ( 'p' | 'P' ) 
-        ( '+' | '-' )? 
-        ( '0' .. '9' )+
-        ;
-    
-fragment 
-FloatSuffix
-    :   'f' | 'F' 
-    ;     
-
-fragment
-DoubleSuffix
-    :   'd' | 'D'
-    ;
-        
-FLOATLITERAL
-    :   NonIntegerNumber FloatSuffix
-    ;
-    
-DOUBLELITERAL
-    :   NonIntegerNumber DoubleSuffix?
-    ;
-
-CHARLITERAL
-    :   '\'' 
-        (   EscapeSequence 
-        |   ~( '\'' | '\\' | '\r' | '\n' )
-        ) 
-        '\''
-    ; 
-
-STRINGLITERAL
-    :   '"' 
-        (   EscapeSequence
-        |   ~( '\\' | '"' | '\r' | '\n' )        
-        )* 
-        '"' 
-    ;
-        
-ABSTRACT
-    :   'abstract'
-    ;
-    
-ASSERT
-    :   'assert'
-    ;
-    
-BOOLEAN
-    :   'boolean'
-    ;
-    
-BREAK
-    :   'break'
-    ;
-    
-BYTE
-    :   'byte'
-    ;
-    
-CASE
-    :   'case'
-    ;
-    
-CATCH
-    :   'catch'
-    ;
-    
-CHAR
-    :   'char'
-    ;
-    
-CLASS
-    :   'class'
-    ;
-    
-CONST
-    :   'const'
-    ;
-
-CONTINUE
-    :   'continue'
-    ;
-
-DEFAULT
-    :   'default'
-    ;
-
-DO
-    :   'do'
-    ;
-
-DOUBLE
-    :   'double'
-    ;
-
-ELSE
-    :   'else'
-    ;
-
-ENUM
-    :   'enum'
-    ;             
-
-EXTENDS
-    :   'extends'
-    ;
-
-FINAL
-    :   'final'
-    ;
-
-FINALLY
-    :   'finally'
-    ;
-
-FLOAT
-    :   'float'
-    ;
-
-FOR
-    :   'for'
-    ;
-
-GOTO
-    :   'goto'
-    ;
-
-IF
-    :   'if'
-    ;
-
-IMPLEMENTS
-    :   'implements'
-    ;
-
-IMPORT
-    :   'import'
-    ;
-
-INSTANCEOF
-    :   'instanceof'
-    ;
-
-INT
-    :   'int'
-    ;
-
-INTERFACE
-    :   'interface'
-    ;
-
-LONG
-    :   'long'
-    ;
-
-NATIVE
-    :   'native'
-    ;
-
-NEW
-    :   'new'
-    ;
-
-PACKAGE
-    :   'package'
-    ;
-
-PRIVATE
-    :   'private'
-    ;
-
-PROTECTED
-    :   'protected'
-    ;
-
-PUBLIC
-    :   'public'
-    ;
-
-RETURN
-    :   'return'
-    ;
-
-SHORT
-    :   'short'
-    ;
-
-STATIC
-    :   'static'
-    ;
-
-STRICTFP
-    :   'strictfp'
-    ;
-
-SUPER
-    :   'super'
-    ;
-
-SWITCH
-    :   'switch'
-    ;
-
-SYNCHRONIZED
-    :   'synchronized'
-    ;
-
-THIS
-    :   'this'
-    ;
-
-THROW
-    :   'throw'
-    ;
-
-THROWS
-    :   'throws'
-    ;
-
-TRANSIENT
-    :   'transient'
-    ;
-
-TRY
-    :   'try'
-    ;
-
-VOID
-    :   'void'
-    ;
-
-VOLATILE
-    :   'volatile'
-    ;
-
-WHILE
-    :   'while'
-    ;
-
-TRUE
-    :   'true'
-    ;
-
-FALSE
-    :   'false'
-    ;
-
-NULL
-    :   'null'
-    ;
-
-LPAREN
-    :   '('
-    ;
-
-RPAREN
-    :   ')'
-    ;
-
-LBRACE
-    :   '{'
-    ;
-
-RBRACE
-    :   '}'
-    ;
-
-LBRACKET
-    :   '['
-    ;
-
-RBRACKET
-    :   ']'
-    ;
-
-SEMI
-    :   ';'
-    ;
-
-COMMA
-    :   ','
-    ;
-
-DOT
-    :   '.'
-    ;
-
-ELLIPSIS
-    :   '...'
-    ;
-
-EQ
-    :   '='
-    ;
-
-BANG
-    :   '!'
-    ;
-
-TILDE
-    :   '~'
-    ;
-
-QUES
-    :   '?'
-    ;
-
-COLON
-    :   ':'
-    ;
-
-EQEQ
-    :   '=='
-    ;
-
-AMPAMP
-    :   '&&'
-    ;
-
-BARBAR
-    :   '||'
-    ;
-
-PLUSPLUS
-    :   '++'
-    ;
-
-SUBSUB
-    :   '--'
-    ;
-
-PLUS
-    :   '+'
-    ;
-
-SUB
-    :   '-'
-    ;
-
-STAR
-    :   '*'
-    ;
-
-SLASH
-    :   '/'
-    ;
-
-AMP
-    :   '&'
-    ;
-
-BAR
-    :   '|'
-    ;
-
-CARET
-    :   '^'
-    ;
-
-PERCENT
-    :   '%'
-    ;
-
-PLUSEQ
-    :   '+='
-    ; 
-    
-SUBEQ
-    :   '-='
-    ;
-
-STAREQ
-    :   '*='
-    ;
-
-SLASHEQ
-    :   '/='
-    ;
-
-AMPEQ
-    :   '&='
-    ;
-
-BAREQ
-    :   '|='
-    ;
-
-CARETEQ
-    :   '^='
-    ;
-
-PERCENTEQ
-    :   '%='
-    ;
-
-MONKEYS_AT
-    :   '@'
-    ;
-
-BANGEQ
-    :   '!='
-    ;
-
-GT
-    :   '>'
-    ;
-
-LT
-    :   '<'
-    ;        
+ConstraintOperator	
+	: '&' | '|'
+	;
 
 BooleanLiteral
 	:   'true' | 'false'
@@ -597,9 +227,9 @@ IntegerTypeSuffix
 FloatingPointLiteral
     	:   ('0'..'9')+ '.' ('0'..'9')* Exponent? FloatTypeSuffix?
  	|   '.' ('0'..'9')+ Exponent? FloatTypeSuffix?
- 	|   ('0'..'9')+ Exponent 
+ 	|   ('0'..'9')+ Exponent FloatTypeSuffix
+ 	|   ('0'..'9')+ Exponent
 	|   ('0'..'9')+ FloatTypeSuffix
-	|   ('0'..'9')+ Exponent FloatTypeSuffix
 	;
 
 fragment
@@ -641,6 +271,10 @@ UnicodeEscape
 IDENTIFIER 
 	:   Letter (Letter|JavaIDDigit)*
 	;
+	
+/*ExtendedIdentifiertoken 
+	:   Letter (Letter|JavaIDDigit|'['|']'|'"'|'.')*
+	;*/
 
 fragment
 Letter
@@ -688,4 +322,3 @@ COMMENT
 LINE_COMMENT
 	: '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
 	;
-
