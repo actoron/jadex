@@ -30,7 +30,9 @@ public class JavaParserTest
 		{
 //			String c	= "$waste != $location";
 //			String c	= "$waste.getLocation().getDistance($location) > 0.2";
-			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2";
+//			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2";
+//			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $waste.getLocation()!=$location";
+			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $location!=$waste.getLocation()";
 
 			// Todo: Agent specific handling ($beliefbase etc.s)
 //			String c	= "$beliefbase.chargestate > 0.2";
@@ -43,7 +45,7 @@ public class JavaParserTest
 			JavaJadexParser parser = new JavaJadexParser(tokens);
 		
 			parser.rhs();
-			System.out.println("Parsed expression: "+parser.getStack()+"\n");
+			System.out.println("Parsed expression:\n"+parser.getStack()+"\n");
 			Constraint[]	constraints	= (Constraint[])parser.getStack()
 				.toArray(new Constraint[parser.getStack().size()]);
 
@@ -51,9 +53,9 @@ public class JavaParserTest
 				new File("../jadex-applications-bdi/target/classes").toURI().toURL()});
 			OAVTypeModel	tmodel	= new OAVTypeModel("cleanertypes", cl);
 
-//			OAVObjectType	locatype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Location");
-//			ObjectCondition	locacon	= new ObjectCondition(locatype);
-//			locacon.addConstraint(new BoundConstraint(null, new Variable("$location", locatype)));
+			OAVObjectType	locatype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Location");
+			ObjectCondition	locacon	= new ObjectCondition(locatype);
+			locacon.addConstraint(new BoundConstraint(null, new Variable("$location", locatype)));
 			
 			OAVObjectType	wastetype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Waste");
 			ObjectCondition	wastecon	= new ObjectCondition(wastetype);
@@ -62,13 +64,14 @@ public class JavaParserTest
 			ObjectCondition	wastecon2	= new ObjectCondition(wastetype);
 			wastecon2.addConstraint(new BoundConstraint(null, new Variable("$waste2", wastetype)));
 
-			ICondition	predefined	= new AndCondition(new ICondition[]{/*locacon,*/ wastecon2, wastecon});
+//			ICondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon});
+			ICondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon, locacon});
 			
-			System.out.println("Predefined condition: "+predefined+"\n");
+			System.out.println("Predefined condition:\n"+predefined+"\n");
 
 			ICondition	result	= ConditionBuilder.buildCondition(constraints, predefined, tmodel);
 			
-			System.out.println("Condition after build: "+result+"\n");
+			System.out.println("Condition after build:\n"+result+"\n");
 		}
 		catch(Exception ex)
 		{
