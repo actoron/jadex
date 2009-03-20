@@ -28,9 +28,9 @@ public class JavaParserTest
 	{
 		try
 		{
-//			String c	= "$beliefbase_waste != $beliefbase_location";
-//			String c	= "$beliefbase_waste.getLocation().getDistance($beliefbase_location) > 0.2";
-			String c	= "$beliefbase_waste.getLocation().getDistance($beliefbase_waste2.getLocation()) > 0.2";
+//			String c	= "$waste != $location";
+//			String c	= "$waste.getLocation().getDistance($location) > 0.2";
+			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2";
 
 			// Todo: Agent specific handling ($beliefbase etc.s)
 //			String c	= "$beliefbase.chargestate > 0.2";
@@ -51,18 +51,18 @@ public class JavaParserTest
 				new File("../jadex-applications-bdi/target/classes").toURI().toURL()});
 			OAVTypeModel	tmodel	= new OAVTypeModel("cleanertypes", cl);
 
-			OAVObjectType	locatype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Location");
-			ObjectCondition	locacon	= new ObjectCondition(locatype);
-			locacon.addConstraint(new BoundConstraint(null, new Variable("$beliefbase_location", locatype)));
+//			OAVObjectType	locatype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Location");
+//			ObjectCondition	locacon	= new ObjectCondition(locatype);
+//			locacon.addConstraint(new BoundConstraint(null, new Variable("$location", locatype)));
 			
 			OAVObjectType	wastetype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Waste");
 			ObjectCondition	wastecon	= new ObjectCondition(wastetype);
-			wastecon.addConstraint(new BoundConstraint(null, new Variable("$beliefbase_waste", wastetype)));
+			wastecon.addConstraint(new BoundConstraint(null, new Variable("$waste", wastetype)));
 
 			ObjectCondition	wastecon2	= new ObjectCondition(wastetype);
-			wastecon2.addConstraint(new BoundConstraint(null, new Variable("$beliefbase_waste2", wastetype)));
+			wastecon2.addConstraint(new BoundConstraint(null, new Variable("$waste2", wastetype)));
 
-			ICondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon2, wastecon});
+			ICondition	predefined	= new AndCondition(new ICondition[]{/*locacon,*/ wastecon2, wastecon});
 			
 			System.out.println("Predefined condition: "+predefined+"\n");
 
