@@ -1,5 +1,7 @@
 package jadex.rules.rulesystem.rules;
 
+import java.util.List;
+
 
 /**
  *  A literal contraint assures that an object field/method has the
@@ -43,6 +45,15 @@ public class LiteralConstraint extends Constraint
 		return value;
 	}
 	
+	/**
+	 *  Get the variables.
+	 *  @return The declared variables.
+	 */
+	public List getVariables()
+	{
+		return getVariablesForValueSource(getValueSource());
+	}
+
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

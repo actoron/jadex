@@ -4,6 +4,7 @@ import jadex.commons.SReflect;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.MethodCall;
@@ -17,8 +18,10 @@ import jadex.rules.state.OAVTypeModel;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -71,6 +74,8 @@ public class ConditionBuilder
 				ocon.addConstraint(new LiteralConstraint(valuesource, right, getOperator(constraints[i].getOperator())));
 			}
 		}
+		
+		shuffle(lcons);
 
 		return lcons.size()>1 ? new AndCondition(lcons) : (ICondition)lcons.get(0);
 	}
@@ -233,6 +238,82 @@ public class ConditionBuilder
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Shuffle conditions and constraints, such that all variables are bound
+	 *  before used.
+	 *  @param lcons	The list of conditions (shuffled in place).
+	 */
+	protected static void	shuffle(List lcons)
+	{
+		Set	boundvars	= new HashSet();	// Variables, which are bound and therefore can be used.
+		boolean	progress	= true;
+		int	finished	= 0;
+		
+		while(progress)
+		{
+			progress	= false;
+			for(int i=finished; i<lcons.size(); i++)
+			{
+				ICondition	con	= (ICondition) lcons.get(i);
+	
+				// Find variables, which are bound (i.e. operator EQUAL) in this condition.
+				Set	localbound	= new HashSet();
+				List	bcs	= null;
+				if(lcons.get(i) instanceof ObjectCondition)
+				{
+					bcs	= ((ObjectCondition)lcons.get(i)).getBoundConstraints();
+				}
+				else if(lcons.get(i) instanceof CollectCondition)
+				{
+					bcs	= ((CollectCondition)lcons.get(i)).getBoundConstraints();
+				}
+				for(int j=0; bcs!=null && j<bcs.size(); j++)
+				{
+					BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
+					if(bc.getOperator().equals(IOperator.EQUAL))
+					{
+						List	bvars	= bc.getBindVariables();
+						for(int k=0; k<bvars.size(); k++)
+						{
+							localbound.add(bvars.get(k));
+						}
+					}
+				}
+				
+				// Check if all variables are bound.
+				List	vars	= con.getVariables();
+				boolean	check	= true;
+				for(int j=0; check && j<vars.size(); j++)
+				{
+					// Variable must be bound before or in this condition.
+					check	= boundvars.contains(vars.get(j)) || localbound.contains(vars.get(j));
+				}
+	
+				if(check)
+				{
+					// Todo: Shuffle constraints if necessary.
+					
+					// Variables of condition may now be used.
+					boundvars.addAll(localbound);
+					progress	= true;
+					finished++;
+				}
+				else
+				{
+					// Shuffle condition to the end
+					lcons.remove(i);
+					lcons.add(con);
+					i--;
+				}
+			}
+		}
+
+		if(finished<lcons.size())
+		{
+			throw new RuntimeException("Remaining unbound variables in conditions (cycle?): "+lcons+", "+finished);
+		}
 	}
 
 	/**

@@ -52,22 +52,44 @@ public abstract class Constraint implements IConstraint
 	{
 		return operator;
 	}
-	
+
 	/**
-	 *  Get the variables.
-	 *  @return The declared variables.
+	 *  Get the variables for a value source.
+	 *  @param valuesource	The value source
+	 *  @return The variables.
 	 */
-	public List getVariables()
+	public static List	getVariablesForValueSource(Object valuesource)
 	{
 		List	ret;
-		if(valuesource instanceof MethodCall)
+		if(valuesource instanceof Object[])
+		{
+			ret	= new ArrayList();
+			Object[]	srcs	= (Object[]) valuesource;
+			for(int i=0; i<srcs.length; i++)
+			{
+				ret.addAll(getVariablesForValueSource(srcs[i]));
+			}
+		}
+		else if(valuesource instanceof List)
+		{
+			ret	= new ArrayList();
+			List	srcs	= (List) valuesource;
+			for(int i=0; i<srcs.size(); i++)
+			{
+				ret.addAll(getVariablesForValueSource(srcs.get(i)));
+			}
+		}
+		else if(valuesource instanceof MethodCall)
 		{
 			ret	= ((MethodCall)valuesource).getVariables();
 		}
 		else if(valuesource instanceof Variable)
 		{
-			ret = new ArrayList();
-			ret.add(valuesource);
+			ret = Collections.singletonList(valuesource);
+		}
+		else if(valuesource instanceof FunctionCall)
+		{
+			ret	= ((FunctionCall)valuesource).getVariables();
 		}
 		else
 		{

@@ -88,15 +88,7 @@ public class FunctionCall
 		List ret = new ArrayList();
 		for(int i=0; i<paramsources.size(); i++)
 		{
-			Object tmp = paramsources.get(i);
-			if(tmp instanceof Variable)
-			{
-				ret.add(tmp);
-			}
-			else if(tmp instanceof FunctionCall)
-			{
-				ret.addAll(((FunctionCall)tmp).getVariables());
-			}
+			ret.addAll(Constraint.getVariablesForValueSource(paramsources.get(i)));
 		}
 		
 		return ret;

@@ -65,7 +65,7 @@ public class JavaParserTest
 			wastecon2.addConstraint(new BoundConstraint(null, new Variable("$waste2", wastetype)));
 
 //			ICondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon});
-			ICondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon, locacon});
+			ICondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon, wastecon2});
 			
 			System.out.println("Predefined condition:\n"+predefined+"\n");
 

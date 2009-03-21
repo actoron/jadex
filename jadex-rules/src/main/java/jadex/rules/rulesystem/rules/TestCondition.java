@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rules;
 
 import jadex.rules.rulesystem.ICondition;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class TestCondition implements ICondition
 	 */
 	public List getVariables()
 	{
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	/**

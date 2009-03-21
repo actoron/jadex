@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -67,14 +68,19 @@ public class BoundConstraint extends Constraint
 	{
 		if(depvars==null)
 		{
-			depvars	= super.getVariables();
-			if(depvars.isEmpty())
+			List	vfvs	= getVariablesForValueSource(getValueSource());
+			if(vfvs.isEmpty())
 			{
 				depvars	= vars;
 			}
 			else if(!vars.isEmpty())
 			{
+				depvars	= new ArrayList(vfvs);
 				depvars.addAll(vars);
+			}
+			else
+			{
+				depvars	= Collections.EMPTY_LIST;
 			}
 		}
 		return depvars;

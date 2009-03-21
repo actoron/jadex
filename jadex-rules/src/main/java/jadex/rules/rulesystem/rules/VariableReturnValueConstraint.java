@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +50,8 @@ public class VariableReturnValueConstraint extends ReturnValueConstraint
 	 */
 	public List getVariables()
 	{
-		List ret = super.getVariables();
+		List ret = new ArrayList();
+		ret.addAll(super.getVariables());
 		ret.add(var);
 		return ret;
 	}

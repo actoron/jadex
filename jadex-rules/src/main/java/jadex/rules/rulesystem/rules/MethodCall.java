@@ -108,15 +108,7 @@ public class MethodCall
 			depvars = new ArrayList();
 			for(int i=0; i<paramsources.size(); i++)
 			{
-				Object tmp = paramsources.get(i);
-				if(tmp instanceof Variable)
-				{
-					depvars.add(tmp);
-				}
-				else if(tmp instanceof FunctionCall)
-				{
-					depvars.addAll(((FunctionCall)tmp).getVariables());
-				}
+				depvars.addAll(Constraint.getVariablesForValueSource(paramsources.get(i)));
 			}
 		}
 		
