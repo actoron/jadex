@@ -1261,6 +1261,7 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_planinstancecandidate, null);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate, null);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, null);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, null);
 				
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_plans, rplan);
 //				System.out.println("Plan removed: "+rplan+", "+wqes);

@@ -18,6 +18,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -225,10 +226,30 @@ public class GoalLifecycleRules
 //			System.out.println("Dropped goal: "+rgoal+" "+state.getAttributeValue(state.getAttributeValue(rgoal, 
 //				OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED);
+			
+			// Cleanup goal to facilitate gc.
 			if(rplan!=null)
 			{
 				state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_subgoals, rgoal);
 			}
+			Collection coll = state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_finishedplans);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					state.removeAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_finishedplans, it.next());
+				}
+			}
+			coll = state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_finisheddispatchedplans);
+			if(coll!=null)
+			{
+				for(Iterator it=coll.iterator(); it.hasNext(); )
+				{
+					state.removeAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_finisheddispatchedplans, it.next());
+				}
+			}
+			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_parentplan, null);
+			
 			state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_goals, rgoal);
 		}
 	};

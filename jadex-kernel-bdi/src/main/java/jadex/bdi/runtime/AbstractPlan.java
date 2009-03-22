@@ -80,6 +80,16 @@ public abstract class AbstractPlan implements java.io.Serializable
 			throw new RuntimeException("Plan could not be inited: "+myadr+" - "+interpreter+" "+rplan);
 	}
 
+	/**
+	 *  Remove the external usage preventing
+	 *  the state object from being garbage
+	 *  collected.
+	 */
+	protected void finalize() throws Throwable
+	{
+		System.out.println("Finalized: "+this+" "+rplan);
+	}
+	
 	//-------- methods --------
 
 	/**

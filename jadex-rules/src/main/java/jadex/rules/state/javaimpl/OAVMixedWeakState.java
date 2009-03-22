@@ -65,9 +65,6 @@ public class OAVMixedWeakState	implements IOAVState
 	/** The deleted objects (only available in event notifications) (oid -> content map). */
 	protected Map deletedobjects;
 	
-	/** The object types (oid -> type). */
-//	protected Map types;
-	
 	/** The java objects set. */
 	protected Set javaobjects;
 	
@@ -244,6 +241,19 @@ public class OAVMixedWeakState	implements IOAVState
 							
 							if(cnts.size()>0)
 								System.out.println("objects@"+OAVMixedWeakState.this.hashCode()+": "+sorted);
+						
+//							try
+//							{
+//								System.out.print("checkcyc[");
+//								List cycles = findCycle(weakobjects.keySet());
+//								if(cycles!=null && cycles.size()>0)
+//									System.out.println("WAHHHHHHHHHH: "+cycles);
+//								System.out.println("]");
+//							}
+//							catch(Exception e)
+//							{
+//								e.printStackTrace();
+//							}
 						}
 					};
 					if(synchronizator!=null)
@@ -527,6 +537,7 @@ public class OAVMixedWeakState	implements IOAVState
 		// Remove the object itself (needs to be done before removing its references to avoid recursion)
 		Map content	= (Map)objects.remove(id);
 		weakobjects.put(id, content);
+				
 //		objectspertype.remove(types.get(id), id);
 		if(content==null)
 			throw new RuntimeException("Object not found: "+id);
@@ -894,23 +905,39 @@ public class OAVMixedWeakState	implements IOAVState
 					Map	theobject	= getObject(subgraph.get(i));
 					for(Iterator keys=theobject.keySet().iterator(); cycle==null && keys.hasNext(); )
 					{
-						OAVAttributeType	attr	= (OAVAttributeType)keys.next();
-						Object	value	= theobject.get(attr);
-						if(value instanceof Collection)
+						Object tmp = keys.next();
+						if(tmp instanceof OAVAttributeType)
 						{
-							for(Iterator refs=((Collection)value).iterator(); cycle==null && refs.hasNext(); )
-								cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), refs.next(), attr);
-						}
-						else if(value instanceof Map)
-						{
-							for(Iterator refs=((Map)value).values().iterator(); cycle==null && refs.hasNext(); )
-								cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), refs.next(), attr);
-							for(Iterator refs=((Map)value).keySet().iterator(); cycle==null && refs.hasNext(); )
-								cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), refs.next(), attr);
-						}						
-						else
-						{
-							cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), value, attr);
+							OAVAttributeType attr = (OAVAttributeType)tmp;
+							Object	value	= theobject.get(attr);
+							if(value instanceof Collection)
+							{
+								for(Iterator refs=((Collection)value).iterator(); cycle==null && refs.hasNext(); )
+								{
+									Object next = refs.next();
+									if(generator.isId(next))
+										cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), next, attr);
+								}
+							}
+							else if(value instanceof Map)
+							{
+								for(Iterator refs=((Map)value).values().iterator(); cycle==null && refs.hasNext(); )
+								{
+									Object next = refs.next();
+									if(generator.isId(next))
+										cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), next, attr);
+								}
+								for(Iterator refs=((Map)value).keySet().iterator(); cycle==null && refs.hasNext(); )
+								{	
+									Object next = refs.next();
+									if(generator.isId(next))
+										cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), next, attr);
+								}
+							}						
+							else if(generator.isId(value))
+							{
+								cycle = findCycleForValue(oids, checked, edges, subgraph, subgraph.get(i), value, attr);
+							}
 						}
 					}
 				}
@@ -928,11 +955,15 @@ public class OAVMixedWeakState	implements IOAVState
 	protected List findCycleForValue(Collection oids, Set checked, Map edges, List subgraph, Object current, Object next, OAVAttributeType attr)
 	{
 		// #ifndef MIDP
-		assert nocheck || generator.isId(current);
-		assert nocheck || generator.isId(next);
+//		assert nocheck || generator.isId(current);
+//		assert nocheck || generator.isId(next);
 		// #endif
 
 		List	cycle	= null;
+		
+		if(!generator.isId(current) || !generator.isId(next))
+			return cycle;
+			
 		if(edges.containsKey(next))
 		{
 			// Cycle found.
@@ -945,8 +976,11 @@ public class OAVMixedWeakState	implements IOAVState
 			{
 				Object	node1	= edges.get(node);
 				attr	= (OAVAttributeType)edges.get(new Tuple(node, node1));
+				if(attr!=null)
+					System.out.println("here: "+node+" "+node1);
+				
 				// prepend for expected ordering 'node, attr, ref'.
-				cycle.add(0, attr.getName());
+				cycle.add(0, attr!=null? attr.getName(): null);
 				cycle.add(0, node1);
 				node	= node1;
 			}
