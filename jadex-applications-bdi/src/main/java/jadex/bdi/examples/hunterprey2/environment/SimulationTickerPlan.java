@@ -30,12 +30,7 @@ public class SimulationTickerPlan extends Plan
 	
 	// The world environment
 	private Environment env = null;
-	
-//	// HACK! max iterations for a goal
-//	private Integer maxIterations = new Integer(10);
-//	private Map iterationCounters = new HashMap();
-//	private List recreatedGoals = new ArrayList();
-	
+
 	//-------- methods --------
 
 	/**
@@ -73,14 +68,18 @@ public class SimulationTickerPlan extends Plan
 
 				// wait for all move task simulation events 
 				IInternalEvent evt = null;
+				System.out.println("conuter: " + env.getSimTaskCounter());
 				while (env.getSimTaskCounter() != 0)
 				{
 					do
 					{
+						System.out.println("waiting for sim-event");
 						evt = waitForInternalEvent("simulation_event");
 					} while (!evt.getParameter("type").getValue().equals(SimulationEvent.DESTINATION_REACHED));
 
+					
 					env.updateSimTaskCounter(-1);
+					System.out.println("sim-event! coutner decreased, new value: " + env.getSimTaskCounter());
 				}
 
 				// Dispatch new visions.

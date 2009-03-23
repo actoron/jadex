@@ -254,7 +254,7 @@ public class Environment implements IEnvironment
 	 */
 	protected synchronized void updateSimTaskCounter(int diff)
 	{
-		simtaskcounter =+ diff;
+		simtaskcounter += diff;
 		this.pcs.firePropertyChange("simTaskCounter", simtaskcounter-diff, simtaskcounter);
 	}
 
@@ -516,9 +516,7 @@ public class Environment implements IEnvironment
 
 				List tasks = new ArrayList();
 				tasks.add(new MoveObjectTask(new Vector2Double(0.0), engine.getAreaSize().copy()));
-				Integer simId = createSimObject(copy, getSimObjectType(copy), props, tasks,
-						true, true);
-				copy.setSimId(simId);
+				createSimObject(copy, getSimObjectType(copy), props, tasks, true, true);
 				
 				this.highscore.add(copy);
 
