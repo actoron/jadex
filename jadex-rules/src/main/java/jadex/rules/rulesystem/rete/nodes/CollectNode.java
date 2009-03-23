@@ -150,6 +150,8 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		CollectMemory nodemem = (CollectMemory)mem.getNodeMemory(this);
 		
 		Tuple resulttuple = nodemem.getWorkingTuple(indextuple);
+		
+		// Create new result tuple if none is present.
 		if(resulttuple==null)
 		{
 			List obs = left.getObjects();
@@ -169,6 +171,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			}
 			nodemem.putWorkingTuple(indextuple, resulttuple);
 		}
+		// Add new value to existing reult tuple.
 		else
 		{
 			// Hack!!! Changing original tuple should be avoided,
@@ -210,6 +213,8 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+		
+//		System.out.println(nodemem);
 	}
 
 	/**
@@ -225,41 +230,56 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		Tuple indextuple = createIndexTuple(state, left, mem);
 		CollectMemory nodemem = (CollectMemory)mem.getNodeMemory(this);
 		Tuple resulttuple = nodemem.getWorkingTuple(indextuple);
+		
 		assert resulttuple!=null: "No working tuple found: "+indextuple;
 		
 		Object val = left.getObject(tupleindex);
 		Set vals = (Set)resulttuple.getObject(tupleindex);
-		boolean removed = vals.remove(val);
-		assert removed: "Value not found in result tuple: "+val;
 		
-		if(checkConstraints(resulttuple, state))
+		boolean removed = vals.remove(val);
+		
+		// Remove tuple when last element is removed from set. 
+		if(vals.isEmpty())
 		{
-			// If constraints passed and not in result -> add
-			if(!nodemem.resultMemoryContains(resulttuple))
-			{
-				nodemem.addResultTuple(resulttuple);
-				propagateAdditionToTupleConsumers(resulttuple, state, mem, agenda);
-			}
-			// If constraints passed and in result -> modify
-			else
-			{
-				// todo: 
-				propagateModificationToTupleConsumers(resulttuple, null, null, resulttuple, state, mem, agenda);
-			}
+			nodemem.removeWorkingTuple(indextuple);
+			nodemem.removeResultTuple(resulttuple);
 		}
+		// Check constraints if at least one element.
 		else
 		{
-			// If constraints not passed and in result -> remove
-			if(nodemem.resultMemoryContains(resulttuple))
+			assert removed: "Value not found in result tuple: "+val;
+			
+			if(checkConstraints(resulttuple, state))
 			{
-				nodemem.removeResultTuple(resulttuple);
-				propagateRemovalToTupleConsumers(resulttuple, state, mem, agenda);
+				// If constraints passed and not in result -> add
+				if(!nodemem.resultMemoryContains(resulttuple))
+				{
+					nodemem.addResultTuple(resulttuple);
+					propagateAdditionToTupleConsumers(resulttuple, state, mem, agenda);
+				}
+				// If constraints passed and in result -> modify
+				else
+				{
+					// todo: 
+					propagateModificationToTupleConsumers(resulttuple, null, null, resulttuple, state, mem, agenda);
+				}
 			}
-			// If constraints not passed and not in result -> nop
+			else
+			{
+				// If constraints not passed and in result -> remove
+				if(nodemem.resultMemoryContains(resulttuple))
+				{
+					nodemem.removeResultTuple(resulttuple);
+					propagateRemovalToTupleConsumers(resulttuple, state, mem, agenda);
+				}
+				// If constraints not passed and not in result -> nop
+			}
 		}
 		
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	
+//		System.out.println(nodemem);
 	}
 
 	/**
@@ -322,6 +342,8 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
+	
+//		System.out.println(nodemem);
 	}
 
 	/**

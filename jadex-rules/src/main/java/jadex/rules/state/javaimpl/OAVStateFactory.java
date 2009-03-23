@@ -13,7 +13,7 @@ public class OAVStateFactory
 	 */
 	public static IOAVState	createOAVState(OAVTypeModel model)
 	{
-//		return new OAVState(model);
-		return new OAVMixedWeakState(model);
+		return new OAVState(model);
+//		return new OAVMixedWeakState(model);
 	}
 }

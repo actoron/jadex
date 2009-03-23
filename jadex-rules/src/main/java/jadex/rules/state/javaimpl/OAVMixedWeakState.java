@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -31,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.WeakHashMap;
 
 /**
@@ -149,7 +147,7 @@ public class OAVMixedWeakState	implements IOAVState
 //		this.generator = new OAVObjectIdGenerator();
 				
 //		this.nocheck = true;
-		new Thread(new Runnable()
+/*		new Thread(new Runnable()
 		{
 			public void run()
 			{
@@ -270,7 +268,7 @@ public class OAVMixedWeakState	implements IOAVState
 //					old_tsize	= Math.max(old_tsize, tsize);
 				}
 			}
-		}).start();
+		}).start();*/
 	}
 	
 	/**
@@ -976,8 +974,8 @@ public class OAVMixedWeakState	implements IOAVState
 			{
 				Object	node1	= edges.get(node);
 				attr	= (OAVAttributeType)edges.get(new Tuple(node, node1));
-				if(attr!=null)
-					System.out.println("here: "+node+" "+node1);
+//				if(attr!=null)
+//					System.out.println("here: "+node+" "+node1);
 				
 				// prepend for expected ordering 'node, attr, ref'.
 				cycle.add(0, attr!=null? attr.getName(): null);

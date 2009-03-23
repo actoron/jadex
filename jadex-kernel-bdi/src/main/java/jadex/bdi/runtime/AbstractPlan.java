@@ -84,11 +84,11 @@ public abstract class AbstractPlan implements java.io.Serializable
 	 *  Remove the external usage preventing
 	 *  the state object from being garbage
 	 *  collected.
-	 */
+	 * /
 	protected void finalize() throws Throwable
 	{
 		System.out.println("Finalized: "+this+" "+rplan);
-	}
+	}*/
 	
 	//-------- methods --------
 
