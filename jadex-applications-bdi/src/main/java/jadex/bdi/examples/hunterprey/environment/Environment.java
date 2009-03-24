@@ -265,7 +265,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public synchronized TaskInfo addEatTask(Creature me, WorldObject obj)
+	public TaskInfo addEatTask(Creature me, WorldObject obj)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"eat", me, obj});
 		tasklist.add(ret);
@@ -276,7 +276,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Add a move or eat action to the queue.
 	 */
-	public synchronized TaskInfo addMoveTask(Creature me, String dir)
+	public TaskInfo addMoveTask(Creature me, String dir)
 	{
 		TaskInfo ret = new TaskInfo(new Object[]{"move", me, dir});
 		tasklist.add(ret);
@@ -290,7 +290,7 @@ public class Environment implements IEnvironment
 	 * other Agents. They compute their next step with the old vision. :-( 
 	 * This is a race condition too! Tasks can be lost.
 	 */
-	protected synchronized void clearTaskList()
+	protected void clearTaskList()
 	{
 		int length = tasklist.size();
 		tasklist.clear();
@@ -392,7 +392,7 @@ public class Environment implements IEnvironment
 	 *  Add a new creature to the world.
 	 *  @param creature The creature.
 	 */
-	public synchronized Creature addCreature(Creature creature)
+	public Creature addCreature(Creature creature)
 	{
 		Creature copy;
 		if(!creatures.containsKey(creature))
@@ -428,7 +428,7 @@ public class Environment implements IEnvironment
 	 *  Remove a creature to the world.
 	 *  @param creature The creature.
 	 */
-	public synchronized boolean removeCreature(Creature creature)
+	public boolean removeCreature(Creature creature)
 	{
 		// Remove tasks of this creature.
 		int	tasks	= tasklist.size();
@@ -451,7 +451,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Execute a step.
 	 */
-	public synchronized void executeStep()
+	public void executeStep()
 	{
 		// Creatures that already acted in this step.
 		Set	acted	= new HashSet();
@@ -694,24 +694,6 @@ public class Environment implements IEnvironment
 	}
 
 	/**
-	 *  Block a thread until the monitor is notified.
-	 * /
-	protected void block()
-	{
-		try
-		{
-			synchronized(monitor)
-			{
-				monitor.wait();
-			}
-		}
-		catch(InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 *  Get the internal representation of a creature.
 	 *  If the creature is unknown it gets added to the environment.
 	 *  @param creature The creature.
@@ -755,7 +737,7 @@ public class Environment implements IEnvironment
 	 *  Get the current highscore.
 	 *  @return The 10 best creatures.
 	 */
-	public synchronized Creature[] getHighscore()
+	public Creature[] getHighscore()
 	{
 		try {
 			Collections.sort(highscore, new Comparator()
@@ -778,7 +760,7 @@ public class Environment implements IEnvironment
 	/**
 	 *  Save the highscore to a file.
 	 */
-	public synchronized void saveHighscore()
+	public void saveHighscore()
 	{
 		OutputStreamWriter os = null;
 		try

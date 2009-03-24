@@ -97,7 +97,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo("match", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		
 		typeinfos.add(new TypeInfo("expression", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
-		typeinfos.add(new TypeInfo("expression/parameter", OAVBDIMetaModel.expressionparameter_type));
+//		typeinfos.add(new TypeInfo("expression/parameter", OAVBDIMetaModel.expressionparameter_type));
 		typeinfos.add(new TypeInfo("condition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		
 		typeinfos.add(new TypeInfo("property", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));

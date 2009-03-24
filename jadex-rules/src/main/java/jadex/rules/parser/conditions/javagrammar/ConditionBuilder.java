@@ -92,10 +92,10 @@ public class ConditionBuilder
 	protected static Object[] getObjectConditionAndValueSource(UnaryExpression value, List lcons, Map bcons, OAVTypeModel tmodel)
 	{
 		Object[]	ret;
-		Primary	prim	= value.getPrimary();
-		if(prim instanceof jadex.rules.parser.conditions.javagrammar.Variable)
+		Object	prim	= value.getPrimary();
+		if(prim instanceof Variable)
 		{
-			Variable	var	= (Variable) bcons.get(((jadex.rules.parser.conditions.javagrammar.Variable)prim).getName());
+			Variable	var	= (Variable)prim;
 			if(var==null)
 			{
 				throw new RuntimeException("Unbound variable: "+prim);
@@ -204,12 +204,12 @@ public class ConditionBuilder
 	protected static Object flattenToPrimary(UnaryExpression value, List lcons, Map bcons, OAVTypeModel tmodel)
 	{
 		Object	ret;
-		Primary	prim	= value.getPrimary();
+		Object	prim	= value.getPrimary();
 		if(value.getSuffixes()==null)
 		{
-			if(prim instanceof jadex.rules.parser.conditions.javagrammar.Variable)
+			if(prim instanceof Variable)
 			{
-				ret	= bcons.get(((jadex.rules.parser.conditions.javagrammar.Variable)prim).getName());
+				ret	= prim;
 				if(ret==null)
 				{
 					throw new RuntimeException("Unbound variable: "+prim);

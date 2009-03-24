@@ -6,7 +6,7 @@ import jadex.commons.SUtil;
 /**
  *  A literal is a constant primary value.
  */
-public class Literal	extends	Primary
+public class Literal
 {
 	//-------- attributes --------
 	

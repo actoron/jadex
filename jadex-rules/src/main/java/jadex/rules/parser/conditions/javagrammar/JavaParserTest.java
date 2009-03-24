@@ -11,6 +11,7 @@ import jadex.rules.state.OAVTypeModel;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Map;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -32,23 +33,18 @@ public class JavaParserTest
 //			String c	= "$waste.getLocation().getDistance($location) > 0.2";
 //			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2";
 //			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $waste.getLocation()!=$location";
-			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $location!=$waste.getLocation()";
+//			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $location!=$waste.getLocation()";
 
 			// Todo: Agent specific handling ($beliefbase etc.s)
 //			String c	= "$beliefbase.chargestate > 0.2";
 //			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2";
-//			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2==7";
+			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2==7";
 			
 			ANTLRStringStream exp = new ANTLRStringStream(c);
 			JavaJadexLexer lexer = new JavaJadexLexer(exp);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			JavaJadexParser parser = new JavaJadexParser(tokens);
 		
-			parser.rhs();
-			System.out.println("Parsed expression:\n"+parser.getStack()+"\n");
-			Constraint[]	constraints	= (Constraint[])parser.getStack()
-				.toArray(new Constraint[parser.getStack().size()]);
-
 			ClassLoader	cl	= new URLClassLoader(new URL[]{
 				new File("../jadex-applications-bdi/target/classes").toURI().toURL()});
 			OAVTypeModel	tmodel	= new OAVTypeModel("cleanertypes", cl);
@@ -64,10 +60,29 @@ public class JavaParserTest
 			ObjectCondition	wastecon2	= new ObjectCondition(wastetype);
 			wastecon2.addConstraint(new BoundConstraint(null, new Variable("$waste2", wastetype)));
 
-//			ICondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon});
-			ICondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon, wastecon2});
+//			AndCondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon});
+			AndCondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon, wastecon2});
+			final Map	varmap	= ConditionBuilder.buildConditionMap(predefined.getConditions());
 			
 			System.out.println("Predefined condition:\n"+predefined+"\n");
+
+			parser.setParserHelper(new IParserHelper()
+			{
+				public Variable getVariable(String name)
+				{
+					return (Variable)varmap.get(name);
+				}
+				
+				public boolean isPseudoVariable(String name)
+				{
+					return name.equals("$beliefbase");
+				}
+			});
+			parser.lhs();
+
+			System.out.println("Parsed expression:\n"+parser.getStack()+"\n");
+			Constraint[]	constraints	= (Constraint[])parser.getStack()
+				.toArray(new Constraint[parser.getStack().size()]);
 
 			ICondition	result	= ConditionBuilder.buildCondition(constraints, predefined, tmodel);
 			

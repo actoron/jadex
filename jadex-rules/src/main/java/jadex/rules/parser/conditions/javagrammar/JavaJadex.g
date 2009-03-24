@@ -5,6 +5,8 @@ grammar JavaJadex;
 @header 
 {
 package jadex.rules.parser.conditions.javagrammar;
+
+import jadex.rules.rulesystem.rules.Variable;
 }
 
 @lexer::header 
@@ -17,12 +19,23 @@ package jadex.rules.parser.conditions.javagrammar;
 	/** The stack of elements generated during parsing. */
 	protected List	stack	= new ArrayList();
 	
+	/** The parser helper provides additional information (e.g. local variables). */
+	protected IParserHelper	helper;
+	
 	/**
 	 *  Get the elements from the stack.
 	 */
 	public List	getStack()
 	{
 		return stack;
+	}
+
+	/**
+	 *  Set the predefined conditions.
+	 */
+	public void	setParserHelper(IParserHelper helper)
+	{
+		this.helper	= helper;
 	}
 }
 
@@ -79,7 +92,7 @@ equalityExpression
  *  A comparison between two values.
  */
 relationalExpression
-	: unaryExpression
+	: additiveExpression
         (
 		{
 			String	operator	= null;
@@ -88,7 +101,7 @@ relationalExpression
         	|'<''=' {operator="<=";}
         	|'>' {operator=">";}
         	|'>''=' {operator=">=";}
-        	) unaryExpression
+        	) additiveExpression
 	        {
 	        	// Pop values from stack and add constraint.
 	        	UnaryExpression	right	= (UnaryExpression)stack.remove(stack.size()-1);
@@ -96,6 +109,27 @@ relationalExpression
 	        	stack.add(new Constraint(left, right, operator));
 	        }
         )?
+	;
+
+/**
+ *  An additive expression adds or subtracts two values.
+ */
+additiveExpression
+	: unaryExpression
+        (
+		{
+			String	operator	= null;
+		}
+	        ('+' {operator="+";}
+        	|'-' {operator="-";}
+        	) unaryExpression
+	        {
+	        	// Pop values from stack and add constraint.
+	        	UnaryExpression	right	= (UnaryExpression)stack.remove(stack.size()-1);
+	        	UnaryExpression	left	= (UnaryExpression)stack.remove(stack.size()-1);
+	        	stack.add(new Operation(left, right, operator));
+	        }
+	)?
 	;
 	
 /**
@@ -114,7 +148,7 @@ unaryExpression
 				suffs	= new ArrayList();
 			suffs.add(0, stack.remove(stack.size()-1));
 		}
-		Primary	prim	= (Primary)stack.remove(stack.size()-1);
+		Object	prim	= (Object)stack.remove(stack.size()-1);
 		stack.add(new UnaryExpression(prim, suffs==null ? null
 			: (Suffix[])suffs.toArray(new Suffix[suffs.size()])));
 	}
@@ -124,8 +158,9 @@ unaryExpression
  *  Primary part of a expression, i.e. a direct representation of a value.
  */
 primary
-	: /*'(' expression ')'	// Todo
-	|*/ literal
+	: '(' expression ')'
+	| literal
+	| {helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText())}? pseudovariable
 	| variable
 	;
 
@@ -168,12 +203,34 @@ methodAccess
  *  A variable represents a value provided from the outside.
  */
 variable
-	: tmp = IDENTIFIER {stack.add(new Variable(tmp.getText()));}
+	: tmp = IDENTIFIER
+	{
+		Variable	var	= helper.getVariable(tmp.getText());
+		if(var!=null)
+			stack.add(var);
+		else
+			throw new RuntimeException("No such variable: "+tmp.getText());
+	}
+	;
+
+/**
+ *  A pseudo variable represents a value provided from the outside.
+ */
+pseudovariable
+	: tmp = IDENTIFIER '.' tmp2=IDENTIFIER
+	{
+		String name	= tmp.getText()+"."+tmp2.getText();
+		Variable	var	= helper.getVariable(name);
+		if(var!=null)
+			stack.add(var);
+		else
+			throw new RuntimeException("No such variable: "+name);
+	}
 	;
 
 literal
-	: lit=floatingPointLiteral
-	| lit=integerLiteral
+	: floatingPointLiteral
+	| integerLiteral
 	| CharacterLiteral {stack.add(new Literal(new Character($CharacterLiteral.text.charAt(0))));}
 	| StringLiteral {stack.add(new Literal($StringLiteral.text.substring(1, $StringLiteral.text.length()-1)));}
 	| BooleanLiteral {stack.add(new Literal($BooleanLiteral.text.equals("true")? Boolean.TRUE: Boolean.FALSE));}

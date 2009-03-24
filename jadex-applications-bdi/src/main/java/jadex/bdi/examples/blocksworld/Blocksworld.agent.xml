@@ -317,7 +317,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		</configuration>
 
 		<!-- Benchmark configuration. Uses benchmark plan to perform runs, and quiet stack plans. -->
-		<configuration name="benchmark(runs=10, goals=10)">
+		<configuration name="benchmark(runs=10/goals=10)">
 			<beliefs>
 				<initialbelief ref="quiet">
 					<fact>true</fact>
@@ -329,7 +329,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		</configuration>
 
 		<!-- Benchmark configuration. Uses benchmark plan to perform runs, and quiet stack plans. -->
-		<configuration name="benchmark(runs=10, goals=50)">
+		<configuration name="benchmark(runs=10/goals=50)">
 			<beliefs>
 				<initialbelief ref="quiet">
 					<fact>true</fact>
@@ -345,7 +345,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		</configuration>
 
 		<!-- Benchmark configuration. Uses benchmark plan to perform runs, and quiet stack plans. -->
-		<configuration name="benchmark(runs=10, goals=500)">
+		<configuration name="benchmark(runs=10/goals=500)">
 			<beliefs>
 				<initialbelief ref="quiet">
 					<fact>true</fact>

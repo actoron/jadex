@@ -163,7 +163,7 @@
 			select NegotiationReport $nr from $beliefbase.negotiation_reports
 			where $nr.getOrder().equals($order)
 			order by $nr.getTime()
-			<parameter name="$order" class="Order"/>
+			<!-- <parameter name="$order" class="Order"/> -->
 		</expression>
 	</expressions>
 

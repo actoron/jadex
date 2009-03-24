@@ -61,4 +61,16 @@ public class InterpreterTimedObject implements ITimedObject
 	{
 		return action;
 	}
+
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		String	name	= null;
+		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+		if(bdii!=null)
+			name	= bdii.getAgentAdapter().getAgentIdentifier().getLocalName();
+		return name + ": " + action; 
+	}
 }

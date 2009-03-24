@@ -9,8 +9,8 @@ public class UnaryExpression
 {
 	//-------- attributes --------
 	
-	/** The primary value. */
-	protected Primary	primary;
+	/** The primary value expression. */
+	protected Object	primary;
 	
 	/** The suffixes, if any. */
 	protected Suffix[]	suffixes;
@@ -20,7 +20,7 @@ public class UnaryExpression
 	/**
 	 *  Create a new unary expression.
 	 */
-	public UnaryExpression(Primary primary, Suffix[] suffixes)
+	public UnaryExpression(Object primary, Suffix[] suffixes)
 	{
 		this.primary	= primary;
 		this.suffixes	= suffixes;
@@ -29,9 +29,9 @@ public class UnaryExpression
 	//-------- methods --------
 	
 	/**
-	 *  Get the primary value.
+	 *  Get the primary value expression.
 	 */
-	public Primary	getPrimary()
+	public Object	getPrimary()
 	{
 		return this.primary;
 	}

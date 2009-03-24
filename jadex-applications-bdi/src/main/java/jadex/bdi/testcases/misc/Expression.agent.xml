@@ -41,7 +41,8 @@
 	<expressions>
 		<expression name="exp" class="String">
 			new String[]{"a","b","c"}[$num]
-			<parameter name="$num" class="int"/> <!-- bug in jibx :-( text must be before subtags. -->
+			<!-- bug in jibx :-( text must be before subtags. -->
+			<!-- <parameter name="$num" class="int"/>  -->
 		</expression>
 
 		<expression name="join" class="String">

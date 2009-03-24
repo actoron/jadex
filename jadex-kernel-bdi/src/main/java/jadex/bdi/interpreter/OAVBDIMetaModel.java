@@ -315,37 +315,37 @@ public class OAVBDIMetaModel
 
 	//-------- expression parameter --------
 
-	/** The expression parameter type. */
-	public static OAVObjectType expressionparameter_type;
-	
-	/** Expression parameter has class attribute. */
-	public static OAVAttributeType expressionparameter_has_class;
+//	/** The expression parameter type. */
+//	public static OAVObjectType expressionparameter_type;
+//	
+//	/** Expression parameter has class attribute. */
+//	public static OAVAttributeType expressionparameter_has_class;
 	
 	//-------- expression relevants --------
 
-	/** The expression relevant type. */
-	public static OAVObjectType expressionrelevant_type;
-	
-	/** Expression relevant has reference attribute. */
-	public static OAVAttributeType expressionrelevant_has_ref;
-	
-	/** Expression relevant has reference attribute. */
-	public static OAVAttributeType expressionrelevant_has_eventtype;
-	
-	/** The relevant belief type. */
-	public static OAVObjectType relevantbelief_type;
-	
-	/** The relevant beliefset type. */
-	public static OAVObjectType relevantbeliefset_type;
-	
-	/** The relevant goal type. */
-	public static OAVObjectType relevantgoal_type;
-	
-	/** The relevant parameter type. */
-	public static OAVObjectType relevantparameter_type;
-	
-	/** The relevant parameterset type. */
-	public static OAVObjectType relevantparameterset_type;
+//	/** The expression relevant type. */
+//	public static OAVObjectType expressionrelevant_type;
+//	
+//	/** Expression relevant has reference attribute. */
+//	public static OAVAttributeType expressionrelevant_has_ref;
+//	
+//	/** Expression relevant has reference attribute. */
+//	public static OAVAttributeType expressionrelevant_has_eventtype;
+//	
+//	/** The relevant belief type. */
+//	public static OAVObjectType relevantbelief_type;
+//	
+//	/** The relevant beliefset type. */
+//	public static OAVObjectType relevantbeliefset_type;
+//	
+//	/** The relevant goal type. */
+//	public static OAVObjectType relevantgoal_type;
+//	
+//	/** The relevant parameter type. */
+//	public static OAVObjectType relevantparameter_type;
+//	
+//	/** The relevant parameterset type. */
+//	public static OAVObjectType relevantparameterset_type;
 	
 	//-------- condition --------
 	
@@ -811,16 +811,16 @@ public class OAVBDIMetaModel
 		modelelement_type = bdimm_type_model.createType("melement", object_type);
 		capabilityref_type	= bdimm_type_model.createType("mcapabilityref", modelelement_type);
 		referenceableelement_type	= bdimm_type_model.createType("mreferenceableelement", modelelement_type);
-		expressionrelevant_type = bdimm_type_model.createType("mexpressionrelevant", modelelement_type);
+//		expressionrelevant_type = bdimm_type_model.createType("mexpressionrelevant", modelelement_type);
 		elementreference_type	= bdimm_type_model.createType("melementreference", referenceableelement_type);
-		expressionparameter_type = bdimm_type_model.createType("mexpressionparameter", modelelement_type);
+//		expressionparameter_type = bdimm_type_model.createType("mexpressionparameter", modelelement_type);
 		expression_type = bdimm_type_model.createType("mexpression", referenceableelement_type);
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
-		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
-		relevantbeliefset_type = bdimm_type_model.createType("mrelevantbeliefset", expressionrelevant_type);
-		relevantgoal_type = bdimm_type_model.createType("mrelevantgoal", expressionrelevant_type);
-		relevantparameter_type = bdimm_type_model.createType("mrelevantparameter", expressionrelevant_type);
-		relevantparameterset_type = bdimm_type_model.createType("mrelevantparameterset", expressionrelevant_type);
+//		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
+//		relevantbeliefset_type = bdimm_type_model.createType("mrelevantbeliefset", expressionrelevant_type);
+//		relevantgoal_type = bdimm_type_model.createType("mrelevantgoal", expressionrelevant_type);
+//		relevantparameter_type = bdimm_type_model.createType("mrelevantparameter", expressionrelevant_type);
+//		relevantparameterset_type = bdimm_type_model.createType("mrelevantparameterset", expressionrelevant_type);
 		typedelement_type = bdimm_type_model.createType("mtypedelement", referenceableelement_type);
 		parameter_type = bdimm_type_model.createType("mparameter", typedelement_type);
 		parameterset_type = bdimm_type_model.createType("mparameterset", typedelement_type);
@@ -893,14 +893,14 @@ public class OAVBDIMetaModel
 		// expression
 //		expressionparameter_has_class = expressionparameter_type.createAttributeType("mexpressionparameter_has_class", OAVJavaType.java_class_type);
 		
-		expressionrelevant_has_ref = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_ref", OAVJavaType.java_string_type);
-		expressionrelevant_has_eventtype = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_eventtype", OAVJavaType.java_string_type);
+//		expressionrelevant_has_ref = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_ref", OAVJavaType.java_string_type);
+//		expressionrelevant_has_eventtype = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_eventtype", OAVJavaType.java_string_type);
 
 		expression_has_language = expression_type.createAttributeType("mexpression_has_language", OAVJavaType.java_string_type, OAVAttributeType.NONE);//, "java");
 		expression_has_content = expression_type.createAttributeType("mexpression_has_content", OAVJavaType.java_object_type);// java_parsedexpression_type)
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
-		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
-		expression_has_relevants = expression_type.createAttributeType("mexpression_has_relevants",  expressionrelevant_type, OAVAttributeType.LIST);
+//		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
+//		expression_has_relevants = expression_type.createAttributeType("mexpression_has_relevants",  expressionrelevant_type, OAVAttributeType.LIST);
 		expression_has_evaluationmode = expression_type.createAttributeType("mexpression_has_evaluationmode", OAVJavaType.java_string_type);
 				
 		// condition
