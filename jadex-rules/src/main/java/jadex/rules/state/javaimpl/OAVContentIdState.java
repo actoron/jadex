@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ import java.util.Set;
  *  An object holding the agent state as
  *  OAV triples (object, attribute, value).
  */
-public class OAVState	extends OAVAbstractState
+public class OAVContentIdState	extends OAVAbstractState
 {
 	// #ifndef MIDP
 	//-------- constants --------
@@ -26,10 +27,12 @@ public class OAVState	extends OAVAbstractState
 	
 	//-------- attributes --------
 	
-	/** The objects table (oid -> content map). */
-	protected Map objects;
+	/** The objects table. */
+	protected Set objects;
 	
-	/**  Writing (and therefore resurrecting) is not supported. */
+	/** The external usages of object ids (object id -> cnt).
+	 *  Externally referenced objects can be read, even after they are removed from the state due to garbage collection.
+	 *  Writing (and therefore resurrecting) is not supported. */
 	protected Map externalusages;
 	
 	//-------- constructors --------
@@ -37,15 +40,27 @@ public class OAVState	extends OAVAbstractState
 	/**
 	 *  Create a new empty OAV state representation.
 	 */
-	public OAVState(OAVTypeModel tmodel)
+	public OAVContentIdState(OAVTypeModel tmodel)
 	{
 		super(tmodel);
-		this.objects = new LinkedHashMap();
-		this.externalusages = new LinkedHashMap();
+		this.objects = new LinkedHashSet();
+	}
+	
+	/**
+	 *  Create an id generator.
+	 *  @return The id generator.
+	 */
+	public IOAVIdGenerator createIdGenerator()
+	{
+		return new OAVDebugIdGenerator();
+		
+//		return new OAVNameIdGenerator();
+//		return new OAVLongIdGenerator();
+//		return new OAVObjectIdGenerator();
 	}
 	
 	//-------- object management --------
-		
+	
 	/**
 	 *  Add an external usage of a state object (oid). This prevents
 	 *  the oav object of being garbage collected as long
@@ -186,9 +201,8 @@ public class OAVState	extends OAVAbstractState
 	 */
 	protected Map internalCreateObject(Object id)
 	{
-		Map content = new LinkedHashMap();
-		objects.put(id, content);
-		return content;
+		objects.add(id);
+		return null;//((ContentId)id).getContentMap();
 	}
 	
 	/**
@@ -198,7 +212,8 @@ public class OAVState	extends OAVAbstractState
 	 */
 	protected Map internalRemoveObject(Object id)
 	{
-		return (Map)objects.remove(id);
+		objects.remove(id);
+		return null;//((ContentId)id).getContentMap();
 	}
 	
 	/**
@@ -208,7 +223,7 @@ public class OAVState	extends OAVAbstractState
 	 */
 	protected Map internalGetObjectContent(Object id)
 	{
-		return (Map)objects.get(id);
+		return null;//((ContentId)id).getContentMap();
 	}
 	
 	/**
@@ -218,7 +233,7 @@ public class OAVState	extends OAVAbstractState
 	 */
 	protected boolean internalContainsObject(Object id)
 	{
-		return objects.containsKey(id);
+		return objects.contains(id);
 	}
 	
 	/**
@@ -236,7 +251,7 @@ public class OAVState	extends OAVAbstractState
 	 */
 	protected Set internalGetObjects()
 	{
-		return objects.keySet();
+		return objects;
 	}
 
 }
