@@ -258,14 +258,12 @@ public class GoalLifecycleRules
 	
 	/**
 	 *  Create a goal, when the ADF creation condition triggers.
-	 *  @param usercond	The ADF part of the creation condition.
 	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalCreationUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[] createGoalCreationUserRule(Object model)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-//		Variable mcapa = new Variable("?mcapa", OAVBDIMetaModel.capability_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		
 		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
@@ -274,19 +272,15 @@ public class GoalLifecycleRules
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
-//		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mcapa));
 		capcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.capability_has_goals}, mgoal, IOperator.CONTAINS));
 		
 		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
 		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
 		mgoalcon.addConstraint(new LiteralConstraint(null, model));
 		
-//		ObjectCondition	mcapcon	= new ObjectCondition(OAVBDIMetaModel.capability_type);
-//		mcapcon.addConstraint(new BoundConstraint(null, mcapa));
-//		mcapcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.capability_has_goals, mgoal, IOperator.CONTAINS));
-		
-		Rule rule = new Rule(rulename, new AndCondition(new ICondition[]{ragentcon, mgoalcon, capcon, usercond}), GOAL_CREATION_ACTION);
-		return rule;
+		return new Object[]{
+			new AndCondition(new ICondition[]{ragentcon, mgoalcon, capcon}),
+			GOAL_CREATION_ACTION};
 	}
 	
 	/**

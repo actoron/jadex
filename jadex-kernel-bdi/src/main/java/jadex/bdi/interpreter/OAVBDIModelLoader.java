@@ -6,6 +6,9 @@ import jadex.commons.Tuple;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.xml.Reader;
 import jadex.commons.xml.StackElement;
+import jadex.rules.parser.conditions.ParserHelper;
+import jadex.rules.parser.conditions.javagrammar.IParserHelper;
+import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
@@ -16,8 +19,10 @@ import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.Constraint;
 import jadex.rules.rulesystem.rules.IOperator;
+import jadex.rules.rulesystem.rules.IPriorityEvaluator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.ObjectCondition;
+import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -342,10 +347,11 @@ public class OAVBDIModelLoader
 	{
 		IRulebase rb = model.getRulebase();
 		IOAVState	state	= model.getState();
-		Object	magent	= model.getHandle();
+		Object	mcapa	= model.getHandle();
+		String[]	imports	= OAVBDIXMLReader.getImports(state, mcapa);
 		
 		// Build user defined goal conditions and add them to the rule base.
-		Collection mgoals = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_goals);
+		Collection mgoals = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goals);
 		if(mgoals!=null)
 		{
 			for(Iterator it=mgoals.iterator(); it.hasNext(); )
@@ -358,11 +364,12 @@ public class OAVBDIModelLoader
 				Object create = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_creationcondition);
 				if(create!=null)
 				{
-					ICondition usercond = (ICondition)state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
+					Object usercond = state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
 					{
 						String rulename = Rulebase.getUniqueRuleName(rb, "goal_create_"+gtname);
-						rb.addRule(GoalLifecycleRules.createGoalCreationUserRule(rulename, usercond, mgoal));
+						Object[]	tmp	= GoalLifecycleRules.createGoalCreationUserRule(mgoal);
+						rb.addRule(createUserRule(state, mcapa, imports, mgoal, create, usercond, rulename, tmp));
 					}
 				}
 				
@@ -430,11 +437,12 @@ public class OAVBDIModelLoader
 					Object target = state.getAttributeValue(mgoal, OAVBDIMetaModel.achievegoal_has_targetcondition);
 					if(target!=null)
 					{
-						ICondition usercond = (ICondition)state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
+						Object usercond = state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
 							String rulename = Rulebase.getUniqueRuleName(rb, "achievegoal_target_"+gtname);
-							rb.addRule(GoalProcessingRules.createAchievegoalSucceededUserRule(rulename, usercond, mgoal));
+							Object[]	tmp	= GoalProcessingRules.createAchievegoalSucceededUserRule(mgoal);
+							rb.addRule(createUserRule(state, mcapa, imports, mgoal, target, usercond, rulename, tmp));
 						}
 					}
 				}
@@ -476,7 +484,7 @@ public class OAVBDIModelLoader
 		}
 		
 		// Build user defined plan conditions and add them to the rule base.
-		Collection mplans = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_plans);
+		Collection mplans = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_plans);
 		if(mplans!=null)
 		{
 			for(Iterator it=mplans.iterator(); it.hasNext(); )
@@ -520,7 +528,7 @@ public class OAVBDIModelLoader
 		}
 		
 		// Build user defined dynamic belief conditions and add them to the rule base.
-		Collection mbeliefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefs);
+		Collection mbeliefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefs);
 		if(mbeliefs!=null)
 		{
 			for(Iterator it=mbeliefs.iterator(); it.hasNext(); )
@@ -548,7 +556,7 @@ public class OAVBDIModelLoader
 		}
 		
 		// Build user defined dynamic belief set conditions and add them to the rule base.
-		Collection mbeliefsets = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefsets);
+		Collection mbeliefsets = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefsets);
 		if(mbeliefsets!=null)
 		{
 			for(Iterator it=mbeliefsets.iterator(); it.hasNext(); )
@@ -576,7 +584,7 @@ public class OAVBDIModelLoader
 		}
 		
 		// Build user defined conditions and add them to the rule base.
-		Collection mconds = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_conditions);
+		Collection mconds = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_conditions);
 		if(mconds!=null)
 		{
 			for(Iterator it=mconds.iterator(); it.hasNext(); )
@@ -593,7 +601,7 @@ public class OAVBDIModelLoader
 		}
 
 		// Load subcapabilities.
-		Collection mcaparefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_capabilityrefs);
+		Collection mcaparefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
 		if(mcaparefs!=null)
 		{
 			for(Iterator it=mcaparefs.iterator(); it.hasNext(); )
@@ -646,6 +654,44 @@ public class OAVBDIModelLoader
 			if(builder!=null && ReteBuilder.REPORTING)
 				System.out.println(builder.getBuildReport());
 		}
+	}
+
+	/**
+	 *  Create a user rule.
+	 *  @param state	The state. 
+	 *  @param mcapa	The scope (mcapability).
+	 *  @param imports	The imports.
+	 *  @param melement	The element that holds the condition, if any (e.g. mgoal or mplan).
+	 *  @param mcondition	The mcondition.
+	 *  @param usercond	The user condition (ADF text).
+	 *  @param rulename	The name of the rule to create.
+	 *  @param tmp	The rule template [predefined condition, action, priority evaluator(optional)].
+	 *  @return The created rule.
+	 */
+	protected IRule	createUserRule(IOAVState state, Object mcapa,
+			String[] imports, Object melement, Object mcondition,
+			Object usercond, String rulename, Object[] tmp)
+	{
+		IRule	ret;
+		if(usercond instanceof String)
+		{
+			String language = (String)state.getAttributeValue(mcondition, OAVBDIMetaModel.expression_has_language);
+			IParserHelper	helper	= new BDIParserHelper((ICondition)tmp[0], mcapa, melement, state); 
+			ICondition	cond	= ParserHelper.parseCondition((ICondition)tmp[0], (String)usercond, language, state.getTypeModel(), imports, null, helper);
+			ret	= tmp.length==2
+				? new Rule(rulename, cond, (IAction)tmp[1])
+				: new Rule(rulename, cond, (IAction)tmp[1], (IPriorityEvaluator)tmp[2]);
+		}
+		
+		// Compatibility code for clips conditions: Todo remove
+		else
+		{
+			ICondition	cond	= new AndCondition(new ICondition[]{(ICondition)tmp[0], (ICondition)usercond});
+			ret	= tmp.length==2
+				? new Rule(rulename, cond, (IAction)tmp[1])
+				: new Rule(rulename, cond, (IAction)tmp[1], (IPriorityEvaluator)tmp[2]);
+		}
+		return ret;
 	}
 
 	/**

@@ -3,7 +3,6 @@ package jadex.rules.state.javaimpl;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVTypeModel;
 
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -16,14 +15,6 @@ import java.util.Set;
  */
 public class OAVState	extends OAVAbstractState
 {
-	// #ifndef MIDP
-	//-------- constants --------
-	
-	/** The argument types for property change listener adding/removal (cached for speed). */
-	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
-		
-	// #endif
-	
 	//-------- attributes --------
 	
 	/** The objects table (oid -> content map). */

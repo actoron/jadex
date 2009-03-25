@@ -44,6 +44,5 @@ public class PlayGamePlan extends Plan
 
 
 //		killAgent();
-		System.out.println("finished");
 	}
 }

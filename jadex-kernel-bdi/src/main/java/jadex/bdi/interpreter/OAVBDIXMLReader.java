@@ -4,14 +4,13 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.LinkInfo;
-import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.Reader;
+import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.io.xml.OAVObjectHandler;
 
 import java.util.ArrayList;
@@ -221,6 +220,8 @@ public class OAVBDIXMLReader
 				
 				if(state.getType(object).isSubtype(OAVBDIMetaModel.condition_type))
 				{
+					// Conditions now parsed in createAgentModelEntry...
+					
 //					System.out.println("Found condition: "+se.object);
 
 					if(lang==null || "clips".equals(lang))
@@ -228,7 +229,7 @@ public class OAVBDIXMLReader
 						List	errors	= null;//new ArrayList();
 						try
 						{
-							ret = ParserHelper.parseCondition(value, state.getTypeModel(), getImports(state, root), errors);
+							ret = ParserHelper.parseClipsCondition(value, state.getTypeModel(), getImports(state, root), errors);
 						}
 						catch(Exception e)
 						{
@@ -243,13 +244,17 @@ public class OAVBDIXMLReader
 //							}
 //						}
 					}
+					else if(lang.equals("jcl"))
+					{
+						// Java conditions parsed later in createAgentModelEntry()
+					}
 					else
 					{
 //						report.put(se, "Unknown condition language: "+lang);
 						throw new RuntimeException("Unknown condition language: "+lang);
 					}	
 //					System.out.println(ret);
-					
+
 				}
 				else
 				{
@@ -268,10 +273,12 @@ public class OAVBDIXMLReader
 					}
 					else if("clips".equals(lang))
 					{
+						// Conditions now parsed in createAgentModelEntry...
+
 						List	errors	= new ArrayList();
 						try
 						{
-							ret = ParserHelper.parseCondition(value, state.getTypeModel(), getImports(state, root), errors);
+							ret = ParserHelper.parseClipsCondition(value, state.getTypeModel(), getImports(state, root), errors);
 						}
 						catch(Exception e)
 						{

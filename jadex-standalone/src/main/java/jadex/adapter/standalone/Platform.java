@@ -420,25 +420,25 @@ public class Platform extends AbstractPlatform
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");
 		
-		Thread	gc	= new Thread(new Runnable()
-		{
-			public void run()
-			{
-				while(true)
-				{
-					try
-					{
-						Thread.sleep(5000);
-						System.gc();
-						Thread.sleep(1000);
-						System.runFinalization();
-					}
-					catch(Exception e){}
-				}
-			}
-		});
-		gc.setDaemon(true);
-		gc.start();
+//		Thread	gc	= new Thread(new Runnable()
+//		{
+//			public void run()
+//			{
+//				while(true)
+//				{
+//					try
+//					{
+//						Thread.sleep(5000);
+//						System.gc();
+//						Thread.sleep(1000);
+//						System.runFinalization();
+//					}
+//					catch(Exception e){}
+//				}
+//			}
+//		});
+//		gc.setDaemon(true);
+//		gc.start();
 	}
 
 	/**

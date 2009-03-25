@@ -2,7 +2,6 @@ package jadex.rules.state.javaimpl;
 
 import jadex.rules.state.OAVTypeModel;
 
-import java.beans.PropertyChangeListener;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,14 +12,6 @@ import java.util.Set;
  */
 public class OAVContentIdState	extends OAVAbstractState
 {
-	// #ifndef MIDP
-	//-------- constants --------
-	
-	/** The argument types for property change listener adding/removal (cached for speed). */
-	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
-		
-	// #endif
-	
 	//-------- attributes --------
 	
 	/** The objects table. */
@@ -152,4 +143,18 @@ public class OAVContentIdState	extends OAVAbstractState
 		return objects;
 	}
 
+	/**
+	 *  Test if reading the object (oid) is allowed.
+	 *  Reading is allowed on removed objects as long as there are external references.
+	 *  @param id The object (oid).
+	 *  @return True, if valid.
+	 */
+	protected boolean checkValidStateObjectRead(Object id)
+	{
+		// #ifndef MIDP
+		assert nocheck || generator.isId(id);
+		// #endif
+
+		return true;	// Hack!!! Needed, because isExternallyUsed always returns false.
+	}
 }

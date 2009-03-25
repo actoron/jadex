@@ -253,20 +253,23 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The goal model element.
 	 */
-	protected static Rule createAchievegoalSucceededUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createAchievegoalSucceededUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-//		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.achievegoal_type, IOperator.INSTANCEOF));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		Rule achievegoal_succeeded	= new Rule(rulename, new AndCondition(new ICondition[]{goalcon, capacon, usercond}), GOAL_SUCCEEDED, IPriorityEvaluator.PRIORITY_1);
-		return achievegoal_succeeded;
+		return new Object[]{
+			new AndCondition(new ICondition[]{goalcon, capacon}),
+			GOAL_SUCCEEDED,
+			IPriorityEvaluator.PRIORITY_1};
 	}
 	
 	/**

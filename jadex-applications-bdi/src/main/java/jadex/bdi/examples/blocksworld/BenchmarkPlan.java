@@ -111,7 +111,7 @@ public class BenchmarkPlan	extends Plan
 		deviation	= Math.sqrt(deviation/runs);
 		System.out.println("Standard deviation of runs (millis): "+Math.round(deviation));
 
-		killAgent();
+//		killAgent();
 	}
 }
 

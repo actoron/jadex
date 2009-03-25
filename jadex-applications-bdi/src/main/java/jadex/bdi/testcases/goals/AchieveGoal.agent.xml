@@ -55,11 +55,11 @@
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
 				?mbel	= (mbelief (melement_has_name "mycontext"))
  			</contextcondition>
-			<targetcondition>
- 				// $beliefbase.count==5
+			<targetcondition language="jcl">
+ 				$beliefbase.count==5
 
-				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
-				?mbel	= (mbelief (melement_has_name "count"))
+				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
+				// ?mbel	= (mbelief (melement_has_name "count"))
  			</targetcondition>
 			<!-- <failurecondition>
  				// $beliefbase.myfailure

@@ -11,6 +11,8 @@ import jadex.rules.state.OAVTypeModel;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.antlr.runtime.ANTLRStringStream;
@@ -61,8 +63,9 @@ public class JavaParserTest
 			wastecon2.addConstraint(new BoundConstraint(null, new Variable("$waste2", wastetype)));
 
 //			AndCondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon});
-			AndCondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon, wastecon2});
-			final Map	varmap	= ConditionBuilder.buildConditionMap(predefined.getConditions());
+			final AndCondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon, wastecon2});
+			final Map	varmap	= new HashMap();
+			ConditionBuilder.buildConditionMap(predefined.getConditions(), varmap, new HashMap(), new HashMap());
 			
 			System.out.println("Predefined condition:\n"+predefined+"\n");
 
@@ -76,6 +79,11 @@ public class JavaParserTest
 				public boolean isPseudoVariable(String name)
 				{
 					return name.equals("$beliefbase");
+				}
+				
+				public List getConditions()
+				{
+					return predefined.getConditions();
 				}
 			});
 			parser.lhs();

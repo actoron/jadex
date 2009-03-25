@@ -2,6 +2,8 @@ package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.rules.rulesystem.rules.Variable;
 
+import java.util.List;
+
 /**
  *  Provides an extension point to introduce
  *  additional information (e.g. local variables)
@@ -22,4 +24,9 @@ public interface IParserHelper
 	 *  @return True, if the name is a pseudo variable.
 	 */
 	public boolean	isPseudoVariable(String name);
+
+	/**
+	 *  Get the conditions after parsing.
+	 */
+	public List	getConditions();
 }
