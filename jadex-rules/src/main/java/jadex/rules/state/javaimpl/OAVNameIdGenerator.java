@@ -4,6 +4,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -16,6 +17,9 @@ public class OAVNameIdGenerator implements IOAVIdGenerator
 	/** The id counter map (type -> count). */
 	protected Map	counters;
 	
+	/** The flag indicating if content ids should be produced. */
+	protected boolean iscontentid;
+	
 	//-------- constructors --------
 
 	/**
@@ -23,7 +27,16 @@ public class OAVNameIdGenerator implements IOAVIdGenerator
 	 */
 	public OAVNameIdGenerator()
 	{
+		this(false);
+	}
+	
+	/**
+	 *  Create a new id generator.
+	 */
+	public OAVNameIdGenerator(boolean iscontentid)
+	{
 		this.counters	= new HashMap();
+		this.iscontentid = iscontentid;
 	}
 	
 	/**
@@ -41,7 +54,7 @@ public class OAVNameIdGenerator implements IOAVIdGenerator
 		}
 		
 		long	id	= start;
-		Object ret = new OAVObjectId(/*state,*/ type, id++);
+		Object ret = iscontentid? new OAVContentId(type, id++): new OAVObjectId(type, id++);
 
 		if(state.containsObject(ret))
 			System.out.println("Warning, id overflow.");
@@ -138,5 +151,39 @@ public class OAVNameIdGenerator implements IOAVIdGenerator
 			ret	= 31 * ret + type.hashCode();
 			return ret;
 		}*/
+	}
+	
+	/**
+	 *  An id for an OAV object.
+	 */
+	private static class OAVContentId extends OAVObjectId implements IOAVContentId
+	{
+		//-------- attributes --------
+		
+		/** The content map. */
+		protected Map	content;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create an OAV object id with the given id value.
+		 *  @param id The id value.
+		 */
+		public OAVContentId(OAVObjectType type, long id)
+		{
+			super(type, id);
+			this.content = new LinkedHashMap();
+		}
+	
+		//-------- methods --------
+		
+		/**
+		 *  Get the content.
+		 *  @return The content.
+		 */
+		public Map getContent()
+		{
+			return content;
+		}
 	}
 }

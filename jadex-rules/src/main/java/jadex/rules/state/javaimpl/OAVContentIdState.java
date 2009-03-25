@@ -1,12 +1,8 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVTypeModel;
 
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,11 +26,6 @@ public class OAVContentIdState	extends OAVAbstractState
 	/** The objects table. */
 	protected Set objects;
 	
-	/** The external usages of object ids (object id -> cnt).
-	 *  Externally referenced objects can be read, even after they are removed from the state due to garbage collection.
-	 *  Writing (and therefore resurrecting) is not supported. */
-	protected Map externalusages;
-	
 	//-------- constructors --------
 	
 	/**
@@ -52,11 +43,10 @@ public class OAVContentIdState	extends OAVAbstractState
 	 */
 	public IOAVIdGenerator createIdGenerator()
 	{
-		return new OAVDebugIdGenerator();
-		
-//		return new OAVNameIdGenerator();
-//		return new OAVLongIdGenerator();
-//		return new OAVObjectIdGenerator();
+//		return new OAVLongIdGenerator(true);
+//		return new OAVNameIdGenerator(true);
+//		return new OAVDebugIdGenerator(true);
+		return new OAVObjectIdGenerator(true);
 	}
 	
 	//-------- object management --------
@@ -73,20 +63,6 @@ public class OAVContentIdState	extends OAVAbstractState
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		// #endif
-
-		// Get the usages of the oav object
-		Integer cnt = (Integer)externalusages.get(id);
-		if(cnt==null)
-			cnt = new Integer(1);
-		else
-			cnt = new Integer(cnt.intValue()+1);
-		externalusages.put(id, cnt);
-		
-//		if(id.toString().indexOf("waitabstraction")!=-1)
-//		{
-//			System.err.println("Add ex: "+id/*+" "+external*/+" "+cnt);
-//			Thread.dumpStack();
-//		}
 	}
 	
 	/**
@@ -102,94 +78,16 @@ public class OAVContentIdState	extends OAVAbstractState
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		// #endif
-
-		Integer cnt = (Integer)externalusages.get(id);
-		if(cnt==null)
-			throw new RuntimeException("Reference not found: "+id);
-	
-//		if(id.toString().indexOf("plan_5")!=-1)
-//			System.err.println("Remove ex: "+id/*+" "+external*/+" "+cnt);
-
-		if(cnt.intValue()==1)
-		{
-			externalusages.remove(id);
-
-			// Delete object, when there are no internal references.
-			Map	iusages	= getObjectUsages(id);
-//			if(objects.containsKey(id) && !rootobjects.contains(id) && (iusages==null || iusages.isEmpty()))
-			if(internalContainsObject(id) && !rootobjects.contains(id) && (iusages==null || iusages.isEmpty()))
-			{
-//					System.err.println("Garbage collecting unreferenced object: "+id);
-//					Thread.dumpStack();
-				
-				// Remove pseudo external references from contained objects, when original object once was referenced
-				if(iusages!=null)
-				{
-//					Map	content	= (Map)objects.get(id);
-					Map	content	= internalGetObjectContent(id);
-					for(Iterator it=content.keySet().iterator(); it.hasNext(); )
-					{
-						OAVAttributeType attribute = (OAVAttributeType)it.next();
-						Object value = content.get(attribute);
-						if(value!=null)
-						{
-							if(attribute.getMultiplicity().equals(OAVAttributeType.NONE))
-							{
-								if(generator.isId(value) && isManaged(value))
-									removeExternalObjectUsage(value, this);
-							}
-							else
-							{
-								if(value instanceof Map)
-								{
-									Map	values	= (Map)value;
-									for(Iterator vit = values.keySet().iterator(); vit.hasNext();)
-									{
-										Object key = vit.next();
-										Object	value1	= values.get(key);
-										if(generator.isId(key) && isManaged(key))
-											removeExternalObjectUsage(key, this);
-										if(generator.isId(value1) && isManaged(value1))
-											removeExternalObjectUsage(value1, this);
-									}
-								}
-								else
-								{
-									for(Iterator vit = ((Collection)value).iterator(); vit.hasNext();)
-									{
-										Object value1 = vit.next();
-										if(generator.isId(value1) && isManaged(value1))
-											removeExternalObjectUsage(value1, this);
-									}
-								}
-							}
-						}
-					}
-					removeObject(id);
-				}
-				
-				// Remove object as if it was a normal reference
-				else
-				{
-					internalDropObject(id, null, false);
-				}
-
-//					System.err.println("Garbage collected unreferenced object: "+id);
-			}
-		}
-		else
-		{
-			externalusages.put(id, new Integer(cnt.intValue()-1));
-		}
 	}
 	
 	/**
 	 *  Test if an object is externally used.
+	 *  @param id The id.
 	 *  @return True, if externally used.
 	 */
 	protected boolean isExternallyUsed(Object id)
 	{
-		return externalusages.get(id)!=null;
+		return false;
 	}
 	
 	//-------- internal object handling --------
@@ -202,7 +100,7 @@ public class OAVContentIdState	extends OAVAbstractState
 	protected Map internalCreateObject(Object id)
 	{
 		objects.add(id);
-		return null;//((ContentId)id).getContentMap();
+		return ((IOAVContentId)id).getContent();
 	}
 	
 	/**
@@ -213,7 +111,7 @@ public class OAVContentIdState	extends OAVAbstractState
 	protected Map internalRemoveObject(Object id)
 	{
 		objects.remove(id);
-		return null;//((ContentId)id).getContentMap();
+		return ((IOAVContentId)id).getContent();
 	}
 	
 	/**
@@ -223,7 +121,7 @@ public class OAVContentIdState	extends OAVAbstractState
 	 */
 	protected Map internalGetObjectContent(Object id)
 	{
-		return null;//((ContentId)id).getContentMap();
+		return ((IOAVContentId)id).getContent();
 	}
 	
 	/**
