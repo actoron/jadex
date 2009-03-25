@@ -13,6 +13,8 @@ import java.util.List;
  */
 public class MAGRSpaceInstance extends MSpaceInstance
 {
+	//-------- attributes --------
+	
 	/** The groups. */
 	protected List groups;
 	
@@ -80,7 +82,6 @@ public class MAGRSpaceInstance extends MSpaceInstance
 		return ret;
 	}
 
-	
 	/**
 	 *  Get a string representation of this AGR space instance.
 	 *  @return A string representation of this AGR space instance.

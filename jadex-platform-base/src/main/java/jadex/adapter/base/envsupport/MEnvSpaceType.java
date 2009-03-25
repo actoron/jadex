@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport;
 
+import jadex.adapter.base.agr.MGroupInstance;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -11,17 +12,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An Environment space description.
+ *  Java representation of environemnt space type for xml description.
  */
 public class MEnvSpaceType	extends MSpaceType
 {
 	//-------- attributes --------
 	
-	/** The width. */
-	protected double width;
-
 	/** The height. */
-	protected double height;
+	protected List dimensions;
 	
 	/** The implementation class. */
 	protected String clazz;
@@ -29,39 +27,24 @@ public class MEnvSpaceType	extends MSpaceType
 	//-------- methods --------
 		
 	/**
-	 *  Get the width.
-	 *  @return The width.
+	 *  Add a dimension.
 	 */
-	public double getWidth()
+	public void addDimension(Double d)
 	{
-		return width;
+		if(dimensions==null)
+			dimensions = new ArrayList();
+		dimensions.add(d);	
 	}
 	
 	/**
-	 *  Set the width.
-	 *  @param width The width to set.
+	 *  Get the dimensions.
+	 *  @return The dimensions.
 	 */
-	public void setWidth(double width)
+	public List getDimensions()
 	{
-		this.width = width;
+		return dimensions;
 	}
 	
-	/**
-	 * @return the height
-	 */
-	public double getHeight()
-	{
-		return this.height;
-	}
-
-	/**
-	 * @param height the height to set
-	 */
-	public void setHeight(double height)
-	{
-		this.height = height;
-	}
-
 	/**
 	 * @return the clazz
 	 */
@@ -88,10 +71,8 @@ public class MEnvSpaceType	extends MSpaceType
 		sbuf.append(SReflect.getInnerClassName(getClass()));
 		sbuf.append("(name=");
 		sbuf.append(getName());
-		sbuf.append(", width=");
-		sbuf.append(getWidth());
-		sbuf.append(", height=");
-		sbuf.append(getHeight());
+		sbuf.append(", dimensions=");
+		sbuf.append(getDimensions());
 		sbuf.append(", class=");
 		sbuf.append(getClazz());
 		sbuf.append(")");
@@ -107,7 +88,9 @@ public class MEnvSpaceType	extends MSpaceType
 	{
 		Set types = new HashSet();
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class));
-		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class));
+		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
+			SUtil.createHashMap(new String[]{"type"}, new String[]{"setTypeName"}), null));
+		types.add(new TypeInfo("envobject", MEnvObject.class));
 		return types;
 	}
 }

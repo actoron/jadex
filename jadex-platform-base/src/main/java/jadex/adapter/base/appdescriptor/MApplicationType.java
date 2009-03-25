@@ -163,6 +163,7 @@ public class MApplicationType
 
 	/**
 	 *  Get a named agenttype.
+	 *  @param name The agent type name.
 	 *  @return The agenttype (if any).
 	 */
 	public MAgentType getMAgentType(String name)
@@ -177,6 +178,23 @@ public class MApplicationType
 		return ret;
 	}
 
+	/**
+	 *  Get a named spacetype.
+	 *  @param name The space type name.
+	 *  @return The spacetype (if any).
+	 */
+	public MSpaceType getMSpaceType(String name)
+	{
+		MSpaceType ret	= null;
+		for(int i=0; ret==null && i<spacetypes.size(); i++)
+		{
+			MSpaceType st = (MSpaceType)spacetypes.get(i);
+			if(st.getName().equals(name))
+				ret	= st;
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Get the applications.
 	 *  @return The applications.

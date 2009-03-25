@@ -163,6 +163,15 @@ public class ApplicationContext	extends BaseContext
 	}
 	
 	/**
+	 *  Get the platform.
+	 *  @return The platform.
+	 */
+	public IPlatform getPlatform()
+	{
+		return platform;
+	}	
+	
+	/**
 	 *  Create an agent in the context.
 	 *  @param name	The name of the newly created agent.
 	 *  @param type	The agent type as defined in the application type.
@@ -281,4 +290,5 @@ public class ApplicationContext	extends BaseContext
 	{
 		return agenttypes!=null ? (String)agenttypes.get(aid) : null;
 	}
+	
 }

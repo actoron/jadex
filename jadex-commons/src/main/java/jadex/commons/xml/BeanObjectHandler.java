@@ -135,15 +135,30 @@ public class BeanObjectHandler implements IObjectHandler
 		for(int i=0; !ret && i<ms.length; i++)
 		{
 			Class[] ps = ms[i].getParameterTypes();
-			if(ps.length==1 && ps[0].isAssignableFrom(clazz))
+			if(ps.length==1)
 			{
-				try
+				if(ps[0].isAssignableFrom(clazz))
 				{
-					ms[i].invoke(parent, new Object[]{object});
-					ret	= true;
+					try
+					{
+						ms[i].invoke(parent, new Object[]{object});
+						ret	= true;
+					}
+					catch(Exception e)
+					{
+					}
 				}
-				catch(Exception e)
+				else if(BasicTypeConverter.isBuiltInType(ps[0]) && object instanceof String)
 				{
+					try
+					{
+						object = BasicTypeConverter.convertBuiltInTypes(ps[0], (String)object);
+						ms[i].invoke(parent, new Object[]{object});
+						ret	= true;
+					}
+					catch(Exception e)
+					{
+					}
 				}
 			}
 		}

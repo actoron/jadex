@@ -1,0 +1,47 @@
+<!--
+	<H3>The garbage collector application descriptor</H3>
+
+	It can be started to launch a garbage collector scenario.
+	This example is inspired by the "robot" example
+	of the Jason BDI agent engine.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-env"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
+	
+	<spacetypes>
+		<env:envspacetype name="gc2dspace" class="ContinuousSpace2D">
+			<!-- <env:action name="drop" class="DropWaste"></env:action>
+			<env:process>new WasteCreator()</env:process>
+			<env:dimension name="width">10</env:dimension>
+			<env:dimension name="height">10</env:dimension> -->
+		</env:envspacetype>
+	</spacetypes>
+	
+	<agenttypes>
+		<!-- <agenttype name="Environment" filename="jadex/bdi/examples/garbagecollector/Environment.agent.xml"/>  -->
+		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollectorEnv.agent.xml"/>
+		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurnerEnv.agent.xml"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="One Burner / One Collector">
+			<agents>
+				<agent name="Collector1" type="Collector"/>
+				<agent name="Burner1" type="Burner"/>
+			</agents>
+			
+			<env:envspace type="gc2dspace">
+				<env:envobject type="collector" owner="Collector1">
+				</env:envobject>
+				<env:envobject type="burner" owner="Burner1">
+				</env:envobject>
+			</env:envspace>
+		</application>
+	</applications>
+
+</applicationtype>
