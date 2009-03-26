@@ -1,5 +1,7 @@
 package jadex.adapter.base.appdescriptor;
 
+import jadex.commons.SUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -202,5 +204,35 @@ public class MApplicationType
 	public List getMApplicationInstances()
 	{
 		return this.applications;
+	}
+	
+	/**
+	 *  Get complete imports (including own package).
+	 *  @return An array of imports;
+	 */
+	public String[] getAllImports()
+	{
+		String[] ret = SUtil.EMPTY_STRING;
+		
+		if(imports!=null)
+		{
+			if(packagename!=null)
+			{
+				ret = new String[imports.size()+1];
+				ret[imports.size()] = packagename+".*";
+			}
+			else
+			{
+				ret = new String[imports.size()];
+			}
+			for(int i=0; i<imports.size(); i++)
+				ret[i] = (String)imports.get(i);
+		}
+		else if(packagename!=null)
+		{
+			ret = new String[]{packagename+".*"};
+		}
+		
+		return ret;
 	}
 }

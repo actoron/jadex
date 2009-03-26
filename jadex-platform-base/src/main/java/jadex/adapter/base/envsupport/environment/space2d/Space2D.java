@@ -1,6 +1,7 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IClockService;
@@ -49,5 +50,28 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	public IVector2 getAreaSize()
 	{
 		return areaSize_.copy();
+	}
+	
+	/**
+	 *  Set the area size.
+	 *  @param areaSize The area size.
+	 */
+	public void setAreaSize(IVector2 areaSize)
+	{
+		areaSize_ = areaSize;
+	}
+	
+	/**
+	 *  Get the position of an object.
+	 *  @param id The id.
+	 *  @return The position.
+	 */
+	public IVector2 getPosition(Object id)
+	{
+		IVector2 ret = null;
+		ISpaceObject obj = getSpaceObject((Long)id);  // Hack change id to object?!
+		if(obj!=null)
+			ret = (IVector2)obj.getProperty("position");
+		return ret;
 	}
 }

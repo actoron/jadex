@@ -202,7 +202,7 @@ public class MAgentInstance
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$platform", platform);
 
-			String[] imports = (String[])apptype.getImports().toArray(new String[apptype.getImports().size()]);
+			String[] imports = apptype.getAllImports();
 			for(int i=0; i<parameters.size(); i++)
 			{
 				Object tmp = parameters.get(i);

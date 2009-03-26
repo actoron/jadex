@@ -36,8 +36,8 @@ public class OAVContentIdState	extends OAVAbstractState
 	{
 //		return new OAVLongIdGenerator(true);
 //		return new OAVNameIdGenerator(true);
-//		return new OAVDebugIdGenerator(true);
-		return new OAVObjectIdGenerator(true);
+		return new OAVDebugIdGenerator(true);
+//		return new OAVObjectIdGenerator(true);
 	}
 	
 	//-------- object management --------

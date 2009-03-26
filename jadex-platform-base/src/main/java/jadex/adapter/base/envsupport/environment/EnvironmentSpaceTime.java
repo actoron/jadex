@@ -1,16 +1,18 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.adapter.base.envsupport.math.Vector1Long;
+import jadex.bridge.IClockService;
+
 import java.util.Iterator;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.Vector1Long;
-import jadex.bridge.IClock;
-import jadex.bridge.IClockService;
-
-/** An environment space with a notion of time. */
+/**
+ *  An environment space with a notion of time. 
+ */
 public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 										   implements ChangeListener
 {
@@ -31,10 +33,9 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 	protected EnvironmentSpaceTime(IClockService clockService, IVector1 timeCoefficient)
 	{
 		super();
-		clockService_ = clockService;
-		timeStamp_ = clockService_.getTime();
-		timeCoefficient_ = timeCoefficient;
-		clockService_.addChangeListener(this);
+		if(clockService!=null)
+			setClockService(clockService);
+		timeCoefficient_ = timeCoefficient != null? timeCoefficient: new Vector1Double(0.001);
 	}
 	
 	/**
@@ -81,5 +82,17 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 	public void stateChanged(ChangeEvent e)
 	{
 		timeStep(clockService_.getTime());
+	}
+	
+	/**
+	 *  Set the clock service.
+	 *  @param clockService The clock service.
+	 */
+	public void setClockService(IClockService clockService)
+	{
+		this.clockService_ = clockService;
+		
+		timeStamp_ = clockService_.getTime();
+		clockService_.addChangeListener(this);
 	}
 }

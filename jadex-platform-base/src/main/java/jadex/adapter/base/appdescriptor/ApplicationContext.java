@@ -190,6 +190,7 @@ public class ApplicationContext	extends BaseContext
 		if(at==null)
 			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+apptype);
 		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
+		
 		ams.createAgent(name, at.getFilename(), configuration, arguments, new IResultListener()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -209,10 +210,12 @@ public class ApplicationContext	extends BaseContext
 				
 				if(!containsAgent(aid))
 					addAgent(aid);	// Hack??? agentCreated() may be called from AMS.
+				
 				if(master)
 				{
 					addProperty(aid, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
 				}
+				
 				if(start)
 				{
 					ams.startAgent(aid, listener);

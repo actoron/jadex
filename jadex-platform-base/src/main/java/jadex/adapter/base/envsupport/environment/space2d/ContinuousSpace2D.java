@@ -11,10 +11,25 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.bridge.IClockService;
 
+/**
+ * 
+ */
 public class ContinuousSpace2D extends Space2D
 {
 	/** The default ID for this space */
 	public static final String DEFAULT_NAME = ContinuousSpace2D.class.getName();
+	
+	/**
+	 * Creates a new {@link ContinuousSpace2D} with the default name.
+	 * 
+	 * @param clockService the clock service
+	 * @param timeCoefficient the time coefficient for time differences.
+	 * @param areaSize the size of the 2D area
+	 */
+	public ContinuousSpace2D()
+	{
+		this(null, null, null);
+	}
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with the default name.
@@ -97,15 +112,5 @@ public class ContinuousSpace2D extends Space2D
 		}
 		
 		return nearest;
-	}
-	
-	/**
-	 * Returns the space's name.
-	 * 
-	 * @return the space's name.
-	 */
-	public String getName()
-	{
-		return (String) spaceProperties_.get("name");
 	}
 }

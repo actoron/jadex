@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport;
 
-import jadex.adapter.base.agr.MGroupInstance;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -18,11 +17,17 @@ public class MEnvSpaceType	extends MSpaceType
 {
 	//-------- attributes --------
 	
-	/** The height. */
+	/** The dimensions. */
 	protected List dimensions;
 	
-	/** The implementation class. */
-	protected String clazz;
+	/** The action types. */
+	protected List actiontypes;
+	
+	/** The process types. */
+	protected List processtypes;
+	
+	/** The implementation class name. */
+	protected String classname;
 	
 	//-------- methods --------
 		
@@ -46,19 +51,61 @@ public class MEnvSpaceType	extends MSpaceType
 	}
 	
 	/**
-	 * @return the clazz
+	 *  Add a action type.
+	 *  @param action The action.
 	 */
-	public String getClazz()
+	public void addMEnvActionType(MEnvActionType action)
 	{
-		return this.clazz;
+		if(actiontypes==null)
+			actiontypes = new ArrayList();
+		actiontypes.add(action);	
+	}
+	
+	/**
+	 *  Get the action types.
+	 *  @return The action types.
+	 */
+	public List getMEnvActionTypes()
+	{
+		return actiontypes;
+	}
+	
+	/**
+	 *  Add a process type.
+	 *  @param process The process.
+	 */
+	public void addMEnvProcessType(MEnvProcessType process)
+	{
+		if(processtypes==null)
+			processtypes = new ArrayList();
+		processtypes.add(process);	
+	}
+	
+	/**
+	 *  Get the process types.
+	 *  @return The process types.
+	 */
+	public List getMEnvProcessTypes()
+	{
+		return processtypes;
+	}
+	
+	/**
+	 *  Get the class name.
+	 *  @return The class name.
+	 */
+	public String getClassName()
+	{
+		return this.classname;
 	}
 
 	/**
-	 * @param clazz the clazz to set
+	 *  Set the class name.
+	 *  @param classname The class name to set.
 	 */
-	public void setClazz(String clazz)
+	public void setClassName(String classname)
 	{
-		this.clazz = clazz;
+		this.classname = classname;
 	}
 
 	/**
@@ -73,8 +120,10 @@ public class MEnvSpaceType	extends MSpaceType
 		sbuf.append(getName());
 		sbuf.append(", dimensions=");
 		sbuf.append(getDimensions());
+		sbuf.append(", action types=");
+		sbuf.append(getMEnvActionTypes());
 		sbuf.append(", class=");
-		sbuf.append(getClazz());
+		sbuf.append(getClassName());
 		sbuf.append(")");
 		return sbuf.toString();
 	}
@@ -87,10 +136,15 @@ public class MEnvSpaceType	extends MSpaceType
 	public static Set getXMLMapping()
 	{
 		Set types = new HashSet();
-		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class));
+		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
 			SUtil.createHashMap(new String[]{"type"}, new String[]{"setTypeName"}), null));
-		types.add(new TypeInfo("envobject", MEnvObject.class));
+		types.add(new TypeInfo("actiontype", MEnvActionType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
+		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
+		types.add(new TypeInfo("object", MEnvObject.class));
 		return types;
 	}
 }

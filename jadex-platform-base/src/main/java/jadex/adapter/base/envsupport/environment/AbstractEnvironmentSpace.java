@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ */
 public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 {
 	/** Available actions in the space. */
@@ -28,6 +31,9 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	/** Object ID counter for new IDs. */
 	private AtomicCounter	objectIdCounter_;
 	
+	/**
+	 *  Create an environment space
+	 */
 	public AbstractEnvironmentSpace()
 	{
 		actions_ = Collections.synchronizedMap(new HashMap());
@@ -170,7 +176,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 * 
 	 * @param action the action
 	 */
-	public void addAction(ISpaceAction action)
+	public void addSpaceAction(ISpaceAction action)
 	{
 		actions_.put(action.getId(), action);
 	}
@@ -183,6 +189,24 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	public void removeAction(Object actionId)
 	{
 		actions_.remove(actionId);
+	}
+	
+	/**
+	 * Returns the space's name.
+	 * @return the space's name.
+	 */
+	public String getName()
+	{
+		return (String)spaceProperties_.get("name");
+	}
+	
+	/**
+	 * Returns the space's name.
+	 * @return the space's name.
+	 */
+	public void setName(String name)
+	{
+		spaceProperties_.put("name", name);
 	}
 	
 	/**

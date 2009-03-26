@@ -77,7 +77,7 @@ public interface IEnvironmentSpace extends ISpace
 	 * 
 	 * @param action the action
 	 */
-	public void addAction(ISpaceAction action);
+	public void addSpaceAction(ISpaceAction action);
 	
 	/**
 	 * Removes an environment action.
@@ -97,7 +97,6 @@ public interface IEnvironmentSpace extends ISpace
 	
 	/**
 	 * Returns the space's name.
-	 * 
 	 * @return the space's name.
 	 */
 	public String getName();

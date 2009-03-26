@@ -117,7 +117,7 @@
 		<!-- Plan for taking some waste, bringing it to a burner
 			and going back. -->
 		<plan name="take_plan">
-			<body class="TakePlan"/>
+			<body class="TakePlanEnv"/>
 			<trigger>
 				<goal ref="take"/>
 			</trigger>
@@ -125,7 +125,7 @@
 
 		<!-- Plan for running on a predefined route and searching waste. -->
 		<plan name="checking_plan">
-			<body class="CheckingPlan"/>
+			<body class="CheckingPlanEnv"/>
 			<trigger>
 				<goal ref="check"/>
 			</trigger>
@@ -133,7 +133,7 @@
 
 		<!-- Plan for picking up some garbage. -->
 		<plan name="pickup_plan">
-			<body class="PickUpPlan"/>
+			<body class="PickUpPlanEnv"/>
 			<trigger>
 				<goal ref="pick"/>
 			</trigger>
@@ -144,7 +144,7 @@
 			<parameter name="pos" class="Position">
  				<goalmapping ref="go.pos"/>
 			</parameter>
-			<body class="GoPlan"/>
+			<body class="GoPlanEnv"/>
 			<trigger>
 				<goal ref="go"/>
 			</trigger>

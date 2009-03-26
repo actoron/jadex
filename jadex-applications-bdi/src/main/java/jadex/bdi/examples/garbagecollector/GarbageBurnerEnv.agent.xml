@@ -11,12 +11,16 @@
 	name="GarbageBurnerEnv"
 	package="jadex.bdi.examples.garbagecollector">
 
+	<imports>
+		<import>jadex.adapter.base.contextservice.*</import>
+		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D</import>
+	</imports>
+
 	<beliefs>
-		<!-- Environment object as singleton.
- 			Parameters are name and type of agent for adding it
-			No clean solution but avoids registering of agents.-->
-		<belief name="env" class="Environment">
-			<fact>Environment.getInstance(Environment.BURNER, $scope.getAgentName())</fact>
+		<!-- Environment. -->
+		<belief name="env" class="ContinuousSpace2D">
+ 			<fact>((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("mygc2dspace")</fact>
  		</belief>
 
 		<!-- The actual position on the grid world. -->
@@ -92,7 +96,7 @@
 	<plans>
 		<!-- Plan for burning garbage. -->
 		<plan name="burn_plan">
-			<body class="BurnPlan"/>
+			<body class="BurnPlanEnv"/>
 			<trigger>
 				<goal ref="burn"/>
 			</trigger>
@@ -100,7 +104,7 @@
 
 		<!-- Plan for trying to pick up waste. -->
 		<plan name="pickup_plan">
-			<body class="PickUpPlan"/>
+			<body class="PickUpPlanEnv"/>
 			<trigger>
 				<goal ref="pick"/>
 			</trigger>

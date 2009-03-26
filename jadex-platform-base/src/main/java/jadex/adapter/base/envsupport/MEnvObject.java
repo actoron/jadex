@@ -1,7 +1,7 @@
 package jadex.adapter.base.envsupport;
 
 /**
- * 
+ *  Representation of an environment object.
  */
 public class MEnvObject
 {
@@ -12,6 +12,9 @@ public class MEnvObject
 	
 	/** The type. */
 	protected String type;
+	
+	/** The owner. */
+	protected String owner;
 
 	//-------- methods --------
 
@@ -34,8 +37,8 @@ public class MEnvObject
 	}
 	
 	/**
-	 *  Get the name.
-	 *  @return The name.
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -43,11 +46,29 @@ public class MEnvObject
 	}
 
 	/**
-	 *  Set the name.
-	 *  @param name The name to set.
+	 *  Set the type.
+	 *  @param name The type to set.
 	 */
 	public void setType(String type)
 	{
 		this.type = type;
+	}
+	
+	/**
+	 *  Get the owner.
+	 *  @return The owner.
+	 */
+	public String getOwner()
+	{
+		return this.owner;
+	}
+
+	/**
+	 *  Set the owner.
+	 *  @param name The owner to set.
+	 */
+	public void setOwner(String owner)
+	{
+		this.owner = owner;
 	}
 }

@@ -5,10 +5,16 @@ import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.contextservice.ISpace;
+import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
+import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.bridge.IClockService;
+import jadex.commons.SReflect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,27 +55,80 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public ISpace createSpace(ApplicationContext app)
+	public ISpace createSpace(ApplicationContext app) throws Exception
 	{
-//		AGRSpace	ret	= new AGRSpace(getName(), app);
-		// Hack!!! todo: use reflection
-		IClockService cs = (IClockService)app.getPlatform().getService(IClockService.class);
 		MApplicationType mapt = app.getApplicationType();
-		MEnvSpaceType st = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
-		List dims = st.getDimensions();
-		if(dims==null || dims.size()!=2)
-			throw new RuntimeException("todo");
-		IVector2 d = new Vector2Double(((Number)dims.get(0)).doubleValue(), ((Number)dims.get(1)).doubleValue());
+		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
 		
-		ContinuousSpace2D ret = new ContinuousSpace2D(cs, null, d);
+		Class envcl = SReflect.findClass(spacetype.getClassName(), mapt.getAllImports(), null);
 		
-		for(int i=0; objects!=null && i<objects.size(); i++)
+		// Create and init space.
+		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)envcl.newInstance();
+		
+		if(getName()!=null)
 		{
-			MEnvObject mobj = (MEnvObject)objects.get(i);
+			ret.setName(getName());
+		}
 		
-			// What to do with id?
-			// How to set owner (agent)?
-			Object id = ret.createSpaceObject(mobj.getType(), null, null, null);
+		if(ret instanceof EnvironmentSpaceTime) // Hack?
+		{
+			((EnvironmentSpaceTime)ret).setClockService((IClockService)app.getPlatform().getService(IClockService.class));
+		}
+		
+		if(ret instanceof Space2D) // Hack?
+		{
+			List dims = spacetype.getDimensions();
+			IVector2 areasize = new Vector2Double(((Number)dims.get(0)).doubleValue(), ((Number)dims.get(1)).doubleValue());
+			((Space2D)ret).setAreaSize(areasize);
+		}
+		
+		// Create actions.
+		List actions = spacetype.getMEnvActionTypes();
+		if(actions!=null)
+		{
+			for(int i=0; i<actions.size(); i++)
+			{
+				MEnvActionType maction = (MEnvActionType)actions.get(i);
+				Class proccl = SReflect.findClass(maction.getClassName(), mapt.getAllImports(), null);
+				
+				ISpaceAction action = (ISpaceAction)proccl.newInstance();
+				
+				// todo: id
+//				ret.addSpaceAction(maction.getName(), action);
+				System.out.println("Adding environment action: "+maction.getName());
+				ret.addSpaceAction(action);
+			}
+		}
+		
+		// Create processes.
+		List processes = spacetype.getMEnvProcessTypes();
+		if(processes!=null)
+		{
+			for(int i=0; i<processes.size(); i++)
+			{
+				MEnvProcessType mproc = (MEnvProcessType)actions.get(i);
+				Class proccl = SReflect.findClass(mproc.getClassName(), mapt.getAllImports(), null);
+				
+				ISpaceProcess proc = (ISpaceProcess)proccl.newInstance();
+				
+				// todo: id
+//				ret.addSpaceProcess(mproc.getName(), proc);
+				System.out.println("Adding environment process: "+mproc.getName());
+				ret.addSpaceProcess(proc);
+			}
+		}
+		
+		// Create initial objects.
+		if(objects!=null)
+		{
+			for(int i=0; i<objects.size(); i++)
+			{
+				MEnvObject mobj = (MEnvObject)objects.get(i);
+			
+				// What to do with id?
+				// How to set owner (agent)?
+				Object id = ret.createSpaceObject(mobj.getType(), null, null, null);
+			}
 		}
 		
 		return ret;
