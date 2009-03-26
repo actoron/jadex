@@ -20,6 +20,7 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -174,20 +175,25 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The belief model element.
 	 */
-	protected static Rule createDynamicBeliefUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createDynamicBeliefUserRule(Object model)
 	{
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable ret = new Variable("?ret", OAVJavaType.java_object_type);
 			
 		ObjectCondition	belcon	= new ObjectCondition(OAVBDIRuntimeModel.belief_type);
 		belcon.addConstraint(new BoundConstraint(null, rbelief));
 		belcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
 
-		Rule dynamic_belief = new Rule(rulename, new AndCondition(new ICondition[]{belcon, capcon, usercond}), 
-			DYNAMIC_BELIEF_CHANGED);
-		return dynamic_belief;
+		return new Object[]{
+			new AndCondition(new ICondition[]{belcon, capcon}),
+			DYNAMIC_BELIEF_CHANGED,
+			null,
+			ret};
 	}
 	
 	/**
@@ -301,11 +307,12 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Rule createDynamicParameterUserRule(String rulename, Object mpe, ICondition usercond, String ptname)
+	protected static Object[]	createDynamicParameterUserRule(Object mpe, String ptname)
 	{
 		Variable rparam = new Variable("?rparameter", OAVBDIRuntimeModel.parameter_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable ret = new Variable("?ret", OAVJavaType.java_object_type);
 		
 		ObjectCondition	rparamcon	= new ObjectCondition(OAVBDIRuntimeModel.parameter_type);
 		rparamcon.addConstraint(new BoundConstraint(null, rparam));
@@ -322,9 +329,11 @@ public class BeliefRules
 		IConstraint con2 = new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rpe, IOperator.CONTAINS);
 		rcapacon.addConstraint(new OrConstraint(new IConstraint[]{con1, con2}));
 		
-		Rule dynamic_param = new Rule(rulename,
-			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon, usercond}), DYNAMIC_VALUE_CHANGED, IPriorityEvaluator.PRIORITY_1);
-		return dynamic_param;
+		return new Object[]{
+			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon}),
+			DYNAMIC_VALUE_CHANGED,
+			IPriorityEvaluator.PRIORITY_1,
+			ret};
 	}
 	
 	/**

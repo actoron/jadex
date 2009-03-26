@@ -5,6 +5,7 @@ import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
+import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.MethodCall;
@@ -17,8 +18,10 @@ import jadex.rules.state.OAVTypeModel;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,9 +39,11 @@ public class ConditionBuilder
 	 *  @param constraints	The constraints to represent.
 	 *  @param condition	Predefined condition that can be used if necessary.
 	 *  @param tmodel	The type model.
+	 *  @param generated	Conditions that have been generated during parsing (required for inversion).
+	 *  @param invert True, if the generated condition part should be inverted.
 	 *  @return The generated condition.
 	 */
-	public static ICondition	buildCondition(Constraint[] constraints, ICondition condition, OAVTypeModel tmodel)
+	public static ICondition	buildCondition(Constraint[] constraints, ICondition condition, OAVTypeModel tmodel, Set generated, boolean invert)
 	{
 		// Unfold AND conditions.
 		List	lcons	= new ArrayList();
@@ -58,23 +63,26 @@ public class ConditionBuilder
 		Map	bcons	= new HashMap();	// variable -> object conditions (object condition with defining bound constraint).
 		buildConditionMap(lcons, variables, boundconstraints, bcons);
 		
+		if(generated==null)
+			generated	= new HashSet();
+		
 		for(int i=0; i<constraints.length; i++)
 		{
 			// Get object condition and value source for left part.
-			Object[]	left	= getObjectConditionAndValueSource(constraints[i].getLeftValue(), lcons, variables, boundconstraints, bcons, tmodel);
+			Object[]	left	= getObjectConditionAndValueSource(constraints[i].getLeftValue(), lcons, generated, variables, boundconstraints, bcons, tmodel, invert);
 			ObjectCondition	ocon	= (ObjectCondition)left[0];
 			Object	valuesource	= left[1];
 
 			// Get literal or variable for right part.
-			Object	right	= flattenToPrimary(constraints[i].getRightValue(), lcons, variables, boundconstraints, bcons, tmodel);
+			Object	right	= flattenToPrimary(constraints[i].getRightValue(), lcons, generated, variables, boundconstraints, bcons, tmodel, invert);
 			
 			if(right instanceof Variable)
 			{
-				ocon.addConstraint(new BoundConstraint(valuesource, (Variable)right, getOperator(constraints[i].getOperator())));
+				addConstraint(ocon, new BoundConstraint(valuesource, (Variable)right, getOperator(constraints[i].getOperator())), lcons, generated, bcons, invert);
 			}
 			else // Right is constant value
 			{
-				ocon.addConstraint(new LiteralConstraint(valuesource, right, getOperator(constraints[i].getOperator())));
+				addConstraint(ocon, new LiteralConstraint(valuesource, right, getOperator(constraints[i].getOperator())), lcons, generated, bcons, invert);
 			}
 		}
 		
@@ -92,7 +100,7 @@ public class ConditionBuilder
 	 *  @param tmodel	The type model.
 	 *  @return	A tuple containing the object conditions and the remaining value source.
 	 */
-	protected static Object[] getObjectConditionAndValueSource(UnaryExpression value, List lcons, Map variables, Map boundconstraints, Map bcons, OAVTypeModel tmodel)
+	protected static Object[] getObjectConditionAndValueSource(UnaryExpression value, List lcons, Set generated, Map variables, Map boundconstraints, Map bcons, OAVTypeModel tmodel, boolean invert)
 	{
 		Object[]	ret;
 		Object	prim	= value.getPrimary();
@@ -137,7 +145,7 @@ public class ConditionBuilder
 							Class[]	paramtypes	= new Class[params.length];
 							for(int j=0; j<params.length; j++)
 							{
-								params[j]	= flattenToPrimary(ma.getParameterValues()[j], lcons, variables, boundconstraints, bcons, tmodel);
+								params[j]	= flattenToPrimary(ma.getParameterValues()[j], lcons, generated, variables, boundconstraints, bcons, tmodel, invert);
 								if(params[j] instanceof Variable)
 								{
 									if(((Variable) params[j]).getType() instanceof OAVJavaType)
@@ -187,7 +195,9 @@ public class ConditionBuilder
 
 				BoundConstraint	bc	= (BoundConstraint)boundconstraints.get(var);
 				if(bc!=null && bc.getValueSource()!=null)
-					throw new UnsupportedOperationException("Todo: Combined value sources: "+value);
+				{
+					suffs	= combineValueSources(bc.getValueSource(), suffs);
+				}
 				ret	= suffs.size()==1 ? new Object[]{ocon, suffs.get(0)} : new Object[]{ocon, suffs};
 			}
 		}
@@ -209,7 +219,7 @@ public class ConditionBuilder
 	 *  @param tmodel	The type model.
 	 *  @return	The primary value (i.e. variable or literal).
 	 */
-	protected static Object flattenToPrimary(UnaryExpression value, List lcons, Map variables, Map boundconstraints, Map bcons, OAVTypeModel tmodel)
+	protected static Object flattenToPrimary(UnaryExpression value, List lcons, Set generated, Map variables, Map boundconstraints, Map bcons, OAVTypeModel tmodel, boolean invert)
 	{
 		Object	ret;
 		Object	prim	= value.getPrimary();
@@ -234,7 +244,7 @@ public class ConditionBuilder
 		}
 		else
 		{
-			Object[]	ocvs	= getObjectConditionAndValueSource(value, lcons, variables, boundconstraints, bcons, tmodel);
+			Object[]	ocvs	= getObjectConditionAndValueSource(value, lcons, generated, variables, boundconstraints, bcons, tmodel, invert);
 			OAVObjectType	type	= getReturnType(ocvs[1], tmodel);
 
 			String	varname;
@@ -243,7 +253,7 @@ public class ConditionBuilder
 			variables.put(varname, tmpvar);
 			BoundConstraint	bc	= new BoundConstraint(ocvs[1], tmpvar);
 			boundconstraints.put(tmpvar, bc);
-			((ObjectCondition)ocvs[0]).addConstraint(bc);
+			addConstraint(((ObjectCondition)ocvs[0]), bc, lcons, generated, bcons, invert);
 			ret	= tmpvar;
 		}
 		
@@ -422,5 +432,67 @@ public class ConditionBuilder
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Combine (i.e. chain) value sources.
+	 *  @param valuesource	The initial value source.
+	 *  @param suffs	The suffixes to the initial value source.
+	 *  @return The combined value source.
+	 */
+	protected static List	combineValueSources(Object valuesource, List suffs)
+	{
+		List	ret	= new ArrayList();
+		
+		// For chained access only the last one is relevant.
+		if(valuesource instanceof Object[])
+		{
+			ret.addAll(Arrays.asList((Object[])valuesource));
+		}
+		else if(valuesource instanceof List)
+		{
+			ret.addAll((List)valuesource);
+		}
+		else if(valuesource!=null)
+		{
+			ret.add(valuesource);
+		}
+		
+		ret.addAll(suffs);
+		
+		return ret;
+	}
+
+	/**
+	 *  Add a constraint to an object condition.
+	 *  Creates a copy of the condition, if required for inverting.
+	 *  @param ocon	The object condition.
+	 *  @param constraint The constraint to add.
+	 *  @param generated	The set of generated conditions
+	 *  @param bcons	The conditions map.
+	 */
+	protected static void addConstraint(ObjectCondition ocon, IConstraint constraint, List lcons, Set generated, Map bcons, boolean invert)
+	{
+		if(invert && !generated.contains(ocon))
+		{
+			// Copy condition.
+			ObjectCondition	tmp	= new ObjectCondition(ocon.getObjectType());
+			for(int i=0; i<ocon.getConstraints().size(); i++)
+				tmp.addConstraint((IConstraint)ocon.getConstraints().get(i));
+			lcons.add(tmp);
+			generated.add(tmp);
+			
+			// Replace in mapping.
+			for(Iterator it=bcons.keySet().iterator(); it.hasNext(); )
+			{
+				Object	var	= it.next();
+				if(bcons.get(var)==ocon)
+					bcons.put(var, tmp);
+			}
+			
+			ocon	= tmp;
+		}
+		
+		ocon.addConstraint(constraint);
 	}
 }

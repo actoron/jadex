@@ -316,10 +316,22 @@ public abstract class Plan extends AbstractPlan
 	 */
 	public void waitForGoal(final IGoal goal, long timeout)
 	{
-		// Todo: check thread access.
-		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		WaitAbstractionFlyweight.addGoal(wa, goal, getState(), getRCapability());
-		PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
+		if(goal.isFinished())
+		{
+			// Todo: check thread access.
+			if(OAVBDIRuntimeModel.GOALPROCESSINGSTATE_FAILED.equals(
+					getState().getAttributeValue(((ElementFlyweight)goal).getHandle(), OAVBDIRuntimeModel.goal_has_processingstate)))
+			{
+				throw new GoalFailureException("Goal failed: "+goal);
+			}
+		}
+		else
+		{
+			// Todo: check thread access.
+			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
+			WaitAbstractionFlyweight.addGoal(wa, goal, getState(), getRCapability());
+			PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
+		}
 	}
 
 	/**

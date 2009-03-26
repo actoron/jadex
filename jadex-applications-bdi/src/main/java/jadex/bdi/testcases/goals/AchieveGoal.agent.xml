@@ -49,11 +49,11 @@
 	
 	<goals>
 		<achievegoal name="testgoal" retry="true" exclude="never">
-			<contextcondition>
- 				// $beliefbase.mycontext
+			<contextcondition language="jcl">
+ 				$beliefbase.mycontext
 
-				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "mycontext"))
+				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
+				// ?mbel	= (mbelief (melement_has_name "mycontext"))
  			</contextcondition>
 			<targetcondition language="jcl">
  				$beliefbase.count==5
@@ -94,7 +94,7 @@
 
 	<properties>
 		<!-- <property name="logging.level">Level.INFO</property> -->
-		<property name="debugging">false</property>
+		<property name="debugging">true</property>
 	</properties>
 
 	<configurations>

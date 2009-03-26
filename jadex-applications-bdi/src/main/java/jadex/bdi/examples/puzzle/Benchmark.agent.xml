@@ -48,8 +48,9 @@
 		<!-- The goal to make a move on the board that is the solution. -->
 		<achievegoal name="makemove" recalculate="false">
 			<parameter name="depth" class="int"/>
-			<targetcondition>
-				// $beliefbase.getBelief("board").getFact().isSolution()
+			<targetcondition language="jcl">
+				$beliefbase.board.isSolution()
+
 				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?board))
 				// ?mbelief = (mbelief (melement_has_name "board"))
 				// ?board = (IBoard (solution true))
@@ -57,7 +58,7 @@
 				// ?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact ?board))
 				// ?board = (IBoard (solution true))
 				
-				?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact.IBoard:solution true))
+				// ?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact.IBoard:solution true))
 			</targetcondition>
  		</achievegoal>
 

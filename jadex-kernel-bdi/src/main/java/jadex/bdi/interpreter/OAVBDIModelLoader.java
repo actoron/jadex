@@ -21,6 +21,7 @@ import jadex.rules.rulesystem.rules.Constraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.IPriorityEvaluator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
+import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
@@ -319,8 +320,11 @@ public class OAVBDIModelLoader
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
+//				e.printStackTrace();
+				if(e instanceof RuntimeException)
+					throw (RuntimeException)e;
+				else
+					throw new RuntimeException(e);
 			}
 			finally
 			{
@@ -377,13 +381,16 @@ public class OAVBDIModelLoader
 				if(context!=null)
 				{
 					// Two rules have to be added (negated condition for suspend)
-					ICondition usercond = (ICondition)state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
+					Object	usercond	= state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
 					{
 						String rulename = Rulebase.getUniqueRuleName(rb, "goal_option_"+gtname);
-						rb.addRule(GoalLifecycleRules.createGoalOptionUserRule(rulename, usercond, mgoal));
+						Object[]	tmp	= GoalLifecycleRules.createGoalOptionUserRule(mgoal);
+						rb.addRule(createUserRule(state, mcapa, imports, mgoal, context, usercond, rulename, tmp));
+
 						rulename = Rulebase.getUniqueRuleName(rb, "goal_suspend_"+gtname);
-						rb.addRule(GoalLifecycleRules.createGoalSuspendUserRule(rulename, usercond, mgoal));
+						tmp	= GoalLifecycleRules.createGoalSuspendUserRule(mgoal);
+						rb.addRule(createUserRule(state, mcapa, imports, mgoal, context, usercond, rulename, tmp));
 					}
 				}
 				
@@ -476,7 +483,7 @@ public class OAVBDIModelLoader
 				}
 				
 				// Create rules for dynamic parameter values.
-				createDynamicParameterValuesConditions(mgoal, state, rb);
+				createDynamicParameterValuesConditions(mgoal, state, rb, mcapa, imports);
 				
 				// Create rules for dynamic parameter set values.
 				createDynamicParameterSetValuesConditions(mgoal, state, rb);
@@ -520,7 +527,7 @@ public class OAVBDIModelLoader
 				}
 				
 				// Create rules for dynamic parameter values.
-				createDynamicParameterValuesConditions(mplan, state, rb);
+				createDynamicParameterValuesConditions(mplan, state, rb, mcapa, imports);
 				
 				// Create rules for dynamic parameter set values.
 				createDynamicParameterSetValuesConditions(mplan, state, rb);
@@ -544,11 +551,12 @@ public class OAVBDIModelLoader
 					if(fact!=null)
 					{
 						Object usercond = state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_content);
-						if(usercond instanceof ICondition)
+						if(usercond!=null)
 						{
 							String btname = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
 							String rulename = Rulebase.getUniqueRuleName(rb, "belief_dynamicfact_"+btname);
-							rb.addRule(BeliefRules.createDynamicBeliefUserRule(rulename, (ICondition)usercond, mbel));
+							Object[]	tmp	= BeliefRules.createDynamicBeliefUserRule(mbel);
+							rb.addRule(createUserRule(state, mcapa, imports, null, fact, usercond, rulename, tmp));
 						}
 					}
 				}
@@ -665,7 +673,7 @@ public class OAVBDIModelLoader
 	 *  @param mcondition	The mcondition.
 	 *  @param usercond	The user condition (ADF text).
 	 *  @param rulename	The name of the rule to create.
-	 *  @param tmp	The rule template [predefined condition, action, priority evaluator(optional)].
+	 *  @param tmp	The rule template [predefined condition, action, priority evaluator(optional), return variable(optional), invert (optional)].
 	 *  @return The created rule.
 	 */
 	protected IRule	createUserRule(IOAVState state, Object mcapa,
@@ -673,11 +681,12 @@ public class OAVBDIModelLoader
 			Object usercond, String rulename, Object[] tmp)
 	{
 		IRule	ret;
+		boolean	invert	= tmp.length>=5 && Boolean.TRUE.equals(tmp[4]);
 		if(usercond instanceof String)
 		{
 			String language = (String)state.getAttributeValue(mcondition, OAVBDIMetaModel.expression_has_language);
-			IParserHelper	helper	= new BDIParserHelper((ICondition)tmp[0], mcapa, melement, state); 
-			ICondition	cond	= ParserHelper.parseCondition((ICondition)tmp[0], (String)usercond, language, state.getTypeModel(), imports, null, helper);
+			IParserHelper	helper	= new BDIParserHelper((ICondition)tmp[0], mcapa, melement, state, tmp.length>=4 ? (Variable)tmp[3] : null); 
+			ICondition	cond	= ParserHelper.parseCondition((ICondition)tmp[0], (String)usercond, language, state.getTypeModel(), imports, null, helper, invert);
 			ret	= tmp.length==2
 				? new Rule(rulename, cond, (IAction)tmp[1])
 				: new Rule(rulename, cond, (IAction)tmp[1], (IPriorityEvaluator)tmp[2]);
@@ -686,7 +695,8 @@ public class OAVBDIModelLoader
 		// Compatibility code for clips conditions: Todo remove
 		else
 		{
-			ICondition	cond	= new AndCondition(new ICondition[]{(ICondition)tmp[0], (ICondition)usercond});
+			ICondition	cond	= new AndCondition(new ICondition[]{(ICondition)tmp[0],
+				invert ? new NotCondition((ICondition)usercond) : (ICondition)usercond });
 			ret	= tmp.length==2
 				? new Rule(rulename, cond, (IAction)tmp[1])
 				: new Rule(rulename, cond, (IAction)tmp[1], (IPriorityEvaluator)tmp[2]);
@@ -700,7 +710,7 @@ public class OAVBDIModelLoader
 	 *  @param state The state.
 	 *  @param rb The rulebase.
 	 */
-	protected void createDynamicParameterValuesConditions(Object mpe, IOAVState state, IRulebase rb)
+	protected void createDynamicParameterValuesConditions(Object mpe, IOAVState state, IRulebase rb, Object mcapa, String[] imports)
 	{
 		// Create rules for dynamic parameter value.
 		
@@ -719,10 +729,11 @@ public class OAVBDIModelLoader
 					{
 						String ptname = (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
 						Object usercond = state.getAttributeValue(value, OAVBDIMetaModel.expression_has_content);
-						if(usercond instanceof ICondition)
+						if(usercond!=null)
 						{
 							String rulename = Rulebase.getUniqueRuleName(rb, "parameter_dynamicvalue_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
-							rb.addRule(BeliefRules.createDynamicParameterUserRule(rulename, mpe, (ICondition)usercond, ptname));
+							Object[]	tmp	= BeliefRules.createDynamicParameterUserRule(mpe, ptname);
+							rb.addRule(createUserRule(state, mcapa, imports, mpe, value, usercond, rulename, tmp));
 						}
 					}
 				}

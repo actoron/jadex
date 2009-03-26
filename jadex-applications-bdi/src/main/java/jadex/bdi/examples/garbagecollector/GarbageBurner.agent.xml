@@ -23,6 +23,7 @@
 		<belief name="pos" class="Position" evaluationmode="push">
 			<fact language="clips">
 				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
+				// $beliefbase.env.getPosition($scope.getAgentName())
 				
 				?agent = (agent (agent_has_localname ?agentname))
 				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))

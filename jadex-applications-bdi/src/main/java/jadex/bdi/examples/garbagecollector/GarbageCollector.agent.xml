@@ -37,14 +37,15 @@
 		<!-- When at least one piece of waste is present on the
 			current posistion the actual position is perceived as dirty. -->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
- 			<fact language="clips">
+ 			<fact language="jcl">
  				// ((Environment)$beliefbase.getBelief("env").getFact()).isDirty((Position)$beliefbase.getBelief("pos").getFact())
+ 				$beliefbase.env.isDirty($beliefbase.pos)
 			
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				?mbel_pos = (mbelief (melement_has_name "pos"))
- 				?env = (Environment (isDirty (?pos) ?ret))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
+				// ?mbel_pos = (mbelief (melement_has_name "pos"))
+ 				// ?env = (Environment (isDirty (?pos) ?ret))
  			</fact>
 		</belief>
 		

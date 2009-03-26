@@ -294,6 +294,10 @@ public class OAVBDIXMLReader
 							throw new RuntimeException("Parse errors: "+errors);
 						}
 					}
+					else if(lang.equals("jcl"))
+					{
+						// Java conditions parsed later in createAgentModelEntry()
+					}
 					else
 					{
 //						report.put(se, "Unknown condition language: "+lang);

@@ -288,7 +288,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF condition part.
 	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalOptionUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createGoalOptionUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -302,10 +302,9 @@ public class GoalLifecycleRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		ICondition goalcond = new AndCondition(new ICondition[]{goalcon, capcon, usercond});
-		
-		Rule goal_optionize	= new Rule(rulename, goalcond, GOAL_OPTION_ACTION);
-		return goal_optionize;
+		return new Object[]{
+			new AndCondition(new ICondition[]{goalcon, capcon}),
+			GOAL_OPTION_ACTION};
 	}
 
 	/**
@@ -313,7 +312,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF part of the context condition (will be negated automatically).
 	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalSuspendUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createGoalSuspendUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -327,10 +326,12 @@ public class GoalLifecycleRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		ICondition goalcond = new AndCondition(new ICondition[]{goalcon, capcon, new NotCondition(usercond)});
-		
-		Rule goal_dropping = new Rule(rulename, goalcond, GOAL_SUSPEND_ACTION);
-		return goal_dropping;
+		return new Object[]{
+			new AndCondition(new ICondition[]{goalcon, capcon}),
+			GOAL_SUSPEND_ACTION,
+			null,
+			null,
+			Boolean.TRUE};	// Invert user condition.
 	}
 
 	/**

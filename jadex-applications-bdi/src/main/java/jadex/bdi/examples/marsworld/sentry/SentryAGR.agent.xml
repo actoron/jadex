@@ -97,6 +97,8 @@
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. -->
 			<targetcondition>
+				// $beliefbase.getBeliefSet("analysed_targets").containsFact($goal.target)
+				
 				?rgoal	= (goal (parameterelement_has_parameters ?param_target))
 				?param_target	= (parameter (parameter_has_value ?target))
 				(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))

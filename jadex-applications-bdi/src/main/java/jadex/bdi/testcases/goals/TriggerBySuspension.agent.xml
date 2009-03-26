@@ -48,10 +48,11 @@
 				?rbel = (belief (element_has_model ?mbel) (belief_has_fact != 5))
 				?mbel = (mbelief (melement_has_name "count"))
 			</contextcondition>
-			<targetcondition>
- 				// $beliefbase.count==10
- 				?rbel = (belief (element_has_model ?mbel) (belief_has_fact 10))
-				?mbel = (mbelief (melement_has_name "count"))
+			<targetcondition language="jcl">
+ 				$beliefbase.count==10
+ 				
+ 				// ?rbel = (belief (element_has_model ?mbel) (belief_has_fact 10))
+				// ?mbel = (mbelief (melement_has_name "count"))
  			</targetcondition>
 		</achievegoal>
 	</goals>

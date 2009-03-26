@@ -41,7 +41,7 @@ public class ChainedExtractor implements IValueExtractor
 		Object ret = extractors[0].getValue(left, right, state);
 		for(int i=1; ret!=null && i<extractors.length; i++)
 		{
-			ret = extractors[i].getValue(null, ret, state);
+			ret = extractors[i].getValue(left, ret, state);	// Todo: right might be needed too!
 		}
 		return ret;
 	}

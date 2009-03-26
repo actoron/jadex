@@ -85,6 +85,11 @@ public class JavaParserTest
 				{
 					return predefined.getConditions();
 				}
+				
+				public Constraint completeConstraint(Object exp)
+				{
+					throw new UnsupportedOperationException();
+				}
 			});
 			parser.lhs();
 
@@ -92,7 +97,7 @@ public class JavaParserTest
 			Constraint[]	constraints	= (Constraint[])parser.getStack()
 				.toArray(new Constraint[parser.getStack().size()]);
 
-			ICondition	result	= ConditionBuilder.buildCondition(constraints, predefined, tmodel);
+			ICondition	result	= ConditionBuilder.buildCondition(constraints, predefined, tmodel, null, false);
 			
 			System.out.println("Condition after build:\n"+result+"\n");
 		}

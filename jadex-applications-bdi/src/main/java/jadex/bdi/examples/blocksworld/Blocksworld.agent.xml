@@ -150,12 +150,15 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		<!-- Clear one block. -->
 		<achievegoal name="clear">
 			<parameter name="block" class="Block" />
-			<targetcondition>
-				?param = (parameter (parameter_has_name "block") (parameter_has_value ?block))
-				?rgoal = (goal (parameterelement_has_parameters contains ?param))
-				?block = (Block (clear true))
+			<targetcondition language="jcl">
+				$goal.block.isClear()
+				// $goal.block.clear
+				
+				// ?param = (parameter (parameter_has_name "block") (parameter_has_value ?block))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?param))
+				// ?block = (Block (clear true))
 	
-				<!-- // $goal.block.isClear()
+				<!-- 
 				
 				// Drools Syntax
 				$block	: Block(clear == true)
@@ -170,16 +173,19 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		<achievegoal name="stack">
 			<parameter name="block" class="Block" />
 			<parameter name="target" class="Block" />
-			<targetcondition>
-				<!-- // $goal.block.getLower()==$goal.target
-				// Drools Syntax
-				$target	: Block()
-				$block	: Block(lower == $target)-->
+			<targetcondition language="jcl">
+				$goal.block.getLower()==$goal.target
+				// $goal.block.lower==$goal.target
 				
-				?block	= (Block (lower ?target))
-				?param2	= (parameter (parameter_has_name "block") (parameter_has_value ?block))
-				?param1	= (parameter (parameter_has_name "target") (parameter_has_value ?target))
-				?rgoal	= (goal (parameterelement_has_parameters contains ?param1) (parameterelement_has_parameters contains ?param2))
+				// Drools Syntax
+				// $target	: Block()
+				// $block	: Block(lower == $target)-->
+				
+				// Clips
+				// ?block	= (Block (lower ?target))
+				// ?param2	= (parameter (parameter_has_name "block") (parameter_has_value ?block))
+				// ?param1	= (parameter (parameter_has_name "target") (parameter_has_value ?target))
+				// ?rgoal	= (goal (parameterelement_has_parameters contains ?param1) (parameterelement_has_parameters contains ?param2))
 			</targetcondition>
 		</achievegoal>
 		
