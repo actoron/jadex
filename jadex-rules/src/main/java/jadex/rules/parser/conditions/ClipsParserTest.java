@@ -48,17 +48,17 @@ public class ClipsParserTest
 //			ICondition cond = parser.rhs(OAVJavaType.java_type_model);
 //			System.out.println(cond);
 			
-			String c	= "$beliefbase.chargestate > 0.2";
-			
-			ANTLRStringStream exp = new ANTLRStringStream(c);
-			JadexJavaRulesLexer lexer = new JadexJavaRulesLexer(exp);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			JadexJavaRulesParser parser = new JadexJavaRulesParser(tokens);
-		
-			JavaRulesContext	jrc	= new JavaRulesContext(null);
-			parser.setContext(jrc);
-			parser.rhs();
-			System.out.println(jrc);
+//			String c	= "$beliefbase.chargestate > 0.2";
+//			
+//			ANTLRStringStream exp = new ANTLRStringStream(c);
+//			JadexJavaRulesLexer lexer = new JadexJavaRulesLexer(exp);
+//			CommonTokenStream tokens = new CommonTokenStream(lexer);
+//			JadexJavaRulesParser parser = new JadexJavaRulesParser(tokens);
+//		
+//			JavaRulesContext	jrc	= new JavaRulesContext(null);
+//			parser.setContext(jrc);
+//			parser.rhs();
+//			System.out.println(jrc);
 			
 		}
 		catch(Exception ex)

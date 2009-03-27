@@ -11,9 +11,7 @@ import jadex.rules.state.OAVTypeModel;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -35,12 +33,12 @@ public class JavaParserTest
 //			String c	= "$waste.getLocation().getDistance($location) > 0.2";
 //			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2";
 //			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $waste.getLocation()!=$location";
-//			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $location!=$waste.getLocation()";
+			String c	= "$waste.getLocation().getDistance($waste2.getLocation()) > 0.2 && $location!=$waste.getLocation()";
 
 			// Todo: Agent specific handling ($beliefbase etc.s)
 //			String c	= "$beliefbase.chargestate > 0.2";
 //			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2";
-			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2==7";
+//			String c	= "$beliefbase.waste.getDistance($beliefbase.location) > 0.2==7";
 			
 			ANTLRStringStream exp = new ANTLRStringStream(c);
 			JavaJadexLexer lexer = new JavaJadexLexer(exp);
@@ -63,9 +61,8 @@ public class JavaParserTest
 			wastecon2.addConstraint(new BoundConstraint(null, new Variable("$waste2", wastetype)));
 
 //			AndCondition	predefined	= new AndCondition(new ICondition[]{wastecon2, wastecon});
-			final AndCondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon, wastecon2});
-			final Map	varmap	= new HashMap();
-			ConditionBuilder.buildConditionMap(predefined.getConditions(), varmap, new HashMap(), new HashMap());
+			AndCondition	predefined	= new AndCondition(new ICondition[]{locacon, wastecon, wastecon2});
+			final BuildContext	context	= new BuildContext(predefined, tmodel);
 			
 			System.out.println("Predefined condition:\n"+predefined+"\n");
 
@@ -73,7 +70,7 @@ public class JavaParserTest
 			{
 				public Variable getVariable(String name)
 				{
-					return (Variable)varmap.get(name);
+					return context.getVariable(name);
 				}
 				
 				public boolean isPseudoVariable(String name)
@@ -83,21 +80,15 @@ public class JavaParserTest
 				
 				public List getConditions()
 				{
-					return predefined.getConditions();
-				}
-				
-				public Constraint completeConstraint(Object exp)
-				{
-					throw new UnsupportedOperationException();
+					return context.getConditions();
 				}
 			});
-			parser.lhs();
 
-			System.out.println("Parsed expression:\n"+parser.getStack()+"\n");
-			Constraint[]	constraints	= (Constraint[])parser.getStack()
-				.toArray(new Constraint[parser.getStack().size()]);
+			Expression	pexp	= parser.lhs();
 
-			ICondition	result	= ConditionBuilder.buildCondition(constraints, predefined, tmodel, null, false);
+			System.out.println("Parsed expression:\n"+pexp+"\n");
+
+			ICondition	result	= ConstraintBuilder.buildConstraints(pexp, predefined, tmodel);
 			
 			System.out.println("Condition after build:\n"+result+"\n");
 		}

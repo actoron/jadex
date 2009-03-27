@@ -13,8 +13,8 @@ public class MethodAccess	extends	Suffix
 	/** The name of the method. */
 	protected String	name;
 	
-	/** The parameter values. */
-	protected UnaryExpression[]	parametervalues;
+	/** The parameter value expressions. */
+	protected Expression[]	parametervalues;
 	
 	//-------- constructors --------
 	
@@ -23,7 +23,7 @@ public class MethodAccess	extends	Suffix
 	 *  @param name	The method name.
 	 *  @param parametervalues	Expressions for the parameter values (if any).
 	 */
-	public MethodAccess(String name, UnaryExpression[] parametervalues)
+	public MethodAccess(String name, Expression[] parametervalues)
 	{
 		this.name	= name;
 		this.parametervalues	= parametervalues;
@@ -42,7 +42,7 @@ public class MethodAccess	extends	Suffix
 	/**
 	 *  Get the parameter values expressions (if any).
 	 */
-	public UnaryExpression[]	getParameterValues()
+	public Expression[]	getParameterValues()
 	{
 		return this.parametervalues;
 	}

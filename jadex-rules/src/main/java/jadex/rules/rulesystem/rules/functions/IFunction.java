@@ -9,6 +9,25 @@ import java.util.Set;
  */
 public interface IFunction
 {
+	//-------- constants --------
+	
+	/** The sum function for adding two or more values. */
+	public static final IFunction	SUM	= new Sum();
+	
+	/** The sub function for subtracting one or more values from another value. */
+	public static final IFunction	SUB	= new Sub();
+	
+	/** The mult function for multiplying two or more values. */
+	public static final IFunction	MULT	= new Mult();
+	
+	/** The div function for dividing a value by another value. */
+	public static final IFunction	DIV	= new Div();
+	
+	/** The modulo function for building the remainder after dividing two values. */
+	public static final IFunction	MOD	= new Modulo();
+	
+	//-------- methods --------
+	
 	/**
 	 *  Invoke a function and return a value (optional).
 	 *  @param paramvalues The parameter values.

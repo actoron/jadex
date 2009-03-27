@@ -78,9 +78,12 @@ rhs[OAVTypeModel tmodel] returns [ICondition condition]
 
 // Conditional elements
 ce[OAVTypeModel tmodel, Map vars] returns [ICondition condition] 	
-	: tmp = andce[tmodel, vars] {$condition = tmp;}
-	| tmp = notce[tmodel, vars] {$condition = tmp;}
-	| tmp = testce[tmodel, vars] {$condition = tmp;}
+	: {"and".equals(ClipsJadexParser.this.input.LT(2).getText()) && !SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)}?
+		tmp = andce[tmodel, vars] {$condition = tmp;}
+	| {"not".equals(ClipsJadexParser.this.input.LT(2).getText()) && !SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)}?
+		tmp = notce[tmodel, vars] {$condition = tmp;}
+	| {"test".equals(ClipsJadexParser.this.input.LT(2).getText()) && !SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)}?
+		tmp = testce[tmodel, vars] {$condition = tmp;}
 	| tmp = collectce[tmodel, vars] {$condition = tmp;}
 	| {SConditions.lookaheadObjectCE(ClipsJadexParser.this.input)}? tmp = objectce[tmodel, vars] {$condition = tmp;}
 	;
@@ -108,7 +111,10 @@ notce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
 	;
 
 testce[OAVTypeModel tmodel, Map vars] returns [ICondition condition]
-	: '(' 'test' (({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? call=functionCall[tmodel, vars])  | call=operatorCall[tmodel, vars]) ')'
+	: '(' 'test'
+		( call=operatorCall[tmodel, vars]
+		| ({SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? call=functionCall[tmodel, vars])
+		) ')'
 	{
 		$condition = new TestCondition(new PredicateConstraint(call));
 	}
@@ -388,7 +394,7 @@ functionCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]
 	;
 
 operatorCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]	
-	: '('  op=operator? exp1=parameter[tmodel, vars] exp2=parameter[tmodel, vars] ')'
+	: '('  op=operator/*?*/ exp1=parameter[tmodel, vars] exp2=parameter[tmodel, vars] ')'
 	{
 		IFunction func = new OperatorFunction(op!=null? op: IOperator.EQUAL);
 		$fc = new FunctionCall(func, new Object[]{exp1, exp2});
@@ -551,6 +557,7 @@ identifier returns [Token identifier]
 	| tmp='test' {$identifier = tmp;}
 	| tmp='not' {$identifier = tmp;}
 	| tmp='and' {$identifier = tmp;}
+	| tmp='collect' {$identifier = tmp;}
 	| tmp='contains' {$identifier = tmp;}
 	| tmp='excludes' {$identifier = tmp;}
 	;
@@ -590,7 +597,7 @@ FloatingPointLiteral
     	:   ('0'..'9')+ '.' ('0'..'9')* Exponent? FloatTypeSuffix?
  	|   '.' ('0'..'9')+ Exponent? FloatTypeSuffix?
  	|   ('0'..'9')+ Exponent FloatTypeSuffix?
-	|   ('0'..'9')+ Exponent? FloatTypeSuffix
+	|   ('0'..'9')+ FloatTypeSuffix
 	;
 
 fragment

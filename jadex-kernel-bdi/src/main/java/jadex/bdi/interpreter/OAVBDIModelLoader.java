@@ -685,7 +685,7 @@ public class OAVBDIModelLoader
 		if(usercond instanceof String)
 		{
 			String language = (String)state.getAttributeValue(mcondition, OAVBDIMetaModel.expression_has_language);
-			IParserHelper	helper	= new BDIParserHelper((ICondition)tmp[0], mcapa, melement, state, tmp.length>=4 ? (Variable)tmp[3] : null); 
+			IParserHelper	helper	= new BDIParserHelper((ICondition)tmp[0], mcapa, melement, state, tmp.length>=4 ? (Variable)tmp[3] : null, invert); 
 			ICondition	cond	= ParserHelper.parseCondition((ICondition)tmp[0], (String)usercond, language, state.getTypeModel(), imports, null, helper, invert);
 			ret	= tmp.length==2
 				? new Rule(rulename, cond, (IAction)tmp[1])

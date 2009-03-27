@@ -1,80 +1,76 @@
 package jadex.rules.parser.conditions.javagrammar;
 
-import jadex.commons.SUtil;
 
 /**
- *  A computable value composed of primary value and zero to many suffixes.
+ *  An unary operation operates on one value.
  */
-public class UnaryExpression
+public class UnaryExpression	extends Expression
 {
 	//-------- attributes --------
 	
-	/** The primary value expression. */
-	protected Object	primary;
-	
-	/** The suffixes, if any. */
-	protected Suffix[]	suffixes;
-	
+	/** The value expression. */
+	protected Expression	value;
+
+	/** The operator. */
+	protected Object	operator;
+
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new unary expression.
+	 *  Create a new unary operation.
 	 */
-	public UnaryExpression(Object primary, Suffix[] suffixes)
+	public UnaryExpression(Expression value, Object operator)
 	{
-		this.primary	= primary;
-		this.suffixes	= suffixes;
+		this.value	= value;
+		this.operator	= operator;
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 *  Get the primary value expression.
+	 *  Get the value.
 	 */
-	public Object	getPrimary()
+	public Expression	getValue()
 	{
-		return this.primary;
+		return this.value;
 	}
 	
 	/**
-	 *  Get the suffixes (if any).
+	 *  Get the operator.
 	 */
-	public Suffix[]	getSuffixes()
+	public Object	getOperator()
 	{
-		return suffixes;
+		return this.operator;
 	}
 	
 	/**
-	 *  Get a string representation of this unary expression.
+	 *  Get a string representation of this expression.
 	 */
 	public String	toString()
 	{
 		StringBuffer	ret	= new StringBuffer();
-		ret.append(primary.toString());
-		for(int s=0; suffixes!=null && s<suffixes.length; s++)
-		{
-			ret.append(suffixes[s].toString());
-		}
+		ret.append(getOperator());
+		ret.append(getValue().toString());
 		return ret.toString();
 	}
 
 	/**
-	 *  Test if this unary expression is equal to some object.
+	 *  Test if this expression is equal to some object.
 	 */
 	public boolean	equals(Object o)
 	{
 		return o instanceof UnaryExpression
-			&& ((UnaryExpression)o).getPrimary().equals(getPrimary())
-			&& SUtil.arrayEquals(((UnaryExpression)o).getSuffixes(), getSuffixes());
+			&& ((UnaryExpression)o).getValue().equals(getValue())
+			&& ((UnaryExpression)o).getOperator().equals(getOperator());
 	}
 	
 	/**
-	 *  Get the hash code of this unary expression.
+	 *  Get the hash code of this expression.
 	 */
 	public int	hashCode()
 	{
-		int	ret	= 31 + getPrimary().hashCode();
-		ret = 31*ret + (getSuffixes()!=null ? SUtil.arrayHashCode(getSuffixes()): 0);
+		int	ret	= 31 + getValue().hashCode();
+		ret	= 31*ret + getOperator().hashCode();
 		return ret;
 	}
 }

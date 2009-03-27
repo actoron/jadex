@@ -20,7 +20,7 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.ValueSourceReturnValueConstraint;
 import jadex.rules.rulesystem.rules.Variable;
-import jadex.rules.rulesystem.rules.functions.Sum;
+import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -139,7 +139,7 @@ public class Golfing
 		c4.addConstraint(new BoundConstraint(golfer_has_color, bob_color, IOperator.NOTEQUAL));
 
 		ObjectCondition	c5	= new ObjectCondition(golfer_type);
-		c5.addConstraint(new ValueSourceReturnValueConstraint(golfer_has_position, new FunctionCall(new Sum(), new Object[]{fred_pos, new Integer(1)})));
+		c5.addConstraint(new ValueSourceReturnValueConstraint(golfer_has_position, new FunctionCall(IFunction.SUM, new Object[]{fred_pos, new Integer(1)})));
 		c5.addConstraint(new LiteralConstraint(golfer_has_color, "blue"));
 		c5.addConstraint(new OrConstraint(new IConstraint[]
 		{

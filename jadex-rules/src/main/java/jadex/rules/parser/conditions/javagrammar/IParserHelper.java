@@ -36,6 +36,12 @@ public interface IParserHelper
 	 *  context (e.g. to 'exp==true').
 	 *  @param exp	The expression that needs to be converted to a constraint.
 	 *  @return The constraint.
-	 */
+	 * /
 	public Constraint completeConstraint(Object exp);
+
+	/**
+	 *  Get the conditions, which have been generated during parsing.
+	 *  @return The generated conditions.
+	 * /
+	public Set getGeneratedConditions();*/
 }

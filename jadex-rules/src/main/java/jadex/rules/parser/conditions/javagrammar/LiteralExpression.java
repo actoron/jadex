@@ -4,13 +4,13 @@ import jadex.commons.SUtil;
 
 
 /**
- *  A literal is a constant primary value.
+ *  A literal is a constant value.
  */
-public class Literal
+public class LiteralExpression	extends Expression
 {
 	//-------- attributes --------
 	
-	/** The value. */
+	/** The literal value. */
 	protected Object	value;
 	
 	//-------- constructors --------
@@ -18,7 +18,7 @@ public class Literal
 	/**
 	 *  Create a new literal.
 	 */
-	public Literal(Object value)
+	public LiteralExpression(Object value)
 	{
 		this.value	= value;
 	}
@@ -46,8 +46,8 @@ public class Literal
 	 */
 	public boolean	equals(Object o)
 	{
-		return o instanceof Literal
-			&& SUtil.equals(((Literal)o).getValue(), getValue());
+		return o instanceof LiteralExpression
+			&& SUtil.equals(((LiteralExpression)o).getValue(), getValue());
 	}
 	
 	/**
