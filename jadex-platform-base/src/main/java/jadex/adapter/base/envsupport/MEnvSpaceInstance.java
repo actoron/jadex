@@ -9,11 +9,11 @@ import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.bridge.IClockService;
+import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
@@ -59,8 +59,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	{
 		MApplicationType mapt = app.getApplicationType();
 		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
+		ClassLoader cl = ((ILibraryService)app.getPlatform().getService(ILibraryService.class)).getClassLoader();
 		
-		Class envcl = SReflect.findClass(spacetype.getClassName(), mapt.getAllImports(), null);
+		Class envcl = SReflect.findClass(spacetype.getClassName(), mapt.getAllImports(), cl);
 		
 		// Create and init space.
 		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)envcl.newInstance();
@@ -89,7 +90,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<actions.size(); i++)
 			{
 				MEnvActionType maction = (MEnvActionType)actions.get(i);
-				Class proccl = SReflect.findClass(maction.getClassName(), mapt.getAllImports(), null);
+				Class proccl = SReflect.findClass(maction.getClassName(), mapt.getAllImports(), cl);
 				
 				ISpaceAction action = (ISpaceAction)proccl.newInstance();
 				
@@ -106,8 +107,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		{
 			for(int i=0; i<processes.size(); i++)
 			{
-				MEnvProcessType mproc = (MEnvProcessType)actions.get(i);
-				Class proccl = SReflect.findClass(mproc.getClassName(), mapt.getAllImports(), null);
+				MEnvProcessType mproc = (MEnvProcessType)processes.get(i);
+				Class proccl = SReflect.findClass(mproc.getClassName(), mapt.getAllImports(), cl);
 				
 				ISpaceProcess proc = (ISpaceProcess)proccl.newInstance();
 				

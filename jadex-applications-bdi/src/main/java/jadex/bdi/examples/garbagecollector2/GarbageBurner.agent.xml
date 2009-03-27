@@ -8,13 +8,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
-	name="GarbageBurnerEnv"
-	package="jadex.bdi.examples.garbagecollector">
+	name="GarbageBurner"
+	package="jadex.bdi.examples.garbagecollector2">
 
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
 		<import>jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
 	</imports>
 
 	<beliefs>

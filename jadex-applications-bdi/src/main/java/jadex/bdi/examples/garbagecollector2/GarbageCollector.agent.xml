@@ -11,26 +11,37 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
-	name="GarbageCollectorEnv"
-	package="jadex.bdi.examples.garbagecollector">
+	name="GarbageCollector"
+	package="jadex.bdi.examples.garbagecollector2">
+
+	<imports>
+		<import>jadex.adapter.base.contextservice.*</import>
+		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+	</imports>
 
 	<beliefs>
-		<!-- Environment object as singleton.
- 			Parameters are name and type of agent for adding it
-			No clean solution but avoids registering of agents.-->
-		<belief name="env" class="Environment">
-			<fact>Environment.getInstance(Environment.COLLECTOR, $scope.getAgentName())</fact>
+		<!-- Environment. -->
+		<belief name="env" class="ContinuousSpace2D">
+ 			<fact>((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("mygc2dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject">
+ 			<fact>$beliefbase.env.getSpaceObject($agent.getAgentIdentifier())</fact>
  		</belief>
 
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="Position" evaluationmode="push">
-			<fact language="clips">
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
+			<fact language="jcl">
+				$beliefbase.myself.getProperty("position")
 				
-				?agent = (agent (agent_has_localname ?agentname))
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?env = (Environment (getPosition (?agentname) ?ret))
+				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
+				// ?agent = (agent (agent_has_localname ?agentname))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?env = (Environment (getPosition (?agentname) ?ret))
 			</fact>
  		</belief>
 
@@ -38,25 +49,27 @@
 			current posistion the actual position is perceived as dirty. -->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
  			<fact language="clips">
+ 				$beliefbase.myself.getProperty("position")
+ 				
  				// ((Environment)$beliefbase.getBelief("env").getFact()).isDirty((Position)$beliefbase.getBelief("pos").getFact())
-			
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				?mbel_pos = (mbelief (melement_has_name "pos"))
- 				?env = (Environment (isDirty (?pos) ?ret))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
+				// ?mbel_pos = (mbelief (melement_has_name "pos"))
+ 				// ?env = (Environment (isDirty (?pos) ?ret))
  			</fact>
 		</belief>
 		
 		<!-- Flag indicating if the agent currently carries garbage. -->
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
- 			<fact language="clips">
+ 			<fact language="jcl">
+ 				$beliefbase.myself.getProperty("has_garbage")
+ 			
  				// ((Environment)$beliefbase.getBelief("env").getFact()).hasGarbage($scope.getAgentName())
-		
-				?agent = (agent (agent_has_localname ?agentname))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
- 				?env = (Environment (hasGarbage (?agentname) ?ret))
+				// ?agent = (agent (agent_has_localname ?agentname))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+ 				// ?env = (Environment (hasGarbage (?agentname) ?ret))
 			</fact>
 		</belief>
 	</beliefs>

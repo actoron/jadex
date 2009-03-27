@@ -1,7 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.bridge.IClock;
 
 import java.util.Map;
 

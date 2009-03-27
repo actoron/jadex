@@ -1,4 +1,4 @@
-package jadex.bdi.examples.garbagecollector;
+package jadex.bdi.examples.garbagecollector2;
 
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -19,32 +19,32 @@ public class GoPlanEnv extends Plan
 	{
 		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
 		IVector2 size = env.getAreaSize();
-		Position target = (Position)getParameter("pos").getValue();
+		IVector2 target = (IVector2)getParameter("pos").getValue();
 
 		while(!target.equals(env.getPosition(getAgentIdentifier())))
 		{
 			IVector2 mypos = env.getPosition(getAgentIdentifier());
 			String dir = null;
 			int mx = mypos.getXAsInteger();
-			int tx = target.getX();
+			int tx = target.getXAsInteger();
 			int my = mypos.getYAsInteger();
-			int ty = target.getY();
+			int ty = target.getYAsInteger();
 
 			assert mx!=tx || my!=ty;
 
 			if(mx!=tx)
 			{
-				dir = Environment.RIGHT;
+				dir = GoAction.RIGHT;
 				int dx = Math.abs(mx-tx);
 				if(mx>tx && dx<=size.getXAsInteger()/2)
-					dir = Environment.LEFT;
+					dir = GoAction.LEFT;
 			}
 			else
 			{
-				dir = Environment.DOWN;
+				dir = GoAction.DOWN;
 				int dy = Math.abs(my-ty);
 				if(my>ty && dy<=size.getYAsInteger()/2)
-					dir = Environment.UP;
+					dir = GoAction.UP;
 			}
 
 			//System.out.println("Wants to go: "+dir);

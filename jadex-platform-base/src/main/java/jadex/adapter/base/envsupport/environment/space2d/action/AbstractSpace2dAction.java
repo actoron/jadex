@@ -8,12 +8,17 @@ public abstract class AbstractSpace2dAction implements ISpaceAction
 	public static final Object SET_POSITION = SetPosition.class;
 	
 	// Default Action Parameters
-	public static final DefaultParameter ACTOR_ID  = new DefaultParameter(-1);
-	public static final DefaultParameter OBJECT_ID = new DefaultParameter(-2);
-	public static final DefaultParameter POSITION_ID = new DefaultParameter(-3);
-	public static final DefaultParameter VELOCITY_ID = new DefaultParameter(-4);
+	public static final String ACTOR_ID  = "actor_id";
+	public static final String OBJECT_ID = "object_id";
+	public static final String POSITION_ID = "position_id";
+	public static final String VELOCITY_ID = "velocity_id";
 	
-	private static class DefaultParameter
+//	public static final DefaultParameter ACTOR_ID  = new DefaultParameter(-1);
+//	public static final DefaultParameter OBJECT_ID = new DefaultParameter(-2);
+//	public static final DefaultParameter POSITION_ID = new DefaultParameter(-3);
+//	public static final DefaultParameter VELOCITY_ID = new DefaultParameter(-4);
+	
+	/*private static class DefaultParameter
 	{
 		int id_;
 		
@@ -32,5 +37,5 @@ public abstract class AbstractSpace2dAction implements ISpaceAction
 			return ((obj.getClass().equals((this.getClass()))) &&
 					(((DefaultParameter) obj).id_ == id_));
 		}
-	}
+	}*/
 }

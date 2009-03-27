@@ -1,4 +1,4 @@
-package jadex.bdi.examples.garbagecollector;
+package jadex.bdi.examples.garbagecollector2;
 
 import java.util.Map;
 

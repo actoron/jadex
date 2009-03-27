@@ -9,6 +9,12 @@ import java.util.Map;
 public interface IEnvironmentSpace extends ISpace
 {
 	/**
+	 * Returns the space's name.
+	 * @return the space's name.
+	 */
+	public String getName();
+	
+	/**
 	 * Adds a space process.
 	 * 
 	 * @param process new space process
@@ -39,14 +45,14 @@ public interface IEnvironmentSpace extends ISpace
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public Long createSpaceObject(Object type, Map properties, List tasks, List listeners);
+	public Object createSpaceObject(Object type, Map properties, List tasks, List listeners);
 	
 	/** 
 	 * Destroys an object in this space.
 	 * 
 	 * @param objectId the object's ID
 	 */
-	public void destroySpaceObject(Long objectId);
+	public void destroySpaceObject(Object objectId);
 	
 	/**
 	 * Returns an object in this space.
@@ -54,7 +60,7 @@ public interface IEnvironmentSpace extends ISpace
 	 * @param objectId the object's ID
 	 * @return the object in this space
 	 */
-	public ISpaceObject getSpaceObject(Long objectId);
+	public ISpaceObject getSpaceObject(Object objectId);
 	
 	/**
 	 * Gets a space property
@@ -95,9 +101,4 @@ public interface IEnvironmentSpace extends ISpace
 	 */
 	public Object performAction(Object actionId, Map parameters);
 	
-	/**
-	 * Returns the space's name.
-	 * @return the space's name.
-	 */
-	public String getName();
 }

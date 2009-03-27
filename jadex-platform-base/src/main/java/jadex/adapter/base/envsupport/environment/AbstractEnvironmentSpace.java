@@ -84,7 +84,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public Long createSpaceObject(Object type, Map properties, List tasks, List listeners)
+	public Object createSpaceObject(Object type, Map properties, List tasks, List listeners)
 	{
 		Long objectId = null;
 		synchronized(spaceObjects_)
@@ -116,7 +116,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 * 
 	 * @param objectId the object's ID
 	 */
-	public void destroySpaceObject(Long objectId)
+	public void destroySpaceObject(Object objectId)
 	{
 		synchronized(spaceObjects_)
 		{
@@ -144,7 +144,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 * @param objectId the object's ID
 	 * @return the object in this space
 	 */
-	public ISpaceObject getSpaceObject(Long objectId)
+	public ISpaceObject getSpaceObject(Object objectId)
 	{
 		return (ISpaceObject) spaceObjects_.get(objectId);
 	}

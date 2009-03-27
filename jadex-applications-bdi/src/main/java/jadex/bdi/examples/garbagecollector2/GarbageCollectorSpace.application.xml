@@ -11,14 +11,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
+	name="GarbageCollectorSpace" package="jadex.bdi.examples.garbagecollector2">
 	
 	<imports>
-		<import>jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 	</imports>
 	
 	<spacetypes>
-		<env:envspacetype name="gc2dspace" class="ContinuousSpace2D">
+		<env:envspacetype name="gc2dspace" class="Grid2D">
 			<env:actiontype name="pickup" class="PickupWasteAction" />
 			<env:actiontype name="drop" class="DropWasteAction" />
 			<env:actiontype name="burn" class="BurnWasteAction" />
@@ -30,9 +30,8 @@
 	</spacetypes>
 	
 	<agenttypes>
-		<!-- <agenttype name="Environment" filename="jadex/bdi/examples/garbagecollector/Environment.agent.xml"/>  -->
-		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollectorEnv.agent.xml"/>
-		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurnerEnv.agent.xml"/>
+		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector2/GarbageCollector.agent.xml"/>
+		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector2/GarbageBurner.agent.xml"/>
 	</agenttypes>
 	
 	<applications>

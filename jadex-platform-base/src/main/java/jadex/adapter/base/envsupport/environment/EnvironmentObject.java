@@ -9,7 +9,9 @@ import java.util.Map;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.bridge.IClock;
 
-
+/**
+ *  Default implementation of a space object. 
+ */
 public class EnvironmentObject implements ISpaceObject
 {
 	/** The object's ID. */
