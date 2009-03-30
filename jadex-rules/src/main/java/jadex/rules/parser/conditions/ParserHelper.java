@@ -5,9 +5,13 @@ import jadex.rules.parser.conditions.javagrammar.Expression;
 import jadex.rules.parser.conditions.javagrammar.IParserHelper;
 import jadex.rules.parser.conditions.javagrammar.JavaJadexLexer;
 import jadex.rules.parser.conditions.javagrammar.JavaJadexParser;
+import jadex.rules.parser.conditions.javagrammar.OperationExpression;
+import jadex.rules.parser.conditions.javagrammar.VariableExpression;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.NotCondition;
+import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.OAVTypeModel;
 
 import java.util.List;
@@ -28,7 +32,7 @@ public class ParserHelper
 	 *  @param invert True if the user condition needs to be inverted.
 	 *  @return The condition.
 	 */
-	public static ICondition parseCondition(ICondition precon, String text, String language, OAVTypeModel model, String[] imports, List errors, IParserHelper helper, boolean invert)
+	public static ICondition parseCondition(ICondition precon, String text, String language, OAVTypeModel model, String[] imports, List errors, IParserHelper helper, Variable returnvar, boolean invert)
 	{
 		ICondition	ret	= null;
 
@@ -41,7 +45,7 @@ public class ParserHelper
 		}
 		else if(language.equals("jcl"))
 		{
-			ret	= parseJavaCondition(precon, text, model, imports, errors, helper, invert);
+			ret	= parseJavaCondition(precon, text, model, imports, errors, helper, returnvar, invert);
 		}
 		
 		return ret;
@@ -99,7 +103,7 @@ public class ParserHelper
 	 *  @param model The model.
 	 *  @return The condition.
 	 */
-	public static ICondition parseJavaCondition(ICondition precon, String text, OAVTypeModel model, String[] imports, List errors, IParserHelper helper, boolean invert)
+	public static ICondition parseJavaCondition(ICondition precon, String text, OAVTypeModel model, String[] imports, List errors, IParserHelper helper, Variable returnvar, boolean invert)
 	{
 		ICondition	ret	= null;
 		ANTLRStringStream exp = new ANTLRStringStream(text);
@@ -112,7 +116,14 @@ public class ParserHelper
 			Expression	pexp	= parser.lhs();
 			precon	= new AndCondition(helper.getConditions());
 
-			ret	= ConstraintBuilder.buildConstraints(pexp, precon, model);
+			if(returnvar!=null)
+			{
+				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), precon, model);
+			}
+			else
+			{
+				ret	= ConstraintBuilder.buildConstraints(pexp, precon, model);
+			}
 
 //			if(invert)
 //			{

@@ -78,11 +78,11 @@ public class ConstraintBuilder
 			OperationExpression	opex	= (OperationExpression)exp;
 			if(opex.getOperator() instanceof IOperator)
 			{
-				buildOperatorConstraint(opex.getLeftValue(), opex.getLeftValue(), (IOperator)opex.getOperator(), context);
+				buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), (IOperator)opex.getOperator(), context);
 			}
 //			else if(opex.getOperator() instanceof IFunction)
 //			{
-//				buildFunctionConstraint(opex.getLeftValue(), opex.getLeftValue(), (IFunction)opex.getOperator(), context);
+//				buildFunctionConstraint(opex.getLeftValue(), opex.getRightValue(), (IFunction)opex.getOperator(), context);
 //			}
 			else
 			{
@@ -91,13 +91,13 @@ public class ConstraintBuilder
 		}
 		else
 		{
-			throw new RuntimeException("Unexpected constraint type: "+exp);
+			// Conditional
+			// Literal
+			// Primary
+			// Unary
+			// Variable
+			buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), IOperator.EQUAL, context);
 		}
-		// Conditional
-		// Literal
-		// Primary
-		// Unary
-		// Variable
 	}
 
 	/**

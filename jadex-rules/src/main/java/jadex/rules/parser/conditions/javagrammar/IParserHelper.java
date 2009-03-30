@@ -29,19 +29,4 @@ public interface IParserHelper
 	 *  Get the conditions after parsing.
 	 */
 	public List	getConditions();
-
-	/**
-	 *  If a top level expression is not a constraint
-	 *  it needs to be expanded depending on the
-	 *  context (e.g. to 'exp==true').
-	 *  @param exp	The expression that needs to be converted to a constraint.
-	 *  @return The constraint.
-	 * /
-	public Constraint completeConstraint(Object exp);
-
-	/**
-	 *  Get the conditions, which have been generated during parsing.
-	 *  @return The generated conditions.
-	 * /
-	public Set getGeneratedConditions();*/
 }

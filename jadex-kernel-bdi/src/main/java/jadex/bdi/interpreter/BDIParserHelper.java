@@ -2,12 +2,9 @@ package jadex.bdi.interpreter;
 
 import jadex.rules.parser.conditions.javagrammar.BuildContext;
 import jadex.rules.parser.conditions.javagrammar.IParserHelper;
-import jadex.rules.parser.conditions.javagrammar.LiteralExpression;
-import jadex.rules.parser.conditions.javagrammar.PrimaryExpression;
 import jadex.rules.rulesystem.ICondition;
-import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
-import jadex.rules.rulesystem.rules.Constraint;
+import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.ObjectCondition;
@@ -16,11 +13,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *  Handler for BDI-specific parsing issues ($beliefbase etc.)
@@ -51,7 +44,7 @@ public class BDIParserHelper implements IParserHelper
 	 *  @param state	The state.
 	 *  @param returnvar	The return value variable (if return value condition).
 	 */
-	public BDIParserHelper(ICondition condition, Object mcapa, Object melement, IOAVState state, Variable returnvar, boolean invert)
+	public BDIParserHelper(ICondition condition, Object mcapa, Object melement, IOAVState state)
 	{
 		this.mcapa	= mcapa;
 		this.melement	= melement;
@@ -107,29 +100,26 @@ public class BDIParserHelper implements IParserHelper
 				throw new RuntimeException("No such belief (set): "+name);
 			}
 			
-//			// Build belief (set) condition to bind fact(s) variable.
-//			Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
-//			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));	// Todo: array class for belief set
-//			Variable	belvar	= new Variable(name+"_bel", type);
-//			ObjectCondition	rbelcon	= new ObjectCondition(type);
-//			rbelcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel));
-//			rbelcon.addConstraint(new BoundConstraint(attr2, ret));
-//			rbelcon.addConstraint(new BoundConstraint(null, belvar));
-//			lcons.add(rbelcon);
-//			bcons.put(ret, rbelcon);
-//			variables.put(name, ret);
-//			
-//			// Augment capability condition to check belief (set) variable.
-//			Variable	capvar	= context.getVariable("?rcapa");
-//			if(capvar==null)
-//				throw new RuntimeException("Variable '?rcapa' required to build belief (set) condition: "+name);
-//			ObjectCondition	rcapcon	= context.getObjectCondition(capvar);
-//			if(rcapcon==null)
-//				throw new RuntimeException("Capability condition required to build belief (set) condition: "+name);
-//			BoundConstraint	bc	= context.getBoundConstraint(capvar);
-//			if(bc.getValueSource()!=null)
-//				throw new UnsupportedOperationException("Value source for capability object not yet supported.");
-//			rcapcon.addConstraint(new BoundConstraint(attr1, belvar, IOperator.CONTAINS));
+			// Build belief (set) condition to bind fact(s) variable.
+			Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
+			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));	// Todo: array class for belief set
+			Variable	belvar	= new Variable(name+"_bel", type);
+			context.createObjectCondition(type, new IConstraint[]{
+				new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
+				new BoundConstraint(attr2, ret),
+				new BoundConstraint(null, belvar)});
+			
+			// Augment capability condition to check belief (set) variable.
+			Variable	capvar	= context.getVariable("?rcapa");
+			if(capvar==null)
+				throw new RuntimeException("Variable '?rcapa' required to build belief (set) condition: "+name);
+			ObjectCondition	rcapcon	= context.getObjectCondition(capvar);
+			if(rcapcon==null)
+				throw new RuntimeException("Capability condition required to build belief (set) condition: "+name);
+			BoundConstraint	bc	= context.getBoundConstraint(capvar);
+			if(bc.getValueSource()!=null)
+				throw new UnsupportedOperationException("Value source for capability object not yet supported.");
+			rcapcon.addConstraint(new BoundConstraint(attr1, belvar, IOperator.CONTAINS));
 		}
 		
 		else if(ret==null && name.startsWith("$goal."))
@@ -158,25 +148,22 @@ public class BDIParserHelper implements IParserHelper
 			Class	clazz	= (Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class);
 			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));	// Todo: array class for parameter set
 			Variable	parvar	= new Variable(name+"par", type);
-			ObjectCondition	rparcon	= new ObjectCondition(type);
-			rparcon.addConstraint(new LiteralConstraint(attr3, parname));
-			rparcon.addConstraint(new BoundConstraint(attr2, ret));
-			rparcon.addConstraint(new BoundConstraint(null, parvar));
-//			lcons.add(rparcon);
-//			bcons.put(ret, rparcon);
-//			variables.put(name, ret);
-//
-//			// Augment goal condition to check parameter (set) variable.
-//			Variable	goalvar	= (Variable)variables.get("?rgoal");
-//			if(goalvar==null)
-//				throw new RuntimeException("Variable '?rgoal' required to build parameter (set) condition: "+name);
-//			ObjectCondition	rgoalcon	= (ObjectCondition)bcons.get(goalvar);
-//			if(rgoalcon==null)
-//				throw new RuntimeException("Goal condition required to build parameter (set) condition: "+name);
-//			BoundConstraint	bc	= (BoundConstraint)boundconstraints.get(goalvar);
-//			if(bc!=null && bc.getValueSource()!=null)
-//				throw new UnsupportedOperationException("Value source for goal object not yet supported.");
-//			ConditionBuilder.addConstraint(rgoalcon, new BoundConstraint(attr1, parvar, IOperator.CONTAINS), lcons, generated, bcons, invert);
+			context.createObjectCondition(type, new IConstraint[]{
+				new LiteralConstraint(attr3, parname),
+				new BoundConstraint(attr2, ret),
+				new BoundConstraint(null, parvar)});
+
+			// Augment goal condition to check parameter (set) variable.
+			Variable	goalvar	= context.getVariable("?rgoal");
+			if(goalvar==null)
+				throw new RuntimeException("Variable '?rgoal' required to build parameter (set) condition: "+name);
+			ObjectCondition	rgoalcon	= (ObjectCondition)context.getObjectCondition(goalvar);
+			if(rgoalcon==null)
+				throw new RuntimeException("Goal condition required to build parameter (set) condition: "+name);
+			BoundConstraint	bc	= (BoundConstraint)context.getBoundConstraint(goalvar);
+			if(bc!=null && bc.getValueSource()!=null)
+				throw new UnsupportedOperationException("Value source for goal object not yet supported.");
+			rgoalcon.addConstraint(new BoundConstraint(attr1, parvar, IOperator.CONTAINS));
 		}
 
 		return ret;

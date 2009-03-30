@@ -3,6 +3,7 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.rulesystem.rules.ObjectCondition;
@@ -165,6 +166,37 @@ public class BuildContext
 		boundconstraints.put(tmpvar, bc);
 		condition.addConstraint(bc);
 		return tmpvar;
+	}
+
+	/**
+	 *  Create a new object condition with the given constraints.
+	 *  Also adds mappings corresponding to bound constraints (if any).
+	 *  @param type	The object type.
+	 *  @param constraints	The constraints (if any).
+	 */
+	public void createObjectCondition(OAVObjectType type, IConstraint[] constraints)
+	{
+		ObjectCondition	ocon	= new ObjectCondition(type);
+		lcons.add(ocon);
+		for(int i=0; constraints!=null && i<constraints.length; i++)
+		{
+			ocon.addConstraint(constraints[i]);
+			if(constraints[i] instanceof BoundConstraint)
+			{
+				BoundConstraint	bc	= (BoundConstraint)constraints[i];
+				List	bvars	= bc.getBindVariables();
+				for(int k=0; k<bvars.size(); k++)
+				{
+					variables.put(((Variable)bvars.get(k)).getName(), bvars.get(k));
+					// Todo: by multiple ocurrences use the simplest bc.getValueSource() 
+					if(bc.getOperator().equals(IOperator.EQUAL))
+					{
+						boundconstraints.put(bvars.get(k), bc);
+						bcons.put(bvars.get(k), ocon);
+					}
+				}
+			}
+		}
 	}
 
 	/**
