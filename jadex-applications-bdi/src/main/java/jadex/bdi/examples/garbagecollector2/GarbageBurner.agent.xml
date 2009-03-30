@@ -14,38 +14,47 @@
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
-		<import>jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
 	</imports>
 
 	<beliefs>
 		<!-- Environment. -->
-		<belief name="env" class="ContinuousSpace2D">
- 			<fact>((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("mygc2dspace")</fact>
+		<belief name="env" class="Grid2D">
+ 			<fact>(Grid2D)((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("mygc2dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject">
+ 			<fact>$beliefbase.env.getSpaceObject($agent.getAgentIdentifier())</fact>
  		</belief>
 
 		<!-- The actual position on the grid world. -->
-		<belief name="pos" class="Position" evaluationmode="push">
-			<fact language="clips">
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
+		<belief name="pos" class="IVector2" evaluationmode="push">
+			<fact language="jcl">
+				$beliefbase.myself.getProperty("position")
 				
-				?agent = (agent (agent_has_localname ?agentname))
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?env = (Environment (getPosition (?agentname) ?ret))
+				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
+				// ?agent = (agent (agent_has_localname ?agentname))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?env = (Environment (getPosition (?agentname) ?ret))
 			</fact>
  		</belief>
-
+		
 		<!-- The garbages at the current posistion. -->
 		<beliefset name="garbages" class="String" evaluationmode="push">
-			<facts language="clips">
+			<facts language="jcl">
+				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage")
+				
 				// ((Environment)$beliefbase.getBelief("env").getFact()).getGarbages($beliefbase.getBelief("pos").getFact())
 				
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				?mbel_pos = (mbelief (melement_has_name "pos"))
- 				?env = (Environment (getGarbages (?pos) $?ret))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
+				// ?mbel_pos = (mbelief (melement_has_name "pos"))
+ 				// ?env = (Environment (getGarbages (?pos) $?ret))
 			</facts>
 		</beliefset>
 	</beliefs>

@@ -7,7 +7,8 @@ import java.util.Map;
 /**
  * External access interface.
  */
-public class ExternalAccess implements IExternalAccess {
+public class ExternalAccess implements IExternalAccess 
+{
 	// -------- attributes --------
 
 	/** The agent. */

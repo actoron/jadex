@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
+
 import java.util.Map;
 
 
@@ -9,11 +10,10 @@ import java.util.Map;
 public interface ISpaceAction
 {
 	/**
-	 * Performs the action.
-	 * 
-	 * @param parameters parameters for the action
-	 * @param space the environment space
-	 * @return action return value
+	 *  Performs a space action.
+	 *  @param parameters parameters for the action
+	 *  @param space the environment space
+	 *  @return action return value
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space);
 

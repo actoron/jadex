@@ -6,12 +6,13 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ObjectEvent;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.environment.space2d.action.AbstractSpace2dAction;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 
 /**
- *  The 
+ *  The go action for moving one field in one of four directions.
  */
 public class GoAction implements ISpaceAction
 {
@@ -25,7 +26,7 @@ public class GoAction implements ISpaceAction
 
 	public static final String DIRECTION = "direction";
 	
-	public static final String POSITION_CHANGED = "position_changed";
+//	public static final String POSITION_CHANGED = "position_changed";
 
 	
 	//-------- methods --------
@@ -41,9 +42,9 @@ public class GoAction implements ISpaceAction
 		System.out.println("go waste action: "+parameters);
 		
 		String dir = (String)parameters.get(DIRECTION);
-		Object oid = (Long)parameters.get(AbstractSpace2dAction.OBJECT_ID);
+		Object oid = (Long)parameters.get(ISpaceObject.OBJECT_ID);
 		ISpaceObject obj = space.getSpaceObject(oid);
-		IVector2 pos = (IVector2)obj.getProperty("position");
+		IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
 		
 		if(dir.equals(UP))
 		{
@@ -62,8 +63,11 @@ public class GoAction implements ISpaceAction
 			pos.add(new Vector2Int(1, 0));
 		}
 		
-		obj.setProperty("position", pos);
-		obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));
+		obj.setProperty(Space2D.POSITION, pos);
+		
+		System.out.println("Go action: "+obj.getProperty(ISpaceObject.ACTOR_ID)+" "+pos);
+		
+//		obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));
 		
 		return null;
 	}

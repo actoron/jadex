@@ -24,23 +24,22 @@ public class Grid2D extends Space2D
 	/** The default ID for this space */
 	public static final String DEFAULT_NAME = Grid2D.class.getName();
 	
-	//todo: rename in boder behaviour
-	/** Euclidean plane behavior */
-	public static final int AREA_BEHAVIOR_EUCLID = 0;
+	/** Border strict mode. */
+	public static final int BORDER_STRICT = 0;
 
-	/** Torus behavior */
-	public static final int AREA_BEHAVIOR_TORUS = 1;
+	/** Border torus behavior. */
+	public static final int BORDER_TORUS = 1;
 
 	//-------- attributes --------
 	
 	/** The behavior of the world */
-	public int area_behavior_ = AREA_BEHAVIOR_TORUS;
+	public int border_mode;
 	
 	/** All simobject id's accessible per position. */
-	protected MultiCollection spaceObjectsByGridPosition_;
+	protected MultiCollection objectsygridpos;
 	
 	/** Last known discrete position of a simobject */
-	protected Map gridPositionBySpaceObjectId_;
+	protected Map gridposbyobject;
 	
 	//-------- constructors --------
 	
@@ -79,59 +78,82 @@ public class Grid2D extends Space2D
 	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IVector2 areaSize, Object spaceName)
 	{
 		super(clockService, timeCoefficient, areaSize);
-		spaceProperties_.put("name", spaceName);
-		this.spaceObjectsByGridPosition_ = new MultiCollection();
-		this.gridPositionBySpaceObjectId_ = new HashMap();
+		this.spaceproperties.put("name", spaceName);
+		this.objectsygridpos = new MultiCollection();
+		this.gridposbyobject = new HashMap();
+		this.border_mode = BORDER_TORUS;
 	}
 	
 	//-------- grid specific methods --------
 	
 	/**
 	 * Get all SimObjects at a specific grid position
-	 */
+	 * /
 	public ISpaceObject[] getSpaceObjectsByGridPosition(IVector2 position)
 	{
-		return getSpaceObjectsByGridPosition(position, null);
-	}
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			return getSpaceObjectsByGridPosition(position, null);
+		}
+	}*/
 
 	/**
 	 * Get all SimObjects from a specific type at a specific grid position
-	 */
+	 * /
 	public ISpaceObject[] getSpaceObjectsByGridPosition(IVector2 position, Object type)
 	{
-		ISpaceObject[] ret = null;
-		synchronized(spaceObjects_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			synchronized(spaceObjectsByType_)
+			ISpaceObject[] ret = null;
+			Collection simobjs = objectsygridpos.getCollection(position);
+			if (null == type)
 			{
-				synchronized(spaceObjectsByGridPosition_)
+				ret = (ISpaceObject[])simobjs.toArray(new ISpaceObject[simobjs.size()]);
+			}
+			else
+			{
+				List l = new ArrayList();
+				for (Iterator objs = simobjs.iterator(); objs.hasNext();)
 				{
-					Collection simobjs = spaceObjectsByGridPosition_.getCollection(position);
-					if (null == type)
+					ISpaceObject currentObj = (ISpaceObject)objs.next();
+					if (type.equals(currentObj.getType()))
 					{
-						ret = (ISpaceObject[])simobjs.toArray(new ISpaceObject[simobjs.size()]);
+						l.add(currentObj);
 					}
-					else
+				}
+				ret = (ISpaceObject[])l.toArray(new ISpaceObject[l.size()]);
+			}
+			return ret;
+		}
+	}*/
+	
+	/**
+	 * Get all SimObjects from a specific type at a specific grid position
+	 */
+	public Collection getSpaceObjectsByGridPosition(IVector2 position, Object type)
+	{
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			Collection ret = null;
+			Collection simobjs = objectsygridpos.getCollection(position);
+			if(null == type)
+			{
+				ret = simobjs;
+			}
+			else
+			{
+				ret = new ArrayList();
+				for (Iterator objs = simobjs.iterator(); objs.hasNext();)
+				{
+					ISpaceObject currentObj = (ISpaceObject)objs.next();
+					if (type.equals(currentObj.getType()))
 					{
-						List l = new ArrayList();
-						for (Iterator objs = simobjs.iterator(); objs.hasNext();)
-						{
-							ISpaceObject currentObj = (ISpaceObject)objs.next();
-//							synchronized(currentObj)
-//							{
-								if (type.equals(currentObj.getType()))
-								{
-									l.add(currentObj);
-								}
-//							}
-							
-						}
-						ret = (ISpaceObject[])l.toArray(new ISpaceObject[l.size()]);
+						ret.add(currentObj);
 					}
 				}
 			}
+			return ret;
 		}
-		return ret;
 	}
 	
 	/**
@@ -142,63 +164,53 @@ public class Grid2D extends Space2D
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance)
 	{
-		Collection ret = new ArrayList();
-		
-		int sizex = areaSize_.getXAsInteger();
-		int sizey = areaSize_.getYAsInteger();
-
-		int x = position.getXAsInteger();
-		int y = position.getYAsInteger();
-		
-		int range = distance.getAsInteger();
-
-		synchronized(spaceObjectsByGridPosition_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			switch(area_behavior_)
+			Collection ret = new ArrayList();
+			
+			int sizex = areasize.getXAsInteger();
+			int sizey = areasize.getYAsInteger();
+	
+			int x = position.getXAsInteger();
+			int y = position.getYAsInteger();
+			
+			int range = distance.getAsInteger();
+	
+			if(border_mode==BORDER_TORUS)
 			{
-				case AREA_BEHAVIOR_TORUS:
+				for (int i = x - range; i <= x + range; i++)
 				{
-					for (int i = x - range; i <= x + range; i++)
+					for (int j = y - range; j <= y + range; j++)
 					{
-						for (int j = y - range; j <= y + range; j++)
-						{
-							Collection tmp = spaceObjectsByGridPosition_.getCollection(
-									new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
-							if (tmp != null)
-								ret.addAll(tmp);
-						}
+						Collection tmp = objectsygridpos.getCollection(
+								new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
+						if (tmp != null)
+							ret.addAll(tmp);
 					}
 				}
-					break;
-
-				case AREA_BEHAVIOR_EUCLID:
-				{
-					int minx = (x - range >= 0 ? x - range : 0);
-					int maxx = (x + range <= sizex ? x + range : sizex);
-
-					int miny = (y - range >= 0 ? y - range : 0);
-					int maxy = (y + range <= sizey ? y + range : sizey);
-
-					for (int i = minx; i <= maxx; i++)
-					{
-						for (int j = miny; j <= maxy; j++)
-						{
-							Collection tmp = spaceObjectsByGridPosition_.getCollection(
-									new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
-							if (tmp != null)
-								ret.addAll(tmp);
-						}
-					}
-				}
-					break;
-
-				default:
-					// can't happen
-					break;
 			}
-		}
+			else if(border_mode==BORDER_STRICT)
+			{
+				int minx = (x - range >= 0 ? x - range : 0);
+				int maxx = (x + range <= sizex ? x + range : sizex);
 
-		return(ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+				int miny = (y - range >= 0 ? y - range : 0);
+				int maxy = (y + range <= sizey ? y + range : sizey);
+
+				for (int i = minx; i <= maxx; i++)
+				{
+					for (int j = miny; j <= maxy; j++)
+					{
+						Collection tmp = objectsygridpos.getCollection(
+								new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
+						if (tmp != null)
+							ret.addAll(tmp);
+					}
+				}
+			}
+			
+			return(ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+		}
 	}
 	
 	/**
@@ -207,21 +219,19 @@ public class Grid2D extends Space2D
 	 */
 	public IVector2 getEmptyGridPosition()
 	{
-		IVector2 ret = null;
-		
-		synchronized(spaceObjectsByGridPosition_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
+			IVector2 ret = null;
 			while (ret == null)
 			{
 				ret = new Vector2Int(getRandomPosition(Vector2Int.ZERO));
-				if(spaceObjectsByGridPosition_.containsKey(ret))
+				if(objectsygridpos.containsKey(ret))
 				{
 					ret = null;
 				}
 			}
+			return ret;
 		}
-		
-		return ret;
 	}
 	
 	//-------- overridings --------
@@ -233,31 +243,21 @@ public class Grid2D extends Space2D
 	 */
 	public void setPosition(Object id, IVector2 pos)
 	{
-		synchronized(spaceObjects_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			synchronized(spaceObjectsByType_)
-			{
-				synchronized(spaceObjectsByGridPosition_)
-				{
-					synchronized(gridPositionBySpaceObjectId_)
-					{
-						ISpaceObject obj = getSpaceObject(id);
-						IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
-						if(oldpos!=null)
-							spaceObjectsByGridPosition_.remove(oldpos, obj);
-						
-						spaceObjectsByGridPosition_.put(pos, obj);
-						gridPositionBySpaceObjectId_.put(id, pos);
-					}
-				}
-			}
+			ISpaceObject obj = getSpaceObject(id);
+			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
+			if(oldpos!=null)
+				objectsygridpos.remove(oldpos, obj);
+			
+			objectsygridpos.put(pos, obj);
+			gridposbyobject.put(id, pos);
+			super.setPosition(id, pos);
 		}
-		super.setPosition(id, pos);
 	}
 	
 	/** 
 	 * Creates an object in this space.
-	 * 
 	 * @param type the object's type
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
@@ -266,60 +266,39 @@ public class Grid2D extends Space2D
 	 */
 	public Object createSpaceObject(Object type, Map properties, List tasks, List listeners)
 	{
-		Object id;
-		
-		synchronized(spaceObjects_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			synchronized(spaceObjectsByType_)
+			// TODO: maybe only assign position to discretePosition vector?
+			
+			Object id = super.createSpaceObject(type, properties, tasks, listeners);
+			
+			if(properties!=null)
 			{
-				synchronized(spaceObjectsByGridPosition_)
+				IVector2 pos = (IVector2)properties.get(POSITION);
+				if(pos!=null)
 				{
-					synchronized(gridPositionBySpaceObjectId_)
-					{
-						// TODO: maybe only assign position to discretePosition vector?
-						
-						id = super.createSpaceObject(type, properties, tasks, listeners);
-						
-						if(properties!=null)
-						{
-							IVector2 pos = (IVector2)properties.get(POSITION);
-							if(pos!=null)
-							{
-								spaceObjectsByGridPosition_.put(pos, getSpaceObject(id));
-								gridPositionBySpaceObjectId_.put(id, pos);
-							}
-						}
-					}
+					objectsygridpos.put(pos, getSpaceObject(id));
+					gridposbyobject.put(id, pos);
 				}
 			}
+			return id;
 		}
-		return id;
 	}
 	
 	/** 
 	 * Destroys an object in this space.
-	 * 
 	 * @param objectId the object's ID
 	 */
 	public void destroySpaceObject(Object id)
 	{
-		synchronized(spaceObjects_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			synchronized(spaceObjectsByType_)
-			{
-				synchronized (spaceObjectsByGridPosition_)
-				{
-					synchronized (gridPositionBySpaceObjectId_)
-					{
-						// remove the object from grid
-						IVector2 pos = (IVector2)gridPositionBySpaceObjectId_.remove(id);
-						if(pos!=null)
-							spaceObjectsByGridPosition_.remove(pos, spaceObjects_.get(id));
-						
-						super.destroySpaceObject(id);
-					}
-				}
-			}
+			// remove the object from grid
+			IVector2 pos = (IVector2)gridposbyobject.remove(id);
+			if(pos!=null)
+				objectsygridpos.remove(pos, spaceobjects.get(id));
+			
+			super.destroySpaceObject(id);
 		}
 	}
 }

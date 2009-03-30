@@ -63,7 +63,7 @@ public class ContinuousSpace2D extends Space2D
 							 Object spaceName)
 	{
 		super(clockService, timeCoefficient, areaSize);
-		spaceProperties_.put("name", spaceName);
+		spaceproperties.put("name", spaceName);
 	}
 	
 	//-------- methods --------

@@ -482,9 +482,6 @@ public class SReflect
 		Class	clazz	= null;
 //		System.out.println("+++fC: "+clname+" "+imports);
 	
-		if(clname.indexOf("PickupWaste")!=-1)
-			System.out.println("here");
-		
 		// Try to find in cache.
 		boolean	cachemiss	= false;
 		Map	cache	= (Map)classcache.get(classloader);

@@ -291,7 +291,7 @@ public class OAVBDIXMLReader
 //							{
 //								report.put(se, errors.get(i));
 //							}
-							throw new RuntimeException("Parse errors: "+errors);
+							throw new RuntimeException("Parse errors: "+value+" "+errors);
 						}
 					}
 					else if(lang.equals("jcl"))

@@ -25,20 +25,20 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	public static final String POSITION = "position";
 	
 	/** Area size. */
-	protected IVector2 areaSize_;
+	protected IVector2 areasize;
 	
 	//-------- constructors --------
 	
 	/**
 	 * Initializes the TimeSpace.
-	 * @param clockService the clock service
-	 * @param timeCoefficient the time coefficient for time differences.
-	 * @param areaSize the size of the 2D area
+	 * @param clockservice the clock service
+	 * @param timecoefficient the time coefficient for time differences.
+	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(IClockService clockService, IVector1 timeCoefficient, IVector2 areaSize)
+	protected Space2D(IClockService clockservice, IVector1 timecoefficient, IVector2 areasize)
 	{
-		super(clockService, timeCoefficient);
-		areaSize_ = areaSize;
+		super(clockservice, timecoefficient);
+		this.areasize = areasize;
 	}
 	
 	//-------- methods --------
@@ -75,7 +75,10 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public IVector2 getAreaSize()
 	{
-		return areaSize_.copy();
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			return areasize.copy();
+		}
 	}
 	
 	/**
@@ -84,7 +87,10 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public void setAreaSize(IVector2 areaSize)
 	{
-		areaSize_ = areaSize;
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			areasize = areaSize;
+		}
 	}
 	
 	/**
@@ -94,10 +100,13 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public IVector2 getPosition(Object id)
 	{
-		ISpaceObject obj = getSpaceObject(id); 
-		if(obj==null)
-			throw new RuntimeException("Space object not found: "+id);
-		return (IVector2)obj.getProperty(POSITION);
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			ISpaceObject obj = getSpaceObject(id); 
+			if(obj==null)
+				throw new RuntimeException("Space object not found: "+id);
+			return (IVector2)obj.getProperty(POSITION);
+		}
 	}
 	
 	/**
@@ -107,10 +116,13 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public void setPosition(Object id, IVector2 pos)
 	{
-		ISpaceObject obj = getSpaceObject(id); 
-		if(obj==null)
-			throw new RuntimeException("Space object not found: "+id);
-		obj.setProperty(POSITION, pos);
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			ISpaceObject obj = getSpaceObject(id); 
+			if(obj==null)
+				throw new RuntimeException("Space object not found: "+id);
+			obj.setProperty(POSITION, pos);
+		}
 	}
 	
 	/**
@@ -121,15 +133,18 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public IVector2 getRandomPosition(IVector2 distance)
 	{
-		if (distance == null)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			distance = Vector2Double.ZERO;
+			if (distance == null)
+			{
+				distance = Vector2Double.ZERO;
+			}
+			IVector2 position = areasize.copy();
+			position.subtract(distance);
+			position.randomX(distance.getX(), position.getX());
+			position.randomY(distance.getY(), position.getY());
+			return position;
 		}
-		IVector2 position = areaSize_.copy();
-		position.subtract(distance);
-		position.randomX(distance.getX(), position.getX());
-		position.randomY(distance.getY(), position.getY());
-		return position;
 	}
 	
 	/**
@@ -142,29 +157,32 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxDist)
 	{
-		ISpaceObject nearest = null;
-		IVector1 distance = null;
-		synchronized(spaceObjects_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			Set objects = spaceObjects_.entrySet();
-			for(Iterator it = objects.iterator(); it.hasNext();)
+			ISpaceObject nearest = null;
+			IVector1 distance = null;
+			synchronized(spaceobjects)
 			{
-				Map.Entry entry = (Entry)it.next();
-				ISpaceObject currentObj = (ISpaceObject) entry.getValue();
-				IVector1 objDist = ((IVector2) currentObj.getProperty(Space2D.POSITION)).getDistance(position); 
-				if ((nearest == null) || (objDist.less(distance)))
+				Set objects = spaceobjects.entrySet();
+				for(Iterator it = objects.iterator(); it.hasNext();)
 				{
-					nearest = currentObj;
-					distance = objDist;
+					Map.Entry entry = (Entry)it.next();
+					ISpaceObject currentObj = (ISpaceObject) entry.getValue();
+					IVector1 objDist = ((IVector2) currentObj.getProperty(Space2D.POSITION)).getDistance(position); 
+					if ((nearest == null) || (objDist.less(distance)))
+					{
+						nearest = currentObj;
+						distance = objDist;
+					}
 				}
 			}
+			if((maxDist != null) && (distance != null) && (maxDist.less(distance)))
+			{
+				return null;
+			}
+			
+			return nearest;
 		}
-		if((maxDist != null) && (distance != null) && (maxDist.less(distance)))
-		{
-			return null;
-		}
-		
-		return nearest;
 	}
 	
 	/**
@@ -175,11 +193,11 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist)
 	{
-		List ret = new ArrayList();
-		
-		synchronized(spaceObjects_)
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			Set objects = spaceObjects_.entrySet();
+			List ret = new ArrayList();
+		
+			Set objects = spaceobjects.entrySet();
 			for(Iterator it = objects.iterator(); it.hasNext();)
 			{
 				Map.Entry entry = (Entry)it.next();
@@ -190,8 +208,8 @@ public abstract class Space2D extends EnvironmentSpaceTime
 					ret.add(obj);
 				}
 			}
-		}
 		
-		return (ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+			return (ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+		}
 	}
 }

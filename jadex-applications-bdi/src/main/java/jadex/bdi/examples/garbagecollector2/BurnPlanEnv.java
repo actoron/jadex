@@ -3,6 +3,8 @@ package jadex.bdi.examples.garbagecollector2;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bdi.runtime.Plan.SyncResultListener;
+import jadex.bridge.IAgentIdentifier;
 
 /**
  *  Burn a piece of garbage.
@@ -25,7 +27,9 @@ public class BurnPlanEnv extends Plan
 		// Burn the waste.
 		waitFor(100);
 		
-		env.performAction("burn", null); // todo: garbage as parameter?
+		SyncResultListener	srl	= new SyncResultListener();
+		env.performAction("burn", null, srl); // todo: garbage as parameter?
+		srl.waitForResult();
 		
 //		env.burn(getAgentName());
 	}

@@ -19,6 +19,7 @@
 		<import>jadex.adapter.base.appdescriptor.*</import>
 		<import>jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
 	</imports>
 
 	<beliefs>
@@ -33,7 +34,7 @@
  		</belief>
 
 		<!-- The actual position on the grid world. -->
-		<belief name="pos" class="Position" evaluationmode="push">
+		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl">
 				$beliefbase.myself.getProperty("position")
 				
@@ -48,8 +49,8 @@
 		<!-- When at least one piece of waste is present on the
 			current posistion the actual position is perceived as dirty. -->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
- 			<fact language="clips">
- 				$beliefbase.myself.getProperty("position")
+ 			<fact language="jcl">
+ 				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage").size()>0
  				
  				// ((Environment)$beliefbase.getBelief("env").getFact()).isDirty((Position)$beliefbase.getBelief("pos").getFact())
 				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
@@ -82,7 +83,7 @@
  			burner present. -->
 		 	<achievegoal name="take">
 			<!-- <unique/>  -->
-			<creationcondition>
+			<!--  <creationcondition>
 				// unique (?rcapa and ?mgoal are provided internally)
 				(not (and
 					?adopted	= (goal (element_has_model ?mgoal))
@@ -99,7 +100,7 @@
 					?mbel_env = (mbelief (melement_has_name "env"))
 					?env	= (Environment (isBurnerPresent (?pos) true))
 				))
-			</creationcondition>
+			</creationcondition>-->
 			<deliberation>
 				<inhibits ref="check"/>
 			</deliberation>
@@ -111,7 +112,7 @@
 
 		<!-- Goal for going to a specified position. -->
 		<achievegoal name="go">
-			<parameter name="pos" class="Position"/>
+			<parameter name="pos" class="IVector2"/>
 		</achievegoal>
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
@@ -154,7 +155,7 @@
 
 		<!-- Plan for going to a target position. -->
 		<plan name="go_plan">
-			<parameter name="pos" class="Position">
+			<parameter name="pos" class="IVector2">
  				<goalmapping ref="go.pos"/>
 			</parameter>
 			<body class="GoPlanEnv"/>

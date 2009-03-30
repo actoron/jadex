@@ -13,17 +13,20 @@ import javax.swing.event.ChangeListener;
 /**
  *  An environment space with a notion of time. 
  */
-public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
-										   implements ChangeListener
+public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace implements ChangeListener
 {
+	//-------- attributes --------
+	
 	/** The current time coefficient */
-	protected IVector1 timeCoefficient_;
+	protected IVector1 timecoefficient;
 	
 	/** The clock server */
-	protected IClockService clockService_;
+	protected IClockService clockservice;
 	
 	/** The last time stamp */
-	private long timeStamp_;
+	private long timestamp;
+	
+	//-------- constructors --------
 	
 	/**
 	 * Initializes the SpaceTime.
@@ -35,12 +38,13 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 		super();
 		if(clockService!=null)
 			setClockService(clockService);
-		timeCoefficient_ = timeCoefficient != null? timeCoefficient: new Vector1Double(0.001);
+		timecoefficient = timeCoefficient != null? timeCoefficient: new Vector1Double(0.001);
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 * Returns whether this space has a concept of time.
-	 * 
 	 * @return true if the space has a concept of time, false otherwise.
 	 */
 	public boolean hasTime()
@@ -51,37 +55,40 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 	/** 
 	 * Steps the time of the space. May be non-functional in spaces that do not have
 	 * a concept of time. See hasTime().
-	 * 
 	 * @param currentTime the current time
 	 */
 	public void timeStep(long currentTime)
 	{
-		IVector1 deltaT = timeCoefficient_.copy().multiply(new Vector1Long(currentTime - timeStamp_));
-		timeStamp_ = currentTime;
-		
-		synchronized (spaceObjects_)
+		synchronized(syncobject.getMonitor())
 		{
-			for (Iterator it = spaceObjects_.values().iterator(); it.hasNext(); )
+			IVector1 deltaT = timecoefficient.copy().multiply(new Vector1Long(currentTime - timestamp));
+			timestamp = currentTime;
+		
+			// Execute enqueued actions.
+			getSynchronizedObject().executeEntries();
+		
+			for(Iterator it = spaceobjects.values().iterator(); it.hasNext(); )
 			{
-				ISpaceObject obj = (ISpaceObject) it.next();
+				SpaceObject obj = (SpaceObject)it.next();
 				obj.updateObject(currentTime, deltaT);
 			}
-		}
-		
-		synchronized(processes_)
-		{
-			Object[] processes = processes_.values().toArray();
-			for(int i = 0; i < processes.length; ++i)
+			
+			Object[] procs = processes.values().toArray();
+			for(int i = 0; i < procs.length; ++i)
 			{
-				ISpaceProcess process = (ISpaceProcess) processes[i];
+				ISpaceProcess process = (ISpaceProcess) procs[i];
 				process.execute(currentTime, deltaT, this);
 			}
 		}
 	}
 	
+	/**
+	 *  Called when clock changes.
+	 *  @param e The clock event.
+	 */
 	public void stateChanged(ChangeEvent e)
 	{
-		timeStep(clockService_.getTime());
+		timeStep(clockservice.getTime());
 	}
 	
 	/**
@@ -90,9 +97,8 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace
 	 */
 	public void setClockService(IClockService clockService)
 	{
-		this.clockService_ = clockService;
-		
-		timeStamp_ = clockService_.getTime();
-		clockService_.addChangeListener(this);
+		this.clockservice = clockService;
+		timestamp = clockservice.getTime();
+		clockservice.addChangeListener(this);
 	}
 }

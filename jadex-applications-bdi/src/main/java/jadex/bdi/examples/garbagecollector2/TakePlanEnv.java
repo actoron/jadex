@@ -8,6 +8,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bdi.runtime.Plan.SyncResultListener;
 
 /**
  *  Take some garbage and bring it to the burner.
@@ -39,7 +40,9 @@ public class TakePlanEnv extends Plan
 //		env.drop(getAgentName());
 		Map params = new HashMap();
 		params.put("agent", getAgentIdentifier());
-		env.performAction("drop", params);
+		SyncResultListener srl	= new SyncResultListener();
+		env.performAction("drop", params, srl);
+		srl.waitForResult();
 		
 		// Go back.
 		IGoal goback = createGoal("go");

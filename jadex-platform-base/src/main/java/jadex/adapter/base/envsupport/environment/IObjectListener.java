@@ -1,5 +1,8 @@
 package jadex.adapter.base.envsupport.environment;
 
+/**
+ * 
+ */
 public interface IObjectListener
 {
 	/**

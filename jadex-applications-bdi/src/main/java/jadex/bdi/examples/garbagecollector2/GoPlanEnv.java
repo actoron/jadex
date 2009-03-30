@@ -1,8 +1,10 @@
 package jadex.bdi.examples.garbagecollector2;
 
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.Plan;
+import jadex.bdi.runtime.Plan.SyncResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,8 +56,11 @@ public class GoPlanEnv extends Plan
 //			env.go(getAgentName(), dir);
 			
 			Map params = new HashMap();
-			params.put("dir", dir);
-			env.performAction("go", params);
+			params.put(GoAction.DIRECTION, dir);
+			params.put(ISpaceObject.ACTOR_ID, getAgentIdentifier());
+			SyncResultListener srl	= new SyncResultListener();
+			env.performAction("go", params, srl); // todo: garbage as parameter?
+			srl.waitForResult();
 		}
 	}
 }
