@@ -89,13 +89,45 @@ public class ConstraintBuilder
 				throw new RuntimeException("Unexpected operator type: "+opex);
 			}
 		}
+		else if(exp instanceof UnaryExpression)
+		{
+			UnaryExpression	unex	= (UnaryExpression)exp;
+			if(unex.getOperator().equals(UnaryExpression.OPERATOR_NOT))
+			{
+				boolean	built	= false;
+
+				// Try to build not constraint by inverting the operator.
+				if(unex.getValue() instanceof OperationExpression)
+				{
+					OperationExpression	opex	= (OperationExpression)unex.getValue();
+					if(opex.getOperator() instanceof IOperator)
+					{
+						IOperator	inverse	= OperationExpression.getInverseOperator0((IOperator)opex.getOperator());
+						if(inverse!=null)
+						{
+							buildConstraint(new OperationExpression(
+								opex.getLeftValue(), opex.getRightValue(), inverse) , context);
+							built	= true;
+						}
+					}
+				}
+
+				if(!built)
+				{
+					buildOperatorConstraint(unex.getValue(), new LiteralExpression(Boolean.TRUE), IOperator.NOTEQUAL, context);
+				}
+			}
+			else
+			{
+				throw new RuntimeException("Unexpected operator type: "+unex);
+			}
+		}
+		// Conditional
+		// Literal
+		// Primary
+		// Variable
 		else
 		{
-			// Conditional
-			// Literal
-			// Primary
-			// Unary
-			// Variable
 			buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), IOperator.EQUAL, context);
 		}
 	}

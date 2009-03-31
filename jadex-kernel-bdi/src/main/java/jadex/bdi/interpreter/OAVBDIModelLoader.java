@@ -397,11 +397,12 @@ public class OAVBDIModelLoader
 				Object drop = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_dropcondition);
 				if(drop!=null)
 				{
-					ICondition usercond = (ICondition)state.getAttributeValue(drop, OAVBDIMetaModel.expression_has_content);
+					Object usercond = state.getAttributeValue(drop, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
 					{
 						String rulename = Rulebase.getUniqueRuleName(rb, "goal_drop_"+gtname);
-						rb.addRule(GoalLifecycleRules.createGoalDroppingUserRule(rulename, usercond, mgoal));
+						Object[]	tmp	= GoalLifecycleRules.createGoalDroppingUserRule(mgoal);
+						rb.addRule(createUserRule(state, mcapa, imports, mgoal, drop, usercond, rulename, tmp));
 					}
 				}
 				
@@ -409,11 +410,12 @@ public class OAVBDIModelLoader
 				Object recur = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_recurcondition);
 				if(recur!=null)
 				{
-					ICondition usercond = (ICondition)state.getAttributeValue(recur, OAVBDIMetaModel.expression_has_content);
+					Object	usercond = state.getAttributeValue(recur, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
 					{
 						String rulename = Rulebase.getUniqueRuleName(rb, "goal_recur_"+gtname);
-						rb.addRule(GoalProcessingRules.createGoalRecurUserRule(rulename, usercond, mgoal));
+						Object[]	tmp	= GoalProcessingRules.createGoalRecurUserRule(mgoal);
+						rb.addRule(createUserRule(state, mcapa, imports, mgoal, recur, usercond, rulename, tmp));
 					}
 				}
 				
@@ -424,15 +426,19 @@ public class OAVBDIModelLoader
 					for(Iterator it2=inhibits.iterator(); it2.hasNext(); )
 					{
 						Object	inhibit = it2.next();
-						ICondition usercond = (ICondition)state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_content);
+						Object	usercond = state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
 							String	ref	= (String)state.getAttributeValue(inhibit, OAVBDIMetaModel.inhibits_has_ref);
 							String	inmode	= (String)state.getAttributeValue(inhibit, OAVBDIMetaModel.inhibits_has_inhibit);
+
 							String rulename = Rulebase.getUniqueRuleName(rb, "goal_deliberate_addinstanceinhibition_"+gtname);
-							rb.addRule(GoalDeliberationRules.createAddInhibitionLinkUserRule(rulename, usercond, mgoal, inmode, ref));
+							Object[]	tmp	= GoalDeliberationRules.createAddInhibitionLinkUserRule(mgoal, inmode, ref);
+							rb.addRule(createUserRule(state, mcapa, imports, mgoal, inhibit, usercond, rulename, tmp));
+
 							rulename = Rulebase.getUniqueRuleName(rb, "goal_deliberate_removeinstanceinhibition_"+gtname);
-							rb.addRule(GoalDeliberationRules.createRemoveInhibitionLinkUserRule(rulename, usercond, mgoal, inmode, ref));
+							tmp	= GoalDeliberationRules.createRemoveInhibitionLinkUserRule(mgoal, inmode, ref);
+							rb.addRule(createUserRule(state, mcapa, imports, mgoal, inhibit, usercond, rulename, tmp));
 						}
 					}
 				}

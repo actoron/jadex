@@ -148,7 +148,7 @@ additiveExpression returns [Expression exp]
  *  A multiplicative expression multiplies or divides two values.
  */
 multiplicativeExpression returns [Expression exp]
-	: tmp = unaryExpression {$exp = tmp;}
+	: tmp = primaryExpression {$exp = tmp;}
         (
 		{
 			IFunction	operator	= null;
@@ -156,7 +156,7 @@ multiplicativeExpression returns [Expression exp]
 	        ('*' {operator=IFunction.MULT;}
         	|'/' {operator=IFunction.DIV;}
         	|'%' {operator=IFunction.MOD;}
-        	) tmp2 = unaryExpression
+        	) tmp2 = primaryExpression
 	        {
 	        	$exp = new OperationExpression(tmp, tmp2, operator);
 	        }
@@ -166,10 +166,10 @@ multiplicativeExpression returns [Expression exp]
 /**
  *  An unary expression produces a single value
  */
-unaryExpression returns [Expression exp]
+primaryExpression returns [Expression exp]
 	:
-	tmp = primary {List suffs = null;}
-	(tmp2 = suffix
+	tmp = primaryPrefix {List suffs = null;}
+	(tmp2 = primarySuffix
 		{
 			if(suffs==null)
 				suffs	= new ArrayList();
@@ -187,7 +187,7 @@ unaryExpression returns [Expression exp]
 /**
  *  Primary part of a expression, i.e. a direct representation of a value.
  */
-primary returns [Expression exp]
+primaryPrefix returns [Expression exp]
 	: '(' tmp = expression ')' {$exp = tmp;}
 	| tmp = literal {$exp = tmp;}
 	| {helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText())}? tmp = pseudovariable {$exp = tmp;}
@@ -197,7 +197,7 @@ primary returns [Expression exp]
 /**
  *  Continuations on a value, i.e. field or method access.
  */
-suffix returns [Suffix suff]
+primarySuffix returns [Suffix suff]
 	: tmp = fieldAccess {$suff = tmp;}
 	| tmp = methodAccess {$suff = tmp;}
 	;

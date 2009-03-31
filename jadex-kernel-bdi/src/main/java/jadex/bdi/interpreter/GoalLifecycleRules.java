@@ -367,9 +367,10 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF part of the context condition.
 	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalDroppingUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createGoalDroppingUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	rgoalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		rgoalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -378,8 +379,11 @@ public class GoalLifecycleRules
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED, IOperator.NOTEQUAL)));
 		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
-		Rule goal_dropping = new Rule(rulename, new AndCondition(new ICondition[]{rgoalcon, usercond}), GOAL_DROPPING_ACTION);
-		return goal_dropping;
+		ObjectCondition	rcapcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		rcapcon.addConstraint(new BoundConstraint(null, rcapa));
+		rcapcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+
+		return new Object[]{new AndCondition(new ICondition[]{rgoalcon, rcapcon}), GOAL_DROPPING_ACTION};
 	}
 	
 	/**

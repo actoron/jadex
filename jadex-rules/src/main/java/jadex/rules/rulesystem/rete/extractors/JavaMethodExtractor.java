@@ -139,6 +139,19 @@ public class JavaMethodExtractor implements IValueExtractor
 	 */
 	public String toString()
 	{
-		return objex.toString()+"."+methodcall;
+		StringBuffer	ret	= new StringBuffer();
+		ret.append(objex);
+		ret.append(".");
+		ret.append(methodcall.getMethod().getName());
+		ret.append("(");
+		for(int i=0; parameters!=null && i<parameters.length; i++)
+		{
+			if(i>0)
+				ret.append(", ");
+			ret.append(parameters[i]);
+		}
+		ret.append(")");
+		
+		return ret.toString();
 	}
 }

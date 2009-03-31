@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
@@ -79,7 +80,14 @@ public class GuiOpenClosePlan extends Plan
 			getLogger().info("3 secs are over, gui was not closed.");
 			tr.setReason("3 secs are over, gui was not closed.");
 		}
-		frame.dispose();
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				frame.dispose();
+			}
+		});
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 

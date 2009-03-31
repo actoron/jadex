@@ -134,4 +134,42 @@ public class OperationExpression	extends Expression
 		ret	= 31*ret + getOperator().hashCode();
 		return ret;
 	}
+
+	/**
+	 *  Get the inverse operator.
+	 *  @param operator	The operator
+	 *  @return	The inverse operator of null, if no inverse exists.
+	 */
+	public static IOperator getInverseOperator0(IOperator operator)
+	{
+		IOperator	ret	= null;
+		if(operator.equals(IOperator.CONTAINS))
+			ret	= IOperator.EXCLUDES;
+		else if(operator.equals(IOperator.EQUAL))
+			ret	= IOperator.NOTEQUAL;
+		else if(operator.equals(IOperator.EXCLUDES))
+			ret	= IOperator.CONTAINS;
+		else if(operator.equals(IOperator.GREATER))
+			ret	= IOperator.LESSOREQUAL;
+		else if(operator.equals(IOperator.GREATEROREQUAL))
+			ret	= IOperator.LESS;
+//		else if(operator.equals(IOperator.INSTANCEOF))
+//			ret	= ???
+		else if(operator.equals(IOperator.LESS))
+			ret	= IOperator.GREATEROREQUAL;
+		else if(operator.equals(IOperator.LESSOREQUAL))
+			ret	= IOperator.GREATER;
+//		else if(operator.equals(IOperator.MATCHES))
+//			ret	= ???
+		else if(operator.equals(IOperator.NOTEQUAL))
+			ret	= IOperator.EQUAL;
+//		else if(operator.equals(IOperator.STARTSWITH))
+//			ret	= IOperator.???
+//		else if(operator.equals(OPERATOR_AND))
+//			ret	= ???
+//		else if(operator.equals(OPERATOR_OR))
+//			ret	= ???
+		
+		return ret;
+	}
 }

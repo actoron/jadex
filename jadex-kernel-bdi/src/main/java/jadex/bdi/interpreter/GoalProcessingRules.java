@@ -1357,9 +1357,10 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the context condition.
 	 *  @param model	The goal model element.
 	 */
-	protected static Rule createGoalRecurUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createGoalRecurUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	rgoalcon = new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		rgoalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -1369,7 +1370,11 @@ public class GoalProcessingRules
 		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_PAUSED));
 		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 
-		Rule goal_recur = new Rule(rulename, new AndCondition(new ICondition[]{rgoalcon, usercond}), new IAction()
+		ObjectCondition	rcapcon = new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		rcapcon.addConstraint(new BoundConstraint(null, rcapa));
+		rcapcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+
+		return new Object[]{new AndCondition(new ICondition[]{rgoalcon, rcapcon}), new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
@@ -1377,8 +1382,7 @@ public class GoalProcessingRules
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 				changeProcessingState(state, rgoal, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS);
 			}
-		});
-		return goal_recur;
+		}};
 	}
 	
 }

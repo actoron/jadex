@@ -750,7 +750,7 @@ public class ReteBuilder
 		{
 			PredicateConstraint pc = (PredicateConstraint)c;
 			ConstantExtractor ex1 = new ConstantExtractor(Boolean.TRUE);
-			IValueExtractor ex2 = buildFunctionExtractor(pc.getFunctionCall(), context);
+			IValueExtractor ex2 = buildFunctionExtractor(-1, pc.getFunctionCall(),-1,  context);
 			ret.add(new ConstraintEvaluator(IOperator.EQUAL, ex1, ex2));
 		}
 		else if(c instanceof ReturnValueConstraint && (!context.isAlpha() || isAlphaExecutable(cond, c)))
@@ -770,7 +770,7 @@ public class ReteBuilder
 				Variable var = ((VariableReturnValueConstraint)pc).getVariable();
 				ex1 = buildVariableExtractor(var, context);
 			}
-			IValueExtractor ex2 = buildFunctionExtractor(pc.getFunctionCall(), context);
+			IValueExtractor ex2 = buildFunctionExtractor(-1, pc.getFunctionCall(), -1, context);
 			ret.add(new ConstraintEvaluator(pc.getOperator(), ex1, ex2));
 		}
 		else if(c instanceof BoundConstraint)
@@ -797,7 +797,7 @@ public class ReteBuilder
 				}
 				
 				// Add constraint for second occurrence in alpha, if possible (e.g. (Block (has_topcolor ?c) (has_bottomcolor ?c)))
-				else if(context.isAlpha() && context.isConstrainable(var))
+				else if(context.isAlpha() && context.isConstrainable(var) && isAlphaExecutable(cond, c))
 				{
 					IValueExtractor ex1 = getRightVariableExtractor(context, var);
 					int subindex = bc.isMultiConstraint()? i: -1;
@@ -806,9 +806,9 @@ public class ReteBuilder
 				}
 
 				// Add join for second occurrence in beta, if possible (e.g. (Block (has_color ?c)) (Ball (has_color ?c)))
-				else if(!context.isAlpha() && context.isJoinable(var))
+				else if(!context.isAlpha())
 				{
-					IValueExtractor leftex = getLeftVariableExtractor(context, var);
+					IValueExtractor leftex = createValueExtractor(-1, var, -1, context);
 					int subindex = bc.isMultiConstraint()? i: -1;
 					IValueExtractor rightex = createValueExtractor(-1, bc.getValueSource(), subindex, context);
 					IOperator op = bc.getOperator();
@@ -852,25 +852,26 @@ public class ReteBuilder
 	 *  @param fc The function call.
 	 *  @return The function call.
 	 */
-	public IValueExtractor buildFunctionExtractor(FunctionCall fc, BuildContext context)
+	public IValueExtractor buildFunctionExtractor(int tupleindex, FunctionCall fc, int subindex, BuildContext context)
 	{
 		List pcs = fc.getParameterSources();
 		IValueExtractor[] fex = new IValueExtractor[pcs.size()];
 		for(int i=0; i<pcs.size(); i++)
 		{
 			Object tmp = pcs.get(i);
-			if(tmp instanceof Variable)
-			{
-				fex[i] = buildVariableExtractor((Variable)tmp, context);
-			}
-			else if(tmp instanceof FunctionCall)
-			{
-				fex[i] = buildFunctionExtractor((FunctionCall)tmp, context);
-			}
-			else
-			{
-				fex[i] = new ConstantExtractor(tmp);
-			}
+			fex[i]	= createValueExtractor(tupleindex, tmp, subindex, context);
+//			if(tmp instanceof Variable)
+//			{
+//				fex[i] = buildVariableExtractor((Variable)tmp, context);
+//			}
+//			else if(tmp instanceof FunctionCall)
+//			{
+//				fex[i] = buildFunctionExtractor((FunctionCall)tmp, context);
+//			}
+//			else
+//			{
+//				fex[i] = new ConstantExtractor(tmp);
+//			}
 		}
 		return new FunctionExtractor(fc.getFunction(), fex); 
 	}
@@ -924,7 +925,7 @@ public class ReteBuilder
 		if(ret)
 		{
 			ObjectCondition ocond = (ObjectCondition)cond;
-			List vars = c.getVariables();
+			Set vars = new HashSet(c.getVariables());
 			
 			List consts = ocond.getBoundConstraints();
 			for(int i = 0; i < consts.size(); i++)
@@ -1266,7 +1267,7 @@ public class ReteBuilder
 		if(vi==null)
 			throw new RuntimeException("Could not find variable declaration: "+var);
 		if(!context.isRightUnavailable() && vi.getTupleIndex() == context.getTupleCount())
-			throw new RuntimeException("Variable is right availble in this condition: "+var);
+			throw new RuntimeException("Variable is right available in this condition: "+var);
 		
 		ret = createValueExtractor(vi.getTupleIndex(), vi.getValueSource(), vi.getSubindex(), context);
 
@@ -1338,7 +1339,7 @@ public class ReteBuilder
 		}
 		else if(valuesource instanceof FunctionCall)
 		{
-			ret = buildFunctionExtractor((FunctionCall)valuesource, context);
+			ret = buildFunctionExtractor(-1, (FunctionCall)valuesource, -1, context);
 		}
 		else if(valuesource instanceof Variable)
 		{
@@ -1347,6 +1348,11 @@ public class ReteBuilder
 		else if(valuesource instanceof Constant)
 		{
 			ret = new ConstantExtractor(((Constant)valuesource).getValue());
+		}
+		else
+		{
+			ret	= new ConstantExtractor(valuesource);
+			System.out.println("Warning: Assuming constant value '"+valuesource+"' in rule: "+context.getRule().getName());
 		}
 		
 		if(ret==null)
@@ -1367,19 +1373,20 @@ public class ReteBuilder
 		for(int i=0; i<pcs.size(); i++)
 		{
 			Object tmp = pcs.get(i);
-			if(tmp instanceof Variable)
-			{
-//				System.out.println(i+" "+mc);
-				fex[i] = buildVariableExtractor((Variable)tmp, context);
-			}
-			else if(tmp instanceof FunctionCall)
-			{
-				fex[i] = buildFunctionExtractor((FunctionCall)tmp, context);
-			}
-			else
-			{
-				fex[i] = new ConstantExtractor(tmp);
-			}
+			fex[i]	= createValueExtractor(-1, tmp, -1, context);
+//			if(tmp instanceof Variable)
+//			{
+////				System.out.println(i+" "+mc);
+//				fex[i] = buildVariableExtractor((Variable)tmp, context);
+//			}
+//			else if(tmp instanceof FunctionCall)
+//			{
+//				fex[i] = buildFunctionExtractor((FunctionCall)tmp, context);
+//			}
+//			else
+//			{
+//				fex[i] = new ConstantExtractor(tmp);
+//			}
 		}
 		
 		IValueExtractor oex = createValueExtractor(tupleindex, null, -1, context);

@@ -6,6 +6,7 @@ import jadex.rules.parser.conditions.javagrammar.IParserHelper;
 import jadex.rules.parser.conditions.javagrammar.JavaJadexLexer;
 import jadex.rules.parser.conditions.javagrammar.JavaJadexParser;
 import jadex.rules.parser.conditions.javagrammar.OperationExpression;
+import jadex.rules.parser.conditions.javagrammar.UnaryExpression;
 import jadex.rules.parser.conditions.javagrammar.VariableExpression;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
@@ -119,6 +120,10 @@ public class ParserHelper
 			if(returnvar!=null)
 			{
 				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), precon, model);
+			}
+			else if(invert)
+			{
+				ret	= ConstraintBuilder.buildConstraints(new UnaryExpression(pexp, UnaryExpression.OPERATOR_NOT), precon, model);
 			}
 			else
 			{

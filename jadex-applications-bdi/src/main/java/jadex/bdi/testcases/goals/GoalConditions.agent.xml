@@ -52,23 +52,23 @@
 
 	<goals>
 		<performgoal name="test" exclude="never">
-			<creationcondition>
- 				// $beliefbase.creation
+			<creationcondition language="jcl">
+ 				$beliefbase.creation
 
-				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "creation"))
+				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
+				// ?mbel	= (mbelief (melement_has_name "creation"))
  			</creationcondition>
- 			<contextcondition>
- 				// $beliefbase.context
+ 			<contextcondition language="jcl">
+ 				$beliefbase.context
 
-				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "context"))
+				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
+				// ?mbel	= (mbelief (melement_has_name "context"))
  			</contextcondition>
-			<dropcondition>
- 				// $beliefbase.drop
+			<dropcondition language="jcl">
+ 				$beliefbase.drop
 
-				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "drop"))
+				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
+				// ?mbel	= (mbelief (melement_has_name "drop"))
  			</dropcondition>
 		</performgoal>
 	</goals>

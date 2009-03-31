@@ -77,7 +77,7 @@
 		
 			<!-- Execution service. -->
 			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
-				new jadex.adapter.base.execution.AsyncExecutionService(
+				new jadex.adapter.base.execution.SyncExecutionService(
 					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
 			</property>
 

@@ -174,7 +174,7 @@ public class GoalDeliberationRules
 	 *  a) there is an inhibiting rgoal on type level
 	 *  b) the inhibition condition triggers.
 	 */
-	protected static Rule createAddInhibitionLinkUserRule(String rulename, ICondition usercond, Object model, String inmode, String ref)
+	protected static Object[]	createAddInhibitionLinkUserRule(Object model, String inmode, String ref)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -214,16 +214,16 @@ public class GoalDeliberationRules
 				state.addAttributeValue(refgoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule(rulename,
-			new AndCondition(new ICondition[]{goalcon, refgoalcon, refcapcon, capcon, usercond}), 
-			action, IPriorityEvaluator.PRIORITY_1);
+		return new Object[]{
+			new AndCondition(new ICondition[]{goalcon, refgoalcon, refcapcon, capcon}),
+			action, IPriorityEvaluator.PRIORITY_1};
 	}
 	
 	/**
 	 *  Remove an inhibition entry (the inhibitor) from a goal when
 	 *  b) the negated inhibition condition triggers.
 	 */
-	protected static Rule createRemoveInhibitionLinkUserRule(String rulename, ICondition usercond, Object model, String inmode, String ref)
+	protected static Object[]	createRemoveInhibitionLinkUserRule(Object model, String inmode, String ref)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -263,9 +263,12 @@ public class GoalDeliberationRules
 				state.removeAttributeValue(refgoal, OAVBDIRuntimeModel.goal_has_inhibitors, rgoal);
 			}
 		};
-		return new Rule(rulename,
-				new AndCondition(new ICondition[]{goalcon, refgoalcon, refcapcon, capcon, new NotCondition(usercond)}), 
-			action, IPriorityEvaluator.PRIORITY_1);
+		return new Object[]{
+			new AndCondition(new ICondition[]{goalcon, refgoalcon, refcapcon, capcon}), 
+			action,
+			IPriorityEvaluator.PRIORITY_1,
+			null,
+			Boolean.TRUE};
 	}
 	
 	/**

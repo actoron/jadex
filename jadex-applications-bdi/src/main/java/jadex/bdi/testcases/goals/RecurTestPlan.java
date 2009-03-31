@@ -61,28 +61,28 @@ public class RecurTestPlan extends Plan
 //		perf.setRecur(false);	// Necessary for perform goal to finish after plan execution.
 		waitFor(250);
 
-		report	= new TestReport("perform_succeeded", "Test if perform goal succeedes after plan is found.");
+		report	= new TestReport("perform_succeeded", "Test if perform goal succeeds after plan is found.");
 		if(perf.isSucceeded())
 			report.setSucceeded(true);
 		else
 			report.setReason("Goal not succeeded.");
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
-		report	= new TestReport("achieve_succeeded", "Test if achieve goal succeedes after plan is found.");
+		report	= new TestReport("achieve_succeeded", "Test if achieve goal succeeds after plan is found.");
 		if(achi.isSucceeded())
 			report.setSucceeded(true);
 		else
 			report.setReason("Goal not succeeded.");
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
-		report	= new TestReport("query_succeeded", "Test if query goal succeedes after plan is found.");
+		report	= new TestReport("query_succeeded", "Test if query goal succeeds after plan is found.");
 		if(quer.isSucceeded())
 			report.setSucceeded(true);
 		else
 			report.setReason("Goal not succeeded.");
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 	
-		report	= new TestReport("perform2_succeeded", "Test if perform goal succeedes after plan is found.");
+		report	= new TestReport("perform2_succeeded", "Test if perform goal succeeds after plan is found.");
 		if(perf2.isSucceeded())
 			report.setSucceeded(true);
 		else

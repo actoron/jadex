@@ -6,20 +6,32 @@ package jadex.rules.parser.conditions.javagrammar;
  */
 public class UnaryExpression	extends Expression
 {
+	//-------- constants --------
+
+	/** The not operator "!". */
+	public static final String	OPERATOR_NOT	= "!";
+	
+	/** The (unary) minus operator "-". */
+	// unary plus is ignored by parser.
+	public static final String	OPERATOR_MINUS	= "-";
+	
+	/** The bitwise not operator "~". */
+	public static final String	OPERATOR_BNOT	= "~";
+	
 	//-------- attributes --------
 	
 	/** The value expression. */
 	protected Expression	value;
 
 	/** The operator. */
-	protected Object	operator;
+	protected String	operator;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new unary operation.
 	 */
-	public UnaryExpression(Expression value, Object operator)
+	public UnaryExpression(Expression value, String operator)
 	{
 		this.value	= value;
 		this.operator	= operator;

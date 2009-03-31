@@ -155,14 +155,17 @@
 			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
 			<!-- todo: remove unique support? <unique/>--> 
 			<creationcondition>
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?adopted	= (goal (element_has_model ?mgoal))
-					?rcapa		= (capability (capability_has_goals contains ?adopted))
-				))
-
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
 				?mbeliefset = (mbeliefset (melement_has_name "wastes"))
+				
+				// unique (?rcapa and ?mgoal are provided internally)
+				(not (and
+					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+					?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
+					?rcapa = (capability (capability_has_goals contains ?adopted))
+					// ?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters $?x ?rparam $?y))
+					//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+				))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
 			<contextcondition>
@@ -194,24 +197,24 @@
 			<deliberation>
 			<!-- <deliberation cardinality="1"> -->
 				<inhibits ref="performlookforwaste"/>
-				<inhibits ref="achievecleanup">
-					// $beliefbase.my_location.getDistance($goal.waste.getLocation())
-					// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+				<inhibits ref="achievecleanup" language="jcl">
+					$beliefbase.my_location.getDistance($goal.waste.getLocation())
+					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
 					
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (melement_has_name "my_location"))
-					
-					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-					?waste = (jadex.bdi.examples.cleanerworld.Waste (location ?wasteloc))
-					
-					?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
-					?refgoal = (goal (parameterelement_has_parameters contains ?refparam))
-					
-					?refwaste = (Waste (location ?refwasteloc &amp; 
-						:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
-							(MethodCallFunction "Location" "getDistance" ?myloc ?refwasteloc)  
-					)))
+					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
+					// ?mbelief = (mbelief (melement_has_name "my_location"))
+					//
+					// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+					// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+					// ?waste = (jadex.bdi.examples.cleanerworld.Waste (location ?wasteloc))
+					//
+					// ?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
+					// ?refgoal = (goal (parameterelement_has_parameters contains ?refparam))
+					//
+					// ?refwaste = (Waste (location ?refwasteloc &amp; 
+					// 	:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
+					// 		(MethodCallFunction "Location" "getDistance" ?myloc ?refwasteloc)  
+					// )))
 	
 					// Does not work because Locations are not directly in state.
 					// ?wasteloc = (Location (getDistance(?myloc) ?wastedist))

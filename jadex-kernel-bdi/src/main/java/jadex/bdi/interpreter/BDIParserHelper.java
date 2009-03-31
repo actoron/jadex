@@ -166,6 +166,50 @@ public class BDIParserHelper implements IParserHelper
 			rgoalcon.addConstraint(new BoundConstraint(attr1, parvar, IOperator.CONTAINS));
 		}
 
+		else if(ret==null && name.startsWith("$ref."))
+		{
+			String	parname	= name.substring(5);
+			OAVObjectType	type	= OAVBDIRuntimeModel.parameter_type;
+			OAVAttributeType	attr1	= OAVBDIRuntimeModel.parameterelement_has_parameters;
+			OAVAttributeType	attr2	= OAVBDIRuntimeModel.parameter_has_value;
+			OAVAttributeType	attr3	= OAVBDIRuntimeModel.parameter_has_name;
+			Object	mpar	= state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parameters, parname);
+			if(mpar==null)
+			{
+				type	= OAVBDIRuntimeModel.parameterset_type;
+				attr1	= OAVBDIRuntimeModel.parameterelement_has_parametersets;
+				attr2	= OAVBDIRuntimeModel.parameterset_has_values;
+				attr3	= OAVBDIRuntimeModel.parameterset_has_name;
+				mpar	= state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parametersets, parname);
+			}
+
+			if(mpar==null)
+			{
+				throw new RuntimeException("No such parameter (set): "+name);
+			}
+
+			// Build parameter (set) condition to bind value(s) variable.
+			Class	clazz	= (Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class);
+			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));	// Todo: array class for parameter set
+			Variable	parvar	= new Variable(name+"par", type);
+			context.createObjectCondition(type, new IConstraint[]{
+				new LiteralConstraint(attr3, parname),
+				new BoundConstraint(attr2, ret),
+				new BoundConstraint(null, parvar)});
+
+			// Augment goal condition to check parameter (set) variable.
+			Variable	goalvar	= context.getVariable("?refgoal");
+			if(goalvar==null)
+				throw new RuntimeException("Variable '?refgoal' required to build parameter (set) condition: "+name);
+			ObjectCondition	rgoalcon	= (ObjectCondition)context.getObjectCondition(goalvar);
+			if(rgoalcon==null)
+				throw new RuntimeException("Refgoal condition required to build parameter (set) condition: "+name);
+			BoundConstraint	bc	= (BoundConstraint)context.getBoundConstraint(goalvar);
+			if(bc!=null && bc.getValueSource()!=null)
+				throw new UnsupportedOperationException("Value source for goal object not yet supported.");
+			rgoalcon.addConstraint(new BoundConstraint(attr1, parvar, IOperator.CONTAINS));
+		}
+
 		return ret;
 	}
 
@@ -176,7 +220,7 @@ public class BDIParserHelper implements IParserHelper
 	 */
 	public boolean	isPseudoVariable(String name)
 	{
-		return "$beliefbase".equals(name) || "$goal".equals(name);
+		return "$beliefbase".equals(name) || "$goal".equals(name) || "$ref".equals(name);
 	}
 
 	/**
