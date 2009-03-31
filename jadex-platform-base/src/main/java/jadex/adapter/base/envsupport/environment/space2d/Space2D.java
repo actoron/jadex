@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
+import jadex.adapter.base.envsupport.environment.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -35,9 +36,9 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 * @param timecoefficient the time coefficient for time differences.
 	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(IClockService clockservice, IVector1 timecoefficient, IVector2 areasize)
+	protected Space2D(IClockService clockservice, IVector1 timecoefficient, IActionExecutor executor, IVector2 areasize)
 	{
-		super(clockservice, timecoefficient);
+		super(clockservice, timecoefficient, executor);
 		this.areasize = areasize;
 	}
 	
@@ -128,7 +129,6 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	/**
 	 * Retrieves a random position within the simulation area with a minimum
 	 * distance from the edge.
-	 * 
 	 * @param distance minimum distance from the edge, null or zero for no distance
 	 */
 	public IVector2 getRandomPosition(IVector2 distance)

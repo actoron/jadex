@@ -12,6 +12,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
@@ -78,8 +79,18 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		
 		if(ret instanceof Space2D) // Hack?
 		{
+			IVector2 areasize;
 			List dims = spacetype.getDimensions();
-			IVector2 areasize = new Vector2Double(((Number)dims.get(0)).doubleValue(), ((Number)dims.get(1)).doubleValue());
+			Number dim1 = (Number)dims.get(0);
+			Number dim2 = (Number)dims.get(0);
+			
+			if(dim1 instanceof Integer)
+				areasize = new Vector2Double(dim1.doubleValue(), dim2.doubleValue());
+			else if(dim2 instanceof Double)
+				areasize = new Vector2Int(dim1.intValue(), dim2.intValue());
+			else
+				throw new RuntimeException("Dimension class not supported: "+dim1);
+			
 			((Space2D)ret).setAreaSize(areasize);
 		}
 		
@@ -126,9 +137,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				MEnvObject mobj = (MEnvObject)objects.get(i);
 			
-				// What to do with id?
+				// What to do with obj?
 				// How to set owner (agent)?
-				Object id = ret.createSpaceObject(mobj.getType(), null, null, null);
+				Object obj = ret.createSpaceObject(mobj.getType(), null, null, null);
 			}
 		}
 		

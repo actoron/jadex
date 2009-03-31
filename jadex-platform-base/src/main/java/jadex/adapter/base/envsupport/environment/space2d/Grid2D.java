@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
+import jadex.adapter.base.envsupport.environment.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -52,7 +53,7 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D()
 	{
-		this(null, null, null);
+		this(null, null, null, null);
 	}
 	
 	/**
@@ -62,9 +63,9 @@ public class Grid2D extends Space2D
 	 * @param timeCoefficient the time coefficient for time differences.
 	 * @param areaSize the size of the 2D area
 	 */
-	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IVector2 areaSize)
+	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IActionExecutor executor, IVector2 areaSize)
 	{
-		this(clockService, timeCoefficient, areaSize, DEFAULT_NAME);
+		this(clockService, timeCoefficient, executor, areaSize, DEFAULT_NAME);
 	}
 	
 	/**
@@ -75,9 +76,9 @@ public class Grid2D extends Space2D
 	 * @param areaSize the size of the 2D area
 	 * @param spaceName the name of this space
 	 */
-	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IVector2 areaSize, Object spaceName)
+	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IActionExecutor executor, IVector2 areaSize, Object spaceName)
 	{
-		super(clockService, timeCoefficient, areaSize);
+		super(clockService, timeCoefficient, executor, areaSize);
 		this.spaceproperties.put("name", spaceName);
 		this.objectsygridpos = new MultiCollection();
 		this.gridposbyobject = new HashMap();
@@ -264,24 +265,24 @@ public class Grid2D extends Space2D
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public Object createSpaceObject(Object type, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners)
 	{
 		synchronized(getSynchronizedObject().getMonitor())
 		{
 			// TODO: maybe only assign position to discretePosition vector?
 			
-			Object id = super.createSpaceObject(type, properties, tasks, listeners);
+			ISpaceObject obj = super.createSpaceObject(type, properties, tasks, listeners);
 			
 			if(properties!=null)
 			{
 				IVector2 pos = (IVector2)properties.get(POSITION);
 				if(pos!=null)
 				{
-					objectsygridpos.put(pos, getSpaceObject(id));
-					gridposbyobject.put(id, pos);
+					objectsygridpos.put(pos, obj);
+					gridposbyobject.put(obj.getId(), pos);
 				}
 			}
-			return id;
+			return obj;
 		}
 	}
 	

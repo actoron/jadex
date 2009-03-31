@@ -76,8 +76,8 @@ public class CreateWasteProcess implements ISpaceProcess
 			{
 				Map props = new HashMap();
 				props.put(Space2D.POSITION, pos);
-				Object id = grid.createSpaceObject("garbage", props, null, null);
-				System.out.println("Created garbage: "+space.getSpaceObject(id));
+				Object obj = grid.createSpaceObject("garbage", props, null, null);
+				System.out.println("Created garbage: "+obj);
 			}
 		}
 	}

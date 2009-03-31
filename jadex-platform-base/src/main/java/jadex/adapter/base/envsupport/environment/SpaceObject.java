@@ -1,6 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.commons.SReflect;
 import jadex.commons.SimplePropertyChangeSupport;
 
 import java.beans.PropertyChangeListener;
@@ -239,6 +240,26 @@ public class SpaceObject implements ISpaceObject
 			IObjectListener listener = (IObjectListener) it.next();
 			listener.dispatchObjectEvent(event);
 		}
+	}
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append(SReflect.getInnerClassName(this.getClass()));
+		buf.append("(id=");
+		buf.append(getId());
+		buf.append(", type=");
+		buf.append(getType());
+		buf.append(", properties=");
+		buf.append(getProperties());
+		buf.append(", tasks=");
+		buf.append(tasks);
+		buf.append(")");
+		return buf.toString();
 	}
 	
 	//-------- property methods --------

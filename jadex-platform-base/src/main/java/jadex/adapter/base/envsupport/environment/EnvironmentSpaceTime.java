@@ -15,6 +15,17 @@ import javax.swing.event.ChangeListener;
  */
 public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace implements ChangeListener
 {
+	//-------- constants --------
+	
+	/** The execution mode immediately. */
+//	public static final String EXECUTION_MODE_IMMEDIATELY = "execution_immediately";
+	
+	/** The execution mode roundbased. */
+//	public static final String EXECUTION_MODE_ROUNDBASED = "execution_roundbased";
+	
+	/** The execution mode roundbased alternating. */
+//	public static final String EXECUTION_MODE_ROUNDBASED_ALTERNATING = "execution_roundbased_alternating";
+	
 	//-------- attributes --------
 	
 	/** The current time coefficient */
@@ -24,7 +35,10 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace impl
 	protected IClockService clockservice;
 	
 	/** The last time stamp */
-	private long timestamp;
+	protected long timestamp;
+	
+	/** The action executor. */
+	protected IActionExecutor executor;
 	
 	//-------- constructors --------
 	
@@ -33,12 +47,13 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace impl
 	 * @param clockService the clock service
 	 * @param timeCoefficient the time coefficient for time differences.
 	 */
-	protected EnvironmentSpaceTime(IClockService clockService, IVector1 timeCoefficient)
+	protected EnvironmentSpaceTime(IClockService clockService, IVector1 timeCoefficient, IActionExecutor executor)
 	{
 		super();
 		if(clockService!=null)
 			setClockService(clockService);
 		timecoefficient = timeCoefficient != null? timeCoefficient: new Vector1Double(0.001);
+		this.executor = executor==null? new ImmediateExecutor(): executor;
 	}
 	
 	//-------- methods --------
@@ -55,29 +70,29 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace impl
 	/** 
 	 * Steps the time of the space. May be non-functional in spaces that do not have
 	 * a concept of time. See hasTime().
-	 * @param currentTime the current time
+	 * @param currenttime the current time
 	 */
-	public void timeStep(long currentTime)
+	public void timeStep(long currenttime)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(getSynchronizedObject().getMonitor())
 		{
-			IVector1 deltaT = timecoefficient.copy().multiply(new Vector1Long(currentTime - timestamp));
-			timestamp = currentTime;
+			IVector1 deltat = timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
+			timestamp = currenttime;
 		
 			// Execute enqueued actions.
-			getSynchronizedObject().executeEntries();
-		
+			executor.execute(currenttime, deltat, getSynchronizedObject());
+				
 			for(Iterator it = spaceobjects.values().iterator(); it.hasNext(); )
 			{
 				SpaceObject obj = (SpaceObject)it.next();
-				obj.updateObject(currentTime, deltaT);
+				obj.updateObject(currenttime, deltat);
 			}
 			
 			Object[] procs = processes.values().toArray();
 			for(int i = 0; i < procs.length; ++i)
 			{
 				ISpaceProcess process = (ISpaceProcess) procs[i];
-				process.execute(currentTime, deltaT, this);
+				process.execute(currenttime, deltat, this);
 			}
 		}
 	}
@@ -100,5 +115,14 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace impl
 		this.clockservice = clockService;
 		timestamp = clockservice.getTime();
 		clockservice.addChangeListener(this);
+	}
+	
+	/**
+	 *  Set the action executor.
+	 *  @param executor The executor.
+	 */
+	public void setActionExecutor(IActionExecutor executor)
+	{
+		this.executor = executor;
 	}
 }

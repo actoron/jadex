@@ -100,7 +100,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public Object createSpaceObject(Object type, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners)
 	{
 		synchronized(syncobject.getMonitor())
 		{
@@ -113,14 +113,14 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 			
 			ISpaceObject obj = new SpaceObject(id, type, properties, tasks, listeners, syncobject.getMonitor());
 			spaceobjects.put(id, obj);
-			List typeObjects = (List) spaceobjectsbytype.get(obj.getType());
-			if (typeObjects == null)
+			List typeobjects = (List)spaceobjectsbytype.get(obj.getType());
+			if(typeobjects == null)
 			{
-				typeObjects = Collections.synchronizedList(new ArrayList());
-				spaceobjectsbytype.put(obj.getType(), typeObjects);
+				typeobjects = Collections.synchronizedList(new ArrayList());
+				spaceobjectsbytype.put(obj.getType(), typeobjects);
 			}
-			typeObjects.add(obj);
-			return id;
+			typeobjects.add(obj);
+			return obj;
 		}
 	}
 	

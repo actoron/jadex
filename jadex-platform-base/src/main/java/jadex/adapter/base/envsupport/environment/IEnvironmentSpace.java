@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Main interface for an environment space.
  */
 public interface IEnvironmentSpace extends ISpace
 {
@@ -43,9 +43,9 @@ public interface IEnvironmentSpace extends ISpace
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
 	 * @param listeners initial listeners (may be null)
-	 * @return the object's ID
+	 * @return the object.
 	 */
-	public Object createSpaceObject(Object type, Map properties, List tasks, List listeners);
+	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners);
 	
 	/** 
 	 * Destroys an object in this space.
