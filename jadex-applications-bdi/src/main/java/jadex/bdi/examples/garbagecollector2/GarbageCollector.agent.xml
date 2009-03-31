@@ -17,20 +17,20 @@
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
-		<import>jadex.adapter.base.envsupport.environment.space2d.ContinuousSpace2D</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
 	</imports>
 
 	<beliefs>
 		<!-- Environment. -->
-		<belief name="env" class="ContinuousSpace2D">
- 			<fact>((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("mygc2dspace")</fact>
+		<belief name="env" class="Grid2D">
+ 			<fact>(Grid2D)((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("mygc2dspace")</fact>
  		</belief>
  		
  		<!-- Myself. -->
  		<belief name="myself" class="ISpaceObject">
- 			<fact>$beliefbase.env.getSpaceObject($agent.getAgentIdentifier())</fact>
+ 			<fact>$beliefbase.env.getSpaceObject($scope.getAgentIdentifier())</fact>
  		</belief>
 
 		<!-- The actual position on the grid world. -->

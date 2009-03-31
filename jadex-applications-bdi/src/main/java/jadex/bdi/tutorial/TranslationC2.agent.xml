@@ -77,7 +77,7 @@
 			select one $wordpair.get(1)
 			from Tuple $wordpair in $beliefbase.getBeliefSet("egwords").getFacts()
 			where $wordpair.get(0).equals($eword)
-			<parameter name="$eword" class="String"/>
+			<!-- <parameter name="$eword" class="String"/> -->
 		</expression>
 		<!-- <expression name="query_egword">
 			select one $wordpair.get(1)

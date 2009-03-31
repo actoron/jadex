@@ -110,7 +110,7 @@
 			select one $wordpair.get(1)
 			from Tuple $wordpair in $beliefbase.getBeliefSet("egwords").getFacts()
 			where $wordpair.get(0).equals($eword)
-			<parameter name="$eword" class="String"/>
+			<!-- <parameter name="$eword" class="String"/> -->
 		</expression>
 		<!-- This query selects the first matching entry from the English - French
 			dictionary, whereby the parameter $eword is compared to the first
@@ -119,7 +119,7 @@
 			select one $wordpair.get(1)
 			from Tuple $wordpair in $beliefbase.getBeliefSet("efwords").getFacts()
 			where $wordpair.get(0).equals($eword)
-			<parameter name="$eword" class="String"/>
+			<!-- <parameter name="$eword" class="String"/> -->
 		</expression>
 	</expressions>
 

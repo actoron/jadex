@@ -1339,7 +1339,7 @@ public class ReteBuilder
 		}
 		else if(valuesource instanceof FunctionCall)
 		{
-			ret = buildFunctionExtractor(-1, (FunctionCall)valuesource, -1, context);
+			ret = buildFunctionExtractor(tupleindex, (FunctionCall)valuesource, subindex, context);
 		}
 		else if(valuesource instanceof Variable)
 		{

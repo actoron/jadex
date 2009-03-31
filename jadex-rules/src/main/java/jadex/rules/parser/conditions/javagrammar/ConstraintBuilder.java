@@ -5,11 +5,15 @@ import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
+import jadex.rules.rulesystem.rules.Constant;
+import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.rulesystem.rules.functions.IFunction;
+import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
@@ -267,6 +271,29 @@ public class ConstraintBuilder
 			{
 				throw new RuntimeException("Primary expression must start with variable: "+value);
 			}
+		}
+		else if(value instanceof OperationExpression)
+		{
+			OperationExpression	opex	= (OperationExpression)value;
+			IFunction	func;
+			if(opex.getOperator() instanceof IFunction)
+				func	= (IFunction)opex.getOperator();
+			else
+				func	= new OperatorFunction((IOperator)opex.getOperator());
+			
+			Object[]	left	= getObjectConditionAndValueSource(opex.getLeftValue(), context);
+			Object	right	= flattenToPrimary(opex.getRightValue(), context);
+			if(right instanceof VariableExpression)
+			{
+				right	= ((VariableExpression)right).getVariable();
+			}
+			else //if(right instanceof LiteralExpression)
+			{
+				right	= new Constant(((LiteralExpression)right).getValue());
+			}
+
+			Object	valuesource	= new FunctionCall(func, new Object[]{left[1], right});
+			ret	= new Object[]{left[0], valuesource};
 		}
 		else
 		{
