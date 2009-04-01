@@ -37,7 +37,7 @@
 			<parameter name="num" class="int">
 				<bindingoptions>new int[]{1,2,3}</bindingoptions>
 			</parameter>
-			<creationcondition>
+			<creationcondition language="clips">
  				// $beliefbase.create
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))

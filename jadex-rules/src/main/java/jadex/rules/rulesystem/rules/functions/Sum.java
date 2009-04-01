@@ -66,7 +66,7 @@ public class Sum implements IFunction
 	 */
 	public String toString()
 	{
-		return "sum";
+		return "+";
 	}
 
 	/**

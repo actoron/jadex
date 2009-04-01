@@ -40,7 +40,7 @@
 			<deliberation>
 				<inhibits ref="docnt" inhibit="when_in_process"/>
 			</deliberation>
-			<maintaincondition>
+			<maintaincondition language="clips">
 				// $beliefbase.count&lt;4
 
 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact &lt; 4))
@@ -85,11 +85,11 @@
 	</plans>
 	
 	<expressions>
-		<condition name="countis5">
+		<condition name="countis5" language="clips">
 			?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
 			?mbel	= (mbelief (melement_has_name "count"))
 		</condition>
-		<condition name="countis6">
+		<condition name="countis6" language="clips">
 			?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 6))
 			?mbel	= (mbelief (melement_has_name "count"))
 		</condition>

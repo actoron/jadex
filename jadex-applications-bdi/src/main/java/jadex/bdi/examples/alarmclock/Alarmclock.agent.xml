@@ -45,7 +45,7 @@
 				<value>?alarm</value>
 			</parameter>
 			<!-- <unique/> -->
-			<creationcondition>
+			<creationcondition language="clips">
 				// alarm.isActive()
 				?alarm = (Alarm (active true) (alarmtime != -2))
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
@@ -57,13 +57,13 @@
 					)
 				)
 			</creationcondition>
-			<contextcondition>
+			<contextcondition language="clips">
 				// $goal.alarm.isActive()
 				?alarm = (Alarm (active true))
 				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</contextcondition>
-			<dropcondition>
+			<dropcondition language="clips">
 				// !$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
 				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
@@ -74,7 +74,7 @@
 					)
 				)
 			</dropcondition>
-			<targetcondition>
+			<targetcondition language="clips">
 				// $goal.alarm.getAlarmtime()==Alarm.NO_ALARM
 				?alarm = (Alarm (alarmtime -2))
 				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))

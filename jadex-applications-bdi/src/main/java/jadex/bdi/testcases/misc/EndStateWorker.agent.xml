@@ -41,7 +41,7 @@
 	<goals>
 		<!-- A goal that should not be triggered in end state. -->
 		<achievegoal name="testgoal">
-			<creationcondition>
+			<creationcondition language="clips">
 				// $beliefbase.trigger
 				?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
 				?mbel_trigger	= (mbelief (melement_has_name "trigger"))
@@ -68,7 +68,7 @@
 			<body class="ResultPlan"/>
 			<trigger>
 				<goal ref="testgoal"/>
-				<condition>
+				<condition language="clips">
 					// $beliefbase.trigger
 					?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
 					?mbel_trigger	= (mbelief (melement_has_name "trigger"))
@@ -133,7 +133,7 @@
 	<expressions>
 		<!-- Tests for end state elements are finished when all elements have
 			 been triggered and therefore there is no more unsucceeded test. -->
-		<condition name="end_tests_finished">
+		<condition name="end_tests_finished" language="clips">
 			//(select one TestReport $report from $beliefbase.reports
 			//where !$report.isSucceeded())==null
 			

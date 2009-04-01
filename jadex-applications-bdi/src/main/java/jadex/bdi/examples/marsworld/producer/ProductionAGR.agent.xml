@@ -31,7 +31,7 @@
 		<!-- Produce ore at a target. -->
 		<achievegoal name="produce_ore">
 			<parameter name="target" class="Target"/>
-			<dropcondition>
+			<dropcondition language="clips">
 				// $beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel) (belief_has_fact true))

@@ -99,7 +99,7 @@
 	<goals>
 		<!-- Main goal to play a game. -->
 		<performgoal name="play_game" exclude="never">
-			<contextcondition>
+			<contextcondition language="clips">
 				// $beliefbase.players.length > 0
 				// ?rbeliefset = (beliefset (beliefset_has_facts $?facts) (element_has_model ?mbeliefset))
 				// ?mbeliefset = (mbeliefset (melement_has_name "players"))
@@ -159,7 +159,7 @@
 				$beliefbase.getBeliefSet("players").containsFact($plan.player)
 				&amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
 			</contextcondition>-->
-			<contextcondition>
+			<contextcondition language="clips">
 				// $beliefbase.getBeliefSet("players").containsFact($plan.player)
 				// &amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
 			
@@ -408,7 +408,7 @@
 		</condition>-->
 		
 		<!-- Check if it is the dealer's first turn. -->
-		<condition name="dealers_first_turn">
+		<condition name="dealers_first_turn" language="clips">
 			?dealer = (Player (cardCnt 0))
 			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?dealer))
 			
@@ -435,7 +435,7 @@
 		</condition>
 		
 		<!-- Check if it is the dealer's first turn. -->
-		<condition name="dealers_second_turn">
+		<condition name="dealers_second_turn" language="clips">
 			(not
 				(and
 					?player = (Player (playingstate != "idle") (playingstate != "finished"))
@@ -449,7 +449,7 @@
 		</condition>
 
 		<!-- Check if it is the $player's turn. -->
-		<condition name="players_turn">
+		<condition name="players_turn" language="clips">
 			// All players must be idle, playing, or finished.
 			// (select one Player $p from $beliefbase.players
 			// where !$p.getState().equals(Player.STATE_IDLE)
@@ -486,7 +486,7 @@
 		</condition>
 
 		<!-- Check if the dealer has drawn its first card. -->
-		<condition name="dealer_card">
+		<condition name="dealer_card" language="clips">
 			// $beliefbase.myself.getCards().length==1
 			
 			?player = (Player (cardCnt 1))
@@ -494,7 +494,7 @@
 		</condition>
 
 		<!-- Check if the dealer has finished drawing cards. -->
-		<condition name="dealer_finished">
+		<condition name="dealer_finished" language="clips">
 			// $beliefbase.myself.getState().equals(Player.STATE_FINISHED)
 			// || $beliefbase.myself.getState().equals(Player.STATE_IDLE)
 			

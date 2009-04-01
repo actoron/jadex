@@ -41,6 +41,7 @@ import jadex.rules.rulesystem.rules.AndConstraint;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.Constant;
+import jadex.rules.rulesystem.rules.Constraint;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
@@ -122,8 +123,8 @@ public class ReteBuilder
 	 */
 	public ReteNode addRule(ReteNode root, IRule rule)
 	{
-//		if(rule.getName().equals("planwaitqueue_goalfinished"))
-//			System.out.println("ysfk lk");
+//		if(rule.getName().indexOf("maintaingoal_maintain")!=-1)
+//			System.out.println("ysfklk");
 		
 		// todo: or, exists conditions
 		
@@ -924,20 +925,20 @@ public class ReteBuilder
 		
 		if(ret)
 		{
+			Set	available	= new HashSet();
 			ObjectCondition ocond = (ObjectCondition)cond;
-			Set vars = new HashSet(c.getVariables());
 			
 			List consts = ocond.getBoundConstraints();
 			for(int i = 0; i < consts.size(); i++)
 			{
 				BoundConstraint bc = (BoundConstraint)consts.get(i);
-				if(bc.getOperator().equals(IOperator.EQUAL))
+				if(bc.getOperator().equals(IOperator.EQUAL)
+					&& available.containsAll(Constraint.getVariablesForValueSource(bc.getValueSource())))
 				{
-					List vs = bc.getVariables();
-					vars.removeAll(vs);
+					available.addAll(bc.getBindVariables());
 				}
 			}
-			ret = vars.isEmpty();
+			ret = available.containsAll(c.getVariables());
 		}
 
 		return ret;

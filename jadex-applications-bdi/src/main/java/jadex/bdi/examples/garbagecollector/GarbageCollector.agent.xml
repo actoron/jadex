@@ -70,7 +70,7 @@
  			burner present. -->
 		 	<achievegoal name="take">
 			<!-- <unique/>  -->
-			<creationcondition>
+			<creationcondition language="clips">
 				// unique (?rcapa and ?mgoal are provided internally)
 				(not (and
 					?adopted	= (goal (element_has_model ?mgoal))
@@ -104,7 +104,7 @@
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
 		<achievegoal name="pick" exclude="never" retrydelay="100">
- 			<dropcondition>
+ 			<dropcondition language="clips">
  				// !$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
 				?mbelief = (mbelief (melement_has_name "is_dirty"))

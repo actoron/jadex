@@ -467,11 +467,12 @@ public class OAVBDIModelLoader
 					Object maintain = state.getAttributeValue(mgoal, OAVBDIMetaModel.maintaingoal_has_maintaincondition);
 					if(maintain!=null)
 					{
-						ICondition usercond = (ICondition)state.getAttributeValue(maintain, OAVBDIMetaModel.expression_has_content);						if(usercond!=null)
+						Object usercond = state.getAttributeValue(maintain, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
 							String rulename = Rulebase.getUniqueRuleName(rb, "maintaingoal_maintain_"+gtname);
-							rb.addRule(GoalProcessingRules.createMaintaingoalProcessingUserRule(rulename, usercond, mgoal));
+							Object[]	tmp	= GoalProcessingRules.createMaintaingoalProcessingUserRule(mgoal);
+							rb.addRule(createUserRule(state, mcapa, imports, mgoal, maintain, usercond, rulename, tmp));
 						}
 					}
 					
@@ -479,11 +480,12 @@ public class OAVBDIModelLoader
 					target	= target!=null ? target : maintain;
 					if(target!=null)
 					{
-						ICondition usercond = (ICondition)state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
+						Object	usercond = state.getAttributeValue(target, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
 							String rulename = Rulebase.getUniqueRuleName(rb, "maintaingoal_target_"+gtname);
-							rb.addRule(GoalProcessingRules.createMaintaingoalSucceededUserRule(rulename, usercond, mgoal));
+							Object[]	tmp	= GoalProcessingRules.createMaintaingoalSucceededUserRule(mgoal);
+							rb.addRule(createUserRule(state, mcapa, imports, mgoal, target, usercond, rulename, tmp));
 						}
 					}
 				}

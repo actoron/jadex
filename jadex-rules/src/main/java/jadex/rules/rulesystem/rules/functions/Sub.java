@@ -76,7 +76,7 @@ public class Sub implements IFunction
 	 */
 	public String toString()
 	{
-		return "sum";
+		return "-";
 	}
 
 	/**

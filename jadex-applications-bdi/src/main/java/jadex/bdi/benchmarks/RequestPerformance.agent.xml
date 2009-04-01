@@ -44,7 +44,7 @@
 		<plan name="master_plan">
 			<body class="RequestMasterPlan" />
 			<trigger>
-				<condition>
+				<condition language="clips">
 					?mbelief= (mbelief (melement_has_name "master"))
 					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact true))
 				</condition>
@@ -55,7 +55,7 @@
 		<plan name="sender_plan">
 			<body class="RequestSenderPlan" />
 			<trigger>
-				<condition>
+				<condition language="clips">
 					?mbelief= (mbelief (melement_has_name "receiver"))
 					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact != null))
 				</condition>

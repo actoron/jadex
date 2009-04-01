@@ -52,4 +52,12 @@ public class Constant
 	{
 		return 31 + (getValue()!=null ? getValue().hashCode() : 0);
 	}
+
+	/**
+	 *  Get a stering representation.
+	 */
+	public String	toString()
+	{
+		return "Constant("+value+")"; 
+	}
 }

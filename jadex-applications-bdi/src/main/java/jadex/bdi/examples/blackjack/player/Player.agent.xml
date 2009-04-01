@@ -62,7 +62,7 @@
 	<goals>
 		<!-- Main goal of the player is to play games at a dealer. -->
 		<maintaingoal name="know_dealer" recur="true" recurdelay="2000">
-			<maintaincondition>
+			<maintaincondition language="clips">
 				// $beliefbase.dealer!=null
 				
 				?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
@@ -70,18 +70,18 @@
 		</maintaingoal>
 
 		<achievegoal name="start_playing">
-			<creationcondition>
+			<creationcondition language="clips">
 				// $beliefbase.dealer!=null
 				
 				?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
 			</creationcondition>
-			<contextcondition>
+			<contextcondition language="clips">
 				// $beliefbase.myself.getAccount()>0
 				
 				?myself = (Player (account > 0))
 				?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?myself))
 			</contextcondition>
-			<targetcondition>
+			<targetcondition language="clips">
 				// $beliefbase.myself.getState().equals(Player.STATE_IDLE)
 				
 				?myself = (Player (playingstate "idle"))
@@ -278,7 +278,7 @@
 	</events>
 
 	<expressions>
-		<condition name="start_playing">
+		<condition name="start_playing" language="clips">
 			// $beliefbase.myself.getCards().length==2 &amp;&amp; $beliefbase.gamestate!=null
 			// &amp;&amp; $beliefbase.gamestate.getDealer().getCards().length==1
 		

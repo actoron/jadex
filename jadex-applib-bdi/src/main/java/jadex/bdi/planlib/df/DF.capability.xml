@@ -52,7 +52,13 @@
 				<value>$scope.getTime()</value>
 			</parameter>
 			<parameter name="result" class="IDFAgentDescription" direction="out"/>
-			<maintaincondition>
+			<maintaincondition language="jcl">
+				$goal.result != null
+				&amp;&amp;
+				($goal.result.getLeaseTime() == null
+ 					|| $goal.result.getLeaseTime().getTime()
+						- $goal.current_time - $goal.buffertime &gt; 0)
+
 				<!--($goal.result instanceof AgentDescription) Janino bug.-->
 				// ($goal.result != null)
 				// &amp;&amp;
@@ -61,15 +67,15 @@
 				// - $goal.current_time - $goal.buffertime &gt; 0)
 				
 				// ?rgoal is already bound
-				?param_result	= (parameter (parameter_has_name "result") (parameter_has_value ?result))
-				?param_curtime	= (parameter (parameter_has_name "current_time") (parameter_has_value ?curtime))
-				?param_buftime	= (parameter (parameter_has_name "buffertime") (parameter_has_value ?buftime))
-				?rgoal	= (goal (parameterelement_has_parameters contains ?param_result)
-								(parameterelement_has_parameters contains ?param_curtime)
-								(parameterelement_has_parameters contains ?param_buftime))
-				?result	= (IDFAgentDescription (leaseTime ?leasedate)
-					((MethodCallFunction "java.util.Date" "getTime" ?leasedate) ?leastime))
-				(test (> (Sub ?leastime ?curtime ?buftime) 0))
+				// ?param_result	= (parameter (parameter_has_name "result") (parameter_has_value ?result))
+				// ?param_curtime	= (parameter (parameter_has_name "current_time") (parameter_has_value ?curtime))
+				// ?param_buftime	= (parameter (parameter_has_name "buffertime") (parameter_has_value ?buftime))
+				// ?rgoal	= (goal (parameterelement_has_parameters contains ?param_result)
+				// 				(parameterelement_has_parameters contains ?param_curtime)
+				// 				(parameterelement_has_parameters contains ?param_buftime))
+				// ?result	= (IDFAgentDescription (leaseTime ?leasedate)
+				// 	((MethodCallFunction "java.util.Date" "getTime" ?leasedate) ?leastime))
+				// (test (> (Sub ?leastime ?curtime ?buftime) 0))
 			</maintaincondition>
 		</maintaingoal>
 

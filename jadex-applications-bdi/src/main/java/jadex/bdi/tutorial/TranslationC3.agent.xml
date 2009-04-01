@@ -57,7 +57,7 @@
 		<plan name="thankyou">
 			<body class="ThankYouPlanC3"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 				?rbelief = (belief (element_has_model ?mbelief) 
 					(belief_has_fact ?fact &amp; > 0 &amp; :(== 0 (Modulo ?fact 10))))
 				?mbelief = (mbelief (melement_has_name "transcnt"))

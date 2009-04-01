@@ -64,7 +64,7 @@
 				<value>?order</value>
 			</parameter>
 			<!-- <unique/> -->
-			<creationcondition>
+			<creationcondition language="clips">
 				// $beliefbase.initial_orders!=null
 				?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?x ?order $?y))
 				?order = (Order (state "open"))
@@ -77,7 +77,7 @@
 					)
 				)
 			</creationcondition>
-			<dropcondition>
+			<dropcondition language="clips">
 				// $beliefbase.time > $goal.order.getDeadline().getTime()
 				// ?rbelief = (belief (belief_has_fact ?time))
 				// ?mbelief = (mbelief (melement_has_name "time"))
@@ -90,7 +90,7 @@
 				?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
 				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
-			<targetcondition>
+			<targetcondition language="clips">
 				// Order.DONE.equals($goal.order.getState())
 				?rparam =(parameter (parameter_has_name "order") (parameter_has_value ?order)) 
 				?order = (Order (state "done"))

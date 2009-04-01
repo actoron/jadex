@@ -42,7 +42,7 @@
 
 	<goals>
 		<achievegoal name="init" retry="false">
-			<creationcondition>
+			<creationcondition language="clips">
 				//$beliefbase.cnt&lt;4
 				?mbelief = (mbelief (melement_has_name "cnt"))
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?val) (belief_has_fact &lt; 4))

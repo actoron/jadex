@@ -38,7 +38,7 @@
 		<!-- Produce ore at a target. -->
 		<achievegoal name="produce_ore">
 			<parameter name="target" class="Target"/>
-			<dropcondition>
+			<dropcondition language="clips">
 				// $beliefbase.missionend
 				(belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>

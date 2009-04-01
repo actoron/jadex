@@ -103,17 +103,12 @@ public class FunctionCall
 	public String toString()
 	{
 		StringBuffer ret = new StringBuffer(function.toString());
+		ret.append("(");
 		for(int i=0; i<paramsources.size(); i++)
 		{
-			ret.append(", ");
-			try
-			{
-				ret.append(""+paramsources.get(i));
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
+			if(i>0)
+				ret.append(", ");
+			ret.append(paramsources.get(i));
 		}
 		ret.append(")");
 		return ret.toString();

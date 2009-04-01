@@ -52,11 +52,11 @@
 			<parameter name="missed_max" class="int">
 				<value>3</value>
 			</parameter>
-			<targetcondition>
+			<targetcondition language="clips">
 				// false (i.e. never finished)
 				(test (jadex.rules.rulesystem.rules.functions.Identity false))
 			</targetcondition>
-			<dropcondition>
+			<dropcondition language="clips">
 				// Finished if pinged agent misses max pings.
 				?rparammax = (parameter (parameter_has_name "missed_max") (parameter_has_value ?max))
 				?rparamcnt = (parameter (parameter_has_name "missed_cnt") (parameter_has_value > ?max))

@@ -37,7 +37,7 @@
   	<goals>
 		<!-- Look for targets. -->
 		<achievegoal name="find_targets">
- 			<dropcondition>
+ 			<dropcondition language="clips">
 				// $beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel) (belief_has_fact true))
@@ -55,7 +55,7 @@
 			<unique/>
 			<!-- Create a new goal when a target was added
 				and the mission is going on. -->
-			<creationcondition>
+			<creationcondition language="clips">
 				// unique (?rcapa and ?mgoal are provided internally)
 				(not (and
 					?adopted	= (goal (element_has_model ?mgoal))
@@ -85,7 +85,7 @@
 				== $goal.target
 			</contextcondition> -->
 			<!-- Drop the goal on mission end. -->
-			<dropcondition>
+			<dropcondition language="clips">
 				// $beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel) (belief_has_fact true))
@@ -96,7 +96,7 @@
 				<inhibits ref="move.walk_around"/>
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. -->
-			<targetcondition>
+			<targetcondition language="clips">
 				// $beliefbase.getBeliefSet("analysed_targets").containsFact($goal.target)
 				
 				?rgoal	= (goal (parameterelement_has_parameters ?param_target))

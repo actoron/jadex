@@ -3,6 +3,7 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.MethodCall;
@@ -238,6 +239,10 @@ public class BuildContext
 		else if(valuesource instanceof MethodCall)
 		{
 			ret	= tmodel.getJavaType(((MethodCall)valuesource).getMethod().getReturnType());
+		}
+		else if(valuesource instanceof FunctionCall)
+		{
+			ret	= tmodel.getJavaType(((FunctionCall)valuesource).getFunction().getReturnType());
 		}
 		else
 		{

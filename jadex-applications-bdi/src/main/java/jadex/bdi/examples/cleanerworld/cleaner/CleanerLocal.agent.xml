@@ -115,7 +115,7 @@
 				<inhibits ref="performpatrol" inhibit="when_in_process"/>
 			</deliberation>
 			<!-- Engage in actions when the state is below 0.2. -->
- 			<maintaincondition>
+ 			<maintaincondition language="clips">
  				// $beliefbase.my_chargestate > 0.2
  				// Problem: tries to evaluate on all beliefs the >0.2 constraint
  				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 0.2))
@@ -126,7 +126,7 @@
 				(test (> ?fact 0.2))
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
-			<targetcondition>
+			<targetcondition language="clips">
  				// $beliefbase.my_chargestate >= 1.0
 				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact >=0.3))
 				//?mbelief = (mbelief (melement_has_name "my_chargestate"))
@@ -146,7 +146,7 @@
 			</parameter>
 			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
 			<!-- todo: remove unique support? <unique/>--> 
-			<creationcondition>
+			<creationcondition language="clips">
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
 				?mbeliefset = (mbeliefset (melement_has_name "wastes"))
 				
@@ -160,14 +160,14 @@
 				))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
-			<contextcondition>
+			<contextcondition language="clips">
 				// $beliefbase.daytime
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
-			<dropcondition>
+			<dropcondition language="clips">
 				// $beliefbase.carriedwaste==null &amp;&amp;
 				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
 				// ?rgoal and ?mgoal are provided internally
@@ -182,7 +182,7 @@
 			<!-- <deliberation cardinality="1"> -->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
-				<inhibits ref="achievecleanup">
+				<inhibits ref="achievecleanup" language="clips">
 					// $beliefbase.my_location.getDistance($goal.waste.getLocation())
 					// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
 					
@@ -215,7 +215,7 @@
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<contextcondition>
+			<contextcondition language="clips">
 				// $beliefbase.daytime
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (melement_has_name "daytime"))
@@ -224,7 +224,7 @@
 
 		<!-- Perform patrols at night when the agent is not loading. -->
 		<performgoal name="performpatrol" retry="true" exclude="never">
-			<contextcondition>
+			<contextcondition language="clips">
 				// !$beliefbase.daytime
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
 				?mbelief = (mbelief (melement_has_name "daytime"))
@@ -248,7 +248,7 @@
  				from $beliefbase.wastebins
 				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
 			</failurecondition> -->
-			<dropcondition>
+			<dropcondition language="clips">
 				?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
 				?wastebin = (Wastebin (isFull() true)) 
 					//&amp; :(MethodCallFunction "Wastebin" "isFull" ?wastebin)))

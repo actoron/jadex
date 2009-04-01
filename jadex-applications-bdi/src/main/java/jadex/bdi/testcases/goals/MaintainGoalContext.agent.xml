@@ -39,13 +39,13 @@
 
 	<goals>
 		<maintaingoal name="maintain" exclude="never" retrydelay="100">
-			<contextcondition>
+			<contextcondition language="clips">
  				// $beliefbase.context
  				
  				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
 				?mbel	= (mbelief (melement_has_name "context"))
 			</contextcondition>
-			<maintaincondition>
+			<maintaincondition language="clips">
  				// $beliefbase.count==5
  				
  				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))

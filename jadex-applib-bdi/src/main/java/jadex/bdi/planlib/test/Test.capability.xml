@@ -60,7 +60,7 @@
 
 	<goals>
 		<achievegoal name="tests_finished">
-			<creationcondition>
+			<creationcondition language="clips">
 				// $beliefbase.testcase_cnt==$beliefbase.reports.length
 				
 				?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
@@ -72,7 +72,7 @@
 			</creationcondition>		
 		</achievegoal>
 		<achievegoal name="test_timeout">
-			<creationcondition>
+			<creationcondition language="clips">
 				// $beliefbase.timeout_failure
 				
 				?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))

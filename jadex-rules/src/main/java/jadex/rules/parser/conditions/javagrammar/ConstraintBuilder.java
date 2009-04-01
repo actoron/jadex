@@ -330,6 +330,29 @@ public class ConstraintBuilder
 			Object[]	ocvs	= getObjectConditionAndValueSource(value, context);
 			ret	= new VariableExpression(context.generateVariableBinding((ObjectCondition)ocvs[0], ocvs[1]));
 		}
+		else if(value instanceof OperationExpression)
+		{
+			OperationExpression	opex	= (OperationExpression)value;
+			IFunction	func;
+			if(opex.getOperator() instanceof IFunction)
+				func	= (IFunction)opex.getOperator();
+			else
+				func	= new OperatorFunction((IOperator)opex.getOperator());
+			
+			Object[]	left	= getObjectConditionAndValueSource(opex.getLeftValue(), context);
+			Object	right	= flattenToPrimary(opex.getRightValue(), context);
+			if(right instanceof VariableExpression)
+			{
+				right	= ((VariableExpression)right).getVariable();
+			}
+			else //if(right instanceof LiteralExpression)
+			{
+				right	= new Constant(((LiteralExpression)right).getValue());
+			}
+
+			Object	valuesource	= new FunctionCall(func, new Object[]{left[1], right});
+			ret	= new VariableExpression(context.generateVariableBinding((ObjectCondition)left[0], valuesource));
+		}
 		else
 		{
 			throw new UnsupportedOperationException("Todo: flatten expressions of type: "+value);

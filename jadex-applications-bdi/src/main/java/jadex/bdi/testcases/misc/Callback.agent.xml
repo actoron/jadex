@@ -33,7 +33,7 @@
 
 	<goals>
 		<achievegoal name="goal">
-			<creationcondition>
+			<creationcondition language="clips">
 				//$beliefbase.bel==2
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
 				?mbelief = (mbelief (melement_has_name "bel"))
@@ -52,7 +52,7 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// $beliefbase.bel==4
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 4))
 					?mbelief = (mbelief (melement_has_name "bel"))

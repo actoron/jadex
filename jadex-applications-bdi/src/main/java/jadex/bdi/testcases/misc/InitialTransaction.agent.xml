@@ -47,7 +47,7 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					//$beliefbase.text!=null
 					
 					?rbel_text	= (belief (element_has_model ?mbel_text) (belief_has_fact != null))

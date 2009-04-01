@@ -33,14 +33,14 @@
 	<goals>
 		<!-- goal succeeds without plan -->
 		<achievegoal name="successgoal">
-			<targetcondition>
+			<targetcondition language="clips">
 				// true
 				(test (Identity true))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal fails without plan -->
 		<achievegoal name="failuregoal">
-			<targetcondition>
+			<targetcondition language="clips">
 				// false
 				(test (Identity false))
 			</targetcondition>

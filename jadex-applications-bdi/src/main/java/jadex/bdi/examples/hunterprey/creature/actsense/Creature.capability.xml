@@ -68,7 +68,7 @@
 		<maintaingoal name="maintain_lease" recur="true" recurdelay="2000">
 			<!-- Hack!!! Result required for getvision plan. todo: refactor -->
 			<parameter name="result" class="Object" direction="out" />
-			<maintaincondition>
+			<maintaincondition language="clips">
 				// $beliefbase.my_self.getLeaseticks()>10
 				
 				?rbel_myself	= (belief (element_has_model ?mbel_myself) (belief_has_fact ?myself)) 

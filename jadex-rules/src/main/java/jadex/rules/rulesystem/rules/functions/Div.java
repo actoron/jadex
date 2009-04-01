@@ -52,7 +52,7 @@ public class Div implements IFunction
 	 */
 	public String toString()
 	{
-		return "div";
+		return "/";
 	}
 	
 	/**

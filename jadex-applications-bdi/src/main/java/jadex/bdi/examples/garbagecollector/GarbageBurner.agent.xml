@@ -73,7 +73,7 @@
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?garbage))
 				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
 			</creationcondition>-->
-			<creationcondition>
+			<creationcondition language="clips">
 				// unique (?rcapa and ?mgoal are provided internally)
 				(not (and
 					?adopted	= (goal (element_has_model ?mgoal))

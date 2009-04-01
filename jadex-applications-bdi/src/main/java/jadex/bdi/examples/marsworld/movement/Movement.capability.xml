@@ -57,7 +57,7 @@
 
 		<!-- Walk around without target when nothing else to do. -->
 		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
-			<dropcondition>
+			<dropcondition language="clips">
 				// $beliefbase.missionend
 				(belief (element_has_model ?mbel) (belief_has_fact true))
 				?mbel	= (mbelief (melement_has_name "missionend"))
@@ -66,7 +66,7 @@
 
 		<!-- Watch for targets and memorize them. -->
 		<performgoal name="watch_targets" exported="true">
- 			<dropcondition>
+ 			<dropcondition language="clips">
 				// $beliefbase.missionend
 				(belief (element_has_model ?mbel) (belief_has_fact true))
 				?mbel	= (mbelief (melement_has_name "missionend"))
@@ -79,7 +79,7 @@
 				<value>$beliefbase.my_home</value>
 			</parameter>
 			<!-- <unique/>-->
-			<creationcondition>
+			<creationcondition language="clips">
 				// $beliefbase.missionend
 				// &amp;&amp; !$beliefbase.my_location.isNear($beliefbase.my_home)
 

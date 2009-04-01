@@ -82,7 +82,7 @@
 				<inhibits ref="eat_food" inhibit="when_in_process"/>
 				<inhibits ref="wander_around" inhibit="when_in_process" />
 			</deliberation>
-			<maintaincondition>
+			<maintaincondition language="clips">
 				// !$beliefbase.is_indanger
 				(not
 					(and
@@ -101,7 +101,7 @@
 				<value>?food</value>
 			</parameter>
 			<!-- <unique/> -->
-			<creationcondition>
+			<creationcondition language="clips">
  				// $beliefbase.eating_allowed &amp;&amp;
  				// !$beliefbase.getBeliefSet("forbidden_food").containsFact($food)
 

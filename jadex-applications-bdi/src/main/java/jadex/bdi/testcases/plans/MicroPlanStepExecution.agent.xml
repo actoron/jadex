@@ -50,7 +50,7 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// $beliefbase.a 
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 					?mbelief = (mbelief (melement_has_name "a"))
@@ -63,7 +63,7 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// $beliefbase.b 
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 					?mbelief = (mbelief (melement_has_name "b"))
@@ -76,7 +76,7 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// $beliefbase.a &amp;&amp; $beliefbase.b
 					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 					?mbelief = (mbelief (melement_has_name "a"))

@@ -90,7 +90,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// "test".equals($beliefbase.a)
 					
 					?rbel_a	= (belief (element_has_model ?mbel_a) (belief_has_fact "test"))
@@ -107,7 +107,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// "test".equals($beliefbase.b)
 					
 					?rbel_b	= (belief (element_has_model ?mbel_b) (belief_has_fact "test"))
@@ -124,7 +124,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// $beliefbase.c.length>0 &amp;&amp; "test".equals($beliefbase.c[0])
 					
 					?rbelset_c	= (beliefset (element_has_model ?mbelset_c) (beliefset_has_facts contains "test"))
@@ -141,7 +141,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition>
+				<condition language="clips">
 					// $beliefbase.d.length>0 &amp;&amp; "test".equals($beliefbase.d[0])
 					
 					?rbelset_d	= (beliefset (element_has_model ?mbelset_d) (beliefset_has_facts contains "test"))

@@ -48,7 +48,7 @@
 	<plans>
 		<plan name="activity">
 			<body class="TestContextPlan"/>
-			<contextcondition>
+			<contextcondition language="clips">
 				//$beliefbase.context
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
 				?mbelief = (mbelief (melement_has_name "context"))
@@ -70,7 +70,7 @@
 	</plans>
 
 	<expressions>
-		<condition name="plan_context">
+		<condition name="plan_context" language="clips">
 			//!$beliefbase.context
 			?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
 			?mbelief = (mbelief (melement_has_name "context"))

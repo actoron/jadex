@@ -54,6 +54,15 @@ public class Modulo implements IFunction
 	}
 	
 	/**
+	 *  Get the string representation.
+	 *  @return The string representation. 
+	 */
+	public String toString()
+	{
+		return "%";
+	}
+	
+	/**
 	 *  Test for equality.
 	 */
 	public boolean equals(Object obj)

@@ -70,9 +70,9 @@ logicalOrExpression returns [Expression exp]
         (
         	'||' tmp2 = logicalAndExpression
         	{
-        		$exp = new OperationExpression(tmp, tmp2, OperationExpression.OPERATOR_OR);
+        		$exp = new OperationExpression($exp, tmp2, OperationExpression.OPERATOR_OR);
         	}
-        )?
+        )*
 	;
 	
 /**
@@ -83,9 +83,9 @@ logicalAndExpression returns [Expression exp]
         (
         	'&&' tmp2 = equalityExpression
         	{
-        		$exp = new OperationExpression(tmp, tmp2, OperationExpression.OPERATOR_AND);
+        		$exp = new OperationExpression($exp, tmp2, OperationExpression.OPERATOR_AND);
         	}
-        )?
+        )*
 	;
 	
 /**
@@ -101,9 +101,9 @@ equalityExpression returns [Expression exp]
         	|'!=' {operator=IOperator.NOTEQUAL;}
         	) tmp2 = relationalExpression
 	        {
-	        	$exp = new OperationExpression(tmp, tmp2, operator);
+	        	$exp = new OperationExpression($exp, tmp2, operator);
 	        }
-	)?
+	)*
 	;
 
 /**
@@ -121,9 +121,9 @@ relationalExpression returns [Expression exp]
         	|'>=' {operator=IOperator.GREATEROREQUAL;}
         	) tmp2 = additiveExpression
 	        {
-	        	$exp = new OperationExpression(tmp, tmp2, operator);
+	        	$exp = new OperationExpression($exp, tmp2, operator);
 	        }
-        )?
+        )*
 	;
 
 /**
@@ -139,9 +139,9 @@ additiveExpression returns [Expression exp]
         	|'-' {operator=IFunction.SUB;}
         	) tmp2 = multiplicativeExpression
 	        {
-	        	$exp = new OperationExpression(tmp, tmp2, operator);
+	        	$exp = new OperationExpression($exp, tmp2, operator);
 	        }
-	)?
+	)*
 	;
 
 /**
@@ -158,9 +158,9 @@ multiplicativeExpression returns [Expression exp]
         	|'%' {operator=IFunction.MOD;}
         	) tmp2 = primaryExpression
 	        {
-	        	$exp = new OperationExpression(tmp, tmp2, operator);
+	        	$exp = new OperationExpression($exp, tmp2, operator);
 	        }
-	)?
+	)*
 	;
 	
 /**

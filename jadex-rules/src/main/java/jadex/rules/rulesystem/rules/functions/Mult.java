@@ -65,7 +65,7 @@ public class Mult implements IFunction
 	 */
 	public String toString()
 	{
-		return "mult";
+		return "*";
 	}
 	
 	/**

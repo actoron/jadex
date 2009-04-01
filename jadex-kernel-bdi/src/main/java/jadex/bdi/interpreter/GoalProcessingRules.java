@@ -802,9 +802,10 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the maintain condition (will be negated to trigger maintenance).
 	 *  @param model The goal model element.
 	 */
-	protected static Rule createMaintaingoalProcessingUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createMaintaingoalProcessingUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -814,11 +815,14 @@ public class GoalProcessingRules
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		Rule maintaingoal_processing = new Rule(rulename, new AndCondition(new ICondition[]{goalcon, capacon, 
-			new NotCondition(usercond)}), GOAL_PROCESSING, IPriorityEvaluator.PRIORITY_1);
-		return maintaingoal_processing;
+		return new Object[]{new AndCondition(new ICondition[]{goalcon, capacon}),
+			GOAL_PROCESSING,
+			IPriorityEvaluator.PRIORITY_1,
+			null,
+			Boolean.TRUE};
 	}
 
 	/**
@@ -826,9 +830,10 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The goal model element.
 	 */
-	protected static Rule createMaintaingoalSucceededUserRule(String rulename, ICondition usercond, Object model)
+	protected static Object[]	createMaintaingoalSucceededUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
@@ -836,10 +841,13 @@ public class GoalProcessingRules
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
 		
 		ObjectCondition	capacon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capacon.addConstraint(new BoundConstraint(null, rcapa));
 		capacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
 		
-		Rule maintaingoal_succeeded	= new Rule(rulename, new AndCondition(new ICondition[]{goalcon, capacon, usercond}), GOAL_IDLE, IPriorityEvaluator.PRIORITY_1);
-		return maintaingoal_succeeded;
+		return new Object[]{
+			new AndCondition(new ICondition[]{goalcon, capacon}),
+			GOAL_IDLE,
+			IPriorityEvaluator.PRIORITY_1};
 	}
 	
 	/**

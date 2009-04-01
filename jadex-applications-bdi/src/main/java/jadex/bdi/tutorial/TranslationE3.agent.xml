@@ -49,7 +49,7 @@
 			below some threshold given by the belief maxstorage. -->
 		<maintaingoal name="keepstorage" exclude="when_failed">
 			<!-- <maintaincondition>$beliefbase.egwords.length &lt;= $beliefbase.maxstorage</maintaincondition> -->
-			<maintaincondition>
+			<maintaincondition language="clips">
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?maxstorage))
 				?mbelief = (mbelief (melement_has_name "maxstorage"))
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?facts &amp;
