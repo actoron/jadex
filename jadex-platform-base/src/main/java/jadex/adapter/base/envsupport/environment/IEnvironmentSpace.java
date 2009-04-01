@@ -2,6 +2,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public interface IEnvironmentSpace extends ISpace
 	 * @param listeners initial listeners (may be null)
 	 * @return the object.
 	 */
-	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners);
+	public ISpaceObject createSpaceObject(Object type, Object owner, Map properties, List tasks, List listeners);
 	
 	/** 
 	 * Destroys an object in this space.
@@ -92,4 +93,25 @@ public interface IEnvironmentSpace extends ISpace
 	 * @return return value of the action
 	 */
 	public void performAction(Object id, Map parameters, IResultListener listener);
+	
+	/**
+	 *  Get the owner of an object.
+	 *  @param id The id.
+	 *  @return The owner.
+	 */
+//	public Object getOwner(Object id);
+	
+	/**
+	 *  Set the owner of an object.
+	 *  @param id The object id.
+	 *  @param pos The object owner.
+	 */
+	public void setOwner(Object id, Object owner);
+	
+	/**
+	 *  Get the owned objects.
+	 *  @return The owned objects. 
+	 */
+	public ISpaceObject[] getOwnedObjects(Object owner);
+	
 }

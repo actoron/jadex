@@ -39,7 +39,7 @@ public class GoAction implements ISpaceAction
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
-		System.out.println("go waste action: "+parameters);
+		System.out.println("go action: "+parameters);
 		
 		String dir = (String)parameters.get(DIRECTION);
 		Object oid = (Long)parameters.get(ISpaceObject.OBJECT_ID);

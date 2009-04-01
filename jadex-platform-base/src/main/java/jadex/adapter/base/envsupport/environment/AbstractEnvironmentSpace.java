@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
@@ -14,6 +15,10 @@ import java.util.Map;
  */
 public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 {
+	//-------- constants --------
+	
+//	public static final String NO_OWNER = new String("no_owner"); 
+	
 	//-------- attributes --------
 	
 	/** Available actions in the space. */
@@ -27,6 +32,9 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	
 	/** Types of EnvironmentObjects and lists of EnvironmentObjects of that type (typed view). */
 	protected Map spaceobjectsbytype;
+	
+	/** Space object by owner, owner can null (owner view). */
+	protected Map spaceobjectsbyowner;
 	
 	/** Space properties. */
 	protected Map spaceproperties;
@@ -48,6 +56,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 		this.processes = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
+		this.spaceobjectsbyowner = new HashMap();
 		this.spaceproperties = new HashMap();
 		this.objectidcounter = new AtomicCounter();
 		this.syncobject = new SynchronizedObject();
@@ -100,26 +109,36 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(Object type, Object owner, Map properties, List tasks, List listeners)
 	{
 		synchronized(syncobject.getMonitor())
 		{
-			Object id = null;
+			Object id;
 			do
 			{
 				id = objectidcounter.getNext();
 			}
 			while(spaceobjects.containsKey(id));
 			
-			ISpaceObject obj = new SpaceObject(id, type, properties, tasks, listeners, syncobject.getMonitor());
+			ISpaceObject obj = new SpaceObject(id, type, owner, properties, tasks, listeners, syncobject.getMonitor());
 			spaceobjects.put(id, obj);
 			List typeobjects = (List)spaceobjectsbytype.get(obj.getType());
 			if(typeobjects == null)
 			{
-				typeobjects = Collections.synchronizedList(new ArrayList());
+				typeobjects = new ArrayList();
 				spaceobjectsbytype.put(obj.getType(), typeobjects);
 			}
 			typeobjects.add(obj);
+			if(owner!=null)
+			{
+				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
+				if(ownerobjects == null)
+				{
+					ownerobjects = new ArrayList();
+					spaceobjectsbyowner.put(owner, ownerobjects);
+				}
+				ownerobjects.add(obj);
+			}
 			return obj;
 		}
 	}
@@ -139,7 +158,18 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 
 			// remove object
 			spaceobjects.remove(id);
-			((List) spaceobjectsbytype.get(obj.getType())).remove(obj);
+			List typeobjs = (List)spaceobjectsbytype.get(obj.getType());
+			typeobjs.remove(obj);
+			if(typeobjs.size()==0)
+				spaceobjectsbytype.remove(obj.getType());
+			
+			if(obj.getProperty(ISpaceObject.OWNER)!=null)
+			{
+				List ownedobjs = (List)spaceobjectsbyowner.get(obj.getProperty(ISpaceObject.OWNER));
+				ownedobjs.remove(obj);
+				if(ownedobjs.size()==0)
+					spaceobjectsbyowner.remove(obj.getProperty(ISpaceObject.OWNER));
+			}
 		}
 		
 		// signal removal
@@ -270,6 +300,69 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 		}
 	}
 	
+	/**
+	 *  Get the owner of an object.
+	 *  @param id The id.
+	 *  @return The owner.
+	 * /
+	public Object getOwner(Object id)
+	{
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			ISpaceObject obj = getSpaceObject(id); 
+			if(obj==null)
+				throw new RuntimeException("Space object not found: "+id);
+			return obj.getProperty(ISpaceObject.OWNER);
+		}
+	}*/
+	
+	/**
+	 *  Set the owner of an object.
+	 *  @param id The object id.
+	 *  @param pos The object owner.
+	 */
+	public void setOwner(Object id, Object owner)
+	{
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			ISpaceObject obj = getSpaceObject(id); 
+			if(obj==null)
+				throw new RuntimeException("Space object not found: "+id);
+			Object oldowner = obj.getProperty(ISpaceObject.OWNER);
+			if(oldowner!=null)
+			{
+				List ownedobjs = (List)spaceobjectsbyowner.get(oldowner);
+				ownedobjs.remove(obj);
+				if(ownedobjs.size()==0)
+					spaceobjectsbyowner.remove(oldowner);
+			}
+			if(owner!=null)
+			{
+				List ownedobjs = (List)spaceobjectsbyowner.get(owner);
+				if(ownedobjs==null)
+				{
+					ownedobjs = new ArrayList();
+					spaceobjectsbyowner.put(owner, ownedobjs);
+				}
+				ownedobjs.add(obj);
+			}
+			obj.setProperty(ISpaceObject.OWNER, owner);
+		}
+	}
+	
+	/**
+	 *  Get the owned objects.
+	 *  @return The owned objects. 
+	 */
+	public ISpaceObject[] getOwnedObjects(Object owner)
+	{
+		synchronized(getSynchronizedObject().getMonitor())
+		{
+			List ownedobjs = (List)spaceobjectsbyowner.get(owner);
+			return ownedobjs==null? new ISpaceObject[0]: (ISpaceObject[])ownedobjs.toArray(new ISpaceObject[ownedobjs.size()]);
+		}
+	}
+	
 	//-------- ISpace methods --------
 	
 	/**
@@ -284,6 +377,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public void agentRemoved(IAgentIdentifier aid)
 	{
+		// Remove the owned object too?
 	}
 	
 	/**

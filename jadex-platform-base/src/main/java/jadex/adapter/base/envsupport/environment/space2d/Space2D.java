@@ -98,7 +98,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 *  Get the position of an object.
 	 *  @param id The id.
 	 *  @return The position.
-	 */
+	 * /
 	public IVector2 getPosition(Object id)
 	{
 		synchronized(getSynchronizedObject().getMonitor())
@@ -108,7 +108,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 				throw new RuntimeException("Space object not found: "+id);
 			return (IVector2)obj.getProperty(POSITION);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Set the position of an object.

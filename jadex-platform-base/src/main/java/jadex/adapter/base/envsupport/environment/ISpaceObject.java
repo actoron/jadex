@@ -15,6 +15,9 @@ public interface ISpaceObject
 	/** The constant for the actor id property. */
 	public static final String ACTOR_ID  = "actor_id";
 	
+	/** The constant for the owner property. */
+	public static final String OWNER  = "owner";
+	
 	//-------- methods --------
 
 	/**

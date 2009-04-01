@@ -22,10 +22,11 @@ public class GoPlanEnv extends Plan
 		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
 		IVector2 size = env.getAreaSize();
 		IVector2 target = (IVector2)getParameter("pos").getValue();
-
-		while(!target.equals(env.getPosition(getAgentIdentifier())))
+		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+		
+		while(!target.equals(myself.getProperty(Space2D.POSITION)))
 		{
-			IVector2 mypos = env.getPosition(getAgentIdentifier());
+			IVector2 mypos = (IVector2)myself.getProperty(Space2D.POSITION);
 			String dir = null;
 			int mx = mypos.getXAsInteger();
 			int tx = target.getXAsInteger();
@@ -57,9 +58,9 @@ public class GoPlanEnv extends Plan
 			
 			Map params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceObject.ACTOR_ID, getAgentIdentifier());
+			params.put(ISpaceObject.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier().getLocalName())[0].getId());
 			SyncResultListener srl	= new SyncResultListener();
-			env.performAction("go", params, srl); // todo: garbage as parameter?
+			env.performAction("go", params, srl); 
 			srl.waitForResult();
 		}
 	}

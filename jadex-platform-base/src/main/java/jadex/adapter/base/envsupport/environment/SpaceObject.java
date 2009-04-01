@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SimplePropertyChangeSupport;
 
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,9 @@ public class SpaceObject implements ISpaceObject
 
 	/** The object's type. */
 	protected Object type;
+	
+	/** The object's owner. */
+	protected Object owner;
 
 	/** The object's properties. */
 	protected Map properties;
@@ -49,10 +53,11 @@ public class SpaceObject implements ISpaceObject
 	 * @param tasks initial task list (may be null)
 	 * @param listeners initial listeners (may be null)
 	 */
-	public SpaceObject(Object id, Object type, Map properties, List tasks, List listeners, Object monitor)
+	public SpaceObject(Object id, Object type, Object owner, Map properties, List tasks, List listeners, Object monitor)
 	{
 		this.id = id;
 		this.type = type;
+		this.owner = owner;
 		this.properties = properties;
 //		this.tasks = tasks;
 		this.listeners = listeners;
@@ -109,6 +114,18 @@ public class SpaceObject implements ISpaceObject
 	}
 	
 	/**
+	 * Returns the owner of the object.
+	 * @return The owner.
+	 */
+	public Object getOwner()
+	{
+		synchronized(monitor)
+		{
+			return owner;
+		}
+	}
+	
+	/**
 	 * Returns an object's property.
 	 * @param name name of the property
 	 * @return the property
@@ -117,7 +134,7 @@ public class SpaceObject implements ISpaceObject
 	{
 		synchronized(monitor)
 		{
-			return properties.get(name);
+			return properties!=null? properties.get(name): null;
 		}
 	}
 
@@ -131,6 +148,8 @@ public class SpaceObject implements ISpaceObject
 		Object oldval;
 		synchronized(monitor)
 		{
+			if(properties==null)
+				properties= new HashMap();
 			oldval = properties.get(name);
 			properties.put(name, value);
 		}
@@ -145,7 +164,7 @@ public class SpaceObject implements ISpaceObject
 	{
 		synchronized(monitor)
 		{
-			return new HashMap(properties);
+			return properties==null? Collections.EMPTY_MAP: properties;
 		}
 	}
 

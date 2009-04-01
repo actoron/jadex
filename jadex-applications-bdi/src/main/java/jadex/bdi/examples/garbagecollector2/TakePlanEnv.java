@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
@@ -27,7 +28,8 @@ public class TakePlanEnv extends Plan
 		dispatchSubgoalAndWait(pickup);
 
 		// Go to the burner.
-		IVector2 oldpos = env.getPosition(getAgentIdentifier());
+		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself");
+		IVector2 oldpos =(IVector2)myself.getProperty(Space2D.POSITION);
 		IGoal go = createGoal("go");
 //		go.getParameter("pos").setValue(env.getBurnerPosition());
 

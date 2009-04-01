@@ -137,9 +137,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				MEnvObject mobj = (MEnvObject)objects.get(i);
 			
-				// What to do with obj?
-				// How to set owner (agent)?
-				Object obj = ret.createSpaceObject(mobj.getType(), null, null, null);
+				// Hmm local name as owner? better would be agent id, but agents are created after space?
+				Object obj = ret.createSpaceObject(mobj.getType(), mobj.getOwner(), null, null, null);
 			}
 		}
 		
