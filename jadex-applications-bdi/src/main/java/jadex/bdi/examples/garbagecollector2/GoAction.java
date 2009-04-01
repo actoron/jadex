@@ -42,7 +42,7 @@ public class GoAction implements ISpaceAction
 		System.out.println("go action: "+parameters);
 		
 		String dir = (String)parameters.get(DIRECTION);
-		Object oid = (Long)parameters.get(ISpaceObject.OBJECT_ID);
+		Object oid = parameters.get(ISpaceObject.OBJECT_ID);
 		ISpaceObject obj = space.getSpaceObject(oid);
 		IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
 		

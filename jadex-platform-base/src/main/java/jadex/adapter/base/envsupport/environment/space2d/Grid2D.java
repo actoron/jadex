@@ -184,7 +184,7 @@ public class Grid2D extends Space2D
 					for (int j = y - range; j <= y + range; j++)
 					{
 						Collection tmp = objectsygridpos.getCollection(
-								new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
+							new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
 						if (tmp != null)
 							ret.addAll(tmp);
 					}
