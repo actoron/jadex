@@ -1439,7 +1439,7 @@ public class PlanRules
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 //		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+//		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
 		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 			
@@ -1482,7 +1482,7 @@ public class PlanRules
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 //		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+//		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
 		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 			
@@ -1525,7 +1525,7 @@ public class PlanRules
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 //		Variable	wqwa	= new Variable("?wqwa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+//		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
 		Variable	rtel	= new Variable("?rtel", OAVBDIRuntimeModel.element_type);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 			

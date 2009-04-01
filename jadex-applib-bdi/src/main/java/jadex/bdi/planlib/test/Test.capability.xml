@@ -61,6 +61,7 @@
 	<goals>
 		<achievegoal name="tests_finished">
 			<creationcondition language="clips">
+				// $beliefbase.testcase_cnt==$beliefbase.reports.size()
 				// $beliefbase.testcase_cnt==$beliefbase.reports.length
 				
 				?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
@@ -72,13 +73,13 @@
 			</creationcondition>		
 		</achievegoal>
 		<achievegoal name="test_timeout">
-			<creationcondition language="clips">
-				// $beliefbase.timeout_failure
+			<creationcondition language="jcl">
+				$beliefbase.timeout_failure
 				
-				?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
-				?mbel_off = (mbelief (melement_has_name "off"))
-				?rbel_tof = (belief (element_has_model ?mbel_tof) (belief_has_fact true))
-				?mbel_tof = (mbelief (melement_has_name "timeout_failure"))
+				// ?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
+				// ?mbel_off = (mbelief (melement_has_name "off"))
+				// ?rbel_tof = (belief (element_has_model ?mbel_tof) (belief_has_fact true))
+				// ?mbel_tof = (mbelief (melement_has_name "timeout_failure"))
 			</creationcondition>		
 		</achievegoal>
 	</goals>

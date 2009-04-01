@@ -1054,7 +1054,7 @@ public class EventProcessingRules
 			{
 				Object	rpe	= assignments.getVariableValue("?rpe");
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
-				Object	ragent	= assignments.getVariableValue("?ragent");
+//				Object	ragent	= assignments.getVariableValue("?ragent");
 				Object	apl	= state.getAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl);
 
 				// Find best candidates
@@ -1066,7 +1066,7 @@ public class EventProcessingRules
 				// Check if candidates are still valid.
 				// Uses optimistic scheme, i.e. apl may hold invalid entries.
 				// Then the process must be started over again.
-				Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
+//				Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
@@ -1158,7 +1158,7 @@ public class EventProcessingRules
 				// Check if candidates are still valid.
 				// Uses optimistic scheme, i.e. apl may hold invalid entries.
 				// Then the process must be started over again.
-				Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
+//				Object mpe = state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model);
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
@@ -1762,7 +1762,7 @@ public class EventProcessingRules
 				// Have to check if candidate is still valid.
 				// Hack!!! Cannot check if still waiting for same event
 				Object	cand	= it.next();
-				Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
+//				Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
 //				if(OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate)))
 					candidatelist.add(cand);
 			}

@@ -6,8 +6,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaAttributeType;
 
-import java.lang.reflect.Method;
-
 /**
  *  Extractor for fetching a Java value from a rete tuple.
  */
@@ -45,18 +43,7 @@ public class JavaTupleExtractor extends TupleExtractor
 				
 		if(attr!=null)
 		{
-			Method rm = ((OAVJavaAttributeType)attr).getPropertyDescriptor()
-				.getReadMethod();
-			if(rm==null)
-				throw new RuntimeException("No attribute accessor found: "+attr);
-			try
-			{
-				object = rm.invoke(object, new Object[0]);
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			object = ((OAVJavaAttributeType)attr).accessProperty(object);
 		}
 		
 		return object;

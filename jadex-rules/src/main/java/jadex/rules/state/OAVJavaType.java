@@ -142,38 +142,47 @@ public class OAVJavaType extends OAVObjectType
 		// #ifndef MIDP
 		if(ret==null)
 		{
-			try
+			if(clazz.isArray() && "length".equals(attribute))
 			{
-				BeanInfo	bi	= Introspector.getBeanInfo(clazz);
-				PropertyDescriptor[] pds = bi.getPropertyDescriptors();
-				for(int i=0; i<pds.length && ret==null; i++)
+				ret	= new OAVJavaAttributeType(this, attribute,
+						getTypeModel().getJavaType(int.class),
+						OAVAttributeType.NONE, null, null);
+			}
+			else
+			{
+				try
 				{
-					//System.out.println("Here: "+name+" "+pds[i].getName());
-					if(pds[i].getName().equals(attribute))
+					BeanInfo	bi	= Introspector.getBeanInfo(clazz);
+					PropertyDescriptor[] pds = bi.getPropertyDescriptors();
+					for(int i=0; i<pds.length && ret==null; i++)
 					{
-						if(!(pds[i] instanceof IndexedPropertyDescriptor))
+						//System.out.println("Here: "+name+" "+pds[i].getName());
+						if(pds[i].getName().equals(attribute))
 						{
-							ret	= new OAVJavaAttributeType(this, attribute,
-								getTypeModel().getJavaType(pds[i].getPropertyType()),
-								OAVAttributeType.NONE, null, pds[i]);
+							if(!(pds[i] instanceof IndexedPropertyDescriptor))
+							{
+								ret	= new OAVJavaAttributeType(this, attribute,
+									getTypeModel().getJavaType(pds[i].getPropertyType()),
+									OAVAttributeType.NONE, null, pds[i]);
+							}
+							else
+							{
+								// HACK? how to find out which kind of multiplicity
+								ret	= new OAVJavaAttributeType(this, attribute,
+									getTypeModel().getJavaType(((IndexedPropertyDescriptor)pds[i])
+									.getIndexedPropertyType()), OAVAttributeType.LIST, null, pds[i]); 
+							}
+	
+							if(properties==null)
+								properties	= new HashMap();
+							properties.put(attribute, ret);
 						}
-						else
-						{
-							// HACK? how to find out which kind of multiplicity
-							ret	= new OAVJavaAttributeType(this, attribute,
-								getTypeModel().getJavaType(((IndexedPropertyDescriptor)pds[i])
-								.getIndexedPropertyType()), OAVAttributeType.LIST, null, pds[i]); 
-						}
-
-						if(properties==null)
-							properties	= new HashMap();
-						properties.put(attribute, ret);
 					}
 				}
-			}
-			catch(IntrospectionException e)
-			{
-				throw new RuntimeException(e);
+				catch(IntrospectionException e)
+				{
+					throw new RuntimeException(e);
+				}
 			}
 		}
 		// #endif
@@ -234,6 +243,13 @@ public class OAVJavaType extends OAVObjectType
 				throw new RuntimeException(e);
 			}
 			// #endif
+
+			if(clazz.isArray())
+			{
+				attributes.put("length", new OAVJavaAttributeType(this, "length",
+						getTypeModel().getJavaType(int.class),
+						OAVAttributeType.NONE, null, null));
+			}
 		}
 		return attributes.values();
 	}

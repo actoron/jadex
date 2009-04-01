@@ -4,6 +4,8 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
  
 /**
  *  Attribute type for Java object types.
@@ -35,11 +37,11 @@ public class OAVJavaAttributeType extends OAVAttributeType
 	/**
 	 *  Get the property descriptor.
 	 *  @return The property descriptor.
-	 */
+	 * /
 	public PropertyDescriptor getPropertyDescriptor()
 	{
 		return propdesc;
-	}
+	}*/
 	
 	//-------- methods --------
 	
@@ -73,6 +75,36 @@ public class OAVJavaAttributeType extends OAVAttributeType
 				Class	clazz1	= ((OAVJavaType)otype).getClazz();
 				Class	clazz2	= ((OAVJavaType)attr.getObjectType()).getClazz();
 				ret = SReflect.isSupertype(clazz1, clazz2) || SReflect.isSupertype(clazz2, clazz1);
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get the attribute value from a given object.
+	 *  @param object	The object.
+	 *  @return	The value.
+	 */
+	public Object accessProperty(Object object)
+	{
+		Object	ret;
+		
+		if("length".equals(getName()) && ((OAVJavaType)getObjectType()).getClazz().isArray())
+		{
+			ret	= new Integer(Array.getLength(object));
+		}
+		else
+		{
+			Method rm = propdesc.getReadMethod();
+			if(rm==null)
+				throw new RuntimeException("No attribute accessor found: "+this);
+			try
+			{
+				ret = rm.invoke(object, new Object[0]);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
 			}
 		}
 		return ret;

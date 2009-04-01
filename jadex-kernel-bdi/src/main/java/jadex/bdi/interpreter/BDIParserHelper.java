@@ -13,6 +13,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 /**
@@ -67,32 +68,34 @@ public class BDIParserHelper implements IParserHelper
 		{
 			// Create condition for belief(set).
 			String	belname	= name.substring(12);
-			OAVObjectType	type	= OAVBDIRuntimeModel.belief_type;
-			OAVAttributeType	attr1	= OAVBDIRuntimeModel.capability_has_beliefs;
-			OAVAttributeType	attr2	= OAVBDIRuntimeModel.belief_has_fact;
-			Object	mbel	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
-			if(mbel==null)
+			Object	mbel;
+			OAVObjectType	type	= null;
+			Class	clazz	= null;
+			OAVAttributeType	attr1	= null;
+			OAVAttributeType	attr2	= null;
+			if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefs, belname))!=null)
+			{
+				type	= OAVBDIRuntimeModel.belief_type;
+				attr1	= OAVBDIRuntimeModel.capability_has_beliefs;
+				attr2	= OAVBDIRuntimeModel.belief_has_fact;
+				clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
+			}
+			else if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsets, belname))!=null)
 			{
 				type	= OAVBDIRuntimeModel.beliefset_type;
 				attr1	= OAVBDIRuntimeModel.capability_has_beliefsets;
 				attr2	= OAVBDIRuntimeModel.beliefset_has_facts;
-				mbel	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsets, belname);
+				// Todo: set contents should be array instead of list
+//				clazz	= List.class;
+				clazz	= Array.newInstance((Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class), new int[1]).getClass();
 			}
-			if(mbel==null)
+			else if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname))!=null)
 			{
-				mbel	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
-				if(mbel!=null)
-				{
-					throw new UnsupportedOperationException("Belief references not yet supported by parser: "+name);
-				}
+				throw new UnsupportedOperationException("Belief references not yet supported by parser: "+name);
 			}
-			if(mbel==null)
+			else if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, belname))!=null)
 			{
-				mbel	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, belname);
-				if(mbel!=null)
-				{
-					throw new UnsupportedOperationException("Belief set references not yet supported by parser: "+name);
-				}
+				throw new UnsupportedOperationException("Belief set references not yet supported by parser: "+name);
 			}
 
 			if(mbel==null)
@@ -101,8 +104,7 @@ public class BDIParserHelper implements IParserHelper
 			}
 			
 			// Build belief (set) condition to bind fact(s) variable.
-			Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
-			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));	// Todo: array class for belief set
+			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
 			Variable	belvar	= new Variable(name+"_bel", type);
 			context.createObjectCondition(type, new IConstraint[]{
 				new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
@@ -122,21 +124,44 @@ public class BDIParserHelper implements IParserHelper
 			rcapcon.addConstraint(new BoundConstraint(attr1, belvar, IOperator.CONTAINS));
 		}
 		
-		else if(ret==null && name.startsWith("$goal."))
+		else if(ret==null && (name.startsWith("$goal.") || name.startsWith("$ref.")))
 		{
-			String	parname	= name.substring(6);
-			OAVObjectType	type	= OAVBDIRuntimeModel.parameter_type;
-			OAVAttributeType	attr1	= OAVBDIRuntimeModel.parameterelement_has_parameters;
-			OAVAttributeType	attr2	= OAVBDIRuntimeModel.parameter_has_value;
-			OAVAttributeType	attr3	= OAVBDIRuntimeModel.parameter_has_name;
-			Object	mpar	= state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parameters, parname);
-			if(mpar==null)
+			String	parname;
+			String	varname;
+			if(name.startsWith("$goal."))
+			{
+				parname	= name.substring(6);
+				varname	= "?rgoal";
+			}
+			else
+			{
+				parname	= name.substring(5);
+				varname	= "?refgoal";
+			}
+			
+			OAVObjectType	type	= null;
+			OAVAttributeType	attr1	= null;
+			OAVAttributeType	attr2	= null;
+			OAVAttributeType	attr3	= null;
+			Class	clazz	= null;
+			Object	mpar;
+			if((mpar=state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parameters, parname))!=null)
+			{
+				type	= OAVBDIRuntimeModel.parameter_type;
+				attr1	= OAVBDIRuntimeModel.parameterelement_has_parameters;
+				attr2	= OAVBDIRuntimeModel.parameter_has_value;
+				attr3	= OAVBDIRuntimeModel.parameter_has_name;
+				clazz	= (Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class);
+			}
+			else if((mpar=state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parametersets, parname))!=null)
 			{
 				type	= OAVBDIRuntimeModel.parameterset_type;
 				attr1	= OAVBDIRuntimeModel.parameterelement_has_parametersets;
 				attr2	= OAVBDIRuntimeModel.parameterset_has_values;
 				attr3	= OAVBDIRuntimeModel.parameterset_has_name;
-				mpar	= state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parametersets, parname);
+				// Todo: set contents should be array instead of list
+//				clazz	= List.class;
+				clazz	= Array.newInstance((Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class), new int[1]).getClass();
 			}
 
 			if(mpar==null)
@@ -145,8 +170,7 @@ public class BDIParserHelper implements IParserHelper
 			}
 
 			// Build parameter (set) condition to bind value(s) variable.
-			Class	clazz	= (Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class);
-			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));	// Todo: array class for parameter set
+			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
 			Variable	parvar	= new Variable(name+"par", type);
 			context.createObjectCondition(type, new IConstraint[]{
 				new LiteralConstraint(attr3, parname),
@@ -154,56 +178,12 @@ public class BDIParserHelper implements IParserHelper
 				new BoundConstraint(null, parvar)});
 
 			// Augment goal condition to check parameter (set) variable.
-			Variable	goalvar	= context.getVariable("?rgoal");
+			Variable	goalvar	= context.getVariable(varname);
 			if(goalvar==null)
-				throw new RuntimeException("Variable '?rgoal' required to build parameter (set) condition: "+name);
+				throw new RuntimeException("Variable '"+varname+"' required to build parameter (set) condition: "+name);
 			ObjectCondition	rgoalcon	= (ObjectCondition)context.getObjectCondition(goalvar);
 			if(rgoalcon==null)
 				throw new RuntimeException("Goal condition required to build parameter (set) condition: "+name);
-			BoundConstraint	bc	= (BoundConstraint)context.getBoundConstraint(goalvar);
-			if(bc!=null && bc.getValueSource()!=null)
-				throw new UnsupportedOperationException("Value source for goal object not yet supported.");
-			rgoalcon.addConstraint(new BoundConstraint(attr1, parvar, IOperator.CONTAINS));
-		}
-
-		else if(ret==null && name.startsWith("$ref."))
-		{
-			String	parname	= name.substring(5);
-			OAVObjectType	type	= OAVBDIRuntimeModel.parameter_type;
-			OAVAttributeType	attr1	= OAVBDIRuntimeModel.parameterelement_has_parameters;
-			OAVAttributeType	attr2	= OAVBDIRuntimeModel.parameter_has_value;
-			OAVAttributeType	attr3	= OAVBDIRuntimeModel.parameter_has_name;
-			Object	mpar	= state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parameters, parname);
-			if(mpar==null)
-			{
-				type	= OAVBDIRuntimeModel.parameterset_type;
-				attr1	= OAVBDIRuntimeModel.parameterelement_has_parametersets;
-				attr2	= OAVBDIRuntimeModel.parameterset_has_values;
-				attr3	= OAVBDIRuntimeModel.parameterset_has_name;
-				mpar	= state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parametersets, parname);
-			}
-
-			if(mpar==null)
-			{
-				throw new RuntimeException("No such parameter (set): "+name);
-			}
-
-			// Build parameter (set) condition to bind value(s) variable.
-			Class	clazz	= (Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class);
-			ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));	// Todo: array class for parameter set
-			Variable	parvar	= new Variable(name+"par", type);
-			context.createObjectCondition(type, new IConstraint[]{
-				new LiteralConstraint(attr3, parname),
-				new BoundConstraint(attr2, ret),
-				new BoundConstraint(null, parvar)});
-
-			// Augment goal condition to check parameter (set) variable.
-			Variable	goalvar	= context.getVariable("?refgoal");
-			if(goalvar==null)
-				throw new RuntimeException("Variable '?refgoal' required to build parameter (set) condition: "+name);
-			ObjectCondition	rgoalcon	= (ObjectCondition)context.getObjectCondition(goalvar);
-			if(rgoalcon==null)
-				throw new RuntimeException("Refgoal condition required to build parameter (set) condition: "+name);
 			BoundConstraint	bc	= (BoundConstraint)context.getBoundConstraint(goalvar);
 			if(bc!=null && bc.getValueSource()!=null)
 				throw new UnsupportedOperationException("Value source for goal object not yet supported.");

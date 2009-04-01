@@ -200,6 +200,7 @@ primaryPrefix returns [Expression exp]
 primarySuffix returns [Suffix suff]
 	: tmp = fieldAccess {$suff = tmp;}
 	| tmp = methodAccess {$suff = tmp;}
+	| tmp = arrayAccess {$suff = tmp;}
 	;
 
 /**
@@ -223,6 +224,16 @@ methodAccess returns [Suffix suff]
 	)* ')'
 	{
 		$suff	= new MethodAccess(tmp2.getText(), (Expression[])params.toArray(new Expression[params.size()]));
+	}
+	;
+
+/**
+ *  Access an element of an array.
+ */
+arrayAccess returns [Suffix suff]
+	: '[' tmp = expression ']'
+	{
+		$suff = new ArrayAccess(tmp);
 	}
 	;
 

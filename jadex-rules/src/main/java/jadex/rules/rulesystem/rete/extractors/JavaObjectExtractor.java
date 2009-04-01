@@ -5,7 +5,6 @@ import jadex.rules.rulesystem.rete.nodes.VirtualFact;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaAttributeType;
 
-import java.lang.reflect.Method;
 
 /**
  *  Extractor for a Java attribute value (or the whole object).
@@ -46,23 +45,12 @@ public class JavaObjectExtractor extends ObjectExtractor
 		}
 		else
 		{
-			Method rm = ((OAVJavaAttributeType)attr).getPropertyDescriptor()
-				.getReadMethod();
-			if(rm==null)
-				throw new RuntimeException("No attribute accessor found: "+attr);
-			try
-			{
-				ret = rm.invoke(right, new Object[0]);
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			ret = ((OAVJavaAttributeType)attr).accessProperty(right);
 		}
 		
 		return ret;
 	}
-	
+
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation. 
