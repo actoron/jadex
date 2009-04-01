@@ -514,11 +514,12 @@ public class OAVBDIModelLoader
 					Object create = state.getAttributeValue(trigger, OAVBDIMetaModel.plantrigger_has_condition);
 					if(create!=null)
 					{
-						ICondition usercond = (ICondition)state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
+						Object usercond = state.getAttributeValue(create, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
 							String rulename = Rulebase.getUniqueRuleName(rb, "plan_create_"+mplan.toString());
-							rb.addRule(PlanRules.createPlanCreationUserRule(rulename, usercond, mplan));
+							Object[]	tmp	= PlanRules.createPlanCreationUserRule(mplan);
+							rb.addRule(createUserRule(state, mcapa, imports, mplan, create, usercond, rulename, tmp));
 						}
 					}
 				}

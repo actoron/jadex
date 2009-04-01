@@ -1305,7 +1305,7 @@ public class PlanRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param mplan	The plan model element.
 	 */
-	protected static Rule createPlanCreationUserRule(String rulename, ICondition usercond, Object mplan)
+	protected static Object[]	createPlanCreationUserRule(Object mplan)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable mplanvar = new Variable("?mplan", OAVBDIMetaModel.plan_type);
@@ -1321,9 +1321,9 @@ public class PlanRules
 		// Hack??? How to pass mplan to action!?
 		rcapacon.addConstraint(new BoundConstraint(new Constant(mplan), mplanvar));
 		
-		Rule plan_creation = new Rule(rulename, new AndCondition(
-			new ICondition[]{ragentcon, rcapacon, usercond}), PLAN_CREATION);
-		return plan_creation;
+		return new Object[]{
+			new AndCondition(new ICondition[]{ragentcon, rcapacon}),
+			PLAN_CREATION};
 	}
 	
 	/**
