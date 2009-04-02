@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  *  Interface for a space object.
  */
-public interface ISpaceObject
+public interface ISpaceObject extends IPropertyHolder
 {
 	//-------- constants --------
 	

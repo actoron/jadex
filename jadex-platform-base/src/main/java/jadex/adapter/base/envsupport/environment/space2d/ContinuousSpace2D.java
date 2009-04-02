@@ -1,6 +1,6 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
-import jadex.adapter.base.envsupport.environment.IActionExecutor;
+import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IClockService;
@@ -50,7 +50,7 @@ public class ContinuousSpace2D extends Space2D
 		IVector2 areaSize, Object spaceName)
 	{
 		super(clockService, timeCoefficient, executor, areaSize);
-		spaceproperties.put("name", spaceName);
+		setProperty("name", spaceName);
 	}
 	
 	//-------- methods --------

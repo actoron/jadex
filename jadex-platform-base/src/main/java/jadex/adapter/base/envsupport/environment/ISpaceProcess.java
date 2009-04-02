@@ -29,10 +29,4 @@ public interface ISpaceProcess
 	 *  @param space the space this process is running in
 	 */
 	public void execute(long time, IVector1 deltaT, IEnvironmentSpace space);
-
-	/**
-	 *  Returns the id of the process.
-	 *  @return id of the process.
-	 */
-	public Object getId();
 }

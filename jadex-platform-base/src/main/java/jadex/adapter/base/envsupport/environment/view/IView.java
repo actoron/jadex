@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.envsupport.environment.view;
+package jadex.adapter.base.envsupport.environment.view;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 

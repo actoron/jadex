@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  *  Default implementation of a space object. 
  */
-public class SpaceObject implements ISpaceObject
+public class SpaceObject extends PropertyHolder implements ISpaceObject
 {
 	//-------- attributes --------
 	
@@ -37,10 +37,7 @@ public class SpaceObject implements ISpaceObject
 	protected List listeners;
 	
 	/** The monitor. */
-	protected Object monitor;
-	
-	/** The property change support. */
-	protected SimplePropertyChangeSupport pcs;
+	//protected Object monitor;
 	
 	//-------- constructors --------
 	
@@ -61,8 +58,7 @@ public class SpaceObject implements ISpaceObject
 		this.properties = properties;
 //		this.tasks = tasks;
 		this.listeners = listeners;
-		this.monitor = monitor;
-		this.pcs = new SimplePropertyChangeSupport(this);
+		setMonitor(monitor);
 		
 //		this.properties = new HashMap();
 //		if(properties != null)
@@ -122,49 +118,6 @@ public class SpaceObject implements ISpaceObject
 		synchronized(monitor)
 		{
 			return owner;
-		}
-	}
-	
-	/**
-	 * Returns an object's property.
-	 * @param name name of the property
-	 * @return the property
-	 */
-	public Object getProperty(String name)
-	{
-		synchronized(monitor)
-		{
-			return properties!=null? properties.get(name): null;
-		}
-	}
-
-	/**
-	 * Sets an object's property.
-	 * @param name name of the property
-	 * @param value the property
-	 */
-	public void setProperty(String name, Object value)
-	{
-		Object oldval;
-		synchronized(monitor)
-		{
-			if(properties==null)
-				properties= new HashMap();
-			oldval = properties.get(name);
-			properties.put(name, value);
-		}
-		pcs.firePropertyChange(name, oldval, value);
-	}
-
-	/**
-	 * Returns a copy of all of the object's properties.
-	 * @return the properties
-	 */
-	public Map getProperties()
-	{
-		synchronized(monitor)
-		{
-			return properties==null? Collections.EMPTY_MAP: properties;
 		}
 	}
 
@@ -280,28 +233,4 @@ public class SpaceObject implements ISpaceObject
 		buf.append(")");
 		return buf.toString();
 	}
-	
-	//-------- property methods --------
-
-	/**
-     *  Add a PropertyChangeListener to the listener list.
-     *  The listener is registered for all properties.
-     *  @param listener  The PropertyChangeListener to be added.
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener)
-	{
-		pcs.addPropertyChangeListener(listener);
-    }
-
-    /**
-     *  Remove a PropertyChangeListener from the listener list.
-     *  This removes a PropertyChangeListener that was registered
-     *  for all properties.
-     *  @param listener  The PropertyChangeListener to be removed.
-     */
-    public void removePropertyChangeListener(PropertyChangeListener listener)
-	{
-		pcs.removePropertyChangeListener(listener);
-    }
-	
 }

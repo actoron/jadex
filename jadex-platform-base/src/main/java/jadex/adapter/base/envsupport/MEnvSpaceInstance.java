@@ -105,10 +105,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				
 				ISpaceAction action = (ISpaceAction)proccl.newInstance();
 				
-				// todo: id
-//				ret.addSpaceAction(maction.getName(), action);
+				// TODO: id --- fixed! correct?
 				System.out.println("Adding environment action: "+maction.getName());
-				ret.addSpaceAction(action);
+				ret.addSpaceAction(maction.getName(), action);
+				//ret.addSpaceAction(action);
 			}
 		}
 		
@@ -123,10 +123,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				
 				ISpaceProcess proc = (ISpaceProcess)proccl.newInstance();
 				
-				// todo: id
-//				ret.addSpaceProcess(mproc.getName(), proc);
+				// TODO: id --- fixed! correct?
 				System.out.println("Adding environment process: "+mproc.getName());
-				ret.addSpaceProcess(proc);
+				ret.addSpaceProcess(mproc.getName(), proc);
+				//ret.addSpaceProcess(proc);
 			}
 		}
 		

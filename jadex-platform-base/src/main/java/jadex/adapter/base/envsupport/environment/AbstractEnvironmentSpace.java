@@ -1,5 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
+import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
@@ -13,7 +15,8 @@ import java.util.Map;
 /**
  *  
  */
-public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
+public abstract class AbstractEnvironmentSpace extends PropertyHolder 
+											   implements IEnvironmentSpace
 {
 	//-------- constants --------
 	
@@ -21,8 +24,11 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	
 	//-------- attributes --------
 	
-	/** Available actions in the space. */
-	protected Map actions;
+	/** Available space actions. */
+	protected Map spaceactions;
+	
+	/** Available agent actions. */
+	protected Map agentactions;
 	
 	/** The environment processes. */
 	protected Map processes;
@@ -36,14 +42,8 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	/** Space object by owner, owner can null (owner view). */
 	protected Map spaceobjectsbyowner;
 	
-	/** Space properties. */
-	protected Map spaceproperties;
-	
 	/** Object id counter for new ids. */
 	protected AtomicCounter objectidcounter;
-	
-	/** The synchronization object. */
-	protected SynchronizedObject syncobject;
 	
 	//-------- constructors --------
 	
@@ -52,27 +52,27 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public AbstractEnvironmentSpace()
 	{
-		this.actions = new HashMap();
+		this.spaceactions = new HashMap();
+		this.agentactions = new HashMap();
 		this.processes = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
-		this.spaceproperties = new HashMap();
 		this.objectidcounter = new AtomicCounter();
-		this.syncobject = new SynchronizedObject();
 	}
 	
 	//-------- methods --------
 	
 	/**
 	 * Adds a space process.
+	 * @param id ID of the space process
 	 * @param process new space process
 	 */
-	public void addSpaceProcess(final ISpaceProcess process)
+	public void addSpaceProcess(Object id, ISpaceProcess process)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
-			processes.put(process.getId(), process);
+			processes.put(id, process);
 		}
 	}
 
@@ -83,7 +83,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public ISpaceProcess getSpaceProcess(Object id )
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
 			return (ISpaceProcess)processes.get(id);
 		}
@@ -95,7 +95,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public void removeSpaceProcess(final Object id)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
 			processes.remove(id);
 		}
@@ -111,7 +111,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public ISpaceObject createSpaceObject(Object type, Object owner, Map properties, List tasks, List listeners)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
 			Object id;
 			do
@@ -120,7 +120,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 			}
 			while(spaceobjects.containsKey(id));
 			
-			ISpaceObject obj = new SpaceObject(id, type, owner, properties, tasks, listeners, syncobject.getMonitor());
+			ISpaceObject obj = new SpaceObject(id, type, owner, properties, tasks, listeners, monitor);
 			spaceobjects.put(id, obj);
 			List typeobjects = (List)spaceobjectsbytype.get(obj.getType());
 			if(typeobjects == null)
@@ -150,7 +150,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	public void destroySpaceObject(final Object id)
 	{
 		ISpaceObject obj;
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
 			obj = (ISpaceObject)spaceobjects.get(id);
 			// shutdown and jettison tasks
@@ -185,83 +185,34 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public ISpaceObject getSpaceObject(Object id)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
 			return (ISpaceObject)spaceobjects.get(id);
 		}
 	}
 	
 	/**
-	 * Gets a space property
-	 * @param id the property's ID
-	 * @return the property
-	 */
-	public Object getSpaceProperty(Object id)
-	{
-		synchronized(syncobject.getMonitor())
-		{
-			return spaceproperties.get(id);
-		}
-	}
-	
-	/**
-	 * Sets a space property
-	 * @param id the property's ID
-	 * @param property the property
-	 */
-	public void setSpaceProperty(final Object id, final Object property)
-	{
-		synchronized(syncobject.getMonitor())
-		{
-			spaceproperties.put(id, property);
-		}
-	}
-	
-	/**
-	 * Adds an environment action.
+	 * Adds a space action.
+	 * @param actionId the action ID
 	 * @param action the action
 	 */
-	public void addSpaceAction(final ISpaceAction action)
+	public void addSpaceAction(Object id, ISpaceAction action)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
-			actions.put(action.getId(), action);
+			spaceactions.put(id, action);
 		}
 	}
 	
 	/**
-	 * Removes an environment action.
+	 * Removes a space action.
 	 * @param id the action ID
 	 */
-	public void removeAction(final Object id)
+	public void removeSpaceAction(final Object id)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{	
-			actions.remove(id);
-		}
-	}
-	
-	/**
-	 * Returns the space's name.
-	 * @return the space's name.
-	 */
-	public String getName()
-	{
-		synchronized(syncobject.getMonitor())
-		{
-			return (String)spaceproperties.get("name");
-		}
-	}
-	
-	/**
-	 * Returns the space's name.
-	 * @return the space's name.
-	 */
-	public void setName(final String name)
-	{
-		synchronized(syncobject.getMonitor())
-		{
-			spaceproperties.put("name", name);
+			spaceactions.remove(id);
 		}
 	}
 	
@@ -271,32 +222,86 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 * @param parameters parameters for the action (may be null)
 	 * @return return value of the action
 	 */
-	public void performAction(final Object id, final Map parameters, final IResultListener listener)
+	public Object performSpaceAction(final Object id, final Map parameters)
 	{
-		syncobject.invokeLater(new Runnable()
+		synchronized(monitor)
 		{
-			public void run()
-			{
-				ISpaceAction action = (ISpaceAction)actions.get(id);
-				Object ret = action.perform(new HashMap(parameters), AbstractEnvironmentSpace.this);
-				listener.resultAvailable(ret);
-			}
-		});
-		
-//		ISpaceAction action = (ISpaceAction) actions.get(actionId);
-//		assert action != null;
-//		return action.perform(new HashMap(parameters), this);
+			ISpaceAction action = (ISpaceAction) spaceactions.get(id);
+			assert action != null;
+			return action.perform(parameters, this);
+		}
 	}
 	
 	/**
-	 *  Get the synchronized object.
-	 *  @return The sync object.
+	 * Adds an agent action.
+	 * @param actionId the action ID
+	 * @param action the action
 	 */
-	public SynchronizedObject getSynchronizedObject()
+	public void addAgentAction(Object id, IAgentAction action)
 	{
-		synchronized(syncobject.getMonitor())
+		synchronized(monitor)
 		{
-			return syncobject;
+			agentactions.put(id, action);
+		}
+	}
+	
+	/**
+	 * Removes an agent action.
+	 * @param actionId the action ID
+	 */
+	public void removeAgentAction(Object id)
+	{
+		synchronized(monitor)
+		{	
+			agentactions.remove(id);
+		}
+	}
+	
+	/**
+	 * Schedules an agent action.
+	 * @param id Id of the action
+	 * @param parameters parameters for the action (may be null)
+	 * @param listener the result listener
+	 */
+	public void scheduleAgentAction(final Object id, final Map parameters, final IResultListener listener)
+	{
+		synchronized(monitor)
+		{
+			IActionExecutor executor = 
+				(IActionExecutor) processes.get(IActionExecutor.DEFAULT_EXECUTOR_NAME);
+			executor.getSynchronizer().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IAgentAction action = (IAgentAction) agentactions.get(id);
+					Object ret = action.execute(new HashMap(parameters), AbstractEnvironmentSpace.this);
+					listener.resultAvailable(ret);
+				}
+			});
+		}
+	}
+	
+	/**
+	 * Returns the space's name.
+	 * @return the space's name.
+	 */
+	public String getName()
+	{
+		synchronized(monitor)
+		{
+			return (String)getProperty("name");
+		}
+	}
+	
+	/**
+	 * Returns the space's name.
+	 * @return the space's name.
+	 */
+	public void setName(final String name)
+	{
+		synchronized(monitor)
+		{
+			setProperty("name", name);
 		}
 	}
 	
@@ -323,7 +328,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public void setOwner(Object id, Object owner)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
@@ -356,7 +361,7 @@ public abstract class AbstractEnvironmentSpace implements IEnvironmentSpace
 	 */
 	public ISpaceObject[] getOwnedObjects(Object owner)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			List ownedobjs = (List)spaceobjectsbyowner.get(owner);
 			return ownedobjs==null? new ISpaceObject[0]: (ISpaceObject[])ownedobjs.toArray(new ISpaceObject[ownedobjs.size()]);

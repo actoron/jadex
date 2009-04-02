@@ -2,6 +2,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
+import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.commons.concurrent.IResultListener;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  *  Main interface for an environment space.
  */
-public interface IEnvironmentSpace extends ISpace
+public interface IEnvironmentSpace extends ISpace, IPropertyHolder
 {
 	/**
 	 * Returns the space's name.
@@ -21,9 +22,10 @@ public interface IEnvironmentSpace extends ISpace
 	
 	/**
 	 * Adds a space process.
+	 * @param id ID of the space process
 	 * @param process new space process
 	 */
-	public void addSpaceProcess(ISpaceProcess process);
+	public void addSpaceProcess(Object id, ISpaceProcess process);
 
 	/**
 	 * Returns a space process.
@@ -62,37 +64,46 @@ public interface IEnvironmentSpace extends ISpace
 	public ISpaceObject getSpaceObject(Object id);
 	
 	/**
-	 * Gets a space property
-	 * @param id the property's ID
-	 * @return the property
-	 */
-	public Object getSpaceProperty(Object id);
-	
-	/**
-	 * Sets a space property
-	 * @param property the property
-	 */
-	public void setSpaceProperty(Object id, Object property);
-	
-	/**
-	 * Adds an environment action.
+	 * Adds a space action.
+	 * @param actionId the action ID
 	 * @param action the action
 	 */
-	public void addSpaceAction(ISpaceAction action);
+	public void addSpaceAction(Object id, ISpaceAction action);
 	
 	/**
-	 * Removes an environment action.
+	 * Removes a space action.
 	 * @param actionId the action ID
 	 */
-	public void removeAction(Object id);
+	public void removeSpaceAction(Object id);
 	
 	/**
-	 * Performs an environment action.
+	 * Performs a space action.
 	 * @param id Id of the action
 	 * @param parameters parameters for the action (may be null)
 	 * @return return value of the action
 	 */
-	public void performAction(Object id, Map parameters, IResultListener listener);
+	public Object performSpaceAction(Object id, Map parameters);
+	
+	/**
+	 * Adds an agent action.
+	 * @param actionId the action ID
+	 * @param action the action
+	 */
+	public void addAgentAction(Object id, IAgentAction action);
+	
+	/**
+	 * Removes an agent action.
+	 * @param actionId the action ID
+	 */
+	public void removeAgentAction(Object id);
+	
+	/**
+	 * Schedules an agent action.
+	 * @param id Id of the action
+	 * @param parameters parameters for the action (may be null)
+	 * @param listener the result listener
+	 */
+	public void scheduleAgentAction(Object id, Map parameters, IResultListener listener);
 	
 	/**
 	 *  Get the owner of an object.

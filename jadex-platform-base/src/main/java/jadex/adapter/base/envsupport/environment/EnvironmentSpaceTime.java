@@ -1,5 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
+import jadex.adapter.base.envsupport.environment.agentaction.ImmediateExecutor;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector1Long;
@@ -74,13 +76,13 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace impl
 	 */
 	public void timeStep(long currenttime)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			IVector1 deltat = timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
 			timestamp = currenttime;
 		
-			// Execute enqueued actions.
-			executor.execute(currenttime, deltat, getSynchronizedObject());
+			// Execute enqueued actions. // obsolete
+			// executor.execute(currenttime, deltat, getSynchronizedObject());
 				
 			for(Iterator it = spaceobjects.values().iterator(); it.hasNext(); )
 			{

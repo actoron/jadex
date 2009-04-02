@@ -1,7 +1,7 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
-import jadex.adapter.base.envsupport.environment.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
@@ -79,7 +79,7 @@ public class Grid2D extends Space2D
 	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IActionExecutor executor, IVector2 areaSize, Object spaceName)
 	{
 		super(clockService, timeCoefficient, executor, areaSize);
-		this.spaceproperties.put("name", spaceName);
+		this.setProperty("name", spaceName);
 		this.objectsygridpos = new MultiCollection();
 		this.gridposbyobject = new HashMap();
 		this.border_mode = BORDER_TORUS;
@@ -92,7 +92,7 @@ public class Grid2D extends Space2D
 	 * /
 	public ISpaceObject[] getSpaceObjectsByGridPosition(IVector2 position)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			return getSpaceObjectsByGridPosition(position, null);
 		}
@@ -103,7 +103,7 @@ public class Grid2D extends Space2D
 	 * /
 	public ISpaceObject[] getSpaceObjectsByGridPosition(IVector2 position, Object type)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			ISpaceObject[] ret = null;
 			Collection simobjs = objectsygridpos.getCollection(position);
@@ -133,7 +133,7 @@ public class Grid2D extends Space2D
 	 */
 	public Collection getSpaceObjectsByGridPosition(IVector2 position, Object type)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			Collection ret = null;
 			Collection simobjs = objectsygridpos.getCollection(position);
@@ -165,7 +165,7 @@ public class Grid2D extends Space2D
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			Collection ret = new ArrayList();
 			
@@ -220,7 +220,7 @@ public class Grid2D extends Space2D
 	 */
 	public IVector2 getEmptyGridPosition()
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			IVector2 ret = null;
 			while (ret == null)
@@ -244,7 +244,7 @@ public class Grid2D extends Space2D
 	 */
 	public void setPosition(Object id, IVector2 pos)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id);
 			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
@@ -267,7 +267,7 @@ public class Grid2D extends Space2D
 	 */
 	public ISpaceObject createSpaceObject(Object type, Object owner, Map properties, List tasks, List listeners)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			// TODO: maybe only assign position to discretePosition vector?
 			
@@ -289,7 +289,7 @@ public class Grid2D extends Space2D
 	 */
 	public void destroySpaceObject(Object id)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			// remove the object from grid
 			IVector2 pos = (IVector2)gridposbyobject.remove(id);

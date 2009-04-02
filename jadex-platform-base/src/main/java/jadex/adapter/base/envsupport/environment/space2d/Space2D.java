@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
-import jadex.adapter.base.envsupport.environment.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -76,7 +76,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public IVector2 getAreaSize()
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			return areasize.copy();
 		}
@@ -88,7 +88,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public void setAreaSize(IVector2 areaSize)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			areasize = areaSize;
 		}
@@ -101,7 +101,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 * /
 	public IVector2 getPosition(Object id)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
@@ -117,7 +117,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public void setPosition(Object id, IVector2 pos)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
@@ -133,7 +133,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public IVector2 getRandomPosition(IVector2 distance)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			if (distance == null)
 			{
@@ -157,7 +157,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxDist)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			ISpaceObject nearest = null;
 			IVector1 distance = null;
@@ -193,7 +193,7 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist)
 	{
-		synchronized(getSynchronizedObject().getMonitor())
+		synchronized(monitor)
 		{
 			List ret = new ArrayList();
 		
