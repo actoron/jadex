@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
+import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
@@ -126,4 +127,29 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 */
 	public ISpaceObject[] getOwnedObjects(Object owner);
 	
+	/**
+	 * Adds a view to the space.
+	 * @param name name of the view
+	 * @param view the view
+	 */
+	public void addView(String name, IView view);
+	
+	/**
+	 * Removes a view from the space.
+	 * @param name name of the view
+	 */
+	public void removeView(String name);
+	
+	/**
+	 * Gets a specific view.
+	 * @param name name of the view
+	 * @return the view
+	 */
+	public IView getView(String name);
+	
+	/**
+	 * Get all available views in this space.
+	 * @return list of view names
+	 */
+	public List getViewNames();
 }

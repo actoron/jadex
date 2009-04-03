@@ -5,6 +5,7 @@ import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.agentaction.ImmediateExecutor;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
+import jadex.adapter.base.envsupport.environment.view.IView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	
 	/** Available space actions. */
 	protected Map spaceactions;
+	
+	/** Available views */
+	protected Map views;
 	
 	/** Available agent actions. */
 	protected Map agentactions;
@@ -47,6 +51,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 */
 	public AbstractEnvironmentSpace()
 	{
+		this.views = new HashMap();
 		this.spaceactions = new HashMap();
 		this.agentactions = new HashMap();
 		this.processes = new HashMap();
@@ -368,6 +373,56 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		{
 			List ownedobjs = (List)spaceobjectsbyowner.get(owner);
 			return ownedobjs==null? new ISpaceObject[0]: (ISpaceObject[])ownedobjs.toArray(new ISpaceObject[ownedobjs.size()]);
+		}
+	}
+	
+	/**
+	 * Adds a view to the space.
+	 * @param name name of the view
+	 * @param view the view
+	 */
+	public void addView(String name, IView view)
+	{
+		synchronized (monitor)
+		{
+			views.put(name, view);
+		}
+	}
+	
+	/**
+	 * Removes a view from the space.
+	 * @param name name of the view
+	 */
+	public void removeView(String name)
+	{
+		synchronized (monitor)
+		{
+			views.remove(name);
+		}
+	}
+	
+	/**
+	 * Gets a specific view.
+	 * @param name name of the view
+	 * @return the view
+	 */
+	public IView getView(String name)
+	{
+		synchronized (monitor)
+		{
+			return (IView) views.get(name);
+		}
+	}
+	
+	/**
+	 * Get all available views in this space.
+	 * @return list of view names
+	 */
+	public List getViewNames()
+	{
+		synchronized (monitor)
+		{
+			return new ArrayList(views.values());
 		}
 	}
 	

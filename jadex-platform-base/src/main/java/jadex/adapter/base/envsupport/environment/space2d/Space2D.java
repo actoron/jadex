@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
+import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -210,6 +211,14 @@ public abstract class Space2D extends EnvironmentSpaceTime
 			}
 		
 			return (ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+		}
+	}
+	
+	public Object[] getSpaceObjects()
+	{
+		synchronized(monitor)
+		{
+			return spaceobjects.values().toArray();
 		}
 	}
 }

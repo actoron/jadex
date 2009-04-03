@@ -2,6 +2,7 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.agentaction.ImmediateExecutor;
+import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector1Long;
@@ -95,6 +96,12 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace impl
 			{
 				ISpaceProcess process = (ISpaceProcess) procs[i];
 				process.execute(currenttime, deltat, this);
+			}
+			
+			for (Iterator it = views.values().iterator(); it.hasNext(); )
+			{
+				IView view = (IView) it.next();
+				view.update(this);
 			}
 		}
 	}

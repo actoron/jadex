@@ -7,12 +7,6 @@ import java.util.Map;
  */
 public interface IPropertyHolder
 {
-	/** 
-	 * Returns the monitor.
-	 * @return the monitor
-	 */
-	public Object getMonitor();
-	
 	/**
 	 * Returns a property.
 	 * @param name name of the property
