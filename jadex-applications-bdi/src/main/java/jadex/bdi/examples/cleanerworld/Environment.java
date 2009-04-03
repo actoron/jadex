@@ -163,8 +163,10 @@ public class Environment implements IEnvironment
 	 */
 	public synchronized boolean dropWasteInWastebin(Waste waste, Wastebin wastebin)
 	{
-		if(waste==null)
-			System.out.println("here");
+		assert waste!=null;
+		
+//		if(waste==null)
+//			System.out.println("here");
 		
 		boolean ret = false;
 

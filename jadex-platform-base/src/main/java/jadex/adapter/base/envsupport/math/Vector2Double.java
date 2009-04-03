@@ -320,6 +320,15 @@ public class Vector2Double implements IVector2, Cloneable
 		return (x_ == vector.getXAsDouble() && y_ == vector.getYAsDouble());
 	}
 	
+	/** 
+	 *  Compute the hash code.
+	 *  @return The hash code.
+	 */
+	public int hashCode()
+	{
+		return (int)x_*31 + (int)y_;
+	}
+	
 	public String toString()
 	{
 		StringBuffer buffer = new StringBuffer();

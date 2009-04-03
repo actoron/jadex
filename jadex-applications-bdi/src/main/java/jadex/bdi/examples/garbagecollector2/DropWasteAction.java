@@ -5,13 +5,14 @@ import java.util.Map;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 
 /**
  *  Action for dropping waste on the robots field.
  */
-public class DropWasteAction implements ISpaceAction
+public class DropWasteAction implements IAgentAction
 {
 	/**
 	 * Performs the action.

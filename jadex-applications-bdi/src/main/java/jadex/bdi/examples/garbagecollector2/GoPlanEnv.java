@@ -4,7 +4,6 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.Plan.SyncResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +59,7 @@ public class GoPlanEnv extends Plan
 			params.put(GoAction.DIRECTION, dir);
 			params.put(ISpaceObject.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier().getLocalName())[0].getId());
 			SyncResultListener srl	= new SyncResultListener();
-			env.performAction("go", params, srl); 
+			env.performAgentAction("go", params, srl); 
 			srl.waitForResult();
 		}
 	}

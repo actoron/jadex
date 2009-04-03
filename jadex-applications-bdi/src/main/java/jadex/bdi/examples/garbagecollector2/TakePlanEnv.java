@@ -43,7 +43,7 @@ public class TakePlanEnv extends Plan
 		Map params = new HashMap();
 		params.put("agent", getAgentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
-		env.performAction("drop", params, srl);
+		env.performAgentAction("drop", params, srl);
 		srl.waitForResult();
 		
 		// Go back.

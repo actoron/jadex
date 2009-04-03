@@ -1,5 +1,6 @@
 package jadex.rules.state;
 
+import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -16,6 +17,9 @@ public class OAVJavaAttributeType extends OAVAttributeType
 	
 	/** The property descriptor. */
 	protected PropertyDescriptor propdesc;
+	
+	/** The property object read method. */
+	protected static Method propreadmethod;
 	
 	//-------- constructors --------
 	
@@ -92,6 +96,19 @@ public class OAVJavaAttributeType extends OAVAttributeType
 		if("length".equals(getName()) && ((OAVJavaType)getObjectType()).getClazz().isArray())
 		{
 			ret	= new Integer(Array.getLength(object));
+		}
+		else if(IPropertyObject.class.isAssignableFrom(((OAVJavaType)getObjectType()).getClazz()))
+		{
+			try
+			{
+				if(propreadmethod==null)
+					propreadmethod = IPropertyObject.class.getMethod("getProperty", new Class[]{String.class});
+				ret = propreadmethod.invoke(object, new String[]{name});
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 		else
 		{

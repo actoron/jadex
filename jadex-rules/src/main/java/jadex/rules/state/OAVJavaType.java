@@ -1,5 +1,6 @@
 package jadex.rules.state;
 
+import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 
 import java.beans.BeanInfo;
@@ -145,8 +146,14 @@ public class OAVJavaType extends OAVObjectType
 			if(clazz.isArray() && "length".equals(attribute))
 			{
 				ret	= new OAVJavaAttributeType(this, attribute,
-						getTypeModel().getJavaType(int.class),
-						OAVAttributeType.NONE, null, null);
+					getTypeModel().getJavaType(int.class),
+					OAVAttributeType.NONE, null, null);
+			}
+			else if(IPropertyObject.class.isAssignableFrom(clazz))
+			{
+				ret	= new OAVJavaAttributeType(this, attribute,
+					getTypeModel().getJavaType(Object.class),
+					OAVAttributeType.NONE, null, null);
 			}
 			else
 			{

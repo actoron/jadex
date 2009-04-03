@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * 
  */
 public class ActionSynchronizer 
 {
@@ -86,6 +87,7 @@ public class ActionSynchronizer
 			catch(Exception e)
 			{
 				System.err.println("Execution led to exeception: "+e);
+				e.printStackTrace();
 			}
 		}
 	}

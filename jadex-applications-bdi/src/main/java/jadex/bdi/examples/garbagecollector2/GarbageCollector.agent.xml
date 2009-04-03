@@ -36,7 +36,9 @@
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl">
-				$beliefbase.myself.getProperty("position")
+				$beliefbase.myself.position 
+				
+				// $beliefbase.myself.getProperty("position")
 				
 				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
 				// ?agent = (agent (agent_has_localname ?agentname))
@@ -64,7 +66,9 @@
 		<!-- Flag indicating if the agent currently carries garbage. -->
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
  			<fact language="jcl">
- 				$beliefbase.myself.getProperty("has_garbage")
+ 				$beliefbase.myself.garbage!=null
+  				
+  				//$beliefbase.myself.getProperty("has_garbage")
  			
  				// ((Environment)$beliefbase.getBelief("env").getFact()).hasGarbage($scope.getAgentName())
 				// ?agent = (agent (agent_has_localname ?agentname))
@@ -83,7 +87,7 @@
  			burner present. -->
 		 	<achievegoal name="take">
 			<!-- <unique/>  -->
-			<!--  <creationcondition>
+			<creationcondition>
 				// unique (?rcapa and ?mgoal are provided internally)
 				(not (and
 					?adopted	= (goal (element_has_model ?mgoal))
@@ -91,16 +95,21 @@
 				))
 
 				// $beliefbase.is_dirty &amp;&amp; !$beliefbase.env.isBurnerPresent($beliefbase.pos)
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (melement_has_name "is_dirty"))
- 				(not (and
-					?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-					?mbel_pos = (mbelief (melement_has_name "pos"))
-					?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-					?mbel_env = (mbelief (melement_has_name "env"))
-					?env	= (Environment (isBurnerPresent (?pos) true))
-				))
-			</creationcondition>-->
+				?rbelief = (belief (element_has_model.melement_has_name "is_dirty") (belief_has_fact true))	
+				?rbel_pos = (belief (element_has_model.melement_has_name "pos") (belief_has_fact ?pos))
+				?rbel_env = (belief (element_has_model.melement_has_name "env") (belief_has_fact ?env))
+				?env = (Grid2D (getSpaceObjectsByGridPosition (?pos "burner") null))
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
+ 				// (not (and
+				//	?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
+				//	?mbel_pos = (mbelief (melement_has_name "pos"))
+				//	?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				//	?mbel_env = (mbelief (melement_has_name "env"))
+				//	?env	= (Environment (isBurnerPresent (?pos) true))
+				//))
+			</creationcondition>
 			<deliberation>
 				<inhibits ref="check"/>
 			</deliberation>
@@ -119,6 +128,7 @@
 		<achievegoal name="pick" exclude="never" retrydelay="100">
  			<dropcondition>
  				// !$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
+				
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
 				?mbelief = (mbelief (melement_has_name "is_dirty"))
 				?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))

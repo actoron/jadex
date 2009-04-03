@@ -234,8 +234,6 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 						for(Iterator it=extractors.values().iterator(); it.hasNext(); )
 						{
 							IValueExtractor ex = (IValueExtractor)it.next();
-							if(ex==null)
-								System.out.println("here");
 							relevants.addAll(ex.getRelevantAttributes());
 						}
 					}
@@ -269,8 +267,6 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 						for(Iterator it=extractors.values().iterator(); it.hasNext(); )
 						{
 							IValueExtractor ex = (IValueExtractor)it.next();
-							if(ex==null)
-								System.out.println("here");
 							indirects.addAll(ex.getIndirectAttributes());
 						}
 					}

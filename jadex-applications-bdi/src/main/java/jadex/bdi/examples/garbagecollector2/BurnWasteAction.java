@@ -1,8 +1,8 @@
 package jadex.bdi.examples.garbagecollector2;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  *  Action for burning waste.
  */
-public class BurnWasteAction implements ISpaceAction
+public class BurnWasteAction implements IAgentAction
 {
 	/**
 	 * Performs the action.

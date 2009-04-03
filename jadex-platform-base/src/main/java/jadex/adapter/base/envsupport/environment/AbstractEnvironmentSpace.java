@@ -2,12 +2,11 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
-import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.environment.agentaction.ImmediateExecutor;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +17,6 @@ import java.util.Map;
 public abstract class AbstractEnvironmentSpace extends PropertyHolder 
 											   implements IEnvironmentSpace
 {
-	//-------- constants --------
-	
-//	public static final String NO_OWNER = new String("no_owner"); 
-	
 	//-------- attributes --------
 	
 	/** Available space actions. */
@@ -73,6 +68,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		synchronized(monitor)
 		{
 			processes.put(id, process);
+			process.start(this);
 		}
 	}
 
@@ -97,7 +93,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	{
 		synchronized(monitor)
 		{
-			processes.remove(id);
+			ISpaceProcess process = (ISpaceProcess)processes.remove(id);
+			if(process!=null)
+				process.shutdown(this);
 		}
 	}
 	
@@ -263,18 +261,23 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void scheduleAgentAction(final Object id, final Map parameters, final IResultListener listener)
+	public void performAgentAction(final Object id, final Map parameters, final IResultListener listener)
 	{
 		synchronized(monitor)
 		{
-			IActionExecutor executor = 
-				(IActionExecutor) processes.get(IActionExecutor.DEFAULT_EXECUTOR_NAME);
+			IActionExecutor executor = (IActionExecutor)processes.get(IActionExecutor.DEFAULT_EXECUTOR_NAME);
+			if(executor ==null)
+			{
+				executor = new ImmediateExecutor();
+				addSpaceProcess(IActionExecutor.DEFAULT_EXECUTOR_NAME, executor);
+				System.out.println("No agent action executor defined, using immediate execution as default.");
+			}
 			executor.getSynchronizer().invokeLater(new Runnable()
 			{
 				public void run()
 				{
-					IAgentAction action = (IAgentAction) agentactions.get(id);
-					Object ret = action.execute(new HashMap(parameters), AbstractEnvironmentSpace.this);
+					IAgentAction action = (IAgentAction)agentactions.get(id);
+					Object ret = action.perform(new HashMap(parameters), AbstractEnvironmentSpace.this);
 					listener.resultAvailable(ret);
 				}
 			});

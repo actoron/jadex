@@ -3,7 +3,9 @@ package jadex.bdi.examples.garbagecollector2;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 
 import java.util.Collection;
@@ -12,7 +14,7 @@ import java.util.Map;
 /**
  *  Action for picking up waste.
  */
-public class PickupWasteAction implements ISpaceAction
+public class PickupWasteAction implements IAgentAction
 {
 	/**
 	 * Performs the action.
@@ -28,12 +30,14 @@ public class PickupWasteAction implements ISpaceAction
 		
 		Grid2D grid = (Grid2D)space;
 		
-		Object id = parameters.get(ISpaceObject.ACTOR_ID);
-		ISpaceObject so = grid.getSpaceObject(id);
+		Object owner = parameters.get(ISpaceObject.OWNER);
+		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 		
 		if(so.getProperty("garbage")!=null)
 			System.out.println("pickup failed: "+so);
 		
+		if(so.getProperty("garbage")!=null)
+			System.out.println("test");
 		assert so.getProperty("garbage")==null: so;
 		
 		Collection wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.POSITION), "garbage");
@@ -47,13 +51,13 @@ public class PickupWasteAction implements ISpaceAction
 				so.setProperty("garbage", waste);
 				ret = true;
 				//pcs.firePropertyChange("worldObjects", garb, null);
-			}
-	//			System.out.println("Agent picked up: "+name+" "+getPosition(name));
+				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
 			}
 			else
 			{
 	//			System.out.println("Agent picked up failed: "+name+" "+getPosition(name));
 			}
+		}
 //		System.out.println("pickup] "+name);
 		return ret? Boolean.TRUE: Boolean.FALSE;
 	}

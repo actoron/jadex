@@ -2,9 +2,7 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.SReflect;
-import jadex.commons.SimplePropertyChangeSupport;
 
-import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,9 +24,6 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	
 	/** The object's owner. */
 	protected Object owner;
-
-	/** The object's properties. */
-	protected Map properties;
 
 	/** The object's tasks (task names -> tasks). */
 	protected Map tasks;
@@ -122,6 +117,41 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	}
 
 	/**
+<<<<<<< .mine
+	 * Sets an object's property.
+	 * @param name name of the property
+	 * @param value the property
+	 */
+	public void setProperty(String name, Object value)
+	{
+		Object oldval;
+		synchronized(monitor)
+		{
+			if(properties==null)
+				properties= new HashMap();
+//			if(name.indexOf("pos")!=-1)
+//				System.out.println("here");
+			oldval = properties.get(name);
+			properties.put(name, value);
+		}
+		pcs.firePropertyChange(name, oldval, value);
+	}
+
+	/**
+	 * Returns a copy of all of the object's properties.
+	 * @return the properties
+	 */
+	public Map getProperties()
+	{
+		synchronized(monitor)
+		{
+			return properties==null? Collections.EMPTY_MAP: properties;
+		}
+	}
+
+	/**
+=======
+>>>>>>> .r538
 	 * Adds a new task for the object.
 	 * @param task new task
 	 */

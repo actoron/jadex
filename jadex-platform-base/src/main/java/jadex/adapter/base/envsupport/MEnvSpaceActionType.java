@@ -3,7 +3,7 @@ package jadex.adapter.base.envsupport;
 /**
  *  Description of an action type. 
  */
-public class MEnvActionType
+public class MEnvSpaceActionType
 {
 	//-------- attributes --------
 
@@ -49,6 +49,5 @@ public class MEnvActionType
 	public void setClassName(String classname)
 	{
 		this.classname = classname;
-	}
-	
+	}	
 }

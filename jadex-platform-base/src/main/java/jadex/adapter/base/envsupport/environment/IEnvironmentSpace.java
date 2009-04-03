@@ -3,7 +3,7 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
-import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  *  Main interface for an environment space.
  */
-public interface IEnvironmentSpace extends ISpace, IPropertyHolder
+public interface IEnvironmentSpace extends ISpace, IPropertyObject
 {
 	/**
 	 * Returns the space's name.
@@ -98,12 +98,13 @@ public interface IEnvironmentSpace extends ISpace, IPropertyHolder
 	public void removeAgentAction(Object id);
 	
 	/**
-	 * Schedules an agent action.
+	 * Perform an agent action. It will be executed
+	 * according to the space execution policy (e.g. at the end of a round). 
 	 * @param id Id of the action
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void scheduleAgentAction(Object id, Map parameters, IResultListener listener);
+	public void performAgentAction(Object id, Map parameters, IResultListener listener);
 	
 	/**
 	 *  Get the owner of an object.

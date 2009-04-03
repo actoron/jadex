@@ -143,11 +143,11 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
 //		System.out.println("Value set: "+id+" "+type+" "+value);
-		if(id.getClass().getName().indexOf("IBoard")!=-1)
-			System.out.println("here");
-		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
+		
+		if(attr.getName().indexOf("garbage")!=-1)
+			System.out.println("test");
 		
 		if(getRelevantAttributes().contains(attr))
 		{

@@ -1,11 +1,13 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.commons.IPropertyObject;
+
 import java.util.Map;
 
 /**
  *  Interface for a space object.
  */
-public interface ISpaceObject extends IPropertyHolder
+public interface ISpaceObject extends IPropertyObject
 {
 	//-------- constants --------
 	
@@ -37,20 +39,20 @@ public interface ISpaceObject extends IPropertyHolder
 	 *  @param name The name of the property.
 	 *  @return The property.
 	 */
-	public Object getProperty(String name);
+//	public Object getProperty(String name);
 
 	/**
 	 *  Sets an object's property.
 	 *  @param name name of the property
 	 *  @param value the property
 	 */
-	public void setProperty(String name, Object value);
+//	public void setProperty(String name, Object value);
 
 	/**
 	 *  Returns a copy of all of the object's properties.
 	 *  @return the properties
 	 */
-	public Map getProperties();
+//	public Map getProperties();
 
 	/**
 	 *  Adds a new task for the object.

@@ -36,9 +36,6 @@ public class CleanUpWastePlan extends Plan
 			Waste waste = (Waste)getParameter("waste").getValue();
 			// the following is only for debugging
 			
-			if(waste==null)
-				System.out.println("here");
-			
 //			if(waste==null)
 //			{
 //				RProcessGoal	proc	= (RProcessGoal)((ElementWrapper)getRootGoal()).unwrap();

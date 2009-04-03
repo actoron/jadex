@@ -19,13 +19,13 @@
 	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" class="Grid2D">
-			<env:actiontype name="pickup" class="PickupWasteAction" />
-			<env:actiontype name="drop" class="DropWasteAction" />
-			<env:actiontype name="burn" class="BurnWasteAction" />
-			<env:actiontype name="go" class="GoAction" />
+			<env:agentactiontype name="pickup" class="PickupWasteAction" />
+			<env:agentactiontype name="drop" class="DropWasteAction" />
+			<env:agentactiontype name="burn" class="BurnWasteAction" />
+			<env:agentactiontype name="go" class="GoAction" />
 			<env:processtype name="create" class="CreateWasteProcess" />
-			<env:dimension>10</env:dimension>
-			<env:dimension>10</env:dimension>
+			<env:dimension>5</env:dimension>
+			<env:dimension>5</env:dimension>
 		</env:envspacetype>
 	</spacetypes>
 	

@@ -161,6 +161,15 @@ public class Vector1Long implements IVector1
 		return false;
 	}
 	
+	/** 
+	 *  Compute the hash code.
+	 *  @return The hash code.
+	 */
+	public int hashCode()
+	{
+		return (int)x_;
+	}
+	
 	/** Compares the vector to another vector.
 	 *  The vectors are equal if the components are equal.
 	 * 

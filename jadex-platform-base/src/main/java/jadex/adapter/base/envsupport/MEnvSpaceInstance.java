@@ -9,6 +9,7 @@ import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
+import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -95,12 +96,12 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create actions.
-		List actions = spacetype.getMEnvActionTypes();
-		if(actions!=null)
+		List spaceactions = spacetype.getMEnvSpaceActionTypes();
+		if(spaceactions!=null)
 		{
-			for(int i=0; i<actions.size(); i++)
+			for(int i=0; i<spaceactions.size(); i++)
 			{
-				MEnvActionType maction = (MEnvActionType)actions.get(i);
+				MEnvAgentActionType maction = (MEnvAgentActionType)spaceactions.get(i);
 				Class proccl = SReflect.findClass(maction.getClassName(), mapt.getAllImports(), cl);
 				
 				ISpaceAction action = (ISpaceAction)proccl.newInstance();
@@ -108,6 +109,24 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				// TODO: id --- fixed! correct?
 				System.out.println("Adding environment action: "+maction.getName());
 				ret.addSpaceAction(maction.getName(), action);
+				//ret.addSpaceAction(action);
+			}
+		}
+		
+		// Create actions.
+		List agentactions = spacetype.getMEnvAgentActionTypes();
+		if(agentactions!=null)
+		{
+			for(int i=0; i<agentactions.size(); i++)
+			{
+				MEnvAgentActionType maction = (MEnvAgentActionType)agentactions.get(i);
+				Class proccl = SReflect.findClass(maction.getClassName(), mapt.getAllImports(), cl);
+				
+				IAgentAction action = (IAgentAction)proccl.newInstance();
+				
+				// TODO: id --- fixed! correct?
+				System.out.println("Adding environment action: "+maction.getName());
+				ret.addAgentAction(maction.getName(), action);
 				//ret.addSpaceAction(action);
 			}
 		}

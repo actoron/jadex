@@ -35,19 +35,20 @@ public class TakePlan extends Plan
 		dispatchSubgoalAndWait(goback);
 	}
 
-	/*public void aborted()
+	public void aborted()
 	{
-		System.out.println("aborted: "+getAgentName()+" "+this+" "+isAbortedOnSuccess());
+		System.out.println("aborted: "+getAgentName()+" "+this);
 	}
 
 	public void failed()
 	{
 		System.out.println("failed: "+getAgentName()+" "+this+" "+getException());
+		getException().printStackTrace();
 	}
 
 	public void passed()
 	{
 		System.out.println("passed: "+getAgentName()+" "+this);
-	}*/
+	}
 	
 }

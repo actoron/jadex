@@ -20,8 +20,11 @@ public class MEnvSpaceType	extends MSpaceType
 	/** The dimensions. */
 	protected List dimensions;
 	
+	/** The space action types. */
+	protected List spaceactiontypes;
+	
 	/** The action types. */
-	protected List actiontypes;
+	protected List agentactiontypes;
 	
 	/** The process types. */
 	protected List processtypes;
@@ -51,23 +54,43 @@ public class MEnvSpaceType	extends MSpaceType
 	}
 	
 	/**
-	 *  Add a action type.
+	 *  Add a agent action type.
 	 *  @param action The action.
 	 */
-	public void addMEnvActionType(MEnvActionType action)
+	public void addMEnvAgentActionType(MEnvAgentActionType action)
 	{
-		if(actiontypes==null)
-			actiontypes = new ArrayList();
-		actiontypes.add(action);	
+		if(agentactiontypes==null)
+			agentactiontypes = new ArrayList();
+		agentactiontypes.add(action);	
+	}
+	
+	/**
+	 *  Get the agent action types.
+	 *  @return The agent action types.
+	 */
+	public List getMEnvAgentActionTypes()
+	{
+		return agentactiontypes;
+	}
+	
+	/**
+	 *  Add a space action type.
+	 *  @param action The action.
+	 */
+	public void addMEnvSpaceActionType(MEnvAgentActionType action)
+	{
+		if(spaceactiontypes==null)
+			spaceactiontypes = new ArrayList();
+		spaceactiontypes.add(action);	
 	}
 	
 	/**
 	 *  Get the action types.
 	 *  @return The action types.
 	 */
-	public List getMEnvActionTypes()
+	public List getMEnvSpaceActionTypes()
 	{
-		return actiontypes;
+		return spaceactiontypes;
 	}
 	
 	/**
@@ -120,8 +143,10 @@ public class MEnvSpaceType	extends MSpaceType
 		sbuf.append(getName());
 		sbuf.append(", dimensions=");
 		sbuf.append(getDimensions());
-		sbuf.append(", action types=");
-		sbuf.append(getMEnvActionTypes());
+		sbuf.append(", agent action types=");
+		sbuf.append(getMEnvAgentActionTypes());
+		sbuf.append(", space action types=");
+		sbuf.append(getMEnvSpaceActionTypes());
 		sbuf.append(", class=");
 		sbuf.append(getClassName());
 		sbuf.append(")");
@@ -140,7 +165,9 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
 			SUtil.createHashMap(new String[]{"type"}, new String[]{"setTypeName"}), null));
-		types.add(new TypeInfo("actiontype", MEnvActionType.class, null, null,
+		types.add(new TypeInfo("agentactiontype", MEnvAgentActionType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
+		types.add(new TypeInfo("spaceactiontype", MEnvSpaceActionType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));

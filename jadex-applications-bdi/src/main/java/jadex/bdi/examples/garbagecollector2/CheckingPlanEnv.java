@@ -34,14 +34,17 @@ public class CheckingPlanEnv extends Plan
 	 */
 	protected static IVector2 computeNextPosition(IVector2 pos, int sizex, int sizey)
 	{
+		// Go right in even lanes
 		if(pos.getXAsInteger()+1<sizex && pos.getYAsInteger()%2==0)
 		{
 			pos = new Vector2Int(pos.getXAsInteger()+1, pos.getYAsInteger());
 		}
+		// Go left in odd lanes
 		else if(pos.getXAsInteger()-1>=0 && pos.getYAsInteger()%2==1)
 		{
 			pos = new Vector2Int(pos.getXAsInteger()-1, pos.getYAsInteger());
 		}
+		// Go down else
 		else
 		{
 			pos = new Vector2Int(pos.getXAsInteger(), (pos.getYAsInteger()+1)%sizey);

@@ -82,7 +82,9 @@ public class SynchronizedObject //implements ISynchronizator
 			}
 			catch(Exception e)
 			{
+//				e.printStackTrace();
 				System.err.println("Execution led to exeception: "+e);
+				e.printStackTrace();
 			}
 		}
 	}

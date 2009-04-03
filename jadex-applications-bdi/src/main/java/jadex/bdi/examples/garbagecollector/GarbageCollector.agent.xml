@@ -106,6 +106,7 @@
 		<achievegoal name="pick" exclude="never" retrydelay="100">
  			<dropcondition language="clips">
  				// !$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
+				
 				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
 				?mbelief = (mbelief (melement_has_name "is_dirty"))
 				?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))

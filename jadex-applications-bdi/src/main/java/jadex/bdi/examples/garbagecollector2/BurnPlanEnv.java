@@ -28,7 +28,7 @@ public class BurnPlanEnv extends Plan
 		waitFor(100);
 		
 		SyncResultListener srl	= new SyncResultListener();
-		env.performAction("burn", null, srl); // todo: garbage as parameter?
+		env.performAgentAction("burn", null, srl); // todo: garbage as parameter?
 		srl.waitForResult();
 		
 //		env.burn(getAgentName());

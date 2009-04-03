@@ -118,6 +118,15 @@ public class Vector1Double implements IVector1
 		return (x_ == vector.getAsDouble());
 	}
 	
+	/** 
+	 *  Compute the hash code.
+	 *  @return The hash code.
+	 */
+	public int hashCode()
+	{
+		return (int)x_;
+	}
+	
 	public boolean greater(IVector1 vector)
 	{
 		return (x_ > vector.getAsDouble());

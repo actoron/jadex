@@ -143,16 +143,21 @@ public class Grid2D extends Space2D
 			}
 			else
 			{
-				ret = new ArrayList();
-				for (Iterator objs = simobjs.iterator(); objs.hasNext();)
+				ArrayList tmp = new ArrayList();
+				for(Iterator objs = simobjs.iterator(); objs.hasNext();)
 				{
-					ISpaceObject currentObj = (ISpaceObject)objs.next();
-					if (type.equals(currentObj.getType()))
+					ISpaceObject curobj = (ISpaceObject)objs.next();
+					if(type.equals(curobj.getType()))
 					{
-						ret.add(currentObj);
+						tmp.add(curobj);
 					}
 				}
+				if(tmp.size()>0)
+					ret = tmp;
 			}
+			
+//			System.out.println("getSpaceObs: "+position+" "+type+" "+ret+" "+simobjs);
+			
 			return ret;
 		}
 	}
@@ -246,6 +251,25 @@ public class Grid2D extends Space2D
 	{
 		synchronized(monitor)
 		{
+			if(BORDER_TORUS==border_mode)
+			{
+				int sizex = areasize.getXAsInteger();
+				int sizey = areasize.getYAsInteger();
+				
+				int x = pos.getXAsInteger();
+				int y = pos.getYAsInteger();
+				
+				while(x<0)
+					x += sizex;
+				while(y<0)
+					y += sizey;
+				
+				x = x % sizex;
+				y = y % sizey;
+				
+				pos = new Vector2Int(x, y);
+			}
+			
 			ISpaceObject obj = getSpaceObject(id);
 			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
 			if(oldpos!=null)

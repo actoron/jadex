@@ -98,7 +98,7 @@ public class ThreadTest
 		 */
 		public void run()
 		{
-			System.out.println("here: "+this);
+//			System.out.println("here: "+this);
 			synchronized(monitor){};
 			System.out.println("first woken up: "+this);
 			while(true)

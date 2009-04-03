@@ -4,6 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -13,7 +15,7 @@ import java.util.ArrayList;
  */
 public class SimplePropertyChangeSupport	implements Serializable
 {
-	private ArrayList	listener;
+	private List	listener;
 
 	private Object		source;
 
@@ -71,8 +73,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 
 		for(int i = 0; i < listener.size(); i++)
 		{
-			PropertyChangeListener oneListener = (PropertyChangeListener)listener
-					.get(i);
+			PropertyChangeListener oneListener = (PropertyChangeListener)listener.get(i);
 			oneListener.propertyChange(evt);
 		}
 	}

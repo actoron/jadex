@@ -1,35 +1,29 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.SimplePropertyObject;
 
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Basic IPropertyHolder implementation.
+ * Basic synchronized IPropertyObject implementation.
  */
-public abstract class PropertyHolder implements IPropertyHolder
+public abstract class PropertyHolder extends SimplePropertyObject
 {
+	//-------- attributes --------
+	
 	/** The monitor. */
 	protected Object monitor;
 	
-	/** The properties */
-	protected Map properties;
-	
-	/** The property change support. */
-	protected SimplePropertyChangeSupport pcs;
+	//-------- constructors --------
 	
 	/**
 	 * Initializes the PropertyHolder, should be called by subclasses.
-	 * 
 	 */
 	public PropertyHolder()
 	{
 		monitor = this;
-		properties = new HashMap();
-		this.pcs = new SimplePropertyChangeSupport(this);
 	}
 	
 	/**
@@ -39,9 +33,9 @@ public abstract class PropertyHolder implements IPropertyHolder
 	public PropertyHolder(Object monitor)
 	{
 		this.monitor = monitor;
-		properties = new HashMap();
-		this.pcs = new SimplePropertyChangeSupport(this);
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 * Returns a property.
@@ -52,7 +46,7 @@ public abstract class PropertyHolder implements IPropertyHolder
 	{
 		synchronized(monitor)
 		{
-			return properties.get(name);
+			return super.getProperty(name);
 		}
 	}
 	
@@ -62,7 +56,10 @@ public abstract class PropertyHolder implements IPropertyHolder
 	 */
 	public Map getProperties()
 	{
-		return properties==null? Collections.EMPTY_MAP: properties;
+		synchronized(monitor)
+		{
+			return super.getProperties();
+		}
 	}
 	
 	/**
@@ -72,9 +69,12 @@ public abstract class PropertyHolder implements IPropertyHolder
 	 */
 	public void setProperty(String name, Object value)
 	{
+		// cannot call super.set because firePropChanged must be outside of synchronized block
 		Object oldval;
 		synchronized(monitor)
 		{
+			if(properties==null)
+				properties = new HashMap();
 			oldval = properties.get(name);
 			properties.put(name, value);
 		}
@@ -109,7 +109,10 @@ public abstract class PropertyHolder implements IPropertyHolder
      */
     public void addPropertyChangeListener(PropertyChangeListener listener)
 	{
-		pcs.addPropertyChangeListener(listener);
+    	synchronized(monitor)
+    	{
+    		super.addPropertyChangeListener(listener);
+    	}
     }
 
     /**
@@ -120,6 +123,9 @@ public abstract class PropertyHolder implements IPropertyHolder
      */
     public void removePropertyChangeListener(PropertyChangeListener listener)
 	{
-		pcs.removePropertyChangeListener(listener);
+    	synchronized(monitor)
+    	{
+    		super.removePropertyChangeListener(listener);
+    	}
     }
 }

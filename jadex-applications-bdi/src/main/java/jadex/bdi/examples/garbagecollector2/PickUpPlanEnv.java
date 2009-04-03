@@ -19,19 +19,18 @@ public class PickUpPlanEnv extends Plan
 	 */
 	public void body()
 	{
-		//System.out.println("Calling pickup: "+getAgentName()+" "+getRootGoal());
-//		Environment env = (Environment)getBeliefbase().getBelief("env").getFact();
-//		if(!env.pickup(getAgentName()))
-//			fail();
+		System.out.println("Pickup plan: "+getAgentName()+" "+getReason());
 		
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("env").getFact();
 		// todo: garbage as parameter?
 		
 		Map params = new HashMap();
-		params.put(ISpaceObject.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceObject.OWNER, getAgentIdentifier().getLocalName());
 		SyncResultListener srl	= new SyncResultListener();
-		env.performAction("pickup", params, srl); // todo: garbage as parameter?
+		env.performAgentAction("pickup", params, srl); // todo: garbage as parameter?
 		if(!((Boolean)srl.waitForResult()).booleanValue()) 
 			fail();
+		
+		System.out.println("pickup plan end");
 	}
 }

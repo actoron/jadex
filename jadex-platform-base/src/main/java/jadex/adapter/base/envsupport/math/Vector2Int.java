@@ -467,6 +467,18 @@ public class Vector2Int implements IVector2
 		return ((x_ == vector.getXAsInteger()) && (y_ == vector.getYAsInteger()));
 	}
 	
+	/** 
+	 *  Compute the hash code.
+	 *  @return The hash code.
+	 */
+	public int hashCode()
+	{
+		return x_*31 + y_;
+	}
+
+	/**
+	 * 
+	 */
 	public String toString()
 	{
 		StringBuffer buffer = new StringBuffer();
@@ -475,4 +487,5 @@ public class Vector2Int implements IVector2
 		buffer.append(y_);
 		return buffer.toString();
 	}
+
 }

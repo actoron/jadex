@@ -97,7 +97,7 @@ public class MultiThreadTest
 		 */
 		public void run()
 		{
-			System.out.println("here: "+this);
+//			System.out.println("here: "+this);
 			//while(true)
 			//{
 				// Simulate some work.
