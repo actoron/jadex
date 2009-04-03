@@ -24,8 +24,8 @@ public class BurnWasteAction implements IAgentAction
 		
 		Grid2D grid = (Grid2D)space;
 		
-		Object id = parameters.get(ISpaceObject.ACTOR_ID);
-		ISpaceObject so = grid.getSpaceObject(id);
+		Object owner = parameters.get(ISpaceObject.OWNER);
+		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 		
 		assert so.getProperty("garbage")!=null;
 		

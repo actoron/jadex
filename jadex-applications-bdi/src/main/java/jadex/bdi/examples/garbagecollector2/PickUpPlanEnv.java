@@ -19,7 +19,7 @@ public class PickUpPlanEnv extends Plan
 	 */
 	public void body()
 	{
-		System.out.println("Pickup plan: "+getAgentName()+" "+getReason());
+//		System.out.println("Pickup plan: "+getAgentName()+" "+getReason());
 		
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("env").getFact();
 		// todo: garbage as parameter?
@@ -31,6 +31,6 @@ public class PickUpPlanEnv extends Plan
 		if(!((Boolean)srl.waitForResult()).booleanValue()) 
 			fail();
 		
-		System.out.println("pickup plan end");
+//		System.out.println("pickup plan end");
 	}
 }

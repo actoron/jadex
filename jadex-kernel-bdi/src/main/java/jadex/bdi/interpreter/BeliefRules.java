@@ -249,6 +249,8 @@ public class BeliefRules
 			Object neworigfacts	= assignments.getVariableValue("$?ret");
 			
 			updateBeliefSet(state, rbeliefset, neworigfacts);
+			
+			System.out.println("Beliefset "+state.getAttributeValue(state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts));
 		}
 	};
 	

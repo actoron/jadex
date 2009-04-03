@@ -24,8 +24,8 @@
 			<env:agentactiontype name="burn" class="BurnWasteAction" />
 			<env:agentactiontype name="go" class="GoAction" />
 			<env:processtype name="create" class="CreateWasteProcess" />
-			<env:dimension>5</env:dimension>
-			<env:dimension>5</env:dimension>
+			<env:dimension>1</env:dimension>
+			<env:dimension>1</env:dimension>
 		</env:envspacetype>
 	</spacetypes>
 	
@@ -37,7 +37,7 @@
 	<applications>
 		<application name="One Burner / One Collector">
 			<agents>
-				<agent name="Collector1" type="Collector"/>
+				<!--  <agent name="Collector1" type="Collector"/>-->
 				<agent name="Burner1" type="Burner"/>
 			</agents>
 			

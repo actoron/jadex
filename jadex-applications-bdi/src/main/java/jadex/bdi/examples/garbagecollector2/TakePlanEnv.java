@@ -21,29 +21,26 @@ public class TakePlanEnv extends Plan
 	 */
 	public void body()
 	{
-		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
+		Space2D grid = (Space2D)getBeliefbase().getBelief("env").getFact();
 
 		// Pickup the garbarge.
 		IGoal pickup = createGoal("pick");
 		dispatchSubgoalAndWait(pickup);
 
 		// Go to the burner.
-		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself");
+		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 oldpos =(IVector2)myself.getProperty(Space2D.POSITION);
 		IGoal go = createGoal("go");
-//		go.getParameter("pos").setValue(env.getBurnerPosition());
-
-		// todo!!!
-//		go.getParameter("pos").setValue(env.getSp);
+		IVector2 pos = (IVector2)grid.getSpaceObjectsByType("burner")[0].getProperty(Space2D.POSITION);
+		go.getParameter("pos").setValue(pos);
 		dispatchSubgoalAndWait(go);
 
 		// Put down the garbarge.
 		//System.out.println("Calling drop: "+getAgentName()+" "+getRootGoal());
-//		env.drop(getAgentName());
 		Map params = new HashMap();
-		params.put("agent", getAgentIdentifier());
+		params.put(ISpaceObject.OWNER, getAgentIdentifier().getLocalName());
 		SyncResultListener srl	= new SyncResultListener();
-		env.performAgentAction("drop", params, srl);
+		grid.performAgentAction("drop", params, srl);
 		srl.waitForResult();
 		
 		// Go back.
@@ -52,9 +49,9 @@ public class TakePlanEnv extends Plan
 		dispatchSubgoalAndWait(goback);
 	}
 
-	/*public void aborted()
+	public void aborted()
 	{
-		System.out.println("aborted: "+getAgentName()+" "+this+" "+isAbortedOnSuccess());
+		System.out.println("aborted: "+getAgentName()+" "+this);
 	}
 
 	public void failed()
@@ -65,6 +62,6 @@ public class TakePlanEnv extends Plan
 	public void passed()
 	{
 		System.out.println("passed: "+getAgentName()+" "+this);
-	}*/
+	}
 	
 }

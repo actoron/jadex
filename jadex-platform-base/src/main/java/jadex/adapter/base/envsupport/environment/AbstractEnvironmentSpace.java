@@ -195,6 +195,17 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	}
 	
 	/**
+	 * Get all space object of a specific type.
+	 * @param type The space object type.
+	 * @return The space objects of the desired type.
+	 */
+	public ISpaceObject[] getSpaceObjectsByType(Object type)
+	{
+		List obs = (List)spaceobjectsbytype.get(type);
+		return obs==null? new ISpaceObject[0]: (ISpaceObject[])obs.toArray(new ISpaceObject[obs.size()]); 
+	}
+	
+	/**
 	 * Adds a space action.
 	 * @param actionId the action ID
 	 * @param action the action

@@ -159,7 +159,7 @@ public class ApplicationFactory implements IApplicationFactory
 				{
 					final MAgentInstance agent = (MAgentInstance)agents.get(i);
 					
-//					System.out.println("Create: "+agent.getName()+" "+agent.getModel(apptype)+" "+agent.getConfiguration()+" "+agent.getArguments());
+					System.out.println("Create: "+agent.getName()+" "+agent.getTypeName()+" "+agent.getConfiguration());
 					int num = agent.getNumber();
 					for(int j=0; j<num; j++)
 					{

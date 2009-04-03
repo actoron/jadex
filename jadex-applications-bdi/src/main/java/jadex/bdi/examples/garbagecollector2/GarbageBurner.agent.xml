@@ -33,7 +33,9 @@
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl">
-				$beliefbase.myself.getProperty("position")
+				$beliefbase.myself.position
+				
+				//$beliefbase.myself.getProperty("position")
 				
 				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
 				// ?agent = (agent (agent_has_localname ?agentname))
@@ -47,7 +49,7 @@
 		<beliefset name="garbages" class="String" evaluationmode="push">
 			<facts language="jcl">
 				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage")
-				
+ 				
 				// ((Environment)$beliefbase.getBelief("env").getFact()).getGarbages($beliefbase.getBelief("pos").getFact())
 				
 				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
@@ -74,18 +76,17 @@
 		</achievegoal> -->
 		
 		<achievegoal name="burn">
-			<parameter name="garbage" class="String">
+			<parameter name="garbage" class="ISpaceObject">
 				<!--  <bindingoptions>$beliefbase.garbages</bindingoptions>-->
 				<!-- Bind against variable from creation condition. -->
 				<!--  <bindingoptions>"?garbage"</bindingoptions>-->
 				<value>?garbage</value>
 			</parameter>
 			<!-- todo: remove unique support? <unique/> -->
-			<!-- <creationcondition>
-				?garbage = (String)
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?garbage))
-				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
-			</creationcondition>-->
+			<creationcondition>
+				?garbage = (ISpaceObject)
+				?rbeliefset = (beliefset (element_has_model.melement_has_name "garbages") (beliefset_has_facts contains ?garbage))
+			</creationcondition>
 			<creationcondition>
 				// unique (?rcapa and ?mgoal are provided internally)
 				(not (and
@@ -93,14 +94,13 @@
 					?rcapa		= (capability (capability_has_goals contains ?adopted))
 				))
 
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?garbage $?y))
-				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
+				?rbeliefset = (beliefset (element_has_model.melement_has_name "garbages") (beliefset_has_facts $?x ?garbage $?y))
 			</creationcondition>
 			<deliberation cardinality="1"/>
 		</achievegoal>
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
-		<achievegoal name="pick" exclude="never"/>
+		<achievegoal name="pick" exclude="never" retrydelay="100"/>
 	</goals>
 
 	<plans>

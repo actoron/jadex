@@ -65,6 +65,13 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	public ISpaceObject getSpaceObject(Object id);
 	
 	/**
+	 * Get all space object of a specific type.
+	 * @param type The space object type.
+	 * @return The space objects of the desired type.
+	 */
+	public ISpaceObject[] getSpaceObjectsByType(Object type);
+	
+	/**
 	 * Adds a space action.
 	 * @param actionId the action ID
 	 * @param action the action

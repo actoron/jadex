@@ -26,8 +26,8 @@ public class DropWasteAction implements IAgentAction
 		
 		Grid2D grid = (Grid2D)space;
 		
-		Object id = parameters.get(ISpaceObject.ACTOR_ID);
-		ISpaceObject so = grid.getSpaceObject(id);
+		Object owner = parameters.get(ISpaceObject.OWNER);
+		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 		IVector2 pos = (IVector2)so.getProperty(Grid2D.POSITION);
 		
 		assert so.getProperty("garbage")!=null;
@@ -36,7 +36,7 @@ public class DropWasteAction implements IAgentAction
 		grid.setPosition(garb.getId(), pos);
 		so.setProperty("garbage", null);
 		
-		//System.out.println("Agent dropped garbage: "+name+" "+getPosition(name));
+		System.out.println("Agent dropped garbage: "+owner+" "+pos);
 		
 		return null;
 	}

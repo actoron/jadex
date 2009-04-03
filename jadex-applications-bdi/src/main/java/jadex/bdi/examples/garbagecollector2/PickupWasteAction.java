@@ -33,11 +33,9 @@ public class PickupWasteAction implements IAgentAction
 		Object owner = parameters.get(ISpaceObject.OWNER);
 		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 		
-		if(so.getProperty("garbage")!=null)
-			System.out.println("pickup failed: "+so);
+//		if(so.getProperty("garbage")!=null)
+//			System.out.println("pickup failed: "+so);
 		
-		if(so.getProperty("garbage")!=null)
-			System.out.println("test");
 		assert so.getProperty("garbage")==null: so;
 		
 		Collection wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.POSITION), "garbage");
@@ -47,7 +45,7 @@ public class PickupWasteAction implements IAgentAction
 			{
 				Object waste = wastes.iterator().next();
 				wastes.remove(waste);
-				System.out.println("pickup: "+waste);
+//				System.out.println("pickup: "+waste);
 				so.setProperty("garbage", waste);
 				ret = true;
 				//pcs.firePropertyChange("worldObjects", garb, null);

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  *  2D grid environment.
@@ -228,14 +229,37 @@ public class Grid2D extends Space2D
 		synchronized(monitor)
 		{
 			IVector2 ret = null;
-			while (ret == null)
+
+			// Problem of efficiently finding an empty field
+			// Enumerating all empty fields would cause big
+			// memory consumption on big grids
+			
+			if(objectsygridpos.keySet().size()<areasize.getYAsInteger()*areasize.getXAsInteger())
 			{
-				ret = new Vector2Int(getRandomPosition(Vector2Int.ZERO));
-				if(objectsygridpos.containsKey(ret))
+				// first try n times random value 
+				int n = 5;
+				for(int i=0; i<n && ret==null; i++)
 				{
-					ret = null;
+					ret = new Vector2Int(getRandomPosition(Vector2Int.ZERO));
+					if(objectsygridpos.containsKey(ret))
+						ret = null;
+				}
+				
+				// Just find first empty field
+				if(ret==null)
+				{
+					for(int y=0; y<areasize.getYAsInteger(); y++)
+					{
+						for(int x=0; x<areasize.getXAsInteger(); x++)
+						{
+							ret = new Vector2Int(x, y);
+							if(objectsygridpos.containsKey(ret))
+								ret = null;
+						}
+					}
 				}
 			}
+			
 			return ret;
 		}
 	}
@@ -298,6 +322,9 @@ public class Grid2D extends Space2D
 			ISpaceObject obj = super.createSpaceObject(type, owner, properties, tasks, listeners);
 
 			IVector2 pos = properties==null? getEmptyGridPosition(): (IVector2)properties.get(Space2D.POSITION);
+			if(pos==null)
+				pos = getRandomPosition(Vector2Int.ZERO);
+			
 			// Hack! todo: remove this
 			if(properties!=null)
 				properties.remove(Space2D.POSITION);
