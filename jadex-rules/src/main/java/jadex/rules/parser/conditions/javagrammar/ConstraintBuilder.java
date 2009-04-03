@@ -3,6 +3,7 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.ArraySelector;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.Constant;
@@ -151,6 +152,7 @@ public class ConstraintBuilder
 		// Build literal constraint for constant values
 		if(right instanceof LiteralExpression)
 		{
+			// Right side of literal constraint is not a value source (i.e. Constant)
 			ocon.addConstraint(new LiteralConstraint(valuesource, ((LiteralExpression)right).getValue(), op));
 		}
 
@@ -225,8 +227,9 @@ public class ConstraintBuilder
 								}
 								else //if(p instanceof LiteralExpression)
 								{
-									params[j]	= ((LiteralExpression)p).getValue();
-									paramtypes[j]	= params[j]!=null ? params[j].getClass() : null;
+									Object	val	= ((LiteralExpression)p).getValue();
+									params[j]	= new Constant(val);
+									paramtypes[j]	= val!=null ? val.getClass() : null;
 								}
 							}
 							
@@ -253,6 +256,21 @@ public class ConstraintBuilder
 						{
 							throw new RuntimeException("Method invocation not supported on type: "+type);
 						}
+					}
+					else if(suffixes[i] instanceof ArrayAccess)
+					{
+						Expression	index	= flattenToPrimary(((ArrayAccess)suffixes[i]).getIndex(), context);
+						Object	indexsource;
+						if(index instanceof VariableExpression)
+						{
+							indexsource	= ((VariableExpression)index).getVariable();
+						}
+						else //if(p instanceof LiteralExpression)
+						{
+							indexsource	= new Constant(((LiteralExpression)index).getValue());
+						}
+						suffs.add(new ArraySelector(indexsource));
+						type	= context.getTypeModel().getJavaType(((OAVJavaType)type).getClazz().getComponentType());
 					}
 					else
 					{

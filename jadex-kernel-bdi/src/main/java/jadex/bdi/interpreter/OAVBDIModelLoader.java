@@ -16,11 +16,8 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rete.builder.ReteBuilder;
 import jadex.rules.rulesystem.rules.AndCondition;
-import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.Constraint;
-import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.IPriorityEvaluator;
-import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Rule;
@@ -494,7 +491,7 @@ public class OAVBDIModelLoader
 				createDynamicParameterValuesConditions(mgoal, state, rb, mcapa, imports);
 				
 				// Create rules for dynamic parameter set values.
-				createDynamicParameterSetValuesConditions(mgoal, state, rb);
+				createDynamicParameterSetValuesConditions(mgoal, state, rb, mcapa, imports);
 			}
 		}
 		
@@ -527,11 +524,12 @@ public class OAVBDIModelLoader
 				Object context = state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_contextcondition);
 				if(context!=null)
 				{
-					ICondition usercond = (ICondition)state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
+					Object usercond = state.getAttributeValue(context, OAVBDIMetaModel.expression_has_content);
 					if(usercond!=null)
 					{
 						String rulename = Rulebase.getUniqueRuleName(rb, "plan_context_"+mplan.toString());
-						rb.addRule(PlanRules.createPlanContextInvalidUserRule(rulename, usercond, mplan));
+						Object[]	tmp	= PlanRules.createPlanContextInvalidUserRule(mplan);
+						rb.addRule(createUserRule(state, mcapa, imports, mplan, context, usercond, rulename, tmp));
 					}
 				}
 				
@@ -539,7 +537,7 @@ public class OAVBDIModelLoader
 				createDynamicParameterValuesConditions(mplan, state, rb, mcapa, imports);
 				
 				// Create rules for dynamic parameter set values.
-				createDynamicParameterSetValuesConditions(mplan, state, rb);
+				createDynamicParameterSetValuesConditions(mplan, state, rb, mcapa, imports);
 			}
 		}
 		
@@ -589,11 +587,12 @@ public class OAVBDIModelLoader
 					if(facts!=null)
 					{
 						Object usercond = state.getAttributeValue(facts, OAVBDIMetaModel.expression_has_content);
-						if(usercond instanceof ICondition)
+						if(usercond!=null)
 						{
 							String btname = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
 							String rulename = Rulebase.getUniqueRuleName(rb, "beliefset_dynamicfacts_"+btname);
-							rb.addRule(BeliefRules.createDynamicBeliefSetUserRule(rulename, (ICondition)usercond, mbelset));
+							Object[]	tmp	= BeliefRules.createDynamicBeliefSetUserRule(mbelset);
+							rb.addRule(createUserRule(state, mcapa, imports, null, facts, usercond, rulename, tmp));
 						}
 					}
 				}
@@ -608,11 +607,12 @@ public class OAVBDIModelLoader
 			{
 				Object mcond = it.next();
 				Object usercond = state.getAttributeValue(mcond, OAVBDIMetaModel.expression_has_content);
-				if(usercond instanceof ICondition)
+				if(usercond!=null)
 				{
 					String name = (String)state.getAttributeValue(mcond, OAVBDIMetaModel.modelelement_has_name);
 					String rulename = Rulebase.getUniqueRuleName(rb, "condition_"+name);
-					rb.addRule(BeliefRules.createConditionUserRule(rulename, (ICondition)usercond, mcond));
+					Object[]	tmp	= BeliefRules.createConditionUserRule(mcond);
+					rb.addRule(createUserRule(state, mcapa, imports, null, mcond, usercond, rulename, tmp));
 				}
 			}
 		}
@@ -756,7 +756,7 @@ public class OAVBDIModelLoader
 	 *  @param state The state.
 	 *  @param rb The rulebase.
 	 */
-	protected void createDynamicParameterSetValuesConditions(Object mpe, IOAVState state, IRulebase rb)
+	protected void createDynamicParameterSetValuesConditions(Object mpe, IOAVState state, IRulebase rb, Object mcapa, String[] imports)
 	{
 		// Create rules for dynamic parameter set values.
 	
@@ -775,10 +775,11 @@ public class OAVBDIModelLoader
 					{
 						String ptname = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.modelelement_has_name);
 						Object usercond = state.getAttributeValue(values, OAVBDIMetaModel.expression_has_content);
-						if(usercond instanceof ICondition)
+						if(usercond!=null)
 						{
 							String rulename = Rulebase.getUniqueRuleName(rb, "parameterset_dynamicvalues_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
-							rb.addRule(BeliefRules.createDynamicParameterSetUserRule(rulename, mpe, (ICondition)usercond, ptname));
+							Object[]	tmp	= BeliefRules.createDynamicParameterSetUserRule(mpe, ptname);
+							rb.addRule(createUserRule(state, mcapa, imports, mpe, values, usercond, rulename, tmp));
 						}
 					}
 				}
@@ -859,7 +860,7 @@ public class OAVBDIModelLoader
 	 *  @param goalname	The name of the goal type.
 	 *  @param usercond	The user part of the condition
 	 *  @return	The complete goal condition including variables ?rgoal and ?mgoal.
-	 */
+	 * /
 	protected static ICondition createGoalCondition(String goalname, ICondition usercond)
 	{
 		return createGoalCondition(goalname, usercond, null);
@@ -871,7 +872,7 @@ public class OAVBDIModelLoader
 	 *  @param usercond	The user part of the condition.
 	 *  @param lifecyclestate	A goal lifecycle state in which the condition should trigger.
 	 *  @return	The complete goal condition including variables ?rgoal and ?mgoal.
-	 */
+	 * /
 	protected static ICondition createGoalCondition(String goalname, ICondition usercond, String lifecyclestate)
 	{
 		return createGoalCondition(goalname, usercond, lifecyclestate, true);
@@ -885,7 +886,7 @@ public class OAVBDIModelLoader
 	 *  @param islifecyclestate	If true, condition triggers only when goal is in the given lifecyclestate,
 	 *  	otherwise triggers when goal is NOT in lifecyclestate.
 	 *  @return	The complete goal condition including variables ?rgoal and ?mgoal.
-	 */
+	 * /
 	protected static ICondition createGoalCondition(String goalname, ICondition usercond, String lifecyclestate, boolean islifecyclestate)
 	{
 		ObjectCondition	mgoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
@@ -901,7 +902,7 @@ public class OAVBDIModelLoader
 		}
 		ICondition	goalcond	= new AndCondition(new ICondition[]{mgoalcon, goalcon, usercond});
 		return goalcond;
-	}
+	}*/
 
 	/**
 	 * 

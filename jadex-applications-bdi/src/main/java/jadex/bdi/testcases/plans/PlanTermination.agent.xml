@@ -44,10 +44,11 @@
 	<plans>
 		<plan name="worker">
 			<body class="ContextPlan"/>
-			<contextcondition language="clips">
-				// $beliefbase.context
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (melement_has_name "context"))
+			<contextcondition language="jcl">
+				$beliefbase.context
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				// ?mbelief = (mbelief (melement_has_name "context"))
 			</contextcondition>
 		</plan>
 
@@ -71,10 +72,11 @@
 	</properties>
 	
 	<expressions>
-		<condition name="plan_context" language="clips">
-			//!$beliefbase.context
-			?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-			?mbelief = (mbelief (melement_has_name "context"))
+		<condition name="plan_context" language="jcl">
+			!$beliefbase.context
+			
+			// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
+			// ?mbelief = (mbelief (melement_has_name "context"))
 		</condition>
 	</expressions>
 

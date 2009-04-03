@@ -62,24 +62,24 @@
 	<goals>
 		<!-- Main goal of the player is to play games at a dealer. -->
 		<maintaingoal name="know_dealer" recur="true" recurdelay="2000">
-			<maintaincondition language="clips">
-				// $beliefbase.dealer!=null
+			<maintaincondition language="jcl">
+				$beliefbase.dealer!=null
 				
-				?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
+				// ?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
 			</maintaincondition>
 		</maintaingoal>
 
 		<achievegoal name="start_playing">
-			<creationcondition language="clips">
-				// $beliefbase.dealer!=null
+			<creationcondition language="jcl">
+				$beliefbase.dealer!=null
 				
-				?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
+				// ?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
 			</creationcondition>
-			<contextcondition language="clips">
-				// $beliefbase.myself.getAccount()>0
+			<contextcondition language="jcl">
+				$beliefbase.myself.getAccount()>0
 				
-				?myself = (Player (account > 0))
-				?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?myself))
+				// ?myself = (Player (account > 0))
+				// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?myself))
 			</contextcondition>
 			<targetcondition language="clips">
 				// $beliefbase.myself.getState().equals(Player.STATE_IDLE)
@@ -278,17 +278,16 @@
 	</events>
 
 	<expressions>
-		<condition name="start_playing" language="clips">
-			// $beliefbase.myself.getCards().length==2 &amp;&amp; $beliefbase.gamestate!=null
-			// &amp;&amp; $beliefbase.gamestate.getDealer().getCards().length==1
+		<condition name="start_playing" language="jcl">
+			$beliefbase.myself.getCards().length==2 &amp;&amp; $beliefbase.gamestate!=null
+			&amp;&amp; $beliefbase.gamestate.getDealer().getCards().length==1
 		
-			?player = (Player (cardCnt 2))
-			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
+			// ?player = (Player (cardCnt 2))
+			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 
-			?rbelief2 = (belief (element_has_model.melement_has_name "gamestate") (belief_has_fact ?gamestate))
-			?gamestate = (GameState (dealer ?dealer &amp; 
-				:(== 1 (MethodCallFunction "Player" "getCardCnt" ?dealer))))
-			//?dealer = (Player (cardCnt 1))			
+			// ?rbelief2 = (belief (element_has_model.melement_has_name "gamestate") (belief_has_fact ?gamestate))
+			// ?gamestate = (GameState (dealer ?dealer &amp; 
+			// 	:(== 1 (MethodCallFunction "Player" "getCardCnt" ?dealer))))
 		</condition>
 	</expressions>
 

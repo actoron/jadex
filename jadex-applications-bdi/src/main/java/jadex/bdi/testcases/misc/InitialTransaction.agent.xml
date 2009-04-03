@@ -47,11 +47,11 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<condition language="clips">
-					//$beliefbase.text!=null
+				<condition language="jcl">
+					$beliefbase.text!=null
 					
-					?rbel_text	= (belief (element_has_model ?mbel_text) (belief_has_fact != null))
-					?mbel_txt	= (mbelief (melement_has_name "text"))
+					// ?rbel_text	= (belief (element_has_model ?mbel_text) (belief_has_fact != null))
+					// ?mbel_txt	= (mbelief (melement_has_name "text"))
 				</condition>
 			</trigger>
 		</plan>

@@ -148,7 +148,7 @@ additiveExpression returns [Expression exp]
  *  A multiplicative expression multiplies or divides two values.
  */
 multiplicativeExpression returns [Expression exp]
-	: tmp = primaryExpression {$exp = tmp;}
+	: tmp = unaryExpression {$exp = tmp;}
         (
 		{
 			IFunction	operator	= null;
@@ -156,7 +156,7 @@ multiplicativeExpression returns [Expression exp]
 	        ('*' {operator=IFunction.MULT;}
         	|'/' {operator=IFunction.DIV;}
         	|'%' {operator=IFunction.MOD;}
-        	) tmp2 = primaryExpression
+        	) tmp2 = unaryExpression
 	        {
 	        	$exp = new OperationExpression($exp, tmp2, operator);
 	        }
@@ -164,7 +164,18 @@ multiplicativeExpression returns [Expression exp]
 	;
 	
 /**
- *  An unary expression produces a single value
+ *  An unary expression operates on a single value.
+ */
+unaryExpression returns [Expression exp]
+	: '+' tmp = unaryExpression {$exp = tmp;}
+	| '-' tmp = unaryExpression {$exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_MINUS);}
+	| '!' tmp = unaryExpression {$exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_NOT);}
+	| '~' tmp = unaryExpression {$exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_BNOT);}
+	| tmp = primaryExpression {$exp = tmp;}
+	;
+	
+/**
+ *  A primary expression produces a single value
  */
 primaryExpression returns [Expression exp]
 	:
@@ -275,6 +286,16 @@ literal returns [Expression exp]
 	;
 
 floatingPointLiteral returns [Expression exp]
+	: FloatingPointLiteral {$exp = new LiteralExpression(new Double($FloatingPointLiteral.text));}
+	;
+
+integerLiteral returns [Expression exp]
+	: HexLiteral {$exp = new LiteralExpression(new Integer($HexLiteral.text));}
+	| OctalLiteral {$exp = new LiteralExpression(new Integer($OctalLiteral.text));}
+	| DecimalLiteral {$exp = new LiteralExpression(new Integer($DecimalLiteral.text));}
+	;
+/*
+floatingPointLiteral returns [Expression exp]
 	: sign=('+'|'-')? FloatingPointLiteral {$exp = new LiteralExpression(sign!=null && "-".equals(sign.getText())? new Double("-"+$FloatingPointLiteral.text): new Double($FloatingPointLiteral.text));}
 	;
 
@@ -283,7 +304,7 @@ integerLiteral returns [Expression exp]
 	| OctalLiteral {$exp = new LiteralExpression((sign!=null && "-".equals(sign.getText())? new Integer("-"+$OctalLiteral.text): new Integer($OctalLiteral.text)));}
 	| DecimalLiteral {$exp = new LiteralExpression(sign!=null && "-".equals(sign.getText())? new Integer("-"+$DecimalLiteral.text): new Integer($DecimalLiteral.text));})
 	;
-
+*/
 
 
 // Lexxer

@@ -46,10 +46,11 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition language="clips">
-					// $beliefbase.count==1
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 1))
-					?mbelief = (mbelief (melement_has_name "count"))
+				<condition language="jcl">
+					$beliefbase.count==1
+					
+					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 1))
+					// ?mbelief = (mbelief (melement_has_name "count"))
 				</condition>
 			</trigger>
 		</plan>
@@ -63,10 +64,11 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
- 				<condition language="clips">
- 					// $beliefbase.count==2
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
-					?mbelief = (mbelief (melement_has_name "count"))
+ 				<condition language="jcl">
+ 					$beliefbase.count==2
+ 					
+					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
+					// ?mbelief = (mbelief (melement_has_name "count"))
  				</condition>
 			</trigger>
 		</plan>

@@ -33,10 +33,11 @@
 
 	<goals>
 		<achievegoal name="goal">
-			<creationcondition language="clips">
-				//$beliefbase.bel==2
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
-				?mbelief = (mbelief (melement_has_name "bel"))
+			<creationcondition language="jcl">
+				$beliefbase.bel==2
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
+				// ?mbelief = (mbelief (melement_has_name "bel"))
 			</creationcondition>
 		</achievegoal>
 	</goals>
@@ -52,10 +53,11 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<condition language="clips">
-					// $beliefbase.bel==4
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 4))
-					?mbelief = (mbelief (melement_has_name "bel"))
+				<condition language="jcl">
+					$beliefbase.bel==4
+					
+					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 4))
+					// ?mbelief = (mbelief (melement_has_name "bel"))
 				</condition>
 			</trigger>
 		</plan>

@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-03-27 10:50:29
+// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-04-03 13:39:25
 
 package jadex.rules.parser.conditions;
 
@@ -1931,7 +1931,7 @@ public class ClipsJadexParser extends Parser {
 
                     state._fsp--;
 
-                    val = tmp1;
+                    val = new Constant(tmp1);
 
                     }
                     break;

@@ -48,16 +48,17 @@
 		<!-- Goal type to keep the number of entries in the dictionary
 			below some threshold given by the belief maxstorage. -->
 		<maintaingoal name="keepstorage" exclude="when_failed">
-			<!-- <maintaincondition>$beliefbase.egwords.length &lt;= $beliefbase.maxstorage</maintaincondition> -->
-			<maintaincondition language="clips">
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?maxstorage))
-				?mbelief = (mbelief (melement_has_name "maxstorage"))
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?facts &amp;
-					:(&lt; ?maxstorage (Length $?facts))))
-				?mbeliefset = (mbeliefset (melement_has_name "egwords"))
-			
-				?rgoal = (goal (element_has_model ?mgoal))
-				?mgoal = (mmaintaingoal (melement_has_name "keepstorage"))
+			<maintaincondition language="jcl">
+				$beliefbase.egwords.length &lt;= $beliefbase.maxstorage
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?maxstorage))
+				// ?mbelief = (mbelief (melement_has_name "maxstorage"))
+				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?facts &amp;
+				// 	:(&lt; ?maxstorage (Length $?facts))))
+				// ?mbeliefset = (mbeliefset (melement_has_name "egwords"))
+				//
+				// ?rgoal = (goal (element_has_model ?mgoal))
+				// ?mgoal = (mmaintaingoal (melement_has_name "keepstorage"))
 			</maintaincondition>
 		</maintaingoal>
 	</goals>

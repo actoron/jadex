@@ -54,11 +54,12 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
  			<fact>new BeanChangesArrayList()</fact>
 		</belief>
 		<beliefset name="belset" class="String"  evaluationmode="push">
-			<facts language="clips">
-				// $beliefbase.bel
-				?mbel = (mbelief (melement_has_name "bel"))
-				?rbel = (belief (element_has_model ?mbel) (belief_has_fact ?bca))
-				?bca = (BeanChangesArrayList (toArray() $?ret))
+			<facts language="jcl">
+				$beliefbase.bel
+				
+				// ?mbel = (mbelief (melement_has_name "bel"))
+				// ?rbel = (belief (element_has_model ?mbel) (belief_has_fact ?bca))
+				// ?bca = (BeanChangesArrayList (toArray() ?ret))
 			</facts>
 		</beliefset>
 

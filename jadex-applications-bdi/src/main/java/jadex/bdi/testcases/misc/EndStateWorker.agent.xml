@@ -41,10 +41,11 @@
 	<goals>
 		<!-- A goal that should not be triggered in end state. -->
 		<achievegoal name="testgoal">
-			<creationcondition language="clips">
-				// $beliefbase.trigger
-				?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
-				?mbel_trigger	= (mbelief (melement_has_name "trigger"))
+			<creationcondition language="jcl">
+				$beliefbase.trigger
+				
+				// ?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
+				// ?mbel_trigger	= (mbelief (melement_has_name "trigger"))
 			</creationcondition>
 		</achievegoal>
 		<achievegoal name="endgoal">
@@ -68,10 +69,11 @@
 			<body class="ResultPlan"/>
 			<trigger>
 				<goal ref="testgoal"/>
-				<condition language="clips">
-					// $beliefbase.trigger
-					?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
-					?mbel_trigger	= (mbelief (melement_has_name "trigger"))
+				<condition language="jcl">
+					$beliefbase.trigger
+					
+					// ?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
+					// ?mbel_trigger	= (mbelief (melement_has_name "trigger"))
 				</condition>
 			</trigger>
 		</plan>

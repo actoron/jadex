@@ -57,11 +57,11 @@
 					)
 				)
 			</creationcondition>
-			<contextcondition language="clips">
-				// $goal.alarm.isActive()
-				?alarm = (Alarm (active true))
-				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			<contextcondition language="jcl">
+				$goal.alarm.isActive()
+				// ?alarm = (Alarm (active true))
+				// ?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</contextcondition>
 			<dropcondition language="clips">
 				// !$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)

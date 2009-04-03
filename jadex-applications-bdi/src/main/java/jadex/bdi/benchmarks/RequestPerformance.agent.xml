@@ -44,9 +44,11 @@
 		<plan name="master_plan">
 			<body class="RequestMasterPlan" />
 			<trigger>
-				<condition language="clips">
-					?mbelief= (mbelief (melement_has_name "master"))
-					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact true))
+				<condition language="jcl">
+					$beliefbase.master
+					
+					// ?mbelief= (mbelief (melement_has_name "master"))
+					// ?belief	= (belief (element_has_model ?mbelief) (belief_has_fact true))
 				</condition>
 			</trigger>
 		</plan>
@@ -55,9 +57,11 @@
 		<plan name="sender_plan">
 			<body class="RequestSenderPlan" />
 			<trigger>
-				<condition language="clips">
-					?mbelief= (mbelief (melement_has_name "receiver"))
-					?belief	= (belief (element_has_model ?mbelief) (belief_has_fact != null))
+				<condition language="jcl">
+					$beliefbase.receiver!=null
+					
+					// ?mbelief= (mbelief (melement_has_name "receiver"))
+					// ?belief	= (belief (element_has_model ?mbelief) (belief_has_fact != null))
 				</condition>
 			</trigger>
 		</plan>

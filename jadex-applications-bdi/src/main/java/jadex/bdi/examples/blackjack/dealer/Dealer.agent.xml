@@ -99,13 +99,10 @@
 	<goals>
 		<!-- Main goal to play a game. -->
 		<performgoal name="play_game" exclude="never">
-			<contextcondition language="clips">
-				// $beliefbase.players.length > 0
-				// ?rbeliefset = (beliefset (beliefset_has_facts $?facts) (element_has_model ?mbeliefset))
-				// ?mbeliefset = (mbeliefset (melement_has_name "players"))
-				// (test (> (Length $?facts) 0))
+			<contextcondition language="jcl">
+				$beliefbase.players.length > 0
 				
-				?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts $?facts &amp; :(> (Length $?facts) 0) ))
+				// ?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts $?facts &amp; :(> (Length $?facts) 0) ))
 			</contextcondition>
 		</performgoal>
 
@@ -486,11 +483,11 @@
 		</condition>
 
 		<!-- Check if the dealer has drawn its first card. -->
-		<condition name="dealer_card" language="clips">
-			// $beliefbase.myself.getCards().length==1
+		<condition name="dealer_card" language="jcl">
+			$beliefbase.myself.getCards().length==1
 			
-			?player = (Player (cardCnt 1))
-			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
+			// ?player = (Player (cardCnt 1))
+			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 		</condition>
 
 		<!-- Check if the dealer has finished drawing cards. -->

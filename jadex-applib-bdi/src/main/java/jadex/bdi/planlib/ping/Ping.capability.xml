@@ -56,11 +56,13 @@
 				// false (i.e. never finished)
 				(test (jadex.rules.rulesystem.rules.functions.Identity false))
 			</targetcondition>
-			<dropcondition language="clips">
+			<dropcondition language="jcl">
 				// Finished if pinged agent misses max pings.
-				?rparammax = (parameter (parameter_has_name "missed_max") (parameter_has_value ?max))
-				?rparamcnt = (parameter (parameter_has_name "missed_cnt") (parameter_has_value > ?max))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparammax) (parameterelement_has_parameters contains ?rparamcnt))
+				$goal.missed_cnt > $goal.missed_max
+				
+				// ?rparammax = (parameter (parameter_has_name "missed_max") (parameter_has_value ?max))
+				// ?rparamcnt = (parameter (parameter_has_name "missed_cnt") (parameter_has_value > ?max))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparammax) (parameterelement_has_parameters contains ?rparamcnt))
 			</dropcondition>
 		</achievegoal>
 	

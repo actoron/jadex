@@ -402,7 +402,7 @@ operatorCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]
 	;
 
 parameter [OAVTypeModel tmodel, Map vars] returns [Object val]	
-	: tmp1=constant {$val = tmp1;} 
+	: tmp1=constant {$val = new Constant(tmp1);} 
 	| tmp2=variable[null, vars] {$val = tmp2;}
 	| {SConditions.lookaheadFunctionCall(ClipsJadexParser.this.input)}? tmp3=functionCall[tmodel, vars] {$val = tmp3;}
 	| tmp4=operatorCall[tmodel, vars] {$val = tmp4;}

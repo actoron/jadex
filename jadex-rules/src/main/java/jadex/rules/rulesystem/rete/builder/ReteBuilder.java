@@ -12,6 +12,7 @@ import jadex.rules.rulesystem.rete.extractors.ChainedExtractor;
 import jadex.rules.rulesystem.rete.extractors.ConstantExtractor;
 import jadex.rules.rulesystem.rete.extractors.FunctionExtractor;
 import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
+import jadex.rules.rulesystem.rete.extractors.JavaArrayExtractor;
 import jadex.rules.rulesystem.rete.extractors.JavaMethodExtractor;
 import jadex.rules.rulesystem.rete.extractors.JavaObjectExtractor;
 import jadex.rules.rulesystem.rete.extractors.JavaTupleExtractor;
@@ -38,6 +39,7 @@ import jadex.rules.rulesystem.rete.nodes.TestNode;
 import jadex.rules.rulesystem.rete.nodes.TypeNode;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.AndConstraint;
+import jadex.rules.rulesystem.rules.ArraySelector;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.Constant;
@@ -1338,6 +1340,10 @@ public class ReteBuilder
 		{
 			ret = createMethodExtractor(tupleindex, (MethodCall)valuesource, context);
 		}
+		else if(valuesource instanceof ArraySelector)
+		{
+			ret = createArrayExtractor(tupleindex, (ArraySelector)valuesource, context);
+		}
 		else if(valuesource instanceof FunctionCall)
 		{
 			ret = buildFunctionExtractor(tupleindex, (FunctionCall)valuesource, subindex, context);
@@ -1392,6 +1398,18 @@ public class ReteBuilder
 		
 		IValueExtractor oex = createValueExtractor(tupleindex, null, -1, context);
 		return new JavaMethodExtractor(oex, mc, fex); 
+	}
+	
+	/**
+	 *  Build an array extractor for an array selector.
+	 *  @param as The array selector.
+	 *  @return The value extractor.
+	 */
+	public IValueExtractor createArrayExtractor(int tupleindex, ArraySelector as, BuildContext context)
+	{
+		IValueExtractor oex = createValueExtractor(tupleindex, null, -1, context);
+		IValueExtractor iex = createValueExtractor(tupleindex, as.getIndexSource(), -1, context);
+		return new JavaArrayExtractor(oex, iex); 
 	}
 	
 	/**

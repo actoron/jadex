@@ -25,7 +25,6 @@ import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.IPriorityEvaluator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.LiteralReturnValueConstraint;
-import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
@@ -1817,7 +1816,7 @@ public class PlanRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param mplan	The plan model element.
 	 */
-	protected static Rule createPlanContextInvalidUserRule(String rulename, ICondition usercond, Object mplan)
+	protected static Object[]	createPlanContextInvalidUserRule(Object mplan)
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -1830,10 +1829,12 @@ public class PlanRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
-		Rule plancontext_invalid = new Rule(rulename,
-			new AndCondition(new ICondition[]{plancon, capcon, new NotCondition(usercond)}), PLAN_ABORT);
-		
-		return plancontext_invalid;
+		return new Object[]{
+			new AndCondition(new ICondition[]{plancon, capcon}),
+			PLAN_ABORT,
+			null,
+			null,
+			Boolean.TRUE};
 	}	
 	
 	/**

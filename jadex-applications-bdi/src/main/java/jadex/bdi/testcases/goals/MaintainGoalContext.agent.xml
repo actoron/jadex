@@ -39,17 +39,17 @@
 
 	<goals>
 		<maintaingoal name="maintain" exclude="never" retrydelay="100">
-			<contextcondition language="clips">
- 				// $beliefbase.context
+			<contextcondition language="jcl">
+ 				$beliefbase.context
  				
- 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "context"))
+ 				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
+				// ?mbel	= (mbelief (melement_has_name "context"))
 			</contextcondition>
-			<maintaincondition language="clips">
- 				// $beliefbase.count==5
+			<maintaincondition language="jcl">
+ 				$beliefbase.count==5
  				
- 				?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
-				?mbel	= (mbelief (melement_has_name "count"))
+ 				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
+				// ?mbel	= (mbelief (melement_has_name "count"))
 			</maintaincondition>
 		</maintaingoal>
 	</goals>

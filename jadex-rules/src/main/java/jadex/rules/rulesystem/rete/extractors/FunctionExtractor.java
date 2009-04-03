@@ -6,7 +6,6 @@ import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -96,7 +95,11 @@ public class FunctionExtractor implements IValueExtractor
 	 */
 	public Set	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		Set	ret	= new HashSet();
+		for(int i=0; i<extractors.length; i++)
+			ret.addAll(extractors[i].getIndirectAttributes());
+//		ret.addAll(function.getIndirectAttributes());
+		return ret;
 	}
 
 	/**

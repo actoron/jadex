@@ -42,10 +42,11 @@
 		<plan name="tester">
 			<body class="AtomicExceptionPlan"/>
 			<trigger>
-				<!-- <condition>$beliefbase.a</condition> -->
-				<condition language="clips">
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					?mbelief = (mbelief (melement_has_name "a"))
+				<condition language="jcl">
+					$beliefbase.a
+					
+					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+					// ?mbelief = (mbelief (melement_has_name "a"))
 				</condition>
 			</trigger>
 		</plan>

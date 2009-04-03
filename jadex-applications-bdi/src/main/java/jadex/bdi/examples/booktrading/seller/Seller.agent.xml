@@ -34,7 +34,7 @@
 				// from IGoal $g in $goalbase.getGoals("sell_book")
 				
 				?mgoal = (mgoal (melement_has_name "sell_book"))
-				$?ret = (collect 
+				?ret = (collect 
 					?order = (Order)
 					?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
 					?rgoal = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
@@ -66,6 +66,7 @@
 			<!-- <unique/> -->
 			<creationcondition language="clips">
 				// $beliefbase.initial_orders!=null
+				
 				?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?x ?order $?y))
 				?order = (Order (state "open"))
 				?mbelset = (mbeliefset (melement_has_name "initial_orders"))
@@ -79,12 +80,7 @@
 			</creationcondition>
 			<dropcondition language="clips">
 				// $beliefbase.time > $goal.order.getDeadline().getTime()
-				// ?rbelief = (belief (belief_has_fact ?time))
-				// ?mbelief = (mbelief (melement_has_name "time"))
-				// ?rparam = (parameter (parameter_has_name "order"))
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-				// ?order = (Order (getDeadline() ?deadline))
-				// (test (?time &gt; (MethodCallFunction "Date" "getTime" ?deadline)))
+				// $goal.order.getState().equals(Order.FAILED)
 			
 				?order = (Order (state "failed"))
 				?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))

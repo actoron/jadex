@@ -37,10 +37,11 @@ Test three kinds of belief changes.
 			<fact>"Test"</fact>
 		</belief>
 		<belief name="bel_b" class="int" evaluationmode="push">
-			<fact language="clips">
-				// $beliefbase.string.length()
-				?rbel = (belief (element_has_model ?mbel) (belief_has_fact ?fact) (belief_has_fact !=null) ((jadex.rules.rulesystem.rules.functions.MethodCallFunction "java.lang.String" "length" ?fact) ?ret))
-				?mbel = (mbelief (melement_has_name "bel_a"))
+			<fact language="jcl">
+				$beliefbase.bel_a.length()
+				
+				// ?rbel = (belief (element_has_model ?mbel) (belief_has_fact ?fact) (belief_has_fact !=null) ((jadex.rules.rulesystem.rules.functions.MethodCallFunction "java.lang.String" "length" ?fact) ?ret))
+				// ?mbel = (mbelief (melement_has_name "bel_a"))
 			</fact>
 		</belief>
 		<belief name="bel_c" class="TestBean">

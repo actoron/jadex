@@ -196,19 +196,27 @@ public class SConditions
      */
     protected static boolean	lookaheadObjectCE(TokenStream input)
     {
-    	boolean	ret	= !"(".equals(input.LT(1).getText())
-    			&& (!"collect".equals(input.LT(5).getText()) || ".".equals(input.LT(6).getText()))
-    		|| "(".equals(input.LT(1).getText()) && (!"and".equals(input.LT(2).getText())
-        		&& !"not".equals(input.LT(2).getText())
-    			&& !"collect".equals(input.LT(2).getText())
-    			&& !"test".equals(input.LT(2).getText()))
-    		|| "(".equals(input.LT(1).getText()) && ".".equals(input.LT(3).getText());
-//    	System.out.println("lookahead ObjectCE: "+ret+", "
-//    		+input.toString(input.index(), input.size())
-//    		+"'"+input.LT(1).getText()+"' "
-//    		+"'"+input.LT(2).getText()+"' "
-//    		+"'"+input.LT(3).getText()+"'");
-    	return ret;
+    	try
+    	{
+	    	boolean	ret	= !"(".equals(input.LT(1).getText())
+	    			&& (!"collect".equals(input.LT(5).getText()) || ".".equals(input.LT(6).getText()))
+	    		|| "(".equals(input.LT(1).getText()) && (!"and".equals(input.LT(2).getText())
+	        		&& !"not".equals(input.LT(2).getText())
+	    			&& !"collect".equals(input.LT(2).getText())
+	    			&& !"test".equals(input.LT(2).getText()))
+	    		|| "(".equals(input.LT(1).getText()) && ".".equals(input.LT(3).getText());
+	//    	System.out.println("lookahead ObjectCE: "+ret+", "
+	//    		+input.toString(input.index(), input.size())
+	//    		+"'"+input.LT(1).getText()+"' "
+	//    		+"'"+input.LT(2).getText()+"' "
+	//    		+"'"+input.LT(3).getText()+"'");
+	    	return ret;
+    	}
+    	catch(RuntimeException e)
+    	{
+    		e.printStackTrace();
+    		throw e;
+    	}
     }
     
     /**
