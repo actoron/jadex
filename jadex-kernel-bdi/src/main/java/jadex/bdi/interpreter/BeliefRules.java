@@ -220,7 +220,8 @@ public class BeliefRules
 	{
 		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable ret = new Variable("?ret", OAVJavaType.java_object_type);
+		// Hack!!! Todo: multivariable?
+		Variable ret = new Variable("$?ret", OAVJavaType.java_object_type);
 			
 		ObjectCondition	belsetcon	= new ObjectCondition(OAVBDIRuntimeModel.beliefset_type);
 		belsetcon.addConstraint(new BoundConstraint(null, rbeliefset));
@@ -245,7 +246,7 @@ public class BeliefRules
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
 			Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
-			Object neworigfacts	= assignments.getVariableValue("?ret");
+			Object neworigfacts	= assignments.getVariableValue("$?ret");
 			
 			updateBeliefSet(state, rbeliefset, neworigfacts);
 		}
@@ -524,7 +525,8 @@ public class BeliefRules
 		Variable rparam = new Variable("?rparameterset", OAVBDIRuntimeModel.parameterset_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable ret = new Variable("?ret", OAVJavaType.java_object_type);
+		// Hack!!! Todo: multivariable?
+		Variable ret = new Variable("$?ret", OAVJavaType.java_object_type);
 		
 		ObjectCondition	rparamcon	= new ObjectCondition(OAVBDIRuntimeModel.parameterset_type);
 		rparamcon.addConstraint(new BoundConstraint(null, rparam));
@@ -556,7 +558,7 @@ public class BeliefRules
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
 			Object rparamset = assignments.getVariableValue("?rparameterset");
-			Object neworigvalues = assignments.getVariableValue("?ret");
+			Object neworigvalues = assignments.getVariableValue("$?ret");
 			
 			updateParameterSet(state, rparamset, neworigvalues);
 		}

@@ -59,7 +59,7 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 				
 				// ?mbel = (mbelief (melement_has_name "bel"))
 				// ?rbel = (belief (element_has_model ?mbel) (belief_has_fact ?bca))
-				// ?bca = (BeanChangesArrayList (toArray() ?ret))
+				// ?bca = (BeanChangesArrayList (toArray() $?ret))
 			</facts>
 		</beliefset>
 

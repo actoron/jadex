@@ -35,7 +35,7 @@
 				// from IGoal $g in $goalbase.getGoals("purchase_book")
 				
 				?mgoal = (mgoal (melement_has_name "purchase_book"))
-				?ret = (collect 
+				$?ret = (collect 
 					?order = (Order)
 					?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
 					?rgoal = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))

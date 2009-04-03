@@ -54,7 +54,7 @@
 				// ?mbel_env = (mbelief (melement_has_name "env"))
 				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
 				// ?mbel_pos = (mbelief (melement_has_name "pos"))
- 				// ?env = (Environment (getGarbages (?pos) ?ret))
+ 				// ?env = (Environment (getGarbages (?pos) $?ret))
 			</facts>
 		</beliefset>
 	</beliefs>

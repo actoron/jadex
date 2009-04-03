@@ -212,10 +212,10 @@ public class SConditions
 	//    		+"'"+input.LT(3).getText()+"'");
 	    	return ret;
     	}
-    	catch(RuntimeException e)
+    	catch(Throwable e)
     	{
     		e.printStackTrace();
-    		throw e;
+    		throw new RuntimeException(e);
     	}
     }
     
