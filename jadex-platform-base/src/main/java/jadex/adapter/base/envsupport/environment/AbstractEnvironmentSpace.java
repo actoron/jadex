@@ -44,6 +44,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	/** Object id counter for new ids. */
 	protected AtomicCounter objectidcounter;
 	
+	/** The environment listeners. */
+	protected List listeners;
+	
 	//-------- constructors --------
 	
 	/**
@@ -114,6 +117,8 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 */
 	public ISpaceObject createSpaceObject(Object type, Object owner, Map properties, List tasks, List listeners)
 	{
+		ISpaceObject ret;
+		
 		synchronized(monitor)
 		{
 			Object id;
@@ -123,15 +128,16 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 			}
 			while(spaceobjects.containsKey(id));
 			
-			ISpaceObject obj = new SpaceObject(id, type, owner, properties, tasks, listeners, monitor);
-			spaceobjects.put(id, obj);
-			List typeobjects = (List)spaceobjectsbytype.get(obj.getType());
+			ret = new SpaceObject(id, type, owner, properties, tasks, listeners, monitor);
+			spaceobjects.put(id, ret);
+			List typeobjects = (List)spaceobjectsbytype.get(ret.getType());
 			if(typeobjects == null)
 			{
 				typeobjects = new ArrayList();
-				spaceobjectsbytype.put(obj.getType(), typeobjects);
+				spaceobjectsbytype.put(ret.getType(), typeobjects);
 			}
-			typeobjects.add(obj);
+			typeobjects.add(ret);
+			
 			if(owner!=null)
 			{
 				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
@@ -140,10 +146,22 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 					ownerobjects = new ArrayList();
 					spaceobjectsbyowner.put(owner, ownerobjects);
 				}
-				ownerobjects.add(obj);
+				ownerobjects.add(ret);
 			}
-			return obj;
 		}
+		
+		if(listeners!=null)
+		{
+			EnvironmentEvent event = new EnvironmentEvent(EnvironmentEvent.OBJECT_CREATED, this, ret);
+			for(int i=0; i<listeners.size(); i++)
+			{
+				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);
+				if(lis.isRelevant(event))
+					lis.dispatchEnvironmentEvent(event);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/** 
@@ -176,9 +194,21 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		}
 		
 		// signal removal
+		// hmm? what about calling destroy on object? could it do sth. else than throwing event?
 		ObjectEvent event = new ObjectEvent(ObjectEvent.OBJECT_REMOVED);
 		event.setParameter("space_name", getName());
 		obj.fireObjectEvent(event);
+		
+		if(listeners!=null)
+		{
+			EnvironmentEvent ev = new EnvironmentEvent(EnvironmentEvent.OBJECT_DESTRYOED, this, obj);
+			for(int i=0; i<listeners.size(); i++)
+			{
+				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);
+				if(lis.isRelevant(ev))
+					lis.dispatchEnvironmentEvent(ev);
+			}
+		}
 	}
 	
 	/**
@@ -434,6 +464,34 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		synchronized (monitor)
 		{
 			return new ArrayList(views.values());
+		}
+	}
+	
+	/**
+	 *  Add an environment listener.
+	 *  @param listener The environment listener. 
+	 */
+	public void addEnvironmentListener(IEnvironmentListener listener)
+	{
+		synchronized(monitor)
+		{
+			if(listeners==null)
+				listeners = new ArrayList();
+			listeners.add(listener);
+		}
+	}
+	
+	/**
+	 *  Remove an environment listener.
+	 *  @param listener The environment listener. 
+	 */
+	public void removeEnvironmentListener(IEnvironmentListener listener)
+	{
+		synchronized(monitor)
+		{
+			listeners.remove(listener);
+			if(listeners.size()==0)
+				listeners = null;
 		}
 	}
 	

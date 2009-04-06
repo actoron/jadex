@@ -159,4 +159,16 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @return list of view names
 	 */
 	public List getViewNames();
+	
+	/**
+	 *  Add an environment listener.
+	 *  @param listener The environment listener. 
+	 */
+	public void addEnvironmentListener(IEnvironmentListener listener);
+	
+	/**
+	 *  Remove an environment listener.
+	 *  @param listener The environment listener. 
+	 */
+	public void removeEnvironmentListener(IEnvironmentListener listener);
 }

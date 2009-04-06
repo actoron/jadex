@@ -150,8 +150,6 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	}
 
 	/**
-=======
->>>>>>> .r538
 	 * Adds a new task for the object.
 	 * @param task new task
 	 */
@@ -239,7 +237,7 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 		
 		for(Iterator it = listeners.iterator(); it.hasNext(); )
 		{
-			IObjectListener listener = (IObjectListener) it.next();
+			IObjectListener listener = (IObjectListener)it.next();
 			listener.dispatchObjectEvent(event);
 		}
 	}
