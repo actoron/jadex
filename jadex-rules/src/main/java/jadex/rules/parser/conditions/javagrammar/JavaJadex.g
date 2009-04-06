@@ -9,6 +9,8 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.functions.IFunction;
+
+import jadex.commons.SReflect;
 }
 
 @lexer::header 
@@ -27,6 +29,28 @@ package jadex.rules.parser.conditions.javagrammar;
 	public void	setParserHelper(IParserHelper helper)
 	{
 		this.helper	= helper;
+	}
+
+	/** The imports (if any). */
+	protected String[]	imports;
+	
+	/**
+	 *  Set the imports.
+	 */
+	public void	setImports(String[] imports)
+	{
+		this.imports	= imports;
+	}
+
+	/** The classloader. */
+	protected ClassLoader	cloader;
+	
+	/**
+	 *  Set the class loader.
+	 */
+	public void	setClassLoader(ClassLoader cloader)
+	{
+		this.cloader	= cloader;
 	}
 }
 
@@ -202,9 +226,28 @@ primaryPrefix returns [Expression exp]
 	: '(' tmp = expression ')' {$exp = tmp;}
 	| tmp = literal {$exp = tmp;}
 	| {helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText())}? tmp = pseudovariable {$exp = tmp;}
-	| tmp = variable {$exp = tmp;}
+	| {helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null}? tmp = variable {$exp = tmp;}
+	| tmp = staticField {$exp = tmp;}
 	;
 
+
+/**
+ *  Read a field of an object.
+ */
+staticField returns [Expression exp]
+	: tmp = type '.' tmp2 = IDENTIFIER {/*$exp = new FieldAccess(tmp.getText());*/}
+	;
+
+/**
+ *  Read a field of an object.
+ */
+type returns [Expression exp]
+	: tmp = IDENTIFIER {String classname = tmp.getText();}
+	(	{SReflect.findClass0(classname, imports, cloader)==null}?
+		'.' tmp2 = IDENTIFIER {classname += "."+tmp.getText();}
+	)*
+	;
+	
 /**
  *  Continuations on a value, i.e. field or method access.
  */

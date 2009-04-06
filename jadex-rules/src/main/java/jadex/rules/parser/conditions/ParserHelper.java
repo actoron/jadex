@@ -114,6 +114,8 @@ public class ParserHelper
 		try
 		{
 			parser.setParserHelper(helper);
+			parser.setImports(imports);
+			parser.setClassLoader(model.getClassLoader());
 			Expression	pexp	= parser.lhs();
 			precon	= new AndCondition(helper.getConditions());
 
