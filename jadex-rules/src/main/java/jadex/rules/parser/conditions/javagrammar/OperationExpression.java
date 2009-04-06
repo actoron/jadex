@@ -138,7 +138,7 @@ public class OperationExpression	extends Expression
 	/**
 	 *  Get the inverse operator.
 	 *  @param operator	The operator
-	 *  @return	The inverse operator of null, if no inverse exists.
+	 *  @return	The inverse operator or null if none exists.
 	 */
 	public static IOperator getInverseOperator0(IOperator operator)
 	{
@@ -169,7 +169,6 @@ public class OperationExpression	extends Expression
 //			ret	= ???
 //		else if(operator.equals(OPERATOR_OR))
 //			ret	= ???
-		
 		return ret;
 	}
 }

@@ -33,16 +33,16 @@
 	<goals>
 		<!-- goal succeeds without plan -->
 		<achievegoal name="successgoal">
-			<targetcondition language="clips">
-				// true
-				(test (Identity true))
+			<targetcondition language="jcl">
+				true
+				// (test (Identity true))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal fails without plan -->
 		<achievegoal name="failuregoal">
-			<targetcondition language="clips">
-				// false
-				(test (Identity false))
+			<targetcondition language="jcl">
+				false
+				// (test (Identity false))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal succeeds after plan -->
@@ -81,7 +81,7 @@
 	</plans>
 
 	<properties>
-        <!--<property name="debugging">true</property>-->
+        <property name="debugging">false</property>
         <!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
     </properties>
 

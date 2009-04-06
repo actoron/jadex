@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-04-03 13:39:25
+// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g 2009-04-06 11:25:09
 
 package jadex.rules.parser.conditions;
 
@@ -1806,8 +1806,8 @@ public class ClipsJadexParser extends Parser {
                         	IFunction func = null;
             				if(MethodCallFunction.class.equals(clazz))
             				{
-            					String clazzname = (String)exps.remove(0);
-            					String methodname = (String)exps.remove(0);
+            					String clazzname = (String)((Constant)exps.remove(0)).getValue();
+            					String methodname = (String)((Constant)exps.remove(0)).getValue();
             					clazz = SReflect.findClass0(clazzname, imports, tmodel.getClassLoader());
             					Method[] methods = SReflect.getMethods(clazz, methodname);
             					Method method = null;

@@ -123,25 +123,20 @@
 				<inhibits ref="performpatrol" inhibit="when_in_process"/>
 			</deliberation>
 			<!-- Engage in actions when the state is below 0.2. -->
- 			<maintaincondition language="clips">
- 				// $beliefbase.my_chargestate > 0.2
- 				// Problem: tries to evaluate on all beliefs the >0.2 constraint
- 				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 0.2))
-				//?mbelief = (mbelief (melement_has_name "my_chargestate"))
+ 			<maintaincondition language="jcl">
+ 				$beliefbase.my_chargestate > 0.2
 				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				(test (> ?fact 0.2))
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
+				// (test (> ?fact 0.2))
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
-			<targetcondition language="clips">
- 				// $beliefbase.my_chargestate >= 1.0
-				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact >=0.3))
-				//?mbelief = (mbelief (melement_has_name "my_chargestate"))
+			<targetcondition language="jcl">
+ 				$beliefbase.my_chargestate >= 1.0
 				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				(test (>= ?fact 0.3))
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
+				// (test (>= ?fact 0.3))
  			</targetcondition>
 		</maintaingoal>
 
@@ -168,10 +163,11 @@
 				))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
-			<contextcondition language="clips">
-				// $beliefbase.daytime
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (melement_has_name "daytime"))
+			<contextcondition language="jcl">
+				$beliefbase.daytime
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
@@ -231,19 +227,21 @@
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<contextcondition language="clips">
-				// $beliefbase.daytime
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (melement_has_name "daytime"))
+			<contextcondition language="jcl">
+				$beliefbase.daytime
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
 		<!-- Perform patrols at night when the agent is not loading. -->
 		<performgoal name="performpatrol" retry="true" exclude="never">
-			<contextcondition language="clips">
-				// !$beliefbase.daytime
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				?mbelief = (mbelief (melement_has_name "daytime"))
+			<contextcondition language="jcl">
+				!$beliefbase.daytime
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
+				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
@@ -263,13 +261,12 @@
  				from $beliefbase.wastebins
 				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
 			</failurecondition> -->
-			<dropcondition language="clips">
-				// $goal.wastebin.isFull()
+			<dropcondition language="jcl">
+				$goal.wastebin.isFull()
 				
-				?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
-				?wastebin = (Wastebin (isFull() true)) 
-					//&amp; :(MethodCallFunction "Wastebin" "isFull" ?wastebin)))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				// ?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
+				// ?wastebin = (Wastebin (isFull() true)) 
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
 		</achievegoal>
 
@@ -451,11 +448,12 @@
 			<trigger>
 				<goal ref="achievemoveto"/>
 			</trigger>
-			<contextcondition language="clips">
-				//$beliefbase.my_chargestate &gt; 0
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				(test (> ?fact 0))
+			<contextcondition language="jcl">
+				$beliefbase.my_chargestate &gt; 0
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
+				// (test (> ?fact 0))
 			</contextcondition>
 		</plan>
 

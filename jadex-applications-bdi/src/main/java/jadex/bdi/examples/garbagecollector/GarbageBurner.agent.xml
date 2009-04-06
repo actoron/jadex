@@ -34,14 +34,14 @@
 
 		<!-- The garbages at the current posistion. -->
 		<beliefset name="garbages" class="String" evaluationmode="push">
-			<facts language="clips">
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getGarbages($beliefbase.getBelief("pos").getFact())
+			<facts language="jcl">
+				$beliefbase.env.getGarbages($beliefbase.pos)
 				
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				?mbel_pos = (mbelief (melement_has_name "pos"))
- 				?env = (Environment (getGarbages (?pos) $?ret))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
+				// ?mbel_pos = (mbelief (melement_has_name "pos"))
+ 				// ?env = (Environment (getGarbages (?pos) $?ret))
 			</facts>
 		</beliefset>
 	</beliefs>

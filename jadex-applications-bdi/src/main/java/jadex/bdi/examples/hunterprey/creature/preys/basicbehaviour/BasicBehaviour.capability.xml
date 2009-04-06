@@ -57,12 +57,7 @@
 				// $beliefbase.vision!=null &amp;&amp;
 				// (select $object
  				// from $beliefbase.vision.getObjects()
-				// where $object instanceof Hunter).size()>0
-				
-				?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
-				?mbel_vision	= (mbelief (melement_has_name "vision"))
-				?hunter	= (Hunter)
-				?vision	= (Vision (objects contains ?hunter))
+				// where $object instanceof Hunter).size()>0				
 			</fact>
 		</belief>-->
 
@@ -84,10 +79,10 @@
 			</deliberation>
 			<maintaincondition language="clips">
 				// !$beliefbase.is_indanger
+				
+				?rbel_vision	= (belief (element_has_model.melement_has_name "vision") (belief_has_fact ?vision))
 				(not
 					(and
-						?rbel_vision	= (belief (element_has_model ?mbel_vision) (belief_has_fact ?vision))
-						?mbel_vision	= (mbelief (melement_has_name "vision"))
 						?hunter	= (Hunter)
 						?vision	= (Vision (objects contains ?hunter))
 					)

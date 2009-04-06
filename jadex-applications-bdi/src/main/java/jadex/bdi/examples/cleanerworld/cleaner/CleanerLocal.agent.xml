@@ -115,25 +115,20 @@
 				<inhibits ref="performpatrol" inhibit="when_in_process"/>
 			</deliberation>
 			<!-- Engage in actions when the state is below 0.2. -->
- 			<maintaincondition language="clips">
- 				// $beliefbase.my_chargestate > 0.2
- 				// Problem: tries to evaluate on all beliefs the >0.2 constraint
- 				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 0.2))
-				//?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				(test (> ?fact 0.2))
+ 			<maintaincondition language="jcl">
+ 				$beliefbase.my_chargestate > 0.2
+ 				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
+				// (test (> ?fact 0.2))
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
-			<targetcondition language="clips">
- 				// $beliefbase.my_chargestate >= 1.0
-				//?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact >=0.3))
-				//?mbelief = (mbelief (melement_has_name "my_chargestate"))
+			<targetcondition language="jcl">
+ 				$beliefbase.my_chargestate >= 1.0
 				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				(test (>= ?fact 0.3))
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
+				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
+				// (test (>= ?fact 0.3))
  			</targetcondition>
 		</maintaingoal>
 
@@ -160,10 +155,11 @@
 				))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
-			<contextcondition language="clips">
-				// $beliefbase.daytime
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (melement_has_name "daytime"))
+			<contextcondition language="jcl">
+				$beliefbase.daytime
+				
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
@@ -182,27 +178,23 @@
 			<!-- <deliberation cardinality="1"> -->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
-				<inhibits ref="achievecleanup" language="clips">
-					// $beliefbase.my_location.getDistance($goal.waste.getLocation())
-					// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+				<inhibits ref="achievecleanup" language="jcl">
+					$beliefbase.my_location.getDistance($goal.waste.getLocation())
+					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
 					
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (melement_has_name "my_location"))
-					
-					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-					?waste = (Waste (location ?wasteloc))
-					
-					?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
-					?refgoal = (goal (parameterelement_has_parameters contains ?refparam))
-					?refwaste = (Waste (location ?refwasteloc &amp; 
-						:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
-							(MethodCallFunction "Location" "getDistance" ?myloc ?refwasteloc)  
-					)))
-	
-					// Does not work because Locations are not directly in state.
-					// ?wasteloc = (Location (getDistance(?myloc) ?wastedist))
-					// ?refwasteloc = (Location (getDistance(?myloc) &lt; ?wastedist))				
+					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
+					// ?mbelief = (mbelief (melement_has_name "my_location"))
+					// 
+					// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+					// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+					// ?waste = (Waste (location ?wasteloc))
+					// 
+					// ?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
+					// ?refgoal = (goal (parameterelement_has_parameters contains ?refparam))
+					// ?refwaste = (Waste (location ?refwasteloc &amp; 
+					// 	:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
+					// 		(MethodCallFunction "Location" "getDistance" ?myloc ?refwasteloc)  
+					// )))
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. - ->
@@ -215,19 +207,19 @@
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<contextcondition language="clips">
-				// $beliefbase.daytime
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (melement_has_name "daytime"))
+			<contextcondition language="jcl">
+				$beliefbase.daytime
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
 		<!-- Perform patrols at night when the agent is not loading. -->
 		<performgoal name="performpatrol" retry="true" exclude="never">
-			<contextcondition language="clips">
-				// !$beliefbase.daytime
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				?mbelief = (mbelief (melement_has_name "daytime"))
+			<contextcondition language="jcl">
+				!$beliefbase.daytime
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
+				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 

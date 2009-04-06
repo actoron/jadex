@@ -62,7 +62,9 @@ public class UnaryExpression	extends Expression
 	{
 		StringBuffer	ret	= new StringBuffer();
 		ret.append(getOperator());
+		ret.append("(");
 		ret.append(getValue().toString());
+		ret.append(")");
 		return ret.toString();
 	}
 

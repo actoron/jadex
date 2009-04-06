@@ -10,6 +10,7 @@ import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 
@@ -41,6 +42,9 @@ public class BuildContext
 	
 	/** The OAV type model. */
 	protected OAVTypeModel	tmodel;
+	
+	/** The dummy condition (if any). */
+	protected ObjectCondition	dummy;
 	
 	//-------- constructors --------
 	
@@ -210,6 +214,31 @@ public class BuildContext
 		return (Variable)variables.get(name);
 	}
 
+	/**
+	 *  Expressions, which are unrelated to real object
+	 *  conditions should be bound to the dummy condition.
+	 *  After building all constraints, the dummy condition
+	 *  will be removed by reassigning its constraints to
+	 *  a suitable object condition (respecting variable assignment order).
+	 */
+	public ObjectCondition	getDummyCondition()
+	{
+		if(dummy==null)
+		{
+			dummy	= new ObjectCondition(OAVJavaType.java_object_type);
+			lcons.add(dummy);
+		}
+		return dummy;
+	}
+
+	/**
+	 *  Test if a dummy condition was used in the context.
+	 */
+	public boolean hasDummyCondition()
+	{
+		return dummy!=null;
+	}
+	
 	//-------- helper methods --------
 	
 	/**

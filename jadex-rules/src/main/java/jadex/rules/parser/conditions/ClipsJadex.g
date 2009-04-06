@@ -360,8 +360,8 @@ functionCall [OAVTypeModel tmodel, Map vars] returns [FunctionCall fc]
             	IFunction func = null;
 				if(MethodCallFunction.class.equals(clazz))
 				{
-					String clazzname = (String)exps.remove(0);
-					String methodname = (String)exps.remove(0);
+					String clazzname = (String)((Constant)exps.remove(0)).getValue();
+					String methodname = (String)((Constant)exps.remove(0)).getValue();
 					clazz = SReflect.findClass0(clazzname, imports, tmodel.getClassLoader());
 					Method[] methods = SReflect.getMethods(clazz, methodname);
 					Method method = null;

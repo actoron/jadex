@@ -8,12 +8,14 @@ import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.Constant;
 import jadex.rules.rulesystem.rules.FunctionCall;
+import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
+import jadex.rules.rulesystem.rules.functions.Identity;
 import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -64,11 +66,43 @@ public class ConstraintBuilder
 		
 		for(int i=0; i<constraints.size(); i++)
 		{
-			buildConstraint((Expression)constraints.get(i), context);
+			buildConstraint((Expression)constraints.get(i), context, false);
 		}
 
 		List	lcons	= context.getConditions();
 		shuffle(lcons);
+		
+		// Reassign dummy constraints to previous or next condition.
+		if(context.hasDummyCondition())
+		{
+			List	cons	= context.getDummyCondition().getConstraints();
+			for(int i=0; i<lcons.size(); i++)
+			{
+				if(lcons.get(i)==context.getDummyCondition())
+				{
+					ObjectCondition	target;
+					if(i==0 && lcons.size()>1)
+					{
+						// Todo: when adding to next condition, dummy constraints should be first!?
+						target	= (ObjectCondition)lcons.get(i+1);
+					}
+					else if(i>0)
+					{
+						target	= (ObjectCondition)lcons.get(i-1);
+					}
+					else
+					{
+						throw new UnsupportedOperationException("No object conditions produced (todo: test condition): "+expression);
+					}
+					
+					lcons.remove(i);
+					for(int j=0; j<cons.size(); j++)
+					{
+						target.addConstraint((IConstraint)cons.get(j));
+					}
+				}
+			}
+		}
 
 		return lcons.size()>1 ? new AndCondition(lcons) : (ICondition)lcons.get(0);
 	}
@@ -76,14 +110,30 @@ public class ConstraintBuilder
 	/**
 	 *  Build a constraint for a single expression.
 	 */
-	protected static void	buildConstraint(Expression exp, BuildContext context)
+	protected static void	buildConstraint(Expression exp, BuildContext context, boolean invert)
 	{
 		if(exp instanceof OperationExpression)
 		{
 			OperationExpression	opex	= (OperationExpression)exp;
 			if(opex.getOperator() instanceof IOperator)
 			{
-				buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), (IOperator)opex.getOperator(), context);
+				IOperator	operator	= (IOperator)opex.getOperator();
+				if(invert)
+				{
+					IOperator	inverse	= OperationExpression.getInverseOperator0((IOperator)opex.getOperator());
+					if(inverse==null)
+					{
+						buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), IOperator.NOTEQUAL, context);
+					}
+					else
+					{
+						buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), inverse, context);
+					}
+				}
+				else
+				{
+					buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), operator, context);
+				}
 			}
 //			else if(opex.getOperator() instanceof IFunction)
 //			{
@@ -99,28 +149,7 @@ public class ConstraintBuilder
 			UnaryExpression	unex	= (UnaryExpression)exp;
 			if(unex.getOperator().equals(UnaryExpression.OPERATOR_NOT))
 			{
-				boolean	built	= false;
-
-				// Try to build not constraint by inverting the operator.
-				if(unex.getValue() instanceof OperationExpression)
-				{
-					OperationExpression	opex	= (OperationExpression)unex.getValue();
-					if(opex.getOperator() instanceof IOperator)
-					{
-						IOperator	inverse	= OperationExpression.getInverseOperator0((IOperator)opex.getOperator());
-						if(inverse!=null)
-						{
-							buildConstraint(new OperationExpression(
-								opex.getLeftValue(), opex.getRightValue(), inverse) , context);
-							built	= true;
-						}
-					}
-				}
-
-				if(!built)
-				{
-					buildOperatorConstraint(unex.getValue(), new LiteralExpression(Boolean.TRUE), IOperator.NOTEQUAL, context);
-				}
+				buildConstraint(unex.getValue(), context, !invert);
 			}
 			else
 			{
@@ -133,7 +162,7 @@ public class ConstraintBuilder
 		// Variable
 		else
 		{
-			buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), IOperator.EQUAL, context);
+			buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), invert ? IOperator.NOTEQUAL : IOperator.EQUAL, context);
 		}
 	}
 
@@ -313,6 +342,14 @@ public class ConstraintBuilder
 			Object	valuesource	= new FunctionCall(func, new Object[]{left[1], right});
 			ret	= new Object[]{left[0], valuesource};
 		}
+		else if(value instanceof LiteralExpression)
+		{
+			Constant	c	= new Constant(((LiteralExpression)value).getValue());
+			Object	valuesource	= new FunctionCall(new Identity(), new Object[]{c});
+			ret	= new Object[]{context.getDummyCondition(), valuesource};
+		}
+		// Unary
+		// Conditional
 		else
 		{
 			throw new RuntimeException("Unsupported left hand side of constraint: "+value);

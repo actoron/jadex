@@ -47,18 +47,18 @@
 		</achievegoal>
 		<!-- goal succeeds without plan -->
 		<achievegoal name="successgoal">
-			<targetcondition language="clips">
-				// true
+			<targetcondition language="jcl">
+				true
 				
-				(test (Identity true))
+				// (test (Identity true))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal fails without plan -->
 		<achievegoal name="failuregoal">
-			<targetcondition language="clips">
-				// false
+			<targetcondition language="jcl">
+				false
 				
-				(test (Identity false))
+				// (test (Identity false))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal succeeds after plan -->

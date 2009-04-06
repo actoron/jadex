@@ -38,7 +38,6 @@
 			current posistion the actual position is perceived as dirty. -->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
  			<fact language="jcl">
- 				// ((Environment)$beliefbase.getBelief("env").getFact()).isDirty((Position)$beliefbase.getBelief("pos").getFact())
  				$beliefbase.env.isDirty($beliefbase.pos)
 			
 				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
