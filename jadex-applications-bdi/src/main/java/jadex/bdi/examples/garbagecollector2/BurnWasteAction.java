@@ -33,6 +33,8 @@ public class BurnWasteAction implements IAgentAction
 		so.setProperty("garbage", null);
 		space.destroySpaceObject(garb.getId());
 		
+		System.out.println("Garbage burned: "+garb);
+		
 		return null;
 	}
 

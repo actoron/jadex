@@ -1,5 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
+import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.agentaction.ImmediateExecutor;
@@ -8,7 +10,9 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.adapter.base.envsupport.environment.view.IView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +23,12 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 											   implements IEnvironmentSpace
 {
 	//-------- attributes --------
+	
+	/** The space name. */
+	protected String name;
+	
+	/** The context. */
+	protected IContext context;
 	
 	/** Available space actions. */
 	protected Map spaceactions;
@@ -31,6 +41,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	
 	/** The environment processes. */
 	protected Map processes;
+	
+	/** The percept generators. */
+	protected Map perceptgenerators;
 
 	/** Long/ObjectIDs (keys) and environment objects (values). */
 	protected Map spaceobjects;
@@ -58,6 +71,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		this.spaceactions = new HashMap();
 		this.agentactions = new HashMap();
 		this.processes = new HashMap();
+		this.perceptgenerators = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
@@ -152,12 +166,11 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		
 		if(listeners!=null)
 		{
-			EnvironmentEvent event = new EnvironmentEvent(EnvironmentEvent.OBJECT_CREATED, this, ret);
+			EnvironmentEvent event = new EnvironmentEvent(EnvironmentEvent.OBJECT_CREATED, this, ret, null);
 			for(int i=0; i<listeners.size(); i++)
 			{
 				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);
-				if(lis.isRelevant(event))
-					lis.dispatchEnvironmentEvent(event);
+				lis.dispatchEnvironmentEvent(event);
 			}
 		}
 		
@@ -201,12 +214,11 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		
 		if(listeners!=null)
 		{
-			EnvironmentEvent ev = new EnvironmentEvent(EnvironmentEvent.OBJECT_DESTRYOED, this, obj);
+			EnvironmentEvent ev = new EnvironmentEvent(EnvironmentEvent.OBJECT_DESTRYOED, this, obj, null);
 			for(int i=0; i<listeners.size(); i++)
 			{
 				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);
-				if(lis.isRelevant(ev))
-					lis.dispatchEnvironmentEvent(ev);
+				lis.dispatchEnvironmentEvent(ev);
 			}
 		}
 	}
@@ -323,7 +335,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 				public void run()
 				{
 					IAgentAction action = (IAgentAction)agentactions.get(id);
-					Object ret = action.perform(new HashMap(parameters), AbstractEnvironmentSpace.this);
+					Object ret = action.perform(parameters==null? Collections.EMPTY_MAP: parameters, AbstractEnvironmentSpace.this);
 					listener.resultAvailable(ret);
 				}
 			});
@@ -495,6 +507,33 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		}
 	}
 	
+	/**
+	 * Adds a percept generator.
+	 * @param id The percept generator id.
+	 * @param gen The percept generator.
+	 */
+	public void addPerceptGenerator(Object id, IPerceptGenerator gen)
+	{
+		synchronized(monitor)
+		{
+			addEnvironmentListener(gen);
+			perceptgenerators.put(id, gen);
+		}
+	}
+	
+	/**
+	 * Remove a percept generator.
+	 * @param id The percept generator id.
+	 */
+	public void removePerceptGenerator(Object id)
+	{
+		synchronized(monitor)
+		{
+			removeEnvironmentListener((IEnvironmentListener)perceptgenerators.remove(id));
+		}
+	}
+
+	
 	//-------- ISpace methods --------
 	
 	/**
@@ -502,6 +541,17 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 */
 	public void agentAdded(IAgentIdentifier aid)
 	{
+		synchronized(monitor)
+		{
+			if(perceptgenerators!=null)
+			{
+				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
+				{
+					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
+					gen.agentAdded(aid, this);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -509,7 +559,56 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 */
 	public void agentRemoved(IAgentIdentifier aid)
 	{
+		synchronized(monitor)
+		{
+			if(perceptgenerators!=null)
+			{
+				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
+				{
+					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
+					gen.agentRemoved(aid, this);
+				}
+			}
+		}
+		
 		// Remove the owned object too?
+	}
+	
+	
+	/**
+	 *  Get the context.
+	 *  @return The context.
+	 */
+	public IContext getContext()
+	{
+		return context;
+	}
+	
+	/**
+	 *  Set the context.
+	 *  @param context The context.
+	 */
+	public void setContext(IContext context)
+	{
+		this.context = context;
+	}
+	
+	/**
+	 *  Fire an environment event.
+	 *  @param event The event.
+	 */
+	protected void fireEnvironmentEvent(EnvironmentEvent event)
+	{
+		synchronized(monitor)
+		{
+			if(listeners!=null)
+			{
+				for(int i=0; i<listeners.size(); i++)
+				{
+					((IEnvironmentListener)listeners.get(i)).dispatchEnvironmentEvent(event);
+				}
+			}
+		}
 	}
 	
 	/**

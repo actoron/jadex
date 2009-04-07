@@ -9,6 +9,9 @@ public class EnvironmentEvent
 	public static final String OBJECT_CREATED = "created";
 	
 	public static final String OBJECT_DESTRYOED = "destroyed";
+
+	// move to other class?
+	public static final String OBJECT_POSITION_CHANGED = "position_changed";
 	
 	/** The type. */
 	protected String type;
@@ -16,17 +19,21 @@ public class EnvironmentEvent
 	/** The source. */
 	protected IEnvironmentSpace space;
 	
-	/** The object. */
-	protected ISpaceObject object;
+	/** The space object. */
+	protected ISpaceObject spaceobject;
+	
+	/** The info object for additional information (optional and event type dependent). */
+	protected Object info;
 	
 	/**
 	 * 
 	 */
-	public EnvironmentEvent(String type, IEnvironmentSpace space, ISpaceObject object)
+	public EnvironmentEvent(String type, IEnvironmentSpace space, ISpaceObject object, Object info)
 	{
 		this.type = type;
 		this.space = space;
-		this.object = object;
+		this.spaceobject = object;
+		this.info = info;
 	}
 
 	/**
@@ -40,16 +47,26 @@ public class EnvironmentEvent
 	/**
 	 * @return the source
 	 */
-	public Object getSource()
+	public IEnvironmentSpace getSpace()
 	{
 		return this.space;
 	}
 
 	/**
-	 * @return the value
+	 * @return the spaceobject
 	 */
-	public Object getObject()
+	public ISpaceObject getSpaceObject()
 	{
-		return this.object;
+		return this.spaceobject;
 	}
+
+	/**
+	 * @return the info
+	 */
+	public Object getInfo()
+	{
+		return this.info;
+	}
+	
+	
 }

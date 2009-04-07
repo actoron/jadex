@@ -1,6 +1,7 @@
 package jadex.adapter.base.agr;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
+import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.bridge.IAgentIdentifier;
 
@@ -44,6 +45,15 @@ public class AGRSpace implements ISpace
 	public String getName()
 	{
 		return name;
+	}
+	
+	/**
+	 *  Get the context.
+	 *  @return The context.
+	 */
+	public IContext getContext()
+	{
+		return context;
 	}
 	
 	/**

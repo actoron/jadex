@@ -1,17 +1,13 @@
 package jadex.adapter.base.envsupport.environment;
 
 /**
- * 
+ *  Interface for environment listener.
  */
 public interface IEnvironmentListener
 {
 	/**
-	 * 
-	 */
-	public boolean isRelevant(EnvironmentEvent event);
-	
-	/**
-	 * 
+	 *  Dispatch an environment event to this listener.
+	 *  @param event The event.
 	 */
 	public void dispatchEnvironmentEvent(EnvironmentEvent event);
 }

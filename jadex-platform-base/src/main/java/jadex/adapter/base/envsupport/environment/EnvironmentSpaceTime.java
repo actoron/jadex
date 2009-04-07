@@ -52,7 +52,6 @@ public abstract class EnvironmentSpaceTime extends AbstractEnvironmentSpace impl
 	 */
 	protected EnvironmentSpaceTime(IClockService clockService, IVector1 timeCoefficient, IActionExecutor executor)
 	{
-		super();
 		if(clockService!=null)
 			setClockService(clockService);
 		timecoefficient = timeCoefficient != null? timeCoefficient: new Vector1Double(0.001);

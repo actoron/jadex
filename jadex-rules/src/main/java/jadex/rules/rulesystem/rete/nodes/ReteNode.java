@@ -146,8 +146,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		
-		if(attr.getName().indexOf("garbage")!=-1)
-			System.out.println("test");
+//		if(attr.getName().indexOf("garbage")!=-1)
+//			System.out.println("test");
 		
 		if(getRelevantAttributes().contains(attr))
 		{

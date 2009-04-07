@@ -235,10 +235,13 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 			event.setParameter("object_id", id);
 		}
 		
-		for(Iterator it = listeners.iterator(); it.hasNext(); )
+		if(listeners!=null)
 		{
-			IObjectListener listener = (IObjectListener)it.next();
-			listener.dispatchObjectEvent(event);
+			for(Iterator it = listeners.iterator(); it.hasNext(); )
+			{
+				IObjectListener listener = (IObjectListener)it.next();
+				listener.dispatchObjectEvent(event);
+			}
 		}
 	}
 	

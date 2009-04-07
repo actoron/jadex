@@ -207,7 +207,7 @@ public class BeliefRules
 						
 			BeliefRules.setBeliefValue(state, rbelief, fact);
 
-			System.out.println("Belief "+state.getAttributeValue(state.getAttributeValue(rbelief, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact));
+//			System.out.println("Belief "+state.getAttributeValue(state.getAttributeValue(rbelief, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact));
 		}
 	};
 	
@@ -250,7 +250,7 @@ public class BeliefRules
 			
 			updateBeliefSet(state, rbeliefset, neworigfacts);
 			
-			System.out.println("Beliefset "+state.getAttributeValue(state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts));
+//			System.out.println("Beliefset "+state.getAttributeValue(state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts));
 		}
 	};
 	

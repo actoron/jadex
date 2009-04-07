@@ -46,7 +46,9 @@
  		</belief>
 		
 		<!-- The garbages at the current posistion. -->
-		<beliefset name="garbages" class="String" evaluationmode="push">
+		<beliefset name="garbages" class="ISpaceObject"/>
+		
+		<!--  <beliefset name="garbages" class="ISpaceObject" evaluationmode="push">
 			<facts language="jcl">
 				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage")
  				
@@ -58,7 +60,7 @@
 				// ?mbel_pos = (mbelief (melement_has_name "pos"))
  				// ?env = (Environment (getGarbages (?pos) $?ret))
 			</facts>
-		</beliefset>
+		</beliefset> -->
 	</beliefs>
 
 	<goals>

@@ -122,6 +122,19 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 //	public Object getOwner(Object id);
 	
 	/**
+	 * Adds a percept generator.
+	 * @param id The percept generator id.
+	 * @param gen The percept generator.
+	 */
+	public void addPerceptGenerator(Object id, IPerceptGenerator gen);
+	
+	/**
+	 * Remove a percept generator.
+	 * @param id The percept generator id.
+	 */
+	public void removePerceptGenerator(Object id);
+	
+	/**
 	 *  Set the owner of an object.
 	 *  @param id The object id.
 	 *  @param pos The object owner.

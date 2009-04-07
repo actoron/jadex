@@ -29,6 +29,9 @@ public class MEnvSpaceType	extends MSpaceType
 	/** The process types. */
 	protected List processtypes;
 	
+	/** The percept generator types. */
+	protected List perceptgeneratortypes;
+	
 	/** The implementation class name. */
 	protected String classname;
 	
@@ -114,6 +117,26 @@ public class MEnvSpaceType	extends MSpaceType
 	}
 	
 	/**
+	 *  Add a percept generator type.
+	 *  @param perceptgen The percept generator.
+	 */
+	public void addMEnvPerceptGeneratorType(MEnvPerceptGeneratorType perceptgen)
+	{
+		if(perceptgeneratortypes==null)
+			perceptgeneratortypes = new ArrayList();
+		perceptgeneratortypes.add(perceptgen);	
+	}
+	
+	/**
+	 *  Get the percept generator types.
+	 *  @return The percept generator types.
+	 */
+	public List getMEnvPerceptGeneratorTypes()
+	{
+		return perceptgeneratortypes;
+	}
+	
+	/**
 	 *  Get the class name.
 	 *  @return The class name.
 	 */
@@ -171,6 +194,8 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
+		types.add(new TypeInfo("perceptgeneratortype", MEnvPerceptGeneratorType.class, null, null,
+				SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		types.add(new TypeInfo("object", MEnvObject.class));
 		return types;
 	}

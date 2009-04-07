@@ -7,6 +7,7 @@ import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
+import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
@@ -68,6 +69,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		// Create and init space.
 		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)envcl.newInstance();
 		
+		ret.setContext(app);
+		
 		if(getName()!=null)
 		{
 			ret.setName(getName());
@@ -95,7 +98,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			((Space2D)ret).setAreaSize(areasize);
 		}
 		
-		// Create actions.
+		// Create space actions.
 		List spaceactions = spacetype.getMEnvSpaceActionTypes();
 		if(spaceactions!=null)
 		{
@@ -113,7 +116,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		// Create actions.
+		// Create agent actions.
 		List agentactions = spacetype.getMEnvAgentActionTypes();
 		if(agentactions!=null)
 		{
@@ -146,6 +149,23 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				System.out.println("Adding environment process: "+mproc.getName());
 				ret.addSpaceProcess(mproc.getName(), proc);
 				//ret.addSpaceProcess(proc);
+			}
+		}
+		
+		// Create percept generators.
+		List gens = spacetype.getMEnvPerceptGeneratorTypes();
+		if(gens!=null)
+		{
+			for(int i=0; i<gens.size(); i++)
+			{
+				MEnvPerceptGeneratorType mgen = (MEnvPerceptGeneratorType)gens.get(i);
+				Class gencl = SReflect.findClass(mgen.getClassName(), mapt.getAllImports(), cl);
+				
+				IPerceptGenerator gen = (IPerceptGenerator)gencl.newInstance();
+				
+				// TODO: id --- fixed! correct?
+				System.out.println("Adding environment percept generator: "+mgen.getName());
+				ret.addPerceptGenerator(mgen.getName(), gen);
 			}
 		}
 		

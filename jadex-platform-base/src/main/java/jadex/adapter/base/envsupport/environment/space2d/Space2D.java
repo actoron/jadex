@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
@@ -123,7 +124,10 @@ public abstract class Space2D extends EnvironmentSpaceTime
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
+			Object oldpos = obj.getProperty(POSITION);
 			obj.setProperty(POSITION, pos);
+			
+			fireEnvironmentEvent(new EnvironmentEvent(EnvironmentEvent.OBJECT_POSITION_CHANGED, this, obj, oldpos));
 		}
 	}
 	

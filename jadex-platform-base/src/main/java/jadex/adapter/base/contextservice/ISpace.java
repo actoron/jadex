@@ -14,6 +14,12 @@ public interface ISpace
 	public String getName();
 	
 	/**
+	 *  Get the context.
+	 *  @return The context.
+	 */
+	public IContext getContext();
+	
+	/**
 	 *  Called from application context, when an agent was added.
 	 *  Also called once for all agents in the context, when a space
 	 *  is newly added to the context.
