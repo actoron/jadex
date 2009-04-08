@@ -339,8 +339,13 @@ public class ObserverCenter
 				{
 					ISpaceObject obj = (ISpaceObject) objects[i];
 					DrawableCombiner d = (DrawableCombiner) theme.get(obj.getType());
+					IVector2 position = (IVector2) obj.getProperty("position");
+					if (position == null)
+					{
+						continue;
+					}
 					Object[] viewObj = new Object[3];
-					viewObj[0] = ((IVector2) obj.getProperty("position")).copy();
+					viewObj[0] = position.copy();
 					IVector2 vel = ((IVector2) obj.getProperty("velocity"));
 					if (vel != null)
 					{
