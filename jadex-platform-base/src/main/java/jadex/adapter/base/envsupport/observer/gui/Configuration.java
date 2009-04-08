@@ -1,6 +1,8 @@
 package jadex.adapter.base.envsupport.observer.gui;
 
 import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
@@ -26,6 +28,7 @@ public class Configuration
 	private boolean invertyaxis;
 	private Map themes;
 	private Comparator displayorder;
+	private IVector2 objectShift;
 	
 	public Configuration()
 	{
@@ -33,6 +36,7 @@ public class Configuration
 		this.opengl = true;
 		this.customplugins = new ArrayList();
 		this.themes = new HashMap();
+		this.objectShift = new Vector2Double();
 	}
 	
 	/**
@@ -217,5 +221,23 @@ public class Configuration
 	public synchronized void setDisplayOrder(Comparator order)
 	{
 		displayorder = order;
+	}
+	
+	/**
+	 * Gets the object shift.
+	 * @return the object shift
+	 */
+	public synchronized IVector2 getObjectShift()
+	{
+		return objectShift;
+	}
+	
+	/**
+	 * Sets the object shift.
+	 * @param shift the object shift
+	 */
+	public synchronized void setObjectShift(IVector2 shift)
+	{
+		objectShift = shift.copy();
 	}
 }

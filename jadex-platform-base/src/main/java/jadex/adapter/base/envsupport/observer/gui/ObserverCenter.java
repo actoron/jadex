@@ -141,8 +141,12 @@ public class ObserverCenter
 						Map theme = config.getTheme(themeNames[i]);
 						for (Iterator it = theme.values().iterator(); it.hasNext(); )
 						{
-							DrawableCombiner d = (DrawableCombiner) it.next();
-							getViewport().registerDrawableCombiner(d);
+							Object item = it.next();
+							if (item instanceof DrawableCombiner)
+							{
+								DrawableCombiner d = (DrawableCombiner) item;
+								getViewport().registerDrawableCombiner(d);
+							}
 						}
 					}
 					
@@ -319,6 +323,7 @@ public class ObserverCenter
 				IViewport viewport = getViewport();
 				viewport.setInvertX(config.getInvertXAxis());
 				viewport.setInvertY(config.getInvertYAxis());
+				viewport.setObjectShift(config.getObjectShift());
 				
 				// Set pre- and postlayers
 				Map theme = config.getTheme(selectedTheme);

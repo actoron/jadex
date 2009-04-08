@@ -213,13 +213,16 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		combiner.addDrawable(new RegularPolygon(new Vector2Double(0.5), new Vector2Double(0.0), false, Color.RED, 24));
 		theme.put("garbage", combiner);
 		
-		ILayer grid = new GridLayer(((Space2D)ret).getAreaSize(), Color.WHITE);
+		ILayer grid = new GridLayer(new Vector2Double(1.0), Color.WHITE);
 		List prelayers = new ArrayList();
 		prelayers.add(grid);
 		
 		theme.put("prelayers", prelayers);
 		
 		cfg.setTheme("abstract", theme);
+		
+		cfg.setInvertYAxis(true);
+		cfg.setObjectShift(new Vector2Double(0.5));
 		
 		ObserverCenter oc = new ObserverCenter(ret, cfg, (ILibraryService)app.getPlatform().getService(ILibraryService.class));
 		ret.addView(GeneralView2D.class.getName(), new GeneralView2D((Space2D)ret));
