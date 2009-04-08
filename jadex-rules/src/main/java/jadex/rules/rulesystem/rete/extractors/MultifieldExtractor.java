@@ -47,9 +47,10 @@ public class MultifieldExtractor implements IValueExtractor
 	 *  Get the value of an attribute from an object or tuple.
 	 *  @param left The left input tuple. 
 	 *  @param right The right input object.
+	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
 	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, IOAVState state)
+	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
 		// Fetch the virtual fact
 		Object object = tupleindex==-1? right: left.getObject(tupleindex);

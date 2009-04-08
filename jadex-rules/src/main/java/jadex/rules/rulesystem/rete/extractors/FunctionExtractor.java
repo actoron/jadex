@@ -38,16 +38,17 @@ public class FunctionExtractor implements IValueExtractor
 	
 	/**
 	 *  Get the value of an attribute from an object or tuple.
-	 * @param left The left input tuple. 
-	 * @param right The right input object.
-	 * @param state The working memory.
+	 *  @param left The left input tuple. 
+	 *  @param right The right input object.
+	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
+	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, IOAVState state)
+	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
 		// Fetch the parameter values.
 		Object[] paramvalues = new Object[extractors.length];
 		for(int i=0; i<paramvalues.length; i++)
-			paramvalues[i] = extractors[i].getValue(left, right, state);
+			paramvalues[i] = extractors[i].getValue(left, right, prefix, state);
 	
 		// Invoke the function and return the value.
 		Object ret = function.invoke(paramvalues, state);

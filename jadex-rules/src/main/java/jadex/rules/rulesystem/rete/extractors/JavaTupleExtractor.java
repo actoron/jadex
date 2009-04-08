@@ -3,7 +3,6 @@ package jadex.rules.rulesystem.rete.extractors;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.nodes.VirtualFact;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaAttributeType;
 
 /**
@@ -16,7 +15,7 @@ public class JavaTupleExtractor extends TupleExtractor
 	/**
 	 *  Create a new extractor.
 	 */
-	public JavaTupleExtractor(int tupleindex, OAVAttributeType attr)
+	public JavaTupleExtractor(int tupleindex, OAVJavaAttributeType attr)
 	{
 		super(tupleindex, attr);
 	}
@@ -25,11 +24,12 @@ public class JavaTupleExtractor extends TupleExtractor
 	
 	/**
 	 *  Get the value of an attribute from an object or tuple.
-	 * @param left The left input tuple. 
-	 * @param right The right input object.
-	 * @param state The working memory.
+	 *  @param left The left input tuple. 
+	 *  @param right The right input object.
+	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
+	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, IOAVState state)
+	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
 		// Fetch the object from the tuple
 

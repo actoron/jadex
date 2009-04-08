@@ -15,9 +15,11 @@ import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
 import jadex.rules.rulesystem.rete.extractors.JavaArrayExtractor;
 import jadex.rules.rulesystem.rete.extractors.JavaMethodExtractor;
 import jadex.rules.rulesystem.rete.extractors.JavaObjectExtractor;
+import jadex.rules.rulesystem.rete.extractors.JavaPrefixExtractor;
 import jadex.rules.rulesystem.rete.extractors.JavaTupleExtractor;
 import jadex.rules.rulesystem.rete.extractors.MultifieldExtractor;
 import jadex.rules.rulesystem.rete.extractors.ObjectExtractor;
+import jadex.rules.rulesystem.rete.extractors.PrefixExtractor;
 import jadex.rules.rulesystem.rete.extractors.StateExtractor;
 import jadex.rules.rulesystem.rete.extractors.TupleExtractor;
 import jadex.rules.rulesystem.rete.nodes.AlphaNode;
@@ -690,7 +692,7 @@ public class ReteBuilder
 						{
 							IValueExtractor leftex = getLeftVariableExtractor(context, var);
 							int subindex = bc.isMultiConstraint()? i: -1;
-							IValueExtractor rightex = createValueExtractor(-1, bc.getValueSource(), subindex, context);
+							IValueExtractor rightex = createValueExtractor(-1, bc.getValueSource(), subindex, context, false);
 							ret.add(new ConstraintIndexer(leftex, rightex));			
 						}
 					}
@@ -725,7 +727,7 @@ public class ReteBuilder
 		if(c instanceof LiteralConstraint && (!context.isAlpha() || isAlphaExecutable(cond, c)))
 		{
 			LiteralConstraint lic = (LiteralConstraint)c;
-			IValueExtractor ex = createValueExtractor(-1, lic.getValueSource(), -1, context);
+			IValueExtractor ex = createValueExtractor(-1, lic.getValueSource(), -1, context, false);
 			ConstantExtractor vex = new ConstantExtractor(lic.getValue());
 			ret.add(new ConstraintEvaluator(lic.getOperator(), ex, vex));
 		}
@@ -766,7 +768,7 @@ public class ReteBuilder
 			}
 			else if(pc instanceof ValueSourceReturnValueConstraint)
 			{
-				ex1 = createValueExtractor(-1, ((ValueSourceReturnValueConstraint)pc).getValueSource(), -1, context);
+				ex1 = createValueExtractor(-1, ((ValueSourceReturnValueConstraint)pc).getValueSource(), -1, context, false);
 			}
 			else if(pc instanceof VariableReturnValueConstraint)
 			{
@@ -804,16 +806,16 @@ public class ReteBuilder
 				{
 					IValueExtractor ex1 = getRightVariableExtractor(context, var);
 					int subindex = bc.isMultiConstraint()? i: -1;
-					IValueExtractor ex2 = createValueExtractor(-1, bc.getValueSource(), subindex, context);
+					IValueExtractor ex2 = createValueExtractor(-1, bc.getValueSource(), subindex, context, false);
 					ret.add(new ConstraintEvaluator(bc.getOperator(), ex1, ex2));
 				}
 
 				// Add join for second occurrence in beta, if possible (e.g. (Block (has_color ?c)) (Ball (has_color ?c)))
 				else if(!context.isAlpha())
 				{
-					IValueExtractor leftex = createValueExtractor(-1, var, -1, context);
+					IValueExtractor leftex = createValueExtractor(-1, var, -1, context, false);
 					int subindex = bc.isMultiConstraint()? i: -1;
-					IValueExtractor rightex = createValueExtractor(-1, bc.getValueSource(), subindex, context);
+					IValueExtractor rightex = createValueExtractor(-1, bc.getValueSource(), subindex, context, false);
 					IOperator op = bc.getOperator();
 					
 					/*Object os = bc.getValueSource();
@@ -862,7 +864,7 @@ public class ReteBuilder
 		for(int i=0; i<pcs.size(); i++)
 		{
 			Object tmp = pcs.get(i);
-			fex[i]	= createValueExtractor(tupleindex, tmp, subindex, context);
+			fex[i]	= createValueExtractor(tupleindex, tmp, subindex, context, false);
 //			if(tmp instanceof Variable)
 //			{
 //				fex[i] = buildVariableExtractor((Variable)tmp, context);
@@ -1031,7 +1033,7 @@ public class ReteBuilder
 		// If not found create new node.
 		if(node==null)
 		{
-			node = new SplitNode(context.getRootNode().getNextNodeId(), createValueExtractor(-1, attr, -1, context), attr, binds);
+			node = new SplitNode(context.getRootNode().getNextNodeId(), createValueExtractor(-1, attr, -1, context, false), attr, binds);
 			connectRight(context.getLastAlphaNode(), node, context);
 		}
 
@@ -1250,7 +1252,7 @@ public class ReteBuilder
 		if(vi==null)
 			throw new RuntimeException("Could not find variable declaration: "+var);
 		
-		ret = createValueExtractor(-1, vi.getValueSource(), vi.getSubindex(), context);
+		ret = createValueExtractor(-1, vi.getValueSource(), vi.getSubindex(), context, false);
 
 		return ret;
 	}
@@ -1272,7 +1274,7 @@ public class ReteBuilder
 		if(!context.isRightUnavailable() && vi.getTupleIndex() == context.getTupleCount())
 			throw new RuntimeException("Variable is right available in this condition: "+var);
 		
-		ret = createValueExtractor(vi.getTupleIndex(), vi.getValueSource(), vi.getSubindex(), context);
+		ret = createValueExtractor(vi.getTupleIndex(), vi.getValueSource(), vi.getSubindex(), context, false);
 
 		return ret;
 	}
@@ -1284,7 +1286,7 @@ public class ReteBuilder
 	 *  @param subindex The subindex when multisplit (-1 for none).
 	 *  @return The value extractor.
 	 */
-	public IValueExtractor createValueExtractor(int tupleindex, Object valuesource, int subindex, BuildContext context)
+	public IValueExtractor createValueExtractor(int tupleindex, Object valuesource, int subindex, BuildContext context, boolean prefix)
 	{
 		IValueExtractor ret = null;
 		Object key = null;
@@ -1300,10 +1302,10 @@ public class ReteBuilder
 			OAVAttributeType[] sources = (OAVAttributeType[])valuesource;
 			
 			IValueExtractor[] extrs = new IValueExtractor[sources.length];  
-			extrs[0] = createValueExtractor(tupleindex, sources[0], subindex, context);
+			extrs[0] = createValueExtractor(tupleindex, sources[0], subindex, context, false);
 			for(int i=1; i<sources.length; i++)
 			{
-				extrs[i] = createObjectExtractor(sources[i], key);
+				extrs[i] = createPrefixExtractor(sources[i], key);
 			}
 			
 			ret = new ChainedExtractor(extrs);
@@ -1312,10 +1314,10 @@ public class ReteBuilder
 		{
 			List sources = (List)valuesource;
 			IValueExtractor[] extrs = new IValueExtractor[sources.size()]; 
-			extrs[0] = createValueExtractor(tupleindex, sources.get(0), subindex, context);
+			extrs[0] = createValueExtractor(tupleindex, sources.get(0), subindex, context, false);
 			for(int i=1; i<sources.size(); i++)
 			{
-				extrs[i] = createValueExtractor(-1, sources.get(i), -1, context);
+				extrs[i] = createValueExtractor(-1, sources.get(i), -1, context, true);
 			}
 			
 			ret = new ChainedExtractor(extrs);
@@ -1323,7 +1325,11 @@ public class ReteBuilder
 		else if(valuesource==null || valuesource instanceof OAVAttributeType)
 		{
 			OAVAttributeType attr = (OAVAttributeType)valuesource;
-			if(tupleindex!=-1 && subindex==-1)
+			if(prefix)
+			{
+				ret = createPrefixExtractor(attr, key);
+			}
+			else if(tupleindex!=-1 && subindex==-1)
 			{
 				ret = createTupleExtractor(tupleindex, attr, key);
 			}
@@ -1338,11 +1344,11 @@ public class ReteBuilder
 		}
 		else if(valuesource instanceof MethodCall)
 		{
-			ret = createMethodExtractor(tupleindex, (MethodCall)valuesource, context);
+			ret = createMethodExtractor(tupleindex, (MethodCall)valuesource, context, prefix);
 		}
 		else if(valuesource instanceof ArraySelector)
 		{
-			ret = createArrayExtractor(tupleindex, (ArraySelector)valuesource, context);
+			ret = createArrayExtractor(tupleindex, (ArraySelector)valuesource, context, prefix);
 		}
 		else if(valuesource instanceof FunctionCall)
 		{
@@ -1373,14 +1379,14 @@ public class ReteBuilder
 	 *  @param mc The method call.
 	 *  @return The method call.
 	 */
-	public IValueExtractor createMethodExtractor(int tupleindex, MethodCall mc, BuildContext context)
+	public IValueExtractor createMethodExtractor(int tupleindex, MethodCall mc, BuildContext context, boolean prefix)
 	{
 		List pcs = mc.getParameterSources();
 		IValueExtractor[] fex = new IValueExtractor[pcs.size()];
 		for(int i=0; i<pcs.size(); i++)
 		{
 			Object tmp = pcs.get(i);
-			fex[i]	= createValueExtractor(-1, tmp, -1, context);
+			fex[i]	= createValueExtractor(-1, tmp, -1, context, false);
 //			if(tmp instanceof Variable)
 //			{
 ////				System.out.println(i+" "+mc);
@@ -1396,7 +1402,7 @@ public class ReteBuilder
 //			}
 		}
 		
-		IValueExtractor oex = createValueExtractor(tupleindex, null, -1, context);
+		IValueExtractor oex = createValueExtractor(tupleindex, null, -1, context, prefix);
 		return new JavaMethodExtractor(oex, mc, fex); 
 	}
 	
@@ -1405,10 +1411,10 @@ public class ReteBuilder
 	 *  @param as The array selector.
 	 *  @return The value extractor.
 	 */
-	public IValueExtractor createArrayExtractor(int tupleindex, ArraySelector as, BuildContext context)
+	public IValueExtractor createArrayExtractor(int tupleindex, ArraySelector as, BuildContext context, boolean prefix)
 	{
-		IValueExtractor oex = createValueExtractor(tupleindex, null, -1, context);
-		IValueExtractor iex = createValueExtractor(tupleindex, as.getIndexSource(), -1, context);
+		IValueExtractor oex = createValueExtractor(tupleindex, null, -1, context, prefix);
+		IValueExtractor iex = createValueExtractor(tupleindex, as.getIndexSource(), -1, context, false);
 		return new JavaArrayExtractor(oex, iex); 
 	}
 	
@@ -1447,11 +1453,34 @@ public class ReteBuilder
 			// todo: support for Java?
 			if(key!=null)
 				throw new RuntimeException("Map attribute access not yet implemented for Java objects.");
-			ret = new JavaTupleExtractor(tupleindex, attr);
+			ret = new JavaTupleExtractor(tupleindex, (OAVJavaAttributeType)attr);
 		}
 		else
 		{
 			ret = new TupleExtractor(tupleindex, attr, key);
+		}
+		return ret;
+	}
+
+	
+	/**
+	 *  Create a prefix extractor for the given (OAV or Java) attribute.
+	 *  @param attr	The attribute.
+	 *  @return The extractor.
+	 */
+	protected IValueExtractor createPrefixExtractor(OAVAttributeType attr, Object key)
+	{
+		IValueExtractor ret;
+		if(attr instanceof OAVJavaAttributeType)
+		{
+			// todo: support for Java?
+			if(key!=null)
+				throw new RuntimeException("Map attribute access not yet implemented for Java objects.");
+			ret = new JavaPrefixExtractor((OAVJavaAttributeType)attr);
+		}
+		else
+		{
+			ret = new PrefixExtractor(attr, key);
 		}
 		return ret;
 	}

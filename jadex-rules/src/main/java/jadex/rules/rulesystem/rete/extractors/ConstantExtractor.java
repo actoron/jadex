@@ -32,11 +32,12 @@ public class ConstantExtractor implements IValueExtractor
 	
 	/**
 	 *  Get the value of an attribute from an object or tuple.
-	 * @param left The left input tuple. 
-	 * @param right The right input object.
-	 * @param state The working memory.
+	 *  @param left The left input tuple. 
+	 *  @param right The right input object.
+	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
+	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, IOAVState state)
+	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
 		return value;
 	}

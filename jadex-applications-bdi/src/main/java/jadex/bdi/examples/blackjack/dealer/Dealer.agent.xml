@@ -491,12 +491,12 @@
 		</condition>
 
 		<!-- Check if the dealer has finished drawing cards. -->
-		<condition name="dealer_finished" language="clips">
-			// $beliefbase.myself.getState().equals(Player.STATE_FINISHED)
-			// || $beliefbase.myself.getState().equals(Player.STATE_IDLE)
-			
-			?player = (Player (playingstate "idle" | "finished"))
-			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
+		<condition name="dealer_finished" language="jcl">
+			$beliefbase.myself.getState().equals(Player.STATE_FINISHED)
+			|| $beliefbase.myself.getState().equals(Player.STATE_IDLE)
+						
+			// ?player = (Player (playingstate "idle" | "finished"))
+			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 		</condition>
 
 	</expressions>

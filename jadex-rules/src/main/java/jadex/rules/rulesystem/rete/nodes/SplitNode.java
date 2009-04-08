@@ -456,7 +456,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	{
 		List ret = new ArrayList();
 		
-		Object vals = extractor.getValue(null, object, state);
+		Object vals = extractor.getValue(null, object, null, state);
 		Object[] values = (Object[])SReflect.getArray(vals); // Hack! assumes Object[]
 		 
 		if(values!=null && values.length>=min_values)

@@ -738,7 +738,14 @@ public class AMS implements IAMS, IPlatformService
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
 			{
-				alisteners[i].agentRemoved(ad);
+				try
+				{
+					alisteners[i].agentRemoved(ad);
+				}
+				catch(Exception e)
+				{
+					System.out.println("WARNING: Exception when removing agent: "+ad+", "+e);
+				}
 			}
 			
 			if(listener!=null)

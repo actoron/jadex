@@ -49,17 +49,18 @@ public class JavaMethodExtractor implements IValueExtractor
 	 *  Get the value of an attribute from an object or tuple.
 	 *  @param left The left input tuple. 
 	 *  @param right The right input object.
+	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
 	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, IOAVState state)
+	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
 		// Extract parameters
 		Object[]	paramvalues	= new Object[parameters.length];
 		for(int i=0; i<parameters.length; i++)
-			paramvalues[i]	= parameters[i].getValue(left, right, state);
+			paramvalues[i]	= parameters[i].getValue(left, right, prefix, state);
 		
 		// Call method on object.
-		Object	object	= objex.getValue(left, right, state);
+		Object	object	= objex.getValue(left, right, prefix, state);
 		try
 		{
 			return methodcall.getMethod().invoke(object, paramvalues);

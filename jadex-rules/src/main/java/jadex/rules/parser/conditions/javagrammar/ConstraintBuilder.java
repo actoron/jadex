@@ -214,110 +214,122 @@ public class ConstraintBuilder
 		else if(value instanceof PrimaryExpression)
 		{
 			Expression	prim	= ((PrimaryExpression)value).getPrefix();
+			ObjectCondition	ocon;				
+			OAVObjectType	type;
+			Object	valuesource;
 			if(prim instanceof VariableExpression)
 			{
 				Variable	var	= ((VariableExpression)prim).getVariable();
-				
-				ObjectCondition	ocon	= (ObjectCondition)context.getObjectCondition(var);
-				
-				List	suffs	= new ArrayList();
-				OAVObjectType	type	= var.getType();
-				Suffix[]	suffixes	= ((PrimaryExpression)value).getSuffixes();
-				for(int i=0; i<suffixes.length; i++)
-				{
-					if(suffixes[i] instanceof FieldAccess)
-					{
-						OAVAttributeType	attr	= type.getAttributeType(
-							((FieldAccess)suffixes[i]).getName());
-						suffs.add(attr);
-						type	= attr.getType();
-					}
-					else if(suffixes[i] instanceof MethodAccess)
-					{
-						if(type instanceof OAVJavaType)
-						{
-							MethodAccess	ma	= (MethodAccess)suffixes[i];
-							Object[]	params	= new Object[ma.getParameterValues()!=null ? ma.getParameterValues().length : 0];
-							Class[]	paramtypes	= new Class[params.length];
-							for(int j=0; j<params.length; j++)
-							{
-								Expression	p	= flattenToPrimary(ma.getParameterValues()[j], context);
-								if(p instanceof VariableExpression)
-								{
-									params[j]	= ((VariableExpression)p).getVariable();
-									if(((Variable) params[j]).getType() instanceof OAVJavaType)
-									{
-										paramtypes[j]	= ((OAVJavaType)((Variable)params[j]).getType()).getClazz(); 
-									}
-									else
-									{
-										throw new RuntimeException("Cannot build method call: Only Java types supported for parameters: "+ma.getParameterValues()[j]);
-									}
-								}
-								else //if(p instanceof LiteralExpression)
-								{
-									Object	val	= ((LiteralExpression)p).getValue();
-									params[j]	= new Constant(val);
-									paramtypes[j]	= val!=null ? val.getClass() : null;
-								}
-							}
-							
-							Class	clazz	= ((OAVJavaType)type).getClazz();
-							Method[]	methods	= SReflect.getMethods(clazz, ma.getName());
-							Class[][]	mparamtypes	= new Class[methods.length][];
-							for(int j=0; j<methods.length; j++)
-							{
-								mparamtypes[j]	= methods[j].getParameterTypes(); 
-							}
-							int[]	matches	= SReflect.matchArgumentTypes(paramtypes, mparamtypes);
-							if(matches.length==0)
-							{
-								throw new RuntimeException("No matching method found for: "+clazz.getName()+ma);
-							}
-							else if(matches.length>1)
-							{
-								System.out.println("Warning: Multiple matching methods found for: "+clazz.getName()+", "+ma);
-							}
-							suffs.add(new MethodCall((OAVJavaType)type, methods[matches[0]], params));
-							type	= context.getTypeModel().getJavaType(methods[matches[0]].getReturnType());
-						}
-						else
-						{
-							throw new RuntimeException("Method invocation not supported on type: "+type);
-						}
-					}
-					else if(suffixes[i] instanceof ArrayAccess)
-					{
-						Expression	index	= flattenToPrimary(((ArrayAccess)suffixes[i]).getIndex(), context);
-						Object	indexsource;
-						if(index instanceof VariableExpression)
-						{
-							indexsource	= ((VariableExpression)index).getVariable();
-						}
-						else //if(p instanceof LiteralExpression)
-						{
-							indexsource	= new Constant(((LiteralExpression)index).getValue());
-						}
-						suffs.add(new ArraySelector(indexsource));
-						type	= context.getTypeModel().getJavaType(((OAVJavaType)type).getClazz().getComponentType());
-					}
-					else
-					{
-						throw new RuntimeException("Unknown suffix element: "+suffixes[i]);
-					}
-				}
-
-				BoundConstraint	bc	= context.getBoundConstraint(var);
-				if(bc.getValueSource()!=null)
-				{
-					suffs	= combineValueSources(bc.getValueSource(), suffs);
-				}
-				ret	= suffs.size()==1 ? new Object[]{ocon, suffs.get(0)} : new Object[]{ocon, suffs};
+				ocon	= (ObjectCondition)context.getObjectCondition(var);				
+				type	= var.getType();
+				valuesource	= context.getBoundConstraint(var).getValueSource();
+			}
+			else if(prim instanceof LiteralExpression)
+			{
+				Constant	c	= new Constant(((LiteralExpression)prim).getValue());
+				valuesource	= new FunctionCall(new Identity(), new Object[]{c});
+				ocon	= context.getDummyCondition();
+				if(c.getValue()!=null)
+					type	= context.getTypeModel().getJavaType(c.getClass());
+				else
+					type	= OAVJavaType.java_object_type;
 			}
 			else
 			{
-				throw new RuntimeException("Primary expression must start with variable: "+value);
+				throw new UnsupportedOperationException("Unsupported start of primary expression: "+value);
 			}
+
+			List	suffs	= new ArrayList();
+			Suffix[]	suffixes	= ((PrimaryExpression)value).getSuffixes();
+			for(int i=0; i<suffixes.length; i++)
+			{
+				if(suffixes[i] instanceof FieldAccess)
+				{
+					OAVAttributeType	attr	= type.getAttributeType(
+						((FieldAccess)suffixes[i]).getName());
+					suffs.add(attr);
+					type	= attr.getType();
+				}
+				else if(suffixes[i] instanceof MethodAccess)
+				{
+					if(type instanceof OAVJavaType)
+					{
+						MethodAccess	ma	= (MethodAccess)suffixes[i];
+						Object[]	params	= new Object[ma.getParameterValues()!=null ? ma.getParameterValues().length : 0];
+						Class[]	paramtypes	= new Class[params.length];
+						for(int j=0; j<params.length; j++)
+						{
+							Expression	p	= flattenToPrimary(ma.getParameterValues()[j], context);
+							if(p instanceof VariableExpression)
+							{
+								params[j]	= ((VariableExpression)p).getVariable();
+								if(((Variable) params[j]).getType() instanceof OAVJavaType)
+								{
+									paramtypes[j]	= ((OAVJavaType)((Variable)params[j]).getType()).getClazz(); 
+								}
+								else
+								{
+									throw new RuntimeException("Cannot build method call: Only Java types supported for parameters: "+ma.getParameterValues()[j]);
+								}
+							}
+							else //if(p instanceof LiteralExpression)
+							{
+								Object	val	= ((LiteralExpression)p).getValue();
+								params[j]	= new Constant(val);
+								paramtypes[j]	= val!=null ? val.getClass() : null;
+							}
+						}
+						
+						Class	clazz	= ((OAVJavaType)type).getClazz();
+						Method[]	methods	= SReflect.getMethods(clazz, ma.getName());
+						Class[][]	mparamtypes	= new Class[methods.length][];
+						for(int j=0; j<methods.length; j++)
+						{
+							mparamtypes[j]	= methods[j].getParameterTypes(); 
+						}
+						int[]	matches	= SReflect.matchArgumentTypes(paramtypes, mparamtypes);
+						if(matches.length==0)
+						{
+							throw new RuntimeException("No matching method found for: "+clazz.getName()+ma);
+						}
+						else if(matches.length>1)
+						{
+							System.out.println("Warning: Multiple matching methods found for: "+clazz.getName()+", "+ma);
+						}
+						suffs.add(new MethodCall((OAVJavaType)type, methods[matches[0]], params));
+						type	= context.getTypeModel().getJavaType(methods[matches[0]].getReturnType());
+					}
+					else
+					{
+						throw new RuntimeException("Method invocation not supported on type: "+type);
+					}
+				}
+				else if(suffixes[i] instanceof ArrayAccess)
+				{
+					Expression	index	= flattenToPrimary(((ArrayAccess)suffixes[i]).getIndex(), context);
+					Object	indexsource;
+					if(index instanceof VariableExpression)
+					{
+						indexsource	= ((VariableExpression)index).getVariable();
+					}
+					else //if(p instanceof LiteralExpression)
+					{
+						indexsource	= new Constant(((LiteralExpression)index).getValue());
+					}
+					suffs.add(new ArraySelector(indexsource));
+					type	= context.getTypeModel().getJavaType(((OAVJavaType)type).getClazz().getComponentType());
+				}
+				else
+				{
+					throw new RuntimeException("Unknown suffix element: "+suffixes[i]);
+				}
+			}
+
+			if(valuesource!=null)
+			{
+				suffs	= combineValueSources(valuesource, suffs);
+			}
+			ret	= suffs.size()==1 ? new Object[]{ocon, suffs.get(0)} : new Object[]{ocon, suffs};
 		}
 		else if(value instanceof OperationExpression)
 		{

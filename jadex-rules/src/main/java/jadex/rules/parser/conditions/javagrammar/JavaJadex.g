@@ -11,6 +11,8 @@ import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 
 import jadex.commons.SReflect;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 }
 
 @lexer::header 
@@ -235,16 +237,33 @@ primaryPrefix returns [Expression exp]
  *  Read a field of an object.
  */
 staticField returns [Expression exp]
-	: tmp = type '.' tmp2 = IDENTIFIER {/*$exp = new FieldAccess(tmp.getText());*/}
+	: clazz = type '.' field = IDENTIFIER
+	{
+		try
+		{
+			Field	f	= clazz.getField(field.getText());
+			$exp	= new LiteralExpression(f.get(null));
+			if((f.getModifiers()&Modifier.FINAL)==0)
+				System.out.println("Warning: static field should be final: "+clazz+", "+field.getText());
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 	;
 
 /**
  *  Read a field of an object.
  */
-type returns [Expression exp]
-	: tmp = IDENTIFIER {String classname = tmp.getText();}
-	(	{SReflect.findClass0(classname, imports, cloader)==null}?
-		'.' tmp2 = IDENTIFIER {classname += "."+tmp.getText();}
+type returns [Class clazz]
+	: tmp = IDENTIFIER
+	{
+		String	classname	= tmp.getText();
+		$clazz	= SReflect.findClass0(classname, imports, cloader);
+	}
+	(	{($clazz=SReflect.findClass0(classname, imports, cloader))==null}?
+		'.' tmp2 = IDENTIFIER {classname += "."+tmp2.getText();}
 	)*
 	;
 	

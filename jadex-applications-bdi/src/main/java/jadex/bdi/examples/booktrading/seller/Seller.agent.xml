@@ -78,19 +78,20 @@
 					)
 				)
 			</creationcondition>
-			<dropcondition language="clips">
+			<dropcondition language="jcl">
 				// $beliefbase.time > $goal.order.getDeadline().getTime()
-				// $goal.order.getState().equals(Order.FAILED)
+				$goal.order.getState().equals(Order.FAILED)
 			
-				?order = (Order (state "failed"))
-				?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				// ?order = (Order (state "failed"))
+				// ?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
-			<targetcondition language="clips">
-				// Order.DONE.equals($goal.order.getState())
-				?rparam =(parameter (parameter_has_name "order") (parameter_has_value ?order)) 
-				?order = (Order (state "done"))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			<targetcondition language="jcl">
+				Order.DONE.equals($goal.order.getState())
+				
+				// ?rparam =(parameter (parameter_has_name "order") (parameter_has_value ?order)) 
+				// ?order = (Order (state "done"))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</targetcondition>
 		</achievegoal>
 		

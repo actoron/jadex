@@ -41,12 +41,13 @@ public class JavaArrayExtractor implements IValueExtractor
 	 *  Get the value of an attribute from an object or tuple.
 	 *  @param left The left input tuple. 
 	 *  @param right The right input object.
+	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
 	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, IOAVState state)
+	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
-		Object	array	= objex.getValue(left, right, state);
-		int	i	= ((Number)index.getValue(left, right, state)).intValue();
+		Object	array	= objex.getValue(left, right, prefix, state);
+		int	i	= ((Number)index.getValue(left, right, prefix, state)).intValue();
 		return Array.get(array, i);
 	}
 

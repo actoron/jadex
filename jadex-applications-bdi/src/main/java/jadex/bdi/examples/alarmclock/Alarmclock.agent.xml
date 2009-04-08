@@ -74,11 +74,12 @@
 					)
 				)
 			</dropcondition>
-			<targetcondition language="clips">
-				// $goal.alarm.getAlarmtime()==Alarm.NO_ALARM
-				?alarm = (Alarm (alarmtime -2))
-				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+			<targetcondition language="jcl">
+				$goal.alarm.getAlarmtime()==Alarm.NO_ALARM
+				
+				// ?alarm = (Alarm (alarmtime -2))
+				// ?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</targetcondition>
 		</achievegoal>
 

@@ -73,7 +73,7 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 		for(Iterator it=extractors.keySet().iterator(); it.hasNext(); )
 		{
 			Object	variable	= it.next();
-			vars.put(variable, ((IValueExtractor)extractors.get(variable)).getValue(tuple, null, state));
+			vars.put(variable, ((IValueExtractor)extractors.get(variable)).getValue(tuple, null, null, state));
 		}
 		ReteVariableAssignments	assignments	= new ReteVariableAssignments(vars, rule);
 		nodemem.put(tuple, assignments);
@@ -128,7 +128,7 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 		for(Iterator it=extractors.keySet().iterator(); it.hasNext(); )
 		{
 			Object	variable	= it.next();
-			newvars.put(variable, ((IValueExtractor)extractors.get(variable)).getValue(tuple, null, state));
+			newvars.put(variable, ((IValueExtractor)extractors.get(variable)).getValue(tuple, null, null, state));
 		}
 
 		// Change activation, if necessary.

@@ -81,11 +81,11 @@
 				// ?myself = (Player (account > 0))
 				// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?myself))
 			</contextcondition>
-			<targetcondition language="clips">
-				// $beliefbase.myself.getState().equals(Player.STATE_IDLE)
+			<targetcondition language="jcl">
+				$beliefbase.myself.getState().equals(Player.STATE_IDLE)
 				
-				?myself = (Player (playingstate "idle"))
-				?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact != null))
+				// ?myself = (Player (playingstate "idle"))
+				// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact != null))
 			</targetcondition>
 		</achievegoal>
 

@@ -32,18 +32,22 @@ public class ChainedExtractor implements IValueExtractor
 	
 	/**
 	 *  Get the value of an attribute from an object or tuple.
-	 * @param left The left input tuple. 
-	 * @param right The right input object.
-	 * @param state The working memory.
+	 *  @param left The left input tuple. 
+	 *  @param right The right input object.
+	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
+	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, IOAVState state)
+	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
-		Object ret = extractors[0].getValue(left, right, state);
-		for(int i=1; ret!=null && i<extractors.length; i++)
+		prefix = extractors[0].getValue(left, right, prefix, state);
+		for(int i=1; prefix!=null && i<extractors.length; i++)
 		{
-			ret = extractors[i].getValue(left, ret, state);	// Todo: right might be needed too!
+			// Todo: throw exception when prefix nulls
+//			if(prefix==null)
+//				throw new NullPointerException(this.toString());
+			prefix = extractors[i].getValue(left, right, prefix, state);
 		}
-		return ret;
+		return prefix;
 	}
 	
 	/**

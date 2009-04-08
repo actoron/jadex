@@ -1,22 +1,21 @@
 package jadex.rules.rulesystem.rete.extractors;
 
 import jadex.rules.rulesystem.rete.Tuple;
-import jadex.rules.rulesystem.rete.nodes.VirtualFact;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaAttributeType;
 
 
 /**
- *  Extractor for a Java attribute value (or the whole object).
+ *  Extractor for a Java attribute value.
  */
-public class JavaObjectExtractor extends ObjectExtractor
+public class JavaPrefixExtractor extends ObjectExtractor
 {
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new extractor.
 	 */
-	public JavaObjectExtractor(OAVJavaAttributeType attr)
+	public JavaPrefixExtractor(OAVJavaAttributeType attr)
 	{
 		super(attr);
 	}
@@ -32,24 +31,7 @@ public class JavaObjectExtractor extends ObjectExtractor
 	 */
 	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
-		// Fetch the value from the state
-		// a) attr == null -> use object
-		// b) attr !=null -> use right.getXYZ()
-		
-		if(right instanceof VirtualFact)
-			right = ((VirtualFact)right).getObject();
-		
-		Object ret;
-		if(attr==null)
-		{
-			ret = right;
-		}
-		else
-		{
-			ret = ((OAVJavaAttributeType)attr).accessProperty(right);
-		}
-		
-		return ret;
+		return ((OAVJavaAttributeType)attr).accessProperty(prefix);
 	}
 
 	/**
@@ -58,6 +40,6 @@ public class JavaObjectExtractor extends ObjectExtractor
 	 */
 	public String toString()
 	{
-		return "[java]"+(attr==null? "object": attr.getName());
+		return ".[java]" + attr.getName();
 	}
 }

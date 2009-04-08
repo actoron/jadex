@@ -2,7 +2,6 @@ package jadex.rules.rulesystem.rete.extractors;
 
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
-import jadex.rules.rulesystem.rete.nodes.VirtualFact;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -11,14 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *  Extractor for fetching a value from a rete tuple.
+ *  Extractor for an attribute value.
  */
-public class TupleExtractor implements IValueExtractor
+public class PrefixExtractor implements IValueExtractor
 {
 	//-------- attributes --------
-	
-	/** The tuple index. */
-	protected int tupleindex;
 	
 	/** The attribute type. */
 	protected OAVAttributeType attr;
@@ -31,21 +27,20 @@ public class TupleExtractor implements IValueExtractor
 	/**
 	 *  Create a new extractor.
 	 */
-	public TupleExtractor(int tupleindex, OAVAttributeType attr)
+	public PrefixExtractor(OAVAttributeType attr)
 	{
-		this(tupleindex, attr, null);
+		this.attr = attr;
 	}
 	
 	/**
 	 *  Create a new extractor.
 	 */
-	public TupleExtractor(int tupleindex, OAVAttributeType attr, Object key)
+	public PrefixExtractor(OAVAttributeType attr, Object key)
 	{
-		this.tupleindex = tupleindex;
 		this.attr = attr;
 		this.key = key;
 	}
-
+	
 	//-------- methods --------
 	
 	/**
@@ -57,32 +52,22 @@ public class TupleExtractor implements IValueExtractor
 	 */
 	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
 	{
-		// Fetch the object from the tuple
-		
-		// Fetch the value from the state
-		// a) attr == null -> use object
-		// b) attr !=null -> use state.getAttributeValue(object, attr) or
-		//                       state.getAttributeValues(object, attr);
-		
-		Object object = left.getObject(tupleindex);
-		
-		if(object instanceof VirtualFact)
-			object = ((VirtualFact)object).getObject();
-		
 		Object ret;
 		if(attr==OAVAttributeType.OBJECTTYPE)
 		{
-			ret = state.getType(object);
+			ret = state.getType(prefix);
+		}
+		else if(attr!=null)
+		{
+			ret = OAVAttributeType.NONE.equals(attr.getMultiplicity())?
+				state.getAttributeValue(prefix, attr):
+				key!=null? state.getAttributeValue(prefix, attr, key):
+				state.getAttributeValues(prefix, attr);
 		}
 		else
 		{
-			ret = attr==null?  object: 
-				OAVAttributeType.NONE.equals(attr.getMultiplicity())?
-					state.getAttributeValue(object, attr):
-					key!=null? state.getAttributeValue(object, attr, key):
-					state.getAttributeValues(object, attr);
+			ret	= prefix;
 		}
-		
 		return ret;
 	}
 	
@@ -95,9 +80,32 @@ public class TupleExtractor implements IValueExtractor
 	 */
 	public boolean isAffected(int tupleindex, OAVAttributeType attr)
 	{
-		return tupleindex==tupleindex && SUtil.equals(this.attr, attr);
+		// Todo: affected for indirect attributes?
+		return false;
 	}
 	
+	/**
+	 *  Get the set of relevant attribute types.
+	 */
+	public Set	getRelevantAttributes()
+	{
+		return Collections.EMPTY_SET;
+	}
+
+	/**
+	 *  Get the set of indirect attribute types.
+	 *  I.e. attributes of objects, which are not part of an object conditions
+	 *  (e.g. for chained extractors) 
+	 *  @return The relevant attribute types.
+	 */
+	public Set	getIndirectAttributes()
+	{
+		Set	ret	= new HashSet();
+		if(attr!=null)
+			ret.add(attr);
+		return ret;
+	}
+
 	/**
 	 *  Get the attribute.
 	 *  @return The attribute.
@@ -108,53 +116,21 @@ public class TupleExtractor implements IValueExtractor
 	}
 	
 	/**
-	 *  Get the set of relevant attribute types.
-	 */
-	public Set	getRelevantAttributes()
-	{
-		Set	ret	= new HashSet();
-		if(attr!=null)
-			ret.add(attr);
-		return ret;
-	}
-	
-	/**
-	 *  Get the set of indirect attribute types.
-	 *  I.e. attributes of objects, which are not part of an object conditions
-	 *  (e.g. for chained extractors) 
-	 *  @return The relevant attribute types.
-	 */
-	public Set	getIndirectAttributes()
-	{
-		return Collections.EMPTY_SET;
-	}
-
-	/**
-	 *  Get the tuple index.
-	 *  @return The tuple index.
-	 */
-	public int getTupleIndex()
-	{
-		return tupleindex;
-	}
-	
-	/**
 	 *  Get the string representation.
 	 *  @return The string representation. 
 	 */
 	public String toString()
 	{
-		return "["+tupleindex+"]"+"."+(attr==null? "object": attr.getName())+(key==null? "": "["+key+"]");
+		return (attr!=null ? "." + attr.getName() : "prefix")+(key==null? "": "["+key+"]");
 	}
+
 
 	/**
 	 *  The hash code.
 	 */
 	public int hashCode()
 	{
-		int	result	= 31 + (attr!=null ? attr.hashCode() : 0);
-		result	= result*31 + tupleindex;
-		return result;
+		return 31 + (attr!=null ? attr.hashCode() : 0);
 	}
 
 	/**
@@ -165,13 +141,7 @@ public class TupleExtractor implements IValueExtractor
 		if(this==obj)
 			return true;
 
-		boolean	ret	= false;
-		if(obj instanceof TupleExtractor)
-		{
-			TupleExtractor	other	= (TupleExtractor)obj;
-			ret	= SUtil.equals(attr, other.getAttribute())
-				&& tupleindex==other.getTupleIndex();
-		}
-		return ret;
+		return obj instanceof PrefixExtractor
+			&& SUtil.equals(attr, ((PrefixExtractor)obj).getAttribute());
 	}
 }

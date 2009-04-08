@@ -73,7 +73,7 @@ public class ConstraintIndexer
 	 */
 	public void addObject(Object right, IOAVState state, BetaMemory bmem)
 	{
-		Object rvalue = extractor2.getValue(null, right, state);
+		Object rvalue = extractor2.getValue(null, right, null, state);
 		bmem.addObject(rvalue, right, this);
 	}
 	
@@ -85,7 +85,7 @@ public class ConstraintIndexer
 	 */
 	public void addTuple(Tuple left, IOAVState state, BetaMemory bmem)
 	{
-		Object lvalue = extractor1.getValue(left, null, state);
+		Object lvalue = extractor1.getValue(left, null, null, state);
 		bmem.addTuple(lvalue, left, this);
 	}
 	
