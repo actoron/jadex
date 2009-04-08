@@ -120,7 +120,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	 */
 	public String getIconPath()
 	{
-		return getClass().getPackage().getName().replaceAll("capability\\.plugin","").concat("images.").replaceAll("\\.", "/").concat("introspector_icon.png");
+		return getClass().getPackage().getName().replaceAll("gui\\.plugin","").concat("images.").replaceAll("\\.", "/").concat("introspector_icon.png");
 	}
 	
 	public synchronized Component getView()
