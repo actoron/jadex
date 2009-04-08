@@ -12,15 +12,28 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.environment.view.GeneralView2D;
+import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
+import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
+import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
+import jadex.adapter.base.envsupport.observer.gui.Configuration;
+import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Java representation of environemnt space instance for xml description.
@@ -180,6 +193,36 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Object obj = ret.createSpaceObject(mobj.getType(), mobj.getOwner(), null, null, null);
 			}
 		}
+		
+		// Create the observers.
+		// Hack!
+		Configuration cfg = new Configuration();
+		Map theme = new HashMap();
+		
+		DrawableCombiner combiner = new DrawableCombiner();
+		combiner.addDrawable(new RegularPolygon(new Vector2Double(2.0), new Vector2Double(0.0), false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
+		combiner.addDrawable(new Triangle(new Vector2Double(1.0), new Vector2Double(0.0), true, Color.BLUE), 0);
+		theme.put("collector", combiner);
+
+		DrawableCombiner burner = new DrawableCombiner();
+		combiner.addDrawable(new RegularPolygon(new Vector2Double(2.0), new Vector2Double(0.0), false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
+		combiner.addDrawable(new Triangle(new Vector2Double(1.0), new Vector2Double(0.0), true, Color.BLUE), 0);
+		theme.put("burner", combiner);
+
+		combiner = new DrawableCombiner(new Vector2Double(0.5));
+		combiner.addDrawable(new RegularPolygon(new Vector2Double(0.5), new Vector2Double(0.0), false, Color.RED, 24));
+		theme.put("garbage", combiner);
+		
+		ILayer grid = new GridLayer(((Space2D)ret).getAreaSize(), Color.WHITE);
+		List prelayers = new ArrayList();
+		prelayers.add(grid);
+		
+		theme.put("prelayers", prelayers);
+		
+		cfg.setTheme("abstract", theme);
+		
+		ObserverCenter oc = new ObserverCenter(ret, cfg, (ILibraryService)app.getPlatform().getService(ILibraryService.class));
+		ret.addView(GeneralView2D.class.getName(), new GeneralView2D((Space2D)ret));
 		
 		return ret;
 	}

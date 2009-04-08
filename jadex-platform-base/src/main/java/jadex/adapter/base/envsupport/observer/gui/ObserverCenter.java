@@ -257,7 +257,8 @@ public class ObserverCenter
 			addPluginButton(plugins_[i]);
 		}
 		
-		activatePlugin(plugins_[0]);
+		if(plugins_.length>0)
+			activatePlugin(plugins_[0]);
 	}
 	
 	/** Adds a plugin to the toolbar.
@@ -326,7 +327,7 @@ public class ObserverCenter
 				viewport.setPreLayers(preLayers);
 				viewport.setPostLayers(postLayers);
 				
-				Object[] objects = (ISpaceObject[]) space.getView(GeneralView2D.class.getName()).getObjects();
+				Object[] objects = space.getView(GeneralView2D.class.getName()).getObjects();
 				List objectList = null;
 				objectList = new ArrayList(objects.length + 1);
 				for (int i = 0; i < objects.length; ++i )

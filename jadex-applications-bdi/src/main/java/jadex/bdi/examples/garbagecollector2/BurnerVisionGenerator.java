@@ -93,26 +93,34 @@ public class BurnerVisionGenerator implements IPerceptGenerator
 	 */
 	public void dispatchEnvironmentEvent(EnvironmentEvent event)
 	{
-		if(isRelevant(event))
+		if(agents!=null && "garbage".equals(event.getSpaceObject().getType()))
 		{
-			IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.POSITION);
-			IVector2 oldpos = (IVector2)event.getInfo();
-			
 			for(int i=0; i<agents.size(); i++)
 			{
 				IAgentIdentifier agent = (IAgentIdentifier)agents.get(i);
-				
-				String owner = agent.getLocalName(); // Hack!
-				ISpaceObject agentobj = event.getSpace().getOwnedObjects(owner)[0];
-				
-				if(agentobj.getProperty(Space2D.POSITION).equals(pos))
+
+				if(EnvironmentEvent.OBJECT_POSITION_CHANGED.equals(event.getType()))
 				{
-					// percept garbage_appeared
-					perproc.processPercept(event.getSpace(), GARBAGE_APPEARED, event.getSpaceObject(), agent);
+					IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.POSITION);
+					IVector2 oldpos = (IVector2)event.getInfo();
+					
+					String owner = agent.getLocalName(); // Hack!
+					ISpaceObject agentobj = event.getSpace().getOwnedObjects(owner)[0];
+					
+					if(agentobj.getProperty(Space2D.POSITION).equals(pos))
+					{
+						// percept garbage appeared
+						perproc.processPercept(event.getSpace(), GARBAGE_APPEARED, event.getSpaceObject(), agent);
+					}
+					else if(agentobj.getProperty(Space2D.POSITION).equals(oldpos))
+					{
+						// percept garbage disappeared
+						perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
+					}
 				}
-				else if(agentobj.getProperty(Space2D.POSITION).equals(oldpos))
+				else if(EnvironmentEvent.OBJECT_DESTRYOED.equals(event.getType()))
 				{
-					// percept garbage_vanished
+					// percept garbage disappeared
 					perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
 				}
 			}
