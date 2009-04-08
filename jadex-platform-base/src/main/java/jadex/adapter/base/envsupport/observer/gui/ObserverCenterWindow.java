@@ -9,6 +9,8 @@ import jadex.commons.SGUI;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Component;
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -44,33 +46,57 @@ public class ObserverCenterWindow extends JFrame
 	 *  @param title title of the window
 	 *  @param simView view of the simulation
 	 */
-	public ObserverCenterWindow(String title, ILibraryService libService, boolean opengl)
+	public ObserverCenterWindow(String title, final ILibraryService libService, final boolean opengl)
 	{
 		super(title);
 		
-		viewport = createViewport(libService, opengl);
-		
-		menubar = new JMenuBar();
-		menubar.add(new JMenu("Test"));
-		setJMenuBar(menubar);
-		
-		toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
-		getContentPane().add(toolbar, BorderLayout.NORTH);
-		
-		mainpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-		mainpane.setDividerLocation(200 + mainpane.getInsets().left);
-		getContentPane().add(mainpane, BorderLayout.CENTER);
-		
-		mainpane.setLeftComponent(new JPanel());
-		
-		mainpane.setRightComponent(viewport.getCanvas());
+		Runnable runnable = new Runnable()
+		{
+			public void run()
+			{
+				viewport = createViewport(libService, opengl);
 
-		setResizable(true);
-		setBackground(null);
-		pack();
-		setSize(600, 400);
-		setLocation(SGUI.calculateMiddlePosition(this));
-		setVisible(true);
+				menubar = new JMenuBar();
+				menubar.add(new JMenu("Test"));
+				setJMenuBar(menubar);
+
+				toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
+				getContentPane().add(toolbar, BorderLayout.NORTH);
+
+				mainpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+				mainpane.setDividerLocation(200 + mainpane.getInsets().left);
+				getContentPane().add(mainpane, BorderLayout.CENTER);
+
+				mainpane.setLeftComponent(new JPanel());
+
+				mainpane.setRightComponent(viewport.getCanvas());
+
+				setResizable(true);
+				setBackground(null);
+				pack();
+				setSize(600, 400);
+				setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
+				setVisible(true);
+			}
+		};
+		
+		if (EventQueue.isDispatchThread())
+		{
+			runnable.run();
+		}
+		else
+		{
+			try
+			{
+				EventQueue.invokeAndWait(runnable);
+			}
+			catch (InterruptedException e)
+			{
+			}
+			catch (InvocationTargetException e)
+			{
+			}
+		}
 	}
 	
 	/**
@@ -148,11 +174,10 @@ public class ObserverCenterWindow extends JFrame
 			// Try OpenGL...
 			try
 			{
-				
 				ViewportJOGL vp = new ViewportJOGL(libService);
 				frame.add(vp.getCanvas());
 				frame.setVisible(true);
-				if (!((ViewportJOGL) vp).isValid())
+				if (!vp.isValid())
 				{
 					System.err.println("OpenGL support insufficient, using Java2D fallback...");
 					opengl = false;
@@ -169,7 +194,6 @@ public class ObserverCenterWindow extends JFrame
 				opengl = false;
 			}
 		}
-		frame.dispose();
 		
 		IViewport viewport = null;
 		if (opengl)

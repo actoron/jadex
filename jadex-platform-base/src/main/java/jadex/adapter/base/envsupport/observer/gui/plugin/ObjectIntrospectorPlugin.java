@@ -159,7 +159,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		{
 			Map.Entry entry = (Entry) it.next();
 			dataSet[i][0] = entry.getKey();
-			dataSet[i][1] = entry.getValue().toString();
+			dataSet[i][1] = String.valueOf(entry.getValue());
 			++i;
 		}
 		DefaultTableModel model = (DefaultTableModel) propertyTable_.getModel();

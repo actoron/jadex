@@ -20,6 +20,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -253,8 +254,9 @@ public class ObserverCenter
 		//plugins.add(plugin);
 		//plugin = new ToolboxPlugin();
 		//plugins.add(plugin);
+		plugins.addAll(Arrays.asList(config.getPlugins()));
 		
-		plugins_ = config.getPlugins();
+		plugins_ = (IObserverCenterPlugin[]) plugins.toArray(new IObserverCenterPlugin[0]);
 		
 		for (int i = 0; i < plugins_.length; ++i)
 		{
@@ -470,6 +472,7 @@ public class ObserverCenter
 	{
 		public void leftClicked(IVector2 position)
 		{
+			position = position.copy().subtract(config.getObjectShift());
 			IVector1 maxDist = config.getSelectorDistance();
 			((Space2D) space).getNearestObject(position, maxDist);
 			ISpaceObject obj = ((Space2D) space).getNearestObject(position, maxDist);

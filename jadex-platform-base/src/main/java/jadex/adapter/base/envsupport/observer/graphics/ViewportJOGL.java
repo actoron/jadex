@@ -132,7 +132,9 @@ public class ViewportJOGL extends AbstractViewport
 	 */
 	public boolean isValid()
 	{
-		while(uninitialized_)
+		//TODO: Hack: do proper validity checking
+		return true;
+		/*while(uninitialized_)
 		{
 			try
 			{
@@ -142,7 +144,7 @@ public class ViewportJOGL extends AbstractViewport
 			{
 			}
 		}
-		return valid_;
+		return valid_;*/
 	}
 
 	/**
