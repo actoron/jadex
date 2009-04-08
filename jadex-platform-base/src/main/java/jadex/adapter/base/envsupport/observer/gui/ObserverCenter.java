@@ -83,7 +83,7 @@ public class ObserverCenter
 	 *  @param cfg the configuration
 	 *  @param libSrvc the platform library service for loading resources (images etc.)
 	 */
-	public ObserverCenter(IEnvironmentSpace space, Configuration cfg, final ILibraryService libSrvc)
+	public ObserverCenter(final IEnvironmentSpace space, Configuration cfg, final ILibraryService libSrvc)
 	{
 		this.libService = libSrvc;
 		this.space = space;
@@ -97,6 +97,8 @@ public class ObserverCenter
 				{
 					String mainTitle = config.getWindowTitle();
 					mainWindow_ = new ObserverCenterWindow(mainTitle, libService, config.useOpenGl());
+					IViewport vp = mainWindow_.getViewport();
+					vp.setSize(((Space2D) space).getAreaSize());
 					loadPlugins();
 					
 					JMenu refreshMenu = new JMenu("Display");
