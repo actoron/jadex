@@ -24,9 +24,8 @@ public interface ISpaceProcess
 
 	/**
 	 *  Executes the environment process
-	 *  @param time the current time
-	 *  @param deltaT time passed during this step
+	 *  @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
 	 *  @param space the space this process is running in
 	 */
-	public void execute(long time, IVector1 deltaT, IEnvironmentSpace space);
+	public void execute(IVector1 progress, IEnvironmentSpace space);
 }

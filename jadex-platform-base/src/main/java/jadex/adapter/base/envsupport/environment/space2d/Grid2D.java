@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
+import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.math.IVector1;
@@ -60,26 +61,27 @@ public class Grid2D extends Space2D
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with the default name.
 	 * 
-	 * @param clockService the clock service
-	 * @param timeCoefficient the time coefficient for time differences.
+	 * @param spaceexecutor executor for the space
+	 * @param actionexecutor executor for agent actions
 	 * @param areaSize the size of the 2D area
 	 */
-	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IActionExecutor executor, IVector2 areaSize)
+	public Grid2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, IVector2 areaSize)
 	{
-		this(clockService, timeCoefficient, executor, areaSize, DEFAULT_NAME);
+		this(spaceexecutor, actionexecutor, areaSize, DEFAULT_NAME);
 	}
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with a special ID.
 	 * 
-	 * @param clockService the clock service
-	 * @param timeCoefficient the time coefficient for time differences.
+	 * @param spaceexecutor executor for the space
+	 * @param actionexecutor executor for agent actions
 	 * @param areaSize the size of the 2D area
 	 * @param spaceName the name of this space
 	 */
-	public Grid2D(IClockService clockService, IVector1 timeCoefficient, IActionExecutor executor, IVector2 areaSize, Object spaceName)
+	public Grid2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, 
+			IVector2 areaSize, Object spaceName)
 	{
-		super(clockService, timeCoefficient, executor, areaSize);
+		super(spaceexecutor, actionexecutor, areaSize);
 		this.setProperty("name", spaceName);
 		this.objectsygridpos = new MultiCollection();
 		this.gridposbyobject = new HashMap();

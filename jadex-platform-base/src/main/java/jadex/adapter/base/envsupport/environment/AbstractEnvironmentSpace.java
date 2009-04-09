@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
@@ -8,6 +7,7 @@ import jadex.adapter.base.envsupport.environment.agentaction.ImmediateExecutor;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 import jadex.adapter.base.envsupport.environment.view.IView;
+import jadex.adapter.base.envsupport.math.IVector1;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,12 +60,37 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	/** The environment listeners. */
 	protected List listeners;
 	
+	/** The space executor. */
+	protected ISpaceExecutor spaceexecutor;
+	
+	/** The action executor. */
+	protected IActionExecutor actionexecutor;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an environment space
 	 */
 	public AbstractEnvironmentSpace()
+	{
+		this(null, null);
+	}
+	
+	/**
+	 *  Create an environment space
+	 *  @param actionexecutor executor for agent actions
+	 */
+	public AbstractEnvironmentSpace(IActionExecutor actionexecutor)
+	{
+		this(null, actionexecutor);
+	}
+	
+	/**
+	 *  Create an environment space
+	 *  @param spaceexecutor executor for the space
+	 *  @param actionexecutor executor for agent actions
+	 */
+	public AbstractEnvironmentSpace(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor)
 	{
 		this.views = new HashMap();
 		this.spaceactions = new HashMap();
@@ -76,6 +101,11 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
 		this.objectidcounter = new AtomicCounter();
+		this.actionexecutor = actionexecutor==null? new ImmediateExecutor(): actionexecutor;
+		if (spaceexecutor != null)
+		{
+			setSpaceExecutor(spaceexecutor);
+		}
 	}
 	
 	//-------- methods --------
@@ -591,6 +621,45 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	public void setContext(IContext context)
 	{
 		this.context = context;
+	}
+	
+	/** Sets the space executor that executes the space.
+	 *  @param the space executor
+	 */
+	public void setSpaceExecutor(ISpaceExecutor executor)
+	{
+		this.spaceexecutor = executor;
+		executor.setSpace(this);
+	}
+	
+	/** 
+	 * Steps the space. May be non-functional in spaces that do not have
+	 * a concept of steps.
+	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
+	 */
+	public void step(IVector1 progress)
+	{
+		synchronized(monitor)
+		{
+			for(Iterator it = spaceobjects.values().iterator(); it.hasNext(); )
+			{
+				SpaceObject obj = (SpaceObject)it.next();
+				obj.updateObject(progress);
+			}
+			
+			Object[] procs = processes.values().toArray();
+			for(int i = 0; i < procs.length; ++i)
+			{
+				ISpaceProcess process = (ISpaceProcess) procs[i];
+				process.execute(progress, this);
+			}
+			
+			for (Iterator it = views.values().iterator(); it.hasNext(); )
+			{
+				IView view = (IView) it.next();
+				view.update(this);
+			}
+		}
 	}
 	
 	/**

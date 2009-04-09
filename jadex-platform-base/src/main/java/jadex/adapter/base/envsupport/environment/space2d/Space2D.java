@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
-import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
+import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.environment.view.IView;
@@ -20,7 +21,7 @@ import jadex.bridge.IClockService;
 /**
  * 
  */
-public abstract class Space2D extends EnvironmentSpaceTime
+public abstract class Space2D extends AbstractEnvironmentSpace
 {
 	//-------- constants --------
 	
@@ -33,14 +34,14 @@ public abstract class Space2D extends EnvironmentSpaceTime
 	//-------- constructors --------
 	
 	/**
-	 * Initializes the TimeSpace.
-	 * @param clockservice the clock service
-	 * @param timecoefficient the time coefficient for time differences.
+	 * Initializes the 2D-Space.
+	 * @param spaceexecutor executor for the space
+	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(IClockService clockservice, IVector1 timecoefficient, IActionExecutor executor, IVector2 areasize)
+	protected Space2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, IVector2 areasize)
 	{
-		super(clockservice, timecoefficient, executor);
+		super(spaceexecutor, actionexecutor);
 		this.areasize = areasize;
 	}
 	

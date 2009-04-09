@@ -6,7 +6,6 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.EnvironmentSpaceTime;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
@@ -89,10 +88,11 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			ret.setName(getName());
 		}
 		
-		if(ret instanceof EnvironmentSpaceTime) // Hack?
+		//TODO: FIXME! (spaceexecutor)
+		/*if(ret instanceof EnvironmentSpaceTime) // Hack?
 		{
 			((EnvironmentSpaceTime)ret).setClockService((IClockService)app.getPlatform().getService(IClockService.class));
-		}
+		}*/
 		
 		if(ret instanceof Space2D) // Hack?
 		{

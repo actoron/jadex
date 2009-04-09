@@ -209,9 +209,9 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	/**
 	 * Updates the object to the current time.
 	 * time the current time	
-	 * @param deltaT the time difference that has passed
+	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
 	 */
-	public void updateObject(long time, IVector1 deltaT)
+	public void updateObject(IVector1 progress)
 	{
 		synchronized(monitor)
 		{
@@ -219,7 +219,7 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 			for(int i = 0; i < tasks.length; ++i)
 			{
 				IObjectTask task = (IObjectTask) tasks[i];
-				task.execute(time, deltaT, this);
+				task.execute(progress, this);
 			}
 		}
 	}

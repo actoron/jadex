@@ -26,11 +26,10 @@ public class ImmediateExecutor extends AbstractActionExecutor
 	
 	/**
 	 *  Executes the environment process
-	 *  @param time the current time
-	 *  @param deltaT time passed during this step
+	 *  @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
 	 *  @param space the space this process is running in
 	 */
-	public void execute(long currenttime, IVector1 deltat, IEnvironmentSpace space)
+	public void execute(IVector1 progress, IEnvironmentSpace space)
 	{
 		getSynchronizer().executeEntries(null);
 	}

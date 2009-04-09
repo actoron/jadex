@@ -24,11 +24,10 @@ public interface IObjectTask
 
 	/**
 	 *  Executes the task.
-	 *  @param time the current time
-	 *  @param deltaT time passed
+	 *  @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
 	 *  @param obj to the environment object that is executing the task
 	 */
-	public void execute(long time, IVector1 deltaT, ISpaceObject obj);
+	public void execute(IVector1 progress, ISpaceObject obj);
 
 	/**
 	 *  Returns the ID of the task.
