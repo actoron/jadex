@@ -7,7 +7,8 @@ public interface ISpaceExecutor
 {
 	/**
 	 * Sets the space for the executor. Called by the space when the executor is added.
+	 * Can perform any init operations for setting up the executor.
 	 * @param space the space being executed
 	 */
-	public void setSpace(IEnvironmentSpace space);
+	public void init(IEnvironmentSpace space);
 }

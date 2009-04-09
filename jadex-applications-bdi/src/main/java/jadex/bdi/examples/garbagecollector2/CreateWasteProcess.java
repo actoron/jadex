@@ -1,10 +1,6 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -12,8 +8,9 @@ import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bdi.examples.garbagecollector.Environment;
-import jadex.bdi.examples.garbagecollector.Position;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -59,7 +56,7 @@ public class CreateWasteProcess implements ISpaceProcess
 	 * @param deltat time passed during this step
 	 * @param space the space this process is running in
 	 */
-	public void execute(long time, IVector1 deltat, IEnvironmentSpace space)
+	public void execute(IVector1 deltat, IEnvironmentSpace space)
 	{
 //		System.out.println("create waste process called: "+time);
 		

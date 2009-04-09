@@ -89,7 +89,7 @@ public abstract class AbstractClock implements IClock
 		// tick is due. It then notifies all registered tick timers. 
 		this.ticktimer = new Timer(0, this, new ITimedObject()
 		{
-			public void timeEventOccurred()
+			public void timeEventOccurred(long currenttime)
 			{
 				synchronized(AbstractClock.this)
 				{
@@ -99,7 +99,7 @@ public abstract class AbstractClock implements IClock
 					ticktimers.clear();
 					
 					for(int i=0; i<tts.length; i++)
-						tts[i].getTimedObject().timeEventOccurred();
+						tts[i].getTimedObject().timeEventOccurred(currenttime);
 				}
 			}
 		});

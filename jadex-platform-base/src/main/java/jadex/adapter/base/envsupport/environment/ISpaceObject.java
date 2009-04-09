@@ -2,8 +2,6 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.commons.IPropertyObject;
 
-import java.util.Map;
-
 /**
  *  Interface for a space object.
  */

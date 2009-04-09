@@ -73,7 +73,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 //		{
 			createTickTimer(new ITimedObject()
 			{
-				public void timeEventOccurred()
+				public void timeEventOccurred(long currenttime)
 				{
 					synchronized(this)
 					{
@@ -304,6 +304,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 			{
 				Timer	next = null;
 				long	diff = 1;
+				long	currenttime = getTime();
 	
 				// Getting entry and waiting has to be synchronized
 				// to avoid new (earlier) entries being added in between.
@@ -326,7 +327,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 						
 						// Get next entry from timetable.
 						next = (Timer)timers.first();
-						diff = (long)((next.time - getTime())/getDilation());
+						diff = (long)((next.time - currenttime)/getDilation());
 //						System.out.println("diff: "+diff+" "+next.time+" "+getTime()+" "+next);
 	
 						// Wait until next entry is due.
@@ -366,7 +367,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 					
 					try
 					{
-						next.getTimedObject().timeEventOccurred();
+						next.getTimedObject().timeEventOccurred(currenttime);
 //						System.out.println("notified: "+next);
 					}
 					catch(Exception e)

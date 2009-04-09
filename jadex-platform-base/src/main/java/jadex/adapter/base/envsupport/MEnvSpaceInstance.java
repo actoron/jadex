@@ -6,14 +6,16 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
+import jadex.adapter.base.envsupport.environment.RoundBasedExecutor;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.environment.view.GeneralView2D;
 import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
@@ -82,6 +84,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)envcl.newInstance();
 		
 		ret.setContext(app);
+		
+		// Hack!!
+		ret.setSpaceExecutor(new RoundBasedExecutor(null, (IClockService)app.getPlatform().getService(IClockService.class), new Vector1Long(1000)));
 		
 		if(getName()!=null)
 		{

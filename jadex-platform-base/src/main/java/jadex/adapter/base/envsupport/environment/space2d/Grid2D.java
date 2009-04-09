@@ -2,11 +2,9 @@ package jadex.adapter.base.envsupport.environment.space2d;
 
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bridge.IClockService;
 import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  *  2D grid environment.
@@ -55,7 +52,7 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D()
 	{
-		this(null, null, null, null);
+		this(null, null, null);
 	}
 	
 	/**
@@ -65,9 +62,9 @@ public class Grid2D extends Space2D
 	 * @param actionexecutor executor for agent actions
 	 * @param areaSize the size of the 2D area
 	 */
-	public Grid2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, IVector2 areaSize)
+	public Grid2D(ISpaceExecutor spaceexecutor, IVector2 areaSize)
 	{
-		this(spaceexecutor, actionexecutor, areaSize, DEFAULT_NAME);
+		this(spaceexecutor, areaSize, DEFAULT_NAME);
 	}
 	
 	/**
@@ -78,10 +75,9 @@ public class Grid2D extends Space2D
 	 * @param areaSize the size of the 2D area
 	 * @param spaceName the name of this space
 	 */
-	public Grid2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, 
-			IVector2 areaSize, Object spaceName)
+	public Grid2D(ISpaceExecutor spaceexecutor, IVector2 areaSize, Object spaceName)
 	{
-		super(spaceexecutor, actionexecutor, areaSize);
+		super(spaceexecutor, areaSize);
 		this.setProperty("name", spaceName);
 		this.objectsygridpos = new MultiCollection();
 		this.gridposbyobject = new HashMap();

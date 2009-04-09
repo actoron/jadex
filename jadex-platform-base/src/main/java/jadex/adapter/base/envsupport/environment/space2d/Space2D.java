@@ -11,15 +11,12 @@ import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
-import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.bridge.IClockService;
 
 /**
- * 
+ *  General 2D space.
  */
 public abstract class Space2D extends AbstractEnvironmentSpace
 {
@@ -39,9 +36,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, IVector2 areasize)
+	protected Space2D(ISpaceExecutor spaceexecutor, IVector2 areasize)
 	{
-		super(spaceexecutor, actionexecutor);
+		super(spaceexecutor);
 		this.areasize = areasize;
 	}
 	

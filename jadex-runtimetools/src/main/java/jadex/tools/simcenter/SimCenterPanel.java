@@ -160,7 +160,7 @@ public class SimCenterPanel extends JPanel
 	
 	/**
 	 *  Main for testing. 
-	 */
+	 * /
 	public static void main(String[] args)
 	{
 		final SimCenterPanel p = new SimCenterPanel(null);
@@ -169,7 +169,7 @@ public class SimCenterPanel extends JPanel
 		{
 			clock.createTimer(2000*i, new ITimedObject()
 			{
-				public void timeEventOccurred()
+				public void timeEventOccurred(long currenttime)
 				{
 					System.out.println("Event: "+clock.getTime());
 				}
@@ -188,7 +188,7 @@ public class SimCenterPanel extends JPanel
 				p.updateView();
 			}
 		});
-		t.start();*/
+		t.start();* /
 		clock.start();
-	}
+	}*/
 }

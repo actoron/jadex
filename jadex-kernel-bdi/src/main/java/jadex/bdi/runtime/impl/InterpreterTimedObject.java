@@ -37,7 +37,7 @@ public class InterpreterTimedObject implements ITimedObject
 	 *  // todo: will be enhanced with a TimerEvent when
 	 *  // we enhance the time service 
 	 */
-	public void timeEventOccurred()
+	public void timeEventOccurred(long currenttime)
 	{
 		BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
 		if(interpreter!=null)

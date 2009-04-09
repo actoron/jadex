@@ -1,10 +1,12 @@
-package jadex.adapter.base.envsupport.environment.agentaction;
+package jadex.adapter.base.envsupport.environment;
 
 import java.util.Map;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.commons.concurrent.IResultListener;
-
+/**
+ *  Interface for agent actions. These actions are asynchronous and
+ *  first scheduled in the environment. They will be executed when the
+ *  next step() is called.
+ */
 public interface IAgentAction
 {
 	/**

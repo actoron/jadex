@@ -1,13 +1,10 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
-import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.bridge.IClockService;
 
 /**
- * 
+ *  Continuous version of 2D space.
  */
 public class ContinuousSpace2D extends Space2D
 {
@@ -23,7 +20,7 @@ public class ContinuousSpace2D extends Space2D
 	 */
 	public ContinuousSpace2D()
 	{
-		this(null, null, null, null);
+		this(null, null, null);
 	}
 	
 	/**
@@ -32,9 +29,9 @@ public class ContinuousSpace2D extends Space2D
 	 * @param actionexecutor executor for agent actions
 	 * @param areaSize the size of the 2D area
 	 */
-	public ContinuousSpace2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, IVector2 areaSize)
+	public ContinuousSpace2D(ISpaceExecutor spaceexecutor, IVector2 areaSize)
 	{
-		this(spaceexecutor, actionexecutor, areaSize, DEFAULT_NAME);
+		this(spaceexecutor, areaSize, DEFAULT_NAME);
 	}
 	
 	/**
@@ -44,10 +41,10 @@ public class ContinuousSpace2D extends Space2D
 	 * @param areaSize the size of the 2D area
 	 * @param spaceName the name of this space
 	 */
-	public ContinuousSpace2D(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor, 
+	public ContinuousSpace2D(ISpaceExecutor spaceexecutor, 
 		IVector2 areaSize, Object spaceName)
 	{
-		super(spaceexecutor, actionexecutor, areaSize);
+		super(spaceexecutor, areaSize);
 		setProperty("name", spaceName);
 	}
 	

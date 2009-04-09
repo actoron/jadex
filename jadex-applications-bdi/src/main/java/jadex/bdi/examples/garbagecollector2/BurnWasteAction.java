@@ -1,8 +1,8 @@
 package jadex.bdi.examples.garbagecollector2;
 
+import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 
 import java.util.Map;

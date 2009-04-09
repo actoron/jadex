@@ -10,5 +10,5 @@ public interface ITimedObject
 	 *  // todo: will be enhanced with a TimerEvent when
 	 *  // we enhance the time service 
 	 */
-	public void timeEventOccurred();
+	public void timeEventOccurred(long currenttime);
 }

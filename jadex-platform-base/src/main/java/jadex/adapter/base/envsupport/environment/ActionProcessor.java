@@ -1,4 +1,4 @@
-package jadex.adapter.base.envsupport.environment.agentaction;
+package jadex.adapter.base.envsupport.environment;
 
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
@@ -14,7 +14,7 @@ import java.util.TreeSet;
 /**
  * 
  */
-public class ActionSynchronizer 
+public class ActionProcessor 
 {
 	public static final Comparator DEFAULT_COMPARATOR = new DefaultComparator();
 	
@@ -37,9 +37,9 @@ public class ActionSynchronizer
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public ActionSynchronizer()
+	public ActionProcessor(Object monitor)
 	{
-		this(null);
+		this(monitor, null);
 	}
 	
 	/**
@@ -47,8 +47,9 @@ public class ActionSynchronizer
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public ActionSynchronizer(Comparator comp)
+	public ActionProcessor(Object monitor, Comparator comp)
 	{
+		this.monitor = monitor;
 		this.ext_entries = Collections.synchronizedSet(new TreeSet(comp==null? DEFAULT_COMPARATOR: comp));
 	}
 	

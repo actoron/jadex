@@ -451,7 +451,7 @@ public class TCPTransport implements ITransport
 		/**
 		 *  Called when timepoint was reached.
 		 */
-		public void timeEventOccurred()
+		public void timeEventOccurred(long currenttime)
 		{
 			//System.out.println("Timeout reached for: "+address);
 			removeConnection(address);

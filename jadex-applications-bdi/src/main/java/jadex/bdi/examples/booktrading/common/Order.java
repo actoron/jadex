@@ -129,7 +129,7 @@ public class Order
 			
 			clock.createTimer(wait , new ITimedObject()
 			{
-				public void timeEventOccurred()
+				public void timeEventOccurred(long currenttime)
 				{
 					synchronized(Order.this)
 					{

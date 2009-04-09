@@ -164,7 +164,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
 		{
-			public void timeEventOccurred()
+			public void timeEventOccurred(long currenttime)
 			{
 				interpreter.invokeLater(run);
 			}

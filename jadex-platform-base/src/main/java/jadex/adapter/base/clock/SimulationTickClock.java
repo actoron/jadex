@@ -67,7 +67,7 @@ public class SimulationTickClock extends AbstractClock implements ISimulationClo
 		{
 			removeTimer(t);
 			// Execute due timers.
-			t.getTimedObject().timeEventOccurred();
+			t.getTimedObject().timeEventOccurred(currenttime);
 		}
 		
 		notifyListeners();

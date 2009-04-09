@@ -68,7 +68,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 		
 		// Must not be done while holding lock to avoid deadlocks.
 		if(t!=null)
-			t.getTimedObject().timeEventOccurred();
+			t.getTimedObject().timeEventOccurred(currenttime);
 			
 		notifyListeners();
 		return advanced;

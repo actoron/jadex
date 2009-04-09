@@ -1,13 +1,10 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.IContext;
-import jadex.adapter.base.envsupport.environment.agentaction.IActionExecutor;
-import jadex.adapter.base.envsupport.environment.agentaction.IAgentAction;
-import jadex.adapter.base.envsupport.environment.agentaction.ImmediateExecutor;
-import jadex.bridge.IAgentIdentifier;
-import jadex.commons.concurrent.IResultListener;
 import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.bridge.IAgentIdentifier;
+import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +61,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	protected ISpaceExecutor spaceexecutor;
 	
 	/** The action executor. */
-	protected IActionExecutor actionexecutor;
+	protected ActionProcessor actionexecutor;
 	
 	//-------- constructors --------
 	
@@ -73,16 +70,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 */
 	public AbstractEnvironmentSpace()
 	{
-		this(null, null);
-	}
-	
-	/**
-	 *  Create an environment space
-	 *  @param actionexecutor executor for agent actions
-	 */
-	public AbstractEnvironmentSpace(IActionExecutor actionexecutor)
-	{
-		this(null, actionexecutor);
+		this(null);
 	}
 	
 	/**
@@ -90,8 +78,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 *  @param spaceexecutor executor for the space
 	 *  @param actionexecutor executor for agent actions
 	 */
-	public AbstractEnvironmentSpace(ISpaceExecutor spaceexecutor, IActionExecutor actionexecutor)
+	public AbstractEnvironmentSpace(ISpaceExecutor spaceexecutor)
 	{
+		this.monitor = new Object();
 		this.views = new HashMap();
 		this.spaceactions = new HashMap();
 		this.agentactions = new HashMap();
@@ -101,11 +90,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
 		this.objectidcounter = new AtomicCounter();
-		this.actionexecutor = actionexecutor==null? new ImmediateExecutor(): actionexecutor;
-		if (spaceexecutor != null)
-		{
+		this.actionexecutor = new ActionProcessor(monitor);
+		if(spaceexecutor != null)
 			setSpaceExecutor(spaceexecutor);
-		}
 	}
 	
 	//-------- methods --------
@@ -351,25 +338,15 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 */
 	public void performAgentAction(final Object id, final Map parameters, final IResultListener listener)
 	{
-		synchronized(monitor)
+		actionexecutor.invokeLater(new Runnable()
 		{
-			IActionExecutor executor = (IActionExecutor)processes.get(IActionExecutor.DEFAULT_EXECUTOR_NAME);
-			if(executor ==null)
+			public void run()
 			{
-				executor = new ImmediateExecutor();
-				addSpaceProcess(IActionExecutor.DEFAULT_EXECUTOR_NAME, executor);
-				System.out.println("No agent action executor defined, using immediate execution as default.");
+				IAgentAction action = (IAgentAction)agentactions.get(id);
+				Object ret = action.perform(parameters==null? Collections.EMPTY_MAP: parameters, AbstractEnvironmentSpace.this);
+				listener.resultAvailable(ret);
 			}
-			executor.getSynchronizer().invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					IAgentAction action = (IAgentAction)agentactions.get(id);
-					Object ret = action.perform(parameters==null? Collections.EMPTY_MAP: parameters, AbstractEnvironmentSpace.this);
-					listener.resultAvailable(ret);
-				}
-			});
-		}
+		}, null); // todo: what about metainfo
 	}
 	
 	/**
@@ -629,7 +606,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	public void setSpaceExecutor(ISpaceExecutor executor)
 	{
 		this.spaceexecutor = executor;
-		executor.setSpace(this);
+		executor.init(this);
 	}
 	
 	/** 
@@ -641,12 +618,17 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	{
 		synchronized(monitor)
 		{
+			// Update the environment objects.
 			for(Iterator it = spaceobjects.values().iterator(); it.hasNext(); )
 			{
 				SpaceObject obj = (SpaceObject)it.next();
 				obj.updateObject(progress);
 			}
 			
+			// Execute the scheduled agent actions.
+			actionexecutor.executeEntries(null); // todo: where to get filter
+			
+			// Execute the processes.
 			Object[] procs = processes.values().toArray();
 			for(int i = 0; i < procs.length; ++i)
 			{
@@ -654,6 +636,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 				process.execute(progress, this);
 			}
 			
+			// Update the views.
 			for (Iterator it = views.values().iterator(); it.hasNext(); )
 			{
 				IView view = (IView) it.next();
