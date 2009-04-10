@@ -20,7 +20,6 @@ import java.util.Map;
 public class Configuration
 {
 	private String windowtitle;
-	private int fps;
 	private boolean opengl;
 	private List customplugins;
 	private IVector1 selectorDistance;
@@ -73,28 +72,6 @@ public class Configuration
 	public synchronized boolean useOpenGl()
 	{
 		return opengl;
-	}
-	
-	/**
-	 * Gets the target frames per second.
-	 * @return target frames per second
-	 */
-	public synchronized int getFps()
-	{
-		return fps;
-	}
-	
-	/**
-	 * Sets the target frames per second.
-	 * @param fps target frames per second
-	 */
-	public synchronized void setFps(int fps)
-	{
-		if (fps < 0)
-		{
-			fps = 0;
-		}
-		this.fps = fps;
 	}
 	
 	/**

@@ -186,11 +186,13 @@ public class ObserverCenterWindow extends JFrame
 			catch (RuntimeException e0)
 			{
 				System.err.println("OpenGL initialization failed, using Java2D fallback...");
+				System.err.println(e0);
 				opengl = false;
 			}
 			catch (Error e1)
 			{
 				System.err.println("OpenGL initialization failed, using Java2D fallback...");
+				System.err.println(e1);
 				opengl = false;
 			}
 		}

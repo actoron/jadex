@@ -55,9 +55,13 @@ public class ObserverCenter
 	 */
 	private IObserverCenterPlugin[] plugins_;
 	
+	/** Viewport refresh timer
+	 */
+	private Timer vptimer;
+	
 	/** Plugin refresh timer
 	 */
-	private Timer timer_;
+	private Timer plugintimer;
 	
 	/** Selection controller
 	 */
@@ -136,7 +140,7 @@ public class ObserverCenter
 					
 					mainWindow_.addMenu(refreshMenu);
 					
-					String[] themeNames = config.getThemeNames();
+					/*String[] themeNames = config.getThemeNames();
 					for (int i = 0; i < themeNames.length; ++i)
 					{
 						Map theme = config.getTheme(themeNames[i]);
@@ -149,9 +153,9 @@ public class ObserverCenter
 								getViewport().registerDrawableCombiner(d);
 							}
 						}
-					}
+					}*/
 					
-					timer_ = new Timer(100, new ActionListener()
+					plugintimer = new Timer(100, new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
 							{
@@ -162,10 +166,18 @@ public class ObserverCenter
 										activePlugin_.refresh();
 									}
 								}
-								updateDisplay();
 							}
 						});
-					timer_.start();
+					plugintimer.start();
+					
+					vptimer = new Timer(33, new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							updateDisplay();
+						}
+					});
+					vptimer.start();
 					
 					mainWindow_.addWindowListener(new ObserverWindowController());
 					
@@ -428,18 +440,18 @@ public class ObserverCenter
 		
 		public void actionPerformed(ActionEvent e)
 		{
-			timer_.stop();
+			plugintimer.stop();
 			if (time_ > 0)
 			{
-				timer_.setDelay(time_);
-				timer_.start();
+				plugintimer.setDelay(time_);
+				plugintimer.start();
 			}
 		}
 	}
 	
 	private class ViewportRefreshAction extends AbstractAction
 	{
-		private int fps_;
+		private int delay;
 		
 		/** Creates new PluginRefreshAction
 		 * 
@@ -447,24 +459,26 @@ public class ObserverCenter
 		 */
 		public ViewportRefreshAction(int fps)
 		{
-			fps_ = fps;
-			if (fps_ < 0)
+			delay = 1000 / fps;
+			if (fps < 0)
 			{
-				fps_ = 0;
+				fps = 0;
 			}
-			if (fps_ == 0)
+			if (fps == 0)
 			{
 				putValue(NAME, "Unlimited");
 			}
 			else
 			{
-				putValue(NAME, Integer.toString(fps_) + " FPS");
+				putValue(NAME, Integer.toString(fps) + " FPS");
 			}
 		}
 		
 		public void actionPerformed(ActionEvent e)
 		{
-			config.setFps(fps_);
+			vptimer.stop();
+			vptimer.setDelay(delay);
+			vptimer.start();
 		}
 	}
 	
@@ -498,7 +512,7 @@ public class ObserverCenter
 		
 		public void windowClosing(WindowEvent e)
 		{
-			timer_.stop();
+			plugintimer.stop();
 			mainWindow_.dispose();
 		}
 		
@@ -517,6 +531,5 @@ public class ObserverCenter
 		public void windowOpened(WindowEvent e)
 		{
 		}
-		
 	}
 }

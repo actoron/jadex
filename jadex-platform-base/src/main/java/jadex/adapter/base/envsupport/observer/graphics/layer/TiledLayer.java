@@ -55,17 +55,34 @@ public class TiledLayer implements ILayer
 		this.texturePath_ = texturePath;
 		texture_ = null;
 	}
+	
+	/**
+	 * Initializes the layer for a Java2D viewport
+	 * 
+	 * @param vp the viewport
+	 * @param g Graphics2D context
+	 */
+	public void init(ViewportJ2D vp, Graphics2D g)
+	{
+		image_ = vp.getImage(texturePath_);
+		imageToUser_ = new AffineTransform();
+		imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_
+				.getHeight());
+	}
+
+	/**
+	 * Initializes the layer for an OpenGL viewport
+	 * 
+	 * @param vp the viewport
+	 * @param gl OpenGL context
+	 */
+	public void init(ViewportJOGL vp, GL gl)
+	{
+		texture_ = vp.getRepeatingTexture(gl, texturePath_);
+	}
 
 	public void draw(IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
-		if(image_ == null)
-		{
-			image_ = vp.getImage(texturePath_);
-			imageToUser_ = new AffineTransform();
-			imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_
-					.getHeight());
-		}
-
 		for(double x = 0.0; x < areaSize.getXAsDouble(); x = x
 				+ tileSize_.getXAsDouble())
 		{
@@ -83,11 +100,6 @@ public class TiledLayer implements ILayer
 
 	public synchronized void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
-		if(texture_ == null)
-		{
-			texture_ = vp.getRepeatingTexture(gl, texturePath_);
-		}
-
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_.getTexId());
 

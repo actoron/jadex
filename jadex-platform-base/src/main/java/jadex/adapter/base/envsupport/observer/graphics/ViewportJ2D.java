@@ -195,19 +195,16 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				g.fillRect(0, 0, getWidth(), getHeight());
 				setupTransform(g);
 
-				while(!newDrawableCombiners_.isEmpty())
-				{
-					DrawableCombiner d = (DrawableCombiner)newDrawableCombiners_
-							.remove(0);
-					d.init(ViewportJ2D.this, g);
-				}
-
 				synchronized(preLayers_)
 				{
 					Iterator it = preLayers_.iterator();
 					while(it.hasNext())
 					{
 						ILayer l = (ILayer)it.next();
+						if (!drawObjects_.contains(l))
+						{
+							l.init(ViewportJ2D.this, g);
+						}
 						l.draw(size_, ViewportJ2D.this, g);
 					}
 				}
@@ -216,6 +213,19 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				{
 					synchronized(objectLayers_)
 					{
+						objectLayers_.clear();
+						for (Iterator it = objectList_.iterator(); it.hasNext(); )
+						{
+							Object[] o = (Object[]) it.next();
+							DrawableCombiner d = (DrawableCombiner) o[2];
+							if (!drawObjects_.contains(d))
+							{
+								d.init(ViewportJ2D.this, g);
+								drawObjects_.add(d);
+							}
+							objectLayers_.addAll(d.getLayers());
+						}
+						
 						AffineTransform tf = g.getTransform();
 						g.translate(objShiftX_, objShiftY_);
 						for(Iterator it = objectLayers_.iterator(); it
@@ -251,6 +261,10 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 					while(it.hasNext())
 					{
 						ILayer l = (ILayer)it.next();
+						if (!drawObjects_.contains(l))
+						{
+							l.init(ViewportJ2D.this, g);
+						}
 						l.draw(size_, ViewportJ2D.this, g);
 					}
 				}
@@ -289,18 +303,20 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 		private void setupScissorPolygon()
 		{
+			float pixShiftX = (paddedSize_.getXAsFloat() / backBuffer_.getWidth());
+			float pixShiftY = (paddedSize_.getYAsFloat() / backBuffer_.getHeight());
 			scissorPolygon_.reset();
 			scissorPolygon_.moveTo(posX_, posY_);
 			scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), posY_);
 			scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), paddedSize_
 					.getYAsFloat());
 			scissorPolygon_.lineTo(posX_, paddedSize_.getYAsFloat());
-			scissorPolygon_.lineTo(posX_, size_.getYAsFloat());
-			scissorPolygon_.lineTo(size_.getXAsFloat(), size_.getYAsFloat());
-			scissorPolygon_.lineTo(size_.getXAsFloat(), 0.0f);
+			scissorPolygon_.lineTo(posX_, size_.getYAsFloat() + pixShiftY);
+			scissorPolygon_.lineTo(size_.getXAsFloat() + pixShiftX, size_.getYAsFloat() + pixShiftY);
+			scissorPolygon_.lineTo(size_.getXAsFloat() + pixShiftX, 0.0f);
 			scissorPolygon_.lineTo(0.0f, 0.0f);
-			scissorPolygon_.lineTo(0.0f, size_.getYAsFloat());
-			scissorPolygon_.lineTo(posX_, size_.getYAsFloat());
+			scissorPolygon_.lineTo(0.0f, size_.getYAsFloat() + pixShiftY);
+			scissorPolygon_.lineTo(posX_, size_.getYAsFloat() + pixShiftY);
 			scissorPolygon_.closePath();
 		}
 	}

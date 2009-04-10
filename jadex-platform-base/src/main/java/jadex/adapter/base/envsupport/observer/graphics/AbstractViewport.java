@@ -53,8 +53,8 @@ public abstract class AbstractViewport implements IViewport
 	/** Real size of the viewport including padding. */
 	protected IVector2			paddedSize_;
 
-	/** Newly registered drawableCombiners. */
-	protected List				newDrawableCombiners_;
+	/** Known drawable Objects. */
+	protected Set				drawObjects_;
 
 	/** Registered object layers. */
 	protected SortedSet			objectLayers_;
@@ -79,7 +79,7 @@ public abstract class AbstractViewport implements IViewport
 		preserveAR_ = true;
 		size_ = new Vector2Double(1.0);
 		paddedSize_ = size_.copy();
-		newDrawableCombiners_ = Collections.synchronizedList(new LinkedList());
+		drawObjects_ = Collections.synchronizedSet(new HashSet());
 		objectLayers_ = Collections.synchronizedSortedSet(new TreeSet());
 		objectList_ = Collections.synchronizedList(new ArrayList());
 		preLayers_ = Collections.synchronizedList(new ArrayList());
@@ -99,17 +99,6 @@ public abstract class AbstractViewport implements IViewport
 			objectList_.clear();
 			objectList_.addAll(objectList);
 		}
-	}
-
-	/**
-	 * Registers a DrawableCombiner to be used in the object list.
-	 * 
-	 * @param d the DrawableCombiner
-	 */
-	public void registerDrawableCombiner(DrawableCombiner d)
-	{
-		objectLayers_.addAll(d.getLayers());
-		newDrawableCombiners_.add(d);
 	}
 
 	/**

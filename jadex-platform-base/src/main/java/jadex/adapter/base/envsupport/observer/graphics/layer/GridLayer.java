@@ -1,6 +1,7 @@
 package jadex.adapter.base.envsupport.observer.graphics.layer;
 
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 
@@ -25,6 +26,16 @@ public class GridLayer implements ILayer
 
 	/** OpenGL color cache. */
 	protected float[]	oglColor_;
+	
+	/**
+	 * Creates a new gridlayer with a grid size of 1.0.
+	 * 
+	 * @param c color of the grid
+	 */
+	public GridLayer(Color c)
+	{
+		this(new Vector2Double(1.0), c);
+	}
 
 	/**
 	 * Creates a new gridlayer.
@@ -41,6 +52,26 @@ public class GridLayer implements ILayer
 		oglColor_[1] = c_.getGreen() / 255.0f;
 		oglColor_[2] = c_.getBlue() / 255.0f;
 		oglColor_[3] = c_.getAlpha() / 255.0f;
+	}
+	
+	/**
+	 * Initializes the layer for a Java2D viewport
+	 * 
+	 * @param vp the viewport
+	 * @param g Graphics2D context
+	 */
+	public void init(ViewportJ2D vp, Graphics2D g)
+	{
+	}
+
+	/**
+	 * Initializes the layer for an OpenGL viewport
+	 * 
+	 * @param vp the viewport
+	 * @param gl OpenGL context
+	 */
+	public void init(ViewportJOGL vp, GL gl)
+	{
 	}
 
 	/**

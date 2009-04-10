@@ -82,13 +82,6 @@ public interface IViewport
 	public void setPostLayers(List layer);
 
 	/**
-	 * Registers a DrawableCombiner to be used in the object list.
-	 * 
-	 * @param d the DrawableCombiner
-	 */
-	public void registerDrawableCombiner(DrawableCombiner d);
-
-	/**
 	 * Sets the current objects to draw.
 	 * 
 	 * @param objectList objects that should be drawn

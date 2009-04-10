@@ -56,13 +56,10 @@ public class ViewportJOGL extends AbstractViewport
 	/** Display lists. */
 	private Map					displayLists_;
 
-	/** Registered drawables. */
-	private List				registeredDrawables_;
-
 	/** True, until the OpenGL context is initialized. */
 	private volatile boolean	uninitialized_;
 
-	/** This will be true if the OpenGL context supports all necessaryextensions. */
+	/** This will be true if the OpenGL context supports all necessary extensions. */
 	private volatile boolean	valid_;
 
 	/** True, if non-power-of-two texture support is available. */
@@ -83,7 +80,6 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		super();
 
-		registeredDrawables_ = Collections.synchronizedList(new ArrayList());
 		libService_ = libService;
 		uninitialized_ = true;
 		valid_ = false;
@@ -244,8 +240,8 @@ public class ViewportJOGL extends AbstractViewport
 		double yFac = canvas_.getHeight() / paddedSize_.getYAsDouble();
 		int x = (int)(-posX_ * xFac);
 		int y = (int)(-posY_ * yFac);
-		int w = (int)Math.ceil(size_.getXAsDouble() * xFac);
-		int h = (int)Math.ceil(size_.getYAsDouble() * yFac);
+		int w = 1 + (int)Math.ceil(size_.getXAsDouble() * xFac);
+		int h = 1 + (int)Math.ceil(size_.getYAsDouble() * yFac);
 		gl.glScissor(x, y, w, h);
 	}
 
@@ -351,14 +347,6 @@ public class ViewportJOGL extends AbstractViewport
 		{
 			GL gl = drawable.getGL();
 
-			while(!newDrawableCombiners_.isEmpty())
-			{
-				DrawableCombiner d = (DrawableCombiner)newDrawableCombiners_
-						.remove(0);
-				d.init(ViewportJOGL.this, gl);
-				registeredDrawables_.add(d);
-			}
-
 			setupMatrix(gl);
 
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT);
@@ -371,14 +359,32 @@ public class ViewportJOGL extends AbstractViewport
 				while(it.hasNext())
 				{
 					ILayer l = (ILayer)it.next();
+					if (!drawObjects_.contains(l))
+					{
+						l.init(ViewportJOGL.this, gl);
+					}
 					l.draw(size_, ViewportJOGL.this, gl);
 				}
 			}
-
+			
 			synchronized(objectList_)
 			{
 				synchronized(objectLayers_)
 				{
+					objectLayers_.clear();
+					for (Iterator it = objectList_.iterator(); it.hasNext(); )
+					{
+						Object[] o = (Object[]) it.next();
+						DrawableCombiner d = (DrawableCombiner) o[2];
+						if (!drawObjects_.contains(d))
+						{
+							d.init(ViewportJOGL.this, gl);
+							drawObjects_.add(d);
+						}
+						objectLayers_.addAll(d.getLayers());
+					}
+					
+					
 					gl.glPushMatrix();
 					gl.glTranslatef(objShiftX_, objShiftY_, 0.0f);
 					for(Iterator it = objectLayers_.iterator(); it.hasNext();)
@@ -391,6 +397,7 @@ public class ViewportJOGL extends AbstractViewport
 							IVector2 pos = (IVector2)o[0];
 							IVector2 vel = (IVector2)o[1];
 							DrawableCombiner d = (DrawableCombiner)o[2];
+							
 							d.setPosition(pos);
 							if(vel != null)
 							{
@@ -413,6 +420,10 @@ public class ViewportJOGL extends AbstractViewport
 				while(it.hasNext())
 				{
 					ILayer l = (ILayer)it.next();
+					if (!drawObjects_.contains(l))
+					{
+						l.init(ViewportJOGL.this, gl);
+					}
 					l.draw(size_, ViewportJOGL.this, gl);
 				}
 			}
@@ -458,11 +469,7 @@ public class ViewportJOGL extends AbstractViewport
 			repeatingTextureCache_.clear();
 			displayLists_.clear();
 
-			for(Iterator it = registeredDrawables_.iterator(); it.hasNext();)
-			{
-				DrawableCombiner d = (DrawableCombiner)it.next();
-				d.init(ViewportJOGL.this, gl);
-			}
+			drawObjects_.clear();
 
 			uninitialized_ = false;
 		}

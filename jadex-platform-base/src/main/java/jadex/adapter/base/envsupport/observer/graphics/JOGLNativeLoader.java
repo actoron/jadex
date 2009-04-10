@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.observer.graphics;
 
+import java.awt.Frame;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -154,6 +155,15 @@ public class JOGLNativeLoader
 	private static void loadLibraries(String libPath, String prefix,
 			String suffix)
 	{
+		// Stupid workaround to force Java to load awt-support...
+		try
+		{
+			System.loadLibrary("jawt");
+		}
+		catch (UnsatisfiedLinkError e)
+		{
+		}
+		
 		for(int i = 0; i < LIBNAMES.length; ++i)
 		{
 			String path = libPath + prefix + LIBNAMES[i] + suffix;
