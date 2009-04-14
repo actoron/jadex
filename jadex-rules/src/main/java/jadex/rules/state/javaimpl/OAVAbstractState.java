@@ -1166,6 +1166,8 @@ public abstract class OAVAbstractState	implements IOAVState
 	 */
 	public Object getAttributeValue(Object id, OAVAttributeType attribute, Object key)
 	{
+		if(!generator.isId(id))
+			System.out.println("dlhgvawildh");
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObjectRead(id);

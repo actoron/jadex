@@ -95,7 +95,7 @@
 				<!-- <bindingoptions>$beliefbase.food</bindingoptions> -->
 				<value>?food</value>
 			</parameter>
-			<!-- <unique/> -->
+			<unique dummy="true"/>
 			<creationcondition language="clips">
  				// $beliefbase.eating_allowed &amp;&amp;
  				// !$beliefbase.getBeliefSet("forbidden_food").containsFact($food)

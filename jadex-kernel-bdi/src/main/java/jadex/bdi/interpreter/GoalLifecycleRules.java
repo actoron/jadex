@@ -1,5 +1,6 @@
 package jadex.bdi.interpreter;
 
+import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -17,6 +18,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -280,6 +282,75 @@ public class GoalLifecycleRules
 		
 		return new Object[]{
 			new AndCondition(new ICondition[]{ragentcon, mgoalcon, capcon}),
+			GOAL_CREATION_ACTION};
+	}
+	
+	
+	/**
+	 *  Create a goal, when the ADF creation condition triggers and no similar goal exists (according to unique flags)
+	 *  @param model	The goal model element.
+	 */
+	protected static Object[] createGoalCreationUniqueUserRule(Object model, IOAVState state)
+	{
+		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
+		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
+		
+		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
+		ragentcon.addConstraint(new BoundConstraint(null, ragent));
+		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE));
+		
+		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
+		capcon.addConstraint(new BoundConstraint(null, rcapa));
+		capcon.addConstraint(new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.capability_has_goals}, mgoal, IOperator.CONTAINS));
+		
+		ObjectCondition	mgoalcon = new ObjectCondition(OAVBDIMetaModel.goal_type);
+		mgoalcon.addConstraint(new BoundConstraint(null, mgoal));
+		mgoalcon.addConstraint(new LiteralConstraint(null, model));
+		
+		// Build not condition for unique part.
+		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
+		ObjectCondition	rgoalcon	= new ObjectCondition(rgoal.getType());
+		rgoalcon.addConstraint(new BoundConstraint(null, rgoal));
+		rgoalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, model));
+
+		ObjectCondition	capcon2	= new ObjectCondition(rcapa.getType());
+		capcon2.addConstraint(new BoundConstraint(null, rcapa));
+		capcon2.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));
+		
+		List	parcons	= new ArrayList();
+		Collection	mparams	= state.getAttributeValues(model, OAVBDIMetaModel.parameterelement_has_parameters);
+		Collection	excluded	= state.getAttributeValues(model, OAVBDIMetaModel.goal_has_excludedparameter);
+		if(mparams!=null)
+		{
+			for(Iterator it=mparams.iterator(); it.hasNext(); )
+			{
+				Object	mparam	= it.next();
+				if(excluded==null || !excluded.contains(mparam))
+				{
+					String	pname	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
+					IParsedExpression	pexp	= (IParsedExpression)state.getAttributeValue(state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value), OAVBDIMetaModel.expression_has_content);	// Todo: value-variable attribute???
+					Class	clazz	= (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
+					
+					Variable	parvar	= new Variable("?para_"+parcons.size(), OAVBDIRuntimeModel.parameter_type);
+					ObjectCondition	parcon	= new ObjectCondition(parvar.getType());
+					parcon.addConstraint(new BoundConstraint(null, parvar));
+					parcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.parameter_has_name, pname));
+					parcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameter_has_value, new Variable(pexp.getExpressionText(), state.getTypeModel().getJavaType(clazz))));
+					parcons.add(parcon);
+					
+					rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parameters, parvar, IOperator.CONTAINS));
+				}
+			}
+		}
+		// Todo: parameter sets???
+		
+		parcons.add(rgoalcon);
+		parcons.add(capcon2);
+		ICondition	unicon	= new NotCondition(new AndCondition(parcons));
+		
+		return new Object[]{
+			new AndCondition(new ICondition[]{ragentcon, mgoalcon, capcon, unicon}),
 			GOAL_CREATION_ACTION};
 	}
 	

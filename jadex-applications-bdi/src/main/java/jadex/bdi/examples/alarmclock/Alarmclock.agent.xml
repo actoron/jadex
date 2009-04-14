@@ -42,20 +42,26 @@
 		<achievegoal name="alarm" exclude="when_failed">
 			<parameter name="alarm" class="Alarm">
 				<!--  <bindingoptions>$beliefbase.alarms</bindingoptions> -->
-				<value>?alarm</value>
+				<value>$alarm</value>
+<!--			<value ref="$alarm"/>
+				<bindingvalue variable="$alarm"/>
+				<mapping variable="$alarm"/>
+				<variablemapping ref="$alarm"/>  -->
 			</parameter>
-			<!-- <unique/> -->
-			<creationcondition language="clips">
+			<unique dummy="true"/>
+			<creationcondition language="jcl">
+				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime()!=Alarm.NO_ALARM
 				// alarm.isActive()
-				?alarm = (Alarm (active true) (alarmtime != -2))
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
-				?mbeliefset = (mbeliefset (melement_has_name "alarms"))
-				(not
-					(and
-						?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
-						?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-					)
-				)
+				
+				// ?alarm = (Alarm (active true) (alarmtime != -2))
+				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
+				// ?mbeliefset = (mbeliefset (melement_has_name "alarms"))
+				// (not
+				// 	(and
+				// 		?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+				// 		?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				// 	)
+				// )
 			</creationcondition>
 			<contextcondition language="jcl">
 				$goal.alarm.isActive()

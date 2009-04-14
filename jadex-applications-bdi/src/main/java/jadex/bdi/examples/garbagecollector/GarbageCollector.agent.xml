@@ -68,25 +68,26 @@
 			to some burner and going back. A new goal is created
  			whenever the actual position is dirty and there is no
  			burner present. -->
-		 	<achievegoal name="take">
-			<!-- <unique/>  -->
-			<creationcondition language="clips">
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?adopted	= (goal (element_has_model ?mgoal))
-					?rcapa		= (capability (capability_has_goals contains ?adopted))
-				))
+		 <achievegoal name="take">
+			<unique dummy="true"/>
+			<creationcondition language="jcl">
+				$beliefbase.is_dirty &amp;&amp; !$beliefbase.env.isBurnerPresent($beliefbase.pos)
 
-				// $beliefbase.is_dirty &amp;&amp; !$beliefbase.env.isBurnerPresent($beliefbase.pos)
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				?mbelief = (mbelief (melement_has_name "is_dirty"))
- 				(not (and
-					?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-					?mbel_pos = (mbelief (melement_has_name "pos"))
-					?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-					?mbel_env = (mbelief (melement_has_name "env"))
-					?env	= (Environment (isBurnerPresent (?pos) true))
-				))
+				// // unique (?rcapa and ?mgoal are provided internally)
+				// (not (and
+				// 	?adopted	= (goal (element_has_model ?mgoal))
+				// 	?rcapa		= (capability (capability_has_goals contains ?adopted))
+				// ))
+				// 
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
+				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
+ 				// (not (and
+				// 	?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
+				// 	?mbel_pos = (mbelief (melement_has_name "pos"))
+				// 	?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// 	?mbel_env = (mbelief (melement_has_name "env"))
+				// 	?env	= (Environment (isBurnerPresent (?pos) true))
+				// ))
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="check"/>
@@ -104,13 +105,13 @@
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
 		<achievegoal name="pick" exclude="never" retrydelay="100">
- 			<dropcondition language="clips">
- 				// !$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
+ 			<dropcondition language="jcl">
+ 				!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
 				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				?mbelief = (mbelief (melement_has_name "is_dirty"))
-				?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))
-				?mbelief2 = (mbelief (melement_has_name "has_garbage"))
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
+				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
+				// ?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))
+				// ?mbelief2 = (mbelief (melement_has_name "has_garbage"))
  			</dropcondition>
 		</achievegoal>
 	</goals>

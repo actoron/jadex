@@ -1,14 +1,15 @@
 package jadex.bdi.interpreter;
 
 import jadex.commons.SReflect;
-import jadex.rules.parser.conditions.javagrammar.BuildContext;
-import jadex.rules.parser.conditions.javagrammar.IParserHelper;
+import jadex.rules.parser.conditions.javagrammar.DefaultParserHelper;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.Constant;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
+import jadex.rules.rulesystem.rules.LiteralReturnValueConstraint;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
@@ -17,27 +18,23 @@ import jadex.rules.state.IOAVState;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /**
  *  Handler for BDI-specific parsing issues ($beliefbase etc.)
  */
-public class BDIParserHelper implements IParserHelper
+public class BDIParserHelper extends	DefaultParserHelper
 {
 	//-------- attributes --------
 	
-	/** The build context. */
-	protected BuildContext	context;
-	
+	/** The state. */
+	protected IOAVState	state;
+
 	/** The local scope (mcapability). */
 	protected Object	mcapa;
 	
 	/** The local element, if any (e.g. mgoal or mplan). */
 	protected Object	melement;
-	
-	/** The state. */
-	protected IOAVState	state;
 	
 	//-------- constructors --------
 	
@@ -51,10 +48,10 @@ public class BDIParserHelper implements IParserHelper
 	 */
 	public BDIParserHelper(ICondition condition, Object mcapa, Object melement, IOAVState state)
 	{
+		super(condition, state.getTypeModel());
+		this.state	= state;
 		this.mcapa	= mcapa;
 		this.melement	= melement;
-		this.state	= state;
-		this.context	= new BuildContext(condition, state.getTypeModel());
 	}
 	
 	//-------- IParserHelper interface --------
@@ -66,7 +63,7 @@ public class BDIParserHelper implements IParserHelper
 	 */
 	public Variable	getVariable(String name)
 	{
-		Variable	ret	= context.getVariable(name);
+		Variable	ret	= super.getVariable(name);
 		
 		if(ret==null && name.startsWith("$beliefbase."))
 		{
@@ -86,7 +83,7 @@ public class BDIParserHelper implements IParserHelper
 			Object	mbel;
 			if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefs, belname))!=null)
 			{
-				// Build belief (set) condition to bind fact(s) variable.
+				// Build belief condition to bind fact variable.
 				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
 				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
 				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.belief_type);
@@ -99,7 +96,7 @@ public class BDIParserHelper implements IParserHelper
 			}
 			else if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsets, belname))!=null)
 			{
-				// Build belief (set) condition to bind fact(s) variable.
+				// Build belief set condition to bind facts variable.
 				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
 				clazz	= Array.newInstance(SReflect.getWrappedType(clazz), 0).getClass();
 				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
@@ -114,11 +111,89 @@ public class BDIParserHelper implements IParserHelper
 			}
 			else if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname))!=null)
 			{
-				throw new UnsupportedOperationException("Belief references not yet supported by parser: "+name);
+				// (ResolvesTo ?rcapa "mycap.mybelief" ?rbel ?rtargetscope)
+				String	ref	= (String)state.getAttributeValue(mbel, OAVBDIMetaModel.elementreference_has_concrete);
+				String	tmpbelname	= ref;
+				int	idx=tmpbelname.indexOf('.');
+				String	capname	= tmpbelname.substring(0, idx);
+				tmpbelname = tmpbelname.substring(idx+1);
+				Object	mcaparef	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
+				if(mcaparef==null)
+					throw new RuntimeException("Could not resolve reference to belief: "+name+", "+ref);
+				mcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				while((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefs, tmpbelname))==null)
+				{
+					mbel	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, tmpbelname);
+					if(mbel==null)
+						throw new RuntimeException("Could not resolve reference to belief: "+name+", "+ref);
+					tmpbelname	= (String)state.getAttributeValue(mbel, OAVBDIMetaModel.elementreference_has_concrete);
+					idx=tmpbelname.indexOf('.');
+					capname	= tmpbelname.substring(0, idx);
+					tmpbelname = tmpbelname.substring(idx+1);
+					mcaparef	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
+					if(mcaparef==null)
+						throw new RuntimeException("Could not resolve reference to belief: "+name+", "+ref);
+					mcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				}
+				
+				// Build belief condition to bind fact variable.
+				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
+				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.belief_type);
+				context.createObjectCondition(OAVBDIRuntimeModel.belief_type, new IConstraint[]{
+					new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
+					new BoundConstraint(OAVBDIRuntimeModel.belief_has_fact, ret),
+					new BoundConstraint(null, belvar)});
+				Variable	belcapvar	= new Variable(name+"_belcap", OAVBDIRuntimeModel.capability_type);
+
+				context.createObjectCondition(OAVBDIRuntimeModel.capability_type, new IConstraint[]{
+						new BoundConstraint(null, belcapvar),
+						new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, belvar),
+						new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{capvar, new Constant(ref), belvar, belcapvar}))});
 			}
 			else if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, belname))!=null)
 			{
-				throw new UnsupportedOperationException("Belief set references not yet supported by parser: "+name);
+				// (ResolvesTo ?rcapa "mycap.mybelief" ?rbel ?rtargetscope)
+				String	ref	= (String)state.getAttributeValue(mbel, OAVBDIMetaModel.elementreference_has_concrete);
+				String	tmpbelname	= ref;
+				int	idx=tmpbelname.indexOf('.');
+				String	capname	= tmpbelname.substring(0, idx);
+				tmpbelname = tmpbelname.substring(idx+1);
+				Object	mcaparef	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
+				if(mcaparef==null)
+					throw new RuntimeException("Could not resolve reference to beliefset: "+name+", "+ref);
+				Object	tmpmcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				while((mbel=state.getAttributeValue(tmpmcapa, OAVBDIMetaModel.capability_has_beliefsets, tmpbelname))==null)
+				{
+					mbel	= state.getAttributeValue(tmpmcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, tmpbelname);
+					if(mbel==null)
+						throw new RuntimeException("Could not resolve reference to beliefset: "+name+", "+ref);
+					tmpbelname	= (String)state.getAttributeValue(mbel, OAVBDIMetaModel.elementreference_has_concrete);
+					idx=tmpbelname.indexOf('.');
+					capname	= tmpbelname.substring(0, idx);
+					tmpbelname = tmpbelname.substring(idx+1);
+					mcaparef	= state.getAttributeValue(tmpmcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
+					if(mcaparef==null)
+						throw new RuntimeException("Could not resolve reference to beliefset: "+name+", "+ref);
+					tmpmcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				}
+				
+				// Build belief set condition to bind facts variable.
+				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
+				clazz	= Array.newInstance(SReflect.getWrappedType(clazz), 0).getClass();
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
+				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.beliefset_type);
+				Object	valuesource	= new FunctionCall(new SetToArray(clazz), new Object[]{OAVBDIRuntimeModel.beliefset_has_facts});
+				context.createObjectCondition(OAVBDIRuntimeModel.beliefset_type, new IConstraint[]{
+					new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
+					new BoundConstraint(valuesource, ret),
+					new BoundConstraint(null, belvar)});
+				Variable	belcapvar	= new Variable(name+"_belcap", OAVBDIRuntimeModel.capability_type);
+
+				context.createObjectCondition(OAVBDIRuntimeModel.capability_type, new IConstraint[]{
+						new BoundConstraint(null, belcapvar),
+						new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, belvar),
+						new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{capvar, new Constant(ref), belvar, belcapvar}))});				
 			}
 			else
 			{
@@ -199,14 +274,6 @@ public class BDIParserHelper implements IParserHelper
 	public boolean	isPseudoVariable(String name)
 	{
 		return "$beliefbase".equals(name) || "$goal".equals(name) || "$ref".equals(name);
-	}
-
-	/**
-	 *  Get the conditions after parsing.
-	 */
-	public List	getConditions()
-	{
-		return context.getConditions();
 	}
 
 	//-------- helper classes --------

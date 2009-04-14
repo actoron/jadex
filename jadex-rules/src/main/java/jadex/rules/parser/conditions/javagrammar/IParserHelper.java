@@ -19,6 +19,12 @@ public interface IParserHelper
 	public Variable	getVariable(String name);
 
 	/**
+	 *  Add a variable.
+	 *  @param var The variable.
+	 */
+	public void	addVariable(Variable var);
+
+	/**
 	 *  Test, if a name refers to a pseudo variable (e.g. $beliefbase).
 	 *  @param	name	The variable name.
 	 *  @return True, if the name is a pseudo variable.

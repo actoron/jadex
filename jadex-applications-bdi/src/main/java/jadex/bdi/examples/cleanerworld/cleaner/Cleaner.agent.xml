@@ -145,22 +145,24 @@
 			<parameter name="waste" class="Waste">
 				<!-- Bind against variable from creation condition. -->
 				<!-- <bindingoptions>"?waste"</bindingoptions> -->
-				<value>?waste</value>
+				<value>$waste</value>
 			</parameter>
 			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
-			<!-- todo: remove unique support? <unique/>--> 
-			<creationcondition language="clips">
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
-				?mbeliefset = (mbeliefset (melement_has_name "wastes"))
-				
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-					?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
-					?rcapa = (capability (capability_has_goals contains ?adopted))
-					// ?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters $?x ?rparam $?y))
-					//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				))
+			<unique dummy="true"/>
+			<creationcondition language="jcl">
+				Waste $waste
+			
+				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
+				// ?mbeliefset = (mbeliefset (melement_has_name "wastes"))
+				// 
+				// // unique (?rcapa and ?mgoal are provided internally)
+				// (not (and
+				// 	?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+				// 	?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
+				// 	?rcapa = (capability (capability_has_goals contains ?adopted))
+				// 	// ?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters $?x ?rparam $?y))
+				// 	//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+				// ))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
 			<contextcondition language="jcl">

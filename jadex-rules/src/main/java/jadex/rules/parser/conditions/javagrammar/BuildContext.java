@@ -58,7 +58,8 @@ public class BuildContext
 		
 		// Unfold AND conditions.
 		this.lcons	= new ArrayList();
-		lcons.add(condition);
+		if(condition!=null)
+			lcons.add(condition);
 		for(int i=0; i<lcons.size(); i++)
 		{
 			if(lcons.get(i) instanceof AndCondition)
@@ -212,6 +213,15 @@ public class BuildContext
 	public Variable getVariable(String name)
 	{
 		return (Variable)variables.get(name);
+	}
+
+	/**
+	 *  Add a variable.
+	 *  @param var The variable.
+	 */
+	public void	addVariable(Variable var)
+	{
+		variables.put(var.getName(), var);
 	}
 
 	/**

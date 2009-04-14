@@ -34,7 +34,7 @@ public class TakePlan extends Plan
 		goback.getParameter("pos").setValue(oldpos);
 		dispatchSubgoalAndWait(goback);
 	}
-
+/*
 	public void aborted()
 	{
 		System.out.println("aborted: "+getAgentName()+" "+this);
@@ -50,5 +50,5 @@ public class TakePlan extends Plan
 	{
 		System.out.println("passed: "+getAgentName()+" "+this);
 	}
-	
+*/
 }

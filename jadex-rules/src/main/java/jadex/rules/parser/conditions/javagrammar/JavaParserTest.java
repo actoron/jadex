@@ -82,6 +82,9 @@ public class JavaParserTest
 				{
 					return context.getConditions();
 				}
+				public void addVariable(Variable var)
+				{
+				}
 			});
 
 			Expression	pexp	= parser.lhs();

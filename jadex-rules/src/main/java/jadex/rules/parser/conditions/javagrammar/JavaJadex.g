@@ -9,6 +9,9 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.functions.IFunction;
+import jadex.rules.state.OAVTypeModel;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVJavaType;
 
 import jadex.commons.SReflect;
 import java.lang.reflect.Field;
@@ -44,15 +47,15 @@ package jadex.rules.parser.conditions.javagrammar;
 		this.imports	= imports;
 	}
 
-	/** The classloader. */
-	protected ClassLoader	cloader;
+	/** The type model. */
+	protected OAVTypeModel	tmodel;
 	
 	/**
-	 *  Set the class loader.
+	 *  Set the type model.
 	 */
-	public void	setClassLoader(ClassLoader cloader)
+	public void	setTypeModel(OAVTypeModel tmodel)
 	{
-		this.cloader	= cloader;
+		this.tmodel	= tmodel;
 	}
 }
 
@@ -118,11 +121,9 @@ logicalAndExpression returns [Expression exp]
  *  An equality comparison between two values.
  */
 equalityExpression returns [Expression exp]
+	@init{IOperator	operator = null;}
 	: tmp = relationalExpression {$exp = tmp;}
         (
-		{
-			IOperator	operator	= null;
-		}
 	        ('==' {operator=IOperator.EQUAL;}
         	|'!=' {operator=IOperator.NOTEQUAL;}
         	) tmp2 = relationalExpression
@@ -136,11 +137,9 @@ equalityExpression returns [Expression exp]
  *  A comparison between two values.
  */
 relationalExpression returns [Expression exp]
+	@init{IOperator	operator = null;}
 	: tmp = additiveExpression {$exp = tmp;}
         (
-		{
-			IOperator	operator	= null;
-		}
         	('<' {operator=IOperator.LESS;}
         	|'<=' {operator=IOperator.LESSOREQUAL;}
         	|'>' {operator=IOperator.GREATER;}
@@ -156,11 +155,9 @@ relationalExpression returns [Expression exp]
  *  An additive expression adds or subtracts two values.
  */
 additiveExpression returns [Expression exp]
+	@init{IFunction	operator = null;}
 	: tmp = multiplicativeExpression {$exp = tmp;}
         (
-		{
-			IFunction	operator	= null;
-		}
 	        ('+' {operator=IFunction.SUM;}
         	|'-' {operator=IFunction.SUB;}
         	) tmp2 = multiplicativeExpression
@@ -174,11 +171,9 @@ additiveExpression returns [Expression exp]
  *  A multiplicative expression multiplies or divides two values.
  */
 multiplicativeExpression returns [Expression exp]
+	@init{IFunction	operator = null;}
 	: tmp = unaryExpression {$exp = tmp;}
         (
-		{
-			IFunction	operator	= null;
-		}
 	        ('*' {operator=IFunction.MULT;}
         	|'/' {operator=IFunction.DIV;}
         	|'%' {operator=IFunction.MOD;}
@@ -204,8 +199,8 @@ unaryExpression returns [Expression exp]
  *  A primary expression produces a single value
  */
 primaryExpression returns [Expression exp]
-	:
-	tmp = primaryPrefix {List suffs = null;}
+	@init{List suffs = null;}
+	: tmp = primaryPrefix
 	(tmp2 = primarySuffix
 		{
 			if(suffs==null)
@@ -229,7 +224,8 @@ primaryPrefix returns [Expression exp]
 	| tmp = literal {$exp = tmp;}
 	| {helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText())}? tmp = pseudovariable {$exp = tmp;}
 	| {helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null}? tmp = variable {$exp = tmp;}
-	| tmp = staticField {$exp = tmp;}
+	| (staticField) => {SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)}? tmp = staticField {$exp = tmp;}
+	| (existentialDeclaration) => tmp = existentialDeclaration {$exp = tmp;}
 	;
 
 
@@ -237,10 +233,11 @@ primaryPrefix returns [Expression exp]
  *  Read a field of an object.
  */
 staticField returns [Expression exp]
-	: clazz = type '.' field = IDENTIFIER
+	: otype = type '.' field = IDENTIFIER
 	{
 		try
 		{
+			Class	clazz	= ((OAVJavaType)otype).getClazz();
 			Field	f	= clazz.getField(field.getText());
 			$exp	= new LiteralExpression(f.get(null));
 			if((f.getModifiers()&Modifier.FINAL)==0)
@@ -254,16 +251,44 @@ staticField returns [Expression exp]
 	;
 
 /**
- *  Read a field of an object.
+ *  Demand the existence of an object and bind an instance to a variable.
  */
-type returns [Class clazz]
+existentialDeclaration returns [Expression exp]
+	: otype = type varname = IDENTIFIER
+	{
+		Variable	var	= new Variable(varname.getText(), otype);
+		$exp	= new ExistentialDeclaration(otype, var);
+		helper.addVariable(var);
+	}
+	;
+
+/**
+ *  An oav type or java class.
+ */
+type returns [OAVObjectType otype]
+	@init{String name = null;}
 	: tmp = IDENTIFIER
 	{
-		String	classname	= tmp.getText();
-		$clazz	= SReflect.findClass0(classname, imports, cloader);
+		name	= tmp.getText();
+		try
+		{
+			$otype	= tmodel.getObjectType(name);
+		}
+		catch(Exception e)
+		{
+			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
+			if(clazz!=null)
+				$otype	= tmodel.getJavaType(clazz);
+		}
 	}
-	(	{($clazz=SReflect.findClass0(classname, imports, cloader))==null}?
-		'.' tmp2 = IDENTIFIER {classname += "."+tmp2.getText();}
+	(	{$otype==null}?
+		'.' tmp2 = IDENTIFIER
+		{
+			name += "."+tmp2.getText();
+ 			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
+			if(clazz!=null)
+				$otype	= tmodel.getJavaType(clazz);
+ 		}
 	)*
 	;
 	
@@ -287,12 +312,9 @@ fieldAccess returns [Suffix suff]
  *  Invoke a method on an object.
  */
 methodAccess returns [Suffix suff]
+	@init{List params = new ArrayList();}
 	: '.' tmp1 = IDENTIFIER '(' ')' {$suff = new MethodAccess(tmp1.getText(), null);}
-	| '.' tmp2 = IDENTIFIER '(' p1 = expression
-	{
-		List params	= new ArrayList();
-		params.add(p1);
-	}
+	| '.' tmp2 = IDENTIFIER '(' p1 = expression {params.add(p1);}
 	(',' p2 = expression {params.add(p2);}
 	)* ')'
 	{

@@ -12,6 +12,7 @@ import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.MethodCall;
+import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
@@ -156,6 +157,19 @@ public class ConstraintBuilder
 				throw new RuntimeException("Unexpected operator type: "+unex);
 			}
 		}
+		else if(exp instanceof ExistentialDeclaration)
+		{
+			if(invert)
+			{
+				throw new UnsupportedOperationException("Todo: build NOT nodes for inverted declarations: "+exp);
+			}
+			
+			ExistentialDeclaration	edec	= (ExistentialDeclaration)exp;
+			context.createObjectCondition(edec.getType(), new IConstraint[]
+			{
+				new BoundConstraint(null, edec.getVariable())
+            });
+		}
 		// Conditional
 		// Literal
 		// Primary
@@ -245,6 +259,8 @@ public class ConstraintBuilder
 			{
 				if(suffixes[i] instanceof FieldAccess)
 				{
+					if(type==null)
+						System.out.println("kldfhgib");
 					OAVAttributeType	attr	= type.getAttributeType(
 						((FieldAccess)suffixes[i]).getName());
 					suffs.add(attr);
@@ -360,8 +376,34 @@ public class ConstraintBuilder
 			Object	valuesource	= new FunctionCall(new Identity(), new Object[]{c});
 			ret	= new Object[]{context.getDummyCondition(), valuesource};
 		}
+		else if(value instanceof ConditionalExpression)
+		{
+			ConditionalExpression	coex	= (ConditionalExpression)value;
+			Object[]	tmp	= getObjectConditionAndValueSource(coex.getCondition(), context);
+			Object	first	= flattenToPrimary(coex.getFirstValue(), context);
+			Object	second	= flattenToPrimary(coex.getSecondValue(), context);
+			if(first instanceof VariableExpression)
+			{
+				first	= ((VariableExpression)first).getVariable();
+			}
+			else //if(first instanceof LiteralExpression)
+			{
+				first	= new Constant(((LiteralExpression)first).getValue());
+			}
+			if(second instanceof VariableExpression)
+			{
+				second	= ((VariableExpression)second).getVariable();
+			}
+			else //if(second instanceof LiteralExpression)
+			{
+				second	= new Constant(((LiteralExpression)second).getValue());
+			}
+			
+			Object	valuesource	= new FunctionCall(ConditionalExpression.FUNCTION_CONDITIONAL, new Object[]{tmp[1], first, second});
+			ret	= new Object[]{tmp[0], valuesource};
+		}
 		// Unary
-		// Conditional
+		// ExistentialDeclaration
 		else
 		{
 			throw new RuntimeException("Unsupported left hand side of constraint: "+value);
@@ -445,7 +487,8 @@ public class ConstraintBuilder
 			for(int i=finished; i<lcons.size(); i++)
 			{
 				ICondition	con	= (ICondition) lcons.get(i);
-	
+				boolean	check	= true;
+
 				// Find variables, which are bound (i.e. operator EQUAL) in this condition.
 				Set	localbound	= new HashSet();
 				List	bcs	= null;
@@ -456,6 +499,12 @@ public class ConstraintBuilder
 				else if(lcons.get(i) instanceof CollectCondition)
 				{
 					bcs	= ((CollectCondition)lcons.get(i)).getBoundConstraints();
+				}
+				else if(lcons.get(i) instanceof NotCondition)
+				{
+					// Put not conditions last.
+					for(int j=i+1; check && j<lcons.size(); j++)
+						check	= lcons.get(j) instanceof NotCondition;
 				}
 				for(int j=0; bcs!=null && j<bcs.size(); j++)
 				{
@@ -471,12 +520,14 @@ public class ConstraintBuilder
 				}
 				
 				// Check if all variables are bound.
-				List	vars	= con.getVariables();
-				boolean	check	= true;
-				for(int j=0; check && j<vars.size(); j++)
+				if(check)
 				{
-					// Variable must be bound before or in this condition.
-					check	= boundvars.contains(vars.get(j)) || localbound.contains(vars.get(j));
+					List	vars	= con.getVariables();
+					for(int j=0; check && j<vars.size(); j++)
+					{
+						// Variable must be bound before or in this condition.
+						check	= boundvars.contains(vars.get(j)) || localbound.contains(vars.get(j));
+					}
 				}
 	
 				if(check)

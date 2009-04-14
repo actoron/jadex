@@ -351,6 +351,29 @@ public class OAVBDIModelLoader
 		Object	mcapa	= model.getHandle();
 		String[]	imports	= OAVBDIXMLReader.getImports(state, mcapa);
 		
+		// Load subcapabilities.
+		Collection mcaparefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
+		if(mcaparefs!=null)
+		{
+			for(Iterator it=mcaparefs.iterator(); it.hasNext(); )
+			{
+				Object mcaparef = it.next();
+				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
+				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, null);
+				model.addSubcapabilityModel(cmodel);
+				if(!cmodel.getReport().isEmpty())
+				{
+					StackElement se	= new StackElement("capability", mcaparef);
+//					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
+//					se.object	= mcaparef;
+					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
+					report.addDocument(cmodel.getFilename(), cmodel.getReport().toHTMLString());
+				}
+
+				state.setAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());				
+			}
+		}
+
 		// Build user defined goal conditions and add them to the rule base.
 		Collection mgoals = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goals);
 		if(mgoals!=null)
@@ -369,8 +392,17 @@ public class OAVBDIModelLoader
 					if(usercond!=null)
 					{
 						String rulename = Rulebase.getUniqueRuleName(rb, "goal_create_"+gtname);
-						Object[]	tmp	= GoalLifecycleRules.createGoalCreationUserRule(mgoal);
-						rb.addRule(createUserRule(state, mcapa, imports, mgoal, create, usercond, rulename, tmp));
+						Boolean	unique	= (Boolean)state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_unique);
+						if(unique==null || !unique.booleanValue())
+						{
+							Object[]	tmp	= GoalLifecycleRules.createGoalCreationUserRule(mgoal);
+							rb.addRule(createUserRule(state, mcapa, imports, mgoal, create, usercond, rulename, tmp));
+						}
+						else
+						{
+							Object[]	tmp	= GoalLifecycleRules.createGoalCreationUniqueUserRule(mgoal, state);
+							rb.addRule(createUserRule(state, mcapa, imports, mgoal, create, usercond, rulename, tmp));
+						}
 					}
 				}
 				
@@ -614,29 +646,6 @@ public class OAVBDIModelLoader
 					Object[]	tmp	= BeliefRules.createConditionUserRule(mcond);
 					rb.addRule(createUserRule(state, mcapa, imports, null, mcond, usercond, rulename, tmp));
 				}
-			}
-		}
-
-		// Load subcapabilities.
-		Collection mcaparefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
-		if(mcaparefs!=null)
-		{
-			for(Iterator it=mcaparefs.iterator(); it.hasNext(); )
-			{
-				Object mcaparef = it.next();
-				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
-				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, null);
-				model.addSubcapabilityModel(cmodel);
-				if(!cmodel.getReport().isEmpty())
-				{
-					StackElement se	= new StackElement("capability", mcaparef);
-//					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
-//					se.object	= mcaparef;
-					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
-					report.addDocument(cmodel.getFilename(), cmodel.getReport().toHTMLString());
-				}
-
-				state.setAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());				
 			}
 		}
 		

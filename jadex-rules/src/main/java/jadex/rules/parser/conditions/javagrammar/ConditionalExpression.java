@@ -1,5 +1,11 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rules.functions.IFunction;
+import jadex.rules.state.IOAVState;
+
+import java.util.Collections;
+import java.util.Set;
+
 
 /**
  *  A conditional operation uses a condition to choose from two values:
@@ -7,7 +13,34 @@ package jadex.rules.parser.conditions.javagrammar;
  */
 public class ConditionalExpression	extends Expression
 {
-	//-------- attributes --------
+	//-------- constants --------
+	
+	/** A function to evaluate conditionals. */
+	public static final IFunction	FUNCTION_CONDITIONAL	= new IFunction()
+	{
+		public Set getRelevantAttributes()
+		{
+			return Collections.EMPTY_SET;
+		}
+		public Class getReturnType()
+		{
+			// Todo: get most specific return type of params 1 and 2!?
+			return Object.class;
+		}
+		public Object invoke(Object[] paramvalues, IOAVState state)
+		{
+			if(paramvalues==null || paramvalues.length!=3)
+				throw new IllegalArgumentException("Conditional requires three parameters.");
+			
+			return ((Boolean)paramvalues[0]).booleanValue() ? paramvalues[1] : paramvalues[2];
+		}
+		public String	toString()
+		{
+			return "?:";
+		}
+	};
+	
+	 //-------- attributes --------
 	
 	/** The condition. */
 	protected Expression	condition;

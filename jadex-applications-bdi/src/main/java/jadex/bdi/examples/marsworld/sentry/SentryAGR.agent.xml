@@ -37,11 +37,9 @@
   	<goals>
 		<!-- Look for targets. -->
 		<achievegoal name="find_targets">
- 			<dropcondition language="clips">
-				// $beliefbase.missionend
-				// Hack should not access subcapability directly!!! 
-				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "missionend"))
+			<dropcondition language="jcl">
+				$beliefbase.missionend
+				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>
 		</achievegoal>
 
@@ -52,16 +50,10 @@
 			<parameter name="target" class="Target">
 				<value>?target</value>
 			</parameter>
-			<unique/>
+			<unique dummy="true"/>
 			<!-- Create a new goal when a target was added
 				and the mission is going on. -->
 			<creationcondition language="clips">
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?adopted	= (goal (element_has_model ?mgoal))
-					?rcapa		= (capability (capability_has_goals contains ?adopted))
-				))
-
 				// !$beliefbase.missionend
 				// Hack should not access subcapability directly!!! 
 				(belief (element_has_model ?mbel_missionend) (belief_has_fact false))
@@ -85,11 +77,9 @@
 				== $goal.target
 			</contextcondition> -->
 			<!-- Drop the goal on mission end. -->
-			<dropcondition language="clips">
-				// $beliefbase.missionend
-				// Hack should not access subcapability directly!!! 
-				(belief (element_has_model ?mbel) (belief_has_fact true))
-				?mbel	= (mbelief (melement_has_name "missionend"))
+			<dropcondition language="jcl">
+				$beliefbase.missionend
+				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>
 
 			<deliberation>

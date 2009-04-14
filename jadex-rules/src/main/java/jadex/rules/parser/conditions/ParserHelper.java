@@ -1,6 +1,7 @@
 package jadex.rules.parser.conditions;
 
 import jadex.rules.parser.conditions.javagrammar.ConstraintBuilder;
+import jadex.rules.parser.conditions.javagrammar.DefaultParserHelper;
 import jadex.rules.parser.conditions.javagrammar.Expression;
 import jadex.rules.parser.conditions.javagrammar.IParserHelper;
 import jadex.rules.parser.conditions.javagrammar.JavaJadexLexer;
@@ -104,6 +105,17 @@ public class ParserHelper
 	 *  @param model The model.
 	 *  @return The condition.
 	 */
+	public static ICondition parseJavaCondition(String text, OAVTypeModel model)
+	{
+		return parseJavaCondition(null, text, model, null, null, new DefaultParserHelper(null, model), null, false);
+	}
+
+	/**
+	 *  Parse a condition.
+	 *  @param text The text.
+	 *  @param model The model.
+	 *  @return The condition.
+	 */
 	public static ICondition parseJavaCondition(ICondition precon, String text, OAVTypeModel model, String[] imports, List errors, IParserHelper helper, Variable returnvar, boolean invert)
 	{
 		ICondition	ret	= null;
@@ -115,7 +127,7 @@ public class ParserHelper
 		{
 			parser.setParserHelper(helper);
 			parser.setImports(imports);
-			parser.setClassLoader(model.getClassLoader());
+			parser.setTypeModel(model);
 			Expression	pexp	= parser.lhs();
 			precon	= new AndCondition(helper.getConditions());
 

@@ -36,14 +36,13 @@
 			<fact>"blurps"</fact>
 		</belief>
 		<belief name="react_on_value" class="String" evaluationmode="push">
-			<fact language="clips">
- 				// $beliefbase.my_value.equals("magic")? "magic": "n/a"
+			<fact language="jcl">
+ 				$beliefbase.my_value.equals("magic")? "magic": "n/a"
+ 				
  				// Todo: set to "n/a" instead of leaving null
-
-				(belief (element_has_model ?mbel)
-							(belief_has_fact "magic") (belief_has_fact ?ret))
-				//		  	(belief_has_fact != "magic") ((jadex.rules.rulesystem.rules.functions.Identity "n/a") ?ret))
-				?mbel = (mbelief (melement_has_name "my_value"))
+				// (belief (element_has_model ?mbel)
+				// 			(belief_has_fact "magic") (belief_has_fact ?ret))
+				// ?mbel = (mbelief (melement_has_name "my_value"))
 			</fact>
 		</belief>
 
@@ -53,14 +52,14 @@
 			<fact>2</fact>
 		</beliefset>
 		<belief name="react_on_values" class="String" evaluationmode="push">
-			<fact language="clips">
- 				// $beliefbase.my_values.length==2? "magic": "n/a"
+			<fact language="jcl">
+ 				$beliefbase.my_values.length==2? "magic": "n/a"
+ 				
  				// Todo: set to "n/a" instead of leaving null
-
-				(beliefset (element_has_model ?mbelset)
-					(beliefset_has_facts ?$facts &amp;:(== (Length ?$facts) 2)) 
-					((Identity "magic") ?ret))
-				?mbelset = (mbeliefset (melement_has_name "my_values"))
+				// (beliefset (element_has_model ?mbelset)
+				// 	(beliefset_has_facts ?$facts &amp;:(== (Length ?$facts) 2)) 
+				// 	((Identity "magic") ?ret))
+				// ?mbelset = (mbeliefset (melement_has_name "my_values"))
 			</fact>
 		</belief>
 	</beliefs>

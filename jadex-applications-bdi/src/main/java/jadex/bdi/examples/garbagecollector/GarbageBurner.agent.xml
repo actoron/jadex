@@ -51,35 +51,16 @@
 			its position a new goal is craeted (see binding).
  			The unique tag avoids creating more than one goal
  			per specific piece of garbage. -->
-		<!-- <achievegoal name="burn">
-			<parameter name="garbage" class="String">
-				<bindingoptions>$beliefbase.garbages</bindingoptions>
-			</parameter>
-			<unique/>
-			<creationcondition>true</creationcondition>
-			<deliberation cardinality="1"/>
-		</achievegoal> -->
-		
 		<achievegoal name="burn">
 			<parameter name="garbage" class="String">
 				<!--  <bindingoptions>$beliefbase.garbages</bindingoptions>-->
 				<!-- Bind against variable from creation condition. -->
-				<!--  <bindingoptions>"?garbage"</bindingoptions>-->
-				<value>?garbage</value>
+				<value>$garbage</value>
 			</parameter>
-			<!-- todo: remove unique support? <unique/> -->
-			<!-- <creationcondition>
-				?garbage = (String)
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?garbage))
-				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
-			</creationcondition>-->
+			<unique dummy="true"/>
 			<creationcondition language="clips">
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?adopted	= (goal (element_has_model ?mgoal))
-					?rcapa		= (capability (capability_has_goals contains ?adopted))
-				))
-
+				// Garbage $garbage
+			
 				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?garbage $?y))
 				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
 			</creationcondition>
