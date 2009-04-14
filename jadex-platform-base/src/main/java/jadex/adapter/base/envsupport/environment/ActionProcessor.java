@@ -135,7 +135,7 @@ public class ActionProcessor
 	{
 		synchronized(monitor)
 		{
-			ext_entries.add(new Entry(action, metainfo));
+			ext_entries.add(new Entry(action, metainfo==null? new DefaultEntryMetaInfo(0, null): metainfo));
 		}
 //		adapter.wakeup();
 	}

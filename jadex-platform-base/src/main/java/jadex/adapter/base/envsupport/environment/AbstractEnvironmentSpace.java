@@ -249,6 +249,22 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	{
 		synchronized(monitor)
 		{
+			ISpaceObject ret = (ISpaceObject)spaceobjects.get(id);
+			if(ret==null)
+				throw new RuntimeException("Space object not found: "+id);
+			return ret;
+		}
+	}
+	
+	/**
+	 * Returns an object in this space.
+	 * @param id the object's ID
+	 * @return the object in this space
+	 */
+	public ISpaceObject getSpaceObject0(Object id)
+	{
+		synchronized(monitor)
+		{
 			return (ISpaceObject)spaceobjects.get(id);
 		}
 	}
@@ -346,7 +362,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 				Object ret = action.perform(parameters==null? Collections.EMPTY_MAP: parameters, AbstractEnvironmentSpace.this);
 				listener.resultAvailable(ret);
 			}
-		}, null); // todo: what about metainfo
+		}); // todo: what about metainfo
 	}
 	
 	/**

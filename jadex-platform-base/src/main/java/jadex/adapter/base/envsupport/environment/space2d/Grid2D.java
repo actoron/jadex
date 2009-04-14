@@ -39,7 +39,7 @@ public class Grid2D extends Space2D
 	protected MultiCollection objectsygridpos;
 	
 	/** Last known discrete position of a simobject */
-	protected Map gridposbyobject;
+//	protected Map gridposbyobject;
 	
 	//-------- constructors --------
 	
@@ -80,7 +80,7 @@ public class Grid2D extends Space2D
 		super(spaceexecutor, areaSize);
 		this.setProperty("name", spaceName);
 		this.objectsygridpos = new MultiCollection();
-		this.gridposbyobject = new HashMap();
+//		this.gridposbyobject = new HashMap();
 		this.border_mode = BORDER_TORUS;
 	}
 	
@@ -273,32 +273,37 @@ public class Grid2D extends Space2D
 	{
 		synchronized(monitor)
 		{
-			if(BORDER_TORUS==border_mode)
-			{
-				int sizex = areasize.getXAsInteger();
-				int sizey = areasize.getYAsInteger();
-				
-				int x = pos.getXAsInteger();
-				int y = pos.getYAsInteger();
-				
-				while(x<0)
-					x += sizex;
-				while(y<0)
-					y += sizey;
-				
-				x = x % sizex;
-				y = y % sizey;
-				
-				pos = new Vector2Int(x, y);
-			}
-			
 			ISpaceObject obj = getSpaceObject(id);
+			
 			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
 			if(oldpos!=null)
 				objectsygridpos.remove(oldpos, obj);
 			
-			objectsygridpos.put(pos, obj);
-			gridposbyobject.put(id, pos);
+			if(pos!=null)
+			{
+				if(BORDER_TORUS==border_mode)
+				{
+					int sizex = areasize.getXAsInteger();
+					int sizey = areasize.getYAsInteger();
+					
+					int x = pos.getXAsInteger();
+					int y = pos.getYAsInteger();
+					
+					while(x<0)
+						x += sizex;
+					while(y<0)
+						y += sizey;
+					
+					x = x % sizex;
+					y = y % sizey;
+					
+					pos = new Vector2Int(x, y);
+				}
+			
+				objectsygridpos.put(pos, obj);
+//				gridposbyobject.put(id, pos);
+			}
+			
 			super.setPosition(id, pos);
 		}
 	}
@@ -341,7 +346,8 @@ public class Grid2D extends Space2D
 		synchronized(monitor)
 		{
 			// remove the object from grid
-			IVector2 pos = (IVector2)gridposbyobject.remove(id);
+//			IVector2 pos = (IVector2)gridposbyobject.remove(id);
+			IVector2 pos = (IVector2)getSpaceObject(id).getProperty(Space2D.POSITION);
 			if(pos!=null)
 				objectsygridpos.remove(pos, spaceobjects.get(id));
 			
