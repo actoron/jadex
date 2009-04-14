@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
-import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -9,7 +8,6 @@ import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +36,6 @@ public class Grid2D extends Space2D
 	/** All simobject id's accessible per position. */
 	protected MultiCollection objectsygridpos;
 	
-	/** Last known discrete position of a simobject */
-//	protected Map gridposbyobject;
-	
 	//-------- constructors --------
 	
 	/**
@@ -52,35 +47,32 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D()
 	{
-		this(null, null, null);
+		this(null, null);
 	}
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with the default name.
 	 * 
-	 * @param spaceexecutor executor for the space
 	 * @param actionexecutor executor for agent actions
 	 * @param areaSize the size of the 2D area
 	 */
-	public Grid2D(ISpaceExecutor spaceexecutor, IVector2 areaSize)
+	public Grid2D(IVector2 areaSize)
 	{
-		this(spaceexecutor, areaSize, DEFAULT_NAME);
+		this(areaSize, DEFAULT_NAME);
 	}
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with a special ID.
 	 * 
-	 * @param spaceexecutor executor for the space
 	 * @param actionexecutor executor for agent actions
 	 * @param areaSize the size of the 2D area
 	 * @param spaceName the name of this space
 	 */
-	public Grid2D(ISpaceExecutor spaceexecutor, IVector2 areaSize, Object spaceName)
+	public Grid2D(IVector2 areaSize, Object spaceName)
 	{
-		super(spaceexecutor, areaSize);
+		super(areaSize);
 		this.setProperty("name", spaceName);
 		this.objectsygridpos = new MultiCollection();
-//		this.gridposbyobject = new HashMap();
 		this.border_mode = BORDER_TORUS;
 	}
 	
@@ -346,7 +338,6 @@ public class Grid2D extends Space2D
 		synchronized(monitor)
 		{
 			// remove the object from grid
-//			IVector2 pos = (IVector2)gridposbyobject.remove(id);
 			IVector2 pos = (IVector2)getSpaceObject(id).getProperty(Space2D.POSITION);
 			if(pos!=null)
 				objectsygridpos.remove(pos, spaceobjects.get(id));

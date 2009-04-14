@@ -29,6 +29,9 @@ import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -85,19 +88,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		
 		ret.setContext(app);
 		
-		// Hack!!
-		ret.setSpaceExecutor(new RoundBasedExecutor(null, (IClockService)app.getPlatform().getService(IClockService.class), new Vector1Long(1000)));
-		
 		if(getName()!=null)
 		{
 			ret.setName(getName());
 		}
-		
-		//TODO: FIXME! (spaceexecutor)
-		/*if(ret instanceof EnvironmentSpaceTime) // Hack?
-		{
-			((EnvironmentSpaceTime)ret).setClockService((IClockService)app.getPlatform().getService(IClockService.class));
-		}*/
 		
 		if(ret instanceof Space2D) // Hack?
 		{
@@ -231,6 +225,14 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		
 		ObserverCenter oc = new ObserverCenter(ret, cfg, (ILibraryService)app.getPlatform().getService(ILibraryService.class));
 		ret.addView(GeneralView2D.class.getName(), new GeneralView2D((Space2D)ret));
+		
+		
+		// Create (and start) the environment executor.
+		IParsedExpression exp = spacetype.getSpaceExecutor();
+		SimpleValueFetcher fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$space", ret);
+		fetcher.setValue("$platform", app.getPlatform());
+		Object spaceexe = exp.getValue(fetcher);
 		
 		return ret;
 	}

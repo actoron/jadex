@@ -173,11 +173,6 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 */
 	public List getViewNames();
 	
-	/** Sets the space executor that executes the space.
-	 *  @param the space executor
-	 */
-	public void setSpaceExecutor(ISpaceExecutor executor);
-	
 	/** 
 	 * Steps the space. May be non-functional in spaces that do not have
 	 * a concept of steps.

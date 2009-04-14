@@ -188,7 +188,7 @@ public class Reader
 					// Handle post-processing
 					if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
 					{
-						typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root);
+						topse.object = typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root);
 					}
 
 					// Handle linking

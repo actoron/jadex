@@ -83,7 +83,7 @@ public class BeanObjectHandler implements IObjectHandler
 		
 		if(linkinfo!=null)
 		{
-			linked = internalLinkObjects(parent.getClass(), (String)linkinfo, object, parent);
+			linked = internalLinkObjects(object.getClass(), (String)linkinfo, object, parent);
 			if(!linked)
 				throw new RuntimeException("Failure in link info: "+linkinfo);
 		}

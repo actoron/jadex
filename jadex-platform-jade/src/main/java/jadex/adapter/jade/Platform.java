@@ -83,7 +83,15 @@ public class Platform implements IPlatform
 		this.threadpool = ThreadPoolFactory.createThreadPool();
 		this.logger = Logger.getLogger("JADE_Platform");
 		this.services = new LinkedHashMap();
-		this.appfactory = new ApplicationFactory(this, new Set[]{MAGRSpaceType.getXMLMapping()});
+		this.appfactory = new ApplicationFactory(this, new java.util.Set[]
+		    {
+				jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
+				jadex.adapter.base.envsupport.MEnvSpaceType.getXMLMapping()
+			}, 
+			new java.util.Set[]
+			{
+				jadex.adapter.base.envsupport.MEnvSpaceType.getXMLLinkInfos()
+			});
 		services.put(ILibraryService.class, new LibraryService());
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));

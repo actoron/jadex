@@ -1,9 +1,15 @@
 package jadex.adapter.base.envsupport;
 
+import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.xml.IPostProcessor;
+import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,6 +40,10 @@ public class MEnvSpaceType	extends MSpaceType
 	
 	/** The implementation class name. */
 	protected String classname;
+	
+	/** The space executor expression. */
+	protected String spaceexecutorstring;
+	protected IParsedExpression spaceexecutor;
 	
 	//-------- methods --------
 		
@@ -153,6 +163,38 @@ public class MEnvSpaceType	extends MSpaceType
 	{
 		this.classname = classname;
 	}
+	
+	/**
+	 *  Set the space executor.
+	 */
+	public void setSpaceExecutor(IParsedExpression spaceexecutor)
+	{
+		this.spaceexecutor = spaceexecutor;
+	}
+	
+	/**
+	 * @return the spaceexecutor
+	 */
+	public IParsedExpression getSpaceExecutor()
+	{
+		return this.spaceexecutor;
+	}
+
+	/**
+	 * @return the spaceexecutorstring
+	 */
+	public String getSpaceexEcutorString()
+	{
+		return this.spaceexecutorstring;
+	}
+
+	/**
+	 * @param spaceexecutorstring the spaceexecutorstring to set
+	 */
+	public void setSpaceExecutorString(String spaceexecutorstring)
+	{
+		this.spaceexecutorstring = spaceexecutorstring;
+	}
 
 	/**
 	 *  Get a string representation of this AGR space type.
@@ -184,6 +226,7 @@ public class MEnvSpaceType	extends MSpaceType
 	public static Set getXMLMapping()
 	{
 		Set types = new HashSet();
+		ExpressionProcessor exproc = new ExpressionProcessor();
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
@@ -195,8 +238,52 @@ public class MEnvSpaceType	extends MSpaceType
 		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		types.add(new TypeInfo("perceptgeneratortype", MEnvPerceptGeneratorType.class, null, null,
-				SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
+		
+		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, exproc));
+
 		types.add(new TypeInfo("object", MEnvObject.class));
 		return types;
+	}
+	
+	/**
+	 *  Get the XML link infos.
+	 */
+	public static Set getXMLLinkInfos()
+	{
+		Set linkinfos = new HashSet();
+		
+		linkinfos.add(new LinkInfo("spaceexecutor", "setSpaceExecutor"));
+		
+		return linkinfos;
+	}
+	
+	/**
+	 *  Parse expression text.
+	 */
+	static class ExpressionProcessor	implements IPostProcessor
+	{
+		// Hack!!! Should be configurable.
+		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+
+		/**
+		 *  Parse expression text.
+		 */
+		public Object postProcess(Object context, Object object, Object root)
+		{
+			Object ret = null;
+			
+			System.out.println("Found expression: "+object);
+			try
+			{
+				ret = exp_parser.parseExpression((String)object, ((MApplicationType)root).getAllImports(), null, null); // todo: classloader???
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			return ret;
+		}
 	}
 }

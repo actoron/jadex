@@ -15,18 +15,43 @@
 	
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.adapter.base.envsupport.math.Vector1Long</import>
+		<import>jadex.bridge.IClockService</import>
 	</imports>
 	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" class="Grid2D">
+			<!-- agent actions. -->
 			<env:agentactiontype name="pickup" class="PickupWasteAction" />
 			<env:agentactiontype name="drop" class="DropWasteAction" />
 			<env:agentactiontype name="burn" class="BurnWasteAction" />
 			<env:agentactiontype name="go" class="GoAction" />
+			
+			<!-- processes. -->
 			<env:processtype name="create" class="CreateWasteProcess" />
+			
+			<!-- percept generators -->
 			<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
+			
+			<!-- dimensions -->
 			<env:dimension>10</env:dimension>
 			<env:dimension>10</env:dimension>
+			
+			<!-- views and presentations -->
+			<!--  <env:view name="all">
+				<env:presentation name="?">
+					<env:theme name="abstract">
+						<env:drawable>
+							new RegularPolygon(new Vector2Double(2.0), new Vector2Double(0.0), false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1)
+						</env:drawable>
+						<env:prelayer>new GridLayer(new Vector2Double(1.0), Color.WHITE)</env:prelayer>
+					</env:theme>
+				</env:presentation>
+			</env:view>-->
+			
+			<!-- executor -->
+			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(1000))</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
 	

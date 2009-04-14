@@ -55,9 +55,10 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings (if any).
 	 */
-	public ApplicationFactory(IPlatform platform, Set[] mappings)
+	public ApplicationFactory(IPlatform platform, Set[] mappings, Set[] linkinfos)
 	{
 		this.platform = platform;
+		
 		Set types = new HashSet();
 		Map attrs = new HashMap();
 		attrs.put("type", "setTypeName");
@@ -78,7 +79,13 @@ public class ApplicationFactory implements IApplicationFactory
 			types.addAll(mappings[i]);
 		}
 		
-		this.reader = new Reader(new BeanObjectHandler(), types, null, null);
+		Set links = new HashSet();
+		for(int i=0; linkinfos!=null && i<linkinfos.length; i++)
+		{
+			links.addAll(linkinfos[i]);
+		}
+		
+		this.reader = new Reader(new BeanObjectHandler(), types, links, null);
 	}
 	
 	//-------- IAgentFactory interface --------

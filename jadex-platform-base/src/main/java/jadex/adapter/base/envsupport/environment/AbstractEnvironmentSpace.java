@@ -57,9 +57,6 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	/** The environment listeners. */
 	protected List listeners;
 	
-	/** The space executor. */
-	protected ISpaceExecutor spaceexecutor;
-	
 	/** The action executor. */
 	protected ActionProcessor actionexecutor;
 	
@@ -67,18 +64,10 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	
 	/**
 	 *  Create an environment space
-	 */
-	public AbstractEnvironmentSpace()
-	{
-		this(null);
-	}
-	
-	/**
-	 *  Create an environment space
 	 *  @param spaceexecutor executor for the space
 	 *  @param actionexecutor executor for agent actions
 	 */
-	public AbstractEnvironmentSpace(ISpaceExecutor spaceexecutor)
+	public AbstractEnvironmentSpace()
 	{
 		this.monitor = new Object();
 		this.views = new HashMap();
@@ -91,8 +80,6 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		this.spaceobjectsbyowner = new HashMap();
 		this.objectidcounter = new AtomicCounter();
 		this.actionexecutor = new ActionProcessor(monitor);
-		if(spaceexecutor != null)
-			setSpaceExecutor(spaceexecutor);
 	}
 	
 	//-------- methods --------
@@ -614,15 +601,6 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	public void setContext(IContext context)
 	{
 		this.context = context;
-	}
-	
-	/** Sets the space executor that executes the space.
-	 *  @param the space executor
-	 */
-	public void setSpaceExecutor(ISpaceExecutor executor)
-	{
-		this.spaceexecutor = executor;
-		executor.init(this);
 	}
 	
 	/** 

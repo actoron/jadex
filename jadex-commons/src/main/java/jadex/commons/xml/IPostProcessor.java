@@ -11,5 +11,5 @@ public interface IPostProcessor
 	 *  @param object	The object to post process.
 	 *  @param root	The root object in the state.
 	 */
-	public void	postProcess(Object context, Object object, Object root);
+	public Object postProcess(Object context, Object object, Object root);
 }

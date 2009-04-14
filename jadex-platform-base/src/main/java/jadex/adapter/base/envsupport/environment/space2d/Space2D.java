@@ -1,19 +1,18 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
+import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Double;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-
-import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
-import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Double;
 
 /**
  *  General 2D space.
@@ -36,9 +35,8 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(ISpaceExecutor spaceexecutor, IVector2 areasize)
+	protected Space2D(IVector2 areasize)
 	{
-		super(spaceexecutor);
 		this.areasize = areasize;
 	}
 	

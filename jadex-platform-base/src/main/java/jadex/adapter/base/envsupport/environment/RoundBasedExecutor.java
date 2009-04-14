@@ -9,12 +9,15 @@ import jadex.bridge.ITimedObject;
 /**
  * 
  */
-public class RoundBasedExecutor extends DeltaTimeExecutor
+public class RoundBasedExecutor
 {
 	//-------- constants --------
 	
-	/** The round time. */
-	protected IVector1 roundtime;
+	/** The time coefficient */
+	protected IVector1 timecoefficient;
+	
+	/** Current time stamp */
+	protected long timestamp;
 	
 	/** The elapsed time. */
 	protected IVector1 elapsed;
@@ -26,26 +29,27 @@ public class RoundBasedExecutor extends DeltaTimeExecutor
 	 * @param timecoefficient the time coefficient
 	 * @param clockservice the clock service
 	 */
-	public RoundBasedExecutor(IVector1 timecoefficient, IClockService clockservice, IVector1 roundtime)
+	public RoundBasedExecutor(final IEnvironmentSpace space, final IClockService clockservice, final IVector1 roundtime)
 	{
-		super(timecoefficient, clockservice);
-		this.roundtime = roundtime;
-		this.elapsed = Vector1Double.ZERO;
+		this(space, null, clockservice, roundtime);
 	}
 	
-	//-------- ISpaceExecutor--------
-	
 	/**
-	 * Sets the space for the executor. Called by the space when the executor is added.
-	 * @param space the space being executed
+	 * Creates a new DeltaTimeExecutor
+	 * @param timecoefficient the time coefficient
+	 * @param clockservice the clock service
 	 */
-	public void init(final IEnvironmentSpace space)
+	public RoundBasedExecutor(final IEnvironmentSpace space, IVector1 timecoefficient, final IClockService clockservice, final IVector1 roundtime)
 	{
+		this.timecoefficient = timecoefficient==null? new Vector1Double(0.001): timecoefficient;
+		this.timestamp = clockservice.getTime();
+		this.elapsed = Vector1Double.ZERO;
+		
 		clockservice.createTimer(roundtime.getAsLong(), new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				IVector1 progress = timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
+				IVector1 progress = RoundBasedExecutor.this.timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
 				timestamp = currenttime;
 				
 				space.step(progress);

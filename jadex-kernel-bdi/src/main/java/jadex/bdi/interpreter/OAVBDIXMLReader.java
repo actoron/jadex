@@ -208,7 +208,7 @@ public class OAVBDIXMLReader
 		/**
 		 *  Parse expression text.
 		 */
-		public void postProcess(Object context, Object object, Object root)
+		public Object postProcess(Object context, Object object, Object root)
 		{
 			IOAVState state = (IOAVState)context;
 			Object	ret	= null;
@@ -308,6 +308,9 @@ public class OAVBDIXMLReader
 			
 			if(ret!=null)
 				state.setAttributeValue(object, OAVBDIMetaModel.expression_has_content, ret);
+		
+			// do not change the object itself.
+			return object;
 		}
 	}
 	
@@ -340,7 +343,7 @@ public class OAVBDIXMLReader
 		/**
 		 *  Load class.
 		 */
-		public void postProcess(Object context, Object object, Object root)
+		public Object postProcess(Object context, Object object, Object root)
 		{
 			IOAVState state = (IOAVState)context;
 			String	value	= (String)state.getAttributeValue(object, classnameattr);
@@ -357,6 +360,9 @@ public class OAVBDIXMLReader
 					e.printStackTrace();
 				}
 			}
+			
+			// do not change the object itself.
+			return object;
 		}
 	}
 
