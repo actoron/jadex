@@ -81,10 +81,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
 		ClassLoader cl = ((ILibraryService)app.getPlatform().getService(ILibraryService.class)).getClassLoader();
 		
-		Class envcl = SReflect.findClass(spacetype.getClassName(), mapt.getAllImports(), cl);
-		
 		// Create and init space.
-		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)envcl.newInstance();
+		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)spacetype.getClazz().newInstance();
 		
 		ret.setContext(app);
 		
@@ -117,14 +115,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<spaceactions.size(); i++)
 			{
 				MEnvAgentActionType maction = (MEnvAgentActionType)spaceactions.get(i);
-				Class proccl = SReflect.findClass(maction.getClassName(), mapt.getAllImports(), cl);
+				ISpaceAction action = (ISpaceAction)maction.getClazz().newInstance();
 				
-				ISpaceAction action = (ISpaceAction)proccl.newInstance();
-				
-				// TODO: id --- fixed! correct?
 				System.out.println("Adding environment action: "+maction.getName());
 				ret.addSpaceAction(maction.getName(), action);
-				//ret.addSpaceAction(action);
 			}
 		}
 		
@@ -135,14 +129,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<agentactions.size(); i++)
 			{
 				MEnvAgentActionType maction = (MEnvAgentActionType)agentactions.get(i);
-				Class proccl = SReflect.findClass(maction.getClassName(), mapt.getAllImports(), cl);
+				IAgentAction action = (IAgentAction)maction.getClazz().newInstance();
 				
-				IAgentAction action = (IAgentAction)proccl.newInstance();
-				
-				// TODO: id --- fixed! correct?
 				System.out.println("Adding environment action: "+maction.getName());
 				ret.addAgentAction(maction.getName(), action);
-				//ret.addSpaceAction(action);
 			}
 		}
 		
@@ -153,14 +143,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<processes.size(); i++)
 			{
 				MEnvProcessType mproc = (MEnvProcessType)processes.get(i);
-				Class proccl = SReflect.findClass(mproc.getClassName(), mapt.getAllImports(), cl);
+				ISpaceProcess proc = (ISpaceProcess)mproc.getClazz().newInstance();
 				
-				ISpaceProcess proc = (ISpaceProcess)proccl.newInstance();
-				
-				// TODO: id --- fixed! correct?
 				System.out.println("Adding environment process: "+mproc.getName());
 				ret.addSpaceProcess(mproc.getName(), proc);
-				//ret.addSpaceProcess(proc);
 			}
 		}
 		
@@ -171,9 +157,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<gens.size(); i++)
 			{
 				MEnvPerceptGeneratorType mgen = (MEnvPerceptGeneratorType)gens.get(i);
-				Class gencl = SReflect.findClass(mgen.getClassName(), mapt.getAllImports(), cl);
-				
-				IPerceptGenerator gen = (IPerceptGenerator)gencl.newInstance();
+				IPerceptGenerator gen = (IPerceptGenerator)mgen.getClazz().newInstance();
 				
 				// TODO: id --- fixed! correct?
 				System.out.println("Adding environment percept generator: "+mgen.getName());

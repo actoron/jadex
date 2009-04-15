@@ -61,13 +61,13 @@ public class ApplicationFactory implements IApplicationFactory
 		
 		Set types = new HashSet();
 		Map attrs = new HashMap();
-		attrs.put("type", "setTypeName");
-		types.add(new TypeInfo("applicationtype", MApplicationType.class, "setDescription", null));
+		attrs.put("type", "typeName");
+		types.add(new TypeInfo("applicationtype", MApplicationType.class, "description", null));
 		types.add(new TypeInfo("spacetype", MSpaceType.class));
 		types.add(new TypeInfo("agenttype", MAgentType.class));
-		types.add(new TypeInfo("application", MApplicationInstance.class, null, null, attrs, null));
+		types.add(new TypeInfo("application", MApplicationInstance.class, null, null, attrs, null, null));
 		types.add(new TypeInfo("space", MSpaceInstance.class));
-		types.add(new TypeInfo("agent", MAgentInstance.class, null, null, attrs, null));
+		types.add(new TypeInfo("agent", MAgentInstance.class, null, null, attrs, null, null));
 		types.add(new TypeInfo("parameter", MArgument.class));
 		types.add(new TypeInfo("parameterset", MArgumentSet.class));
 		types.add(new TypeInfo("value", String.class));
@@ -85,7 +85,10 @@ public class ApplicationFactory implements IApplicationFactory
 			links.addAll(linkinfos[i]);
 		}
 		
-		this.reader = new Reader(new BeanObjectHandler(), types, links, null);
+		Set ignored = new HashSet();
+		ignored.add("schemaLocation");
+		
+		this.reader = new Reader(new BeanObjectHandler(), types, links, ignored);
 	}
 	
 	//-------- IAgentFactory interface --------
@@ -214,8 +217,8 @@ public class ApplicationFactory implements IApplicationFactory
 			MApplicationType apptype = null;
 			try
 			{
-				// todo: classloader null?
-				apptype = (MApplicationType)reader.read(new FileInputStream(filename), null, null);
+				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				apptype = (MApplicationType)reader.read(new FileInputStream(filename), cl, null);
 				ret = new ApplicationModel(apptype, filename);
 //				System.out.println("Loaded application type: "+apptype);
 			

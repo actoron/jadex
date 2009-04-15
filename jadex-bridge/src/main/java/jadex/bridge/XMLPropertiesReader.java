@@ -29,11 +29,11 @@ public class XMLPropertiesReader
 	static
 	{
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo("property", Property.class, null, "setValue"));
+		typeinfos.add(new TypeInfo("property", Property.class, null, "value"));
 		typeinfos.add(new TypeInfo("properties", Properties.class));
 		
 		Set linkinfos = new HashSet();
-		linkinfos.add(new LinkInfo("properties", "addSubproperties"));
+		linkinfos.add(new LinkInfo("properties", "subproperties"));
 		
 		Set ignoredattrs = new HashSet();
 		ignoredattrs.add("schemaLocation");

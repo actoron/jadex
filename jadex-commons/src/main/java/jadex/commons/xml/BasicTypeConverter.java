@@ -6,9 +6,12 @@ import java.util.Set;
 /**
  *  Converter for basic types.
  */
-public class BasicTypeConverter
+public class BasicTypeConverter //implements ITypeConverter
 {
 	//-------- static part --------
+	
+	/** Converter instance. */
+//	protected static BasicTypeConverter CONVERTER = new BasicTypeConverter();
 	
 	/** The built-in types. */
 	protected static Set builtintypes;
@@ -40,7 +43,7 @@ public class BasicTypeConverter
 	 *  @param clazz The target clazz.
 	 *  @param val The string valut to convert.
 	 */
-	public static Object convertBuiltInTypes(Class clazz, String val)
+	public static Object convertType(Class clazz, String val)
 	{
 		Object ret;
 		

@@ -16,7 +16,7 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context) throws Exception;
+	public Object createObject(Object type, boolean root, Object context, ClassLoader classloader) throws Exception;
 	
 	/**
 	 *  Handle the attribute of an object.
@@ -26,7 +26,8 @@ public interface IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, Object attrinfo, Object context) throws Exception;
+	public void handleAttributeValue(Object object, String attrname, List attrpath, Object attrval, 
+		Object attrinfo, Object context, ClassLoader classloader) throws Exception;
 	
 	/**
 	 *  Link an object to its parent.
@@ -36,5 +37,6 @@ public interface IObjectHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, Object context) throws Exception;
+	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, 
+		Object context, ClassLoader classloader) throws Exception;
 }

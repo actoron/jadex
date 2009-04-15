@@ -65,7 +65,7 @@ public class Reader
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
 		Object root = null;
 		List stack = new ArrayList();
-		StackElement	topse	= null;
+		StackElement topse	= null;
 		String comment = null;
 		
 		while(parser.hasNext())
@@ -93,7 +93,7 @@ public class Reader
 				Object object = null;
 				if(typeinfo!=null && typeinfo.getTypeInfo()!=null)
 				{
-					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context);
+					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context, classloader);
 				}
 				else
 				{
@@ -136,7 +136,9 @@ public class Reader
 						if(!ignoredattrs.contains(attrname))
 						{
 							Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
-							handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context);
+							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
+							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
+							handler.handleAttributeValue(object, attrname, attrpath, val, attrinfo, context, classloader);
 						}
 					}
 				}
@@ -147,7 +149,7 @@ public class Reader
 					Object commentinfo = typeinfo.getCommentInfo();
 					if(commentinfo!=null)
 					{
-						handler.handleAttributeValue(object, null, null, comment, commentinfo, context);
+						handler.handleAttributeValue(object, null, null, comment, commentinfo, context, classloader);
 					}
 				}
 				
@@ -177,7 +179,7 @@ public class Reader
 					{
 						if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
 						{
-							handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), context);
+							handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), context, classloader);
 						}
 						else
 						{
@@ -188,7 +190,7 @@ public class Reader
 					// Handle post-processing
 					if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
 					{
-						topse.object = typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root);
+						topse.object = typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
 					}
 
 					// Handle linking
@@ -201,7 +203,7 @@ public class Reader
 						}
 						
 						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack));
-						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context);
+						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader);
 					}
 				}
 				

@@ -23,7 +23,7 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context) throws Exception
+	public Object createObject(Object type, boolean root, Object context, ClassLoader classloader) throws Exception
 	{
 		Object ret = null;
 		IOAVState state = (IOAVState)context;
@@ -48,7 +48,7 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, Object attrinfo, Object context) throws Exception
+	public void handleAttributeValue(Object object, String attrname, List attrpath, Object attrval, Object attrinfo, Object context, ClassLoader classloader) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
 
@@ -88,7 +88,7 @@ public class OAVObjectHandler implements IObjectHandler
 		{
 			Object arg = attrtype.getType() instanceof OAVJavaType 
 				&& BasicTypeConverter.isBuiltInType(((OAVJavaType)attrtype.getType()).getClazz())?
-				BasicTypeConverter.convertBuiltInTypes(((OAVJavaType)attrtype.getType()).getClazz(), attrval): attrval;
+				BasicTypeConverter.convertType(((OAVJavaType)attrtype.getType()).getClazz(), (String)attrval): attrval;
 	
 			if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
 			{
@@ -113,7 +113,7 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object elem, Object parent, Object linkinfo, String tagname, Object context) throws Exception
+	public void linkObject(Object elem, Object parent, Object linkinfo, String tagname, Object context, ClassLoader classloader) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
 		

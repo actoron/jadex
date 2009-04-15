@@ -6,8 +6,6 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamReader;
-
 /**
  *  Handler for reading XML into Java beans.
  */
@@ -22,7 +20,7 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context) throws Exception
+	public Object createObject(Object type, boolean root, Object context, ClassLoader classloader) throws Exception
 	{
 		Object ret = null;
 		Class clazz = (Class)type;
@@ -42,9 +40,11 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, Object attrinfo, Object context) throws Exception
+	public void handleAttributeValue(Object object, String attrname, List attrpath, Object attrval, 
+		Object attrinfo, Object context, ClassLoader classloader) throws Exception
 	{
-		String mname = attrinfo!=null? (String)attrinfo: "set"+attrname.substring(0,1).toUpperCase()+attrname.substring(1);
+		String mname = attrinfo!=null? "set"+((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
+			: "set"+attrname.substring(0,1).toUpperCase()+attrname.substring(1);
 		
 		Method[] ms = SReflect.getMethods(object.getClass(), mname);
 		boolean set = false;
@@ -53,7 +53,12 @@ public class BeanObjectHandler implements IObjectHandler
 			Class[] ps = ms[j].getParameterTypes();
 			if(ps.length==1)
 			{
-				Object arg = BasicTypeConverter.convertBuiltInTypes(ps[0], attrval);
+				Object arg;
+				if(attrval instanceof String && !String.class.isAssignableFrom(ps[0]))
+					arg = BasicTypeConverter.convertType(ps[0], (String)attrval);
+				else
+					arg = attrval;
+				
 				try
 				{
 					ms[j].invoke(object, new Object[]{arg});
@@ -64,6 +69,9 @@ public class BeanObjectHandler implements IObjectHandler
 				}
 			}
 		}
+		
+		if(!set)
+			throw new RuntimeException("Failure in setting attribute: "+attrname+" on object: "+object);
 	}
 	
 	/**
@@ -74,7 +82,8 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, Object context) throws Exception
+	public void linkObject(Object object, Object parent, Object linkinfo, 
+		String tagname, Object context, ClassLoader classloader) throws Exception
 	{
 		// Add object to its parent.
 		boolean	linked	= false;
@@ -83,7 +92,13 @@ public class BeanObjectHandler implements IObjectHandler
 		
 		if(linkinfo!=null)
 		{
-			linked = internalLinkObjects(object.getClass(), (String)linkinfo, object, parent);
+			String setm = "set"+((String)linkinfo).substring(0,1).toUpperCase()+((String)linkinfo).substring(1);
+			linked = internalLinkObjects(object.getClass(), setm, object, parent);
+			if(!linked)
+			{
+				String addm = "add"+((String)linkinfo).substring(0,1).toUpperCase()+((String)linkinfo).substring(1);
+				linked = internalLinkObjects(object.getClass(), addm, object, parent);
+			}
 			if(!linked)
 				throw new RuntimeException("Failure in link info: "+linkinfo);
 		}
@@ -152,7 +167,7 @@ public class BeanObjectHandler implements IObjectHandler
 				{
 					try
 					{
-						object = BasicTypeConverter.convertBuiltInTypes(ps[0], (String)object);
+						object = BasicTypeConverter.convertType(ps[0], (String)object);
 						ms[i].invoke(parent, new Object[]{object});
 						ret	= true;
 					}

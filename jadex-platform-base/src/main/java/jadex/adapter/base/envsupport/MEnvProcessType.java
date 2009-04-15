@@ -10,9 +10,9 @@ public class MEnvProcessType
 	/** The name. */
 	protected String name;
 	
-	/** The implementation class name. */
-	protected String classname;
-
+	/** The implementation clazz. */
+	protected Class clazz;
+	
 	//-------- methods --------
 
 	/**
@@ -37,18 +37,18 @@ public class MEnvProcessType
 	 *  Get the class name.
 	 *  @return The class name.
 	 */
-	public String getClassName()
+	public Class getClazz()
 	{
-		return this.classname;
+		return this.clazz;
 	}
 
 	/**
 	 *  Set the class name.
 	 *  @param name The class name to set.
 	 */
-	public void setClassName(String classname)
+	public void setClazz(Class clazz)
 	{
-		this.classname = classname;
+		this.clazz = clazz;
 	}
 	
 }

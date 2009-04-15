@@ -5,6 +5,7 @@ import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.xml.IPostProcessor;
+import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.IExpressionParser;
@@ -38,11 +39,13 @@ public class MEnvSpaceType	extends MSpaceType
 	/** The percept generator types. */
 	protected List perceptgeneratortypes;
 	
-	/** The implementation class name. */
-	protected String classname;
+	/** The views. */
+	protected List views;
+	
+	/** The implementation class. */
+	protected Class clazz;
 	
 	/** The space executor expression. */
-	protected String spaceexecutorstring;
 	protected IParsedExpression spaceexecutor;
 	
 	//-------- methods --------
@@ -147,21 +150,41 @@ public class MEnvSpaceType	extends MSpaceType
 	}
 	
 	/**
-	 *  Get the class name.
-	 *  @return The class name.
+	 *  Add a view.
+	 *  @param view The view.
 	 */
-	public String getClassName()
+	public void addMEnvView(MEnvView view)
 	{
-		return this.classname;
+		if(views==null)
+			views = new ArrayList();
+		views.add(view);	
+	}
+	
+	/**
+	 *  Get the view.
+	 *  @return The view.
+	 */
+	public List getMEnvViews()
+	{
+		return views;
+	}
+	
+	/**
+	 *  Get the clazz.
+	 *  @return The clazz.
+	 */
+	public Class getClazz()
+	{
+		return this.clazz;
 	}
 
 	/**
 	 *  Set the class name.
-	 *  @param classname The class name to set.
+	 *  @param name The class name to set.
 	 */
-	public void setClassName(String classname)
+	public void setClazz(Class clazz)
 	{
-		this.classname = classname;
+		this.clazz = clazz;
 	}
 	
 	/**
@@ -181,22 +204,6 @@ public class MEnvSpaceType	extends MSpaceType
 	}
 
 	/**
-	 * @return the spaceexecutorstring
-	 */
-	public String getSpaceexEcutorString()
-	{
-		return this.spaceexecutorstring;
-	}
-
-	/**
-	 * @param spaceexecutorstring the spaceexecutorstring to set
-	 */
-	public void setSpaceExecutorString(String spaceexecutorstring)
-	{
-		this.spaceexecutorstring = spaceexecutorstring;
-	}
-
-	/**
 	 *  Get a string representation of this AGR space type.
 	 *  @return A string representation of this AGR space type.
 	 */
@@ -213,7 +220,7 @@ public class MEnvSpaceType	extends MSpaceType
 		sbuf.append(", space action types=");
 		sbuf.append(getMEnvSpaceActionTypes());
 		sbuf.append(", class=");
-		sbuf.append(getClassName());
+		sbuf.append(getClazz());
 		sbuf.append(")");
 		return sbuf.toString();
 	}
@@ -227,20 +234,33 @@ public class MEnvSpaceType	extends MSpaceType
 	{
 		Set types = new HashSet();
 		ExpressionProcessor exproc = new ExpressionProcessor();
-		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
-		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
-			SUtil.createHashMap(new String[]{"type"}, new String[]{"setTypeName"}), null));
-		types.add(new TypeInfo("agentactiontype", MEnvAgentActionType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
-		types.add(new TypeInfo("spaceactiontype", MEnvSpaceActionType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
-		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
-		types.add(new TypeInfo("perceptgeneratortype", MEnvPerceptGeneratorType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"setClassName"}), null));
 		
-		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, exproc));
+		ITypeConverter conv = new ClassConverter();
+		
+		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+		
+		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
+			SUtil.createHashMap(new String[]{"type"}, new String[]{"typeName"}), null, null));
+
+		types.add(new TypeInfo("agentactiontype", MEnvAgentActionType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+		
+		types.add(new TypeInfo("spaceactiontype", MEnvSpaceActionType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+		
+		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}), 
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+		
+		types.add(new TypeInfo("perceptgeneratortype", MEnvPerceptGeneratorType.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+		
+		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, null, exproc));
 
 		types.add(new TypeInfo("object", MEnvObject.class));
 		return types;
@@ -253,7 +273,7 @@ public class MEnvSpaceType	extends MSpaceType
 	{
 		Set linkinfos = new HashSet();
 		
-		linkinfos.add(new LinkInfo("spaceexecutor", "setSpaceExecutor"));
+		linkinfos.add(new LinkInfo("spaceexecutor", "spaceExecutor"));
 		
 		return linkinfos;
 	}
@@ -269,20 +289,38 @@ public class MEnvSpaceType	extends MSpaceType
 		/**
 		 *  Parse expression text.
 		 */
-		public Object postProcess(Object context, Object object, Object root)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			Object ret = null;
 			
 			System.out.println("Found expression: "+object);
 			try
 			{
-				ret = exp_parser.parseExpression((String)object, ((MApplicationType)root).getAllImports(), null, null); // todo: classloader???
+				ret = exp_parser.parseExpression((String)object, ((MApplicationType)root).getAllImports(), null, classloader);
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 			}
 			
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Parse class names.
+	 */
+	static class ClassConverter	implements ITypeConverter
+	{
+		/**
+		 *  Convert a string value to a type.
+		 *  @param val The string value to convert.
+		 */
+		public Object convertObject(String val, Object root, ClassLoader classloader)
+		{
+			Class ret = SReflect.findClass0(val, ((MApplicationType)root).getAllImports(), classloader);
+			if(ret==null)
+				throw new RuntimeException("Could not parse class: "+val);
 			return ret;
 		}
 	}
