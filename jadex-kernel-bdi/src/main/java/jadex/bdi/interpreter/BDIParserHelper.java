@@ -148,7 +148,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 
 				context.createObjectCondition(OAVBDIRuntimeModel.capability_type, new IConstraint[]{
 						new BoundConstraint(null, belcapvar),
-						new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, belvar),
+						new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, belvar, IOperator.CONTAINS),
 						new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{capvar, new Constant(ref), belvar, belcapvar}))});
 			}
 			else if((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, belname))!=null)
@@ -192,7 +192,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 
 				context.createObjectCondition(OAVBDIRuntimeModel.capability_type, new IConstraint[]{
 						new BoundConstraint(null, belcapvar),
-						new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, belvar),
+						new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, belvar, IOperator.CONTAINS),
 						new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{capvar, new Constant(ref), belvar, belcapvar}))});				
 			}
 			else

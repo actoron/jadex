@@ -32,6 +32,9 @@
 		<!-- The seen targets. -->
 		<beliefset name="analysed_targets" class="Target"/>
 
+		<beliefref name="missionend">
+			<concrete ref="move.missionend"/>
+		</beliefref>
 	</beliefs>
 
   	<goals>

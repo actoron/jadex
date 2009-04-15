@@ -35,6 +35,12 @@
 				<agent type="Carrier" number="3" />
 			</agents>
 		</application>
+		<application name="Sentry only">
+			<agents>
+				<agent type="Environment"/>
+				<agent type="Sentry" number="1" />
+			</agents>
+		</application>
 	</applications>
 
 </applicationtype>

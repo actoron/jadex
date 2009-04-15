@@ -38,6 +38,9 @@
 		<!-- The targets sent to the sentries. -->
 		<beliefset name="finished_targets" class="Target"/>
 		
+		<beliefref name="missionend">
+			<concrete ref="move.missionend"/>
+		</beliefref>
 	</beliefs>
 
 	<goals>
