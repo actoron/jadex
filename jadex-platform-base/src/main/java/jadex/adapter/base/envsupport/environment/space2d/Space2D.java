@@ -168,12 +168,15 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				for(Iterator it = objects.iterator(); it.hasNext();)
 				{
 					Map.Entry entry = (Entry)it.next();
-					ISpaceObject currentObj = (ISpaceObject) entry.getValue();
-					IVector1 objDist = ((IVector2) currentObj.getProperty(Space2D.POSITION)).getDistance(position); 
-					if ((nearest == null) || (objDist.less(distance)))
+					ISpaceObject curobj = (ISpaceObject)entry.getValue();
+					if(curobj.getProperty(Space2D.POSITION)!=null)
 					{
-						nearest = currentObj;
-						distance = objDist;
+						IVector1 objdist = ((IVector2)curobj.getProperty(Space2D.POSITION)).getDistance(position); 
+						if ((nearest == null) || (objdist.less(distance)))
+						{
+							nearest = curobj;
+							distance = objdist;
+						}
 					}
 				}
 			}

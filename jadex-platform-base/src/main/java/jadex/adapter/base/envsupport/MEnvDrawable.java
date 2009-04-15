@@ -85,7 +85,7 @@ public class MEnvDrawable
 	 *  Add a part.
 	 *  @param part The part.
 	 */
-	public void addPart(MEnvTexturedRectangle part)
+	public void addPart(Object part)
 	{
 		if(parts==null)
 			parts = new ArrayList();

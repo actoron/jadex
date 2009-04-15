@@ -280,9 +280,13 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}),
 			null, null));
 
-		types.add(new TypeInfo("gridprelayer", MEnvGridPreLayer.class, null, null,null,
+		types.add(new TypeInfo("gridprelayer", MEnvGridPreLayer.class, null, null, null,
 			SUtil.createHashMap(new String[]{"color"}, new ITypeConverter[]{colorconv}), null));
 
+		types.add(new TypeInfo("tiledprelayer", MEnvTiledPreLayer.class, null, null, 
+			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}),
+			null, null));
+		
 		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, null, exproc));
 
 		types.add(new TypeInfo("object", MEnvObject.class));
@@ -299,6 +303,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("spaceexecutor", "spaceExecutor"));
 		linkinfos.add(new LinkInfo("texturedrectangle", "part"));
 		linkinfos.add(new LinkInfo("gridprelayer", "preLayer"));
+		linkinfos.add(new LinkInfo("tiledprelayer", "preLayer"));
 		
 		return linkinfos;
 	}

@@ -25,6 +25,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangl
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
+import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.adapter.base.envsupport.observer.gui.Configuration;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.bridge.IClockService;
@@ -233,6 +234,12 @@ public class MEnvSpaceInstance extends MSpaceInstance
 								{
 									MEnvGridPreLayer sourceprelayer = (MEnvGridPreLayer)tmp;
 									GridLayer targetprelayer = new GridLayer(sourceprelayer.getSize(), sourceprelayer.getColor());
+									targetprelayers.add(targetprelayer);
+								}
+								else if(tmp instanceof MEnvTiledPreLayer)
+								{
+									MEnvTiledPreLayer sourceprelayer = (MEnvTiledPreLayer)tmp;
+									TiledLayer targetprelayer = new TiledLayer(sourceprelayer.getSize(), sourceprelayer.getImagePath());
 									targetprelayers.add(targetprelayer);
 								}
 							}
