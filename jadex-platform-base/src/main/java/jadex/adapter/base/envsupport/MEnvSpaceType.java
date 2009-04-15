@@ -12,10 +12,15 @@ import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.text.html.StyleSheet;
+
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Stylesheet;
 
 /**
  *  Java representation of environemnt space type for xml description.
@@ -235,34 +240,35 @@ public class MEnvSpaceType	extends MSpaceType
 		Set types = new HashSet();
 		ExpressionProcessor exproc = new ExpressionProcessor();
 		
-		ITypeConverter conv = new ClassConverter();
+		ITypeConverter typeconv = new ClassConverter();
+		ITypeConverter colorconv = new ColorConverter();
 		
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
 		
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
 			SUtil.createHashMap(new String[]{"type"}, new String[]{"typeName"}), null, null));
 
 		types.add(new TypeInfo("agentactiontype", MEnvAgentActionType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
 		
 		types.add(new TypeInfo("spaceactiontype", MEnvSpaceActionType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
 		
 		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}), 
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
 		
 		types.add(new TypeInfo("perceptgeneratortype", MEnvPerceptGeneratorType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
 
 		types.add(new TypeInfo("view", MEnvView.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
 
 		types.add(new TypeInfo("theme", MEnvTheme.class));
 
@@ -273,7 +279,10 @@ public class MEnvSpaceType	extends MSpaceType
 		types.add(new TypeInfo("texturedrectangle", MEnvTexturedRectangle.class, null, null,
 			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}),
 			null, null));
-		
+
+		types.add(new TypeInfo("gridprelayer", MEnvGridPreLayer.class, null, null,null,
+			SUtil.createHashMap(new String[]{"color"}, new ITypeConverter[]{colorconv}), null));
+
 		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, null, exproc));
 
 		types.add(new TypeInfo("object", MEnvObject.class));
@@ -289,6 +298,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		linkinfos.add(new LinkInfo("spaceexecutor", "spaceExecutor"));
 		linkinfos.add(new LinkInfo("texturedrectangle", "part"));
+		linkinfos.add(new LinkInfo("gridprelayer", "preLayer"));
 		
 		return linkinfos;
 	}
@@ -337,6 +347,24 @@ public class MEnvSpaceType	extends MSpaceType
 			if(ret==null)
 				throw new RuntimeException("Could not parse class: "+val);
 			return ret;
+		}
+	}
+	
+	/**
+	 *  Parse class names.
+	 */
+	static class ColorConverter	implements ITypeConverter
+	{
+		protected StyleSheet ss = new StyleSheet();
+		
+		/**
+		 *  Convert a string value to a type.
+		 *  @param val The string value to convert.
+		 */
+		public Object convertObject(String val, Object root, ClassLoader classloader)
+		{
+			// Cannot use CSS.stringToColor() because they haven't made it public :-(
+			return ss.stringToColor(val);
 		}
 	}
 }

@@ -5,6 +5,7 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
+import jadex.commons.SUtil;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -261,7 +262,8 @@ public class ViewportJOGL extends AbstractViewport
 		BufferedImage tmpImage = null;
 		try
 		{
-			tmpImage = ImageIO.read(cl.getResource(path));
+			tmpImage = ImageIO.read(SUtil.getResource(path, cl));
+//			tmpImage = ImageIO.read(cl.getResource(path));
 			AffineTransform tf = AffineTransform.getScaleInstance(1, -1);
 			tf.translate(0, -tmpImage.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tf,

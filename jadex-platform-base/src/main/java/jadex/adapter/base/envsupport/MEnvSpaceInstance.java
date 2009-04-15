@@ -21,6 +21,7 @@ import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
@@ -177,10 +178,79 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		// Create the observers.
-		// Hack!
+		// Hack! Is configuation the presentation?
 		Configuration cfg = new Configuration();
-		Map theme = new HashMap();
+		cfg.setInvertYAxis(true);
+		cfg.setObjectShift(new Vector2Double(0.5));
+		
+		List sourceviews = spacetype.getMEnvViews();
+		if(sourceviews!=null)
+		{
+			for(int i=0; i<sourceviews.size(); i++)
+			{				
+				MEnvView sourceview = (MEnvView)sourceviews.get(i);
+				
+				List sourcethemes = sourceview.getMEnvThemes();
+				if(sourcethemes!=null)
+				{
+					for(int j=0; j<sourcethemes.size(); j++)
+					{
+						MEnvTheme sourcetheme = (MEnvTheme)sourcethemes.get(j);
+						Map targettheme = new HashMap();
+						cfg.setTheme(sourcetheme.getName(), targettheme);
+						
+						List drawables = sourcetheme.getMEnvDrawables();
+						if(drawables!=null)
+						{
+							for(int k=0; k<drawables.size(); k++)
+							{
+								MEnvDrawable sourcedrawable = (MEnvDrawable)drawables.get(k);
+								DrawableCombiner targetdrawable = new DrawableCombiner(sourcedrawable.getSize());
+								targettheme.put(sourcedrawable.getObjectType(), targetdrawable);
+								
+								List parts = sourcedrawable.getParts();
+								if(parts!=null)
+								{
+									for(int l=0; l<parts.size(); l++)
+									{
+										MEnvTexturedRectangle sourcepart = (MEnvTexturedRectangle)parts.get(l);
+										TexturedRectangle targetpart = new TexturedRectangle(sourcepart.getSize(), sourcepart.getShift(), sourcepart.isRotating(), sourcepart.getImagePath());
+										targetdrawable.addDrawable(targetpart);
+									}
+								}
+							}
+						}
+						
+						List prelayers = sourcetheme.getPreLayers();
+						if(prelayers!=null)
+						{
+							List targetprelayers = new ArrayList();
+							targettheme.put("prelayers", targetprelayers);
+							for(int k=0; k<prelayers.size(); k++)
+							{
+								Object tmp = prelayers.get(k);
+								if(tmp instanceof MEnvGridPreLayer)
+								{
+									MEnvGridPreLayer sourceprelayer = (MEnvGridPreLayer)tmp;
+									GridLayer targetprelayer = new GridLayer(sourceprelayer.getSize(), sourceprelayer.getColor());
+									targetprelayers.add(targetprelayer);
+								}
+							}
+						}
+					}
+				}
+				
+				IView targetview = (IView)sourceview.getClazz().newInstance();
+				targetview.setSpace(ret);
+				ret.addView(sourceview.getName(), targetview);
+			}
+
+			ObserverCenter oc = new ObserverCenter(ret, cfg, (ILibraryService)app.getPlatform().getService(ILibraryService.class));
+		}
+
+
+		
+		/*Map theme = new HashMap();
 		
 		DrawableCombiner combiner = new DrawableCombiner();
 		combiner.addDrawable(new RegularPolygon(new Vector2Double(2.0), new Vector2Double(0.0), false, new Color(1.0f, 1.0f, 0.0f, 0.5f), 24), -1);
@@ -208,7 +278,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		cfg.setObjectShift(new Vector2Double(0.5));
 		
 		ObserverCenter oc = new ObserverCenter(ret, cfg, (ILibraryService)app.getPlatform().getService(ILibraryService.class));
-		ret.addView(GeneralView2D.class.getName(), new GeneralView2D((Space2D)ret));
+		ret.addView(GeneralView2D.class.getName(), new GeneralView2D((Space2D)ret));*/
 		
 		
 		// Create (and start) the environment executor.

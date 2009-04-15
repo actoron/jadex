@@ -26,12 +26,19 @@ public class GeneralView2D implements IView
 	/**
 	 * Creates a general 2D view that presents all Objects in a Space2D to the observer.
 	 */
-	public GeneralView2D(Space2D space)
+	public GeneralView2D()
 	{
-		this.space = space;
 		monitor = new Object();
 		objects = new Object[0];
 		dirty = false;
+	}
+	
+	/**
+	 * 
+	 */
+	public void setSpace(IEnvironmentSpace space)
+	{
+		this.space = (Space2D)space;
 	}
 	
 	/**

@@ -17,8 +17,7 @@ public class MEnvTheme
 	protected List drawables;
 	
 	/** The prelayers. */
-	// todo?
-//	protected List prelayers;
+	protected List prelayers;
 	
 	//-------- methods --------
 
@@ -58,5 +57,25 @@ public class MEnvTheme
 	public List getMEnvDrawables()
 	{
 		return drawables;
+	}
+	
+	/**
+	 *  Add a prelayer.
+	 *  @param theme The prelayer.
+	 */
+	public void addPreLayer(Object prelayer)
+	{
+		if(prelayers==null)
+			prelayers = new ArrayList();
+		prelayers.add(prelayer);	
+	}
+	
+	/**
+	 *  Get the prelayers.
+	 *  @return The prelayers.
+	 */
+	public List getPreLayers()
+	{
+		return prelayers;
 	}
 }

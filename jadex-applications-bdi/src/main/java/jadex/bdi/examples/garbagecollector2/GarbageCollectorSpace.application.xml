@@ -42,21 +42,21 @@
 			<!-- views and presentations -->
 			<env:view name="view_all" class="GeneralView2D">
 				<env:theme name="abstract">
-					<env:drawable objecttype="collector" size="0.8">
-						<env:texturedrectangle size="0.8" shift="0" rotating="false" imagepath="images/collector.png" />
+					<env:drawable objecttype="collector">
+						<env:texturedrectangle width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
 					</env:drawable>
 					<env:drawable objecttype="burner">
-						<env:texturedrectangle size="0.8" shift="0" rotating="false" imagepath="images/burner.png" />
+						<env:texturedrectangle width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
 					</env:drawable>
 					<env:drawable objecttype="garbage">
-						<env:texturedrectangle size="0.5" shift="0" rotating="false" imagepath="images/garbage.png" />
+						<env:texturedrectangle width="0.7" height="0.7" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
 					</env:drawable>
-					<!-- <env:prelayer>new GridLayer(new Vector2Double(1.0), Color.WHITE)</env:prelayer> -->
+					<env:gridprelayer width="1.0" height="1.0" color="#FFFFFF" />
 				</env:theme>
 			</env:view>
 			
 			<!-- executor -->
-			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(1000))</env:spaceexecutor>
+			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
 	

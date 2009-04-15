@@ -1,5 +1,8 @@
 package jadex.adapter.base.envsupport;
 
+import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Double;
+
 
 /**
  * 
@@ -8,11 +11,17 @@ public class MEnvTexturedRectangle
 {
 	//-------- attributes --------
 
-	/** The shift. */
-	protected double shift;
+	/** The shift x. */
+	protected double shiftx;
 	
-	/** The size. */
-	protected double size;
+	/** The shift x. */
+	protected double shifty;
+	
+	/** The width. */
+	protected double width;
+	
+	/** The height. */
+	protected double height;
 	
 	/** The flag for rotating. */
 	protected boolean rotating;
@@ -23,43 +32,78 @@ public class MEnvTexturedRectangle
 	//-------- methods --------
 
 	/**
-	 *  Get the size.
-	 *  @return The size.
+	 *  Get the width.
+	 *  @return The width.
 	 */
-	public double getSize()
+	public double getWidth()
 	{
-		return this.size;
+		return this.width;
+	}
+
+	/**
+	 *  Set the width.
+	 *  @param width The width to set.
+	 */
+	public void setWidth(double width)
+	{
+		this.width = width;
 	}
 	
 	/**
-	 *  Set the size.
-	 *  @param size The size to set.
+	 *  Get the height.
+	 *  @return The height.
 	 */
-	public void setSize(double size)
+	public double getHeight()
 	{
-		this.size = size;
+		return this.height;
 	}
+
+	/**
+	 *  Set the height.
+	 *  @param height The height to set.
+	 */
+	public void setHeight(double height)
+	{
+		this.height = height;
+	}
+
 
 	/**
 	 * @return the shift
 	 */
-	public double getShift()
+	public double getShiftX()
 	{
-		return this.shift;
+		return this.shiftx;
 	}
 
 	/**
 	 * @param shift the shift to set
 	 */
-	public void setShift(double shift)
+	public void setShiftX(double shiftx)
 	{
-		this.shift = shift;
+		this.shiftx = shiftx;
+	}
+	
+	/**
+	 * @return the shift
+	 */
+	public double getShiftY()
+	{
+		return this.shiftx;
+	}
+
+	/**
+	 * @param shift the shift to set
+	 */
+	public void setShiftY(double shiftx)
+	{
+		this.shiftx = shiftx;
 	}
 
 	/**
 	 * @return the rotating
 	 */
-	public boolean getRotating()
+	public boolean isRotating()
 	{
 		return this.rotating;
 	}
@@ -86,5 +130,21 @@ public class MEnvTexturedRectangle
 	public void setImagePath(String imagepath)
 	{
 		this.imagepath = imagepath;
+	}
+	
+	/**
+	 * 
+	 */
+	public IVector2 getShift()
+	{
+		return shiftx==0 && shifty==0? Vector2Double.ZERO: new Vector2Double(shiftx, shifty);
+	}
+	
+	/**
+	 * 
+	 */
+	public IVector2 getSize()
+	{
+		return width==0 && height==0? Vector2Double.ZERO: new Vector2Double(width, height);
 	}
 }

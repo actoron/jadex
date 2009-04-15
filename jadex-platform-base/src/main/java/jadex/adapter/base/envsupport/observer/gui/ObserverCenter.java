@@ -346,58 +346,66 @@ public class ObserverCenter
 				viewport.setPreLayers(preLayers);
 				viewport.setPostLayers(postLayers);
 				
-				Object[] objects = space.getView(GeneralView2D.class.getName()).getObjects();
-				List objectList = null;
-				objectList = new ArrayList(objects.length + 1);
-				for (int i = 0; i < objects.length; ++i )
+				List viewnames = space.getViewNames();
+				if(viewnames!=null)
 				{
-					ISpaceObject obj = (ISpaceObject) objects[i];
-					DrawableCombiner d = (DrawableCombiner) theme.get(obj.getType());
-					IVector2 position = (IVector2) obj.getProperty("position");
-					if (position == null)
+					for(int i=0; i<viewnames.size(); i++)
 					{
-						continue;
+						Object[] objects = space.getView((String)viewnames.get(i)).getObjects();
+						
+						List objectList = null;
+						objectList = new ArrayList(objects.length + 1);
+						for (int j = 0; j < objects.length; ++j )
+						{
+							ISpaceObject obj = (ISpaceObject) objects[j];
+							DrawableCombiner d = (DrawableCombiner) theme.get(obj.getType());
+							IVector2 position = (IVector2) obj.getProperty("position");
+							if (position == null)
+							{
+								continue;
+							}
+							Object[] viewObj = new Object[3];
+							viewObj[0] = position.copy();
+							IVector2 vel = ((IVector2) obj.getProperty("velocity"));
+							if (vel != null)
+							{
+								viewObj[1] = vel.copy();
+							}
+							viewObj[2] = d;
+							objectList.add(viewObj);
+						}
+						
+						ISpaceObject mObj = null;
+						if (markedObject != null)
+						{
+							mObj = (ISpaceObject) space.getSpaceObject(markedObject);
+						}
+						if (mObj != null)
+						{
+							IVector2 size = ((DrawableCombiner) theme.get(mObj.getType())).getSize();
+							size.multiply(2.0);
+							Object[] viewObj = new Object[3];
+							DrawableCombiner marker = (DrawableCombiner) theme.get("marker");
+							marker.setDrawableSizes(size);
+							viewObj[0] = mObj.getProperty("position");
+							viewObj[2] = marker;
+							objectList.add(viewObj);
+						}
+						else
+						{
+							markedObject = null;
+						}
+						
+						Comparator drawOrder = config.getDisplayOrder();
+						if (drawOrder != null)
+						{
+							Collections.sort(objectList, drawOrder);
+						}
+						
+						viewport.setObjectList(objectList);
+						viewport.refresh();
 					}
-					Object[] viewObj = new Object[3];
-					viewObj[0] = position.copy();
-					IVector2 vel = ((IVector2) obj.getProperty("velocity"));
-					if (vel != null)
-					{
-						viewObj[1] = vel.copy();
-					}
-					viewObj[2] = d;
-					objectList.add(viewObj);
 				}
-				
-				ISpaceObject mObj = null;
-				if (markedObject != null)
-				{
-					mObj = (ISpaceObject) space.getSpaceObject(markedObject);
-				}
-				if (mObj != null)
-				{
-					IVector2 size = ((DrawableCombiner) theme.get(mObj.getType())).getSize();
-					size.multiply(2.0);
-					Object[] viewObj = new Object[3];
-					DrawableCombiner marker = (DrawableCombiner) theme.get("marker");
-					marker.setDrawableSizes(size);
-					viewObj[0] = mObj.getProperty("position");
-					viewObj[2] = marker;
-					objectList.add(viewObj);
-				}
-				else
-				{
-					markedObject = null;
-				}
-				
-				Comparator drawOrder = config.getDisplayOrder();
-				if (drawOrder != null)
-				{
-					Collections.sort(objectList, drawOrder);
-				}
-				
-				viewport.setObjectList(objectList);
-				viewport.refresh();
 			}
 		});
 	}

@@ -64,9 +64,9 @@ public class CreateWasteProcess implements ISpaceProcess
 		
 		delta.add(deltat);
 		
-		if(delta.getAsDouble()>1)
+		if(delta.getAsDouble()>2)
 		{
-			delta.subtract(new Vector1Double(1));
+			delta.subtract(new Vector1Double(2));
 		
 			IVector2 pos = grid.getRandomPosition(Vector2Int.ZERO);
 			if(pos!=null)

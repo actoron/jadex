@@ -3,47 +3,27 @@ package jadex.adapter.base.envsupport;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 
  */
-public class MEnvDrawable
+public class MEnvGridPreLayer
 {
 	//-------- attributes --------
 
-	/** The objecttype. */
-	protected String objecttype;
-	
 	/** The width. */
 	protected double width;
 	
 	/** The height. */
 	protected double height;
 	
-	/** The contained parts. */
-	protected List parts;
+	/** The color. */
+	protected Color color;
 
 	//-------- methods --------
-
-	/**
-	 *  Get the objecttype.
-	 *  @return The objecttype.
-	 */
-	public String getObjectType()
-	{
-		return this.objecttype;
-	}
-
-	/**
-	 *  Set the objecttype.
-	 *  @param objecttype The objecttype to set.
-	 */
-	public void setObjectType(String objecttype)
-	{
-		this.objecttype = objecttype;
-	}
 	
 	/**
 	 *  Get the width.
@@ -82,25 +62,21 @@ public class MEnvDrawable
 	}
 	
 	/**
-	 *  Add a part.
-	 *  @param part The part.
+	 * @return the color
 	 */
-	public void addPart(MEnvTexturedRectangle part)
+	public Color getColor()
 	{
-		if(parts==null)
-			parts = new ArrayList();
-		parts.add(part);	
+		return color;
 	}
-	
+
 	/**
-	 *  Get the parts.
-	 *  @return The parts.
+	 * @param color the color to set
 	 */
-	public List getParts()
+	public void setColor(Color color)
 	{
-		return parts;
+		this.color = color;
 	}
-	
+
 	/**
 	 * 
 	 */

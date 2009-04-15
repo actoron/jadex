@@ -14,6 +14,11 @@ public interface IView
 	public static final String SIMPLE_VIEW_2D = "Simple 2D View";
 	
 	/**
+	 * 
+	 */
+	public void setSpace(IEnvironmentSpace space);
+	
+	/**
 	 * Returns the type of the view.
 	 * @return type of the view
 	 */

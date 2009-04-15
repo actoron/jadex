@@ -485,7 +485,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	{
 		synchronized (monitor)
 		{
-			return new ArrayList(views.values());
+			return new ArrayList(views.keySet());
 		}
 	}
 	
