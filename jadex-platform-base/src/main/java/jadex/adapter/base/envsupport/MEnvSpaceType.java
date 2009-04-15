@@ -259,6 +259,20 @@ public class MEnvSpaceType	extends MSpaceType
 		types.add(new TypeInfo("perceptgeneratortype", MEnvPerceptGeneratorType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
 			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+
+		types.add(new TypeInfo("view", MEnvView.class, null, null,
+			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
+			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{conv}), null));
+
+		types.add(new TypeInfo("theme", MEnvTheme.class));
+
+		types.add(new TypeInfo("drawable", MEnvDrawable.class, null, null,
+			SUtil.createHashMap(new String[]{"objecttype"}, new String[]{"objectType"}),
+			null, null));
+
+		types.add(new TypeInfo("texturedrectangle", MEnvTexturedRectangle.class, null, null,
+			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}),
+			null, null));
 		
 		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, null, exproc));
 
@@ -274,6 +288,7 @@ public class MEnvSpaceType	extends MSpaceType
 		Set linkinfos = new HashSet();
 		
 		linkinfos.add(new LinkInfo("spaceexecutor", "spaceExecutor"));
+		linkinfos.add(new LinkInfo("texturedrectangle", "part"));
 		
 		return linkinfos;
 	}
