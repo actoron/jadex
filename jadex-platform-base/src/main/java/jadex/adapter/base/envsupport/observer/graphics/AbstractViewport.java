@@ -51,7 +51,7 @@ public abstract class AbstractViewport implements IViewport
 	protected IVector2			size_;
 
 	/** Real size of the viewport including padding. */
-	protected IVector2			paddedSize_;
+	public IVector2			paddedSize_;
 
 	/** Known drawable Objects. */
 	protected Set				drawObjects_;
@@ -164,16 +164,24 @@ public abstract class AbstractViewport implements IViewport
 			if(sizeAR > windowAR)
 			{
 				width = size.getXAsDouble();
-				height = size.getYAsDouble() * sizeAR / windowAR;
+				//height = size.getYAsDouble() * sizeAR / windowAR;
+				height = size.getXAsDouble() / windowAR;
 			}
 			else
 			{
-				width = size.getXAsDouble() / sizeAR * windowAR;
+				//width = size.getXAsDouble() / sizeAR * windowAR;
+				width = size.getYAsDouble() * windowAR;
 				height = size.getYAsDouble();
 			}
-
+			
+			double xFac = canvas_.getWidth() / width;
+			double yFac = canvas_.getHeight() / height;
 			posX_ = (float)-((width - size.getXAsDouble()) / 2.0);
 			posY_ = (float)-((height - size.getYAsDouble()) / 2.0);
+			/*System.out.print("posX:");
+			System.out.println(posX_ * xFac);
+			posX_ = (float)(((int)(posX_ * xFac)) / xFac);
+			posY_ = (float)(((int)(posY_ * yFac)) / yFac);*/
 		}
 		else
 		{

@@ -122,14 +122,14 @@ public class GridLayer implements ILayer
 		gl.glColor4fv(oglColor_, 0);
 
 		gl.glBegin(gl.GL_LINES);
-		for(float x = 0.0f; x <= areaSize.getXAsFloat(); x = x
+		for(float x = 0.0f; !(x > areaSize.getXAsFloat()); x = x
 				+ gridSize_.getXAsFloat())
 		{
 			gl.glVertex2f(x, 0.0f);
 			gl.glVertex2f(x, areaSize.getYAsFloat());
 		}
 
-		for(float y = 0.0f; y <= areaSize.getYAsFloat(); y = y
+		for(float y = 0.0f; !(y > areaSize.getYAsFloat()); y = y
 				+ gridSize_.getYAsFloat())
 		{
 			gl.glVertex2f(0.0f, y);

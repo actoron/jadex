@@ -240,8 +240,9 @@ public class ViewportJOGL extends AbstractViewport
 		double yFac = canvas_.getHeight() / paddedSize_.getYAsDouble();
 		int x = (int)(-posX_ * xFac);
 		int y = (int)(-posY_ * yFac);
-		int w = 1 + (int)Math.ceil(size_.getXAsDouble() * xFac);
-		int h = 1 + (int)Math.ceil(size_.getYAsDouble() * yFac);
+		//TODO: this is likely to be wrong
+		int w = (int)Math.round(size_.getXAsDouble() * xFac) + 2;
+		int h = (int)Math.round(size_.getYAsDouble() * yFac) + 2;
 		gl.glScissor(x, y, w, h);
 	}
 
