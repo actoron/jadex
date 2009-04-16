@@ -43,15 +43,15 @@
 			<env:view name="view_all" class="GeneralView2D">
 				<env:theme name="abstract">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
-						<env:texturedrectangle width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
+						<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
 					</env:drawable>
 					<env:drawable objecttype="burner" width="1.0" height="1.0">
-						<env:texturedrectangle width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
+						<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
 					</env:drawable>
 					<env:drawable objecttype="garbage" width="0.7" height="0.7">
 						<env:texturedrectangle width="0.7" height="0.7" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
 					</env:drawable>
-					<!-- <env:tiledprelayer width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" /> -->
+					<env:tiledprelayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
 					<env:gridprelayer width="1.0" height="1.0" color="#FFFFFF" />
 				</env:theme>
 			</env:view>
@@ -75,6 +75,22 @@
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
 				<env:object type="collector" owner="Collector1">
+				</env:object>
+				<env:object type="burner" owner="Burner1">
+				</env:object>
+			</env:envspace>
+		</application>
+		<application name="One Burner / Two Collectors">
+			<agents>
+				<agent name="Collector2" type="Collector"/>
+				<agent name="Collector1" type="Collector"/>
+				<agent name="Burner1" type="Burner"/>
+			</agents>
+			
+			<env:envspace name="mygc2dspace" type="gc2dspace">
+				<env:object type="collector" owner="Collector1">
+				</env:object>
+				<env:object type="collector" owner="Collector2">
 				</env:object>
 				<env:object type="burner" owner="Burner1">
 				</env:object>
