@@ -136,9 +136,9 @@ public class Reader
 						if(!ignoredattrs.contains(attrname))
 						{
 							Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
-							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
-							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
-							handler.handleAttributeValue(object, attrname, attrpath, val, attrinfo, context, classloader);
+//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
+//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
+							handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context, classloader, root);
 						}
 					}
 				}
@@ -149,7 +149,7 @@ public class Reader
 					Object commentinfo = typeinfo.getCommentInfo();
 					if(commentinfo!=null)
 					{
-						handler.handleAttributeValue(object, null, null, comment, commentinfo, context, classloader);
+						handler.handleAttributeValue(object, null, null, comment, commentinfo, context, classloader, root);
 					}
 				}
 				
@@ -179,7 +179,7 @@ public class Reader
 					{
 						if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
 						{
-							handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), context, classloader);
+							handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), context, classloader, root);
 						}
 						else
 						{
@@ -203,7 +203,7 @@ public class Reader
 						}
 						
 						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack));
-						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader);
+						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader, root);
 					}
 				}
 				

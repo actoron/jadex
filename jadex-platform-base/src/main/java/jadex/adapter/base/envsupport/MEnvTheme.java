@@ -18,6 +18,9 @@ public class MEnvTheme
 	
 	/** The prelayers. */
 	protected List prelayers;
+
+	/** The postlayers. */
+	protected List postlayers;
 	
 	//-------- methods --------
 
@@ -77,5 +80,25 @@ public class MEnvTheme
 	public List getPreLayers()
 	{
 		return prelayers;
+	}
+	
+	/**
+	 *  Add a postlayer.
+	 *  @param theme The postlayer.
+	 */
+	public void addPostLayer(Object postlayer)
+	{
+		if(postlayers==null)
+			postlayers = new ArrayList();
+		postlayers.add(postlayer);	
+	}
+	
+	/**
+	 *  Get the postlayers.
+	 *  @return The postlayers.
+	 */
+	public List getPostLayers()
+	{
+		return postlayers;
 	}
 }

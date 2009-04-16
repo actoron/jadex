@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Basic IPropertyObject implementation.
  */
-public abstract class SimplePropertyObject implements IPropertyObject
+public class SimplePropertyObject implements IPropertyObject
 {
 	//-------- attributes --------
 	

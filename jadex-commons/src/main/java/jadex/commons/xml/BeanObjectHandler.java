@@ -40,38 +40,122 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, List attrpath, Object attrval, 
-		Object attrinfo, Object context, ClassLoader classloader) throws Exception
+	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, 
+		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
 	{
-		String mname = attrinfo!=null? "set"+((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
-			: "set"+attrname.substring(0,1).toUpperCase()+attrname.substring(1);
-		
-		Method[] ms = SReflect.getMethods(object.getClass(), mname);
 		boolean set = false;
-		for(int j=0; j<ms.length && !set; j++)
+		
+		if(attrinfo instanceof BeanAttributeInfo)
 		{
-			Class[] ps = ms[j].getParameterTypes();
-			if(ps.length==1)
-			{
-				Object arg;
-				if(attrval instanceof String && !String.class.isAssignableFrom(ps[0]))
-					arg = BasicTypeConverter.convertType(ps[0], (String)attrval);
-				else
-					arg = attrval;
+			BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
+			
+			if(bai.getMapName()!=null)
+			{	
+				// Write to a map.
+				String mapname = bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
+			
+				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName(): attrname;
 				
-				try
+				Method[] ms = SReflect.getMethods(object.getClass(), "put"+mapname);
+				for(int i=0; i<2 && !set; i++)
 				{
-					ms[j].invoke(object, new Object[]{arg});
-					set = true;
+					for(int j=0; j<ms.length && !set; j++)
+					{
+						Class[] ps = ms[j].getParameterTypes();
+						if(ps.length==2)
+						{
+							Object arg = convertAttributeValue(attrval, ps[1], bai.getConverter(), root, classloader);
+							
+							try
+							{
+								ms[j].invoke(object, new Object[]{jattrname, arg});
+								set = true;
+							}
+							catch(Exception e)
+							{
+							}
+						}
+					}
+					ms = SReflect.getMethods(object.getClass(), "set"+mapname);
 				}
-				catch(Exception e)
+			}
+			else
+			{
+				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName().substring(0,1).toUpperCase()+bai.getAttributeName().substring(1)
+					: attrname.substring(0,1).toUpperCase()+attrname.substring(1);
+				
+				Method[] ms = SReflect.getMethods(object.getClass(), "set"+jattrname);
+				
+				for(int j=0; j<ms.length && !set; j++)
 				{
+					Class[] ps = ms[j].getParameterTypes();
+					if(ps.length==1)
+					{
+						Object arg = convertAttributeValue(attrval, ps[0], bai.getConverter(), root, classloader);
+						
+						try
+						{
+							ms[j].invoke(object, new Object[]{arg});
+							set = true;
+						}
+						catch(Exception e)
+						{
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			// Write as normal bean attribute.
+						
+			String jattrname = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
+				: attrname.substring(0,1).toUpperCase()+attrname.substring(1);
+			
+			Method[] ms = SReflect.getMethods(object.getClass(), "set"+jattrname);
+			
+			for(int j=0; j<ms.length && !set; j++)
+			{
+				Class[] ps = ms[j].getParameterTypes();
+				if(ps.length==1)
+				{
+					Object arg = convertAttributeValue(attrval, ps[0], null, root, classloader);
+					
+					try
+					{
+						ms[j].invoke(object, new Object[]{arg});
+						set = true;
+					}
+					catch(Exception e)
+					{
+					}
 				}
 			}
 		}
 		
 		if(!set)
 			throw new RuntimeException("Failure in setting attribute: "+attrname+" on object: "+object);
+	}
+	
+	/**
+	 * 
+	 */
+	protected Object convertAttributeValue(String attrval, Class targetclass, ITypeConverter converter, Object root, ClassLoader classloader)
+	{
+		Object ret = attrval;
+
+		if(converter!=null)
+		{
+			ret = converter.convertObject(attrval, root, classloader);
+		}
+		else if(!String.class.isAssignableFrom(targetclass))
+		{
+			ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
+			if(conv!=null)
+				ret = conv.convertObject(attrval, root, classloader);
+		}
+	
+		return ret;
 	}
 	
 	/**
@@ -83,7 +167,7 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, 
-		String tagname, Object context, ClassLoader classloader) throws Exception
+		String tagname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		// Add object to its parent.
 		boolean	linked	= false;
@@ -93,11 +177,11 @@ public class BeanObjectHandler implements IObjectHandler
 		if(linkinfo!=null)
 		{
 			String setm = "set"+((String)linkinfo).substring(0,1).toUpperCase()+((String)linkinfo).substring(1);
-			linked = internalLinkObjects(object.getClass(), setm, object, parent);
+			linked = internalLinkObjects(object.getClass(), setm, object, parent, root, classloader);
 			if(!linked)
 			{
 				String addm = "add"+((String)linkinfo).substring(0,1).toUpperCase()+((String)linkinfo).substring(1);
-				linked = internalLinkObjects(object.getClass(), addm, object, parent);
+				linked = internalLinkObjects(object.getClass(), addm, object, parent, root, classloader);
 			}
 			if(!linked)
 				throw new RuntimeException("Failure in link info: "+linkinfo);
@@ -110,17 +194,17 @@ public class BeanObjectHandler implements IObjectHandler
 			if(!BasicTypeConverter.isBuiltInType(clazz))
 			{
 				String name = SReflect.getInnerClassName(clazz);
-				linked = internalLinkObjects(clazz, "set"+name, object, parent);
+				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
 				if(!linked)
-					linked = internalLinkObjects(clazz, "add"+name, object, parent);
+					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
 			}
 			
 			if(!linked)
 			{
 				String name = tagname.substring(0, 1).toUpperCase()+tagname.substring(1);
-				linked = internalLinkObjects(clazz, "set"+name, object, parent);
+				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
 				if(!linked)
-					linked = internalLinkObjects(clazz, "add"+name, object, parent);
+					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
 			}
 			
 			if(!linked)
@@ -142,7 +226,7 @@ public class BeanObjectHandler implements IObjectHandler
 	/**
 	 * Internal link objects method.
 	 */
-	protected boolean internalLinkObjects(Class clazz, String name, Object object, Object parent) throws Exception
+	protected boolean internalLinkObjects(Class clazz, String name, Object object, Object parent, Object root, ClassLoader classloader) throws Exception
 	{
 		boolean ret = false;
 		
@@ -163,16 +247,20 @@ public class BeanObjectHandler implements IObjectHandler
 					{
 					}
 				}
-				else if(BasicTypeConverter.isBuiltInType(ps[0]) && object instanceof String)
+				else if(object instanceof String)
 				{
-					try
+					ITypeConverter converter = BasicTypeConverter.getBasicConverter(ps[0]);
+					if(converter != null)
 					{
-						object = BasicTypeConverter.convertType(ps[0], (String)object);
-						ms[i].invoke(parent, new Object[]{object});
-						ret	= true;
-					}
-					catch(Exception e)
-					{
+						try
+						{
+							object = converter.convertObject((String)object, root, classloader);
+							ms[i].invoke(parent, new Object[]{object});
+							ret	= true;
+						}
+						catch(Exception e)
+						{
+						}
 					}
 				}
 			}

@@ -48,7 +48,7 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, List attrpath, Object attrval, Object attrinfo, Object context, ClassLoader classloader) throws Exception
+	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
 
@@ -88,7 +88,8 @@ public class OAVObjectHandler implements IObjectHandler
 		{
 			Object arg = attrtype.getType() instanceof OAVJavaType 
 				&& BasicTypeConverter.isBuiltInType(((OAVJavaType)attrtype.getType()).getClazz())?
-				BasicTypeConverter.convertType(((OAVJavaType)attrtype.getType()).getClazz(), (String)attrval): attrval;
+				BasicTypeConverter.getBasicConverter((((OAVJavaType)attrtype.getType()).getClazz())).convertObject(attrval, root, classloader):
+					attrval;
 	
 			if(attrtype.getMultiplicity().equals(OAVAttributeType.NONE))
 			{
@@ -113,7 +114,7 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object elem, Object parent, Object linkinfo, String tagname, Object context, ClassLoader classloader) throws Exception
+	public void linkObject(Object elem, Object parent, Object linkinfo, String tagname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
 		

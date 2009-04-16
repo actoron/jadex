@@ -31,6 +31,7 @@ import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
+import jadex.commons.SimplePropertyObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
@@ -230,20 +231,26 @@ public class MEnvSpaceInstance extends MSpaceInstance
 							for(int k=0; k<prelayers.size(); k++)
 							{
 								Object tmp = prelayers.get(k);
-								if(tmp instanceof MEnvGridPreLayer)
+								if(tmp instanceof MEnvGridLayer)
 								{
-									MEnvGridPreLayer sourceprelayer = (MEnvGridPreLayer)tmp;
+									MEnvGridLayer sourceprelayer = (MEnvGridLayer)tmp;
 									GridLayer targetprelayer = new GridLayer(sourceprelayer.getSize(), sourceprelayer.getColor());
 									targetprelayers.add(targetprelayer);
 								}
-								else if(tmp instanceof MEnvTiledPreLayer)
+								else if(tmp instanceof MEnvTiledLayer)
 								{
-									MEnvTiledPreLayer sourceprelayer = (MEnvTiledPreLayer)tmp;
+									MEnvTiledLayer sourceprelayer = (MEnvTiledLayer)tmp;
 									TiledLayer targetprelayer = new TiledLayer(sourceprelayer.getSize(), sourceprelayer.getImagePath());
 									targetprelayers.add(targetprelayer);
 								}
+								else if(tmp instanceof SimplePropertyObject)
+								{
+									SimplePropertyObject sp = (SimplePropertyObject)tmp;
+								}
 							}
 						}
+						
+						// todo: postlayers
 					}
 				}
 				

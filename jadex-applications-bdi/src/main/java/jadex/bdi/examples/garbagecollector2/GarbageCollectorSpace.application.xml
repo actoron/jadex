@@ -23,38 +23,45 @@
 	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" class="Grid2D">
-			<!-- agent actions. -->
-			<env:agentactiontype name="pickup" class="PickupWasteAction" />
-			<env:agentactiontype name="drop" class="DropWasteAction" />
-			<env:agentactiontype name="burn" class="BurnWasteAction" />
-			<env:agentactiontype name="go" class="GoAction" />
-			
-			<!-- processes. -->
-			<env:processtype name="create" class="CreateWasteProcess" />
-			
-			<!-- percept generators -->
-			<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
-			
-			<!-- dimensions -->
 			<env:dimension>10</env:dimension>
 			<env:dimension>10</env:dimension>
+		
+			<env:agentactiontypes>
+				<env:agentactiontype name="pickup" class="PickupWasteAction" />
+				<env:agentactiontype name="drop" class="DropWasteAction" />
+				<env:agentactiontype name="burn" class="BurnWasteAction" />
+				<env:agentactiontype name="go" class="GoAction" />
+			</env:agentactiontypes>
 			
-			<!-- views and presentations -->
-			<env:view name="view_all" class="GeneralView2D">
-				<env:theme name="abstract">
-					<env:drawable objecttype="collector" width="1.0" height="1.0">
-						<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
-					</env:drawable>
-					<env:drawable objecttype="burner" width="1.0" height="1.0">
-						<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
-					</env:drawable>
-					<env:drawable objecttype="garbage" width="0.7" height="0.7">
-						<env:texturedrectangle width="0.7" height="0.7" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
-					</env:drawable>
-					<env:tiledprelayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
-					<env:gridprelayer width="1.0" height="1.0" color="#FFFFFF" />
-				</env:theme>
-			</env:view>
+			<env:processtypes>
+				<env:processtype name="create" class="CreateWasteProcess" />
+			</env:processtypes>
+			
+			<env:perceptgeneratortypes>
+				<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
+			</env:perceptgeneratortypes>
+			
+			<env:views>
+				<env:view name="view_all" class="GeneralView2D">
+					<env:theme name="abstract">
+						<env:drawable objecttype="collector" width="1.0" height="1.0">
+							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
+						</env:drawable>
+						<env:drawable objecttype="burner" width="1.0" height="1.0">
+							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
+						</env:drawable>
+						<env:drawable objecttype="garbage" width="0.7" height="0.7">
+							<env:texturedrectangle width="0.7" height="0.7" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
+						</env:drawable>
+						<env:prelayers>
+							<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
+							<env:gridlayer width="1.0" height="1.0" color="#FFFFFF" />
+						</env:prelayers>
+						<env:postlayers>
+						</env:postlayers>
+					</env:theme>
+				</env:view>
+			</env:views>
 			
 			<!-- executor -->
 			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>

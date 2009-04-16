@@ -65,9 +65,9 @@ public class ApplicationFactory implements IApplicationFactory
 		types.add(new TypeInfo("applicationtype", MApplicationType.class, "description", null));
 		types.add(new TypeInfo("spacetype", MSpaceType.class));
 		types.add(new TypeInfo("agenttype", MAgentType.class));
-		types.add(new TypeInfo("application", MApplicationInstance.class, null, null, attrs, null, null));
+		types.add(new TypeInfo("application", MApplicationInstance.class, null, null, attrs, null));
 		types.add(new TypeInfo("space", MSpaceInstance.class));
-		types.add(new TypeInfo("agent", MAgentInstance.class, null, null, attrs, null, null));
+		types.add(new TypeInfo("agent", MAgentInstance.class, null, null, attrs, null));
 		types.add(new TypeInfo("parameter", MArgument.class));
 		types.add(new TypeInfo("parameterset", MArgumentSet.class));
 		types.add(new TypeInfo("value", String.class));

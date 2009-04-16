@@ -4,6 +4,9 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.SimplePropertyObject;
+import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.BeanAttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.LinkInfo;
@@ -244,50 +247,64 @@ public class MEnvSpaceType	extends MSpaceType
 		ITypeConverter colorconv = new ColorConverter();
 		
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
+			SUtil.createHashMap(new String[]{"class"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, null)}), null));
 		
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
-			SUtil.createHashMap(new String[]{"type"}, new String[]{"typeName"}), null, null));
+			SUtil.createHashMap(new String[]{"type"},
+			new BeanAttributeInfo[]{new BeanAttributeInfo("typeName")}), null));
 
 		types.add(new TypeInfo("agentactiontype", MEnvAgentActionType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
+			SUtil.createHashMap(new String[]{"class"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, null)}), null));
 		
 		types.add(new TypeInfo("spaceactiontype", MEnvSpaceActionType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
+			SUtil.createHashMap(new String[]{"class"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, null)}), null));
 		
 		types.add(new TypeInfo("processtype", MEnvProcessType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}), 
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
+			SUtil.createHashMap(new String[]{"class"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, null)}), null));
 		
 		types.add(new TypeInfo("perceptgeneratortype", MEnvPerceptGeneratorType.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
+			SUtil.createHashMap(new String[]{"class"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, null)}), null));
 
 		types.add(new TypeInfo("view", MEnvView.class, null, null,
-			SUtil.createHashMap(new String[]{"class"}, new String[]{"clazz"}),
-			SUtil.createHashMap(new String[]{"class"}, new ITypeConverter[]{typeconv}), null));
+			SUtil.createHashMap(new String[]{"class"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, null)}), null));
 
 		types.add(new TypeInfo("theme", MEnvTheme.class));
 
 		types.add(new TypeInfo("drawable", MEnvDrawable.class, null, null,
-			SUtil.createHashMap(new String[]{"objecttype"}, new String[]{"objectType"}),
-			null, null));
+			SUtil.createHashMap(new String[]{"objecttype"}, new String[]{"objectType"}), null));
 
 		types.add(new TypeInfo("texturedrectangle", MEnvTexturedRectangle.class, null, null,
-			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}),
-			null, null));
+			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}), null));
 
-		types.add(new TypeInfo("gridprelayer", MEnvGridPreLayer.class, null, null, null,
-			SUtil.createHashMap(new String[]{"color"}, new ITypeConverter[]{colorconv}), null));
+//		types.add(new TypeInfo("gridlayer", MEnvGridLayer.class, null, null,
+//			SUtil.createHashMap(new String[]{"color"}, 
+//			new BeanAttributeInfo[]{new BeanAttributeInfo(null, colorconv, null)}), null));
 
-		types.add(new TypeInfo("tiledprelayer", MEnvTiledPreLayer.class, null, null, 
-			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}),
-			null, null));
+		types.add(new TypeInfo("gridlayer", SimplePropertyObject.class, null, null,
+			SUtil.createHashMap(new String[]
+			{
+				"color",
+				"width",
+				"height",
+			}, 
+			new BeanAttributeInfo[]
+			{
+				new BeanAttributeInfo("color", colorconv, "property"),
+				new BeanAttributeInfo("width", BasicTypeConverter.DOUBLE_CONVERTER, "property"),
+				new BeanAttributeInfo("height", BasicTypeConverter.DOUBLE_CONVERTER, "property")
+			}), null));
+
 		
-		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, null, exproc));
+		types.add(new TypeInfo("tiledlayer", MEnvTiledLayer.class, null, null, 
+			SUtil.createHashMap(new String[]{"imagepath"}, new String[]{"imagePath"}), null));
+		
+		types.add(new TypeInfo("spaceexecutor", String.class, null, null, null, exproc));
 
 		types.add(new TypeInfo("object", MEnvObject.class));
 		return types;
@@ -302,8 +319,10 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		linkinfos.add(new LinkInfo("spaceexecutor", "spaceExecutor"));
 		linkinfos.add(new LinkInfo("texturedrectangle", "part"));
-		linkinfos.add(new LinkInfo("gridprelayer", "preLayer"));
-		linkinfos.add(new LinkInfo("tiledprelayer", "preLayer"));
+		linkinfos.add(new LinkInfo("prelayers/gridlayer", "preLayer"));
+		linkinfos.add(new LinkInfo("postlayers/gridlayer", "postLayer"));
+		linkinfos.add(new LinkInfo("prelayers/tiledlayer", "preLayer"));
+		linkinfos.add(new LinkInfo("postlayers/tiledlayer", "postLayer"));
 		
 		return linkinfos;
 	}

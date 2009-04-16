@@ -23,7 +23,7 @@ public class TypeInfo	extends AbstractInfo
 	protected Map attributesinfo;
 	
 	/** The attributes converters. */
-	protected Map attributesconverters;
+//	protected Map attributesconverters;
 
 	/** The post processor (if any). */
 	protected IPostProcessor postproc;
@@ -37,7 +37,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(String xmlpath, Object typeinfo)
 	{
-		this(xmlpath, typeinfo, null, null, null, null, null);
+		this(xmlpath, typeinfo, null, null, null, null);
 	}
 	
 	/**
@@ -49,7 +49,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo)
 	{
-		this(xmlpath, typeinfo, commentinfo, contentinfo, null, null, null);
+		this(xmlpath, typeinfo, commentinfo, contentinfo, null, null);
 	}
 	
 	/**
@@ -62,14 +62,14 @@ public class TypeInfo	extends AbstractInfo
 	 *  @param postproc The post processor. 
 	 */
 	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
-		Map attributesinfo, Map attributesconverters, IPostProcessor postproc)
+		Map attributesinfo, IPostProcessor postproc)
 	{
 		super(xmlpath);
 		this.typeinfo = typeinfo;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.attributesinfo = attributesinfo;
-		this.attributesconverters = attributesconverters;
+//		this.attributesconverters = attributesconverters;
 		this.postproc = postproc;
 	}
 	
@@ -88,7 +88,7 @@ public class TypeInfo	extends AbstractInfo
 	 *  Set the type info.
 	 *  @param type The type to set.
 	 */
-	public void setTypeInfo(Object type)
+	public void setTypeInfo(Object typeinfo)
 	{
 		this.typeinfo = typeinfo;
 	}
@@ -145,13 +145,13 @@ public class TypeInfo	extends AbstractInfo
 	 *  Add an attribute info.
 	 *  @param xmlname The xml attribute name.
 	 *  @param attrinfo The attribute info.
-	 */
+	 * /
 	public void addAttributeConverter(String xmlname, ITypeConverter converter)
 	{
 		if(attributesconverters==null)
 			attributesconverters = new HashMap();
 		attributesconverters.put(xmlname, converter);
-	}
+	}*/
 	
 	/**
 	 *  Get the attribute info.
@@ -167,11 +167,11 @@ public class TypeInfo	extends AbstractInfo
 	 *  Get the attribute converter.
 	 *  @param xmlname The xml name of the attribute.
 	 *  @return The attribute converter.
-	 */
+	 * /
 	public ITypeConverter getAttributeConverter(String xmlname)
 	{
 		return (ITypeConverter)(attributesconverters==null? null: attributesconverters.get(xmlname));
-	}
+	}*/
 
 	/**
 	 *  Get the post-processor.

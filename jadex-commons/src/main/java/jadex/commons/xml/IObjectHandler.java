@@ -26,8 +26,8 @@ public interface IObjectHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, List attrpath, Object attrval, 
-		Object attrinfo, Object context, ClassLoader classloader) throws Exception;
+	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, 
+		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception;
 	
 	/**
 	 *  Link an object to its parent.
@@ -38,5 +38,5 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, 
-		Object context, ClassLoader classloader) throws Exception;
+		Object context, ClassLoader classloader, Object root) throws Exception;
 }
