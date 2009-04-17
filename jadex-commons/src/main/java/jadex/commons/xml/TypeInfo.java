@@ -1,7 +1,10 @@
 package jadex.commons.xml;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Mapping from tag (or path fragment) to OAV type.
@@ -22,9 +25,6 @@ public class TypeInfo	extends AbstractInfo
 	/** The attributes info. */
 	protected Map attributesinfo;
 	
-	/** The attributes converters. */
-//	protected Map attributesconverters;
-
 	/** The post processor (if any). */
 	protected IPostProcessor postproc;
 	
@@ -69,7 +69,6 @@ public class TypeInfo	extends AbstractInfo
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.attributesinfo = attributesinfo;
-//		this.attributesconverters = attributesconverters;
 		this.postproc = postproc;
 	}
 	
@@ -142,18 +141,6 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
-	 *  Add an attribute info.
-	 *  @param xmlname The xml attribute name.
-	 *  @param attrinfo The attribute info.
-	 * /
-	public void addAttributeConverter(String xmlname, ITypeConverter converter)
-	{
-		if(attributesconverters==null)
-			attributesconverters = new HashMap();
-		attributesconverters.put(xmlname, converter);
-	}*/
-	
-	/**
 	 *  Get the attribute info.
 	 *  @param xmlname The xml name of the attribute.
 	 *  @return The attribute info.
@@ -164,15 +151,14 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
-	 *  Get the attribute converter.
-	 *  @param xmlname The xml name of the attribute.
-	 *  @return The attribute converter.
-	 * /
-	public ITypeConverter getAttributeConverter(String xmlname)
+	 *  Get the attribute names.
+	 *  @return The attribute names.
+	 */
+	public Set getAttributeNames()
 	{
-		return (ITypeConverter)(attributesconverters==null? null: attributesconverters.get(xmlname));
-	}*/
-
+		return attributesinfo==null? Collections.EMPTY_SET: new HashSet(attributesinfo.keySet());
+	}
+	
 	/**
 	 *  Get the post-processor.
 	 *  @return The post-processor
@@ -189,5 +175,5 @@ public class TypeInfo	extends AbstractInfo
 	public void setPostProcessor(IPostProcessor pproc)
 	{
 		this.postproc = pproc;
-	}	
+	}
 }

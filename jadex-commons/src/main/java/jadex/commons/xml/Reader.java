@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -128,10 +129,12 @@ public class Reader
 					}
 					
 					// Handle attributes
+					Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getAttributeNames();
 					for(int i=0; i<parser.getAttributeCount(); i++)
 					{
 						String attrname = parser.getAttributeLocalName(i);
 						String attrval = parser.getAttributeValue(i);
+						attrs.remove(attrname);
 						
 						if(!ignoredattrs.contains(attrname))
 						{
@@ -140,6 +143,15 @@ public class Reader
 //							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
 							handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context, classloader, root);
 						}
+					}
+					// Handle unset attributes (possibly have default value).
+					for(Iterator it=attrs.iterator(); it.hasNext(); )
+					{
+						String attrname = (String)it.next();
+						Object attrinfo = typeinfo.getAttributeInfo(attrname);
+						
+						// Hack. want to read attribute info here
+						handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, context, classloader, root);
 					}
 				}
 				
@@ -190,7 +202,8 @@ public class Reader
 					// Handle post-processing
 					if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
 					{
-						topse.object = typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
+//						topse.object = 
+						typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
 					}
 
 					// Handle linking

@@ -43,32 +43,83 @@ public class BeanObjectHandler implements IObjectHandler
 	public void handleAttributeValue(Object object, String xmlattrname, List attrpath, String attrval, 
 		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
 	{
-		setAttributeValue(attrinfo, xmlattrname, object, attrval, root, classloader);
+		// Hack!
+		if(attrval!=null)
+			setAttributeValue(attrinfo, xmlattrname, object, attrval, root, classloader);
+		else if(attrinfo instanceof BeanAttributeInfo && ((BeanAttributeInfo)attrinfo).getDefaultValue()!=null)
+			setAttributeValue(attrinfo, xmlattrname, object, ((BeanAttributeInfo)attrinfo).getDefaultValue(), root, classloader);
 	}
-	
+		
 	/**
-	 * 
+	 *  Link an object to its parent.
+	 *  @param object The object.
+	 *  @param parent The parent object.
+	 *  @param linkinfo The link info.
+	 *  @param tagname The current tagname (for name guessing).
+	 *  @param context The context.
 	 */
-	protected Object convertAttributeValue(Object attrval, Class targetclass, ITypeConverter converter, Object root, ClassLoader classloader)
+	public void linkObject(Object object, Object parent, Object linkinfo, 
+		String tagname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
-		Object ret = attrval;
-
-		if(converter!=null)
+		// Add object to its parent.
+		boolean	linked	= false;
+		List classes	= new LinkedList();
+		classes.add(object.getClass());
+		
+		if(linkinfo!=null)
 		{
-			ret = converter.convertObject(attrval, root, classloader);
+			setAttributeValue(linkinfo, tagname, parent, object, root, classloader);
+			linked = true;
 		}
-		else if(!String.class.isAssignableFrom(targetclass))
+		
+		// Try name guessing via class/superclass/interface names of object to add
+		while(!linked && !classes.isEmpty())
 		{
-			ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
-			if(conv!=null)
-				ret = conv.convertObject(attrval, root, classloader);
+			Class clazz = (Class)classes.remove(0);
+			
+			if(!BasicTypeConverter.isBuiltInType(clazz))
+			{
+				String name = SReflect.getInnerClassName(clazz);
+				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
+				if(!linked)
+					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
+			}
+			
+			if(!linked)
+			{
+				String name = tagname.substring(0, 1).toUpperCase()+tagname.substring(1);
+				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
+				if(!linked)
+					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
+			}
+			
+			if(!linked)
+			{
+				if(clazz.getSuperclass()!=null)
+					classes.add(clazz.getSuperclass());
+				Class[]	ifs	= clazz.getInterfaces();
+				for(int i=0; i<ifs.length; i++)
+				{
+					classes.add(ifs[i]);
+				}
+			}
 		}
-	
-		return ret;
+		
+		if(!linked)
+			throw new RuntimeException("Could not link: "+object+" "+parent);
 	}
 	
+	//-------- helper methods --------
+	
 	/**
-	 * 
+	 *  Set an attribute value.
+	 *  Similar to handleAttributValue but allows objects as attribute values (for linking).
+	 *  @param attrinfo The attribute info.
+	 *  @param xmlattrname The xml attribute name.
+	 *  @param object The object.
+	 *  @param attrval The attribute value.
+	 *  @param root The root object.
+	 *  @param classloader The classloader.
 	 */
 	protected void setAttributeValue(Object attrinfo, String xmlattrname, Object object, 
 		Object attrval, Object root, ClassLoader classloader)
@@ -132,7 +183,40 @@ public class BeanObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 * 
+	 *  Convert an attribute value by using a converter.
+	 *  @param attrval The attribute value.
+	 *  @param targetcalss The target class.
+	 *  @param converter The converter.
+	 *  @param root The root.
+	 *  @param classloader The classloader.
+	 */
+	protected Object convertAttributeValue(Object attrval, Class targetclass, ITypeConverter converter, Object root, ClassLoader classloader)
+	{
+		Object ret = attrval;
+
+		if(converter!=null)
+		{
+			ret = converter.convertObject(attrval, root, classloader);
+		}
+		else if(!String.class.isAssignableFrom(targetclass))
+		{
+			ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
+			if(conv!=null)
+				ret = conv.convertObject(attrval, root, classloader);
+		}
+	
+		return ret;
+	}
+	
+	/**
+	 *  Set a value directly on a Java bean.
+	 *  @param prefixes The method prefixes.
+	 *  @param postfix The mothod postfix.
+	 *  @param attrval The attribute value.
+	 *  @param object The object.
+	 *  @param root The root.
+	 *  @param classloader The classloader.
+	 *  @param converter The converter.
 	 */
 	protected boolean setDirectValue(String[] prefixes, String postfix, Object attrval, Object object, Object root, ClassLoader classloader, ITypeConverter converter)
 	{
@@ -165,79 +249,13 @@ public class BeanObjectHandler implements IObjectHandler
 	}
 	
 	/**
-	 *  Link an object to its parent.
+	 *  Internal link objects method.
+	 *  @param clazz The clazz.
+	 *  @param name The name.
 	 *  @param object The object.
-	 *  @param parent The parent object.
-	 *  @param linkinfo The link info.
-	 *  @param tagname The current tagname (for name guessing).
-	 *  @param context The context.
-	 */
-	public void linkObject(Object object, Object parent, Object linkinfo, 
-		String tagname, Object context, ClassLoader classloader, Object root) throws Exception
-	{
-		// Add object to its parent.
-		boolean	linked	= false;
-		List classes	= new LinkedList();
-		classes.add(object.getClass());
-		
-		if(linkinfo!=null)
-		{
-			setAttributeValue(linkinfo, tagname, parent, object, root, classloader);
-			linked = true;
-		}
-//		else if(linkinfo instanceof String)
-//		{
-//			String postfix = ((String)linkinfo).substring(0,1).toUpperCase()+((String)linkinfo).substring(1);
-//			String setm = "set"+postfix;
-//			linked = internalLinkObjects(object.getClass(), setm, object, parent, root, classloader);
-//			if(!linked)
-//			{
-//				String addm = "add"+postfix;
-//				linked = internalLinkObjects(object.getClass(), addm, object, parent, root, classloader);
-//			}
-//			if(!linked)
-//				throw new RuntimeException("Failure in link info: "+linkinfo);
-//		}
-		
-		// Try name guessing via class/superclass/interface names of object to add
-		while(!linked && !classes.isEmpty())
-		{
-			Class clazz = (Class)classes.remove(0);
-			
-			if(!BasicTypeConverter.isBuiltInType(clazz))
-			{
-				String name = SReflect.getInnerClassName(clazz);
-				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
-				if(!linked)
-					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
-			}
-			
-			if(!linked)
-			{
-				String name = tagname.substring(0, 1).toUpperCase()+tagname.substring(1);
-				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
-				if(!linked)
-					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
-			}
-			
-			if(!linked)
-			{
-				if(clazz.getSuperclass()!=null)
-					classes.add(clazz.getSuperclass());
-				Class[]	ifs	= clazz.getInterfaces();
-				for(int i=0; i<ifs.length; i++)
-				{
-					classes.add(ifs[i]);
-				}
-			}
-		}
-		
-		if(!linked)
-			throw new RuntimeException("Could not link: "+object+" "+parent);
-	}
-		
-	/**
-	 * Internal link objects method.
+	 *  @param parent The parent.
+	 *  @param root The root.
+	 *  @param classloader classloader.
 	 */
 	protected boolean internalLinkObjects(Class clazz, String name, Object object, Object parent, Object root, ClassLoader classloader) throws Exception
 	{

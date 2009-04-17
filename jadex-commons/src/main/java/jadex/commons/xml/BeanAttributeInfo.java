@@ -1,5 +1,6 @@
 package jadex.commons.xml;
 
+
 /**
  *  Java bean attribute meta information.
  */
@@ -15,6 +16,9 @@ public class BeanAttributeInfo
 	
 	/** The map name (if it should be put in map). */
 	protected String mapname;
+	
+	/** The default value. */
+	protected Object defaultvalue;
 	
 	//-------- constructors --------
 	
@@ -39,9 +43,18 @@ public class BeanAttributeInfo
 	 */
 	public BeanAttributeInfo(String attributename, ITypeConverter converter, String mapname)
 	{
+		this(attributename, converter, mapname, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String attributename, ITypeConverter converter, String mapname, Object defaultvalue)
+	{
 		this.attributename = attributename;
 		this.converter = converter;
 		this.mapname = mapname;
+		this.defaultvalue = defaultvalue;
 	}
 
 	//-------- methods --------
@@ -101,4 +114,23 @@ public class BeanAttributeInfo
 	{
 		this.mapname = mapname;
 	}
+
+	/**
+	 *  Get the default value.
+	 *  @return the defaultvalue.
+	 */
+	public Object getDefaultValue()
+	{
+		return this.defaultvalue;
+	}
+
+	/**
+	 *  Set the default value.
+	 *  @param defaultvalue the defaultvalue to set.
+	 */
+	public void setDefaultValue(Object defaultvalue)
+	{
+		this.defaultvalue = defaultvalue;
+	}
+
 }

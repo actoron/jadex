@@ -27,6 +27,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,34 +76,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		return properties;
 	}
 
-	//-------- attributes --------
-	
-	/** The environment objects. */
-//	protected List objects;
-
-	//-------- methods --------
-	
-	/**
-	 *  Get the objects of this space.
-	 *  @return An array of objects (if any).
-	 * /
-	public MEnvObject[] getMEnvObjects()
-	{
-		return objects==null? null:
-			(MEnvObject[])objects.toArray(new MGroupInstance[objects.size()]);
-	}*/
-
-	/**
-	 *  Add an object to this space.
-	 *  @param object The object to add. 
-	 * /
-	public void addMEnvObject(MEnvObject object)
-	{
-		if(objects==null)
-			objects	= new ArrayList();
-		objects.add(object);
-	}*/
-	
 	/**
 	 *  Create a space.
 	 */
@@ -264,20 +237,20 @@ public class MEnvSpaceInstance extends MSpaceInstance
 							targettheme.put("prelayers", targetprelayers);
 							for(int k=0; k<prelayers.size(); k++)
 							{
-								Object tmp = prelayers.get(k);
-								System.out.println("prelayer: "+tmp);
-//								if(tmp instanceof MEnvGridLayer)
-//								{
-//									MEnvGridLayer sourceprelayer = (MEnvGridLayer)tmp;
-//									GridLayer targetprelayer = new GridLayer(sourceprelayer.getSize(), sourceprelayer.getColor());
-//									targetprelayers.add(targetprelayer);
-//								}
-//								else if(tmp instanceof MEnvTiledLayer)
-//								{
-//									MEnvTiledLayer sourceprelayer = (MEnvTiledLayer)tmp;
-//									TiledLayer targetprelayer = new TiledLayer(sourceprelayer.getSize(), sourceprelayer.getImagePath());
-//									targetprelayers.add(targetprelayer);
-//								}
+								Map layer = (Map)prelayers.get(k);
+								System.out.println("prelayer: "+layer);
+								if("gridlayer".equals(getProperty(layer, "type")))
+								{
+									IVector2 size = getVector2((Double)getProperty(layer, "width"), (Double)getProperty(layer, "height"));
+									GridLayer targetprelayer = new GridLayer(size, (Color)getProperty(layer, "color"));
+									targetprelayers.add(targetprelayer);
+								}
+								else if("tiledlayer".equals(getProperty(layer, "type")))
+								{
+									IVector2 size = getVector2((Double)getProperty(layer, "width"), (Double)getProperty(layer, "height"));
+									TiledLayer targetprelayer = new TiledLayer(size, (String)getProperty(layer, "imagepath"));
+									targetprelayers.add(targetprelayer);
+								}
 							}
 						}
 						
