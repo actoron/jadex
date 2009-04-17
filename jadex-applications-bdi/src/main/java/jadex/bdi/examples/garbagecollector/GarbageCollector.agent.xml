@@ -24,13 +24,13 @@
 
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="Position" evaluationmode="push">
-			<fact language="clips">
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
+			<fact language="jcl">
+				$beliefbase.env.getPosition($scope.getAgentName())
 				
-				?agent = (agent (agent_has_localname ?agentname))
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?env = (Environment (getPosition (?agentname) ?ret))
+				// ?agent = (agent (agent_has_localname ?agentname))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?env = (Environment (getPosition (?agentname) ?ret))
 			</fact>
  		</belief>
 
@@ -51,13 +51,13 @@
 		
 		<!-- Flag indicating if the agent currently carries garbage. -->
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
- 			<fact language="clips">
- 				// ((Environment)$beliefbase.getBelief("env").getFact()).hasGarbage($scope.getAgentName())
+ 			<fact language="jcl">
+ 				$beliefbase.env.hasGarbage($scope.getAgentName())
 		
-				?agent = (agent (agent_has_localname ?agentname))
-				?mbel_env = (mbelief (melement_has_name "env"))
-				?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
- 				?env = (Environment (hasGarbage (?agentname) ?ret))
+				// ?agent = (agent (agent_has_localname ?agentname))
+				// ?mbel_env = (mbelief (melement_has_name "env"))
+				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
+ 				// ?env = (Environment (hasGarbage (?agentname) ?ret))
 			</fact>
 		</belief>
 	</beliefs>

@@ -1,6 +1,7 @@
 package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.ArraySelector;
@@ -17,6 +18,7 @@ import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.rulesystem.rules.functions.Identity;
+import jadex.rules.rulesystem.rules.functions.MethodCallFunction;
 import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -27,6 +29,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -70,10 +73,10 @@ public class ConstraintBuilder
 			buildConstraint((Expression)constraints.get(i), context, false);
 		}
 
-		List	lcons	= context.getConditions();
-		shuffle(lcons);
+		shuffle(context);
 		
 		// Reassign dummy constraints to previous or next condition.
+		List	lcons	= context.getConditions();
 		if(context.hasDummyCondition())
 		{
 			List	cons	= context.getDummyCondition().getConstraints();
@@ -248,6 +251,17 @@ public class ConstraintBuilder
 				else
 					type	= OAVJavaType.java_object_type;
 			}
+			else if(prim instanceof StaticMethodAccess)
+			{
+				StaticMethodAccess	sma	= (StaticMethodAccess)prim;
+				MethodCall mc = createMethodCall(sma.getType(), sma.getName(), sma.getParameterValues(), context);
+
+				ocon	= context.getDummyCondition();
+				List	paramsources	= mc.getParameterSources();
+				paramsources.add(0, new Constant(null));
+				valuesource	= new FunctionCall(new MethodCallFunction(mc.getMethod()), paramsources);
+				type	= context.getTypeModel().getJavaType(mc.getMethod().getReturnType());
+			}
 			else
 			{
 				throw new UnsupportedOperationException("Unsupported start of primary expression: "+value);
@@ -271,49 +285,11 @@ public class ConstraintBuilder
 					if(type instanceof OAVJavaType)
 					{
 						MethodAccess	ma	= (MethodAccess)suffixes[i];
-						Object[]	params	= new Object[ma.getParameterValues()!=null ? ma.getParameterValues().length : 0];
-						Class[]	paramtypes	= new Class[params.length];
-						for(int j=0; j<params.length; j++)
-						{
-							Expression	p	= flattenToPrimary(ma.getParameterValues()[j], context);
-							if(p instanceof VariableExpression)
-							{
-								params[j]	= ((VariableExpression)p).getVariable();
-								if(((Variable) params[j]).getType() instanceof OAVJavaType)
-								{
-									paramtypes[j]	= ((OAVJavaType)((Variable)params[j]).getType()).getClazz(); 
-								}
-								else
-								{
-									throw new RuntimeException("Cannot build method call: Only Java types supported for parameters: "+ma.getParameterValues()[j]);
-								}
-							}
-							else //if(p instanceof LiteralExpression)
-							{
-								Object	val	= ((LiteralExpression)p).getValue();
-								params[j]	= new Constant(val);
-								paramtypes[j]	= val!=null ? val.getClass() : null;
-							}
-						}
-						
-						Class	clazz	= ((OAVJavaType)type).getClazz();
-						Method[]	methods	= SReflect.getMethods(clazz, ma.getName());
-						Class[][]	mparamtypes	= new Class[methods.length][];
-						for(int j=0; j<methods.length; j++)
-						{
-							mparamtypes[j]	= methods[j].getParameterTypes(); 
-						}
-						int[]	matches	= SReflect.matchArgumentTypes(paramtypes, mparamtypes);
-						if(matches.length==0)
-						{
-							throw new RuntimeException("No matching method found for: "+clazz.getName()+ma);
-						}
-						else if(matches.length>1)
-						{
-							System.out.println("Warning: Multiple matching methods found for: "+clazz.getName()+", "+ma);
-						}
-						suffs.add(new MethodCall((OAVJavaType)type, methods[matches[0]], params));
-						type	= context.getTypeModel().getJavaType(methods[matches[0]].getReturnType());
+						Expression[]	paramvalues	= ma.getParameterValues();
+						String	name	= ma.getName();
+						MethodCall mc = createMethodCall((OAVJavaType)type, name, paramvalues, context);
+						suffs.add(mc);
+						type	= context.getTypeModel().getJavaType(mc.getMethod().getReturnType());
 					}
 					else
 					{
@@ -413,6 +389,61 @@ public class ConstraintBuilder
 	}
 
 	/**
+	 *  Create a method call.
+	 * @param type	The object type.
+	 * @param name	The method name.
+	 * @param paramvalues	The parameter values.
+	 * @param context	The build context.
+	 * @return	The method call object.
+	 */
+	protected static MethodCall createMethodCall(OAVJavaType type, String name, Expression[] paramvalues, BuildContext context)
+	{
+		Object[]	params	= new Object[paramvalues!=null ? paramvalues.length : 0];
+		Class[]	paramtypes	= new Class[params.length];
+		for(int j=0; j<params.length; j++)
+		{
+			Expression	p	= flattenToPrimary(paramvalues[j], context);
+			if(p instanceof VariableExpression)
+			{
+				params[j]	= ((VariableExpression)p).getVariable();
+				if(((Variable) params[j]).getType() instanceof OAVJavaType)
+				{
+					paramtypes[j]	= ((OAVJavaType)((Variable)params[j]).getType()).getClazz(); 
+				}
+				else
+				{
+					throw new RuntimeException("Cannot build method call: Only Java types supported for parameters: "+paramvalues[j]);
+				}
+			}
+			else //if(p instanceof LiteralExpression)
+			{
+				Object	val	= ((LiteralExpression)p).getValue();
+				params[j]	= new Constant(val);
+				paramtypes[j]	= val!=null ? val.getClass() : null;
+			}
+		}
+		
+		Class	clazz	= type.getClazz();
+		Method[]	methods	= SReflect.getMethods(clazz, name);
+		Class[][]	mparamtypes	= new Class[methods.length][];
+		for(int j=0; j<methods.length; j++)
+		{
+			mparamtypes[j]	= methods[j].getParameterTypes(); 
+		}
+		int[]	matches	= SReflect.matchArgumentTypes(paramtypes, mparamtypes);
+		if(matches.length==0)
+		{
+			throw new RuntimeException("No matching method found for: "+clazz.getName()+"."+name+SUtil.arrayToString(paramvalues));
+		}
+		else if(matches.length>1)
+		{
+			System.out.println("Warning: Multiple matching methods found for: "+clazz.getName()+"."+name+SUtil.arrayToString(paramvalues));
+		}
+		MethodCall	mc	= new MethodCall(type, methods[matches[0]], params);
+		return mc;
+	}
+
+	/**
 	 *  Flatten a value to a primary value (literal or variable).
 	 *  For a complex expression, additional conditions might be created
 	 *  that bind the desired value in a new variable. 
@@ -475,8 +506,9 @@ public class ConstraintBuilder
 	 *  before used.
 	 *  @param lcons	The list of conditions (shuffled in place).
 	 */
-	protected static void	shuffle(List lcons)
+	protected static void	shuffle(BuildContext context)
 	{
+		List lcons	= context.getConditions();
 		Set	boundvars	= new HashSet();	// Variables, which are bound and therefore can be used.
 		boolean	progress	= true;
 		int	finished	= 0;
@@ -484,26 +516,27 @@ public class ConstraintBuilder
 		while(progress)
 		{
 			progress	= false;
+			int skipped	= 0;
 			for(int i=finished; i<lcons.size(); i++)
 			{
-				ICondition	con	= (ICondition) lcons.get(i);
+				ICondition	con	= (ICondition) lcons.get(i-skipped);
 				boolean	check	= true;
 
 				// Find variables, which are bound (i.e. operator EQUAL) in this condition.
 				Set	localbound	= new HashSet();
 				List	bcs	= null;
-				if(lcons.get(i) instanceof ObjectCondition)
+				if(con instanceof ObjectCondition)
 				{
-					bcs	= ((ObjectCondition)lcons.get(i)).getBoundConstraints();
+					bcs	= ((ObjectCondition)con).getBoundConstraints();
 				}
-				else if(lcons.get(i) instanceof CollectCondition)
+				else if(con instanceof CollectCondition)
 				{
-					bcs	= ((CollectCondition)lcons.get(i)).getBoundConstraints();
+					bcs	= ((CollectCondition)con).getBoundConstraints();
 				}
-				else if(lcons.get(i) instanceof NotCondition)
+				else if(con instanceof NotCondition)
 				{
 					// Put not conditions last.
-					for(int j=i+1; check && j<lcons.size(); j++)
+					for(int j=i-skipped+1; check && j<lcons.size(); j++)
 						check	= lcons.get(j) instanceof NotCondition;
 				}
 				for(int j=0; bcs!=null && j<bcs.size(); j++)
@@ -542,16 +575,60 @@ public class ConstraintBuilder
 				else
 				{
 					// Shuffle condition to the end
-					lcons.remove(i);
+					lcons.remove(i-skipped);
 					lcons.add(con);
-					i--;
+					skipped++;
 				}
 			}
 		}
 
+		// When not all conditions are finished there is a cycle in the unbound variables.
 		if(finished<lcons.size())
 		{
-			throw new RuntimeException("Remaining unbound variables in conditions (cycle?): "+lcons+", "+finished);
+			// Break the cycle by splitting the first unfinished condition.
+			ICondition	con	= (ICondition) lcons.get(finished);
+			if(!(con instanceof ObjectCondition))
+			{
+				throw new UnsupportedOperationException("Cycle(?) in non-object condition: "+lcons);
+			}
+
+			// Scan all constraints and retain those, which cannot be evaluated.
+			List	constraints	= new ArrayList(((ObjectCondition)con).getConstraints());
+			progress	= true;
+			while(progress)
+			{
+				progress	= false;
+				for(Iterator it=constraints.iterator(); it.hasNext(); )
+				{
+					IConstraint	c	= (IConstraint)it.next();
+					Set	localbound	= new HashSet(boundvars);
+					if(c instanceof BoundConstraint && ((BoundConstraint)c).getOperator().equals(IOperator.EQUAL))
+					{
+						List	bvars	= ((BoundConstraint)c).getBindVariables();
+						for(int k=0; k<bvars.size(); k++)
+						{
+							localbound.add(bvars.get(k));
+						}
+					}
+
+					if(localbound.containsAll(c.getVariables()))
+					{
+						it.remove();
+						progress	= true;
+						boundvars.addAll(localbound);
+					}
+				}
+			}
+			
+			BoundConstraint	bc	= new BoundConstraint(null, new Variable(context.generateVariableName(),((ObjectCondition)con).getObjectType()));
+			List	constraints2	= new ArrayList(((ObjectCondition)con).getConstraints());
+			constraints2.removeAll(constraints);
+			constraints.add(bc);
+			constraints2.add(bc);
+			context.getConditions().remove(con);
+			context.createObjectCondition(((ObjectCondition)con).getObjectType(), (IConstraint[])constraints2.toArray(new IConstraint[constraints2.size()]));
+			context.createObjectCondition(((ObjectCondition)con).getObjectType(), (IConstraint[])constraints.toArray(new IConstraint[constraints.size()]));
+			shuffle(context);
 		}
 	}
 	

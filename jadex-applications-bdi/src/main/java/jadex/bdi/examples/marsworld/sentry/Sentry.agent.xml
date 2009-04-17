@@ -16,6 +16,7 @@
 		<import>jadex.bdi.examples.marsworld.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
+		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 	</imports>
 
@@ -32,11 +33,19 @@
 		<!-- The seen targets. -->
 		<beliefset name="my_targets" class="Target"/>
 
-		<!-- The seen targets. -->
+		<!-- The analysed targets. -->
 		<beliefset name="analysed_targets" class="Target"/>
 
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
+		</beliefref>
+		
+		<beliefref name="my_location">
+			<concrete ref="move.my_location"/>
+		</beliefref>
+		
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
 		</beliefref>
 	</beliefs>
 
@@ -54,31 +63,38 @@
 			<!-- The parameter target is bound to one
 				of the facts in the belief my_targets. -->
 			<parameter name="target" class="Target">
-				<value>?target</value>
+				<value>
+					// Hack!!! Condition can also match target object from message
+					$beliefbase.environment.getTarget($target.getId())
+				</value>
 			</parameter>
 			<unique dummy="true"/>
 			<!-- Create a new goal when a target was added
 				and the mission is going on. -->
-			<creationcondition language="clips">
-				// !$beliefbase.missionend
-				(belief (element_has_model.melement_has_name "missionend") (belief_has_fact false))
+			<creationcondition language="jcl">
+				!$beliefbase.missionend &amp;&amp;
+				Target $target &amp;&amp;
+				Arrays.asList($beliefbase.my_targets).contains($target) &amp;&amp;
+				!Arrays.asList($beliefbase.analysed_targets).contains($target)
 				
-				// select $target from $beliefbase.my_targets
-				// where !$beliefbase.getBeliefSet("analysed_targets").containsFact($target)
-				(beliefset (element_has_model ?mbel_mytargets) (beliefset_has_facts $?x ?target $?y))
-				?mbel_mytargets = (mbeliefset (melement_has_name "my_targets"))
-				(not
-					(and
-						(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
-						?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
-					)
-				)
+				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact false))
+				//
+				// (beliefset (element_has_model ?mbel_mytargets) (beliefset_has_facts $?x ?target $?y))
+				// ?mbel_mytargets = (mbeliefset (melement_has_name "my_targets"))
+				// (not
+				// 	(and
+				// 		(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
+				// 		?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
+				// 	)
+				// )
 			</creationcondition>
 			<!-- Suspend the goal when some other target is nearer to the agent.- ->
-			<contextcondition>
-				(select one Target $target from $beliefbase.my_targets
-				order by $beliefbase.my_location.getDistance($target.getLocation()))
-				== $goal.target
+			<contextcondition language="jcl">
+				// (select one Target $target from $beliefbase.my_targets
+				// order by $beliefbase.my_location.getDistance($target.getLocation()))
+				// == $goal.target
+				
+				!(Target $t2 &amp;&amp; $beliefbase.my_location.getDistance($goal.target.getLocation()) > $beliefbase.my_location.getDistance($t2.getLocation()))
 			</contextcondition> -->
 			<!-- Drop the goal on mission end. -->
 			<dropcondition language="jcl">

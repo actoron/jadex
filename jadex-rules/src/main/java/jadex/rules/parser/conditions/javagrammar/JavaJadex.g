@@ -222,15 +222,43 @@ primaryExpression returns [Expression exp]
 primaryPrefix returns [Expression exp]
 	: '(' tmp = expression ')' {$exp = tmp;}
 	| tmp = literal {$exp = tmp;}
-	| {helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText())}? tmp = pseudovariable {$exp = tmp;}
-	| {helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null}? tmp = variable {$exp = tmp;}
-	| (staticField) => {SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)}? tmp = staticField {$exp = tmp;}
-	| (existentialDeclaration) => tmp = existentialDeclaration {$exp = tmp;}
+	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)!=-1}? tmp = typePrimary {$exp = tmp;}
+	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)==-1}? tmp = nontypePrimary {$exp = tmp;}
 	;
 
+/**
+ * Primary expression starting with a type.
+ */
+typePrimary returns [Expression exp]
+	: {SJavaParser.lookaheadStaticMethod(JavaJadexParser.this.input, tmodel, imports)}? tmp = staticMethod {$exp = tmp;}
+	| {SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)}? tmp = staticField {$exp = tmp;}
+	| {SJavaParser.lookaheadExistential(JavaJadexParser.this.input, tmodel, imports)}? tmp = existentialDeclaration {$exp = tmp;}
+	;
 
 /**
- *  Read a field of an object.
+ * Primary expression starting with a non-type identifier.
+ */
+nontypePrimary returns [Expression exp]
+	: {helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText()) && !"(".equals(JavaJadexParser.this.input.LT(4).getText())}? tmp = pseudovariable {$exp = tmp;}
+	| {helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null}? tmp = variable {$exp = tmp;}
+	;
+
+/**
+ *  Invoke a static method
+ */
+staticMethod returns [Expression exp]
+	@init{List params = new ArrayList();}
+	: otype = type '.' tmp1 = IDENTIFIER '(' ')' {$exp = new StaticMethodAccess((OAVJavaType)otype, tmp1.getText(), null);}
+	| otype = type '.' tmp2 = IDENTIFIER '(' p1 = expression {params.add(p1);}
+	(',' p2 = expression {params.add(p2);}
+	)* ')'
+	{
+		$exp	= new StaticMethodAccess((OAVJavaType)otype, tmp2.getText(), (Expression[])params.toArray(new Expression[params.size()]));
+	}
+	;
+
+/**
+ *  Read a field of a class.
  */
 staticField returns [Expression exp]
 	: otype = type '.' field = IDENTIFIER
@@ -341,7 +369,9 @@ variable returns [Expression exp]
 		String	name	= tmp.getText();
 		Variable	var	= helper.getVariable(name);
 		if(var==null)
+		{
 			throw new RuntimeException("No such variable: "+name);
+		}
 		$exp	= new VariableExpression(var);
 	}
 	;

@@ -1,5 +1,9 @@
 package jadex.bdi.interpreter;
 
+import jadex.bdi.runtime.IBeliefbase;
+import jadex.bdi.runtime.ICapability;
+import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
+import jadex.bdi.runtime.impl.CapabilityFlyweight;
 import jadex.commons.SReflect;
 import jadex.rules.parser.conditions.javagrammar.DefaultParserHelper;
 import jadex.rules.rulesystem.ICondition;
@@ -120,20 +124,20 @@ public class BDIParserHelper extends	DefaultParserHelper
 				Object	mcaparef	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
 				if(mcaparef==null)
 					throw new RuntimeException("Could not resolve reference to belief: "+name+", "+ref);
-				mcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-				while((mbel=state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefs, tmpbelname))==null)
+				Object	tmpmcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				while((mbel=state.getAttributeValue(tmpmcapa, OAVBDIMetaModel.capability_has_beliefs, tmpbelname))==null)
 				{
-					mbel	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, tmpbelname);
+					mbel	= state.getAttributeValue(tmpmcapa, OAVBDIMetaModel.capability_has_beliefrefs, tmpbelname);
 					if(mbel==null)
 						throw new RuntimeException("Could not resolve reference to belief: "+name+", "+ref);
 					tmpbelname	= (String)state.getAttributeValue(mbel, OAVBDIMetaModel.elementreference_has_concrete);
 					idx=tmpbelname.indexOf('.');
 					capname	= tmpbelname.substring(0, idx);
 					tmpbelname = tmpbelname.substring(idx+1);
-					mcaparef	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
+					mcaparef	= state.getAttributeValue(tmpmcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
 					if(mcaparef==null)
 						throw new RuntimeException("Could not resolve reference to belief: "+name+", "+ref);
-					mcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+					tmpmcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
 				}
 				
 				// Build belief condition to bind fact variable.
@@ -261,6 +265,58 @@ public class BDIParserHelper extends	DefaultParserHelper
 			{
 				throw new RuntimeException("No such parameter (set): "+name);
 			}
+		}
+		
+		else if(ret==null && "$beliefbase".equals(name))
+		{
+			Variable	capvar	= context.getVariable("?rcapa");
+			if(capvar==null)
+				throw new RuntimeException("Variable '?rcapa' required to build beliefbase constraint: "+name);
+			ObjectCondition	rcapcon	= context.getObjectCondition(capvar);
+			if(rcapcon==null)
+				throw new RuntimeException("Capability condition required to build beliefbase constraint: "+name);
+			Object	valuesource	= new FunctionCall(new IFunction()
+			{
+				public Set getRelevantAttributes()
+				{
+					return Collections.EMPTY_SET;
+				}
+				public Class getReturnType()
+				{
+					return IBeliefbase.class;
+				}
+				public Object invoke(Object[] paramvalues, IOAVState state)
+				{
+					return BeliefbaseFlyweight.getBeliefbaseFlyweight(state, paramvalues[0]);
+				}
+			}, new Object[]{capvar});
+			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
+		}
+
+		else if(ret==null && "$scope".equals(name))
+		{
+			Variable	capvar	= context.getVariable("?rcapa");
+			if(capvar==null)
+				throw new RuntimeException("Variable '?rcapa' required to build beliefbase constraint: "+name);
+			ObjectCondition	rcapcon	= context.getObjectCondition(capvar);
+			if(rcapcon==null)
+				throw new RuntimeException("Capability condition required to build beliefbase constraint: "+name);
+			Object	valuesource	= new FunctionCall(new IFunction()
+			{
+				public Set getRelevantAttributes()
+				{
+					return Collections.EMPTY_SET;
+				}
+				public Class getReturnType()
+				{
+					return ICapability.class;
+				}
+				public Object invoke(Object[] paramvalues, IOAVState state)
+				{
+					return new CapabilityFlyweight(state, paramvalues[0]);
+				}
+			}, new Object[]{capvar});
+			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
 		}
 
 		return ret;

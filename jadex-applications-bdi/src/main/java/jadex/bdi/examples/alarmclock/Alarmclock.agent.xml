@@ -69,16 +69,18 @@
 				// ?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
 				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</contextcondition>
-			<dropcondition language="clips">
-				// !$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
-				?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-				(not
-					(and
-						?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
-						?mbeliefset = (mbeliefset (melement_has_name "alarms"))
-					)
-				)
+			<dropcondition language="jcl">
+				//!$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
+				!Arrays.asList($beliefbase.alarms).contains($goal.alarm)
+				
+				// ?rparam = (parameter (parameter_has_name "alarm") (parameter_has_value ?alarm))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				// (not
+				// 	(and
+				// 		?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?alarm))
+				// 		?mbeliefset = (mbeliefset (melement_has_name "alarms"))
+				// 	)
+				// )
 			</dropcondition>
 			<targetcondition language="jcl">
 				$goal.alarm.getAlarmtime()==Alarm.NO_ALARM

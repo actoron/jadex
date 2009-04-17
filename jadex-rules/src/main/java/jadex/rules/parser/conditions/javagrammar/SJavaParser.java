@@ -72,6 +72,18 @@ public class SJavaParser
     protected static boolean	lookaheadStaticField(TokenStream input, OAVTypeModel tmodel, String[] imports)
     {
     	int index	= lookaheadType(input, tmodel, imports);
-    	return index!=-1 &&	input.LT(index+1).getText().equals(".") && input.LA(index+2)==JavaJadexLexer.IDENTIFIER;
+    	return index!=-1 &&	".".equals(input.LT(index+1).getText()) && input.LA(index+2)==JavaJadexLexer.IDENTIFIER;
+    }
+    
+    /**
+     *  Lookahead for a static method.
+     *  @param input	The token stream.
+     *  @param tmodel	The OAV type model.
+     *  @return	True for a static field.
+     */
+    protected static boolean	lookaheadStaticMethod(TokenStream input, OAVTypeModel tmodel, String[] imports)
+    {
+    	int index	= lookaheadType(input, tmodel, imports);
+    	return index!=-1 &&	".".equals(input.LT(index+1).getText()) && input.LA(index+2)==JavaJadexLexer.IDENTIFIER  &&	"(".equals(input.LT(index+3).getText());
     }
 }

@@ -19,6 +19,7 @@
 
 	<imports>
 		<import>jadex.bdi.examples.cleanerworld.*</import>
+		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
@@ -173,22 +174,21 @@
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
-			<dropcondition language="clips">
+			<dropcondition language="jcl">
 				// $beliefbase.carriedwaste==null &amp;&amp;
 				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
+				$beliefbase.carriedwaste==null &amp;&amp;
+				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
 				
 				// ?rgoal and ?mgoal are provided internally
-				?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-				
-				//?rgoal = (goal (parameterelement_has_parameters $?x ?rparam $?y))
-				//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts excludes ?waste))
-				?mbeliefset = (mbeliefset (melement_has_name "wastes"))
-				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
-				?mbelief = (mbelief (melement_has_name "carriedwaste"))
+				// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+				//
+				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts excludes ?waste))
+				// ?mbeliefset = (mbeliefset (melement_has_name "wastes"))
+				// 
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
+				// ?mbelief = (mbelief (melement_has_name "carriedwaste"))
 				
 				// todo: make sure that all elements are in same capa
  			</dropcondition>

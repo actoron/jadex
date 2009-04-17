@@ -164,10 +164,31 @@ public class BuildContext
 	 */
 	public Variable	generateVariableBinding(ObjectCondition	condition, Object valuesource)
 	{
-		String	varname;
+		return generateVariableBinding(condition, generateVariableName(), valuesource);
+	}
+
+	/**
+	 *  Generate a variable name.
+	 *  @return An unused variable name.
+	 */
+	public String generateVariableName()
+	{
+		String varname;
 		for(int i=1; variables.containsKey(varname = "$tmpvar_"+i); i++);
-		Variable	tmpvar	= new Variable(varname, getReturnType(valuesource, tmodel));
-		variables.put(varname, tmpvar);
+		return varname;
+	}
+
+	/**
+	 *  Create a new variable and bind it using the given object condition and value source.
+	 *  @param condition	The object condition.
+	 *  @param name	The variable name.
+	 *  @param valuesource	The value source.
+	 *  @return	The new variable.
+	 */
+	public Variable	generateVariableBinding(ObjectCondition	condition, String name, Object valuesource)
+	{
+		Variable	tmpvar	= new Variable(name, getReturnType(valuesource, tmodel));
+		variables.put(name, tmpvar);
 		BoundConstraint	bc	= new BoundConstraint(valuesource, tmpvar);
 		boundconstraints.put(tmpvar, bc);
 		condition.addConstraint(bc);

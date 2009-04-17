@@ -105,5 +105,12 @@ public class MethodCallFunction implements IFunction
 		return Collections.EMPTY_SET;
 	}
 
+	/**
+	 *  Create a string representation.
+	 */
+	public String toString()
+	{
+		return method.getName();
+	}
 }
 

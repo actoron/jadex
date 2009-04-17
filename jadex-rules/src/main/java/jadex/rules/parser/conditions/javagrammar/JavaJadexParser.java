@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g 2009-04-14 11:41:33
+// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g 2009-04-17 14:49:32
 
 package jadex.rules.parser.conditions.javagrammar;
 
@@ -18,8 +18,7 @@ import org.antlr.runtime.*;
 import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+
 public class JavaJadexParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "IDENTIFIER", "CharacterLiteral", "StringLiteral", "BooleanLiteral", "FloatingPointLiteral", "HexLiteral", "OctalLiteral", "DecimalLiteral", "HexDigit", "IntegerTypeSuffix", "Exponent", "FloatTypeSuffix", "EscapeSequence", "UnicodeEscape", "OctalEscape", "Letter", "JavaIDDigit", "WS", "COMMENT", "LINE_COMMENT", "'?'", "':'", "'||'", "'&&'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'+'", "'-'", "'*'", "'/'", "'%'", "'!'", "'~'", "'('", "')'", "'.'", "','", "'['", "']'", "'null'"
@@ -138,11 +137,9 @@ public class JavaJadexParser extends Parser {
             tmp=expression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            match(input,EOF,FOLLOW_EOF_in_lhs50); if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            match(input,EOF,FOLLOW_EOF_in_lhs50); 
+            exp = tmp;
 
             }
 
@@ -174,10 +171,8 @@ public class JavaJadexParser extends Parser {
             tmp=conditionalExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
 
             }
 
@@ -213,10 +208,8 @@ public class JavaJadexParser extends Parser {
             tmp=logicalOrExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:86:9: ( '?' tmp2= conditionalExpression ':' tmp3= conditionalExpression )?
             int alt1=2;
             int LA1_0 = input.LA(1);
@@ -228,23 +221,21 @@ public class JavaJadexParser extends Parser {
                 case 1 :
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:87:10: '?' tmp2= conditionalExpression ':' tmp3= conditionalExpression
                     {
-                    match(input,24,FOLLOW_24_in_conditionalExpression121); if (state.failed) return exp;
+                    match(input,24,FOLLOW_24_in_conditionalExpression121); 
                     pushFollow(FOLLOW_conditionalExpression_in_conditionalExpression127);
                     tmp2=conditionalExpression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    match(input,25,FOLLOW_25_in_conditionalExpression129); if (state.failed) return exp;
+
+                    match(input,25,FOLLOW_25_in_conditionalExpression129); 
                     pushFollow(FOLLOW_conditionalExpression_in_conditionalExpression135);
                     tmp3=conditionalExpression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
 
-                              		exp = new ConditionalExpression(tmp, tmp2, tmp3);
-                              	
-                    }
+
+                            		exp = new ConditionalExpression(tmp, tmp2, tmp3);
+                            	
 
                     }
                     break;
@@ -284,10 +275,8 @@ public class JavaJadexParser extends Parser {
             tmp=logicalAndExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:99:9: ( '||' tmp2= logicalAndExpression )*
             loop2:
             do {
@@ -303,17 +292,15 @@ public class JavaJadexParser extends Parser {
             	case 1 :
             	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:100:10: '||' tmp2= logicalAndExpression
             	    {
-            	    match(input,26,FOLLOW_26_in_logicalOrExpression202); if (state.failed) return exp;
+            	    match(input,26,FOLLOW_26_in_logicalOrExpression202); 
             	    pushFollow(FOLLOW_logicalAndExpression_in_logicalOrExpression208);
             	    tmp2=logicalAndExpression();
 
             	    state._fsp--;
-            	    if (state.failed) return exp;
-            	    if ( state.backtracking==0 ) {
 
-            	              		exp = new OperationExpression(exp, tmp2, OperationExpression.OPERATOR_OR);
-            	              	
-            	    }
+
+            	            		exp = new OperationExpression(exp, tmp2, OperationExpression.OPERATOR_OR);
+            	            	
 
             	    }
             	    break;
@@ -356,10 +343,8 @@ public class JavaJadexParser extends Parser {
             tmp=equalityExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:112:9: ( '&&' tmp2= equalityExpression )*
             loop3:
             do {
@@ -375,17 +360,15 @@ public class JavaJadexParser extends Parser {
             	case 1 :
             	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:113:10: '&&' tmp2= equalityExpression
             	    {
-            	    match(input,27,FOLLOW_27_in_logicalAndExpression275); if (state.failed) return exp;
+            	    match(input,27,FOLLOW_27_in_logicalAndExpression275); 
             	    pushFollow(FOLLOW_equalityExpression_in_logicalAndExpression281);
             	    tmp2=equalityExpression();
 
             	    state._fsp--;
-            	    if (state.failed) return exp;
-            	    if ( state.backtracking==0 ) {
 
-            	              		exp = new OperationExpression(exp, tmp2, OperationExpression.OPERATOR_AND);
-            	              	
-            	    }
+
+            	            		exp = new OperationExpression(exp, tmp2, OperationExpression.OPERATOR_AND);
+            	            	
 
             	    }
             	    break;
@@ -429,10 +412,8 @@ public class JavaJadexParser extends Parser {
             tmp=relationalExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:126:9: ( ( '==' | '!=' ) tmp2= relationalExpression )*
             loop5:
             do {
@@ -459,7 +440,6 @@ public class JavaJadexParser extends Parser {
             	        alt4=2;
             	    }
             	    else {
-            	        if (state.backtracking>0) {state.failed=true; return exp;}
             	        NoViableAltException nvae =
             	            new NoViableAltException("", 4, 0, input);
 
@@ -469,20 +449,16 @@ public class JavaJadexParser extends Parser {
             	        case 1 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:127:11: '=='
             	            {
-            	            match(input,28,FOLLOW_28_in_equalityExpression354); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IOperator.EQUAL;
-            	            }
+            	            match(input,28,FOLLOW_28_in_equalityExpression354); 
+            	            operator=IOperator.EQUAL;
 
             	            }
             	            break;
             	        case 2 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:128:11: '!='
             	            {
-            	            match(input,29,FOLLOW_29_in_equalityExpression368); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IOperator.NOTEQUAL;
-            	            }
+            	            match(input,29,FOLLOW_29_in_equalityExpression368); 
+            	            operator=IOperator.NOTEQUAL;
 
             	            }
             	            break;
@@ -493,12 +469,10 @@ public class JavaJadexParser extends Parser {
             	    tmp2=relationalExpression();
 
             	    state._fsp--;
-            	    if (state.failed) return exp;
-            	    if ( state.backtracking==0 ) {
 
-            	      	        	exp = new OperationExpression(exp, tmp2, operator);
-            	      	        
-            	    }
+
+            	    	        	exp = new OperationExpression(exp, tmp2, operator);
+            	    	        
 
             	    }
             	    break;
@@ -542,10 +516,8 @@ public class JavaJadexParser extends Parser {
             tmp=additiveExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:142:9: ( ( '<' | '<=' | '>' | '>=' ) tmp2= additiveExpression )*
             loop7:
             do {
@@ -585,7 +557,6 @@ public class JavaJadexParser extends Parser {
             	        }
             	        break;
             	    default:
-            	        if (state.backtracking>0) {state.failed=true; return exp;}
             	        NoViableAltException nvae =
             	            new NoViableAltException("", 6, 0, input);
 
@@ -596,40 +567,32 @@ public class JavaJadexParser extends Parser {
             	        case 1 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:143:11: '<'
             	            {
-            	            match(input,30,FOLLOW_30_in_relationalExpression452); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IOperator.LESS;
-            	            }
+            	            match(input,30,FOLLOW_30_in_relationalExpression452); 
+            	            operator=IOperator.LESS;
 
             	            }
             	            break;
             	        case 2 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:144:11: '<='
             	            {
-            	            match(input,31,FOLLOW_31_in_relationalExpression466); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IOperator.LESSOREQUAL;
-            	            }
+            	            match(input,31,FOLLOW_31_in_relationalExpression466); 
+            	            operator=IOperator.LESSOREQUAL;
 
             	            }
             	            break;
             	        case 3 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:145:11: '>'
             	            {
-            	            match(input,32,FOLLOW_32_in_relationalExpression480); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IOperator.GREATER;
-            	            }
+            	            match(input,32,FOLLOW_32_in_relationalExpression480); 
+            	            operator=IOperator.GREATER;
 
             	            }
             	            break;
             	        case 4 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:146:11: '>='
             	            {
-            	            match(input,33,FOLLOW_33_in_relationalExpression494); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IOperator.GREATEROREQUAL;
-            	            }
+            	            match(input,33,FOLLOW_33_in_relationalExpression494); 
+            	            operator=IOperator.GREATEROREQUAL;
 
             	            }
             	            break;
@@ -640,12 +603,10 @@ public class JavaJadexParser extends Parser {
             	    tmp2=additiveExpression();
 
             	    state._fsp--;
-            	    if (state.failed) return exp;
-            	    if ( state.backtracking==0 ) {
 
-            	      	        	exp = new OperationExpression(exp, tmp2, operator);
-            	      	        
-            	    }
+
+            	    	        	exp = new OperationExpression(exp, tmp2, operator);
+            	    	        
 
             	    }
             	    break;
@@ -689,10 +650,8 @@ public class JavaJadexParser extends Parser {
             tmp=multiplicativeExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:160:9: ( ( '+' | '-' ) tmp2= multiplicativeExpression )*
             loop9:
             do {
@@ -719,7 +678,6 @@ public class JavaJadexParser extends Parser {
             	        alt8=2;
             	    }
             	    else {
-            	        if (state.backtracking>0) {state.failed=true; return exp;}
             	        NoViableAltException nvae =
             	            new NoViableAltException("", 8, 0, input);
 
@@ -729,20 +687,16 @@ public class JavaJadexParser extends Parser {
             	        case 1 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:161:11: '+'
             	            {
-            	            match(input,34,FOLLOW_34_in_additiveExpression585); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IFunction.SUM;
-            	            }
+            	            match(input,34,FOLLOW_34_in_additiveExpression585); 
+            	            operator=IFunction.SUM;
 
             	            }
             	            break;
             	        case 2 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:162:11: '-'
             	            {
-            	            match(input,35,FOLLOW_35_in_additiveExpression599); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IFunction.SUB;
-            	            }
+            	            match(input,35,FOLLOW_35_in_additiveExpression599); 
+            	            operator=IFunction.SUB;
 
             	            }
             	            break;
@@ -753,12 +707,10 @@ public class JavaJadexParser extends Parser {
             	    tmp2=multiplicativeExpression();
 
             	    state._fsp--;
-            	    if (state.failed) return exp;
-            	    if ( state.backtracking==0 ) {
 
-            	      	        	exp = new OperationExpression(exp, tmp2, operator);
-            	      	        
-            	    }
+
+            	    	        	exp = new OperationExpression(exp, tmp2, operator);
+            	    	        
 
             	    }
             	    break;
@@ -802,10 +754,8 @@ public class JavaJadexParser extends Parser {
             tmp=unaryExpression();
 
             state._fsp--;
-            if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = tmp;
-            }
+
+            exp = tmp;
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:176:9: ( ( '*' | '/' | '%' ) tmp2= unaryExpression )*
             loop11:
             do {
@@ -840,7 +790,6 @@ public class JavaJadexParser extends Parser {
             	        }
             	        break;
             	    default:
-            	        if (state.backtracking>0) {state.failed=true; return exp;}
             	        NoViableAltException nvae =
             	            new NoViableAltException("", 10, 0, input);
 
@@ -851,30 +800,24 @@ public class JavaJadexParser extends Parser {
             	        case 1 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:177:11: '*'
             	            {
-            	            match(input,36,FOLLOW_36_in_multiplicativeExpression683); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IFunction.MULT;
-            	            }
+            	            match(input,36,FOLLOW_36_in_multiplicativeExpression683); 
+            	            operator=IFunction.MULT;
 
             	            }
             	            break;
             	        case 2 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:178:11: '/'
             	            {
-            	            match(input,37,FOLLOW_37_in_multiplicativeExpression697); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IFunction.DIV;
-            	            }
+            	            match(input,37,FOLLOW_37_in_multiplicativeExpression697); 
+            	            operator=IFunction.DIV;
 
             	            }
             	            break;
             	        case 3 :
             	            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:179:11: '%'
             	            {
-            	            match(input,38,FOLLOW_38_in_multiplicativeExpression711); if (state.failed) return exp;
-            	            if ( state.backtracking==0 ) {
-            	              operator=IFunction.MOD;
-            	            }
+            	            match(input,38,FOLLOW_38_in_multiplicativeExpression711); 
+            	            operator=IFunction.MOD;
 
             	            }
             	            break;
@@ -885,12 +828,10 @@ public class JavaJadexParser extends Parser {
             	    tmp2=unaryExpression();
 
             	    state._fsp--;
-            	    if (state.failed) return exp;
-            	    if ( state.backtracking==0 ) {
 
-            	      	        	exp = new OperationExpression(exp, tmp2, operator);
-            	      	        
-            	    }
+
+            	    	        	exp = new OperationExpression(exp, tmp2, operator);
+            	    	        
 
             	    }
             	    break;
@@ -962,7 +903,6 @@ public class JavaJadexParser extends Parser {
                 }
                 break;
             default:
-                if (state.backtracking>0) {state.failed=true; return exp;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 12, 0, input);
 
@@ -973,60 +913,52 @@ public class JavaJadexParser extends Parser {
                 case 1 :
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:191:4: '+' tmp= unaryExpression
                     {
-                    match(input,34,FOLLOW_34_in_unaryExpression763); if (state.failed) return exp;
+                    match(input,34,FOLLOW_34_in_unaryExpression763); 
                     pushFollow(FOLLOW_unaryExpression_in_unaryExpression769);
                     tmp=unaryExpression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+
+                    exp = tmp;
 
                     }
                     break;
                 case 2 :
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:192:4: '-' tmp= unaryExpression
                     {
-                    match(input,35,FOLLOW_35_in_unaryExpression776); if (state.failed) return exp;
+                    match(input,35,FOLLOW_35_in_unaryExpression776); 
                     pushFollow(FOLLOW_unaryExpression_in_unaryExpression782);
                     tmp=unaryExpression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_MINUS);
-                    }
+
+                    exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_MINUS);
 
                     }
                     break;
                 case 3 :
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:193:4: '!' tmp= unaryExpression
                     {
-                    match(input,39,FOLLOW_39_in_unaryExpression789); if (state.failed) return exp;
+                    match(input,39,FOLLOW_39_in_unaryExpression789); 
                     pushFollow(FOLLOW_unaryExpression_in_unaryExpression795);
                     tmp=unaryExpression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_NOT);
-                    }
+
+                    exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_NOT);
 
                     }
                     break;
                 case 4 :
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:194:4: '~' tmp= unaryExpression
                     {
-                    match(input,40,FOLLOW_40_in_unaryExpression802); if (state.failed) return exp;
+                    match(input,40,FOLLOW_40_in_unaryExpression802); 
                     pushFollow(FOLLOW_unaryExpression_in_unaryExpression808);
                     tmp=unaryExpression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_BNOT);
-                    }
+
+                    exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_BNOT);
 
                     }
                     break;
@@ -1037,10 +969,8 @@ public class JavaJadexParser extends Parser {
                     tmp=primaryExpression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+
+                    exp = tmp;
 
                     }
                     break;
@@ -1077,7 +1007,7 @@ public class JavaJadexParser extends Parser {
             tmp=primaryPrefix();
 
             state._fsp--;
-            if (state.failed) return exp;
+
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:204:2: (tmp2= primarySuffix )*
             loop13:
             do {
@@ -1097,14 +1027,12 @@ public class JavaJadexParser extends Parser {
             	    tmp2=primarySuffix();
 
             	    state._fsp--;
-            	    if (state.failed) return exp;
-            	    if ( state.backtracking==0 ) {
 
-            	      			if(suffs==null)
-            	      				suffs	= new ArrayList();
-            	      			suffs.add(tmp2);
-            	      		
-            	    }
+
+            	    			if(suffs==null)
+            	    				suffs	= new ArrayList();
+            	    			suffs.add(tmp2);
+            	    		
 
             	    }
             	    break;
@@ -1114,14 +1042,12 @@ public class JavaJadexParser extends Parser {
                 }
             } while (true);
 
-            if ( state.backtracking==0 ) {
 
-              		if(suffs==null)
-              			exp = tmp;
-              		else
-              			exp = new PrimaryExpression(tmp, (Suffix[])suffs.toArray(new Suffix[suffs.size()]));
-              	
-            }
+            		if(suffs==null)
+            			exp = tmp;
+            		else
+            			exp = new PrimaryExpression(tmp, (Suffix[])suffs.toArray(new Suffix[suffs.size()]));
+            	
 
             }
 
@@ -1138,7 +1064,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "primaryPrefix"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:219:1: primaryPrefix returns [Expression exp] : ( '(' tmp= expression ')' | tmp= literal | {...}?tmp= pseudovariable | {...}?tmp= variable | ( staticField )=>{...}?tmp= staticField | ( existentialDeclaration )=>tmp= existentialDeclaration );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:219:1: primaryPrefix returns [Expression exp] : ( '(' tmp= expression ')' | tmp= literal | {...}?tmp= typePrimary | {...}?tmp= nontypePrimary );
     public final Expression primaryPrefix() throws RecognitionException {
         Expression exp = null;
 
@@ -1146,23 +1072,114 @@ public class JavaJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:223:2: ( '(' tmp= expression ')' | tmp= literal | {...}?tmp= pseudovariable | {...}?tmp= variable | ( staticField )=>{...}?tmp= staticField | ( existentialDeclaration )=>tmp= existentialDeclaration )
-            int alt14=6;
-            alt14 = dfa14.predict(input);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:223:2: ( '(' tmp= expression ')' | tmp= literal | {...}?tmp= typePrimary | {...}?tmp= nontypePrimary )
+            int alt14=4;
+            switch ( input.LA(1) ) {
+            case 41:
+                {
+                alt14=1;
+                }
+                break;
+            case CharacterLiteral:
+            case StringLiteral:
+            case BooleanLiteral:
+            case FloatingPointLiteral:
+            case HexLiteral:
+            case OctalLiteral:
+            case DecimalLiteral:
+            case 47:
+                {
+                alt14=2;
+                }
+                break;
+            case IDENTIFIER:
+                {
+                switch ( input.LA(2) ) {
+                case 43:
+                    {
+                    int LA14_4 = input.LA(3);
+
+                    if ( (LA14_4==IDENTIFIER) ) {
+                        int LA14_7 = input.LA(4);
+
+                        if ( ((((SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)!=-1)&&(SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)))||((SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)!=-1)&&(SJavaParser.lookaheadStaticMethod(JavaJadexParser.this.input, tmodel, imports)))||((SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)!=-1)&&(SJavaParser.lookaheadExistential(JavaJadexParser.this.input, tmodel, imports))))) ) {
+                            alt14=3;
+                        }
+                        else if ( ((((SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)==-1)&&(helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null))||((SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)==-1)&&(helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText()) && !"(".equals(JavaJadexParser.this.input.LT(4).getText()))))) ) {
+                            alt14=4;
+                        }
+                        else {
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 14, 7, input);
+
+                            throw nvae;
+                        }
+                    }
+                    else {
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 14, 4, input);
+
+                        throw nvae;
+                    }
+                    }
+                    break;
+                case EOF:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 42:
+                case 44:
+                case 45:
+                case 46:
+                    {
+                    alt14=4;
+                    }
+                    break;
+                case IDENTIFIER:
+                    {
+                    alt14=3;
+                    }
+                    break;
+                default:
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 14, 3, input);
+
+                    throw nvae;
+                }
+
+                }
+                break;
+            default:
+                NoViableAltException nvae =
+                    new NoViableAltException("", 14, 0, input);
+
+                throw nvae;
+            }
+
             switch (alt14) {
                 case 1 :
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:223:4: '(' tmp= expression ')'
                     {
-                    match(input,41,FOLLOW_41_in_primaryPrefix884); if (state.failed) return exp;
+                    match(input,41,FOLLOW_41_in_primaryPrefix884); 
                     pushFollow(FOLLOW_expression_in_primaryPrefix890);
                     tmp=expression();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    match(input,42,FOLLOW_42_in_primaryPrefix892); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+
+                    match(input,42,FOLLOW_42_in_primaryPrefix892); 
+                    exp = tmp;
 
                     }
                     break;
@@ -1173,78 +1190,38 @@ public class JavaJadexParser extends Parser {
                     tmp=literal();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+
+                    exp = tmp;
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:225:4: {...}?tmp= pseudovariable
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:225:4: {...}?tmp= typePrimary
                     {
-                    if ( !((helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText()))) ) {
-                        if (state.backtracking>0) {state.failed=true; return exp;}
-                        throw new FailedPredicateException(input, "primaryPrefix", "helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText())");
+                    if ( !((SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)!=-1)) ) {
+                        throw new FailedPredicateException(input, "primaryPrefix", "SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)!=-1");
                     }
-                    pushFollow(FOLLOW_pseudovariable_in_primaryPrefix916);
-                    tmp=pseudovariable();
+                    pushFollow(FOLLOW_typePrimary_in_primaryPrefix916);
+                    tmp=typePrimary();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+
+                    exp = tmp;
 
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:226:4: {...}?tmp= variable
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:226:4: {...}?tmp= nontypePrimary
                     {
-                    if ( !((helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null)) ) {
-                        if (state.backtracking>0) {state.failed=true; return exp;}
-                        throw new FailedPredicateException(input, "primaryPrefix", "helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null");
+                    if ( !((SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)==-1)) ) {
+                        throw new FailedPredicateException(input, "primaryPrefix", "SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)==-1");
                     }
-                    pushFollow(FOLLOW_variable_in_primaryPrefix929);
-                    tmp=variable();
+                    pushFollow(FOLLOW_nontypePrimary_in_primaryPrefix929);
+                    tmp=nontypePrimary();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
 
-                    }
-                    break;
-                case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:227:4: ( staticField )=>{...}?tmp= staticField
-                    {
-                    if ( !((SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports))) ) {
-                        if (state.backtracking>0) {state.failed=true; return exp;}
-                        throw new FailedPredicateException(input, "primaryPrefix", "SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)");
-                    }
-                    pushFollow(FOLLOW_staticField_in_primaryPrefix948);
-                    tmp=staticField();
-
-                    state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
-
-                    }
-                    break;
-                case 6 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:228:4: ( existentialDeclaration )=>tmp= existentialDeclaration
-                    {
-                    pushFollow(FOLLOW_existentialDeclaration_in_primaryPrefix965);
-                    tmp=existentialDeclaration();
-
-                    state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+                    exp = tmp;
 
                     }
                     break;
@@ -1262,8 +1239,314 @@ public class JavaJadexParser extends Parser {
     // $ANTLR end "primaryPrefix"
 
 
+    // $ANTLR start "typePrimary"
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:229:1: typePrimary returns [Expression exp] : ({...}?tmp= staticMethod | {...}?tmp= staticField | {...}?tmp= existentialDeclaration );
+    public final Expression typePrimary() throws RecognitionException {
+        Expression exp = null;
+
+        Expression tmp = null;
+
+
+        try {
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:233:2: ({...}?tmp= staticMethod | {...}?tmp= staticField | {...}?tmp= existentialDeclaration )
+            int alt15=3;
+            int LA15_0 = input.LA(1);
+
+            if ( (LA15_0==IDENTIFIER) ) {
+                int LA15_1 = input.LA(2);
+
+                if ( ((SJavaParser.lookaheadStaticMethod(JavaJadexParser.this.input, tmodel, imports))) ) {
+                    alt15=1;
+                }
+                else if ( ((SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports))) ) {
+                    alt15=2;
+                }
+                else if ( ((SJavaParser.lookaheadExistential(JavaJadexParser.this.input, tmodel, imports))) ) {
+                    alt15=3;
+                }
+                else {
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 15, 1, input);
+
+                    throw nvae;
+                }
+            }
+            else {
+                NoViableAltException nvae =
+                    new NoViableAltException("", 15, 0, input);
+
+                throw nvae;
+            }
+            switch (alt15) {
+                case 1 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:233:4: {...}?tmp= staticMethod
+                    {
+                    if ( !((SJavaParser.lookaheadStaticMethod(JavaJadexParser.this.input, tmodel, imports))) ) {
+                        throw new FailedPredicateException(input, "typePrimary", "SJavaParser.lookaheadStaticMethod(JavaJadexParser.this.input, tmodel, imports)");
+                    }
+                    pushFollow(FOLLOW_staticMethod_in_typePrimary954);
+                    tmp=staticMethod();
+
+                    state._fsp--;
+
+                    exp = tmp;
+
+                    }
+                    break;
+                case 2 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:234:4: {...}?tmp= staticField
+                    {
+                    if ( !((SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports))) ) {
+                        throw new FailedPredicateException(input, "typePrimary", "SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)");
+                    }
+                    pushFollow(FOLLOW_staticField_in_typePrimary967);
+                    tmp=staticField();
+
+                    state._fsp--;
+
+                    exp = tmp;
+
+                    }
+                    break;
+                case 3 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:235:4: {...}?tmp= existentialDeclaration
+                    {
+                    if ( !((SJavaParser.lookaheadExistential(JavaJadexParser.this.input, tmodel, imports))) ) {
+                        throw new FailedPredicateException(input, "typePrimary", "SJavaParser.lookaheadExistential(JavaJadexParser.this.input, tmodel, imports)");
+                    }
+                    pushFollow(FOLLOW_existentialDeclaration_in_typePrimary980);
+                    tmp=existentialDeclaration();
+
+                    state._fsp--;
+
+                    exp = tmp;
+
+                    }
+                    break;
+
+            }
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return exp;
+    }
+    // $ANTLR end "typePrimary"
+
+
+    // $ANTLR start "nontypePrimary"
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:238:1: nontypePrimary returns [Expression exp] : ({...}?tmp= pseudovariable | {...}?tmp= variable );
+    public final Expression nontypePrimary() throws RecognitionException {
+        Expression exp = null;
+
+        Expression tmp = null;
+
+
+        try {
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:242:2: ({...}?tmp= pseudovariable | {...}?tmp= variable )
+            int alt16=2;
+            int LA16_0 = input.LA(1);
+
+            if ( (LA16_0==IDENTIFIER) ) {
+                int LA16_1 = input.LA(2);
+
+                if ( (LA16_1==43) ) {
+                    int LA16_2 = input.LA(3);
+
+                    if ( (LA16_2==IDENTIFIER) ) {
+                        int LA16_4 = input.LA(4);
+
+                        if ( ((helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText()) && !"(".equals(JavaJadexParser.this.input.LT(4).getText()))) ) {
+                            alt16=1;
+                        }
+                        else if ( ((helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null)) ) {
+                            alt16=2;
+                        }
+                        else {
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 16, 4, input);
+
+                            throw nvae;
+                        }
+                    }
+                    else {
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 16, 2, input);
+
+                        throw nvae;
+                    }
+                }
+                else if ( (LA16_1==EOF||(LA16_1>=24 && LA16_1<=38)||LA16_1==42||(LA16_1>=44 && LA16_1<=46)) ) {
+                    alt16=2;
+                }
+                else {
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 16, 1, input);
+
+                    throw nvae;
+                }
+            }
+            else {
+                NoViableAltException nvae =
+                    new NoViableAltException("", 16, 0, input);
+
+                throw nvae;
+            }
+            switch (alt16) {
+                case 1 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:242:4: {...}?tmp= pseudovariable
+                    {
+                    if ( !((helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText()) && !"(".equals(JavaJadexParser.this.input.LT(4).getText()))) ) {
+                        throw new FailedPredicateException(input, "nontypePrimary", "helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText()) && !\"(\".equals(JavaJadexParser.this.input.LT(4).getText())");
+                    }
+                    pushFollow(FOLLOW_pseudovariable_in_nontypePrimary1005);
+                    tmp=pseudovariable();
+
+                    state._fsp--;
+
+                    exp = tmp;
+
+                    }
+                    break;
+                case 2 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:243:4: {...}?tmp= variable
+                    {
+                    if ( !((helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null)) ) {
+                        throw new FailedPredicateException(input, "nontypePrimary", "helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null");
+                    }
+                    pushFollow(FOLLOW_variable_in_nontypePrimary1018);
+                    tmp=variable();
+
+                    state._fsp--;
+
+                    exp = tmp;
+
+                    }
+                    break;
+
+            }
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return exp;
+    }
+    // $ANTLR end "nontypePrimary"
+
+
+    // $ANTLR start "staticMethod"
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:246:1: staticMethod returns [Expression exp] : (otype= type '.' tmp1= IDENTIFIER '(' ')' | otype= type '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')' );
+    public final Expression staticMethod() throws RecognitionException {
+        Expression exp = null;
+
+        Token tmp1=null;
+        Token tmp2=null;
+        OAVObjectType otype = null;
+
+        Expression p1 = null;
+
+        Expression p2 = null;
+
+
+        List params = new ArrayList();
+        try {
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:251:2: (otype= type '.' tmp1= IDENTIFIER '(' ')' | otype= type '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')' )
+            int alt18=2;
+            alt18 = dfa18.predict(input);
+            switch (alt18) {
+                case 1 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:251:4: otype= type '.' tmp1= IDENTIFIER '(' ')'
+                    {
+                    pushFollow(FOLLOW_type_in_staticMethod1046);
+                    otype=type();
+
+                    state._fsp--;
+
+                    match(input,43,FOLLOW_43_in_staticMethod1048); 
+                    tmp1=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_staticMethod1054); 
+                    match(input,41,FOLLOW_41_in_staticMethod1056); 
+                    match(input,42,FOLLOW_42_in_staticMethod1058); 
+                    exp = new StaticMethodAccess((OAVJavaType)otype, tmp1.getText(), null);
+
+                    }
+                    break;
+                case 2 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:252:4: otype= type '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')'
+                    {
+                    pushFollow(FOLLOW_type_in_staticMethod1069);
+                    otype=type();
+
+                    state._fsp--;
+
+                    match(input,43,FOLLOW_43_in_staticMethod1071); 
+                    tmp2=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_staticMethod1077); 
+                    match(input,41,FOLLOW_41_in_staticMethod1079); 
+                    pushFollow(FOLLOW_expression_in_staticMethod1085);
+                    p1=expression();
+
+                    state._fsp--;
+
+                    params.add(p1);
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:253:2: ( ',' p2= expression )*
+                    loop17:
+                    do {
+                        int alt17=2;
+                        int LA17_0 = input.LA(1);
+
+                        if ( (LA17_0==44) ) {
+                            alt17=1;
+                        }
+
+
+                        switch (alt17) {
+                    	case 1 :
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:253:3: ',' p2= expression
+                    	    {
+                    	    match(input,44,FOLLOW_44_in_staticMethod1091); 
+                    	    pushFollow(FOLLOW_expression_in_staticMethod1097);
+                    	    p2=expression();
+
+                    	    state._fsp--;
+
+                    	    params.add(p2);
+
+                    	    }
+                    	    break;
+
+                    	default :
+                    	    break loop17;
+                        }
+                    } while (true);
+
+                    match(input,42,FOLLOW_42_in_staticMethod1105); 
+
+                    		exp = new StaticMethodAccess((OAVJavaType)otype, tmp2.getText(), (Expression[])params.toArray(new Expression[params.size()]));
+                    	
+
+                    }
+                    break;
+
+            }
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return exp;
+    }
+    // $ANTLR end "staticMethod"
+
+
     // $ANTLR start "staticField"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:232:1: staticField returns [Expression exp] : otype= type '.' field= IDENTIFIER ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:260:1: staticField returns [Expression exp] : otype= type '.' field= IDENTIFIER ;
     public final Expression staticField() throws RecognitionException {
         Expression exp = null;
 
@@ -1272,32 +1555,30 @@ public class JavaJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:236:2: (otype= type '.' field= IDENTIFIER )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:236:4: otype= type '.' field= IDENTIFIER
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:264:2: (otype= type '.' field= IDENTIFIER )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:264:4: otype= type '.' field= IDENTIFIER
             {
-            pushFollow(FOLLOW_type_in_staticField989);
+            pushFollow(FOLLOW_type_in_staticField1129);
             otype=type();
 
             state._fsp--;
-            if (state.failed) return exp;
-            match(input,43,FOLLOW_43_in_staticField991); if (state.failed) return exp;
-            field=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_staticField997); if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
 
-              		try
-              		{
-              			Class	clazz	= ((OAVJavaType)otype).getClazz();
-              			Field	f	= clazz.getField(field.getText());
-              			exp = new LiteralExpression(f.get(null));
-              			if((f.getModifiers()&Modifier.FINAL)==0)
-              				System.out.println("Warning: static field should be final: "+clazz+", "+field.getText());
-              		}
-              		catch(Exception e)
-              		{
-              			throw new RuntimeException(e);
-              		}
-              	
-            }
+            match(input,43,FOLLOW_43_in_staticField1131); 
+            field=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_staticField1137); 
+
+            		try
+            		{
+            			Class	clazz	= ((OAVJavaType)otype).getClazz();
+            			Field	f	= clazz.getField(field.getText());
+            			exp = new LiteralExpression(f.get(null));
+            			if((f.getModifiers()&Modifier.FINAL)==0)
+            				System.out.println("Warning: static field should be final: "+clazz+", "+field.getText());
+            		}
+            		catch(Exception e)
+            		{
+            			throw new RuntimeException(e);
+            		}
+            	
 
             }
 
@@ -1314,7 +1595,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "existentialDeclaration"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:253:1: existentialDeclaration returns [Expression exp] : otype= type varname= IDENTIFIER ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:281:1: existentialDeclaration returns [Expression exp] : otype= type varname= IDENTIFIER ;
     public final Expression existentialDeclaration() throws RecognitionException {
         Expression exp = null;
 
@@ -1323,22 +1604,20 @@ public class JavaJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:257:2: (otype= type varname= IDENTIFIER )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:257:4: otype= type varname= IDENTIFIER
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:285:2: (otype= type varname= IDENTIFIER )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:285:4: otype= type varname= IDENTIFIER
             {
-            pushFollow(FOLLOW_type_in_existentialDeclaration1021);
+            pushFollow(FOLLOW_type_in_existentialDeclaration1161);
             otype=type();
 
             state._fsp--;
-            if (state.failed) return exp;
-            varname=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_existentialDeclaration1027); if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
 
-              		Variable	var	= new Variable(varname.getText(), otype);
-              		exp = new ExistentialDeclaration(otype, var);
-              		helper.addVariable(var);
-              	
-            }
+            varname=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_existentialDeclaration1167); 
+
+            		Variable	var	= new Variable(varname.getText(), otype);
+            		exp = new ExistentialDeclaration(otype, var);
+            		helper.addVariable(var);
+            	
 
             }
 
@@ -1355,7 +1634,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "type"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:265:1: type returns [OAVObjectType otype] : tmp= IDENTIFIER ({...}? '.' tmp2= IDENTIFIER )* ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:293:1: type returns [OAVObjectType otype] : tmp= IDENTIFIER ({...}? '.' tmp2= IDENTIFIER )* ;
     public final OAVObjectType type() throws RecognitionException {
         OAVObjectType otype = null;
 
@@ -1364,45 +1643,43 @@ public class JavaJadexParser extends Parser {
 
         String name = null;
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:270:2: (tmp= IDENTIFIER ({...}? '.' tmp2= IDENTIFIER )* )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:270:4: tmp= IDENTIFIER ({...}? '.' tmp2= IDENTIFIER )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:298:2: (tmp= IDENTIFIER ({...}? '.' tmp2= IDENTIFIER )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:298:4: tmp= IDENTIFIER ({...}? '.' tmp2= IDENTIFIER )*
             {
-            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_type1056); if (state.failed) return otype;
-            if ( state.backtracking==0 ) {
+            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_type1196); 
 
-              		name	= tmp.getText();
-              		try
-              		{
-              			otype = tmodel.getObjectType(name);
-              		}
-              		catch(Exception e)
-              		{
-              			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
-              			if(clazz!=null)
-              				otype = tmodel.getJavaType(clazz);
-              		}
-              	
-            }
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:284:2: ({...}? '.' tmp2= IDENTIFIER )*
-            loop15:
+            		name	= tmp.getText();
+            		try
+            		{
+            			otype = tmodel.getObjectType(name);
+            		}
+            		catch(Exception e)
+            		{
+            			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
+            			if(clazz!=null)
+            				otype = tmodel.getJavaType(clazz);
+            		}
+            	
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:312:2: ({...}? '.' tmp2= IDENTIFIER )*
+            loop19:
             do {
-                int alt15=2;
-                int LA15_0 = input.LA(1);
+                int alt19=2;
+                int LA19_0 = input.LA(1);
 
-                if ( (LA15_0==43) ) {
-                    int LA15_1 = input.LA(2);
+                if ( (LA19_0==43) ) {
+                    int LA19_1 = input.LA(2);
 
-                    if ( (LA15_1==IDENTIFIER) ) {
-                        int LA15_3 = input.LA(3);
+                    if ( (LA19_1==IDENTIFIER) ) {
+                        int LA19_3 = input.LA(3);
 
-                        if ( (LA15_3==43) ) {
-                            int LA15_4 = input.LA(4);
+                        if ( (LA19_3==43) ) {
+                            int LA19_4 = input.LA(4);
 
-                            if ( (LA15_4==IDENTIFIER) ) {
-                                int LA15_6 = input.LA(5);
+                            if ( (LA19_4==IDENTIFIER) ) {
+                                int LA19_6 = input.LA(5);
 
                                 if ( ((otype==null)) ) {
-                                    alt15=1;
+                                    alt19=1;
                                 }
 
 
@@ -1410,8 +1687,8 @@ public class JavaJadexParser extends Parser {
 
 
                         }
-                        else if ( (LA15_3==IDENTIFIER) ) {
-                            alt15=1;
+                        else if ( (LA19_3==IDENTIFIER) ) {
+                            alt19=1;
                         }
 
 
@@ -1421,30 +1698,27 @@ public class JavaJadexParser extends Parser {
                 }
 
 
-                switch (alt15) {
+                switch (alt19) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:284:4: {...}? '.' tmp2= IDENTIFIER
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:312:4: {...}? '.' tmp2= IDENTIFIER
             	    {
             	    if ( !((otype==null)) ) {
-            	        if (state.backtracking>0) {state.failed=true; return otype;}
             	        throw new FailedPredicateException(input, "type", "$otype==null");
             	    }
-            	    match(input,43,FOLLOW_43_in_type1068); if (state.failed) return otype;
-            	    tmp2=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_type1074); if (state.failed) return otype;
-            	    if ( state.backtracking==0 ) {
+            	    match(input,43,FOLLOW_43_in_type1208); 
+            	    tmp2=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_type1214); 
 
-            	      			name += "."+tmp2.getText();
-            	       			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
-            	      			if(clazz!=null)
-            	      				otype = tmodel.getJavaType(clazz);
-            	       		
-            	    }
+            	    			name += "."+tmp2.getText();
+            	     			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
+            	    			if(clazz!=null)
+            	    				otype = tmodel.getJavaType(clazz);
+            	     		
 
             	    }
             	    break;
 
             	default :
-            	    break loop15;
+            	    break loop19;
                 }
             } while (true);
 
@@ -1464,7 +1738,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "primarySuffix"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:295:1: primarySuffix returns [Suffix suff] : (tmp= fieldAccess | tmp= methodAccess | tmp= arrayAccess );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:323:1: primarySuffix returns [Suffix suff] : (tmp= fieldAccess | tmp= methodAccess | tmp= arrayAccess );
     public final Suffix primarySuffix() throws RecognitionException {
         Suffix suff = null;
 
@@ -1472,88 +1746,79 @@ public class JavaJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:299:2: (tmp= fieldAccess | tmp= methodAccess | tmp= arrayAccess )
-            int alt16=3;
-            int LA16_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:327:2: (tmp= fieldAccess | tmp= methodAccess | tmp= arrayAccess )
+            int alt20=3;
+            int LA20_0 = input.LA(1);
 
-            if ( (LA16_0==43) ) {
-                int LA16_1 = input.LA(2);
+            if ( (LA20_0==43) ) {
+                int LA20_1 = input.LA(2);
 
-                if ( (LA16_1==IDENTIFIER) ) {
-                    int LA16_3 = input.LA(3);
+                if ( (LA20_1==IDENTIFIER) ) {
+                    int LA20_3 = input.LA(3);
 
-                    if ( (LA16_3==41) ) {
-                        alt16=2;
+                    if ( (LA20_3==41) ) {
+                        alt20=2;
                     }
-                    else if ( (LA16_3==EOF||(LA16_3>=24 && LA16_3<=38)||(LA16_3>=42 && LA16_3<=46)) ) {
-                        alt16=1;
+                    else if ( (LA20_3==EOF||(LA20_3>=24 && LA20_3<=38)||(LA20_3>=42 && LA20_3<=46)) ) {
+                        alt20=1;
                     }
                     else {
-                        if (state.backtracking>0) {state.failed=true; return suff;}
                         NoViableAltException nvae =
-                            new NoViableAltException("", 16, 3, input);
+                            new NoViableAltException("", 20, 3, input);
 
                         throw nvae;
                     }
                 }
                 else {
-                    if (state.backtracking>0) {state.failed=true; return suff;}
                     NoViableAltException nvae =
-                        new NoViableAltException("", 16, 1, input);
+                        new NoViableAltException("", 20, 1, input);
 
                     throw nvae;
                 }
             }
-            else if ( (LA16_0==45) ) {
-                alt16=3;
+            else if ( (LA20_0==45) ) {
+                alt20=3;
             }
             else {
-                if (state.backtracking>0) {state.failed=true; return suff;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 16, 0, input);
+                    new NoViableAltException("", 20, 0, input);
 
                 throw nvae;
             }
-            switch (alt16) {
+            switch (alt20) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:299:4: tmp= fieldAccess
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:327:4: tmp= fieldAccess
                     {
-                    pushFollow(FOLLOW_fieldAccess_in_primarySuffix1104);
+                    pushFollow(FOLLOW_fieldAccess_in_primarySuffix1244);
                     tmp=fieldAccess();
 
                     state._fsp--;
-                    if (state.failed) return suff;
-                    if ( state.backtracking==0 ) {
-                      suff = tmp;
-                    }
+
+                    suff = tmp;
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:300:4: tmp= methodAccess
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:328:4: tmp= methodAccess
                     {
-                    pushFollow(FOLLOW_methodAccess_in_primarySuffix1115);
+                    pushFollow(FOLLOW_methodAccess_in_primarySuffix1255);
                     tmp=methodAccess();
 
                     state._fsp--;
-                    if (state.failed) return suff;
-                    if ( state.backtracking==0 ) {
-                      suff = tmp;
-                    }
+
+                    suff = tmp;
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:301:4: tmp= arrayAccess
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:329:4: tmp= arrayAccess
                     {
-                    pushFollow(FOLLOW_arrayAccess_in_primarySuffix1126);
+                    pushFollow(FOLLOW_arrayAccess_in_primarySuffix1266);
                     tmp=arrayAccess();
 
                     state._fsp--;
-                    if (state.failed) return suff;
-                    if ( state.backtracking==0 ) {
-                      suff = tmp;
-                    }
+
+                    suff = tmp;
 
                     }
                     break;
@@ -1572,21 +1837,19 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "fieldAccess"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:304:1: fieldAccess returns [Suffix suff] : '.' tmp= IDENTIFIER ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:332:1: fieldAccess returns [Suffix suff] : '.' tmp= IDENTIFIER ;
     public final Suffix fieldAccess() throws RecognitionException {
         Suffix suff = null;
 
         Token tmp=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:308:2: ( '.' tmp= IDENTIFIER )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:308:4: '.' tmp= IDENTIFIER
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:336:2: ( '.' tmp= IDENTIFIER )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:336:4: '.' tmp= IDENTIFIER
             {
-            match(input,43,FOLLOW_43_in_fieldAccess1145); if (state.failed) return suff;
-            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_fieldAccess1151); if (state.failed) return suff;
-            if ( state.backtracking==0 ) {
-              suff = new FieldAccess(tmp.getText());
-            }
+            match(input,43,FOLLOW_43_in_fieldAccess1285); 
+            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_fieldAccess1291); 
+            suff = new FieldAccess(tmp.getText());
 
             }
 
@@ -1603,7 +1866,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "methodAccess"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:311:1: methodAccess returns [Suffix suff] : ( '.' tmp1= IDENTIFIER '(' ')' | '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:339:1: methodAccess returns [Suffix suff] : ( '.' tmp1= IDENTIFIER '(' ')' | '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')' );
     public final Suffix methodAccess() throws RecognitionException {
         Suffix suff = null;
 
@@ -1616,123 +1879,111 @@ public class JavaJadexParser extends Parser {
 
         List params = new ArrayList();
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:316:2: ( '.' tmp1= IDENTIFIER '(' ')' | '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')' )
-            int alt18=2;
-            int LA18_0 = input.LA(1);
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:344:2: ( '.' tmp1= IDENTIFIER '(' ')' | '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')' )
+            int alt22=2;
+            int LA22_0 = input.LA(1);
 
-            if ( (LA18_0==43) ) {
-                int LA18_1 = input.LA(2);
+            if ( (LA22_0==43) ) {
+                int LA22_1 = input.LA(2);
 
-                if ( (LA18_1==IDENTIFIER) ) {
-                    int LA18_2 = input.LA(3);
+                if ( (LA22_1==IDENTIFIER) ) {
+                    int LA22_2 = input.LA(3);
 
-                    if ( (LA18_2==41) ) {
-                        int LA18_3 = input.LA(4);
+                    if ( (LA22_2==41) ) {
+                        int LA22_3 = input.LA(4);
 
-                        if ( (LA18_3==42) ) {
-                            alt18=1;
+                        if ( (LA22_3==42) ) {
+                            alt22=1;
                         }
-                        else if ( ((LA18_3>=IDENTIFIER && LA18_3<=DecimalLiteral)||(LA18_3>=34 && LA18_3<=35)||(LA18_3>=39 && LA18_3<=41)||LA18_3==47) ) {
-                            alt18=2;
+                        else if ( ((LA22_3>=IDENTIFIER && LA22_3<=DecimalLiteral)||(LA22_3>=34 && LA22_3<=35)||(LA22_3>=39 && LA22_3<=41)||LA22_3==47) ) {
+                            alt22=2;
                         }
                         else {
-                            if (state.backtracking>0) {state.failed=true; return suff;}
                             NoViableAltException nvae =
-                                new NoViableAltException("", 18, 3, input);
+                                new NoViableAltException("", 22, 3, input);
 
                             throw nvae;
                         }
                     }
                     else {
-                        if (state.backtracking>0) {state.failed=true; return suff;}
                         NoViableAltException nvae =
-                            new NoViableAltException("", 18, 2, input);
+                            new NoViableAltException("", 22, 2, input);
 
                         throw nvae;
                     }
                 }
                 else {
-                    if (state.backtracking>0) {state.failed=true; return suff;}
                     NoViableAltException nvae =
-                        new NoViableAltException("", 18, 1, input);
+                        new NoViableAltException("", 22, 1, input);
 
                     throw nvae;
                 }
             }
             else {
-                if (state.backtracking>0) {state.failed=true; return suff;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 18, 0, input);
+                    new NoViableAltException("", 22, 0, input);
 
                 throw nvae;
             }
-            switch (alt18) {
+            switch (alt22) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:316:4: '.' tmp1= IDENTIFIER '(' ')'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:344:4: '.' tmp1= IDENTIFIER '(' ')'
                     {
-                    match(input,43,FOLLOW_43_in_methodAccess1175); if (state.failed) return suff;
-                    tmp1=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_methodAccess1181); if (state.failed) return suff;
-                    match(input,41,FOLLOW_41_in_methodAccess1183); if (state.failed) return suff;
-                    match(input,42,FOLLOW_42_in_methodAccess1185); if (state.failed) return suff;
-                    if ( state.backtracking==0 ) {
-                      suff = new MethodAccess(tmp1.getText(), null);
-                    }
+                    match(input,43,FOLLOW_43_in_methodAccess1315); 
+                    tmp1=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_methodAccess1321); 
+                    match(input,41,FOLLOW_41_in_methodAccess1323); 
+                    match(input,42,FOLLOW_42_in_methodAccess1325); 
+                    suff = new MethodAccess(tmp1.getText(), null);
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:317:4: '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:345:4: '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')'
                     {
-                    match(input,43,FOLLOW_43_in_methodAccess1192); if (state.failed) return suff;
-                    tmp2=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_methodAccess1198); if (state.failed) return suff;
-                    match(input,41,FOLLOW_41_in_methodAccess1200); if (state.failed) return suff;
-                    pushFollow(FOLLOW_expression_in_methodAccess1206);
+                    match(input,43,FOLLOW_43_in_methodAccess1332); 
+                    tmp2=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_methodAccess1338); 
+                    match(input,41,FOLLOW_41_in_methodAccess1340); 
+                    pushFollow(FOLLOW_expression_in_methodAccess1346);
                     p1=expression();
 
                     state._fsp--;
-                    if (state.failed) return suff;
-                    if ( state.backtracking==0 ) {
-                      params.add(p1);
-                    }
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:318:2: ( ',' p2= expression )*
-                    loop17:
-                    do {
-                        int alt17=2;
-                        int LA17_0 = input.LA(1);
 
-                        if ( (LA17_0==44) ) {
-                            alt17=1;
+                    params.add(p1);
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:346:2: ( ',' p2= expression )*
+                    loop21:
+                    do {
+                        int alt21=2;
+                        int LA21_0 = input.LA(1);
+
+                        if ( (LA21_0==44) ) {
+                            alt21=1;
                         }
 
 
-                        switch (alt17) {
+                        switch (alt21) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:318:3: ',' p2= expression
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:346:3: ',' p2= expression
                     	    {
-                    	    match(input,44,FOLLOW_44_in_methodAccess1212); if (state.failed) return suff;
-                    	    pushFollow(FOLLOW_expression_in_methodAccess1218);
+                    	    match(input,44,FOLLOW_44_in_methodAccess1352); 
+                    	    pushFollow(FOLLOW_expression_in_methodAccess1358);
                     	    p2=expression();
 
                     	    state._fsp--;
-                    	    if (state.failed) return suff;
-                    	    if ( state.backtracking==0 ) {
-                    	      params.add(p2);
-                    	    }
+
+                    	    params.add(p2);
 
                     	    }
                     	    break;
 
                     	default :
-                    	    break loop17;
+                    	    break loop21;
                         }
                     } while (true);
 
-                    match(input,42,FOLLOW_42_in_methodAccess1226); if (state.failed) return suff;
-                    if ( state.backtracking==0 ) {
+                    match(input,42,FOLLOW_42_in_methodAccess1366); 
 
-                      		suff = new MethodAccess(tmp2.getText(), (Expression[])params.toArray(new Expression[params.size()]));
-                      	
-                    }
+                    		suff = new MethodAccess(tmp2.getText(), (Expression[])params.toArray(new Expression[params.size()]));
+                    	
 
                     }
                     break;
@@ -1751,7 +2002,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "arrayAccess"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:325:1: arrayAccess returns [Suffix suff] : '[' tmp= expression ']' ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:353:1: arrayAccess returns [Suffix suff] : '[' tmp= expression ']' ;
     public final Suffix arrayAccess() throws RecognitionException {
         Suffix suff = null;
 
@@ -1759,21 +2010,19 @@ public class JavaJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:329:2: ( '[' tmp= expression ']' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:329:4: '[' tmp= expression ']'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:357:2: ( '[' tmp= expression ']' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:357:4: '[' tmp= expression ']'
             {
-            match(input,45,FOLLOW_45_in_arrayAccess1246); if (state.failed) return suff;
-            pushFollow(FOLLOW_expression_in_arrayAccess1252);
+            match(input,45,FOLLOW_45_in_arrayAccess1386); 
+            pushFollow(FOLLOW_expression_in_arrayAccess1392);
             tmp=expression();
 
             state._fsp--;
-            if (state.failed) return suff;
-            match(input,46,FOLLOW_46_in_arrayAccess1254); if (state.failed) return suff;
-            if ( state.backtracking==0 ) {
 
-              		suff = new ArrayAccess(tmp);
-              	
-            }
+            match(input,46,FOLLOW_46_in_arrayAccess1394); 
+
+            		suff = new ArrayAccess(tmp);
+            	
 
             }
 
@@ -1790,26 +2039,26 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "variable"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:335:1: variable returns [Expression exp] : tmp= IDENTIFIER ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:363:1: variable returns [Expression exp] : tmp= IDENTIFIER ;
     public final Expression variable() throws RecognitionException {
         Expression exp = null;
 
         Token tmp=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:339:2: (tmp= IDENTIFIER )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:339:4: tmp= IDENTIFIER
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:367:2: (tmp= IDENTIFIER )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:367:4: tmp= IDENTIFIER
             {
-            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_variable1278); if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
+            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_variable1418); 
 
-              		String	name	= tmp.getText();
-              		Variable	var	= helper.getVariable(name);
-              		if(var==null)
-              			throw new RuntimeException("No such variable: "+name);
-              		exp = new VariableExpression(var);
-              	
-            }
+            		String	name	= tmp.getText();
+            		Variable	var	= helper.getVariable(name);
+            		if(var==null)
+            		{
+            			throw new RuntimeException("No such variable: "+name);
+            		}
+            		exp = new VariableExpression(var);
+            	
 
             }
 
@@ -1826,7 +2075,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "pseudovariable"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:349:1: pseudovariable returns [Expression exp] : tmp= IDENTIFIER '.' tmp2= IDENTIFIER ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:379:1: pseudovariable returns [Expression exp] : tmp= IDENTIFIER '.' tmp2= IDENTIFIER ;
     public final Expression pseudovariable() throws RecognitionException {
         Expression exp = null;
 
@@ -1834,21 +2083,19 @@ public class JavaJadexParser extends Parser {
         Token tmp2=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:353:2: (tmp= IDENTIFIER '.' tmp2= IDENTIFIER )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:353:4: tmp= IDENTIFIER '.' tmp2= IDENTIFIER
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:383:2: (tmp= IDENTIFIER '.' tmp2= IDENTIFIER )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:383:4: tmp= IDENTIFIER '.' tmp2= IDENTIFIER
             {
-            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_pseudovariable1302); if (state.failed) return exp;
-            match(input,43,FOLLOW_43_in_pseudovariable1304); if (state.failed) return exp;
-            tmp2=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_pseudovariable1308); if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
+            tmp=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_pseudovariable1442); 
+            match(input,43,FOLLOW_43_in_pseudovariable1444); 
+            tmp2=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_pseudovariable1448); 
 
-              		String name	= tmp.getText()+"."+tmp2.getText();
-              		Variable	var	= helper.getVariable(name);
-              		if(var==null)
-              			throw new RuntimeException("No such variable: "+name);
-              		exp = new VariableExpression(var);
-              	
-            }
+            		String name	= tmp.getText()+"."+tmp2.getText();
+            		Variable	var	= helper.getVariable(name);
+            		if(var==null)
+            			throw new RuntimeException("No such variable: "+name);
+            		exp = new VariableExpression(var);
+            	
 
             }
 
@@ -1865,7 +2112,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "literal"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:363:1: literal returns [Expression exp] : (tmp= floatingPointLiteral | tmp= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:393:1: literal returns [Expression exp] : (tmp= floatingPointLiteral | tmp= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' );
     public final Expression literal() throws RecognitionException {
         Expression exp = null;
 
@@ -1876,115 +2123,102 @@ public class JavaJadexParser extends Parser {
 
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:364:2: (tmp= floatingPointLiteral | tmp= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
-            int alt19=6;
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:394:2: (tmp= floatingPointLiteral | tmp= integerLiteral | CharacterLiteral | StringLiteral | BooleanLiteral | 'null' )
+            int alt23=6;
             switch ( input.LA(1) ) {
             case FloatingPointLiteral:
                 {
-                alt19=1;
+                alt23=1;
                 }
                 break;
             case HexLiteral:
             case OctalLiteral:
             case DecimalLiteral:
                 {
-                alt19=2;
+                alt23=2;
                 }
                 break;
             case CharacterLiteral:
                 {
-                alt19=3;
+                alt23=3;
                 }
                 break;
             case StringLiteral:
                 {
-                alt19=4;
+                alt23=4;
                 }
                 break;
             case BooleanLiteral:
                 {
-                alt19=5;
+                alt23=5;
                 }
                 break;
             case 47:
                 {
-                alt19=6;
+                alt23=6;
                 }
                 break;
             default:
-                if (state.backtracking>0) {state.failed=true; return exp;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 19, 0, input);
+                    new NoViableAltException("", 23, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt19) {
+            switch (alt23) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:364:4: tmp= floatingPointLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:394:4: tmp= floatingPointLiteral
                     {
-                    pushFollow(FOLLOW_floatingPointLiteral_in_literal1330);
+                    pushFollow(FOLLOW_floatingPointLiteral_in_literal1470);
                     tmp=floatingPointLiteral();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+
+                    exp = tmp;
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:365:4: tmp= integerLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:395:4: tmp= integerLiteral
                     {
-                    pushFollow(FOLLOW_integerLiteral_in_literal1341);
+                    pushFollow(FOLLOW_integerLiteral_in_literal1481);
                     tmp=integerLiteral();
 
                     state._fsp--;
-                    if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = tmp;
-                    }
+
+                    exp = tmp;
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:366:4: CharacterLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:396:4: CharacterLiteral
                     {
-                    CharacterLiteral1=(Token)match(input,CharacterLiteral,FOLLOW_CharacterLiteral_in_literal1348); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new LiteralExpression(new Character((CharacterLiteral1!=null?CharacterLiteral1.getText():null).charAt(0)));
-                    }
+                    CharacterLiteral1=(Token)match(input,CharacterLiteral,FOLLOW_CharacterLiteral_in_literal1488); 
+                    exp = new LiteralExpression(new Character((CharacterLiteral1!=null?CharacterLiteral1.getText():null).charAt(0)));
 
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:367:4: StringLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:397:4: StringLiteral
                     {
-                    StringLiteral2=(Token)match(input,StringLiteral,FOLLOW_StringLiteral_in_literal1355); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new LiteralExpression((StringLiteral2!=null?StringLiteral2.getText():null).substring(1, (StringLiteral2!=null?StringLiteral2.getText():null).length()-1));
-                    }
+                    StringLiteral2=(Token)match(input,StringLiteral,FOLLOW_StringLiteral_in_literal1495); 
+                    exp = new LiteralExpression((StringLiteral2!=null?StringLiteral2.getText():null).substring(1, (StringLiteral2!=null?StringLiteral2.getText():null).length()-1));
 
                     }
                     break;
                 case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:368:4: BooleanLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:398:4: BooleanLiteral
                     {
-                    BooleanLiteral3=(Token)match(input,BooleanLiteral,FOLLOW_BooleanLiteral_in_literal1362); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new LiteralExpression((BooleanLiteral3!=null?BooleanLiteral3.getText():null).equals("true")? Boolean.TRUE: Boolean.FALSE);
-                    }
+                    BooleanLiteral3=(Token)match(input,BooleanLiteral,FOLLOW_BooleanLiteral_in_literal1502); 
+                    exp = new LiteralExpression((BooleanLiteral3!=null?BooleanLiteral3.getText():null).equals("true")? Boolean.TRUE: Boolean.FALSE);
 
                     }
                     break;
                 case 6 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:369:4: 'null'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:399:4: 'null'
                     {
-                    match(input,47,FOLLOW_47_in_literal1369); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new LiteralExpression(null);
-                    }
+                    match(input,47,FOLLOW_47_in_literal1509); 
+                    exp = new LiteralExpression(null);
 
                     }
                     break;
@@ -2003,20 +2237,18 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "floatingPointLiteral"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:372:1: floatingPointLiteral returns [Expression exp] : FloatingPointLiteral ;
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:402:1: floatingPointLiteral returns [Expression exp] : FloatingPointLiteral ;
     public final Expression floatingPointLiteral() throws RecognitionException {
         Expression exp = null;
 
         Token FloatingPointLiteral4=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:373:2: ( FloatingPointLiteral )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:373:4: FloatingPointLiteral
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:403:2: ( FloatingPointLiteral )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:403:4: FloatingPointLiteral
             {
-            FloatingPointLiteral4=(Token)match(input,FloatingPointLiteral,FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1386); if (state.failed) return exp;
-            if ( state.backtracking==0 ) {
-              exp = new LiteralExpression(new Double((FloatingPointLiteral4!=null?FloatingPointLiteral4.getText():null)));
-            }
+            FloatingPointLiteral4=(Token)match(input,FloatingPointLiteral,FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1526); 
+            exp = new LiteralExpression(new Double((FloatingPointLiteral4!=null?FloatingPointLiteral4.getText():null)));
 
             }
 
@@ -2033,7 +2265,7 @@ public class JavaJadexParser extends Parser {
 
 
     // $ANTLR start "integerLiteral"
-    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:376:1: integerLiteral returns [Expression exp] : ( HexLiteral | OctalLiteral | DecimalLiteral );
+    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:406:1: integerLiteral returns [Expression exp] : ( HexLiteral | OctalLiteral | DecimalLiteral );
     public final Expression integerLiteral() throws RecognitionException {
         Expression exp = null;
 
@@ -2042,60 +2274,53 @@ public class JavaJadexParser extends Parser {
         Token DecimalLiteral7=null;
 
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:377:2: ( HexLiteral | OctalLiteral | DecimalLiteral )
-            int alt20=3;
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:407:2: ( HexLiteral | OctalLiteral | DecimalLiteral )
+            int alt24=3;
             switch ( input.LA(1) ) {
             case HexLiteral:
                 {
-                alt20=1;
+                alt24=1;
                 }
                 break;
             case OctalLiteral:
                 {
-                alt20=2;
+                alt24=2;
                 }
                 break;
             case DecimalLiteral:
                 {
-                alt20=3;
+                alt24=3;
                 }
                 break;
             default:
-                if (state.backtracking>0) {state.failed=true; return exp;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 20, 0, input);
+                    new NoViableAltException("", 24, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt20) {
+            switch (alt24) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:377:4: HexLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:407:4: HexLiteral
                     {
-                    HexLiteral5=(Token)match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1403); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new LiteralExpression(new Integer((HexLiteral5!=null?HexLiteral5.getText():null)));
-                    }
+                    HexLiteral5=(Token)match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1543); 
+                    exp = new LiteralExpression(new Integer((HexLiteral5!=null?HexLiteral5.getText():null)));
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:378:4: OctalLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:408:4: OctalLiteral
                     {
-                    OctalLiteral6=(Token)match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1410); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new LiteralExpression(new Integer((OctalLiteral6!=null?OctalLiteral6.getText():null)));
-                    }
+                    OctalLiteral6=(Token)match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1550); 
+                    exp = new LiteralExpression(new Integer((OctalLiteral6!=null?OctalLiteral6.getText():null)));
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:379:4: DecimalLiteral
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:409:4: DecimalLiteral
                     {
-                    DecimalLiteral7=(Token)match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1417); if (state.failed) return exp;
-                    if ( state.backtracking==0 ) {
-                      exp = new LiteralExpression(new Integer((DecimalLiteral7!=null?DecimalLiteral7.getText():null)));
-                    }
+                    DecimalLiteral7=(Token)match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1557); 
+                    exp = new LiteralExpression(new Integer((DecimalLiteral7!=null?DecimalLiteral7.getText():null)));
 
                     }
                     break;
@@ -2112,175 +2337,63 @@ public class JavaJadexParser extends Parser {
     }
     // $ANTLR end "integerLiteral"
 
-    // $ANTLR start synpred1_JavaJadex
-    public final void synpred1_JavaJadex_fragment() throws RecognitionException {   
-        // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:227:4: ( staticField )
-        // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:227:5: staticField
-        {
-        pushFollow(FOLLOW_staticField_in_synpred1_JavaJadex937);
-        staticField();
-
-        state._fsp--;
-        if (state.failed) return ;
-
-        }
-    }
-    // $ANTLR end synpred1_JavaJadex
-
-    // $ANTLR start synpred2_JavaJadex
-    public final void synpred2_JavaJadex_fragment() throws RecognitionException {   
-        // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:228:4: ( existentialDeclaration )
-        // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:228:5: existentialDeclaration
-        {
-        pushFollow(FOLLOW_existentialDeclaration_in_synpred2_JavaJadex956);
-        existentialDeclaration();
-
-        state._fsp--;
-        if (state.failed) return ;
-
-        }
-    }
-    // $ANTLR end synpred2_JavaJadex
-
     // Delegated rules
 
-    public final boolean synpred1_JavaJadex() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred1_JavaJadex_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public final boolean synpred2_JavaJadex() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred2_JavaJadex_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
 
-
-    protected DFA14 dfa14 = new DFA14(this);
-    static final String DFA14_eotS =
-        "\13\uffff";
-    static final String DFA14_eofS =
-        "\3\uffff\1\6\7\uffff";
-    static final String DFA14_minS =
-        "\1\4\2\uffff\2\4\2\uffff\1\4\3\uffff";
-    static final String DFA14_maxS =
-        "\1\57\2\uffff\1\56\1\4\2\uffff\1\53\3\uffff";
-    static final String DFA14_acceptS =
-        "\1\uffff\1\1\1\2\2\uffff\1\6\1\4\1\uffff\1\6\1\3\1\5";
-    static final String DFA14_specialS =
-        "\3\uffff\1\1\3\uffff\1\0\3\uffff}>";
-    static final String[] DFA14_transitionS = {
-            "\1\3\7\2\35\uffff\1\1\5\uffff\1\2",
-            "",
-            "",
-            "\1\5\23\uffff\17\6\3\uffff\1\6\1\4\3\6",
-            "\1\7",
-            "",
-            "",
-            "\1\5\46\uffff\1\10",
-            "",
+    protected DFA18 dfa18 = new DFA18(this);
+    static final String DFA18_eotS =
+        "\7\uffff";
+    static final String DFA18_eofS =
+        "\7\uffff";
+    static final String DFA18_minS =
+        "\1\4\1\53\1\4\1\51\1\4\2\uffff";
+    static final String DFA18_maxS =
+        "\1\4\1\53\1\4\1\53\1\57\2\uffff";
+    static final String DFA18_acceptS =
+        "\5\uffff\1\1\1\2";
+    static final String DFA18_specialS =
+        "\7\uffff}>";
+    static final String[] DFA18_transitionS = {
+            "\1\1",
+            "\1\2",
+            "\1\3",
+            "\1\4\1\uffff\1\2",
+            "\10\6\26\uffff\2\6\3\uffff\3\6\1\5\4\uffff\1\6",
             "",
             ""
     };
 
-    static final short[] DFA14_eot = DFA.unpackEncodedString(DFA14_eotS);
-    static final short[] DFA14_eof = DFA.unpackEncodedString(DFA14_eofS);
-    static final char[] DFA14_min = DFA.unpackEncodedStringToUnsignedChars(DFA14_minS);
-    static final char[] DFA14_max = DFA.unpackEncodedStringToUnsignedChars(DFA14_maxS);
-    static final short[] DFA14_accept = DFA.unpackEncodedString(DFA14_acceptS);
-    static final short[] DFA14_special = DFA.unpackEncodedString(DFA14_specialS);
-    static final short[][] DFA14_transition;
+    static final short[] DFA18_eot = DFA.unpackEncodedString(DFA18_eotS);
+    static final short[] DFA18_eof = DFA.unpackEncodedString(DFA18_eofS);
+    static final char[] DFA18_min = DFA.unpackEncodedStringToUnsignedChars(DFA18_minS);
+    static final char[] DFA18_max = DFA.unpackEncodedStringToUnsignedChars(DFA18_maxS);
+    static final short[] DFA18_accept = DFA.unpackEncodedString(DFA18_acceptS);
+    static final short[] DFA18_special = DFA.unpackEncodedString(DFA18_specialS);
+    static final short[][] DFA18_transition;
 
     static {
-        int numStates = DFA14_transitionS.length;
-        DFA14_transition = new short[numStates][];
+        int numStates = DFA18_transitionS.length;
+        DFA18_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA14_transition[i] = DFA.unpackEncodedString(DFA14_transitionS[i]);
+            DFA18_transition[i] = DFA.unpackEncodedString(DFA18_transitionS[i]);
         }
     }
 
-    class DFA14 extends DFA {
+    class DFA18 extends DFA {
 
-        public DFA14(BaseRecognizer recognizer) {
+        public DFA18(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 14;
-            this.eot = DFA14_eot;
-            this.eof = DFA14_eof;
-            this.min = DFA14_min;
-            this.max = DFA14_max;
-            this.accept = DFA14_accept;
-            this.special = DFA14_special;
-            this.transition = DFA14_transition;
+            this.decisionNumber = 18;
+            this.eot = DFA18_eot;
+            this.eof = DFA18_eof;
+            this.min = DFA18_min;
+            this.max = DFA18_max;
+            this.accept = DFA18_accept;
+            this.special = DFA18_special;
+            this.transition = DFA18_transition;
         }
         public String getDescription() {
-            return "219:1: primaryPrefix returns [Expression exp] : ( '(' tmp= expression ')' | tmp= literal | {...}?tmp= pseudovariable | {...}?tmp= variable | ( staticField )=>{...}?tmp= staticField | ( existentialDeclaration )=>tmp= existentialDeclaration );";
-        }
-        public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
-            TokenStream input = (TokenStream)_input;
-        	int _s = s;
-            switch ( s ) {
-                    case 0 : 
-                        int LA14_7 = input.LA(1);
-
-                         
-                        int index14_7 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA14_7==43) && (synpred2_JavaJadex())) {s = 8;}
-
-                        else if ( (LA14_7==IDENTIFIER) && (synpred2_JavaJadex())) {s = 5;}
-
-                        else if ( ((helper.isPseudoVariable(JavaJadexParser.this.input.LT(1).getText()))) ) {s = 9;}
-
-                        else if ( ((helper.getVariable(JavaJadexParser.this.input.LT(1).getText())!=null)) ) {s = 6;}
-
-                        else if ( ((synpred1_JavaJadex()&&(SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)))) ) {s = 10;}
-
-                         
-                        input.seek(index14_7);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 : 
-                        int LA14_3 = input.LA(1);
-
-                         
-                        int index14_3 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA14_3==43) ) {s = 4;}
-
-                        else if ( (LA14_3==IDENTIFIER) && (synpred2_JavaJadex())) {s = 5;}
-
-                        else if ( (LA14_3==EOF||(LA14_3>=24 && LA14_3<=38)||LA14_3==42||(LA14_3>=44 && LA14_3<=46)) ) {s = 6;}
-
-                         
-                        input.seek(index14_3);
-                        if ( s>=0 ) return s;
-                        break;
-            }
-            if (state.backtracking>0) {state.failed=true; return -1;}
-            NoViableAltException nvae =
-                new NoViableAltException(getDescription(), 14, _s, input);
-            error(nvae);
-            throw nvae;
+            return "246:1: staticMethod returns [Expression exp] : (otype= type '.' tmp1= IDENTIFIER '(' ')' | otype= type '.' tmp2= IDENTIFIER '(' p1= expression ( ',' p2= expression )* ')' );";
         }
     }
  
@@ -2333,52 +2446,66 @@ public class JavaJadexParser extends Parser {
     public static final BitSet FOLLOW_expression_in_primaryPrefix890 = new BitSet(new long[]{0x0000040000000000L});
     public static final BitSet FOLLOW_42_in_primaryPrefix892 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_literal_in_primaryPrefix903 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_pseudovariable_in_primaryPrefix916 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_variable_in_primaryPrefix929 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_staticField_in_primaryPrefix948 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_existentialDeclaration_in_primaryPrefix965 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_staticField989 = new BitSet(new long[]{0x0000080000000000L});
-    public static final BitSet FOLLOW_43_in_staticField991 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_staticField997 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_existentialDeclaration1021 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_existentialDeclaration1027 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_type1056 = new BitSet(new long[]{0x0000080000000002L});
-    public static final BitSet FOLLOW_43_in_type1068 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_type1074 = new BitSet(new long[]{0x0000080000000002L});
-    public static final BitSet FOLLOW_fieldAccess_in_primarySuffix1104 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_methodAccess_in_primarySuffix1115 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_arrayAccess_in_primarySuffix1126 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_43_in_fieldAccess1145 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_fieldAccess1151 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_43_in_methodAccess1175 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_methodAccess1181 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_41_in_methodAccess1183 = new BitSet(new long[]{0x0000040000000000L});
-    public static final BitSet FOLLOW_42_in_methodAccess1185 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_43_in_methodAccess1192 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_methodAccess1198 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_41_in_methodAccess1200 = new BitSet(new long[]{0x0000838C00000FF0L});
-    public static final BitSet FOLLOW_expression_in_methodAccess1206 = new BitSet(new long[]{0x0000140000000000L});
-    public static final BitSet FOLLOW_44_in_methodAccess1212 = new BitSet(new long[]{0x0000838C00000FF0L});
-    public static final BitSet FOLLOW_expression_in_methodAccess1218 = new BitSet(new long[]{0x0000140000000000L});
-    public static final BitSet FOLLOW_42_in_methodAccess1226 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_45_in_arrayAccess1246 = new BitSet(new long[]{0x0000838C00000FF0L});
-    public static final BitSet FOLLOW_expression_in_arrayAccess1252 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_46_in_arrayAccess1254 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_variable1278 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_pseudovariable1302 = new BitSet(new long[]{0x0000080000000000L});
-    public static final BitSet FOLLOW_43_in_pseudovariable1304 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_pseudovariable1308 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_floatingPointLiteral_in_literal1330 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_integerLiteral_in_literal1341 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CharacterLiteral_in_literal1348 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_StringLiteral_in_literal1355 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BooleanLiteral_in_literal1362 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_47_in_literal1369 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1386 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_HexLiteral_in_integerLiteral1403 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OctalLiteral_in_integerLiteral1410 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DecimalLiteral_in_integerLiteral1417 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_staticField_in_synpred1_JavaJadex937 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_existentialDeclaration_in_synpred2_JavaJadex956 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typePrimary_in_primaryPrefix916 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_nontypePrimary_in_primaryPrefix929 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_staticMethod_in_typePrimary954 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_staticField_in_typePrimary967 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_existentialDeclaration_in_typePrimary980 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_pseudovariable_in_nontypePrimary1005 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_variable_in_nontypePrimary1018 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_staticMethod1046 = new BitSet(new long[]{0x0000080000000000L});
+    public static final BitSet FOLLOW_43_in_staticMethod1048 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_staticMethod1054 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_41_in_staticMethod1056 = new BitSet(new long[]{0x0000040000000000L});
+    public static final BitSet FOLLOW_42_in_staticMethod1058 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_staticMethod1069 = new BitSet(new long[]{0x0000080000000000L});
+    public static final BitSet FOLLOW_43_in_staticMethod1071 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_staticMethod1077 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_41_in_staticMethod1079 = new BitSet(new long[]{0x0000838C00000FF0L});
+    public static final BitSet FOLLOW_expression_in_staticMethod1085 = new BitSet(new long[]{0x0000140000000000L});
+    public static final BitSet FOLLOW_44_in_staticMethod1091 = new BitSet(new long[]{0x0000838C00000FF0L});
+    public static final BitSet FOLLOW_expression_in_staticMethod1097 = new BitSet(new long[]{0x0000140000000000L});
+    public static final BitSet FOLLOW_42_in_staticMethod1105 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_staticField1129 = new BitSet(new long[]{0x0000080000000000L});
+    public static final BitSet FOLLOW_43_in_staticField1131 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_staticField1137 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_existentialDeclaration1161 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_existentialDeclaration1167 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_type1196 = new BitSet(new long[]{0x0000080000000002L});
+    public static final BitSet FOLLOW_43_in_type1208 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_type1214 = new BitSet(new long[]{0x0000080000000002L});
+    public static final BitSet FOLLOW_fieldAccess_in_primarySuffix1244 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_methodAccess_in_primarySuffix1255 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_arrayAccess_in_primarySuffix1266 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_43_in_fieldAccess1285 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_fieldAccess1291 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_43_in_methodAccess1315 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_methodAccess1321 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_41_in_methodAccess1323 = new BitSet(new long[]{0x0000040000000000L});
+    public static final BitSet FOLLOW_42_in_methodAccess1325 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_43_in_methodAccess1332 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_methodAccess1338 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_41_in_methodAccess1340 = new BitSet(new long[]{0x0000838C00000FF0L});
+    public static final BitSet FOLLOW_expression_in_methodAccess1346 = new BitSet(new long[]{0x0000140000000000L});
+    public static final BitSet FOLLOW_44_in_methodAccess1352 = new BitSet(new long[]{0x0000838C00000FF0L});
+    public static final BitSet FOLLOW_expression_in_methodAccess1358 = new BitSet(new long[]{0x0000140000000000L});
+    public static final BitSet FOLLOW_42_in_methodAccess1366 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_45_in_arrayAccess1386 = new BitSet(new long[]{0x0000838C00000FF0L});
+    public static final BitSet FOLLOW_expression_in_arrayAccess1392 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_46_in_arrayAccess1394 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_variable1418 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_pseudovariable1442 = new BitSet(new long[]{0x0000080000000000L});
+    public static final BitSet FOLLOW_43_in_pseudovariable1444 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_pseudovariable1448 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_floatingPointLiteral_in_literal1470 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_integerLiteral_in_literal1481 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CharacterLiteral_in_literal1488 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_StringLiteral_in_literal1495 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BooleanLiteral_in_literal1502 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_47_in_literal1509 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FloatingPointLiteral_in_floatingPointLiteral1526 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_HexLiteral_in_integerLiteral1543 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_OctalLiteral_in_integerLiteral1550 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DecimalLiteral_in_integerLiteral1557 = new BitSet(new long[]{0x0000000000000002L});
 
 }
