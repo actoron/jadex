@@ -9,7 +9,7 @@ public interface ITypeConverter
 {
 	/**
 	 *  Convert a string value to another type.
-	 *  @param val The string value to convert.
+	 *  @param val The value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader);
+	public Object convertObject(Object val, Object root, ClassLoader classloader);
 }

@@ -23,7 +23,15 @@ public class BeanAttributeInfo
 	 */
 	public BeanAttributeInfo(String attributename)
 	{
-		this(attributename, null, null);
+		this(attributename, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String attributename, ITypeConverter converter)
+	{
+		this(attributename, converter, null);
 	}
 	
 	/**

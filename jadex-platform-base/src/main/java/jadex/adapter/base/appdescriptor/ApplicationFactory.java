@@ -156,6 +156,8 @@ public class ApplicationFactory implements IApplicationFactory
 					{
 						for(int i=0; i<spaces.size(); i++)
 						{
+							System.out.println(spaces.get(i));
+							
 							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
 							ISpace space = si.createSpace(context);
 							context.addSpace(space);

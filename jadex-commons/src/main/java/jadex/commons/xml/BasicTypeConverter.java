@@ -12,46 +12,38 @@ public class BasicTypeConverter //implements ITypeConverter
 {
 	//-------- static part --------
 	
+	/** String -> String converter. (remove?) */
 	public static ITypeConverter STRING_CONVERTER = new StringTypeConverter();
+	
+	/** String -> Integer converter.  */
 	public static ITypeConverter INTEGER_CONVERTER = new IntegerTypeConverter();
+	
+	/** String -> Long converter. */
 	public static ITypeConverter LONG_CONVERTER = new LongTypeConverter();
+	
+	/** String -> Float converter. */
 	public static ITypeConverter FLOAT_CONVERTER = new FloatTypeConverter();
+	
+	/** String -> Double converter. */
 	public static ITypeConverter DOUBLE_CONVERTER = new DoubleTypeConverter();
+	
+	/** String -> Boolean converter. */
 	public static ITypeConverter BOOLEAN_CONVERTER = new BooleanTypeConverter();
+	
+	/** String -> Short converter. */
 	public static ITypeConverter SHORT_CONVERTER = new ShortTypeConverter();
+	
+	/** String -> Byte converter. */
 	public static ITypeConverter BYTE_CONVERTER = new ByteTypeConverter();
+	
+	/** String -> Character converter. (remove?) */
 	public static ITypeConverter CHARACTER_CONVERTER = new CharacterTypeConverter();
 	
-	/** Converter instance. */
-//	protected static BasicTypeConverter CONVERTER = new BasicTypeConverter();
-	
-	/** The built-in types. */
-//	protected static Set builtintypes;
-	
+	/** The map of basic converters. */
 	protected static Map basicconverters;
-	
 	
 	static
 	{
-//		builtintypes = new HashSet();
-//		builtintypes.add(String.class);
-//		builtintypes.add(int.class);
-//		builtintypes.add(Integer.class);
-//		builtintypes.add(long.class);
-//		builtintypes.add(Long.class);
-//		builtintypes.add(float.class);
-//		builtintypes.add(Float.class);
-//		builtintypes.add(double.class);
-//		builtintypes.add(Double.class);
-//		builtintypes.add(boolean.class);
-//		builtintypes.add(Boolean.class);
-//		builtintypes.add(short.class);
-//		builtintypes.add(Short.class);
-//		builtintypes.add(byte.class);
-//		builtintypes.add(Byte.class);
-//		builtintypes.add(char.class);
-//		builtintypes.add(Character.class);
-		
 		basicconverters = new HashMap();
 		basicconverters.put(String.class, STRING_CONVERTER);
 		basicconverters.put(int.class, INTEGER_CONVERTER);
@@ -73,59 +65,6 @@ public class BasicTypeConverter //implements ITypeConverter
 	}
 	
 	/**
-	 *  Convert a string value to a built-in type.
-	 *  @param clazz The target clazz.
-	 *  @param val The string valut to convert.
-	 * /
-	public static Object convertType(Class clazz, String val)
-	{
-		Object ret;
-		
-		if(clazz.equals(String.class))
-		{
-			ret = val;
-		}
-		else if(clazz.equals(int.class) || clazz.equals(Integer.class))
-		{
-			ret = new Integer(val);
-		}
-		else if(clazz.equals(long.class) || clazz.equals(Long.class))
-		{
-			ret = new Long(val);
-		}
-		else if(clazz.equals(float.class) || clazz.equals(Float.class))
-		{
-			ret = new Float(val);
-		}
-		else if(clazz.equals(double.class) || clazz.equals(Double.class))
-		{
-			ret = new Double(val);
-		}
-		else if(clazz.equals(boolean.class) || clazz.equals(Boolean.class))
-		{
-			ret = new Boolean(val);
-		}
-		else if(clazz.equals(short.class) || clazz.equals(Short.class))
-		{
-			ret = new Short(val);
-		}
-		else if(clazz.equals(byte.class) || clazz.equals(Byte.class))
-		{
-			ret = new Byte(val);
-		}
-		else if(clazz.equals(char.class) || clazz.equals(Character.class))
-		{
-			ret = new Character(val.charAt(0)); // ?
-		}
-		else
-		{
-			throw new RuntimeException("Unknown argument type: "+clazz);
-		}
-		
-		return ret;
-	}*/
-	
-	/**
 	 *  Test if a clazz is a built-in type.
 	 *  @param clazz The clazz.
 	 *  @return True, if built-in type.
@@ -136,7 +75,9 @@ public class BasicTypeConverter //implements ITypeConverter
 	}
 	
 	/**
-	 * 
+	 *  Get a String -> X converter for a target clazz.
+	 *  @param clazz The clazz.
+	 *  @return converter The converter.
 	 */
 	public static ITypeConverter getBasicConverter(Class clazz)
 	{
@@ -145,7 +86,7 @@ public class BasicTypeConverter //implements ITypeConverter
 }
 
 /**
- * 
+ *  String -> String converter. (remove?)
  */
 class StringTypeConverter implements ITypeConverter
 {
@@ -153,14 +94,14 @@ class StringTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
 		return val;
 	}
 }
 
 /**
- * 
+ *  String -> Integer converter.
  */
 class IntegerTypeConverter implements ITypeConverter
 {
@@ -168,14 +109,16 @@ class IntegerTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Integer(val);
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Integer((String)val);
 	}
 }
 
 /**
- * 
+ *  String -> Long converter.
  */
 class LongTypeConverter implements ITypeConverter
 {
@@ -183,14 +126,16 @@ class LongTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Long(val);
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Long((String)val);
 	}
 }
 
 /**
- * 
+ *  String -> Float converter.
  */
 class FloatTypeConverter implements ITypeConverter
 {
@@ -198,14 +143,16 @@ class FloatTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Float(val);
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Float((String)val);
 	}
 }
 
 /**
- * 
+ *  String -> Double converter.
  */
 class DoubleTypeConverter implements ITypeConverter
 {
@@ -213,14 +160,16 @@ class DoubleTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Double(val);
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Double((String)val);
 	}
 }
 
 /**
- * 
+ *  String -> Boolean converter.
  */
 class BooleanTypeConverter implements ITypeConverter
 {
@@ -228,14 +177,16 @@ class BooleanTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Boolean(val);
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Boolean((String)val);
 	}
 }
 
 /**
- * 
+ *  String -> Short converter.
  */
 class ShortTypeConverter implements ITypeConverter
 {
@@ -243,14 +194,16 @@ class ShortTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Short(val);
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Short((String)val);
 	}
 }
 
 /**
- * 
+ *  String -> Byte converter.
  */
 class ByteTypeConverter implements ITypeConverter
 {
@@ -258,14 +211,16 @@ class ByteTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Byte(val);
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Byte((String)val);
 	}
 }
 
 /**
- * 
+ *  String -> Character converter.
  */
 class CharacterTypeConverter implements ITypeConverter
 {
@@ -273,9 +228,11 @@ class CharacterTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(String val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader)
 	{
-		return new Character(val.charAt(0)); //?
+		if(!(val instanceof String))
+			throw new RuntimeException("Source value must be string: "+val);
+		return new Character(((String)val).charAt(0)); //?
 	}
 }
 

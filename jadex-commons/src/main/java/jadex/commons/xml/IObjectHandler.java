@@ -21,12 +21,12 @@ public interface IObjectHandler
 	/**
 	 *  Handle the attribute of an object.
 	 *  @param object The object.
-	 *  @param attrname The attribute name.
+	 *  @param xmlattrname The attribute name.
 	 *  @param attrval The attribute value.
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String attrname, List attrpath, String attrval, 
+	public void handleAttributeValue(Object object, String xmlattrname, List attrpath, String attrval, 
 		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception;
 	
 	/**
