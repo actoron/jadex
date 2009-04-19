@@ -4,6 +4,7 @@ import jadex.adapter.base.fipa.Done;
 import jadex.bdi.examples.hunterprey2.RequestMove;
 import jadex.bdi.examples.hunterprey2.TaskInfo;
 import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -38,13 +39,8 @@ public class  MovePlan extends Plan
 //		waitForCondition("notasks");
 		
 		// Wait for tick from SimTickerPlan
-		IInternalEvent evt = null;
-		do
-		{
-			evt = waitForInternalEvent("simulation_event");
-		}
-		while (evt.getParameter("type").getValue().equals(SimulationTickerPlan.EVENT_TYPE_TICK));
-
+		waitForInternalEvent("tick_event");
+		
 		// Result is null, when creature died and action was not executed.
 		if(ti.getResult()!=null && ((Boolean)ti.getResult()).booleanValue())
 		{

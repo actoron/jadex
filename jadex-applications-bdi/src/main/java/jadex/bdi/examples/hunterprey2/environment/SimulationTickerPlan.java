@@ -21,11 +21,6 @@ import jadex.bridge.MessageFailureException;
  */
 public class SimulationTickerPlan extends Plan
 {
-	// ----- constants --------
-	
-	public final static String EVENT_TYPE_TICK = SimulationTickerPlan.class.getName() + ".EVENT_TYPE_TICK";
-	
-	
 	// ----- attributes -------
 	
 	// The world environment
@@ -51,6 +46,9 @@ public class SimulationTickerPlan extends Plan
 			catch (TimeoutException te) {}
 		}
 
+		// queue all simulation events
+		getWaitqueue().addInternalEvent("simulation_event");
+		
 		while(true)
 		{
 			boolean tick = ((Boolean) getBeliefbase().getBelief("tick").getFact()).booleanValue();
@@ -63,23 +61,21 @@ public class SimulationTickerPlan extends Plan
 			{
 				// wait step time
 				waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
-				
+
 				env.executeStep();
 
 				// wait for all move task simulation events 
 				IInternalEvent evt = null;
-				System.out.println("conuter: " + env.getSimTaskCounter());
-				while (env.getSimTaskCounter() != 0)
+				while (env.getSimTaskCounter() > 0)
 				{
+					//System.out.println(this + " waiting for move tasks : " + env.getSimTaskCounter());
 					do
 					{
-						System.out.println("waiting for sim-event");
 						evt = waitForInternalEvent("simulation_event");
 					} while (!evt.getParameter("type").getValue().equals(SimulationEvent.DESTINATION_REACHED));
-
 					
 					env.updateSimTaskCounter(-1);
-					System.out.println("sim-event! coutner decreased, new value: " + env.getSimTaskCounter());
+					//System.out.println(this + " one task finished ("+evt.getParameter("type").getValue()+"), waiting for move tasks : " + env.getSimTaskCounter());
 				}
 
 				// Dispatch new visions.
@@ -103,8 +99,8 @@ public class SimulationTickerPlan extends Plan
 					}
 				}
 
-				IInternalEvent event = createInternalEvent("simulation_event");
-				event.getParameter("type").setValue(EVENT_TYPE_TICK);
+				IInternalEvent event = createInternalEvent("tick_event");
+				event.getParameter("round").setValue(new Integer(env.getWorldAge()));
 				dispatchInternalEvent(event);
 				
 			}

@@ -195,31 +195,26 @@ public class Environment implements IEnvironment
 			Map properties, List tasks, boolean signalDestruction,
 			boolean listen)
 	{
-//		// halt the engine
-//		Object simObjectAccess = engine.getSimObjectAccess();
-//		synchronized (simObjectAccess)
-//		{
-			Location l = wo.getLocation();
+		Location l = wo.getLocation();
 
-			if (properties == null)
-			{
-				properties = new HashMap();
-			}
-			
-			properties.put(SIM_OBJECT_PROPERTY_ONTOLOGY, wo);
+		if (properties == null)
+		{
+			properties = new HashMap();
+		}
+		
+		properties.put(SIM_OBJECT_PROPERTY_ONTOLOGY, wo);
 
-			if (listen && listener == null)
-			{
-				listener = new LocalSimulationEventListener(agent);
-			}
+		if (listen && listener == null)
+		{
+			listener = new LocalSimulationEventListener(agent);
+		}
 
-			Integer simId = engine.createSimObject(type, properties, tasks, l
-					.getAsIVector2(), signalDestruction, (listen?listener:null));
-			
-			wo.setSimId(simId);
+		Integer simId = engine.createSimObject(type, properties, tasks, l
+				.getAsIVector2(), signalDestruction, (listen?listener:null));
+		
+		wo.setSimId(simId);
 
-			return simId;
-//		}
+		return simId;
 
 	}
 
@@ -231,22 +226,19 @@ public class Environment implements IEnvironment
 	protected boolean destroySimObject(WorldObject wo)
 	{
 
-//		Object simObjectAccess = engine.getSimObjectAccess();
-//		synchronized (simObjectAccess)
-//		{
-			if (wo.getSimId() == null)
-			{
-				agent.getLogger().warning(
-						"Try to destroy WorldObject without SimId! " + wo);
+		if (wo.getSimId() == null)
+		{
+			agent.getLogger().warning(
+					"Try to destroy WorldObject without SimId! " + wo);
 
-				return false;
-			}
+			return false;
+		}
 
-			engine.destroySimObject(wo.getSimId());
-			wo.setSimId(null);
+		engine.destroySimObject(wo.getSimId());
+		wo.setSimId(null);
 
-			return true;
-//		}
+		return true;
+
 	}
 	
 	/**
@@ -254,6 +246,7 @@ public class Environment implements IEnvironment
 	 */
 	protected synchronized void updateSimTaskCounter(int diff)
 	{
+		assert (simtaskcounter + diff) >= 0;
 		simtaskcounter += diff;
 		this.pcs.firePropertyChange("simTaskCounter", simtaskcounter-diff, simtaskcounter);
 	}
@@ -332,12 +325,15 @@ public class Environment implements IEnvironment
 			Creature creat = getCreature((Creature) food);
 			ret = engine.performAction(EatAction.DEFAULT_NAME, me.getSimId(), creat.getSimId(), null);
 			
-			// remove creature from internal mapping and 
-			// remove tasks as well
-			removeCreature(creat);
+			if (ret) {
+				// remove creature tasks and creature
+				removeCreature(creat);
+			}
 			
 		}
 
+		System.out.println(this + " eat ("+me+", "+food+") return: " + ret);
+		
 		return ret;
 
 	}
@@ -348,6 +344,8 @@ public class Environment implements IEnvironment
 	public synchronized TaskInfo addEatTask(Creature me, WorldObject obj)
 	{
 
+		//System.out.println("EatTask added: " + me + " - " + obj);
+		
 		TaskInfo ret = new TaskInfo(new Object[]
 		{ "eat", me, obj });
 		tasklist.add(ret);
@@ -364,6 +362,8 @@ public class Environment implements IEnvironment
 	public synchronized TaskInfo addMoveTask(Creature me, String dir)
 	{
 
+		//System.out.println("MoveTask added: " + me + " - " + dir);
+		
 		TaskInfo ret = new TaskInfo(new Object[]
 		{ "move", me, dir });
 		tasklist.add(ret);
@@ -373,21 +373,6 @@ public class Environment implements IEnvironment
 		return ret;
 
 	}
-
-//	/**
-//	 * Clear the TaskList
-//	 * HACK! Should be done in executeStep method, but that leads to problems with
-//	 * other Agents. They compute their next step with the old vision. :-( 
-//	 * This is a race condition too! Tasks can be lost.
-//	 */
-//	protected synchronized void clearTaskList()
-//	{
-//
-//		int length = tasklist.size();
-//		tasklist.clear();
-//		this.pcs.firePropertyChange("taskSize", length, tasklist.size());
-//
-//	}
 
 	/**
 	 *  Get the current vision (without updating the creatures leaseticks).
@@ -575,13 +560,13 @@ public class Environment implements IEnvironment
 	{
 
 		
-		StringBuffer b = new StringBuffer();
-		b.append("executing step " + engine.getEnvironmentProperty(ENV_PROPERTY_AGE) + "\n");
-//		b.append("WorldSize=\t" + engine. + "\n");
-		b.append("CreatureSize=\t" + creatures.size() + "\n");
-//		b.append("FoodSize=\t" + food.size() + "\n");
-		b.append("TaskSize=\t" + tasklist.size() + "\n");
-		b.append("SimtaskCounter=\t" + simtaskcounter + "\n");
+//		StringBuffer b = new StringBuffer();
+//		b.append("executing step " + engine.getEnvironmentProperty(ENV_PROPERTY_AGE) + "\n");
+////		b.append("WorldSize=\t" + engine. + "\n");
+//		b.append("CreatureSize=\t" + creatures.size() + "\n");
+////		b.append("FoodSize=\t" + food.size() + "\n");
+//		b.append("TaskSize=\t" + tasklist.size() + "\n");
+//		b.append("SimtaskCounter=\t" + simtaskcounter + "\n");
 		
 		
 		if (simtaskcounter != 0)
@@ -647,9 +632,9 @@ public class Environment implements IEnvironment
 			tasklist.clear();
 			this.pcs.firePropertyChange("taskSize", tasks.length, tasklist.size());
 			
-			b.append("MoveTasks=\t" + simtaskcounter + "\n");
-			b.append("-------------------------------------");
-			System.out.println(b.toString());
+//			b.append("MoveTasks=\t" + simtaskcounter + "\n");
+//			b.append("-------------------------------------");
+//			System.out.println(b.toString());
 			
 		}
 

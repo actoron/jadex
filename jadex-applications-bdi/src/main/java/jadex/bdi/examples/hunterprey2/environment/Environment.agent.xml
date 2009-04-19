@@ -313,6 +313,11 @@
     		<parameter name="type" class="String"/>
     		<parameter name="task" class="ISimObjectTask"/>
     	</internalevent>
+    	
+    	<!-- Generic ticker event event. -->
+    	<internalevent name="tick_event" posttoall="true">
+    		<parameter name="round" class="Integer"/>
+    	</internalevent>
 	</events>
 	
 	<expressions>
