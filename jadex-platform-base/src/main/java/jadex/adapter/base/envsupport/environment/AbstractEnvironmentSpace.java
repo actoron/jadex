@@ -218,7 +218,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		
 		if(listeners!=null)
 		{
-			EnvironmentEvent ev = new EnvironmentEvent(EnvironmentEvent.OBJECT_DESTRYOED, this, obj, null);
+			EnvironmentEvent ev = new EnvironmentEvent(EnvironmentEvent.OBJECT_DESTROYED, this, obj, null);
 			for(int i=0; i<listeners.size(); i++)
 			{
 				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);

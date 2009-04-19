@@ -19,9 +19,6 @@ public class RoundBasedExecutor
 	/** Current time stamp */
 	protected long timestamp;
 	
-	/** The elapsed time. */
-	protected IVector1 elapsed;
-	
 	//-------- constructors--------
 	
 	/**
@@ -43,14 +40,16 @@ public class RoundBasedExecutor
 	{
 		this.timecoefficient = timecoefficient==null? new Vector1Double(0.001): timecoefficient;
 		this.timestamp = clockservice.getTime();
-		this.elapsed = Vector1Double.ZERO;
 		
 		clockservice.createTimer(roundtime.getAsLong(), new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				IVector1 progress = RoundBasedExecutor.this.timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
+//				IVector1 progress = RoundBasedExecutor.this.timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
+				IVector1 progress = new Vector1Long(currenttime - timestamp);
 				timestamp = currenttime;
+				
+				System.out.println("time: "+timestamp+" "+progress+" "+roundtime.getAsLong());
 				
 				space.step(progress);
 				

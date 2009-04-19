@@ -16,8 +16,7 @@
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
 		<property type="application_factory">
-			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
-				new java.util.Set[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform, null, null)
 		</property>
 		
 		<!-- Kernels. -->

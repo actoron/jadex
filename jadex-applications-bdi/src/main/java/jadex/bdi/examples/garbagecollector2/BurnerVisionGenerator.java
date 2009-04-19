@@ -118,7 +118,7 @@ public class BurnerVisionGenerator implements IPerceptGenerator
 						perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
 					}
 				}
-				else if(EnvironmentEvent.OBJECT_DESTRYOED.equals(event.getType()))
+				else if(EnvironmentEvent.OBJECT_DESTROYED.equals(event.getType()))
 				{
 					// percept garbage disappeared
 					perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);

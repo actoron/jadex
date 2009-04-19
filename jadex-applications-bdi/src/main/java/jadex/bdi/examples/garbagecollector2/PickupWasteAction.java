@@ -43,9 +43,6 @@ public class PickupWasteAction implements IAgentAction
 		{
 //			if(Math.random()>0.5)
 			{
-				if(waste.getProperty(Space2D.POSITION)==null)
-					System.out.println("here");
-				
 				wastes.remove(waste);
 				System.out.println("pickup: "+waste);
 				so.setProperty("garbage", waste);

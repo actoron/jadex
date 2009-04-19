@@ -1,7 +1,27 @@
 package jadex.adapter.base.envsupport;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
+import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
+import jadex.adapter.base.envsupport.environment.ISpaceProcess;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.environment.view.IView;
+import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
+import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
+import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
+import jadex.adapter.base.envsupport.observer.gui.Configuration;
+import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
+import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -11,8 +31,13 @@ import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +128,8 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
 			SUtil.createHashMap(new String[]{"type"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("typeName")}), null));
+			new BeanAttributeInfo[]{new BeanAttributeInfo("typeName")
+			}), null));
 		
 		types.add(new TypeInfo("agentactiontype", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
@@ -126,47 +152,167 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("view", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "name"}, 
+			SUtil.createHashMap(new String[]{"class", "name", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
-			new BeanAttributeInfo(null, null, "")}), null));
+			new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					Map sourceview = (Map)args.get("sourceview");
+					Configuration cfg = (Configuration)args.get("cfg");
+					IEnvironmentSpace space = (IEnvironmentSpace)args.get("space");
+					
+					List sourcethemes = (List)sourceview.get("themes");
+					if(sourcethemes!=null)
+					{
+						for(int j=0; j<sourcethemes.size(); j++)
+						{
+							Map sourcetheme = (Map)sourcethemes.get(j);
+							cfg.setTheme((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), 
+								(Map)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
+						}
+					}
+					
+					IView ret = (IView)((Class)MEnvSpaceInstance.getProperty(sourceview, "clazz")).newInstance();
+					ret.setSpace(space);
+					return ret;
+				}
+			})
+			}), null));
 		
 		types.add(new TypeInfo("theme", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "creator"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					Map ret = new HashMap();
+					
+					List drawables = (List)args.get("drawables");
+					if(drawables!=null)
+					{
+						for(int k=0; k<drawables.size(); k++)
+						{
+							Map sourcedrawable = (Map)drawables.get(k);
+							ret.put(MEnvSpaceInstance.getProperty(sourcedrawable, "objecttype"), 
+								((IObjectCreator)MEnvSpaceInstance.getProperty(sourcedrawable, "creator")).createObject(sourcedrawable));
+						}
+					}
+					
+					List prelayers = (List)args.get("prelayers");
+					if(prelayers!=null)
+					{
+						List targetprelayers = new ArrayList();
+						ret.put("prelayers", targetprelayers);
+						for(int k=0; k<prelayers.size(); k++)
+						{
+							Map layer = (Map)prelayers.get(k);
+							System.out.println("prelayer: "+layer);
+							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
+						}
+					}
+					
+					List postlayers = (List)args.get("postlayers");
+					if(postlayers!=null)
+					{
+						List targetprelayers = new ArrayList();
+						ret.put("postlayers", targetprelayers);
+						for(int k=0; k<postlayers.size(); k++)
+						{
+							Map layer = (Map)postlayers.get(k);
+							System.out.println("postlayer: "+layer);
+							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
+						}
+					}
+					return ret;
+				}
+			})
+			}), null));
 		
 		types.add(new TypeInfo("drawable", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"objecttype", "width", "height"}, 
+			SUtil.createHashMap(new String[]{"objecttype", "width", "height", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "")}), null));
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"), (Double)MEnvSpaceInstance.getProperty(args, "height"));
+					DrawableCombiner ret = new DrawableCombiner(size);
+					
+					List parts = (List)args.get("parts");
+					if(parts!=null)
+					{
+						for(int l=0; l<parts.size(); l++)
+						{
+							Map sourcepart = (Map)parts.get(l);
+							ret.addDrawable((IDrawable)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepart, "creator")).createObject(sourcepart));
+						}
+					}
+					return ret;
+				}
+			})
+			}), null));
 
 		types.add(new TypeInfo("texturedrectangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "shiftx", "shifty", "rotating"}, 
+			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "shiftx", "shifty", "rotating", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "")
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
+						(Double)MEnvSpaceInstance.getProperty(args, "height"));
+					IVector2 shift = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "shiftx"), 
+						(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
+					boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
+						((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
+					return new TexturedRectangle(size, shift, rotating, (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
+				}
+			})
 			}), null));
 		
 		types.add(new TypeInfo("gridlayer", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"color", "width", "height", "type"}, 
+			SUtil.createHashMap(new String[]{"color", "width", "height", "type", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, colorconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, null, "", "gridlayer")
+			new BeanAttributeInfo(null, null, "", "gridlayer"),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
+							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+					return new GridLayer(size, (Color)MEnvSpaceInstance.getProperty(args, "color"));
+				}
+			})
 			}), null));
 
 		types.add(new TypeInfo("tiledlayer", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "type"}, 
+			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "type", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, null, "", "tiledlayer")
+			new BeanAttributeInfo(null, null, "", "tiledlayer"),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
+							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+					return new TiledLayer(size, (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
+				}
+			})
 			}), null));
-		
 			
 		types.add(new TypeInfo("object", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "type", "owner"}, 

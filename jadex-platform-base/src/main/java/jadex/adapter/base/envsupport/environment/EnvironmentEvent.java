@@ -8,7 +8,7 @@ public class EnvironmentEvent
 {
 	public static final String OBJECT_CREATED = "created";
 	
-	public static final String OBJECT_DESTRYOED = "destroyed";
+	public static final String OBJECT_DESTROYED = "destroyed";
 
 	// move to other class?
 	public static final String OBJECT_POSITION_CHANGED = "position_changed";
