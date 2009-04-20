@@ -9,8 +9,10 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.IViewportListener;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.ObjectIntrospectorPlugin;
+import jadex.adapter.base.envsupport.observer.theme.Theme2D;
 import jadex.bridge.ILibraryService;
 
 import java.awt.EventQueue;
@@ -340,9 +342,9 @@ public class ObserverCenter
 				viewport.setObjectShift(config.getObjectShift());
 				
 				// Set pre- and postlayers
-				Map theme = config.getTheme(selectedTheme);
-				List preLayers = (List) theme.get("prelayers");
-				List postLayers = (List) theme.get("postlayers");
+				Theme2D theme = config.getTheme(selectedTheme);
+				ILayer[] preLayers = theme.getPrelayers();
+				ILayer[] postLayers = theme.getPostlayers();
 				viewport.setPreLayers(preLayers);
 				viewport.setPostLayers(postLayers);
 				
@@ -358,7 +360,7 @@ public class ObserverCenter
 						for (int j = 0; j < objects.length; ++j )
 						{
 							ISpaceObject obj = (ISpaceObject) objects[j];
-							DrawableCombiner d = (DrawableCombiner) theme.get(obj.getType());
+							DrawableCombiner d = theme.getDrawableCombiner(obj.getType());
 							IVector2 position = (IVector2) obj.getProperty("position");
 							if (position == null)
 							{
@@ -382,10 +384,10 @@ public class ObserverCenter
 						}
 						if (mObj != null)
 						{
-							IVector2 size = ((DrawableCombiner) theme.get(mObj.getType())).getSize();
+							IVector2 size = theme.getDrawableCombiner(mObj.getType()).getSize().copy();
 							size.multiply(2.0);
 							Object[] viewObj = new Object[3];
-							DrawableCombiner marker = (DrawableCombiner) theme.get("marker");
+							DrawableCombiner marker = theme.getMarkerDrawCombiner();
 							marker.setDrawableSizes(size);
 							viewObj[0] = mObj.getProperty("position");
 							viewObj[2] = marker;

@@ -18,9 +18,11 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
+import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.adapter.base.envsupport.observer.gui.Configuration;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
+import jadex.adapter.base.envsupport.observer.theme.Theme2D;
 import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -170,7 +172,7 @@ public class MEnvSpaceType	extends MSpaceType
 						{
 							Map sourcetheme = (Map)sourcethemes.get(j);
 							cfg.setTheme((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), 
-								(Map)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
+								(Theme2D)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
 						}
 					}
 					
@@ -188,7 +190,7 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Map ret = new HashMap();
+					Theme2D ret = new Theme2D();
 					
 					List drawables = (List)args.get("drawables");
 					if(drawables!=null)
@@ -196,8 +198,8 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int k=0; k<drawables.size(); k++)
 						{
 							Map sourcedrawable = (Map)drawables.get(k);
-							ret.put(MEnvSpaceInstance.getProperty(sourcedrawable, "objecttype"), 
-								((IObjectCreator)MEnvSpaceInstance.getProperty(sourcedrawable, "creator")).createObject(sourcedrawable));
+							ret.addDrawableCombiner(MEnvSpaceInstance.getProperty(sourcedrawable, "objecttype"), 
+													((IObjectCreator)MEnvSpaceInstance.getProperty(sourcedrawable, "creator")).createObject(sourcedrawable));
 						}
 					}
 					
@@ -205,26 +207,26 @@ public class MEnvSpaceType	extends MSpaceType
 					if(prelayers!=null)
 					{
 						List targetprelayers = new ArrayList();
-						ret.put("prelayers", targetprelayers);
 						for(int k=0; k<prelayers.size(); k++)
 						{
 							Map layer = (Map)prelayers.get(k);
 							System.out.println("prelayer: "+layer);
 							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
+						ret.setPrelayers((ILayer[]) targetprelayers.toArray(new ILayer[0]));
 					}
 					
 					List postlayers = (List)args.get("postlayers");
 					if(postlayers!=null)
 					{
-						List targetprelayers = new ArrayList();
-						ret.put("postlayers", targetprelayers);
+						List targetpostlayers = new ArrayList();
 						for(int k=0; k<postlayers.size(); k++)
 						{
 							Map layer = (Map)postlayers.get(k);
 							System.out.println("postlayer: "+layer);
-							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
+							targetpostlayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
+						ret.setPostlayers((ILayer[]) targetpostlayers.toArray(new ILayer[0]));
 					}
 					return ret;
 				}

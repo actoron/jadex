@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
+import jadex.adapter.base.envsupport.observer.theme.Theme2D;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -160,9 +161,9 @@ public class Configuration
 	 * Returns a specific theme.
 	 * @return the theme
 	 */
-	public synchronized Map getTheme(String name)
+	public synchronized Theme2D getTheme(String name)
 	{
-		return (Map) themes.get(name);
+		return (Theme2D) themes.get(name);
 	}
 	
 	/**
@@ -170,14 +171,14 @@ public class Configuration
 	 * @param name name of the theme
 	 * @param theme the theme
 	 */
-	public synchronized void setTheme(String name, Map theme)
+	public synchronized void setTheme(String name, Theme2D theme)
 	{
-		if (!theme.containsKey("marker"))
+		if (theme.getMarkerDrawCombiner() == null)
 		{
 			DrawableCombiner objectMarker = new DrawableCombiner();
 			IDrawable markerDrawable = new TexturedRectangle(getClass().getPackage().getName().replaceAll("gui", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
 			objectMarker.addDrawable(markerDrawable, Integer.MAX_VALUE);
-			theme.put("marker", objectMarker);
+			theme.setMarkerDrawCombiner(objectMarker);
 		}
 		themes.put(name, theme);
 	}

@@ -358,10 +358,9 @@ public class ViewportJOGL extends AbstractViewport
 
 			synchronized(preLayers_)
 			{
-				Iterator it = preLayers_.iterator();
-				while(it.hasNext())
+				for (int i = 0; i < preLayers_.length; ++i)
 				{
-					ILayer l = (ILayer)it.next();
+					ILayer l = preLayers_[i];
 					if (!drawObjects_.contains(l))
 					{
 						l.init(ViewportJOGL.this, gl);
@@ -419,10 +418,9 @@ public class ViewportJOGL extends AbstractViewport
 
 			synchronized(postLayers_)
 			{
-				Iterator it = postLayers_.iterator();
-				while(it.hasNext())
+				for (int i = 0; i < postLayers_.length; ++i)
 				{
-					ILayer l = (ILayer)it.next();
+					ILayer l = postLayers_[i];
 					if (!drawObjects_.contains(l))
 					{
 						l.init(ViewportJOGL.this, gl);

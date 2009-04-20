@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.observer.graphics;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 
 import java.awt.Canvas;
 import java.util.List;
@@ -72,14 +73,14 @@ public interface IViewport
 	 * 
 	 * @param layers new layers
 	 */
-	public void setPreLayers(List layer);
+	public void setPreLayers(ILayer[] layer);
 
 	/**
 	 * Sets the layers that are applied after the drawables are drawn.
 	 * 
 	 * @param layers new layers
 	 */
-	public void setPostLayers(List layer);
+	public void setPostLayers(ILayer[] layer);
 
 	/**
 	 * Sets the current objects to draw.

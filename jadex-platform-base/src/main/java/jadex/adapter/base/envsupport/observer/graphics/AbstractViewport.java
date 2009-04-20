@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
@@ -63,10 +64,10 @@ public abstract class AbstractViewport implements IViewport
 	protected List				objectList_;
 
 	/** Layers applied before drawable rendering */
-	protected List				preLayers_;
+	protected ILayer[]				preLayers_;
 
 	/** Layers applied after drawable rendering */
-	protected List				postLayers_;
+	protected ILayer[]				postLayers_;
 
 	/** The listeners of the viewport. */
 	private Set					listeners_;
@@ -82,8 +83,8 @@ public abstract class AbstractViewport implements IViewport
 		drawObjects_ = Collections.synchronizedSet(new HashSet());
 		objectLayers_ = Collections.synchronizedSortedSet(new TreeSet());
 		objectList_ = Collections.synchronizedList(new ArrayList());
-		preLayers_ = Collections.synchronizedList(new ArrayList());
-		postLayers_ = Collections.synchronizedList(new ArrayList());
+		preLayers_ = new ILayer[0];
+		postLayers_ = new ILayer[0];
 		listeners_ = Collections.synchronizedSet(new HashSet());
 	}
 
@@ -114,15 +115,18 @@ public abstract class AbstractViewport implements IViewport
 	 * 
 	 * @param layers the pre-layers
 	 */
-	public void setPreLayers(List layers)
+	public void setPreLayers(ILayer[] layers)
 	{
-		if(layers != null)
+		synchronized(preLayers_)
 		{
-			preLayers_ = new ArrayList(layers);
-		}
-		else
-		{
-			preLayers_ = new ArrayList();
+			if(layers != null)
+			{
+				preLayers_ = layers;
+			}
+			else
+			{
+				preLayers_ = new ILayer[0];
+			}
 		}
 	}
 
@@ -131,15 +135,18 @@ public abstract class AbstractViewport implements IViewport
 	 * 
 	 * @param layers the post-layers
 	 */
-	public void setPostLayers(List layers)
+	public void setPostLayers(ILayer[] layers)
 	{
-		if(layers != null)
+		synchronized(postLayers_)
 		{
-			postLayers_ = new ArrayList(layers);
-		}
-		else
-		{
-			postLayers_ = new ArrayList();
+			if(layers != null)
+			{
+				postLayers_ = layers;
+			}
+			else
+			{
+				postLayers_ = new ILayer[0];
+			}
 		}
 	}
 
