@@ -16,6 +16,7 @@
 		<import>jadex.bridge.IAgentIdentifier</import>
 		<import>jadex.bdi.planlib.test.TestReport</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
+		<import>java.util.*</import>
 	</imports>
 	
 	<capabilities>
@@ -135,17 +136,19 @@
 	<expressions>
 		<!-- Tests for end state elements are finished when all elements have
 			 been triggered and therefore there is no more unsucceeded test. -->
-		<condition name="end_tests_finished" language="clips">
+		<condition name="end_tests_finished" language="jcl">
 			//(select one TestReport $report from $beliefbase.reports
 			//where !$report.isSucceeded())==null
 			
-			(not
-				(and
-					?report	= (TestReport (succeeded false) (reason null))
-					?rbelset_reports	= (beliefset (element_has_model ?mbelset_reports) (beliefset_has_facts contains ?report))
-					?mbelset_reports	= (mbeliefset (melement_has_name "reports"))
-				)
-			)
+			!(TestReport $report &amp;&amp; !$report.isSucceeded() &amp;&amp; Arrays.asList($beliefbase.reports).contains($report))
+			
+			// (not
+			// 	(and
+			// 		?report	= (TestReport (succeeded false) (reason null))
+			// 		?rbelset_reports	= (beliefset (element_has_model ?mbelset_reports) (beliefset_has_facts contains ?report))
+			// 		?mbelset_reports	= (mbeliefset (melement_has_name "reports"))
+			// 	)
+			// )
 		</condition>
 	</expressions>
 	

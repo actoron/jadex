@@ -106,6 +106,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 
 	<imports>
 		<import>java.awt.Color</import>
+		<import>java.util.*</import>
 	</imports>
 
 	<beliefs>
@@ -193,47 +194,66 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		<achievegoal name="configure">
 			<parameter name="configuration" class="Table" />
  			<parameterset name="blocks" class="Block"/>
-			<targetcondition language="clips">
+			<targetcondition language="jcl">
 				<!-- $beliefbase.table.configurationEquals($goal.configuration)
 				<relevantbeliefset ref="blocks"/> -->
-				?mbelief = (mbelief (melement_has_name "table"))
-				?belief = (belief (element_has_model ?mbelief) (belief_has_fact ?table))
-				?param = (parameter (parameter_has_name "configuration") (parameter_has_value ?conf))
-				?rgoal = (goal (parameterelement_has_parameters contains ?param))				
-				(not
-					(and
-						?block1	= (Block (color ?colorb))
-						?table	= (Table (allBlocks contains ?block1))
-						(not
-							(and
-								?block2	= (Block (color ?colorb))
-								?conf	= (Table (allBlocks contains ?block2))
-							)
-						)
-					)
-				)
-				(not
-					(and
-						?block1	= (Block (color ?colorb))
-						?conf	= (Table (allBlocks contains ?block1))
-						(not
-							(and
-								?block2	= (Block (color ?colorb))
-								?table	= (Table (allBlocks contains ?block2))
-							)
-						)
-					)
-				)
-				(not
-					(and
-						?block1	= (Block (lower ?lower1) (color ?colorb))
-						?table	= (Table (allBlocks contains ?block1))
-						?block2	= (Block (lower ?lower2) (color ?colorb))
-						?conf	= (Table (allBlocks contains ?block2))
-						?lower1	= (Block (color ?colorl))
-						?lower2	= (Block (color != ?colorl))
-					)
-				)
+				// There is no block on the table for which there is no block in the configuration
+				!(Block $block1 &amp;&amp;
+					Arrays.asList($beliefbase.table.getAllBlocks()).contains($block1) &amp;&amp;
+					!(Block $block2 &amp;&amp;
+						$block2.color==$block1.color &amp;&amp;
+						Arrays.asList($goal.configuration.getAllBlocks()).contains($block2)))
+				&amp;&amp;
+				// There is no block in the configuration for which there is no block on the table
+				!(Block $block3 &amp;&amp;
+					Arrays.asList($goal.configuration.getAllBlocks()).contains($block3) &amp;&amp;
+					!(Block $block4 &amp;&amp;
+						$block4.color==$block3.color &amp;&amp;
+						Arrays.asList($beliefbase.table.getAllBlocks()).contains($block4)))				
+				&amp;&amp;
+				// Every block on the table is located on the same block as in the configuration
+				!(	Block $block5 &amp;&amp; Arrays.asList($beliefbase.table.getAllBlocks()).contains($block5) &amp;&amp;
+					Block $block6 &amp;&amp; Arrays.asList($goal.configuration.getAllBlocks()).contains($block6) &amp;&amp;
+					$block5.color==$block6.color &amp;&amp; $block5.lower.color!=$block6.lower.color)
+				
+				// ?mbelief = (mbelief (melement_has_name "table"))
+				// ?belief = (belief (element_has_model ?mbelief) (belief_has_fact ?table))
+				// ?param = (parameter (parameter_has_name "configuration") (parameter_has_value ?conf))
+				// ?rgoal = (goal (parameterelement_has_parameters contains ?param))				
+				// (not
+				// 	(and
+				// 		?block1	= (Block (color ?colorb))
+				// 		?table	= (Table (allBlocks contains ?block1))
+				// 		(not
+				// 			(and
+				// 				?block2	= (Block (color ?colorb))
+				// 				?conf	= (Table (allBlocks contains ?block2))
+				// 			)
+				// 		)
+				// 	)
+				// )
+				// (not
+				// 	(and
+				// 		?block1	= (Block (color ?colorb))
+				// 		?conf	= (Table (allBlocks contains ?block1))
+				// 		(not
+				// 			(and
+				// 				?block2	= (Block (color ?colorb))
+				// 				?table	= (Table (allBlocks contains ?block2))
+				// 			)
+				// 		)
+				// 	)
+				// )
+				// (not
+				// 	(and
+				// 		?block1	= (Block (lower ?lower1) (color ?colorb))
+				// 		?table	= (Table (allBlocks contains ?block1))
+				// 		?block2	= (Block (lower ?lower2) (color ?colorb))
+				// 		?conf	= (Table (allBlocks contains ?block2))
+				// 		?lower1	= (Block (color ?colorl))
+				// 		?lower2	= (Block (color != ?colorl))
+				// 	)
+				// )
 			</targetcondition>
 		</achievegoal>
 	</goals>

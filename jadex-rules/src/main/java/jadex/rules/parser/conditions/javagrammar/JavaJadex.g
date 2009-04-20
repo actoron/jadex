@@ -46,17 +46,6 @@ package jadex.rules.parser.conditions.javagrammar;
 	{
 		this.imports	= imports;
 	}
-
-	/** The type model. */
-	protected OAVTypeModel	tmodel;
-	
-	/**
-	 *  Set the type model.
-	 */
-	public void	setTypeModel(OAVTypeModel tmodel)
-	{
-		this.tmodel	= tmodel;
-	}
 }
 
 // Parser
@@ -222,17 +211,17 @@ primaryExpression returns [Expression exp]
 primaryPrefix returns [Expression exp]
 	: '(' tmp = expression ')' {$exp = tmp;}
 	| tmp = literal {$exp = tmp;}
-	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)!=-1}? tmp = typePrimary {$exp = tmp;}
-	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, tmodel, imports)==-1}? tmp = nontypePrimary {$exp = tmp;}
+	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)!=-1}? tmp = typePrimary {$exp = tmp;}
+	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)==-1}? tmp = nontypePrimary {$exp = tmp;}
 	;
 
 /**
  * Primary expression starting with a type.
  */
 typePrimary returns [Expression exp]
-	: {SJavaParser.lookaheadStaticMethod(JavaJadexParser.this.input, tmodel, imports)}? tmp = staticMethod {$exp = tmp;}
-	| {SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, tmodel, imports)}? tmp = staticField {$exp = tmp;}
-	| {SJavaParser.lookaheadExistential(JavaJadexParser.this.input, tmodel, imports)}? tmp = existentialDeclaration {$exp = tmp;}
+	: {SJavaParser.lookaheadStaticMethod(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)}? tmp = staticMethod {$exp = tmp;}
+	| {SJavaParser.lookaheadStaticField(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)}? tmp = staticField {$exp = tmp;}
+	| {SJavaParser.lookaheadExistential(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)}? tmp = existentialDeclaration {$exp = tmp;}
 	;
 
 /**
@@ -300,22 +289,22 @@ type returns [OAVObjectType otype]
 		name	= tmp.getText();
 		try
 		{
-			$otype	= tmodel.getObjectType(name);
+			$otype	= helper.getBuildContext().getTypeModel().getObjectType(name);
 		}
 		catch(Exception e)
 		{
-			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
+			Class	clazz	= SReflect.findClass0(name, imports, helper.getBuildContext().getTypeModel().getClassLoader());
 			if(clazz!=null)
-				$otype	= tmodel.getJavaType(clazz);
+				$otype	= helper.getBuildContext().getTypeModel().getJavaType(clazz);
 		}
 	}
 	(	{$otype==null}?
 		'.' tmp2 = IDENTIFIER
 		{
 			name += "."+tmp2.getText();
- 			Class	clazz	= SReflect.findClass0(name, imports, tmodel.getClassLoader());
+ 			Class	clazz	= SReflect.findClass0(name, imports, helper.getBuildContext().getTypeModel().getClassLoader());
 			if(clazz!=null)
-				$otype	= tmodel.getJavaType(clazz);
+				$otype	= helper.getBuildContext().getTypeModel().getJavaType(clazz);
  		}
 	)*
 	;

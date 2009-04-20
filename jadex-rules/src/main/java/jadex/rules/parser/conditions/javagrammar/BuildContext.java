@@ -3,6 +3,7 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
@@ -16,8 +17,10 @@ import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  The build context captures knowledge about
@@ -46,6 +49,9 @@ public class BuildContext
 	/** The dummy condition (if any). */
 	protected ObjectCondition	dummy;
 	
+	/** The parent build context (if any). */
+	protected BuildContext	parent;
+	
 	//-------- constructors --------
 	
 	/**
@@ -54,13 +60,216 @@ public class BuildContext
 	 */
 	public BuildContext(ICondition condition, OAVTypeModel tmodel)
 	{
-		this.tmodel	= tmodel;
+		this.tmodel	= tmodel;		
+		this.lcons	= new ArrayList();
+		this.variables	= new HashMap();
+		this.boundconstraints	= new HashMap(); 
+		this.bcons	= new HashMap();
+		
+		if(condition!=null)
+			addCondition(condition);
+	}
+	
+	/**
+	 *  Create a new build context.
+	 *  @param parent	The parent build context.
+	 */
+	public BuildContext(BuildContext parent)
+	{
+		this(null, parent.getTypeModel());
+		this.parent	= parent;
+	}
+	
+	//-------- methods --------
+
+	/**
+	 *  Get the conditions.
+	 */
+	public List getConditions()
+	{
+		return lcons;
+	}
+
+	/**
+	 *  Get the OAV type model.
+	 */
+	public OAVTypeModel getTypeModel()
+	{
+		return tmodel;
+	}
+
+	/**
+	 *  Get an object condition for a variable, i.e. a condition, where
+	 *  constraints related to the variable can be added to.
+	 *  @param var	The variable
+	 *  @return The object condition.
+	 *  @throws RuntimeExcpetion	when no condition was found.
+	 */
+	public ObjectCondition getObjectCondition(Variable var)
+	{
+		ObjectCondition	ret	= null;
+		try
+		{
+			ret	= parent!=null ? parent.getObjectCondition(var) : null;
+		}
+		catch(Exception e)
+		{
+		}
+		if(ret==null)
+		{
+			ret	= (ObjectCondition)bcons.get(var);
+		}
+		
+		if(ret==null)
+		{
+			throw new RuntimeException("No object condition for: "+var);
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get the bound constraint a variable, i.e. the value source required
+	 *  for obtaining the variable value from the variables object condition.
+	 *  @param var	The variable
+	 *  @return The bound constraint.
+	 *  @throws RuntimeExcpetion	when no constraint was found.
+	 */
+	public BoundConstraint getBoundConstraint(Variable var)
+	{
+		BoundConstraint	ret	= null;
+		try
+		{
+			ret	= parent!=null ? parent.getBoundConstraint(var) : null;
+		}
+		catch(Exception e)
+		{
+		}
+		if(ret==null)
+		{
+			ret	= (BoundConstraint)boundconstraints.get(var);
+		}
+		
+		if(ret==null)
+		{
+			throw new RuntimeException("No bound constraint for: "+var);
+		}
+		return ret;
+	}
+
+	/**
+	 *  Create a new variable and bind it using the given object condition and value source.
+	 *  @param condition	The object condition.
+	 *  @param valuesource	The value source.
+	 *  @return	The new variable.
+	 */
+	public Variable	generateVariableBinding(ObjectCondition	condition, Object valuesource)
+	{
+		return generateVariableBinding(condition, generateVariableName(), valuesource);
+	}
+
+	/**
+	 *  Generate a variable name.
+	 *  @return An unused variable name.
+	 */
+	public String generateVariableName()
+	{
+		String varname;
+		for(int i=1; getVariable(varname = "$tmpvar_"+i)!=null; i++);
+		return varname;
+	}
+
+	/**
+	 *  Create a new variable and bind it using the given object condition and value source.
+	 *  @param condition	The object condition.
+	 *  @param name	The variable name.
+	 *  @param valuesource	The value source.
+	 *  @return	The new variable.
+	 */
+	public Variable	generateVariableBinding(ObjectCondition	condition, String name, Object valuesource)
+	{
+		Variable	tmpvar	= new Variable(name, getReturnType(valuesource, tmodel));
+		variables.put(name, tmpvar);
+		BoundConstraint	bc	= new BoundConstraint(valuesource, tmpvar);
+		boundconstraints.put(tmpvar, bc);
+		condition.addConstraint(bc);
+		return tmpvar;
+	}
+
+	/**
+	 *  Create a new object condition with the given constraints.
+	 *  Also adds mappings corresponding to bound constraints (if any).
+	 *  @param type	The object type.
+	 *  @param constraints	The constraints (if any).
+	 */
+	public void createObjectCondition(OAVObjectType type, IConstraint[] constraints)
+	{
+		ObjectCondition	ocon	= new ObjectCondition(type);
+		for(int i=0; constraints!=null && i<constraints.length; i++)
+		{
+			ocon.addConstraint(constraints[i]);
+		}
+		
+		addCondition(ocon);
+	}
+
+	/**
+	 *  Get a variable.
+	 *  @param name	The name of the variable.
+	 *  @return The variable, if any.
+	 */
+	public Variable getVariable(String name)
+	{
+		Variable	ret	= parent!=null ? parent.getVariable(name) : null;
+		if(ret==null)
+			ret	= (Variable)variables.get(name);
+		return ret;
+	}
+
+	/**
+	 *  Add a variable.
+	 *  @param var The variable.
+	 */
+	public void	addVariable(Variable var)
+	{
+		variables.put(var.getName(), var);
+	}
+
+	/**
+	 *  Expressions, which are unrelated to real object
+	 *  conditions should be bound to the dummy condition.
+	 *  After building all constraints, the dummy condition
+	 *  will be removed by reassigning its constraints to
+	 *  a suitable object condition (respecting variable assignment order).
+	 */
+	public ObjectCondition	getDummyCondition()
+	{
+		if(dummy==null)
+		{
+			dummy	= new ObjectCondition(OAVJavaType.java_object_type);
+			addCondition(dummy);
+		}
+		return dummy;
+	}
+
+	/**
+	 *  Test if a dummy condition was used in the context.
+	 */
+	public boolean hasDummyCondition()
+	{
+		return dummy!=null;
+	}
+	
+	/**
+	 *  Add a condition to the context.
+	 * 	@param condition	The condition.
+	 */
+	public void addCondition(ICondition condition)
+	{
+		int start	= lcons.size();
+		lcons.add(condition);
 		
 		// Unfold AND conditions.
-		this.lcons	= new ArrayList();
-		if(condition!=null)
-			lcons.add(condition);
-		for(int i=0; i<lcons.size(); i++)
+		for(int i=start; i<lcons.size(); i++)
 		{
 			if(lcons.get(i) instanceof AndCondition)
 			{
@@ -71,10 +280,7 @@ public class BuildContext
 		}
 
 		// Find conditions, bound to specific variables.
-		this.variables	= new HashMap();
-		this.boundconstraints	= new HashMap(); 
-		this.bcons	= new HashMap();
-		for(int i=0; i<lcons.size(); i++)
+		for(int i=start; i<lcons.size(); i++)
 		{
 			List	bcs	= null;
 			if(lcons.get(i) instanceof ObjectCondition)
@@ -106,170 +312,6 @@ public class BuildContext
 		}
 	}
 
-	/**
-	 *  Get the conditions.
-	 */
-	public List getConditions()
-	{
-		return lcons;
-	}
-
-	/**
-	 *  Get the OAV type model.
-	 */
-	public OAVTypeModel getTypeModel()
-	{
-		return tmodel;
-	}
-
-	/**
-	 *  Get an object condition for a variable, i.e. a condition, where
-	 *  constraints related to the variable can be added to.
-	 *  @param var	The variable
-	 *  @return The object condition.
-	 *  @throws RuntimeExcpetion	when no condition was found.
-	 */
-	public ObjectCondition getObjectCondition(Variable var)
-	{
-		ObjectCondition	ret	= (ObjectCondition)bcons.get(var);
-		if(ret==null)
-		{
-			throw new RuntimeException("No object condition for: "+var);
-		}
-		return ret;
-	}
-
-	/**
-	 *  Get the bound constraint a variable, i.e. the value source required
-	 *  for obtaining the variable value from the variables object condition.
-	 *  @param var	The variable
-	 *  @return The bound constraint.
-	 *  @throws RuntimeExcpetion	when no constraint was found.
-	 */
-	public BoundConstraint getBoundConstraint(Variable var)
-	{
-		BoundConstraint	ret	= (BoundConstraint)boundconstraints.get(var);
-		if(ret==null)
-		{
-			throw new RuntimeException("No bound constraint for: "+var);
-		}
-		return ret;
-	}
-
-	/**
-	 *  Create a new variable and bind it using the given object condition and value source.
-	 *  @param condition	The object condition.
-	 *  @param valuesource	The value source.
-	 *  @return	The new variable.
-	 */
-	public Variable	generateVariableBinding(ObjectCondition	condition, Object valuesource)
-	{
-		return generateVariableBinding(condition, generateVariableName(), valuesource);
-	}
-
-	/**
-	 *  Generate a variable name.
-	 *  @return An unused variable name.
-	 */
-	public String generateVariableName()
-	{
-		String varname;
-		for(int i=1; variables.containsKey(varname = "$tmpvar_"+i); i++);
-		return varname;
-	}
-
-	/**
-	 *  Create a new variable and bind it using the given object condition and value source.
-	 *  @param condition	The object condition.
-	 *  @param name	The variable name.
-	 *  @param valuesource	The value source.
-	 *  @return	The new variable.
-	 */
-	public Variable	generateVariableBinding(ObjectCondition	condition, String name, Object valuesource)
-	{
-		Variable	tmpvar	= new Variable(name, getReturnType(valuesource, tmodel));
-		variables.put(name, tmpvar);
-		BoundConstraint	bc	= new BoundConstraint(valuesource, tmpvar);
-		boundconstraints.put(tmpvar, bc);
-		condition.addConstraint(bc);
-		return tmpvar;
-	}
-
-	/**
-	 *  Create a new object condition with the given constraints.
-	 *  Also adds mappings corresponding to bound constraints (if any).
-	 *  @param type	The object type.
-	 *  @param constraints	The constraints (if any).
-	 */
-	public void createObjectCondition(OAVObjectType type, IConstraint[] constraints)
-	{
-		ObjectCondition	ocon	= new ObjectCondition(type);
-		lcons.add(ocon);
-		for(int i=0; constraints!=null && i<constraints.length; i++)
-		{
-			ocon.addConstraint(constraints[i]);
-			if(constraints[i] instanceof BoundConstraint)
-			{
-				BoundConstraint	bc	= (BoundConstraint)constraints[i];
-				List	bvars	= bc.getBindVariables();
-				for(int k=0; k<bvars.size(); k++)
-				{
-					variables.put(((Variable)bvars.get(k)).getName(), bvars.get(k));
-					// Todo: by multiple ocurrences use the simplest bc.getValueSource() 
-					if(bc.getOperator().equals(IOperator.EQUAL))
-					{
-						boundconstraints.put(bvars.get(k), bc);
-						bcons.put(bvars.get(k), ocon);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 *  Get a variable.
-	 *  @param name	The name of the variable.
-	 *  @return The variable, if any.
-	 */
-	public Variable getVariable(String name)
-	{
-		return (Variable)variables.get(name);
-	}
-
-	/**
-	 *  Add a variable.
-	 *  @param var The variable.
-	 */
-	public void	addVariable(Variable var)
-	{
-		variables.put(var.getName(), var);
-	}
-
-	/**
-	 *  Expressions, which are unrelated to real object
-	 *  conditions should be bound to the dummy condition.
-	 *  After building all constraints, the dummy condition
-	 *  will be removed by reassigning its constraints to
-	 *  a suitable object condition (respecting variable assignment order).
-	 */
-	public ObjectCondition	getDummyCondition()
-	{
-		if(dummy==null)
-		{
-			dummy	= new ObjectCondition(OAVJavaType.java_object_type);
-			lcons.add(dummy);
-		}
-		return dummy;
-	}
-
-	/**
-	 *  Test if a dummy condition was used in the context.
-	 */
-	public boolean hasDummyCondition()
-	{
-		return dummy!=null;
-	}
-	
 	//-------- helper methods --------
 	
 	/**
@@ -309,6 +351,50 @@ public class BuildContext
 			throw new RuntimeException("Unknown value source type: "+valuesource);
 		}
 		
+		return ret;
+	}
+
+	/**
+	 *  Return the parent build context (if any).
+	 */
+	public BuildContext	getParent()
+	{
+		return parent;
+	}
+
+	/**
+	 *  Get the variables, which are available in this build context.
+	 */
+	public Set	getBoundVariables()
+	{
+		Set	ret	= new HashSet();
+		if(getParent()!=null)
+			ret.addAll(getParent().getBoundVariables());
+		for(int i=0; i<lcons.size(); i++)
+		{
+			ICondition	con	= (ICondition) lcons.get(i);
+			List	bcs	= null;
+			if(con instanceof ObjectCondition)
+			{
+				bcs	= ((ObjectCondition)con).getBoundConstraints();
+			}
+			else if(con instanceof CollectCondition)
+			{
+				bcs	= ((CollectCondition)con).getBoundConstraints();
+			}
+			for(int j=0; bcs!=null && j<bcs.size(); j++)
+			{
+				BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
+				if(bc.getOperator().equals(IOperator.EQUAL))
+				{
+					List	bvars	= bc.getBindVariables();
+					for(int k=0; k<bvars.size(); k++)
+					{
+						ret.add(bvars.get(k));
+					}
+				}
+			}
+		}
 		return ret;
 	}
 }

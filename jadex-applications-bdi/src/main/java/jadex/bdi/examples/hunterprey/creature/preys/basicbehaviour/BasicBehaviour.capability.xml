@@ -16,6 +16,7 @@
 	<imports>
 		<import>jadex.bdi.examples.hunterprey.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
+		<import>java.util.*</import>
 	</imports>
 
 	<capabilities>
@@ -53,11 +54,13 @@
 
 		<!-- Is the prey in danger. - ->
 		<belief name="is_indanger" class="boolean" evaluationmode="push">
-			<fact language="clips">
+			<fact language="jcl">
 				// $beliefbase.vision!=null &amp;&amp;
 				// (select $object
  				// from $beliefbase.vision.getObjects()
-				// where $object instanceof Hunter).size()>0				
+				// where $object instanceof Hunter).size()>0
+				
+				!(Hunter $hunter &amp;&amp; Arrays.asList($beliefbase.vision.getObjects()).contains($hunter))				
 			</fact>
 		</belief>-->
 
@@ -77,16 +80,18 @@
 				<inhibits ref="eat_food" inhibit="when_in_process"/>
 				<inhibits ref="wander_around" inhibit="when_in_process" />
 			</deliberation>
-			<maintaincondition language="clips">
+			<maintaincondition language="jcl">
 				// !$beliefbase.is_indanger
 				
-				?rbel_vision	= (belief (element_has_model.melement_has_name "vision") (belief_has_fact ?vision))
-				(not
-					(and
-						?hunter	= (Hunter)
-						?vision	= (Vision (objects contains ?hunter))
-					)
-				)
+				!(Hunter $hunter &amp;&amp; Arrays.asList($beliefbase.vision.getObjects()).contains($hunter))
+				
+				// ?rbel_vision	= (belief (element_has_model.melement_has_name "vision") (belief_has_fact ?vision))
+				// (not
+				// 	(and
+				// 		?hunter	= (Hunter)
+				// 		?vision	= (Vision (objects contains ?hunter))
+				// 	)
+				// )
 			</maintaincondition>
 		</maintaingoal>
 

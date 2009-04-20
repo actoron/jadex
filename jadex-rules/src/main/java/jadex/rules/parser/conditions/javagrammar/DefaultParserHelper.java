@@ -69,4 +69,12 @@ public class DefaultParserHelper implements IParserHelper
 	{
 		return context.getConditions();
 	}
+
+	/**
+	 *	Get the build context.
+	 */
+	public BuildContext	getBuildContext()
+	{
+		return context;
+	}
 }

@@ -23,7 +23,6 @@ import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
-import jadex.rules.state.OAVTypeModel;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,21 +43,65 @@ public class ConstraintBuilder
 	/**
 	 *  Build or adapt conditions for representing the given constraints.
 	 *  @param expression	The expression, which contains the constraints to represent.
-	 *  @param condition	Predefined condition that should be extended to reflect the constraints.
-	 *  @param tmodel	The type model.
+	 *  @param context	The build context.
 	 *  @return The generated condition.
 	 */
-	public static ICondition	buildConstraints(Expression expression, ICondition condition, OAVTypeModel tmodel)
+	public static ICondition	buildConstraints(Expression expression, BuildContext context)
 	{
-		BuildContext	context	= new BuildContext(condition, tmodel);
-
-		// Unfold AND expressions
+		// Decompose expression into 1) object conditions, 2) NOT conditions, 3) remaining constraints.
+		List	conditions	= new ArrayList();
 		List	constraints	= new ArrayList();
+		List	nots	= new ArrayList();
 		constraints.add(expression);
 		for(int i=0; i<constraints.size(); i++)
 		{
 			Expression	exp	= (Expression)constraints.get(i);
-			if(exp instanceof OperationExpression
+			if(exp instanceof ExistentialDeclaration)
+			{
+				constraints.remove(i);
+				conditions.add(exp);
+				i--;
+			}
+			
+			// Test if an unary not is a NOT condition (i.e. contains an existential declaration) instead of just a constraint
+			else if(exp instanceof UnaryExpression
+				&& ((UnaryExpression)exp).getOperator().equals(UnaryExpression.OPERATOR_NOT))
+			{
+				boolean	notcon	= false;
+				List	exps	= new ArrayList();
+				exps.add(((UnaryExpression)exp).getValue());
+				while(!notcon && !exps.isEmpty())
+				{
+					if(exps.get(0) instanceof ExistentialDeclaration)
+					{
+						notcon	= true;
+					}
+					// Unfold nested NOT
+					else if(exps.get(0) instanceof UnaryExpression
+						&& ((UnaryExpression)exps.get(0)).getOperator().equals(UnaryExpression.OPERATOR_NOT))
+					{
+						exps.add(((UnaryExpression)exps.get(0)).getValue());
+					}
+					// Unfold AND for complex NOTs
+					else if(exps.get(0) instanceof OperationExpression
+						&& ((OperationExpression)exps.get(0)).getOperator().equals(OperationExpression.OPERATOR_AND))
+					{
+						exps.add(((OperationExpression)exps.get(0)).getLeftValue());
+						exps.add(((OperationExpression)exps.get(0)).getRightValue());
+					}
+					exps.remove(0);
+				}
+				
+				if(notcon)
+				{
+					constraints.remove(i);
+					i--;
+					nots.add(((UnaryExpression)exp).getValue());
+				}
+			}
+			
+			// Unfold AND expression
+			else if(exp instanceof OperationExpression
 				&& ((OperationExpression)exp).getOperator().equals(OperationExpression.OPERATOR_AND))
 			{
 				constraints.add(i+1, ((OperationExpression)exp).getLeftValue());
@@ -68,9 +111,28 @@ public class ConstraintBuilder
 			}
 		}
 		
+		// Build object conditions.
+		for(int i=0; i<conditions.size(); i++)
+		{
+			ExistentialDeclaration	edec	= (ExistentialDeclaration)conditions.get(i);
+			context.createObjectCondition(edec.getType(), new IConstraint[]
+			{
+				new BoundConstraint(null, edec.getVariable())
+            });
+		}
+
+		// Build remaining constraints.
 		for(int i=0; i<constraints.size(); i++)
 		{
 			buildConstraint((Expression)constraints.get(i), context, false);
+		}
+
+		// Build NOT conditions.
+		for(int i=0; i<nots.size(); i++)
+		{
+			BuildContext	newcon	= new BuildContext(context);
+			ICondition	cond	= buildConstraints((Expression)nots.get(i), newcon);
+			context.addCondition(new NotCondition(cond));
 		}
 
 		shuffle(context);
@@ -160,19 +222,6 @@ public class ConstraintBuilder
 				throw new RuntimeException("Unexpected operator type: "+unex);
 			}
 		}
-		else if(exp instanceof ExistentialDeclaration)
-		{
-			if(invert)
-			{
-				throw new UnsupportedOperationException("Todo: build NOT nodes for inverted declarations: "+exp);
-			}
-			
-			ExistentialDeclaration	edec	= (ExistentialDeclaration)exp;
-			context.createObjectCondition(edec.getType(), new IConstraint[]
-			{
-				new BoundConstraint(null, edec.getVariable())
-            });
-		}
 		// Conditional
 		// Literal
 		// Primary
@@ -191,6 +240,9 @@ public class ConstraintBuilder
 		// Get object condition and value source for left part.
 		Object[]	tmp	= getObjectConditionAndValueSource(left, context);
 		ObjectCondition	ocon	= (ObjectCondition)tmp[0];
+		if(!context.getConditions().contains(ocon))
+			throw new UnsupportedOperationException("Cannot add constraints to parent build context: "+left+", "+context.getConditions());
+		
 		Object	valuesource	= tmp[1];
 
 		right	= flattenToPrimary(right, context);
@@ -510,6 +562,8 @@ public class ConstraintBuilder
 	{
 		List lcons	= context.getConditions();
 		Set	boundvars	= new HashSet();	// Variables, which are bound and therefore can be used.
+		if(context.getParent()!=null)
+			boundvars.addAll(context.getParent().getBoundVariables());
 		boolean	progress	= true;
 		int	finished	= 0;
 		

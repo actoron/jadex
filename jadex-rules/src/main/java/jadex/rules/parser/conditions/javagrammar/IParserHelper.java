@@ -35,4 +35,9 @@ public interface IParserHelper
 	 *  Get the conditions after parsing.
 	 */
 	public List	getConditions();
+	
+	/**
+	 *	Get the build context.
+	 */
+	public BuildContext	getBuildContext();
 }

@@ -54,7 +54,7 @@
 			<parameter name="garbage" class="String">
 				<!--  <bindingoptions>$beliefbase.garbages</bindingoptions>-->
 				<!-- Bind against variable from creation condition. -->
-				<value>$garbage</value>
+				<value>?garbage</value>
 			</parameter>
 			<unique dummy="true"/>
 			<creationcondition language="clips">

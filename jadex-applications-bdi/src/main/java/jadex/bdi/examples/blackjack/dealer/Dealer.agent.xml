@@ -152,10 +152,6 @@
 			<trigger>
 				<goal ref="play_with_player"/>
 			</trigger>
-<!--			<contextcondition>
-				$beliefbase.getBeliefSet("players").containsFact($plan.player)
-				&amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
-			</contextcondition>-->
 			<contextcondition language="clips">
 				// $beliefbase.getBeliefSet("players").containsFact($plan.player)
 				// &amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)

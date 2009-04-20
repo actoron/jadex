@@ -47,12 +47,23 @@ public class ParserHelper
 		}
 		else if(language.equals("jcl"))
 		{
-			ret	= parseJavaCondition(precon, text, model, imports, errors, helper, returnvar, invert);
+			ret	= parseJavaCondition(text, imports, errors, helper, returnvar, invert);
 		}
 		
 		return ret;
 	}
-		
+	
+	/**
+	 *  Parse a condition.
+	 *  @param text The text.
+	 *  @param model The model.
+	 *  @return The condition.
+	 */
+	public static ICondition parseClipsCondition(String text, OAVTypeModel model)
+	{
+		return parseClipsCondition(text, model, null, null);
+	}	
+
 	/**
 	 *  Parse a condition.
 	 *  @param text The text.
@@ -107,7 +118,7 @@ public class ParserHelper
 	 */
 	public static ICondition parseJavaCondition(String text, OAVTypeModel model)
 	{
-		return parseJavaCondition(null, text, model, null, null, new DefaultParserHelper(null, model), null, false);
+		return parseJavaCondition(text, null, null, new DefaultParserHelper(null, model), null, false);
 	}
 
 	/**
@@ -116,7 +127,7 @@ public class ParserHelper
 	 *  @param model The model.
 	 *  @return The condition.
 	 */
-	public static ICondition parseJavaCondition(ICondition precon, String text, OAVTypeModel model, String[] imports, List errors, IParserHelper helper, Variable returnvar, boolean invert)
+	public static ICondition parseJavaCondition(String text, String[] imports, List errors, IParserHelper helper, Variable returnvar, boolean invert)
 	{
 		ICondition	ret	= null;
 		ANTLRStringStream exp = new ANTLRStringStream(text);
@@ -127,21 +138,19 @@ public class ParserHelper
 		{
 			parser.setParserHelper(helper);
 			parser.setImports(imports);
-			parser.setTypeModel(model);
 			Expression	pexp	= parser.lhs();
-			precon	= new AndCondition(helper.getConditions());
 
 			if(returnvar!=null)
 			{
-				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), precon, model);
+				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), helper.getBuildContext());
 			}
 			else if(invert)
 			{
-				ret	= ConstraintBuilder.buildConstraints(new UnaryExpression(pexp, UnaryExpression.OPERATOR_NOT), precon, model);
+				ret	= ConstraintBuilder.buildConstraints(new UnaryExpression(pexp, UnaryExpression.OPERATOR_NOT), helper.getBuildContext());
 			}
 			else
 			{
-				ret	= ConstraintBuilder.buildConstraints(pexp, precon, model);
+				ret	= ConstraintBuilder.buildConstraints(pexp, helper.getBuildContext());
 			}
 
 //			if(invert)

@@ -15,13 +15,13 @@ the examples can also be started directly via Java. In order
 start the helloworld example you can use the following command:
 
 java -cp 
-antlr-runtime-3.0.1.jar;
+antlr-runtime-3.1.3.jar;
 collections-generic-4.01.jar;
 colt-1.2.0.jar;concurrent-1.3.4.jar;
-jadex-commons-2.0-beta1.jar;
-jadex-rules-2.0-beta1.jar;
-jadex-rules-applications-2.0-beta1.jar;
-jadex-rules-tools-2.0-beta1.jar;
+jadex-commons-2.0-beta2.jar;
+jadex-rules-2.0-beta2.jar;
+jadex-rules-applications-2.0-beta2.jar;
+jadex-rules-tools-2.0-beta2.jar;
 jung-3d-2.0-beta1.jar;
 jung-algorithms-2.0-beta1.jar;
 jung-api-2.0-beta1.jar;

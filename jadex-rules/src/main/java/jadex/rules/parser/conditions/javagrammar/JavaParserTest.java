@@ -85,13 +85,17 @@ public class JavaParserTest
 				public void addVariable(Variable var)
 				{
 				}
+				public BuildContext getBuildContext()
+				{
+					return context;
+				}
 			});
 
 			Expression	pexp	= parser.lhs();
 
 			System.out.println("Parsed expression:\n"+pexp+"\n");
 
-			ICondition	result	= ConstraintBuilder.buildConstraints(pexp, predefined, tmodel);
+			ICondition	result	= ConstraintBuilder.buildConstraints(pexp, new BuildContext(predefined, tmodel));
 			
 			System.out.println("Condition after build:\n"+result+"\n");
 		}
