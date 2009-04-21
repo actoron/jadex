@@ -1,2 +1,2 @@
 cd ..\..\..\..\..\..\..\..\lib
-java -cp antlr-runtime-3.1.3.jar;collections-generic-4.01.jar;colt-1.2.0.jar;concurrent-1.3.4.jar;jadex-commons-2.0-beta2.jar;jadex-rules-2.0-beta2.jar;jadex-rules-applications-2.0-beta2.jar;jadex-rules-tools-2.0-beta2.jar;jung-3d-2.0-beta1.jar;jung-algorithms-2.0-beta1.jar;jung-api-2.0-beta1.jar;jung-graph-impl-2.0-beta1.jar;jung-io-2.0-beta1.jar;jung-jai-2.0-beta1.jar;jung-visualization-2.0-beta1.jar;stringtemplate-3.1-b1.jar jadex.rules.examples.helloworld.OAVHelloWorld
+java -cp jadex-rules-applications-2.0-beta2.jar jadex.rules.examples.helloworld.OAVHelloWorld
