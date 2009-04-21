@@ -2,6 +2,7 @@ package jadex.adapter.base.envsupport.environment.space2d.action;
 
 import java.util.Map;
 
+import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -17,7 +18,7 @@ public class GetPosition extends AbstractSpace2dAction
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
-		Object id = parameters.get(ISpaceObject.OBJECT_ID);
+		Object id = parameters.get(IAgentAction.OBJECT_ID);
 		IVector2 pos = (IVector2)parameters.get(POSITION_ID);
 		((Space2D)space).setPosition(id, pos);
 		

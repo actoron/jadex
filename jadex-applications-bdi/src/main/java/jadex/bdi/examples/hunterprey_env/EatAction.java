@@ -1,4 +1,4 @@
-package jadex.bdi.examples.garbagecollector2;
+package jadex.bdi.examples.hunterprey_env;
 
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
@@ -8,9 +8,9 @@ import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import java.util.Map;
 
 /**
- *  Action for burning waste.
+ *  Action for eating food or another creature.
  */
-public class BurnWasteAction implements IAgentAction
+public class EatAction implements IAgentAction
 {
 	/**
 	 * Performs the action.
@@ -20,20 +20,20 @@ public class BurnWasteAction implements IAgentAction
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
-		System.out.println("burn waste action: "+parameters);
+		System.out.println("move action: "+parameters);
 		
-		Grid2D grid = (Grid2D)space;
-		
-		Object owner = parameters.get(IAgentAction.ACTOR_ID);
-		ISpaceObject so = grid.getOwnedObjects(owner)[0];
-		
-		assert so.getProperty("garbage")!=null;
-		
-		ISpaceObject garb = (ISpaceObject)so.getProperty("garbage");
-		so.setProperty("garbage", null);
-		space.destroySpaceObject(garb.getId());
-		
-		System.out.println("Garbage burned: "+garb);
+//		Grid2D grid = (Grid2D)space;
+//		
+//		Object owner = parameters.get(IAgentAction.ACTOR_ID);
+//		ISpaceObject so = grid.getOwnedObjects(owner)[0];
+//		
+//		assert so.getProperty("garbage")!=null;
+//		
+//		ISpaceObject garb = (ISpaceObject)so.getProperty("garbage");
+//		so.setProperty("garbage", null);
+//		space.destroySpaceObject(garb.getId());
+//		
+//		System.out.println("Garbage burned: "+garb);
 		
 		return null;
 	}
@@ -45,6 +45,6 @@ public class BurnWasteAction implements IAgentAction
 	public Object getId()
 	{
 		// todo: remove here or from application xml?
-		return "burn";
+		return "eat";
 	}
 }

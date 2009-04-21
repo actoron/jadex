@@ -26,7 +26,7 @@ public class DropWasteAction implements IAgentAction
 		
 		Grid2D grid = (Grid2D)space;
 		
-		Object owner = parameters.get(ISpaceObject.OWNER);
+		Object owner = parameters.get(IAgentAction.ACTOR_ID);
 		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 		IVector2 pos = (IVector2)so.getProperty(Grid2D.POSITION);
 		

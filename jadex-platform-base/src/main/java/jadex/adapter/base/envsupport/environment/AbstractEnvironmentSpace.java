@@ -201,12 +201,12 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 			if(typeobjs.size()==0)
 				spaceobjectsbytype.remove(obj.getType());
 			
-			if(obj.getProperty(ISpaceObject.OWNER)!=null)
+			if(obj.getProperty(IAgentAction.ACTOR_ID)!=null)
 			{
-				List ownedobjs = (List)spaceobjectsbyowner.get(obj.getProperty(ISpaceObject.OWNER));
+				List ownedobjs = (List)spaceobjectsbyowner.get(obj.getProperty(IAgentAction.ACTOR_ID));
 				ownedobjs.remove(obj);
 				if(ownedobjs.size()==0)
-					spaceobjectsbyowner.remove(obj.getProperty(ISpaceObject.OWNER));
+					spaceobjectsbyowner.remove(obj.getProperty(IAgentAction.ACTOR_ID));
 			}
 		}
 		
@@ -404,7 +404,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
-			Object oldowner = obj.getProperty(ISpaceObject.OWNER);
+			Object oldowner = obj.getProperty(IAgentAction.ACTOR_ID);
 			if(oldowner!=null)
 			{
 				List ownedobjs = (List)spaceobjectsbyowner.get(oldowner);
@@ -422,7 +422,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 				}
 				ownedobjs.add(obj);
 			}
-			obj.setProperty(ISpaceObject.OWNER, owner);
+			obj.setProperty(IAgentAction.ACTOR_ID, owner);
 		}
 	}
 	

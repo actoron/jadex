@@ -89,12 +89,22 @@
 					// (select one ParticipantProposal $prop from $goal.proposals
 					// where $prop.getEvaluation()==null)==null) ? true : null
 					
+					// $goal.acceptables.length>0 ||
+					// !(ParticipantProposal $prop &amp;&amp;
+					// 	$prop.getEvaluation()==null &amp;&amp;
+					// 	Arrays.asList($goal.proposals).contains($prop))
+
+					// !($goal.acceptables.length==0 &amp;&amp;
+					// 	ParticipantProposal $prop &amp;&amp;
+					// 	$prop.getEvaluation()==null &amp;&amp;
+					// 	Arrays.asList($goal.proposals).contains($prop))
+					
 					// a v b -> not(not(a v b)) -> not(not(a) n not(b))
 					// a: $goal.acceptables.length>0 
 					// not(a): $goal.acceptables.length==0 (= there is no element in acceptables)
 					// b: all proposals have an evaluation (= no one has none)
 					// not(b): there is a proposal that has evaluation==null
-										
+					//					
 					(not
 						(and
 							?proposal = (ParticipantProposal (evaluation null))
@@ -102,13 +112,13 @@
 							
 							?acceptables = (parameterset (parameterset_has_name "acceptables") (parameterset_has_values $?accs))
 							(test (== (Length $?accs) 0))
-
+					
 							?rpe	= (goal (parameterelement_has_parametersets contains ?proposals) (parameterelement_has_parametersets contains ?acceptables))
 						)
 					)
 					?rpe = (goal ((Identity true) ?ret))
 				
-										// alternative implementation
+					// alternative implementation
 					//(not
 					//	(and
 					//		?proposal = (ParticipantProposal (evaluation null))

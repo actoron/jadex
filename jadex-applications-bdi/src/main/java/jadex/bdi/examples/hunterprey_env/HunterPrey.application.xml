@@ -1,0 +1,85 @@
+<!--
+	<H3>The hunter prey application descriptor</H3>
+
+	Two kinds of creatures live on a grid world.
+	Hunters try to catch the prey, while prey
+	moves around looking for food.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-env"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	name="HunterPrey" package="jadex.bdi.examples.hunterprey_env">
+	
+	<imports>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.adapter.base.envsupport.math.Vector1Long</import>
+		<import>jadex.bridge.IClockService</import>
+		<import>jadex.adapter.base.envsupport.environment.view.GeneralView2D</import>
+	</imports>
+	
+	<spacetypes>
+		<env:envspacetype name="2dspace" class="Grid2D">
+			<env:dimension>30</env:dimension>
+			<env:dimension>30</env:dimension>
+
+			<env:agentactiontypes>
+				<env:agentactiontype name="move" class="MoveAction" />
+				<env:agentactiontype name="eat" class="EatAction" />
+			</env:agentactiontypes>
+			
+			<env:processtypes>
+				<env:processtype name="create" class="CreateFoodProcess" />
+			</env:processtypes>
+<!-- 			
+			<env:perceptgeneratortypes>
+				<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
+			</env:perceptgeneratortypes>
+ -->			
+			<env:views>
+				<env:view name="view_all" class="GeneralView2D">
+					<env:theme name="abstract">
+						<env:drawable objecttype="food" width="1.0" height="1.0">
+							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
+						</env:drawable>
+						<env:drawable objecttype="obstacle" width="1.0" height="1.0">
+							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/obstacle.png" />
+						</env:drawable>
+						<env:drawable objecttype="prey" width="1.0" height="1.0">
+							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/prey.png" />
+						</env:drawable>
+ 						<env:prelayers>
+							<env:tiledlayer width="17.5" height="17.5" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
+							<env:gridlayer width="1.0" height="1.0" color="black" />
+						</env:prelayers>
+						<env:postlayers>
+						</env:postlayers>
+					</env:theme>
+				</env:view>
+			</env:views>
+
+			<!-- executor -->
+			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>
+		</env:envspacetype>
+	</spacetypes>
+
+	<agenttypes>
+		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_env/dumbprey/DumbPrey.agent.xml"/>
+	</agenttypes>
+
+	<applications>
+		<application name="default">
+ 			<agents>
+				<agent name="Dummy1" type="DumbPrey"/>
+			</agents>
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:object type="prey" owner="Dummy1">
+				</env:object>
+ 			</env:envspace>
+ 		</application>
+	</applications>
+
+</applicationtype>

@@ -293,6 +293,10 @@
 					order by $beliefbase.getBelief("my_location").getFact().getDistance($wastebin.getLocation())
 				</value> -->
 				<value language="clips">
+					// Wastebin $wastebin &amp;&amp; !(Wastebin $wb2 &amp;&amp;
+					// $beliefbase.my_location.getDistance($wastebin.getLocation())
+					// &lt; $beliefbase.my_location.getDistance($wastebin.getLocation()))
+				
 					?ret = (Wastebin (location ?loc) (isFull() false))
 					
 					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))

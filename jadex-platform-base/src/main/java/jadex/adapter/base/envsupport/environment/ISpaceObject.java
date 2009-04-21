@@ -7,19 +7,8 @@ import jadex.commons.IPropertyObject;
  */
 public interface ISpaceObject extends IPropertyObject
 {
-	//-------- constants --------
-	
-	/** The constant for the object id property. */
-	public static final String OBJECT_ID = "object_id";
-	
-	/** The constant for the actor id property. */
-	public static final String ACTOR_ID  = "actor_id";
-	
-	/** The constant for the owner property. */
-	public static final String OWNER  = "owner";
-	
 	//-------- methods --------
-
+	
 	/**
 	 *  Get the objects id.
 	 *  @return The object id.

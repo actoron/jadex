@@ -28,7 +28,7 @@ public class PickupWasteAction implements IAgentAction
 				
 		Grid2D grid = (Grid2D)space;
 		
-		Object owner = parameters.get(ISpaceObject.OWNER);
+		Object owner = parameters.get(IAgentAction.ACTOR_ID);
 		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 
 //		if(so.getProperty("garbage")!=null)
