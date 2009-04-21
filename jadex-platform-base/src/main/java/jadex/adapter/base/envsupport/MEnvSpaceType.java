@@ -116,11 +116,6 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"class"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, "property")}), null));
 		
-		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
-			SUtil.createHashMap(new String[]{"type"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("typeName")
-			}), null));
-		
 		types.add(new TypeInfo("agentactiontype", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
@@ -150,19 +145,19 @@ public class MEnvSpaceType	extends MSpaceType
 				public Object createObject(Map args) throws Exception
 				{
 					Map sourceview = (Map)args.get("sourceview");
-					Map themes = (Map)args.get("themes");
+//					Map themes = (Map)args.get("themes");
 					IEnvironmentSpace space = (IEnvironmentSpace)args.get("space");
-					
-					List sourcethemes = (List)sourceview.get("themes");
-					if(sourcethemes!=null)
-					{
-						for(int j=0; j<sourcethemes.size(); j++)
-						{
-							Map sourcetheme = (Map)sourcethemes.get(j);
-							themes.put((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), 
-								(Theme2D)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
-						}
-					}
+//					
+//					List sourcethemes = (List)sourceview.get("themes");
+//					if(sourcethemes!=null)
+//					{
+//						for(int j=0; j<sourcethemes.size(); j++)
+//						{
+//							Map sourcetheme = (Map)sourcethemes.get(j);
+//							themes.put((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), 
+//								(Theme2D)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
+//						}
+//					}
 					
 					IView ret = (IView)((Class)MEnvSpaceInstance.getProperty(sourceview, "clazz")).newInstance();
 					ret.setSpace(space);
@@ -239,7 +234,8 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int l=0; l<parts.size(); l++)
 						{
 							Map sourcepart = (Map)parts.get(l);
-							ret.addDrawable((IDrawable)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepart, "creator")).createObject(sourcepart));
+							int layer = MEnvSpaceInstance.getProperty(sourcepart, "layer")!=null? ((Integer)MEnvSpaceInstance.getProperty(sourcepart, "layer")).intValue(): 0;
+							ret.addDrawable((IDrawable)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepart, "creator")).createObject(sourcepart), layer);
 						}
 					}
 					return ret;
@@ -248,13 +244,14 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 
 		types.add(new TypeInfo("texturedrectangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "shiftx", "shifty", "rotating", "creator"}, 
+			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "shiftx", "shifty", "rotating", "layer", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -271,13 +268,14 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("triangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "creator"}, 
+			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, colorconv, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -294,13 +292,14 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("rectangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "creator"}, 
+			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, colorconv, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -317,13 +316,14 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("regularpolygon", MultiCollection.class, null, null,
-				SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "vertices", "creator"}, 
+				SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "vertices", "layer", "creator"}, 
 				new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "", new Integer(3)),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
 				{
@@ -377,6 +377,13 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}), null));
 			
+		// type instance declarations.
+		
+		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
+			SUtil.createHashMap(new String[]{"type"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("typeName")
+			}), null));
+		
 		types.add(new TypeInfo("object", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "type", "owner"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
@@ -384,6 +391,22 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, "")
 			}), null));
+		
+		types.add(new TypeInfo("spaceaction", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"type"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+		
+		types.add(new TypeInfo("spaceaction/parameter", MultiCollection.class, null, new BeanAttributeInfo("value", null, ""),
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+
+		types.add(new TypeInfo("observer", MultiCollection.class, null, null,
+				SUtil.createHashMap(new String[]{"name", "view", "theme"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, null, "")
+				}), null));
 		
 		return types;
 	}
@@ -411,9 +434,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("perceptgeneratortype", new BeanAttributeInfo("perceptgeneratortypes", null, "property")));
 		linkinfos.add(new LinkInfo("view", new BeanAttributeInfo("views", null, "property")));
 		linkinfos.add(new LinkInfo("spaceexecutor", new BeanAttributeInfo(null, expconv, "property")));
-		
-		// view
-		linkinfos.add(new LinkInfo("theme", new BeanAttributeInfo("themes", null, "")));
+		linkinfos.add(new LinkInfo("theme", new BeanAttributeInfo("themes", null, "property")));
 		
 		// theme
 		linkinfos.add(new LinkInfo("drawable", new BeanAttributeInfo("drawables", null, "")));
@@ -430,6 +451,11 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		// space instance
 		linkinfos.add(new LinkInfo("object", new BeanAttributeInfo("objects", null, "property")));
+		linkinfos.add(new LinkInfo("spaceaction", new BeanAttributeInfo("spaceactions", null, "property")));
+		linkinfos.add(new LinkInfo("observer", new BeanAttributeInfo("observers", null, "property")));
+		
+		// space action 
+		linkinfos.add(new LinkInfo("spaceaction/parameter", new BeanAttributeInfo("parameters", null, "")));
 		
 		return linkinfos;
 	}

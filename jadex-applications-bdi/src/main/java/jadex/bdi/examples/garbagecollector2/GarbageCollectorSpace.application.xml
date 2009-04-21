@@ -26,12 +26,14 @@
 			<env:dimension>10</env:dimension>
 			<env:dimension>10</env:dimension>
 		
-			<env:agentactiontypes>
+			<env:actiontypes>
+				<!-- <env:spaceactiontype name="init" class="PickupWasteAction" /> -->
+			
 				<env:agentactiontype name="pickup" class="PickupWasteAction" />
 				<env:agentactiontype name="drop" class="DropWasteAction" />
 				<env:agentactiontype name="burn" class="BurnWasteAction" />
 				<env:agentactiontype name="go" class="GoAction" />
-			</env:agentactiontypes>
+			</env:actiontypes>
 			
 			<env:processtypes>
 				<env:processtype name="create" class="CreateWasteProcess" />
@@ -43,38 +45,41 @@
 			
 			<env:views>
 				<env:view name="view_all" class="GeneralView2D">
-					<env:theme name="icons">
-						<env:drawable objecttype="collector" width="1.0" height="1.0">
-							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
-						</env:drawable>
-						<env:drawable objecttype="burner" width="1.0" height="1.0">
-							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
-						</env:drawable>
-						<env:drawable objecttype="garbage" width="0.7" height="0.7">
-							<env:texturedrectangle width="0.7" height="0.7" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
-						</env:drawable>
-						<env:prelayers>
-							<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
-							<env:gridlayer width="1.0" height="1.0" color="WHITE" />
-						</env:prelayers>
-					</env:theme>
-					
-					<env:theme name="abstract">
-						<env:drawable objecttype="collector" width="1.0" height="1.0">
-							<env:triangle width="0.9" height="0.9" color="RED" />
-						</env:drawable>
-						<env:drawable objecttype="burner" width="1.0" height="1.0">
-							<env:triangle width="0.9" height="0.9" color="GREEN" />
-						</env:drawable>
-						<env:drawable objecttype="garbage" width="0.7" height="0.7">
-							<env:rectangle width="0.3" height="0.3" color="YELLOW" />
-						</env:drawable>
-						<env:prelayers>
-							<env:gridlayer width="1.0" height="1.0" color="WHITE" />
-						</env:prelayers>
-					</env:theme>
 				</env:view>
 			</env:views>
+			
+			<env:themes>
+				<env:theme name="icons">
+					<env:drawable objecttype="collector" width="1.0" height="1.0">
+						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
+					</env:drawable>
+					<env:drawable objecttype="burner" width="1.0" height="1.0">
+						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
+					</env:drawable>
+					<env:drawable objecttype="garbage" width="0.7" height="0.7">
+						<env:texturedrectangle layer="0" width="0.7" height="0.7" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
+					</env:drawable>
+					<env:prelayers>
+						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
+						<env:gridlayer width="1.0" height="1.0" color="WHITE" />
+					</env:prelayers>
+					</env:theme>
+					
+					<!-- <env:theme name="abstract">
+					<env:drawable objecttype="collector" width="1.0" height="1.0">
+						<env:triangle width="0.9" height="0.9" color="RED" />
+					</env:drawable>
+					<env:drawable objecttype="burner" width="1.0" height="1.0">
+						<env:triangle width="0.9" height="0.9" color="GREEN" />
+					</env:drawable>
+					<env:drawable objecttype="garbage" width="0.7" height="0.7">
+						<env:rectangle width="0.3" height="0.3" color="YELLOW" />
+					</env:drawable>
+					<env:prelayers>
+						<env:gridlayer width="1.0" height="1.0" color="WHITE" />
+					</env:prelayers>
+				</env:theme> -->
+			</env:themes>
 			
 			<!-- executor -->
 			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>
@@ -94,12 +99,13 @@
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:object type="collector" owner="Collector1">
-				</env:object>
-				<env:object type="burner" owner="Burner1">
-				</env:object>
+				<env:objects>
+					<env:object type="collector" owner="Collector1" />
+					<env:object type="burner" owner="Burner1" />
+				</env:objects>
 			</env:envspace>
 		</application>
+		
 		<application name="One Burner / Two Collectors">
 			<agents>
 				<agent name="Collector2" type="Collector"/>
@@ -108,12 +114,24 @@
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:object type="collector" owner="Collector1">
-				</env:object>
-				<env:object type="collector" owner="Collector2">
-				</env:object>
-				<env:object type="burner" owner="Burner1">
-				</env:object>
+				<env:objects>
+					<env:object type="collector" owner="Collector1" />
+					<env:object type="collector" owner="Collector2" />
+					<env:object type="burner" owner="Burner1" />
+				</env:objects>
+				
+				<env:initactions>
+					<env:spaceaction type="init">
+						<env:parameter name="p1">new Integer(1)</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" theme="abstract">
+						<env:plugins>
+						</env:plugins>
+					</env:observer>
+				</env:observers>
 			</env:envspace>
 		</application>
 	</applications>
