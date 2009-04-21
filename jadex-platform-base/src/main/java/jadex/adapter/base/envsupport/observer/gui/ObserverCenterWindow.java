@@ -38,15 +38,12 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	private JSplitPane mainpane;
 	
-	/** The viewport */
-	private IViewport viewport;
-	
 	/** Creates the main window.
 	 * 
 	 *  @param title title of the window
 	 *  @param simView view of the simulation
 	 */
-	public ObserverCenterWindow(String title, final ILibraryService libService, final boolean opengl)
+	public ObserverCenterWindow(String title)
 	{
 		super(title);
 		
@@ -54,8 +51,6 @@ public class ObserverCenterWindow extends JFrame
 		{
 			public void run()
 			{
-				viewport = createViewport(libService, opengl);
-
 				menubar = new JMenuBar();
 				menubar.add(new JMenu("Test"));
 				setJMenuBar(menubar);
@@ -68,8 +63,6 @@ public class ObserverCenterWindow extends JFrame
 				getContentPane().add(mainpane, BorderLayout.CENTER);
 
 				mainpane.setLeftComponent(new JPanel());
-
-				mainpane.setRightComponent(viewport.getCanvas());
 
 				setResizable(true);
 				setBackground(null);
@@ -97,15 +90,6 @@ public class ObserverCenterWindow extends JFrame
 			{
 			}
 		}
-	}
-	
-	/**
-	 * Returns the viewport.
-	 * @return the viewport
-	 */
-	public IViewport getViewport()
-	{
-		return viewport;
 	}
 	
 	/** Adds a menu
@@ -161,51 +145,13 @@ public class ObserverCenterWindow extends JFrame
 		mainpane.setLeftComponent(view);
 	}
 	
-	private IViewport createViewport(ILibraryService libService, boolean opengl)
+	/** Sets the presentation view.
+	 *  
+	 *  @param view the view
+	 */
+	public void setPresentationView(Component view)
 	{
-		final JFrame frame = new JFrame("");
-		frame.setLayout(new BorderLayout());
-		frame.setUndecorated(true);
-		frame.pack();
-		frame.setSize(1, 1);
-		
-		if (opengl)
-		{
-			// Try OpenGL...
-			try
-			{
-				ViewportJOGL vp = new ViewportJOGL(libService);
-				frame.add(vp.getCanvas());
-				frame.setVisible(true);
-				if (!vp.isValid())
-				{
-					System.err.println("OpenGL support insufficient, using Java2D fallback...");
-					opengl = false;
-				}
-			}
-			catch (RuntimeException e0)
-			{
-				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-				System.err.println(e0);
-				opengl = false;
-			}
-			catch (Error e1)
-			{
-				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-				System.err.println(e1);
-				opengl = false;
-			}
-		}
-		
-		IViewport viewport = null;
-		if (opengl)
-		{
-			viewport = new ViewportJOGL(libService);
-		}
-		else
-		{
-			viewport = new ViewportJ2D(libService);
-		}
-		return viewport;
+		mainpane.setRightComponent(view);
+		mainpane.setDividerLocation(200 + mainpane.getInsets().left);
 	}
 }

@@ -14,7 +14,6 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
-import jadex.adapter.base.envsupport.observer.gui.Configuration;
 import jadex.adapter.base.envsupport.observer.theme.Theme2D;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -151,7 +150,7 @@ public class MEnvSpaceType	extends MSpaceType
 				public Object createObject(Map args) throws Exception
 				{
 					Map sourceview = (Map)args.get("sourceview");
-					Configuration cfg = (Configuration)args.get("cfg");
+					Map themes = (Map)args.get("themes");
 					IEnvironmentSpace space = (IEnvironmentSpace)args.get("space");
 					
 					List sourcethemes = (List)sourceview.get("themes");
@@ -160,7 +159,7 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int j=0; j<sourcethemes.size(); j++)
 						{
 							Map sourcetheme = (Map)sourcethemes.get(j);
-							cfg.setTheme((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), 
+							themes.put((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), 
 								(Theme2D)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
 						}
 					}

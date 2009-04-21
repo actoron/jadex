@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.observer.gui.plugin;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
+import jadex.adapter.base.envsupport.observer.gui.presentation.IPresentation;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -130,7 +131,8 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	
 	public synchronized void refresh()
 	{
-		Object observedId = observerCenter_.getMarkedObject();
+		IPresentation p = observerCenter_.getSelectedPresentation();
+		Object observedId = p.getSelectedObject();
 		if (observedId == null)
 		{
 			idLabel_.setText("");
@@ -139,13 +141,13 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 			propertyTable_.setModel(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 			return;
 		}
-		IEnvironmentSpace space = observerCenter_.getEnvironmentSpace();
+		IEnvironmentSpace space = observerCenter_.getSpace();
 		Map properties = space.getSpaceObject(observedId).getProperties();
 		IVector2 position = ((IVector2) properties.get("position")).copy();
 		String type = space.getSpaceObject(observedId).getType().toString();
 		if ((properties == null) || (position == null) || (type == null))
 		{
-			observerCenter_.markObject(null);
+			p.setSelectedObject(null);
 			return;
 		}
 		

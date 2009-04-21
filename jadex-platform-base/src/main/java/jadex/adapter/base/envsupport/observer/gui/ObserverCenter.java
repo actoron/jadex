@@ -9,9 +9,12 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.IViewportListener;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.ObjectIntrospectorPlugin;
+import jadex.adapter.base.envsupport.observer.gui.presentation.IPresentation;
 import jadex.adapter.base.envsupport.observer.theme.Theme2D;
 import jadex.bridge.ILibraryService;
 
@@ -21,10 +24,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,15 +52,15 @@ public class ObserverCenter
 	
 	/** The main window.
 	 */
-	private ObserverCenterWindow mainWindow_;
+	private ObserverCenterWindow mainwindow;
 	
 	/** Currently active plugin
 	 */
-	private IObserverCenterPlugin activePlugin_;
+	private IObserverCenterPlugin activeplugin;
 	
 	/** The plugins
 	 */
-	private IObserverCenterPlugin[] plugins_;
+	private IObserverCenterPlugin[] plugins;
 	
 	/** Viewport refresh timer
 	 */
@@ -65,48 +70,42 @@ public class ObserverCenter
 	 */
 	private Timer plugintimer;
 	
-	/** Selection controller
-	 */
-	private SelectionController selectionController_;
-	
 	/** The library service */
 	private ILibraryService libService;
 	
 	/** The space that is being observed. */
 	private IEnvironmentSpace space;
 	
-	/** The configuration of the observer */
-	private Configuration config;
+	/** Available themes */
+	private Map themes;
 	
-	/** Currently marked object */
-	private Object markedObject;
+	/** Available presentations */
+	private Map presentations;
 	
-	/** Currently selected theme */
-	private String selectedTheme;
+	/** Selected presentations */
+	private IPresentation selectedpresentation;
 	
 	/** Creates an observer center.
 	 *  
+	 *  @param windowTitle title of the observer window
 	 *  @param space the space being observed
-	 *  @param cfg the configuration
 	 *  @param libSrvc the platform library service for loading resources (images etc.)
+	 *  @param customplugins custom plugins used in the observer
 	 */
-	public ObserverCenter(final IEnvironmentSpace space, Configuration cfg, final ILibraryService libSrvc)
+	public ObserverCenter(final String windowTitle, final IEnvironmentSpace space, ILibraryService libSrvc, List customplugins)
 	{
+		themes = Collections.synchronizedMap(new HashMap());
+		presentations = Collections.synchronizedMap(new HashMap());
+		final List cPlugins = customplugins == null? new ArrayList(): customplugins;
 		this.libService = libSrvc;
 		this.space = space;
-		this.config = cfg;
-		selectedTheme = config.getThemeNames()[0];
-		activePlugin_ = null;
-		selectionController_ = new SelectionController();
-		EventQueue.invokeLater(new Runnable()
+		activeplugin = null;
+		Runnable init = new Runnable()
 			{
 				public void run()
-				{
-					String mainTitle = config.getWindowTitle();
-					mainWindow_ = new ObserverCenterWindow(mainTitle, libService, config.useOpenGl());
-					IViewport vp = mainWindow_.getViewport();
-					vp.setSize(((Space2D) space).getAreaSize());
-					loadPlugins();
+				{;
+					mainwindow = new ObserverCenterWindow(windowTitle);
+					loadPlugins(cPlugins);
 					
 					JMenu refreshMenu = new JMenu("Display");
 					
@@ -140,32 +139,17 @@ public class ObserverCenter
 					}
 					refreshMenu.add(viewportMenu);
 					
-					mainWindow_.addMenu(refreshMenu);
-					
-					/*String[] themeNames = config.getThemeNames();
-					for (int i = 0; i < themeNames.length; ++i)
-					{
-						Map theme = config.getTheme(themeNames[i]);
-						for (Iterator it = theme.values().iterator(); it.hasNext(); )
-						{
-							Object item = it.next();
-							if (item instanceof DrawableCombiner)
-							{
-								DrawableCombiner d = (DrawableCombiner) item;
-								getViewport().registerDrawableCombiner(d);
-							}
-						}
-					}*/
+					mainwindow.addMenu(refreshMenu);
 					
 					plugintimer = new Timer(100, new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
 							{
-								synchronized(plugins_)
+								synchronized(ObserverCenter.this.plugins)
 								{
-									if (activePlugin_ != null)
+									if (activeplugin != null)
 									{
-										activePlugin_.refresh();
+										activeplugin.refresh();
 									}
 								}
 							}
@@ -181,81 +165,118 @@ public class ObserverCenter
 					});
 					vptimer.start();
 					
-					mainWindow_.addWindowListener(new ObserverWindowController());
-					
-					setEnableSelection(true);
+					mainwindow.addWindowListener(new ObserverWindowController());
 				}
-			});
+			};
+		if (EventQueue.isDispatchThread())
+		{
+			init.run();
+		}
+		else
+		{
+			try
+			{
+				EventQueue.invokeAndWait(init);
+			}
+			catch (InterruptedException e)
+			{
+			}
+			catch (InvocationTargetException e)
+			{
+			}
+		}
 	}
 	
-	/** Returns the configuration
-	 * 
-	 *  @return observer configuration
+	/**
+	 * Adds a presentation.
+	 * @param name name of the presentation
+	 * @param presentation the presentation
 	 */
-	public Configuration getConfig()
+	public void addPresentation(String name, IPresentation presentation)
 	{
-		return config;
+		synchronized (presentation)
+		{
+			presentation.setObserverCenter(this);
+			presentations.put(name, presentation);
+			if (presentations.size() == 1)
+			{
+				selectPresentation(name);
+			}
+		}
+	}
+	
+	/**
+	 * Select a presentation.
+	 * @param name name of the presentation
+	 */
+	public void selectPresentation(String name)
+	{
+		IPresentation p = (IPresentation) presentations.get(name);
+		mainwindow.setPresentationView(p.getView());
+		selectedpresentation = p;
+	}
+	
+	/**
+	 * Adds a theme.
+	 * @param name name of the theme
+	 * @param theme a theme
+	 */
+	public void addTheme(String name, Object theme)
+	{
+		//TODO: Move up to app-descriptor?
+		Theme2D theme2d = (Theme2D) theme;
+		if (theme2d.getMarkerDrawCombiner() == null)
+		{
+			DrawableCombiner objectMarker = new DrawableCombiner();
+			IDrawable markerDrawable = new TexturedRectangle(getClass().getPackage().getName().replaceAll("gui", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
+			objectMarker.addDrawable(markerDrawable, Integer.MAX_VALUE);
+			theme2d.setMarkerDrawCombiner(objectMarker);
+		}
+		synchronized(themes)
+		{
+			if ((themes.isEmpty()) && (selectedpresentation != null))
+			{
+				selectedpresentation.setTheme(theme);
+			}
+			themes.put(name, theme);
+		}
+		
 	}
 	
 	/** Returns access to the environment space
 	 * 
 	 *  @return simulation engine access
 	 */
-	public IEnvironmentSpace getEnvironmentSpace()
+	public IEnvironmentSpace getSpace()
 	{
 		return space;
 	}
 	
-	/** Returns the simulation viewport
+	/**
+	 * Returns access to the library service
 	 * 
-	 *  @return simulation viewport
+	 *  @return the library service
 	 */
-	public IViewport getViewport()
+	public ILibraryService getLibraryService()
 	{
-		return mainWindow_.getViewport();
+		return libService;
 	}
 	
-	/** Marks an object.
-	 *  
-	 *  @param object to mark, null for deselection
-	 */
-	public void markObject(final Object objectId)
-	{
-		markedObject = objectId;
-		if (activePlugin_ != null)
-		{
-			activePlugin_.refresh();
-		}
-	}
-	
-	/** Returns the currently marked object.
+	/**
+	 * Returns the selected presentation.
 	 * 
-	 *  @return currently marked object
+	 *  @return the selected presentation
 	 */
-	public Object getMarkedObject()
+	public IPresentation getSelectedPresentation()
 	{
-		return markedObject;
+		return selectedpresentation;
 	}
 	
-	/** Enables and disables selection.
-	 *  
-	 *  @param enabled true to enable selection
+	/**
+	 * Loads all available plugins
+	 * @param customplugins custom plugins used in addition to standard plugins
 	 */
-	public void setEnableSelection(boolean enabled)
-	{
-		if (enabled)
-		{
-			getViewport().addViewportListener(selectionController_);
-		}
-		else
-		{
-			getViewport().removeViewportListener(selectionController_);
-		}
-	}
-	
-	/** Loads all available plugins
-	 */
-	private void loadPlugins()
+	private void loadPlugins(List customplugins)
 	{
 		ArrayList plugins = new ArrayList();
 		
@@ -268,17 +289,17 @@ public class ObserverCenter
 		//plugins.add(plugin);
 		//plugin = new ToolboxPlugin();
 		//plugins.add(plugin);
-		plugins.addAll(Arrays.asList(config.getPlugins()));
+		plugins.addAll(customplugins);
 		
-		plugins_ = (IObserverCenterPlugin[]) plugins.toArray(new IObserverCenterPlugin[0]);
+		this.plugins = (IObserverCenterPlugin[]) plugins.toArray(new IObserverCenterPlugin[0]);
 		
-		for (int i = 0; i < plugins_.length; ++i)
+		for (int i = 0; i < this.plugins.length; ++i)
 		{
-			addPluginButton(plugins_[i]);
+			addPluginButton(this.plugins[i]);
 		}
 		
-		if(plugins_.length>0)
-			activatePlugin(plugins_[0]);
+		if(this.plugins.length>0)
+			activatePlugin(this.plugins[0]);
 	}
 	
 	/** Adds a plugin to the toolbar.
@@ -290,7 +311,7 @@ public class ObserverCenter
 		String iconPath = plugin.getIconPath();
 		if (iconPath == null)
 		{
-			mainWindow_.addToolbarItem(plugin.getName(), new PluginAction(plugin));
+			mainwindow.addToolbarItem(plugin.getName(), new PluginAction(plugin));
 		}
 		else
 		{
@@ -301,29 +322,29 @@ public class ObserverCenter
 				System.out.println(cl.getResource(iconPath));
 				BufferedImage image = ImageIO.read(cl.getResource(iconPath));
 				ImageIcon icon = new ImageIcon(image);
-				mainWindow_.addToolbarItem(plugin.getName(), icon, new PluginAction(plugin));
+				mainwindow.addToolbarItem(plugin.getName(), icon, new PluginAction(plugin));
 			}
 			catch (Exception e)
 			{
 				System.err.println("Icon image " + iconPath + " not found.");
-				mainWindow_.addToolbarItem(plugin.getName(), new PluginAction(plugin));
+				mainwindow.addToolbarItem(plugin.getName(), new PluginAction(plugin));
 			}
 		}
 	}
 	
 	private void activatePlugin(IObserverCenterPlugin plugin)
 	{
-		synchronized (plugins_)
+		synchronized (this.plugins)
 		{
-			IObserverCenterPlugin oldPlugin = activePlugin_;
+			IObserverCenterPlugin oldPlugin = activeplugin;
 			if (oldPlugin != null)
 			{
 				oldPlugin.shutdown();
 			}
 
-			mainWindow_.setPluginView(plugin.getView());
+			mainwindow.setPluginView(plugin.getView());
 			plugin.start(this);
-			activePlugin_ = plugin;
+			activeplugin = plugin;
 		}
 	}
 	
@@ -332,98 +353,24 @@ public class ObserverCenter
 	 */
 	private void updateDisplay()
 	{
-		EventQueue.invokeLater(new Runnable()
+		if (selectedpresentation != null)
 		{
-			public void run()
-			{
-				IViewport viewport = getViewport();
-				viewport.setInvertX(config.getInvertXAxis());
-				viewport.setInvertY(config.getInvertYAxis());
-				viewport.setObjectShift(config.getObjectShift());
-				
-				// Set pre- and postlayers
-				Theme2D theme = config.getTheme(selectedTheme);
-				ILayer[] preLayers = theme.getPrelayers();
-				ILayer[] postLayers = theme.getPostlayers();
-				viewport.setPreLayers(preLayers);
-				viewport.setPostLayers(postLayers);
-				
-				List viewnames = space.getViewNames();
-				if(viewnames!=null)
-				{
-					for(int i=0; i<viewnames.size(); i++)
-					{
-						Object[] objects = space.getView((String)viewnames.get(i)).getObjects();
-						
-						List objectList = null;
-						objectList = new ArrayList(objects.length + 1);
-						for (int j = 0; j < objects.length; ++j )
-						{
-							ISpaceObject obj = (ISpaceObject) objects[j];
-							DrawableCombiner d = theme.getDrawableCombiner(obj.getType());
-							IVector2 position = (IVector2) obj.getProperty("position");
-							if (position == null)
-							{
-								continue;
-							}
-							Object[] viewObj = new Object[3];
-							viewObj[0] = position.copy();
-							IVector2 vel = ((IVector2) obj.getProperty("velocity"));
-							if (vel != null)
-							{
-								viewObj[1] = vel.copy();
-							}
-							viewObj[2] = d;
-							objectList.add(viewObj);
-						}
-						
-						ISpaceObject mObj = null;
-						if (markedObject != null)
-						{
-							mObj = (ISpaceObject) space.getSpaceObject(markedObject);
-						}
-						if (mObj != null)
-						{
-							IVector2 size = theme.getDrawableCombiner(mObj.getType()).getSize().copy();
-							size.multiply(2.0);
-							Object[] viewObj = new Object[3];
-							DrawableCombiner marker = theme.getMarkerDrawCombiner();
-							marker.setDrawableSizes(size);
-							viewObj[0] = mObj.getProperty("position");
-							viewObj[2] = marker;
-							objectList.add(viewObj);
-						}
-						else
-						{
-							markedObject = null;
-						}
-						
-						Comparator drawOrder = config.getDisplayOrder();
-						if (drawOrder != null)
-						{
-							Collections.sort(objectList, drawOrder);
-						}
-						
-						viewport.setObjectList(objectList);
-						viewport.refresh();
-					}
-				}
-			}
-		});
+			selectedpresentation.refresh();
+		}
 	}
 	
 	private class PluginAction extends AbstractAction
 	{
-		private IObserverCenterPlugin plugin_;
+		private IObserverCenterPlugin plugin;
 		
 		public PluginAction(IObserverCenterPlugin plugin)
 		{
-			plugin_ = plugin;
+			this.plugin = plugin;
 		}
 		
 		public void actionPerformed(ActionEvent e)
 		{
-			activatePlugin(plugin_);
+			activatePlugin(this.plugin);
 		}
 	}
 	
@@ -492,24 +439,6 @@ public class ObserverCenter
 		}
 	}
 	
-	private class SelectionController implements IViewportListener
-	{
-		public void leftClicked(IVector2 position)
-		{
-			position = position.copy().subtract(config.getObjectShift());
-			IVector1 maxDist = config.getSelectorDistance();
-			((Space2D) space).getNearestObject(position, maxDist);
-			ISpaceObject obj = ((Space2D) space).getNearestObject(position, maxDist);
-			final Object observedId = obj.getId();
-			
-			markObject(observedId);
-		}
-		
-		public void rightClicked(IVector2 position)
-		{
-		}
-	}
-	
 	private class ObserverWindowController implements WindowListener
 	{
 		public void windowActivated(WindowEvent e)
@@ -523,7 +452,7 @@ public class ObserverCenter
 		public void windowClosing(WindowEvent e)
 		{
 			plugintimer.stop();
-			mainWindow_.dispose();
+			mainwindow.dispose();
 		}
 		
 		public void windowDeactivated(WindowEvent e)

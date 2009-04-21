@@ -20,8 +20,10 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
-import jadex.adapter.base.envsupport.observer.gui.Configuration;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
+import jadex.adapter.base.envsupport.observer.gui.presentation.IPresentation;
+import jadex.adapter.base.envsupport.observer.gui.presentation.Presentation2D;
+import jadex.adapter.base.envsupport.observer.theme.Theme2D;
 import jadex.bridge.ILibraryService;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.collection.MultiCollection;
@@ -31,8 +33,10 @@ import jadex.javaparser.SimpleValueFetcher;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  *  Java representation of environemnt space instance for xml description.
@@ -182,11 +186,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		// Hack! Is configuation the presentation?
-		Configuration cfg = new Configuration();
-		cfg.setInvertYAxis(true);
-		cfg.setObjectShift(new Vector2Double(0.5));
-		
+		Map themes = new HashMap();
 		List sourceviews = spacetype.getPropertyList("views");
 		if(sourceviews!=null)
 		{
@@ -196,13 +196,26 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				
 				Map viewargs = new HashMap();
 				viewargs.put("sourceview", sourceview);
-				viewargs.put("cfg", cfg);
+				viewargs.put("themes", themes);
 				viewargs.put("space", ret);
 				
 				ret.addView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
 			}
-
-			ObserverCenter oc = new ObserverCenter(ret, cfg, (ILibraryService)app.getPlatform().getService(ILibraryService.class));
+			
+			ObserverCenter oc = new ObserverCenter("Default Window Title", ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), null);
+			
+			// Hack! Is configuation the presentation?
+			// Yes!
+			Presentation2D presentation = new Presentation2D();
+			presentation.setInvertYAxis(true);
+			presentation.setObjectShift(new Vector2Double(0.5));
+			oc.addPresentation("Simple 2D Space", presentation);
+			
+			for (Iterator it = themes.entrySet().iterator(); it.hasNext(); )
+			{
+				Map.Entry entry = (Entry) it.next();
+				oc.addTheme((String) entry.getKey(), entry.getValue());
+			}
 		}
 		
 		// Create (and start) the environment executor.
