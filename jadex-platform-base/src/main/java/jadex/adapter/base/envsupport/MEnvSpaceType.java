@@ -1,29 +1,21 @@
 package jadex.adapter.base.envsupport;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
-import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
-import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.adapter.base.envsupport.observer.gui.Configuration;
-import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.theme.Theme2D;
-import jadex.bridge.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -33,13 +25,10 @@ import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -282,6 +271,79 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}), null));
 		
+		types.add(new TypeInfo("triangle", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "creator"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+			new BeanAttributeInfo(null, colorconv, ""),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
+						(Double)MEnvSpaceInstance.getProperty(args, "height"));
+					IVector2 shift = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "shiftx"), 
+						(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
+					boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
+						((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
+					return new Triangle(size, shift, rotating, (Color)MEnvSpaceInstance.getProperty(args, "color"));
+				}
+			})
+			}), null));
+		
+		types.add(new TypeInfo("rectangle", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "creator"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+			new BeanAttributeInfo(null, colorconv, ""),
+			new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			{
+				public Object createObject(Map args) throws Exception
+				{
+					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
+						(Double)MEnvSpaceInstance.getProperty(args, "height"));
+					IVector2 shift = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "shiftx"), 
+						(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
+					boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
+						((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
+					return new Rectangle(size, shift, rotating, (Color)MEnvSpaceInstance.getProperty(args, "color"));
+				}
+			})
+			}), null));
+		
+		types.add(new TypeInfo("regularpolygon", MultiCollection.class, null, null,
+				SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "vertices", "creator"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, colorconv, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "", new Integer(3)),
+				new BeanAttributeInfo(null, null, "", new IObjectCreator()
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
+							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+						IVector2 shift = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "shiftx"), 
+							(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
+						boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
+							((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
+						int vertices  = MEnvSpaceInstance.getProperty(args, "vertices")==null? 3: 
+							((Integer)MEnvSpaceInstance.getProperty(args, "vertices")).intValue();
+
+						return new RegularPolygon(size, shift, rotating, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices);
+					}
+				})
+				}), null));
+		
 		types.add(new TypeInfo("gridlayer", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"color", "width", "height", "type", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, colorconv, ""),
@@ -363,6 +425,9 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		// drawable
 		linkinfos.add(new LinkInfo("texturedrectangle", new BeanAttributeInfo("parts", null, "")));		
+		linkinfos.add(new LinkInfo("triangle", new BeanAttributeInfo("parts", null, "")));		
+		linkinfos.add(new LinkInfo("rectangle", new BeanAttributeInfo("parts", null, "")));		
+		linkinfos.add(new LinkInfo("regularpolygon", new BeanAttributeInfo("parts", null, "")));		
 		
 		// space instance
 		linkinfos.add(new LinkInfo("object", new BeanAttributeInfo("objects", null, "property")));

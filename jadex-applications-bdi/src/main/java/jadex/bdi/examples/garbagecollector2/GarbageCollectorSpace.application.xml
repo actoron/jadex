@@ -43,7 +43,7 @@
 			
 			<env:views>
 				<env:view name="view_all" class="GeneralView2D">
-					<env:theme name="abstract">
+					<env:theme name="icons">
 						<env:drawable objecttype="collector" width="1.0" height="1.0">
 							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
 						</env:drawable>
@@ -55,10 +55,23 @@
 						</env:drawable>
 						<env:prelayers>
 							<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
-							<env:gridlayer width="1.0" height="1.0" color="#FFFFFF" />
+							<env:gridlayer width="1.0" height="1.0" color="WHITE" />
 						</env:prelayers>
-						<env:postlayers>
-						</env:postlayers>
+					</env:theme>
+					
+					<env:theme name="abstract">
+						<env:drawable objecttype="collector" width="1.0" height="1.0">
+							<env:triangle width="0.9" height="0.9" color="RED" />
+						</env:drawable>
+						<env:drawable objecttype="burner" width="1.0" height="1.0">
+							<env:triangle width="0.9" height="0.9" color="GREEN" />
+						</env:drawable>
+						<env:drawable objecttype="garbage" width="0.7" height="0.7">
+							<env:rectangle width="0.3" height="0.3" color="YELLOW" />
+						</env:drawable>
+						<env:prelayers>
+							<env:gridlayer width="1.0" height="1.0" color="WHITE" />
+						</env:prelayers>
 					</env:theme>
 				</env:view>
 			</env:views>
