@@ -1,5 +1,6 @@
 package jadex.rules.examples.golfing;
 
+import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
@@ -169,6 +170,67 @@ public class Golfing
 	}
 	
 	/**
+	 *  Create the rule for finding a solution (in JCL language).
+	 */
+	public static IRule	createFindSolutionRuleJCL()
+	{
+		ICondition	cond	= ParserHelper.parseJavaCondition(
+			// - A foursome of golfers is standing at a tee, in a line from left to right.
+			"golfer $fred && $fred.golfer_has_name==\"Fred\" &&"+
+			"golfer $joe && $joe.golfer_has_name==\"Joe\" &&"+
+			"golfer $bob && $bob.golfer_has_name==\"Bob\" &&"+
+			"golfer $tom && $tom.golfer_has_name==\"Tom\" &&"+
+			"$fred.golfer_has_position!=$joe.golfer_has_position &&"+
+			"$fred.golfer_has_position!=$bob.golfer_has_position &&"+
+			"$fred.golfer_has_position!=$tom.golfer_has_position &&"+
+			"$joe.golfer_has_position!=$bob.golfer_has_position &&"+
+			"$joe.golfer_has_position!=$tom.golfer_has_position &&"+
+			"$bob.golfer_has_position!=$tom.golfer_has_position &&"+
+			
+			// - Each golfer wears different colored pants; one is wearing red pants.
+			"$fred.golfer_has_color!=$joe.golfer_has_color &&"+
+			"$fred.golfer_has_color!=$bob.golfer_has_color &&"+
+			"$fred.golfer_has_color!=$tom.golfer_has_color &&"+
+			"$joe.golfer_has_color!=$bob.golfer_has_color &&"+
+			"$joe.golfer_has_color!=$tom.golfer_has_color &&"+
+			"$bob.golfer_has_color!=$tom.golfer_has_color &&"+
+
+			// - The golfer to Fred’s immediate right is wearing blue pants.
+			"golfer $tmp && $tmp.golfer_has_position==$fred.golfer_has_position+1 && $tmp.golfer_has_color==\"blue\" &&"+
+			"($tmp==$joe || $tmp==$bob || $tmp==$tom) &&"+
+
+			// - Joe is second in line.
+			"$joe.golfer_has_position==2 &&"+
+
+			// - Bob is wearing plaid pants.
+			"$bob.golfer_has_color==\"plaid\" &&"+
+			
+			// - Tom isn’t in position one or four, and he isn’t wearing the hideous orange pants.
+			"$tom.golfer_has_position!=1 && $tom.golfer_has_position!=4 && $tom.golfer_has_color!=\"orange\"",
+
+			golfing_type_model);
+		
+		IRule	find_solution	= new Rule("find_solution", cond, new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	fred	= assignments.getVariableValue("$fred");
+				Object	joe	= assignments.getVariableValue("$joe");
+				Object	bob	= assignments.getVariableValue("$bob");
+				Object	tom	= assignments.getVariableValue("$tom");
+
+				System.out.println("Found a solution:");
+				System.out.println("Fred "+state.getAttributeValue(fred, golfer_has_position)+" "+state.getAttributeValue(fred, golfer_has_color));
+				System.out.println("Joe "+state.getAttributeValue(joe, golfer_has_position)+" "+state.getAttributeValue(joe, golfer_has_color));
+				System.out.println("Bob "+state.getAttributeValue(bob, golfer_has_position)+" "+state.getAttributeValue(bob, golfer_has_color));
+				System.out.println("Tom "+state.getAttributeValue(tom, golfer_has_position)+" "+state.getAttributeValue(tom, golfer_has_color));
+			}
+		});
+		
+		return find_solution;
+	}
+	
+	/**
 	 *  Create the state containing all possible combinations.
 	 */
 	public static IOAVState	createState()
@@ -201,7 +263,8 @@ public class Golfing
 	public static void main(String[] args)
 	{
 		Rulebase rb = new Rulebase();
-		rb.addRule(createFindSolutionRule());
+		rb.addRule(createFindSolutionRuleJCL());
+//		rb.addRule(createFindSolutionRule());
 		IPatternMatcherFunctionality pf = new RetePatternMatcherFunctionality(rb);
 		RuleSystem system = new RuleSystem(createState(), rb,  pf);
 		system.init();
