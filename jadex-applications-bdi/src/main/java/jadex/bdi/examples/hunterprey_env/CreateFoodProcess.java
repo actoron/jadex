@@ -7,7 +7,6 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
-import jadex.adapter.base.envsupport.math.Vector2Int;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,23 +64,23 @@ public class CreateFoodProcess implements ISpaceProcess
 	 */
 	public void execute(IVector1 deltat, IEnvironmentSpace space)
 	{
-		System.out.println("create food process called: "+deltat);
+//		System.out.println("create food process called: "+deltat);
 		
 		Grid2D grid = (Grid2D)space;
 		
 		delta.add(deltat);
 		
-		if(delta.getAsDouble()>2)
+		if(delta.getAsDouble()>5)
 		{
-			delta.subtract(new Vector1Double(2));
+			delta.subtract(new Vector1Double(5));
 		
 			IVector2 pos = grid.getEmptyGridPosition();
 			if(pos!=null)
 			{
 				Map props = new HashMap();
 				props.put(Space2D.POSITION, pos);
-				Object obj = grid.createSpaceObject("food", null, props, null, null);
-				System.out.println("Created food: "+obj);
+				grid.createSpaceObject("food", null, props, null, null);
+//				System.out.println("Created food: "+obj);
 			}
 		}
 	}

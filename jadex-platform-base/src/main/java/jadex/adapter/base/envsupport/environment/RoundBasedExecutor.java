@@ -49,7 +49,7 @@ public class RoundBasedExecutor
 				IVector1 progress = new Vector1Long(currenttime - timestamp);
 				timestamp = currenttime;
 				
-				System.out.println("time: "+timestamp+" "+progress+" "+roundtime.getAsLong());
+//				System.out.println("time: "+timestamp+" "+progress+" "+roundtime.getAsLong());
 				
 				space.step(progress);
 				

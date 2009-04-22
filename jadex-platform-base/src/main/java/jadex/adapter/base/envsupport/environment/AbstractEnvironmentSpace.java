@@ -345,9 +345,16 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		{
 			public void run()
 			{
-				IAgentAction action = (IAgentAction)agentactions.get(id);
-				Object ret = action.perform(parameters==null? Collections.EMPTY_MAP: parameters, AbstractEnvironmentSpace.this);
-				listener.resultAvailable(ret);
+				try
+				{
+					IAgentAction action = (IAgentAction)agentactions.get(id);
+					Object ret = action.perform(parameters==null? Collections.EMPTY_MAP: parameters, AbstractEnvironmentSpace.this);
+					listener.resultAvailable(ret);
+				}
+				catch(RuntimeException e)
+				{
+					listener.exceptionOccurred(e);
+				}
 			}
 		}); // todo: what about metainfo
 	}

@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport;
 
-import jadex.adapter.base.agr.MGroupInstance;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
@@ -15,28 +14,16 @@ import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
-import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
-import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
-import jadex.adapter.base.envsupport.observer.gui.presentation.IPresentation;
 import jadex.adapter.base.envsupport.observer.gui.presentation.Presentation2D;
-import jadex.adapter.base.envsupport.observer.theme.Theme2D;
 import jadex.bridge.ILibraryService;
-import jadex.commons.SimplePropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
-import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  *  Java representation of environemnt space instance for xml description.
@@ -88,7 +75,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	{
 		MApplicationType mapt = app.getApplicationType();
 		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
-		ClassLoader cl = ((ILibraryService)app.getPlatform().getService(ILibraryService.class)).getClassLoader();
 		
 		// Create and init space.
 		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)((Class)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "clazz")).newInstance();
@@ -182,7 +168,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Map mobj = (Map)objects.get(i);
 			
 				// Hmm local name as owner? better would be agent id, but agents are created after space?
-				Object obj = ret.createSpaceObject(MEnvSpaceInstance.getProperty(mobj, "type"), MEnvSpaceInstance.getProperty(mobj, "owner"), null, null, null);
+				ret.createSpaceObject(MEnvSpaceInstance.getProperty(mobj, "type"), MEnvSpaceInstance.getProperty(mobj, "owner"), null, null, null);
 			}
 		}
 		
@@ -190,6 +176,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		List actions = (List)getPropertyList("spaceactions");
 		if(actions!=null)
 		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$space", ret);
+			fetcher.setValue("$platform", app.getPlatform());
 			for(int i=0; i<actions.size(); i++)
 			{
 				Map action = (Map)actions.get(i);
@@ -201,7 +190,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					for(int j=0; j<ps.size(); j++)
 					{
 						Map param = (Map)ps.get(j);
-						params.put(param.get("name"), param.get("value"));
+						// Create (and start) the environment executor.
+						IParsedExpression exp = (IParsedExpression)param.get("value");
+						params.put(param.get("name"), exp.getValue(fetcher));
 					}
 				}
 				
@@ -260,7 +251,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$space", ret);
 		fetcher.setValue("$platform", app.getPlatform());
-		Object spaceexe = exp.getValue(fetcher);
+		exp.getValue(fetcher);	// Executor starts itself
 		
 		return ret;		
 	}

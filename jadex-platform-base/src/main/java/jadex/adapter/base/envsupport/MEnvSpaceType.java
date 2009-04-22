@@ -112,6 +112,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		ITypeConverter typeconv = new ClassConverter();
 		ITypeConverter colorconv = new ColorConverter();
+		ITypeConverter expconv = new ExpressionConverter();
 		
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
 			SUtil.createHashMap(new String[]{"class"}, 
@@ -397,7 +398,7 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"type"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
-		types.add(new TypeInfo("spaceaction/parameter", HashMap.class, null, new BeanAttributeInfo("value", null, ""),
+		types.add(new TypeInfo("spaceaction/parameter", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 

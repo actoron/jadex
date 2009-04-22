@@ -26,10 +26,11 @@
 			<env:dimension>30</env:dimension>
 			<env:dimension>30</env:dimension>
 
-			<env:agentactiontypes>
+			<env:actiontypes>
 				<env:agentactiontype name="move" class="MoveAction" />
 				<env:agentactiontype name="eat" class="EatAction" />
-			</env:agentactiontypes>
+				<env:spaceactiontype name="create_obstacles" class="CreateObstaclesAction" />
+			</env:actiontypes>
 			
 			<env:processtypes>
 				<env:processtype name="create" class="CreateFoodProcess" />
@@ -40,26 +41,31 @@
 			</env:perceptgeneratortypes>
  -->			
 			<env:views>
-				<env:view name="view_all" class="GeneralView2D">
-					<env:theme name="abstract">
-						<env:drawable objecttype="food" width="1.0" height="1.0">
-							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
-						</env:drawable>
-						<env:drawable objecttype="obstacle" width="1.0" height="1.0">
-							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/obstacle.png" />
-						</env:drawable>
-						<env:drawable objecttype="prey" width="1.0" height="1.0">
-							<env:texturedrectangle width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/prey.png" />
-						</env:drawable>
- 						<env:prelayers>
-							<env:tiledlayer width="17.5" height="17.5" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
-							<env:gridlayer width="1.0" height="1.0" color="black" />
-						</env:prelayers>
-						<env:postlayers>
-						</env:postlayers>
-					</env:theme>
-				</env:view>
+				<env:view name="view_all" class="GeneralView2D" />
 			</env:views>
+
+			<env:themes>
+				<env:theme name="icons">
+					<env:drawable objecttype="food" width="1.0" height="1.0">
+						<env:texturedrectangle layer="0" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
+					</env:drawable>
+					<env:drawable objecttype="obstacle" width="1.0" height="1.0">
+						<env:texturedrectangle layer="0" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/obstacle.png" />
+					</env:drawable>
+					<env:drawable objecttype="prey" width="1.0" height="1.0">
+						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/prey.png" />
+					</env:drawable>
+					<env:drawable objecttype="hunter" width="1.0" height="1.0">
+						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/hunter.png" />
+					</env:drawable>
+					<env:prelayers>
+						<env:tiledlayer width="17.5" height="17.5" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
+						<env:gridlayer width="1.0" height="1.0" color="black" />
+					</env:prelayers>
+					<env:postlayers>
+					</env:postlayers>
+				</env:theme>
+			</env:themes>
 
 			<!-- executor -->
 			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>
@@ -71,13 +77,61 @@
 	</agenttypes>
 
 	<applications>
-		<application name="default">
+		<application name="One Dumb Prey">
  			<agents>
 				<agent name="Dummy1" type="DumbPrey"/>
 			</agents>
+			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:object type="prey" owner="Dummy1">
-				</env:object>
+				<env:objects>
+					<env:object type="prey" owner="Dummy1"/>
+				</env:objects>
+
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="world" view="view_all" theme="icons">
+						<env:plugins>
+						</env:plugins>
+					</env:observer>
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="Five Dumb Preys">
+ 			<agents>
+				<agent name="Duffy" type="DumbPrey"/>
+				<agent name="Dumbo" type="DumbPrey"/>
+				<agent name="Dimitri" type="DumbPrey"/>
+				<agent name="Dork" type="DumbPrey"/>
+				<agent name="Django" type="DumbPrey"/>
+			</agents>
+			
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:objects>
+					<env:object type="prey" owner="Duffy"/>
+					<env:object type="prey" owner="Dumbo"/>
+					<env:object type="prey" owner="Dimitri"/>
+					<env:object type="prey" owner="Dork"/>
+					<env:object type="prey" owner="Django"/>
+				</env:objects>
+
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="world" view="view_all" theme="icons">
+						<env:plugins>
+						</env:plugins>
+					</env:observer>
+				</env:observers>
  			</env:envspace>
  		</application>
 	</applications>

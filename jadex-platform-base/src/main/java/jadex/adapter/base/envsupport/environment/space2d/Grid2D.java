@@ -157,7 +157,7 @@ public class Grid2D extends Space2D
 	 * Retrieve all objects in the distance for a position
 	 * @param position
 	 * @param distance
-	 * @return {@link SimObject}[] 
+	 * @return {@link ISpaceObject}[] 
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance)
 	{

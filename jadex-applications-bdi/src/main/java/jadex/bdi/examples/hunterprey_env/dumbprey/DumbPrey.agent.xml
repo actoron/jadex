@@ -23,7 +23,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
- 			<fact>(Grid2D)((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("mygc2dspace")</fact>
+ 			<fact>(Grid2D)((IContextService)$scope.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0].getSpace("my2dspace")</fact>
  		</belief>
  		
  		<!-- Myself. -->
@@ -31,6 +31,12 @@
  			<fact>$beliefbase.env.getOwnedObjects($scope.getAgentIdentifier().getLocalName())[0]</fact>
  		</belief>
 	</beliefs>
+	
+	<plans>
+		<plan name="dumbprey_plan">
+			<body class="DumbPreyPlan"/>
+		</plan>
+	</plans>
 
 	<properties>
 		<!-- The environment may throw exceptions when executing property listeners
@@ -42,6 +48,9 @@
 
 	<configurations>
 		<configuration name="default">
+			<plans>
+				<initialplan ref="dumbprey_plan"/>
+			</plans>
 		</configuration>
 	</configurations>
 
