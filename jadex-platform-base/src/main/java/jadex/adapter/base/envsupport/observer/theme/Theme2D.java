@@ -30,7 +30,7 @@ public class Theme2D
 		postlayers = new ILayer[0];
 		marker = null;
 	}
-	
+
 	/**
 	 * Returns a specific drawable combiner object
 	 * @param id identifier of the drawable combiner object

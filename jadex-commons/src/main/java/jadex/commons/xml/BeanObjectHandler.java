@@ -260,7 +260,7 @@ public class BeanObjectHandler implements IObjectHandler
 	protected boolean internalLinkObjects(Class clazz, String name, Object object, Object parent, Object root, ClassLoader classloader) throws Exception
 	{
 		boolean ret = false;
-		
+			
 		Method[] ms = SReflect.getMethods(parent.getClass(), name);
 		for(int i=0; !ret && i<ms.length; i++)
 		{

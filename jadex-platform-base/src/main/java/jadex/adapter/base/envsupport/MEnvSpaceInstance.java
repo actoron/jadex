@@ -186,7 +186,31 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		Map themes = new HashMap();
+		// Create initial space actions.
+		List actions = (List)getPropertyList("spaceactions");
+		if(actions!=null)
+		{
+			for(int i=0; i<actions.size(); i++)
+			{
+				Map action = (Map)actions.get(i);
+				List ps = (List)action.get("parameters");
+				Map params = null;
+				if(ps!=null)
+				{
+					params = new HashMap();
+					for(int j=0; j<ps.size(); j++)
+					{
+						Map param = (Map)ps.get(j);
+						params.put(param.get("name"), param.get("value"));
+					}
+				}
+				
+				System.out.println("Performing initial space action: "+getProperty(action, "type"));
+				ret.performSpaceAction(getProperty(action, "type"), params);
+			}
+		}
+		
+//		Map themes = new HashMap();
 		List sourceviews = spacetype.getPropertyList("views");
 		if(sourceviews!=null)
 		{
@@ -196,25 +220,38 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				
 				Map viewargs = new HashMap();
 				viewargs.put("sourceview", sourceview);
-				viewargs.put("themes", themes);
+//				viewargs.put("themes", themes);
 				viewargs.put("space", ret);
 				
 				ret.addView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
 			}
-			
-			ObserverCenter oc = new ObserverCenter("Default Window Title", ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), null);
-			
-			// Hack! Is configuation the presentation?
-			// Yes!
-			Presentation2D presentation = new Presentation2D();
-			presentation.setInvertYAxis(true);
-			presentation.setObjectShift(new Vector2Double(0.5));
-			oc.addPresentation("Simple 2D Space", presentation);
-			
-			for (Iterator it = themes.entrySet().iterator(); it.hasNext(); )
-			{
-				Map.Entry entry = (Entry) it.next();
-				oc.addTheme((String) entry.getKey(), entry.getValue());
+		}
+		
+		List sourceobs = getPropertyList("observers");
+		if(sourceobs!=null)
+		{
+			for(int i=0; i<sourceobs.size(); i++)
+			{				
+				Map sourceob = (Map)sourceobs.get(i);
+				
+				String title = getProperty(sourceob, "name")!=null? (String)getProperty(sourceob, "name"): "Default Observer";
+				// todo: add plugins
+				
+				ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), null);
+				
+				// Hack! Is configuation the presentation?
+				// Yes!
+				Presentation2D presentation = new Presentation2D();
+				presentation.setInvertYAxis(true);
+				presentation.setObjectShift(new Vector2Double(0.5));
+				oc.addPresentation("Simple 2D Space", presentation);
+				
+				List themes = spacetype.getPropertyList("themes");
+				for(int j=0; j<themes.size(); j++)
+				{
+					Map sourcetheme = (Map)themes.get(j);
+					oc.addTheme((String)getProperty(sourcetheme, "name"), ((IObjectCreator)getProperty(sourcetheme, "creator")).createObject(sourcetheme));
+				}
 			}
 		}
 		
@@ -226,13 +263,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		Object spaceexe = exp.getValue(fetcher);
 		
 		return ret;		
-		
-//		Map args = new HashMap();
-//		args.put("application", app);
-//		args.put("spacetype", spacetype);
-//		args.put("spaceinstance", this);
-//
-//		return ret;
 	}
 
 	/**

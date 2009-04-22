@@ -103,6 +103,19 @@
 					<env:object type="collector" owner="Collector1" />
 					<env:object type="burner" owner="Burner1" />
 				</env:objects>
+				
+				<!-- <env:initactions>
+					<env:spaceaction type="init">
+						<env:parameter name="p1">new Integer(1)</env:parameter>
+					</env:spaceaction>
+				</env:initactions> -->
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" theme="abstract">
+						<env:plugins>
+						</env:plugins>
+					</env:observer>
+				</env:observers>
 			</env:envspace>
 		</application>
 		

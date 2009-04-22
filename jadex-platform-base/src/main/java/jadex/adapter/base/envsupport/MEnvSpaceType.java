@@ -28,6 +28,7 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -396,7 +397,7 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"type"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
-		types.add(new TypeInfo("spaceaction/parameter", MultiCollection.class, null, new BeanAttributeInfo("value", null, ""),
+		types.add(new TypeInfo("spaceaction/parameter", HashMap.class, null, new BeanAttributeInfo("value", null, ""),
 			SUtil.createHashMap(new String[]{"name"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 
