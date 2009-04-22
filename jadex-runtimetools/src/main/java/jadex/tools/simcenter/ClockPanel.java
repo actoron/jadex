@@ -202,7 +202,8 @@ public class ClockPanel extends AbstractTimePanel
 					if(!IClock.TYPE_SYSTEM.equals(lastclocktype))
 					{
 						getSimulationService().setClockType(IClock.TYPE_SYSTEM);
-						updateView();
+//						updateView();
+						simp.updateView();
 					}
 				}
 				else if("Continuous".equals(emode.getSelectedItem()))
@@ -210,7 +211,8 @@ public class ClockPanel extends AbstractTimePanel
 					if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
 					{
 						getSimulationService().setClockType(IClock.TYPE_CONTINUOUS);
-						updateView();
+//						updateView();
+						simp.updateView();
 					}
 				}
 				else if("Time Stepped".equals(emode.getSelectedItem()))
@@ -218,7 +220,8 @@ public class ClockPanel extends AbstractTimePanel
 					if(!IClock.TYPE_TIME_DRIVEN.equals(lastclocktype))
 					{
 						getSimulationService().setClockType(IClock.TYPE_TIME_DRIVEN);
-						updateView();
+//						updateView();
+						simp.updateView();
 					}
 				}
 				else if("Event Driven".equals(emode.getSelectedItem()))
@@ -226,7 +229,8 @@ public class ClockPanel extends AbstractTimePanel
 					if(!IClock.TYPE_EVENT_DRIVEN.equals(lastclocktype))
 					{
 						getSimulationService().setClockType(IClock.TYPE_EVENT_DRIVEN);
-						updateView();
+//						updateView();
+						simp.updateView();
 					}
 				}
 				else

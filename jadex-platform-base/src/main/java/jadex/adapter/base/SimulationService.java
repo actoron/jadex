@@ -84,6 +84,7 @@ public class SimulationService implements ISimulationService
 					else if(MODE_ACTION_STEP.equals(getMode()))
 					{
 						setExecuting(false);
+						advanceevent = true;
 					}
 				}
 				
