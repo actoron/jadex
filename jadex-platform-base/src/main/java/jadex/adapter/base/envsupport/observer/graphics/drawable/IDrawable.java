@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
@@ -17,7 +18,7 @@ public interface IDrawable
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void init(ViewportJ2D vp, Graphics2D g);
+	public void init(ViewportJ2D vp);
 
 	/**
 	 * Initializes the object for an OpenGL viewport
@@ -25,52 +26,63 @@ public interface IDrawable
 	 * @param vp the viewport
 	 * @param gl OpenGL context
 	 */
-	public void init(ViewportJOGL vp, GL gl);
+	public void init(ViewportJOGL vp);
 
 	/**
 	 * Draws the object to a Java2D viewport
 	 * 
-	 * @param layer the current layer
+	 * @param obj the object being drawn
 	 * @param vp the viewport
-	 * @param g Graphics2D context
 	 */
-	public void draw(ViewportJ2D vp, Graphics2D g);
+	public void draw(Object obj, ViewportJ2D vp);
 
 	/**
 	 * Draws the object to an OpenGL viewport
 	 * 
-	 * @param layer the current layer
+	 * @param obj the object being drawn
 	 * @param vp the viewport
-	 * @param gl OpenGL context
 	 */
-	public void draw(ViewportJOGL vp, GL gl);
+	public void draw(Object obj, ViewportJOGL vp);
 
 	/**
-	 * Sets the position of the object.
+	 * Sets the position of the visual to a fixed position.
 	 * 
-	 * @param pos new position
+	 * @param pos fixed position
 	 */
 	public void setPosition(IVector2 pos);
 
 	/**
-	 * Sets the velocity of the object. Depending on implementation, this may
-	 * result in rotation or other graphical features being used.
+	 * Sets the rotation of the visual to a fixed rotation.
 	 * 
-	 * @param velocity new velocity
+	 * @param rotation the fixed rotation
 	 */
-	public void setVelocity(IVector2 velocity);
+	public void setRotation(IVector1 rotation);
 
 	/**
-	 * Sets the size of the drawable on screen.
+	 * Sets the size (scale) of the visual to a fixed size.
 	 * 
-	 * @param size new size
+	 * @param size fixed size
 	 */
 	public void setSize(IVector2 size);
-
+	
 	/**
-	 * Sets the shift away from the centered position.
+	 * Binds the position of the visual to an object property.
 	 * 
-	 * @param shift the shift from the centered position
+	 * @param propId the property ID
 	 */
-	public void setShift(IVector2 shift);
+	public void bindPosition(String propId);
+	
+	/**
+	 * Binds the rotation of the visual to an object property.
+	 * 
+	 * @param propId the property ID
+	 */
+	public void bindRotation(String propId);
+	
+	/**
+	 * Binds the size of the visual to an object property.
+	 * 
+	 * @param propId the property ID
+	 */
+	public void bindSize(String propId);
 }

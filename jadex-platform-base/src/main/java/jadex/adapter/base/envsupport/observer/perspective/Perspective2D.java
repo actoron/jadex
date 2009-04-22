@@ -1,4 +1,4 @@
-package jadex.adapter.base.envsupport.observer.gui.presentation;
+package jadex.adapter.base.envsupport.observer.perspective;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
@@ -13,9 +13,11 @@ import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.graphics.YOrder;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
-import jadex.adapter.base.envsupport.observer.theme.Theme2D;
+import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.bridge.ILibraryService;
 
 import java.awt.BorderLayout;
@@ -24,20 +26,16 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JFrame;
 
-public class Presentation2D implements IPresentation
+public class Perspective2D implements IPerspective
 {
-	private static final Set SUPPORTED_THEME_TYPES = new HashSet();
-	static
-	{
-		SUPPORTED_THEME_TYPES.add(Theme2D.class);
-	}
-	
 	/** Name of the presentation */
 	protected String name;
 	
@@ -49,52 +47,64 @@ public class Presentation2D implements IPresentation
 	
 	/** Selection controller
 	 */
-	private SelectionController selectioncontroller;
-	
-	/** The current theme */
-	protected Theme2D theme;
+	protected SelectionController selectioncontroller;
 	
 	/** The selected object */
 	protected Object selectedobject;
 	
 	/** Order in which objects are displayed */
-	private Comparator displayorder;
+	protected Comparator displayorder;
 	
 	/** The object shift */
-	private IVector2 objectShift;
+	protected IVector2 objectShift;
 	
 	/** Maximum selection distance */
-	private IVector1 selectorDistance;
+	protected IVector1 selectorDistance;
 	
 	/** Flag if the x-axis should be inverted */
-	private boolean invertxaxis;
+	protected boolean invertxaxis;
 	
 	/** Flag if the y-axis should be inverted */
-	private boolean invertyaxis;
+	protected boolean invertyaxis;
 	
 	/** Try OpenGL if true */
-	private boolean tryopengl;
+	protected boolean tryopengl;
+	
+	/** The visuals (DrawableCombiners) */
+	protected Map visuals;
+	
+	/** The prelayers */
+	protected ILayer[] prelayers;
+	
+	/** The postlayers */
+	protected ILayer[] postlayers;
+	
+	/** The marker drawable combiner */
+	protected DrawableCombiner marker;
 	
 	/**
-	 * Creates a 2D-Presentation.
+	 * Creates a 2D-Perspective.
 	 */
-	public Presentation2D()
+	public Perspective2D()
 	{
+		this.visuals = Collections.synchronizedMap(new HashMap());
+		this.prelayers = new ILayer[0];
+		this.postlayers = new ILayer[0];
+		
 		this.objectShift = new Vector2Double();
 		this.selectorDistance = new Vector1Double(1.0);
 		this.tryopengl = true;
 		
-		this.displayorder = new YOrder();
+		this.displayorder = null;
 		
-		this.theme = new Theme2D();
 		this.name = getClass().getName();
 		viewport = null;
 		selectioncontroller = new SelectionController();
 	}
 	
 	/**
-	 * Returns the name of the presentation
-	 * @return name of the presentation
+	 * Returns the name of the perspective
+	 * @return name of the perspective
 	 */
 	public String getName()
 	{
@@ -102,36 +112,12 @@ public class Presentation2D implements IPresentation
 	}
 	
 	/**
-	 * Sets the name of the presentation
-	 * @param name name of the presentation
+	 * Sets the name of the perspective
+	 * @param name name of the perspective
 	 */
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-	
-	/**
-	 * Returns supported theme types.
-	 * 
-	 * @return supported theme types
-	 */
-	public Set getSupportedThemeTypes()
-	{
-		return SUPPORTED_THEME_TYPES;
-	}
-	
-	/**
-	 * Sets the current theme.
-	 * @param theme the new theme 
-	 */
-	public void setTheme(Object theme)
-	{
-		if ((!SUPPORTED_THEME_TYPES.contains(theme.getClass())) ||
-			(theme == null))
-		{
-			theme = new Theme2D();
-		}
-		this.theme = (Theme2D) theme;
 	}
 	
 	/** Returns the currently selected object.
@@ -163,13 +149,92 @@ public class Presentation2D implements IPresentation
 	}
 	
 	/**
-	 * Gets the view of the presentation.
+	 * Adds a new visual object.
+	 * @param id identifier of the object
+	 * @param visual the visual object
+	 */
+	public void addVisual(Object id, Object visual)
+	{
+		visuals.put(id, visual);
+	}
+	
+	/**
+	 * Removes a new visual object.
+	 * @param id identifier of the object
+	 */
+	public void removeVisual(Object id)
+	{
+		visuals.remove(id);
+	}
+	
+	/**
+	 * Returns the prelayers.
+	 * @return the prelayers
+	 */
+	public ILayer[] getPrelayers()
+	{
+		return prelayers;
+	}
+	
+	/**
+	 * Sets the prelayers.
+	 * @param prelayers the prelayers
+	 */
+	public void setPrelayers(ILayer[] prelayers)
+	{
+		this.prelayers = prelayers;
+	}
+	
+	/**
+	 * Returns the Postlayers.
+	 * @return the Postlayers
+	 */
+	public ILayer[] getPostlayers()
+	{
+		return postlayers;
+	}
+	
+	/**
+	 * Sets the Postlayers.
+	 * @param Postlayers the Postlayers
+	 */
+	public void setPostlayers(ILayer[] postlayers)
+	{
+		this.postlayers = postlayers;
+	}
+	
+	/**
+	 * Gets the drawable combiner object for the object marker
+	 * @return the marker drawable
+	 */
+	public DrawableCombiner getMarkerDrawCombiner()
+	{
+		return marker;
+	}
+	
+	/**
+	 * Sets the drawable combiner object for the object marker
+	 * @param marker the marker drawable
+	 */
+	public void setMarkerDrawCombiner(DrawableCombiner marker)
+	{
+		this.marker = marker;
+	}
+	
+	/**
+	 * Gets the view of the perspective.
 	 * @return the view
 	 */
 	public Component getView()
 	{
 		if (viewport == null)
 		{
+			if (marker == null)
+			{
+				marker = new DrawableCombiner();
+				IDrawable markerDrawable = new TexturedRectangle(getClass().getPackage().getName().replaceAll("perspective", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
+				marker.addDrawable(markerDrawable, Integer.MAX_VALUE);
+			}
 			viewport = createViewport(obscenter.getLibraryService(), tryopengl);
 			viewport.setSize(((Space2D)(obscenter.getSpace())).getAreaSize().copy());
 			viewport.addViewportListener(selectioncontroller);
@@ -279,7 +344,7 @@ public class Presentation2D implements IPresentation
 	}
 	
 	/**
-	 * Refreshes the presentation.
+	 * Refreshes the perspective.
 	 */
 	public void refresh()
 	{
@@ -298,10 +363,8 @@ public class Presentation2D implements IPresentation
 				
 				// Set pre- and postlayers
 				IEnvironmentSpace space = obscenter.getSpace();
-				ILayer[] preLayers = theme.getPrelayers();
-				ILayer[] postLayers = theme.getPostlayers();
-				viewport.setPreLayers(preLayers);
-				viewport.setPostLayers(postLayers);
+				viewport.setPreLayers(prelayers);
+				viewport.setPostLayers(postlayers);
 				
 				List viewnames = space.getViewNames();
 				if(viewnames!=null)
@@ -315,24 +378,14 @@ public class Presentation2D implements IPresentation
 						for (int j = 0; j < objects.length; ++j )
 						{
 							ISpaceObject obj = (ISpaceObject) objects[j];
-							DrawableCombiner d = theme.getDrawableCombiner(obj.getType());
+							DrawableCombiner d = (DrawableCombiner) visuals.get(obj.getType());
 							if (d == null)
 							{
 								continue;
 							}
-							IVector2 position = (IVector2) obj.getProperty("position");
-							if (position == null)
-							{
-								continue;
-							}
-							Object[] viewObj = new Object[3];
-							viewObj[0] = position.copy();
-							IVector2 vel = ((IVector2) obj.getProperty("velocity"));
-							if (vel != null)
-							{
-								viewObj[1] = vel.copy();
-							}
-							viewObj[2] = d;
+							Object[] viewObj = new Object[2];
+							viewObj[0] = obj;
+							viewObj[1] = d;
 							objectList.add(viewObj);
 						}
 						
@@ -343,13 +396,12 @@ public class Presentation2D implements IPresentation
 						}
 						if (mObj != null)
 						{
-							IVector2 size = theme.getDrawableCombiner(mObj.getType()).getSize().copy();
-							size.multiply(2.0);
-							Object[] viewObj = new Object[3];
-							DrawableCombiner marker = theme.getMarkerDrawCombiner();
-							marker.setDrawableSizes(size);
-							viewObj[0] = mObj.getProperty("position");
-							viewObj[2] = marker;
+							Object size = ((DrawableCombiner)visuals.get(mObj.getType())).getSize();
+							size = SObjectInspector.getVector2(mObj, size).copy().multiply(2.0);
+							Object[] viewObj = new Object[2];
+							marker.setSize((IVector2) size);
+							viewObj[0] = mObj;
+							viewObj[1] = marker;
 							objectList.add(viewObj);
 						}
 						else

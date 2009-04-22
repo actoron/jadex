@@ -14,8 +14,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangl
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.ObjectIntrospectorPlugin;
-import jadex.adapter.base.envsupport.observer.gui.presentation.IPresentation;
-import jadex.adapter.base.envsupport.observer.theme.Theme2D;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
 
 import java.awt.EventQueue;
@@ -76,14 +75,11 @@ public class ObserverCenter
 	/** The space that is being observed. */
 	private IEnvironmentSpace space;
 	
-	/** Available themes */
-	private Map themes;
+	/** Perspectives */
+	private Map perspectives;
 	
-	/** Available presentations */
-	private Map presentations;
-	
-	/** Selected presentations */
-	private IPresentation selectedpresentation;
+	/** Selected Perspective */
+	private IPerspective selectedperspective;
 	
 	/** Creates an observer center.
 	 *  
@@ -94,8 +90,7 @@ public class ObserverCenter
 	 */
 	public ObserverCenter(final String windowTitle, final IEnvironmentSpace space, ILibraryService libSrvc, List customplugins)
 	{
-		themes = Collections.synchronizedMap(new HashMap());
-		presentations = Collections.synchronizedMap(new HashMap());
+		perspectives = Collections.synchronizedMap(new HashMap());
 		final List cPlugins = customplugins == null? new ArrayList(): customplugins;
 		this.libService = libSrvc;
 		this.space = space;
@@ -188,59 +183,21 @@ public class ObserverCenter
 	}
 	
 	/**
-	 * Adds a presentation.
-	 * @param name name of the presentation
-	 * @param presentation the presentation
+	 * Adds a perspective.
+	 * @param name name of the perspective
+	 * @param perspective the perspective
 	 */
-	public void addPresentation(String name, IPresentation presentation)
+	public void addPerspective(String name, IPerspective perspective)
 	{
-		synchronized (presentation)
+		synchronized(perspective)
 		{
-			presentation.setObserverCenter(this);
-			presentations.put(name, presentation);
-			if (presentations.size() == 1)
+			perspective.setObserverCenter(this);
+			perspectives.put(name, perspective);
+			if (perspectives.size() == 1)
 			{
-				selectPresentation(name);
+				setSelectedPerspective(name);
 			}
 		}
-	}
-	
-	/**
-	 * Select a presentation.
-	 * @param name name of the presentation
-	 */
-	public void selectPresentation(String name)
-	{
-		IPresentation p = (IPresentation) presentations.get(name);
-		mainwindow.setPresentationView(p.getView());
-		selectedpresentation = p;
-	}
-	
-	/**
-	 * Adds a theme.
-	 * @param name name of the theme
-	 * @param theme a theme
-	 */
-	public void addTheme(String name, Object theme)
-	{
-		//TODO: Move up to app-descriptor?
-		Theme2D theme2d = (Theme2D) theme;
-		if (theme2d.getMarkerDrawCombiner() == null)
-		{
-			DrawableCombiner objectMarker = new DrawableCombiner();
-			IDrawable markerDrawable = new TexturedRectangle(getClass().getPackage().getName().replaceAll("gui", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
-			objectMarker.addDrawable(markerDrawable, Integer.MAX_VALUE);
-			theme2d.setMarkerDrawCombiner(objectMarker);
-		}
-		synchronized(themes)
-		{
-			if ((themes.isEmpty()) && (selectedpresentation != null))
-			{
-				selectedpresentation.setTheme(theme);
-			}
-			themes.put(name, theme);
-		}
-		
 	}
 	
 	/** Returns access to the environment space
@@ -263,13 +220,29 @@ public class ObserverCenter
 	}
 	
 	/**
-	 * Returns the selected presentation.
+	 * Returns the selected perspective.
 	 * 
-	 *  @return the selected presentation
+	 *  @return the selected perspective
 	 */
-	public IPresentation getSelectedPresentation()
+	public IPerspective getSelectedPerspective()
 	{
-		return selectedpresentation;
+		return selectedperspective;
+	}
+	
+	/**
+	 * Sets the selected perspective.
+	 * 
+	 *  @param name name of the perspective
+	 */
+	public void setSelectedPerspective(String name)
+	{
+		synchronized(perspectives)
+		{
+			IPerspective perspective = (IPerspective) perspectives.get(name);
+			perspective.setObserverCenter(this);
+			selectedperspective = perspective;
+			mainwindow.setPerspectiveView(perspective.getView());
+		}
 	}
 	
 	/**
@@ -353,9 +326,12 @@ public class ObserverCenter
 	 */
 	private void updateDisplay()
 	{
-		if (selectedpresentation != null)
+		synchronized(perspectives)
 		{
-			selectedpresentation.refresh();
+			if (selectedperspective != null)
+			{
+				selectedperspective.refresh();
+			}
 		}
 	}
 	

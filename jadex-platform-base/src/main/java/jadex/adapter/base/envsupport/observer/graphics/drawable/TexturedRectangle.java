@@ -1,10 +1,12 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.Texture2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
+import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -30,100 +32,98 @@ public class TexturedRectangle extends RotatingPrimitive
 	private AffineTransform		imageToUser_;
 
 	/**
-	 * Creates an unrotated TexturedCenteredRectangle at 0,0 and size 1,1.
+	 * Creates default TexturedRectangle.
 	 * 
 	 * @param texturePath resource path of the texture
 	 */
 	public TexturedRectangle(String texturePath)
 	{
-		this(new Vector2Double(1.0), new Vector2Double(0.0), false, texturePath);
-	}
-
-	/**
-	 * Creates a new TexturedRectangle drawable.
-	 * 
-	 * @param size initial size
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
-	 * @param texturePath resource path of the texture
-	 */
-	public TexturedRectangle(IVector2 size, boolean rotating, String texturePath)
-	{
-		this(size, new Vector2Double(0.0), rotating, texturePath);
-	}
-
-	/**
-	 * Creates a new TexturedRectangle drawable.
-	 * 
-	 * @param size initial size
-	 * @param shift shift from the centered position using scale(1.0, 1.0)
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
-	 * @param texturePath resource path of the texture
-	 */
-	public TexturedRectangle(IVector2 size, IVector2 shift, boolean rotating,
-			String texturePath)
-	{
-		super(size, shift, rotating);
+		super();
 		texturePath_ = texturePath;
 		texture_ = null;
 		image_ = null;
 	}
 
-	public void init(ViewportJ2D vp, Graphics2D g)
+	/**
+	 * Creates a new TexturedRectangle drawable.
+	 * 
+	 * @param position position or position-binding
+	 * @param rotation rotation or rotation-binding
+	 * @param size size or size-binding
+	 * @param texturePath resource path of the texture
+	 */
+	public TexturedRectangle(Object position, Object rotation, Object size, String texturePath)
+	{
+		super(position, rotation, size);
+		texturePath_ = texturePath;
+		texture_ = null;
+		image_ = null;
+	}
+
+	public void init(ViewportJ2D vp)
 	{
 		image_ = vp.getImage(texturePath_);
 		imageToUser_ = new AffineTransform();
 		imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_.getHeight());
 	}
 
-	public void init(ViewportJOGL vp, GL gl)
+	public void init(ViewportJOGL vp)
 	{
-		texture_ = vp.getClampedTexture(gl, texturePath_);
+		texture_ = vp.getClampedTexture(vp.getContext(), texturePath_);
 	}
 
-	public synchronized void draw(ViewportJ2D vp, Graphics2D g)
+	public synchronized void draw(Object obj, ViewportJ2D vp)
 	{
+		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
-		g.translate(px_ - (w_ / 2), py_ - (h_ / 2));
-		g.translate(shiftX_, shiftY_);
-		g.scale(w_, h_);
-		if(rotating_)
+		
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		IVector1 rotation = SObjectInspector.getVector1asDirection(obj, this.rotation);
+		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		if ((position == null) || (size == null) || (rotation == null))
 		{
-			g.rotate(rot_);
+			return;
 		}
-		// g.drawImage(image_, imageToUser_, null);
+		
+		g.translate(position.getXAsDouble() - (size.getXAsDouble() / 2),
+					position.getYAsDouble() - (size.getYAsDouble() / 2));
+		g.scale(size.getXAsDouble(), size.getYAsDouble());
+		g.rotate(rotation.getAsDouble());
+		
 		g.drawImage(image_, vp.getImageTransform(image_.getWidth(), image_
 				.getHeight()), null);
 		g.setTransform(transform);
 	}
 
-	public synchronized void draw(ViewportJOGL vp, GL gl)
+	public synchronized void draw(Object obj, ViewportJOGL vp)
 	{
+		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_.getTexId());
-		setupMatrix(gl);
+		
+		if (setupMatrix(obj, gl));
+		{
+			gl.glMatrixMode(GL.GL_TEXTURE);
+			gl.glPushMatrix();
+			vp.setupTexMatrix(gl, texture_.getMaxX(), texture_.getMaxY());
 
-		gl.glMatrixMode(GL.GL_TEXTURE);
-		gl.glPushMatrix();
-		vp.setupTexMatrix(gl, texture_.getMaxX(), texture_.getMaxY());
+			gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			gl.glBegin(GL.GL_QUADS);
+			gl.glTexCoord2f(0.0f, 0.0f);
+			gl.glVertex2f(-0.5f, -0.5f);
+			gl.glTexCoord2f(1.0f, 0.0f);
+			gl.glVertex2f(0.5f, -0.5f);
+			gl.glTexCoord2f(1.0f, 1.0f);
+			gl.glVertex2f(0.5f, 0.5f);
+			gl.glTexCoord2f(0.0f, 1.0f);
+			gl.glVertex2f(-0.5f, 0.5f);
+			gl.glEnd();
 
-		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		gl.glBegin(GL.GL_QUADS);
-		gl.glTexCoord2f(0.0f, 0.0f);
-		gl.glVertex2f(-0.5f, -0.5f);
-		gl.glTexCoord2f(1.0f, 0.0f);
-		gl.glVertex2f(0.5f, -0.5f);
-		gl.glTexCoord2f(1.0f, 1.0f);
-		gl.glVertex2f(0.5f, 0.5f);
-		gl.glTexCoord2f(0.0f, 1.0f);
-		gl.glVertex2f(-0.5f, 0.5f);
-		gl.glEnd();
-
-		gl.glDisable(GL.GL_TEXTURE_2D);
-		gl.glPopMatrix();
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glDisable(GL.GL_TEXTURE_2D);
+			gl.glPopMatrix();
+			gl.glMatrixMode(GL.GL_MODELVIEW);
+		}
 		gl.glPopMatrix();
 	}
 }

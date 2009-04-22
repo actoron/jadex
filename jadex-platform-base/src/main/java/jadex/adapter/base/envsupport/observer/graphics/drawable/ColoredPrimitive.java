@@ -13,20 +13,29 @@ public abstract class ColoredPrimitive extends RotatingPrimitive
 
 	/** OpenGL color cache. */
 	protected float[]	oglColor_;
+	
+	/**
+	 * Initializes the drawable.
+	 */
+	protected ColoredPrimitive()
+	{
+		super();
+		setColor(Color.WHITE);
+	}
 
 	/**
 	 * Initializes the drawable.
 	 * 
-	 * @param size initial size
-	 * @param shift shift from the centered position using scale(1.0, 1.0)
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
+	 * @param position position or position-binding
+	 * @param rotation rotation or rotation-binding
+	 * @param size size or size-binding
 	 * @param c the drawable's color
 	 */
-	protected ColoredPrimitive(IVector2 size, IVector2 shift, boolean rotating,
-			Color c)
+	protected ColoredPrimitive(Object position, Object rotation, Object size, Color c)
 	{
-		super(size, shift, rotating);
+		super(position, rotation, size);
+		if (c == null)
+			c = Color.WHITE;
 		setColor(c);
 	}
 

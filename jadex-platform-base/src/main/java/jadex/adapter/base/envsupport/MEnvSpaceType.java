@@ -5,6 +5,7 @@ import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
@@ -14,7 +15,8 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
-import jadex.adapter.base.envsupport.observer.theme.Theme2D;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
+import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -168,14 +170,15 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}), null));
 		
-		types.add(new TypeInfo("theme", MultiCollection.class, null, null,
+		types.add(new TypeInfo("perspective", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Theme2D ret = new Theme2D();
+					// TODO: Allow more than the 2D-Perspective?
+					IPerspective ret = new Perspective2D();
 					
 					List drawables = (List)args.get("drawables");
 					if(drawables!=null)
@@ -183,7 +186,7 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int k=0; k<drawables.size(); k++)
 						{
 							Map sourcedrawable = (Map)drawables.get(k);
-							ret.addDrawableCombiner(MEnvSpaceInstance.getProperty(sourcedrawable, "objecttype"), 
+							ret.addVisual(MEnvSpaceInstance.getProperty(sourcedrawable, "objecttype"), 
 													((IObjectCreator)MEnvSpaceInstance.getProperty(sourcedrawable, "creator")).createObject(sourcedrawable));
 						}
 					}
@@ -198,7 +201,7 @@ public class MEnvSpaceType	extends MSpaceType
 							System.out.println("prelayer: "+layer);
 							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
-						ret.setPrelayers((ILayer[]) targetprelayers.toArray(new ILayer[0]));
+						((Perspective2D) ret).setPrelayers((ILayer[]) targetprelayers.toArray(new ILayer[0]));
 					}
 					
 					List postlayers = (List)args.get("postlayers");
@@ -211,8 +214,12 @@ public class MEnvSpaceType	extends MSpaceType
 							System.out.println("postlayer: "+layer);
 							targetpostlayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
-						ret.setPostlayers((ILayer[]) targetpostlayers.toArray(new ILayer[0]));
+						((Perspective2D) ret).setPostlayers((ILayer[]) targetpostlayers.toArray(new ILayer[0]));
 					}
+					// TODO: Add attributes
+					((Perspective2D) ret).setInvertYAxis(true);
+					((Perspective2D) ret).setObjectShift(new Vector2Double(0.5));
+					
 					return ret;
 				}
 			})
@@ -228,7 +235,8 @@ public class MEnvSpaceType	extends MSpaceType
 				public Object createObject(Map args) throws Exception
 				{
 					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"), (Double)MEnvSpaceInstance.getProperty(args, "height"));
-					DrawableCombiner ret = new DrawableCombiner(size);
+					DrawableCombiner ret = new DrawableCombiner();
+					ret.setSize(size);
 					
 					List parts = (List)args.get("parts");
 					if(parts!=null)
@@ -246,13 +254,10 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 
 		types.add(new TypeInfo("texturedrectangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "shiftx", "shifty", "rotating", "layer", "creator"}, 
+			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "layer", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
@@ -260,22 +265,16 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					IVector2 size = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 						(Double)MEnvSpaceInstance.getProperty(args, "height"));
-					IVector2 shift = MEnvSpaceInstance.getVector2((Double)MEnvSpaceInstance.getProperty(args, "shiftx"), 
-						(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
-					boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
-						((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
-					return new TexturedRectangle(size, shift, rotating, (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
+					return new TexturedRectangle(null, null, size, (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
 				}
 			})
 			}), null));
 		
 		types.add(new TypeInfo("triangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "layer", "creator"}, 
+			SUtil.createHashMap(new String[]{"width", "height", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, colorconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -288,18 +287,16 @@ public class MEnvSpaceType	extends MSpaceType
 						(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
 					boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
 						((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
-					return new Triangle(size, shift, rotating, (Color)MEnvSpaceInstance.getProperty(args, "color"));
+					return new Triangle(null, null, size, (Color)MEnvSpaceInstance.getProperty(args, "color"));
 				}
 			})
 			}), null));
 		
 		types.add(new TypeInfo("rectangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "layer", "creator"}, 
+			SUtil.createHashMap(new String[]{"width", "height", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, colorconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -312,18 +309,16 @@ public class MEnvSpaceType	extends MSpaceType
 						(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
 					boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
 						((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
-					return new Rectangle(size, shift, rotating, (Color)MEnvSpaceInstance.getProperty(args, "color"));
+					return new Rectangle(null, null, size, (Color)MEnvSpaceInstance.getProperty(args, "color"));
 				}
 			})
 			}), null));
 		
 		types.add(new TypeInfo("regularpolygon", MultiCollection.class, null, null,
-				SUtil.createHashMap(new String[]{"width", "height", "shiftx", "shifty", "rotating", "color", "vertices", "layer", "creator"}, 
+				SUtil.createHashMap(new String[]{"width", "height", "color", "vertices", "layer", "creator"}, 
 				new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "", new Integer(3)),
@@ -340,7 +335,7 @@ public class MEnvSpaceType	extends MSpaceType
 						int vertices  = MEnvSpaceInstance.getProperty(args, "vertices")==null? 3: 
 							((Integer)MEnvSpaceInstance.getProperty(args, "vertices")).intValue();
 
-						return new RegularPolygon(size, shift, rotating, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices);
+						return new RegularPolygon(null, null, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices);
 					}
 				})
 				}), null));
@@ -403,7 +398,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 
 		types.add(new TypeInfo("observer", MultiCollection.class, null, null,
-				SUtil.createHashMap(new String[]{"name", "view", "theme"}, 
+				SUtil.createHashMap(new String[]{"name", "view", "perspective"}, 
 				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
@@ -436,7 +431,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("perceptgeneratortype", new BeanAttributeInfo("perceptgeneratortypes", null, "property")));
 		linkinfos.add(new LinkInfo("view", new BeanAttributeInfo("views", null, "property")));
 		linkinfos.add(new LinkInfo("spaceexecutor", new BeanAttributeInfo(null, expconv, "property")));
-		linkinfos.add(new LinkInfo("theme", new BeanAttributeInfo("themes", null, "property")));
+		linkinfos.add(new LinkInfo("perspective", new BeanAttributeInfo("perspectives", null, "property")));
 		
 		// theme
 		linkinfos.add(new LinkInfo("drawable", new BeanAttributeInfo("drawables", null, "")));

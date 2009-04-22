@@ -29,42 +29,26 @@ public class RegularPolygon extends ColoredPrimitive
 	 */
 	public RegularPolygon()
 	{
-		this(new Vector2Double(1.0), new Vector2Double(0.0), false,
-				Color.WHITE, 3);
+		super();
+		vertices_ = 3;
 	}
 
 	/**
 	 * Generates a new RegularPolygon.
 	 * 
-	 * @param size size of the polygon
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
-	 * @param c color of the polygon
+	 * @param position position or position-binding
+	 * @param rotation rotation or rotation-binding
+	 * @param size size or size-binding
+	 * @param c the drawable's color
 	 * @param vertices number of vertices (corners)
 	 */
-	public RegularPolygon(IVector2 size, boolean rotating, Color c, int vertices)
+	public RegularPolygon(Object position, Object rotation, Object size, Color c, int vertices)
 	{
-		this(size, new Vector2Double(0.0), rotating, c, vertices);
-	}
-
-	/**
-	 * Generates a new RegularPolygon.
-	 * 
-	 * @param size size of the polygon
-	 * @param shift shift from the centered position using scale(1.0, 1.0)
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
-	 * @param c color of the polygon
-	 * @param vertices number of vertices (corners)
-	 */
-	public RegularPolygon(IVector2 size, IVector2 shift, boolean rotating,
-			Color c, int vertices)
-	{
-		super(size, shift, rotating, c);
+		super(position, rotation, size, c);
 		vertices_ = vertices;
 	}
 
-	public void init(ViewportJ2D vp, Graphics2D g)
+	public void init(ViewportJ2D vp)
 	{
 		path_ = new GeneralPath();
 		path_.moveTo(0.5f, 0.0f);
@@ -78,8 +62,9 @@ public class RegularPolygon extends ColoredPrimitive
 		path_.closePath();
 	}
 
-	public void init(ViewportJOGL vp, GL gl)
+	public void init(ViewportJOGL vp)
 	{
+		GL gl = vp.getContext();
 		String listName = getClass().getName() + "_"
 				+ new Integer(vertices_).toString();
 		Integer list = vp.getDisplayList(listName);
@@ -107,30 +92,25 @@ public class RegularPolygon extends ColoredPrimitive
 		dList_ = list.intValue();
 	}
 
-	public void draw(ViewportJ2D vp, Graphics2D g)
+	public void draw(Object obj, ViewportJ2D vp)
 	{
+		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
-		// setupMatrix(g);
-		g.translate(px_, py_);
-		// g.translate(shiftX_, shiftY_);
-		g.scale(w_, h_);
-		if(rotating_)
-		{
-			// g.rotate(rot_);
-		}
+		if (!setupMatrix(obj, g))
+			return;
 		g.setColor(c_);
 		g.fill(path_);
 		g.setTransform(transform);
 	}
 
-	public void draw(ViewportJOGL vp, GL gl)
+	public void draw(Object obj, ViewportJOGL vp)
 	{
+		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
-		setupMatrix(gl);
-
-		gl.glCallList(dList_);
-
+		if (setupMatrix(obj, gl))
+			gl.glCallList(dList_);
+		
 		gl.glPopMatrix();
 	}
 }

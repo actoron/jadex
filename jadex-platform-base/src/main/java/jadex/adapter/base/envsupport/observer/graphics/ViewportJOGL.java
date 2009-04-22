@@ -68,6 +68,9 @@ public class ViewportJOGL extends AbstractViewport
 
 	/** Action that renders the frame. */
 	private Runnable			renderFrameAction_;
+	
+	/** Current OpenGL rendering context */
+	private GL context_;
 
 	/**
 	 * Creates a new OpenGL-based viewport. May throw UnsatisfiedLinkError and
@@ -222,6 +225,15 @@ public class ViewportJOGL extends AbstractViewport
 		gl.glScalef(maxX * -((inversionFlag_.getXAsInteger() << 1) - 1), maxY
 				* -((inversionFlag_.getYAsInteger() << 1) - 1), 1.0f);
 	}
+	
+	/**
+	 * Returns the current GL rendering context.
+	 * @return GL context, null if none is available
+	 */
+	public GL getContext()
+	{
+		return context_;
+	}
 
 	private void setupMatrix(GL gl)
 	{
@@ -355,6 +367,8 @@ public class ViewportJOGL extends AbstractViewport
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT);
 
 			gl.glEnable(GL.GL_SCISSOR_TEST);
+			
+			context_ = gl;
 
 			synchronized(preLayers_)
 			{
@@ -377,10 +391,10 @@ public class ViewportJOGL extends AbstractViewport
 					for (Iterator it = objectList_.iterator(); it.hasNext(); )
 					{
 						Object[] o = (Object[]) it.next();
-						DrawableCombiner d = (DrawableCombiner) o[2];
+						DrawableCombiner d = (DrawableCombiner) o[1];
 						if (!drawObjects_.contains(d))
 						{
-							d.init(ViewportJOGL.this, gl);
+							d.init(ViewportJOGL.this);
 							drawObjects_.add(d);
 						}
 						objectLayers_.addAll(d.getLayers());
@@ -396,20 +410,9 @@ public class ViewportJOGL extends AbstractViewport
 						while(it2.hasNext())
 						{
 							Object[] o = (Object[])it2.next();
-							IVector2 pos = (IVector2)o[0];
-							IVector2 vel = (IVector2)o[1];
-							DrawableCombiner d = (DrawableCombiner)o[2];
-							
-							d.setPosition(pos);
-							if(vel != null)
-							{
-								d.setVelocity(vel);
-							}
-							else
-							{
-								d.setVelocity(Vector2Double.ZERO);
-							}
-							d.draw(layer, ViewportJOGL.this, gl);
+							Object obj = o[0];
+							DrawableCombiner d = (DrawableCombiner)o[1];
+							d.draw(obj, layer, ViewportJOGL.this);
 						}
 					}
 					gl.glPopMatrix();
@@ -428,7 +431,8 @@ public class ViewportJOGL extends AbstractViewport
 					l.draw(size_, ViewportJOGL.this, gl);
 				}
 			}
-
+			
+			context_ = null;
 			gl.glDisable(GL.GL_SCISSOR_TEST);
 		}
 
@@ -440,6 +444,7 @@ public class ViewportJOGL extends AbstractViewport
 		public void init(GLAutoDrawable drawable)
 		{
 			GL gl = drawable.getGL();
+			context_ = gl;
 			gl.glViewport(0, 0, canvas_.getWidth(), canvas_.getHeight());
 			gl.glMatrixMode(GL.GL_MODELVIEW);
 
@@ -448,7 +453,7 @@ public class ViewportJOGL extends AbstractViewport
 
 			setupMatrix(gl);
 			gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+			
 			// Check for OpenGL version or extensions if needed
 			if(gl.isExtensionAvailable("GL_VERSION_2_0")
 					|| gl.isExtensionAvailable("GL_VERSION_2_1")
@@ -473,6 +478,7 @@ public class ViewportJOGL extends AbstractViewport
 			drawObjects_.clear();
 
 			uninitialized_ = false;
+			context_ = null;
 		}
 
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width,

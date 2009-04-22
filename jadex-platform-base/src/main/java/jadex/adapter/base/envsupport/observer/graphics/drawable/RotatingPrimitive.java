@@ -1,171 +1,89 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 
 import java.awt.Graphics2D;
 
 import javax.media.opengl.GL;
 
 
-public abstract class RotatingPrimitive implements IDrawable
+public abstract class RotatingPrimitive extends AbstractVisual2D implements IDrawable
 {
 	private static final float	PI_2	= (float)(Math.PI / 2.0);
-
-	/** Flag whether the drawable is rotating. */
-	protected boolean			rotating_;
-
-	/** Drawable rotation. */
-	protected float				rot_;
-
-	/** x-axis position. */
-	protected float				px_;
-
-	/** y-axis position. */
-	protected float				py_;
-
-	/** Width */
-	protected float				w_;
-
-	/** Height */
-	protected float				h_;
-
-	/** x-shift */
-	protected float				shiftX_;
-
-	/** y-shift */
-	protected float				shiftY_;
+	
+	/**
+	 * Initializes the drawable.
+	 */
+	protected RotatingPrimitive()
+	{
+		super();
+	}
 
 	/**
 	 * Initializes the drawable.
 	 * 
-	 * @param size initial size
-	 * @param shift shift from the centered position using scale(1.0, 1.0)
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
+	 * @param position position or position-binding
+	 * @param rotation rotation or rotation-binding
+	 * @param size size or size-binding
 	 */
-	protected RotatingPrimitive(IVector2 size, IVector2 shift, boolean rotating)
+	protected RotatingPrimitive(Object position, Object rotation, Object size)
 	{
-		setPosition(new Vector2Double(0.0));
-		setSize(size);
-		setVelocity(new Vector2Double(0.0));
-		setRotating(rotating);
-		setShift(shift);
-	}
-
-	/**
-	 * Gets the position of the drawable.
-	 * 
-	 * @return position of the drawable
-	 */
-	public synchronized IVector2 getPosition()
-	{
-		return new Vector2Double(px_, py_);
-	}
-
-	/**
-	 * Sets the position of the drawable.
-	 * 
-	 * @param pos new position
-	 */
-	public synchronized void setPosition(IVector2 pos)
-	{
-		px_ = pos.getXAsFloat();
-		py_ = pos.getYAsFloat();
-	}
-
-	/**
-	 * Gets the size of the drawable.
-	 * 
-	 * @return size of the drawable
-	 */
-	public synchronized IVector2 getSize()
-	{
-		return new Vector2Double(w_, h_);
-	}
-
-	/**
-	 * Sets the size of the drawable.
-	 * 
-	 * @param size new size
-	 */
-	public synchronized void setSize(IVector2 size)
-	{
-		w_ = size.getXAsFloat();
-		h_ = size.getYAsFloat();
-	}
-
-	/**
-	 * Sets the shift away from the centered position using scale(1.0, 1.0).
-	 * 
-	 * @param shift the shift from the centered position using scale(1.0, 1.0)
-	 */
-	public synchronized void setShift(IVector2 shift)
-	{
-		shiftX_ = shift.getXAsFloat();
-		shiftY_ = shift.getYAsFloat();
-	}
-
-	/**
-	 * Sets the velocity of the drawable.
-	 * 
-	 * @param velocity new velocity
-	 */
-	public void setVelocity(IVector2 velocity)
-	{
-		rot_ = velocity.getDirectionAsFloat() - PI_2;
-	}
-
-	/**
-	 * Determines whether the drawable is rotating depending on its velocity.
-	 * 
-	 * @return true if the drawable is rotating depending on its velocity
-	 */
-	public boolean isRotating()
-	{
-		return rotating_;
-	}
-
-	/**
-	 * Sets whether the drawable rotates depending on its velocity.
-	 * 
-	 * @param rotating if true, the drawable will rotate depending on its
-	 *        velocity
-	 */
-	public void setRotating(boolean rotating)
-	{
-		rotating_ = rotating;
+		super();
+		if (position != null)
+			this.position = position;
+		if (rotation != null)
+			this.rotation = rotation;
+		if (size != null)
+			this.size = size;
 	}
 
 	/**
 	 * Sets up the transformation matrix before drawing.
 	 * 
+	 * @param obj object being drawn
 	 * @param g graphics context
+	 * @return true, if the setup was successful
 	 */
-	protected void setupMatrix(Graphics2D g)
+	protected boolean setupMatrix(Object obj, Graphics2D g)
 	{
-		g.translate(px_, py_);
-		g.translate(shiftX_, shiftY_);
-		g.scale(w_, h_);
-		if(rotating_)
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		IVector1 rotation = SObjectInspector.getVector1(obj, this.rotation);
+		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		
+		if ((position == null) || (size == null) || (rotation == null))
 		{
-			g.rotate(rot_);
+			return false;
 		}
+		
+		g.translate(position.getXAsDouble(), position.getYAsDouble());
+		g.scale(size.getXAsDouble(), size.getYAsDouble());
+		g.rotate(rotation.getAsDouble());
+		return true;
 	}
 
 	/**
 	 * Sets up the transformation matrix before drawing.
 	 * 
+	 * @param obj object being drawn
 	 * @param gl OpenGL context
 	 */
-	protected void setupMatrix(GL gl)
+	protected boolean setupMatrix(Object obj, GL gl)
 	{
-		gl.glTranslatef(px_, py_, 0.0f);
-		gl.glTranslatef(shiftX_, shiftY_, 0.0f);
-		gl.glScalef(w_, h_, 1.0f);
-		if(rotating_)
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		IVector1 rotation = SObjectInspector.getVector1asDirection(obj, this.rotation);
+		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		
+		if ((position == null) || (size == null) || (rotation == null))
 		{
-			gl.glRotated(Math.toDegrees(rot_), 0.0, 0.0, 1.0);
+			return false;
 		}
+		
+		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
+		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
+		gl.glRotated(Math.toDegrees(rotation.getAsFloat()), 0.0, 0.0, 1.0);
+		return true;
 	}
 }

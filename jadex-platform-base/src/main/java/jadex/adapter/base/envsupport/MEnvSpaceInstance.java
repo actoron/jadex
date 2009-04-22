@@ -15,7 +15,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
-import jadex.adapter.base.envsupport.observer.gui.presentation.Presentation2D;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
@@ -211,7 +211,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				
 				Map viewargs = new HashMap();
 				viewargs.put("sourceview", sourceview);
-//				viewargs.put("themes", themes);
 				viewargs.put("space", ret);
 				
 				ret.addView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
@@ -231,17 +230,17 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), null);
 				
 				// Hack! Is configuation the presentation?
-				// Yes!
-				Presentation2D presentation = new Presentation2D();
-				presentation.setInvertYAxis(true);
-				presentation.setObjectShift(new Vector2Double(0.5));
-				oc.addPresentation("Simple 2D Space", presentation);
+				// Yes! No, now it's, together with the Theme, the Perspective.
+				//Perspective2D perspective = new Perspective2D();
+				//perspective.setInvertYAxis(true);
+				//perspective.setObjectShift(new Vector2Double(0.5));
+				//oc.addPerspective("Simple 2D Space", perspective);
 				
-				List themes = spacetype.getPropertyList("themes");
-				for(int j=0; j<themes.size(); j++)
+				List perspectives = spacetype.getPropertyList("perspectives");
+				for(int j=0; j<perspectives.size(); j++)
 				{
-					Map sourcetheme = (Map)themes.get(j);
-					oc.addTheme((String)getProperty(sourcetheme, "name"), ((IObjectCreator)getProperty(sourcetheme, "creator")).createObject(sourcetheme));
+					Map sourcetheme = (Map)perspectives.get(j);
+					oc.addPerspective((String)getProperty(sourcetheme, "name"), (IPerspective)((IObjectCreator)getProperty(sourcetheme, "creator")).createObject(sourcetheme));
 				}
 			}
 		}

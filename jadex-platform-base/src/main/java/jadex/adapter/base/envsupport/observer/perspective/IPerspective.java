@@ -1,4 +1,4 @@
-package jadex.adapter.base.envsupport.observer.gui.presentation;
+package jadex.adapter.base.envsupport.observer.perspective;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
@@ -7,28 +7,15 @@ import java.awt.Component;
 import java.util.Set;
 
 /**
- * A presentation responsible for displaying information gathered using a view.
+ * A perspective responsible for displaying information gathered using a view.
  */
-public interface IPresentation
+public interface IPerspective
 {
 	/**
-	 * Returns the name of the presentation
-	 * @return name of the presentation
+	 * Returns the name of the perspective
+	 * @return name of the perspective
 	 */
 	public String getName();
-	
-	/**
-	 * Returns supported theme types as Class objects.
-	 * 
-	 * @return supported theme types
-	 */
-	public Set getSupportedThemeTypes();
-	
-	/**
-	 * Sets the current theme.
-	 * @param theme the new theme 
-	 */
-	public void setTheme(Object theme);
 	
 	/** Returns the currently selected object.
 	 * 
@@ -50,13 +37,26 @@ public interface IPresentation
 	public void setObserverCenter(ObserverCenter obscenter);
 	
 	/**
-	 * Gets the view of the presentation.
-	 * @return the view
+	 * Adds a new visual object.
+	 * @param id identifier of the object
+	 * @param visual the visual object
+	 */
+	public void addVisual(Object id, Object visual);
+	
+	/**
+	 * Removes a new visual object.
+	 * @param id identifier of the object
+	 */
+	public void removeVisual(Object id);
+	
+	/**
+	 * Gets the view component of the perspective.
+	 * @return the view component
 	 */
 	public Component getView();
 	
 	/**
-	 * Refreshes the presentation.
+	 * Refreshes the perspective.
 	 */
 	public void refresh();
 }

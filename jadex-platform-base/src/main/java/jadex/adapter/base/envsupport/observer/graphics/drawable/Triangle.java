@@ -30,41 +30,36 @@ public class Triangle extends ColoredPrimitive
 
 	/**
 	 * Generates a new Triangle
-	 * 
-	 * @param size size of the triangle
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
-	 * @param c color of the triangle
 	 */
-	public Triangle(IVector2 size, boolean rotating, Color c)
+	public Triangle()
 	{
-		this(size, new Vector2Double(0.0), rotating, c);
+		super();
 	}
 
 	/**
 	 * Generates a new Triangle
 	 * 
-	 * @param size size of the triangle
-	 * @param shift shift from the centered position using scale(1.0, 1.0)
-	 * @param rotating if true, the resulting drawable will rotate depending on
-	 *        the velocity
-	 * @param c color of the triangle
+	 * @param position position or position-binding
+	 * @param rotation rotation or rotation-binding
+	 * @param size size or size-binding
+	 * @param c the drawable's color
 	 */
-	public Triangle(IVector2 size, IVector2 shift, boolean rotating, Color c)
+	public Triangle(Object position, Object rotation, Object size, Color c)
 	{
-		super(size, shift, rotating, c);
+		super(position, rotation, size, c);
 	}
 
-	public void init(ViewportJ2D vp, Graphics2D g)
+	public void init(ViewportJ2D vp)
 	{
 	}
 
-	public void init(ViewportJOGL vp, GL gl)
+	public void init(ViewportJOGL vp)
 	{
 		String listName = getClass().getName();
 		Integer list = vp.getDisplayList(listName);
 		if(list == null)
 		{
+			GL gl = vp.getContext();
 			int newList = gl.glGenLists(1);
 			gl.glNewList(newList, GL.GL_COMPILE);
 
@@ -82,22 +77,24 @@ public class Triangle extends ColoredPrimitive
 		dList_ = list.intValue();
 	}
 
-	public void draw(ViewportJ2D vp, Graphics2D g)
+	public void draw(Object obj, ViewportJ2D vp)
 	{
+		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
-		setupMatrix(g);
+		if (!setupMatrix(obj, g))
+			return;
 		g.setColor(c_);
 		g.fill(J2D_TRIANGLE);
 		g.setTransform(transform);
 	}
 
-	public void draw(ViewportJOGL vp, GL gl)
+	public void draw(Object obj, ViewportJOGL vp)
 	{
+		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
-		setupMatrix(gl);
-
-		gl.glCallList(dList_);
+		if (setupMatrix(obj, gl))
+			gl.glCallList(dList_);
 
 		gl.glPopMatrix();
 	}

@@ -48,22 +48,22 @@
 				</env:view>
 			</env:views>
 			
-			<env:themes>
-				<env:theme name="icons">
-					<env:drawable objecttype="collector" width="1.0" height="1.0">
-						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
+			<env:perspectives>
+				<env:perspective name="icons">
+					<env:drawable objecttype="collector" width="0.9" height="0.9">
+						<env:texturedrectangle layer="2" width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
 					</env:drawable>
-					<env:drawable objecttype="burner" width="1.0" height="1.0">
-						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
+					<env:drawable objecttype="burner" width="0.9" height="0.9">
+						<env:texturedrectangle layer="1" width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
 					</env:drawable>
 					<env:drawable objecttype="garbage" width="0.7" height="0.7">
-						<env:texturedrectangle layer="0" width="0.7" height="0.7" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
+						<env:texturedrectangle layer="0" width="1.0" height="1.0" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
 					</env:drawable>
 					<env:prelayers>
 						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
 						<env:gridlayer width="1.0" height="1.0" color="WHITE" />
 					</env:prelayers>
-					</env:theme>
+					</env:perspective>
 					
 					<!-- <env:theme name="abstract">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
@@ -79,7 +79,7 @@
 						<env:gridlayer width="1.0" height="1.0" color="WHITE" />
 					</env:prelayers>
 				</env:theme> -->
-			</env:themes>
+			</env:perspectives>
 			
 			<!-- executor -->
 			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>
@@ -111,7 +111,7 @@
 				</env:initactions> -->
 				
 				<env:observers>
-					<env:observer name="world" view="view_all" theme="abstract">
+					<env:observer name="world" view="view_all" perspective="abstract">
 						<env:plugins>
 						</env:plugins>
 					</env:observer>
@@ -140,7 +140,7 @@
 				</env:initactions>
 				
 				<env:observers>
-					<env:observer name="world" view="view_all" theme="abstract">
+					<env:observer name="world" view="view_all" perspective="abstract">
 						<env:plugins>
 						</env:plugins>
 					</env:observer>

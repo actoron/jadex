@@ -35,6 +35,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 	/** Action that renders the frame. */
 	private Runnable	renderFrameAction_;
+	
+	/** The current draw context */
+	private Graphics2D context_;
 
 	/**
 	 * Creates a new Viewport.
@@ -83,6 +86,11 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	public void refresh()
 	{
 		EventQueue.invokeLater(renderFrameAction_);
+	}
+	
+	public Graphics2D getContext()
+	{
+		return context_;
 	}
 
 	/**
@@ -194,6 +202,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				g.setColor(java.awt.Color.BLACK);
 				g.fillRect(0, 0, getWidth(), getHeight());
 				setupTransform(g);
+				context_ = g;
 
 				synchronized(preLayers_)
 				{
@@ -216,10 +225,10 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						for (Iterator it = objectList_.iterator(); it.hasNext(); )
 						{
 							Object[] o = (Object[]) it.next();
-							DrawableCombiner d = (DrawableCombiner) o[2];
+							DrawableCombiner d = (DrawableCombiner) o[1];
 							if (!drawObjects_.contains(d))
 							{
-								d.init(ViewportJ2D.this, g);
+								d.init(ViewportJ2D.this);
 								drawObjects_.add(d);
 							}
 							objectLayers_.addAll(d.getLayers());
@@ -235,19 +244,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 							while(it2.hasNext())
 							{
 								Object[] o = (Object[])it2.next();
-								IVector2 pos = (IVector2)o[0];
-								IVector2 vel = (IVector2)o[1];
-								DrawableCombiner d = (DrawableCombiner)o[2];
-								d.setPosition(pos);
-								if(vel != null)
-								{
-									d.setVelocity(vel);
-								}
-								else
-								{
-									d.setVelocity(Vector2Double.ZERO);
-								}
-								d.draw(layer, ViewportJ2D.this, g);
+								Object obj = o[0];
+								DrawableCombiner d = (DrawableCombiner)o[1];
+								d.draw(obj, layer, ViewportJ2D.this);
 							}
 						}
 						g.setTransform(tf);
@@ -266,7 +265,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						l.draw(size_, ViewportJ2D.this, g);
 					}
 				}
-
+				
+				context_ = null;
+				
 				// glScissor replacement
 				g.setColor(java.awt.Color.BLACK);
 				g.fill(scissorPolygon_);

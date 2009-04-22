@@ -145,11 +145,11 @@ public class ObserverCenterWindow extends JFrame
 		mainpane.setLeftComponent(view);
 	}
 	
-	/** Sets the presentation view.
+	/** Sets the perspective view.
 	 *  
 	 *  @param view the view
 	 */
-	public void setPresentationView(Component view)
+	public void setPerspectiveView(Component view)
 	{
 		mainpane.setRightComponent(view);
 		mainpane.setDividerLocation(200 + mainpane.getInsets().left);

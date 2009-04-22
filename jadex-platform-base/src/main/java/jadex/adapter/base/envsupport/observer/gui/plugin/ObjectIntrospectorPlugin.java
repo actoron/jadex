@@ -3,7 +3,7 @@ package jadex.adapter.base.envsupport.observer.gui.plugin;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
-import jadex.adapter.base.envsupport.observer.gui.presentation.IPresentation;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -47,10 +47,6 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	 */
 	private JLabel typeLabel_;
 	
-	/** The position label
-	 */
-	private JLabel posLabel_;
-	
 	/** Property table
 	 */
 	private JTable propertyTable_;
@@ -68,15 +64,11 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		
 		JPanel objectPanel = new JPanel();
 		objectPanel.setBorder(new TitledBorder("Object"));
-		objectPanel.setLayout(new GridLayout(3, 2));
+		objectPanel.setLayout(new GridLayout(2, 2));
 		JLabel idLabelDesc = new JLabel("Object ID");
 		objectPanel.add(idLabelDesc, BorderLayout.WEST);
 		idLabel_ = new JLabel("");
 		objectPanel.add(idLabel_, BorderLayout.EAST);
-		JLabel posLabelDesc = new JLabel("Position");
-		objectPanel.add(posLabelDesc, BorderLayout.WEST);
-		posLabel_ = new JLabel("");
-		objectPanel.add(posLabel_, BorderLayout.EAST);
 		JLabel typeLabelDesc = new JLabel("Type");
 		objectPanel.add(typeLabelDesc);
 		typeLabel_ = new JLabel("");
@@ -131,28 +123,26 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	
 	public synchronized void refresh()
 	{
-		IPresentation p = observerCenter_.getSelectedPresentation();
+		
+		IPerspective p = observerCenter_.getSelectedPerspective();
 		Object observedId = p.getSelectedObject();
 		if (observedId == null)
 		{
 			idLabel_.setText("");
-			posLabel_.setText("");
 			typeLabel_.setText("");
 			propertyTable_.setModel(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 			return;
 		}
 		IEnvironmentSpace space = observerCenter_.getSpace();
 		Map properties = space.getSpaceObject(observedId).getProperties();
-		IVector2 position = ((IVector2) properties.get("position")).copy();
 		String type = space.getSpaceObject(observedId).getType().toString();
-		if ((properties == null) || (position == null) || (type == null))
+		if ((properties == null) || (type == null))
 		{
 			p.setSelectedObject(null);
 			return;
 		}
 		
 		idLabel_.setText(observedId.toString());
-		posLabel_.setText(position.toString());
 		typeLabel_.setText(type);
 		Set entries = properties.entrySet();
 		Object[][] dataSet = new Object[entries.size()][2];

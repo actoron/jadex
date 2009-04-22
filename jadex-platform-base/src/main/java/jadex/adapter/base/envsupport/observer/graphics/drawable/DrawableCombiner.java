@@ -1,11 +1,14 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
+import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,31 +24,19 @@ import javax.media.opengl.GL;
 /**
  * This drawable combines multiple drawables into a single drawable object.
  */
-public class DrawableCombiner
+public class DrawableCombiner extends AbstractVisual2D
 {
 	/** The drawables. */
 	private Map			drawables_;
-
-	/** The size of the object. */
-	private IVector2	size_;
 
 	/**
 	 * Creates a new DrawableCombiner of size 1.0.
 	 */
 	public DrawableCombiner()
 	{
-		this(new Vector2Double(1.0));
-	}
-
-	/**
-	 * Creates a new DrawableCombiner.
-	 * 
-	 * @param size size of the object
-	 */
-	public DrawableCombiner(IVector2 size)
-	{
+		super();
 		drawables_ = new HashMap();
-		size_ = size;
+		position = "position";
 	}
 
 	/**
@@ -100,7 +91,7 @@ public class DrawableCombiner
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void init(ViewportJ2D vp, Graphics2D g)
+	public void init(ViewportJ2D vp)
 	{
 		for(Iterator it = drawables_.values().iterator(); it.hasNext();)
 		{
@@ -108,7 +99,7 @@ public class DrawableCombiner
 			for(Iterator it2 = drawList.iterator(); it2.hasNext();)
 			{
 				IDrawable d = (IDrawable)it2.next();
-				d.init(vp, g);
+				d.init(vp);
 			}
 		}
 	}
@@ -119,7 +110,7 @@ public class DrawableCombiner
 	 * @param vp the viewport
 	 * @param gl OpenGL context
 	 */
-	public void init(ViewportJOGL vp, GL gl)
+	public void init(ViewportJOGL vp)
 	{
 		for(Iterator it = drawables_.values().iterator(); it.hasNext();)
 		{
@@ -127,7 +118,7 @@ public class DrawableCombiner
 			for(Iterator it2 = drawList.iterator(); it2.hasNext();)
 			{
 				IDrawable d = (IDrawable)it2.next();
-				d.init(vp, gl);
+				d.init(vp);
 			}
 		}
 	}
@@ -135,117 +126,90 @@ public class DrawableCombiner
 	/**
 	 * Draws the objects to a Java2D viewport
 	 * 
+	 * @param obj object being drawn
 	 * @param layer the current layer
 	 * @param vp the viewport
-	 * @param g Graphics2D context
 	 */
-	public void draw(Integer layer, ViewportJ2D vp, Graphics2D g)
+	public void draw(Object obj, Integer layer, ViewportJ2D vp)
 	{
 		List drawList = (List)drawables_.get(layer);
 		if(drawList == null)
 		{
 			return;
 		}
+		
+		Graphics2D g = vp.getContext();
+		AffineTransform t = g.getTransform();
+		
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		IVector1 rotation = SObjectInspector.getVector1asDirection(obj, this.rotation);
+		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		
+		if ((position == null) || (size == null) || (rotation == null))
+		{
+			return;
+		}
+		
+		g.translate(position.getXAsDouble(), position.getYAsDouble());
+		g.scale(size.getXAsDouble(), size.getYAsDouble());
+		g.rotate(rotation.getAsDouble());
 
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();
-			d.draw(vp, g);
+			d.draw(obj, vp);
 		}
+		
+		g.setTransform(t);
 	}
 
 	/**
 	 * Draws the objects to an OpenGL viewport
 	 * 
+	 * @param obj object being drawn
 	 * @param layer the current layer
 	 * @param vp the viewport
-	 * @param gl OpenGL context
 	 */
-	public void draw(Integer layer, ViewportJOGL vp, GL gl)
+	public void draw(Object obj, Integer layer, ViewportJOGL vp)
 	{
 		List drawList = (List)drawables_.get(layer);
 		if(drawList == null)
 		{
 			return;
 		}
-
+		
+		GL gl = vp.getContext();
+		
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		IVector1 rotation = SObjectInspector.getVector1asDirection(obj, this.rotation);
+		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		
+		if ((position == null) || (size == null) || (rotation == null))
+		{
+			return;
+		}
+		
+		gl.glPushMatrix();
+		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
+		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
+		gl.glRotated(Math.toDegrees(rotation.getAsDouble()), 0.0, 0.0, 1.0);
+		
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();
-			d.draw(vp, gl);
+			d.draw(obj, vp);
 		}
+		
+		gl.glPopMatrix();
 	}
 
 	/**
-	 * Sets the position of the drawables.
-	 * 
-	 * @param pos new position
+	 * Returns the scale of the combiner in relation to an object.
+	 * @param obj an object
 	 */
-	public void setPosition(IVector2 pos)
+	public IVector2 getSize(Object obj)
 	{
-		for(Iterator it = drawables_.values().iterator(); it.hasNext();)
-		{
-			List drawList = (List)it.next();
-			for(Iterator it2 = drawList.iterator(); it2.hasNext();)
-			{
-				IDrawable d = (IDrawable)it2.next();
-				d.setPosition(pos);
-			}
-		}
-	}
-
-	/**
-	 * Sets the velocity of the drawables.
-	 * 
-	 * @param velocity new velocity
-	 */
-	public void setVelocity(IVector2 velocity)
-	{
-		for(Iterator it = drawables_.values().iterator(); it.hasNext();)
-		{
-			List drawList = (List)it.next();
-			for(Iterator it2 = drawList.iterator(); it2.hasNext();)
-			{
-				IDrawable d = (IDrawable)it2.next();
-				d.setVelocity(velocity);
-			}
-		}
-	}
-
-	/**
-	 * Sets the sizes of all drawables to a single value.
-	 * 
-	 * @param size new size
-	 */
-	public void setDrawableSizes(IVector2 size)
-	{
-		for(Iterator it = drawables_.values().iterator(); it.hasNext();)
-		{
-			List drawList = (List)it.next();
-			for(Iterator it2 = drawList.iterator(); it2.hasNext();)
-			{
-				IDrawable d = (IDrawable)it2.next();
-				d.setSize(size);
-			}
-		}
-	}
-
-	/**
-	 * Returns the size of the object
-	 */
-	public IVector2 getSize()
-	{
-		return size_.copy();
-	}
-
-	/**
-	 * Sets the size of the object
-	 * 
-	 * @param size new size of the object
-	 */
-	public void setSize(IVector2 size)
-	{
-		size_ = size.copy();
+		return SObjectInspector.getVector2(obj, size);
 	}
 
 	/**
