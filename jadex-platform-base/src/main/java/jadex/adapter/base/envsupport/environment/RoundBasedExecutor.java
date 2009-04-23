@@ -52,8 +52,9 @@ public class RoundBasedExecutor
 //				System.out.println("time: "+timestamp+" "+progress+" "+roundtime.getAsLong());
 				
 				space.step(progress);
-				
 				clockservice.createTimer(roundtime.getAsLong(), this);
+
+				System.out.println("-------------------------------------------");
 			}
 		});
 	}

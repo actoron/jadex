@@ -61,7 +61,9 @@ public class PickupWasteAction implements IAgentAction
 		{
 			System.out.println("Agent picked up failed: "+so);
 		}
-//		System.out.println("pickup] "+name);
+
+		System.out.println("pickup waste action "+parameters);
+
 		return ret? Boolean.TRUE: Boolean.FALSE;
 	}
 

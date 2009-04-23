@@ -1,37 +1,31 @@
 package jadex.adapter.base.envsupport.environment.space2d.action;
 
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.math.IVector2;
 
+import java.util.Map;
+
 /**
- * 
+ * Set the position action.
  */
-public class GetPosition extends AbstractSpace2dAction
+public class GetPosition implements ISpaceAction
 {
+	/** The constant identifier for this action. */
+	public static final String SET_POSITION = "set_position";
+	
+	// Default Action Parameters
+	public static final String POSITION_ID = "position_id";
+	public static final String VELOCITY_ID = "velocity_id";
+	
 	/**
 	 *  Perform an action.
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
 		Object id = parameters.get(IAgentAction.OBJECT_ID);
-		IVector2 pos = (IVector2)parameters.get(POSITION_ID);
-		((Space2D)space).setPosition(id, pos);
-		
-//		Long objectId = (Long) parameters.get(OBJECT_ID);
-//		IVector2 position = (IVector2) parameters.get(POSITION_ID);
-//		ISpaceObject obj = space.getSpaceObject(objectId);
-//		obj.setProperty("position", position);
-		return null;
+		IVector2 pos = (IVector2)space.getSpaceObject(id).getProperty(POSITION_ID);
+		return pos;
 	}
-	
-	public Object getId()
-	{
-		return SET_POSITION;
-	}
-
 }

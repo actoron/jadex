@@ -57,7 +57,6 @@ public class ContextPanel extends AbstractTimePanel
 	 *  Create a context panel.
 	 *  @param context The execution context.
 	 */
-	//public ContextPanel(ExecutionContext context)
 	public ContextPanel(SimCenterPanel simp)
 	{
 		super(simp.getPlatform());
@@ -101,21 +100,16 @@ public class ContextPanel extends AbstractTimePanel
 	 */
 	public void updateView()
 	{
-//		System.out.println("update View");
+//		System.out.println("uv1: start="+START.isEnabled()+" step="+STEP_EVENT.isEnabled()+" time="+STEP_TIME.isEnabled()+" pause="+PAUSE.isEnabled());
+		
+		// todo: use event information for updating
+		
 		START.setEnabled(START.isEnabled());
 		STEP_EVENT.setEnabled(STEP_EVENT.isEnabled());
 		STEP_TIME.setEnabled(STEP_TIME.isEnabled());
 		PAUSE.setEnabled(PAUSE.isEnabled());
+//		System.out.println("uv2: start="+START.isEnabled()+" step="+STEP_EVENT.isEnabled()+" time="+STEP_TIME.isEnabled()+" pause="+PAUSE.isEnabled());
 	}
-	
-	/**
-	 *  Get the execution context.
-	 *  @return The execution context.
-	 * /
-	public ExecutionContext getContext()
-	{
-		return simp.getControl();
-	}*/
 	
 	/**
 	 *  Start action.

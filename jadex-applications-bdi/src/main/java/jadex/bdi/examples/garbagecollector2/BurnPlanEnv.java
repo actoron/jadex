@@ -29,9 +29,6 @@ public class BurnPlanEnv extends Plan
 		IGoal pickup = createGoal("pick");
 		dispatchSubgoalAndWait(pickup);
 
-		// Burn the waste.
-		waitFor(100);
-		
 		SyncResultListener srl	= new SyncResultListener();
 		Map params = new HashMap();
 		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier().getLocalName());

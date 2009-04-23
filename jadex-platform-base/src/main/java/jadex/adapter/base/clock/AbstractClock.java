@@ -217,7 +217,7 @@ public abstract class AbstractClock implements IClock
 			}
 		}
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "new_delta"));
 	}
 
 	/**
@@ -246,7 +246,7 @@ public abstract class AbstractClock implements IClock
 		if(!STATE_RUNNING.equals(state))
 		{
 			this.state = STATE_RUNNING;
-			notifyListeners();
+			notifyListeners(new ExtendedChangeEvent(this, "started"));
 		}
 	}
 	
@@ -258,7 +258,7 @@ public abstract class AbstractClock implements IClock
 		if(STATE_RUNNING.equals(state))
 		{
 			this.state = STATE_SUSPENDED;
-			notifyListeners();
+			notifyListeners(new ExtendedChangeEvent(this, "stopped"));
 		}
 	}
 	
@@ -273,7 +273,7 @@ public abstract class AbstractClock implements IClock
 		this.timers.clear();
 		this.ticktimers.clear();
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "reset"));
 	}
 	
 	/**
@@ -341,7 +341,7 @@ public abstract class AbstractClock implements IClock
 			timers.add(timer);
 		}
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "added_timer"));
 	}
 	
 	/**
@@ -356,7 +356,7 @@ public abstract class AbstractClock implements IClock
 			timers.remove(timer);
 		}
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "removed_timer"));
 	}
 	
 	/**
@@ -379,7 +379,7 @@ public abstract class AbstractClock implements IClock
 //			}
 		}
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "added_tick_timer"));
 	}
 
 	/**
@@ -409,7 +409,7 @@ public abstract class AbstractClock implements IClock
 				removeTimer(ticktimer);
 		}
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "removed_tick_timer"));
 	}
 	
 	/**
@@ -433,9 +433,9 @@ public abstract class AbstractClock implements IClock
 	/**
 	 *  Notify the listeners.
 	 */
-	protected void notifyListeners()
+	protected void notifyListeners(ChangeEvent ce)
 	{
-		ChangeEvent ce = new ChangeEvent(this);
+		System.out.println(""+this.getClass()+" "+ce);
 		for(int i=0; i<listeners.size(); i++)
 			((ChangeListener)listeners.get(i)).stateChanged(ce);
 	}
@@ -461,3 +461,5 @@ public abstract class AbstractClock implements IClock
 			listener.resultAvailable(null);
 	}
 }
+
+

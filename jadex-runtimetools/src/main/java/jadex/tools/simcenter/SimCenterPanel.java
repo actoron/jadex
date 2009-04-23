@@ -1,9 +1,7 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
-import jadex.bridge.ITimedObject;
 import jadex.commons.TimeFormat;
 
 import java.awt.BorderLayout;
@@ -11,7 +9,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
@@ -127,8 +124,6 @@ public class SimCenterPanel extends JPanel
 		
 		return ret;
 	}
-	
-	
 	
 	/**
 	 *  Get the time mode.

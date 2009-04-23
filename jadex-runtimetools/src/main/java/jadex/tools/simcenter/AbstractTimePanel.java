@@ -9,7 +9,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
 /**
  *	Base panel for displaying/editing clock related data.
  *  Handles listener and swing update issues. 
@@ -48,22 +47,24 @@ public abstract class AbstractTimePanel extends JPanel
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				if(!updatecalled && active)
+//				if(!updatecalled && active)
 				{
-					updatecalled	= true;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							updatecalled	= false;
-							updateView();
-						}
-					});
+//					updatecalled	= true;
+					invokeUpdateView();
+//					SwingUtilities.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
+//							updatecalled	= false;
+//							updateView();
+//						}
+//					});
 				}
 			}
 		};
 		
-		// The context listener is used to change the clock listener, when the clock is exchanged.
+		// The simservice listener is used for getting informed when the clock is exchanged 
+		// and when the its execution state changes.
 		contextlistener = new ChangeListener()
 		{
 			IClockService oldclock	= getClockService();
@@ -78,6 +79,8 @@ public abstract class AbstractTimePanel extends JPanel
 					// Inform listener that clock has changed.
 					clocklistener.stateChanged(e);
 				}
+				
+				invokeUpdateView();
 			}
 		};
 	}
@@ -136,4 +139,25 @@ public abstract class AbstractTimePanel extends JPanel
 	 *  Update the view.
 	 */
 	public abstract void updateView();
+
+	/**
+	 * 
+	 */
+	public void invokeUpdateView()
+	{
+		if(SwingUtilities.isEventDispatchThread())
+		{
+			updateView();
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					updateView();
+				}
+			});
+		}
+	}
 }

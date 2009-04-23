@@ -269,9 +269,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	 */
 	public static IVector2 getVector2(Double x, Double y)
 	{
-		if(x==null || y==null)
-			return null;
-		return x.doubleValue()==0 && y.doubleValue()==0? Vector2Double.ZERO: new Vector2Double(x.doubleValue(), y.doubleValue());
+		IVector2 ret = null;
+		if(x!=null && y!=null)
+			ret = x.doubleValue()==0 && y.doubleValue()==0? Vector2Double.ZERO: new Vector2Double(x.doubleValue(), y.doubleValue());
+		return ret;
 	}
 	
 	/**

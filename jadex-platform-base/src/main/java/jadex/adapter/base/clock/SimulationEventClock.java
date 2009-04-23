@@ -70,7 +70,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 		if(t!=null)
 			t.getTimedObject().timeEventOccurred(currenttime);
 			
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "next_timepoint"));
 		return advanced;
 	}
 	

@@ -158,7 +158,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 			executor.execute();
 		}
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "new_dilation"));
 	}
 	
 	/**
@@ -190,8 +190,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 		
 		if(notify)
 		{
-//			notificator.execute();
-			notifyListeners();
+			notifyListeners(new ExtendedChangeEvent(this, "start"));
 		}
 	}
 	
@@ -214,7 +213,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 		}
 		
 		if(notify)
-			notifyListeners();
+			notifyListeners(new ExtendedChangeEvent(this, "stop"));
 	}
 	
 	/**
@@ -231,7 +230,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 			this.currenttime = starttime;
 		}
 		
-		notifyListeners();
+		notifyListeners(new ExtendedChangeEvent(this, "reset"));
 	}
 	
 	/**
@@ -377,7 +376,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 				}
 	
 //				System.out.println("Exit"+timers.isEmpty());
-				notifyListeners();
+				notifyListeners(new ExtendedChangeEvent(this, "next_timepoint"));
 	
 				return !timers.isEmpty();
 			}

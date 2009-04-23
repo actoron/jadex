@@ -1,6 +1,7 @@
 package jadex.adapter.base;
 
 import jadex.adapter.base.clock.ClockService;
+import jadex.adapter.base.clock.ExtendedChangeEvent;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
@@ -84,7 +85,6 @@ public class SimulationService implements ISimulationService
 					else if(MODE_ACTION_STEP.equals(getMode()))
 					{
 						setExecuting(false);
-						advanceevent = true;
 					}
 				}
 				
@@ -161,13 +161,15 @@ public class SimulationService implements ISimulationService
 		boolean dorun = false;
 		synchronized(this)
 		{
+			if(executing)
+				return;
+//				throw new RuntimeException("Step only possible when executing.");
+
 			if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
 				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
 			{
 				throw new RuntimeException("Step only possible in simulation mode.");
 			}
-			if(executing)
-				throw new RuntimeException("Step only possible when executing.");
 	
 			setMode(MODE_ACTION_STEP);
 			setExecuting(true);
@@ -181,7 +183,7 @@ public class SimulationService implements ISimulationService
 		if(dorun)
 		{
 			getClockService().start();
-			getExecutorService().start();
+//			getExecutorService().start();
 		}
 		
 		boolean advanced = getClockService().advanceEvent();
@@ -206,15 +208,16 @@ public class SimulationService implements ISimulationService
 		boolean dorun = false;
 		synchronized(this)
 		{
+			if(executing)
+				return;
+//				throw new RuntimeException("Step only possible when not executing.");
+			
 			if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
 				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
 			{
 				throw new RuntimeException("Step only possible in simulation mode.");
 			}
-			if(executing)
-			{
-				throw new RuntimeException("Step only possible when not executing.");
-			}
+			
 			//System.out.println(simclock.getTimers().length+" "+jadex.commons.SUtil.arrayToString(simclock.getTimers()));
 				
 			setMode(MODE_TIME_STEP);
@@ -229,7 +232,7 @@ public class SimulationService implements ISimulationService
 		if(dorun)
 		{
 			getClockService().start();
-			getExecutorService().start();
+//			getExecutorService().start();
 		}
 		
 		// Do not hold lock while clock is advanced to avoid deadlocks
@@ -273,29 +276,34 @@ public class SimulationService implements ISimulationService
 	 */
 	public void setClockType(String type)
 	{
+		if(isExecuting())
+			return;
+//			throw new RuntimeException("Change clock not allowed during execution.");
+		
+		
 		IClockService cs = (IClockService)platform.getService(IClockService.class);
 		String oldtype = cs.getClockType();
 		
-		if(isExecuting())
-			throw new RuntimeException("Change clock not allowed during execution.");
-		
-		//System.out.println("Exchanged clock!!! "+clock);
-		if(IClock.TYPE_EVENT_DRIVEN.equals(oldtype)
-			|| IClock.TYPE_TIME_DRIVEN.equals(oldtype))
+		if(!type.equals(oldtype))
 		{
-			getExecutorService().removeIdleCommand(simcommand);
+			//System.out.println("Exchanged clock!!! "+clock);
+			if(IClock.TYPE_EVENT_DRIVEN.equals(oldtype)
+				|| IClock.TYPE_TIME_DRIVEN.equals(oldtype))
+			{
+				getExecutorService().removeIdleCommand(simcommand);
+			}
+			
+			((ClockService)cs).setClock(type);
+			
+			if(IClock.TYPE_EVENT_DRIVEN.equals(type)
+				|| IClock.TYPE_TIME_DRIVEN.equals(type))
+			{
+				getExecutorService().addIdleCommand(simcommand);
+			}
+			
+			running = false;
+			notifyListeners(new ExtendedChangeEvent(this, "clock_type", type));
 		}
-		
-		((ClockService)cs).setClock(type);
-		
-		if(IClock.TYPE_EVENT_DRIVEN.equals(type)
-			|| IClock.TYPE_TIME_DRIVEN.equals(type))
-		{
-			getExecutorService().addIdleCommand(simcommand);
-		}
-		
-		running = false;
-		notifyListeners();
 	}
 		
 	/**
@@ -337,17 +345,19 @@ public class SimulationService implements ISimulationService
 	 */
 	public void setExecuting(boolean executing)
 	{
-		//System.out.println("executing: "+executing);
-		this.executing = executing;
-		notifyListeners();
+		if(executing!=this.executing)
+		{
+			System.out.println("executing: "+executing);
+			this.executing = executing;
+			notifyListeners(new ExtendedChangeEvent(this, "executing", executing? Boolean.TRUE: Boolean.FALSE));
+		}
 	}
 	
 	/**
 	 *  Notify the listeners.
 	 */
-	protected void notifyListeners()
+	protected void notifyListeners(ChangeEvent ce)
 	{
-		ChangeEvent ce = new ChangeEvent(this);
 		for(int i=0; i<listeners.size(); i++)
 			((ChangeListener)listeners.get(i)).stateChanged(ce);
 	}

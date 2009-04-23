@@ -1,18 +1,13 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ObjectEvent;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.environment.space2d.action.AbstractSpace2dAction;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bdi.examples.garbagecollector.Position;
+
+import java.util.Map;
 
 /**
  *  The go action for moving one field in one of four directions.
@@ -77,7 +72,7 @@ public class GoAction implements IAgentAction
 		
 		((Space2D)space).setPosition(oid, pos);
 		
-//		System.out.println("Go action: "+obj.getProperty(ISpaceObject.ACTOR_ID)+" "+pos);
+		System.out.println("Go action: "+obj.getProperty(IAgentAction.ACTOR_ID)+" "+pos);
 		
 //		obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));
 		

@@ -51,10 +51,6 @@ public class GoPlanEnv extends Plan
 			}
 
 			//System.out.println("Wants to go: "+dir);
-			waitFor(100);
-			//System.out.println(getAgentName()+" "+getName());
-			
-//			env.go(getAgentName(), dir);
 			
 			Map params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
