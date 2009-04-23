@@ -14,6 +14,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangl
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.ObjectIntrospectorPlugin;
+import jadex.adapter.base.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
 
@@ -192,6 +193,7 @@ public class ObserverCenter
 		synchronized(perspective)
 		{
 			perspective.setObserverCenter(this);
+			perspective.setName(name);
 			perspectives.put(name, perspective);
 			if (perspectives.size() == 1)
 			{
@@ -218,6 +220,17 @@ public class ObserverCenter
 	{
 		return libService;
 	}
+	
+	/**
+	 * Returns the available perspectives.
+	 * 
+	 *  @return the available perspectives
+	 */
+	public Map getPerspectives()
+	{
+		return perspectives;
+	}
+	
 	
 	/**
 	 * Returns the selected perspective.
@@ -258,8 +271,8 @@ public class ObserverCenter
 		// TODO: remove hard coding
 		plugins.add(plugin);
 		// TODO: port from simsupport
-		//plugin = new VisualsPlugin();
-		//plugins.add(plugin);
+		plugin = new VisualsPlugin();
+		plugins.add(plugin);
 		//plugin = new ToolboxPlugin();
 		//plugins.add(plugin);
 		plugins.addAll(customplugins);

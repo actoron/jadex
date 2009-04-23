@@ -2,7 +2,6 @@ package jadex.adapter.base.envsupport.observer.graphics.layer;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.observer.graphics.Texture2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 
@@ -24,7 +23,7 @@ public class TiledLayer implements ILayer
 	protected String			texturePath_;
 
 	/** Texture ID for OpenGL operations. */
-	private Texture2D			texture_;
+	private int					texture_;
 
 	/** Image for Java2D operations. */
 	private BufferedImage		image_;
@@ -53,7 +52,7 @@ public class TiledLayer implements ILayer
 	{
 		this.tileSize_ = tileSize.copy();
 		this.texturePath_ = texturePath;
-		texture_ = null;
+		texture_ = 0;
 	}
 	
 	/**
@@ -101,14 +100,31 @@ public class TiledLayer implements ILayer
 	public synchronized void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
 		gl.glEnable(GL.GL_TEXTURE_2D);
-		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_.getTexId());
+		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 
-		float pTilesX = areaSize.getXAsFloat() / tileSize_.getXAsFloat();
-		float pTilesY = areaSize.getYAsFloat() / tileSize_.getYAsFloat();
+		//float pTilesX = areaSize.getXAsFloat() / tileSize_.getXAsFloat();
+		//float pTilesY = areaSize.getYAsFloat() / tileSize_.getYAsFloat();
 
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
+		
+		gl.glMatrixMode(GL.GL_TEXTURE);
+		gl.glPushMatrix();
+		gl.glScalef(tileSize_.getXAsFloat(), tileSize_.getYAsFloat(), 1.0f);
 		gl.glBegin(GL.GL_QUADS);
+		gl.glTexCoord2f(0.0f, 0.0f);
+		gl.glVertex2f(0.0f, 0.0f);
+		gl.glTexCoord2f(1.0f, 0.0f);
+		gl.glVertex2f(areaSize.getXAsFloat(), 0.0f);
+		gl.glTexCoord2f(1.0f, 1.0f);
+		gl.glVertex2f(areaSize.getXAsFloat(), areaSize.getYAsFloat());
+		gl.glTexCoord2f(0.0f, 1.0f);
+		gl.glVertex2f(0.0f, areaSize.getYAsFloat());
+		gl.glEnd();
+		gl.glPopMatrix();
+		gl.glMatrixMode(GL.GL_MODELVIEW);
+		
+
+		/*gl.glBegin(GL.GL_QUADS);
 		for(float x = 0.0f; x < areaSize.getXAsFloat(); x = x
 				+ tileSize_.getXAsFloat())
 		{
@@ -117,16 +133,16 @@ public class TiledLayer implements ILayer
 			{
 				gl.glTexCoord2f(0.0f, 0.0f);
 				gl.glVertex2f(x, y);
-				gl.glTexCoord2f(texture_.getMaxX(), 0.0f);
+				gl.glTexCoord2f(1.0f, 0.0f);
 				gl.glVertex2f(x + tileSize_.getXAsFloat(), y);
-				gl.glTexCoord2f(texture_.getMaxX(), texture_.getMaxY());
+				gl.glTexCoord2f(1.0f, 1.0f);
 				gl.glVertex2f(x + tileSize_.getXAsFloat(), y
 						+ tileSize_.getYAsFloat());
-				gl.glTexCoord2f(0.0f, texture_.getMaxY());
+				gl.glTexCoord2f(0.0f, 1.0f);
 				gl.glVertex2f(x, y + tileSize_.getYAsFloat());
 			}
 		}
-		gl.glEnd();
+		gl.glEnd();*/
 
 		gl.glDisable(GL.GL_TEXTURE_2D);
 	}

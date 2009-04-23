@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -24,7 +25,9 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -39,6 +42,7 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
+import javax.media.opengl.glu.GLU;
 
 
 /**
@@ -71,6 +75,9 @@ public class ViewportJOGL extends AbstractViewport
 	
 	/** Current OpenGL rendering context */
 	private GL context_;
+	
+	/** GLU library */
+	private GLU glu;
 
 	/**
 	 * Creates a new OpenGL-based viewport. May throw UnsatisfiedLinkError and
@@ -83,7 +90,7 @@ public class ViewportJOGL extends AbstractViewport
 	public ViewportJOGL(ILibraryService libService)
 	{
 		super();
-
+		glu = new GLU();
 		libService_ = libService;
 		uninitialized_ = true;
 		valid_ = false;
@@ -154,17 +161,17 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param path resource path of the texture
 	 * @return the texture
 	 */
-	public Texture2D getRepeatingTexture(GL gl, String path)
+	public int getRepeatingTexture(GL gl, String path)
 	{
 
-		Texture2D texture = (Texture2D)repeatingTextureCache_.get(path);
+		Integer texture = (Integer)repeatingTextureCache_.get(path);
 		if(texture == null)
 		{
 			texture = loadTexture(gl, path, GL.GL_REPEAT);
 			repeatingTextureCache_.put(path, texture);
 		}
 
-		return texture;
+		return texture.intValue();
 	}
 
 	/**
@@ -174,17 +181,17 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param path resource path of the texture
 	 * @return the texture
 	 */
-	public Texture2D getClampedTexture(GL gl, String path)
+	public int getClampedTexture(GL gl, String path)
 	{
 
-		Texture2D texture = (Texture2D)clampedTextureCache_.get(path);
+		Integer texture = (Integer)clampedTextureCache_.get(path);
 		if(texture == null)
 		{
 			texture = loadTexture(gl, path, GL.GL_CLAMP_TO_EDGE);
 			clampedTextureCache_.put(path, texture);
 		}
 
-		return texture;
+		return texture.intValue();
 	}
 
 	/**
@@ -208,23 +215,6 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		displayLists_.put(listName, list);
 	}
-
-	/**
-	 * Configures the texture matrix for a specific texture. Caller must ensure
-	 * being in the correct matrix mode before calling this method.
-	 * 
-	 * @param gl GL context
-	 * @param maxX maximum texture x-coordinate (for padded textures)
-	 * @param maxY maximum texture y-coordinate (for padded textures)
-	 */
-	public void setupTexMatrix(GL gl, float maxX, float maxY)
-	{
-		gl.glLoadIdentity();
-		gl.glTranslatef(maxX * inversionFlag_.getXAsInteger(), maxY
-				* inversionFlag_.getYAsInteger(), 0.0f);
-		gl.glScalef(maxX * -((inversionFlag_.getXAsInteger() << 1) - 1), maxY
-				* -((inversionFlag_.getYAsInteger() << 1) - 1), 1.0f);
-	}
 	
 	/**
 	 * Returns the current GL rendering context.
@@ -247,16 +237,52 @@ public class ViewportJOGL extends AbstractViewport
 						.getYAsDouble()
 						* (inversionFlag_.getYAsInteger() ^ 1), -0.5, 0.5);
 		gl.glTranslated(-posX_, -posY_, 0.0);
-
+		
+		/*double[] modelMat = new double[16];
+		double[] projMat = new double[16];
+		int[] view = new int[4];
+		gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, modelMat, 0);
+		
+		gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projMat, 0);
+		
+		gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
+		
+		double[] start = new double[3];
+		glu.gluProject(0.0, 0.0, 0.0, modelMat, 0, projMat, 0, view, 0, start, 0);
+		System.out.println(Arrays.toString(start));
+		double[] end = new double[3];
+		glu.gluProject(size_.getXAsDouble(), size_.getYAsDouble(), 0.0, modelMat, 0, projMat, 0, view, 0, end, 0);
+		System.out.println(Arrays.toString(end));
+		int x = (int)Math.min(start[0], end[0]);
+		int y = (int)Math.min(start[1], end[1]);
+		int w = (int)(Math.ceil(Math.max(start[0], end[0])) - (int)Math.min(start[0], end[0]));
+		int h = (int)(Math.ceil(Math.max(start[1], end[1])) - (int)Math.min(start[1], end[1]));
+		//gl.glScissor((int)Math.abs(start[0]), (int)Math.abs(start[1]), (int)Math.ceil(Math.abs(end[0])), (int)Math.ceil(Math.abs(end[1])));
+		gl.glScissor(x, y, w, h);*/
+		
 		// Setup the scissor box
 		double xFac = canvas_.getWidth() / paddedSize_.getXAsDouble();
 		double yFac = canvas_.getHeight() / paddedSize_.getYAsDouble();
-		int x = (int)(-posX_ * xFac);
-		int y = (int)(-posY_ * yFac);
+		int x = (int)(-posX_ * xFac) - 1;
+		int y = (int)(-posY_ * yFac) - 1;
 		//TODO: this is likely to be wrong
 		int w = (int)Math.round(size_.getXAsDouble() * xFac) + 2;
 		int h = (int)Math.round(size_.getYAsDouble() * yFac) + 2;
 		gl.glScissor(x, y, w, h);
+	}
+	
+	/**
+	 * Configures the texture matrix.
+	 * 
+	 * @param gl GL context
+	 */
+	private void setupTexMatrix(GL gl)
+	{
+		gl.glMatrixMode(GL.GL_TEXTURE);
+		gl.glLoadIdentity();
+		gl.glTranslatef(inversionFlag_.getXAsInteger(), inversionFlag_.getYAsInteger(), 0.0f);
+		gl.glScalef(-((inversionFlag_.getXAsInteger() << 1) - 1), -((inversionFlag_.getYAsInteger() << 1) - 1), 1.0f);
+		gl.glMatrixMode(GL.GL_MODELVIEW);
 	}
 
 	/**
@@ -266,7 +292,7 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param path texture resource path
 	 * @param wrapParam wrap parameter
 	 */
-	private synchronized Texture2D loadTexture(GL gl, String path, int wrapMode)
+	private synchronized Integer loadTexture(GL gl, String path, int wrapMode)
 	{
 		// Load image
 		ClassLoader cl = libService_.getClassLoader();
@@ -296,8 +322,6 @@ public class ViewportJOGL extends AbstractViewport
 			height = (int)Math
 					.pow(2, Math.ceil(Math.log(height) / Math.log(2)));
 		}
-		double maxX = (double)(tmpImage.getWidth() - 1) / width;
-		double maxY = (double)(tmpImage.getHeight() - 1) / height;
 
 		// Convert image data
 		ColorModel colorModel = new ComponentColorModel(ColorSpace
@@ -309,12 +333,13 @@ public class ViewportJOGL extends AbstractViewport
 		BufferedImage image = new BufferedImage(colorModel, raster, false,
 				new Hashtable());
 		Graphics2D g = (Graphics2D)image.getGraphics();
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);		
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 		g.setComposite(AlphaComposite.Src);
 		int ow = tmpImage.getWidth();
 		int oh = tmpImage.getHeight();
-		g.drawImage(tmpImage, 0, 0, null);
+		g.drawImage(tmpImage, 0, 0, width, height, 0, 0, tmpImage.getWidth(), tmpImage.getHeight(), null);
 
 		// Fill up padded textures, may be wrong approach for
 		// clamped textures.
@@ -335,7 +360,7 @@ public class ViewportJOGL extends AbstractViewport
 		// Prepare texture
 		int[] texId = new int[1];
 		gl.glGenTextures(1, texId, 0);
-		Texture2D texture = new Texture2D(texId[0], (float)maxX, (float)maxY);
+		Integer texture = new Integer(texId[0]);
 
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texId[0]);
@@ -355,13 +380,20 @@ public class ViewportJOGL extends AbstractViewport
 
 		return texture;
 	}
+	
+	private IVector2 matMult(float[] mat, double x, double y)
+	{
+		double v0 = (mat[0] * x) + (mat[4] * y) + mat[12];
+		double v1 = (mat[1] * x) + (mat[5] * y) + mat[13];
+		return new Vector2Double(v0, v1);
+	}
 
 	private class GLController implements GLEventListener
 	{
 		public void display(GLAutoDrawable drawable)
 		{
 			GL gl = drawable.getGL();
-
+			
 			setupMatrix(gl);
 
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT);
@@ -452,6 +484,7 @@ public class ViewportJOGL extends AbstractViewport
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
 			setupMatrix(gl);
+			setupTexMatrix(gl);
 			gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			
 			// Check for OpenGL version or extensions if needed

@@ -3,7 +3,6 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.observer.graphics.Texture2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
@@ -23,7 +22,7 @@ public class TexturedRectangle extends RotatingPrimitive
 	protected String			texturePath_;
 
 	/** Texture ID for OpenGL operations. */
-	private Texture2D			texture_;
+	private int					texture_;
 
 	/** Image for Java2D operations. */
 	private BufferedImage		image_;
@@ -40,7 +39,7 @@ public class TexturedRectangle extends RotatingPrimitive
 	{
 		super();
 		texturePath_ = texturePath;
-		texture_ = null;
+		texture_ = 0;
 		image_ = null;
 	}
 
@@ -56,7 +55,7 @@ public class TexturedRectangle extends RotatingPrimitive
 	{
 		super(position, rotation, size);
 		texturePath_ = texturePath;
-		texture_ = null;
+		texture_ = 0;
 		image_ = null;
 	}
 
@@ -102,14 +101,10 @@ public class TexturedRectangle extends RotatingPrimitive
 		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glEnable(GL.GL_TEXTURE_2D);
-		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_.getTexId());
+		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 		
 		if (setupMatrix(obj, gl));
 		{
-			gl.glMatrixMode(GL.GL_TEXTURE);
-			gl.glPushMatrix();
-			vp.setupTexMatrix(gl, texture_.getMaxX(), texture_.getMaxY());
-
 			gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			gl.glBegin(GL.GL_QUADS);
 			gl.glTexCoord2f(0.0f, 0.0f);
@@ -123,8 +118,6 @@ public class TexturedRectangle extends RotatingPrimitive
 			gl.glEnd();
 
 			gl.glDisable(GL.GL_TEXTURE_2D);
-			gl.glPopMatrix();
-			gl.glMatrixMode(GL.GL_MODELVIEW);
 		}
 		gl.glPopMatrix();
 	}

@@ -17,6 +17,12 @@ public interface IPerspective
 	 */
 	public String getName();
 	
+	/**
+	 * Sets the name of the perspective
+	 * @param name name of the perspective
+	 */
+	public void setName(String name);
+	
 	/** Returns the currently selected object.
 	 * 
 	 *  @return currently selected object
