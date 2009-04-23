@@ -66,6 +66,13 @@ public interface IDrawable
 	public void setSize(IVector2 size);
 	
 	/**
+	 * Sets the draw condition.
+	 * 
+	 * @param drawcondition the draw condition
+	 */
+	public void setDrawCondition(DrawCondition drawcondition);
+	
+	/**
 	 * Binds the position of the visual to an object property.
 	 * 
 	 * @param propId the property ID

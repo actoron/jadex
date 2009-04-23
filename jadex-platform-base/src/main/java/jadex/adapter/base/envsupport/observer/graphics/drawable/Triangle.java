@@ -79,6 +79,7 @@ public class Triangle extends ColoredPrimitive
 
 	public void draw(Object obj, ViewportJ2D vp)
 	{
+		super.draw(obj, vp);
 		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
 		if (!setupMatrix(obj, g))
@@ -90,6 +91,7 @@ public class Triangle extends ColoredPrimitive
 
 	public void draw(Object obj, ViewportJOGL vp)
 	{
+		super.draw(obj, vp);
 		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);

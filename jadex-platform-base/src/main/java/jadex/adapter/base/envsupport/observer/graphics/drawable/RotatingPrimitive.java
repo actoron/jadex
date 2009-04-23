@@ -3,6 +3,8 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
+import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 
 import java.awt.Graphics2D;
@@ -14,12 +16,16 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 {
 	private static final float	PI_2	= (float)(Math.PI / 2.0);
 	
+	/** The condition deciding if the drawable should be drawn. */
+	protected DrawCondition drawcondition;
+	
 	/**
 	 * Initializes the drawable.
 	 */
 	protected RotatingPrimitive()
 	{
 		super();
+		drawcondition = null;
 	}
 
 	/**
@@ -32,6 +38,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	protected RotatingPrimitive(Object position, Object rotation, Object size)
 	{
 		super();
+		drawcondition = null;
 		if (position != null)
 			this.position = position;
 		if (rotation != null)
@@ -85,5 +92,39 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
 		gl.glRotated(Math.toDegrees(rotation.getAsFloat()), 0.0, 0.0, 1.0);
 		return true;
+	}
+	
+	/**
+	 * Draws the object to a Java2D viewport
+	 * 
+	 * @param obj the object being drawn
+	 * @param vp the viewport
+	 */
+	public void draw(Object obj, ViewportJ2D vp)
+	{
+		if ((drawcondition != null) && (!drawcondition.testCondition(obj)))
+			return;
+	}
+
+	/**
+	 * Draws the object to an OpenGL viewport
+	 * 
+	 * @param obj the object being drawn
+	 * @param vp the viewport
+	 */
+	public void draw(Object obj, ViewportJOGL vp)
+	{
+		if ((drawcondition != null) && (!drawcondition.testCondition(obj)))
+			return;
+	}
+	
+	/**
+	 * Sets the draw condition.
+	 * 
+	 * @param drawcondition the draw condition
+	 */
+	public void setDrawCondition(DrawCondition drawcondition)
+	{
+		this.drawcondition = drawcondition;
 	}
 }

@@ -74,6 +74,7 @@ public class TexturedRectangle extends RotatingPrimitive
 
 	public synchronized void draw(Object obj, ViewportJ2D vp)
 	{
+		super.draw(obj, vp);
 		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
 		
@@ -97,6 +98,7 @@ public class TexturedRectangle extends RotatingPrimitive
 
 	public synchronized void draw(Object obj, ViewportJOGL vp)
 	{
+		super.draw(obj, vp);
 		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glEnable(GL.GL_TEXTURE_2D);
