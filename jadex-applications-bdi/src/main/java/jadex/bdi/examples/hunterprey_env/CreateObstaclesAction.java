@@ -5,6 +5,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  *  Action for creating obstacles at random locations.
  */
-public class CreateObstaclesAction implements ISpaceAction
+public class CreateObstaclesAction	extends SimplePropertyObject	implements ISpaceAction
 {
 	//-------- constants --------
 	

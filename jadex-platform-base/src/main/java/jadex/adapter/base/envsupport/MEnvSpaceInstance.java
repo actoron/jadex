@@ -11,7 +11,9 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.environment.view.IView;
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
@@ -265,6 +267,17 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	{
 		Object tmp = map.get(name);
 		return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
+	}
+	
+	/**
+	 * 
+	 */
+	public static IVector1 getVector1(Double val)
+	{
+		IVector1 ret = null;
+		if(val!=null)
+			ret = val.doubleValue()==0 ? Vector1Double.ZERO: new Vector1Double(val.doubleValue());
+		return ret;
 	}
 	
 	/**

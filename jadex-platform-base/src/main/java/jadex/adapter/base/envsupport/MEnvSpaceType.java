@@ -4,7 +4,9 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.view.IView;
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
@@ -271,12 +273,13 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("triangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"width", "height", "color", "layer", "creator"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			SUtil.createHashMap(new String[]{"width", "height", "color", "layer", "rotation", "creator"}, 
+			new BeanAttributeInfo[]{
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, colorconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -287,14 +290,15 @@ public class MEnvSpaceType	extends MSpaceType
 						(Double)MEnvSpaceInstance.getProperty(args, "shifty"));
 					boolean rotating = MEnvSpaceInstance.getProperty(args, "rotating")==null? false: 
 						((Boolean)MEnvSpaceInstance.getProperty(args, "rotating")).booleanValue();
-					return new Triangle(null, null, size, (Color)MEnvSpaceInstance.getProperty(args, "color"));
+					IVector1 rotation = MEnvSpaceInstance.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
+					return new Triangle(null, rotation, size, (Color)MEnvSpaceInstance.getProperty(args, "color"));
 				}
 			})
 			}), null));
 		
 		types.add(new TypeInfo("rectangle", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"width", "height", "color", "layer", "creator"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo[]{
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, colorconv, ""),
@@ -316,7 +320,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo("regularpolygon", MultiCollection.class, null, null,
 				SUtil.createHashMap(new String[]{"width", "height", "color", "vertices", "layer", "creator"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+				new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
