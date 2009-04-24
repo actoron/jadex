@@ -1,11 +1,11 @@
 package jadex.adapter.base.envsupport.environment;
 
-import java.util.Map;
-
+import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;
+
+import java.util.Iterator;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -17,9 +17,6 @@ public class DeltaTimeExecutor
 {
 	//-------- attributes --------
 	
-	/** The time coefficient */
-	protected IVector1 timecoefficient;
-	
 	/** Current time stamp */
 	protected long timestamp;
 	
@@ -30,22 +27,55 @@ public class DeltaTimeExecutor
 	 * @param timecoefficient the time coefficient
 	 * @param clockservice the clock service
 	 */
-	public DeltaTimeExecutor(final IEnvironmentSpace space, IVector1 timecoefficient, final IClockService clockservice)
+	public DeltaTimeExecutor(final AbstractEnvironmentSpace space, final IClockService clockservice)
 	{
-		this.timecoefficient = timecoefficient==null? new Vector1Double(0.001): timecoefficient;
 		this.timestamp = clockservice.getTime();
 		
+		// Start the processes.
+		Object[] procs = space.getProcesses().toArray();
+		for(int i = 0; i < procs.length; ++i)
+		{
+			ISpaceProcess process = (ISpaceProcess) procs[i];
+			process.start(clockservice, space);
+		}
+
 		clockservice.addChangeListener(new ChangeListener()
 		{
 			public void stateChanged(ChangeEvent e)
 			{				
 				long currenttime = clockservice.getTime();
-				IVector1 progress = DeltaTimeExecutor.this.timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
+				IVector1 progress = new Vector1Long(currenttime - timestamp);
 				timestamp = currenttime;
 
-				System.out.println("step: "+timestamp+" "+progress);
+//				System.out.println("step: "+timestamp+" "+progress);
 	
-				space.step(progress);
+				synchronized(space.getMonitor())
+				{
+					// Update the environment objects.
+					for(Iterator it = space.getSpaceObjectsCollection().iterator(); it.hasNext(); )
+					{
+						SpaceObject obj = (SpaceObject)it.next();
+						obj.updateObject(progress);
+					}
+					
+					// Execute the scheduled agent actions.
+					space.getAgentActionList().executeActions(null, true);
+					
+					// Execute the processes.
+					Object[] procs = space.getProcesses().toArray();
+					for(int i = 0; i < procs.length; ++i)
+					{
+						ISpaceProcess process = (ISpaceProcess) procs[i];
+						process.execute(clockservice, space);
+					}
+					
+					// Update the views.
+					for (Iterator it = space.getViews().iterator(); it.hasNext(); )
+					{
+						IView view = (IView) it.next();
+						view.update(space);
+					}
+				}
 			}
 		});
 	}

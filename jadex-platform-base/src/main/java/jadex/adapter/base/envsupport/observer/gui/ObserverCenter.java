@@ -1,17 +1,6 @@
 package jadex.adapter.base.envsupport.observer.gui;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.environment.view.GeneralView2D;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.observer.graphics.IViewport;
-import jadex.adapter.base.envsupport.observer.graphics.IViewportListener;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
-import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.ObjectIntrospectorPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.VisualsPlugin;
@@ -26,11 +15,8 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 

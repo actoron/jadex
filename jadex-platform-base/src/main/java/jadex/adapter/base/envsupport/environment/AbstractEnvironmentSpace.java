@@ -2,12 +2,11 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.envsupport.environment.view.IView;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -57,15 +56,13 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	/** The environment listeners. */
 	protected List listeners;
 	
-	/** The action executor. */
-	protected ActionProcessor actionexecutor;
+	/** The list of scheduled agent actions. */
+	protected AgentActionList	actionlist;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an environment space
-	 *  @param spaceexecutor executor for the space
-	 *  @param actionexecutor executor for agent actions
 	 */
 	public AbstractEnvironmentSpace()
 	{
@@ -79,7 +76,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
 		this.objectidcounter = new AtomicCounter();
-		this.actionexecutor = new ActionProcessor(monitor);
+		this.actionlist	= new AgentActionList(this);
 	}
 	
 	//-------- methods --------
@@ -94,7 +91,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		synchronized(monitor)
 		{
 			processes.put(id, process);
-			process.start(this);
+//			process.start(this);	// Done by executor.
 		}
 	}
 
@@ -322,6 +319,21 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	}
 	
 	/**
+	 * Adds an agent action.
+	 * @param actionId the action ID
+	 * @param action the action
+	 */
+	protected IAgentAction	getAgentAction(Object id)
+	{
+		IAgentAction	ret	= (IAgentAction)agentactions.get(id);
+		if(ret==null)
+		{
+			throw new RuntimeException("No such agent action: "+id);
+		}
+		return ret;
+	}
+
+	/**
 	 * Removes an agent action.
 	 * @param actionId the action ID
 	 */
@@ -339,24 +351,12 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void performAgentAction(final Object id, final Map parameters, final IResultListener listener)
+	public void performAgentAction(Object id, Map parameters, IResultListener listener)
 	{
-		actionexecutor.invokeLater(new Runnable()
+		synchronized(monitor)
 		{
-			public void run()
-			{
-				try
-				{
-					IAgentAction action = (IAgentAction)agentactions.get(id);
-					Object ret = action.perform(parameters==null? Collections.EMPTY_MAP: parameters, AbstractEnvironmentSpace.this);
-					listener.resultAvailable(ret);
-				}
-				catch(RuntimeException e)
-				{
-					listener.exceptionOccurred(e);
-				}
-			}
-		}); // todo: what about metainfo
+			actionlist.scheduleAgentAction(getAgentAction(id), parameters, listener);
+		}
 	}
 	
 	/**
@@ -609,12 +609,45 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	{
 		this.context = context;
 	}
+
+	/**
+	 *  Get the space objects.
+	 */
+	// Hack!!! getSpaceObjecs() implemented in Space2D???
+	protected Collection	getSpaceObjectsCollection()
+	{
+		return spaceobjects.values();
+	}
+	
+	/**
+	 *  Get the processes.
+	 */
+	protected Collection	getProcesses()
+	{
+		return processes.values();
+	}
+	
+	/**
+	 *  Get the list of scheduled agent actions
+	 */
+	protected AgentActionList	getAgentActionList()
+	{
+		return actionlist;
+	}
+	
+	/**
+	 *  Get the views.
+	 */
+	protected Collection	getViews()
+	{
+		return views.values();
+	}
 	
 	/** 
 	 * Steps the space. May be non-functional in spaces that do not have
 	 * a concept of steps.
 	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
-	 */
+	 * /
 	public void step(IVector1 progress)
 	{
 		synchronized(monitor)
@@ -644,7 +677,8 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 				view.update(this);
 			}
 		}
-	}
+	}*/
+	
 	
 	/**
 	 *  Fire an environment event.

@@ -1,7 +1,5 @@
 package jadex.adapter.base.envsupport.environment.view;
 
-import java.util.List;
-
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 
@@ -28,7 +26,6 @@ public class GeneralView2D implements IView
 	 */
 	public GeneralView2D()
 	{
-		monitor = new Object();
 		objects = new Object[0];
 		dirty = false;
 	}
@@ -39,6 +36,7 @@ public class GeneralView2D implements IView
 	public void setSpace(IEnvironmentSpace space)
 	{
 		this.space = (Space2D)space;
+		this.monitor	= this.space.getMonitor();
 	}
 	
 	/**

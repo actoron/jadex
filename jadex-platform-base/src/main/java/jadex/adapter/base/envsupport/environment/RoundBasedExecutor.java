@@ -1,20 +1,19 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.envsupport.environment.view.IView;
 import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;
 import jadex.bridge.ITimedObject;
 
+import java.util.Iterator;
+
 /**
- * 
+ *  Synchronized execution of all actions in rounds based on clock ticks.
  */
 public class RoundBasedExecutor
 {
 	//-------- constants --------
-	
-	/** The time coefficient */
-	protected IVector1 timecoefficient;
 	
 	/** Current time stamp */
 	protected long timestamp;
@@ -22,39 +21,62 @@ public class RoundBasedExecutor
 	//-------- constructors--------
 	
 	/**
-	 * Creates a new DeltaTimeExecutor
-	 * @param timecoefficient the time coefficient
-	 * @param clockservice the clock service
+	 *  Creates a new round based executor.
+	 *  @param space	The space.
+	 *  @param clockservice	The clock service.
 	 */
-	public RoundBasedExecutor(final IEnvironmentSpace space, final IClockService clockservice, final IVector1 roundtime)
+	public RoundBasedExecutor(final AbstractEnvironmentSpace space, final IClockService clockservice)
 	{
-		this(space, null, clockservice, roundtime);
-	}
-	
-	/**
-	 * Creates a new DeltaTimeExecutor
-	 * @param timecoefficient the time coefficient
-	 * @param clockservice the clock service
-	 */
-	public RoundBasedExecutor(final IEnvironmentSpace space, IVector1 timecoefficient, final IClockService clockservice, final IVector1 roundtime)
-	{
-		this.timecoefficient = timecoefficient==null? new Vector1Double(0.001): timecoefficient;
 		this.timestamp = clockservice.getTime();
 		
-		clockservice.createTimer(roundtime.getAsLong(), new ITimedObject()
+		// Start the processes.
+		Object[] procs = space.getProcesses().toArray();
+		for(int i = 0; i < procs.length; ++i)
+		{
+			ISpaceProcess process = (ISpaceProcess) procs[i];
+			process.start(clockservice, space);
+		}
+		
+		clockservice.createTickTimer(new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-//				IVector1 progress = RoundBasedExecutor.this.timecoefficient.copy().multiply(new Vector1Long(currenttime - timestamp));
 				IVector1 progress = new Vector1Long(currenttime - timestamp);
 				timestamp = currenttime;
 				
-//				System.out.println("time: "+timestamp+" "+progress+" "+roundtime.getAsLong());
-				
-				space.step(progress);
-				clockservice.createTimer(roundtime.getAsLong(), this);
+				synchronized(space.getMonitor())
+				{
+					// Update the environment objects.
+					for(Iterator it = space.getSpaceObjectsCollection().iterator(); it.hasNext(); )
+					{
+						SpaceObject obj = (SpaceObject)it.next();
+						obj.updateObject(progress);
+					}
+					
+					// Execute the scheduled agent actions.
+					space.getAgentActionList().executeActions(null, false);
+					
+					// Execute the processes.
+					Object[] procs = space.getProcesses().toArray();
+					for(int i = 0; i < procs.length; ++i)
+					{
+						ISpaceProcess process = (ISpaceProcess) procs[i];
+						process.execute(clockservice, space);
+					}
+					
+					// Update the views.
+					for (Iterator it = space.getViews().iterator(); it.hasNext(); )
+					{
+						IView view = (IView) it.next();
+						view.update(space);
+					}
 
-				System.out.println("-------------------------------------------");
+					// Wakeup the agents.
+					space.getAgentActionList().wakeupAgents(null);
+				}
+
+				clockservice.createTickTimer(this);
+//				System.out.println("-------------------------------------------");
 			}
 		});
 	}

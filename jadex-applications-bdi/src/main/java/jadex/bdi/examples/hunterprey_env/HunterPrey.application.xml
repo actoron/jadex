@@ -33,7 +33,9 @@
 			</env:actiontypes>
 			
 			<env:processtypes>
-				<env:processtype name="create" class="CreateFoodProcess" />
+				<env:processtype name="create" class="CreateFoodProcess">
+					<!-- <env:property name="rate">5</env:property> -->
+				</env:processtype>
 			</env:processtypes>
 <!-- 			
 			<env:perceptgeneratortypes>
@@ -44,8 +46,8 @@
 				<env:view name="view_all" class="GeneralView2D" />
 			</env:views>
 
-			<env:themes>
-				<env:theme name="icons">
+			<env:perspectives>
+				<env:perspective name="icons">
 					<env:drawable objecttype="food" width="1.0" height="1.0">
 						<env:texturedrectangle layer="0" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
 					</env:drawable>
@@ -64,11 +66,11 @@
 					</env:prelayers>
 					<env:postlayers>
 					</env:postlayers>
-				</env:theme>
-			</env:themes>
+				</env:perspective>
+			</env:perspectives>
 
 			<!-- executor -->
-			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>
+			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class))</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
 
@@ -94,7 +96,7 @@
 				</env:initactions>
 
 				<env:observers>
-					<env:observer name="world" view="view_all" theme="icons">
+					<env:observer name="world" view="view_all" perspective="icons">
 						<env:plugins>
 						</env:plugins>
 					</env:observer>
@@ -127,7 +129,7 @@
 				</env:initactions>
 
 				<env:observers>
-					<env:observer name="world" view="view_all" theme="icons">
+					<env:observer name="world" view="view_all" perspective="icons">
 						<env:plugins>
 						</env:plugins>
 					</env:observer>

@@ -4,9 +4,8 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.bridge.IClockService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +17,8 @@ public class CreateFoodProcess implements ISpaceProcess
 {
 	//-------- attributes --------
 	
-	/** The time passed. */
-	protected IVector1 delta;
+	/** The last executed tick. */
+	protected double	lasttick;
 	
 	//-------- constructors --------
 	
@@ -28,27 +27,27 @@ public class CreateFoodProcess implements ISpaceProcess
 	 */
 	public CreateFoodProcess()
 	{
-		this.delta = Vector1Double.ZERO;
 	}
 	
 	//-------- ISpaceProcess interface --------
 	
 	/**
-	 * This method will be executed by the object before the process gets added
-	 * to the execution queue.
-	 * 
-	 * @param space the space this process is running in
+	 *  This method will be executed by the object before the process gets added
+	 *  to the execution queue.
+	 *  @param clock	The clock.
+	 *  @param space	The space this process is running in.
 	 */
-	public void start(IEnvironmentSpace space)
+	public void start(IClockService clock, IEnvironmentSpace space)
 	{
+		this.lasttick	= clock.getTick();
 		System.out.println("create food process started.");
 	}
 
 	/**
-	 * This method will be executed by the object before the process is removed
-	 * from the execution queue.
-	 * 
-	 * @param space the space this process is running in
+	 *  This method will be executed by the object before the process is removed
+	 *  from the execution queue.
+	 *  @param clock	The clock.
+	 *  @param space	The space this process is running in.
 	 */
 	public void shutdown(IEnvironmentSpace space)
 	{
@@ -56,23 +55,21 @@ public class CreateFoodProcess implements ISpaceProcess
 	}
 
 	/**
-	 * Executes the environment process
-	 * 
-	 * @param time the current time
-	 * @param deltat time passed during this step
-	 * @param space the space this process is running in
+	 *  Executes the environment process
+	 *  @param clock	The clock.
+	 *  @param space	The space this process is running in.
 	 */
-	public void execute(IVector1 deltat, IEnvironmentSpace space)
+	public void execute(IClockService clock, IEnvironmentSpace space)
 	{
 //		System.out.println("create food process called: "+deltat);
 		
 		Grid2D grid = (Grid2D)space;
 		
-		delta.add(deltat);
+		double	delta	= clock.getTick() - lasttick;
 		
-		if(delta.getAsDouble()>5)
+		if(delta>5)
 		{
-			delta.subtract(new Vector1Double(5));
+			lasttick	= clock.getTick();
 		
 			IVector2 pos = grid.getEmptyGridPosition();
 			if(pos!=null)
@@ -83,16 +80,5 @@ public class CreateFoodProcess implements ISpaceProcess
 //				System.out.println("Created food: "+obj);
 			}
 		}
-	}
-
-
-	/**
-	 * Returns the ID of the action.
-	 * @return ID of the action
-	 */
-	public Object getId()
-	{
-		// todo: remove here or from application xml?
-		return "create-food";
 	}
 }

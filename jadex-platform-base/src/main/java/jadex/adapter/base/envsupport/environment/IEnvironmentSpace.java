@@ -3,7 +3,6 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.view.IView;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
@@ -177,8 +176,8 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * Steps the space. May be non-functional in spaces that do not have
 	 * a concept of steps.
 	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
-	 */
-	public void step(IVector1 progress);
+	 * /
+	public void step(IVector1 progress);*/
 	
 	/**
 	 *  Add an environment listener.

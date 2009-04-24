@@ -91,16 +91,18 @@ public abstract class AbstractClock implements IClock
 		{
 			public void timeEventOccurred(long currenttime)
 			{
+				TickTimer[] tts;
+				
 				synchronized(AbstractClock.this)
 				{
 //					System.out.println("Ticktimer notified: "+ticktimers);
 					
-					TickTimer[] tts = (TickTimer[])ticktimers.toArray(new TickTimer[ticktimers.size()]);
+					tts = (TickTimer[])ticktimers.toArray(new TickTimer[ticktimers.size()]);
 					ticktimers.clear();
-					
-					for(int i=0; i<tts.length; i++)
-						tts[i].getTimedObject().timeEventOccurred(currenttime);
 				}
+				
+				for(int i=0; i<tts.length; i++)
+					tts[i].getTimedObject().timeEventOccurred(currenttime);
 			}
 		});
 	}
@@ -435,7 +437,7 @@ public abstract class AbstractClock implements IClock
 	 */
 	protected void notifyListeners(ChangeEvent ce)
 	{
-		System.out.println(""+this.getClass()+" "+ce);
+//		System.out.println(""+this.getClass()+" "+ce);
 		for(int i=0; i<listeners.size(); i++)
 			((ChangeListener)listeners.get(i)).stateChanged(ce);
 	}

@@ -245,12 +245,15 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		// Create (and start) the environment executor.
+		// Create the environment executor.
 		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "spaceexecutor");
-		SimpleValueFetcher fetcher = new SimpleValueFetcher();
-		fetcher.setValue("$space", ret);
-		fetcher.setValue("$platform", app.getPlatform());
-		exp.getValue(fetcher);	// Executor starts itself
+		if(exp!=null)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$space", ret);
+			fetcher.setValue("$platform", app.getPlatform());
+			exp.getValue(fetcher);	// Executor starts itself
+		}
 		
 		return ret;		
 	}
