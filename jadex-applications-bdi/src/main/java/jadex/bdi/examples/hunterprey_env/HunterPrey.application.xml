@@ -96,7 +96,7 @@
 				</env:initactions>
 
 				<env:observers>
-					<env:observer name="world" view="view_all" perspective="icons">
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
 						<env:plugins>
 						</env:plugins>
 					</env:observer>
@@ -129,7 +129,7 @@
 				</env:initactions>
 
 				<env:observers>
-					<env:observer name="world" view="view_all" perspective="icons">
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
 						<env:plugins>
 						</env:plugins>
 					</env:observer>
