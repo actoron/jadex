@@ -373,7 +373,12 @@ public class MEnvSpaceType	extends MSpaceType
 				}
 			})
 			}), null));
-			
+	
+		types.add(new TypeInfo("process/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+
+	
 		// type instance declarations.
 		
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
@@ -453,6 +458,9 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		// space action 
 		linkinfos.add(new LinkInfo("spaceaction/parameter", new BeanAttributeInfo("parameters", null, "")));
+		
+		// action, process
+		linkinfos.add(new LinkInfo("process/property", new BeanAttributeInfo("properties", null, "")));
 		
 		return linkinfos;
 	}

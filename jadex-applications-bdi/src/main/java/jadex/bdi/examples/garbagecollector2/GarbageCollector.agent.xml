@@ -49,7 +49,7 @@
  		</belief>
 
 		<!-- When at least one piece of waste is present on the
-			current posistion the actual position is perceived as dirty. -->
+			current position the actual position is perceived as dirty. -->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
  			<fact language="jcl">
  				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage").size()>0

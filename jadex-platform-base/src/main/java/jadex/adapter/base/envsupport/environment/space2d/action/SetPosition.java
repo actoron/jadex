@@ -7,11 +7,12 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.commons.SimplePropertyObject;
 
 /**
  *  Set the position action.
  */
-public class SetPosition implements ISpaceAction
+public class SetPosition extends SimplePropertyObject implements ISpaceAction
 {
 	/**
 	 *  Perform an action.

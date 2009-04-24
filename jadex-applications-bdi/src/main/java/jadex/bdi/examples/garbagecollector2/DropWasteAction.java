@@ -8,11 +8,12 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.commons.SimplePropertyObject;
 
 /**
  *  Action for dropping waste on the robots field.
  */
-public class DropWasteAction implements IAgentAction
+public class DropWasteAction extends SimplePropertyObject implements IAgentAction
 {
 	/**
 	 * Performs the action.

@@ -1,12 +1,13 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.bridge.IClockService;
+import jadex.commons.IPropertyObject;
 
 /**
  * Space process interface. Use this interface to implement new
  * space processes.
  */
-public interface ISpaceProcess
+public interface ISpaceProcess extends IPropertyObject
 {
 	/**
 	 *  This method will be executed by the object before the process gets added

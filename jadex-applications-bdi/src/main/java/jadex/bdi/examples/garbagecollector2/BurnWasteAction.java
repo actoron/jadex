@@ -4,13 +4,14 @@ import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
 
 /**
  *  Action for burning waste.
  */
-public class BurnWasteAction implements IAgentAction
+public class BurnWasteAction extends SimplePropertyObject implements IAgentAction
 {
 	/**
 	 * Performs the action.

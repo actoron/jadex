@@ -1,5 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.commons.IPropertyObject;
+
 import java.util.Map;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Map;
  *  first scheduled in the environment. They will be executed when the
  *  next step() is called.
  */
-public interface IAgentAction
+public interface IAgentAction extends IPropertyObject
 {
 	//-------- constants --------
 

@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.Collection;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  *  Action allowing a creature to move.
  */
-public class MoveAction implements IAgentAction
+public class MoveAction extends SimplePropertyObject implements IAgentAction
 {
 	//-------- constants --------
 	

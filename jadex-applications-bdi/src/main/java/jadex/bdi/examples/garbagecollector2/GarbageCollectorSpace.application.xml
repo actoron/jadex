@@ -80,7 +80,7 @@
 			</env:perspectives>
 			
 			<!-- executor -->
-			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class), new Vector1Long(100))</env:spaceexecutor>
+			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class))</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
 	

@@ -4,13 +4,14 @@ import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
 
 /**
  * Set the position action.
  */
-public class GetPosition implements ISpaceAction
+public class GetPosition extends SimplePropertyObject implements ISpaceAction
 {
 	/** The constant identifier for this action. */
 	public static final String SET_POSITION = "set_position";

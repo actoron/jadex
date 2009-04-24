@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IClockService;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  *  Process for continuously creating food.
  */
-public class CreateFoodProcess implements ISpaceProcess
+public class CreateFoodProcess extends SimplePropertyObject implements ISpaceProcess
 {
 	//-------- attributes --------
 	

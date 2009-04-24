@@ -34,7 +34,7 @@
 			
 			<env:processtypes>
 				<env:processtype name="create" class="CreateFoodProcess">
-					<!-- <env:property name="rate">5</env:property> -->
+					<env:property name="rate">5</env:property>
 				</env:processtype>
 			</env:processtypes>
 <!-- 			

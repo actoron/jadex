@@ -1,13 +1,15 @@
 package jadex.adapter.base.envsupport.environment;
 
 
+import jadex.commons.IPropertyObject;
+
 import java.util.Map;
 
 
 /**
  * An action in the environment
  */
-public interface ISpaceAction
+public interface ISpaceAction extends IPropertyObject
 {
 	/**
 	 *  Performs a space action.

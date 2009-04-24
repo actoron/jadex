@@ -6,13 +6,14 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
 
 /**
  *  The go action for moving one field in one of four directions.
  */
-public class GoAction implements IAgentAction
+public class GoAction extends SimplePropertyObject implements IAgentAction
 {
 	//-------- constants --------
 

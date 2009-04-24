@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bridge.IClockService;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  * 
  */
-public class CreateWasteProcess implements ISpaceProcess
+public class CreateWasteProcess extends SimplePropertyObject implements ISpaceProcess
 {
 	//-------- attributes --------
 	

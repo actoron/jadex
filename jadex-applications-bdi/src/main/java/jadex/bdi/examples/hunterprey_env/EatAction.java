@@ -5,13 +5,14 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
 
 /**
  *  Action for eating food or another creature.
  */
-public class EatAction implements IAgentAction
+public class EatAction extends SimplePropertyObject implements IAgentAction
 {
 	//-------- constants --------
 	
