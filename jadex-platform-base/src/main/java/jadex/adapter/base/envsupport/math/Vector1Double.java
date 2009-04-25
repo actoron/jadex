@@ -151,4 +151,12 @@ public class Vector1Double implements IVector1
 		}
 		return buffer.toString();
 	}
+
+	public static IVector1 getVector1(Double val)
+	{
+		IVector1 ret = null;
+		if(val!=null)
+			ret = val.doubleValue()==0 ? ZERO: new Vector1Double(val.doubleValue());
+		return ret;
+	}
 }

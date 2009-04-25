@@ -11,16 +11,16 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.environment.view.IView;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
+import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.HashMap;
@@ -77,9 +77,13 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	{
 		MApplicationType mapt = app.getApplicationType();
 		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
-		
+
 		// Create and init space.
 		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)((Class)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "clazz")).newInstance();
+		
+		SimpleValueFetcher fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$space", ret);
+		fetcher.setValue("$platform", app.getPlatform());
 		
 		ret.setContext(app);
 		
@@ -113,6 +117,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map maction = (Map)spaceactions.get(i);
 				ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
+				List props = (List)maction.get("properties");
+				setProperties(action, props, fetcher);
 				
 				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
 				ret.addSpaceAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
@@ -127,6 +133,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map maction = (Map)agentactions.get(i);
 				IAgentAction action = (IAgentAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
+				List props = (List)maction.get("properties");
+				setProperties(action, props, fetcher);
 				
 				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
 				ret.addAgentAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
@@ -139,11 +147,13 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		{
 			for(int i=0; i<processes.size(); i++)
 			{
-				Map mproc = (Map)processes.get(i);
-				ISpaceProcess proc = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mproc, "clazz")).newInstance();
+				Map mprocess = (Map)processes.get(i);
+				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
+				List props = (List)mprocess.get("properties");
+				setProperties(process, props, fetcher);
 				
-				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mproc, "name"));
-				ret.addSpaceProcess(MEnvSpaceInstance.getProperty(mproc, "name"), proc);
+				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
+				ret.addSpaceProcess(MEnvSpaceInstance.getProperty(mprocess, "name"), process);
 			}
 		}
 		
@@ -155,6 +165,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mgen = (Map)gens.get(i);
 				IPerceptGenerator gen = (IPerceptGenerator)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
+				List props = (List)mgen.get("properties");
+				setProperties(gen, props, fetcher);
 				
 				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
 				ret.addPerceptGenerator(MEnvSpaceInstance.getProperty(mgen, "name"), gen);
@@ -178,9 +190,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		List actions = (List)getPropertyList("spaceactions");
 		if(actions!=null)
 		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$space", ret);
-			fetcher.setValue("$platform", app.getPlatform());
 			for(int i=0; i<actions.size(); i++)
 			{
 				Map action = (Map)actions.get(i);
@@ -192,7 +201,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					for(int j=0; j<ps.size(); j++)
 					{
 						Map param = (Map)ps.get(j);
-						// Create (and start) the environment executor.
 						IParsedExpression exp = (IParsedExpression)param.get("value");
 						params.put(param.get("name"), exp.getValue(fetcher));
 					}
@@ -251,9 +259,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "spaceexecutor");
 		if(exp!=null)
 		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$space", ret);
-			fetcher.setValue("$platform", app.getPlatform());
 			exp.getValue(fetcher);	// Executor starts itself
 		}
 		
@@ -261,7 +266,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	}
 
 	/**
-	 * 
+	 *  Get a property from a (multi)map.
+	 *  @param map The map.
+	 *  @param name The name.
+	 *  @return The property.
 	 */
 	public static Object getProperty(Map map, String name)
 	{
@@ -270,25 +278,23 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	}
 	
 	/**
-	 * 
+	 *  Set properties on a IPropertyObject.
+	 *  @param object The IPropertyObject.
+	 *  @param properties A list properties (containing maps with "name", "value" keys).
+	 *  @param fetcher The fetcher for parsing the Java expression (can provide
+	 *  predefined values to the expression)
 	 */
-	public static IVector1 getVector1(Double val)
+	protected void setProperties(IPropertyObject object, List properties, IValueFetcher fetcher)
 	{
-		IVector1 ret = null;
-		if(val!=null)
-			ret = val.doubleValue()==0 ? Vector1Double.ZERO: new Vector1Double(val.doubleValue());
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public static IVector2 getVector2(Double x, Double y)
-	{
-		IVector2 ret = null;
-		if(x!=null && y!=null)
-			ret = x.doubleValue()==0 && y.doubleValue()==0? Vector2Double.ZERO: new Vector2Double(x.doubleValue(), y.doubleValue());
-		return ret;
+		if(properties!=null)
+		{
+			for(int i=0; i<properties.size(); i++)
+			{
+				Map prop = (Map)properties.get(i);
+				IParsedExpression exp = (IParsedExpression)prop.get("value");
+				object.setProperty((String)prop.get("name"), exp.getValue(fetcher));
+			}
+		}
 	}
 	
 	/**

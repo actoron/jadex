@@ -2,6 +2,7 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.IPropertyObject;
 
 /**
  *  Interface for percept generators.
@@ -10,7 +11,7 @@ import jadex.bridge.IAgentIdentifier;
  *  is meant as a piece of information that is of interest for
  *  an agent.
  */
-public interface IPerceptGenerator extends IEnvironmentListener
+public interface IPerceptGenerator extends IEnvironmentListener, IPropertyObject
 {
 	/**
 	 *  Called when an agent was added to the space.

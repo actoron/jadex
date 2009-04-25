@@ -20,14 +20,14 @@ public class CreateFoodProcess extends SimplePropertyObject implements ISpacePro
 	
 	/** The last executed tick. */
 	protected double	lasttick;
-	
+
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new create food process.
 	 */
 	public CreateFoodProcess()
-	{
+	{		
 	}
 	
 	//-------- ISpaceProcess interface --------
@@ -68,7 +68,10 @@ public class CreateFoodProcess extends SimplePropertyObject implements ISpacePro
 		
 		double	delta	= clock.getTick() - lasttick;
 		
-		if(delta>5)
+		int rate = getProperty("rate")!=null? 
+			((Integer)getProperty("rate")).intValue(): 5;
+		
+		if(delta>rate)
 		{
 			lasttick	= clock.getTick();
 		

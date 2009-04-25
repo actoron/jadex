@@ -352,5 +352,19 @@ public class Vector2Double implements IVector2, Cloneable
 		}
 		return buffer.toString();
 	}
+
+	/**
+	 *  Get a vector for two doubles.
+	 *  @param a The first value.
+	 *  @param b The second value.
+	 *  @return The vector (null if at least one of args is null).
+	 */
+	public static IVector2 getVector2(Double a, Double b)
+	{
+		IVector2 ret = null;
+		if(a!=null && b!=null)
+			ret = a.doubleValue()==0 && b.doubleValue()==0? ZERO: new Vector2Double(a.doubleValue(), b.doubleValue());
+		return ret;
+	}
 }
 

@@ -5,6 +5,7 @@ import jadex.bridge.ITimedObject;
 import jadex.bridge.ITimer;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.adapter.base.clock.ExtendedChangeEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;

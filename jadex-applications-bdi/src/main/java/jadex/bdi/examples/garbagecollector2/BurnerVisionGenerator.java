@@ -9,6 +9,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  *  Percept generator for burner agents.
  */
-public class BurnerVisionGenerator implements IPerceptGenerator
+public class BurnerVisionGenerator extends SimplePropertyObject implements IPerceptGenerator
 {
 	//-------- constants --------
 	
@@ -80,12 +81,12 @@ public class BurnerVisionGenerator implements IPerceptGenerator
 	/**
 	 *  Test if an event is relevant for the percept generator.
 	 *  @param event The event.
-	 */
+	 * /
 	public boolean isRelevant(EnvironmentEvent event)
 	{
 		return agents!=null && "garbage".equals(event.getSpaceObject().getType()) && 
 		EnvironmentEvent.OBJECT_POSITION_CHANGED.equals(event.getType());
-	}
+	}*/
 	
 	/**
 	 *  Dispatch an environment event to this listener.

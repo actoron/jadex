@@ -15,6 +15,13 @@ import jadex.commons.concurrent.IResultListener;
  */
 public class BurnerVisionProcessor implements IPerceptProcessor
 {
+	/**
+	 *  Process a new percept.
+	 *  @param space The space.
+	 *  @param type The type.
+	 *  @param percept The percept.
+	 *  @param agent The agent identifier.
+	 */
 	public void processPercept(ISpace space, final String type, final Object percept, IAgentIdentifier agent)
 	{
 		IAMS ams = (IAMS)((ApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);

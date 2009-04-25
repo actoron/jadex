@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  *  Action for creating obstacles at random locations.
  */
-public class CreateObstaclesAction	extends SimplePropertyObject	implements ISpaceAction
+public class CreateObstaclesAction extends SimplePropertyObject implements ISpaceAction
 {
 	//-------- constants --------
 	
