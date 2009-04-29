@@ -22,9 +22,9 @@
 	</imports>
 	
 	<spacetypes>
-		<env:envspacetype name="gc2dspace" class="Grid2D">
-			<env:dimension>10</env:dimension>
-			<env:dimension>10</env:dimension>
+		<env:envspacetype name="gc2dspace" width="10" height="10" class="Grid2D">
+			<!-- <env:dimension>10</env:dimension>
+			<env:dimension>10</env:dimension> -->
 		
 			<env:actiontypes>
 				<env:agentactiontype name="pickup" class="PickupWasteAction" />
@@ -34,7 +34,9 @@
 			</env:actiontypes>
 			
 			<env:processtypes>
-				<env:processtype name="create" class="CreateWasteProcess" />
+				<env:processtype name="create" class="CreateWasteProcess" >
+					<env:property name="rate">5</env:property>
+				</env:processtype>
 			</env:processtypes>
 			
 			<env:perceptgeneratortypes>
@@ -50,6 +52,7 @@
 				<env:perspective name="icons">
 					<env:drawable objecttype="collector" width="0.9" height="0.9">
 						<env:texturedrectangle layer="2"  imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
+						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.2" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" conditionclass="CollectorGarbageDrawCondition"/>
 					</env:drawable>
 					<env:drawable objecttype="burner" width="0.9" height="0.9">
 						<env:texturedrectangle layer="1" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
@@ -63,20 +66,21 @@
 					</env:prelayers>
 					</env:perspective>
 					
-					<!-- <env:theme name="abstract">
+				<env:perspective name="abstract">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
-						<env:triangle width="0.9" height="0.9" color="RED" />
+						<env:triangle layer="2" color="RED" />
+						<env:rectangle layer="3" color="YELLOW" width="0.2" height="0.2" conditionclass="CollectorGarbageDrawCondition"/>
 					</env:drawable>
 					<env:drawable objecttype="burner" width="1.0" height="1.0">
-						<env:triangle width="0.9" height="0.9" color="GREEN" />
+						<env:triangle layer="1" color="GREEN" />
 					</env:drawable>
 					<env:drawable objecttype="garbage" width="0.7" height="0.7">
-						<env:rectangle width="0.3" height="0.3" color="YELLOW" />
+						<env:rectangle layer="0" color="YELLOW" />
 					</env:drawable>
 					<env:prelayers>
 						<env:gridlayer width="1.0" height="1.0" color="WHITE" />
 					</env:prelayers>
-				</env:theme> -->
+				</env:perspective>
 			</env:perspectives>
 			
 			<!-- executor -->
@@ -101,12 +105,6 @@
 					<env:object type="collector" owner="Collector1" />
 					<env:object type="burner" owner="Burner1" />
 				</env:objects>
-				
-				<!-- <env:initactions>
-					<env:spaceaction type="init">
-						<env:parameter name="p1">new Integer(1)</env:parameter>
-					</env:spaceaction>
-				</env:initactions> -->
 				
 				<env:observers>
 					<env:observer name="world" view="view_all" perspective="abstract">

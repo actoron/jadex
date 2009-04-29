@@ -51,9 +51,9 @@ public class TexturedRectangle extends RotatingPrimitive
 	 * @param size size or size-binding
 	 * @param texturePath resource path of the texture
 	 */
-	public TexturedRectangle(Object position, Object rotation, Object size, String texturePath)
+	public TexturedRectangle(Object position, Object rotation, Object size, String texturePath, DrawCondition drawcondition)
 	{
-		super(position, rotation, size);
+		super(position, rotation, size, drawcondition);
 		texturePath_ = texturePath;
 		texture_ = 0;
 		image_ = null;
@@ -71,9 +71,8 @@ public class TexturedRectangle extends RotatingPrimitive
 		texture_ = vp.getClampedTexture(vp.getContext(), texturePath_);
 	}
 
-	public synchronized void draw(Object obj, ViewportJ2D vp)
+	public synchronized void doDraw(Object obj, ViewportJ2D vp)
 	{
-		super.draw(obj, vp);
 		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
 		
@@ -95,9 +94,8 @@ public class TexturedRectangle extends RotatingPrimitive
 		g.setTransform(transform);
 	}
 
-	public synchronized void draw(Object obj, ViewportJOGL vp)
+	public synchronized void doDraw(Object obj, ViewportJOGL vp)
 	{
-		super.draw(obj, vp);
 		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glEnable(GL.GL_TEXTURE_2D);

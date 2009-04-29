@@ -2,7 +2,6 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
@@ -35,10 +34,10 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param rotation rotation or rotation-binding
 	 * @param size size or size-binding
 	 */
-	protected RotatingPrimitive(Object position, Object rotation, Object size)
+	protected RotatingPrimitive(Object position, Object rotation, Object size, DrawCondition drawcondition)
 	{
 		super();
-		drawcondition = null;
+		this.drawcondition = drawcondition;
 		if (position != null)
 			this.position = position;
 		if (rotation != null)
@@ -100,10 +99,10 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public void draw(Object obj, ViewportJ2D vp)
+	public final void draw(Object obj, ViewportJ2D vp)
 	{
-		if ((drawcondition != null) && (!drawcondition.testCondition(obj)))
-			return;
+		if((drawcondition == null) || drawcondition.testCondition(obj))
+			doDraw(obj, vp);
 	}
 
 	/**
@@ -112,11 +111,27 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public void draw(Object obj, ViewportJOGL vp)
+	public final void draw(Object obj, ViewportJOGL vp)
 	{
-		if ((drawcondition != null) && (!drawcondition.testCondition(obj)))
-			return;
+		if((drawcondition == null) || drawcondition.testCondition(obj))
+			doDraw(obj, vp);
 	}
+	
+	/**
+	 * Draws the object to a Java2D viewport
+	 * 
+	 * @param obj the object being drawn
+	 * @param vp the viewport
+	 */
+	public abstract void doDraw(Object obj, ViewportJ2D vp);
+	
+	/**
+	 * Draws the object to an OpenGL viewport
+	 * 
+	 * @param obj the object being drawn
+	 * @param vp the viewport
+	 */
+	public abstract void doDraw(Object obj, ViewportJOGL vp);
 	
 	/**
 	 * Sets the draw condition.

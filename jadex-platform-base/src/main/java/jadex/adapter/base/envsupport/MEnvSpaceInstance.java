@@ -94,19 +94,22 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		
 		if(ret instanceof Space2D) // Hack?
 		{
-			IVector2 areasize;
-			List dims = spacetype.getPropertyList("dimensions");
-			Number dim1 = (Number)dims.get(0);
-			Number dim2 = (Number)dims.get(1);
+//			IVector2 areasize;
+//			List dims = spacetype.getPropertyList("dimensions");
+//			Number dim1 = (Number)dims.get(0);
+//			Number dim2 = (Number)dims.get(1);
+//			
+//			if(dim1 instanceof Integer)
+//				areasize = new Vector2Double(dim1.doubleValue(), dim2.doubleValue());
+//			else if(dim2 instanceof Double)
+//				areasize = new Vector2Int(dim1.intValue(), dim2.intValue());
+//			else
+//				throw new RuntimeException("Dimension class not supported: "+dim1);
 			
-			if(dim1 instanceof Integer)
-				areasize = new Vector2Double(dim1.doubleValue(), dim2.doubleValue());
-			else if(dim2 instanceof Double)
-				areasize = new Vector2Int(dim1.intValue(), dim2.intValue());
-			else
-				throw new RuntimeException("Dimension class not supported: "+dim1);
+			Double width = getProperty(properties, "width")!=null? (Double)getProperty(properties, "width"): (Double)getProperty(spacetype.getProperties(), "width");
+			Double height = getProperty(properties, "height")!=null? (Double)getProperty(properties, "height"): (Double)getProperty(spacetype.getProperties(), "height");
 			
-			((Space2D)ret).setAreaSize(areasize);
+			((Space2D)ret).setAreaSize(Vector2Double.getVector2(width, height));
 		}
 		
 		// Create space actions.

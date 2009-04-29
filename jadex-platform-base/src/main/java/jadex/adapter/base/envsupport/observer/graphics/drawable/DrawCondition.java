@@ -4,7 +4,7 @@ import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 
 public abstract class DrawCondition
 {
-	private Object object;
+	public Object object;
 	
 	/**
 	 * Evaluates the condition.

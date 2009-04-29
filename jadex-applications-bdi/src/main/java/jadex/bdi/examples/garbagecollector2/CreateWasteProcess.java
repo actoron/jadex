@@ -69,7 +69,10 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 		
 		double	delta	= clock.getTick() - lasttick;
 		
-		if(delta>2)
+		int rate = getProperty("rate")!=null? 
+			((Integer)getProperty("rate")).intValue(): 5;
+		
+		if(delta>rate)
 		{
 			lasttick	= clock.getTick();
 		

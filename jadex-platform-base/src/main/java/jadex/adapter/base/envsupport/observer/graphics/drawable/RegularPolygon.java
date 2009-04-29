@@ -42,9 +42,9 @@ public class RegularPolygon extends ColoredPrimitive
 	 * @param c the drawable's color
 	 * @param vertices number of vertices (corners)
 	 */
-	public RegularPolygon(Object position, Object rotation, Object size, Color c, int vertices)
+	public RegularPolygon(Object position, Object rotation, Object size, Color c, int vertices, DrawCondition drawcondition)
 	{
-		super(position, rotation, size, c);
+		super(position, rotation, size, c, drawcondition);
 		vertices_ = vertices;
 	}
 
@@ -92,9 +92,8 @@ public class RegularPolygon extends ColoredPrimitive
 		dList_ = list.intValue();
 	}
 
-	public void draw(Object obj, ViewportJ2D vp)
+	public void doDraw(Object obj, ViewportJ2D vp)
 	{
-		super.draw(obj, vp);
 		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
 		if (!setupMatrix(obj, g))
@@ -104,9 +103,8 @@ public class RegularPolygon extends ColoredPrimitive
 		g.setTransform(transform);
 	}
 
-	public void draw(Object obj, ViewportJOGL vp)
+	public void doDraw(Object obj, ViewportJOGL vp)
 	{
-		super.draw(obj, vp);
 		GL gl = vp.getContext();
 		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
