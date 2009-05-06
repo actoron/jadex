@@ -53,6 +53,9 @@ import javax.media.opengl.glu.GLU;
  */
 public class ViewportJOGL extends AbstractViewport
 {
+	/** Minimum canvas size */
+	private static final int MIN_SIZE = 32;
+	
 	/** Clamped texture cache. */
 	private Map					clampedTextureCache_;
 
@@ -398,6 +401,11 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		public void display(GLAutoDrawable drawable)
 		{
+			if ((canvas_.getWidth() < MIN_SIZE) ||
+				(canvas_.getHeight() < MIN_SIZE))
+			{
+				return;
+			}
 			GL gl = drawable.getGL();
 			
 			setupMatrix(gl);
@@ -524,6 +532,11 @@ public class ViewportJOGL extends AbstractViewport
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 				int height)
 		{
+			if ((canvas_.getWidth() < MIN_SIZE) ||
+				(canvas_.getHeight() < MIN_SIZE))
+			{
+				return;
+			}
 			GL gl = drawable.getGL();
 			setSize(size_);
 			setupMatrix(gl);
@@ -535,8 +548,8 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		public void display()
 		{
-			if ((getWidth() < 1) ||
-				(getHeight() < 1))
+			if ((getWidth() < MIN_SIZE) ||
+				(getHeight() < MIN_SIZE))
 			{
 				return;
 			}
