@@ -127,9 +127,8 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	{
 		
 		IPerspective p = observerCenter_.getSelectedPerspective();
-		Object observedId = p.getSelectedObject();
-		IDataView dataview = observerCenter_.getSelectedDataView();
-		if ((observedId == null) || (dataview == null))
+		Object observedObj = p.getSelectedObject();
+		if (observedObj == null)
 		{
 			idLabel_.setText("");
 			typeLabel_.setText("");
@@ -137,7 +136,6 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 			return;
 		}
 		
-		Object observedObj = dataview.getObject(observedId);
 		Set propNames = SObjectInspector.getPropertyNames(observedObj);
 		String type = SObjectInspector.getType(observedObj).toString();
 		if ((propNames == null) || (type == null))
@@ -146,7 +144,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 			return;
 		}
 		
-		idLabel_.setText(observedId.toString());
+		idLabel_.setText(String.valueOf(SObjectInspector.getId(observedObj)));
 		typeLabel_.setText(type);
 		Object[][] dataSet = new Object[propNames.size()][2];
 		int i = 0;

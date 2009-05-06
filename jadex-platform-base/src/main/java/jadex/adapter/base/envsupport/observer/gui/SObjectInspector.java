@@ -23,6 +23,30 @@ import jadex.commons.IPropertyObject;
 public class SObjectInspector
 {
 	/**
+	 * Retrieves the id of an object.
+	 * @param obj the object being inspected
+	 * @return the id
+	 */
+	public static Object getId(Object obj)
+	{
+		if (obj instanceof ISpaceObject)
+		{
+			return ((ISpaceObject) obj).getId();
+		}
+		Object ret;
+		ret = getProperty(obj, "id");
+		if (ret == null)
+		{
+			ret = getProperty(obj, "name");
+		}
+		if (ret == null)
+		{
+			ret = obj.toString();
+		}
+		return ret;
+	}
+	
+	/**
 	 * Retrieves the type of an object.
 	 * @param obj the object being inspected
 	 * @return the type

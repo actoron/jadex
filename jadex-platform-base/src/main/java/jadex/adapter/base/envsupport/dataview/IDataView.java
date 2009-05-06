@@ -25,12 +25,6 @@ public interface IDataView
 	public String getType();
 	
 	/**
-	 * Returns an object in this view using an identifier
-	 * @return identified object or null if not found
-	 */
-	public Object getObject(Object identifier);
-	
-	/**
 	 * Returns a list of objects in this view
 	 * @return list of objects
 	 */

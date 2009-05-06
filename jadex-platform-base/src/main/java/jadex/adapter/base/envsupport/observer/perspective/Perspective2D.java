@@ -1,10 +1,6 @@
 package jadex.adapter.base.envsupport.observer.perspective;
 
 import jadex.adapter.base.envsupport.dataview.IDataView;
-import jadex.adapter.base.envsupport.dataview.IDataView2D;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
@@ -13,7 +9,6 @@ import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.IViewportListener;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
-import jadex.adapter.base.envsupport.observer.graphics.YOrder;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
@@ -29,10 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JFrame;
 
@@ -386,18 +379,13 @@ public class Perspective2D implements IPerspective
 					objectList.add(viewObj);
 				}
 
-				Object mObj = null;
 				if (selectedobject != null)
 				{
-					mObj = dataview.getObject(selectedobject);
-				}
-				if (mObj != null)
-				{
-					Object size = ((DrawableCombiner)visuals.get(SObjectInspector.getType(mObj))).getSize();
-					size = SObjectInspector.getVector2(mObj, size).copy().multiply(2.0);
+					Object size = ((DrawableCombiner)visuals.get(SObjectInspector.getType(selectedobject))).getSize();
+					size = SObjectInspector.getVector2(selectedobject, size).copy().multiply(2.0);
 					Object[] viewObj = new Object[2];
 					marker.setSize((IVector2) size);
-					viewObj[0] = mObj;
+					viewObj[0] = selectedobject;
 					viewObj[1] = marker;
 					objectList.add(viewObj);
 				}
@@ -470,10 +458,29 @@ public class Perspective2D implements IPerspective
 		public void leftClicked(IVector2 position)
 		{
 			IDataView dataview = obscenter.getSelectedDataView();
-			if ((dataview == null) || (!(dataview instanceof IDataView2D)))
+			if (dataview == null)
 				return;
 			position = position.copy().subtract(objectShift);
-			selectedobject = ((IDataView2D) dataview).getNearestObjectId(position, selectorDistance);
+			
+			IVector1 minDist = null;
+			Object closest = null;
+			Object[] objects = dataview.getObjects();
+			for (int i = 0; i < objects.length; ++i)
+			{
+				DrawableCombiner d = (DrawableCombiner) visuals.get(SObjectInspector.getType(objects[i]));
+				Object pBind = d.getPosition();
+				IVector2 objPos = SObjectInspector.getVector2(objects[i], pBind);
+				if ((closest == null) || (position.getDistance(objPos).less(minDist)))
+				{
+					closest = objects[i];
+					minDist = position.getDistance(objPos);
+				}
+			}
+			
+			if ((closest != null) && (minDist.less(selectorDistance)))
+			{
+				selectedobject = closest;
+			}
 		}
 		
 		public void rightClicked(IVector2 position)

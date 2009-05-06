@@ -28,9 +28,13 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	 */
 	private JPanel mainPanel_;
 	
-	/** The themes
+	/** The perspectives
 	 */
 	private JList perspectivelist;
+	
+	/** The dataviews
+	 */
+	private JList dataviewlist;
 	
 	/** The observer center
 	 */
@@ -39,6 +43,10 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	/** The perspective selection controller
 	 */
 	private ListSelectionListener perspectiveController_;
+	
+	/** The dataview selection controller
+	 */
+	private ListSelectionListener dataviewController_;
 	
 	public VisualsPlugin()
 	{
@@ -50,7 +58,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		JPanel perspectivePanel = new JPanel(new GridBagLayout());
 		perspectivePanel.setBorder(new TitledBorder("Perspective"));
 		perspectivelist = new JList(new DefaultComboBoxModel());
-		JScrollPane themeScrollPane = new JScrollPane(perspectivelist);
+		JScrollPane perspectiveScrollPane = new JScrollPane(perspectivelist);
 		perspectiveController_ = new ListSelectionListener()
 		{
 			public void valueChanged(ListSelectionEvent e)
@@ -65,8 +73,8 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.weighty = 1.0;
 		c.weightx = 1.0;
 		c.anchor = GridBagConstraints.CENTER;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		perspectivePanel.add(themeScrollPane, c);
+		c.fill = GridBagConstraints.BOTH;
+		perspectivePanel.add(perspectiveScrollPane, c);
 		
 		c = new GridBagConstraints();
 		c.gridx = 0;
@@ -74,8 +82,38 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.weighty = 1.0;
 		c.weightx = 1.0;
 		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.BOTH;
 		mainPanel_.add(perspectivePanel, c);
+		
+		JPanel dataviewPanel = new JPanel(new GridBagLayout());
+		dataviewPanel.setBorder(new TitledBorder("Dataview"));
+		dataviewlist = new JList(new DefaultComboBoxModel());
+		JScrollPane dataviewScrollPane = new JScrollPane(dataviewlist);
+		dataviewController_ = new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				String selection = (String) dataviewlist.getSelectedValue();
+				observerCenter_.setSelectedDataView(selection);
+			}
+		};
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.BOTH;
+		dataviewPanel.add(dataviewScrollPane, c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.BOTH;
+		mainPanel_.add(dataviewPanel, c);
 	}
 	
 	/** Starts the plugin
@@ -99,6 +137,19 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		
 		perspectivelist.addListSelectionListener(perspectiveController_);
 		
+		Map dataviews = observerCenter_.getDataViews();
+		synchronized(dataviews)
+		{
+			Set dataviewnames = dataviews.keySet();
+			for (Iterator it = dataviewnames.iterator(); it.hasNext(); )
+			{
+				String name = (String) it.next();
+				((DefaultComboBoxModel) dataviewlist.getModel()).addElement(name);
+			}
+		}
+		
+		dataviewlist.addListSelectionListener(dataviewController_);
+		
 		refresh();
 		
 		
@@ -111,6 +162,8 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	{
 		perspectivelist.removeListSelectionListener(perspectiveController_);
 		((DefaultComboBoxModel) perspectivelist.getModel()).removeAllElements();
+		dataviewlist.removeListSelectionListener(dataviewController_);
+		((DefaultComboBoxModel) dataviewlist.getModel()).removeAllElements();
 	}
 	
 	/** Returns the name of the plugin
@@ -146,5 +199,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	{
 		String selection = observerCenter_.getSelectedPerspective().getName();
 		perspectivelist.setSelectedValue(selection, true);
+		selection = observerCenter_.getSelectedDataViewName();
+		dataviewlist.setSelectedValue(selection, true);
 	}
 }
