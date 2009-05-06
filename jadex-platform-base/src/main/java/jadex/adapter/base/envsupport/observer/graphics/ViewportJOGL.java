@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
@@ -75,9 +76,6 @@ public class ViewportJOGL extends AbstractViewport
 	
 	/** Current OpenGL rendering context */
 	private GL context_;
-	
-	/** GLU library */
-	private GLU glu;
 
 	/**
 	 * Creates a new OpenGL-based viewport. May throw UnsatisfiedLinkError and
@@ -90,7 +88,6 @@ public class ViewportJOGL extends AbstractViewport
 	public ViewportJOGL(ILibraryService libService)
 	{
 		super();
-		glu = new GLU();
 		libService_ = libService;
 		uninitialized_ = true;
 		valid_ = false;
@@ -223,6 +220,15 @@ public class ViewportJOGL extends AbstractViewport
 	public GL getContext()
 	{
 		return context_;
+	}
+	
+	/**
+	 * Returns the padded size
+	 * @return padded size
+	 */
+	public IVector2 getPaddedSize()
+	{
+		return paddedSize_;
 	}
 
 	private void setupMatrix(GL gl)
@@ -482,6 +488,7 @@ public class ViewportJOGL extends AbstractViewport
 
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glDisable(GL.GL_DEPTH_TEST);
 
 			setupMatrix(gl);
 			setupTexMatrix(gl);

@@ -89,6 +89,13 @@ public interface IVector2
 	 */
 	public IVector2 multiply(IVector2 vector);
 	
+	/** Performs a division on the vector.
+	 *
+	 *  @param vector vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector2 divide(IVector2 vector);
+	
 	/** Sets all vector components to zero.
 	 *
 	 *  @return a reference to the called vector (NOT a copy)

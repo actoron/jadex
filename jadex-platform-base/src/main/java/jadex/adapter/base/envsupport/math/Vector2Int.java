@@ -180,6 +180,18 @@ public class Vector2Int implements IVector2
 		return this;
 	}
 	
+	/** Performs a division on the vector.
+	 *
+	 *  @param vector vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector2 divide(IVector2 vector)
+	{
+		x_ /= vector.getXAsInteger();
+		y_ /= vector.getYAsInteger();
+		return this;
+	}
+	
 	/** Sets all vector components to zero.
 	 *
 	 *  @return a reference to the called vector (NOT a copy)

@@ -135,6 +135,17 @@ public class SynchronizedVector2Wrapper implements IVector2
 		return this;
 	}
 	
+	/** Performs a division on the vector.
+	 *
+	 *  @param vector vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public synchronized IVector2 divide(IVector2 vector)
+	{
+		vector_.divide(vector);
+		return this;
+	}
+	
 	/** Sets all vector components to zero.
 	 *
 	 *  @return a reference to the called vector (NOT a copy)

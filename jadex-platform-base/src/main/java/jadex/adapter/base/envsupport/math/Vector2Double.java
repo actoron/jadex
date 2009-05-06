@@ -133,6 +133,18 @@ public class Vector2Double implements IVector2, Cloneable
 		return this;
 	}
 	
+	/** Performs a division on the vector.
+	 *
+	 *  @param vector vector
+	 *  @return a reference to the called vector (NOT a copy)
+	 */
+	public IVector2 divide(IVector2 vector)
+	{
+		x_ /= vector.getXAsDouble();
+		y_ /= vector.getYAsDouble();
+		return this;
+	}
+	
 	public IVector2 zero()
 	{
 		x_ = 0.0;

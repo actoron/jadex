@@ -2,12 +2,14 @@ package jadex.adapter.base.envsupport.observer.graphics.layer;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
@@ -120,21 +122,29 @@ public class GridLayer implements ILayer
 	public void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
 		gl.glColor4fv(oglColor_, 0);
-
-		gl.glBegin(gl.GL_LINES);
-		for(float x = 0.0f; !(x > areaSize.getXAsFloat()); x = x
-				+ gridSize_.getXAsFloat())
+		
+		IVector2 pixSize = vp.getPaddedSize().copy().divide(new Vector2Double(vp.getCanvas().getWidth(), vp.getCanvas().getHeight()));
+		
+		gl.glBegin(GL.GL_QUADS);
+		
+		IVector2 step = areaSize.copy().subtract(pixSize).divide(areaSize.copy().divide(gridSize_));
+		
+		for (float x = 0.0f; x < areaSize.getXAsFloat(); x = x + step.getXAsFloat())
 		{
 			gl.glVertex2f(x, 0.0f);
 			gl.glVertex2f(x, areaSize.getYAsFloat());
+			gl.glVertex2f(x + pixSize.getXAsFloat(), areaSize.getYAsFloat());
+			gl.glVertex2f(x + pixSize.getXAsFloat(), 0.0f);
 		}
-
-		for(float y = 0.0f; !(y > areaSize.getYAsFloat()); y = y
-				+ gridSize_.getYAsFloat())
+		
+		for (float y = 0.0f; y < areaSize.getYAsFloat(); y = y + step.getYAsFloat())
 		{
 			gl.glVertex2f(0.0f, y);
 			gl.glVertex2f(areaSize.getXAsFloat(), y);
+			gl.glVertex2f(areaSize.getXAsFloat(), y + pixSize.getXAsFloat());
+			gl.glVertex2f(0.0f, y + pixSize.getXAsFloat());
 		}
+		
 		gl.glEnd();
 	}
 
