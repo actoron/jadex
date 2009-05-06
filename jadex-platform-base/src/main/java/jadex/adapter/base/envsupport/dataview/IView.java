@@ -1,4 +1,4 @@
-package jadex.adapter.base.envsupport.environment.view;
+package jadex.adapter.base.envsupport.dataview;
 
 import java.util.List;
 

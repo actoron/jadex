@@ -1,6 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.envsupport.environment.view.IView;
+import jadex.adapter.base.envsupport.dataview.IView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;

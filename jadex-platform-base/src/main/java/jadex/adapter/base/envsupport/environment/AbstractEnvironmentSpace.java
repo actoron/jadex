@@ -1,7 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.IContext;
-import jadex.adapter.base.envsupport.environment.view.IView;
+import jadex.adapter.base.envsupport.dataview.IView;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 

@@ -1,4 +1,4 @@
-package jadex.adapter.base.envsupport.environment.view;
+package jadex.adapter.base.envsupport.dataview;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
