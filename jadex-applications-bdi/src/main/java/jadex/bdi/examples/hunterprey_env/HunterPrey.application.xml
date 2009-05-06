@@ -22,9 +22,7 @@
 	</imports>
 	
 	<spacetypes>
-		<env:envspacetype name="2dspace" class="Grid2D">
-			<env:dimension>30</env:dimension>
-			<env:dimension>30</env:dimension>
+		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
 
 			<env:actiontypes>
 				<env:agentactiontype name="move" class="MoveAction" />
@@ -111,6 +109,23 @@
 					<env:object type="prey" owner="Dummy1"/>
 				</env:objects>
 
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
+						<env:plugins>
+						</env:plugins>
+					</env:observer>
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="Empty">			
+			<env:envspace name="my2dspace" type="2dspace">
 				<env:initactions>
 					<env:spaceaction type="create_obstacles">
 						<env:parameter name="count">125</env:parameter>
