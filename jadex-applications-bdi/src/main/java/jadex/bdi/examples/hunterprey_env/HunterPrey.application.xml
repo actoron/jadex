@@ -18,7 +18,7 @@
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.adapter.base.envsupport.math.Vector1Long</import>
 		<import>jadex.bridge.IClockService</import>
-		<import>jadex.adapter.base.envsupport.environment.view.GeneralView2D</import>
+		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D</import>
 	</imports>
 	
 	<spacetypes>
@@ -43,7 +43,7 @@
 			</env:perceptgeneratortypes>
  -->			
 			<env:views>
-				<env:view name="view_all" class="GeneralView2D" />
+				<env:view name="view_all" class="GeneralDataView2D" />
 			</env:views>
 
 			<env:perspectives>
