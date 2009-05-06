@@ -138,9 +138,9 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		}
 		
 		Object observedObj = dataview.getObject(observedId);
-		Map properties = SObjectInspector.getProperties(observedObj);
+		Set propNames = SObjectInspector.getPropertyNames(observedObj);
 		String type = SObjectInspector.getType(observedObj).toString();
-		if ((properties == null) || (type == null))
+		if ((propNames == null) || (type == null))
 		{
 			p.setSelectedObject(null);
 			return;
@@ -148,14 +148,13 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		
 		idLabel_.setText(observedId.toString());
 		typeLabel_.setText(type);
-		Set entries = properties.entrySet();
-		Object[][] dataSet = new Object[entries.size()][2];
+		Object[][] dataSet = new Object[propNames.size()][2];
 		int i = 0;
-		for (Iterator it = entries.iterator(); it.hasNext(); )
+		for (Iterator it = propNames.iterator(); it.hasNext(); )
 		{
-			Map.Entry entry = (Entry) it.next();
-			dataSet[i][0] = entry.getKey();
-			dataSet[i][1] = String.valueOf(entry.getValue());
+			String name = (String) it.next();
+			dataSet[i][0] = name;
+			dataSet[i][1] = String.valueOf(SObjectInspector.getProperty(observedObj, name));
 			++i;
 		}
 		DefaultTableModel model = (DefaultTableModel) propertyTable_.getModel();

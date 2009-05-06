@@ -7,8 +7,11 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import jadex.adapter.base.envsupport.environment.IDynamicValue;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -40,40 +43,31 @@ public class SObjectInspector
 	}
 	
 	/**
-	 * Retrieves all properties of an Object.
+	 * Retrieves the names of all properties of an Object.
 	 * @param obj the object being inspected
-	 * @return map the properties
+	 * @return the property names
 	 */
-	public static Map getProperties(Object obj)
+	public static Set getPropertyNames(Object obj)
 	{
 		if (obj instanceof IPropertyObject)
 		{
-			return ((IPropertyObject) obj).getProperties(); 
+			return new HashSet(((IPropertyObject) obj).getProperties().keySet()); 
 		}
 		
-		HashMap ret = new HashMap();
+		HashSet ret = new HashSet();
 		try
 		{
 			BeanInfo info = Introspector.getBeanInfo(obj.getClass());
 			PropertyDescriptor[] descs = info.getPropertyDescriptors();
 			for (int i = 0; i < descs.length; ++i)
 			{
-				String name = descs[i].getName();
-				Method getter = descs[i].getReadMethod();
-				Object val = getter.invoke(obj, (Object[]) null);
-				ret.put(name, val);
+				ret.add(descs[i].getName());
 			}
 		}
 		catch (IntrospectionException e)
 		{
 		}
 		catch (IllegalArgumentException e)
-		{
-		}
-		catch (IllegalAccessException e)
-		{
-		}
-		catch (InvocationTargetException e)
 		{
 		}
 		return ret;
@@ -87,37 +81,48 @@ public class SObjectInspector
 	 */
 	public static Object getProperty(Object obj, String name)
 	{
+		Object ret = null;
 		if (obj instanceof IPropertyObject)
 		{
-			return ((IPropertyObject) obj).getProperty(name); 
+			ret = ((IPropertyObject) obj).getProperty(name); 
 		}
 		
-		try
+		if (ret == null)
 		{
-			BeanInfo info = Introspector.getBeanInfo(obj.getClass());
-			PropertyDescriptor[] descs = info.getPropertyDescriptors();
-			for (int i = 0; i < descs.length; ++i)
+			try
 			{
-				if (descs[i].getName().equals(name))
+				BeanInfo info = Introspector.getBeanInfo(obj.getClass());
+				PropertyDescriptor[] descs = info.getPropertyDescriptors();
+				for (int i = 0; i < descs.length; ++i)
 				{
-					Method getter = descs[i].getReadMethod();
-					return getter.invoke(obj, (Object[]) null);
+					if (descs[i].getName().equals(name))
+					{
+						Method getter = descs[i].getReadMethod();
+						return getter.invoke(obj, (Object[]) null);
+					}
 				}
 			}
+			catch (IntrospectionException e)
+			{
+			}
+			catch (IllegalArgumentException e)
+			{
+			}
+			catch (IllegalAccessException e)
+			{
+			}
+			catch (InvocationTargetException e)
+			{
+			}
 		}
-		catch (IntrospectionException e)
+		
+		if (ret instanceof IDynamicValue)
 		{
+			ret = ((IDynamicValue) ret).getValue();
 		}
-		catch (IllegalArgumentException e)
-		{
-		}
-		catch (IllegalAccessException e)
-		{
-		}
-		catch (InvocationTargetException e)
-		{
-		}
-		return null;
+		
+		return ret;
+		
 	}
 	
 	/**

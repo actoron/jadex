@@ -533,6 +533,16 @@ public class ViewportJOGL extends AbstractViewport
 
 	private class ResizeableGLCanvas extends GLCanvas
 	{
+		public void display()
+		{
+			if ((getWidth() < 1) ||
+				(getHeight() < 1))
+			{
+				return;
+			}
+			super.display();
+		}
+		
 		public ResizeableGLCanvas(GLCapabilities caps)
 		{
 			super(caps);
