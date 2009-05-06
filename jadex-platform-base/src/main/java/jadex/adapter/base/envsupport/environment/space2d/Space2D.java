@@ -149,7 +149,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	}
 	
 	/**
-	 * Returns the ID of the nearest object to the given position within a
+	 * Returns the nearest object to the given position within a
 	 * maximum distance from the position.
 	 * 
 	 * @param position position the object should be nearest to

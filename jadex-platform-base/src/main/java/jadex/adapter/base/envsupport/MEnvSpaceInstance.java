@@ -226,7 +226,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				viewargs.put("sourceview", sourceview);
 				viewargs.put("space", ret);
 				
-				ret.addView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
+				ret.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
 			}
 		}
 		

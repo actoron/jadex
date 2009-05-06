@@ -147,30 +147,30 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	public ISpaceObject[] getOwnedObjects(Object owner);
 	
 	/**
-	 * Adds a view to the space.
+	 * Adds a dataview to the space.
 	 * @param name name of the view
 	 * @param view the view
 	 */
-	public void addView(String name, IDataView view);
+	public void addDataView(String name, IDataView view);
 	
 	/**
-	 * Removes a view from the space.
-	 * @param name name of the view
+	 * Removes a dataview from the space.
+	 * @param name name of the dataview
 	 */
-	public void removeView(String name);
+	public void removeDataView(String name);
 	
 	/**
-	 * Gets a specific view.
-	 * @param name name of the view
-	 * @return the view
+	 * Gets a specific dataview.
+	 * @param name name of the dataview
+	 * @return the dataview
 	 */
-	public IDataView getView(String name);
+	public IDataView getDataView(String name);
 	
 	/**
-	 * Get all available views in this space.
-	 * @return list of view names
+	 * Get all available dataviews in this space.
+	 * @return all available dataviews
 	 */
-	public List getViewNames();
+	public Map getDataViews();
 	
 	/** 
 	 * Steps the space. May be non-functional in spaces that do not have

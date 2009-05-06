@@ -6,7 +6,10 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.commons.IPropertyObject;
@@ -16,6 +19,66 @@ import jadex.commons.IPropertyObject;
  */
 public class SObjectInspector
 {
+	/**
+	 * Retrieves the type of an object.
+	 * @param obj the object being inspected
+	 * @return the type
+	 */
+	public static Object getType(Object obj)
+	{
+		if (obj instanceof ISpaceObject)
+		{
+			return ((ISpaceObject) obj).getType();
+		}
+		Object ret;
+		ret = getProperty(obj, "type");
+		if (ret == null)
+		{
+			ret = obj.getClass().getName();
+		}
+		return ret;
+	}
+	
+	/**
+	 * Retrieves all properties of an Object.
+	 * @param obj the object being inspected
+	 * @return map the properties
+	 */
+	public static Map getProperties(Object obj)
+	{
+		if (obj instanceof IPropertyObject)
+		{
+			return ((IPropertyObject) obj).getProperties(); 
+		}
+		
+		HashMap ret = new HashMap();
+		try
+		{
+			BeanInfo info = Introspector.getBeanInfo(obj.getClass());
+			PropertyDescriptor[] descs = info.getPropertyDescriptors();
+			for (int i = 0; i < descs.length; ++i)
+			{
+				String name = descs[i].getName();
+				Method getter = descs[i].getReadMethod();
+				Object val = getter.invoke(obj, (Object[]) null);
+				ret.put(name, val);
+			}
+		}
+		catch (IntrospectionException e)
+		{
+		}
+		catch (IllegalArgumentException e)
+		{
+		}
+		catch (IllegalAccessException e)
+		{
+		}
+		catch (InvocationTargetException e)
+		{
+		}
+		return ret;
+	}
+	
 	/**
 	 * Retrieves a property from an IPropertyObject.
 	 * @param obj the object being inspected

@@ -1,5 +1,7 @@
 package jadex.adapter.base.envsupport.observer.perspective;
 
+import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.envsupport.dataview.IDataView2D;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -236,7 +238,7 @@ public class Perspective2D implements IPerspective
 				marker.addDrawable(markerDrawable, Integer.MAX_VALUE);
 			}
 			viewport = createViewport(obscenter.getLibraryService(), tryopengl);
-			viewport.setSize(((Space2D)(obscenter.getSpace())).getAreaSize().copy());
+			viewport.setSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);
 		}
 		return viewport.getCanvas();
@@ -348,7 +350,8 @@ public class Perspective2D implements IPerspective
 	 */
 	public void refresh()
 	{
-		if (obscenter.getSpace() == null)
+		final IDataView dataview = obscenter.getSelectedDataView();
+		if (dataview == null)
 		{
 			return;
 		}
@@ -362,62 +365,54 @@ public class Perspective2D implements IPerspective
 				viewport.setObjectShift(objectShift);
 				
 				// Set pre- and postlayers
-				IEnvironmentSpace space = obscenter.getSpace();
 				viewport.setPreLayers(prelayers);
 				viewport.setPostLayers(postlayers);
 				
-				List viewnames = space.getViewNames();
-				if(viewnames!=null)
+				Object[] objects = dataview.getObjects();
+
+				List objectList = null;
+				objectList = new ArrayList(objects.length + 1);
+				for (int j = 0; j < objects.length; ++j )
 				{
-					for(int i=0; i<viewnames.size(); i++)
+					Object obj = objects[j];
+					DrawableCombiner d = (DrawableCombiner) visuals.get(SObjectInspector.getType(obj));
+					if (d == null)
 					{
-						Object[] objects = space.getView((String)viewnames.get(i)).getObjects();
-						
-						List objectList = null;
-						objectList = new ArrayList(objects.length + 1);
-						for (int j = 0; j < objects.length; ++j )
-						{
-							ISpaceObject obj = (ISpaceObject) objects[j];
-							DrawableCombiner d = (DrawableCombiner) visuals.get(obj.getType());
-							if (d == null)
-							{
-								continue;
-							}
-							Object[] viewObj = new Object[2];
-							viewObj[0] = obj;
-							viewObj[1] = d;
-							objectList.add(viewObj);
-						}
-						
-						ISpaceObject mObj = null;
-						if (selectedobject != null)
-						{
-							mObj = (ISpaceObject) space.getSpaceObject(selectedobject);
-						}
-						if (mObj != null)
-						{
-							Object size = ((DrawableCombiner)visuals.get(mObj.getType())).getSize();
-							size = SObjectInspector.getVector2(mObj, size).copy().multiply(2.0);
-							Object[] viewObj = new Object[2];
-							marker.setSize((IVector2) size);
-							viewObj[0] = mObj;
-							viewObj[1] = marker;
-							objectList.add(viewObj);
-						}
-						else
-						{
-							selectedobject = null;
-						}
-						
-						if (displayorder != null)
-						{
-							Collections.sort(objectList, displayorder);
-						}
-						
-						viewport.setObjectList(objectList);
-						viewport.refresh();
+						continue;
 					}
+					Object[] viewObj = new Object[2];
+					viewObj[0] = obj;
+					viewObj[1] = d;
+					objectList.add(viewObj);
 				}
+
+				Object mObj = null;
+				if (selectedobject != null)
+				{
+					mObj = dataview.getObject(selectedobject);
+				}
+				if (mObj != null)
+				{
+					Object size = ((DrawableCombiner)visuals.get(SObjectInspector.getType(mObj))).getSize();
+					size = SObjectInspector.getVector2(mObj, size).copy().multiply(2.0);
+					Object[] viewObj = new Object[2];
+					marker.setSize((IVector2) size);
+					viewObj[0] = mObj;
+					viewObj[1] = marker;
+					objectList.add(viewObj);
+				}
+				else
+				{
+					selectedobject = null;
+				}
+
+				if (displayorder != null)
+				{
+					Collections.sort(objectList, displayorder);
+				}
+
+				viewport.setObjectList(objectList);
+				viewport.refresh();
 			}
 		});
 	}
@@ -474,10 +469,11 @@ public class Perspective2D implements IPerspective
 	{
 		public void leftClicked(IVector2 position)
 		{
+			IDataView dataview = obscenter.getSelectedDataView();
+			if ((dataview == null) || (!(dataview instanceof IDataView2D)))
+				return;
 			position = position.copy().subtract(objectShift);
-			((Space2D) obscenter.getSpace()).getNearestObject(position, selectorDistance);
-			ISpaceObject obj = ((Space2D) obscenter.getSpace()).getNearestObject(position, selectorDistance);
-			selectedobject = obj.getId();
+			selectedobject = ((IDataView2D) dataview).getNearestObjectId(position, selectorDistance);
 		}
 		
 		public void rightClicked(IVector2 position)

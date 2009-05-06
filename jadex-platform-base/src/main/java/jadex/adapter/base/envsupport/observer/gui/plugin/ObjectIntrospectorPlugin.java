@@ -1,8 +1,10 @@
 package jadex.adapter.base.envsupport.observer.gui.plugin;
 
+import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
+import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 
 import java.awt.BorderLayout;
@@ -126,16 +128,18 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		
 		IPerspective p = observerCenter_.getSelectedPerspective();
 		Object observedId = p.getSelectedObject();
-		if (observedId == null)
+		IDataView dataview = observerCenter_.getSelectedDataView();
+		if ((observedId == null) || (dataview == null))
 		{
 			idLabel_.setText("");
 			typeLabel_.setText("");
 			propertyTable_.setModel(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 			return;
 		}
-		IEnvironmentSpace space = observerCenter_.getSpace();
-		Map properties = space.getSpaceObject(observedId).getProperties();
-		String type = space.getSpaceObject(observedId).getType().toString();
+		
+		Object observedObj = dataview.getObject(observedId);
+		Map properties = SObjectInspector.getProperties(observedObj);
+		String type = SObjectInspector.getType(observedObj).toString();
 		if ((properties == null) || (type == null))
 		{
 			p.setSelectedObject(null);

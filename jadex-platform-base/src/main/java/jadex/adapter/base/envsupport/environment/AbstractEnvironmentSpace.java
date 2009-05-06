@@ -451,7 +451,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * @param name name of the view
 	 * @param view the view
 	 */
-	public void addView(String name, IDataView view)
+	public void addDataView(String name, IDataView view)
 	{
 		synchronized (monitor)
 		{
@@ -463,7 +463,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * Removes a view from the space.
 	 * @param name name of the view
 	 */
-	public void removeView(String name)
+	public void removeDataView(String name)
 	{
 		synchronized (monitor)
 		{
@@ -476,7 +476,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * @param name name of the view
 	 * @return the view
 	 */
-	public IDataView getView(String name)
+	public IDataView getDataView(String name)
 	{
 		synchronized (monitor)
 		{
@@ -485,14 +485,14 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	}
 	
 	/**
-	 * Get all available views in this space.
-	 * @return list of view names
+	 * Get all available dataviews in this space.
+	 * @return all available dataviews
 	 */
-	public List getViewNames()
+	public Map getDataViews()
 	{
 		synchronized (monitor)
 		{
-			return new ArrayList(views.keySet());
+			return new HashMap(views);
 		}
 	}
 	

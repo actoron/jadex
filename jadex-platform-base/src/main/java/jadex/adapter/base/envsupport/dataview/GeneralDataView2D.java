@@ -2,12 +2,14 @@ package jadex.adapter.base.envsupport.dataview;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector2;
 
 /**
  * A general 2D view that presents all Objects in a Space2D to the observer.
  *
  */
-public class GeneralDataView2D implements IDataView
+public class GeneralDataView2D implements IDataView2D
 {
 	/** The space the view is connected to */
 	protected Space2D space;
@@ -49,6 +51,19 @@ public class GeneralDataView2D implements IDataView
 	}
 	
 	/**
+	 * Returns an object in this view using an identifier
+	 * @return identified object or null if not found
+	 */
+	public Object getObject(Object identifier)
+	{
+		synchronized (monitor)
+		{
+			Space2D spc = (Space2D) space;
+			return spc.getSpaceObject(identifier);
+		}
+	}
+	
+	/**
 	 * Returns a list of objects in this view
 	 * @return list of objects
 	 */
@@ -79,4 +94,20 @@ public class GeneralDataView2D implements IDataView
 		}
 	}
 	
+	/**
+	 * Returns the ID of the nearest object to the given position within a
+	 * maximum distance from the position.
+	 * 
+	 * @param position position the object should be nearest to
+	 * @param maxDist maximum distance from the position, use null for unlimited distance
+	 * @return the ID of nearest object or null if none is found
+	 */
+	public Object getNearestObjectId(IVector2 position, IVector1 maxDist)
+	{
+		synchronized (monitor)
+		{
+			Space2D spc = (Space2D) space;
+			return spc.getNearestObject(position, maxDist).getId();
+		}
+	}
 }

@@ -1,6 +1,9 @@
 package jadex.adapter.base.envsupport.observer.gui;
 
+import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.ObjectIntrospectorPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.VisualsPlugin;
@@ -19,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -59,14 +63,21 @@ public class ObserverCenter
 	/** The library service */
 	private ILibraryService libService;
 	
-	/** The space that is being observed. */
-	private IEnvironmentSpace space;
+	/** Additional IDataView objects */
+	private Map dataviews;
+	
+	/** Selected dataview name */
+	private String selecteddataviewname;
 	
 	/** Perspectives */
 	private Map perspectives;
 	
 	/** Selected Perspective */
 	private IPerspective selectedperspective;
+	
+	//TODO: move to Perspective!
+	/** Area size of the space */
+	private IVector2 areasize;
 	
 	/** Creates an observer center.
 	 *  
@@ -77,10 +88,14 @@ public class ObserverCenter
 	 */
 	public ObserverCenter(final String windowTitle, final IEnvironmentSpace space, ILibraryService libSrvc, List customplugins)
 	{
+		areasize = ((Space2D)space).getAreaSize().copy();
 		perspectives = Collections.synchronizedMap(new HashMap());
+		dataviews = Collections.synchronizedMap(new HashMap());
 		final List cPlugins = customplugins == null? new ArrayList(): customplugins;
 		this.libService = libSrvc;
-		this.space = space;
+		dataviews.putAll(space.getDataViews());
+		if (!dataviews.isEmpty())
+			selecteddataviewname = (String) dataviews.keySet().iterator().next();
 		activeplugin = null;
 		Runnable init = new Runnable()
 			{
@@ -169,6 +184,75 @@ public class ObserverCenter
 		}
 	}
 	
+	//TODO:Move to Perspective!
+	/**
+	 * Returns the area size.
+	 * 
+	 * @return area size
+	 */
+	public IVector2 getAreaSize()
+	{
+		return areasize;
+	}
+	
+	/**
+	 * Adds an additional dataview.
+	 * @param name name of the dataview
+	 * @param dataview an additional dataview
+	 */
+	public void addDataView(String name, IDataView dataview)
+	{
+		synchronized (dataview)
+		{
+			dataviews.put(name, dataview);
+			if (selecteddataviewname == null)
+			{
+				selecteddataviewname = name;
+			}
+		}
+	}
+	
+	/**
+	 * Returns the available dataviews.
+	 * 
+	 *  @return the available dataviews
+	 */
+	public Map getDataViews()
+	{
+		return dataviews;
+	}
+	
+	
+	/**
+	 * Returns the selected dataview.
+	 * 
+	 *  @return the selected dataview
+	 */
+	public IDataView getSelectedDataView()
+	{
+		return (IDataView) dataviews.get(selecteddataviewname);
+	}
+	
+	/**
+	 * Returns the selected dataview name.
+	 * 
+	 *  @return the selected dataview name
+	 */
+	public String getSelectedDataViewName()
+	{
+		return selecteddataviewname;
+	}
+	
+	/**
+	 * Sets the selected dataview.
+	 * 
+	 *  @param name name of the dataview to be selected
+	 */
+	public void setSelectedDataView(String name)
+	{
+		selecteddataviewname = name;
+	}
+	
 	/**
 	 * Adds a perspective.
 	 * @param name name of the perspective
@@ -186,15 +270,6 @@ public class ObserverCenter
 				setSelectedPerspective(name);
 			}
 		}
-	}
-	
-	/** Returns access to the environment space
-	 * 
-	 *  @return simulation engine access
-	 */
-	public IEnvironmentSpace getSpace()
-	{
-		return space;
 	}
 	
 	/**
