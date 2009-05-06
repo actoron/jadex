@@ -8,7 +8,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 /**
  * View used by an observer to display part of the environment
  */
-public interface IView
+public interface IDataView
 {
 	// View Types //
 	public static final String SIMPLE_VIEW_2D = "Simple 2D View";

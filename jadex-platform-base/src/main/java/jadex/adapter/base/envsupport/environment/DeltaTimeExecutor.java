@@ -1,6 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.envsupport.dataview.IView;
+import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;
@@ -72,7 +72,7 @@ public class DeltaTimeExecutor
 					// Update the views.
 					for (Iterator it = space.getViews().iterator(); it.hasNext(); )
 					{
-						IView view = (IView) it.next();
+						IDataView view = (IDataView) it.next();
 						view.update(space);
 					}
 				}

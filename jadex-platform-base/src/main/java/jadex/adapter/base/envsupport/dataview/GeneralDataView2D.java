@@ -7,7 +7,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
  * A general 2D view that presents all Objects in a Space2D to the observer.
  *
  */
-public class GeneralView2D implements IView
+public class GeneralDataView2D implements IDataView
 {
 	/** The space the view is connected to */
 	protected Space2D space;
@@ -24,7 +24,7 @@ public class GeneralView2D implements IView
 	/**
 	 * Creates a general 2D view that presents all Objects in a Space2D to the observer.
 	 */
-	public GeneralView2D()
+	public GeneralDataView2D()
 	{
 		objects = new Object[0];
 		dirty = false;
@@ -45,7 +45,7 @@ public class GeneralView2D implements IView
 	 */
 	public String getType()
 	{
-		return IView.SIMPLE_VIEW_2D;
+		return IDataView.SIMPLE_VIEW_2D;
 	}
 	
 	/**

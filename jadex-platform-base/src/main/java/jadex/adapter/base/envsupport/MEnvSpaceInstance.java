@@ -4,7 +4,7 @@ import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.contextservice.ISpace;
-import jadex.adapter.base.envsupport.dataview.IView;
+import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
@@ -226,7 +226,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				viewargs.put("sourceview", sourceview);
 				viewargs.put("space", ret);
 				
-				ret.addView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
+				ret.addView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
 			}
 		}
 		

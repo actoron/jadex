@@ -2,7 +2,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
-import jadex.adapter.base.envsupport.dataview.IView;
+import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
@@ -151,7 +151,7 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @param name name of the view
 	 * @param view the view
 	 */
-	public void addView(String name, IView view);
+	public void addView(String name, IDataView view);
 	
 	/**
 	 * Removes a view from the space.
@@ -164,7 +164,7 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @param name name of the view
 	 * @return the view
 	 */
-	public IView getView(String name);
+	public IDataView getView(String name);
 	
 	/**
 	 * Get all available views in this space.

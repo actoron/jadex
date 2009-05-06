@@ -1,7 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.IContext;
-import jadex.adapter.base.envsupport.dataview.IView;
+import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
@@ -451,7 +451,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * @param name name of the view
 	 * @param view the view
 	 */
-	public void addView(String name, IView view)
+	public void addView(String name, IDataView view)
 	{
 		synchronized (monitor)
 		{
@@ -476,11 +476,11 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * @param name name of the view
 	 * @return the view
 	 */
-	public IView getView(String name)
+	public IDataView getView(String name)
 	{
 		synchronized (monitor)
 		{
-			return (IView) views.get(name);
+			return (IDataView) views.get(name);
 		}
 	}
 	

@@ -2,7 +2,7 @@ package jadex.adapter.base.envsupport;
 
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
-import jadex.adapter.base.envsupport.dataview.IView;
+import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector1;
@@ -174,7 +174,7 @@ public class MEnvSpaceType	extends MSpaceType
 //						}
 //					}
 					
-					IView ret = (IView)((Class)MEnvSpaceInstance.getProperty(sourceview, "clazz")).newInstance();
+					IDataView ret = (IDataView)((Class)MEnvSpaceInstance.getProperty(sourceview, "clazz")).newInstance();
 					ret.setSpace(space);
 					return ret;
 				}
