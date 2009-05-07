@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class MEnvSpaceInstance extends MSpaceInstance
 {
-//-------- attributes --------
+	//-------- attributes --------
 	
 	/** The properties. */
 	protected Map properties;
@@ -123,7 +123,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				List props = (List)maction.get("properties");
 				setProperties(action, props, fetcher);
 				
-				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
+//				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
 				ret.addSpaceAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
 			}
 		}
@@ -139,7 +139,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				List props = (List)maction.get("properties");
 				setProperties(action, props, fetcher);
 				
-				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
+//				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
 				ret.addAgentAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
 			}
 		}
@@ -155,7 +155,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				List props = (List)mprocess.get("properties");
 				setProperties(process, props, fetcher);
 				
-				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
+//				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
 				ret.addSpaceProcess(MEnvSpaceInstance.getProperty(mprocess, "name"), process);
 			}
 		}
@@ -171,7 +171,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				List props = (List)mgen.get("properties");
 				setProperties(gen, props, fetcher);
 				
-				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
+//				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
 				ret.addPerceptGenerator(MEnvSpaceInstance.getProperty(mgen, "name"), gen);
 			}
 		}
@@ -209,7 +209,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					}
 				}
 				
-				System.out.println("Performing initial space action: "+getProperty(action, "type"));
+//				System.out.println("Performing initial space action: "+getProperty(action, "type"));
 				ret.performSpaceAction(getProperty(action, "type"), params);
 			}
 		}

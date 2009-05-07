@@ -22,7 +22,7 @@ public class CheckingPlanEnv extends Plan
 		IVector2 mypos = (IVector2)getBeliefbase().getBelief("pos").getFact();
 		IVector2 newpos = computeNextPosition(mypos, size.getXAsInteger(), size.getYAsInteger());
 
-		System.out.println("Moving from "+mypos+" to: "+newpos);
+//		System.out.println("Moving from "+mypos+" to: "+newpos);
 		IGoal go = createGoal("go");
 		go.getParameter("pos").setValue(newpos);
 		dispatchSubgoalAndWait(go);

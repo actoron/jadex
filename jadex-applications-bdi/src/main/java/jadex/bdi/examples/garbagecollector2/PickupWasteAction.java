@@ -39,19 +39,19 @@ public class PickupWasteAction extends SimplePropertyObject implements IAgentAct
 		
 		Collection wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.POSITION), "garbage");
 		ISpaceObject waste = (ISpaceObject)(wastes!=null? wastes.iterator().next(): null);
-		System.out.println("pickup waste action: "+so+" "+so.getProperty(Grid2D.POSITION)+" "+waste);
+//		System.out.println("pickup waste action: "+so+" "+so.getProperty(Grid2D.POSITION)+" "+waste);
 		if(wastes!=null)
 		{
 //			if(Math.random()>0.5)
 			{
 				wastes.remove(waste);
-				System.out.println("pickup: "+waste);
+//				System.out.println("pickup: "+waste);
 				so.setProperty("garbage", waste);
 				
 				grid.setPosition(waste.getId(), null);
 				ret = true;
 				//pcs.firePropertyChange("worldObjects", garb, null);
-				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
+//				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
 			}
 //			else
 //			{
@@ -60,10 +60,10 @@ public class PickupWasteAction extends SimplePropertyObject implements IAgentAct
 		}
 		else
 		{
-			System.out.println("Agent picked up failed: "+so);
+//			System.out.println("Agent picked up failed: "+so);
 		}
 
-		System.out.println("pickup waste action "+parameters);
+//		System.out.println("pickup waste action "+parameters);
 
 		return ret? Boolean.TRUE: Boolean.FALSE;
 	}

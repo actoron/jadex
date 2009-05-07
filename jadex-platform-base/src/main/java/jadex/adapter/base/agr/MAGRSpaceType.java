@@ -105,7 +105,8 @@ public class MAGRSpaceType	extends MSpaceType
 		types.add(new TypeInfo("agrspacetype", MAGRSpaceType.class));
 		types.add(new TypeInfo("grouptype", MGroupType.class));
 		types.add(new TypeInfo("role", MRoleType.class));
-		types.add(new TypeInfo("agrspace", MAGRSpaceInstance.class));
+		types.add(new TypeInfo("agrspace", MAGRSpaceInstance.class, null, null,
+			SUtil.createHashMap(new String[]{"type"}, new String[]{"typeName"}), null));
 		types.add(new TypeInfo("group", MGroupInstance.class, null, null,
 			SUtil.createHashMap(new String[]{"type"}, new String[]{"typeName"}), null));
 		types.add(new TypeInfo("position", MPosition.class, null, null,

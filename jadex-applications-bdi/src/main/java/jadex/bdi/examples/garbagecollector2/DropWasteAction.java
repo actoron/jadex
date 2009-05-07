@@ -23,7 +23,7 @@ public class DropWasteAction extends SimplePropertyObject implements IAgentActio
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
-		System.out.println("drop waste action: "+parameters);
+//		System.out.println("drop waste action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
 		
@@ -37,7 +37,7 @@ public class DropWasteAction extends SimplePropertyObject implements IAgentActio
 		grid.setPosition(garb.getId(), pos);
 		so.setProperty("garbage", null);
 		
-		System.out.println("Agent dropped garbage: "+owner+" "+pos);
+//		System.out.println("Agent dropped garbage: "+owner+" "+pos);
 		
 		return null;
 	}

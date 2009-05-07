@@ -207,7 +207,7 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int k=0; k<prelayers.size(); k++)
 						{
 							Map layer = (Map)prelayers.get(k);
-							System.out.println("prelayer: "+layer);
+//							System.out.println("prelayer: "+layer);
 							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
 						((Perspective2D) ret).setPrelayers((ILayer[]) targetprelayers.toArray(new ILayer[0]));
@@ -220,7 +220,7 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int k=0; k<postlayers.size(); k++)
 						{
 							Map layer = (Map)postlayers.get(k);
-							System.out.println("postlayer: "+layer);
+//							System.out.println("postlayer: "+layer);
 							targetpostlayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
 						((Perspective2D) ret).setPostlayers((ILayer[]) targetpostlayers.toArray(new ILayer[0]));
@@ -520,7 +520,7 @@ public class MEnvSpaceType	extends MSpaceType
 			
 			Object ret = null;
 			
-			System.out.println("Found expression: "+val);
+//			System.out.println("Found expression: "+val);
 			try
 			{
 				ret = exp_parser.parseExpression((String)val, ((MApplicationType)root).getAllImports(), null, classloader);

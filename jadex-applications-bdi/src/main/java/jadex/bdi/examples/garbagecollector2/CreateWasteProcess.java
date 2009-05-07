@@ -42,7 +42,7 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 	public void start(IClockService clock, IEnvironmentSpace space)
 	{
 		this.lasttick	= clock.getTick();
-		System.out.println("create waste process started.");
+//		System.out.println("create waste process started.");
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 	 */
 	public void shutdown(IEnvironmentSpace space)
 	{
-		System.out.println("create waste process shutdowned.");
+//		System.out.println("create waste process shutdowned.");
 	}
 
 	/**

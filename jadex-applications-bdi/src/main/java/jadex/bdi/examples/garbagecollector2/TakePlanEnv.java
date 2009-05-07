@@ -52,17 +52,17 @@ public class TakePlanEnv extends Plan
 
 	public void aborted()
 	{
-		System.out.println("aborted: "+getAgentName()+" "+this);
+//		System.out.println("aborted: "+getAgentName()+" "+this);
 	}
 
 	public void failed()
 	{
-		System.out.println("failed: "+getAgentName()+" "+this+" "+getException());
+//		System.out.println("failed: "+getAgentName()+" "+this+" "+getException());
 	}
 
 	public void passed()
 	{
-		System.out.println("passed: "+getAgentName()+" "+this);
+//		System.out.println("passed: "+getAgentName()+" "+this);
 	}
 	
 }

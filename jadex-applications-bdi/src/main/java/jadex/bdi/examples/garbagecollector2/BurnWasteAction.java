@@ -21,7 +21,7 @@ public class BurnWasteAction extends SimplePropertyObject implements IAgentActio
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
-		System.out.println("burn waste action: "+parameters);
+//		System.out.println("burn waste action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
 		
@@ -34,7 +34,7 @@ public class BurnWasteAction extends SimplePropertyObject implements IAgentActio
 		so.setProperty("garbage", null);
 		space.destroySpaceObject(garb.getId());
 		
-		System.out.println("Garbage burned: "+garb);
+//		System.out.println("Garbage burned: "+garb);
 		
 		return null;
 	}

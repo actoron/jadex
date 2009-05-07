@@ -1,4 +1,4 @@
-<!--
+	<!--
 	<H3>The hunter prey application descriptor</H3>
 
 	Two kinds of creatures live on a grid world.
@@ -32,7 +32,7 @@
 			
 			<env:processtypes>
 				<env:processtype name="create" class="CreateFoodProcess">
-					<!-- <env:property name="rate">5</env:property> -->
+					<env:property name="rate">5</env:property>
 				</env:processtype>
 			</env:processtypes>
 <!-- 			
@@ -65,28 +65,6 @@
 					<env:postlayers>
 					</env:postlayers>
 				</env:perspective>
-
-				<env:perspective name="abstract">
-					<env:drawable objecttype="food" width="1.0" height="1.0">
-						<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
-					</env:drawable>
-					<env:drawable objecttype="obstacle" width="1.0" height="1.0">
-						<env:triangle layer="0" width="0.9" height="0.9" rotation="3.14159" color="#996600" />
-					</env:drawable>
-					<env:drawable objecttype="prey" width="1.0" height="1.0">
-						<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="5" color="#CCCCCC" />
-					</env:drawable>
-					<env:drawable objecttype="hunter" width="1.0" height="1.0">
-						<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="8" color="#3366FF" />
-					</env:drawable>
-					<env:prelayers>
-						<!-- <env:tiledlayer width="17.5" height="17.5" color="white" /> -->
-						<env:gridlayer width="1.0" height="1.0" color="white" />
-					</env:prelayers>
-					<env:postlayers>
-					</env:postlayers>
-				</env:perspective>
-	
 			</env:perspectives>
 
 			<!-- executor -->
