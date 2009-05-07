@@ -1,9 +1,11 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.environment.IDynamicValue;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
+import jadex.javaparser.IParsedExpression;
 
 import java.awt.Graphics2D;
 
@@ -70,7 +72,7 @@ public interface IDrawable
 	 * 
 	 * @param drawcondition the draw condition
 	 */
-	public void setDrawCondition(DrawCondition drawcondition);
+	public void setDrawCondition(IParsedExpression drawcondition);
 	
 	/**
 	 * Binds the position of the visual to an object property.

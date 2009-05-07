@@ -1,11 +1,13 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.environment.IDynamicValue;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.javaparser.IParsedExpression;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -51,7 +53,7 @@ public class TexturedRectangle extends RotatingPrimitive
 	 * @param size size or size-binding
 	 * @param texturePath resource path of the texture
 	 */
-	public TexturedRectangle(Object position, Object rotation, Object size, String texturePath, DrawCondition drawcondition)
+	public TexturedRectangle(Object position, Object rotation, Object size, String texturePath, IParsedExpression drawcondition)
 	{
 		super(position, rotation, size, drawcondition);
 		texturePath_ = texturePath;

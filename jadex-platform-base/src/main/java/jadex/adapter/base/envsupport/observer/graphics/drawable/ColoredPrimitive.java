@@ -1,6 +1,9 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
 
+import jadex.adapter.base.envsupport.environment.IDynamicValue;
+import jadex.javaparser.IParsedExpression;
+
 import java.awt.Color;
 
 
@@ -29,7 +32,7 @@ public abstract class ColoredPrimitive extends RotatingPrimitive
 	 * @param size size or size-binding
 	 * @param c the drawable's color
 	 */
-	protected ColoredPrimitive(Object position, Object rotation, Object size, Color c, DrawCondition drawcondition)
+	protected ColoredPrimitive(Object position, Object rotation, Object size, Color c, IParsedExpression drawcondition)
 	{
 		super(position, rotation, size, drawcondition);
 		if (c == null)

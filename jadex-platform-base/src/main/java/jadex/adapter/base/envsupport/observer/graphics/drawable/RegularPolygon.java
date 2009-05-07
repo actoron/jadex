@@ -1,9 +1,11 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.environment.IDynamicValue;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
+import jadex.javaparser.IParsedExpression;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -42,7 +44,7 @@ public class RegularPolygon extends ColoredPrimitive
 	 * @param c the drawable's color
 	 * @param vertices number of vertices (corners)
 	 */
-	public RegularPolygon(Object position, Object rotation, Object size, Color c, int vertices, DrawCondition drawcondition)
+	public RegularPolygon(Object position, Object rotation, Object size, Color c, int vertices, IParsedExpression drawcondition)
 	{
 		super(position, rotation, size, c, drawcondition);
 		vertices_ = vertices;

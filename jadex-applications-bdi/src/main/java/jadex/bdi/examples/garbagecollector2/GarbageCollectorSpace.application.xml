@@ -52,7 +52,9 @@
 				<env:perspective name="icons">
 					<env:drawable objecttype="collector" width="0.9" height="0.9">
 						<env:texturedrectangle layer="2"  imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
-						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.2" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" conditionclass="CollectorGarbageDrawCondition"/>
+						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.2" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
+							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
+						</env:texturedrectangle>
 					</env:drawable>
 					<env:drawable objecttype="burner" width="0.9" height="0.9">
 						<env:texturedrectangle layer="1" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
@@ -69,7 +71,7 @@
 				<env:perspective name="abstract">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
 						<env:triangle layer="2" color="RED" />
-						<env:rectangle layer="3" color="YELLOW" width="0.2" height="0.2" conditionclass="CollectorGarbageDrawCondition"/>
+						<env:rectangle layer="3" color="YELLOW" width="0.2" height="0.2"/>
 					</env:drawable>
 					<env:drawable objecttype="burner" width="1.0" height="1.0">
 						<env:triangle layer="1" color="GREEN" />

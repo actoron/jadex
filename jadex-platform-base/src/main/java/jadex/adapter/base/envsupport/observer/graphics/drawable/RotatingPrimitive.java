@@ -1,10 +1,13 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.environment.IDynamicValue;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Graphics2D;
 
@@ -16,7 +19,8 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	private static final float	PI_2	= (float)(Math.PI / 2.0);
 	
 	/** The condition deciding if the drawable should be drawn. */
-	protected DrawCondition drawcondition;
+//	protected DrawCondition drawcondition;
+	protected IParsedExpression drawcondition;
 	
 	/**
 	 * Initializes the drawable.
@@ -34,7 +38,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param rotation rotation or rotation-binding
 	 * @param size size or size-binding
 	 */
-	protected RotatingPrimitive(Object position, Object rotation, Object size, DrawCondition drawcondition)
+	protected RotatingPrimitive(Object position, Object rotation, Object size, IParsedExpression drawcondition)
 	{
 		super();
 		this.drawcondition = drawcondition;
@@ -101,7 +105,15 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 */
 	public final void draw(Object obj, ViewportJ2D vp)
 	{
-		if((drawcondition == null) || drawcondition.testCondition(obj))
+		boolean draw = drawcondition==null;
+		if(!draw)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$object", obj);
+			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
+		}
+		
+		if(draw)
 			doDraw(obj, vp);
 	}
 
@@ -113,7 +125,15 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 */
 	public final void draw(Object obj, ViewportJOGL vp)
 	{
-		if((drawcondition == null) || drawcondition.testCondition(obj))
+		boolean draw = drawcondition==null;
+		if(!draw)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$object", obj);
+			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
+		}
+
+		if(draw)
 			doDraw(obj, vp);
 	}
 	
@@ -138,7 +158,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * 
 	 * @param drawcondition the draw condition
 	 */
-	public void setDrawCondition(DrawCondition drawcondition)
+	public void setDrawCondition(IParsedExpression drawcondition)
 	{
 		this.drawcondition = drawcondition;
 	}

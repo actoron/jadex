@@ -3,13 +3,11 @@ package jadex.adapter.base.envsupport;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.envsupport.dataview.IDataView;
-import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawCondition;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
@@ -31,7 +29,6 @@ import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.awt.Color;
@@ -266,8 +263,10 @@ public class MEnvSpaceType	extends MSpaceType
 				})
 			}), null));
 
+	
+		
 		types.add(new TypeInfo("texturedrectangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"x", "y", "rotation", "imagepath", "width", "height", "layer", "conditionclass", "creator"}, 
+			SUtil.createHashMap(new String[]{"x", "y", "rotation", "imagepath", "width", "height", "layer", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -276,7 +275,6 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-				new BeanAttributeInfo(null, typeconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
 				{
 					public Object createObject(Map args) throws Exception
@@ -286,15 +284,14 @@ public class MEnvSpaceType	extends MSpaceType
 						IVector1 rot = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
 						IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
-						Class condcl = (Class)MEnvSpaceInstance.getProperty(args, "conditionclass");
-						DrawCondition dc = condcl!=null? (DrawCondition)condcl.newInstance(): null; 
-						return new TexturedRectangle(pos, rot, size, (String)MEnvSpaceInstance.getProperty(args, "imagepath"), dc);
+						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
+						return new TexturedRectangle(pos, rot, size, (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
 					}
 				})
 			}), null));
 		
 		types.add(new TypeInfo("triangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"x", "y", "rotation", "width", "height", "color", "layer", "conditionclass", "creator"}, 
+			SUtil.createHashMap(new String[]{"x", "y", "rotation", "width", "height", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -303,7 +300,6 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-				new BeanAttributeInfo(null, typeconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
 				{
 					public Object createObject(Map args) throws Exception
@@ -313,15 +309,14 @@ public class MEnvSpaceType	extends MSpaceType
 						IVector1 rot = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
 						IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
-						Class condcl = (Class)MEnvSpaceInstance.getProperty(args, "conditionclass");
-						DrawCondition dc = condcl!=null? (DrawCondition)condcl.newInstance(): null; 
-						return new Triangle(pos, rot, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), dc);
+						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
+						return new Triangle(pos, rot, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
 					}
 				})
 			}), null));
 		
 		types.add(new TypeInfo("rectangle", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"x", "y", "rotation", "width", "height", "color", "layer", "conditionclass", "creator"}, 
+			SUtil.createHashMap(new String[]{"x", "y", "rotation", "width", "height", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -330,7 +325,6 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-				new BeanAttributeInfo(null, typeconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
 				{
 					public Object createObject(Map args) throws Exception
@@ -340,15 +334,14 @@ public class MEnvSpaceType	extends MSpaceType
 						IVector1 rot = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
 						IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
-						Class condcl = (Class)MEnvSpaceInstance.getProperty(args, "conditionclass");
-						DrawCondition dc = condcl!=null? (DrawCondition)condcl.newInstance(): null; 
-						return new Rectangle(pos, rot, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), dc);
+						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
+						return new Rectangle(pos, rot, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
 					}
 				})
 			}), null));
 		
 		types.add(new TypeInfo("regularpolygon", MultiCollection.class, null, null,
-				SUtil.createHashMap(new String[]{"x", "y", "rotation", "width", "height", "color", "vertices", "layer", "conditionclass", "creator"}, 
+				SUtil.createHashMap(new String[]{"x", "y", "rotation", "width", "height", "color", "vertices", "layer", "creator"}, 
 				new BeanAttributeInfo[]{
 					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -358,7 +351,6 @@ public class MEnvSpaceType	extends MSpaceType
 					new BeanAttributeInfo(null, colorconv, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "", new Integer(3)),
 					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-					new BeanAttributeInfo(null, typeconv, ""),
 					new BeanAttributeInfo(null, null, "", new IObjectCreator()
 					{
 						public Object createObject(Map args) throws Exception
@@ -370,9 +362,8 @@ public class MEnvSpaceType	extends MSpaceType
 								(Double)MEnvSpaceInstance.getProperty(args, "height"));
 							int vertices  = MEnvSpaceInstance.getProperty(args, "vertices")==null? 3: 
 								((Integer)MEnvSpaceInstance.getProperty(args, "vertices")).intValue();
-							Class condcl = (Class)MEnvSpaceInstance.getProperty(args, "conditionclass");
-							DrawCondition dc = condcl!=null? (DrawCondition)condcl.newInstance(): null; 
-							return new RegularPolygon(pos, rot, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices, dc);
+							IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
+							return new RegularPolygon(pos, rot, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
 						}
 					})
 				}), null));
@@ -491,6 +482,9 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("rectangle", new BeanAttributeInfo("parts", null, "")));		
 		linkinfos.add(new LinkInfo("regularpolygon", new BeanAttributeInfo("parts", null, "")));		
 		
+		// all drawable elems
+		linkinfos.add(new LinkInfo("drawcondition", new BeanAttributeInfo("drawcondition", expconv, "")));		
+
 		// space instance
 		linkinfos.add(new LinkInfo("object", new BeanAttributeInfo("objects", null, "property")));
 		linkinfos.add(new LinkInfo("spaceaction", new BeanAttributeInfo("spaceactions", null, "property")));
