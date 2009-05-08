@@ -141,17 +141,20 @@ public class DrawableCombiner extends AbstractVisual2D
 		AffineTransform t = g.getTransform();
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 rotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
+		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
+		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
+		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
-		if ((position == null) || (size == null) || (rotation == null))
+		if ((position == null) || (size == null) || (xrotation == null) || (yrotation == null) || (zrotation == null))
 		{
 			return;
 		}
 		
 		g.translate(position.getXAsDouble(), position.getYAsDouble());
 		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.rotate(rotation.getAsDouble());
+		g.scale(Math.cos(xrotation.getAsDouble()), Math.cos(yrotation.getAsDouble()));
+		g.rotate(zrotation.getAsDouble());
 
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
@@ -180,10 +183,12 @@ public class DrawableCombiner extends AbstractVisual2D
 		GL gl = vp.getContext();
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 rotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
+		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
+		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
+		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
-		if ((position == null) || (size == null) || (rotation == null))
+		if ((position == null) || (size == null) || (zrotation == null))
 		{
 			return;
 		}
@@ -191,7 +196,9 @@ public class DrawableCombiner extends AbstractVisual2D
 		gl.glPushMatrix();
 		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
 		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
-		gl.glRotated(Math.toDegrees(rotation.getAsDouble()), 0.0, 0.0, 1.0);
+		gl.glRotated(Math.toDegrees(xrotation.getAsFloat()), 1.0, 0.0, 0.0);
+		gl.glRotated(Math.toDegrees(yrotation.getAsFloat()), 0.0, 1.0, 0.0);
+		gl.glRotated(Math.toDegrees(zrotation.getAsDouble()), 0.0, 0.0, 1.0);
 		
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{

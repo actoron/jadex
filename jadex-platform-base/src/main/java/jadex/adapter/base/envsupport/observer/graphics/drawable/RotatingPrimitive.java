@@ -20,8 +20,6 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 //	protected DrawCondition drawcondition;
 	protected IParsedExpression drawcondition;
 	
-	protected float tRotation;
-	
 	/**
 	 * Initializes the drawable.
 	 */
@@ -29,7 +27,6 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	{
 		super();
 		drawcondition = null;
-		tRotation = 0.0f;
 	}
 
 	/**
@@ -79,7 +76,6 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		
 		g.translate(position.getXAsDouble(), position.getYAsDouble());
 		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		tRotation = (tRotation + 0.1f) % (float)(Math.PI * 2);
 		g.scale(Math.cos(xrotation.getAsDouble()), Math.cos(yrotation.getAsDouble()));
 		g.rotate(zrotation.getAsDouble());
 		
