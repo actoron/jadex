@@ -1,16 +1,14 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IAgentAction;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.Plan.SyncResultListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Take some garbage and bring it to the burner.
@@ -39,7 +37,7 @@ public class TakePlanEnv extends Plan
 		// Put down the garbarge.
 		//System.out.println("Calling drop: "+getAgentName()+" "+getRootGoal());
 		Map params = new HashMap();
-		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier().getLocalName());
+		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
 		grid.performAgentAction("drop", params, srl);
 		srl.waitForResult();

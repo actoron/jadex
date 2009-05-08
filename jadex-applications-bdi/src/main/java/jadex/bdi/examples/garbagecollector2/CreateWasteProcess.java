@@ -81,7 +81,7 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 			{
 				Map props = new HashMap();
 				props.put(Space2D.POSITION, pos);
-				grid.createSpaceObject("garbage", null, props, null, null);
+				grid.createSpaceObject("garbage", props, null, null);
 //				System.out.println("Created waste: "+obj);
 			}
 		}

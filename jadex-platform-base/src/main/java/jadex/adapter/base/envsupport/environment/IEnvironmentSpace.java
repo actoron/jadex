@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.bridge.IAgentIdentifier;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
@@ -48,7 +49,7 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @param listeners initial listeners (may be null)
 	 * @return the object.
 	 */
-	public ISpaceObject createSpaceObject(Object type, Object owner, Map properties, List tasks, List listeners);
+	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners);
 	
 	/** 
 	 * Destroys an object in this space.
@@ -136,15 +137,15 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	/**
 	 *  Set the owner of an object.
 	 *  @param id The object id.
-	 *  @param pos The object owner.
+	 *  @param owner The object owner.
 	 */
-	public void setOwner(Object id, Object owner);
+	public void setOwner(Object id, IAgentIdentifier owner);
 	
 	/**
 	 *  Get the owned objects.
 	 *  @return The owned objects. 
 	 */
-	public ISpaceObject[] getOwnedObjects(Object owner);
+	public ISpaceObject[] getOwnedObjects(IAgentIdentifier owner);
 	
 	/**
 	 * Adds a dataview to the space.

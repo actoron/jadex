@@ -1,13 +1,11 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.Plan.SyncResultListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Try to pickup some piece of garbage.
@@ -25,7 +23,7 @@ public class PickUpPlanEnv extends Plan
 		// todo: garbage as parameter?
 		
 		Map params = new HashMap();
-		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier().getLocalName());
+		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
 		env.performAgentAction("pickup", params, srl); // todo: garbage as parameter?
 		if(!((Boolean)srl.waitForResult()).booleanValue()) 

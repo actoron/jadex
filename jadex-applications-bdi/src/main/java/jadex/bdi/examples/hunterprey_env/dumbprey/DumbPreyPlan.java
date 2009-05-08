@@ -42,7 +42,7 @@ public class DumbPreyPlan extends Plan
 				{
 					SyncResultListener srl	= new SyncResultListener();
 					Map params = new HashMap();
-					params.put(IAgentAction.ACTOR_ID, getAgentIdentifier().getLocalName());
+					params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
 					params.put(IAgentAction.OBJECT_ID, foods.iterator().next());
 					env.performAgentAction("eat", params, srl);
 					srl.waitForResult();
@@ -73,7 +73,7 @@ public class DumbPreyPlan extends Plan
 				{
 					SyncResultListener srl	= new SyncResultListener();
 					Map params = new HashMap();
-					params.put(IAgentAction.ACTOR_ID, getAgentIdentifier().getLocalName());
+					params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
 					params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 					env.performAgentAction("move", params, srl);
 					srl.waitForResult();

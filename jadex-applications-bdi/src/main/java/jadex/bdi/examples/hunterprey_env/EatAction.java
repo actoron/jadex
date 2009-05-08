@@ -5,6 +5,7 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ public class EatAction extends SimplePropertyObject implements IAgentAction
 //		System.out.println("eat action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
-		Object owner = parameters.get(IAgentAction.ACTOR_ID);
+		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(IAgentAction.ACTOR_ID);
 		ISpaceObject avatar = grid.getOwnedObjects(owner)[0];
 		ISpaceObject target = (ISpaceObject)parameters.get(IAgentAction.OBJECT_ID);
 		

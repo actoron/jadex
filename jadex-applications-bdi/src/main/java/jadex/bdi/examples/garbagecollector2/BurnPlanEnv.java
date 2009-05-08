@@ -31,7 +31,7 @@ public class BurnPlanEnv extends Plan
 
 		SyncResultListener srl	= new SyncResultListener();
 		Map params = new HashMap();
-		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier().getLocalName());
+		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
 		env.performAgentAction("burn", params, srl);
 		srl.waitForResult();
 	}

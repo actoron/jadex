@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
+import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
@@ -25,7 +26,7 @@ public class BurnWasteAction extends SimplePropertyObject implements IAgentActio
 		
 		Grid2D grid = (Grid2D)space;
 		
-		Object owner = parameters.get(IAgentAction.ACTOR_ID);
+		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(IAgentAction.ACTOR_ID);
 		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 		
 		assert so.getProperty("garbage")!=null;

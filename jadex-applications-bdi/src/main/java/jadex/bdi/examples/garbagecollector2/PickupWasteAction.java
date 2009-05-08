@@ -2,11 +2,10 @@ package jadex.bdi.examples.garbagecollector2;
 
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Collection;
@@ -29,7 +28,7 @@ public class PickupWasteAction extends SimplePropertyObject implements IAgentAct
 				
 		Grid2D grid = (Grid2D)space;
 		
-		Object owner = parameters.get(IAgentAction.ACTOR_ID);
+		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(IAgentAction.ACTOR_ID);
 		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 
 //		if(so.getProperty("garbage")!=null)

@@ -22,9 +22,6 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	/** The object's type. */
 	protected Object type;
 	
-	/** The object's owner. */
-	protected Object owner;
-
 	/** The object's tasks (task names -> tasks). */
 	protected Map tasks;
 
@@ -45,11 +42,10 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	 * @param tasks initial task list (may be null)
 	 * @param listeners initial listeners (may be null)
 	 */
-	public SpaceObject(Object id, Object type, Object owner, Map properties, List tasks, List listeners, Object monitor)
+	public SpaceObject(Object id, Object type, Map properties, List tasks, List listeners, Object monitor)
 	{
 		this.id = id;
 		this.type = type;
-		this.owner = owner;
 		this.properties = properties;
 //		this.tasks = tasks;
 		this.listeners = listeners;
@@ -103,21 +99,8 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 			return type;
 		}
 	}
-	
-	/**
-	 * Returns the owner of the object.
-	 * @return The owner.
-	 */
-	public Object getOwner()
-	{
-		synchronized(monitor)
-		{
-			return owner;
-		}
-	}
 
 	/**
-<<<<<<< .mine
 	 * Sets an object's property.
 	 * @param name name of the property
 	 * @param value the property

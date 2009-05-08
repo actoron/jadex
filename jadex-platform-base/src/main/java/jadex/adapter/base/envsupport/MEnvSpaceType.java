@@ -127,11 +127,17 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property")
 			}), null));
 		
+		types.add(new TypeInfo("avatarmapping", MultiCollection.class, null, null,
+				SUtil.createHashMap(new String[]{"agenttype", "objecttype"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, null, ""),
+				}), null));
+
 		types.add(new TypeInfo("agentactiontype", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
-			new BeanAttributeInfo(null, null, ""),
-			}), null));
+				SUtil.createHashMap(new String[]{"class", "name"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
+				new BeanAttributeInfo(null, null, ""),
+				}), null));
 		
 		types.add(new TypeInfo("spaceactiontype", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
@@ -477,6 +483,7 @@ public class MEnvSpaceType	extends MSpaceType
 	
 		// spacetype
 //		linkinfos.add(new LinkInfo("dimension", new BeanAttributeInfo("dimensions", BasicTypeConverter.DOUBLE_CONVERTER, "property")));
+		linkinfos.add(new LinkInfo("avatarmapping", new BeanAttributeInfo("avatarmappings", null, "property")));
 		linkinfos.add(new LinkInfo("agentactiontype", new BeanAttributeInfo("agentactiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("spaceactiontype", new BeanAttributeInfo("spaceactiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("processtype", new BeanAttributeInfo("processtypes", null, "property")));

@@ -80,7 +80,7 @@ public class CreateFoodProcess extends SimplePropertyObject implements ISpacePro
 			{
 				Map props = new HashMap();
 				props.put(Space2D.POSITION, pos);
-				grid.createSpaceObject("food", null, props, null, null);
+				grid.createSpaceObject("food", props, null, null);
 //				System.out.println("Created food: "+obj);
 			}
 		}

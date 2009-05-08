@@ -25,6 +25,11 @@
 		<env:envspacetype name="gc2dspace" width="10" height="10" class="Grid2D">
 			<!-- <env:dimension>10</env:dimension>
 			<env:dimension>10</env:dimension> -->
+			
+			<env:avatarmappings>
+				<env:avatarmapping agenttype="Collector" objecttype="collector"/>
+				<env:avatarmapping agenttype="Burner" objecttype="burner"/>
+			</env:avatarmappings>
 		
 			<env:actiontypes>
 				<env:agentactiontype name="pickup" class="PickupWasteAction" />
@@ -103,10 +108,10 @@
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:objects>
+				<!-- <env:objects>
 					<env:object type="collector" owner="Collector1" />
 					<env:object type="burner" owner="Burner1" />
-				</env:objects>
+				</env:objects> -->
 				
 				<env:observers>
 					<env:observer name="world" view="view_all" perspective="abstract">
@@ -125,11 +130,11 @@
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:objects>
+				<!-- <env:objects>
 					<env:object type="collector" owner="Collector1" />
 					<env:object type="collector" owner="Collector2" />
 					<env:object type="burner" owner="Burner1" />
-				</env:objects>
+				</env:objects> -->
 				
 				<env:observers>
 					<env:observer name="world" view="view_all" perspective="abstract">

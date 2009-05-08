@@ -42,7 +42,7 @@ public class CreateObstaclesAction extends SimplePropertyObject implements ISpac
 			{
 				Map props = new HashMap();
 				props.put(Space2D.POSITION, pos);
-				grid.createSpaceObject("obstacle", null, props, null, null);
+				grid.createSpaceObject("obstacle", props, null, null);
 //				System.out.println("Created obstacle: "+obj);
 			}
 		}

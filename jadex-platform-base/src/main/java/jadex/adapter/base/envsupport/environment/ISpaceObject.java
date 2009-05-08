@@ -7,6 +7,11 @@ import jadex.commons.IPropertyObject;
  */
 public interface ISpaceObject extends IPropertyObject
 {
+	//-------- constants --------
+	
+	/** The owner property. */
+	public static final String	PROPERTY_OWNER	= "owner";
+	
 	//-------- methods --------
 	
 	/**

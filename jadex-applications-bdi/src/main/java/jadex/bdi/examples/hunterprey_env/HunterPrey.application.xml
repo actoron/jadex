@@ -23,6 +23,9 @@
 	
 	<spacetypes>
 		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
+			<env:avatarmappings>
+				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
+			</env:avatarmappings>
 
 			<env:actiontypes>
 				<env:agentactiontype name="move" class="MoveAction" />
@@ -36,6 +39,18 @@
 				</env:processtype>
 			</env:processtypes>
 <!-- 			
+			<env:percepttypes>
+				<env:percepttype name="new_food">
+					<env:parameter name="$prey" objecttype="prey">
+						<env:property name="location" />
+					</env:parameter>
+					<env:parameter name="$food" objecttype="food">
+						<env:property name="location" />
+					</env:parameter>
+				</env:percepttype>
+			</env:percepttypes>
+ -->
+ <!-- 			
 			<env:perceptgeneratortypes>
 				<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
 			</env:perceptgeneratortypes>
@@ -67,6 +82,28 @@
 				</env:perspective>
 			</env:perspectives>
 
+
+			<env:perspective name="abstract">
+				<env:drawable objecttype="food" width="1.0" height="1.0">
+					<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
+				</env:drawable>
+				<env:drawable objecttype="obstacle" width="1.0" height="1.0">
+					<env:triangle layer="0" width="0.9" height="0.9" zrotation="3.14159" color="#996600" />
+				</env:drawable>
+				<env:drawable objecttype="prey" width="1.0" height="1.0">
+					<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="5" color="#CCCCCC" />
+				</env:drawable>
+				<env:drawable objecttype="hunter" width="1.0" height="1.0">
+					<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="8" color="#3366FF" />
+				</env:drawable>
+				<env:prelayers>
+					<!-- <env:tiledlayer width="17.5" height="17.5" color="white" /> -->
+					<env:gridlayer width="1.0" height="1.0" color="white" />
+				</env:prelayers>
+				<env:postlayers>
+				</env:postlayers>
+			</env:perspective>
+			
 			<!-- executor -->
 			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class))</env:spaceexecutor>
 		</env:envspacetype>
@@ -83,10 +120,6 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:objects>
-					<env:object type="prey" owner="Dummy1"/>
-				</env:objects>
-
 				<env:initactions>
 					<env:spaceaction type="create_obstacles">
 						<env:parameter name="count">125</env:parameter>
@@ -119,24 +152,12 @@
  			</env:envspace>
  		</application>
 
-		<application name="Five Dumb Preys">
- 			<agents>
-				<agent name="Duffy" type="DumbPrey"/>
-				<agent name="Dumbo" type="DumbPrey"/>
-				<agent name="Dimitri" type="DumbPrey"/>
-				<agent name="Dork" type="DumbPrey"/>
-				<agent name="Django" type="DumbPrey"/>
+		<application name="Multi">
+			<agents>
+				<agent type="DumbPrey" number="100"/>
 			</agents>
-			
+				
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:objects>
-					<env:object type="prey" owner="Duffy"/>
-					<env:object type="prey" owner="Dumbo"/>
-					<env:object type="prey" owner="Dimitri"/>
-					<env:object type="prey" owner="Dork"/>
-					<env:object type="prey" owner="Django"/>
-				</env:objects>
-
 				<env:initactions>
 					<env:spaceaction type="create_obstacles">
 						<env:parameter name="count">125</env:parameter>
@@ -148,6 +169,28 @@
 						<env:plugins>
 						</env:plugins>
 					</env:observer>
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="Five Dumb Preys">
+ 			<agents>
+				<agent name="Duffy" type="DumbPrey"/>
+				<agent name="Dumbo" type="DumbPrey"/>
+				<agent name="Dimitri" type="DumbPrey"/>
+				<agent name="Dork" type="DumbPrey"/>
+				<agent name="Django" type="DumbPrey"/>
+			</agents>
+			
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
 				</env:observers>
  			</env:envspace>
  		</application>

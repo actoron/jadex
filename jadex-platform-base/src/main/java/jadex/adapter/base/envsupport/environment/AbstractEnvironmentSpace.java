@@ -1,8 +1,10 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
@@ -25,6 +27,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	
 	/** The context. */
 	protected IContext context;
+	
+	/** Avatar mappings. */
+	protected MultiCollection avatarmappings;
 	
 	/** Available space actions. */
 	protected Map spaceactions;
@@ -68,6 +73,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	{
 		this.monitor = new Object();
 		this.views = new HashMap();
+		this.avatarmappings = new MultiCollection();
 		this.spaceactions = new HashMap();
 		this.agentactions = new HashMap();
 		this.processes = new HashMap();
@@ -130,7 +136,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(Object type, Object owner, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners)
 	{
 		ISpaceObject ret;
 		
@@ -143,7 +149,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 			}
 			while(spaceobjects.containsKey(id));
 			
-			ret = new SpaceObject(id, type, owner, properties, tasks, listeners, monitor);
+			ret = new SpaceObject(id, type, properties, tasks, listeners, monitor);
 			spaceobjects.put(id, ret);
 			List typeobjects = (List)spaceobjectsbytype.get(ret.getType());
 			if(typeobjects == null)
@@ -153,8 +159,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 			}
 			typeobjects.add(ret);
 			
-			if(owner!=null)
+			if(properties!=null && properties.get(ISpaceObject.PROPERTY_OWNER)!=null)
 			{
+				IAgentIdentifier	owner	= (IAgentIdentifier)properties.get(ISpaceObject.PROPERTY_OWNER);
 				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
 				if(ownerobjects == null)
 				{
@@ -198,12 +205,12 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 			if(typeobjs.size()==0)
 				spaceobjectsbytype.remove(obj.getType());
 			
-			if(obj.getProperty(IAgentAction.ACTOR_ID)!=null)
+			if(obj.getProperty(ISpaceObject.PROPERTY_OWNER)!=null)
 			{
-				List ownedobjs = (List)spaceobjectsbyowner.get(obj.getProperty(IAgentAction.ACTOR_ID));
+				List ownedobjs = (List)spaceobjectsbyowner.get(obj.getProperty(ISpaceObject.PROPERTY_OWNER));
 				ownedobjs.remove(obj);
 				if(ownedobjs.size()==0)
-					spaceobjectsbyowner.remove(obj.getProperty(IAgentAction.ACTOR_ID));
+					spaceobjectsbyowner.remove(obj.getProperty(ISpaceObject.PROPERTY_OWNER));
 			}
 		}
 		
@@ -264,6 +271,33 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		return obs==null? new ISpaceObject[0]: (ISpaceObject[])obs.toArray(new ISpaceObject[obs.size()]); 
 	}
 	
+
+	/**
+	 * Adds an avatar mapping.
+	 * @param agenttype The agent type.
+	 * @param objecttype The object type to represent the agent.
+	 */
+	public void addAvatarMappings(String agenttype, String objecttype)
+	{
+		synchronized(monitor)
+		{
+			this.avatarmappings.put(agenttype, objecttype);			
+		}
+	}
+
+	/**
+	 * Remove an avatar mapping.
+	 * @param agenttype The agent type.
+	 * @param objecttype The object type to represent the agent.
+	 */
+	public void removeAvatarMappings(String agenttype, String objecttype)
+	{
+		synchronized(monitor)
+		{
+			this.avatarmappings.remove(agenttype, objecttype);			
+		}
+	}
+
 	/**
 	 * Adds a space action.
 	 * @param actionId the action ID
@@ -387,31 +421,31 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 *  Get the owner of an object.
 	 *  @param id The id.
 	 *  @return The owner.
-	 * /
-	public Object getOwner(Object id)
-	{
-		synchronized(getSynchronizedObject().getMonitor())
-		{
-			ISpaceObject obj = getSpaceObject(id); 
-			if(obj==null)
-				throw new RuntimeException("Space object not found: "+id);
-			return obj.getProperty(ISpaceObject.OWNER);
-		}
-	}*/
-	
-	/**
-	 *  Set the owner of an object.
-	 *  @param id The object id.
-	 *  @param pos The object owner.
 	 */
-	public void setOwner(Object id, Object owner)
+	public IAgentIdentifier	getOwner(Object id)
 	{
 		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
-			Object oldowner = obj.getProperty(IAgentAction.ACTOR_ID);
+			return (IAgentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+		}
+	}
+	
+	/**
+	 *  Set the owner of an object.
+	 *  @param id The object id.
+	 *  @param pos The object owner.
+	 */
+	public void setOwner(Object id, IAgentIdentifier owner)
+	{
+		synchronized(monitor)
+		{
+			ISpaceObject obj = getSpaceObject(id); 
+			if(obj==null)
+				throw new RuntimeException("Space object not found: "+id);
+			Object oldowner = obj.getProperty(ISpaceObject.PROPERTY_OWNER);
 			if(oldowner!=null)
 			{
 				List ownedobjs = (List)spaceobjectsbyowner.get(oldowner);
@@ -429,7 +463,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 				}
 				ownedobjs.add(obj);
 			}
-			obj.setProperty(IAgentAction.ACTOR_ID, owner);
+			obj.setProperty(ISpaceObject.PROPERTY_OWNER, owner);
 		}
 	}
 	
@@ -437,7 +471,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	 *  Get the owned objects.
 	 *  @return The owned objects. 
 	 */
-	public ISpaceObject[] getOwnedObjects(Object owner)
+	public ISpaceObject[] getOwnedObjects(IAgentIdentifier owner)
 	{
 		synchronized(monitor)
 		{
@@ -560,6 +594,20 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	{
 		synchronized(monitor)
 		{
+			// Add avatar(s) if any.
+			String	agenttype	= ((ApplicationContext)getContext()).getAgentType(aid);
+			if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)
+			{
+				for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
+				{
+					String	objecttype	= (String)it.next();
+					// Hmm local name as owner? better would be agent id, but agents are created after space?
+					Map	props	= new HashMap();
+					props.put(ISpaceObject.PROPERTY_OWNER, aid);
+					createSpaceObject(objecttype, props, null, null);
+				}
+			}
+			
 			if(perceptgenerators!=null)
 			{
 				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )

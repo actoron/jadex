@@ -54,7 +54,7 @@ public class GoPlanEnv extends Plan
 			
 			Map params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(IAgentAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier().getLocalName())[0].getId());
+			params.put(IAgentAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
 			SyncResultListener srl	= new SyncResultListener();
 			env.performAgentAction("go", params, srl); 
 			srl.waitForResult();

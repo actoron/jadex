@@ -104,9 +104,7 @@ public class BurnerVisionGenerator extends SimplePropertyObject implements IPerc
 				{
 					IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.POSITION);
 					IVector2 oldpos = (IVector2)event.getInfo();
-					
-					String owner = agent.getLocalName(); // Hack!
-					ISpaceObject agentobj = event.getSpace().getOwnedObjects(owner)[0];
+					ISpaceObject agentobj = event.getSpace().getOwnedObjects(agent)[0];
 					
 					if(agentobj.getProperty(Space2D.POSITION).equals(pos))
 					{

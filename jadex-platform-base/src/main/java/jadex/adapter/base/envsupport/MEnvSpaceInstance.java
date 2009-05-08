@@ -9,13 +9,14 @@ import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
+import jadex.adapter.base.fipa.IAMS;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.ILibraryService;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
@@ -112,6 +113,18 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			((Space2D)ret).setAreaSize(Vector2Double.getVector2(width, height));
 		}
 		
+		// Add avatar mappings.
+		List avmappings = spacetype.getPropertyList("avatarmappings");
+		if(avmappings!=null)
+		{
+			for(int i=0; i<avmappings.size(); i++)
+			{
+				Map mapping = (Map)avmappings.get(i);
+				ret.addAvatarMappings((String)MEnvSpaceInstance.getProperty(mapping, "agenttype"), 
+					(String)MEnvSpaceInstance.getProperty(mapping, "objecttype"));
+			}
+		}
+		
 		// Create space actions.
 		List spaceactions = spacetype.getPropertyList("spaceactiontypes");
 		if(spaceactions!=null)
@@ -183,9 +196,20 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<objects.size(); i++)
 			{
 				Map mobj = (Map)objects.get(i);
-			
-				// Hmm local name as owner? better would be agent id, but agents are created after space?
-				ret.createSpaceObject(MEnvSpaceInstance.getProperty(mobj, "type"), MEnvSpaceInstance.getProperty(mobj, "owner"), null, null, null);
+				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
+				Map	props	= null;
+				if(owner!=null)
+				{
+					IAgentIdentifier	ownerid;
+					IAMS	ams	= ((IAMS)app.getPlatform().getService(IAMS.class));
+					if(owner.indexOf("@")!=-1)
+						ownerid	= ams.createAgentIdentifier((String)owner, false);
+					else
+						ownerid	= ams.createAgentIdentifier((String)owner, true);
+					props	= new HashMap();
+					props.put(ISpaceObject.PROPERTY_OWNER, ownerid);
+				}
+				ret.createSpaceObject(MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
 			}
 		}
 		
