@@ -1,7 +1,7 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.IVector3;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
@@ -17,7 +17,6 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 {
 	
 	/** The condition deciding if the drawable should be drawn. */
-//	protected DrawCondition drawcondition;
 	protected IParsedExpression drawcondition;
 	
 	/**
@@ -26,7 +25,6 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	protected RotatingPrimitive()
 	{
 		super();
-		drawcondition = null;
 	}
 
 	/**
@@ -38,20 +36,10 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
 	 */
-	protected RotatingPrimitive(Object position, Object xrotation, Object yrotation, Object zrotation, Object size, IParsedExpression drawcondition)
+	protected RotatingPrimitive(Object position, Object rotation, Object size, IParsedExpression drawcondition)
 	{
-		super();
+		super(position, rotation, size);
 		this.drawcondition = drawcondition;
-		if (position != null)
-			this.position = position;
-		if (xrotation != null)
-			this.xRotation = xrotation;
-		if (xrotation != null)
-			this.xRotation = xrotation;
-		if (zrotation != null)
-			this.zRotation = zrotation;
-		if (size != null)
-			this.size = size;
 	}
 
 	/**
@@ -64,20 +52,21 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	protected boolean setupMatrix(Object obj, Graphics2D g)
 	{
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
-		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
-		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
+		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, rot.getXAsDouble());
+//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotatio);
+//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
-		if ((position == null) || (size == null) || (xrotation == null) || (yrotation == null) || (zrotation == null))
+		if ((position == null) || (size == null) || (rot == null))
 		{
 			return false;
 		}
 		
 		g.translate(position.getXAsDouble(), position.getYAsDouble());
 		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.scale(Math.cos(xrotation.getAsDouble()), Math.cos(yrotation.getAsDouble()));
-		g.rotate(zrotation.getAsDouble());
+		g.scale(Math.cos(rot.getXAsDouble()), Math.cos(rot.getYAsDouble()));
+		g.rotate(rot.getZAsDouble());
 		
 		return true;
 	}
@@ -91,21 +80,22 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	protected boolean setupMatrix(Object obj, GL gl)
 	{
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
-		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
-		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
+		IVector3 rot = SObjectInspector.getVector3(obj, this.size);
+//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
+//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
+//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
-		if ((position == null) || (size == null) || (xrotation == null) || (yrotation == null) || (zrotation == null))
+		if ((position == null) || (size == null) || (rot == null))
 		{
 			return false;
 		}
 		
 		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
 		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
-		gl.glRotated(Math.toDegrees(xrotation.getAsFloat()), 1.0, 0.0, 0.0);
-		gl.glRotated(Math.toDegrees(yrotation.getAsFloat()), 0.0, 1.0, 0.0);
-		gl.glRotated(Math.toDegrees(zrotation.getAsFloat()), 0.0, 0.0, 1.0);
+		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
+		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
+		gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
 		return true;
 	}
 	

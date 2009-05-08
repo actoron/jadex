@@ -38,9 +38,9 @@ public class Rectangle extends ColoredPrimitive
 	 * @param size size or size-binding
 	 * @param c the drawable's color
 	 */
-	public Rectangle(Object position, Object xrotation, Object yrotation, Object zrotation, Object size, Color c, IParsedExpression drawcondition)
+	public Rectangle(Object position, Object rotation, Object size, Color c, IParsedExpression drawcondition)
 	{
-		super(position, xrotation, yrotation, zrotation, size, c, drawcondition);
+		super(position, rotation, size, c, drawcondition);
 	}
 
 	public void init(ViewportJ2D vp)

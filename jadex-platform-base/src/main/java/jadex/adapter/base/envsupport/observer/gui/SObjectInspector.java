@@ -14,6 +14,7 @@ import java.util.Set;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.IVector3;
 import jadex.commons.IPropertyObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
@@ -252,6 +253,28 @@ public class SObjectInspector
 			vector2 = (IVector2) SObjectInspector.getProperty(obj, (String) vecId);
 		}
 		return vector2;
+	}
+	
+	/**
+	 * Retrieves a 3-vector given an object and either a string-based binding or
+	 * the vector itself.
+	 * 
+	 * @param obj the object
+	 * @param vecId either the vector or a property name
+	 * @return retrieved 3-vector
+	 */
+	public static IVector3 getVector3(Object obj, Object vecId)
+	{
+		IVector3 vector3;
+		if (vecId instanceof IVector3)
+		{
+			vector3 = (IVector3) vecId;
+		}
+		else
+		{
+			vector3 = (IVector3) SObjectInspector.getProperty(obj, (String) vecId);
+		}
+		return vector3;
 	}
 
 }

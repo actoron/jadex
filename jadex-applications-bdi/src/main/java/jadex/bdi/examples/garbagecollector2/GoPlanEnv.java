@@ -50,7 +50,7 @@ public class GoPlanEnv extends Plan
 					dir = GoAction.UP;
 			}
 
-			//System.out.println("Wants to go: "+dir);
+			System.out.println("Wants to go: "+dir);
 			
 			Map params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);

@@ -23,8 +23,11 @@
 	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" width="10" height="10" class="Grid2D">
-			<!-- <env:dimension>10</env:dimension>
-			<env:dimension>10</env:dimension> -->
+			<!-- <env:objecttypes>
+				<env:objecttype name="collector">
+					<env:property name="rotatez"></env:property>
+				</env:objecttype>
+			</env:objecttypes> -->
 			
 			<env:avatarmappings>
 				<env:avatarmapping agenttype="Collector" objecttype="collector"/>
@@ -55,7 +58,7 @@
 			
 			<env:perspectives>
 				<env:perspective name="icons">
-					<env:drawable objecttype="collector" width="0.9" height="0.9">
+					<env:drawable objecttype="collector" width="0.9" height="0.9" rotation="rotatez">
 						<env:texturedrectangle layer="2"  imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
 						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.2" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
 							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
@@ -76,7 +79,9 @@
 				<env:perspective name="abstract">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
 						<env:triangle layer="2" color="RED" />
-						<env:rectangle layer="3" color="YELLOW" width="0.2" height="0.2"/>
+						<env:rectangle layer="3" color="YELLOW" width="0.2" height="0.2">
+							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
+						</env:rectangle>
 					</env:drawable>
 					<env:drawable objecttype="burner" width="1.0" height="1.0">
 						<env:triangle layer="1" color="GREEN" />
@@ -109,7 +114,14 @@
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
 				<!-- <env:objects>
-					<env:object type="collector" owner="Collector1" />
+					<env:object type="collector" owner="Collector1" >
+						<env:property name="rotatez">
+							$object.getProperty("lastmove")==null || $object.getProperty("lastmove").equals("right")? Math.PI:
+							$object.getProperty("lastmove").equals("left")? Math.PI:
+							$object.getProperty("lastmove").equals("up")? Math.PI/2:
+							Math.PI*3/2
+						</env:property>
+					</env:object>
 					<env:object type="burner" owner="Burner1" />
 				</env:objects> -->
 				

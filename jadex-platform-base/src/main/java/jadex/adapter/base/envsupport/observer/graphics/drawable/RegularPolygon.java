@@ -43,9 +43,9 @@ public class RegularPolygon extends ColoredPrimitive
 	 * @param c the drawable's color
 	 * @param vertices number of vertices (corners)
 	 */
-	public RegularPolygon(Object position, Object xrotation, Object yrotation, Object zrotation, Object size, Color c, int vertices, IParsedExpression drawcondition)
+	public RegularPolygon(Object position, Object rotation, Object size, Color c, int vertices, IParsedExpression drawcondition)
 	{
-		super(position, xrotation, yrotation, zrotation, size, c, drawcondition);
+		super(position, rotation, size, c, drawcondition);
 		vertices_ = vertices;
 	}
 

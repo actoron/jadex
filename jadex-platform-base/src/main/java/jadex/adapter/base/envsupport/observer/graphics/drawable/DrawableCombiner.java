@@ -2,6 +2,10 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.IVector3;
+import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
@@ -19,7 +23,6 @@ import java.util.Set;
 
 import javax.media.opengl.GL;
 
-
 /**
  * This drawable combines multiple drawables into a single drawable object.
  */
@@ -33,11 +36,18 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public DrawableCombiner()
 	{
-		super();
-		drawables_ = new HashMap();
-		position = "position";
+		this(null, null, null);
 	}
 
+	/**
+	 * Creates a new DrawableCombiner of size 1.0.
+	 */
+	public DrawableCombiner(Object position, Object rotation, Object size)
+	{
+		super(position==null? "position": position, rotation, size);
+		drawables_ = new HashMap();
+	}
+	
 	/**
 	 * Adds a drawable to the combiner.
 	 * 
@@ -140,21 +150,24 @@ public class DrawableCombiner extends AbstractVisual2D
 		Graphics2D g = vp.getContext();
 		AffineTransform t = g.getTransform();
 		
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
-		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
-		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
-		
-		if ((position == null) || (size == null) || (xrotation == null) || (yrotation == null) || (zrotation == null))
-		{
+		if(position==null)
 			return;
-		}
+		
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		if(size==null)
+			size = new Vector2Double(1,0);
+		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
+//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
+//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
+		if(rot==null)
+			rot = Vector3Double.ZERO.copy();
 		
 		g.translate(position.getXAsDouble(), position.getYAsDouble());
 		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.scale(Math.cos(xrotation.getAsDouble()), Math.cos(yrotation.getAsDouble()));
-		g.rotate(zrotation.getAsDouble());
+		g.scale(Math.cos(rot.getXAsDouble()), Math.cos(rot.getYAsDouble()));
+		g.rotate(rot.getZAsDouble());
 
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
@@ -182,25 +195,28 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		GL gl = vp.getContext();
 		
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
-		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
-		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
-		
-		if ((position == null) || (size == null) || (zrotation == null))
-		{
+		if(position==null)
 			return;
-		}
 		
-		gl.glPushMatrix();
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		if(size==null)
+			size = new Vector2Double(1,0);
+		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
+//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
+//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
+		if(rot==null)
+			rot = Vector3Double.ZERO.copy();
+		
 		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
 		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
-		gl.glRotated(Math.toDegrees(xrotation.getAsFloat()), 1.0, 0.0, 0.0);
-		gl.glRotated(Math.toDegrees(yrotation.getAsFloat()), 0.0, 1.0, 0.0);
-		gl.glRotated(Math.toDegrees(zrotation.getAsDouble()), 0.0, 0.0, 1.0);
+		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
+		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
+		gl.glRotated(Math.toDegrees(rot.getZAsDouble()), 0.0, 0.0, 1.0);
 //		System.out.println("draw: "+obj+" "+size+" "+rotation+" "+position);
 		
+//		System.out.println("draw: "+obj+" "+size+" "+rotation+" "+position);
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();

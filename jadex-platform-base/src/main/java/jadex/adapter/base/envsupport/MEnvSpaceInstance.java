@@ -95,18 +95,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		
 		if(ret instanceof Space2D) // Hack?
 		{
-//			IVector2 areasize;
-//			List dims = spacetype.getPropertyList("dimensions");
-//			Number dim1 = (Number)dims.get(0);
-//			Number dim2 = (Number)dims.get(1);
-//			
-//			if(dim1 instanceof Integer)
-//				areasize = new Vector2Double(dim1.doubleValue(), dim2.doubleValue());
-//			else if(dim2 instanceof Double)
-//				areasize = new Vector2Int(dim1.intValue(), dim2.intValue());
-//			else
-//				throw new RuntimeException("Dimension class not supported: "+dim1);
-			
 			Double width = getProperty(properties, "width")!=null? (Double)getProperty(properties, "width"): (Double)getProperty(spacetype.getProperties(), "width");
 			Double height = getProperty(properties, "height")!=null? (Double)getProperty(properties, "height"): (Double)getProperty(spacetype.getProperties(), "height");
 			
@@ -196,8 +184,24 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<objects.size(); i++)
 			{
 				Map mobj = (Map)objects.get(i);
+			
+				// todo: support static objecttype declarartions
+				
+				List mprops = (List)mobj.get("properties");
+				Map props = null;
+				if(mprops!=null)
+				{
+					props = new HashMap();
+					for(int j=0; j<mprops.size(); j++)
+					{
+						Map prop = (Map)mprops.get(j);
+						IParsedExpression exp = (IParsedExpression)prop.get("value");
+						// todo: support static and dynamic values?!
+						props.put((String)prop.get("name"), exp);
+//						props.put((String)prop.get("name"), exp.getValue(fetcher));
+					}
+				}
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
-				Map	props	= null;
 				if(owner!=null)
 				{
 					IAgentIdentifier	ownerid;
@@ -206,9 +210,12 @@ public class MEnvSpaceInstance extends MSpaceInstance
 						ownerid	= ams.createAgentIdentifier((String)owner, false);
 					else
 						ownerid	= ams.createAgentIdentifier((String)owner, true);
-					props	= new HashMap();
+					if(props==null)
+						props	= new HashMap();
 					props.put(ISpaceObject.PROPERTY_OWNER, ownerid);
 				}
+				
+				// Hmm local name as owner? better would be agent id, but agents are created after space?
 				ret.createSpaceObject(MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
 			}
 		}
