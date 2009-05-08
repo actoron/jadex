@@ -2,8 +2,8 @@ package jadex.adapter.base.envsupport.dataview;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
+
+import java.util.Map;
 
 /**
  * A general 2D view that presents all Objects in a Space2D to the observer.
@@ -35,7 +35,7 @@ public class GeneralDataView2D implements IDataView
 	/**
 	 * 
 	 */
-	public void setSpace(IEnvironmentSpace space)
+	public void init(IEnvironmentSpace space, Map props)
 	{
 		this.space = (Space2D)space;
 		this.monitor	= this.space.getMonitor();

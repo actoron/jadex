@@ -29,6 +29,7 @@ import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.awt.Color;
@@ -155,8 +156,9 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("view", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "name", "creator"}, 
+			SUtil.createHashMap(new String[]{"class", "name", "objecttype", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
+			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
@@ -178,11 +180,32 @@ public class MEnvSpaceType	extends MSpaceType
 //					}
 					
 					IDataView ret = (IDataView)((Class)MEnvSpaceInstance.getProperty(sourceview, "clazz")).newInstance();
-					ret.setSpace(space);
+					
+					Map	props	= null;
+					List lprops = (List)sourceview.get("properties");
+					if(lprops!=null)
+					{
+						props	= new HashMap();
+						SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
+						fetcher.setValues(args);
+						for(int i=0; i<lprops.size(); i++)
+						{
+							Map	prop	= (Map)lprops.get(i);
+							IParsedExpression exp = (IParsedExpression)prop.get("value");
+							props.put(prop.get("name"), exp.getValue(fetcher));
+							
+						}
+					}
+					
+					ret.init(space, props);
 					return ret;
 				}
 			})
 			}), null));
+
+		types.add(new TypeInfo("view/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+				SUtil.createHashMap(new String[]{"name"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("perspective", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "creator"}, 
@@ -520,6 +543,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("processtype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("spaceactiontype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("agentactiontype/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("view/property", new BeanAttributeInfo("properties", null, "")));
 		
 		return linkinfos;
 	}

@@ -18,7 +18,7 @@
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.adapter.base.envsupport.math.Vector1Long</import>
 		<import>jadex.bridge.IClockService</import>
-		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D</import>
+		<import>jadex.adapter.base.envsupport.dataview.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -56,7 +56,12 @@
 			</env:perceptgeneratortypes>
  -->			
 			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D" />
+				<env:view name="all_view" class="GeneralDataView2D" />
+				<!-- <env:view name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:view> -->
+				<env:view name="prey_view" class="LocalDataView2D" objecttype="prey">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:view>
 			</env:views>
 
 			<env:perspectives>

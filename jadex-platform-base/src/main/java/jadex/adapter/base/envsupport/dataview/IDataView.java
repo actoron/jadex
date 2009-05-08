@@ -1,9 +1,8 @@
 package jadex.adapter.base.envsupport.dataview;
 
-import java.util.List;
-
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+
+import java.util.Map;
 
 /**
  * View used by an observer to display part of the environment
@@ -14,9 +13,10 @@ public interface IDataView
 	public static final String SIMPLE_VIEW_2D = "Simple 2D View";
 	
 	/**
-	 * 
+	 *  Initialize the view.
 	 */
-	public void setSpace(IEnvironmentSpace space);
+	// todo: other form of initialization?
+	public void init(IEnvironmentSpace space, Map properties);
 	
 	/**
 	 * Returns the type of the view.

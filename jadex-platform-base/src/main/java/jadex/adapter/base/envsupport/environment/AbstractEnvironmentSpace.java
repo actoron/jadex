@@ -1,9 +1,16 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
+import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.contextservice.IContext;
+import jadex.adapter.base.envsupport.IObjectCreator;
+import jadex.adapter.base.envsupport.MEnvSpaceInstance;
+import jadex.adapter.base.envsupport.MEnvSpaceType;
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ILibraryService;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
 
@@ -30,6 +37,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 	
 	/** Avatar mappings. */
 	protected MultiCollection avatarmappings;
+
+	/** Data view mappings. */
+	protected MultiCollection	dataviewmappings;
 	
 	/** Available space actions. */
 	protected Map spaceactions;
@@ -74,6 +84,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		this.monitor = new Object();
 		this.views = new HashMap();
 		this.avatarmappings = new MultiCollection();
+		this.dataviewmappings = new MultiCollection();
 		this.spaceactions = new HashMap();
 		this.agentactions = new HashMap();
 		this.processes = new HashMap();
@@ -169,6 +180,41 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 					spaceobjectsbyowner.put(owner, ownerobjects);
 				}
 				ownerobjects.add(ret);
+			}
+			
+			// Create view(s) for the object if any.
+			if(dataviewmappings!=null && dataviewmappings.getCollection(type)!=null)
+			{
+				for(Iterator it=dataviewmappings.getCollection(type).iterator(); it.hasNext(); )
+				{
+					try
+					{
+						Map	sourceview	= (Map)it.next();
+						Map viewargs = new HashMap();
+						viewargs.put("sourceview", sourceview);
+						viewargs.put("space", this);
+						viewargs.put("$object", ret);
+						
+						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
+						addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id, view);
+
+//						ObserverCenter oc = new ObserverCenter((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id, this, (ILibraryService)((ApplicationContext)getContext()).getPlatform().getService(ILibraryService.class), null);
+//						
+//						MEnvSpaceType	spacetype	= (MEnvSpaceType)((ApplicationContext)getContext()).getApplicationType().getMSpaceTypes().get(0);
+//						List perspectives = spacetype.getPropertyList("perspectives");
+//						for(int j=0; j<perspectives.size(); j++)
+//						{
+//							Map sourcetheme = (Map)perspectives.get(j);
+//							oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
+//						}
+					}
+					catch(Exception e)
+					{
+						if(e instanceof RuntimeException)
+							throw (RuntimeException)e;
+						throw new RuntimeException(e);
+					}
+				}
 			}
 		}
 		
@@ -530,6 +576,19 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder
 		}
 	}
 	
+	/**
+	 *  Add a mapping from object type to data view
+	 *  @param objecttype	The object type.
+	 *  @param view	Settings for view creation.
+	 */
+	public void addDataViewMapping(String objecttype, Map view)
+	{
+		synchronized(monitor)
+		{
+			dataviewmappings.put(objecttype, view);
+		}
+	}
+
 	/**
 	 *  Add an environment listener.
 	 *  @param listener The environment listener. 

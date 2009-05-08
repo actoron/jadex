@@ -199,6 +199,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		gl.glRotated(Math.toDegrees(xrotation.getAsFloat()), 1.0, 0.0, 0.0);
 		gl.glRotated(Math.toDegrees(yrotation.getAsFloat()), 0.0, 1.0, 0.0);
 		gl.glRotated(Math.toDegrees(zrotation.getAsDouble()), 0.0, 0.0, 1.0);
+//		System.out.println("draw: "+obj+" "+size+" "+rotation+" "+position);
 		
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{

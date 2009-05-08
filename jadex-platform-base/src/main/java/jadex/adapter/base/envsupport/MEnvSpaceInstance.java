@@ -245,12 +245,19 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<sourceviews.size(); i++)
 			{				
 				Map sourceview = (Map)sourceviews.get(i);
-				
-				Map viewargs = new HashMap();
-				viewargs.put("sourceview", sourceview);
-				viewargs.put("space", ret);
-				
-				ret.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs));
+				if(MEnvSpaceInstance.getProperty(sourceview, "objecttype")==null)
+				{
+					Map viewargs = new HashMap();
+					viewargs.put("sourceview", sourceview);
+					viewargs.put("space", ret);
+					
+					IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
+					ret.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), view);
+				}
+				else
+				{
+					ret.addDataViewMapping((String)MEnvSpaceInstance.getProperty(sourceview, "objecttype"), sourceview);
+				}
 			}
 		}
 		
