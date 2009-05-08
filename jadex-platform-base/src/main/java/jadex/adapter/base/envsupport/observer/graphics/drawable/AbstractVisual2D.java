@@ -9,8 +9,14 @@ public class AbstractVisual2D
 	/** The size (scale) of the visual or a bound property to the size. */
 	protected Object	size;
 	
-	/** The rotation of the visual or a bound property to the rotation. */
-	protected Object	rotation;
+	/** The rotation of the visual or a bound property to the rotation along the x-axis. */
+	protected Object	xRotation;
+	
+	/** The rotation of the visual or a bound property to the rotation along the y-axis. */
+	protected Object	yRotation;
+	
+	/** The rotation of the visual or a bound property to the rotation along the z-axis. */
+	protected Object	zRotation;
 	
 	/** The position of the visual or a bound property to the position. */
 	protected Object	position;
@@ -21,7 +27,9 @@ public class AbstractVisual2D
 	public AbstractVisual2D()
 	{
 		this.size = new Vector2Double(1.0);
-		this.rotation = Vector2Double.ZERO.copy();
+		this.xRotation = Vector2Double.ZERO.copy();
+		this.yRotation = Vector2Double.ZERO.copy();
+		this.zRotation = Vector2Double.ZERO.copy();
 		this.position = Vector2Double.ZERO.copy();
 	}
 	
@@ -36,13 +44,44 @@ public class AbstractVisual2D
 	}
 
 	/**
-	 * Sets the rotation of the visual to a fixed rotation.
+	 * Sets the z-rotation of the visual to a fixed rotation.
+	 * (alias for setZRotation)
 	 * 
-	 * @param rotation the fixed rotation
+	 * @param rotation the fixed z-rotation
 	 */
 	public void setRotation(IVector1 rotation)
 	{
-		this.rotation = rotation;
+		setZRotation(rotation);
+	}
+	
+	/**
+	 * Sets the x-rotation of the visual to a fixed rotation.
+	 * 
+	 * @param rotation the fixed x-rotation
+	 */
+	public void setXRotation(IVector1 rotation)
+	{
+		this.xRotation = rotation;
+	}
+	
+	/**
+	 * Sets the y-rotation of the visual to a fixed rotation.
+	 * 
+	 * @param rotation the fixed y-rotation
+	 */
+	public void setYRotation(IVector1 rotation)
+	{
+		this.yRotation = rotation;
+	}
+	
+	/**
+	 * Sets the z-rotation of the visual to a fixed rotation.
+	 * 
+	 * @param rotation the fixed z-rotation
+	 */
+	public void setZRotation(IVector1 rotation)
+	{
+		this.zRotation = rotation;
 	}
 
 	/**
@@ -66,13 +105,44 @@ public class AbstractVisual2D
 	}
 	
 	/**
-	 * Binds the rotation of the visual to an object property.
+	 * Binds the z-rotation of the visual to an object property.
+	 * (alias for bindZRotation)
 	 * 
 	 * @param propId the property ID
 	 */
 	public void bindRotation(String propId)
 	{
-		rotation = propId;
+		bindZRotation(propId);
+	}
+	
+	/**
+	 * Binds the x-rotation of the visual to an object property.
+	 * 
+	 * @param propId the property ID
+	 */
+	public void bindXRotation(String propId)
+	{
+		xRotation = propId;
+	}
+	
+	/**
+	 * Binds the y-rotation of the visual to an object property.
+	 * 
+	 * @param propId the property ID
+	 */
+	public void bindYRotation(String propId)
+	{
+		yRotation = propId;
+	}
+	
+	/**
+	 * Binds the z-rotation of the visual to an object property.
+	 * 
+	 * @param propId the property ID
+	 */
+	public void bindZRotation(String propId)
+	{
+		zRotation = propId;
 	}
 	
 	/**
@@ -94,15 +164,35 @@ public class AbstractVisual2D
 	{
 		return position;
 	}
+	
+	/**
+	 * Gets the x-axis rotation or rotation-binding.
+	 * 
+	 * @return x-axis rotation or rotation-binding
+	 */
+	public Object getXRotation()
+	{
+		return xRotation;
+	}
+	
+	/**
+	 * Gets the y-axis rotation or rotation-binding.
+	 * 
+	 * @return y-axis rotation or rotation-binding
+	 */
+	public Object getYRotation()
+	{
+		return yRotation;
+	}
 
 	/**
-	 * Gets the rotation or rotation-binding.
+	 * Gets the z-axis rotation or rotation-binding.
 	 * 
-	 * @return rotation or rotation-binding
+	 * @return z-axis rotation or rotation-binding
 	 */
-	public Object getRotation()
+	public Object getZRotation()
 	{
-		return rotation;
+		return zRotation;
 	}
 	
 	/**

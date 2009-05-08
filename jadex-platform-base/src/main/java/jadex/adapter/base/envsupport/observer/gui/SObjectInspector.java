@@ -11,11 +11,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.adapter.base.envsupport.environment.IDynamicValue;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.commons.IPropertyObject;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 /**
  * A convenience class for retrieving properties from objects.
@@ -140,9 +141,11 @@ public class SObjectInspector
 			}
 		}
 		
-		if (ret instanceof IDynamicValue)
+		if (ret instanceof IParsedExpression)
 		{
-			ret = ((IDynamicValue) ret).getValue();
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$object", obj);
+			ret = ((IParsedExpression) ret).getValue(fetcher);
 		}
 		
 		return ret;
@@ -180,7 +183,7 @@ public class SObjectInspector
 	 * @param vecId either the vector or a property name
 	 * @return retrieved 1-vector
 	 */
-	public static IVector1 getVector1asDirection(Object obj, Object vecId)
+	public static IVector1 getVector1AsDirection(Object obj, Object vecId)
 	{
 		Object vector1;
 		if (vecId instanceof String)
@@ -195,6 +198,35 @@ public class SObjectInspector
 		if (vector1 instanceof IVector2)
 		{
 			vector1 = ((IVector2) vector1).getDirection();
+		}
+		
+		return (IVector1) vector1;
+	}
+	
+	/**
+	 * Retrieves a 1-vector given an object and either a string-based binding or
+	 * the vector itself. If the vector is a 2-vector, it is converted to a 1-vector
+	 * by retrieving the length of the vector.
+	 * 
+	 * @param obj the object
+	 * @param vecId either the vector or a property name
+	 * @return retrieved 1-vector
+	 */
+	public static IVector1 getVector1AsLength(Object obj, Object vecId)
+	{
+		Object vector1;
+		if (vecId instanceof String)
+		{
+			vector1 = SObjectInspector.getProperty(obj, (String) vecId);
+		}
+		else
+		{
+			vector1 = vecId;
+		}
+		
+		if (vector1 instanceof IVector2)
+		{
+			vector1 = ((IVector2) vector1).getLength();
 		}
 		
 		return (IVector1) vector1;

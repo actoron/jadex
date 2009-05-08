@@ -2,7 +2,6 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
@@ -142,7 +141,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		AffineTransform t = g.getTransform();
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 rotation = SObjectInspector.getVector1asDirection(obj, this.rotation);
+		IVector1 rotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
 		if ((position == null) || (size == null) || (rotation == null))
@@ -181,7 +180,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		GL gl = vp.getContext();
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 rotation = SObjectInspector.getVector1asDirection(obj, this.rotation);
+		IVector1 rotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
 		if ((position == null) || (size == null) || (rotation == null))

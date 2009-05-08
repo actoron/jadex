@@ -1,9 +1,6 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.environment.IDynamicValue;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
@@ -49,13 +46,15 @@ public class TexturedRectangle extends RotatingPrimitive
 	 * Creates a new TexturedRectangle drawable.
 	 * 
 	 * @param position position or position-binding
-	 * @param rotation rotation or rotation-binding
+	 * @param xrotation xrotation or rotation-binding
+	 * @param yrotation yrotation or rotation-binding
+	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
 	 * @param texturePath resource path of the texture
 	 */
-	public TexturedRectangle(Object position, Object rotation, Object size, String texturePath, IParsedExpression drawcondition)
+	public TexturedRectangle(Object position, Object xrotation, Object yrotation, Object zrotation, Object size, String texturePath, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, drawcondition);
+		super(position, xrotation, yrotation, zrotation, size, drawcondition);
 		texturePath_ = texturePath;
 		texture_ = 0;
 		image_ = null;
@@ -79,17 +78,10 @@ public class TexturedRectangle extends RotatingPrimitive
 		AffineTransform transform = g.getTransform();
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector1 rotation = SObjectInspector.getVector1asDirection(obj, this.rotation);
-		IVector2 position = SObjectInspector.getVector2(obj, this.position);
-		if ((position == null) || (size == null) || (rotation == null))
-		{
-			return;
-		}
 		
-		g.translate(position.getXAsDouble() - (size.getXAsDouble() / 2),
-					position.getYAsDouble() - (size.getYAsDouble() / 2));
-		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.rotate(rotation.getAsDouble());
+		if (!setupMatrix(obj, g))
+			return;
+		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		
 		g.drawImage(image_, vp.getImageTransform(image_.getWidth(), image_
 				.getHeight()), null);

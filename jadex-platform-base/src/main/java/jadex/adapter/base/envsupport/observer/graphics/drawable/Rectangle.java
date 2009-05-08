@@ -1,8 +1,5 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.environment.IDynamicValue;
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.javaparser.IParsedExpression;
@@ -35,13 +32,15 @@ public class Rectangle extends ColoredPrimitive
 	 * Generates a new Rectangle
 	 * 
 	 * @param position position or position-binding
-	 * @param rotation rotation or rotation-binding
+	 * @param xrotation xrotation or rotation-binding
+	 * @param yrotation yrotation or rotation-binding
+	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
 	 * @param c the drawable's color
 	 */
-	public Rectangle(Object position, Object rotation, Object size, Color c, IParsedExpression drawcondition)
+	public Rectangle(Object position, Object xrotation, Object yrotation, Object zrotation, Object size, Color c, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, c, drawcondition);
+		super(position, xrotation, yrotation, zrotation, size, c, drawcondition);
 	}
 
 	public void init(ViewportJ2D vp)

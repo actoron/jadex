@@ -1,15 +1,7 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.environment.IDynamicValue;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
-import jadex.javaparser.IParsedExpression;
-
-import java.awt.Graphics2D;
-
-import javax.media.opengl.GL;
 
 
 public interface IDrawable
@@ -45,53 +37,4 @@ public interface IDrawable
 	 * @param vp the viewport
 	 */
 	public void draw(Object obj, ViewportJOGL vp);
-
-	/**
-	 * Sets the position of the visual to a fixed position.
-	 * 
-	 * @param pos fixed position
-	 */
-	public void setPosition(IVector2 pos);
-
-	/**
-	 * Sets the rotation of the visual to a fixed rotation.
-	 * 
-	 * @param rotation the fixed rotation
-	 */
-	public void setRotation(IVector1 rotation);
-
-	/**
-	 * Sets the size (scale) of the visual to a fixed size.
-	 * 
-	 * @param size fixed size
-	 */
-	public void setSize(IVector2 size);
-	
-	/**
-	 * Sets the draw condition.
-	 * 
-	 * @param drawcondition the draw condition
-	 */
-	public void setDrawCondition(IParsedExpression drawcondition);
-	
-	/**
-	 * Binds the position of the visual to an object property.
-	 * 
-	 * @param propId the property ID
-	 */
-	public void bindPosition(String propId);
-	
-	/**
-	 * Binds the rotation of the visual to an object property.
-	 * 
-	 * @param propId the property ID
-	 */
-	public void bindRotation(String propId);
-	
-	/**
-	 * Binds the size of the visual to an object property.
-	 * 
-	 * @param propId the property ID
-	 */
-	public void bindSize(String propId);
 }
