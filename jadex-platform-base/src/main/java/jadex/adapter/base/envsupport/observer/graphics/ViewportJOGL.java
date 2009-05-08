@@ -310,11 +310,10 @@ public class ViewportJOGL extends AbstractViewport
 		try
 		{
 			tmpImage = ImageIO.read(SUtil.getResource(path, cl));
-//			tmpImage = ImageIO.read(cl.getResource(path));
 			AffineTransform tf = AffineTransform.getScaleInstance(1, -1);
 			tf.translate(0, -tmpImage.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tf,
-					AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+					AffineTransformOp.TYPE_BICUBIC);
 			tmpImage = op.filter(tmpImage, null);
 		}
 		catch(Exception e)
@@ -350,12 +349,6 @@ public class ViewportJOGL extends AbstractViewport
 		int oh = tmpImage.getHeight();
 		g.drawImage(tmpImage, 0, 0, width, height, 0, 0, tmpImage.getWidth(), tmpImage.getHeight(), null);
 
-		// Fill up padded textures, may be wrong approach for
-		// clamped textures.
-		// g.drawImage(tmpImage, ow, 0, null);
-		// g.drawImage(tmpImage, 0, oh, null);
-		// g.drawImage(tmpImage, ow, oh, null);
-
 		g.dispose();
 		tmpImage = null;
 
@@ -388,13 +381,6 @@ public class ViewportJOGL extends AbstractViewport
 
 
 		return texture;
-	}
-	
-	private IVector2 matMult(float[] mat, double x, double y)
-	{
-		double v0 = (mat[0] * x) + (mat[4] * y) + mat[12];
-		double v1 = (mat[1] * x) + (mat[5] * y) + mat[13];
-		return new Vector2Double(v0, v1);
 	}
 
 	private class GLController implements GLEventListener

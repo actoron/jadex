@@ -3,19 +3,30 @@ package jadex.adapter.base.envsupport.observer.graphics;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.color.ColorSpace;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -171,24 +182,16 @@ public abstract class AbstractViewport implements IViewport
 			if(sizeAR > windowAR)
 			{
 				width = size.getXAsDouble();
-				//height = size.getYAsDouble() * sizeAR / windowAR;
 				height = size.getXAsDouble() / windowAR;
 			}
 			else
 			{
-				//width = size.getXAsDouble() / sizeAR * windowAR;
 				width = size.getYAsDouble() * windowAR;
 				height = size.getYAsDouble();
 			}
 			
-			double xFac = canvas_.getWidth() / width;
-			double yFac = canvas_.getHeight() / height;
 			posX_ = (float)-((width - size.getXAsDouble()) / 2.0);
 			posY_ = (float)-((height - size.getYAsDouble()) / 2.0);
-			/*System.out.print("posX:");
-			System.out.println(posX_ * xFac);
-			posX_ = (float)(((int)(posX_ * xFac)) / xFac);
-			posY_ = (float)(((int)(posY_ * yFac)) / yFac);*/
 		}
 		else
 		{
@@ -308,6 +311,22 @@ public abstract class AbstractViewport implements IViewport
 	public void removeViewportListener(IViewportListener listener)
 	{
 		listeners_.remove(listener);
+	}
+	
+	public static BufferedImage stringToImage(Font font, String text)
+	{
+		TextLayout textLayout = new TextLayout(text, font, new FontRenderContext(null, true, true));
+		Rectangle2D bounds = textLayout.getBounds();
+		ColorModel colorModel = new ComponentColorModel(ColorSpace
+				.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8, 8}, true,
+				false, ComponentColorModel.TRANSLUCENT, DataBuffer.TYPE_BYTE);
+		WritableRaster raster = Raster.createInterleavedRaster(
+				DataBuffer.TYPE_BYTE, (int)Math.ceil(bounds.getWidth()), (int)Math.ceil(bounds.getHeight()), 4, null);
+		BufferedImage image = new BufferedImage(colorModel, raster, false,
+				new Hashtable());
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		textLayout.draw(g, 0, 0);
+		return image;
 	}
 
 	/**
