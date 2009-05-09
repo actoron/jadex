@@ -13,6 +13,9 @@ import java.awt.Graphics2D;
 import javax.media.opengl.GL;
 
 
+/**
+ *  Base class for rotating objects.
+ */
 public abstract class RotatingPrimitive extends AbstractVisual2D implements IDrawable
 {
 	
@@ -58,7 +61,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 //		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
-		if ((position == null) || (size == null) || (rot == null))
+		if((position == null) || (size == null) || (rot == null))
 		{
 			return false;
 		}
@@ -80,13 +83,13 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	protected boolean setupMatrix(Object obj, GL gl)
 	{
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector3 rot = SObjectInspector.getVector3(obj, this.size);
+		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
 //		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
 //		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
 //		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		
-		if ((position == null) || (size == null) || (rot == null))
+		if((position == null) || (size == null) || (rot == null))
 		{
 			return false;
 		}

@@ -1,9 +1,7 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.IVector3;
-import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
@@ -158,17 +156,15 @@ public class DrawableCombiner extends AbstractVisual2D
 		if(size==null)
 			size = new Vector2Double(1,0);
 		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
-//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
-//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
-//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		if(rot==null)
 			rot = Vector3Double.ZERO.copy();
 		
 		g.translate(position.getXAsDouble(), position.getYAsDouble());
 		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.scale(Math.cos(rot.getXAsDouble()), Math.cos(rot.getYAsDouble()));
+		g.scale(Math.cos(size.getXAsDouble()), Math.cos(size.getYAsDouble()));
 		g.rotate(rot.getZAsDouble());
 
+		System.out.println("draw: "+obj+" "+size+" "+rot+" "+position);
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();
@@ -203,20 +199,17 @@ public class DrawableCombiner extends AbstractVisual2D
 		if(size==null)
 			size = new Vector2Double(1,0);
 		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
-//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
-//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
-//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
 		if(rot==null)
 			rot = Vector3Double.ZERO.copy();
 		
+		gl.glPushMatrix();
 		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
 		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
 		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
 		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
-		gl.glRotated(Math.toDegrees(rot.getZAsDouble()), 0.0, 0.0, 1.0);
-//		System.out.println("draw: "+obj+" "+size+" "+rotation+" "+position);
+		gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
 		
-//		System.out.println("draw: "+obj+" "+size+" "+rotation+" "+position);
+//		System.out.println("draw: "+obj+" "+size+" "+rot+" "+position);
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();

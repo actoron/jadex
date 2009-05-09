@@ -265,14 +265,14 @@ public class SObjectInspector
 	 */
 	public static IVector3 getVector3(Object obj, Object vecId)
 	{
-		IVector3 vector3;
+		IVector3 vector3=null;
 		if (vecId instanceof IVector3)
 		{
-			vector3 = (IVector3) vecId;
+			vector3 = (IVector3)vecId;
 		}
 		else
 		{
-			vector3 = (IVector3) SObjectInspector.getProperty(obj, (String) vecId);
+			vector3 = (IVector3)SObjectInspector.getProperty(obj, (String) vecId);
 		}
 		return vector3;
 	}

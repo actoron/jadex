@@ -93,7 +93,7 @@
 					<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
 				</env:drawable>
 				<env:drawable objecttype="obstacle" width="1.0" height="1.0">
-					<env:triangle layer="0" width="0.9" height="0.9" zrotation="3.14159" color="#996600" />
+					<env:triangle layer="0" width="0.9" height="0.9" rotatez="3.14159" color="#996600" />
 				</env:drawable>
 				<env:drawable objecttype="prey" width="1.0" height="1.0">
 					<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="5" color="#CCCCCC" />

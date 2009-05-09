@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.IVector3;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -53,7 +52,7 @@ public class AbstractVisual2D
 	 */
 	public void setRotation(IVector3 rotation)
 	{
-		this.rotation = rotation;
+		this.rotation = rotation.copy();
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class AbstractVisual2D
 	 */
 	public void setSize(IVector2 size)
 	{
-		this.size = size;
+		this.size = size.copy();
 	}
 	
 	/**
@@ -115,5 +114,11 @@ public class AbstractVisual2D
 	public Object getSize()
 	{
 		return size;
+	}
+
+	
+	public Object getRotation()
+	{
+		return rotation;
 	}
 }

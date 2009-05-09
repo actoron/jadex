@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
@@ -127,6 +128,12 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property")
+			}), null));
+		
+		types.add(new TypeInfo("avatarmapping", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"agenttype", "objecttype"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, null, ""),
 			}), null));
 		
 		types.add(new TypeInfo("agentactiontype", MultiCollection.class, null, null,
@@ -286,7 +293,10 @@ public class MEnvSpaceType	extends MSpaceType
 						Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
 						if(rotation==null)
 						{
-							rotation = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
+							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
 						if(size==null)
@@ -340,7 +350,10 @@ public class MEnvSpaceType	extends MSpaceType
 						Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
 						if(rotation==null)
 						{
-							rotation = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
+							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
 						if(size==null)
@@ -384,7 +397,10 @@ public class MEnvSpaceType	extends MSpaceType
 						Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
 						if(rotation==null)
 						{
-							rotation = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
+							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
 						if(size==null)
@@ -428,7 +444,10 @@ public class MEnvSpaceType	extends MSpaceType
 						Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
 						if(rotation==null)
 						{
-							rotation = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
+							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
 						if(size==null)
@@ -473,7 +492,10 @@ public class MEnvSpaceType	extends MSpaceType
 							Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
 							if(rotation==null)
 							{
-								rotation = Vector1Double.getVector1((Double)MEnvSpaceInstance.getProperty(args, "rotation"));
+								Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+								Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+								Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+								rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 							}
 							Object size = MEnvSpaceInstance.getProperty(args, "size");
 							if(size==null)
@@ -599,6 +621,7 @@ public class MEnvSpaceType	extends MSpaceType
 	
 		// spacetype
 //		linkinfos.add(new LinkInfo("dimension", new BeanAttributeInfo("dimensions", BasicTypeConverter.DOUBLE_CONVERTER, "property")));
+		linkinfos.add(new LinkInfo("avatarmapping", new BeanAttributeInfo("avatarmappings", null, "property")));
 		linkinfos.add(new LinkInfo("agentactiontype", new BeanAttributeInfo("agentactiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("spaceactiontype", new BeanAttributeInfo("spaceactiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("processtype", new BeanAttributeInfo("processtypes", null, "property")));

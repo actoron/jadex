@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport.observer.graphics;
 
-import java.awt.Frame;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
