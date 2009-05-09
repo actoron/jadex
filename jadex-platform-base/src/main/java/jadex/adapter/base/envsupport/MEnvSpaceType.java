@@ -122,6 +122,10 @@ public class MEnvSpaceType	extends MSpaceType
 //		ITypeConverter tdoubleconv = new TolerantDoubleTypeConverter();
 		ITypeConverter tintconv = new TolerantIntegerTypeConverter();
 		
+		types.add(new TypeInfo("objecttype", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+		
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "width", "height", "depth"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, "property"),
@@ -204,10 +208,6 @@ public class MEnvSpaceType	extends MSpaceType
 				}
 			})
 			}), null));
-
-		types.add(new TypeInfo("view/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-				SUtil.createHashMap(new String[]{"name"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("perspective", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "creator"}, 
@@ -552,21 +552,29 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 
 		types.add(new TypeInfo("spaceactiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-				SUtil.createHashMap(new String[]{"name"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 
 		types.add(new TypeInfo("agentactiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-				SUtil.createHashMap(new String[]{"name"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("perceptgeneratortype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-				SUtil.createHashMap(new String[]{"name"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+	
+		types.add(new TypeInfo("view/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("object/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-				SUtil.createHashMap(new String[]{"name"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
-	
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+
+		types.add(new TypeInfo("objecttype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+
 		// type instance declarations.
 		
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
@@ -621,6 +629,7 @@ public class MEnvSpaceType	extends MSpaceType
 	
 		// spacetype
 //		linkinfos.add(new LinkInfo("dimension", new BeanAttributeInfo("dimensions", BasicTypeConverter.DOUBLE_CONVERTER, "property")));
+		linkinfos.add(new LinkInfo("objecttype", new BeanAttributeInfo("objecttypes", null, "property")));
 		linkinfos.add(new LinkInfo("avatarmapping", new BeanAttributeInfo("avatarmappings", null, "property")));
 		linkinfos.add(new LinkInfo("agentactiontype", new BeanAttributeInfo("agentactiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("spaceactiontype", new BeanAttributeInfo("spaceactiontypes", null, "property")));
@@ -654,12 +663,13 @@ public class MEnvSpaceType	extends MSpaceType
 		// space action 
 		linkinfos.add(new LinkInfo("spaceaction/parameter", new BeanAttributeInfo("parameters", null, "")));
 		
-		// action, process
+		// action, process, ...
 		linkinfos.add(new LinkInfo("processtype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("spaceactiontype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("agentactiontype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("object/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("view/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("objecttype/property", new BeanAttributeInfo("properties", null, "")));
 		
 		return linkinfos;
 	}

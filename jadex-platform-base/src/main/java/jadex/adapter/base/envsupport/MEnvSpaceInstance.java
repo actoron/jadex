@@ -101,6 +101,32 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			((Space2D)ret).setAreaSize(Vector2Double.getVector2(width, height));
 		}
 		
+		// Create space object types.
+		List objecttypes = spacetype.getPropertyList("objecttypes");
+		if(objecttypes!=null)
+		{
+			for(int i=0; i<objecttypes.size(); i++)
+			{
+				Map mobjecttype = (Map)objecttypes.get(i);
+				List props = (List)mobjecttype.get("properties");
+				Map properties = null;
+				
+				if(props!=null)
+				{
+					properties = new HashMap();
+					for(int j=0; j<props.size(); j++)
+					{
+						Map prop = (Map)props.get(j);
+						IParsedExpression exp = (IParsedExpression)prop.get("value");
+						properties.put((String)prop.get("name"), exp);
+					}
+				}
+				
+				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name"));
+				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
+			}
+		}
+		
 		// Add avatar mappings.
 		List avmappings = spacetype.getPropertyList("avatarmappings");
 		if(avmappings!=null)
@@ -216,7 +242,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				}
 				
 				// Hmm local name as owner? better would be agent id, but agents are created after space?
-				ret.createSpaceObject(MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
+				ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
 			}
 		}
 		

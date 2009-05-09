@@ -24,7 +24,7 @@ public interface ISpaceObject extends IPropertyObject
 	 *  Returns the type of the object.
 	 *  @return the type
 	 */
-	public Object getType();
+	public String getType();
 	
 	/**
 	 *  Returns an object's property.

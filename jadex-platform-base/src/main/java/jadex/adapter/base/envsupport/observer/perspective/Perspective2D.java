@@ -470,7 +470,7 @@ public class Perspective2D implements IPerspective
 				DrawableCombiner d = (DrawableCombiner) visuals.get(SObjectInspector.getType(objects[i]));
 				Object pBind = d.getPosition();
 				IVector2 objPos = SObjectInspector.getVector2(objects[i], pBind);
-				if ((closest == null) || (position.getDistance(objPos).less(minDist)))
+				if((closest == null) || (position.getDistance(objPos).less(minDist)))
 				{
 					closest = objects[i];
 					minDist = position.getDistance(objPos);

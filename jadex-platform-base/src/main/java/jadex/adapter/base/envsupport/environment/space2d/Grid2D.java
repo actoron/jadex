@@ -308,13 +308,13 @@ public class Grid2D extends Space2D
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(Object type, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners)
 	{
 		synchronized(monitor)
 		{
 			// TODO: maybe only assign position to discretePosition vector?
 			
-			ISpaceObject obj = super.createSpaceObject(type, properties, tasks, listeners);
+			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks, listeners);
 
 			IVector2 pos = properties==null? getEmptyGridPosition(): (IVector2)properties.get(Space2D.POSITION);
 			if(pos==null)

@@ -272,7 +272,14 @@ public class SObjectInspector
 		}
 		else
 		{
-			vector3 = (IVector3)SObjectInspector.getProperty(obj, (String) vecId);
+			try
+			{
+				vector3 = (IVector3)SObjectInspector.getProperty(obj, (String) vecId);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		return vector3;
 	}

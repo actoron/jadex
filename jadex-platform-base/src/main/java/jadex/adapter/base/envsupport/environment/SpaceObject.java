@@ -20,7 +20,7 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	protected Object id;
 
 	/** The object's type. */
-	protected Object type;
+	protected String typename;
 	
 	/** The object's tasks (task names -> tasks). */
 	protected Map tasks;
@@ -37,15 +37,15 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	 * Creates a new EnvironmentObject.
 	 * 
 	 * @param objectId the object's ID
-	 * @param type the object's type
+	 * @param typename the object's type
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
 	 * @param listeners initial listeners (may be null)
 	 */
-	public SpaceObject(Object id, Object type, Map properties, List tasks, List listeners, Object monitor)
+	public SpaceObject(Object id, String typename, Map properties, List tasks, List listeners, Object monitor)
 	{
 		this.id = id;
-		this.type = type;
+		this.typename = typename;
 		this.properties = properties;
 //		this.tasks = tasks;
 		this.listeners = listeners;
@@ -92,11 +92,11 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	 * Returns the type of the object.
 	 * @return the type
 	 */
-	public Object getType()
+	public String getType()
 	{
 		synchronized(monitor)
 		{
-			return type;
+			return typename;
 		}
 	}
 

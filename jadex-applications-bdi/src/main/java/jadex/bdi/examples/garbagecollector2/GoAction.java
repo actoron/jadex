@@ -73,6 +73,8 @@ public class GoAction extends SimplePropertyObject implements IAgentAction
 		
 		((Space2D)space).setPosition(oid, pos);
 		
+		obj.setProperty("lastmove", dir);
+		
 //		System.out.println("Go action: "+obj.getProperty(IAgentAction.ACTOR_ID)+" "+pos);
 		
 //		obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));

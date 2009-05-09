@@ -23,6 +23,12 @@
 	
 	<spacetypes>
 		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
+			<env:objecttypes>
+				<env:objecttype name="prey" />
+				<env:objecttype name="obstacle" />
+				<env:objecttype name="food" />
+			</env:objecttypes>
+			
 			<env:avatarmappings>
 				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
 			</env:avatarmappings>
