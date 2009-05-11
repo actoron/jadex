@@ -75,6 +75,9 @@ public class DeltaTimeExecutor
 						IDataView view = (IDataView) it.next();
 						view.update(space);
 					}
+
+					// Send the percepts to the agents.
+					space.getPerceptList().processPercepts(null);
 				}
 			}
 		});

@@ -1,16 +1,11 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.envsupport.IObjectCreator;
 import jadex.adapter.base.envsupport.MEnvSpaceInstance;
-import jadex.adapter.base.envsupport.MEnvSpaceType;
 import jadex.adapter.base.envsupport.dataview.IDataView;
-import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
-import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.ILibraryService;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
 
@@ -55,6 +50,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** The percept generators. */
 	protected Map perceptgenerators;
 
+	/** The percept mappings. */
+	protected Map perceptmappings;
+
 	/** The space object types. */
 	protected Map spaceobjecttypes;
 	
@@ -76,6 +74,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** The list of scheduled agent actions. */
 	protected AgentActionList	actionlist;
 	
+	/** The list of scheduled percepts. */
+	protected PerceptList	perceptlist;
+	
 	//-------- constructors --------
 	
 	/**
@@ -91,12 +92,14 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		this.agentactions = new HashMap();
 		this.processes = new HashMap();
 		this.perceptgenerators = new HashMap();
+		this.perceptmappings = new HashMap();
 		this.spaceobjecttypes = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
 		this.objectidcounter = new AtomicCounter();
 		this.actionlist	= new AgentActionList(this);
+		this.perceptlist	= new PerceptList(this);
 	}
 	
 	//-------- methods --------
@@ -248,16 +251,6 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 						
 						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
 						addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id, view);
-
-//						ObserverCenter oc = new ObserverCenter((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id, this, (ILibraryService)((ApplicationContext)getContext()).getPlatform().getService(ILibraryService.class), null);
-//						
-//						MEnvSpaceType	spacetype	= (MEnvSpaceType)((ApplicationContext)getContext()).getApplicationType().getMSpaceTypes().get(0);
-//						List perspectives = spacetype.getPropertyList("perspectives");
-//						for(int j=0; j<perspectives.size(); j++)
-//						{
-//							Map sourcetheme = (Map)perspectives.get(j);
-//							oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
-//						}
 					}
 					catch(Exception e)
 					{
@@ -491,6 +484,25 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	}
 	
 	/**
+	 *  Create a percept for the given agent.
+	 *  @param type	The percept type.
+	 *  @param data	The content of the percept (if any).
+	 *  @param agent	The agent that should receive the percept.
+	 */
+	public void createPercept(String type, Object data, IAgentIdentifier agent)
+	{
+		synchronized(monitor)
+		{
+			String	agenttype	= ((ApplicationContext)getContext()).getAgentType(agent);
+			IPerceptProcessor	proc	= (IPerceptProcessor)perceptmappings.get(agenttype);
+			if(proc!=null)
+				perceptlist.schedulePercept(type, data, agent, proc);
+			else
+				System.out.println("Warning: No processor for percept: "+type+", "+data+", "+agent);
+		}
+	}
+
+	/**
 	 * Returns the space's name.
 	 * @return the space's name.
 	 */
@@ -694,6 +706,33 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		}
 	}
 
+	/**
+	 *  Add a percept mapping.
+	 *  @param	agenttype	The agent type.
+	 *  @param	proc	The percept processor.
+	 */
+	// Todo: multiple processors per agent -> mapping per percept type.
+	public void addPerceptMapping(String agenttype, IPerceptProcessor proc)
+	{
+		synchronized(monitor)
+		{
+			perceptmappings.put(agenttype, proc);
+		}
+	}
+	
+	/**
+	 *  remove a percept mapping.
+	 *  @param	agenttype	The agent type.
+	 *  @param	proc	The percept processor.
+	 */
+	// Todo: multiple processors per agent -> mapping per percept type.
+	public void removePerceptMapping(String agenttype, IPerceptProcessor proc)
+	{
+		synchronized(monitor)
+		{
+			perceptmappings.remove(agenttype);
+		}
+	}
 	
 	//-------- ISpace methods --------
 	
@@ -791,6 +830,14 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	protected AgentActionList	getAgentActionList()
 	{
 		return actionlist;
+	}
+	
+	/**
+	 *  Get the list of scheduled percepts.
+	 */
+	protected PerceptList	getPerceptList()
+	{
+		return perceptlist;
 	}
 	
 	/**

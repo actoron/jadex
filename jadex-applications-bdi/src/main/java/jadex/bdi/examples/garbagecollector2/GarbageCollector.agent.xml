@@ -36,7 +36,7 @@
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl">
-				$beliefbase.myself.position 
+				$beliefbase.myself.position
 				
 				// $beliefbase.myself.getProperty("position")
 				

@@ -8,6 +8,7 @@ import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
+import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
@@ -203,6 +204,18 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
+		// Create percept mappings.
+		List pmaps = spacetype.getPropertyList("perceptmappings");
+		if(pmaps!=null)
+		{
+			for(int i=0; i<pmaps.size(); i++)
+			{
+				Map mgen = (Map)pmaps.get(i);
+				IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
+				ret.addPerceptMapping((String)MEnvSpaceInstance.getProperty(mgen, "agenttype"), proc);
+			}
+		}
+
 		// Create initial objects.
 		List objects = (List)getPropertyList("objects");
 		if(objects!=null)

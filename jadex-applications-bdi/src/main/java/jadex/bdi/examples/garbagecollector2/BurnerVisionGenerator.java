@@ -2,9 +2,9 @@ package jadex.bdi.examples.garbagecollector2;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.contextservice.ISpace;
+import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
-import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -31,20 +31,6 @@ public class BurnerVisionGenerator extends SimplePropertyObject implements IPerc
 	
 	/** The consuming agents. */
 	protected List agents;
-	
-	/** The percept processor. */
-	protected IPerceptProcessor perproc;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new percept generator.
-	 */
-	public BurnerVisionGenerator()
-	{
-		// Hack?!
-		this.perproc = new BurnerVisionProcessor();
-	}
 	
 	//-------- IPerceptGenerator --------
 		
@@ -109,18 +95,21 @@ public class BurnerVisionGenerator extends SimplePropertyObject implements IPerc
 					if(agentobj.getProperty(Space2D.POSITION).equals(pos))
 					{
 						// percept garbage appeared
-						perproc.processPercept(event.getSpace(), GARBAGE_APPEARED, event.getSpaceObject(), agent);
+//						perproc.processPercept(event.getSpace(), GARBAGE_APPEARED, event.getSpaceObject(), agent);
+						((AbstractEnvironmentSpace)event.getSpace()).createPercept(GARBAGE_APPEARED, event.getSpaceObject(), agent);
 					}
 					else if(agentobj.getProperty(Space2D.POSITION).equals(oldpos))
 					{
 						// percept garbage disappeared
-						perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
+//						perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
+						((AbstractEnvironmentSpace)event.getSpace()).createPercept(GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
 					}
 				}
 				else if(EnvironmentEvent.OBJECT_DESTROYED.equals(event.getType()))
 				{
 					// percept garbage disappeared
-					perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
+//					perproc.processPercept(event.getSpace(), GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
+					((AbstractEnvironmentSpace)event.getSpace()).createPercept(GARBAGE_DISAPPEARED, event.getSpaceObject(), agent);
 				}
 			}
 		}

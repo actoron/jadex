@@ -56,6 +56,11 @@
 			
 			<env:perceptgeneratortypes>
 				<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
+				<env:perceptmapping agenttype="Burner" class="BurnerVisionProcessor">
+					<!-- Todo: mapping per percept type? - ->
+					<env:percepttype name="garbage_appeared"/>
+					<env:percepttype name="garbage_disappeared"/> -->
+				</env:perceptmapping>
 			</env:perceptgeneratortypes>
 			
 			<env:views>
@@ -81,7 +86,7 @@
 						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
 						<env:gridlayer width="1.0" height="1.0" color="WHITE" />
 					</env:prelayers>
-					</env:perspective>
+				</env:perspective>
 					
 				<env:perspective name="abstract">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">

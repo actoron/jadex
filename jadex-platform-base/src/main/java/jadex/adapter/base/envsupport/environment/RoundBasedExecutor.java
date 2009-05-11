@@ -71,6 +71,9 @@ public class RoundBasedExecutor
 						view.update(space);
 					}
 
+					// Send the percepts to the agents.
+					space.getPerceptList().processPercepts(null);
+
 					// Wakeup the agents.
 					space.getAgentActionList().wakeupAgents(null);
 				}
