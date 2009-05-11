@@ -426,6 +426,7 @@ public class Perspective2D implements IPerspective
 					System.err.println("OpenGL support insufficient, using Java2D fallback...");
 					tryopengl = false;
 				}
+				frame.dispose();
 			}
 			catch (RuntimeException e0)
 			{

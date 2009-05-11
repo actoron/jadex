@@ -64,7 +64,7 @@ public class ObserverCenter
 	private ILibraryService libService;
 	
 	/** Additional IDataView objects */
-	private Map dataviews;
+	private Map externaldataviews;
 	
 	/** Selected dataview name */
 	private String selecteddataviewname;
@@ -74,6 +74,9 @@ public class ObserverCenter
 	
 	/** Selected Perspective */
 	private IPerspective selectedperspective;
+	
+	/** The current space */
+	private Space2D space;
 	
 	//TODO: move to Perspective!
 	/** Area size of the space */
@@ -88,14 +91,15 @@ public class ObserverCenter
 	 */
 	public ObserverCenter(final String windowTitle, final IEnvironmentSpace space, ILibraryService libSrvc, List customplugins)
 	{
+		this.space = (Space2D) space;
 		areasize = ((Space2D)space).getAreaSize().copy();
 		perspectives = Collections.synchronizedMap(new HashMap());
-		dataviews = Collections.synchronizedMap(new HashMap());
+		externaldataviews = Collections.synchronizedMap(new HashMap());
 		final List cPlugins = customplugins == null? new ArrayList(): customplugins;
 		this.libService = libSrvc;
-		dataviews.putAll(space.getDataViews());
-		if (!dataviews.isEmpty())
-			selecteddataviewname = (String) dataviews.keySet().iterator().next();
+		Map spaceviews = space.getDataViews();
+		if (!spaceviews.isEmpty())
+			selecteddataviewname = (String) spaceviews.keySet().iterator().next();
 		activeplugin = null;
 		Runnable init = new Runnable()
 			{
@@ -204,7 +208,7 @@ public class ObserverCenter
 	{
 		synchronized (dataview)
 		{
-			dataviews.put(name, dataview);
+			externaldataviews.put(name, dataview);
 			if (selecteddataviewname == null)
 			{
 				selecteddataviewname = name;
@@ -219,7 +223,10 @@ public class ObserverCenter
 	 */
 	public Map getDataViews()
 	{
-		return dataviews;
+		Map allViews = new HashMap();
+		allViews.putAll(externaldataviews);
+		allViews.putAll(space.getDataViews());
+		return allViews;
 	}
 	
 	
@@ -230,7 +237,10 @@ public class ObserverCenter
 	 */
 	public IDataView getSelectedDataView()
 	{
-		return (IDataView) dataviews.get(selecteddataviewname);
+		IDataView dataview = space.getDataView(selecteddataviewname);
+		if (dataview == null)
+			dataview = (IDataView) externaldataviews.get(selecteddataviewname);
+		return dataview;
 	}
 	
 	/**
@@ -318,7 +328,6 @@ public class ObserverCenter
 			mainwindow.setPerspectiveView(perspective.getView());
 		}
 	}
-	
 	/**
 	 * Loads all available plugins
 	 * @param customplugins custom plugins used in addition to standard plugins
