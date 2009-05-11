@@ -75,7 +75,6 @@ public class TexturedRectangle extends RotatingPrimitive
 	public synchronized void doDraw(Object obj, ViewportJ2D vp)
 	{
 		Graphics2D g = vp.getContext();
-		AffineTransform transform = g.getTransform();
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
 		
@@ -85,13 +84,11 @@ public class TexturedRectangle extends RotatingPrimitive
 		
 		g.drawImage(image_, vp.getImageTransform(image_.getWidth(), image_
 				.getHeight()), null);
-		g.setTransform(transform);
 	}
 
 	public synchronized void doDraw(Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
-		gl.glPushMatrix();
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 		
@@ -111,6 +108,5 @@ public class TexturedRectangle extends RotatingPrimitive
 
 			gl.glDisable(GL.GL_TEXTURE_2D);
 		}
-		gl.glPopMatrix();
 	}
 }

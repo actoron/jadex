@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -15,22 +16,30 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 
 public abstract class AbstractViewport implements IViewport
@@ -203,6 +212,15 @@ public abstract class AbstractViewport implements IViewport
 
 		paddedSize_ = new Vector2Double(width, height);
 	}
+	
+	/**
+	 * Returns the padded size
+	 * @return padded size
+	 */
+	public IVector2 getPaddedSize()
+	{
+		return paddedSize_;
+	}
 
 	/**
 	 * Sets the position of the bottom left corner of the viewport.
@@ -313,19 +331,28 @@ public abstract class AbstractViewport implements IViewport
 		listeners_.remove(listener);
 	}
 	
-	public static BufferedImage stringToImage(Font font, String text)
+	/**
+	 * Returns an image for texturing of a text.
+	 * 
+	 * @param text the text
+	 */
+	public static final BufferedImage convertTextToImage(Font font, Color color, String text)
 	{
 		TextLayout textLayout = new TextLayout(text, font, new FontRenderContext(null, true, true));
 		Rectangle2D bounds = textLayout.getBounds();
-		ColorModel colorModel = new ComponentColorModel(ColorSpace
-				.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8, 8}, true,
-				false, ComponentColorModel.TRANSLUCENT, DataBuffer.TYPE_BYTE);
-		WritableRaster raster = Raster.createInterleavedRaster(
-				DataBuffer.TYPE_BYTE, (int)Math.ceil(bounds.getWidth()), (int)Math.ceil(bounds.getHeight()), 4, null);
-		BufferedImage image = new BufferedImage(colorModel, raster, false,
-				new Hashtable());
+		
+		BufferedImage image = new BufferedImage((int)Math.ceil(bounds.getWidth()), (int)Math.ceil(bounds.getHeight()), BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		Graphics2D g = (Graphics2D) image.getGraphics();
-		textLayout.draw(g, 0, 0);
+		g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+		g.fillRect(0, 0, image.getWidth(), image.getHeight());
+		g.setColor(color);
+		textLayout.draw(g, 0, image.getHeight() - 1);
+		g.dispose();
+		AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+	    tx.translate(0, -image.getHeight(null));
+	    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+	    image = op.filter(image, null);
+
 		return image;
 	}
 

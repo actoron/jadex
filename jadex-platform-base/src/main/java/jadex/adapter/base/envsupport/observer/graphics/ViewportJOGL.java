@@ -12,7 +12,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
@@ -26,14 +25,11 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -43,7 +39,6 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
-import javax.media.opengl.glu.GLU;
 
 
 /**
@@ -61,6 +56,9 @@ public class ViewportJOGL extends AbstractViewport
 
 	/** Repeating texture cache. */
 	private Map					repeatingTextureCache_;
+	
+	/** Cache for text-images */
+	protected Map 		textCache_;
 
 	/** Display lists. */
 	private Map					displayLists_;
@@ -97,6 +95,7 @@ public class ViewportJOGL extends AbstractViewport
 		npot_ = false;
 		clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
 		repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
+		textCache_ = Collections.synchronizedMap(new TextureLRUCache(100));
 		displayLists_ = Collections.synchronizedMap(new HashMap());
 
 		try
@@ -193,6 +192,30 @@ public class ViewportJOGL extends AbstractViewport
 
 		return texture.intValue();
 	}
+	
+	/**
+	 *  Returns the texture of a text
+	 *  
+	 *  @param info information on the text
+	 *  @return the texture
+	 */
+	public SizedTexture getTextTexture(TextInfo info)
+	{
+		synchronized (textCache_)
+		{
+			SizedTexture ret = (SizedTexture) textCache_.get(info);
+			if (ret == null)
+			{
+				BufferedImage image = convertTextToImage(info.getFont(), info.getColor(), info.getText());
+				IVector2 size = new Vector2Double(image.getWidth(), image.getHeight());
+				Integer tex = prepareTexture(context_, image, GL.GL_CLAMP_TO_EDGE);
+				ret = new SizedTexture(tex.intValue(), size);
+				textCache_.put(info, ret);
+			}
+			
+			return ret;
+		}
+	}
 
 	/**
 	 * Returns a previous generated display list or null if it doesn't exist
@@ -223,15 +246,6 @@ public class ViewportJOGL extends AbstractViewport
 	public GL getContext()
 	{
 		return context_;
-	}
-	
-	/**
-	 * Returns the padded size
-	 * @return padded size
-	 */
-	public IVector2 getPaddedSize()
-	{
-		return paddedSize_;
 	}
 
 	private void setupMatrix(GL gl)
@@ -321,9 +335,21 @@ public class ViewportJOGL extends AbstractViewport
 			System.err.println("Image not found: " + path);
 			throw new RuntimeException("Image not found: " + path);
 		}
-
-		int width = tmpImage.getWidth();
-		int height = tmpImage.getHeight();
+		
+		return prepareTexture(gl, tmpImage, wrapMode);
+	}
+	
+	/**
+	 * Perpares a Texture
+	 * 
+	 * @param gl OpenGL interface
+	 * @param inputImage the image being converted to a texture
+	 * @param wrapParam wrap parameter
+	 */
+	private Integer prepareTexture(GL gl, BufferedImage inputImage, int wrapMode)
+	{
+		int width = inputImage.getWidth();
+		int height = inputImage.getHeight();
 		if(!npot_)
 		{
 			width = (int)Math.pow(2, Math.ceil(Math.log(width) / Math.log(2)));
@@ -345,12 +371,10 @@ public class ViewportJOGL extends AbstractViewport
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 		g.setComposite(AlphaComposite.Src);
-		int ow = tmpImage.getWidth();
-		int oh = tmpImage.getHeight();
-		g.drawImage(tmpImage, 0, 0, width, height, 0, 0, tmpImage.getWidth(), tmpImage.getHeight(), null);
+		g.drawImage(inputImage, 0, 0, width, height, 0, 0, inputImage.getWidth(), inputImage.getHeight(), null);
 
 		g.dispose();
-		tmpImage = null;
+		inputImage = null;
 
 		byte[] imgData = ((DataBufferByte)image.getRaster().getDataBuffer())
 				.getData();
@@ -378,8 +402,7 @@ public class ViewportJOGL extends AbstractViewport
 				GL.GL_UNSIGNED_BYTE, buffer);
 
 		gl.glDisable(GL.GL_TEXTURE_2D);
-
-
+		
 		return texture;
 	}
 
@@ -396,7 +419,7 @@ public class ViewportJOGL extends AbstractViewport
 			
 			setupMatrix(gl);
 
-			gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 
 			gl.glEnable(GL.GL_SCISSOR_TEST);
 			
@@ -555,6 +578,29 @@ public class ViewportJOGL extends AbstractViewport
 		public Dimension getMinimumSize()
 		{
 			return new Dimension(1, 1);
+		}
+	}
+	
+	private class TextureLRUCache extends LinkedHashMap
+	{
+		private int maxSize;
+		
+		public TextureLRUCache(int maxSize)
+		{
+			super(16, 0.75f, true);
+			this.maxSize = maxSize;
+		}
+		
+		protected boolean removeEldestEntry(Map.Entry eldest)
+		{
+			if (size() > maxSize)
+			{
+				int[] tex = new int[1];
+				tex[0] = ((Integer) eldest.getValue()).intValue();
+				context_.glDeleteTextures(1, tex, 0);
+				return true;
+			}
+			return false;
 		}
 	}
 }

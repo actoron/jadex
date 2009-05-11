@@ -25,16 +25,18 @@ public interface IDrawable
 	/**
 	 * Draws the object to a Java2D viewport
 	 * 
+	 * @param dc the DrawableCombiner drawing the object
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public void draw(Object obj, ViewportJ2D vp);
+	public void draw(DrawableCombiner dc, Object obj, ViewportJ2D vp);
 
 	/**
 	 * Draws the object to an OpenGL viewport
 	 * 
+	 * @param dc the DrawableCombiner drawing the object
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public void draw(Object obj, ViewportJOGL vp);
+	public void draw(DrawableCombiner dc, Object obj, ViewportJOGL vp);
 }

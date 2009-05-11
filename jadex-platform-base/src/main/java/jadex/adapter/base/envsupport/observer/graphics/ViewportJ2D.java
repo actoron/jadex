@@ -7,20 +7,30 @@ import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.color.ColorSpace;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -38,6 +48,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	
 	/** The current draw context */
 	private Graphics2D context_;
+	
+	/** Cache for text-images */
+	protected Map 		textCache_;
 
 	/**
 	 * Creates a new Viewport.
@@ -50,7 +63,8 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 		libService_ = libService;
 		imageCache_ = Collections.synchronizedMap(new HashMap());
-
+		textCache_ = Collections.synchronizedMap(new ImageLRUCache(100));
+		
 		canvas_ = new ViewportCanvas();
 		canvas_.addComponentListener(this);
 
@@ -109,6 +123,26 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				/ (double)sizeX, -((inversionFlag_.getYAsInteger() << 1) - 1)
 				/ (double)sizeY);
 		return imageTransform;
+	}
+	
+	/**
+	 *  Returns the image of a text
+	 *  
+	 *  @param info information on the text
+	 */
+	public BufferedImage getTextImage(TextInfo info)
+	{
+		synchronized (textCache_)
+		{
+			BufferedImage image = (BufferedImage) textCache_.get(info);
+			if (image == null)
+			{
+				image = convertTextToImage(info.getFont(), info.getColor(), info.getText());
+				textCache_.put(info, image);
+			}
+			
+			return image;
+		}
 	}
 
 	// Component events
@@ -317,6 +351,22 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 			scissorPolygon_.lineTo(0.0f, size_.getYAsFloat() + pixShiftY);
 			scissorPolygon_.lineTo(posX_, size_.getYAsFloat() + pixShiftY);
 			scissorPolygon_.closePath();
+		}
+	}
+	
+	private class ImageLRUCache extends LinkedHashMap
+	{
+		private int maxSize;
+		
+		public ImageLRUCache(int maxSize)
+		{
+			super(16, 0.75f, true);
+			this.maxSize = maxSize;
+		}
+		
+		protected boolean removeEldestEntry(Map.Entry eldest)
+		{
+			return (size() > maxSize);
 		}
 	}
 }

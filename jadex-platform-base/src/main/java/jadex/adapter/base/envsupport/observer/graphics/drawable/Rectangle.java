@@ -75,23 +75,18 @@ public class Rectangle extends ColoredPrimitive
 	public void doDraw(Object obj, ViewportJ2D vp)
 	{
 		Graphics2D g = vp.getContext();
-		AffineTransform transform = g.getTransform();
 		if (!setupMatrix(obj, g))
 			return;
 		g.setColor(c_);
 		g.fill(J2D_RECTANGLE);
-		g.setTransform(transform);
 	}
 
 	public void doDraw(Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
-		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
 		if (setupMatrix(obj, gl))
 			gl.glCallList(dList_);
-
-		gl.glPopMatrix();
 	}
 
 }

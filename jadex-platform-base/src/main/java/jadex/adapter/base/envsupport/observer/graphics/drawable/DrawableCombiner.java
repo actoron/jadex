@@ -129,6 +129,57 @@ public class DrawableCombiner extends AbstractVisual2D
 			}
 		}
 	}
+	
+	/**
+	 * Sets the basic matrix for the combiner, call can be skipped if alternative draw method is required.
+	 * 
+	 * @param obj object being drawn
+	 * @param g the viewport context
+	 */
+	public void setupMatrix(Object obj, Graphics2D g)
+	{
+		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		if(position==null)
+			return;
+		
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		if(size==null)
+			size = new Vector2Double(1,0);
+		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+		if(rot==null)
+			rot = Vector3Double.ZERO.copy();
+		
+		g.translate(position.getXAsDouble(), position.getYAsDouble());
+		g.scale(size.getXAsDouble(), size.getYAsDouble());
+		g.scale(Math.cos(rot.getYAsDouble()), Math.cos(rot.getXAsDouble()));
+		g.rotate(rot.getZAsDouble());
+	}
+	
+	/**
+	 * Sets the basic matrix for the combiner, call can be skipped if alternative draw method is required.
+	 * 
+	 * @param obj object being drawn
+	 * @param gl the viewport context
+	 */
+	public void setupMatrix(Object obj, GL gl)
+	{
+		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		if(position==null)
+			return;
+		
+		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		if(size==null)
+			size = new Vector2Double(1,0);
+		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+		if(rot==null)
+			rot = Vector3Double.ZERO.copy();
+		
+		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
+		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
+		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
+		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
+		gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
+	}
 
 	/**
 	 * Draws the objects to a Java2D viewport
@@ -146,32 +197,13 @@ public class DrawableCombiner extends AbstractVisual2D
 		}
 		
 		Graphics2D g = vp.getContext();
-		AffineTransform t = g.getTransform();
-		
-		IVector2 position = SObjectInspector.getVector2(obj, this.position);
-		if(position==null)
-			return;
-		
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		if(size==null)
-			size = new Vector2Double(1,0);
-		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
-		if(rot==null)
-			rot = Vector3Double.ZERO.copy();
-		
-		g.translate(position.getXAsDouble(), position.getYAsDouble());
-		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.scale(Math.cos(size.getXAsDouble()), Math.cos(size.getYAsDouble()));
-		g.rotate(rot.getZAsDouble());
 
-		System.out.println("draw: "+obj+" "+size+" "+rot+" "+position);
+		//System.out.println("draw: "+obj+" "+size+" "+rot+" "+position);
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();
-			d.draw(obj, vp);
+			d.draw(this, obj, vp);
 		}
-		
-		g.setTransform(t);
 	}
 
 	/**
@@ -191,32 +223,12 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		GL gl = vp.getContext();
 		
-		IVector2 position = SObjectInspector.getVector2(obj, this.position);
-		if(position==null)
-			return;
-		
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		if(size==null)
-			size = new Vector2Double(1,0);
-		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
-		if(rot==null)
-			rot = Vector3Double.ZERO.copy();
-		
-		gl.glPushMatrix();
-		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
-		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
-		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
-		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
-		gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
-		
 //		System.out.println("draw: "+obj+" "+size+" "+rot+" "+position);
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();
-			d.draw(obj, vp);
+			d.draw(this, obj, vp);
 		}
-		
-		gl.glPopMatrix();
 	}
 
 	/**

@@ -9,6 +9,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 
 import javax.media.opengl.GL;
 
@@ -105,10 +106,11 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	/**
 	 * Draws the object to a Java2D viewport
 	 * 
+	 * @param dc the DrawableCombiner drawing the object
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public final void draw(Object obj, ViewportJ2D vp)
+	public final void draw(DrawableCombiner dc, Object obj, ViewportJ2D vp)
 	{
 		boolean draw = drawcondition==null;
 		if(!draw)
@@ -119,16 +121,23 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		}
 		
 		if(draw)
+		{
+			Graphics2D g = vp.getContext();
+			AffineTransform t = g.getTransform();
+			dc.setupMatrix(obj, g);
 			doDraw(obj, vp);
+			g.setTransform(t);
+		}
 	}
 
 	/**
 	 * Draws the object to an OpenGL viewport
 	 * 
+	 * @param dc the DrawableCombiner drawing the object
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public final void draw(Object obj, ViewportJOGL vp)
+	public final void draw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
 	{
 		boolean draw = drawcondition==null;
 		if(!draw)
@@ -139,7 +148,13 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		}
 
 		if(draw)
+		{
+			GL gl = vp.getContext();
+			gl.glPushMatrix();
+			dc.setupMatrix(obj, gl);
 			doDraw(obj, vp);
+			gl.glPopMatrix();
+		}
 	}
 	
 	/**

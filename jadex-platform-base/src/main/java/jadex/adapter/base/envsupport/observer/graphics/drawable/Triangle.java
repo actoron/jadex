@@ -92,12 +92,9 @@ public class Triangle extends ColoredPrimitive
 	public void doDraw(Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
-		gl.glPushMatrix();
 		gl.glColor4fv(oglColor_, 0);
 		if (setupMatrix(obj, gl))
 			gl.glCallList(dList_);
-
-		gl.glPopMatrix();
 	}
 
 }
