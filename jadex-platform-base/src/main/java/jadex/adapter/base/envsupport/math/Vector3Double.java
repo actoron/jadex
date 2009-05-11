@@ -32,6 +32,7 @@ public class Vector3Double implements IVector3, Cloneable
 	{
 		x_ = vector.getXAsDouble();
 		y_ = vector.getYAsDouble();
+		z_ = vector.getYAsDouble();
 	}
 
 	/** Creates a new Vector2 using the scalar to assign the
@@ -62,6 +63,7 @@ public class Vector3Double implements IVector3, Cloneable
 	{
 		x_ = vector.getXAsDouble();
 		y_ = vector.getYAsDouble();
+		y_ = vector.getZAsDouble();
 		return this;
 	}
 	
