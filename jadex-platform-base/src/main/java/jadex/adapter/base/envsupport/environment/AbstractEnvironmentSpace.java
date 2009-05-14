@@ -84,7 +84,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 */
 	public AbstractEnvironmentSpace()
 	{
-		this.monitor = new Object();
+		super(new Object());
 		this.views = new HashMap();
 		this.avatarmappings = new MultiCollection();
 		this.dataviewmappings = new MultiCollection();
@@ -493,6 +493,8 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	{
 		synchronized(monitor)
 		{
+//			System.out.println("New percept: "+type+", "+data+", "+agent);
+			
 			String	agenttype	= ((ApplicationContext)getContext()).getAgentType(agent);
 			IPerceptProcessor	proc	= (IPerceptProcessor)perceptmappings.get(agenttype);
 			if(proc!=null)

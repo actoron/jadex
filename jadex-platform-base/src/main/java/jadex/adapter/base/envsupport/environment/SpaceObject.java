@@ -44,12 +44,13 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	 */
 	public SpaceObject(Object id, String typename, Map properties, List tasks, List listeners, Object monitor)
 	{
+		super(monitor);
+		
 		this.id = id;
 		this.typename = typename;
 		this.properties = properties;
 //		this.tasks = tasks;
 		this.listeners = listeners;
-		setMonitor(monitor);
 		
 //		this.properties = new HashMap();
 //		if(properties != null)

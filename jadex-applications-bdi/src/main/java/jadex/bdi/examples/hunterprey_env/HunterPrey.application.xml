@@ -56,11 +56,11 @@
 				</env:percepttype>
 			</env:percepttypes>
  -->
- <!-- 			
+  			
 			<env:perceptgeneratortypes>
-				<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
+				<env:perceptgeneratortype name="creaturevisiongen" class="CreatureVisionGenerator"/>
 			</env:perceptgeneratortypes>
- -->			
+			
 			<env:views>
 				<env:view name="all_view" class="GeneralDataView2D" />
 				<!-- <env:view name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:view> -->

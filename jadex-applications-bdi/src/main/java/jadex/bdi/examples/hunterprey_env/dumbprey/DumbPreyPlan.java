@@ -29,6 +29,8 @@ public class DumbPreyPlan extends Plan
 		
 		while(true)
 		{
+			System.out.println("new round for: "+getAgentName());
+			
 			// Get current vision.
 			IVector2	pos	= (IVector2)myself.getProperty(Space2D.POSITION);
 //			ISpaceObject[]	vision	= env.getNearObjects(pos, range);
