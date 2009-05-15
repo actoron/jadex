@@ -71,11 +71,11 @@
 			<env:perspectives>
 				<env:perspective name="icons">
 					<env:drawable objecttype="collector" width="0.9" height="0.9" rotation="rotation">
-						<env:texturedrectangle layer="2"  imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
-						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.2" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
+						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
+						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.3" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
 							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
 						</env:texturedrectangle>
-						<env:text layer="4" x="0.0" y="0.5" text="Collector $position$"/>
+						<env:text layer="4" x="0.0" y="0.4" text="Collector $position$"/>
 					</env:drawable>
 					<env:drawable objecttype="burner" width="0.9" height="0.9">
 						<env:texturedrectangle layer="1" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />

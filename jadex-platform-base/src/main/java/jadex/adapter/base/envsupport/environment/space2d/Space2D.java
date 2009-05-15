@@ -126,6 +126,20 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			fireEnvironmentEvent(new EnvironmentEvent(EnvironmentEvent.OBJECT_POSITION_CHANGED, this, obj, oldpos));
 		}
 	}
+
+	/**
+	 *  Get the distance between two positions.
+	 *  @param pos1	The first position.
+	 *  @param pos2	The second position.
+	 */
+	// Todo: border properties (e.g. torus) for generic 2D space?
+	public IVector1	getDistance(IVector2 pos1, IVector2 pos2)
+	{
+		synchronized(monitor)
+		{
+			return pos1.getDistance(pos2);
+		}
+	}
 	
 	/**
 	 * Retrieves a random position within the simulation area with a minimum

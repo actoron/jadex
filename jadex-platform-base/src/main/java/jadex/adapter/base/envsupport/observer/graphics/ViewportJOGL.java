@@ -337,7 +337,8 @@ public class ViewportJOGL extends AbstractViewport
 			throw new RuntimeException("Image not found: " + path);
 		}
 		
-		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, GL.GL_LINEAR_MIPMAP_LINEAR);
+//		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, GL.GL_LINEAR_MIPMAP_LINEAR);
+		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, GL.GL_LINEAR);
 	}
 	
 	/**

@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
@@ -297,6 +298,40 @@ public class Grid2D extends Space2D
 			}
 			
 			super.setPosition(id, pos);
+		}
+	}
+	
+	/**
+	 *  Get the distance between two positions.
+	 *  @param pos1	The first position.
+	 *  @param pos2	The second position.
+	 */
+	public IVector1	getDistance(IVector2 pos1, IVector2 pos2)
+	{
+		synchronized(monitor)
+		{
+			IVector1	ret;
+			
+			if(BORDER_TORUS==border_mode)
+			{
+				int	x1	= pos1.getXAsInteger();
+				int	y1	= pos1.getYAsInteger();
+				int	x2	= pos2.getXAsInteger();
+				int	y2	= pos2.getYAsInteger();
+				int sizex	= areasize.getXAsInteger();
+				int sizey	= areasize.getYAsInteger();
+				
+				int dx	= x1<x2	? Math.min(x2-x1, x1+sizex-x2) : Math.min(x1-x2, x2+sizex-x1);
+				int dy	= y1<y2	? Math.min(y2-y1, y1+sizey-y2) : Math.min(y1-y2, y2+sizey-y1);
+				
+				ret	= new Vector1Double(Math.sqrt((dx * dx) + (dy * dy)));
+			}
+			else
+			{
+				ret	= pos1.getDistance(pos2);
+			}
+			
+			return ret;
 		}
 	}
 	
