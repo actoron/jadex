@@ -8,7 +8,6 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.examples.hunterprey_env.MoveAction;
 import jadex.bdi.runtime.Plan;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,20 +23,17 @@ public class DumbPreyPlan extends Plan
 	{
 		Grid2D	env	= (Grid2D)getBeliefbase().getBelief("env").getFact();
 		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-//		IVector1	range	= new Vector1Int(3);	// Todo: vision range should be managed by environment.
 		String	lastdir	= null;
 		
 		while(true)
 		{
-			System.out.println("new round for: "+getAgentName());
+//			System.out.println("nearest food for: "+getAgentName()+", "+getBeliefbase().getBelief("nearest_food").getFact());
 			
-			// Get current vision.
+			// Get current position.
 			IVector2	pos	= (IVector2)myself.getProperty(Space2D.POSITION);
-//			ISpaceObject[]	vision	= env.getNearObjects(pos, range);
-//			System.out.println("Vision: "+getAgentName()+", "+SUtil.arrayToString(vision));
 			
-			Collection	foods	= env.getSpaceObjectsByGridPosition(pos, "food");
-			if(foods!=null && !foods.isEmpty())
+			ISpaceObject	food	= (ISpaceObject)getBeliefbase().getBelief("nearest_food").getFact();
+			if(food!=null && pos.equals(food.getProperty(Space2D.POSITION)))
 			{
 				// Perform eat action.
 				try
@@ -45,7 +41,7 @@ public class DumbPreyPlan extends Plan
 					SyncResultListener srl	= new SyncResultListener();
 					Map params = new HashMap();
 					params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
-					params.put(IAgentAction.OBJECT_ID, foods.iterator().next());
+					params.put(IAgentAction.OBJECT_ID, food);
 					env.performAgentAction("eat", params, srl);
 					srl.waitForResult();
 				}
@@ -57,8 +53,23 @@ public class DumbPreyPlan extends Plan
 
 			else
 			{
-				// Turn 90° with probability 0.25, otherwise continue moving in same direction.
-				if(lastdir==null || Math.random()>0.75)
+				// Move towards the food, if any
+				if(food!=null)
+				{
+					String	newdir	= MoveAction.getDirection(env, pos, (IVector2)food.getProperty(Space2D.POSITION));
+					if(newdir!=null)
+					{
+						lastdir	= newdir;
+					}
+					else
+					{
+						// Food unreachable.
+						getBeliefbase().getBelief("nearest_food").setFact(null);						
+					}
+				}
+				
+				// When no food, turn 90° with probability 0.25, otherwise continue moving in same direction.
+				else if(lastdir==null || Math.random()>0.75)
 				{
 					if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
 					{
@@ -82,7 +93,9 @@ public class DumbPreyPlan extends Plan
 				}
 				catch(RuntimeException e)
 				{
-					// Move failed, turn 90°.
+					// Move failed, forget about food and turn 90°.
+					getBeliefbase().getBelief("nearest_food").setFact(null);
+					
 //					System.out.println("Move failed: "+e);
 					if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
 					{

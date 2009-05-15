@@ -89,12 +89,12 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 			{
 				if(!unchanged.contains(objects[i]))
 				{
-					if(objects[i].getType().equals("prey"))
+					if(isCreature(objects[i]))
 					{
 						IAgentIdentifier	owner	= (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 						((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_APPEARED, event.getSpaceObject(), owner);
 					}
-					if(event.getSpaceObject().getType().equals("prey"))
+					if(isCreature(event.getSpaceObject()))
 					{
 						IAgentIdentifier	owner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 						((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_APPEARED, objects[i], owner);
@@ -102,7 +102,7 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 				}
 				
 				// Post movement to preys that stayed in vision range
-				else if(objects[i].getType().equals("prey")) // && unchanged.contains(objects[i])
+				else if(isCreature(objects[i])) // && unchanged.contains(objects[i])
 				{
 					IAgentIdentifier	owner	= (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_MOVED, event.getSpaceObject(), owner);
@@ -115,12 +115,12 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 			{
 				if(!unchanged.contains(oldobjects[i]))
 				{
-					if(oldobjects[i].getType().equals("prey"))
+					if(isCreature(oldobjects[i]))
 					{
 						IAgentIdentifier	owner	= (IAgentIdentifier)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 						((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_DISAPPEARED, event.getSpaceObject(), owner);
 					}
-					if(event.getSpaceObject().getType().equals("prey"))
+					if(isCreature(event.getSpaceObject()))
 					{
 						IAgentIdentifier	owner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 						((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_DISAPPEARED, oldobjects[i], owner);
@@ -136,12 +136,12 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 			// Post appearance for object itself (if prey) as well as all preys in vision range
 			for(int i=0; i<objects.length; i++)
 			{
-				if(objects[i].getType().equals("prey"))
+				if(isCreature(objects[i]))
 				{
 					IAgentIdentifier	owner	= (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_APPEARED, event.getSpaceObject(), owner);
 				}
-				if(event.getSpaceObject().getType().equals("prey"))
+				if(isCreature(event.getSpaceObject()))
 				{
 					IAgentIdentifier	owner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 					((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_APPEARED, objects[i], owner);
@@ -156,12 +156,23 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 			// Post disappearance for all preys in vision range
 			for(int i=0; i<objects.length; i++)
 			{
-				if(objects[i].getType().equals("prey"))
+				if(isCreature(objects[i]))
 				{
 					IAgentIdentifier	owner	= (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
-					((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_APPEARED, event.getSpaceObject(), owner);
+					((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_DISAPPEARED, event.getSpaceObject(), owner);
 				}
 			}
 		}
+	}
+
+	/**
+	 *  Check if an object is a create and will process percepts.
+	 *  @param object	The object.
+	 *  @return	True, if the object is a creature.
+	 */
+	protected boolean isCreature(ISpaceObject object)
+	{
+		// Todo: type inheritance for space objects?
+		return object.getType().equals("prey") || object.getType().equals("hunter");
 	}
 }

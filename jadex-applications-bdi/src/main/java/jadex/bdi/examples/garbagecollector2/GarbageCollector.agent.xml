@@ -85,7 +85,7 @@
 			to some burner and going back. A new goal is created
  			whenever the actual position is dirty and there is no
  			burner present. -->
-		 	<achievegoal name="take">
+		<achievegoal name="take">
 			<!-- <unique/>  -->
 			<creationcondition>
 				// unique (?rcapa and ?mgoal are provided internally)

@@ -829,7 +829,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/**
 	 *  Get the list of scheduled agent actions
 	 */
-	protected AgentActionList	getAgentActionList()
+	public AgentActionList	getAgentActionList()
 	{
 		return actionlist;
 	}

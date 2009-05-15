@@ -19,20 +19,23 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
+		<import>jadex.bdi.examples.hunterprey_env.dumbprey.*</import>
+		<import>jadex.bdi.examples.hunterprey_env.dumbhunter.*</import>
 	</imports>
 	
 	<spacetypes>
 		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
 			<env:objecttypes>
+				<env:objecttype name="hunter" />
 				<env:objecttype name="prey" />
 				<env:objecttype name="obstacle" />
 				<env:objecttype name="food" >
 					<env:property name="size">
 						new Vector2Double(
 							Math.min(1.5, ($object.getProperty("clock").getTick()-
-							$object.getProperty("creation_age").doubleValue())/30.0),
-							Math.min(1.5, ($object.getProperty("clock").getTick()-
-							$object.getProperty("creation_age").doubleValue())/20.0)
+							$object.getProperty("creation_age").doubleValue())/32.0),
+							Math.min(1.2, ($object.getProperty("clock").getTick()-
+							$object.getProperty("creation_age").doubleValue())/40.0)
 						)
 					</env:property>
 				</env:objecttype>
@@ -40,6 +43,7 @@
 			
 			<env:avatarmappings>
 				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
+				<env:avatarmapping agenttype="DumbHunter" objecttype="hunter"/>
 			</env:avatarmappings>
 
 			<env:actiontypes>
@@ -68,6 +72,18 @@
   			
 			<env:perceptgeneratortypes>
 				<env:perceptgeneratortype name="creaturevisiongen" class="CreatureVisionGenerator"/>
+				<env:perceptmapping agenttype="DumbPrey" class="DumbPreyVisionProcessor">
+					<!-- Todo: mapping per percept type? - ->
+					<env:percepttype name="object_appeared"/>
+					<env:percepttype name="object_disappeared"/>
+					<env:percepttype name="object_moved"/> -->
+				</env:perceptmapping>
+				<env:perceptmapping agenttype="DumbHunter" class="DumbHunterVisionProcessor">
+					<!-- Todo: mapping per percept type? - ->
+					<env:percepttype name="object_appeared"/>
+					<env:percepttype name="object_disappeared"/>
+					<env:percepttype name="object_moved"/> -->
+				</env:perceptmapping>
 			</env:perceptgeneratortypes>
 			
 			<env:views>
@@ -131,6 +147,7 @@
 
 	<agenttypes>
 		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_env/dumbprey/DumbPrey.agent.xml"/>
+		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_env/dumbhunter/DumbHunter.agent.xml"/>
 	</agenttypes>
 
 	<applications>
@@ -147,10 +164,26 @@
 				</env:initactions>
 
 				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="One Prey / One Hunter">
+ 			<agents>
+				<agent name="Dumbo" type="DumbPrey"/>
+				<agent name="Lupo" type="DumbHunter"/>
+			</agents>
+			
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
 				</env:observers>
  			</env:envspace>
  		</application>
@@ -185,10 +218,26 @@
 				</env:initactions>
 
 				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+ 		
+		<application name="Lupo's Paradise">
+			<agents>
+				<agent type="DumbPrey" number="100"/>
+				<agent name="Lupo" type="DumbHunter"/>
+			</agents>
+				
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
 				</env:observers>
  			</env:envspace>
  		</application>

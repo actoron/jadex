@@ -121,12 +121,34 @@ public class Grid2D extends Space2D
 	}*/
 	
 	/**
+	 *  Get a position on the grid.
+	 *  Applies torus or strict border settings as necessary.
+	 *  @param position	The position.
+	 *  @return	The position converted to a correct grid position (if necessary).
+	 */
+	public IVector2	getGridPosition(IVector2 position)
+	{
+		IVector2 ret	= position;
+		if(border_mode==BORDER_TORUS)
+		{
+			int sizex = areasize.getXAsInteger();
+			int sizey = areasize.getYAsInteger();
+			ret	= new Vector2Int((position.getXAsInteger()%sizex+sizex)%sizex,
+				(position.getYAsInteger()%sizey+sizey)%sizey);
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 * Get all SimObjects from a specific type at a specific grid position
 	 */
 	public Collection getSpaceObjectsByGridPosition(IVector2 position, Object type)
 	{
 		synchronized(monitor)
 		{
+			if(position!=null)
+				position	= getGridPosition(position);
 			Collection ret = null;
 			Collection simobjs = objectsygridpos.getCollection(position);
 			if(null == type)
@@ -351,8 +373,9 @@ public class Grid2D extends Space2D
 			
 			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks, listeners);
 
-			IVector2 pos = properties==null? getEmptyGridPosition(): (IVector2)properties.get(Space2D.POSITION);
-			if(pos==null)
+			IVector2 pos = properties==null || !properties.containsKey(Space2D.POSITION)
+				? getEmptyGridPosition(): (IVector2)properties.get(Space2D.POSITION);
+			if(pos==null)	// No empty position. todo: fail!?
 				pos = getRandomPosition(Vector2Int.ZERO);
 			
 			// Hack! todo: remove this

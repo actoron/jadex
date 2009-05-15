@@ -96,6 +96,8 @@ public class AgentActionList
 						it.remove();
 						try
 						{
+//							System.out.println("Action: "+entry);
+							
 							Object ret = entry.action.perform(entry.parameters, space);
 							if(entry.listener!=null)
 							{
@@ -180,8 +182,12 @@ public class AgentActionList
 	/**
 	 *  Entry for a scheduled action.
 	 */
-	public static class ActionEntry
+	public static class ActionEntry	implements Comparable
 	{
+		//-------- static part --------
+		
+		protected static int CNT	= 0;
+		
 		//-------- attributes --------
 		
 		/** The action. */
@@ -199,6 +205,9 @@ public class AgentActionList
 		/** The exception (set after failed execution). */
 		public Exception	exception;
 		
+		/** An id to differentiate otherwise equal actions. */
+		public int	id;
+		
 		//-------- constructors --------
 		
 		/**
@@ -209,6 +218,30 @@ public class AgentActionList
 			 this.action	= action;
 			 this.parameters	= parameters;
 			 this.listener	= listener;
+			 synchronized(ActionEntry.class)
+			 {
+				 this.id	= CNT++;
+			 }
+		}
+		
+		//-------- Comparable interface --------
+		
+		/**
+		 *  Compare two action entries.
+		 */
+		public int compareTo(Object obj)
+		{
+			return id - ((ActionEntry)obj).id;
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Create a string representation of the action.
+		 */
+		public String	toString()
+		{
+			return ""+action+parameters;
 		}
 	}
 
