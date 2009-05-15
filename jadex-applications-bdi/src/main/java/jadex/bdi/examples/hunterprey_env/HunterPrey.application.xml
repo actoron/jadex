@@ -78,12 +78,14 @@
 					<env:percepttype name="object_disappeared"/>
 					<env:percepttype name="object_moved"/> -->
 				</env:perceptmapping>
+				<!-- 
 				<env:perceptmapping agenttype="DumbHunter" class="DumbHunterVisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
+					<!- - Todo: mapping per percept type? - ->
 					<env:percepttype name="object_appeared"/>
 					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> -->
+					<env:percepttype name="object_moved"/> - ->
 				</env:perceptmapping>
+				 -->
 			</env:perceptgeneratortypes>
 			
 			<env:views>
