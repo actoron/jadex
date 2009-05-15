@@ -250,6 +250,15 @@ public class SynchronizedVector2Wrapper implements IVector2
 		return vector_.getDirectionAsDouble();
 	}
 	
+	/** Returns the mean average of the vector components.
+	 *
+	 *  @return vector direction
+	 */
+	public synchronized IVector1 getMean()
+	{
+		return vector_.getMean();
+	}
+	
 	/** Returns the distance to another vector.
 	 *
 	 *  @param vector other vector 

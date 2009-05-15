@@ -39,6 +39,7 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
+import javax.media.opengl.glu.GLU;
 
 
 /**
@@ -208,7 +209,7 @@ public class ViewportJOGL extends AbstractViewport
 			{
 				BufferedImage image = convertTextToImage(info.getFont(), info.getColor(), info.getText());
 				IVector2 size = new Vector2Double(image.getWidth(), image.getHeight());
-				Integer tex = prepareTexture(context_, image, GL.GL_CLAMP_TO_EDGE);
+				Integer tex = prepareTexture(context_, image, GL.GL_RGBA, GL.GL_CLAMP_TO_EDGE, GL.GL_LINEAR);
 				ret = new SizedTexture(tex.intValue(), size);
 				textCache_.put(info, ret);
 			}
@@ -336,7 +337,7 @@ public class ViewportJOGL extends AbstractViewport
 			throw new RuntimeException("Image not found: " + path);
 		}
 		
-		return prepareTexture(gl, tmpImage, wrapMode);
+		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, GL.GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
 	/**
@@ -346,7 +347,7 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param inputImage the image being converted to a texture
 	 * @param wrapParam wrap parameter
 	 */
-	private Integer prepareTexture(GL gl, BufferedImage inputImage, int wrapMode)
+	private Integer prepareTexture(GL gl, BufferedImage inputImage, int intFormat, int wrapMode, int ipMode)
 	{
 		int width = inputImage.getWidth();
 		int height = inputImage.getHeight();
@@ -394,12 +395,22 @@ public class ViewportJOGL extends AbstractViewport
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, wrapMode);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, wrapMode);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
-				GL.GL_LINEAR);
+				ipMode);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-				GL.GL_LINEAR);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_COMPRESSED_RGBA, image
+				ipMode);
+		
+		if (ipMode == GL.GL_LINEAR_MIPMAP_LINEAR)
+		{
+			GLU glu = new GLU();
+			glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, intFormat, image
+					.getWidth(), image.getHeight(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, buffer);
+		}
+		else
+		{
+			gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, intFormat, image
 				.getWidth(), image.getHeight(), 0, GL.GL_RGBA,
 				GL.GL_UNSIGNED_BYTE, buffer);
+		}
 
 		gl.glDisable(GL.GL_TEXTURE_2D);
 		

@@ -14,6 +14,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.Text;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
@@ -33,6 +34,7 @@ import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -518,6 +520,58 @@ public class MEnvSpaceType	extends MSpaceType
 					})
 				}), null));
 		
+		types.add(new TypeInfo("text", MultiCollection.class, null, null,
+				SUtil.createHashMap(new String[]{"x", "y", 
+					"position", "font", "style", "basesize", "color", "layer", "text", "creator"}, 
+				new BeanAttributeInfo[]{
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, null, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
+					new BeanAttributeInfo(null, colorconv, ""),
+					new BeanAttributeInfo(null, tintconv, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
+					new BeanAttributeInfo(null, null, "", new IObjectCreator()
+					{
+						public Object createObject(Map args) throws Exception
+						{
+							Object position = MEnvSpaceInstance.getProperty(args, "position");
+							if(position==null)
+							{
+								position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
+									(Double)MEnvSpaceInstance.getProperty(args, "y"));
+							}
+							
+							String fontname = (String) MEnvSpaceInstance.getProperty(args, "font");
+							if(fontname==null)
+							{
+								fontname = "Default";
+							}
+							Integer fontstyle = (Integer) MEnvSpaceInstance.getProperty(args, "style");
+							if (fontstyle==null)
+							{
+								fontstyle = new Integer(Font.PLAIN);
+							}
+							Integer fontsize = (Integer) MEnvSpaceInstance.getProperty(args, "basesize");
+							if (fontsize==null)
+							{
+								fontsize = new Integer(12);
+							}
+							Font font = new Font(fontname, fontstyle.intValue(), fontsize.intValue());
+							
+							
+							
+							String text = (String) MEnvSpaceInstance.getProperty(args, "text");
+							text = String.valueOf(text);
+							
+							IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
+							return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, exp);
+						}
+					})
+				}), null));
+		
 		types.add(new TypeInfo("gridlayer", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"color", "width", "height", "type", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, colorconv, ""),
@@ -656,7 +710,8 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("texturedrectangle", new BeanAttributeInfo("parts", null, "")));		
 		linkinfos.add(new LinkInfo("triangle", new BeanAttributeInfo("parts", null, "")));		
 		linkinfos.add(new LinkInfo("rectangle", new BeanAttributeInfo("parts", null, "")));		
-		linkinfos.add(new LinkInfo("regularpolygon", new BeanAttributeInfo("parts", null, "")));		
+		linkinfos.add(new LinkInfo("regularpolygon", new BeanAttributeInfo("parts", null, "")));
+		linkinfos.add(new LinkInfo("text", new BeanAttributeInfo("parts", null, "")));
 		
 		// all drawable elems
 		linkinfos.add(new LinkInfo("drawcondition", new BeanAttributeInfo("drawcondition", expconv, "")));		

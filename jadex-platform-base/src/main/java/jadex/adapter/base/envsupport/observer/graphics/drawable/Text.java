@@ -6,8 +6,12 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.media.opengl.GL;
+
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -107,14 +111,17 @@ public final class Text implements IDrawable
 		{
 			IVector2 position = SObjectInspector.getVector2(obj, this.position);
 			IVector2 dcPos = SObjectInspector.getVector2(obj, dc.getPosition());
-			if ((position == null) || (dcPos == null))
+			IVector2 dcScale = SObjectInspector.getVector2(obj, dc.getSize());
+			if ((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
 			}
 			
 			Graphics2D g = vp.getContext();
 			AffineTransform t = g.getTransform();
-			BufferedImage image = vp.getTextImage(new TextInfo(baseFont, color, text));
+			float fontscale = dcScale.getMean().getAsFloat();
+			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
+			BufferedImage image = vp.getTextImage(new TextInfo(font, color, getReplacedText(obj)));
 			Canvas canvas = vp.getCanvas();
 			IVector2 size = vp.getPaddedSize().copy().divide(new Vector2Double(canvas.getWidth(), canvas.getHeight())).
 			multiply(new Vector2Double(image.getWidth(), image.getHeight()));
@@ -125,8 +132,6 @@ public final class Text implements IDrawable
 					position.getYAsDouble() - (size.getYAsDouble() / 2.0));
 			g.scale(size.getXAsDouble(), size.getYAsDouble());
 			
-			/*AffineTransform imageTransform = new AffineTransform();
-			imageTransform.scale(1.0 / image.getWidth(), 1.0 / image.getHeight());*/
 			g.drawImage(image, vp.getImageTransform(image.getWidth(), image.getHeight()), null);
 			g.setTransform(t);
 		}
@@ -153,7 +158,8 @@ public final class Text implements IDrawable
 		{
 			IVector2 position = SObjectInspector.getVector2(obj, this.position);
 			IVector2 dcPos = SObjectInspector.getVector2(obj, dc.getPosition());
-			if ((position == null) || (dcPos == null))
+			IVector2 dcScale = SObjectInspector.getVector2(obj, dc.getSize());
+			if ((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
 			}
@@ -161,11 +167,14 @@ public final class Text implements IDrawable
 			GL gl = vp.getContext();
 			gl.glPushMatrix();
 			
-			SizedTexture texture = vp.getTextTexture(new TextInfo(baseFont, color, text));
+			float fontscale = dcScale.getMean().getAsFloat();
+			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
+			SizedTexture texture = vp.getTextTexture(new TextInfo(font, color, getReplacedText(obj)));
 			IVector2 imgSize = texture.getSize();
 			Canvas canvas = vp.getCanvas();
 			IVector2 size = vp.getPaddedSize().copy().divide(new Vector2Double(canvas.getWidth(), canvas.getHeight())).
 			multiply(imgSize);
+			
 			
 			gl.glTranslatef(dcPos.getXAsFloat(), dcPos.getYAsFloat(), 0.0f);
 			gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
@@ -191,5 +200,30 @@ public final class Text implements IDrawable
 			
 			gl.glPopMatrix();
 		}
+	}
+	
+	private String getReplacedText(Object obj)
+	{
+		String[] tokens = text.split("\\$");
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < tokens.length; ++i)
+		{
+			if ((i & 1) == 0)
+			{
+				sb.append(tokens[i]);
+			}
+			else
+			{
+				if (tokens[i] == "")
+				{
+					sb.append("$");
+				}
+				else
+				{
+					sb.append(String.valueOf(SObjectInspector.getProperty(obj, tokens[i])));
+				}
+			}
+		}
+		return sb.toString();
 	}
 }

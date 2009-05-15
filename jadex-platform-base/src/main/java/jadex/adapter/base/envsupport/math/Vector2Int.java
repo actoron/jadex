@@ -314,6 +314,15 @@ public class Vector2Int implements IVector2
 		return Math.atan2(y_, x_);
 	}
 	
+	/** Returns the mean average of the vector components.
+	 *
+	 *  @return vector direction
+	 */
+	public IVector1 getMean()
+	{
+		return new Vector1Int((x_ + y_) >> 1);
+	}
+	
 	/** Returns the distance to another vector.
 	 *
 	 *  @param vector other vector 

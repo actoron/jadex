@@ -160,6 +160,12 @@ public interface IVector2
 	 */
 	public double getDirectionAsDouble();
 	
+	/** Returns the mean average of the vector components.
+	 *
+	 *  @return vector direction
+	 */
+	public IVector1 getMean();
+	
 	/** Returns the distance to another vector.
 	 *
 	 *  @param vector other vector 

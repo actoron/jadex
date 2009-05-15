@@ -136,11 +136,11 @@ public class DrawableCombiner extends AbstractVisual2D
 	 * @param obj object being drawn
 	 * @param g the viewport context
 	 */
-	public void setupMatrix(Object obj, Graphics2D g)
+	public boolean setupMatrix(Object obj, Graphics2D g)
 	{
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		if(position==null)
-			return;
+			return false;
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
 		if(size==null)
@@ -153,6 +153,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		g.scale(size.getXAsDouble(), size.getYAsDouble());
 		g.scale(Math.cos(rot.getYAsDouble()), Math.cos(rot.getXAsDouble()));
 		g.rotate(rot.getZAsDouble());
+		return true;
 	}
 	
 	/**
@@ -161,11 +162,11 @@ public class DrawableCombiner extends AbstractVisual2D
 	 * @param obj object being drawn
 	 * @param gl the viewport context
 	 */
-	public void setupMatrix(Object obj, GL gl)
+	public boolean setupMatrix(Object obj, GL gl)
 	{
 		IVector2 position = SObjectInspector.getVector2(obj, this.position);
 		if(position==null)
-			return;
+			return false;
 		
 		IVector2 size = SObjectInspector.getVector2(obj, this.size);
 		if(size==null)
@@ -179,6 +180,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
 		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
 		gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
+		return true;
 	}
 
 	/**

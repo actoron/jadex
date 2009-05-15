@@ -223,6 +223,11 @@ public class Vector2Double implements IVector2, Cloneable
 	{
 		return Math.atan2(y_, x_);
 	}
+	
+	public IVector1 getMean()
+	{
+		return new Vector1Double((x_ + y_) / 2);
+	}
 
 	public IVector1 getDistance(IVector2 vector)
 	{

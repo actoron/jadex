@@ -124,7 +124,8 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			Graphics2D g = vp.getContext();
 			AffineTransform t = g.getTransform();
-			dc.setupMatrix(obj, g);
+			if (!dc.setupMatrix(obj, g))
+				return;
 			doDraw(obj, vp);
 			g.setTransform(t);
 		}
@@ -151,7 +152,8 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			GL gl = vp.getContext();
 			gl.glPushMatrix();
-			dc.setupMatrix(obj, gl);
+			if (!dc.setupMatrix(obj, gl))
+				return;
 			doDraw(obj, vp);
 			gl.glPopMatrix();
 		}
