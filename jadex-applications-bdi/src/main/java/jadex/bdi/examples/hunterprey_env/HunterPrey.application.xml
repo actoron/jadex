@@ -78,14 +78,12 @@
 					<env:percepttype name="object_disappeared"/>
 					<env:percepttype name="object_moved"/> -->
 				</env:perceptmapping>
-				<!-- 
 				<env:perceptmapping agenttype="DumbHunter" class="DumbHunterVisionProcessor">
-					<!- - Todo: mapping per percept type? - ->
+					<!-- Todo: mapping per percept type? - ->
 					<env:percepttype name="object_appeared"/>
 					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> - ->
+					<env:percepttype name="object_moved"/> -->
 				</env:perceptmapping>
-				 -->
 			</env:perceptgeneratortypes>
 			
 			<env:views>
@@ -229,6 +227,25 @@
 			<agents>
 				<agent type="DumbPrey" number="100"/>
 				<agent name="Lupo" type="DumbHunter"/>
+			</agents>
+				
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="Battlefield">
+			<agents>
+				<agent type="DumbPrey" number="200"/>
+				<agent type="DumbHunter" number="30"/>
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace">

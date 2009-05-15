@@ -32,6 +32,8 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -305,7 +307,9 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 						}
 						catch(Exception e)
 						{
-							AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+e);
+							StringWriter	sw	= new StringWriter();
+							e.printStackTrace(new PrintWriter(sw));
+							AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
 						}
 					}
 					try
@@ -314,7 +318,9 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 					}
 					catch(Exception e)
 					{
-						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+e);
+						StringWriter	sw	= new StringWriter();
+						e.printStackTrace(new PrintWriter(sw));
+						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
 					}
 				}
 				else //if(entries[i] instanceof Runnable)
@@ -325,7 +331,9 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 					}
 					catch(Exception e)
 					{
-						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+e);
+						StringWriter	sw	= new StringWriter();
+						e.printStackTrace(new PrintWriter(sw));
+						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
 					}
 				}
 			}

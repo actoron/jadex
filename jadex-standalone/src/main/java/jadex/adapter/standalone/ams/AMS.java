@@ -489,6 +489,8 @@ public class AMS implements IAMS, IPlatformService
 		StandaloneAgentAdapter adapter = (StandaloneAgentAdapter)adapters.get(aid);
 		if(adapter==null)
 			listener.exceptionOccurred(new RuntimeException("No local agent found for agent identifier: "+aid));
+//		else if(!IAMSAgentDescription.STATE_ACTIVE.equals(adapter.getState()))
+//			listener.exceptionOccurred(new RuntimeException("Agent not (yet?) active: "+aid));
 		else
 			adapter.getKernelAgent().getExternalAccess(listener);
 	}

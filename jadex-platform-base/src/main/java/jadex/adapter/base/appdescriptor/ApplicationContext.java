@@ -62,11 +62,14 @@ public class ApplicationContext	extends BaseContext
 	/**
 	 *  Add an agent to a context.
 	 */
-	public synchronized void	addAgent(IAgentIdentifier agent)
+	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
+	public /*synchronized*/ void	addAgent(IAgentIdentifier agent)
 	{
 		if(isTerminating())
 			throw new RuntimeException("Cannot add agent to terminating context: "+agent+", "+this);
 		
+		// Todo: when not synchronized, the check might not alwyas detect
+		// duplicate addition when race condition (do we care!?)
 		IContextService	cs	= (IContextService) platform.getService(IContextService.class);
 		IContext[]	appcontexts	= cs.getContexts(agent, ApplicationContext.class);
 		if(appcontexts!=null && appcontexts.length>0)

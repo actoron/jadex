@@ -110,22 +110,32 @@ public class BaseContext	implements IContext
 	/**
 	 *  Add an agent to a context.
 	 */
-	public synchronized void	addAgent(IAgentIdentifier agent)
+	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
+	public /*synchronized*/ void	addAgent(IAgentIdentifier agent)
 	{
-		if(agents==null)
-			agents	= new HashSet();
-		
-		agents.add(agent);
-		
-		if(spaces!=null)
+		ISpace[]	aspaces	= null;
+		synchronized(this)
 		{
-			for(Iterator it=spaces.values().iterator(); it.hasNext(); )
+			if(agents==null)
+				agents	= new HashSet();
+			
+			agents.add(agent);
+			
+			if(spaces!=null)
 			{
-				((ISpace)it.next()).agentAdded(agent);
+				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+			}
+			
+			System.out.println("Added agent: "+this);
+		}
+
+		if(aspaces!=null)
+		{
+			for(int i=0; i<aspaces.length; i++)
+			{
+				aspaces[i].agentAdded(agent);
 			}
 		}
-		
-		System.out.println("Added agent: "+this);
 	}
 	
 	/**
