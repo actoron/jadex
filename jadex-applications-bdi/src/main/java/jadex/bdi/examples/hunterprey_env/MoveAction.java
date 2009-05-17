@@ -85,7 +85,7 @@ public class MoveAction extends SimplePropertyObject implements IAgentAction
 			throw new RuntimeException("Cannot move '"+direction+"' due to obstacles: "+obstacles);
 		}
 		
-		// Preys can not "tunnel" through hunters, i.e. from from the field
+		// Preys can not "tunnel" through hunters, i.e. move from the field
 		// where the hunter is now to the field where the hunter was before.
 		if(avatar.getType().equals("prey"))
 		{
@@ -96,7 +96,7 @@ public class MoveAction extends SimplePropertyObject implements IAgentAction
 				for(Iterator it=hunters.iterator(); it.hasNext(); )
 				{
 					ISpaceObject	hunter	= (ISpaceObject)it.next();
-					if(pos.equals(hunter.getProperty(Space2D.POSITION)))
+					if(pos.equals(hunter.getProperty(PROPERTY_LASTPOS)))
 					{
 						System.out.println("Cannot move '"+direction+"' due to hunter: "+hunter);
 						throw new RuntimeException("Cannot move '"+direction+"' due to hunter: "+hunter);
