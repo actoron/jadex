@@ -146,6 +146,7 @@ public class SObjectInspector
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
+			fetcher.setValue("$space", obj);
 			ret = ((IParsedExpression) ret).getValue(fetcher);
 		}
 		

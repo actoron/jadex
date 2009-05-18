@@ -28,8 +28,7 @@ public class GeneralDataView2D implements IDataView
 	 */
 	public GeneralDataView2D()
 	{
-		objects = new Object[0];
-		dirty = false;
+		dirty = true;
 	}
 	
 	/**

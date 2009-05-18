@@ -236,8 +236,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 						Map prop = (Map)mprops.get(j);
 						IParsedExpression exp = (IParsedExpression)prop.get("value");
 						// todo: support static and dynamic values?!
-						props.put((String)prop.get("name"), exp);
-//						props.put((String)prop.get("name"), exp.getValue(fetcher));
+//						props.put((String)prop.get("name"), exp);
+						props.put((String)prop.get("name"), exp.getValue(fetcher));
 					}
 				}
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
@@ -254,7 +254,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					props.put(ISpaceObject.PROPERTY_OWNER, ownerid);
 				}
 				
-				// Hmm local name as owner? better would be agent id, but agents are created after space?
 				ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
 			}
 		}
