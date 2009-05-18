@@ -33,6 +33,9 @@
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1.5" height="1.5">
 			<env:objecttypes>
 				<env:objecttype name="target" />
+				<env:objecttype name="sentry" />
+				<env:objecttype name="producer" />
+				<env:objecttype name="carry" />
 				<env:objecttype name="homebase">
 					<env:property name="text">
 						"Collected ore: "+$object.getProperty("ore")+" \n"+
@@ -42,6 +45,12 @@
 				</env:objecttype>
 			</env:objecttypes>
 									
+			<env:avatarmappings>
+				<env:avatarmapping agenttype="Sentry" objecttype="sentry"/>
+				<env:avatarmapping agenttype="Producer" objecttype="producer"/>
+				<env:avatarmapping agenttype="Carry" objecttype="carry"/>
+			</env:avatarmappings>
+
 			<env:views>
 				<env:view name="all_view" class="GeneralDataView2D" />
 			</env:views>
@@ -57,6 +66,15 @@
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
 						<env:text layer="2" x="0.0" y="0.08" basesize="90" text="$text$" color="black"/>
 					</env:drawable>
+					<env:drawable objecttype="sentry" width="0.1" height="0.1">
+						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/marsworld_env/images/sentry.png" />
+					</env:drawable>
+					<env:drawable objecttype="producer" width="0.1" height="0.1">
+						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/marsworld_env/images/producer.png" />
+					</env:drawable>
+					<env:drawable objecttype="carry" width="0.1" height="0.1">
+						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/marsworld_env/images/carry.png" />
+					</env:drawable>
 					<env:prelayers>
 						<env:tiledlayer width="1.7" height="1.7" imagepath="jadex/bdi/examples/marsworld_env/images/mars.png" />
 					</env:prelayers>
@@ -65,8 +83,20 @@
 		</env:envspacetype>
 	</spacetypes>
 
+	<agenttypes>
+		<agenttype name="Sentry" filename="jadex/bdi/tutorial/TranslationA1.agent.xml"/>
+		<agenttype name="Producer" filename="jadex/bdi/tutorial/TranslationA1.agent.xml"/>
+		<agenttype name="Carry" filename="jadex/bdi/tutorial/TranslationA1.agent.xml"/>
+	</agenttypes>
+
 	<applications>
-		<application name="Empty">			
+		<application name="1 Sentry / 2 Producers / 3 Carries">
+			<agents>
+				<agent type="Sentry" number="1"/>
+				<agent type="Producer" number="2"/>
+				<agent type="Carry" number="3"/>
+			</agents>
+
 			<env:envspace name="my2dspace" type="2dspace">
 				<env:objects>
 					<env:object type="homebase">
