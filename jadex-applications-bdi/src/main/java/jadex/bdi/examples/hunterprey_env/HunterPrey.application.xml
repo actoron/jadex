@@ -141,7 +141,10 @@
 			</env:perspective>
 			
 			<!-- executor -->
-			<env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class))</env:spaceexecutor>
+			<env:spaceexecutor>
+				new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class),
+					new CreatureActionComparator($space))
+			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
 

@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;
 import jadex.bridge.ITimedObject;
 
+import java.util.Comparator;
 import java.util.Iterator;
 
 /**
@@ -19,6 +20,19 @@ public class RoundBasedExecutor
 	protected long timestamp;
 	
 	//-------- constructors--------
+	
+	/**
+	 *  Creates a new round based executor.
+	 *  @param space	The space.
+	 *  @param clockservice	The clock service.
+	 *  @param acomp	The action comparator.
+	 */
+	public RoundBasedExecutor(AbstractEnvironmentSpace space, IClockService clockservice, Comparator acomp)
+	{
+		this(space, clockservice);
+		
+		space.getAgentActionList().setOrdering(acomp);
+	}
 	
 	/**
 	 *  Creates a new round based executor.
