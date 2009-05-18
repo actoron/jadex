@@ -5,16 +5,15 @@ import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.Text;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.Text;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
@@ -803,8 +802,22 @@ public class MEnvSpaceType	extends MSpaceType
 		{
 			if(!(val instanceof String))
 				throw new RuntimeException("Source value must be string: "+val);
+			
+			String	str	= (String)val;
+			String	alpha	= null;
+			if(str.startsWith("#") && str.length()==9)
+			{
+				alpha	= str.substring(7);
+				str	= str.substring(0, 7);
+			}
+			
 			// Cannot use CSS.stringToColor() because they haven't made it public :-(
-			return ss.stringToColor((String)val);
+			Color	c	= ss.stringToColor((String)val);
+			if(alpha!=null)
+			{
+				c	= new Color(c.getRed(), c.getGreen(), c.getBlue(), Integer.parseInt(alpha, 16));
+			}
+			return c;
 		}
 	}
 	

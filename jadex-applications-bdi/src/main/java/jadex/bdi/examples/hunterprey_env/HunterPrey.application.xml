@@ -33,9 +33,9 @@
 					<env:property name="size">
 						new Vector2Double(
 							Math.min(1, ($object.getProperty("clock").getTick()-
-							$object.getProperty("creation_age").doubleValue())/40.0),
+							$object.getProperty("creation_age").doubleValue())/32.0),
 							Math.min(0.8, ($object.getProperty("clock").getTick()-
-							$object.getProperty("creation_age").doubleValue())/32.0)
+							$object.getProperty("creation_age").doubleValue())/40.0)
 						)
 					</env:property>
 				</env:objecttype>
@@ -93,6 +93,10 @@
 					<env:property name="object">$object</env:property>
 					<env:property name="range">2</env:property>
 				</env:view>
+				<env:view name="hunter_view" class="LocalDataView2D" objecttype="hunter">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:view>
 			</env:views>
 
 			<env:perspectives>
@@ -105,15 +109,17 @@
 					</env:drawable>
 					<env:drawable objecttype="prey" width="1.0" height="1.0">
 						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/prey.png" />
+						<env:rectangle layer="-1" width="5" height="5" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="hunter" width="1.0" height="1.0">
 						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/hunter.png" />
+						<env:rectangle layer="-1" width="5" height="5" color="#ffff007f" />
 					</env:drawable>
 					<env:prelayers>
 						<env:tiledlayer width="17.5" height="17.5" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
-						<env:gridlayer width="1.0" height="1.0" color="black" />
 					</env:prelayers>
 					<env:postlayers>
+						<env:gridlayer width="1.0" height="1.0" color="black" />
 					</env:postlayers>
 				</env:perspective>
 			</env:perspectives>
