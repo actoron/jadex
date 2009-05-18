@@ -32,10 +32,10 @@
 				<env:objecttype name="food" >
 					<env:property name="size">
 						new Vector2Double(
-							Math.min(1.5, ($object.getProperty("clock").getTick()-
-							$object.getProperty("creation_age").doubleValue())/32.0),
-							Math.min(1.2, ($object.getProperty("clock").getTick()-
-							$object.getProperty("creation_age").doubleValue())/40.0)
+							Math.min(1, ($object.getProperty("clock").getTick()-
+							$object.getProperty("creation_age").doubleValue())/40.0),
+							Math.min(0.8, ($object.getProperty("clock").getTick()-
+							$object.getProperty("creation_age").doubleValue())/32.0)
 						)
 					</env:property>
 				</env:objecttype>
@@ -245,7 +245,7 @@
 		<application name="Battlefield">
 			<agents>
 				<agent type="DumbPrey" number="200"/>
-				<agent type="DumbHunter" number="30"/>
+				<agent type="DumbHunter" number="20"/>
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace">

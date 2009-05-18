@@ -235,7 +235,8 @@ public class ApplicationContext	extends BaseContext
 	/**
 	 *  Remove an agent from a context.
 	 */
-	public synchronized void removeAgent(IAgentIdentifier agent)
+	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
+	public /*synchronized*/ void	removeAgent(IAgentIdentifier agent)
 	{
 		boolean master = isAgentMaster(agent);
 			

@@ -1,10 +1,12 @@
 package jadex.bdi.examples.hunterprey_env;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
@@ -37,6 +39,11 @@ public class EatAction extends SimplePropertyObject implements IAgentAction
 		ISpaceObject avatar = grid.getOwnedObjects(owner)[0];
 		ISpaceObject target = (ISpaceObject)parameters.get(IAgentAction.OBJECT_ID);
 		
+		if(null==space.getSpaceObject(target.getId()))
+		{
+			throw new RuntimeException("No such object in space: "+target);
+		}
+		
 		if(!avatar.getProperty(Space2D.POSITION).equals(target.getProperty(Space2D.POSITION)))
 		{
 			throw new RuntimeException("Can only eat objects at same position.");
@@ -57,6 +64,15 @@ public class EatAction extends SimplePropertyObject implements IAgentAction
 		}
 		
 		space.destroySpaceObject(target.getId());
+		
+		// Todo: Use listener model for self destroying of agent!?
+		if(target.getProperty(ISpaceObject.PROPERTY_OWNER)!=null)
+		{
+//			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
+			IAMS	ams	= (IAMS)((ApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
+			ams.destroyAgent((IAgentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER), null);
+		}
+		
 		avatar.setProperty(PROPERTY_POINTS, points);
 //		System.out.println("Object eaten: "+target);
 		

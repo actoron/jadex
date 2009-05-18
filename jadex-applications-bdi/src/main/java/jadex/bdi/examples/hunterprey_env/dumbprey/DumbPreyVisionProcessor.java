@@ -35,7 +35,8 @@ public class DumbPreyVisionProcessor implements IPerceptProcessor
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					exception.printStackTrace();
+					// May happen when agent has been killed concurrently.
+//					exception.printStackTrace();
 				}
 				public void resultAvailable(Object result)
 				{

@@ -56,6 +56,11 @@ public class MoveAction extends SimplePropertyObject implements IAgentAction
 		IAgentIdentifier actor = (IAgentIdentifier)parameters.get(IAgentAction.ACTOR_ID);
 		String direction = (String)parameters.get(PARAMETER_DIRECTION);
 		ISpaceObject avatar = grid.getOwnedObjects(actor)[0];
+
+		if(null==space.getSpaceObject(avatar.getId()))
+		{
+			throw new RuntimeException("No such object in space: "+avatar);
+		}
 		
 		IVector2	pos	= (IVector2)avatar.getProperty(Space2D.POSITION);
 		if(DIRECTION_LEFT.equals(direction))
@@ -98,7 +103,7 @@ public class MoveAction extends SimplePropertyObject implements IAgentAction
 					ISpaceObject	hunter	= (ISpaceObject)it.next();
 					if(pos.equals(hunter.getProperty(PROPERTY_LASTPOS)))
 					{
-						System.out.println("Cannot move '"+direction+"' due to hunter: "+hunter);
+//						System.out.println("Cannot move '"+direction+"' due to hunter: "+hunter);
 						throw new RuntimeException("Cannot move '"+direction+"' due to hunter: "+hunter);
 					}
 				}

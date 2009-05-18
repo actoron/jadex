@@ -126,7 +126,7 @@ public class BaseContext	implements IContext
 				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
 			}
 			
-			System.out.println("Added agent: "+this);
+//			System.out.println("Added agent: "+this);
 		}
 
 		if(aspaces!=null)
@@ -141,26 +141,36 @@ public class BaseContext	implements IContext
 	/**
 	 *  Remove an agent from a context.
 	 */
-	public synchronized void	removeAgent(IAgentIdentifier agent)
+	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
+	public /*synchronized*/ void	removeAgent(IAgentIdentifier agent)
 	{
-		if(agents!=null)
+		ISpace[]	aspaces	= null;
+		synchronized(this)
 		{
-			agents.remove(agent);
-			if(agents.isEmpty())
+			if(agents!=null)
 			{
-				agents	= null;
+				agents.remove(agent);
+				if(agents.isEmpty())
+				{
+					agents	= null;
+				}
 			}
+			
+			if(spaces!=null)
+			{
+				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+			}
+			
+//			System.out.println("Removed agent: "+this);
 		}
 
-		if(spaces!=null)
+		if(aspaces!=null)
 		{
-			for(Iterator it=spaces.values().iterator(); it.hasNext(); )
+			for(int i=0; i<aspaces.length; i++)
 			{
-				((ISpace)it.next()).agentRemoved(agent);
+				aspaces[i].agentRemoved(agent);
 			}
 		}
-
-		System.out.println("Removed agent: "+this);
 	}
 	
 	/**
