@@ -30,7 +30,7 @@
 	</imports>
 	
 	<spacetypes>
-		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1.5" height="1.5">
+		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:objecttypes>
 				<env:objecttype name="target" />
 				<env:objecttype name="sentry" />
