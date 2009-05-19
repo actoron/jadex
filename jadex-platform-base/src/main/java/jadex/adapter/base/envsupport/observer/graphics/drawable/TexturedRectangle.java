@@ -77,7 +77,7 @@ public class TexturedRectangle extends RotatingPrimitive
 	{
 		Graphics2D g = vp.getContext();
 		
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
+		IVector2 size = getSize(obj);
 		
 		if (!setupMatrix(obj, g))
 			return;

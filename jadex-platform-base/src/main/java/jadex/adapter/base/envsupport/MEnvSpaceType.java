@@ -9,9 +9,9 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.RotatingPrimitive;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.RotatingPrimitive;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Text;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
@@ -30,6 +30,7 @@ import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -214,6 +215,9 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
+					IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
+					args = (Map)args.get("object");
+					
 					// TODO: Allow more than the 2D-Perspective?
 					IPerspective ret = new Perspective2D();
 					
@@ -223,8 +227,11 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int k=0; k<drawables.size(); k++)
 						{
 							Map sourcedrawable = (Map)drawables.get(k);
+							Map tmp = new HashMap();
+							tmp.put("fetcher", fetcher);
+							tmp.put("object", sourcedrawable);
 							ret.addVisual(MEnvSpaceInstance.getProperty(sourcedrawable, "objecttype"), 
-								((IObjectCreator)MEnvSpaceInstance.getProperty(sourcedrawable, "creator")).createObject(sourcedrawable));
+								((IObjectCreator)MEnvSpaceInstance.getProperty(sourcedrawable, "creator")).createObject(tmp));
 						}
 					}
 					
@@ -278,6 +285,8 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					public Object createObject(Map args) throws Exception
 					{
+						IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
+						args = (Map)args.get("object");
 						Object position = MEnvSpaceInstance.getProperty(args, "position");
 						if(position==null)
 						{
@@ -310,6 +319,10 @@ public class MEnvSpaceType	extends MSpaceType
 								ret.addDrawable((IDrawable)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepart, "creator")).createObject(sourcepart), layer);
 							}
 						}
+						
+						List props = (List)args.get("properties");
+						MEnvSpaceInstance.setProperties(ret, props, fetcher);
+						
 						return ret;
 					}
 				})
@@ -654,6 +667,11 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
+		types.add(new TypeInfo("drawable/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
+		
 		// type instance declarations.
 		
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
@@ -751,6 +769,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("object/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("view/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("objecttype/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("drawable/property", new BeanAttributeInfo("properties", null, "")));
 		
 		return linkinfos;
 	}

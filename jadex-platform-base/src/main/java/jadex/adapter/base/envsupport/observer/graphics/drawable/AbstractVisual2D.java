@@ -19,13 +19,13 @@ public class AbstractVisual2D extends SimplePropertyObject
 	//-------- attributes --------
 	
 	/** The size (scale) of the visual or a bound property to the size. */
-	protected Object	size;
+	private Object	size;
 	
 	/** The rotation of the visual or a bound property to the rotation along the x-axis. */
-	protected Object	rotation;
+	private Object	rotation;
 	
 	/** The position of the visual or a bound property to the position. */
-	protected Object	position;
+	private Object	position;
 	
 	//-------- constructors --------
 	
@@ -136,7 +136,7 @@ public class AbstractVisual2D extends SimplePropertyObject
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$drawable", this);
-			fetcher.setValue("object", obj);
+			fetcher.setValue("$object", obj);
 			ret = (IVector2)getProperty((String)size, fetcher);
 		}
 		
@@ -157,7 +157,7 @@ public class AbstractVisual2D extends SimplePropertyObject
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$drawable", this);
-			fetcher.setValue("object", obj);
+			fetcher.setValue("$object", obj);
 			ret = (IVector3)getProperty((String)rotation, fetcher);
 		}
 		if(ret==null)

@@ -335,14 +335,17 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				List perspectives = spacetype.getPropertyList("perspectives");
 				for(int j=0; j<perspectives.size(); j++)
 				{
-					Map sourcetheme = (Map)perspectives.get(j);
-					IPerspective	persp	= (IPerspective)((IObjectCreator)getProperty(sourcetheme, "creator")).createObject(sourcetheme);
+					Map sourcepers = (Map)perspectives.get(j);
+					Map args = new HashMap();
+					args.put("object", sourcepers);
+					args.put("fetcher", fetcher);
+					IPerspective	persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
 					// TODO: Add attributes
 					if(ret.getClass().getName().indexOf("2D")!=-1)
 						((Perspective2D)persp).setInvertYAxis(true);
 					if(ret.getClass().getName().indexOf("Grid")!=-1)
 						((Perspective2D)persp).setObjectShift(new Vector2Double(0.5));
-					oc.addPerspective((String)getProperty(sourcetheme, "name"), persp);
+					oc.addPerspective((String)getProperty(sourcepers, "name"), persp);
 				}
 			}
 		}
@@ -376,7 +379,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	 *  @param fetcher The fetcher for parsing the Java expression (can provide
 	 *  predefined values to the expression)
 	 */
-	protected void setProperties(IPropertyObject object, List properties, IValueFetcher fetcher)
+	public static void setProperties(IPropertyObject object, List properties, IValueFetcher fetcher)
 	{
 		if(properties!=null)
 		{
@@ -384,7 +387,11 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map prop = (Map)properties.get(i);
 				IParsedExpression exp = (IParsedExpression)prop.get("value");
-				object.setProperty((String)prop.get("name"), exp.getValue(fetcher));
+				boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+				if(dyn)
+					object.setProperty((String)prop.get("name"), exp);
+				else
+					object.setProperty((String)prop.get("name"), exp.getValue(fetcher));
 			}
 		}
 	}

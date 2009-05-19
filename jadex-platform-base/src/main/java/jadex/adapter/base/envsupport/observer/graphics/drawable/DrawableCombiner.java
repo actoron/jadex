@@ -155,7 +155,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	{
 		if(enablePos)
 		{
-			IVector2 position = SObjectInspector.getVector2(obj, this.position);
+			IVector2 position = getPosition(obj);
 			if(position==null)
 				return false;
 			g.translate(position.getXAsDouble(), position.getYAsDouble());
@@ -163,7 +163,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		if(enableSize)
 		{
-			IVector2 size = SObjectInspector.getVector2(obj, this.size);
+			IVector2 size = getSize(obj);
 			if(size==null)
 				size = new Vector2Double(1,0);
 			g.scale(size.getXAsDouble(), size.getYAsDouble());
@@ -171,7 +171,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		if(enableRot)
 		{
-			IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+			IVector3 rot = getRotation(obj);
 			if(rot==null)
 				rot = Vector3Double.ZERO.copy();
 			g.scale(Math.cos(rot.getYAsDouble()), Math.cos(rot.getXAsDouble()));
@@ -192,25 +192,25 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public boolean setupMatrix(Object obj, GL gl, boolean enablePos, boolean enableSize, boolean enableRot)
 	{
-		if (enablePos)
+		if(enablePos)
 		{
-			IVector2 position = SObjectInspector.getVector2(obj, this.position);
+			IVector2 position = getPosition(obj);
 			if(position==null)
 				return false;
 			gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
 		}
 		
-		if (enableSize)
+		if(enableSize)
 		{
-			IVector2 size = SObjectInspector.getVector2(obj, this.size);
+			IVector2 size = getSize(obj);
 			if(size==null)
 				size = new Vector2Double(1,0);
 			gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
 		}
 		
-		if (enableRot)
+		if(enableRot)
 		{
-			IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+			IVector3 rot = getRotation(obj);
 			if(rot==null)
 				rot = Vector3Double.ZERO.copy();
 			gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
@@ -269,15 +269,6 @@ public class DrawableCombiner extends AbstractVisual2D
 			IDrawable d = (IDrawable)it.next();
 			d.draw(this, obj, vp);
 		}
-	}
-
-	/**
-	 * Returns the scale of the combiner in relation to an object.
-	 * @param obj an object
-	 */
-	public IVector2 getSize(Object obj)
-	{
-		return SObjectInspector.getVector2(obj, size);
 	}
 
 	/**

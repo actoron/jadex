@@ -74,12 +74,12 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 */
 	protected boolean setupMatrix(Object obj, Graphics2D g)
 	{
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+		IVector2 size = getSize(obj);
+		IVector3 rot = getRotation(obj);
 //		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, rot.getXAsDouble());
 //		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotatio);
 //		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
-		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		IVector2 position = getPosition(obj);
 		
 		if((position == null) || (size == null) || (rot == null))
 		{
@@ -102,12 +102,12 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 */
 	protected boolean setupMatrix(Object obj, GL gl)
 	{
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+		IVector2 size = getSize(obj);
+		IVector3 rot = getRotation(obj);
 //		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
 //		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
 //		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
-		IVector2 position = SObjectInspector.getVector2(obj, this.position);
+		IVector2 position = getPosition(obj);
 		
 		if((position == null) || (size == null) || (rot == null))
 		{
