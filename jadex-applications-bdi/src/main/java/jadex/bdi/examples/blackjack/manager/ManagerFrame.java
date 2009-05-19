@@ -299,7 +299,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			}
 			else
 			{
-				ApplicationContext ac = (ApplicationContext)((IContextService)agent.getPlatform().getService(IContextService.class)).getContexts(ApplicationContext.class)[0];
+				ApplicationContext ac = (ApplicationContext)((IContextService)agent.getPlatform().getService(IContextService.class)).getContexts(agent.getAgentIdentifier(), ApplicationContext.class)[0];
 				ac.setAgentMaster(agent.getAgentIdentifier(), false);
 				agent.killAgent();
 			}

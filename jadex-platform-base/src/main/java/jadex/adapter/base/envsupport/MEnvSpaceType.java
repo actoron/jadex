@@ -262,9 +262,6 @@ public class MEnvSpaceType	extends MSpaceType
 						}
 						((Perspective2D) ret).setPostlayers((ILayer[]) targetpostlayers.toArray(new ILayer[0]));
 					}
-					// TODO: Add attributes
-					((Perspective2D) ret).setInvertYAxis(true);
-					((Perspective2D) ret).setObjectShift(new Vector2Double(0.5));
 					
 					return ret;
 				}

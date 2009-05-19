@@ -182,6 +182,7 @@ public class AMS implements IAMS, IPlatformService
 					StandaloneAgentAdapter	adapter	= (StandaloneAgentAdapter)adapters.get(agent);
 					if(adapter!=null)
 					{
+						// Todo: use result listener and set active state after agent has inited.
 						desc.setState(IAMSAgentDescription.STATE_ACTIVE);
 						adapter.setState(IAMSAgentDescription.STATE_ACTIVE);
 						adapter.wakeup();

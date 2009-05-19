@@ -11,8 +11,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * Space executor that connects to a clock service and emits time deltas.
+ * Space executor that connects to a clock service and reacts on time deltas.
  */
+// Todo: immediate execution of agent actions and percepts?
 public class DeltaTimeExecutor
 {
 	//-------- attributes --------

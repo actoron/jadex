@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.math.Vector2Int;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -118,11 +119,15 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners)
 	{
+		IVector2 pos = properties!=null ? (IVector2)properties.remove(Space2D.POSITION) : null;
+		if(pos==null)	
+			pos = getRandomPosition(Vector2Int.ZERO);
+		
 		ISpaceObject	ret	= super.createSpaceObject(typename, properties, tasks, listeners);
 		
-		if(ret.getProperty(POSITION)!=null)
+		if(pos!=null)
 		{
-			setPosition(ret.getId(), (IVector2)ret.getProperty(POSITION));
+			setPosition(ret.getId(), pos);
 		}
 		
 		return ret;

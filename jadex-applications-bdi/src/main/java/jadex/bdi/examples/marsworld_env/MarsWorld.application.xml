@@ -21,7 +21,7 @@
 	
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
-		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.adapter.base.envsupport.environment.DeltaTimeExecutor</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
@@ -33,9 +33,18 @@
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:objecttypes>
 				<env:objecttype name="target" />
-				<env:objecttype name="sentry" />
-				<env:objecttype name="producer" />
-				<env:objecttype name="carry" />
+				<env:objecttype name="sentry">
+					<env:property name="vision">0.1</env:property>
+					<env:property name="speed">5.0</env:property>
+				</env:objecttype>
+				<env:objecttype name="producer">
+					<env:property name="vision">0.05</env:property>
+					<env:property name="speed">10.0</env:property>
+				</env:objecttype>
+				<env:objecttype name="carry">
+					<env:property name="vision">0.05</env:property>
+					<env:property name="speed">15.0</env:property>
+				</env:objecttype>
 				<env:objecttype name="homebase">
 					<env:property name="text">
 						"Collected ore: "+$object.getProperty("ore")+" \n"+
@@ -57,8 +66,8 @@
 
 			<env:perspectives>
 				<env:perspective name="icons">
-					<env:drawable objecttype="target" width="0.1" height="0.1">
-						<env:regularpolygon layer="0" width="0.2" height="0.2" vertices="36" color="#C8000096" />
+					<env:drawable objecttype="target" width="0.05" height="0.05">
+						<env:regularpolygon layer="0" width="0.4" height="0.4" vertices="36" color="#C8000096" />
 						<!-- marked target. -->
 						<!-- <env:regularpolygon layer="0" width="0.2" height="0.2" vertices="36" color="#C32323296" /> -->
 					</env:drawable>
@@ -66,20 +75,28 @@
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
 						<env:text layer="2" x="0.0" y="0.08" basesize="90" text="$text$" color="black"/>
 					</env:drawable>
-					<env:drawable objecttype="sentry" width="0.1" height="0.1">
-						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/marsworld_env/images/sentry.png" />
+					<env:drawable objecttype="sentry" width="0.07" height="0.07">
+						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/sentry.png" />
+						<env:regularpolygon layer="1" width="2.86" height="2.86" vertices="36" color="#FAFA1E32" />
 					</env:drawable>
-					<env:drawable objecttype="producer" width="0.1" height="0.1">
-						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/marsworld_env/images/producer.png" />
+					<env:drawable objecttype="producer" width="0.07" height="0.07">
+						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/producer.png" />
+						<env:regularpolygon layer="1" width="1.43" height="1.43" vertices="36" color="#FAFA1E32" />
 					</env:drawable>
-					<env:drawable objecttype="carry" width="0.1" height="0.1">
-						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/marsworld_env/images/carry.png" />
+					<env:drawable objecttype="carry" width="0.07" height="0.07">
+						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/carry.png" />
+						<env:regularpolygon layer="1" width="1.43" height="1.43" vertices="36" color="#FAFA1E32" />
 					</env:drawable>
 					<env:prelayers>
 						<env:tiledlayer width="1.7" height="1.7" imagepath="jadex/bdi/examples/marsworld_env/images/mars.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>
+
+			<!-- executor -->
+			<env:spaceexecutor>
+				new DeltaTimeExecutor($space, (IClockService)$platform.getService(IClockService.class))
+			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
 

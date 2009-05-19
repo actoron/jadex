@@ -83,7 +83,7 @@ public class ProductionPlanAGR extends Plan
 	private void callCarryAgent(Target target)
 	{
 		IContextService cs = (IContextService)getScope().getPlatform().getService(IContextService.class);
-		ApplicationContext ac = (ApplicationContext)cs.getContexts(ApplicationContext.class)[0];
+		ApplicationContext ac = (ApplicationContext)cs.getContexts(getScope().getAgentIdentifier(), ApplicationContext.class)[0];
 		AGRSpace agrs = (AGRSpace)ac.getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
 		IAgentIdentifier[]	carriers	= group.getAgentsForRole("carrier");

@@ -3,12 +3,13 @@ package jadex.adapter.base.envsupport.environment.space2d;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -370,19 +371,17 @@ public class Grid2D extends Space2D
 		synchronized(monitor)
 		{
 			// TODO: maybe only assign position to discretePosition vector?
+			if(properties==null)
+			{
+				properties	= new HashMap();
+			}
+			if(!properties.containsKey(Space2D.POSITION))
+			{
+				// Todo: Fail, when no empty position.
+				properties.put(Space2D.POSITION, getEmptyGridPosition());
+			}
 			
 			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks, listeners);
-
-			IVector2 pos = properties==null || !properties.containsKey(Space2D.POSITION)
-				? getEmptyGridPosition(): (IVector2)properties.get(Space2D.POSITION);
-			if(pos==null)	// No empty position. todo: fail!?
-				pos = getRandomPosition(Vector2Int.ZERO);
-			
-			// Hack! todo: remove this
-			if(properties!=null)
-				properties.remove(Space2D.POSITION);
-			setPosition(obj.getId(), pos);
-
 			return obj;
 		}
 	}
