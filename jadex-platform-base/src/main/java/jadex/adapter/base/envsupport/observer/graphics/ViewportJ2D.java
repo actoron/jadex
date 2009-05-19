@@ -162,6 +162,35 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	public void componentShown(ComponentEvent e)
 	{
 	}
+	
+	/**
+	 * Returns an image for texturing of a text.
+	 * 
+	 * @param text the text
+	 */
+	private static final BufferedImage convertTextToImage(Font font, Color color, String text)
+	{
+		TextLayout textLayout = new TextLayout(text, font, new FontRenderContext(null, true, true));
+		
+		int width = (int) Math.ceil(textLayout.getAdvance());
+		int height = (int) Math.ceil(textLayout.getDescent() + textLayout.getAscent());
+		if ((width == 0) || (height == 0))
+			return null;
+		
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+		g.fillRect(0, 0, image.getWidth(), image.getHeight());
+		g.setColor(color);
+		textLayout.draw(g, 0, image.getHeight() - 1);
+		g.dispose();
+		AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+	    tx.translate(0, -image.getHeight(null));
+	    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BICUBIC);
+	    image = op.filter(image, null);
+
+		return image;
+	}
 
 	/**
 	 * Loads an image.

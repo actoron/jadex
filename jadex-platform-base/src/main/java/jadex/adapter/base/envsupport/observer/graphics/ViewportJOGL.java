@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport.observer.graphics;
 
-import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
@@ -57,9 +56,6 @@ public class ViewportJOGL extends AbstractViewport
 
 	/** Repeating texture cache. */
 	private Map					repeatingTextureCache_;
-	
-	/** Cache for text-images */
-	protected Map 		textCache_;
 
 	/** Display lists. */
 	private Map					displayLists_;
@@ -96,7 +92,6 @@ public class ViewportJOGL extends AbstractViewport
 		npot_ = false;
 		clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
 		repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
-		textCache_ = Collections.synchronizedMap(new TextureLRUCache(100));
 		displayLists_ = Collections.synchronizedMap(new HashMap());
 
 		try
@@ -200,23 +195,30 @@ public class ViewportJOGL extends AbstractViewport
 	 *  @param info information on the text
 	 *  @return the texture
 	 */
-	public SizedTexture getTextTexture(TextInfo info)
+	/*public GlyphTexture getTextTexture(TextInfo info)
 	{
 		synchronized (textCache_)
 		{
-			SizedTexture ret = (SizedTexture) textCache_.get(info);
+			GlyphTexture ret = (GlyphTexture) textCache_.get(info);
 			if (ret == null)
 			{
 				BufferedImage image = convertTextToImage(info.getFont(), info.getColor(), info.getText());
-				IVector2 size = new Vector2Double(image.getWidth(), image.getHeight());
-				Integer tex = prepareTexture(context_, image, GL.GL_RGBA, GL.GL_CLAMP_TO_EDGE, GL.GL_LINEAR);
-				ret = new SizedTexture(tex.intValue(), size);
+				
+				if (image != null)
+				{
+					TextLayout textLayout = new TextLayout(info.getText(), info.getFont(), new FontRenderContext(null, true, true));
+					IVector2 size = new Vector2Double(image.getWidth(), image.getHeight());
+					Integer tex = prepareTexture(context_, image, GL.GL_RGBA, GL.GL_CLAMP_TO_EDGE, GL.GL_LINEAR);
+					ret = new GlyphTexture(tex.intValue(), size, 0);
+				}
+				else
+					ret  = new GlyphTexture(0, Vector2Double.ZERO, 0.0f);
 				textCache_.put(info, ret);
 			}
 			
 			return ret;
 		}
-	}
+	}*/
 
 	/**
 	 * Returns a previous generated display list or null if it doesn't exist
@@ -261,28 +263,6 @@ public class ViewportJOGL extends AbstractViewport
 						.getYAsDouble()
 						* (inversionFlag_.getYAsInteger() ^ 1), -0.5, 0.5);
 		gl.glTranslated(-posX_, -posY_, 0.0);
-		
-		/*double[] modelMat = new double[16];
-		double[] projMat = new double[16];
-		int[] view = new int[4];
-		gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, modelMat, 0);
-		
-		gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projMat, 0);
-		
-		gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
-		
-		double[] start = new double[3];
-		glu.gluProject(0.0, 0.0, 0.0, modelMat, 0, projMat, 0, view, 0, start, 0);
-		System.out.println(Arrays.toString(start));
-		double[] end = new double[3];
-		glu.gluProject(size_.getXAsDouble(), size_.getYAsDouble(), 0.0, modelMat, 0, projMat, 0, view, 0, end, 0);
-		System.out.println(Arrays.toString(end));
-		int x = (int)Math.min(start[0], end[0]);
-		int y = (int)Math.min(start[1], end[1]);
-		int w = (int)(Math.ceil(Math.max(start[0], end[0])) - (int)Math.min(start[0], end[0]));
-		int h = (int)(Math.ceil(Math.max(start[1], end[1])) - (int)Math.min(start[1], end[1]));
-		//gl.glScissor((int)Math.abs(start[0]), (int)Math.abs(start[1]), (int)Math.ceil(Math.abs(end[0])), (int)Math.ceil(Math.abs(end[1])));
-		gl.glScissor(x, y, w, h);*/
 		
 		// Setup the scissor box
 		double xFac = canvas_.getWidth() / paddedSize_.getXAsDouble();
@@ -590,29 +570,6 @@ public class ViewportJOGL extends AbstractViewport
 		public Dimension getMinimumSize()
 		{
 			return new Dimension(1, 1);
-		}
-	}
-	
-	private class TextureLRUCache extends LinkedHashMap
-	{
-		private int maxSize;
-		
-		public TextureLRUCache(int maxSize)
-		{
-			super(16, 0.75f, true);
-			this.maxSize = maxSize;
-		}
-		
-		protected boolean removeEldestEntry(Map.Entry eldest)
-		{
-			if (size() > maxSize)
-			{
-				int[] tex = new int[1];
-				tex[0] = ((Integer) eldest.getValue()).intValue();
-				context_.glDeleteTextures(1, tex, 0);
-				return true;
-			}
-			return false;
 		}
 	}
 }

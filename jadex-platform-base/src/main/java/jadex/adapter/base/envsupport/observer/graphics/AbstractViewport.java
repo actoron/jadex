@@ -69,10 +69,10 @@ public abstract class AbstractViewport implements IViewport
 	protected boolean			preserveAR_;
 
 	/** Size of the viewport without padding. */
-	protected IVector2			size_;
+	public IVector2			size_;
 
 	/** Real size of the viewport including padding. */
-	public IVector2			paddedSize_;
+	protected IVector2			paddedSize_;
 
 	/** Known drawable Objects. */
 	protected Set				drawObjects_;
@@ -221,9 +221,17 @@ public abstract class AbstractViewport implements IViewport
 	{
 		return paddedSize_;
 	}
+	
+	/**
+	 * Gets the position of the viewport.
+	 */
+	public IVector2 getPosition()
+	{
+		return new Vector2Double(posX_, posY_);
+	}
 
 	/**
-	 * Sets the position of the bottom left corner of the viewport.
+	 * Sets the position of the viewport.
 	 */
 	public void setPosition(IVector2 pos)
 	{
@@ -291,6 +299,14 @@ public abstract class AbstractViewport implements IViewport
 			inversionFlag_ = new Vector2Int(inversionFlag_.getXAsInteger(), 0);
 		}
 	}
+	
+	/**
+	 * Gets the shift of all objects.
+	 */
+	public IVector2 getObjectShift()
+	{
+		return new Vector2Double(objShiftX_, objShiftY_);
+	}
 
 	/**
 	 * Sets the shift of all objects.
@@ -329,31 +345,6 @@ public abstract class AbstractViewport implements IViewport
 	public void removeViewportListener(IViewportListener listener)
 	{
 		listeners_.remove(listener);
-	}
-	
-	/**
-	 * Returns an image for texturing of a text.
-	 * 
-	 * @param text the text
-	 */
-	public static final BufferedImage convertTextToImage(Font font, Color color, String text)
-	{
-		TextLayout textLayout = new TextLayout(text, font, new FontRenderContext(null, true, true));
-		Rectangle2D bounds = textLayout.getBounds();
-		
-		BufferedImage image = new BufferedImage((int)Math.ceil(bounds.getWidth()), (int)Math.ceil(bounds.getHeight()), BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-		g.fillRect(0, 0, image.getWidth(), image.getHeight());
-		g.setColor(color);
-		textLayout.draw(g, 0, image.getHeight() - 1);
-		g.dispose();
-		AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-	    tx.translate(0, -image.getHeight(null));
-	    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-	    image = op.filter(image, null);
-
-		return image;
 	}
 
 	/**

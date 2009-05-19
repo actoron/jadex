@@ -6,17 +6,14 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.media.opengl.GL;
+
+import com.sun.opengl.util.j2d.TextRenderer;
 
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport;
-import jadex.adapter.base.envsupport.observer.graphics.SizedTexture;
 import jadex.adapter.base.envsupport.observer.graphics.TextInfo;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
@@ -29,6 +26,9 @@ import jadex.javaparser.SimpleValueFetcher;
  */
 public final class Text implements IDrawable
 {
+	/** Viewport Height on which the base font size is relative to */
+	private float BASE_VIEWPORT_HEIGHT = 300.0f;
+	
 	/** Relative position or binding */
 	private Object position;
 	
@@ -40,10 +40,6 @@ public final class Text implements IDrawable
 	
 	/** Fixed text */
 	private String text;
-	
-	/*private Font cachedFont;
-	private Color cachedColor;
-	private String cachedText;*/
 	
 	/** The condition deciding if the drawable should be drawn. */
 	private IParsedExpression drawcondition;
@@ -119,7 +115,7 @@ public final class Text implements IDrawable
 			
 			Graphics2D g = vp.getContext();
 			AffineTransform t = g.getTransform();
-			float fontscale = dcScale.getMean().getAsFloat();
+			float fontscale = dcScale.getMean().getAsFloat() * (vp.getCanvas().getHeight() / BASE_VIEWPORT_HEIGHT);
 			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
 			BufferedImage image = vp.getTextImage(new TextInfo(font, color, getReplacedText(obj)));
 			Canvas canvas = vp.getCanvas();
@@ -164,41 +160,23 @@ public final class Text implements IDrawable
 				return;
 			}
 			
-			GL gl = vp.getContext();
-			gl.glPushMatrix();
-			
-			float fontscale = dcScale.getMean().getAsFloat();
-			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
-			SizedTexture texture = vp.getTextTexture(new TextInfo(font, color, getReplacedText(obj)));
-			IVector2 imgSize = texture.getSize();
 			Canvas canvas = vp.getCanvas();
-			IVector2 size = vp.getPaddedSize().copy().divide(new Vector2Double(canvas.getWidth(), canvas.getHeight())).
-			multiply(imgSize);
+			float fontscale = dcScale.getMean().getAsFloat() * (canvas.getHeight() / BASE_VIEWPORT_HEIGHT);
+			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
+			String text = getReplacedText(obj);
 			
+			TextRenderer tr = new TextRenderer(font);
+			tr.setColor(color);
+			IVector2 pos = vp.getPosition().copy().negate().add(vp.getObjectShift()).add(dcPos).add(position).divide(vp.getPaddedSize()).multiply(new Vector2Double(canvas.getWidth(), canvas.getHeight()));
+			if (vp.getInvertX())
+				pos.negateX().add(new Vector2Double(canvas.getWidth(), 0));
+			if (vp.getInvertY())
+				pos.negateY().add(new Vector2Double(0, canvas.getHeight()));
+			pos.subtract(new Vector2Double(tr.getBounds(text).getWidth() / 2.0, tr.getBounds(text).getHeight() / 2.0));
 			
-			gl.glTranslatef(dcPos.getXAsFloat(), dcPos.getYAsFloat(), 0.0f);
-			gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
-			gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
-			
-			gl.glEnable(GL.GL_TEXTURE_2D);
-			gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getTexId());
-
-			gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-			gl.glBegin(GL.GL_QUADS);
-			gl.glTexCoord2f(0.0f, 0.0f);
-			gl.glVertex2f(-0.5f, -0.5f);
-			gl.glTexCoord2f(1.0f, 0.0f);
-			gl.glVertex2f(0.5f, -0.5f);
-			gl.glTexCoord2f(1.0f, 1.0f);
-			gl.glVertex2f(0.5f, 0.5f);
-			gl.glTexCoord2f(0.0f, 1.0f);
-			gl.glVertex2f(-0.5f, 0.5f);
-			gl.glEnd();
-
-			gl.glDisable(GL.GL_TEXTURE_2D);
-			
-			gl.glPopMatrix();
+			tr.beginRendering(canvas.getWidth(), canvas.getHeight());
+			tr.draw(text, pos.getXAsInteger(), pos.getYAsInteger());
+			tr.endRendering();
 		}
 	}
 	
