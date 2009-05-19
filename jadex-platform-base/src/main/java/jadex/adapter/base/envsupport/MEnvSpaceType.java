@@ -9,6 +9,7 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.RotatingPrimitive;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Text;
@@ -326,7 +327,7 @@ public class MEnvSpaceType	extends MSpaceType
 
 		types.add(new TypeInfo("texturedrectangle", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", "rotatex", "rotatey", "rotatez", "width", "height", 
-				"position", "rotation", "size", "imagepath", "layer", "creator"}, 
+				"position", "rotation", "size", "abspos", "abssize", "absrot", "imagepath", "layer", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -338,6 +339,9 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -364,16 +368,19 @@ public class MEnvSpaceType	extends MSpaceType
 							size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 								(Double)MEnvSpaceInstance.getProperty(args, "height"));
 						}
+						int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
 
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new TexturedRectangle(position, rotation, size, (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
+						return new TexturedRectangle(position, rotation, size, absFlags, (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
 					}
 				})
 			}), null));
 		
 		types.add(new TypeInfo("triangle", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", "rotatex", "rotatey", "rotatez", "width", "height", 
-					"position", "rotation", "size", "color", "layer", "creator"}, 
+					"position", "rotation", "size", "abspos", "abssize", "absrot", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -385,6 +392,9 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -412,15 +422,19 @@ public class MEnvSpaceType	extends MSpaceType
 								(Double)MEnvSpaceInstance.getProperty(args, "height"));
 						}
 						
+						int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+						
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new Triangle(position, rotation, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
+						return new Triangle(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
 					}
 				})
 			}), null));
 		
 		types.add(new TypeInfo("rectangle", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", "rotatex", "rotatey", "rotatez", "width", "height", 
-					"position", "rotation", "size", "color", "layer", "creator"}, 
+					"position", "rotation", "size", "abspos", "abssize", "absrot", "color", "layer", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -432,6 +446,9 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -458,16 +475,19 @@ public class MEnvSpaceType	extends MSpaceType
 							size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 								(Double)MEnvSpaceInstance.getProperty(args, "height"));
 						}
+						int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
 						
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new Rectangle(position, rotation, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
+						return new Rectangle(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
 					}
 				})
 			}), null));
 		
 		types.add(new TypeInfo("regularpolygon", MultiCollection.class, null, null,
 				SUtil.createHashMap(new String[]{"x", "y", "rotatex", "rotatey", "rotatez", "width", "height", 
-					"position", "rotation", "size", "color", "vertices", "layer", "creator"}, 
+					"position", "rotation", "size", "abspos", "abssize", "absrot", "color", "vertices", "layer", "creator"}, 
 				new BeanAttributeInfo[]{
 					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -479,6 +499,9 @@ public class MEnvSpaceType	extends MSpaceType
 					new BeanAttributeInfo(null, null, ""),
 					new BeanAttributeInfo(null, null, ""),
 					new BeanAttributeInfo(null, null, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 					new BeanAttributeInfo(null, colorconv, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "", new Integer(3)),
 					new BeanAttributeInfo(null, tintconv, ""),
@@ -507,11 +530,15 @@ public class MEnvSpaceType	extends MSpaceType
 									(Double)MEnvSpaceInstance.getProperty(args, "height"));
 							}
 							
+							int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
+							absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
+							absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+							
 							int vertices  = MEnvSpaceInstance.getProperty(args, "vertices")==null? 3: 
 								((Integer)MEnvSpaceInstance.getProperty(args, "vertices")).intValue();
 							
 							IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-							return new RegularPolygon(position, rotation, size, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
+							return new RegularPolygon(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
 						}
 					})
 				}), null));

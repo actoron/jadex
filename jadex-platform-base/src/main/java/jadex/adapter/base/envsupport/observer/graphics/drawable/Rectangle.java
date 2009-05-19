@@ -36,11 +36,12 @@ public class Rectangle extends ColoredPrimitive
 	 * @param yrotation yrotation or rotation-binding
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
+	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 * @param c the drawable's color
 	 */
-	public Rectangle(Object position, Object rotation, Object size, Color c, IParsedExpression drawcondition)
+	public Rectangle(Object position, Object rotation, Object size, int absFlags, Color c, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, c, drawcondition);
+		super(position, rotation, size, absFlags, c, drawcondition);
 	}
 
 	public void init(ViewportJ2D vp)

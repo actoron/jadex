@@ -40,12 +40,13 @@ public class RegularPolygon extends ColoredPrimitive
 	 * @param yrotation yrotation or rotation-binding
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
+	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 * @param c the drawable's color
 	 * @param vertices number of vertices (corners)
 	 */
-	public RegularPolygon(Object position, Object rotation, Object size, Color c, int vertices, IParsedExpression drawcondition)
+	public RegularPolygon(Object position, Object rotation, Object size, int absFlags, Color c, int vertices, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, c, drawcondition);
+		super(position, rotation, size, absFlags, c, drawcondition);
 		vertices_ = vertices;
 	}
 

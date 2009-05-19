@@ -135,24 +135,37 @@ public class DrawableCombiner extends AbstractVisual2D
 	 * 
 	 * @param obj object being drawn
 	 * @param g the viewport context
+	 * @param enablePos enables position setup
+	 * @param enableSize enables size setup
+	 * @param enableRot enables rotation setup
 	 */
-	public boolean setupMatrix(Object obj, Graphics2D g)
+	public boolean setupMatrix(Object obj, Graphics2D g, boolean enablePos, boolean enableSize, boolean enableRot)
 	{
-		IVector2 position = SObjectInspector.getVector2(obj, this.position);
-		if(position==null)
-			return false;
+		if (enablePos)
+		{
+			IVector2 position = SObjectInspector.getVector2(obj, this.position);
+			if(position==null)
+				return false;
+			g.translate(position.getXAsDouble(), position.getYAsDouble());
+		}
 		
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		if(size==null)
-			size = new Vector2Double(1,0);
-		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
-		if(rot==null)
-			rot = Vector3Double.ZERO.copy();
+		if (enableSize)
+		{
+			IVector2 size = SObjectInspector.getVector2(obj, this.size);
+			if(size==null)
+				size = new Vector2Double(1,0);
+			g.scale(size.getXAsDouble(), size.getYAsDouble());
+		}
 		
-		g.translate(position.getXAsDouble(), position.getYAsDouble());
-		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.scale(Math.cos(rot.getYAsDouble()), Math.cos(rot.getXAsDouble()));
-		g.rotate(rot.getZAsDouble());
+		if (enableRot)
+		{
+			IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+			if(rot==null)
+				rot = Vector3Double.ZERO.copy();
+			g.scale(Math.cos(rot.getYAsDouble()), Math.cos(rot.getXAsDouble()));
+			g.rotate(rot.getZAsDouble());
+		}
+		
 		return true;
 	}
 	
@@ -161,25 +174,38 @@ public class DrawableCombiner extends AbstractVisual2D
 	 * 
 	 * @param obj object being drawn
 	 * @param gl the viewport context
+	 * @param enablePos enables position setup
+	 * @param enableSize enables size setup
+	 * @param enableRot enables rotation setup
 	 */
-	public boolean setupMatrix(Object obj, GL gl)
+	public boolean setupMatrix(Object obj, GL gl, boolean enablePos, boolean enableSize, boolean enableRot)
 	{
-		IVector2 position = SObjectInspector.getVector2(obj, this.position);
-		if(position==null)
-			return false;
+		if (enablePos)
+		{
+			IVector2 position = SObjectInspector.getVector2(obj, this.position);
+			if(position==null)
+				return false;
+			gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
+		}
 		
-		IVector2 size = SObjectInspector.getVector2(obj, this.size);
-		if(size==null)
-			size = new Vector2Double(1,0);
-		IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
-		if(rot==null)
-			rot = Vector3Double.ZERO.copy();
+		if (enableSize)
+		{
+			IVector2 size = SObjectInspector.getVector2(obj, this.size);
+			if(size==null)
+				size = new Vector2Double(1,0);
+			gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
+		}
 		
-		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
-		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
-		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
-		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
-		gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
+		if (enableRot)
+		{
+			IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
+			if(rot==null)
+				rot = Vector3Double.ZERO.copy();
+			gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
+			gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
+			gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
+		}
+		
 		return true;
 	}
 

@@ -45,9 +45,9 @@ public class Triangle extends ColoredPrimitive
 	 * @param size size or size-binding
 	 * @param c the drawable's color
 	 */
-	public Triangle(Object position, Object rotation, Object size, Color c, IParsedExpression drawcondition)
+	public Triangle(Object position, Object rotation, Object size, int absFlags, Color c, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, c, drawcondition);
+		super(position, rotation, size, absFlags, c, drawcondition);
 	}
 
 	public void init(ViewportJ2D vp)

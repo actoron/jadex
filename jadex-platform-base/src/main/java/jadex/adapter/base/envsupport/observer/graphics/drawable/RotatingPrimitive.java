@@ -19,6 +19,18 @@ import javax.media.opengl.GL;
  */
 public abstract class RotatingPrimitive extends AbstractVisual2D implements IDrawable
 {
+	public static final int ABSOLUTE_POSITION = 1;
+	public static final int ABSOLUTE_SIZE = 2;
+	public static final int ABSOLUTE_ROTATION = 4;
+	
+	/** Enable DrawableCombiner position */
+	protected boolean enableDCPos;
+	
+	/** Enable DrawableCombiner position */
+	protected boolean enableDCSize;
+	
+	/** Enable DrawableCombiner position */
+	protected boolean enableDCRot;
 	
 	/** The condition deciding if the drawable should be drawn. */
 	protected IParsedExpression drawcondition;
@@ -29,6 +41,9 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	protected RotatingPrimitive()
 	{
 		super();
+		enableDCPos = true;
+		enableDCSize = true;
+		enableDCRot = true;
 	}
 
 	/**
@@ -39,10 +54,14 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param yrotation yrotation or rotation-binding
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
+	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 */
-	protected RotatingPrimitive(Object position, Object rotation, Object size, IParsedExpression drawcondition)
+	protected RotatingPrimitive(Object position, Object rotation, Object size, int absFlags,  IParsedExpression drawcondition)
 	{
 		super(position, rotation, size);
+		enableDCPos = (absFlags & ABSOLUTE_POSITION) == 0;
+		enableDCSize = (absFlags & ABSOLUTE_SIZE) == 0;
+		enableDCRot = (absFlags & ABSOLUTE_ROTATION) == 0;
 		this.drawcondition = drawcondition;
 	}
 
@@ -124,7 +143,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			Graphics2D g = vp.getContext();
 			AffineTransform t = g.getTransform();
-			if (!dc.setupMatrix(obj, g))
+			if (!dc.setupMatrix(obj, g, enableDCPos, enableDCSize, enableDCRot))
 				return;
 			doDraw(obj, vp);
 			g.setTransform(t);
@@ -152,7 +171,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			GL gl = vp.getContext();
 			gl.glPushMatrix();
-			if (!dc.setupMatrix(obj, gl))
+			if (!dc.setupMatrix(obj, gl, enableDCPos, enableDCSize, enableDCRot))
 				return;
 			doDraw(obj, vp);
 			gl.glPopMatrix();
@@ -174,6 +193,36 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param vp the viewport
 	 */
 	public abstract void doDraw(Object obj, ViewportJOGL vp);
+	
+	/** 
+	 * Enables using absolute positioning.
+	 * 
+	 * @param enable true, to use the drawable's value as an absolute.
+	 */
+	public void enableAbsolutePosition(boolean enable)
+	{
+		enableDCPos = !enable;
+	}
+	
+	/** 
+	 * Enables using absolute scaling.
+	 * 
+	 * @param enable true, to use the drawable's value as an absolute.
+	 */
+	public void enableAbsoluteSize(boolean enable)
+	{
+		enableDCSize = !enable;
+	}
+	
+	/** 
+	 * Enables using absolute rotation.
+	 * 
+	 * @param enable true, to use the drawable's value as an absolute.
+	 */
+	public void enableAbsoluteRotation(boolean enable)
+	{
+		enableDCRot = !enable;
+	}
 	
 	/**
 	 * Sets the draw condition.

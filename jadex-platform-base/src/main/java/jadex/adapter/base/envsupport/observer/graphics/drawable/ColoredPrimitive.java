@@ -30,11 +30,12 @@ public abstract class ColoredPrimitive extends RotatingPrimitive
 	 * @param yrotation yrotation or rotation-binding
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
+	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 * @param c the drawable's color
 	 */
-	protected ColoredPrimitive(Object position, Object rotation, Object size, Color c, IParsedExpression drawcondition)
+	protected ColoredPrimitive(Object position, Object rotation, Object size, int absFlags, Color c, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, drawcondition);
+		super(position, rotation, size, absFlags, drawcondition);
 		if (c == null)
 			c = Color.WHITE;
 		setColor(c);

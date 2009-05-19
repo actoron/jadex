@@ -50,11 +50,12 @@ public class TexturedRectangle extends RotatingPrimitive
 	 * @param yrotation yrotation or rotation-binding
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
+	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 * @param texturePath resource path of the texture
 	 */
-	public TexturedRectangle(Object position, Object rotation, Object size, String texturePath, IParsedExpression drawcondition)
+	public TexturedRectangle(Object position, Object rotation, Object size, int absFlags, String texturePath, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, drawcondition);
+		super(position, rotation, size, absFlags, drawcondition);
 		texturePath_ = texturePath;
 		texture_ = 0;
 		image_ = null;
