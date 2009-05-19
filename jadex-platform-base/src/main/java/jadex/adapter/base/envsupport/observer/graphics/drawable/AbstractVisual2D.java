@@ -8,6 +8,7 @@ import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.commons.SimplePropertyObject;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 
 /**
@@ -109,7 +110,15 @@ public class AbstractVisual2D extends SimplePropertyObject
 	 */
 	public IVector2 getPosition(Object obj)
 	{
-		IVector2 ret = SObjectInspector.getVector2(this, position);
+		IVector2 ret = null;
+		if(position instanceof String)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$drawable", this);
+			fetcher.setValue("object", obj);
+			ret = (IVector2)getProperty((String)position, fetcher);
+		}
+		
 		if(ret==null)
 			ret = SObjectInspector.getVector2(obj, position);
 		return ret;
@@ -122,7 +131,15 @@ public class AbstractVisual2D extends SimplePropertyObject
 	 */
 	public IVector2 getSize(Object obj)
 	{
-		IVector2 ret = SObjectInspector.getVector2(this, size);
+		IVector2 ret = null;
+		if(size instanceof String)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$drawable", this);
+			fetcher.setValue("object", obj);
+			ret = (IVector2)getProperty((String)size, fetcher);
+		}
+		
 		if(ret==null)
 			ret = SObjectInspector.getVector2(obj, size);
 		return ret;
@@ -135,30 +152,31 @@ public class AbstractVisual2D extends SimplePropertyObject
 	 */
 	public IVector3 getRotation(Object obj)
 	{
-		IVector3 ret = SObjectInspector.getVector3(this, rotation);
+		IVector3 ret = null;
+		if(rotation instanceof String)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$drawable", this);
+			fetcher.setValue("object", obj);
+			ret = (IVector3)getProperty((String)rotation, fetcher);
+		}
 		if(ret==null)
 			ret = SObjectInspector.getVector3(obj, rotation);
 		return ret;
 //		return rotation;
 	}
 	
-	//-------- overridings --------
-	
 	/**
 	 * Returns a property.
 	 * @param name name of the property
 	 * @return the property
 	 */
-	public Object getProperty(String name)
+	public Object getProperty(String name, IValueFetcher fetcher)
 	{
 		Object ret = properties==null? null: properties.get(name);
 		
 		if(ret instanceof IParsedExpression)
-		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$drawable", this);
 			ret = ((IParsedExpression)ret).getValue(fetcher);
-		}
 		
 		return ret;
 	}

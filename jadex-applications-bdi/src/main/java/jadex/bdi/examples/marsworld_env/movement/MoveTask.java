@@ -46,7 +46,7 @@ public class MoveTask extends ListenableTask
 	 */
 	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
-		double	speed	= ((Number)((IParsedExpression)obj.getProperty(PROPERTY_SPEED)).getValue(null)).doubleValue();
+		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
 		double	maxdist	= progress.getAsDouble()*speed*0.001;
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.POSITION);
 		
