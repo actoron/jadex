@@ -6,8 +6,10 @@ import jadex.commons.SReflect;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Default implementation of a space object. 
@@ -22,8 +24,8 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	/** The object's type. */
 	protected String typename;
 	
-	/** The object's tasks (task names -> tasks). */
-	protected Map tasks;
+	/** The object's tasks. */
+	protected Set	tasks;
 
 	/** Event listeners. */
 	protected List listeners;
@@ -58,13 +60,13 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 //			properties.putAll(properties);
 //		}
 //		
-		this.tasks = new HashMap();
+		this.tasks = new LinkedHashSet();
 		if(tasks != null)
 		{
 			for (Iterator it = tasks.iterator(); it.hasNext(); )
 			{
 				IObjectTask task = (IObjectTask) it.next();
-				this.tasks.put(task.getId(), task);
+				this.tasks.add(task);
 			}
 		}
 //		
@@ -141,37 +143,25 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	{
 		synchronized(monitor)
 		{
+			if(tasks.contains(task))
+				throw new RuntimeException("Task already exists: "+this+", "+task);
 			task.start(this);
-			tasks.put(task.getId(), task);
-		}
-	}
-
-	/**
-	 * Returns a task by its ID.
-	 * @param taskId ID of the task
-	 * @return the task
-	 */
-	public IObjectTask getTask(Object taskId)
-	{
-		synchronized(monitor)
-		{
-			return (IObjectTask) tasks.get(taskId);
+			tasks.add(task);
 		}
 	}
 
 	/**
 	 * Removes a task from the object.
-	 * @param taskId ID of the task
+	 * @param task	The task.
 	 */
-	public void removeTask(Object taskId)
+	public void removeTask(IObjectTask task)
 	{
 		synchronized(monitor)
 		{
-			IObjectTask task = (IObjectTask) tasks.remove(taskId);
-			if(task != null)
-			{
-				task.shutdown(this);
-			}
+			if(!tasks.contains(task))
+				throw new RuntimeException("Task does not exist: "+this+", "+task);
+			task.shutdown(this);
+			tasks.remove(task);
 		}
 	}
 	
@@ -182,10 +172,10 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	{
 		synchronized(monitor)
 		{
-			Object[] taskIds = tasks.keySet().toArray();
-			for (int i = 0; i < taskIds.length; ++i)
+			IObjectTask[] atasks = (IObjectTask[])tasks.toArray(new IObjectTask[tasks.size()]);
+			for (int i = 0; i < atasks.length; ++i)
 			{
-				removeTask(taskIds[i]);
+				removeTask(atasks[i]);
 			}
 		}
 	}
@@ -195,15 +185,14 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	 * time the current time	
 	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
 	 */
-	public void updateObject(IVector1 progress)
+	public void updateObject(IEnvironmentSpace space, IVector1 progress)
 	{
 		synchronized(monitor)
 		{
-			Object[] tasks = this.tasks.values().toArray();
-			for(int i = 0; i < tasks.length; ++i)
+			IObjectTask[] atasks = (IObjectTask[])tasks.toArray(new IObjectTask[tasks.size()]);
+			for(int i = 0; i < atasks.length; ++i)
 			{
-				IObjectTask task = (IObjectTask) tasks[i];
-				task.execute(progress, this);
+				atasks[i].execute(space, this, progress);
 			}
 		}
 	}

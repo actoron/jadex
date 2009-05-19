@@ -10,8 +10,8 @@
 	- <b>Carry agents</b> are able to carry ore to the base.<br><br>
 
 	Objective is to carry as much ore as possible to the<br>
-	homebase in a predefined mission time.<br>-->
-
+	homebase in a predefined mission time.<br>
+-->
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-env"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -35,15 +35,15 @@
 				<env:objecttype name="target" />
 				<env:objecttype name="sentry">
 					<env:property name="vision">0.1</env:property>
-					<env:property name="speed">5.0</env:property>
+					<env:property name="speed">0.05</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
 					<env:property name="vision">0.05</env:property>
-					<env:property name="speed">10.0</env:property>
+					<env:property name="speed">0.1</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
 					<env:property name="vision">0.05</env:property>
-					<env:property name="speed">15.0</env:property>
+					<env:property name="speed">0.15</env:property>
 				</env:objecttype>
 				<env:objecttype name="homebase">
 					<env:property name="text">
@@ -75,9 +75,9 @@
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
 						<env:text layer="2" x="0.0" y="0.08" basesize="90" text="$text$" color="black"/>
 					</env:drawable>
-					<env:drawable objecttype="sentry" width="0.07" height="0.07">
+					<env:drawable objecttype="sentry" width="0.07" height="0.03">
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/sentry.png" />
-						<env:regularpolygon layer="1" width="2.86" height="2.86" vertices="36" color="#FAFA1E32" />
+						<env:regularpolygon layer="1" width="0.2" height="0.2" abssize="true" vertices="36" color="#FAFA1E32" />
 					</env:drawable>
 					<env:drawable objecttype="producer" width="0.07" height="0.07">
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/producer.png" />
@@ -101,16 +101,16 @@
 	</spacetypes>
 
 	<agenttypes>
-		<agenttype name="Sentry" filename="jadex/bdi/tutorial/TranslationA1.agent.xml"/>
-		<agenttype name="Producer" filename="jadex/bdi/tutorial/TranslationA1.agent.xml"/>
-		<agenttype name="Carry" filename="jadex/bdi/tutorial/TranslationA1.agent.xml"/>
+		<agenttype name="Sentry" filename="jadex/bdi/examples/marsworld_env/sentry/Sentry.agent.xml"/>
+		<agenttype name="Producer" filename="jadex/bdi/examples/marsworld_env/sentry/Sentry.agent.xml"/>
+		<agenttype name="Carry" filename="jadex/bdi/examples/marsworld_env/sentry/Sentry.agent.xml"/>
 	</agenttypes>
 
 	<applications>
 		<application name="1 Sentry / 2 Producers / 3 Carries">
 			<agents>
 				<agent type="Sentry" number="1"/>
-				<agent type="Producer" number="2"/>
+ 				<agent type="Producer" number="2"/>
 				<agent type="Carry" number="3"/>
 			</agents>
 

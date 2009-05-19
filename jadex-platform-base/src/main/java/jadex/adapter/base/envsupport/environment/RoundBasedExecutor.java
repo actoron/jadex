@@ -64,7 +64,7 @@ public class RoundBasedExecutor
 					for(Iterator it = space.getSpaceObjectsCollection().iterator(); it.hasNext(); )
 					{
 						SpaceObject obj = (SpaceObject)it.next();
-						obj.updateObject(progress);
+						obj.updateObject(space, progress);
 					}
 					
 					// Execute the scheduled agent actions.

@@ -56,14 +56,14 @@ public interface ISpaceObject extends IPropertyObject
 	 *  Returns a task by its id.
 	 *  @param id The id of the task.
 	 *  @return The task.
-	 */
-	public IObjectTask getTask(Object id);
+	 * /
+	public IObjectTask getTask(Object id);*/
 
 	/**
 	 *  Removes a task from the object.
-	 *  @param id The id of the task
+	 *  @param task	The task.
 	 */
-	public void removeTask(Object id);
+	public void removeTask(IObjectTask task);
 	
 	/**
 	 *  Removes all tasks from the object.
