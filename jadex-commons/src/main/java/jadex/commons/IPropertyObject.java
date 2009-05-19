@@ -2,6 +2,7 @@ package jadex.commons;
 
 import java.beans.PropertyChangeListener;
 import java.util.Map;
+import java.util.Set;
 
 /** Interface for property-holding objects.
  */
@@ -18,7 +19,13 @@ public interface IPropertyObject
 	 * Returns all of the properties.
 	 * @return the properties
 	 */
-	public Map getProperties();
+//	public Map getProperties();
+	
+	/**
+	 * Returns all of the properties.
+	 * @return the properties
+	 */
+	public Set getPropertyNames();
 	
 	/**
 	 * Sets a property

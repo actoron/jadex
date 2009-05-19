@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Basic IPropertyObject implementation.
@@ -44,9 +45,9 @@ public class SimplePropertyObject implements IPropertyObject
 	 * Returns all of the properties.
 	 * @return the properties
 	 */
-	public Map getProperties()
+	public Set getPropertyNames()
 	{
-		return properties==null? Collections.EMPTY_MAP: properties;
+		return properties==null? Collections.EMPTY_SET: properties.keySet();
 	}
 	
 	/**

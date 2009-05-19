@@ -1,13 +1,13 @@
 package jadex.adapter.base.envsupport.dataview;
 
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Int;
+import jadex.adapter.base.envsupport.math.Vector1Double;
+
+import java.util.Map;
 
 /**
  *  A view showing only objects in a local range.
@@ -23,7 +23,7 @@ public class LocalDataView2D implements IDataView
 	protected ISpaceObject	object;
 	
 	/** The range of the view. */
-	protected IVector1	range;
+	protected Object range;
 	
 	//-------- IDataView interface --------
 	
@@ -44,8 +44,15 @@ public class LocalDataView2D implements IDataView
 	{
 		synchronized(space.getMonitor())
 		{
-			IVector2	pos	= (IVector2)object.getProperty(Space2D.POSITION);
-			return space.getNearObjects(pos, range);
+			ISpaceObject[] ret;
+			IVector2 pos = (IVector2)object.getProperty(Space2D.POSITION);
+			if(range instanceof IVector1)
+				ret = space.getNearObjects(pos, (IVector1)range);
+			else if(range instanceof IVector2)
+				ret = space.getNearObjects(pos, (IVector2)range);
+			else
+				throw new RuntimeException("Range must be vector1 or vector2: "+range);
+			return ret;
 		}
 	}
 	
@@ -66,6 +73,9 @@ public class LocalDataView2D implements IDataView
 	{
 		this.space	= (Space2D)space;
 		object	= (ISpaceObject)props.get("object");
-		range	= new Vector1Int(((Number)props.get("range")).intValue());
+		range	= props.get("range");
+		if(range instanceof Number)
+			range	= new Vector1Double(((Number)props.get("range")).doubleValue());
+		
 	}
 }

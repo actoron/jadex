@@ -194,14 +194,14 @@ public class BeanObjectHandler implements IObjectHandler
 	{
 		Object ret = attrval;
 
-		if(converter!=null)
+		if(converter!=null && converter.acceptsInputType(attrval.getClass()))
 		{
 			ret = converter.convertObject(attrval, root, classloader);
 		}
 		else if(!String.class.isAssignableFrom(targetclass))
 		{
 			ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
-			if(conv!=null)
+			if(conv!=null && converter.acceptsInputType(attrval.getClass()))
 				ret = conv.convertObject(attrval, root, classloader);
 		}
 	

@@ -381,8 +381,9 @@ public class Perspective2D implements IPerspective
 
 				if (selectedobject != null)
 				{
-					Object size = ((DrawableCombiner)visuals.get(SObjectInspector.getType(selectedobject))).getSize();
-					size = SObjectInspector.getVector2(selectedobject, size).copy().multiply(2.0);
+//					Object size = ((DrawableCombiner)visuals.get(SObjectInspector.getType(selectedobject))).getSize();
+//					size = SObjectInspector.getVector2(selectedobject, size).copy().multiply(2.0);
+					IVector2 size = ((DrawableCombiner)visuals.get(SObjectInspector.getType(selectedobject))).getSize(selectedobject);
 					Object[] viewObj = new Object[2];
 					marker.setSize((IVector2) size);
 					viewObj[0] = selectedobject;
@@ -469,8 +470,9 @@ public class Perspective2D implements IPerspective
 			for (int i = 0; i < objects.length; ++i)
 			{
 				DrawableCombiner d = (DrawableCombiner) visuals.get(SObjectInspector.getType(objects[i]));
-				Object pBind = d.getPosition();
-				IVector2 objPos = SObjectInspector.getVector2(objects[i], pBind);
+//				Object pBind = d.getPosition();
+//				IVector2 objPos = SObjectInspector.getVector2(objects[i], pBind);
+				IVector2 objPos = d.getPosition(objects[i]); 
 				if (objPos == null)
 				{
 					continue;

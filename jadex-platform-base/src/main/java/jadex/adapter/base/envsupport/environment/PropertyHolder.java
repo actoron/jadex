@@ -1,10 +1,14 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.commons.SimplePropertyObject;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -57,12 +61,24 @@ public abstract class PropertyHolder extends SimplePropertyObject
 	 * Returns all of the properties.
 	 * 
 	 * @return the properties
-	 */
+	 * /
 	public Map getProperties()
 	{
 		synchronized(monitor)
 		{
 			return super.getProperties();
+		}
+	}*/
+	
+	/**
+	 * Returns all of the properties.
+	 * @return the properties
+	 */
+	public Set getPropertyNames()
+	{
+		synchronized(monitor)
+		{
+			return properties==null? Collections.EMPTY_SET: properties.keySet();
 		}
 	}
 

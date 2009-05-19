@@ -77,7 +77,7 @@ public class SObjectInspector
 	{
 		if (obj instanceof IPropertyObject)
 		{
-			return new HashSet(((IPropertyObject) obj).getProperties().keySet()); 
+			return ((IPropertyObject)obj).getPropertyNames(); 
 		}
 		
 		HashSet ret = new HashSet();
@@ -142,11 +142,11 @@ public class SObjectInspector
 			}
 		}
 		
-		if (ret instanceof IParsedExpression)
+		if(ret instanceof IParsedExpression)
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
-			fetcher.setValue("$space", obj);
+//			fetcher.setValue("$space", obj);
 			ret = ((IParsedExpression) ret).getValue(fetcher);
 		}
 		
@@ -245,13 +245,13 @@ public class SObjectInspector
 	public static IVector2 getVector2(Object obj, Object vecId)
 	{
 		IVector2 vector2;
-		if (vecId instanceof IVector2)
+		if(vecId instanceof IVector2)
 		{
-			vector2 = (IVector2) vecId;
+			vector2 = (IVector2)vecId;
 		}
 		else
 		{
-			vector2 = (IVector2) SObjectInspector.getProperty(obj, (String) vecId);
+			vector2 = (IVector2)SObjectInspector.getProperty(obj, (String)vecId);
 		}
 		return vector2;
 	}

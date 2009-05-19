@@ -7,11 +7,16 @@ import jadex.adapter.base.envsupport.math.Vector3Double;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.commons.IPropertyObject;
+import jadex.commons.SimplePropertyChangeSupport;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,9 +31,13 @@ import javax.media.opengl.GL;
  */
 public class DrawableCombiner extends AbstractVisual2D
 {
+	//-------- attributes --------
+	
 	/** The drawables. */
-	private Map			drawables_;
+	private Map	drawables;
 
+	//-------- constructors --------
+	
 	/**
 	 * Creates a new DrawableCombiner of size 1.0.
 	 */
@@ -37,13 +46,16 @@ public class DrawableCombiner extends AbstractVisual2D
 		this(null, null, null);
 	}
 
+	//-------- methods --------
+	
 	/**
 	 * Creates a new DrawableCombiner of size 1.0.
 	 */
 	public DrawableCombiner(Object position, Object rotation, Object size)
 	{
 		super(position==null? "position": position, rotation, size);
-		drawables_ = new HashMap();
+		drawables = new HashMap();
+		this.pcs = new SimplePropertyChangeSupport(this);
 	}
 	
 	/**
@@ -67,11 +79,11 @@ public class DrawableCombiner extends AbstractVisual2D
 	public void addDrawable(IDrawable d, int layer)
 	{
 		Integer l = new Integer(layer);
-		List drawList = (List)drawables_.get(l);
+		List drawList = (List)drawables.get(l);
 		if(drawList == null)
 		{
 			drawList = new ArrayList();
-			drawables_.put(l, drawList);
+			drawables.put(l, drawList);
 		}
 		drawList.add(d);
 	}
@@ -83,7 +95,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public void removeDrawable(IDrawable d)
 	{
-		Collection drawLists = drawables_.values();
+		Collection drawLists = drawables.values();
 
 		for(Iterator it = drawLists.iterator(); it.hasNext();)
 		{
@@ -100,7 +112,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public void init(ViewportJ2D vp)
 	{
-		for(Iterator it = drawables_.values().iterator(); it.hasNext();)
+		for(Iterator it = drawables.values().iterator(); it.hasNext();)
 		{
 			List drawList = (List)it.next();
 			for(Iterator it2 = drawList.iterator(); it2.hasNext();)
@@ -119,7 +131,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public void init(ViewportJOGL vp)
 	{
-		for(Iterator it = drawables_.values().iterator(); it.hasNext();)
+		for(Iterator it = drawables.values().iterator(); it.hasNext();)
 		{
 			List drawList = (List)it.next();
 			for(Iterator it2 = drawList.iterator(); it2.hasNext();)
@@ -141,7 +153,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public boolean setupMatrix(Object obj, Graphics2D g, boolean enablePos, boolean enableSize, boolean enableRot)
 	{
-		if (enablePos)
+		if(enablePos)
 		{
 			IVector2 position = SObjectInspector.getVector2(obj, this.position);
 			if(position==null)
@@ -149,7 +161,7 @@ public class DrawableCombiner extends AbstractVisual2D
 			g.translate(position.getXAsDouble(), position.getYAsDouble());
 		}
 		
-		if (enableSize)
+		if(enableSize)
 		{
 			IVector2 size = SObjectInspector.getVector2(obj, this.size);
 			if(size==null)
@@ -157,7 +169,7 @@ public class DrawableCombiner extends AbstractVisual2D
 			g.scale(size.getXAsDouble(), size.getYAsDouble());
 		}
 		
-		if (enableRot)
+		if(enableRot)
 		{
 			IVector3 rot = SObjectInspector.getVector3(obj, this.rotation);
 			if(rot==null)
@@ -218,7 +230,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public void draw(Object obj, Integer layer, ViewportJ2D vp)
 	{
-		List drawList = (List)drawables_.get(layer);
+		List drawList = (List)drawables.get(layer);
 		if(drawList == null)
 		{
 			return;
@@ -243,7 +255,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public void draw(Object obj, Integer layer, ViewportJOGL vp)
 	{
-		List drawList = (List)drawables_.get(layer);
+		List drawList = (List)drawables.get(layer);
 		if(drawList == null)
 		{
 			return;
@@ -275,7 +287,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	 */
 	public Set getLayers()
 	{
-		Set layers = new HashSet(drawables_.keySet());
+		Set layers = new HashSet(drawables.keySet());
 		return layers;
 	}
 }

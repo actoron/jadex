@@ -178,20 +178,7 @@ public class MEnvSpaceType	extends MSpaceType
 				public Object createObject(Map args) throws Exception
 				{
 					Map sourceview = (Map)args.get("sourceview");
-//					Map themes = (Map)args.get("themes");
 					IEnvironmentSpace space = (IEnvironmentSpace)args.get("space");
-//					
-//					List sourcethemes = (List)sourceview.get("themes");
-//					if(sourcethemes!=null)
-//					{
-//						for(int j=0; j<sourcethemes.size(); j++)
-//						{
-//							Map sourcetheme = (Map)sourcethemes.get(j);
-//							themes.put((String)MEnvSpaceInstance.getProperty(sourcetheme, "name"), 
-//								(Theme2D)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcetheme, "creator")).createObject(sourcetheme));
-//						}
-//					}
-					
 					IDataView ret = (IDataView)((Class)MEnvSpaceInstance.getProperty(sourceview, "clazz")).newInstance();
 					
 					Map	props	= null;
@@ -203,10 +190,13 @@ public class MEnvSpaceType	extends MSpaceType
 						fetcher.setValues(args);
 						for(int i=0; i<lprops.size(); i++)
 						{
-							Map	prop	= (Map)lprops.get(i);
+							Map	prop = (Map)lprops.get(i);
 							IParsedExpression exp = (IParsedExpression)prop.get("value");
-							props.put(prop.get("name"), exp.getValue(fetcher));
-							
+							boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+							if(dyn)
+								props.put((String)prop.get("name"), exp);
+							else
+								props.put((String)prop.get("name"), exp.getValue(fetcher));
 						}
 					}
 					
@@ -630,32 +620,39 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 	
 		types.add(new TypeInfo("processtype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("spaceactiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("agentactiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("perceptgeneratortype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 	
 		types.add(new TypeInfo("view/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""), 
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("object/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("objecttype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		// type instance declarations.
 		
@@ -789,6 +786,16 @@ public class MEnvSpaceType	extends MSpaceType
 			
 			return ret;
 		}
+		
+		/**
+		 *  Test if a converter accepts a specific input type.
+		 *  @param inputtype The input type.
+		 *  @return True, if accepted.
+		 */
+		public boolean acceptsInputType(Class inputtype)
+		{
+			return String.class.isAssignableFrom(inputtype);
+		}
 	}
 	
 	/**
@@ -808,6 +815,16 @@ public class MEnvSpaceType	extends MSpaceType
 			if(ret==null)
 				throw new RuntimeException("Could not parse class: "+val);
 			return ret;
+		}
+		
+		/**
+		 *  Test if a converter accepts a specific input type.
+		 *  @param inputtype The input type.
+		 *  @return True, if accepted.
+		 */
+		public boolean acceptsInputType(Class inputtype)
+		{
+			return String.class.isAssignableFrom(inputtype);
 		}
 	}
 	
@@ -843,6 +860,16 @@ public class MEnvSpaceType	extends MSpaceType
 			}
 			return c;
 		}
+		
+		/**
+		 *  Test if a converter accepts a specific input type.
+		 *  @param inputtype The input type.
+		 *  @return True, if accepted.
+		 */
+		public boolean acceptsInputType(Class inputtype)
+		{
+			return String.class.isAssignableFrom(inputtype);
+		}
 	}
 	
 	/**
@@ -864,6 +891,16 @@ public class MEnvSpaceType	extends MSpaceType
 			catch(Exception e){}
 			return ret;
 		}
+		
+		/**
+		 *  Test if a converter accepts a specific input type.
+		 *  @param inputtype The input type.
+		 *  @return True, if accepted.
+		 */
+		public boolean acceptsInputType(Class inputtype)
+		{
+			return String.class.isAssignableFrom(inputtype);
+		}
 	}
 	
 	/**
@@ -884,6 +921,16 @@ public class MEnvSpaceType	extends MSpaceType
 			try{ret = new Integer((String)val);}
 			catch(Exception e){}
 			return ret;
+		}
+		
+		/**
+		 *  Test if a converter accepts a specific input type.
+		 *  @param inputtype The input type.
+		 *  @return True, if accepted.
+		 */
+		public boolean acceptsInputType(Class inputtype)
+		{
+			return String.class.isAssignableFrom(inputtype);
 		}
 	}
 }

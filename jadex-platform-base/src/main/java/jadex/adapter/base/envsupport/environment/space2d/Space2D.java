@@ -238,6 +238,8 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist)
 	{
+		// todo: make border aware!
+		
 		synchronized(monitor)
 		{
 			List ret = new ArrayList();
@@ -258,6 +260,41 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		}
 	}
 	
+	/**
+	 * Retrieve all objects in the distance for a position
+	 * @param position
+	 * @param distance
+	 * @return The near objects. 
+	 */
+	public ISpaceObject[] getNearObjects(IVector2 position, IVector2 maxdist)
+	{
+		// todo: make border aware!
+		
+		synchronized(monitor)
+		{
+			List ret = new ArrayList();
+		
+			Set objects = spaceobjects.entrySet();
+			for(Iterator it = objects.iterator(); it.hasNext();)
+			{
+				Map.Entry entry = (Entry)it.next();
+				ISpaceObject obj = (ISpaceObject)entry.getValue();
+				IVector2 objpos = (IVector2)obj.getProperty(Space2D.POSITION);
+				if(Math.abs(objpos.getXAsDouble()-position.getXAsDouble())<=maxdist.getXAsDouble()
+					&& Math.abs(objpos.getYAsDouble()-position.getYAsDouble())<=maxdist.getYAsDouble())
+				{
+					ret.add(obj);
+				}
+			}
+		
+			return (ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+		}
+	}
+	
+	/**
+	 *  Get all space objects.
+	 *  @return All space objects.
+	 */
 	public Object[] getSpaceObjects()
 	{
 		synchronized(monitor)

@@ -2,8 +2,9 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -30,8 +31,8 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	/** Event listeners. */
 	protected List listeners;
 	
-	/** The monitor. */
-	//protected Object monitor;
+	/** The fetcher. */
+	protected SimpleValueFetcher fetcher;
 	
 	//-------- constructors --------
 	
@@ -44,40 +45,51 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	 * @param tasks initial task list (may be null)
 	 * @param listeners initial listeners (may be null)
 	 */
-	public SpaceObject(Object id, String typename, Map properties, List tasks, List listeners, Object monitor)
+	public SpaceObject(Object id, String typename, Map properties, List tasks, List listeners, Object monitor, IEnvironmentSpace space)
 	{
 		super(monitor);
 		
 		this.id = id;
 		this.typename = typename;
 		this.properties = properties;
-//		this.tasks = tasks;
 		this.listeners = listeners;
 		
-//		this.properties = new HashMap();
-//		if(properties != null)
-//		{
-//			properties.putAll(properties);
-//		}
-//		
 		this.tasks = new LinkedHashSet();
 		if(tasks != null)
 		{
-			for (Iterator it = tasks.iterator(); it.hasNext(); )
+			for(Iterator it = tasks.iterator(); it.hasNext(); )
 			{
 				IObjectTask task = (IObjectTask) it.next();
 				this.tasks.add(task);
 			}
 		}
-//		
-//		this.listeners = new ArrayList();
-//		if (listeners != null)
-//		{
-//			listeners.addAll(listeners);
-//		}
+		this.fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$object", this);
+		fetcher.setValue("$space", space);
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 * Returns a property.
+	 * 
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public Object getProperty(String name)
+	{
+		synchronized(monitor)
+		{
+			Object ret = super.getProperty(name);
+			
+			if(ret instanceof IParsedExpression)
+			{
+				ret = ((IParsedExpression) ret).getValue(fetcher);
+			}
+			
+			return ret;
+		}
+	}
 	
 	/**
 	 *  Get the objects id.
@@ -100,38 +112,6 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 		synchronized(monitor)
 		{
 			return typename;
-		}
-	}
-
-	/**
-	 * Sets an object's property.
-	 * @param name name of the property
-	 * @param value the property
-	 */
-	public void setProperty(String name, Object value)
-	{
-		Object oldval;
-		synchronized(monitor)
-		{
-			if(properties==null)
-				properties= new HashMap();
-//			if(name.indexOf("pos")!=-1)
-//				System.out.println("here");
-			oldval = properties.get(name);
-			properties.put(name, value);
-		}
-		pcs.firePropertyChange(name, oldval, value);
-	}
-
-	/**
-	 * Returns a copy of all of the object's properties.
-	 * @return the properties
-	 */
-	public Map getProperties()
-	{
-		synchronized(monitor)
-		{
-			return properties==null? Collections.EMPTY_MAP: properties;
 		}
 	}
 
@@ -231,7 +211,7 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 		buf.append(", type=");
 		buf.append(getType());
 		buf.append(", properties=");
-		buf.append(getProperties());
+		buf.append(properties);
 		buf.append(", tasks=");
 		buf.append(tasks);
 		buf.append(")");

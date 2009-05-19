@@ -211,7 +211,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 			}
 			
 			// Create the object.
-			ret = new SpaceObject(id, typename, properties, tasks, listeners, monitor);
+			ret = new SpaceObject(id, typename, properties, tasks, listeners, monitor, this);
 			spaceobjects.put(id, ret);
 
 			// Store in type objects.

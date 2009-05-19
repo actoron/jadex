@@ -120,7 +120,11 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					{
 						Map prop = (Map)props.get(j);
 						IParsedExpression exp = (IParsedExpression)prop.get("value");
-						properties.put((String)prop.get("name"), exp);
+						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+						if(dyn)
+							properties.put((String)prop.get("name"), exp);
+						else
+							properties.put((String)prop.get("name"), exp.getValue(fetcher));
 					}
 				}
 				
@@ -236,9 +240,11 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					{
 						Map prop = (Map)mprops.get(j);
 						IParsedExpression exp = (IParsedExpression)prop.get("value");
-						// todo: support static and dynamic values?!
-//						props.put((String)prop.get("name"), exp);
-						props.put((String)prop.get("name"), exp.getValue(fetcher));
+						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+						if(dyn)
+							props.put((String)prop.get("name"), exp);
+						else
+							props.put((String)prop.get("name"), exp.getValue(fetcher));
 					}
 				}
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");

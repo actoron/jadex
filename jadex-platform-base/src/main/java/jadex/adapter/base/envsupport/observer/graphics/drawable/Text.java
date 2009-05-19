@@ -12,6 +12,7 @@ import javax.media.opengl.GL;
 import com.sun.opengl.util.j2d.TextRenderer;
 
 
+import jadex.adapter.base.envsupport.environment.space2d.action.GetPosition;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.TextInfo;
@@ -106,8 +107,8 @@ public final class Text implements IDrawable
 		if (draw)
 		{
 			IVector2 position = SObjectInspector.getVector2(obj, this.position);
-			IVector2 dcPos = SObjectInspector.getVector2(obj, dc.getPosition());
-			IVector2 dcScale = SObjectInspector.getVector2(obj, dc.getSize());
+			IVector2 dcPos = dc.getPosition(obj);//SObjectInspector.getVector2(obj, dc.getPosition());
+			IVector2 dcScale = dc.getSize(obj);//SObjectInspector.getVector2(obj, dc.getSize());
 			if ((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
@@ -153,8 +154,10 @@ public final class Text implements IDrawable
 		if (draw)
 		{
 			IVector2 position = SObjectInspector.getVector2(obj, this.position);
-			IVector2 dcPos = SObjectInspector.getVector2(obj, dc.getPosition());
-			IVector2 dcScale = SObjectInspector.getVector2(obj, dc.getSize());
+			IVector2 dcPos = dc.getPosition(obj);//SObjectInspector.getVector2(obj, dc.getPosition());
+			IVector2 dcScale = dc.getSize(obj);//SObjectInspector.getVector2(obj, dc.getSize());
+//			IVector2 dcPos = SObjectInspector.getVector2(obj, dc.getPosition());
+//			IVector2 dcScale = SObjectInspector.getVector2(obj, dc.getSize());
 			if ((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;

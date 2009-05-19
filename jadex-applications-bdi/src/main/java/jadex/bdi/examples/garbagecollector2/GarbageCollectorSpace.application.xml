@@ -18,21 +18,24 @@
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
-		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D</import>
+		<import>jadex.adapter.base.envsupport.dataview.*</import>
 	</imports>
 	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" width="10" height="10" class="Grid2D">
 			<env:objecttypes>
 				<env:objecttype name="collector">
-					<env:property name="rotation">
+					<env:property name="rotation" dynamic="true">
 						$object.getProperty("lastmove")==null || $object.getProperty("lastmove").equals("right")? null:
 						$object.getProperty("lastmove").equals("left")? new Vector3Double(Math.PI,0,Math.PI):
 						$object.getProperty("lastmove").equals("up")? new Vector3Double(0,0,Math.PI*3/2):
 						new Vector3Double(0,0,Math.PI/2)
 					</env:property>
+					<env:property name="vision_range">0</env:property>
 				</env:objecttype>
-				<env:objecttype name="burner" />
+				<env:objecttype name="burner">
+					<env:property name="vision_range">0</env:property>
+				</env:objecttype>
 				<env:objecttype name="garbage" />
 			</env:objecttypes>
 			
@@ -64,21 +67,32 @@
 			</env:perceptgeneratortypes>
 			
 			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D">
+				<env:view name="view_all" class="GeneralDataView2D" />
+				<env:view name="collector_view" class="LocalDataView2D" objecttype="collector">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">$object.getProperty("vision_range")</env:property>
+				</env:view>
+				<env:view name="burner_view" class="LocalDataView2D" objecttype="burner">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">$object.getProperty("vision_range")</env:property>
 				</env:view>
 			</env:views>
 			
 			<env:perspectives>
 				<env:perspective name="icons">
 					<env:drawable objecttype="collector" width="0.9" height="0.9" rotation="rotation">
+						<!--  <env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property> -->
 						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
 						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.3" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
 							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
 						</env:texturedrectangle>
 						<env:text layer="4" x="0.0" y="0.4" text="Collector $position$"/>
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="burner" width="0.9" height="0.9">
+						<!-- <env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property> -->
 						<env:texturedrectangle layer="1" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="garbage" width="0.7" height="0.7">
 						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />

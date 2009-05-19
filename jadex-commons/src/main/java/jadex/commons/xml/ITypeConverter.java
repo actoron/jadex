@@ -1,9 +1,7 @@
 package jadex.commons.xml;
 
-import java.util.List;
-
 /**
- * 
+ *  Type converter for converting an object to another type. 
  */
 public interface ITypeConverter
 {
@@ -12,4 +10,11 @@ public interface ITypeConverter
 	 *  @param val The value to convert.
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader);
+	
+	/**
+	 *  Test if a converter accepts a specific input type.
+	 *  @param inputtype The input type.
+	 *  @return True, if accepted.
+	 */
+	public boolean acceptsInputType(Class inputtype);
 }
