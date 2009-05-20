@@ -23,9 +23,9 @@ public class TestPlan extends Plan {
 		IVector2 target = (IVector2) getBeliefbase().getBelief("pos").getFact();
 		ISpaceObject myself = (ISpaceObject) getBeliefbase()
 				.getBelief("myself").getFact();
-		HashMap prop = (HashMap) myself.getProperties();
+//		HashMap prop = (HashMap) myself.getProperties();
 
-		System.out.println("size: " + prop.size());
+//		System.out.println("size: " + prop.size());
 
 		for (int i = 0; i < 10; i++) {
 			waitFor(7000);

@@ -48,6 +48,7 @@ public class PackageProcess extends SimplePropertyObject implements ISpaceProces
 	public void start(IClockService clock, IEnvironmentSpace space) {
 		this.lasttick = clock.getTick();
 		// System.out.println("create package process started.");
+		System.out.println("1************************************************************");
 	}
 
 	/**
@@ -80,7 +81,7 @@ public class PackageProcess extends SimplePropertyObject implements ISpaceProces
 		int rate = getProperty("rate") != null ? ((Integer) getProperty("rate")).intValue() : 5;
 		// System.out.println("LastTick: " + lasttick + "-->roundCount: " +
 		// roundCounter);
-
+		System.out.println("3************************************************************");
 		if (delta > rate) {
 			// Create new package
 			lasttick = clock.getTick();

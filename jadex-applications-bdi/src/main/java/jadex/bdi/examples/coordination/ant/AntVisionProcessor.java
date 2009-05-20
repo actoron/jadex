@@ -44,7 +44,7 @@ public class AntVisionProcessor implements IPerceptProcessor {
 				if (AntVisionGenerator.GRAVITATION_FELT.equals(type)) {
 					Vector2Int gravitationCenter = (Vector2Int) percept;
 					 System.out.println("Setting belief in Ant! Ant is now influenced by follwing gravitation center: " + gravitationCenter.toString());
-					exta.getBeliefbase().getBelief("hasGravitation").setFact(true);
+					exta.getBeliefbase().getBelief("hasGravitation").setFact(new Boolean(true));
 					IGoal go = exta.createGoal("gravitation_influence");
 					go.getParameter("gravitation_center").setValue((IVector2) gravitationCenter);								     
 					exta.dispatchTopLevelGoal(go);

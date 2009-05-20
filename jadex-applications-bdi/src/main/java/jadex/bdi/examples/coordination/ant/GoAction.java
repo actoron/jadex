@@ -108,7 +108,7 @@ public class GoAction extends SimplePropertyObject implements IAgentAction
 			Vector2Int gravitationPos = (Vector2Int) objects[i].getProperty(Space2D.POSITION);
 			if(gravitationPos.equals(pos)){
 				System.out.println("Desired Position has gravitation: " + pos.toString());
-				obj.setProperty(AntVisionGenerator.GRAVITATION_FELT, true);
+				obj.setProperty(AntVisionGenerator.GRAVITATION_FELT, new Boolean(true));
 //				obj.setProperty(GravitationListener.FEELS_GRAVITATION, true);
 //				ObjectEvent gravitationEvent = new ObjectEvent("FEEL_GRAVITATION");
 //				gravitationEvent.setParameter("GRAV_POS", gravitationPos);

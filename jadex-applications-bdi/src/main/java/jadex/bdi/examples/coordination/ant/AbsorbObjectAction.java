@@ -34,9 +34,9 @@ public class AbsorbObjectAction extends SimplePropertyObject implements IAgentAc
 
 		for (int i = 0; i < objects.length; i++) {
 			if (target.equals(objects[i].getProperty(Space2D.POSITION))) {
-				Integer objectCount = (Integer) objects[i].getProperty(ManageGravitationProcess.ABSORBED_OBJECTS);
+				int objectCount = ((Integer) objects[i].getProperty(ManageGravitationProcess.ABSORBED_OBJECTS)).intValue();
 				objectCount++;
-				objects[i].setProperty(ManageGravitationProcess.ABSORBED_OBJECTS, objectCount);
+				objects[i].setProperty(ManageGravitationProcess.ABSORBED_OBJECTS, Integer.valueOf(objectCount));
 				break;
 			}
 		}

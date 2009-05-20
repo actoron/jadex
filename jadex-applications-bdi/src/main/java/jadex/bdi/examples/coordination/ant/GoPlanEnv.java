@@ -21,11 +21,12 @@ public class GoPlanEnv extends Plan
 	public void body()
 	{
 		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
-		boolean hasGravitation = (Boolean) getBeliefbase().getBelief("hasGravitation").getFact();
+		boolean hasGravitation = ((Boolean) getBeliefbase().getBelief("hasGravitation").getFact()).booleanValue();
 		IVector2 size = env.getAreaSize();
 		IVector2 target = (IVector2)getParameter("pos").getValue();
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();		
-		myself.setProperty(GravitationListener.FEELS_GRAVITATION, hasGravitation);
+		myself.setProperty(GravitationListener.FEELS_GRAVITATION, Boolean.valueOf(hasGravitation));
+		
 		
 		//Update destination and gravitationSensor of ant on space 
 		Map params = new HashMap();

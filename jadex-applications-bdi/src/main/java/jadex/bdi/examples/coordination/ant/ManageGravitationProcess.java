@@ -54,7 +54,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 	 */
 	public void start(IClockService clock, IEnvironmentSpace space) {
 		this.lasttick = clock.getTick();
-		// System.out.println("create package process started.");
+		// System.out.println("create gravitation process started.");
 	}
 
 	/**
@@ -89,13 +89,13 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 		if (firstTime) {
 
 			// lasttick = clock.getTick();
-
+System.out.println("Executing GRAVITATION");
 			// add gravitation center
-//			Vector2Int pos = new Vector2Int(4, 5);
-			IVector2 pos = grid.getRandomPosition(new Vector2Int(1,1));
+			Vector2Int pos = new Vector2Int(4, 5);
+//			IVector2 pos = grid.getRandomPosition(new Vector2Int(1,1));
 			int gravitationDistance = 1;
 
-			Map<Object,Object> props = new HashMap<Object,Object>();
+			Map props = new HashMap();
 			props.put(Space2D.POSITION, (IVector2)pos);
 			props.put(GRAVITATION_DISTANCE, new Integer(gravitationDistance));
 			props.put(GRAVITATION_CENTER_ID, "ABC");
@@ -105,9 +105,9 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 			// compute and add surrounding gravitation field for 2D-Environment
 			int xPos = pos.getXAsInteger();
 			int yPos = pos.getYAsInteger();
-			ArrayList<IVector2> gravitationField = getGravitationField(xPos, yPos);
+			ArrayList gravitationField = getGravitationField(xPos, yPos);
 			for(int i=0; i < gravitationField.size(); i++){
-				props = new HashMap<Object,Object>();
+				props = new HashMap();
 				props.put(Space2D.POSITION, gravitationField.get(i));
 				props.put(GRAVITATION_CENTER_ID, "ABC");
 				props.put(GRAVITATION_CENTER_POS, pos);
@@ -124,9 +124,9 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 	 * @param yPos
 	 * @return
 	 */
-	private ArrayList<IVector2> getGravitationField(int xPos, int yPos) {
+	private ArrayList getGravitationField(int xPos, int yPos) {
 
-		ArrayList<IVector2> res = new ArrayList<IVector2>();
+		ArrayList res = new ArrayList();
 		// -/-
 		res.add(new Vector2Int(xPos - 1, yPos - 1));
 		// -/0

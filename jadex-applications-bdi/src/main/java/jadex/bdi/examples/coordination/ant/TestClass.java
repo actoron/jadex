@@ -26,8 +26,11 @@ public class TestClass {
 		System.out.println(b);
 
 		Integer d = new Integer(0);
-		d++;
-		System.out.println(d);
+		int res = d.intValue() + 1;
+//		d = d + new Integer(1);
+		System.out.println(res);
+		
+		
 	}
 
 }

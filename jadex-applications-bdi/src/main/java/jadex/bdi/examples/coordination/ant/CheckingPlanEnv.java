@@ -29,7 +29,7 @@ public class CheckingPlanEnv extends Plan
 		IVector2 newpos = computeNextPositionRandomly(size.getXAsInteger(), size.getYAsInteger());
 		
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		myself.getProperties().put(DESTINATION, newpos.toString());
+		myself.setProperty(DESTINATION, newpos.toString());
 		
 		
 //		System.out.println("Moving from "+mypos+" to: "+newpos);
