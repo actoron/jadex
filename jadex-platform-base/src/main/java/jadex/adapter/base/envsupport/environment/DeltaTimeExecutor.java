@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.Iterator;
 
@@ -14,7 +15,7 @@ import javax.swing.event.ChangeListener;
  * Space executor that connects to a clock service and reacts on time deltas.
  */
 // Todo: immediate execution of agent actions and percepts?
-public class DeltaTimeExecutor
+public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExecutor
 {
 	//-------- attributes --------
 	
@@ -28,8 +29,31 @@ public class DeltaTimeExecutor
 	 * @param timecoefficient the time coefficient
 	 * @param clockservice the clock service
 	 */
+	public DeltaTimeExecutor()
+	{
+	}
+	
+	/**
+	 * Creates a new DeltaTimeExecutor
+	 * @param timecoefficient the time coefficient
+	 * @param clockservice the clock service
+	 */
 	public DeltaTimeExecutor(final AbstractEnvironmentSpace space, final IClockService clockservice)
 	{
+		setProperty("space", space);
+		setProperty("clockservice", clockservice);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Start the space executor.
+	 */
+	public void start()
+	{
+		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
+		final IClockService clockservice = (IClockService)getProperty("clockservice");
+		
 		this.timestamp = clockservice.getTime();
 		
 		// Start the processes.

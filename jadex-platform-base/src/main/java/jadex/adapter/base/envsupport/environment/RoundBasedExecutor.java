@@ -5,6 +5,7 @@ import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;
 import jadex.bridge.ITimedObject;
+import jadex.commons.SimplePropertyObject;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -12,7 +13,7 @@ import java.util.Iterator;
 /**
  *  Synchronized execution of all actions in rounds based on clock ticks.
  */
-public class RoundBasedExecutor
+public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceExecutor
 {
 	//-------- constants --------
 	
@@ -27,11 +28,8 @@ public class RoundBasedExecutor
 	 *  @param clockservice	The clock service.
 	 *  @param acomp	The action comparator.
 	 */
-	public RoundBasedExecutor(AbstractEnvironmentSpace space, IClockService clockservice, Comparator acomp)
+	public RoundBasedExecutor()
 	{
-		this(space, clockservice);
-		
-		space.getAgentActionList().setOrdering(acomp);
 	}
 	
 	/**
@@ -41,6 +39,35 @@ public class RoundBasedExecutor
 	 */
 	public RoundBasedExecutor(final AbstractEnvironmentSpace space, final IClockService clockservice)
 	{
+		this(space, clockservice, null);
+	}
+	
+	/**
+	 *  Creates a new round based executor.
+	 *  @param space	The space.
+	 *  @param clockservice	The clock service.
+	 *  @param acomp	The action comparator.
+	 */
+	public RoundBasedExecutor(AbstractEnvironmentSpace space, IClockService clockservice, Comparator acomp)
+	{
+		setProperty("space", space);
+		setProperty("clockservice", clockservice);
+		setProperty("comparator", acomp);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Start the space executor.
+	 */
+	public void start()
+	{
+		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
+		final IClockService clockservice = (IClockService)getProperty("clockservice");
+		Comparator comp = (Comparator)getProperty("comparator");
+		if(comp!=null)
+			space.getAgentActionList().setOrdering(comp);
+		
 		this.timestamp = clockservice.getTime();
 		
 		// Start the processes.

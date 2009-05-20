@@ -297,8 +297,8 @@ public class MEnvSpaceType	extends MSpaceType
 						if(rotation==null)
 						{
 							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
 							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
@@ -361,8 +361,8 @@ public class MEnvSpaceType	extends MSpaceType
 						if(rotation==null)
 						{
 							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
 							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
@@ -414,8 +414,8 @@ public class MEnvSpaceType	extends MSpaceType
 						if(rotation==null)
 						{
 							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
 							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
@@ -468,8 +468,8 @@ public class MEnvSpaceType	extends MSpaceType
 						if(rotation==null)
 						{
 							Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+							Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
+							Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
 							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 						}
 						Object size = MEnvSpaceInstance.getProperty(args, "size");
@@ -522,8 +522,8 @@ public class MEnvSpaceType	extends MSpaceType
 							if(rotation==null)
 							{
 								Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-								Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-								Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+								Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
+								Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
 								rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 							}
 							Object size = MEnvSpaceInstance.getProperty(args, "size");
@@ -547,56 +547,56 @@ public class MEnvSpaceType	extends MSpaceType
 				}), null));
 		
 		types.add(new TypeInfo("text", MultiCollection.class, null, null,
-				SUtil.createHashMap(new String[]{"x", "y", 
-					"position", "font", "style", "basesize", "color", "layer", "text", "creator"}, 
-				new BeanAttributeInfo[]{
-					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-					new BeanAttributeInfo(null, null, ""),
-					new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
-					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-					new BeanAttributeInfo(null, colorconv, ""),
-					new BeanAttributeInfo(null, tintconv, ""),
-					new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
-					new BeanAttributeInfo(null, null, "", new IObjectCreator()
+			SUtil.createHashMap(new String[]{"x", "y", 
+				"position", "font", "style", "basesize", "color", "layer", "text", "creator"}, 
+			new BeanAttributeInfo[]{
+				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
+				new BeanAttributeInfo(null, colorconv, ""),
+				new BeanAttributeInfo(null, tintconv, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
+				new BeanAttributeInfo(null, null, "", new IObjectCreator()
+				{
+					public Object createObject(Map args) throws Exception
 					{
-						public Object createObject(Map args) throws Exception
+						Object position = MEnvSpaceInstance.getProperty(args, "position");
+						if(position==null)
 						{
-							Object position = MEnvSpaceInstance.getProperty(args, "position");
-							if(position==null)
-							{
-								position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-									(Double)MEnvSpaceInstance.getProperty(args, "y"));
-							}
-							
-							String fontname = (String) MEnvSpaceInstance.getProperty(args, "font");
-							if(fontname==null)
-							{
-								fontname = "Default";
-							}
-							Integer fontstyle = (Integer) MEnvSpaceInstance.getProperty(args, "style");
-							if (fontstyle==null)
-							{
-								fontstyle = new Integer(Font.PLAIN);
-							}
-							Integer fontsize = (Integer) MEnvSpaceInstance.getProperty(args, "basesize");
-							if (fontsize==null)
-							{
-								fontsize = new Integer(12);
-							}
-							Font font = new Font(fontname, fontstyle.intValue(), fontsize.intValue());
-							
-							
-							
-							String text = (String) MEnvSpaceInstance.getProperty(args, "text");
-							text = String.valueOf(text);
-							
-							IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-							return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, exp);
+							position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
+								(Double)MEnvSpaceInstance.getProperty(args, "y"));
 						}
-					})
-				}), null));
+						
+						String fontname = (String) MEnvSpaceInstance.getProperty(args, "font");
+						if(fontname==null)
+						{
+							fontname = "Default";
+						}
+						Integer fontstyle = (Integer) MEnvSpaceInstance.getProperty(args, "style");
+						if (fontstyle==null)
+						{
+							fontstyle = new Integer(Font.PLAIN);
+						}
+						Integer fontsize = (Integer) MEnvSpaceInstance.getProperty(args, "basesize");
+						if (fontsize==null)
+						{
+							fontsize = new Integer(12);
+						}
+						Font font = new Font(fontname, fontstyle.intValue(), fontsize.intValue());
+						
+						
+						
+						String text = (String) MEnvSpaceInstance.getProperty(args, "text");
+						text = String.valueOf(text);
+						
+						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
+						return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, exp);
+					}
+				})
+			}), null));
 		
 		types.add(new TypeInfo("gridlayer", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"color", "width", "height", "type", "creator"}, 
@@ -632,6 +632,11 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}), null));
 	
+		types.add(new TypeInfo("spaceexecutor", MultiCollection.class, null, new BeanAttributeInfo("expression", expconv, ""),
+			SUtil.createHashMap(new String[]{"class"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
+			}), null));
+		
 		types.add(new TypeInfo("processtype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
@@ -668,6 +673,11 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("drawable/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
+
+		types.add(new TypeInfo("spaceexecutor/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
@@ -734,7 +744,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("perceptgeneratortype", new BeanAttributeInfo("perceptgeneratortypes", null, "property")));
 		linkinfos.add(new LinkInfo("perceptmapping", new BeanAttributeInfo("perceptmappings", null, "property")));
 		linkinfos.add(new LinkInfo("view", new BeanAttributeInfo("views", null, "property")));
-		linkinfos.add(new LinkInfo("spaceexecutor", new BeanAttributeInfo(null, expconv, "property")));
+		linkinfos.add(new LinkInfo("spaceexecutor", new BeanAttributeInfo(null, null, "property")));
 		linkinfos.add(new LinkInfo("perspective", new BeanAttributeInfo("perspectives", null, "property")));
 		
 		// theme
@@ -770,6 +780,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("view/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("objecttype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("drawable/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("spaceexecutor/property", new BeanAttributeInfo("properties", null, "")));
 		
 		return linkinfos;
 	}

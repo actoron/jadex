@@ -195,7 +195,7 @@ public class Reader
 						}
 						else
 						{
-							throw new RuntimeException("No content mapping for: "+stack);
+							throw new RuntimeException("No content mapping for: "+topse.getContent()+stack);
 						}
 					}
 					

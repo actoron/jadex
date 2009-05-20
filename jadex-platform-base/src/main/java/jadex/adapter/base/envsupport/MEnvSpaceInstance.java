@@ -9,6 +9,7 @@ import jadex.adapter.base.envsupport.environment.IAgentAction;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
+import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -352,11 +353,21 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create the environment executor.
-		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "spaceexecutor");
+		Map mse = (Map)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "spaceexecutor");
+		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
+		ISpaceExecutor exe = null;
 		if(exp!=null)
 		{
-			exp.getValue(fetcher);	// Executor starts itself
+			exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
 		}
+		else
+		{
+			exe = (ISpaceExecutor)((Class)MEnvSpaceInstance.getProperty(mse, "clazz")).newInstance();
+			List props = (List)mse.get("properties");
+			setProperties(exe, props, fetcher);
+		}
+		if(exe!=null)
+			exe.start();
 		
 		return ret;		
 	}
