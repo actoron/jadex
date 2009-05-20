@@ -161,31 +161,47 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	}
 	
 	/**
-	 * Adds a space process.
-	 * @param id ID of the space process
-	 * @param process new space process
+	 *  Creates a space process.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
 	 */
-	public void createSpaceProcess(Object id, String type)
+	public void createSpaceProcess(String typename, Map properties)
 	{
 		synchronized(monitor)
 		{
+			Object id;
+			do
+			{
+				id = objectidcounter.getNext();
+			}
+			while(spaceobjects.containsKey(id));
 			
-			Map procinfo = (Map)processtypes.get(type);
+			// Prepare properties (runtime props override type props).
+			Map procinfo = (Map)processtypes.get(typename);
 			if(procinfo==null)
-				throw new RuntimeException("Unknown space process: "+type);
+				throw new RuntimeException("Unknown space process: "+typename);
+			
 			try
 			{
 				ISpaceProcess process = (ISpaceProcess)((Class)procinfo.get("_clazz")).newInstance();
+				
+				for(Iterator it = properties.keySet().iterator(); it.hasNext(); )
+				{
+					String propname = (String)it.next();
+					process.setProperty(propname, properties.get(propname)); 
+				}
 				for(Iterator it = procinfo.keySet().iterator(); it.hasNext(); )
 				{
-					String name = (String)it.next();
-					process.setProperty(name, procinfo.get(name)); 
+					String propname = (String)it.next();
+					if(!"_clazz".equals(propname) && !properties.containsKey(propname))
+						process.setProperty(propname, procinfo.get(propname)); 
 				}
+				
 				processes.put(id, process);
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException("Could not create space process: "+type);
+				throw new RuntimeException("Could not create space process: "+typename);
 			}
 //			process.start(this);	// Done by executor.
 		}

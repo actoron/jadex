@@ -172,6 +172,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+				
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
@@ -191,6 +197,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+				
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">10</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
@@ -226,6 +238,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+				
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
@@ -245,6 +263,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+				
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
@@ -264,6 +288,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">1</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
@@ -287,6 +317,12 @@
 					</env:spaceaction>
 				</env:initactions>
 
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">10</env:property>
+					</env:process>
+				</env:processes>
+	
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
 				</env:observers>

@@ -160,14 +160,14 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("perceptgeneratortype", MultiCollection.class, null, null,
-				SUtil.createHashMap(new String[]{"class", "name"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
-				new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"class", "name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
+			new BeanAttributeInfo(null, null, "")}), null));
 
 		types.add(new TypeInfo("perceptmapping", MultiCollection.class, null, null,
-				SUtil.createHashMap(new String[]{"class", "agenttype"}, 
-				new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
-				new BeanAttributeInfo(null, null, "")}), null));
+			SUtil.createHashMap(new String[]{"class", "agenttype"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
+			new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("view", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name", "objecttype", "creator"}, 
@@ -189,16 +189,18 @@ public class MEnvSpaceType	extends MSpaceType
 						props	= new HashMap();
 						SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
 						fetcher.setValues(args);
-						for(int i=0; i<lprops.size(); i++)
-						{
-							Map	prop = (Map)lprops.get(i);
-							IParsedExpression exp = (IParsedExpression)prop.get("value");
-							boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
-							if(dyn)
-								props.put((String)prop.get("name"), exp);
-							else
-								props.put((String)prop.get("name"), exp.getValue(fetcher));
-						}
+						MEnvSpaceInstance.setProperties(lprops, fetcher);
+						
+//						for(int i=0; i<lprops.size(); i++)
+//						{
+//							Map	prop = (Map)lprops.get(i);
+//							IParsedExpression exp = (IParsedExpression)prop.get("value");
+//							boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+//							if(dyn)
+//								props.put((String)prop.get("name"), exp);
+//							else
+//								props.put((String)prop.get("name"), exp.getValue(fetcher));
+//						}
 					}
 					
 					ret.init(space, props);
@@ -667,6 +669,11 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
+		types.add(new TypeInfo("process/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
+
 		types.add(new TypeInfo("objecttype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
@@ -696,6 +703,13 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"name", "type", "owner"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, null, "")
+			}), null));
+		
+		types.add(new TypeInfo("process", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"name", "type"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, "")
 			}), null));
@@ -766,6 +780,7 @@ public class MEnvSpaceType	extends MSpaceType
 
 		// space instance
 		linkinfos.add(new LinkInfo("object", new BeanAttributeInfo("objects", null, "property")));
+		linkinfos.add(new LinkInfo("process", new BeanAttributeInfo("processes", null, "property")));
 		linkinfos.add(new LinkInfo("spaceaction", new BeanAttributeInfo("spaceactions", null, "property")));
 		linkinfos.add(new LinkInfo("observer", new BeanAttributeInfo("observers", null, "property")));
 		
@@ -777,6 +792,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("spaceactiontype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("agentactiontype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("object/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("process/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("view/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("objecttype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("drawable/property", new BeanAttributeInfo("properties", null, "")));

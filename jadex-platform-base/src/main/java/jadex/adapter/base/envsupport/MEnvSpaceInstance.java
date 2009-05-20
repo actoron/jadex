@@ -114,23 +114,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Map mobjecttype = (Map)objecttypes.get(i);
 				List props = (List)mobjecttype.get("properties");
 				Map properties = setProperties(props, fetcher);
-				
-//				if(props!=null)
-//				{
-//					properties = new HashMap();
-//					for(int j=0; j<props.size(); j++)
-//					{
-//						Map prop = (Map)props.get(j);
-//						IParsedExpression exp = (IParsedExpression)prop.get("value");
-//						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
-//						if(dyn)
-//							properties.put((String)prop.get("name"), exp);
-//						else
-//							properties.put((String)prop.get("name"), exp.getValue(fetcher));
-//					}
-//				}
-				
-				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name"));
+//				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name"));
 				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
 			}
 		}
@@ -236,24 +220,8 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mobj = (Map)objects.get(i);
 			
-				// todo: support static objecttype declarartions
-				
 				List mprops = (List)mobj.get("properties");
 				Map props = setProperties(mprops, fetcher);
-//				if(mprops!=null)
-//				{
-//					props = new HashMap();
-//					for(int j=0; j<mprops.size(); j++)
-//					{
-//						Map prop = (Map)mprops.get(j);
-//						IParsedExpression exp = (IParsedExpression)prop.get("value");
-//						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
-//						if(dyn)
-//							props.put((String)prop.get("name"), exp);
-//						else
-//							props.put((String)prop.get("name"), exp.getValue(fetcher));
-//					}
-//				}
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
 				if(owner!=null)
 				{
@@ -269,6 +237,20 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				}
 				
 				ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
+			}
+		}
+		
+		// Create initial processes.
+		List procs = (List)getPropertyList("processes");
+		if(procs!=null)
+		{
+			for(int i=0; i<procs.size(); i++)
+			{
+				Map mproc = (Map)procs.get(i);
+				List mprops = (List)mproc.get("properties");
+				Map props = setProperties(mprops, fetcher);
+				ret.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
+				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
 			}
 		}
 		

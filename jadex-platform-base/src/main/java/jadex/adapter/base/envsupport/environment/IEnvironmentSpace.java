@@ -39,7 +39,7 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @param id ID of the space process
 	 * @param type The process type.
 	 */
-	public void createSpaceProcess(Object id, String type);
+	public void createSpaceProcess(String type, Map props);
 
 	/**
 	 * Returns a space process.
