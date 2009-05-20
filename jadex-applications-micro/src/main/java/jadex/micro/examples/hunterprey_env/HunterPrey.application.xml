@@ -170,24 +170,6 @@
 	</agenttypes>
 
 	<applications>
-		<application name="One Dumb Prey">
- 			<agents>
-				<agent name="Dummy1" type="DumbPrey"/>
-			</agents>
-			
-			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
-
-				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
-				</env:observers>
- 			</env:envspace>
- 		</application>
-
 		<application name="One Micro Prey">
  			<agents>
 				<agent name="Mickey" type="MicroPrey"/>
@@ -199,6 +181,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
@@ -219,6 +207,12 @@
 					</env:spaceaction>
 				</env:initactions>
 
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
+
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
 				</env:observers>
@@ -232,6 +226,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
@@ -254,6 +254,12 @@
 					</env:spaceaction>
 				</env:initactions>
 
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">0.1</env:property>
+					</env:process>
+				</env:processes>
+
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
 				</env:observers>
@@ -273,6 +279,12 @@
 					</env:spaceaction>
 				</env:initactions>
 
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">0.1</env:property>
+					</env:process>
+				</env:processes>
+
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
 				</env:observers>
@@ -291,6 +303,12 @@
 						<env:parameter name="count">1250</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">0.1</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
@@ -313,6 +331,12 @@
 						<env:parameter name="count">125</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
+
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />

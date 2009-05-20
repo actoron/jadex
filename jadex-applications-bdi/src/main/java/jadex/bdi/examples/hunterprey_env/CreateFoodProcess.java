@@ -68,22 +68,25 @@ public class CreateFoodProcess extends SimplePropertyObject implements ISpacePro
 		
 		double	delta	= clock.getTick() - lasttick;
 		
-		int rate = getProperty("rate")!=null? 
-			((Integer)getProperty("rate")).intValue(): 5;
+		double	rate	= getProperty("rate")!=null? 
+			((Number)getProperty("rate")).doubleValue(): 5.0;
 		
 		if(delta>rate)
 		{
 			lasttick	= clock.getTick();
 		
-			IVector2 pos = grid.getEmptyGridPosition();
-			if(pos!=null)
+			for(int i=0; i<delta/rate; i++)
 			{
-				Map props = new HashMap();
-				props.put(Space2D.POSITION, pos);
-				props.put("creation_age", new Double(clock.getTick()));
-				props.put("clock", clock);
-				grid.createSpaceObject("food", props, null, null);
-//				System.out.println("Created food: "+obj);
+				IVector2 pos = grid.getEmptyGridPosition();
+				if(pos!=null)
+				{
+					Map props = new HashMap();
+					props.put(Space2D.POSITION, pos);
+					props.put("creation_age", new Double(clock.getTick()));
+					props.put("clock", clock);
+					grid.createSpaceObject("food", props, null, null);
+//					System.out.println("Created food: "+obj);
+				}
 			}
 		}
 	}
