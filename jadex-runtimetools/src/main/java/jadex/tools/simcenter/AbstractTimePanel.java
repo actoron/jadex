@@ -140,6 +140,8 @@ public abstract class AbstractTimePanel extends JPanel
 	 */
 	public abstract void updateView();
 
+	protected boolean	invoked;	
+	
 	/**
 	 * 
 	 */
@@ -151,13 +153,18 @@ public abstract class AbstractTimePanel extends JPanel
 		}
 		else
 		{
-			SwingUtilities.invokeLater(new Runnable()
+			if(!invoked)
 			{
-				public void run()
+				invoked	= true;
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					updateView();
-				}
-			});
+					public void run()
+					{
+						invoked	= false;
+						updateView();
+					}
+				});
+			}
 		}
 	}
 }

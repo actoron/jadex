@@ -127,6 +127,7 @@ public class SyncExecutionService	implements	IExecutionService
 				}
 				if(perform)
 				{
+//					System.out.println("Idle");
 					Iterator it	= idlecommands.iterator();
 					while(it.hasNext())
 					{

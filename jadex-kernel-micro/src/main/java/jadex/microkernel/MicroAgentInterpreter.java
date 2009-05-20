@@ -1,5 +1,6 @@
 package jadex.microkernel;
 
+import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IArgument;
 import jadex.bridge.IKernelAgent;
@@ -108,44 +109,52 @@ public class MicroAgentInterpreter implements IKernelAgent
 	 */
 	public boolean executeAction()
 	{
-		this.agentthread = Thread.currentThread();
-		
-		// Copy actions from external threads into the state.
-		// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-//		boolean	extexecuted	= false;
-		Runnable[]	entries	= null;
-		synchronized(ext_entries)
+		try
 		{
-			if(!(ext_entries.isEmpty()))
+			this.agentthread = Thread.currentThread();
+			
+			// Copy actions from external threads into the state.
+			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
+	//		boolean	extexecuted	= false;
+			Runnable[]	entries	= null;
+			synchronized(ext_entries)
 			{
-				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-//				for(int i=0; i<ext_entries.size(); i++)
-//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
-				ext_entries.clear();
-				
-//				extexecuted	= true;
+				if(!(ext_entries.isEmpty()))
+				{
+					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+	//				for(int i=0; i<ext_entries.size(); i++)
+	//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
+					ext_entries.clear();
+					
+	//				extexecuted	= true;
+				}
 			}
+			for(int i=0; entries!=null && i<entries.length; i++)
+			{
+				try
+				{
+					entries[i].run();
+				}
+				catch(Exception e)
+				{
+					getLogger().severe("Execution of agent led to exeception: "+e);
+				}
+			}
+	
+			if(!started)
+			{
+				microagent.executeBody();
+				started = true;
+			}
+			
+			this.agentthread = null;
+			return false;
 		}
-		for(int i=0; entries!=null && i<entries.length; i++)
+		catch(AgentTerminatedException ate)
 		{
-			try
-			{
-				entries[i].run();
-			}
-			catch(Exception e)
-			{
-				getLogger().severe("Execution of agent led to exeception: "+e);
-			}
+			// Todo: fix microkernel bug.
+			return false; 
 		}
-
-		if(!started)
-		{
-			microagent.executeBody();
-			started = true;
-		}
-		
-		this.agentthread = null;
-		return false;
 	}
 
 	/**

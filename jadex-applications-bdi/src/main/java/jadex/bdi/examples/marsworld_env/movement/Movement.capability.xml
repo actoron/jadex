@@ -21,7 +21,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact>(Grid2D)$scope.getApplicationContext().getSpace("mygc2dspace")</fact>
+ 			<fact>(Grid2D)$scope.getApplicationContext().getSpace("my2dspace")</fact>
  		</belief>
  		
  		<!-- Myself. -->

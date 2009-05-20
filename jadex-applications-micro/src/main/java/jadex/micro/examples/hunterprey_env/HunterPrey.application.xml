@@ -11,7 +11,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="HunterPrey" package="jadex.bdi.examples.hunterprey_env">
+	name="HunterPrey" package="jadex.micro.examples.hunterprey_env">
 	
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
@@ -19,6 +19,7 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
+		<import>jadex.micro.examples.hunterprey_env.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbprey.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbhunter.*</import>
 	</imports>
@@ -42,6 +43,7 @@
 			</env:objecttypes>
 			
 			<env:avatarmappings>
+				<env:avatarmapping agenttype="MicroPrey" objecttype="prey"/>
 				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
 				<env:avatarmapping agenttype="DumbHunter" objecttype="hunter"/>
 			</env:avatarmappings>
@@ -72,6 +74,12 @@
   			
 			<env:perceptgeneratortypes>
 				<env:perceptgeneratortype name="creaturevisiongen" class="CreatureVisionGenerator"/>
+				<env:perceptmapping agenttype="MicroPrey" class="MicroPreyVisionProcessor">
+					<!-- Todo: mapping per percept type? - ->
+					<env:percepttype name="object_appeared"/>
+					<env:percepttype name="object_disappeared"/>
+					<env:percepttype name="object_moved"/> -->
+				</env:perceptmapping>
 				<env:perceptmapping agenttype="DumbPrey" class="DumbPreyVisionProcessor">
 					<!-- Todo: mapping per percept type? - ->
 					<env:percepttype name="object_appeared"/>
@@ -179,6 +187,24 @@
  			</env:envspace>
  		</application>
 
+		<application name="One Micro Prey">
+ 			<agents>
+				<agent name="Mickey" type="MicroPrey"/>
+			</agents>
+			
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:initactions>
+					<env:spaceaction type="create_obstacles">
+						<env:parameter name="count">125</env:parameter>
+					</env:spaceaction>
+				</env:initactions>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
 		<application name="One Prey / One Hunter">
  			<agents>
 				<agent name="Dumbo" type="DumbPrey"/>
@@ -217,13 +243,13 @@
 
 		<application name="Multi">
 			<agents>
-				<agent type="DumbPrey" number="100"/>
+				<agent type="MicroPrey" number="500"/>
 			</agents>
 				
-			<env:envspace name="my2dspace" type="2dspace">
+			<env:envspace name="my2dspace" type="2dspace" width="100" height="100">
 				<env:initactions>
 					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
+						<env:parameter name="count">1250</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
 
@@ -235,14 +261,14 @@
  		
 		<application name="Lupo's Paradise">
 			<agents>
-				<agent type="DumbPrey" number="100"/>
+				<agent type="MicroPrey" number="2000"/>
 				<agent name="Lupo" type="DumbHunter"/>
 			</agents>
 				
-			<env:envspace name="my2dspace" type="2dspace">
+			<env:envspace name="my2dspace" type="2dspace" width="100" height="100">
 				<env:initactions>
 					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
+						<env:parameter name="count">1250</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
 
@@ -254,14 +280,14 @@
 
 		<application name="Battlefield">
 			<agents>
-				<agent type="DumbPrey" number="200"/>
-				<agent type="DumbHunter" number="30"/>
+				<agent type="MicroPrey" number="5000"/>
+				<agent type="DumbHunter" number="50"/>
 			</agents>
 				
-			<env:envspace name="my2dspace" type="2dspace">
+			<env:envspace name="my2dspace" type="2dspace" width="100" height="100">
 				<env:initactions>
 					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
+						<env:parameter name="count">1250</env:parameter>
 					</env:spaceaction>
 				</env:initactions>
 

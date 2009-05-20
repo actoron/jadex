@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey_env;
 
-import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;

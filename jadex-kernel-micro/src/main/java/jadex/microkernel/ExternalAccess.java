@@ -57,4 +57,15 @@ public class ExternalAccess implements IExternalAccess
 	{
 		interpreter.invokeLater(runnable);
 	}
+
+
+	/**
+	 *  Get the agent implementation.
+	 *  Operations on the agent object
+	 *  should be properly synchronized with invokeLater()!
+	 */
+	public IMicroAgent	getAgent()
+	{
+		return agent;
+	}
 }

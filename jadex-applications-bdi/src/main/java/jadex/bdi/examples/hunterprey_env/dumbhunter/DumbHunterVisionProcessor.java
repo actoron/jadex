@@ -39,40 +39,46 @@ public class DumbHunterVisionProcessor implements IPerceptProcessor
 				}
 				public void resultAvailable(Object result)
 				{
-					try
+					final Space2D	space2d	= (Space2D)space;
+					final IExternalAccess	exta	= (IExternalAccess)result;
+					exta.invokeLater(new Runnable()
 					{
-						Space2D	space2d	= (Space2D)space;
-						IExternalAccess	exta	= (IExternalAccess)result;
-						ISpaceObject	myself	= space2d.getOwnedObjects(agent)[0];
-						IBelief	nearpreybel	= exta.getBeliefbase().getBelief("nearest_prey");
-						ISpaceObject	nearprey	= (ISpaceObject)nearpreybel.getFact();
-						
-						// Remember new prey only if nearer than other known prey (if any).
-						if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))
+						public void run()
 						{
-							if(nearprey==null
-								|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-										(IVector2)nearprey.getProperty(Space2D.POSITION))
-								.greater(
-									space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-										(IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION))))
+							try
 							{
-								nearpreybel.setFact(percept);
+								ISpaceObject	myself	= space2d.getOwnedObjects(agent)[0];
+								IBelief	nearpreybel	= exta.getBeliefbase().getBelief("nearest_prey");
+								ISpaceObject	nearprey	= (ISpaceObject)nearpreybel.getFact();
+								
+								// Remember new prey only if nearer than other known prey (if any).
+								if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))
+								{
+									if(nearprey==null
+										|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
+												(IVector2)nearprey.getProperty(Space2D.POSITION))
+										.greater(
+											space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
+												(IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION))))
+									{
+										nearpreybel.setFact(percept);
+									}
+								}
+								// Remove disappeared prey from belief.
+								else if(percept.equals(nearprey) && type.equals(CreatureVisionGenerator.OBJECT_DISAPPEARED))
+								{
+									nearpreybel.setFact(null);
+								}
+							}
+							catch(Exception e)
+							{
+								// Todo: fix agent init.
+								// Exception might be thrown, when agent not yet initialized
+								// -> AgentRules.findValue() fails due to missing initparents,
+								// when belief is initialized on demand.
 							}
 						}
-						// Remove disappeared prey from belief.
-						else if(percept.equals(nearprey) && type.equals(CreatureVisionGenerator.OBJECT_DISAPPEARED))
-						{
-							nearpreybel.setFact(null);
-						}
-					}
-					catch(Exception e)
-					{
-						// Todo: fix agent init.
-						// Exception might be thrown, when agent not yet initialized
-						// -> AgentRules.findValue() fails due to missing initparents,
-						// when belief is initialized on demand.
-					}
+					});
 				}
 			});
 		}

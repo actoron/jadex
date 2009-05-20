@@ -87,10 +87,8 @@ public abstract class MicroAgent implements IMicroAgent
 	
 	/**
 	 *  Get the external access for this agent.
-	 *  The specific external access interface is kernel specific
-	 *  and has to be casted to its corresponding incarnation.
 	 */
-	public Object getExternalAccess()
+	public IExternalAccess	getExternalAccess()
 	{
 		return new ExternalAccess(this, interpreter);
 	}

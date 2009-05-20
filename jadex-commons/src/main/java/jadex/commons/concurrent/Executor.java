@@ -130,6 +130,7 @@ public class Executor implements Runnable
 	public synchronized void execute()
 	{
 //		System.out.println("executing: "+this+" "+running);
+//		Thread.dumpStack();
 		if(!shutdown)
 		{		
 			// Indicate that thread should continue to run (if running).

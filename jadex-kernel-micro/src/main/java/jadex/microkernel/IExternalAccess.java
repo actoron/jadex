@@ -23,4 +23,11 @@ public interface IExternalAccess
 	 *  the runnable has been executed).
 	 */
 	public void invokeLater(Runnable runnable);
+
+	/**
+	 *  Get the agent implementation.
+	 *  Operations on the agent object
+	 *  should be properly synchronized with invokeLater()!
+	 */
+	public IMicroAgent	getAgent();
 }
