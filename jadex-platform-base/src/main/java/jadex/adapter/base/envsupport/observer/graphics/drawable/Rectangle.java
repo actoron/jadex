@@ -73,20 +73,20 @@ public class Rectangle extends ColoredPrimitive
 		dList_ = list.intValue();
 	}
 
-	public void doDraw(Object obj, ViewportJ2D vp)
+	public void doDraw(DrawableCombiner dc, Object obj, ViewportJ2D vp)
 	{
 		Graphics2D g = vp.getContext();
-		if (!setupMatrix(obj, g))
+		if(!setupMatrix(dc, obj, g))
 			return;
 		g.setColor(c_);
 		g.fill(J2D_RECTANGLE);
 	}
 
-	public void doDraw(Object obj, ViewportJOGL vp)
+	public void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
 		gl.glColor4fv(oglColor_, 0);
-		if (setupMatrix(obj, gl))
+		if(setupMatrix(dc, obj, gl))
 			gl.glCallList(dList_);
 	}
 

@@ -72,14 +72,11 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param g graphics context
 	 * @return true, if the setup was successful
 	 */
-	protected boolean setupMatrix(Object obj, Graphics2D g)
+	protected boolean setupMatrix(DrawableCombiner dc, Object obj, Graphics2D g)
 	{
-		IVector2 size = getSize(obj);
-		IVector3 rot = getRotation(obj);
-//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, rot.getXAsDouble());
-//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotatio);
-//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
-		IVector2 position = getPosition(obj);
+		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize());
+		IVector3 rot = (IVector3)dc.getBoundValue(obj, getRotation());
+		IVector2 position = (IVector2)dc.getBoundValue(obj, getPosition());
 		
 		if((position == null) || (size == null) || (rot == null))
 		{
@@ -100,14 +97,11 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param obj object being drawn
 	 * @param gl OpenGL context
 	 */
-	protected boolean setupMatrix(Object obj, GL gl)
+	protected boolean setupMatrix(DrawableCombiner dc, Object obj, GL gl)
 	{
-		IVector2 size = getSize(obj);
-		IVector3 rot = getRotation(obj);
-//		IVector1 xrotation = SObjectInspector.getVector1AsDirection(obj, this.xRotation);
-//		IVector1 yrotation = SObjectInspector.getVector1AsDirection(obj, this.yRotation);
-//		IVector1 zrotation = SObjectInspector.getVector1AsDirection(obj, this.zRotation);
-		IVector2 position = getPosition(obj);
+		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize());
+		IVector3 rot = (IVector3)dc.getBoundValue(obj, getRotation());
+		IVector2 position = (IVector2)dc.getBoundValue(obj, getPosition());
 		
 		if((position == null) || (size == null) || (rot == null))
 		{
@@ -143,9 +137,9 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			Graphics2D g = vp.getContext();
 			AffineTransform t = g.getTransform();
-			if (!dc.setupMatrix(obj, g, enableDCPos, enableDCSize, enableDCRot))
+			if(!dc.setupMatrix(obj, g, enableDCPos, enableDCSize, enableDCRot))
 				return;
-			doDraw(obj, vp);
+			doDraw(dc, obj, vp);
 			g.setTransform(t);
 		}
 	}
@@ -171,9 +165,9 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			GL gl = vp.getContext();
 			gl.glPushMatrix();
-			if (!dc.setupMatrix(obj, gl, enableDCPos, enableDCSize, enableDCRot))
+			if(!dc.setupMatrix(obj, gl, enableDCPos, enableDCSize, enableDCRot))
 				return;
-			doDraw(obj, vp);
+			doDraw(dc, obj, vp);
 			gl.glPopMatrix();
 		}
 	}
@@ -184,7 +178,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public abstract void doDraw(Object obj, ViewportJ2D vp);
+	public abstract void doDraw(DrawableCombiner dc, Object obj, ViewportJ2D vp);
 	
 	/**
 	 * Draws the object to an OpenGL viewport
@@ -192,7 +186,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param obj the object being drawn
 	 * @param vp the viewport
 	 */
-	public abstract void doDraw(Object obj, ViewportJOGL vp);
+	public abstract void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp);
 	
 	/** 
 	 * Enables using absolute positioning.

@@ -29,13 +29,16 @@ import javax.media.opengl.GL;
 /**
  * This drawable combines multiple drawables into a single drawable object.
  */
-public class DrawableCombiner extends AbstractVisual2D
+public class DrawableCombiner extends AbstractVisual2D implements IPropertyObject
 {
 	//-------- attributes --------
 	
 	/** The drawables. */
 	private Map	drawables;
 
+	/** The properties */
+	protected Map properties;
+	
 	//-------- constructors --------
 	
 	/**
@@ -55,7 +58,6 @@ public class DrawableCombiner extends AbstractVisual2D
 	{
 		super(position==null? "position": position, rotation, size);
 		drawables = new HashMap();
-		this.pcs = new SimplePropertyChangeSupport(this);
 	}
 	
 	/**
@@ -155,7 +157,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	{
 		if(enablePos)
 		{
-			IVector2 position = getPosition(obj);
+			IVector2 position = (IVector2)getBoundValue(obj, getPosition());
 			if(position==null)
 				return false;
 			g.translate(position.getXAsDouble(), position.getYAsDouble());
@@ -163,7 +165,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		if(enableSize)
 		{
-			IVector2 size = getSize(obj);
+			IVector2 size = (IVector2)getBoundValue(obj, getSize());
 			if(size==null)
 				size = new Vector2Double(1,0);
 			g.scale(size.getXAsDouble(), size.getYAsDouble());
@@ -171,7 +173,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		if(enableRot)
 		{
-			IVector3 rot = getRotation(obj);
+			IVector3 rot = (IVector3)getBoundValue(obj, getRotation());
 			if(rot==null)
 				rot = Vector3Double.ZERO.copy();
 			g.scale(Math.cos(rot.getYAsDouble()), Math.cos(rot.getXAsDouble()));
@@ -194,7 +196,7 @@ public class DrawableCombiner extends AbstractVisual2D
 	{
 		if(enablePos)
 		{
-			IVector2 position = getPosition(obj);
+			IVector2 position = (IVector2)getBoundValue(obj, getPosition());
 			if(position==null)
 				return false;
 			gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
@@ -202,7 +204,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		if(enableSize)
 		{
-			IVector2 size = getSize(obj);
+			IVector2 size = (IVector2)getBoundValue(obj, getSize());
 			if(size==null)
 				size = new Vector2Double(1,0);
 			gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
@@ -210,7 +212,7 @@ public class DrawableCombiner extends AbstractVisual2D
 		
 		if(enableRot)
 		{
-			IVector3 rot = getRotation(obj);
+			IVector3 rot = (IVector3)getBoundValue(obj, getRotation());
 			if(rot==null)
 				rot = Vector3Double.ZERO.copy();
 			gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
@@ -280,5 +282,63 @@ public class DrawableCombiner extends AbstractVisual2D
 	{
 		Set layers = new HashSet(drawables.keySet());
 		return layers;
+	}
+	
+	/**
+	 * Gets the bound value for a property.
+	 * @return The bound value.
+	 */
+	public Object getBoundValue(Object obj, Object prop)
+	{
+		Object ret = prop;
+		if(prop instanceof String)
+		{
+			String name = (String)prop;
+			ret = getProperty(name);
+			if(ret instanceof IParsedExpression)
+			{
+				SimpleValueFetcher fetcher = new SimpleValueFetcher();
+				fetcher.setValue("$drawable", this);
+				fetcher.setValue("$object", obj);
+				ret = ((IParsedExpression)ret).getValue(fetcher);
+			}
+			
+			if(ret==null)
+				ret = SObjectInspector.getProperty(obj, name);
+		}
+		return ret;
+	}	
+	
+	//-------- IPropertyObject --------
+	
+	/**
+	 * Returns a property.
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public Object getProperty(String name)
+	{
+		return properties==null? null: properties.get(name);
+	}
+	
+	/**
+	 * Returns all of the properties.
+	 * @return the properties
+	 */
+	public Set getPropertyNames()
+	{
+		return properties==null? Collections.EMPTY_SET: properties.keySet();
+	}
+	
+	/**
+	 * Sets a property
+	 * @param name name of the property
+	 * @param value value of the property
+	 */
+	public void setProperty(String name, Object value)
+	{
+		if(properties==null)
+			properties = new HashMap();
+		properties.put(name, value);
 	}
 }

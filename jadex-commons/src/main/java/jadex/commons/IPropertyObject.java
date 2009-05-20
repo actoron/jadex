@@ -1,7 +1,6 @@
 package jadex.commons;
 
 import java.beans.PropertyChangeListener;
-import java.util.Map;
 import java.util.Set;
 
 /** Interface for property-holding objects.
@@ -41,7 +40,7 @@ public interface IPropertyObject
      *  The listener is registered for all properties.
      *  @param listener  The PropertyChangeListener to be added.
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+//    public void addPropertyChangeListener(PropertyChangeListener listener);
 
     /**
      *  Remove a PropertyChangeListener from the listener list.
@@ -49,5 +48,5 @@ public interface IPropertyObject
      *  for all properties.
      *  @param listener  The PropertyChangeListener to be removed.
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
+//    public void removePropertyChangeListener(PropertyChangeListener listener);
 }

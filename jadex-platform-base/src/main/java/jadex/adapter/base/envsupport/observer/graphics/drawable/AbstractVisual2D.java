@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.IVector3;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -14,7 +13,7 @@ import jadex.javaparser.SimpleValueFetcher;
 /**
  *  Base class for visual elements.
  */
-public class AbstractVisual2D extends SimplePropertyObject
+public class AbstractVisual2D //extends SimplePropertyObject
 {
 	//-------- attributes --------
 	
@@ -103,11 +102,38 @@ public class AbstractVisual2D extends SimplePropertyObject
 	{
 		size = propId;
 	}
+
+	/**
+	 *  Get the size.
+	 *  @return the size.
+	 */
+	public Object getSize()
+	{
+		return this.size;
+	}
+
+	/**
+	 *  Get the rotation.
+	 *  @return the rotation.
+	 */
+	public Object getRotation()
+	{
+		return this.rotation;
+	}
+
+	/**
+	 *  Get the position.
+	 *  @return the position.
+	 */
+	public Object getPosition()
+	{
+		return this.position;
+	}
 	
 	/**
 	 * Gets the position or position-binding.
 	 * @return position or position-binding
-	 */
+	 * /
 	public IVector2 getPosition(Object obj)
 	{
 		IVector2 ret = null;
@@ -123,12 +149,12 @@ public class AbstractVisual2D extends SimplePropertyObject
 			ret = SObjectInspector.getVector2(obj, position);
 		return ret;
 //		return position;
-	}
+	}*/
 	
 	/**
 	 * Gets the size or size-binding.
 	 * @return size or size-binding
-	 */
+	 * /
 	public IVector2 getSize(Object obj)
 	{
 		IVector2 ret = null;
@@ -144,12 +170,12 @@ public class AbstractVisual2D extends SimplePropertyObject
 			ret = SObjectInspector.getVector2(obj, size);
 		return ret;
 //		return size;
-	}
+	}*/
 
 	/**
 	 *  Get the rotation.
 	 *  @return The rotation.
-	 */
+	 * /
 	public IVector3 getRotation(Object obj)
 	{
 		IVector3 ret = null;
@@ -164,13 +190,13 @@ public class AbstractVisual2D extends SimplePropertyObject
 			ret = SObjectInspector.getVector3(obj, rotation);
 		return ret;
 //		return rotation;
-	}
+	}*/
 	
 	/**
 	 * Returns a property.
 	 * @param name name of the property
 	 * @return the property
-	 */
+	 * /
 	public Object getProperty(String name, IValueFetcher fetcher)
 	{
 		Object ret = properties==null? null: properties.get(name);
@@ -179,5 +205,5 @@ public class AbstractVisual2D extends SimplePropertyObject
 			ret = ((IParsedExpression)ret).getValue(fetcher);
 		
 		return ret;
-	}
+	}*/
 }

@@ -73,13 +73,13 @@ public class TexturedRectangle extends RotatingPrimitive
 		texture_ = vp.getClampedTexture(vp.getContext(), texturePath_);
 	}
 
-	public synchronized void doDraw(Object obj, ViewportJ2D vp)
+	public synchronized void doDraw(DrawableCombiner dc, Object obj, ViewportJ2D vp)
 	{
 		Graphics2D g = vp.getContext();
 		
-		IVector2 size = getSize(obj);
+		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize());
 		
-		if (!setupMatrix(obj, g))
+		if (!setupMatrix(dc, obj, g))
 			return;
 		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		
@@ -87,13 +87,13 @@ public class TexturedRectangle extends RotatingPrimitive
 				.getHeight()), null);
 	}
 
-	public synchronized void doDraw(Object obj, ViewportJOGL vp)
+	public synchronized void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 		
-		if (setupMatrix(obj, gl));
+		if(setupMatrix(dc, obj, gl));
 		{
 			gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			gl.glBegin(GL.GL_QUADS);

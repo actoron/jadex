@@ -110,7 +110,7 @@ public class SObjectInspector
 		Object ret = null;
 		if (obj instanceof IPropertyObject)
 		{
-			ret = ((IPropertyObject) obj).getProperty(name); 
+			ret = ((IPropertyObject)obj).getProperty(name); 
 		}
 		
 		if (ret == null)
@@ -146,7 +146,7 @@ public class SObjectInspector
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
-//			fetcher.setValue("$space", obj);
+//			fetcher.setValue("$space", space);
 			ret = ((IParsedExpression) ret).getValue(fetcher);
 		}
 		
@@ -161,7 +161,7 @@ public class SObjectInspector
 	 * @param obj the object
 	 * @param vecId either the vector or a property name
 	 * @return retrieved 1-vector
-	 */
+	 * /
 	public static IVector1 getVector1(Object obj, Object vecId)
 	{
 		IVector1 vector1;
@@ -174,7 +174,7 @@ public class SObjectInspector
 			vector1 = (IVector1) SObjectInspector.getProperty(obj, (String) vecId);
 		}
 		return vector1;
-	}
+	}*/
 	
 	/**
 	 * Retrieves a 1-vector given an object and either a string-based binding or
@@ -184,7 +184,7 @@ public class SObjectInspector
 	 * @param obj the object
 	 * @param vecId either the vector or a property name
 	 * @return retrieved 1-vector
-	 */
+	 * /
 	public static IVector1 getVector1AsDirection(Object obj, Object vecId)
 	{
 		Object vector1;
@@ -203,7 +203,7 @@ public class SObjectInspector
 		}
 		
 		return (IVector1) vector1;
-	}
+	}*/
 	
 	/**
 	 * Retrieves a 1-vector given an object and either a string-based binding or
@@ -213,7 +213,7 @@ public class SObjectInspector
 	 * @param obj the object
 	 * @param vecId either the vector or a property name
 	 * @return retrieved 1-vector
-	 */
+	 * /
 	public static IVector1 getVector1AsLength(Object obj, Object vecId)
 	{
 		Object vector1;
@@ -232,7 +232,7 @@ public class SObjectInspector
 		}
 		
 		return (IVector1) vector1;
-	}
+	}*/
 	
 	/**
 	 * Retrieves a 2-vector given an object and either a string-based binding or
@@ -241,7 +241,7 @@ public class SObjectInspector
 	 * @param obj the object
 	 * @param vecId either the vector or a property name
 	 * @return retrieved 2-vector
-	 */
+	 * /
 	public static IVector2 getVector2(Object obj, Object vecId)
 	{
 		IVector2 vector2;
@@ -254,7 +254,7 @@ public class SObjectInspector
 			vector2 = (IVector2)SObjectInspector.getProperty(obj, (String)vecId);
 		}
 		return vector2;
-	}
+	}*/
 	
 	/**
 	 * Retrieves a 3-vector given an object and either a string-based binding or
@@ -263,7 +263,7 @@ public class SObjectInspector
 	 * @param obj the object
 	 * @param vecId either the vector or a property name
 	 * @return retrieved 3-vector
-	 */
+	 * /
 	public static IVector3 getVector3(Object obj, Object vecId)
 	{
 		IVector3 vector3=null;
@@ -283,6 +283,6 @@ public class SObjectInspector
 			}
 		}
 		return vector3;
-	}
+	}*/
 
 }

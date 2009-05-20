@@ -106,10 +106,10 @@ public final class Text implements IDrawable
 		
 		if (draw)
 		{
-			IVector2 position = SObjectInspector.getVector2(obj, this.position);
-			IVector2 dcPos = dc.getPosition(obj);//SObjectInspector.getVector2(obj, dc.getPosition());
-			IVector2 dcScale = dc.getSize(obj);//SObjectInspector.getVector2(obj, dc.getSize());
-			if ((position == null) || (dcPos == null) || (dcScale == null))
+			IVector2 position = (IVector2)dc.getBoundValue(obj, this.position);
+			IVector2 dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());//SObjectInspector.getVector2(obj, dc.getPosition());
+			IVector2 dcScale = (IVector2)dc.getBoundValue(obj, dc.getSize());//SObjectInspector.getVector2(obj, dc.getSize());
+			if((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
 			}
@@ -153,12 +153,10 @@ public final class Text implements IDrawable
 		
 		if (draw)
 		{
-			IVector2 position = SObjectInspector.getVector2(obj, this.position);
-			IVector2 dcPos = dc.getPosition(obj);//SObjectInspector.getVector2(obj, dc.getPosition());
-			IVector2 dcScale = dc.getSize(obj);//SObjectInspector.getVector2(obj, dc.getSize());
-//			IVector2 dcPos = SObjectInspector.getVector2(obj, dc.getPosition());
-//			IVector2 dcScale = SObjectInspector.getVector2(obj, dc.getSize());
-			if ((position == null) || (dcPos == null) || (dcScale == null))
+			IVector2 position = (IVector2)dc.getBoundValue(obj, this.position);
+			IVector2 dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());//SObjectInspector.getVector2(obj, dc.getPosition());
+			IVector2 dcScale = (IVector2)dc.getBoundValue(obj, dc.getSize());//SObjectInspector.getVector2(obj, dc.getSize());
+			if((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
 			}

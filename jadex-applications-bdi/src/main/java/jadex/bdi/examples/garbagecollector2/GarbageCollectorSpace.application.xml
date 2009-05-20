@@ -106,14 +106,18 @@
 					
 				<env:perspective name="abstract">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
+						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>
 						<env:triangle layer="2" color="red" />
 						<env:rectangle layer="3" color="yellow" width="0.2" height="0.2">
 							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
 						</env:rectangle>
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
 						<env:text layer="4" x="0.0" y="0.4" color="white" text="$owner$"/>
 					</env:drawable>
 					<env:drawable objecttype="burner" width="1.0" height="1.0">
+						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>	
 						<env:triangle layer="1" color="green" />
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
 						<env:text layer="4" x="0.0" y="0.4" color="white" text="$owner$"/>
 					</env:drawable>
 					<env:drawable objecttype="garbage" width="0.7" height="0.7">
