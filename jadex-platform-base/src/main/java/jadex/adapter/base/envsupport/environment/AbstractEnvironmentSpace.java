@@ -29,32 +29,32 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** The context. */
 	protected IContext context;
 	
-	/** Avatar mappings. */
-	protected MultiCollection avatarmappings;
-
-	/** Data view mappings. */
-	protected MultiCollection	dataviewmappings;
+	/** The space object types. */
+	protected Map objecttypes;
+	
+	/** The space process types. */
+	protected Map processtypes;
 	
 	/** Available space actions. */
 	protected Map spaceactions;
 	
-	/** Available views */
-	protected Map views;
-	
 	/** Available agent actions. */
 	protected Map agentactions;
-	
-	/** The environment processes. */
-	protected Map processes;
 	
 	/** The percept generators. */
 	protected Map perceptgenerators;
 
 	/** The percept mappings. */
 	protected Map perceptmappings;
+	
+	/** Avatar mappings. */
+	protected MultiCollection avatarmappings;
 
-	/** The space object types. */
-	protected Map spaceobjecttypes;
+	/** Data view mappings. */
+	protected MultiCollection	dataviewmappings;
+	
+	/** The environment processes. */
+	protected Map processes;
 	
 	/** Long/ObjectIDs (keys) and environment objects (values). */
 	protected Map spaceobjects;
@@ -68,15 +68,18 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** Object id counter for new ids. */
 	protected AtomicCounter objectidcounter;
 	
-	/** The environment listeners. */
-	protected List listeners;
-	
 	/** The list of scheduled agent actions. */
-	protected AgentActionList	actionlist;
+	protected AgentActionList actionlist;
 	
 	/** The list of scheduled percepts. */
-	protected PerceptList	perceptlist;
-	
+	protected PerceptList perceptlist;
+		
+	/** Available views */
+	protected Map views;
+
+	/** The environment listeners. */
+	protected List listeners;
+
 	//-------- constructors --------
 	
 	/**
@@ -90,10 +93,11 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		this.dataviewmappings = new MultiCollection();
 		this.spaceactions = new HashMap();
 		this.agentactions = new HashMap();
+		this.processtypes = new HashMap();
 		this.processes = new HashMap();
 		this.perceptgenerators = new HashMap();
 		this.perceptmappings = new HashMap();
-		this.spaceobjecttypes = new HashMap();
+		this.objecttypes = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
@@ -105,15 +109,84 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	//-------- methods --------
 	
 	/**
+	 *  Add a space type.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 */
+	public void addSpaceObjectType(String typename, Map properties)
+	{
+		synchronized(monitor)
+		{
+			objecttypes.put(typename, properties);
+		}
+	}
+	
+	/**
+	 *  Remove a space object type.
+	 *  @param typename The type name.
+	 */
+	public void removeSpaceObjectType(String typename)
+	{
+		synchronized(monitor)
+		{
+			objecttypes.remove(typename);
+			// Kill running process instances also?
+		}
+	}
+	
+	/**
+	 *  Add a space process type.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 */
+	public void addSpaceProcessType(String typename, Class clazz, Map properties)
+	{
+		synchronized(monitor)
+		{
+			properties.put("_clazz", clazz);
+			processtypes.put(typename, properties);
+		}
+	}
+	
+	/**
+	 *  Remove a space process type.
+	 *  @param typename The type name.
+	 */
+	public void removeSpaceProcessType(String typename)
+	{
+		synchronized(monitor)
+		{
+			processtypes.remove(typename);
+		}
+	}
+	
+	/**
 	 * Adds a space process.
 	 * @param id ID of the space process
 	 * @param process new space process
 	 */
-	public void addSpaceProcess(Object id, ISpaceProcess process)
+	public void createSpaceProcess(Object id, String type)
 	{
 		synchronized(monitor)
 		{
-			processes.put(id, process);
+			
+			Map procinfo = (Map)processtypes.get(type);
+			if(procinfo==null)
+				throw new RuntimeException("Unknown space process: "+type);
+			try
+			{
+				ISpaceProcess process = (ISpaceProcess)((Class)procinfo.get("_clazz")).newInstance();
+				for(Iterator it = procinfo.keySet().iterator(); it.hasNext(); )
+				{
+					String name = (String)it.next();
+					process.setProperty(name, procinfo.get(name)); 
+				}
+				processes.put(id, process);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException("Could not create space process: "+type);
+			}
 //			process.start(this);	// Done by executor.
 		}
 	}
@@ -145,32 +218,6 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		}
 	}
 	
-	/**
-	 *  Add a space type.
-	 *  @param typename The type name.
-	 *  @param properties The properties.
-	 */
-	public void addSpaceObjectType(String typename, Map properties)
-	{
-		synchronized(monitor)
-		{
-			spaceobjecttypes.put(typename, properties);
-		}
-	}
-	
-	/**
-	 *  Remove a space object type.
-	 *  @param typename The type name.
-	 */
-	public void removeSpaceObjectType(String typename)
-	{
-		synchronized(monitor)
-		{
-			spaceobjecttypes.remove(typename);
-		}
-	}
-
-	
 	/** 
 	 * Creates an object in this space.
 	 * @param type the object's type
@@ -181,7 +228,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 */
 	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners)
 	{
-		if(!spaceobjecttypes.containsKey(typename))
+		if(!objecttypes.containsKey(typename))
 			throw new RuntimeException("Unknown space object type: "+typename);
 			
 		ISpaceObject ret;
@@ -197,7 +244,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 			while(spaceobjects.containsKey(id));
 			
 			// Prepare properties (runtime props override type props).
-			Map typeprops = (Map)spaceobjecttypes.get(typename);
+			Map typeprops = (Map)objecttypes.get(typename);
 			if(typeprops!=null)
 			{
 				if(properties==null)

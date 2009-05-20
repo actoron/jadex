@@ -113,22 +113,22 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mobjecttype = (Map)objecttypes.get(i);
 				List props = (List)mobjecttype.get("properties");
-				Map properties = null;
+				Map properties = setProperties(props, fetcher);
 				
-				if(props!=null)
-				{
-					properties = new HashMap();
-					for(int j=0; j<props.size(); j++)
-					{
-						Map prop = (Map)props.get(j);
-						IParsedExpression exp = (IParsedExpression)prop.get("value");
-						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
-						if(dyn)
-							properties.put((String)prop.get("name"), exp);
-						else
-							properties.put((String)prop.get("name"), exp.getValue(fetcher));
-					}
-				}
+//				if(props!=null)
+//				{
+//					properties = new HashMap();
+//					for(int j=0; j<props.size(); j++)
+//					{
+//						Map prop = (Map)props.get(j);
+//						IParsedExpression exp = (IParsedExpression)prop.get("value");
+//						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+//						if(dyn)
+//							properties.put((String)prop.get("name"), exp);
+//						else
+//							properties.put((String)prop.get("name"), exp.getValue(fetcher));
+//					}
+//				}
 				
 				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name"));
 				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
@@ -186,12 +186,17 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<processes.size(); i++)
 			{
 				Map mprocess = (Map)processes.get(i);
-				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
+//				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
 				List props = (List)mprocess.get("properties");
-				setProperties(process, props, fetcher);
+				String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
+				Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
+				
+				Map tmp = setProperties(props, fetcher);
+				tmp.remove("name");
+				tmp.remove("clazz");
 				
 //				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
-				ret.addSpaceProcess(MEnvSpaceInstance.getProperty(mprocess, "name"), process);
+				ret.addSpaceProcessType(name, clazz, tmp);
 			}
 		}
 		
@@ -234,21 +239,21 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				// todo: support static objecttype declarartions
 				
 				List mprops = (List)mobj.get("properties");
-				Map props = null;
-				if(mprops!=null)
-				{
-					props = new HashMap();
-					for(int j=0; j<mprops.size(); j++)
-					{
-						Map prop = (Map)mprops.get(j);
-						IParsedExpression exp = (IParsedExpression)prop.get("value");
-						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
-						if(dyn)
-							props.put((String)prop.get("name"), exp);
-						else
-							props.put((String)prop.get("name"), exp.getValue(fetcher));
-					}
-				}
+				Map props = setProperties(mprops, fetcher);
+//				if(mprops!=null)
+//				{
+//					props = new HashMap();
+//					for(int j=0; j<mprops.size(); j++)
+//					{
+//						Map prop = (Map)mprops.get(j);
+//						IParsedExpression exp = (IParsedExpression)prop.get("value");
+//						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+//						if(dyn)
+//							props.put((String)prop.get("name"), exp);
+//						else
+//							props.put((String)prop.get("name"), exp.getValue(fetcher));
+//					}
+//				}
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
 				if(owner!=null)
 				{
@@ -406,6 +411,32 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					object.setProperty((String)prop.get("name"), exp.getValue(fetcher));
 			}
 		}
+	}
+	
+	/**
+	 *  Set properties on a map.
+	 *  @param properties A list properties (containing maps with "name", "value" keys).
+	 *  @param fetcher The fetcher for parsing the Java expression (can provide
+	 *  predefined values to the expression)
+	 */
+	public static Map setProperties(List properties, IValueFetcher fetcher)
+	{
+		HashMap ret = null;
+		if(properties!=null)
+		{
+			ret = new HashMap();
+			for(int i=0; i<properties.size(); i++)
+			{
+				Map prop = (Map)properties.get(i);
+				IParsedExpression exp = (IParsedExpression)prop.get("value");
+				boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+				if(dyn)
+					ret.put((String)prop.get("name"), exp);
+				else
+					ret.put((String)prop.get("name"), exp.getValue(fetcher));
+			}
+		}
+		return ret;
 	}
 	
 	/**

@@ -22,11 +22,24 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	public String getName();
 	
 	/**
-	 * Adds a space process.
-	 * @param id ID of the space process
-	 * @param process new space process
+	 *  Add a space process type.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
 	 */
-	public void addSpaceProcess(Object id, ISpaceProcess process);
+	public void addSpaceProcessType(String typename, Class clazz, Map properties);
+	
+	/**
+	 *  Remove a space process type.
+	 *  @param typename The type name.
+	 */
+	public void removeSpaceProcessType(String typename);
+	
+	/**
+	 * Creates a space process.
+	 * @param id ID of the space process
+	 * @param type The process type.
+	 */
+	public void createSpaceProcess(Object id, String type);
 
 	/**
 	 * Returns a space process.
