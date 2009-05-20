@@ -3,7 +3,6 @@ package jadex.bdi.examples.marsworld.sentry;
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld.RequestProduction;
 import jadex.bdi.examples.marsworld.Target;
@@ -11,6 +10,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IContextService;
 
 
 /**

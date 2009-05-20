@@ -1,6 +1,7 @@
 package jadex.adapter.base.appdescriptor;
 
-import jadex.adapter.base.contextservice.ISpace;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.ISpace;
 
 import java.util.List;
 
@@ -86,5 +87,5 @@ public abstract class MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public abstract ISpace createSpace(ApplicationContext app) throws Exception;
+	public abstract ISpace createSpace(IApplicationContext app) throws Exception;
 }

@@ -1,7 +1,6 @@
 package jadex.bdi.examples.coordination.ant;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
@@ -11,6 +10,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.ArrayList;

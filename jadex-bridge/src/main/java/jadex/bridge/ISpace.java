@@ -1,6 +1,5 @@
-package jadex.adapter.base.contextservice;
+package jadex.bridge;
 
-import jadex.bridge.IAgentIdentifier;
 
 /**
  *  Interface for spaces.

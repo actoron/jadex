@@ -3,7 +3,6 @@ package jadex.adapter.base.envsupport;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IAgentAction;
@@ -19,7 +18,9 @@ import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.ILibraryService;
+import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
@@ -76,9 +77,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public ISpace createSpace(ApplicationContext app) throws Exception
+	public ISpace createSpace(IApplicationContext app) throws Exception
 	{
-		MApplicationType mapt = app.getApplicationType();
+		MApplicationType mapt = ((ApplicationContext)app).getApplicationType();
 		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
 
 		// Create and init space.

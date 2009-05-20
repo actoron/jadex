@@ -1,5 +1,7 @@
 package jadex.adapter.base.contextservice;
 
+import jadex.bridge.IContext;
+
 import java.util.Map;
 
 /**
@@ -16,7 +18,7 @@ public class DefaultContextFactory implements IContextFactory
 	 *  @param parent	The parent of the context (if any).
 	 *  @param properties	Initialization properties (if any).
 	 */
-	public BaseContext createContext(String name, /*IContext parent,*/ Map properties)
+	public IContext createContext(String name, /*IContext parent,*/ Map properties)
 	{
 		return new BaseContext(name, /*parent,*/ properties);
 	}

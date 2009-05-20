@@ -87,13 +87,13 @@
 			</property>
 
 			<!-- Context service. -->
-			<property type="jadex.adapter.base.contextservice.IContextService" name="context_service">
+			<property type="jadex.bridge.IContextService" name="context_service">
 				new jadex.adapter.base.contextservice.ContextService(
 					new Class[]
 					{
-						jadex.adapter.base.contextservice.IContext.class,
+						jadex.bridge.IContext.class,
 						jadex.adapter.base.contextservice.BaseContext.class,
-						jadex.adapter.base.appdescriptor.ApplicationContext.class
+						jadex.bridge.IApplicationContext.class
 					},
 					new jadex.adapter.base.contextservice.IContextFactory[]
 					{

@@ -1,9 +1,9 @@
 
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 

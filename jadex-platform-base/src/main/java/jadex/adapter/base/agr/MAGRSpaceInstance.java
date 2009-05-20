@@ -1,8 +1,8 @@
 package jadex.adapter.base.agr;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
-import jadex.adapter.base.contextservice.ISpace;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.ISpace;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class MAGRSpaceInstance extends MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public ISpace createSpace(ApplicationContext app)
+	public ISpace createSpace(IApplicationContext app)
 	{
 		AGRSpace	ret	= new AGRSpace(getName(), app);
 		for(int g=0; groups!=null && g<groups.size(); g++)

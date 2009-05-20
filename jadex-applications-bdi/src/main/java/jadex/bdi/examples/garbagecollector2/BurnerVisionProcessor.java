@@ -1,12 +1,12 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.ISpace;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -24,7 +24,7 @@ public class BurnerVisionProcessor implements IPerceptProcessor
 	 */
 	public void processPercept(ISpace space, final String type, final Object percept, IAgentIdentifier agent)
 	{
-		IAMS ams = (IAMS)((ApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
+		IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 		ams.getExternalAccess(agent, new IResultListener()
 		{
 			public void exceptionOccurred(Exception exception)

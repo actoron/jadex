@@ -1,7 +1,5 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
@@ -9,6 +7,8 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class BurnerVisionGenerator extends SimplePropertyObject implements IPerc
 	public void agentAdded(IAgentIdentifier agent, ISpace space)
 	{
 		// Only add agents of type "Burner"
-		if("Burner".equals(((ApplicationContext)space.getContext()).getAgentType(agent)))
+		if("Burner".equals(((IApplicationContext)space.getContext()).getAgentType(agent)))
 		{
 			if(agents==null)
 				agents = new ArrayList();

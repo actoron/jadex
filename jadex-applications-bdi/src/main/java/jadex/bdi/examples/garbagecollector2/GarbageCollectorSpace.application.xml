@@ -159,6 +159,12 @@
 					<env:object type="burner" owner="Burner1" />
 				</env:objects> -->
 				
+				<!-- <env:processes>
+					<env:process name="create" type="">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>-->
+				
 				<env:observers>
 					<env:observer name="world" view="view_all" perspective="abstract">
 						<env:plugins>

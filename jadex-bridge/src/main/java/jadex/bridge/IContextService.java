@@ -1,7 +1,5 @@
-package jadex.adapter.base.contextservice;
+package jadex.bridge;
 
-import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IPlatformService;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Map;
@@ -56,7 +54,7 @@ public interface IContextService extends IPlatformService
 	/**
 	 *  Register a context factory for a given context type. 
 	 */
-	public void	addContextFactory(Class type, IContextFactory factory);
+//	public void	addContextFactory(Class type, IContextFactory factory);
 
 	/**
 	 *  Deregister a context factory for a given context type. 

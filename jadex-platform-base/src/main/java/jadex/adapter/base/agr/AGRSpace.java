@@ -1,9 +1,9 @@
 package jadex.adapter.base.agr;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.IContext;
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.IContext;
+import jadex.bridge.ISpace;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,7 +17,7 @@ public class AGRSpace implements ISpace
 	//-------- attributes --------
 	
 	/** The application context. */
-	protected ApplicationContext	context;
+	protected IApplicationContext	context;
 	
 	/** The name of the space. */
 	protected String	name;
@@ -30,7 +30,7 @@ public class AGRSpace implements ISpace
 	/**
 	 *  Create a new AGR space.
 	 */
-	public AGRSpace(String name, ApplicationContext context)
+	public AGRSpace(String name, IApplicationContext context)
 	{
 		this.name	= name;
 		this.context	= context;

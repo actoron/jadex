@@ -1,12 +1,13 @@
 package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.contextservice.IContextService;
-import jadex.adapter.base.contextservice.ISpace;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
+import jadex.bridge.IContextService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
+import jadex.bridge.ISpace;
 import jadex.commons.SGUI;
 import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.Reader;
@@ -100,7 +101,7 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of the application.
 	 */
-	public Object createApplication(String name, String model, String config, Map arguments)
+	public IApplicationContext createApplication(String name, String model, String config, Map arguments)
 	{
 		ApplicationContext	context = null;
 		
@@ -141,7 +142,7 @@ public class ApplicationFactory implements IApplicationFactory
 				{
 					Map	props	= new HashMap();
 					props.put(ApplicationContext.PROPERTY_APPLICATION_TYPE, apptype);
-					context	= (ApplicationContext)cs.createContext(name, ApplicationContext.class, props);
+					context	= (ApplicationContext)cs.createContext(name, IApplicationContext.class, props);
 				}
 				
 				// todo: result listener?

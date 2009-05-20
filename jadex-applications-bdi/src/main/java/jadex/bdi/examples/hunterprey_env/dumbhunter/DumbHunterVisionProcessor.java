@@ -1,7 +1,5 @@
 package jadex.bdi.examples.hunterprey_env.dumbhunter;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -11,6 +9,8 @@ import jadex.bdi.examples.hunterprey_env.CreatureVisionGenerator;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.ISpace;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -30,7 +30,7 @@ public class DumbHunterVisionProcessor implements IPerceptProcessor
 	{
 		if(((ISpaceObject)percept).getType().equals("prey"))
 		{
-			IAMS ams = (IAMS)((ApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
+			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 			ams.getExternalAccess(agent, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)

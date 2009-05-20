@@ -1,11 +1,11 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.IContext;
 import jadex.adapter.base.envsupport.IObjectCreator;
 import jadex.adapter.base.envsupport.MEnvSpaceInstance;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IContext;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
 

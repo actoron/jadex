@@ -1,6 +1,8 @@
 package jadex.adapter.base.contextservice;
 
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 

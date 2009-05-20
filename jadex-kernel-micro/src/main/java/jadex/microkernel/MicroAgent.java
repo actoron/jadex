@@ -2,7 +2,10 @@ package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IClockService;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ITimedObject;
@@ -258,6 +261,23 @@ public abstract class MicroAgent implements IMicroAgent
 		}
 		
 		return reply;
+	}
+	
+	/**
+	 *  Get the application context.
+	 *  @return The application context (or null).
+	 */
+	public IApplicationContext getApplicationContext()
+	{
+		IApplicationContext ret = null;
+		IContextService cs = (IContextService)getPlatform().getService(IContextService.class);
+		if(cs!=null)
+		{
+			IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
+			if(tmp.length==1)
+				ret = (IApplicationContext)tmp[0];
+		}
+		return ret;
 	}
 	
 }

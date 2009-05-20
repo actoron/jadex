@@ -1,10 +1,11 @@
 package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.contextservice.BaseContext;
-import jadex.adapter.base.contextservice.IContext;
-import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.IPlatform;
 import jadex.commons.concurrent.IResultListener;
 
@@ -18,16 +19,8 @@ import java.util.Map;
  *  When the context is deleted all agents will be destroyed.
  *  An agent must only be in one application context.
  */
-public class ApplicationContext	extends BaseContext
+public class ApplicationContext	extends BaseContext implements IApplicationContext
 {
-	//-------- constants --------
-	
-	/** The application type property (required for context creation). */
-	public static final String	PROPERTY_APPLICATION_TYPE	= "application-type";
-	
-	/** The master flag. */
-	public static final String PROPERTY_AGENT_MASTER = "master";
-	
 	//-------- attributes --------
 	
 	/** The platform. */

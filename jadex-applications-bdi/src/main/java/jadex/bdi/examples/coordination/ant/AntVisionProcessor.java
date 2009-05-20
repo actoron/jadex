@@ -1,7 +1,6 @@
 package jadex.bdi.examples.coordination.ant;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
@@ -10,6 +9,7 @@ import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ISpace;
 import jadex.commons.concurrent.IResultListener;
 
 /**

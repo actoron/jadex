@@ -1,7 +1,6 @@
 package jadex.bridge;
 
 
-
 /**
  *  The agent platform interface.
  */

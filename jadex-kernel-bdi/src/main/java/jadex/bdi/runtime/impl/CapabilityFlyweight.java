@@ -13,7 +13,10 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IClockService;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.IPlatform;
 import jadex.rules.state.IOAVState;
 
@@ -408,6 +411,43 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		else
 		{
 			addEventListener(listener, agent);
+		}
+	}
+	
+	/**
+	 *  Get the application context.
+	 *  @return The application context (or null).
+	 */
+	public IApplicationContext getApplicationContext()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					IContextService cs = (IContextService)adapter.getPlatform().getService(IContextService.class);
+					if(cs!=null)
+					{
+						IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
+						if(tmp.length==1)
+							object = tmp[0];
+					}
+				}
+			};
+			return (IApplicationContext)invoc.object;
+		}
+		else
+		{
+			IApplicationContext ret = null;
+			IContextService cs = (IContextService)adapter.getPlatform().getService(IContextService.class);
+			if(cs!=null)
+			{
+				IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
+				if(tmp.length==1)
+					ret = (IApplicationContext)tmp[0];
+			}
+			return ret;
 		}
 	}
 	

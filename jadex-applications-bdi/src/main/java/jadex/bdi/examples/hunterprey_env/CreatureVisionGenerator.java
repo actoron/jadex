@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey_env;
 
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
@@ -10,6 +9,7 @@ import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Arrays;

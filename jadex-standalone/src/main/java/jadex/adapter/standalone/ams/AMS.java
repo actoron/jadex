@@ -2,8 +2,6 @@ package jadex.adapter.standalone.ams;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.BaseContext;
-import jadex.adapter.base.contextservice.IContext;
-import jadex.adapter.base.contextservice.IContextService;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
@@ -16,6 +14,8 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatformService;
@@ -139,7 +139,7 @@ public class AMS implements IAMS, IPlatformService
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 		
 		// Register new agent at contexts.
-		IContextService	cs	= (IContextService) platform.getService(IContextService.class);
+		IContextService	cs	= (IContextService)platform.getService(IContextService.class);
 		if(cs!=null)
 		{
 			IContext[]	contexts	= cs.getContexts(creator);

@@ -1,7 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.contextservice.ISpace;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 
 /**

@@ -1,6 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IPlatform;
 
 import java.util.logging.Logger;
@@ -124,6 +125,12 @@ public interface ICapability	extends IElement
 	 *  Kill the agent.
 	 */
 	public void killAgent();
+	
+	/**
+	 *  Get the application context.
+	 *  @return The application context (or null).
+	 */
+	public IApplicationContext getApplicationContext();
 
 	/**
 	 *  Add an agent listener

@@ -1,7 +1,7 @@
 package jadex.adapter.base.appdescriptor;
 
-import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.contextservice.IContextFactory;
+import jadex.bridge.IContext;
 import jadex.bridge.IPlatform;
 
 import java.util.Map;
@@ -36,7 +36,7 @@ public class ApplicationContextFactory	implements IContextFactory
 	 *  @param parent	The parent of the context (if any).
 	 *  @param properties	Initialization properties (if any).
 	 */
-	public BaseContext createContext(String name, /*IContext parent,*/ Map properties)
+	public IContext createContext(String name, /*IContext parent,*/ Map properties)
 	{
 		return new ApplicationContext(name, /*parent,*/ properties, platform);
 	}
