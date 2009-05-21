@@ -29,6 +29,9 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 
+/**
+ *  Perspective for viewing in 2D.
+ */
 public class Perspective2D implements IPerspective
 {
 	/** Name of the presentation */
@@ -40,8 +43,7 @@ public class Perspective2D implements IPerspective
 	/** The viewport */
 	protected IViewport viewport;
 	
-	/** Selection controller
-	 */
+	/** Selection controller. */
 	protected SelectionController selectioncontroller;
 	
 	/** The selected object */
@@ -222,14 +224,15 @@ public class Perspective2D implements IPerspective
 	 */
 	public Component getView()
 	{
-		if (viewport == null)
+		if(viewport == null)
 		{
-			if (marker == null)
+			if(marker == null)
 			{
 				marker = new DrawableCombiner();
 				IDrawable markerDrawable = new TexturedRectangle(getClass().getPackage().getName().replaceAll("perspective", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
 				marker.addDrawable(markerDrawable, Integer.MAX_VALUE);
 			}
+//			System.out.println("Persp: "+name+" opengl="+tryopengl);
 			viewport = createViewport(obscenter.getLibraryService(), tryopengl);
 			viewport.setSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);

@@ -113,7 +113,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mobjecttype = (Map)objecttypes.get(i);
 				List props = (List)mobjecttype.get("properties");
-				Map properties = setProperties(props, fetcher);
+				Map properties = convertProperties(props, fetcher);
 //				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name"));
 				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
 			}
@@ -175,7 +175,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
 				Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
 				
-				Map tmp = setProperties(props, fetcher);
+				Map tmp = convertProperties(props, fetcher);
 				tmp.remove("name");
 				tmp.remove("clazz");
 				
@@ -221,7 +221,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Map mobj = (Map)objects.get(i);
 			
 				List mprops = (List)mobj.get("properties");
-				Map props = setProperties(mprops, fetcher);
+				Map props = convertProperties(mprops, fetcher);
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
 				if(owner!=null)
 				{
@@ -248,7 +248,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mproc = (Map)procs.get(i);
 				List mprops = (List)mproc.get("properties");
-				Map props = setProperties(mprops, fetcher);
+				Map props = convertProperties(mprops, fetcher);
 				ret.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
 				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
 			}
@@ -401,7 +401,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	 *  @param fetcher The fetcher for parsing the Java expression (can provide
 	 *  predefined values to the expression)
 	 */
-	public static Map setProperties(List properties, IValueFetcher fetcher)
+	public static Map convertProperties(List properties, IValueFetcher fetcher)
 	{
 		HashMap ret = null;
 		if(properties!=null)

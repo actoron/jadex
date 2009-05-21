@@ -186,21 +186,9 @@ public class MEnvSpaceType	extends MSpaceType
 					List lprops = (List)sourceview.get("properties");
 					if(lprops!=null)
 					{
-						props	= new HashMap();
 						SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
 						fetcher.setValues(args);
-						MEnvSpaceInstance.setProperties(lprops, fetcher);
-						
-//						for(int i=0; i<lprops.size(); i++)
-//						{
-//							Map	prop = (Map)lprops.get(i);
-//							IParsedExpression exp = (IParsedExpression)prop.get("value");
-//							boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
-//							if(dyn)
-//								props.put((String)prop.get("name"), exp);
-//							else
-//								props.put((String)prop.get("name"), exp.getValue(fetcher));
-//						}
+						props = MEnvSpaceInstance.convertProperties(lprops, fetcher);
 					}
 					
 					ret.init(space, props);
@@ -210,9 +198,10 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("perspective", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"name", "creator"}, 
-			new BeanAttributeInfo[]{
+			SUtil.createHashMap(new String[]{"class", "name", "opengl", "creator"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -220,8 +209,12 @@ public class MEnvSpaceType	extends MSpaceType
 					IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
 					args = (Map)args.get("object");
 					
-					// TODO: Allow more than the 2D-Perspective?
-					IPerspective ret = new Perspective2D();
+					IPerspective ret = (IPerspective)((Class)MEnvSpaceInstance.getProperty(args, "clazz")).newInstance();
+					boolean opengl = MEnvSpaceInstance.getProperty(args, "opengl")!=null? 
+						((Boolean)MEnvSpaceInstance.getProperty(args, "opengl")).booleanValue(): true;
+					ret.setOpenGl(opengl);
+					String name = (String)MEnvSpaceInstance.getProperty(args, "name");
+					System.out.println("Perspective: "+name+" using opengl="+opengl);
 					
 					List drawables = (List)args.get("drawables");
 					if(drawables!=null)

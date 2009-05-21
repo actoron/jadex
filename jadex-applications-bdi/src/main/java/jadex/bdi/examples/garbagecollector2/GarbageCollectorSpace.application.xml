@@ -19,6 +19,7 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
+		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -79,7 +80,7 @@
 			</env:views>
 			
 			<env:perspectives>
-				<env:perspective name="icons">
+				<env:perspective name="icons" class="Perspective2D">
 					<env:drawable objecttype="collector" width="1.0" height="1.0" rotation="rotation">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>
 						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
@@ -104,7 +105,7 @@
 					</env:prelayers>
 				</env:perspective>
 					
-				<env:perspective name="abstract">
+				<env:perspective name="abstract" class="Perspective2D" opengl="false">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>
 						<env:triangle layer="2" color="red" />
