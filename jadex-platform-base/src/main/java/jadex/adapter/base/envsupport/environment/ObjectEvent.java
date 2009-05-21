@@ -12,13 +12,20 @@ import java.util.Set;
  */
 public class ObjectEvent implements Serializable
 {
+	//-------- constants --------
+
 	public static final PrimitiveEventType OBJECT_DESTROYED = new PrimitiveEventType(0);
 	public static final PrimitiveEventType OBJECT_REMOVED = new PrimitiveEventType(1);
 	
+	//-------- attributes --------
+
 	/** Event type. */
 	protected Object				type;
 
+	/** The parameters. */
 	protected Map					parameters;
+
+	//-------- constructors --------
 
 	/**
 	 * Creates a new ObjectEvent

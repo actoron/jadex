@@ -1,6 +1,6 @@
 package jadex.bdi.examples.hunterprey_env;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  *  Action for eating food or another creature.
  */
-public class EatAction extends SimplePropertyObject implements IAgentAction
+public class EatAction extends SimplePropertyObject implements ISpaceAction
 {
 	//-------- constants --------
 	
@@ -35,9 +35,9 @@ public class EatAction extends SimplePropertyObject implements IAgentAction
 //		System.out.println("eat action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
-		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(IAgentAction.ACTOR_ID);
+		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject avatar = grid.getOwnedObjects(owner)[0];
-		ISpaceObject target = (ISpaceObject)parameters.get(IAgentAction.OBJECT_ID);
+		ISpaceObject target = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
 		
 		if(null==space.getSpaceObject(target.getId()))
 		{

@@ -3,7 +3,7 @@ package jadex.bdi.examples.garbagecollector2;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.bdi.runtime.IGoal;
@@ -31,8 +31,8 @@ public class BurnPlanEnv extends Plan
 
 		SyncResultListener srl	= new SyncResultListener();
 		Map params = new HashMap();
-		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
-		env.performAgentAction("burn", params, srl);
+		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		env.performSpaceAction("burn", params, srl);
 		srl.waitForResult();
 	}
 }

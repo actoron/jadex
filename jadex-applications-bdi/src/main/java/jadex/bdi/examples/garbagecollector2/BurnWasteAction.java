@@ -1,6 +1,6 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  *  Action for burning waste.
  */
-public class BurnWasteAction extends SimplePropertyObject implements IAgentAction
+public class BurnWasteAction extends SimplePropertyObject implements ISpaceAction
 {
 	/**
 	 * Performs the action.
@@ -26,7 +26,7 @@ public class BurnWasteAction extends SimplePropertyObject implements IAgentActio
 		
 		Grid2D grid = (Grid2D)space;
 		
-		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(IAgentAction.ACTOR_ID);
+		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject so = grid.getOwnedObjects(owner)[0];
 		
 		assert so.getProperty("garbage")!=null;

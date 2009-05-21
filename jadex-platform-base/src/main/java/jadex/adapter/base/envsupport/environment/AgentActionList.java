@@ -50,7 +50,7 @@ public class AgentActionList
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void scheduleAgentAction(IAgentAction action, Map parameters, IResultListener listener)
+	public void scheduleAgentAction(ISpaceAction action, Map parameters, IResultListener listener)
 	{
 		if(actions==null)
 			actions	= new LinkedHashSet();
@@ -191,7 +191,7 @@ public class AgentActionList
 		//-------- attributes --------
 		
 		/** The action. */
-		public IAgentAction	action;
+		public ISpaceAction	action;
 		
 		/** The action parameters. */
 		public Map	parameters;
@@ -213,7 +213,7 @@ public class AgentActionList
 		/**
 		 *  Convenience constructor for inline entry creation.
 		 */
-		public ActionEntry(IAgentAction action, Map parameters, IResultListener listener)
+		public ActionEntry(ISpaceAction action, Map parameters, IResultListener listener)
 		{
 			 this.action	= action;
 			 this.parameters	= parameters;

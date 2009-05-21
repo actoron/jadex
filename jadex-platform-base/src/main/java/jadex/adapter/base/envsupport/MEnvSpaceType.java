@@ -143,13 +143,13 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, null, ""),
 			}), null));
 		
-		types.add(new TypeInfo("agentactiontype", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "name"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
-			new BeanAttributeInfo(null, null, ""),
-			}), null));
+//		types.add(new TypeInfo("agentactiontype", MultiCollection.class, null, null,
+//			SUtil.createHashMap(new String[]{"class", "name"}, 
+//			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
+//			new BeanAttributeInfo(null, null, ""),
+//			}), null));
 		
-		types.add(new TypeInfo("spaceactiontype", MultiCollection.class, null, null,
+		types.add(new TypeInfo("actiontype", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, "")}), null));
@@ -637,15 +637,15 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
-		types.add(new TypeInfo("spaceactiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+		types.add(new TypeInfo("actiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
-		types.add(new TypeInfo("agentactiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
+//		types.add(new TypeInfo("agentactiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+//			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+//			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+//			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("perceptgeneratortype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
@@ -745,8 +745,8 @@ public class MEnvSpaceType	extends MSpaceType
 //		linkinfos.add(new LinkInfo("dimension", new BeanAttributeInfo("dimensions", BasicTypeConverter.DOUBLE_CONVERTER, "property")));
 		linkinfos.add(new LinkInfo("objecttype", new BeanAttributeInfo("objecttypes", null, "property")));
 		linkinfos.add(new LinkInfo("avatarmapping", new BeanAttributeInfo("avatarmappings", null, "property")));
-		linkinfos.add(new LinkInfo("agentactiontype", new BeanAttributeInfo("agentactiontypes", null, "property")));
-		linkinfos.add(new LinkInfo("spaceactiontype", new BeanAttributeInfo("spaceactiontypes", null, "property")));
+//		linkinfos.add(new LinkInfo("agentactiontype", new BeanAttributeInfo("agentactiontypes", null, "property")));
+		linkinfos.add(new LinkInfo("actiontype", new BeanAttributeInfo("actiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("processtype", new BeanAttributeInfo("processtypes", null, "property")));
 		linkinfos.add(new LinkInfo("perceptgeneratortype", new BeanAttributeInfo("perceptgeneratortypes", null, "property")));
 		linkinfos.add(new LinkInfo("perceptmapping", new BeanAttributeInfo("perceptmappings", null, "property")));
@@ -782,8 +782,8 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		// action, process, ...
 		linkinfos.add(new LinkInfo("processtype/property", new BeanAttributeInfo("properties", null, "")));
-		linkinfos.add(new LinkInfo("spaceactiontype/property", new BeanAttributeInfo("properties", null, "")));
-		linkinfos.add(new LinkInfo("agentactiontype/property", new BeanAttributeInfo("properties", null, "")));
+//		linkinfos.add(new LinkInfo("spaceactiontype/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("actiontype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("object/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("process/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("view/property", new BeanAttributeInfo("properties", null, "")));

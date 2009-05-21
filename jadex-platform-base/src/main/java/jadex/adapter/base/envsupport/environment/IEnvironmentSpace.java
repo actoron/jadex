@@ -96,49 +96,36 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @return The space objects of the desired type.
 	 */
 	public ISpaceObject[] getSpaceObjectsByType(Object type);
-	
+			
 	/**
-	 * Adds a space action.
+	 * Adds an space action.
 	 * @param actionId the action ID
 	 * @param action the action
 	 */
 	public void addSpaceAction(Object id, ISpaceAction action);
 	
 	/**
-	 * Removes a space action.
+	 * Removes an space action.
 	 * @param actionId the action ID
 	 */
 	public void removeSpaceAction(Object id);
 	
+	/**
+	 * Perform an space action. It will be executed
+	 * according to the space execution policy (e.g. at the end of a round). 
+	 * @param id Id of the action
+	 * @param parameters parameters for the action (may be null)
+	 * @param listener the result listener
+	 */
+	public void performSpaceAction(Object id, Map parameters, IResultListener listener);
+
 	/**
 	 * Performs a space action.
 	 * @param id Id of the action
 	 * @param parameters parameters for the action (may be null)
 	 * @return return value of the action
 	 */
-	public Object performSpaceAction(Object id, Map parameters);
-	
-	/**
-	 * Adds an agent action.
-	 * @param actionId the action ID
-	 * @param action the action
-	 */
-	public void addAgentAction(Object id, IAgentAction action);
-	
-	/**
-	 * Removes an agent action.
-	 * @param actionId the action ID
-	 */
-	public void removeAgentAction(Object id);
-	
-	/**
-	 * Perform an agent action. It will be executed
-	 * according to the space execution policy (e.g. at the end of a round). 
-	 * @param id Id of the action
-	 * @param parameters parameters for the action (may be null)
-	 * @param listener the result listener
-	 */
-	public void performAgentAction(Object id, Map parameters, IResultListener listener);
+	public Object performSpaceAction(final Object id, final Map parameters);
 	
 	/**
 	 *  Get the owner of an object.

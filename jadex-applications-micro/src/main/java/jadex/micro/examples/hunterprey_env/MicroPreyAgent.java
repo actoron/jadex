@@ -1,6 +1,6 @@
 package jadex.micro.examples.hunterprey_env;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -108,8 +108,8 @@ public class MicroPreyAgent extends MicroAgent
 		{
 			// Perform eat action.
 			Map params = new HashMap();
-			params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
-			params.put(IAgentAction.OBJECT_ID, food);
+			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+			params.put(ISpaceAction.OBJECT_ID, food);
 			env.performAgentAction("eat", params, listener);
 		}
 
@@ -145,7 +145,7 @@ public class MicroPreyAgent extends MicroAgent
 			
 			// Perform move action.
 			Map params = new HashMap();
-			params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
+			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 			params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 			env.performAgentAction("move", params, listener);
 		}

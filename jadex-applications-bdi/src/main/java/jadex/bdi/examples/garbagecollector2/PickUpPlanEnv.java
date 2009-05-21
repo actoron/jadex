@@ -1,6 +1,6 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
 
@@ -23,9 +23,9 @@ public class PickUpPlanEnv extends Plan
 		// todo: garbage as parameter?
 		
 		Map params = new HashMap();
-		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
-		env.performAgentAction("pickup", params, srl); // todo: garbage as parameter?
+		env.performSpaceAction("pickup", params, srl); // todo: garbage as parameter?
 		if(!((Boolean)srl.waitForResult()).booleanValue()) 
 			fail();
 		

@@ -1,6 +1,6 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -54,9 +54,9 @@ public class GoPlanEnv extends Plan
 			
 			Map params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(IAgentAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
 			SyncResultListener srl	= new SyncResultListener();
-			env.performAgentAction("go", params, srl); 
+			env.performSpaceAction("go", params, srl); 
 			srl.waitForResult();
 		}
 	}

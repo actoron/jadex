@@ -1,6 +1,6 @@
 package jadex.bdi.examples.hunterprey_env;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  *  Action allowing a creature to move.
  */
-public class MoveAction extends SimplePropertyObject implements IAgentAction
+public class MoveAction extends SimplePropertyObject implements ISpaceAction
 {
 	//-------- constants --------
 	
@@ -53,7 +53,7 @@ public class MoveAction extends SimplePropertyObject implements IAgentAction
 //		System.out.println("move action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
-		IAgentIdentifier actor = (IAgentIdentifier)parameters.get(IAgentAction.ACTOR_ID);
+		IAgentIdentifier actor = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		String direction = (String)parameters.get(PARAMETER_DIRECTION);
 		ISpaceObject avatar = grid.getOwnedObjects(actor)[0];
 

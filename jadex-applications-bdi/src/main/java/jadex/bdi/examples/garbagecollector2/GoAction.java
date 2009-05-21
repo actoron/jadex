@@ -1,6 +1,6 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  *  The go action for moving one field in one of four directions.
  */
-public class GoAction extends SimplePropertyObject implements IAgentAction
+public class GoAction extends SimplePropertyObject implements ISpaceAction
 {
 	//-------- constants --------
 
@@ -41,7 +41,7 @@ public class GoAction extends SimplePropertyObject implements IAgentAction
 //		System.out.println("go action: "+parameters);
 		
 		String dir = (String)parameters.get(DIRECTION);
-		Object oid = parameters.get(IAgentAction.OBJECT_ID);
+		Object oid = parameters.get(ISpaceAction.OBJECT_ID);
 		ISpaceObject obj = space.getSpaceObject(oid);
 		IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
 		

@@ -46,10 +46,10 @@
 			</env:avatarmappings>
 		
 			<env:actiontypes>
-				<env:agentactiontype name="pickup" class="PickupWasteAction" />
-				<env:agentactiontype name="drop" class="DropWasteAction" />
-				<env:agentactiontype name="burn" class="BurnWasteAction" />
-				<env:agentactiontype name="go" class="GoAction" />
+				<env:actiontype name="pickup" class="PickupWasteAction" />
+				<env:actiontype name="drop" class="DropWasteAction" />
+				<env:actiontype name="burn" class="BurnWasteAction" />
+				<env:actiontype name="go" class="GoAction" />
 			</env:actiontypes>
 			
 			<env:processtypes>

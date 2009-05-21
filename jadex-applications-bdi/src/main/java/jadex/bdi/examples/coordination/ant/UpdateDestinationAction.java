@@ -1,6 +1,6 @@
 package jadex.bdi.examples.coordination.ant;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * The update action for showing the destination field of the ant.
  */
-public class UpdateDestinationAction extends SimplePropertyObject implements IAgentAction {
+public class UpdateDestinationAction extends SimplePropertyObject implements ISpaceAction {
 	// -------- constants --------
 
 	/** The destination and id of the ant. */
@@ -35,7 +35,7 @@ public class UpdateDestinationAction extends SimplePropertyObject implements IAg
 //		System.out.println("performing update destinationSign for: " + (Object) parameters.get(IAgentAction.OBJECT_ID).toString());
 
 		IVector2 destination = (IVector2) parameters.get(DESTINATION);
-		Object ownerAgentId = (Object) parameters.get(IAgentAction.OBJECT_ID);
+		Object ownerAgentId = (Object) parameters.get(ISpaceAction.OBJECT_ID);
 		ISpaceObject[] obj = space.getSpaceObjectsByType("destinationSign");
 
 		// Update destination of object

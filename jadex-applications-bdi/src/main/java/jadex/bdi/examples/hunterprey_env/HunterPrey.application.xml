@@ -47,9 +47,9 @@
 			</env:avatarmappings>
 
 			<env:actiontypes>
-				<env:agentactiontype name="move" class="MoveAction" />
-				<env:agentactiontype name="eat" class="EatAction" />
-				<env:spaceactiontype name="create_obstacles" class="CreateObstaclesAction" />
+				<env:actiontype name="move" class="MoveAction" />
+				<env:actiontype name="eat" class="EatAction" />
+				<env:actiontype name="create_obstacles" class="CreateObstaclesAction" />
 			</env:actiontypes>
 			
 			<env:processtypes>

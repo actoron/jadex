@@ -1,6 +1,6 @@
 package jadex.bdi.examples.coordination.ant;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Absorbs an object.
  */
-public class AbsorbObjectAction extends SimplePropertyObject implements IAgentAction {
+public class AbsorbObjectAction extends SimplePropertyObject implements ISpaceAction {
 	// -------- constants --------
 
 	// -------- methods --------

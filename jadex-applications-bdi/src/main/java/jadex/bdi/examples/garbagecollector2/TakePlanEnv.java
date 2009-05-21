@@ -1,6 +1,6 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -37,9 +37,9 @@ public class TakePlanEnv extends Plan
 		// Put down the garbarge.
 		//System.out.println("Calling drop: "+getAgentName()+" "+getRootGoal());
 		Map params = new HashMap();
-		params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
-		grid.performAgentAction("drop", params, srl);
+		grid.performSpaceAction("drop", params, srl);
 		srl.waitForResult();
 		
 		// Go back.

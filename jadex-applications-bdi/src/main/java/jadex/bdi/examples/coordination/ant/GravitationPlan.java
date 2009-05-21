@@ -1,6 +1,6 @@
 package jadex.bdi.examples.coordination.ant;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.Plan;
@@ -27,7 +27,7 @@ public class GravitationPlan extends Plan
 //		params.put(IAgentAction.OBJECT_ID, getExternalAccess().getAgentIdentifier().getLocalName());
 		params.put(Space2D.POSITION, target);		
 		SyncResultListener srl = new SyncResultListener();
-		env.performAgentAction("absorbObject", params, srl); 
+		env.performSpaceAction("absorbObject", params, srl); 
 		srl.waitForResult();
 
 		//kill agent

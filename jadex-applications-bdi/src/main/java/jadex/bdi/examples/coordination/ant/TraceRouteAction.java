@@ -1,6 +1,6 @@
 package jadex.bdi.examples.coordination.ant;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * This action is responsible for updating the trace route of the ant.
  */
-public class TraceRouteAction extends SimplePropertyObject implements IAgentAction {
+public class TraceRouteAction extends SimplePropertyObject implements ISpaceAction {
 	// -------- constants --------
 
 	/** The destination and id of the ant. */
@@ -36,7 +36,7 @@ public class TraceRouteAction extends SimplePropertyObject implements IAgentActi
 //		System.out.println("performing update destinationSign for: " + (Object) parameters.get(IAgentAction.OBJECT_ID).toString());
 
 		IVector2 position = (IVector2) parameters.get(POSITION);
-		Object ownerAgentId = (Object) parameters.get(IAgentAction.OBJECT_ID);
+		Object ownerAgentId = (Object) parameters.get(ISpaceAction.OBJECT_ID);
 		Integer round = (Integer) parameters.get(ROUND);
 		
 		// add this position to trace route

@@ -35,11 +35,8 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** The space process types. */
 	protected Map processtypes;
 	
-	/** Available space actions. */
-	protected Map spaceactions;
-	
 	/** Available agent actions. */
-	protected Map agentactions;
+	protected Map actions;
 	
 	/** The percept generators. */
 	protected Map perceptgenerators;
@@ -91,8 +88,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		this.views = new HashMap();
 		this.avatarmappings = new MultiCollection();
 		this.dataviewmappings = new MultiCollection();
-		this.spaceactions = new HashMap();
-		this.agentactions = new HashMap();
+		this.actions = new HashMap();
 		this.processtypes = new HashMap();
 		this.processes = new HashMap();
 		this.perceptgenerators = new HashMap();
@@ -450,9 +446,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 			this.avatarmappings.remove(agenttype, objecttype);			
 		}
 	}
-
+	
 	/**
-	 * Adds a space action.
+	 * Adds an space action.
 	 * @param actionId the action ID
 	 * @param action the action
 	 */
@@ -460,25 +456,54 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	{
 		synchronized(monitor)
 		{
-			spaceactions.put(id, action);
+			actions.put(id, action);
 		}
 	}
 	
 	/**
-	 * Removes a space action.
-	 * @param id the action ID
+	 * Adds an space action.
+	 * @param actionId the action ID
+	 * @param action the action
 	 */
-	public void removeSpaceAction(final Object id)
+	protected ISpaceAction	getSpaceAction(Object id)
+	{
+		ISpaceAction	ret	= (ISpaceAction)actions.get(id);
+		if(ret==null)
+		{
+			throw new RuntimeException("No such space action: "+id);
+		}
+		return ret;
+	}
+
+	/**
+	 * Removes an space action.
+	 * @param actionId the action ID
+	 */
+	public void removeSpaceAction(Object id)
 	{
 		synchronized(monitor)
 		{	
-			spaceactions.remove(id);
+			actions.remove(id);
 		}
 	}
 	
 	/**
-	 * Performs an environment action.
-	 * @param id ID of the action
+	 * Schedules an space action.
+	 * @param id Id of the action
+	 * @param parameters parameters for the action (may be null)
+	 * @param listener the result listener
+	 */
+	public void performSpaceAction(Object id, Map parameters, IResultListener listener)
+	{
+		synchronized(monitor)
+		{
+			actionlist.scheduleAgentAction(getSpaceAction(id), parameters, listener);
+		}
+	}
+	
+	/**
+	 * Performs a space action.
+	 * @param id Id of the action
 	 * @param parameters parameters for the action (may be null)
 	 * @return return value of the action
 	 */
@@ -486,63 +511,10 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	{
 		synchronized(monitor)
 		{
-			ISpaceAction action = (ISpaceAction) spaceactions.get(id);
-			assert action != null;
+			ISpaceAction action = (ISpaceAction)actions.get(id);
+			if(action==null)
+				throw new RuntimeException("Action not found: "+id);
 			return action.perform(parameters, this);
-		}
-	}
-	
-	/**
-	 * Adds an agent action.
-	 * @param actionId the action ID
-	 * @param action the action
-	 */
-	public void addAgentAction(Object id, IAgentAction action)
-	{
-		synchronized(monitor)
-		{
-			agentactions.put(id, action);
-		}
-	}
-	
-	/**
-	 * Adds an agent action.
-	 * @param actionId the action ID
-	 * @param action the action
-	 */
-	protected IAgentAction	getAgentAction(Object id)
-	{
-		IAgentAction	ret	= (IAgentAction)agentactions.get(id);
-		if(ret==null)
-		{
-			throw new RuntimeException("No such agent action: "+id);
-		}
-		return ret;
-	}
-
-	/**
-	 * Removes an agent action.
-	 * @param actionId the action ID
-	 */
-	public void removeAgentAction(Object id)
-	{
-		synchronized(monitor)
-		{	
-			agentactions.remove(id);
-		}
-	}
-	
-	/**
-	 * Schedules an agent action.
-	 * @param id Id of the action
-	 * @param parameters parameters for the action (may be null)
-	 * @param listener the result listener
-	 */
-	public void performAgentAction(Object id, Map parameters, IResultListener listener)
-	{
-		synchronized(monitor)
-		{
-			actionlist.scheduleAgentAction(getAgentAction(id), parameters, listener);
 		}
 	}
 	

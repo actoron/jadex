@@ -5,10 +5,9 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
@@ -132,7 +131,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create space actions.
-		List spaceactions = spacetype.getPropertyList("spaceactiontypes");
+		List spaceactions = spacetype.getPropertyList("actiontypes");
 		if(spaceactions!=null)
 		{
 			for(int i=0; i<spaceactions.size(); i++)
@@ -148,20 +147,20 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create agent actions.
-		List agentactions = spacetype.getPropertyList("agentactiontypes");
-		if(agentactions!=null)
-		{
-			for(int i=0; i<agentactions.size(); i++)
-			{
-				Map maction = (Map)agentactions.get(i);
-				IAgentAction action = (IAgentAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
-				List props = (List)maction.get("properties");
-				setProperties(action, props, fetcher);
-				
-//				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
-				ret.addAgentAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
-			}
-		}
+//		List agentactions = spacetype.getPropertyList("agentactiontypes");
+//		if(agentactions!=null)
+//		{
+//			for(int i=0; i<agentactions.size(); i++)
+//			{
+//				Map maction = (Map)agentactions.get(i);
+//				ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
+//				List props = (List)maction.get("properties");
+//				setProperties(action, props, fetcher);
+//				
+////				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
+//				ret.addAgentAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
+//			}
+//		}
 		
 		// Create processes.
 		List processes = spacetype.getPropertyList("processtypes");

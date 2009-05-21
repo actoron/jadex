@@ -1,6 +1,6 @@
 package jadex.bdi.examples.hunterprey_env.dumbhunter;
 
-import jadex.adapter.base.envsupport.environment.IAgentAction;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -40,9 +40,9 @@ public class DumbHunterPlan extends Plan
 				{
 					SyncResultListener srl	= new SyncResultListener();
 					Map params = new HashMap();
-					params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
-					params.put(IAgentAction.OBJECT_ID, prey);
-					env.performAgentAction("eat", params, srl);
+					params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+					params.put(ISpaceAction.OBJECT_ID, prey);
+					env.performSpaceAction("eat", params, srl);
 					srl.waitForResult();
 				}
 				catch(RuntimeException e)
@@ -86,9 +86,9 @@ public class DumbHunterPlan extends Plan
 				{
 					SyncResultListener srl	= new SyncResultListener();
 					Map params = new HashMap();
-					params.put(IAgentAction.ACTOR_ID, getAgentIdentifier());
+					params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 					params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
-					env.performAgentAction("move", params, srl);
+					env.performSpaceAction("move", params, srl);
 					srl.waitForResult();
 				}
 				catch(RuntimeException e)
