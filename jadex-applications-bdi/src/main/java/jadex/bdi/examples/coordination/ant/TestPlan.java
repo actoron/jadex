@@ -3,7 +3,6 @@ package jadex.bdi.examples.coordination.ant;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bdi.runtime.Plan;
 
 import java.util.HashMap;

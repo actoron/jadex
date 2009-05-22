@@ -36,14 +36,14 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new clock. Delta (tick size) is per default 1000 ms.
+	 *  Create a new clock. Delta (tick size) is default (see AbstractClock).
 	 *  @param name The clock name.
 	 *  @param starttime The start time.
 	 *  @param dilation The dilation.
 	 */
 	public ContinuousClock(String name, long starttime, double dilation, IThreadPool threadpool)
 	{
-		this(name, starttime, dilation, 1000, threadpool);
+		this(name, starttime, dilation, DEFAULT_DELTA, threadpool);
 	}
 	
 	/**

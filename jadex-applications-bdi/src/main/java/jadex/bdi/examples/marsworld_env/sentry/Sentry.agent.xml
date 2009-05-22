@@ -15,6 +15,7 @@
 	<imports>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
 	</imports>
 
 	<capabilities>
@@ -24,11 +25,13 @@
 
 	<beliefs>
 
-		<!-- The seen targets. - ->
-		<beliefset name="my_targets" class="Target"/>-->
+		<!-- The seen targets. -->
+		<beliefsetref name="my_targets" class="Target">
+			<concrete ref="move.my_targets"/>
+		</beliefsetref>
 
-		<!-- The analysed targets. - ->
-		<beliefset name="analysed_targets" class="Target"/>-->
+		<!-- The analysed targets. -->
+		<beliefset name="analysed_targets" class="ISpaceObject"/>
 <!--
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
@@ -45,32 +48,27 @@
 	</beliefs>
 
   	<goals>
-		<!-- Look for targets. - ->
-		<achievegoal name="find_targets">
-			<dropcondition language="jcl">
-				$beliefbase.missionend
-				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
-			</dropcondition>
-		</achievegoal>-->
-
-		<!-- Analyse a target.- ->
+		<!-- Analyse a target.-->
 		<achievegoal name="analyse_target" retry="false">
-			<!- - The parameter target is bound to one
-				of the facts in the belief my_targets. - ->
-			<parameter name="target" class="Target">
+			<!-- The parameter target is bound to one
+				of the facts in the belief my_targets. -->
+			<parameter name="target" class="ISpaceObject">
 				<value>
 					// Hack!!! Condition can also match target object from message
-					$beliefbase.environment.getTarget($target.getId())
+					// $beliefbase.environment.getTarget($target.getId())
+					$target
 				</value>
 			</parameter>
 			<unique dummy="true"/>
-			<!- - Create a new goal when a target was added
-				and the mission is going on. - ->
+			<!-- Create a new goal when a target was added
+				and the mission is going on. -->
 			<creationcondition language="jcl">
-				!$beliefbase.missionend &amp;&amp;
-				Target $target &amp;&amp;
+				//!$beliefbase.missionend &amp;&amp;
+				ISpaceObject $target &amp;&amp;
 				Arrays.asList($beliefbase.my_targets).contains($target) &amp;&amp;
-				!Arrays.asList($beliefbase.analysed_targets).contains($target)
+				$target.marked==null
+				// Todo: Should work for method also.
+				// $target.getProperty("marked")==null
 				
 				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact false))
 				//
@@ -83,57 +81,50 @@
 				// 	)
 				// )
 			</creationcondition>
-			<!- - Suspend the goal when some other target is nearer to the agent.- ->
+			<!-- Suspend the goal when some other target is nearer to the agent.- ->
 			<contextcondition language="jcl">
 				// (select one Target $target from $beliefbase.my_targets
 				// order by $beliefbase.my_location.getDistance($target.getLocation()))
 				// == $goal.target
 				
 				!(Target $t2 &amp;&amp; $beliefbase.my_location.getDistance($goal.target.getLocation()) > $beliefbase.my_location.getDistance($t2.getLocation()))
-			</contextcondition> - ->
-			<!- - Drop the goal on mission end. - ->
+			</contextcondition> -->
+			<!-- Drop the goal on mission end. - ->
 			<dropcondition language="jcl">
 				$beliefbase.missionend
 				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
-			</dropcondition>
+			</dropcondition>-->
 
 			<deliberation>
 				<inhibits ref="move.walk_around"/>
 			</deliberation>
-			<!- - The goal is reached when the target is analysed. - ->
-			<targetcondition language="clips">
+			<!-- The goal is reached when the target is analysed. -->
+			<targetcondition language="jcl">
 				// $beliefbase.getBeliefSet("analysed_targets").containsFact($goal.target)
+				$goal.target.getProperty("marked")!=null
 				
 				// ?rgoal	= (goal (parameterelement_has_parameters ?param_target))
 				// ?param_target	= (parameter (parameter_has_value ?target))
 				// (beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
 				// ?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
  
-				?rgoal	= (goal (parameterelement_has_parameters["target"].parameter_has_value ?target))
-				(beliefset (element_has_model.melement_has_name "analysed_targets") (beliefset_has_facts contains ?target))
+				// ?rgoal	= (goal (parameterelement_has_parameters["target"].parameter_has_value ?target))
+				// (beliefset (element_has_model.melement_has_name "analysed_targets") (beliefset_has_facts contains ?target))
  			</targetcondition>
-		</achievegoal>-->
+		</achievegoal>
 	</goals>
 
 	<plans>
-		<!-- Find targets and add them to the targets belief. - ->
-		<plan name="do_find">
-			<body class="SentryFindTargetsPlan"/>
-			<trigger>
-				<goal ref="find_targets"/>
-			</trigger>
-		</plan>-->
-
-		<!-- Analyse a target. - ->
+		<!-- Analyse a target. -->
 		<plan name="do_analyse">
-			<parameter name="target" class="Target">
+			<parameter name="target" class="ISpaceObject">
 				<goalmapping ref="analyse_target.target"/>
 			</parameter>
 			<body class="AnalyseTargetPlan"/>
 			<trigger>
 				<goal ref="analyse_target"/>
 			</trigger>
-		</plan>-->
+		</plan>
 
 		<!-- Add a new target when new info available. - ->
 		<plan name="add_target">
@@ -175,8 +166,6 @@
 			<goals>
 				<!-- Create a goal for walking around. -->
 				<initialgoal ref="move.walk_around"/>
-				<!-- Create a goal for finding targets. - ->
-				<initialgoal ref="find_targets"/>-->
 			</goals>
 		</configuration>
 	</configurations>

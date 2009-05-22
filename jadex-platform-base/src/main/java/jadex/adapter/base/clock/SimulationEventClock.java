@@ -28,7 +28,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 	 */
 	public SimulationEventClock(IClock oldclock)
 	{
-		this(null, 0, 1);
+		this(null, 0, DEFAULT_DELTA);
 		copyFromClock(oldclock);
 	}
 	

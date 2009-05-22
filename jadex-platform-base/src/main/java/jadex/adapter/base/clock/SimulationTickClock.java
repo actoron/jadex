@@ -29,7 +29,7 @@ public class SimulationTickClock extends AbstractClock implements ISimulationClo
 	 */
 	public SimulationTickClock(IClock oldclock)
 	{
-		this(null, 0, 1);
+		this(null, 0, DEFAULT_DELTA);
 		copyFromClock(oldclock);
 	}
 	

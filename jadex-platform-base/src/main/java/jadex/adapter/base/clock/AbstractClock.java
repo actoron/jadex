@@ -22,6 +22,11 @@ import javax.swing.event.ChangeListener;
  */
 public abstract class AbstractClock implements IClock
 {
+	//-------- constants --------
+	
+	/** The default delta (tick time). */
+	public static final long	DEFAULT_DELTA	= 100;
+	
 	//-------- attributes --------
 
 	/** The clock name. */

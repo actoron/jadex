@@ -27,6 +27,7 @@
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
+		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -65,7 +66,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons">
+				<env:perspective name="icons" class="Perspective2D">
 					<env:drawable objecttype="target" width="0.05" height="0.05">
 						<env:regularpolygon layer="0" width="0.4" height="0.4" vertices="36" color="#C8000096" />
 						<!-- marked target. -->
@@ -75,17 +76,20 @@
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
 						<env:text layer="2" x="0.0" y="0.08" basesize="90" text="$text$" color="black"/>
 					</env:drawable>
-					<env:drawable objecttype="sentry" width="0.07" height="0.03">
+					<env:drawable objecttype="sentry" width="0.07" height="0.07">
+						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:regularpolygon layer="1" size="visionsize" abssize="true" vertices="36" color="#FAFA1E32" />
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/sentry.png" />
-						<env:regularpolygon layer="1" width="0.2" height="0.2" abssize="true" vertices="36" color="#FAFA1E32" />
 					</env:drawable>
 					<env:drawable objecttype="producer" width="0.07" height="0.07">
+						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:regularpolygon layer="1" size="visionsize" abssize="true" vertices="36" color="#FAFA1E32" />
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/producer.png" />
-						<env:regularpolygon layer="1" width="1.43" height="1.43" vertices="36" color="#FAFA1E32" />
 					</env:drawable>
 					<env:drawable objecttype="carry" width="0.07" height="0.07">
+						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:regularpolygon layer="1" size="visionsize" abssize="true" vertices="36" color="#FAFA1E32" />
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/carry.png" />
-						<env:regularpolygon layer="1" width="1.43" height="1.43" vertices="36" color="#FAFA1E32" />
 					</env:drawable>
 					<env:prelayers>
 						<env:tiledlayer width="1.7" height="1.7" imagepath="jadex/bdi/examples/marsworld_env/images/mars.png" />
@@ -110,7 +114,7 @@
 		<application name="1 Sentry / 2 Producers / 3 Carries">
 			<agents>
 				<agent type="Sentry" number="1"/>
- 				<agent type="Producer" number="2"/>
+  				<agent type="Producer" number="2"/>
 				<agent type="Carry" number="3"/>
 			</agents>
 
@@ -119,7 +123,7 @@
 					<env:object type="homebase">
 						<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 						<env:property name="space">$space</env:property><!-- hack!!! -->
-						<env:property name="missiontime" dynamic="true">
+						<env:property name="missiontime">
 							90000 + $space.getContext().getPlatform().getService(IClockService.class).getTime()
 						</env:property>
 						<env:property name="ore">0</env:property>

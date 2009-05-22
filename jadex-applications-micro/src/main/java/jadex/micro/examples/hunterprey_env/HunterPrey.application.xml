@@ -23,6 +23,7 @@
 		<import>jadex.bdi.examples.hunterprey_env.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbprey.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbhunter.*</import>
+		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -109,7 +110,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons">
+				<env:perspective name="icons" class="Perspective2D">
 					<env:drawable objecttype="food" width="1.0" height="1.0">
 						<env:texturedrectangle layer="0" size="size" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
 					</env:drawable>
@@ -134,7 +135,7 @@
 			</env:perspectives>
 
 
-			<env:perspective name="abstract">
+			<env:perspective name="abstract" class="Perspective2D">
 				<env:drawable objecttype="food" width="1.0" height="1.0">
 					<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
 				</env:drawable>

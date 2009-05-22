@@ -7,7 +7,6 @@ import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bdi.planlib.simsupport.common.math.Vector2Double;
 import jadex.bridge.IClockService;
 import jadex.commons.SimplePropertyObject;
 
