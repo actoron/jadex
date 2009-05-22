@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Map;
@@ -10,6 +11,17 @@ import java.util.Map;
  */
 public interface IContextService extends IPlatformService
 {
+	//-------- constants --------
+	
+	/** Change event context created. */
+	public static final String EVENT_TYPE_CONTEXT_CREATED = "context_created";
+
+	/** Change event context deleted. */
+	public static final String EVENT_TYPE_CONTEXT_DELETED = "context_deleted";
+
+	
+	//-------- methods --------
+	
 	/**
 	 *  Get all contexts on the platform (if any).
 	 */
@@ -52,6 +64,18 @@ public interface IContextService extends IPlatformService
 	public void	deleteContext(IContext context, IResultListener listener);
 	
 	/**
+	 *  Add a new context listener.
+	 *  @param listener The listener.
+	 */
+	public void addContextListener(IChangeListener listener);
+	
+	/**
+	 *  Remove a change listener.
+	 *  @param listener The listener. 
+	 */
+	public void removeContextListener(IChangeListener listener);
+	
+	/**
 	 *  Register a context factory for a given context type. 
 	 */
 //	public void	addContextFactory(Class type, IContextFactory factory);
@@ -59,5 +83,5 @@ public interface IContextService extends IPlatformService
 	/**
 	 *  Deregister a context factory for a given context type. 
 	 */
-	public void	removeContextFactory(Class type);
+//	public void	removeContextFactory(Class type);
 }

@@ -4,12 +4,11 @@ import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IClockService;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Iterator;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * Space executor that connects to a clock service and reacts on time deltas.
@@ -64,9 +63,9 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 			process.start(clockservice, space);
 		}
 
-		clockservice.addChangeListener(new ChangeListener()
+		clockservice.addChangeListener(new IChangeListener()
 		{
-			public void stateChanged(ChangeEvent e)
+			public void changeOccurred(ChangeEvent e)
 			{				
 				long currenttime = clockservice.getTime();
 				IVector1 progress = new Vector1Long(currenttime - timestamp);

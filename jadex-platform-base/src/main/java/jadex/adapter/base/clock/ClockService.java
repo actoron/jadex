@@ -7,6 +7,7 @@ import jadex.bridge.IPlatform;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.ITimedObject;
 import jadex.bridge.ITimer;
+import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 
@@ -173,7 +174,7 @@ public class ClockService implements IClockService, IPlatformService
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(ChangeListener listener)
+	public void addChangeListener(IChangeListener listener)
 	{
 		this.listeners.add(listener);
 		clock.addChangeListener(listener);
@@ -183,7 +184,7 @@ public class ClockService implements IClockService, IPlatformService
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(ChangeListener listener)
+	public void removeChangeListener(IChangeListener listener)
 	{
 		this.listeners.remove(listener);
 		clock.removeChangeListener(listener);
@@ -262,7 +263,7 @@ public class ClockService implements IClockService, IPlatformService
 		this.clock = clock;
 		for(int i=0; i<listeners.size(); i++)
 		{
-			this.clock.addChangeListener((ChangeListener)listeners.get(i));
+			this.clock.addChangeListener((IChangeListener)listeners.get(i));
 		}
 	}
 

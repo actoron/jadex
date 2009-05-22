@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import javax.swing.event.ChangeListener;
+import jadex.commons.IChangeListener;
 
 
 /**
@@ -8,13 +8,15 @@ import javax.swing.event.ChangeListener;
  */
 public interface IClockService extends IPlatformService
 {
+	//-------- constants --------
+	
 	/**
      * The Class object representing the class corresponding to
      * the this interface. Need due to JavaFlow Bug:
      * http://issues.apache.org/jira/browse/SANDBOX-111
      */
 	public static final Class TYPE = IClockService.class;
-
+	
 	//-------- methods --------
 	
 	/**
@@ -106,13 +108,13 @@ public interface IClockService extends IPlatformService
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(ChangeListener listener);
+	public void addChangeListener(IChangeListener listener);
 	
 	/**
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(ChangeListener listener);
+	public void removeChangeListener(IChangeListener listener);
 	
 	/**
 	 *  Get the clock type.

@@ -15,5 +15,5 @@ public interface IApplicationFactory extends IElementFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of the application.
 	 */
-	public IApplicationContext createApplication(String name, String model, String config, Map arguments);
+	public IApplicationContext createApplication(String name, String model, String config, Map arguments) throws Exception;
 }

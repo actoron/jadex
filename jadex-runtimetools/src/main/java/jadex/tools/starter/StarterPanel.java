@@ -2,8 +2,11 @@ package jadex.tools.starter;
 
 import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IArgument;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IReport;
@@ -93,7 +96,7 @@ public class StarterPanel extends JPanel
 	protected JLabel agentnamel;
 
 	/** The application name. */
-	protected JTextField appname;
+	protected JComboBox appname;
 	protected JLabel appnamel;
 	
 	protected JLabel confl;
@@ -272,7 +275,7 @@ public class StarterPanel extends JPanel
 		agentname = new JTextField();
 		
 		// The application name.
-		appname = new JTextField();
+		appname = new JComboBox();
 
 		// The generate flag for the agentname;
 		genagentname = new JCheckBox("Auto generate", false);
@@ -351,22 +354,56 @@ public class StarterPanel extends JPanel
 						if(model instanceof ApplicationModel)
 						{
 							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
-							fac.createApplication(appname.getText(), filename.getText(), configname, args);
+							try
+							{
+								fac.createApplication((String)appname.getSelectedItem(), filename.getText(), configname, args);
+							}
+							catch(Exception e)
+							{
+								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not start application: "+e.getMessage(), 
+									"Application Problem", JOptionPane.INFORMATION_MESSAGE);
+							}
 						}
 						else
 						{
-							String an = genagentname.isSelected()?  null: agentname.getText();
-							if(an==null) // i.e. name auto generate
+							IApplicationContext ac = null;
+							final String apn = (String)appname.getSelectedItem();
+							if(apn!=null && apn.length()>0)
 							{
-								int max = ((Integer)numagents.getValue()).intValue();
-								for(int i=0; i<max; i++)
+								IContextService cs = (IContextService)starter.getJCC().getAgent().getPlatform().getService(IContextService.class);
+								if(cs!=null)
 								{
-									starter.getJCC().createAgent(filename.getText(), an, configname, args);
+									ac = (IApplicationContext)cs.getContext(apn);
 								}
+							}	
+							String typename = ac!=null? ac.getAgentType(filename.getText()): filename.getText();
+							if(typename==null)
+							{
+								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve agent type: "
+									+filename.getText()+"\n in application: "+ac.getName(), 
+									"Agent Type Problem", JOptionPane.INFORMATION_MESSAGE);
 							}
 							else
 							{
-								starter.getJCC().createAgent(filename.getText(), an, configname, args);
+								String an = genagentname.isSelected()?  null: agentname.getText();
+								if(an==null) // i.e. name auto generate
+								{
+									int max = ((Integer)numagents.getValue()).intValue();
+									for(int i=0; i<max; i++)
+									{
+										if(ac!=null)
+											ac.createAgent(an, typename, configname, args, true, false, null, null);
+										else
+											starter.getJCC().createAgent(typename, an, configname, args);
+									}
+								}
+								else
+								{
+									if(ac!=null)
+										ac.createAgent(an, typename, configname, args, true, false, null, null);
+									else
+										starter.getJCC().createAgent(typename, an, configname, args);
+								}
 							}
 						}
 					}
@@ -602,7 +639,7 @@ public class StarterPanel extends JPanel
 						}
 					});
 					createArguments();
-					apppanel.setVisible(false);
+					apppanel.setVisible(true);
 					arguments.setVisible(true);
 					agentpanel.setVisible(true);
 					start.setVisible(true);
@@ -660,7 +697,7 @@ public class StarterPanel extends JPanel
 			config.removeAllItems();
 			clearArguments();
 			setAgentName("");
-			setApplicationName("");
+			clearApplicationName();
 			filename.setText("");
 			if(error!=null)
 				modeldesc.addTextContent("Error", null, "No model loaded:\n"+error, "error");
@@ -688,12 +725,34 @@ public class StarterPanel extends JPanel
 
 //		if(model.getName()!=null && SXML.isAgentFilename(adf))
 		if(model.getName()!=null && model instanceof ApplicationModel)
-			appname.setText(model.getName());
+		{
+			appname.removeAllItems();
+			appname.addItem(model.getName());
+			appname.setEditable(true);
+		}
 		else if(model.isStartable())
+		{
 			agentname.setText(model.getName());
+			appname.removeAllItems();
+			appname.addItem("");
+			appname.setSelectedItem("");
+			IContextService cs = (IContextService)starter.getJCC().getAgent().getPlatform().getService(IContextService.class);
+			if(cs!=null)
+			{
+				IContext[] contexts =  cs.getContexts(IApplicationContext.class);
+				for(int i=0; i<contexts.length; i++)
+				{
+					appname.addItem(contexts[i].getName());
+				}
+			}
+			appname.setEditable(false);
+		}
 		else
+		{
 			agentname.setText("");
-
+			appname.setEditable(true);
+		}
+		
 		lastfile = model.getFilename();
 
 		ItemListener[] lis = config.getItemListeners();
@@ -1039,21 +1098,18 @@ public class StarterPanel extends JPanel
 	}
 	
 	/**
-	 *  Set the application name.
+	 *  Clear the application name.
 	 *  @param name The name.
 	 */
-	protected void setApplicationName(final String name)
+	protected void clearApplicationName()
 	{
-		if(name!=null)
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					appname.setText(name);
-				}
-			});
-		}
+				appname.removeAll();
+			}
+		});
 	}
 
 	/**

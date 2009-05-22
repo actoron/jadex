@@ -10,6 +10,8 @@ import jadex.bridge.IPlatform;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -291,4 +293,24 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		return agenttypes!=null ? (String)agenttypes.get(aid) : null;
 	}
 	
+	/**
+	 *  Get the agent type for an agent filename.
+	 *  @param aid	The agent filename.
+	 *  @return The agent type name.
+	 */
+	public String getAgentType(String filename)
+	{
+		String ret = null;
+		filename = filename.replace('\\', '/');
+		
+		List agenttypes = apptype.getMAgentTypes();
+		for(Iterator it=agenttypes.iterator(); it.hasNext(); )
+		{
+			MAgentType agenttype = (MAgentType)it.next();
+			if(filename.endsWith(agenttype.getFilename()))
+				ret = agenttype.getName();
+		}
+		
+		return ret;
+	}
 }

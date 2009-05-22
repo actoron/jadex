@@ -1,8 +1,7 @@
 package jadex.adapter.base;
 
 import jadex.bridge.IPlatformService;
-
-import javax.swing.event.ChangeListener;
+import jadex.commons.IChangeListener;
 
 /**
  *  Interface for the time simulation service.
@@ -65,13 +64,13 @@ public interface ISimulationService extends IPlatformService
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(ChangeListener listener);
+	public void addChangeListener(IChangeListener listener);
 	
 	// todo: hack remove method?!
 	/**
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(ChangeListener listener);
+	public void removeChangeListener(IChangeListener listener);
 
 }

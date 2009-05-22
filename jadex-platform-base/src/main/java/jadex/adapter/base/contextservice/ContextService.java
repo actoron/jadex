@@ -3,6 +3,8 @@ package jadex.adapter.base.contextservice;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 
@@ -28,6 +30,9 @@ public class ContextService	implements IContextService
 	
 	/** The context counter for generating unique names. */
 	protected int	contextcnt;
+	
+	/** The listeners. */
+	protected List listeners;
 	
 	//-------- constructors --------
 	
@@ -171,6 +176,7 @@ public class ContextService	implements IContextService
 		}
 		IContext	context	= factory.createContext(name, /*parent,*/ properties);
 		contexts.put(name, context);
+		notifyListeners(new ChangeEvent(this, EVENT_TYPE_CONTEXT_CREATED, context));
 //		if(parent!=null)
 //			((IContext)parent).addSubContext(context);
 		
@@ -182,16 +188,48 @@ public class ContextService	implements IContextService
 	 *  @param listener Listener to be called, when the context is deleted
 	 *    (e.g. after all contained agents have been terminated).
 	 */
-	public synchronized void	deleteContext(IContext context, IResultListener listener)
+	public synchronized void	deleteContext(final IContext context, final IResultListener listener)
 	{
 		if(contexts.remove(context.getName())!=null)
 		{
-			((BaseContext)context).deleteContext(listener);
+			((BaseContext)context).deleteContext(new IResultListener()
+			{
+				public void exceptionOccurred(Exception exception)
+				{
+					listener.exceptionOccurred(exception);
+				}
+				public void resultAvailable(Object result)
+				{
+					listener.resultAvailable(result);
+					notifyListeners(new ChangeEvent(this, EVENT_TYPE_CONTEXT_DELETED, context));
+				}
+			});
 		}
 		else
 		{
 			throw new RuntimeException("Context does not exist: "+context);
 		}
+	}
+	
+	/**
+	 *  Add a new context listener.
+	 *  @param listener The listener.
+	 */
+	public synchronized void addContextListener(IChangeListener listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList();
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Remove a change listener.
+	 *  @param listener The listener. 
+	 */
+	public synchronized void removeContextListener(IChangeListener listener)
+	{
+		if(listeners!=null)
+			listeners.remove(listener);
 	}
 	
 	/**
@@ -218,6 +256,20 @@ public class ContextService	implements IContextService
 				factories	= null;
 			}
 		}		
+	}
+	
+	/**
+	 *  Notify the event listeners.
+	 */
+	protected void notifyListeners(ChangeEvent event)
+	{
+		if(listeners!=null)
+		{
+			for(int i=0; i<listeners.size(); i++)
+			{
+				((IChangeListener)listeners.get(i)).changeOccurred(event);
+			}
+		}
 	}
 	
 	//-------- IPlatformService interface --------

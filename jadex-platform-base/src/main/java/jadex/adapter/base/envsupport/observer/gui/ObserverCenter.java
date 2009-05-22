@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -98,78 +97,80 @@ public class ObserverCenter
 		final List cPlugins = customplugins == null? new ArrayList(): customplugins;
 		this.libService = libSrvc;
 		Map spaceviews = space.getDataViews();
-		if (!spaceviews.isEmpty())
+		if(!spaceviews.isEmpty())
 			selecteddataviewname = (String) spaceviews.keySet().iterator().next();
 		activeplugin = null;
+		
 		Runnable init = new Runnable()
+		{
+			public void run()
 			{
-				public void run()
-				{;
-					mainwindow = new ObserverCenterWindow(windowTitle);
-					loadPlugins(cPlugins);
-					
-					JMenu refreshMenu = new JMenu("Display");
-					
-					JMenu pluginMenu = new JMenu("Plugin Refresh");
-					ButtonGroup group = new ButtonGroup();
-					
-					for (int i = 0; i < PLUGIN_REFRESH_TIMES.length; ++i)
+				mainwindow = new ObserverCenterWindow(windowTitle);
+				loadPlugins(cPlugins);
+				
+				JMenu refreshMenu = new JMenu("Display");
+				
+				JMenu pluginMenu = new JMenu("Plugin Refresh");
+				ButtonGroup group = new ButtonGroup();
+				
+				for(int i = 0; i < PLUGIN_REFRESH_TIMES.length; ++i)
+				{
+					JRadioButtonMenuItem item = new JRadioButtonMenuItem(new PluginRefreshAction(PLUGIN_REFRESH_TIMES[i]));
+					if (PLUGIN_REFRESH_TIMES[i] == 100)
 					{
-						JRadioButtonMenuItem item = new JRadioButtonMenuItem(new PluginRefreshAction(PLUGIN_REFRESH_TIMES[i]));
-						if (PLUGIN_REFRESH_TIMES[i] == 100)
-						{
-							item.setSelected(true);
-						}
-						group.add(item);
-						pluginMenu.add(item);
+						item.setSelected(true);
 					}
-					refreshMenu.add(pluginMenu);
-					
-					JMenu viewportMenu = new JMenu("Viewport Refresh");
-					group = new ButtonGroup();
-					
-					for (int i = 0; i < VIEWPORT_RATES.length; ++i)
-					{
-						JRadioButtonMenuItem item = new JRadioButtonMenuItem(new ViewportRefreshAction(VIEWPORT_RATES[i]));
-						if (VIEWPORT_RATES[i] == 30)
-						{
-							item.setSelected(true);
-						}
-						group.add(item);
-						viewportMenu.add(item);
-					}
-					refreshMenu.add(viewportMenu);
-					
-					mainwindow.addMenu(refreshMenu);
-					
-					plugintimer = new Timer(100, new ActionListener()
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								synchronized(ObserverCenter.this.plugins)
-								{
-									if (activeplugin != null)
-									{
-										activeplugin.refresh();
-									}
-								}
-							}
-						});
-					plugintimer.start();
-					
-					vptimer = new Timer(33, new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							updateDisplay();
-						}
-					});
-					vptimer.start();
-					
-					mainwindow.addWindowListener(new ObserverWindowController());
+					group.add(item);
+					pluginMenu.add(item);
 				}
-			};
-		if (EventQueue.isDispatchThread())
+				refreshMenu.add(pluginMenu);
+				
+				JMenu viewportMenu = new JMenu("Viewport Refresh");
+				group = new ButtonGroup();
+				
+				for(int i = 0; i < VIEWPORT_RATES.length; ++i)
+				{
+					JRadioButtonMenuItem item = new JRadioButtonMenuItem(new ViewportRefreshAction(VIEWPORT_RATES[i]));
+					if (VIEWPORT_RATES[i] == 30)
+					{
+						item.setSelected(true);
+					}
+					group.add(item);
+					viewportMenu.add(item);
+				}
+				refreshMenu.add(viewportMenu);
+				
+				mainwindow.addMenu(refreshMenu);
+				
+				plugintimer = new Timer(100, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						synchronized(ObserverCenter.this.plugins)
+						{
+							if(activeplugin != null)
+							{
+								activeplugin.refresh();
+							}
+						}
+					}
+				});
+				plugintimer.start();
+				
+				vptimer = new Timer(33, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						updateDisplay();
+					}
+				});
+				vptimer.start();
+				
+				mainwindow.addWindowListener(new ObserverWindowController());
+			}
+		};
+		
+		if(EventQueue.isDispatchThread())
 		{
 			init.run();
 		}
@@ -411,7 +412,7 @@ public class ObserverCenter
 	{
 		synchronized(perspectives)
 		{
-			if (selectedperspective != null)
+			if(selectedperspective != null)
 			{
 				selectedperspective.refresh();
 			}
@@ -510,8 +511,7 @@ public class ObserverCenter
 		
 		public void windowClosing(WindowEvent e)
 		{
-			plugintimer.stop();
-			mainwindow.dispose();
+			dispose();
 		}
 		
 		public void windowDeactivated(WindowEvent e)
@@ -529,5 +529,14 @@ public class ObserverCenter
 		public void windowOpened(WindowEvent e)
 		{
 		}
+	}
+	
+	/**
+	 *  Dispose the observer center. 
+	 */
+	public void dispose()
+	{
+		plugintimer.stop();
+		mainwindow.dispose();
 	}
 }

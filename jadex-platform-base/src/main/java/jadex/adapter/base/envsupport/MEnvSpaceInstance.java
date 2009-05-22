@@ -19,10 +19,17 @@ import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ISpace;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.IPropertyObject;
+import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
@@ -30,6 +37,9 @@ import jadex.javaparser.SimpleValueFetcher;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *  Java representation of environemnt space instance for xml description.
@@ -77,7 +87,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public ISpace createSpace(IApplicationContext app) throws Exception
+	public ISpace createSpace(final IApplicationContext app) throws Exception
 	{
 		MApplicationType mapt = ((ApplicationContext)app).getApplicationType();
 		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
@@ -311,7 +321,23 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				String title = getProperty(sourceob, "name")!=null? (String)getProperty(sourceob, "name"): "Default Observer";
 				// todo: add plugins
 				
-				ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), null);
+				// Hack!
+				final ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), null);
+				final IContextService cs = (IContextService)app.getPlatform().getService(IContextService.class);
+				if(cs!=null)
+				{
+					cs.addContextListener(new IChangeListener()
+					{
+						public void changeOccurred(ChangeEvent event)
+						{
+							if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()) && app.equals(event.getValue()))
+							{
+								oc.dispose();
+								cs.removeContextListener(this);
+							}
+						}
+					});
+				}
 				
 				// Hack! Is configuation the presentation?
 				// Yes! No, now it's, together with the Theme, the Perspective.
@@ -327,7 +353,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					Map args = new HashMap();
 					args.put("object", sourcepers);
 					args.put("fetcher", fetcher);
-					IPerspective	persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
+					IPerspective persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
 					// TODO: Add attributes
 					if(ret.getClass().getName().indexOf("2D")!=-1)
 						((Perspective2D)persp).setInvertYAxis(true);

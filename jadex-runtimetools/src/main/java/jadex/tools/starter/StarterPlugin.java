@@ -3,12 +3,19 @@ package jadex.tools.starter;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bridge.IAgentFactory;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IResultListener;
 import jadex.tools.common.AgentTreeTable;
+import jadex.tools.common.ApplicationTreeTable;
 import jadex.tools.common.IMenuItemConstructor;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -40,6 +47,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -118,6 +126,9 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	
 	/** The agent instances in a tree. */
 	private AgentTreeTable agents;
+	
+	/** The application instances in a tree. */
+	private ApplicationTreeTable applications;
 
 	/** A split panel. */
 	private JSplitPane lsplit;
@@ -283,7 +294,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
-								getJCC().createAgent(type, null, null, null/*, getModelExplorer().getClassLoader()*/);
+								getJCC().createAgent(type, null, null, null);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
@@ -291,10 +302,6 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
       		}
   		};
   		mpanel.addMouseListener(ml);
-
-
-		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 		agents = new AgentTreeTable(getJCC().getAgent().getPlatform().getName());
 		agents.setMinimumSize(new Dimension(0, 0));
@@ -325,8 +332,52 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(RESUME_AGENT);
 		agents.getNodeType(AgentTreeTable.NODE_PLATFORM).addPopupAction(KILL_PLATFORM);
 		agents.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
-
-		lsplit.add(agents);
+		
+		applications = new ApplicationTreeTable(getJCC().getAgent().getPlatform().getName());
+		applications.setMinimumSize(new Dimension(0, 0));
+		applications.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		
+		applications.getNodeType(ApplicationTreeTable.NODE_APPLICATION).addPopupAction(KILL_APPLICATION);
+		applications.getNodeType(AgentTreeTable.NODE_PLATFORM).addPopupAction(KILL_PLATFORM);
+		applications.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
+		applications.setColumnWidths(new int[]{200});
+		
+		IContextService cs = (IContextService)jcc.getAgent().getPlatform().getService(IContextService.class);
+		cs.addContextListener(new IChangeListener()
+		{
+			public void changeOccurred(final ChangeEvent event)
+			{
+				if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							applications.addApplication((IApplicationContext)event.getValue());
+						}
+					});
+				}
+				else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							System.out.println("Remove elem: "+event.getValue());
+							applications.removeApplication((IApplicationContext)event.getValue());
+						}
+					});
+				}
+			}	
+		});
+		
+		JTabbedPane tp = new JTabbedPane();
+		tp.addTab("agents", agents);
+		tp.addTab("applications", applications);
+		
+		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		lsplit.add(tp);
 		lsplit.setDividerLocation(300);
 
 		csplit.add(lsplit);
@@ -560,6 +611,47 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	};
 
 	/**
+	 *  Action for killing an application.
+	 */
+	final AbstractAction KILL_APPLICATION = new AbstractAction("Kill application", icons.getIcon("kill_agent"))
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			IContextService cs = (IContextService)jcc.getAgent().getPlatform().getService(IContextService.class);
+			if(cs!=null)
+			{
+				TreePath[] paths = applications.getTreetable().getTree().getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++) 
+				{
+					DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
+					if(node!=null && node.getUserObject() instanceof IContext)
+					{
+						final IContext context = (IContext)node.getUserObject();
+						cs.deleteContext(context, new IResultListener()
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										String text = SUtil.wrapText("Could not kill application: "+context.getName());
+										JOptionPane.showMessageDialog(SGUI.getWindowParent(spanel), text, "Kill Application Problem", JOptionPane.INFORMATION_MESSAGE);
+									}
+								});
+							}
+							public void resultAvailable(Object result)
+							{
+								jcc.setStatusText("Killed application: "+context.getName());
+							}
+						});
+					}
+				}
+			}
+		}
+	};
+	
+	/**
 	 *  Action for killing the platform.
 	 */
 	final AbstractAction KILL_PLATFORM = new AbstractAction("Kill platform", icons.getIcon("kill_platform"))
@@ -685,7 +777,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 									{
 										public void actionPerformed(ActionEvent e)
 										{
-											getJCC().createAgent(type, null, config, null/*, getModelExplorer().getClassLoader()*/);
+											getJCC().createAgent(type, null, config, null);
 										}
 									});
 									me.setToolTipText("Start in configuration: "+config);
@@ -711,7 +803,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										getJCC().createAgent(type, null, null, null/*, getModelExplorer().getClassLoader()*/);
+										getJCC().createAgent(type, null, null, null);
 									}
 								});
 							}

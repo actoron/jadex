@@ -1,20 +1,18 @@
 package jadex.adapter.base;
 
 import jadex.adapter.base.clock.ClockService;
-import jadex.adapter.base.clock.ExtendedChangeEvent;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.bridge.IClock;
 import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ITimer;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.List;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  *  The execution control is the access point for controlling the
@@ -302,7 +300,7 @@ public class SimulationService implements ISimulationService
 			}
 			
 			running = false;
-			notifyListeners(new ExtendedChangeEvent(this, "clock_type", type));
+			notifyListeners(new ChangeEvent(this, "clock_type", type));
 		}
 	}
 		
@@ -326,7 +324,7 @@ public class SimulationService implements ISimulationService
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(ChangeListener listener)
+	public void addChangeListener(IChangeListener listener)
 	{
 		listeners.add(listener);
 	}
@@ -335,7 +333,7 @@ public class SimulationService implements ISimulationService
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(ChangeListener listener)
+	public void removeChangeListener(IChangeListener listener)
 	{
 		listeners.remove(listener);
 	}
@@ -349,7 +347,7 @@ public class SimulationService implements ISimulationService
 		{
 			System.out.println("executing: "+executing);
 			this.executing = executing;
-			notifyListeners(new ExtendedChangeEvent(this, "executing", executing? Boolean.TRUE: Boolean.FALSE));
+			notifyListeners(new ChangeEvent(this, "executing", executing? Boolean.TRUE: Boolean.FALSE));
 		}
 	}
 	
@@ -359,7 +357,7 @@ public class SimulationService implements ISimulationService
 	protected void notifyListeners(ChangeEvent ce)
 	{
 		for(int i=0; i<listeners.size(); i++)
-			((ChangeListener)listeners.get(i)).stateChanged(ce);
+			((IChangeListener)listeners.get(i)).changeOccurred(ce);
 	}
 	
 	/**

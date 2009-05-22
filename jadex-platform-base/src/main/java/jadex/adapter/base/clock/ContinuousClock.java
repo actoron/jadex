@@ -3,11 +3,11 @@ package jadex.adapter.base.clock;
 import jadex.bridge.IClock;
 import jadex.bridge.ITimedObject;
 import jadex.bridge.ITimer;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
-
-import javax.swing.event.ChangeListener;
 
 /**
  *  A continuous clock represents a real time clock that
@@ -158,7 +158,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 			executor.execute();
 		}
 		
-		notifyListeners(new ExtendedChangeEvent(this, "new_dilation"));
+		notifyListeners(new ChangeEvent(this, EVENT_TYPE_NEW_DILATION));
 	}
 	
 	/**
@@ -190,7 +190,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 		
 		if(notify)
 		{
-			notifyListeners(new ExtendedChangeEvent(this, "start"));
+			notifyListeners(new ChangeEvent(this, EVENT_TYPE_STARTED));
 		}
 	}
 	
@@ -213,7 +213,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 		}
 		
 		if(notify)
-			notifyListeners(new ExtendedChangeEvent(this, "stop"));
+			notifyListeners(new ChangeEvent(this, EVENT_TYPE_STOPPED));
 	}
 	
 	/**
@@ -230,7 +230,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 			this.currenttime = starttime;
 		}
 		
-		notifyListeners(new ExtendedChangeEvent(this, "reset"));
+		notifyListeners(new ChangeEvent(this, EVENT_TYPE_RESET));
 	}
 	
 	/**
@@ -280,7 +280,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(ChangeListener listener)
+	public void addChangeListener(IChangeListener listener)
 	{
 		super.addChangeListener(listener);
 //		notificator.execute();
@@ -376,7 +376,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 				}
 	
 //				System.out.println("Exit"+timers.isEmpty());
-				notifyListeners(new ExtendedChangeEvent(this, "next_timepoint"));
+				notifyListeners(new ChangeEvent(this, "next_timepoint"));
 	
 				return !timers.isEmpty();
 			}

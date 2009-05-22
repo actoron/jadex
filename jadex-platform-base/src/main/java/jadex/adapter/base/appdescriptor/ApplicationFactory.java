@@ -101,18 +101,25 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of the application.
 	 */
-	public IApplicationContext createApplication(String name, String model, String config, Map arguments)
+	public IApplicationContext createApplication(String name, String model, String config, Map arguments) throws Exception
 	{
 		ApplicationContext	context = null;
 		
 		if(model!=null && model.toLowerCase().endsWith(".application.xml"))
 		{
 			MApplicationType apptype = null;
-			try
+//			try
 			{
 				// Load application type.
 				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
-				apptype = (MApplicationType)reader.read(new FileInputStream(model), cl, null);
+//				try
+//				{
+					apptype = (MApplicationType)reader.read(new FileInputStream(model), cl, null);
+//				}
+//				catch(Exception e)
+//				{
+//					throw new RuntimeException(e);
+//				}
 				List apps = apptype.getMApplicationInstances();
 				
 				// Select application instance according to configuraion.
@@ -195,13 +202,11 @@ public class ApplicationFactory implements IApplicationFactory
 							DefaultResultListener.getInstance(), null);	
 					}
 				}
-			
-				
 			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
 		}
 		
 		return context;

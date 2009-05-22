@@ -3,11 +3,11 @@ package jadex.tools.simcenter;
 import jadex.adapter.base.ISimulationService;
 import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  *	Base panel for displaying/editing clock related data.
@@ -21,10 +21,10 @@ public abstract class AbstractTimePanel extends JPanel
 	protected IPlatform platform;
 	
 	/** The clock listener. */
-	protected ChangeListener clocklistener;
+	protected IChangeListener clocklistener;
 
 	/** The context listener. */
-	protected ChangeListener contextlistener;
+	protected IChangeListener contextlistener;
 
 	/** The active state (active = updates gui on clock changes). */
 	protected boolean active;
@@ -43,9 +43,9 @@ public abstract class AbstractTimePanel extends JPanel
 //		this.simservice = context;
 		
 		// The clock listener updates the gui when the clock changes.
-		clocklistener = new ChangeListener()
+		clocklistener = new IChangeListener()
 		{
-			public void stateChanged(ChangeEvent e)
+			public void changeOccurred(ChangeEvent e)
 			{
 //				if(!updatecalled && active)
 				{
@@ -65,10 +65,10 @@ public abstract class AbstractTimePanel extends JPanel
 		
 		// The simservice listener is used for getting informed when the clock is exchanged 
 		// and when the its execution state changes.
-		contextlistener = new ChangeListener()
+		contextlistener = new IChangeListener()
 		{
 			IClockService oldclock	= getClockService();
-			public void stateChanged(ChangeEvent e)
+			public void changeOccurred(ChangeEvent e)
 			{
 				IClockService newclock	= getClockService();
 				if(oldclock!=newclock)
@@ -77,7 +77,7 @@ public abstract class AbstractTimePanel extends JPanel
 					newclock.addChangeListener(clocklistener);
 					
 					// Inform listener that clock has changed.
-					clocklistener.stateChanged(e);
+					clocklistener.changeOccurred(e);
 				}
 				
 				invokeUpdateView();

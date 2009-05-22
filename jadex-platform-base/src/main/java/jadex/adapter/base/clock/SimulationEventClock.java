@@ -1,6 +1,7 @@
 package jadex.adapter.base.clock;
 
 import jadex.bridge.IClock;
+import jadex.commons.ChangeEvent;
 
 
 /**
@@ -70,7 +71,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 		if(t!=null)
 			t.getTimedObject().timeEventOccurred(currenttime);
 			
-		notifyListeners(new ExtendedChangeEvent(this, "next_timepoint"));
+		notifyListeners(new ChangeEvent(this, EVENT_TYPE_NEXT_TIMEPOINT));
 		return advanced;
 	}
 	

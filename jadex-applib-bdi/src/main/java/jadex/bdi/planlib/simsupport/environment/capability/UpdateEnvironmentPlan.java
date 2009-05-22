@@ -5,19 +5,21 @@ import jadex.bdi.planlib.simsupport.common.math.Vector1Long;
 import jadex.bdi.planlib.simsupport.environment.ISimulationEngine;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IClock;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 
-import javax.swing.event.ChangeListener;
-
-
+/**
+ *  Update the environment.
+ */
 public class UpdateEnvironmentPlan extends Plan
 {
-	ChangeListener	cl;
+	IChangeListener	cl;
 
 	public void body()
 	{
-		ChangeListener cl = new ChangeListener()
+		IChangeListener cl = new IChangeListener()
 		{
-			public void stateChanged(javax.swing.event.ChangeEvent e)
+			public void changeOccurred(ChangeEvent e)
 			{
 				if(IClock.STATE_RUNNING.equals(getClock().getState()))
 				{

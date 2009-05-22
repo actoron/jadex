@@ -2,6 +2,7 @@ package jadex.tools.common.plugin;
 
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.concurrent.IResultListener;
 
 import java.util.Map;
 

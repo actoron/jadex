@@ -1,7 +1,8 @@
 package jadex.bridge;
 
 
-import javax.swing.event.ChangeListener;
+import jadex.commons.IChangeListener;
+
 
 /**
  *  Interface a for clock. Provides general methods for
@@ -29,6 +30,31 @@ public interface IClock
 
 	/** The clock type time driven. */
 	public static String TYPE_TIME_DRIVEN = "time_driven";
+	
+	/** Change event type new delta. */
+	public static final String EVENT_TYPE_NEW_DELTA = "new_delta";
+
+	/** Change event type new dilation. */
+	public static final String EVENT_TYPE_NEW_DILATION = "new_dilation";
+	
+	/** Change event type started. */
+	public static final String EVENT_TYPE_STARTED = "started";
+
+	/** Change event type stopped. */
+	public static final String EVENT_TYPE_STOPPED = "stopped";
+
+	/** Change event type reset. */
+	public static final String EVENT_TYPE_RESET = "reset";
+
+	/** Change event timer added. */
+	public static final String EVENT_TYPE_TIMER_ADDED = "timer_added";
+
+	/** Change event timer removed. */
+	public static final String EVENT_TYPE_TIMER_REMOVED = "timer_removed";
+
+	/** Change event next timepoint. */
+	public static final String EVENT_TYPE_NEXT_TIMEPOINT = "next_timepoint";
+
 	
 	//-------- methods --------
 	
@@ -141,13 +167,13 @@ public interface IClock
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(ChangeListener listener);
+	public void addChangeListener(IChangeListener listener);
 	
 	/**
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(ChangeListener listener);
+	public void removeChangeListener(IChangeListener listener);
 
 	/**
 	 *  Called, when the clock is no longer used.

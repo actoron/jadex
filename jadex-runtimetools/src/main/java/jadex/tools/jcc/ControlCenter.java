@@ -16,6 +16,7 @@ import jadex.bridge.Property;
 import jadex.bridge.XMLPropertiesReader;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IResultListener;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.RememberOptionMessage;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -683,7 +684,7 @@ public class ControlCenter implements IControlCenter
 	 * dialog to the user.
 	 */
 	public void createAgent(String type, String name, String configname,
-			Map arguments/* , ClassLoader classloader */)
+		Map arguments)//, final IResultListener listener)
 	{
 		try
 		{
@@ -712,7 +713,14 @@ public class ControlCenter implements IControlCenter
 						IAgentIdentifier aid = (IAgentIdentifier)start
 							.getParameter("agentidentifier").getValue();
 						setStatusText("Started agent: " + aid.getLocalName());
+//						if(listener!=null)
+//							listener.resultAvailable(aid);
 					}
+//					else
+//					{
+//						if(listener!=null)
+//							listener.exceptionOccurred(new RuntimeException("Goal failed: "+ae));
+//					}
 				}
 			});
 
