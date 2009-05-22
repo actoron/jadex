@@ -48,7 +48,7 @@ public class UpdateDestinationAction extends SimplePropertyObject implements ISp
 //			System.out.println("Pos of destination sign: " + destinationSign.getProperty(Space2D.POSITION) + "vs graviCenterPos: " + destination.toString());
 			if (destinationSign.getProperty(ANT_ID).equals(ownerAgentId.toString())) {
 //				System.out.println("Destroy Destination Sign? " + feelsGravitation);
-				if (feelsGravitation) {				
+				if (feelsGravitation.booleanValue()) {				
 					((Space2D) space).destroySpaceObject(destinationSign.getId());					
 				} else {
 					destinationSign.setProperty(Space2D.POSITION, destination);

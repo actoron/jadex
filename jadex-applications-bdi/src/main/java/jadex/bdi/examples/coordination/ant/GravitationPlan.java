@@ -23,7 +23,7 @@ public class GravitationPlan extends Plan
 		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		Vector2Int target = (Vector2Int) getParameter("gravitation_center").getValue();
-		boolean hasGravitation = ((Boolean) getBeliefbase().getBelief("hasGravitation").getFact()).booleanValue();
+		Boolean hasGravitation = (Boolean)getBeliefbase().getBelief("hasGravitation").getFact();
 		System.out.println("ANT IS UNDER GRAVITATION CONTROL!!!!!!!!!!! --> GravitationCenter: " + ((Vector2Int) target).toString());
 		
 		//increase absorption count of gravitation center

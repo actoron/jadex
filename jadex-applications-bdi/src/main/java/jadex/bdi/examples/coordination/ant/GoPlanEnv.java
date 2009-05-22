@@ -22,18 +22,18 @@ public class GoPlanEnv extends Plan
 	{
 		System.out.println("calling GO-ENV!!!!!!!!");
 		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
-		boolean hasGravitation = ((Boolean) getBeliefbase().getBelief("hasGravitation").getFact()).booleanValue();
+		Boolean hasGravitation = (Boolean) getBeliefbase().getBelief("hasGravitation").getFact();
 		IVector2 size = env.getAreaSize();
 		IVector2 target = (IVector2)getParameter("pos").getValue();
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();		
-		myself.setProperty(GravitationListener.FEELS_GRAVITATION, Boolean.valueOf(hasGravitation));
+		myself.setProperty(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 		
 		
 		//Update destination and gravitationSensor of ant on space 
 		Map params = new HashMap();
 		params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);		
-		params.put(GravitationListener.FEELS_GRAVITATION,hasGravitation);
+		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 		SyncResultListener srl = new SyncResultListener();
 		env.performSpaceAction("updateDestination", params, srl); 
 		srl.waitForResult();
