@@ -1,14 +1,13 @@
 package jadex.bdi.examples.coordination.ant;
 
-import java.security.SecureRandom;
-
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bdi.examples.garbagecollector.Position;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+
+import java.security.SecureRandom;
 
 /**
  *  Check the grid for garbage.

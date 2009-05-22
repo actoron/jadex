@@ -19,16 +19,23 @@ public class TestClass {
 		
 		
 		int a = 15; 
-		
-		String b = a<10 ? "ja"  : "nein";
-		
-		
-		System.out.println(b);
-
-		Integer d = new Integer(0);
-		int res = d.intValue() + 1;
+		Object value = null;
+//	 Vector2Double pos = a<10 ? new Vector2Double(1.0)  : new Vector2Double(2.0,2.0);
+	
+	 
+//	 
+//		Integer d = new Integer(0);
+//		int res = d.intValue() + 1;
 //		d = d + new Integer(1);
-		System.out.println(res);
+//		System.out.println(res);
+		
+//		String  aa = null;
+//		aa.equals(new String("a")) ? System.out.println("JAa") : System.out.println("Nö");
+		
+//		$object.getProperty("lastmove")==null || $object.getProperty("lastmove").equals("right")? null:
+//			$object.getProperty("lastmove").equals("left")? new Vector3Double(Math.PI,0,Math.PI):
+//			$object.getProperty("lastmove").equals("up")? new Vector3Double(0,0,Math.PI*3/2):
+//			new Vector3Double(0,0,Math.PI/2)
 		
 		
 	}

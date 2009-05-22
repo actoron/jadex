@@ -119,7 +119,7 @@ System.out.println("Executing GRAVITATION");
 	}
 
 	/**
-	 * Compute the 8 surrounding fields on the gravitation center
+	 * Compute the 8 surrounding fields of the gravitation center
 	 * @param xPos
 	 * @param yPos
 	 * @return

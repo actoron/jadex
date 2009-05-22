@@ -5,8 +5,6 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.Plan;
 
-import java.util.HashMap;
-
 /**
  * Check the grid for garbage.
  */

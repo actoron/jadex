@@ -14,7 +14,7 @@ public class GravitationListener implements PropertyChangeListener {
 	 */
 	public void dispatchObjectEvent(ObjectEvent event) {
 
-		System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+
 		if (event instanceof FeelGravitationEvent) {
 			System.out.println("#GravitationListener# dispatched following ObjectEvent. Type: FeelGravitationEvent");
 		}

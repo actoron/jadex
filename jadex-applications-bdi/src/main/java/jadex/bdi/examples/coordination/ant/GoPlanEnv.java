@@ -20,6 +20,7 @@ public class GoPlanEnv extends Plan
 	 */
 	public void body()
 	{
+		System.out.println("calling GO-ENV!!!!!!!!");
 		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
 		boolean hasGravitation = ((Boolean) getBeliefbase().getBelief("hasGravitation").getFact()).booleanValue();
 		IVector2 size = env.getAreaSize();
@@ -32,6 +33,7 @@ public class GoPlanEnv extends Plan
 		Map params = new HashMap();
 		params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);		
+		params.put(GravitationListener.FEELS_GRAVITATION,hasGravitation);
 		SyncResultListener srl = new SyncResultListener();
 		env.performSpaceAction("updateDestination", params, srl); 
 		srl.waitForResult();

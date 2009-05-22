@@ -31,7 +31,7 @@
  		
  		<!-- Myself. -->
  		<belief name="myself" class="ISpaceObject">
-			 <fact>$beliefbase.env.getOwnedObjects($scope.getAgentIdentifier())[0]</fact>
+			 <fact>$beliefbase.env.getOwnedObjects($scope.getAgentIdentifier())[0]</fact>			 
  		</belief>
 
 		<!-- The actual position on the grid world. -->

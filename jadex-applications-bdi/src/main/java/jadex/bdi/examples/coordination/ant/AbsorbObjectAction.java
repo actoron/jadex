@@ -1,7 +1,7 @@
 package jadex.bdi.examples.coordination.ant;
 
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Int;
@@ -32,6 +32,7 @@ public class AbsorbObjectAction extends SimplePropertyObject implements ISpaceAc
 		ISpaceObject[] objects = space.getSpaceObjectsByType(ManageGravitationProcess.GRAVITATION_CENTER);
 		Vector2Int target = (Vector2Int) parameters.get(Space2D.POSITION);
 
+		//increase count of absorbed objects
 		for (int i = 0; i < objects.length; i++) {
 			if (target.equals(objects[i].getProperty(Space2D.POSITION))) {
 				int objectCount = ((Integer) objects[i].getProperty(ManageGravitationProcess.ABSORBED_OBJECTS)).intValue();

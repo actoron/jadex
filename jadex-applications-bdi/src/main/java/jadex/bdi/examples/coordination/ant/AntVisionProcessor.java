@@ -5,7 +5,6 @@ import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IAgentIdentifier;
@@ -45,9 +44,9 @@ public class AntVisionProcessor implements IPerceptProcessor {
 					Vector2Int gravitationCenter = (Vector2Int) percept;
 					 System.out.println("Setting belief in Ant! Ant is now influenced by follwing gravitation center: " + gravitationCenter.toString());
 					exta.getBeliefbase().getBelief("hasGravitation").setFact(new Boolean(true));
-					IGoal go = exta.createGoal("gravitation_influence");
-					go.getParameter("gravitation_center").setValue((IVector2) gravitationCenter);								     
-					exta.dispatchTopLevelGoal(go);
+					IGoal gravitationInfluence = exta.createGoal("gravitation_influence");
+					gravitationInfluence.getParameter("gravitation_center").setValue((IVector2) gravitationCenter);								     
+					exta.dispatchTopLevelGoal(gravitationInfluence);
 //					exta.dispatchTopLevelGoalAndWait(goal)
 				}
 				// else
