@@ -110,7 +110,7 @@ public class MicroPreyAgent extends MicroAgent
 			Map params = new HashMap();
 			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 			params.put(ISpaceAction.OBJECT_ID, food);
-			env.performAgentAction("eat", params, listener);
+			env.performSpaceAction("eat", params, listener);
 		}
 
 		else
@@ -147,7 +147,7 @@ public class MicroPreyAgent extends MicroAgent
 			Map params = new HashMap();
 			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 			params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
-			env.performAgentAction("move", params, listener);
+			env.performSpaceAction("move", params, listener);
 		}
 	}
 	
