@@ -64,6 +64,24 @@ public class SimplePropertyObject implements IPropertyObject
 		pcs.firePropertyChange(name, oldval, value);
 	}
 	
+	//-------- bean accessors --------
+	
+	/**
+	 *  Get the properties (bean accessor).
+	 */
+	public Map	getProperties()
+	{
+		return this.properties;
+	}
+
+	/**
+	 *  Set the properties (bean accessor).
+	 */
+	public void	setProperties(Map properties)
+	{
+		this.properties	= properties;
+	}
+
 	//-------- property methods --------
 
 	/**

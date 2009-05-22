@@ -9,9 +9,9 @@ import jadex.bdi.examples.marsworld_env.movement.ListenableTask;
 import jadex.commons.concurrent.IResultListener;
 
 /**
- *  Move an object towards a destination.
+ *  Analyze a given target.
  */
-public class AnalyseTargetTask extends ListenableTask
+public class AnalyzeTargetTask extends ListenableTask
 {
 	//-------- constants --------
 	
@@ -35,11 +35,11 @@ public class AnalyseTargetTask extends ListenableTask
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new move task.
+	 *  Create a new analyze task.
 	 *  @param destination	The destination. 
-	 *  @param listsner	The result listener to be informed when the destination is reached. 
+	 *  @param listener	The result listener to be informed when the destination is reached. 
 	 */
-	public AnalyseTargetTask(ISpaceObject target, IResultListener listener)
+	public AnalyzeTargetTask(ISpaceObject target, IResultListener listener)
 	{
 		super(listener);
 		this.target	= target;

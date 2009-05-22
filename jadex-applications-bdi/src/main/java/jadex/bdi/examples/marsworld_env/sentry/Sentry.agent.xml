@@ -15,6 +15,7 @@
 	<imports>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 	</imports>
 
@@ -30,26 +31,16 @@
 			<concrete ref="move.my_targets"/>
 		</beliefsetref>
 
-		<!-- The analysed targets. -->
-		<beliefset name="analysed_targets" class="ISpaceObject"/>
 <!--
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
-		</beliefref>
-		
-		<beliefref name="my_location">
-			<concrete ref="move.my_location"/>
-		</beliefref>
-		
-		<beliefref name="environment">
-			<concrete ref="move.environment"/>
-		</beliefref>
+		</beliefref>		
 -->
 	</beliefs>
 
   	<goals>
-		<!-- Analyse a target.-->
-		<achievegoal name="analyse_target" retry="false">
+		<!-- Analyze a target.-->
+		<achievegoal name="analyze_target" retry="false">
 			<!-- The parameter target is bound to one
 				of the facts in the belief my_targets. -->
 			<parameter name="target" class="ISpaceObject">
@@ -116,13 +107,13 @@
 
 	<plans>
 		<!-- Analyse a target. -->
-		<plan name="do_analyse">
+		<plan name="do_analyze">
 			<parameter name="target" class="ISpaceObject">
-				<goalmapping ref="analyse_target.target"/>
+				<goalmapping ref="analyze_target.target"/>
 			</parameter>
-			<body class="AnalyseTargetPlan"/>
+			<body class="AnalyzeTargetPlan"/>
 			<trigger>
-				<goal ref="analyse_target"/>
+				<goal ref="analyze_target"/>
 			</trigger>
 		</plan>
 
@@ -137,15 +128,12 @@
 
 	<events>
 		<!-- Other agents inform the sentries about discovered
-			potential ore resources. - ->
+			potential ore resources. -->
 		<messageevent name="target_inform" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>MarsOntology.ONTOLOGY_NAME</value>
-			</parameter>
-			<match>$content instanceof Target</match>
+			<match>((ISpaceObject)$content).getType().equals("target")</match>
 		</messageevent>
 
 		<messageevent name="request_producer" type="fipa" direction="send">
@@ -155,10 +143,7 @@
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.NUGGETS_XML</value>
  			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>MarsOntology.ONTOLOGY_NAME</value>
-			</parameter>
-		</messageevent>-->
+		</messageevent>
 	</events>
 
 	<configurations>

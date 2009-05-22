@@ -144,7 +144,7 @@ public class CastNode	extends ExpressionNode
 	public String toPlainString()
 	{
 		// Have to add braces ???
-		return "("+jjtGetChild(0).toPlainString()+")" + jjtGetChild(1).toPlainString();
+		return "(("+jjtGetChild(0).toPlainString()+")" + jjtGetChild(1).toPlainString()+")";
 	}
 }
 

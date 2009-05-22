@@ -5,7 +5,6 @@ import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,6 +67,14 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 		fetcher.setValue("$space", space);
 	}
 	
+	/**
+	 *  Bean constructor.
+	 */
+	public SpaceObject()
+	{
+		super(new Object());
+	}
+	
 	//-------- methods --------
 	
 	/**
@@ -104,6 +111,18 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	}
 	
 	/**
+	 * Set the id of the object.
+	 */
+	// Bean setter.
+	public void	setId(Object id)
+	{
+		synchronized(monitor)
+		{
+			this.id	= id;
+		}
+	}
+	
+	/**
 	 * Returns the type of the object.
 	 * @return the type
 	 */
@@ -112,6 +131,18 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 		synchronized(monitor)
 		{
 			return typename;
+		}
+	}
+	
+	/**
+	 * Set the type of the object.
+	 */
+	// Bean setter.
+	public void	setType(String type)
+	{
+		synchronized(monitor)
+		{
+			this.typename	= type;
 		}
 	}
 
