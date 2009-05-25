@@ -10,7 +10,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="AntCoordinationSpace" package="jadex.bdi.examples.coordination.ant">
+	name="AntCoordinationSpace" package="jadex.bdi.examples.antworld">
 	
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
@@ -105,35 +105,35 @@
 					
 					<env:drawable objecttype="ant" width="0.9" height="0.9">
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/coordination/ant/images/ant1.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/ant1.png"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="destinationSign" width="0.6"
 						height="0.6">
 						<env:texturedrectangle layer="1"
-							imagepath="jadex/bdi/examples/coordination/ant/images/destination.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/destination.png"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="traceRoute" width="1.0" height="1.0">
 						<env:texturedrectangle layer="0" size="size"
-							imagepath="jadex/bdi/examples/coordination/ant/images/traceroute.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/traceroute.png"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="gravitationCenter" width="1.0"
 						height="1.0">
 						<env:texturedrectangle layer="3"
-							imagepath="jadex/bdi/examples/coordination/ant/images/gravitationCenter.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/gravitationCenter.png"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="gravitationField" width="1.0"
 						height="1.0">
 						<env:texturedrectangle layer="3"
-							imagepath="jadex/bdi/examples/coordination/ant/images/gravitationField.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/gravitationField.png"/>
 					</env:drawable>
 					
 					<env:prelayers>
 						<env:tiledlayer width="3.5" height="3.5"
-							imagepath="jadex/bdi/examples/coordination/ant/images/bg.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/bg.png"/>
 						<env:gridlayer width="1.0" height="1.0" color="WHITE"/>
 					</env:prelayers>
 				</env:perspective>
@@ -165,7 +165,7 @@
 	
 	<agenttypes>
 		<agenttype name="Ant"
-			filename="jadex/bdi/examples/coordination/ant/Ant.agent.xml"/>
+			filename="jadex/bdi/examples/antworld/Ant.agent.xml"/>
 		
 		
 		<!--<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector2/GarbageBurner.agent.xml"/>-->

@@ -1,10 +1,8 @@
 <!--
   <H3>Ant agent.</H3>
 
-  Runs a predefined way on the grid and searches for
-  garbage. Whenever it sees garbage at its actual position
-  it tries to pick it up and brings it to one of the available
-  garbage burners (chosen randomly).
+  Runs randomly on the grid. If it feels gravitaton, it is absorbed by the gravitation center.
+
 -->
 
 <agent xmlns="http://jadex.sourceforge.net/jadex"
@@ -12,7 +10,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="Ant"
-	package="jadex.bdi.examples.coordination.ant">
+	package="jadex.bdi.examples.antworld">
 
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>

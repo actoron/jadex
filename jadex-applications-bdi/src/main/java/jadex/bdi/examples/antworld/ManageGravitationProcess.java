@@ -89,7 +89,6 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 		if (firstTime) {
 
 			// lasttick = clock.getTick();
-System.out.println("Executing GRAVITATION");
 			// add gravitation center
 			Vector2Int pos = new Vector2Int(4, 5);
 //			IVector2 pos = grid.getRandomPosition(new Vector2Int(1,1));

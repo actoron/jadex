@@ -70,7 +70,7 @@ public class GoAction extends SimplePropertyObject implements ISpaceAction
 			pos = new Vector2Int(px+1, py);
 		}
 		
-		System.out.println("NextDesired position: " + pos.toString());
+//		System.out.println("NextDesired position: " + pos.toString());
 		checkPositionForGravitation(pos, space, obj);
 		
 		((Space2D)space).setPosition(oid, pos);

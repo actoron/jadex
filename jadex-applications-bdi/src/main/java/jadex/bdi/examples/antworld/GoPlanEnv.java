@@ -19,8 +19,7 @@ public class GoPlanEnv extends Plan
 	 *  The plan body.
 	 */
 	public void body()
-	{
-		System.out.println("calling GO-ENV!!!!!!!!");
+	{	
 		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
 		Boolean hasGravitation = (Boolean) getBeliefbase().getBelief("hasGravitation").getFact();
 		IVector2 size = env.getAreaSize();

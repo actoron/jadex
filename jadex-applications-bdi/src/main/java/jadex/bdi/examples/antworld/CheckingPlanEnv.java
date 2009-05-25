@@ -10,7 +10,7 @@ import jadex.bdi.runtime.Plan;
 import java.security.SecureRandom;
 
 /**
- *  Check the grid for garbage.
+ *  Walk randomly on the grid.
  */
 public class CheckingPlanEnv extends Plan
 {

@@ -27,7 +27,7 @@ public class AbsorbObjectAction extends SimplePropertyObject implements ISpaceAc
 	 * @return action return value
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space) {
-		 System.out.println("absorb objects action: "+parameters);
+		 System.out.println("Absorb objects action: "+parameters);
 
 		ISpaceObject[] objects = space.getSpaceObjectsByType(ManageGravitationProcess.GRAVITATION_CENTER);
 		Vector2Int target = (Vector2Int) parameters.get(Space2D.POSITION);
