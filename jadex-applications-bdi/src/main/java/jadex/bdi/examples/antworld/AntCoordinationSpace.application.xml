@@ -24,17 +24,24 @@
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" width="15" height="15" class="Grid2D">
 			<env:objecttypes>
-				<env:objecttype name="ant"/>
+				<env:objecttype name="ant"/>								
 				<env:objecttype name="destinationSign"/>
-				<env:objecttype name="gravitationCenter"/>
-				<env:objecttype name="gravitationField"/>
+				<env:objecttype name="gravitationCenter">
+					<env:property name="text" dynamic="true"> $object.getProperty("absorbedObjects")
+						</env:property>
+				</env:objecttype>
+				<env:objecttype name="gravitationField">
+					<env:property name="text" dynamic="true"> $object.getProperty("gravitation strength")
+						</env:property>
+				</env:objecttype>
+				
 				<!-- The size of the objects decreases as time goes by.-->
 				<env:objecttype name="traceRoute">
 					<env:property name="size" dynamic="true">
-						$object.getProperty("round") == null ? new Vector2Double(3.0,3.0) : new Vector2Double( Math.max(0.1,
-				((20 - $object.getProperty("round"))/28.0)),
-				Math.max(0.1,
-				( (20 - $object.getProperty("round"))/28.0) )) <!--new
+						$object.getProperty("round") == null ? new
+						Vector2Double(3.0,3.0) : new Vector2Double( Math.max(0.1,
+						((20 - $object.getProperty("round"))/28.0)), Math.max(0.1, (
+						(20 - $object.getProperty("round"))/28.0) )) <!--new
 						Vector2Double(0.5,0.5)--> </env:property>
 				</env:objecttype>
 				
@@ -121,14 +128,16 @@
 					
 					<env:drawable objecttype="gravitationCenter" width="1.0"
 						height="1.0">
-						<env:texturedrectangle layer="3"
+						<env:texturedrectangle layer="2"
 							imagepath="jadex/bdi/examples/antworld/images/gravitationCenter.png"/>
+						<env:text layer="2"  basesize="20" text="$text$" color="white"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="gravitationField" width="1.0"
 						height="1.0">
-						<env:texturedrectangle layer="3"
+						<env:texturedrectangle layer="2"
 							imagepath="jadex/bdi/examples/antworld/images/gravitationField.png"/>
+						<env:text layer="3"  basesize="9" text="$text$" color="white"/>
 					</env:drawable>
 					
 					<env:prelayers>
@@ -166,19 +175,19 @@
 	<agenttypes>
 		<agenttype name="Ant"
 			filename="jadex/bdi/examples/antworld/Ant.agent.xml"/>
-		
-		
-		<!--<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector2/GarbageBurner.agent.xml"/>-->
+		<agenttype name="Environment"
+			filename="jadex/bdi/examples/antworld/environment/Environment.agent.xml"/>
 	</agenttypes>
 	
 	<applications>
-		<application name="One Ant">
+		<application name="Ants with Environment">
 			<agents>
 				<agent name="Ant1" type="Ant"/>
 				<agent name="Ant2" type="Ant"/>
 				<agent name="Ant3" type="Ant"/>				
 				<agent name="Ant4" type="Ant"/>
 				<agent name="Ant5" type="Ant"/>
+				<!--<agent name="EnvironmentLocal" type="Environment"/>-->
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">

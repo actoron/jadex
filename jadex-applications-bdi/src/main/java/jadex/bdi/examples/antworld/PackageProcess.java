@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bridge.IClockService;
 import jadex.commons.SimplePropertyObject;
 
@@ -82,15 +83,15 @@ public class PackageProcess extends SimplePropertyObject implements ISpaceProces
 			// Create new package
 			lasttick = clock.getTick();
 
-			// IVector2 pos = grid.getRandomPosition(Vector2Int.ZERO);
-			// if (pos != null) {
-			// Map props = new HashMap();
-			// props.put(Space2D.POSITION, pos);
-			// props.put("round", new Integer(0));
-			// props.put("age", "Child");
-			// grid.createSpaceObject("packageChild", props, null, null);
-			//
-			// }
+//			 IVector2 pos = grid.getRandomPosition(Vector2Int.ZERO); grid.getEmptyGridPosition();
+//			 if (pos != null) {
+//			 Map props = new HashMap();
+//			 props.put(Space2D.POSITION, pos);
+//			 props.put("round", new Integer(0));
+//			 props.put("age", "Child");
+//			 grid.createSpaceObject("packageChild", props, null, null);
+//			
+//			 }
 
 			// Just testing
 			// Map props = new HashMap();

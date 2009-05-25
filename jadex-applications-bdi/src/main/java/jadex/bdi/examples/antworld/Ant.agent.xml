@@ -203,7 +203,7 @@
 			<body class="TestPlan"/>
 		</plan>
 		
-		<!-- Plan ti init the agent.-->
+		<!-- Plan to init the agent.-->
 		<plan name="init_plan">
 			<body class="InitPlan"/>		
 		</plan>
