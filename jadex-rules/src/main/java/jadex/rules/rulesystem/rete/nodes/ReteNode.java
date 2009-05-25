@@ -189,6 +189,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+		// Should never be called.
 		throw new UnsupportedOperationException("Unsupported method.");
 	}
 

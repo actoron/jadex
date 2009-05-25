@@ -353,6 +353,16 @@ public class Vector2Int implements IVector2
 		return new Vector1Int(y_);
 	}
 	
+	public void setX(IVector1 x)
+	{
+		this.x_	= x.getAsInteger(); 
+	}
+
+	public void setY(IVector1 y)
+	{
+		this.y_	= y.getAsInteger(); 
+	}
+
 	/** Returns the x-component of the vector as integer.
 	 *
 	 *  @return x-component as integer

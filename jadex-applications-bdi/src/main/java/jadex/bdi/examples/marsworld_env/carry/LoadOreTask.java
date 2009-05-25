@@ -88,7 +88,7 @@ public class LoadOreTask extends ListenableTask
 		
 		if(finished)
 		{
-			taskFinished(obj, obj.getProperty(AnalyzeTargetTask.PROPERTY_ORE));
+			taskFinished(obj, load? obj.getProperty(AnalyzeTargetTask.PROPERTY_ORE): null); // Todo amount of unloaded ore?
 		}
 	}
 }

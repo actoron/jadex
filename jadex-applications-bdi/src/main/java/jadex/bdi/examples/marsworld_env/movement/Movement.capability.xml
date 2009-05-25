@@ -22,35 +22,16 @@
  		</belief>
  		
  		<!-- Myself. -->
- 		<belief name="myself" class="ISpaceObject">
+ 		<belief name="myself" class="ISpaceObject" exported="true">
  			<fact>$beliefbase.environment.getOwnedObjects($scope.getAgentIdentifier())[0]</fact>
  		</belief>
 
-		<!-- The home location. - ->
-		<belief name="my_home" class="Location" exported="true">
-			<fact>$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position")</fact>
-		</belief>-->
-
-		<!-- The current location. - ->
-		<belief name="my_location" class="Location" exported="true">
-			<fact>$beliefbase.my_home</fact>
-		</belief>-->
-
-		<!-- The agent type (carry, producer or sentry) - ->
-		<belief name="my_type" class="String" exported="true"/>-->
-
-		<!-- The speed. - ->
-		<belief name="my_speed" class="double" exported="true"/>-->
-
-		<!-- The sight radius. - ->
-		<belief name="my_vision" class="double" exported="true"/>-->
-
-		<!-- Is the mission finished? - ->
+		<!-- Is the mission finished? -->
 		<belief name="missionend" class="boolean" updaterate="1000" exported="true">
 			<fact evaluationmode="pull">
  				$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("missiontime")&lt;=$scope.getTime()
  			</fact>
-		</belief>-->
+		</belief>
 
 		<!-- The seen targets. -->
 		<beliefset name="my_targets" class="ISpaceObject" exported="true" />
@@ -64,27 +45,15 @@
 
 		<!-- Walk around without target when nothing else to do. -->
 		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
-<!--
 			<dropcondition language="jcl">
 				$beliefbase.missionend
 				
 				// (belief (element_has_model ?mbel) (belief_has_fact true))
 				// ?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
-  -->
   		</performgoal>
 
-		<!-- Watch for targets and memorize them. - ->
-		<performgoal name="watch_targets" exported="true">
- 			<dropcondition language="jcl">
-				$beliefbase.missionend
-				
-				// (belief (element_has_model ?mbel) (belief_has_fact true))
-				// ?mbel	= (mbelief (melement_has_name "missionend"))
-			</dropcondition>
-		</performgoal>-->
-
-		<!-- Move home when missionend. - ->
+		<!-- Move home when missionend. -->
 		<achievegoal name="missionend">
 			<parameter name="destination" class="IVector2">
 				<value>$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position")</value>
@@ -92,8 +61,9 @@
 			<unique dummy="true"/>
 			<creationcondition language="jcl">
 				$beliefbase.missionend
-				// &amp;&amp; !$beliefbase.my_location.isNear($beliefbase.my_home)
-
+				  &amp;&amp; !$beliefbase.myself.position.equals(
+				  $beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position"))
+				 
 				// (belief (element_has_model ?mbel_missionend) (belief_has_fact true))
 				// ?mbel_missionend = (mbelief (melement_has_name "missionend"))
 				// 
@@ -105,21 +75,20 @@
 				// 
 				// ?mylocation	= (Location (isNear(?myhome) false))
 			</creationcondition>
-		</achievegoal>-->
+		</achievegoal>
 	</goals>
 
 	<plans>
-
 		<!-- Go to a destination. -->
 		<plan name="go_destination">
 			<parameter name="destination" class="IVector2">
  				<goalmapping ref="move_dest.destination"/>
-<!--  				<goalmapping ref="missionend.destination"/> -->
+  				<goalmapping ref="missionend.destination"/>
 			</parameter>
 			<body class="MoveToLocationPlan"/>
 			<trigger>
 				<goal ref="move_dest"/>
-<!-- 				<goal ref="missionend"/> -->
+ 				<goal ref="missionend"/>
 			</trigger>
 		</plan>
 
@@ -130,7 +99,5 @@
 				<goal ref="walk_around"/>
 			</trigger>
 		</plan>
-
 	</plans>
-
 </capability>

@@ -20,32 +20,50 @@ public class SJavaParser
      */
     protected static int	lookaheadType(TokenStream input, OAVTypeModel tmodel, String[] imports)
     {
-    	int	index	= 1;
-    	String	typename	= input.LT(index).getText();
-    	OAVObjectType	type	= null;
-    	while(type==null && index!=-1)
+    	return lookaheadType(1, input, tmodel, imports);
+    }
+
+    /**
+     *  Lookahead for a type.
+     *  @param index	The start index (starts with 1).
+     *  @param input	The token stream.
+     *  @param tmodel	The OAV type model.
+     *  @return	The token index of the last token (identifier) or -1 if no type could be matched.
+     */
+    protected static int	lookaheadType(int index, TokenStream input, OAVTypeModel tmodel, String[] imports)
+    {
+    	if(input.LA(index)==JavaJadexLexer.IDENTIFIER)
     	{
-	    	try
+	    	String	typename	= input.LT(index).getText();
+	    	OAVObjectType	type	= null;
+	    	while(type==null && index!=-1)
 	    	{
-	        	type	= tmodel.getObjectType(typename);	        	
+		    	try
+		    	{
+		        	type	= tmodel.getObjectType(typename);	        	
+		    	}
+		    	catch(Throwable e)
+		    	{
+		    		Class	clazz	= SReflect.findClass0(typename, imports, tmodel.getClassLoader());
+		    		if(clazz!=null)
+		    		{
+		    			type	= tmodel.getJavaType(clazz);
+		    		}
+		    		else if(input.get(index+1).equals("."))
+		    		{
+		    			index	+= 2;
+		    			typename	+= "." + input.get(index).getText();
+		    		}
+		    		else
+		    		{
+		    			index	= -1;
+		    		}
+		    	}
 	    	}
-	    	catch(Throwable e)
-	    	{
-	    		Class	clazz	= SReflect.findClass0(typename, imports, tmodel.getClassLoader());
-	    		if(clazz!=null)
-	    		{
-	    			type	= tmodel.getJavaType(clazz);
-	    		}
-	    		else if(input.get(index+1).equals("."))
-	    		{
-	    			index	+= 2;
-	    			typename	+= "." + input.get(index).getText();
-	    		}
-	    		else
-	    		{
-	    			index	= -1;
-	    		}
-	    	}
+    	}
+    	else
+    	{
+    		index	= -1;
     	}
     	
     	return index;
@@ -85,5 +103,18 @@ public class SJavaParser
     {
     	int index	= lookaheadType(input, tmodel, imports);
     	return index!=-1 &&	".".equals(input.LT(index+1).getText()) && input.LA(index+2)==JavaJadexLexer.IDENTIFIER  &&	"(".equals(input.LT(index+3).getText());
+    }
+
+    
+    /**
+     *  Lookahead for a type cast.
+     *  @param input	The token stream.
+     *  @param tmodel	The OAV type model.
+     *  @return	True for a type cast.
+     */
+    protected static boolean	lookaheadCast(TokenStream input, OAVTypeModel tmodel, String[] imports)
+    {
+    	int index	= lookaheadType(2, input, tmodel, imports);
+    	return "(".equals(input.LT(1).getText()) && index!=-1 && ")".equals(input.LT(index+1).getText());
     }
 }

@@ -177,7 +177,7 @@ public class BuildContext
 		for(int i=1; getVariable(varname = "$tmpvar_"+i)!=null; i++);
 		return varname;
 	}
-
+	
 	/**
 	 *  Create a new variable and bind it using the given object condition and value source.
 	 *  @param condition	The object condition.
@@ -187,11 +187,24 @@ public class BuildContext
 	 */
 	public Variable	generateVariableBinding(ObjectCondition	condition, String name, Object valuesource)
 	{
-		Variable	tmpvar	= new Variable(name, getReturnType(valuesource, tmodel));
+		return generateVariableBinding(condition, name, getReturnType(valuesource, tmodel),	valuesource);
+	}
+
+	/**
+	 *  Create a new variable and bind it using the given object condition and value source.
+	 *  @param condition	The object condition.
+	 *  @param name	The variable name.
+	 *  @param valuesource	The value source.
+	 *  @return	The new variable.
+	 */
+	public Variable	generateVariableBinding(ObjectCondition	condition, String name, OAVObjectType type, Object valuesource)
+	{
+		Variable	tmpvar	= new Variable(name, type);
 		variables.put(name, tmpvar);
 		BoundConstraint	bc	= new BoundConstraint(valuesource, tmpvar);
 		boundconstraints.put(tmpvar, bc);
 		condition.addConstraint(bc);
+		bcons.put(tmpvar, condition);
 		return tmpvar;
 	}
 

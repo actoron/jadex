@@ -277,6 +277,21 @@ public class Vector3Double implements IVector3, Cloneable
 		return new Vector1Double(z_);
 	}
 	
+	public void setX(IVector1 x)
+	{
+		this.x_	= x.getAsDouble(); 
+	}
+
+	public void setY(IVector1 y)
+	{
+		this.y_	= y.getAsDouble(); 
+	}
+
+	public void setZ(IVector1 z)
+	{
+		this.z_	= z.getAsDouble(); 
+	}
+	
 	/** Returns the x-component of the vector as integer.
 	 *
 	 *  @return x-component as integer

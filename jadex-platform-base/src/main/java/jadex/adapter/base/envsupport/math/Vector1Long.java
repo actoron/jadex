@@ -19,6 +19,14 @@ public class Vector1Long implements IVector1
 		x_ = value;
 	}
 	
+	/**
+	 * Creates a new vector.
+	 */
+	// bean constructor
+	public Vector1Long()
+	{
+	}
+	
 	/** Adds another vector to this vector, adding individual components.
 	 *
 	 *  @param vector the vector to add to this vector
@@ -101,6 +109,11 @@ public class Vector1Long implements IVector1
 		return x_;
 	}
 	
+	public void setAsLong(long x)
+	{
+		this.x_	= x; 
+	}
+
 	/** Returns the vector as float.
 	 *
 	 *  @return vector as float

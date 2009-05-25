@@ -336,7 +336,8 @@ public class GoalLifecycleRules
 					ObjectCondition	parcon	= new ObjectCondition(parvar.getType());
 					parcon.addConstraint(new BoundConstraint(null, parvar));
 					parcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.parameter_has_name, pname));
-					parcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameter_has_value, new Variable(pexp.getExpressionText(), state.getTypeModel().getJavaType(clazz))));
+					// Hack!!! Explicitly assign variable name / valuesource!?
+					parcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameter_has_value, new Variable(pexp.getExpressionText().trim(), state.getTypeModel().getJavaType(clazz))));
 					parcons.add(parcon);
 					
 					rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parameters, parvar, IOperator.CONTAINS));

@@ -254,6 +254,16 @@ public class Vector2Double implements IVector2, Cloneable
 		return new Vector1Double(y_);
 	}
 	
+	public void setX(IVector1 x)
+	{
+		this.x_	= x.getAsDouble(); 
+	}
+
+	public void setY(IVector1 y)
+	{
+		this.y_	= y.getAsDouble(); 
+	}
+
 	/** Returns the x-component of the vector as integer.
 	 *
 	 *  @return x-component as integer

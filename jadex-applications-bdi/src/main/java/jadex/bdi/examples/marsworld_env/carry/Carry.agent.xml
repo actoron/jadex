@@ -25,30 +25,20 @@
 	</capabilities>
 
 	<beliefs>
-
-<!--
+		<!-- Missionend belief is used in drop condition of carry ore goal. -->
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>
-		
-		<beliefref name="my_location">
-			<concrete ref="move.my_location"/>
-		</beliefref>
-		
-		<beliefref name="environment">
-			<concrete ref="move.environment"/>
-		</beliefref>
--->
 	</beliefs>
 
   	<goals>
 		<!-- Carry ore to the homebase. -->
 		<achievegoal name="carry_ore">
 			<parameter name="target" class="ISpaceObject"/>
-<!-- 			<dropcondition language="jcl">
+ 			<dropcondition language="jcl">
 				$beliefbase.missionend
 				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
-			</dropcondition> -->
+			</dropcondition>
 			<deliberation>
 				<inhibits ref="move.walk_around"/>
 			</deliberation>
@@ -75,14 +65,14 @@
 			</trigger>
 		</plan>
 
-		<!-- Inform sentries about new targets. - ->
+		<!-- Inform sentries about new targets. -->
 		<plan name="informer">
 			<body class="InformNewTargetPlan"/>
-			<!- - Inform whenever a new fact is added to the belief set my_targets. - ->
+			<!-- Inform whenever a new fact is added to the belief set my_targets. -->
 			<trigger>
 				<factadded ref="move.my_targets"/>
 			</trigger>
-		</plan>-->
+		</plan>
 	</plans>
 
 	<events>
@@ -93,7 +83,8 @@
 			</parameter>
 			<match>$content instanceof RequestCarry</match>
 		</messageevent>
-<!-- 
+
+		<!-- Message event for informing sentries about new targets. -->
 		<messageevent name="inform_target" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
@@ -101,10 +92,7 @@
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.NUGGETS_XML</value>
  			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>MarsOntology.ONTOLOGY_NAME</value>
-			</parameter>
-		</messageevent>-->
+		</messageevent>
 	</events>
 
 	<configurations>

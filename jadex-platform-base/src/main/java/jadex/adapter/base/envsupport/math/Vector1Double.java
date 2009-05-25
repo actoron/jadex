@@ -24,6 +24,14 @@ public class Vector1Double implements IVector1
 		x_ = value;
 	}
 	
+	/**
+	 * Creates a new vector.
+	 */
+	// bean constructor
+	public Vector1Double()
+	{
+	}
+	
 	public IVector1 add(IVector1 vector)
 	{
 		x_ += vector.getAsDouble();
@@ -89,6 +97,11 @@ public class Vector1Double implements IVector1
 		return x_;
 	}
 	
+	public void setAsDouble(double x)
+	{
+		this.x_	= x; 
+	}
+
 	public BigDecimal getAsBigDecimal()
 	{
 		return new BigDecimal(x_);

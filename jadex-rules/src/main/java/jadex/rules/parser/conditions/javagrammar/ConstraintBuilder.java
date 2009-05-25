@@ -283,9 +283,10 @@ public class ConstraintBuilder
 		else if(value instanceof PrimaryExpression)
 		{
 			Expression	prim	= ((PrimaryExpression)value).getPrefix();
-			ObjectCondition	ocon;				
+			ObjectCondition	ocon;
 			OAVObjectType	type;
 			Object	valuesource;
+						
 			if(prim instanceof VariableExpression)
 			{
 				Variable	var	= ((VariableExpression)prim).getVariable();
@@ -314,11 +315,18 @@ public class ConstraintBuilder
 				valuesource	= new FunctionCall(new MethodCallFunction(mc.getMethod()), paramsources);
 				type	= context.getTypeModel().getJavaType(mc.getMethod().getReturnType());
 			}
+			else if(prim instanceof CastExpression)
+			{
+				type	= ((CastExpression)prim).getType();
+				Object[]	ocvs	= getObjectConditionAndValueSource(((CastExpression)prim).getValue(), context);
+				ocon	= (ObjectCondition)ocvs[0];
+				valuesource	= ocvs[1];
+			}			
 			else
 			{
 				throw new UnsupportedOperationException("Unsupported start of primary expression: "+value);
 			}
-
+			
 			List	suffs	= new ArrayList();
 			Suffix[]	suffixes	= ((PrimaryExpression)value).getSuffixes();
 			for(int i=0; i<suffixes.length; i++)
@@ -544,6 +552,22 @@ public class ConstraintBuilder
 
 			Object	valuesource	= new FunctionCall(func, new Object[]{left[1], right});
 			ret	= new VariableExpression(context.generateVariableBinding((ObjectCondition)left[0], valuesource));
+		}
+		else if(value instanceof CastExpression)
+		{
+			Expression	prim	= flattenToPrimary(((CastExpression)value).getValue(), context);
+			if(prim instanceof VariableExpression)
+			{
+				VariableExpression	varex	= (VariableExpression)prim;
+				ObjectCondition	ocon	= context.getObjectCondition(varex.getVariable());
+				Object	valuesource	= context.getBoundConstraint(varex.getVariable()).getValueSource();
+				OAVObjectType	type	= ((CastExpression)value).getType();
+				ret	= new VariableExpression(context.generateVariableBinding(ocon, context.generateVariableName(), type, valuesource));
+			}
+			else
+			{
+				throw new UnsupportedOperationException("Todo: flatten expressions of type: "+value);
+			}
 		}
 		else
 		{

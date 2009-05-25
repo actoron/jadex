@@ -2,7 +2,6 @@ package jadex.bdi.examples.marsworld.carrier;
 
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld.Target;
 import jadex.bdi.runtime.IMessageEvent;

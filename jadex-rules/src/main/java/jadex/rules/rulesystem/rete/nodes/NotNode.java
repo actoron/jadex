@@ -8,6 +8,8 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -181,7 +183,46 @@ public class NotNode extends AbstractBetaNode
 	 */
 	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		throw new UnsupportedOperationException("Unsupported method.");
+		// Use super implementation to update matches, but don't propagate
+		this.delay	= true;
+		super.modifyIndirectObject(object, type, oldvalue, newvalue, state, mem, agenda);
+		this.delay	= false;
+
+		Collection	linput	= getTupleSource().getNodeMemory(mem);
+		if(linput!=null)
+		{
+			// Todo: Use index for avoiding the need for checking all tuple/object pairs.
+			for(Iterator it=linput.iterator(); it.hasNext(); )
+			{
+				Tuple	left	= (Tuple)it.next();
+				boolean	oldprop	= mem.hasNodeMemory(this)
+					&& ((NotMemory)mem.getNodeMemory(this)).getResultMemory().contains(left);
+				if(isAffected(type))
+				{
+					// Left tuple is propagated, when no right element matches.
+					boolean	newprop	= !mem.hasNodeMemory(this)
+						|| ((NotMemory)mem.getNodeMemory(this)).getMappings(left).isEmpty();
+		
+					// When now no mapping exists, tuple is now propagated.
+					if(newprop && !oldprop)
+					{
+						((NotMemory)mem.getNodeMemory(this)).addResultTuple(left);
+						ITupleConsumerNode[] tcs = tconsumers;
+						for(int j=0; tcs!=null && j<tcs.length; j++)
+							tcs[j].addTuple(left, state, mem, agenda);
+					}
+			
+					// When now a mapping exists, tuple is retracted.
+					else if(!newprop && oldprop)
+					{
+						((NotMemory)mem.getNodeMemory(this)).removeResultTuple(left);
+						ITupleConsumerNode[] tcs = tconsumers;
+						for(int j=0; tcs!=null && j<tcs.length; j++)
+							tcs[j].removeTuple(left, state, mem, agenda);
+					}
+				}
+			}
+		}
 	}
 
 	//-------- template methods --------

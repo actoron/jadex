@@ -740,7 +740,7 @@ public class StarterPanel extends JPanel
 			if(cs!=null)
 			{
 				IContext[] contexts =  cs.getContexts(IApplicationContext.class);
-				for(int i=0; i<contexts.length; i++)
+				for(int i=0; contexts!=null && i<contexts.length; i++)
 				{
 					appname.addItem(contexts[i].getName());
 				}

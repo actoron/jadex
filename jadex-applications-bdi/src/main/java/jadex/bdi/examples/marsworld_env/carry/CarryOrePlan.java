@@ -61,7 +61,7 @@ public class CarryOrePlan extends Plan
 			// Unload ore at the homebase.
 			res	= new SyncResultListener();
 			myself.addTask(new LoadOreTask(homebase, false, res));
-			ore	= (Number)res.waitForResult();
+			res.waitForResult();
 			System.out.println("Unloaded ore at homebase: "+getAgentName()+", "+ore+" ore unloaded.");
 		}
 	}

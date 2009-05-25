@@ -19,6 +19,14 @@ public class Vector1Int implements IVector1
 		x_ = value;
 	}
 	
+	/**
+	 * Creates a new vector.
+	 */
+	// bean constructor
+	public Vector1Int()
+	{
+	}
+
 	/** Adds another vector to this vector, adding individual components.
 	 *
 	 *  @param vector the vector to add to this vector
@@ -89,9 +97,14 @@ public class Vector1Int implements IVector1
 	 */
 	public int getAsInteger()
 	{
-		return (int) x_;
+		return  x_;
 	}
 	
+	public void setAsInteger(int x)
+	{
+		this.x_	= x; 
+	}
+
 	/** Returns the vector as long.
 	 *
 	 *  @return vector as long

@@ -181,7 +181,8 @@ unaryExpression returns [Expression exp]
 	| '-' tmp = unaryExpression {$exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_MINUS);}
 	| '!' tmp = unaryExpression {$exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_NOT);}
 	| '~' tmp = unaryExpression {$exp = new UnaryExpression(tmp, UnaryExpression.OPERATOR_BNOT);}
-	| tmp = primaryExpression {$exp = tmp;}
+	| {SJavaParser.lookaheadCast(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)}? '(' tmp1 = type ')' tmp2 = unaryExpression {$exp = new CastExpression(tmp1, tmp2);}
+	| {!SJavaParser.lookaheadCast(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)}? tmp = primaryExpression {$exp = tmp;}
 	;
 	
 /**

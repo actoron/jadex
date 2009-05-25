@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g 2009-04-20 08:44:07
+// $ANTLR 3.1.2 C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g 2009-05-25 10:10:49
 
 package jadex.rules.parser.conditions.javagrammar;
 
@@ -560,7 +560,7 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = BooleanLiteral;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:416:2: ( 'true' | 'false' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:417:2: ( 'true' | 'false' )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -578,7 +578,7 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:416:6: 'true'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:417:6: 'true'
                     {
                     match("true"); 
 
@@ -586,7 +586,7 @@ public class JavaJadexLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:416:15: 'false'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:417:15: 'false'
                     {
                     match("false"); 
 
@@ -608,8 +608,8 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = HexLiteral;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:420:2: ( '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )? )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:420:4: '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:421:2: ( '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )? )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:421:4: '0' ( 'x' | 'X' ) ( HexDigit )+ ( IntegerTypeSuffix )?
             {
             match('0'); 
             if ( input.LA(1)=='X'||input.LA(1)=='x' ) {
@@ -621,7 +621,7 @@ public class JavaJadexLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:420:18: ( HexDigit )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:421:18: ( HexDigit )+
             int cnt2=0;
             loop2:
             do {
@@ -635,7 +635,7 @@ public class JavaJadexLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:420:18: HexDigit
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:421:18: HexDigit
             	    {
             	    mHexDigit(); 
 
@@ -651,7 +651,7 @@ public class JavaJadexLexer extends Lexer {
                 cnt2++;
             } while (true);
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:420:28: ( IntegerTypeSuffix )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:421:28: ( IntegerTypeSuffix )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -660,7 +660,7 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt3) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:420:28: IntegerTypeSuffix
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:421:28: IntegerTypeSuffix
                     {
                     mIntegerTypeSuffix(); 
 
@@ -685,10 +685,10 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = DecimalLiteral;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:2: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )? )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:4: ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:2: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )? )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:4: ( '0' | '1' .. '9' ( '0' .. '9' )* ) ( IntegerTypeSuffix )?
             {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:4: ( '0' | '1' .. '9' ( '0' .. '9' )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:4: ( '0' | '1' .. '9' ( '0' .. '9' )* )
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -706,17 +706,17 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt5) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:5: '0'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:5: '0'
                     {
                     match('0'); 
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:11: '1' .. '9' ( '0' .. '9' )*
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:11: '1' .. '9' ( '0' .. '9' )*
                     {
                     matchRange('1','9'); 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:20: ( '0' .. '9' )*
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:20: ( '0' .. '9' )*
                     loop4:
                     do {
                         int alt4=2;
@@ -729,7 +729,7 @@ public class JavaJadexLexer extends Lexer {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:20: '0' .. '9'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:20: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -747,7 +747,7 @@ public class JavaJadexLexer extends Lexer {
 
             }
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:31: ( IntegerTypeSuffix )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:31: ( IntegerTypeSuffix )?
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -756,7 +756,7 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt6) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:424:31: IntegerTypeSuffix
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:425:31: IntegerTypeSuffix
                     {
                     mIntegerTypeSuffix(); 
 
@@ -781,11 +781,11 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = OctalLiteral;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:428:2: ( '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )? )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:428:4: '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:429:2: ( '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )? )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:429:4: '0' ( '0' .. '7' )+ ( IntegerTypeSuffix )?
             {
             match('0'); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:428:8: ( '0' .. '7' )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:429:8: ( '0' .. '7' )+
             int cnt7=0;
             loop7:
             do {
@@ -799,7 +799,7 @@ public class JavaJadexLexer extends Lexer {
 
                 switch (alt7) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:428:9: '0' .. '7'
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:429:9: '0' .. '7'
             	    {
             	    matchRange('0','7'); 
 
@@ -815,7 +815,7 @@ public class JavaJadexLexer extends Lexer {
                 cnt7++;
             } while (true);
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:428:20: ( IntegerTypeSuffix )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:429:20: ( IntegerTypeSuffix )?
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -824,7 +824,7 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt8) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:428:20: IntegerTypeSuffix
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:429:20: IntegerTypeSuffix
                     {
                     mIntegerTypeSuffix(); 
 
@@ -847,8 +847,8 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "HexDigit"
     public final void mHexDigit() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:432:9: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:432:11: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:433:9: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:433:11: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F')||(input.LA(1)>='a' && input.LA(1)<='f') ) {
                 input.consume();
@@ -871,8 +871,8 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "IntegerTypeSuffix"
     public final void mIntegerTypeSuffix() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:437:2: ( ( 'l' | 'L' ) )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:437:4: ( 'l' | 'L' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:438:2: ( ( 'l' | 'L' ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:438:4: ( 'l' | 'L' )
             {
             if ( input.LA(1)=='L'||input.LA(1)=='l' ) {
                 input.consume();
@@ -897,14 +897,14 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = FloatingPointLiteral;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:6: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )? | '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )? | ( '0' .. '9' )+ Exponent FloatTypeSuffix | ( '0' .. '9' )+ Exponent | ( '0' .. '9' )+ FloatTypeSuffix )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:6: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )? | '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )? | ( '0' .. '9' )+ Exponent FloatTypeSuffix | ( '0' .. '9' )+ Exponent | ( '0' .. '9' )+ FloatTypeSuffix )
             int alt19=5;
             alt19 = dfa19.predict(input);
             switch (alt19) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:10: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:10: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )?
                     {
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:10: ( '0' .. '9' )+
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:10: ( '0' .. '9' )+
                     int cnt9=0;
                     loop9:
                     do {
@@ -918,7 +918,7 @@ public class JavaJadexLexer extends Lexer {
 
                         switch (alt9) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:11: '0' .. '9'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:11: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -935,7 +935,7 @@ public class JavaJadexLexer extends Lexer {
                     } while (true);
 
                     match('.'); 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:26: ( '0' .. '9' )*
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:26: ( '0' .. '9' )*
                     loop10:
                     do {
                         int alt10=2;
@@ -948,7 +948,7 @@ public class JavaJadexLexer extends Lexer {
 
                         switch (alt10) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:27: '0' .. '9'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:27: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -960,7 +960,7 @@ public class JavaJadexLexer extends Lexer {
                         }
                     } while (true);
 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:38: ( Exponent )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:38: ( Exponent )?
                     int alt11=2;
                     int LA11_0 = input.LA(1);
 
@@ -969,7 +969,7 @@ public class JavaJadexLexer extends Lexer {
                     }
                     switch (alt11) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:38: Exponent
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:38: Exponent
                             {
                             mExponent(); 
 
@@ -978,7 +978,7 @@ public class JavaJadexLexer extends Lexer {
 
                     }
 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:48: ( FloatTypeSuffix )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:48: ( FloatTypeSuffix )?
                     int alt12=2;
                     int LA12_0 = input.LA(1);
 
@@ -987,7 +987,7 @@ public class JavaJadexLexer extends Lexer {
                     }
                     switch (alt12) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:441:48: FloatTypeSuffix
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:48: FloatTypeSuffix
                             {
                             mFloatTypeSuffix(); 
 
@@ -1000,10 +1000,10 @@ public class JavaJadexLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:7: '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:7: '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )?
                     {
                     match('.'); 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:11: ( '0' .. '9' )+
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:11: ( '0' .. '9' )+
                     int cnt13=0;
                     loop13:
                     do {
@@ -1017,7 +1017,7 @@ public class JavaJadexLexer extends Lexer {
 
                         switch (alt13) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:12: '0' .. '9'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:12: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -1033,7 +1033,7 @@ public class JavaJadexLexer extends Lexer {
                         cnt13++;
                     } while (true);
 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:23: ( Exponent )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:23: ( Exponent )?
                     int alt14=2;
                     int LA14_0 = input.LA(1);
 
@@ -1042,7 +1042,7 @@ public class JavaJadexLexer extends Lexer {
                     }
                     switch (alt14) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:23: Exponent
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:23: Exponent
                             {
                             mExponent(); 
 
@@ -1051,7 +1051,7 @@ public class JavaJadexLexer extends Lexer {
 
                     }
 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:33: ( FloatTypeSuffix )?
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:33: ( FloatTypeSuffix )?
                     int alt15=2;
                     int LA15_0 = input.LA(1);
 
@@ -1060,7 +1060,7 @@ public class JavaJadexLexer extends Lexer {
                     }
                     switch (alt15) {
                         case 1 :
-                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:442:33: FloatTypeSuffix
+                            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:33: FloatTypeSuffix
                             {
                             mFloatTypeSuffix(); 
 
@@ -1073,9 +1073,9 @@ public class JavaJadexLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:7: ( '0' .. '9' )+ Exponent FloatTypeSuffix
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:444:7: ( '0' .. '9' )+ Exponent FloatTypeSuffix
                     {
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:7: ( '0' .. '9' )+
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:444:7: ( '0' .. '9' )+
                     int cnt16=0;
                     loop16:
                     do {
@@ -1089,7 +1089,7 @@ public class JavaJadexLexer extends Lexer {
 
                         switch (alt16) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:443:8: '0' .. '9'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:444:8: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -1111,9 +1111,9 @@ public class JavaJadexLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:444:7: ( '0' .. '9' )+ Exponent
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:445:7: ( '0' .. '9' )+ Exponent
                     {
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:444:7: ( '0' .. '9' )+
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:445:7: ( '0' .. '9' )+
                     int cnt17=0;
                     loop17:
                     do {
@@ -1127,7 +1127,7 @@ public class JavaJadexLexer extends Lexer {
 
                         switch (alt17) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:444:8: '0' .. '9'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:445:8: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -1148,9 +1148,9 @@ public class JavaJadexLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:445:6: ( '0' .. '9' )+ FloatTypeSuffix
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:446:6: ( '0' .. '9' )+ FloatTypeSuffix
                     {
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:445:6: ( '0' .. '9' )+
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:446:6: ( '0' .. '9' )+
                     int cnt18=0;
                     loop18:
                     do {
@@ -1164,7 +1164,7 @@ public class JavaJadexLexer extends Lexer {
 
                         switch (alt18) {
                     	case 1 :
-                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:445:7: '0' .. '9'
+                    	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:446:7: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -1197,8 +1197,8 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "Exponent"
     public final void mExponent() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:449:9: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:449:11: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:450:9: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:450:11: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -1209,7 +1209,7 @@ public class JavaJadexLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:449:21: ( '+' | '-' )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:450:21: ( '+' | '-' )?
             int alt20=2;
             int LA20_0 = input.LA(1);
 
@@ -1235,7 +1235,7 @@ public class JavaJadexLexer extends Lexer {
 
             }
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:449:32: ( '0' .. '9' )+
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:450:32: ( '0' .. '9' )+
             int cnt21=0;
             loop21:
             do {
@@ -1249,7 +1249,7 @@ public class JavaJadexLexer extends Lexer {
 
                 switch (alt21) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:449:33: '0' .. '9'
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:450:33: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -1277,8 +1277,8 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "FloatTypeSuffix"
     public final void mFloatTypeSuffix() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:454:2: ( ( 'f' | 'F' | 'd' | 'D' ) )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:454:4: ( 'f' | 'F' | 'd' | 'D' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:455:2: ( ( 'f' | 'F' | 'd' | 'D' ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:455:4: ( 'f' | 'F' | 'd' | 'D' )
             {
             if ( input.LA(1)=='D'||input.LA(1)=='F'||input.LA(1)=='d'||input.LA(1)=='f' ) {
                 input.consume();
@@ -1303,11 +1303,11 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = CharacterLiteral;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:458:2: ( '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\'' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:458:6: '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\''
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:459:2: ( '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\'' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:459:6: '\\'' ( EscapeSequence | ~ ( '\\'' | '\\\\' ) ) '\\''
             {
             match('\''); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:458:11: ( EscapeSequence | ~ ( '\\'' | '\\\\' ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:459:11: ( EscapeSequence | ~ ( '\\'' | '\\\\' ) )
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -1325,14 +1325,14 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt22) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:458:13: EscapeSequence
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:459:13: EscapeSequence
                     {
                     mEscapeSequence(); 
 
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:458:30: ~ ( '\\'' | '\\\\' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:459:30: ~ ( '\\'' | '\\\\' )
                     {
                     if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
                         input.consume();
@@ -1368,11 +1368,11 @@ public class JavaJadexLexer extends Lexer {
             int _channel = DEFAULT_TOKEN_CHANNEL;
             Token text=null;
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:462:2: ( '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:462:5: '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:463:2: ( '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:463:5: '\"' (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:462:9: (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:463:9: (text= EscapeSequence | ~ ( '\\\\' | '\"' ) )*
             loop23:
             do {
                 int alt23=3;
@@ -1388,7 +1388,7 @@ public class JavaJadexLexer extends Lexer {
 
                 switch (alt23) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:462:11: text= EscapeSequence
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:463:11: text= EscapeSequence
             	    {
             	    int textStart549 = getCharIndex();
             	    mEscapeSequence(); 
@@ -1397,7 +1397,7 @@ public class JavaJadexLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:462:33: ~ ( '\\\\' | '\"' )
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:463:33: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1432,7 +1432,7 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "EscapeSequence"
     public final void mEscapeSequence() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:467:2: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UnicodeEscape | OctalEscape )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:468:2: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UnicodeEscape | OctalEscape )
             int alt24=3;
             int LA24_0 = input.LA(1);
 
@@ -1483,7 +1483,7 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt24) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:467:6: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:468:6: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
                     match('\\'); 
                     if ( input.LA(1)=='\"'||input.LA(1)=='\''||input.LA(1)=='\\'||input.LA(1)=='b'||input.LA(1)=='f'||input.LA(1)=='n'||input.LA(1)=='r'||input.LA(1)=='t' ) {
@@ -1499,14 +1499,14 @@ public class JavaJadexLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:468:6: UnicodeEscape
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:469:6: UnicodeEscape
                     {
                     mUnicodeEscape(); 
 
                     }
                     break;
                 case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:469:6: OctalEscape
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:470:6: OctalEscape
                     {
                     mOctalEscape(); 
 
@@ -1523,7 +1523,7 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "OctalEscape"
     public final void mOctalEscape() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:2: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:2: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
             int alt25=3;
             int LA25_0 = input.LA(1);
 
@@ -1569,41 +1569,13 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt25) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:6: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:6: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:11: ( '0' .. '3' )
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:12: '0' .. '3'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:11: ( '0' .. '3' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:12: '0' .. '3'
                     {
                     matchRange('0','3'); 
-
-                    }
-
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:22: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:23: '0' .. '7'
-                    {
-                    matchRange('0','7'); 
-
-                    }
-
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:33: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:474:34: '0' .. '7'
-                    {
-                    matchRange('0','7'); 
-
-                    }
-
-
-                    }
-                    break;
-                case 2 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:6: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
-                    {
-                    match('\\'); 
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:11: ( '0' .. '7' )
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:12: '0' .. '7'
-                    {
-                    matchRange('0','7'); 
 
                     }
 
@@ -1614,15 +1586,43 @@ public class JavaJadexLexer extends Lexer {
 
                     }
 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:33: ( '0' .. '7' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:475:34: '0' .. '7'
+                    {
+                    matchRange('0','7'); 
+
+                    }
+
 
                     }
                     break;
-                case 3 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:476:6: '\\\\' ( '0' .. '7' )
+                case 2 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:476:6: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:476:11: ( '0' .. '7' )
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:476:12: '0' .. '7'
+                    {
+                    matchRange('0','7'); 
+
+                    }
+
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:476:22: ( '0' .. '7' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:476:23: '0' .. '7'
+                    {
+                    matchRange('0','7'); 
+
+                    }
+
+
+                    }
+                    break;
+                case 3 :
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:477:6: '\\\\' ( '0' .. '7' )
+                    {
+                    match('\\'); 
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:477:11: ( '0' .. '7' )
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:477:12: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1642,8 +1642,8 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "UnicodeEscape"
     public final void mUnicodeEscape() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:481:2: ( '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:481:6: '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:482:2: ( '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:482:6: '\\\\' 'u' HexDigit HexDigit HexDigit HexDigit
             {
             match('\\'); 
             match('u'); 
@@ -1665,11 +1665,11 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = IDENTIFIER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:485:2: ( Letter ( Letter | JavaIDDigit )* )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:485:6: Letter ( Letter | JavaIDDigit )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:486:2: ( Letter ( Letter | JavaIDDigit )* )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:486:6: Letter ( Letter | JavaIDDigit )*
             {
             mLetter(); 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:485:13: ( Letter | JavaIDDigit )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:486:13: ( Letter | JavaIDDigit )*
             loop26:
             do {
                 int alt26=2;
@@ -1716,7 +1716,7 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "Letter"
     public final void mLetter() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:494:2: ( '\\u0024' | '\\u0041' .. '\\u005a' | '\\u005f' | '\\u0061' .. '\\u007a' | '\\u00c0' .. '\\u00d6' | '\\u00d8' .. '\\u00f6' | '\\u00f8' .. '\\u00ff' | '\\u0100' .. '\\u1fff' | '\\u3040' .. '\\u318f' | '\\u3300' .. '\\u337f' | '\\u3400' .. '\\u3d2d' | '\\u4e00' .. '\\u9fff' | '\\uf900' .. '\\ufaff' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:495:2: ( '\\u0024' | '\\u0041' .. '\\u005a' | '\\u005f' | '\\u0061' .. '\\u007a' | '\\u00c0' .. '\\u00d6' | '\\u00d8' .. '\\u00f6' | '\\u00f8' .. '\\u00ff' | '\\u0100' .. '\\u1fff' | '\\u3040' .. '\\u318f' | '\\u3300' .. '\\u337f' | '\\u3400' .. '\\u3d2d' | '\\u4e00' .. '\\u9fff' | '\\uf900' .. '\\ufaff' )
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:
             {
             if ( input.LA(1)=='$'||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z')||(input.LA(1)>='\u00C0' && input.LA(1)<='\u00D6')||(input.LA(1)>='\u00D8' && input.LA(1)<='\u00F6')||(input.LA(1)>='\u00F8' && input.LA(1)<='\u1FFF')||(input.LA(1)>='\u3040' && input.LA(1)<='\u318F')||(input.LA(1)>='\u3300' && input.LA(1)<='\u337F')||(input.LA(1)>='\u3400' && input.LA(1)<='\u3D2D')||(input.LA(1)>='\u4E00' && input.LA(1)<='\u9FFF')||(input.LA(1)>='\uF900' && input.LA(1)<='\uFAFF') ) {
@@ -1740,7 +1740,7 @@ public class JavaJadexLexer extends Lexer {
     // $ANTLR start "JavaIDDigit"
     public final void mJavaIDDigit() throws RecognitionException {
         try {
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:511:2: ( '\\u0030' .. '\\u0039' | '\\u0660' .. '\\u0669' | '\\u06f0' .. '\\u06f9' | '\\u0966' .. '\\u096f' | '\\u09e6' .. '\\u09ef' | '\\u0a66' .. '\\u0a6f' | '\\u0ae6' .. '\\u0aef' | '\\u0b66' .. '\\u0b6f' | '\\u0be7' .. '\\u0bef' | '\\u0c66' .. '\\u0c6f' | '\\u0ce6' .. '\\u0cef' | '\\u0d66' .. '\\u0d6f' | '\\u0e50' .. '\\u0e59' | '\\u0ed0' .. '\\u0ed9' | '\\u1040' .. '\\u1049' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:512:2: ( '\\u0030' .. '\\u0039' | '\\u0660' .. '\\u0669' | '\\u06f0' .. '\\u06f9' | '\\u0966' .. '\\u096f' | '\\u09e6' .. '\\u09ef' | '\\u0a66' .. '\\u0a6f' | '\\u0ae6' .. '\\u0aef' | '\\u0b66' .. '\\u0b6f' | '\\u0be7' .. '\\u0bef' | '\\u0c66' .. '\\u0c6f' | '\\u0ce6' .. '\\u0cef' | '\\u0d66' .. '\\u0d6f' | '\\u0e50' .. '\\u0e59' | '\\u0ed0' .. '\\u0ed9' | '\\u1040' .. '\\u1049' )
             // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='\u0660' && input.LA(1)<='\u0669')||(input.LA(1)>='\u06F0' && input.LA(1)<='\u06F9')||(input.LA(1)>='\u0966' && input.LA(1)<='\u096F')||(input.LA(1)>='\u09E6' && input.LA(1)<='\u09EF')||(input.LA(1)>='\u0A66' && input.LA(1)<='\u0A6F')||(input.LA(1)>='\u0AE6' && input.LA(1)<='\u0AEF')||(input.LA(1)>='\u0B66' && input.LA(1)<='\u0B6F')||(input.LA(1)>='\u0BE7' && input.LA(1)<='\u0BEF')||(input.LA(1)>='\u0C66' && input.LA(1)<='\u0C6F')||(input.LA(1)>='\u0CE6' && input.LA(1)<='\u0CEF')||(input.LA(1)>='\u0D66' && input.LA(1)<='\u0D6F')||(input.LA(1)>='\u0E50' && input.LA(1)<='\u0E59')||(input.LA(1)>='\u0ED0' && input.LA(1)<='\u0ED9')||(input.LA(1)>='\u1040' && input.LA(1)<='\u1049') ) {
@@ -1766,8 +1766,8 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:528:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:528:8: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:529:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:529:8: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
             {
             if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
@@ -1795,12 +1795,12 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:532:2: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:532:6: '/*' ( options {greedy=false; } : . )* '*/'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:533:2: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:533:6: '/*' ( options {greedy=false; } : . )* '*/'
             {
             match("/*"); 
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:532:11: ( options {greedy=false; } : . )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:533:11: ( options {greedy=false; } : . )*
             loop27:
             do {
                 int alt27=2;
@@ -1825,7 +1825,7 @@ public class JavaJadexLexer extends Lexer {
 
                 switch (alt27) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:532:39: .
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:533:39: .
             	    {
             	    matchAny(); 
 
@@ -1856,12 +1856,12 @@ public class JavaJadexLexer extends Lexer {
         try {
             int _type = LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:536:2: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:536:4: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:537:2: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:537:4: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
             {
             match("//"); 
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:536:9: (~ ( '\\n' | '\\r' ) )*
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:537:9: (~ ( '\\n' | '\\r' ) )*
             loop28:
             do {
                 int alt28=2;
@@ -1874,7 +1874,7 @@ public class JavaJadexLexer extends Lexer {
 
                 switch (alt28) {
             	case 1 :
-            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:536:9: ~ ( '\\n' | '\\r' )
+            	    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:537:9: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1894,7 +1894,7 @@ public class JavaJadexLexer extends Lexer {
                 }
             } while (true);
 
-            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:536:23: ( '\\r' )?
+            // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:537:23: ( '\\r' )?
             int alt29=2;
             int LA29_0 = input.LA(1);
 
@@ -1903,7 +1903,7 @@ public class JavaJadexLexer extends Lexer {
             }
             switch (alt29) {
                 case 1 :
-                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:536:23: '\\r'
+                    // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:537:23: '\\r'
                     {
                     match('\r'); 
 
@@ -2239,7 +2239,7 @@ public class JavaJadexLexer extends Lexer {
             this.transition = DFA19_transition;
         }
         public String getDescription() {
-            return "440:1: FloatingPointLiteral : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )? | '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )? | ( '0' .. '9' )+ Exponent FloatTypeSuffix | ( '0' .. '9' )+ Exponent | ( '0' .. '9' )+ FloatTypeSuffix );";
+            return "441:1: FloatingPointLiteral : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? ( FloatTypeSuffix )? | '.' ( '0' .. '9' )+ ( Exponent )? ( FloatTypeSuffix )? | ( '0' .. '9' )+ Exponent FloatTypeSuffix | ( '0' .. '9' )+ Exponent | ( '0' .. '9' )+ FloatTypeSuffix );";
         }
     }
     static final String DFA30_eotS =
