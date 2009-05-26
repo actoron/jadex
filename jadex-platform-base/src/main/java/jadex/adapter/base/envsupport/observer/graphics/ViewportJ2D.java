@@ -2,6 +2,7 @@ package jadex.adapter.base.envsupport.observer.graphics;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport.MouseController;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
@@ -67,8 +68,11 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 		
 		canvas_ = new ViewportCanvas();
 		canvas_.addComponentListener(this);
-
-		canvas_.addMouseListener(new MouseController());
+		
+		MouseController mc = new MouseController();
+		canvas_.addMouseListener(mc);
+		canvas_.addMouseWheelListener(mc);
+		canvas_.addMouseMotionListener(mc);
 
 		renderFrameAction_ = new Runnable()
 		{
@@ -231,7 +235,6 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 			backBuffer_ = new BufferedImage(1, 1,
 					BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			scissorPolygon_ = new GeneralPath();
-			setupScissorPolygon();
 			clearRectangle_ = new Rectangle.Double();
 			clearRectangle_.x = 0.0;
 			clearRectangle_.y = 0.0;
@@ -258,12 +261,26 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				{
 					backBuffer_ = new BufferedImage(getWidth(), getHeight(),
 							BufferedImage.TYPE_4BYTE_ABGR_PRE);
-					setupScissorPolygon();
 				}
 
 				Graphics2D g = (Graphics2D)backBuffer_.getGraphics();
 				g.setColor(java.awt.Color.BLACK);
 				g.fillRect(0, 0, getWidth(), getHeight());
+				
+				double xFac = backBuffer_.getWidth() / paddedSize_.getXAsDouble();
+				double yFac = backBuffer_.getHeight() / paddedSize_.getYAsDouble();
+				IVector2 shift = position_.copy();
+				if (!getInvertX())
+					shift.negateX();
+				if (getInvertY())
+					shift.negateY();
+				int x = (int)(shift.getXAsDouble() * xFac);
+				int y = (int)(shift.getYAsDouble() * yFac);
+				
+				int w = (int)Math.round(areaSize_.getXAsDouble() * xFac);
+				int h = (int)Math.round(areaSize_.getYAsDouble() * yFac);
+				g.setClip(x, y, w, h);
+				
 				setupTransform(g);
 				context_ = g;
 
@@ -276,7 +293,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						{
 							l.init(ViewportJ2D.this, g);
 						}
-						l.draw(size_, ViewportJ2D.this, g);
+						l.draw(areaSize_, ViewportJ2D.this, g);
 					}
 				}
 
@@ -325,7 +342,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						{
 							l.init(ViewportJ2D.this, g);
 						}
-						l.draw(size_, ViewportJ2D.this, g);
+						l.draw(areaSize_, ViewportJ2D.this, g);
 					}
 				}
 				
@@ -360,27 +377,27 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 					* -((inversionFlag_.getXAsInteger() << 1) - 1),
 					(backBuffer_.getHeight() / paddedSize_.getYAsDouble())
 							* ((inversionFlag_.getYAsInteger() << 1) - 1));
-			g.translate(-posX_, -posY_);
+			g.translate(-position_.getXAsDouble(), -position_.getYAsDouble());
 		}
 
-		private void setupScissorPolygon()
+		/*private void setupScissorPolygon()
 		{
 			float pixShiftX = (paddedSize_.getXAsFloat() / backBuffer_.getWidth());
 			float pixShiftY = (paddedSize_.getYAsFloat() / backBuffer_.getHeight());
 			scissorPolygon_.reset();
-			scissorPolygon_.moveTo(posX_, posY_);
-			scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), posY_);
+			scissorPolygon_.moveTo(position_.getXAsDouble(), position_.getYAsDouble());
+			scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), position_.getYAsDouble());
 			scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), paddedSize_
 					.getYAsFloat());
-			scissorPolygon_.lineTo(posX_, paddedSize_.getYAsFloat());
-			scissorPolygon_.lineTo(posX_, size_.getYAsFloat() + pixShiftY);
+			scissorPolygon_.lineTo(position_.getXAsDouble(), paddedSize_.getYAsFloat());
+			scissorPolygon_.lineTo(position_.getXAsDouble(), size_.getYAsFloat() + pixShiftY);
 			scissorPolygon_.lineTo(size_.getXAsFloat() + pixShiftX, size_.getYAsFloat() + pixShiftY);
 			scissorPolygon_.lineTo(size_.getXAsFloat() + pixShiftX, 0.0f);
-			scissorPolygon_.lineTo(0.0f, 0.0f);
-			scissorPolygon_.lineTo(0.0f, size_.getYAsFloat() + pixShiftY);
-			scissorPolygon_.lineTo(posX_, size_.getYAsFloat() + pixShiftY);
+			scissorPolygon_.lineTo(-pixShiftX, 0.0f);
+			scissorPolygon_.lineTo(-pixShiftX, size_.getYAsFloat() + pixShiftY);
+			scissorPolygon_.lineTo(position_.getXAsDouble(), size_.getYAsFloat() + pixShiftY);
 			scissorPolygon_.closePath();
-		}
+		}*/
 	}
 	
 	private class ImageLRUCache extends LinkedHashMap

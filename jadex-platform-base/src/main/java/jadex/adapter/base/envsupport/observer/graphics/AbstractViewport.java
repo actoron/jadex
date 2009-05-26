@@ -8,12 +8,17 @@ import jadex.bridge.ILibraryService;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.color.ColorSpace;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
@@ -39,6 +44,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.swing.event.MouseInputAdapter;
+
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 
@@ -54,10 +61,7 @@ public abstract class AbstractViewport implements IViewport
 	protected ILibraryService	libService_;
 
 	/** X-Coordinate of the viewport position. */
-	protected float				posX_;
-
-	/** Y-Coordinate of the viewport position. */
-	protected float				posY_;
+	protected IVector2			position_;
 
 	/** Object shift x-coordinate. */
 	protected float				objShiftX_;
@@ -69,7 +73,10 @@ public abstract class AbstractViewport implements IViewport
 	protected boolean			preserveAR_;
 
 	/** Size of the viewport without padding. */
-	public IVector2			size_;
+	protected IVector2			size_;
+	
+	/** Maximum displayable area */
+	protected IVector2			areaSize_;
 
 	/** Real size of the viewport including padding. */
 	protected IVector2			paddedSize_;
@@ -95,10 +102,10 @@ public abstract class AbstractViewport implements IViewport
 	public AbstractViewport()
 	{
 		inversionFlag_ = new Vector2Int(0);
-		posX_ = 0.0f;
-		posY_ = 0.0f;
+		position_ = Vector2Double.ZERO.copy();
 		preserveAR_ = true;
 		size_ = new Vector2Double(1.0);
+		areaSize_ = new Vector2Double(1.0);
 		paddedSize_ = size_.copy();
 		drawObjects_ = Collections.synchronizedSet(new HashSet());
 		objectLayers_ = Collections.synchronizedSortedSet(new TreeSet());
@@ -198,19 +205,36 @@ public abstract class AbstractViewport implements IViewport
 				width = size.getYAsDouble() * windowAR;
 				height = size.getYAsDouble();
 			}
-			
-			posX_ = (float)-((width - size.getXAsDouble()) / 2.0);
-			posY_ = (float)-((height - size.getYAsDouble()) / 2.0);
 		}
 		else
 		{
 			width = size.getXAsDouble();
 			height = size.getYAsDouble();
-			posX_ = 0.0f;
-			posY_ = 0.0f;
 		}
 
 		paddedSize_ = new Vector2Double(width, height);
+	}
+	
+	/**
+	 * Sets the maximum displayable size.
+	 * 
+	 * @param areaSize maximum area size.
+	 */
+	public void setAreaSize(final IVector2 areaSize)
+	{
+		EventQueue.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				areaSize_ = areaSize;
+				setSize(areaSize.copy());
+
+				if (preserveAR_)
+				{
+					setPosition(paddedSize_.copy().subtract(areaSize_).multiply(0.5).negate());
+				}
+			}
+		});
 	}
 	
 	/**
@@ -223,11 +247,20 @@ public abstract class AbstractViewport implements IViewport
 	}
 	
 	/**
+	 * Returns the size of a pixel.
+	 * @retun size of a pixel
+	 */
+	public IVector2 getPixelSize()
+	{
+		return paddedSize_.copy().divide(new Vector2Double(canvas_.getWidth(), canvas_.getHeight()));
+	}
+	
+	/**
 	 * Gets the position of the viewport.
 	 */
 	public IVector2 getPosition()
 	{
-		return new Vector2Double(posX_, posY_);
+		return position_.copy();
 	}
 
 	/**
@@ -235,8 +268,7 @@ public abstract class AbstractViewport implements IViewport
 	 */
 	public void setPosition(IVector2 pos)
 	{
-		posX_ = pos.getXAsFloat();
-		posY_ = pos.getYAsFloat();
+		position_ = pos;
 	}
 
 	public void setPreserveAspectRation(boolean preserveAR)
@@ -365,23 +397,6 @@ public abstract class AbstractViewport implements IViewport
 	}
 
 	/**
-	 * Fires a right mouse click event
-	 * 
-	 * @param position the clicked position
-	 */
-	private void fireRightMouseClickEvent(IVector2 position)
-	{
-		synchronized(listeners_)
-		{
-			for(Iterator it = listeners_.iterator(); it.hasNext();)
-			{
-				IViewportListener listener = (IViewportListener)it.next();
-				listener.rightClicked(position.copy());
-			}
-		}
-	}
-
-	/**
 	 * Converts pixel coordinates into world coordinates
 	 * 
 	 * @param pixelX pixel x-coordinate
@@ -402,46 +417,70 @@ public abstract class AbstractViewport implements IViewport
 
 		double xFac = (paddedSize_.getXAsDouble()) / canvas_.getWidth();
 		double yFac = (paddedSize_.getYAsDouble()) / canvas_.getHeight();
-		IVector2 position = new Vector2Double((xFac * pixelX) + posX_,
-				(yFac * (canvas_.getHeight() - pixelY)) + posY_);
+		IVector2 position = new Vector2Double((xFac * pixelX) + position_.getXAsDouble(),
+				(yFac * (canvas_.getHeight() - pixelY)) + position_.getYAsDouble());
 
 		return position;
 	}
 
-	protected class MouseController implements MouseListener
+	protected class MouseController extends MouseInputAdapter implements MouseWheelListener
 	{
-		public void mouseClicked(MouseEvent e)
+		private IVector2 lastDragPos;
+		
+		public MouseController()
 		{
+			lastDragPos = null;
 		}
-
-		public void mouseEntered(MouseEvent e)
-		{
-		}
-
-		public void mouseExited(MouseEvent e)
-		{
-		}
-
+		
 		public void mousePressed(MouseEvent e)
 		{
 			if(e.getButton() == MouseEvent.BUTTON1)
 			{
-				Point p = e.getPoint();
-				IVector2 position = getWorldCoordinates(p.x, p.y);
-
-				if(e.getButton() == MouseEvent.BUTTON1)
+				IVector2 position = getWorldCoordinates(e.getX(), e.getY());
+				fireLeftMouseClickEvent(position);
+			}
+			else if(e.getButton() == MouseEvent.BUTTON3)
+			{
+				if (e.getClickCount() == 1)
 				{
-					fireLeftMouseClickEvent(position);
+					lastDragPos = (new Vector2Double(e.getX(), e.getY())).multiply(getPixelSize());
 				}
-				else if(e.getButton() == MouseEvent.BUTTON2)
+				else
 				{
-					fireRightMouseClickEvent(position);
+					setAreaSize(areaSize_);
 				}
 			}
 		}
-
+		
+		public void mouseWheelMoved(MouseWheelEvent e)
+		{
+			double zoomShift = -e.getWheelRotation();
+			IVector2 size = size_.copy().subtract(zoomShift);
+			setSize(size);
+			IVector2 pos = getPosition().copy().add(zoomShift / 2.0);
+			setPosition(pos);
+		}
+		
+		public void mouseDragged(MouseEvent e)
+		{
+			if (lastDragPos != null)
+			{
+				IVector2 position = (new Vector2Double(e.getX(), e.getY())).multiply(getPixelSize());
+				IVector2 diff = position.copy().subtract(lastDragPos);
+				if (getInvertX())
+					diff.negateX();
+				if (!getInvertY())
+					diff.negateY();
+				lastDragPos = position;
+				setPosition(getPosition().copy().subtract(diff));
+				
+			}
+		}
+		
 		public void mouseReleased(MouseEvent e)
 		{
+			if (e.getButton() == MouseEvent.BUTTON3)
+				lastDragPos = null;
 		}
 	}
 }

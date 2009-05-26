@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.observer.graphics;
 
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
@@ -10,6 +11,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
@@ -39,6 +41,8 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
+
+import com.sun.opengl.util.j2d.TextRenderer;
 
 
 /**
@@ -74,6 +78,9 @@ public class ViewportJOGL extends AbstractViewport
 	
 	/** Current OpenGL rendering context */
 	private GL context_;
+	
+	/** The text renderers */
+	private Map textRenderers_;
 
 	/**
 	 * Creates a new OpenGL-based viewport. May throw UnsatisfiedLinkError and
@@ -93,6 +100,7 @@ public class ViewportJOGL extends AbstractViewport
 		clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
 		repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
 		displayLists_ = Collections.synchronizedMap(new HashMap());
+		textRenderers_ = Collections.synchronizedMap(new HashMap());
 
 		try
 		{
@@ -112,7 +120,10 @@ public class ViewportJOGL extends AbstractViewport
 			throw e;
 		}
 
-		canvas_.addMouseListener(new MouseController());
+		MouseController mc = new MouseController();
+		canvas_.addMouseListener(mc);
+		canvas_.addMouseWheelListener(mc);
+		canvas_.addMouseMotionListener(mc);
 
 		setSize(new Vector2Double(1.0));
 		renderFrameAction_ = new Runnable()
@@ -190,6 +201,23 @@ public class ViewportJOGL extends AbstractViewport
 	}
 	
 	/**
+	 * Returns an appropriate text renderer.
+	 * 
+	 * @param font the font for the renderer
+	 * @return the renderer
+	 */
+	public TextRenderer getTextRenderer(Font font)
+	{
+		TextRenderer tr = (TextRenderer) textRenderers_.get(font);
+		if (tr == null)
+		{
+			tr = new TextRenderer(font);
+			textRenderers_.put(font, tr);
+		}
+		return tr;
+	}
+	
+	/**
 	 *  Returns the texture of a text
 	 *  
 	 *  @param info information on the text
@@ -262,16 +290,23 @@ public class ViewportJOGL extends AbstractViewport
 						* inversionFlag_.getYAsInteger(), paddedSize_
 						.getYAsDouble()
 						* (inversionFlag_.getYAsInteger() ^ 1), -0.5, 0.5);
-		gl.glTranslated(-posX_, -posY_, 0.0);
+		gl.glTranslated(-position_.getXAsDouble(), -position_.getYAsDouble(), 0.0);
 		
 		// Setup the scissor box
 		double xFac = canvas_.getWidth() / paddedSize_.getXAsDouble();
 		double yFac = canvas_.getHeight() / paddedSize_.getYAsDouble();
-		int x = (int)(-posX_ * xFac) - 1;
-		int y = (int)(-posY_ * yFac) - 1;
-		//TODO: this is likely to be wrong
-		int w = (int)Math.round(size_.getXAsDouble() * xFac) + 2;
-		int h = (int)Math.round(size_.getYAsDouble() * yFac) + 2;
+		
+		IVector2 shift = position_.copy();
+		if (!getInvertX())
+			shift.negateX();
+		if (!getInvertY())
+			shift.negateY();
+		int x = (int)Math.round(shift.getXAsDouble() * xFac);
+		int y = (int)Math.round(shift.getYAsDouble() * yFac);
+		
+		int w = (int)Math.round(areaSize_.getXAsDouble() * xFac);
+		int h = (int)Math.round(areaSize_.getYAsDouble() * yFac);
+		
 		gl.glScissor(x, y, w, h);
 	}
 	
@@ -426,7 +461,7 @@ public class ViewportJOGL extends AbstractViewport
 					{
 						l.init(ViewportJOGL.this, gl);
 					}
-					l.draw(size_, ViewportJOGL.this, gl);
+					l.draw(areaSize_, ViewportJOGL.this, gl);
 				}
 			}
 			
@@ -475,7 +510,7 @@ public class ViewportJOGL extends AbstractViewport
 					{
 						l.init(ViewportJOGL.this, gl);
 					}
-					l.draw(size_, ViewportJOGL.this, gl);
+					l.draw(areaSize_, ViewportJOGL.this, gl);
 				}
 			}
 			

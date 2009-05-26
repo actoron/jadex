@@ -25,6 +25,13 @@ public interface IViewport
 	 * @param size new viewport size
 	 */
 	public void setSize(IVector2 size);
+	
+	/**
+	 * Sets the maximum displayable size.
+	 * 
+	 * @param areaSize maximum area size.
+	 */
+	public void setAreaSize(IVector2 areaSize);
 
 	/**
 	 * Sets whether the viewport should preserve the aspect ratio of the size by

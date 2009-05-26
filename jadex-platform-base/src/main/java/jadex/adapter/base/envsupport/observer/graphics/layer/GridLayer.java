@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.media.opengl.GL;
 
@@ -86,7 +87,7 @@ public class GridLayer implements ILayer
 	public void draw(IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
 		g.setColor(c_);
-		Stroke s = g.getStroke();
+		/*Stroke s = g.getStroke();
 		g.setStroke(new BasicStroke(areaSize.getXAsFloat()
 				/ vp.getCanvas().getWidth()));
 		Line2D.Float line = new Line2D.Float();
@@ -110,6 +111,23 @@ public class GridLayer implements ILayer
 			line.y2 = y;
 			g.draw(line);
 		}
+		g.setStroke(s);*/
+		
+		IVector2 pixSize = vp.getPixelSize();
+		
+		IVector2 step = areaSize.copy().subtract(pixSize).divide(areaSize.copy().divide(gridSize_));
+		
+		for (float x = 0.0f; x < areaSize.getXAsFloat(); x = x + step.getXAsFloat())
+		{
+			Rectangle2D.Float r = new Rectangle2D.Float(x, 0.0f, pixSize.getXAsFloat(), areaSize.getYAsFloat());
+			g.fill(r);
+		}
+		
+		for (float y = 0.0f; y < areaSize.getYAsFloat(); y = y + step.getYAsFloat())
+		{
+			Rectangle2D.Float r = new Rectangle2D.Float(0.0f, y, areaSize.getXAsFloat(), pixSize.getYAsFloat());
+			g.fill(r);
+		}
 	}
 
 	/**
@@ -123,7 +141,7 @@ public class GridLayer implements ILayer
 	{
 		gl.glColor4fv(oglColor_, 0);
 		
-		IVector2 pixSize = vp.getPaddedSize().copy().divide(new Vector2Double(vp.getCanvas().getWidth(), vp.getCanvas().getHeight()));
+		IVector2 pixSize = vp.getPixelSize();
 		
 		gl.glBegin(GL.GL_QUADS);
 		

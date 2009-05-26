@@ -102,9 +102,6 @@ public class TiledLayer implements ILayer
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 
-		//float pTilesX = areaSize.getXAsFloat() / tileSize_.getXAsFloat();
-		//float pTilesY = areaSize.getYAsFloat() / tileSize_.getYAsFloat();
-
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		
 		gl.glMatrixMode(GL.GL_TEXTURE);
@@ -122,27 +119,6 @@ public class TiledLayer implements ILayer
 		gl.glEnd();
 		gl.glPopMatrix();
 		gl.glMatrixMode(GL.GL_MODELVIEW);
-		
-
-		/*gl.glBegin(GL.GL_QUADS);
-		for(float x = 0.0f; x < areaSize.getXAsFloat(); x = x
-				+ tileSize_.getXAsFloat())
-		{
-			for(float y = 0.0f; y < areaSize.getYAsFloat(); y = y
-					+ tileSize_.getYAsFloat())
-			{
-				gl.glTexCoord2f(0.0f, 0.0f);
-				gl.glVertex2f(x, y);
-				gl.glTexCoord2f(1.0f, 0.0f);
-				gl.glVertex2f(x + tileSize_.getXAsFloat(), y);
-				gl.glTexCoord2f(1.0f, 1.0f);
-				gl.glVertex2f(x + tileSize_.getXAsFloat(), y
-						+ tileSize_.getYAsFloat());
-				gl.glTexCoord2f(0.0f, 1.0f);
-				gl.glVertex2f(x, y + tileSize_.getYAsFloat());
-			}
-		}
-		gl.glEnd();*/
 
 		gl.glDisable(GL.GL_TEXTURE_2D);
 	}

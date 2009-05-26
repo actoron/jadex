@@ -234,7 +234,7 @@ public class Perspective2D implements IPerspective
 			}
 //			System.out.println("Persp: "+name+" opengl="+tryopengl);
 			viewport = createViewport(obscenter.getLibraryService(), tryopengl);
-			viewport.setSize(obscenter.getAreaSize());
+			viewport.setAreaSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);
 		}
 		return viewport.getCanvas();
@@ -247,6 +247,7 @@ public class Perspective2D implements IPerspective
 	public void setOpenGl(boolean opengl)
 	{
 		this.tryopengl = opengl;
+		//tryopengl = true;
 	}
 	
 	/**
@@ -488,10 +489,6 @@ public class Perspective2D implements IPerspective
 			{
 				selectedobject = closest;
 			}
-		}
-		
-		public void rightClicked(IVector2 position)
-		{
 		}
 	}
 }
