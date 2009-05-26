@@ -59,11 +59,35 @@
 			</env:processtypes>
 			
 			<env:perceptgeneratortypes>
-				<env:perceptgeneratortype name="burnervisiongen" class="BurnerVisionGenerator"/>
-				<env:perceptmapping agenttype="Burner" class="BurnerVisionProcessor">
+				<env:percepttypes>
+					<!-- <env:percepttype name="garbage_appeared" objecttype="garbage" action="appeared" >
+						<env:objecttypes>
+							<env:objecttype name="garbage"/>
+						</env:objecttypes>
+						<env:actiontypes>
+							<env:actiontype name="appeared"/>
+						</env:actiontypes>
+						<env:agenttypes>
+							<env:agenttype name="collector"/>
+							<env:agenttype name="burner"/>
+						</env:agenttypes>
+					</env:percepttype> -->
+					
+					<env:percepttype name="garbage_appeared" objecttype="garbage" actiontype="appeared" />
+					<env:percepttype name="garbage_disappeared" objecttype="garbage" actiontype="disappeared" />
+				</env:percepttypes>
+			
+				<env:perceptgeneratortype name="visiongen" class="VisionGenerator">
+					<env:property name="range">0</env:property>
+					<env:property name="percepttypes">new String[]{"garbage_appeared", "garbage_disappeared"}</env:property>
+				</env:perceptgeneratortype>
+				
+				<env:perceptmapping agenttype="Burner" class="VisionProcessor">
 					<!-- Todo: mapping per percept type? - ->
 					<env:percepttype name="garbage_appeared"/>
 					<env:percepttype name="garbage_disappeared"/> -->
+				</env:perceptmapping>
+				<env:perceptmapping agenttype="Collector" class="VisionProcessor">
 				</env:perceptmapping>
 			</env:perceptgeneratortypes>
 			

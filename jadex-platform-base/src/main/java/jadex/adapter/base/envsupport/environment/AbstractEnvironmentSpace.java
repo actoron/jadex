@@ -520,15 +520,15 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	
 	/**
 	 *  Create a percept for the given agent.
-	 *  @param type	The percept type.
+	 *  @param type The percept type.
 	 *  @param data	The content of the percept (if any).
-	 *  @param agent	The agent that should receive the percept.
+	 *  @param agent The agent that should receive the percept.
 	 */
 	public void createPercept(String type, Object data, IAgentIdentifier agent)
 	{
 		synchronized(monitor)
 		{
-//			System.out.println("New percept: "+type+", "+data+", "+agent);
+			System.out.println("New percept: "+type+", "+data+", "+agent);
 			
 			String	agenttype	= ((ApplicationContext)getContext()).getAgentType(agent);
 			IPerceptProcessor	proc	= (IPerceptProcessor)perceptmappings.get(agenttype);

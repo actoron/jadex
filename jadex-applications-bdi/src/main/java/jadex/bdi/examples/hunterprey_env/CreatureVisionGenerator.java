@@ -89,11 +89,14 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 			{
 				if(!unchanged.contains(objects[i]))
 				{
+					// Create event for creature that is seen by moving creature.
 					if(isCreature(objects[i]))
 					{
 						IAgentIdentifier	owner	= (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 						((AbstractEnvironmentSpace)event.getSpace()).createPercept(OBJECT_APPEARED, event.getSpaceObject(), owner);
 					}
+					
+					// Create event for moving creature.
 					if(isCreature(event.getSpaceObject()))
 					{
 						IAgentIdentifier	owner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);

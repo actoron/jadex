@@ -149,6 +149,12 @@ public class MEnvSpaceType	extends MSpaceType
 //			new BeanAttributeInfo(null, null, ""),
 //			}), null));
 		
+		types.add(new TypeInfo("percepttype", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"name", "objecttype", "actiontype"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("objecttypes", null, ""),
+			new BeanAttributeInfo("actiontypes", null, "")}), null));
+		
 		types.add(new TypeInfo("actiontype", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
@@ -753,6 +759,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("view", new BeanAttributeInfo("views", null, "property")));
 		linkinfos.add(new LinkInfo("spaceexecutor", new BeanAttributeInfo(null, null, "property")));
 		linkinfos.add(new LinkInfo("perspective", new BeanAttributeInfo("perspectives", null, "property")));
+		linkinfos.add(new LinkInfo("percepttype", new BeanAttributeInfo("percepttypes", null, "property")));
 		
 		// theme
 		linkinfos.add(new LinkInfo("drawable", new BeanAttributeInfo("drawables", null, "")));
@@ -790,7 +797,13 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("objecttype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("drawable/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("spaceexecutor/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("perceptgeneratortype/property", new BeanAttributeInfo("properties", null, "")));
 		
+		// percepts
+		linkinfos.add(new LinkInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttypes", null, "")));
+		linkinfos.add(new LinkInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("agenttypes", null, "")));
+		linkinfos.add(new LinkInfo("percepttype/actiontypes/actiontype", new BeanAttributeInfo("actiontypes", null, "")));
+
 		return linkinfos;
 	}
 	

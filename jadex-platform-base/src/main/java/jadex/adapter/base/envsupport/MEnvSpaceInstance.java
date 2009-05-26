@@ -132,6 +132,21 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
+		// Create space percept types.
+		/*List percepttypes = spacetype.getPropertyList("percepttypes");
+		if(percepttypes!=null)
+		{
+			for(int i=0; i<percepttypes.size(); i++)
+			{
+				Map mpercepttype = (Map)percepttypes.get(i);
+
+				mpercepttype
+				
+//				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name"));
+				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
+			}
+		}*/
+		
 		// Create space actions.
 		List spaceactions = spacetype.getPropertyList("actiontypes");
 		if(spaceactions!=null)

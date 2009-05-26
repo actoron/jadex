@@ -38,19 +38,23 @@
 		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl">
 				$beliefbase.myself.position
-				
 				// $beliefbase.myself.getProperty("position")
-				
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
-				// ?agent = (agent (agent_has_localname ?agentname))
-				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				// ?mbel_env = (mbelief (melement_has_name "env"))
-				// ?env = (Environment (getPosition (?agentname) ?ret))
 			</fact>
  		</belief>
 
+		<!-- The garbages at the current posistion. -->
+		<beliefset name="garbages" class="ISpaceObject"/>
+
 		<!-- When at least one piece of waste is present on the
 			current position the actual position is perceived as dirty. -->
+		<belief name="is_dirty" class="boolean" evaluationmode="push">
+			<fact language="jcl">
+				$beliefbase.garbages.length>0
+			</fact>
+		</belief>
+
+		<!-- When at least one piece of waste is present on the
+			current position the actual position is perceived as dirty. - ->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
  			<fact language="jcl">
  				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage").size()>0
@@ -62,20 +66,13 @@
 				// ?mbel_pos = (mbelief (melement_has_name "pos"))
  				// ?env = (Environment (isDirty (?pos) ?ret))
  			</fact>
-		</belief>
+		</belief>-->
 		
 		<!-- Flag indicating if the agent currently carries garbage. -->
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
  			<fact language="jcl">
  				$beliefbase.myself.garbage!=null
-  				
   				//$beliefbase.myself.getProperty("has_garbage")
- 			
- 				// ((Environment)$beliefbase.getBelief("env").getFact()).hasGarbage($scope.getAgentName())
-				// ?agent = (agent (agent_has_localname ?agentname))
-				// ?mbel_env = (mbelief (melement_has_name "env"))
-				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
- 				// ?env = (Environment (hasGarbage (?agentname) ?ret))
 			</fact>
 		</belief>
 	</beliefs>
@@ -127,13 +124,13 @@
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
 		<achievegoal name="pick" exclude="never" retrydelay="100">
- 			<dropcondition>
- 				// !$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
+ 			<dropcondition language="jcl">
+ 				!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
 				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				?mbelief = (mbelief (melement_has_name "is_dirty"))
-				?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))
-				?mbelief2 = (mbelief (melement_has_name "has_garbage"))
+				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
+				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
+				// ?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))
+				// ?mbelief2 = (mbelief (melement_has_name "has_garbage"))
  			</dropcondition>
 		</achievegoal>
 	</goals>

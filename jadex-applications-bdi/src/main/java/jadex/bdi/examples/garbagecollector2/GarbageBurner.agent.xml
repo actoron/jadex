@@ -35,33 +35,12 @@
 		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl">
 				$beliefbase.myself.position
-				
 				//$beliefbase.myself.getProperty("position")
-				
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
-				// ?agent = (agent (agent_has_localname ?agentname))
-				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				// ?mbel_env = (mbelief (melement_has_name "env"))
-				// ?env = (Environment (getPosition (?agentname) ?ret))
 			</fact>
  		</belief>
 		
 		<!-- The garbages at the current posistion. -->
 		<beliefset name="garbages" class="ISpaceObject"/>
-		
-		<!--  <beliefset name="garbages" class="ISpaceObject" evaluationmode="push">
-			<facts language="jcl">
-				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage")
- 				
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getGarbages($beliefbase.getBelief("pos").getFact())
-				
-				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				// ?mbel_env = (mbelief (melement_has_name "env"))
-				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				// ?mbel_pos = (mbelief (melement_has_name "pos"))
- 				// ?env = (Environment (getGarbages (?pos) $?ret))
-			</facts>
-		</beliefset> -->
 	</beliefs>
 
 	<goals>

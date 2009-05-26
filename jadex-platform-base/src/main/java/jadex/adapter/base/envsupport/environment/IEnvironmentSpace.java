@@ -22,6 +22,20 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	public String getName();
 	
 	/**
+	 *  Add a space percept type.
+	 *  @param typename The percept name.
+	 *  @param objecttypes The objecttypes.
+	 *  @param agenttypes The agenttypes.
+	 * /
+	public void addSpacePerceptType(String typename, String[] objecttypes, String[] actiontypes, String[] agenttypes);
+	
+	/**
+	 *  Remove a space process type.
+	 *  @param typename The type name.
+	 * /
+	public void removeSpacePerceptType(String typename);*/
+	
+	/**
 	 *  Add a space process type.
 	 *  @param typename The type name.
 	 *  @param properties The properties.
