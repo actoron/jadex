@@ -46,27 +46,37 @@ public class DumbPreyVisionProcessor implements IPerceptProcessor
 					{
 						public void run()
 						{
-							ISpaceObject	myself	= space2d.getOwnedObjects(agent)[0];
-							IBelief	nearfoodbel	= exta.getBeliefbase().getBelief("nearest_food");
-							ISpaceObject	nearfood	= (ISpaceObject)nearfoodbel.getFact();
-							
-							// Remember new food only if nearer than other known food (if any).
-							if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))
+							try
 							{
-								if(nearfood==null
-									|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-											(IVector2)nearfood.getProperty(Space2D.POSITION))
-									.greater(
-										space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-											(IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION))))
+								ISpaceObject	myself	= space2d.getOwnedObjects(agent)[0];
+								IBelief	nearfoodbel	= exta.getBeliefbase().getBelief("nearest_food");
+								ISpaceObject	nearfood	= (ISpaceObject)nearfoodbel.getFact();
+								
+								// Remember new food only if nearer than other known food (if any).
+								if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))
 								{
-									nearfoodbel.setFact(percept);
+									if(nearfood==null
+										|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
+												(IVector2)nearfood.getProperty(Space2D.POSITION))
+										.greater(
+											space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
+												(IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION))))
+									{
+										nearfoodbel.setFact(percept);
+									}
+								}
+								// Remove disappeared food from belief.
+								else if(percept.equals(nearfood) && type.equals(CreatureVisionGenerator.OBJECT_DISAPPEARED))
+								{
+									nearfoodbel.setFact(null);
 								}
 							}
-							// Remove disappeared food from belief.
-							else if(percept.equals(nearfood) && type.equals(CreatureVisionGenerator.OBJECT_DISAPPEARED))
+							catch(Exception e)
 							{
-								nearfoodbel.setFact(null);
+								// Todo: fix agent init.
+								// Exception might be thrown, when agent not yet initialized
+								// -> AgentRules.findValue() fails due to missing initparents,
+								// when belief is initialized on demand.
 							}
 						}
 					});

@@ -587,9 +587,9 @@ public abstract class Plan extends AbstractPlan
 			exception	= null;
 			result	= null;
 			
-			if(ex instanceof RuntimeException)
-				throw (RuntimeException)ex;
-			else if(ex!=null)
+//			if(ex instanceof RuntimeException)
+//				throw (RuntimeException)ex;
+			if(ex!=null)
 				throw new RuntimeException(ex);
 
 			return res;

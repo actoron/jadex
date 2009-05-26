@@ -15,8 +15,17 @@ public class AnalyzeTargetTask extends ListenableTask
 {
 	//-------- constants --------
 	
-	/** The flag for analyzed targets. */
-	public static final String	PROPERTY_MARKED	= "marked";
+	/** The state for targets (unknown, analyzing, analyzed). */
+	public static final String	PROPERTY_STATE	= "state";
+	
+	/** The unknown state for target. */
+	public static final String	STATE_UNKNOWN	= "unknown";
+	
+	/** The unknown state for target. */
+	public static final String	STATE_ANALYZING	= "analyzing";
+	
+	/** The unknown state for target. */
+	public static final String	STATE_ANALYZED	= "analyzed";
 	
 	/** The property for the ore amount. */
 	public static final String	PROPERTY_ORE	= "ore";
@@ -49,6 +58,24 @@ public class AnalyzeTargetTask extends ListenableTask
 	//-------- ListenableTask methods --------
 	
 	/**
+	 *  This method will be executed by the object before the task gets added to
+	 *  the execution queue.
+	 *  @param obj	The object that is executing the task.
+	 */
+	public void start(ISpaceObject obj)
+	{
+		IVector2	loc	= (IVector2)obj.getProperty(Space2D.POSITION);
+		IVector2	tloc	= (IVector2)target.getProperty(Space2D.POSITION);
+		if(!loc.equals(tloc))
+			throw new RuntimeException("Not at location: "+obj+", "+target);
+		
+		if(!target.getProperty(PROPERTY_STATE).equals(STATE_UNKNOWN))
+			throw new RuntimeException("Can only analyze '"+STATE_UNKNOWN+"' targets: "+target);
+		
+		target.setProperty(AnalyzeTargetTask.PROPERTY_STATE, AnalyzeTargetTask.STATE_ANALYZING);		
+	}
+	
+	/**
 	 *  Executes the task.
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
@@ -65,7 +92,6 @@ public class AnalyzeTargetTask extends ListenableTask
 		
 		if(time<=0)
 		{
-			target.setProperty(PROPERTY_MARKED, Boolean.TRUE);		
 			taskFinished(obj, target.getProperty(PROPERTY_ORE));
 		}
 	}

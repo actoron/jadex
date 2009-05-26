@@ -48,15 +48,18 @@ public class AnalyzeTargetPlan extends Plan
 		Number	ore	= (Number)res.waitForResult();
 		System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
 		if(ore.intValue()>0)
-			callProductionAgent(target);
+			callProducerAgent(target);
+
+		// Hack??? Should be done in task, but aborts plan before producers are called.
+		target.setProperty(AnalyzeTargetTask.PROPERTY_STATE, AnalyzeTargetTask.STATE_ANALYZED);		
 	}
 
 	/**
-	 *  Sending a location to the Production Agent.
+	 *  Sending a location to the Producer Agent.
 	 *  Therefore it has first to be looked up in the DF.
 	 *  @param target
 	 */
-	private void callProductionAgent(ISpaceObject target)
+	private void callProducerAgent(ISpaceObject target)
 	{
 //		System.out.println("Calling some Production Agent...");
 
