@@ -119,20 +119,17 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners)
 	{
-		IVector2 pos = properties!=null ? (IVector2)properties.remove(Space2D.POSITION) : null;
-		if(pos==null)	
-			pos = getRandomPosition(Vector2Int.ZERO);
-		
 		ISpaceObject	ret	= super.createSpaceObject(typename, properties, tasks, listeners);
 		
+		IVector2 pos = ret.getPropertyNames().contains(POSITION)
+			? (IVector2) ret.getProperty(POSITION) : getRandomPosition(Vector2Int.ZERO);
+
 		if(pos!=null)
 		{
 			setPosition(ret.getId(), pos);
 		}
 		
 		return ret;
-		
-		
 	}
 
 	/**

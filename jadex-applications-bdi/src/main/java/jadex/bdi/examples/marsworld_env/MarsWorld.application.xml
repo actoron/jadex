@@ -51,16 +51,19 @@
 				<env:objecttype name="sentry">
 					<env:property name="vision">0.1</env:property>
 					<env:property name="speed">0.05</env:property>
+					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
 					<env:property name="vision">0.05</env:property>
 					<env:property name="speed">0.1</env:property>
+					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
 					<env:property name="vision">0.05</env:property>
 					<env:property name="speed">0.15</env:property>
 					<env:property name="ore">0</env:property>
 					<env:property name="capacity">20</env:property>
+					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="homebase">
 					<env:property name="ore">0</env:property>
@@ -190,6 +193,39 @@
 					<env:object type="target">
 						<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
 						<env:property name="ore">25</env:property>
+					</env:object>
+				</env:objects>
+				<env:observers>
+					<env:observer name="MarsWorld" view="view_all" perspective="icons"/>
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="Multi">
+			<agents>
+				<agent type="Sentry" number="2"/>
+  				<agent type="Producer" number="5"/>
+				<agent type="Carry" number="10"/>
+			</agents>
+
+			<agr:agrspace name="myagrspace" type="marsagrspace">
+				<agr:group name="mymarsteam" type="marsteam">
+					<agr:position role="sentry" agenttype="Sentry" />
+					<agr:position role="producer" agenttype="Producer" />
+					<agr:position role="carrier" agenttype="Carry" />
+				</agr:group>
+			</agr:agrspace>
+
+			<env:envspace name="my2dspace" type="2dspace" width="2" height ="2">
+				<env:objects>
+					<env:object type="homebase">
+						<env:property name="space">$space</env:property><!-- hack!!! -->
+						<env:property name="missiontime">
+							300000 + $space.getContext().getPlatform().getService(IClockService.class).getTime()
+						</env:property>
+					</env:object>
+					<env:object type="target" number="20">
+						<env:property name="ore">Math.random()>0.3 ? (Integer)(5+Math.random()*35)*5 : 0</env:property>
 					</env:object>
 				</env:objects>
 				<env:observers>

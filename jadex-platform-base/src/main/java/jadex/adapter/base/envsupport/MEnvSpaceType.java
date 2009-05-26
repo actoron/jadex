@@ -693,11 +693,11 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("object", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"name", "type", "owner"}, 
+			SUtil.createHashMap(new String[]{"name", "type", "owner", "number"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, "")
+			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "")
 			}), null));
 		
 		types.add(new TypeInfo("process", MultiCollection.class, null, null,

@@ -5,12 +5,11 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
@@ -19,17 +18,13 @@ import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
-import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ISpace;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IPropertyObject;
-import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
@@ -37,9 +32,6 @@ import jadex.javaparser.SimpleValueFetcher;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 /**
  *  Java representation of environemnt space instance for xml description.
@@ -230,22 +222,31 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Map mobj = (Map)objects.get(i);
 			
 				List mprops = (List)mobj.get("properties");
-				Map props = convertProperties(mprops, fetcher);
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
+				IAgentIdentifier	ownerid	= null;
 				if(owner!=null)
 				{
-					IAgentIdentifier	ownerid;
 					IAMS	ams	= ((IAMS)app.getPlatform().getService(IAMS.class));
 					if(owner.indexOf("@")!=-1)
 						ownerid	= ams.createAgentIdentifier((String)owner, false);
 					else
 						ownerid	= ams.createAgentIdentifier((String)owner, true);
+				}
+				
+				int num	= 1;
+				if(mobj.containsKey("number"))
+				{
+					num	= ((Number)MEnvSpaceInstance.getProperty(mobj, "number")).intValue();
+				}
+				
+				for(int j=0; j<num; j++)
+				{
+					Map props = convertProperties(mprops, fetcher);
 					if(props==null)
 						props	= new HashMap();
 					props.put(ISpaceObject.PROPERTY_OWNER, ownerid);
+					ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
 				}
-				
-				ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
 			}
 		}
 		
