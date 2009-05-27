@@ -10,6 +10,7 @@ import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.PerceptType;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
@@ -30,6 +31,7 @@ import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -131,21 +133,28 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					(String)MEnvSpaceInstance.getProperty(mapping, "objecttype"));
 			}
 		}
-		
 		// Create space percept types.
-		/*List percepttypes = spacetype.getPropertyList("percepttypes");
+		List percepttypes = spacetype.getPropertyList("percepttypes");
 		if(percepttypes!=null)
 		{
 			for(int i=0; i<percepttypes.size(); i++)
 			{
 				Map mpercepttype = (Map)percepttypes.get(i);
 
-				mpercepttype
+				PerceptType pt = new PerceptType();
 				
-//				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name"));
-				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
+				pt.setName((String)getProperty(mpercepttype, "name"));
+				
+				List atypes = (List)mpercepttype.get("agenttypes");
+				pt.setAgentTypes(atypes==null? null: new HashSet(atypes));
+				
+				List otypes = (List)mpercepttype.get("objecttypes");
+				pt.setObjectTypes(otypes==null? null: new HashSet(otypes));
+				
+				System.out.println("Adding environment percept type: "+pt);
+				ret.addPerceptType(pt);
 			}
-		}*/
+		}
 		
 		// Create space actions.
 		List spaceactions = spacetype.getPropertyList("actiontypes");

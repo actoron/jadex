@@ -35,6 +35,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** The space process types. */
 	protected Map processtypes;
 	
+	/** The percepttypes. */
+	protected Map percepttypes;
+	
 	/** Available agent actions. */
 	protected Map actions;
 	
@@ -91,6 +94,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		this.actions = new HashMap();
 		this.processtypes = new HashMap();
 		this.processes = new HashMap();
+		this.percepttypes = new HashMap();
 		this.perceptgenerators = new HashMap();
 		this.perceptmappings = new HashMap();
 		this.objecttypes = new HashMap();
@@ -99,7 +103,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		this.spaceobjectsbyowner = new HashMap();
 		this.objectidcounter = new AtomicCounter();
 		this.actionlist	= new AgentActionList(this);
-		this.perceptlist	= new PerceptList(this);
+		this.perceptlist = new PerceptList(this);
 	}
 	
 	//-------- methods --------
@@ -520,22 +524,25 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	
 	/**
 	 *  Create a percept for the given agent.
-	 *  @param type The percept type.
+	 *  @param typename The percept type.
 	 *  @param data	The content of the percept (if any).
 	 *  @param agent The agent that should receive the percept.
 	 */
-	public void createPercept(String type, Object data, IAgentIdentifier agent)
+	public void createPercept(String typename, Object data, IAgentIdentifier agent)
 	{
 		synchronized(monitor)
 		{
-			System.out.println("New percept: "+type+", "+data+", "+agent);
+//			if(!percepttypes.containsKey(typename))
+//				throw new RuntimeException("Unknown percept type: "+typename);
 			
-			String	agenttype	= ((ApplicationContext)getContext()).getAgentType(agent);
-			IPerceptProcessor	proc	= (IPerceptProcessor)perceptmappings.get(agenttype);
+			System.out.println("New percept: "+typename+", "+data+", "+agent);
+			
+			String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
+			IPerceptProcessor proc	= (IPerceptProcessor)perceptmappings.get(agenttype);
 			if(proc!=null)
-				perceptlist.schedulePercept(type, data, agent, proc);
+				perceptlist.schedulePercept(typename, data, agent, proc);
 			else
-				System.out.println("Warning: No processor for percept: "+type+", "+data+", "+agent);
+				System.out.println("Warning: No processor for percept: "+typename+", "+data+", "+agent);
 		}
 	}
 
@@ -768,6 +775,45 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		synchronized(monitor)
 		{
 			perceptmappings.remove(agenttype);
+		}
+	}
+	
+	/**
+	 *  Add a space percept type.
+	 *  @param typename The percept name.
+	 *  @param objecttypes The objecttypes.
+	 *  @param agenttypes The agenttypes.
+	 */
+	public void addPerceptType(PerceptType percepttype)
+	{
+		synchronized(monitor)
+		{
+			percepttypes.put(percepttype.getName(), percepttype);
+		}
+	}
+	
+	/**
+	 *  Remove a space process type.
+	 *  @param typename The type name.
+	 */
+	public void removePerceptType(String typename)
+	{
+		synchronized(monitor)
+		{
+			percepttypes.remove(typename);
+		}
+	}
+	
+	/**
+	 *  Get a space percept type.
+	 *  @param percepttype The name of the percept type.
+	 *  @return The percept type. 
+	 */
+	public PerceptType getPerceptType(String percepttype)
+	{
+		synchronized(monitor)
+		{
+			return (PerceptType)percepttypes.get(percepttype);
 		}
 	}
 	

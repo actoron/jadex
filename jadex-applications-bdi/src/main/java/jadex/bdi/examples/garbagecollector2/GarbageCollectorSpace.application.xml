@@ -60,26 +60,31 @@
 			
 			<env:perceptgeneratortypes>
 				<env:percepttypes>
-					<!-- <env:percepttype name="garbage_appeared" objecttype="garbage" action="appeared" >
+					<!-- <env:percepttype name="garbage_appeared" objecttype="garbage" >
 						<env:objecttypes>
 							<env:objecttype name="garbage"/>
 						</env:objecttypes>
-						<env:actiontypes>
-							<env:actiontype name="appeared"/>
-						</env:actiontypes>
 						<env:agenttypes>
 							<env:agenttype name="collector"/>
 							<env:agenttype name="burner"/>
 						</env:agenttypes>
 					</env:percepttype> -->
 					
-					<env:percepttype name="garbage_appeared" objecttype="garbage" actiontype="appeared" />
-					<env:percepttype name="garbage_disappeared" objecttype="garbage" actiontype="disappeared" />
+					<env:percepttype name="garbage_appeared" objecttype="garbage"/>
+					<env:percepttype name="garbage_disappeared" objecttype="garbage" />
 				</env:percepttypes>
-			
-				<env:perceptgeneratortype name="visiongen" class="VisionGenerator">
+					
+				<env:perceptgeneratortype name="visiongen" class="AbstractVisionGenerator">
 					<env:property name="range">0</env:property>
-					<env:property name="percepttypes">new String[]{"garbage_appeared", "garbage_disappeared"}</env:property>
+					<!-- percept types are declared with associated action types: 
+						percepttype, actiontype1, actiontype2, ... -->
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"garbage_appeared", "appeared", "created"}, 
+							new String[]{"garbage_disappeared", "disappeared", "destroyed"}
+						}
+					</env:property>
 				</env:perceptgeneratortype>
 				
 				<env:perceptmapping agenttype="Burner" class="VisionProcessor">

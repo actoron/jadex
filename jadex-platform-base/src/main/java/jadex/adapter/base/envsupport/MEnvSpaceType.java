@@ -143,17 +143,11 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, null, ""),
 			}), null));
 		
-//		types.add(new TypeInfo("agentactiontype", MultiCollection.class, null, null,
-//			SUtil.createHashMap(new String[]{"class", "name"}, 
-//			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
-//			new BeanAttributeInfo(null, null, ""),
-//			}), null));
-		
 		types.add(new TypeInfo("percepttype", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"name", "objecttype", "actiontype"}, 
+			SUtil.createHashMap(new String[]{"name", "objecttype", "agenttype"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo("objecttypes", null, ""),
-			new BeanAttributeInfo("actiontypes", null, "")}), null));
+			new BeanAttributeInfo("agenttypes", null, "")}), null));
 		
 		types.add(new TypeInfo("actiontype", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
@@ -802,7 +796,6 @@ public class MEnvSpaceType	extends MSpaceType
 		// percepts
 		linkinfos.add(new LinkInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttypes", null, "")));
 		linkinfos.add(new LinkInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("agenttypes", null, "")));
-		linkinfos.add(new LinkInfo("percepttype/actiontypes/actiontype", new BeanAttributeInfo("actiontypes", null, "")));
 
 		return linkinfos;
 	}
