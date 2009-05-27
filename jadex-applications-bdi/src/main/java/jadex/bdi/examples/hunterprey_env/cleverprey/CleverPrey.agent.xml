@@ -1,0 +1,127 @@
+<!--
+	<H3>The clever prey.</H3>
+
+	Wander, flee and eat behavior for preys.
+
+	Three goal types are supported:<br>
+	- Running away from hunters (maintain keep alone).<br>
+	- Eating food if discovered (achieve eat_food).<br>
+	- Searching for food (perform wander around).
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="CleverPrey"
+	package="jadex.bdi.examples.hunterprey_env.cleverprey">
+
+	<imports>
+		<import>jadex.adapter.base.contextservice.*</import>
+		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.bridge.IContextService</import>
+		<import>java.util.Arrays</import>
+	</imports>
+
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="env" class="Grid2D">
+			<fact>(Grid2D)$scope.getApplicationContext().getSpace("my2dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject">
+ 			<fact>$beliefbase.env.getOwnedObjects($scope.getAgentIdentifier())[0]</fact>
+ 		</belief>
+
+ 		<!-- The known food. -->
+ 		<beliefset name="food" class="ISpaceObject"/>
+	</beliefs>
+	
+	<goals>
+		<!-- A goal to explore the map. -->
+		<performgoal name="wander_around" retry="true" exclude="never" />
+		
+		<!-- Goal to eat any known food (activated in order of distance). -->
+		<achievegoal name="eat_food">
+			<parameter name="food" class="ISpaceObject">
+				<value>$food</value>
+			</parameter>
+			<unique dummy="true"/>
+			<creationcondition language="jcl">
+ 				// $beliefbase.eating_allowed &amp;&amp;
+ 				// !$beliefbase.getBeliefSet("forbidden_food").containsFact($food)
+ 				
+ 				ISpaceObject $food &amp;&amp; $food.getType().equals("food")
+ 				&amp;&amp; Arrays.asList($beliefbase.food).contains($food)
+
+				// ?rbel_eating_allowed	= (belief (element_has_model ?mbel_eating_allowed) (belief_has_fact true))
+				// ?mbel_eating_allowed	= (mbelief (melement_has_name "eating_allowed"))
+				// 
+				// ?rbelset_food	= (beliefset (element_has_model ?mbelset_food) (beliefset_has_facts $?x ?food $?y))
+				// ?mbelset_food	= (mbeliefset (melement_has_name "food"))
+				// 
+				// ?rbelset_forbidden_food	= (beliefset (element_has_model ?mbelset_forbidden_food) (beliefset_has_facts excludes ?food))
+				// ?mbelset_forbidden_food	= (mbeliefset (melement_has_name "forbidden_food"))
+			</creationcondition>
+			<deliberation>
+				<inhibits ref="wander_around"/>
+				<inhibits ref="eat_food" language="jcl">
+					// $beliefbase.my_self.getDistance($goal.$food)
+					// &lt; $beliefbase.my_self.getDistance($ref.$food)
+					$beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$goal.food.position).getAsInteger()
+					&lt; $beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$ref.food.position).getAsInteger()
+					
+					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myself))
+					// ?mbelief = (mbelief (melement_has_name "my_self"))
+					// 
+					// ?rparam = (parameter (parameter_has_name "$food") (parameter_has_value ?food))
+					// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
+					// 
+					// ?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?reffood))
+					// ?refgoal = (goal (parameterelement_has_parameters contains ?refparam &amp;
+					// 	:(&lt; (MethodCallFunction "Creature" "getDistance" ?myself ?food)
+					// 		(MethodCallFunction "Creature" "getDistance" ?myself ?reffood)  
+					// )))
+				</inhibits>
+			</deliberation>
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<plan name="wander_plan">
+			<body class="WanderPlan"/>
+			<trigger>
+				<goal ref="wander_around"/>
+			</trigger>
+		</plan>
+		<plan name="eat_plan">
+			<body class="EatPlan"/>
+			<parameter name="food" class="ISpaceObject">
+				<goalmapping ref="eat_food.food"/>
+			</parameter>
+			<trigger>
+				<goal ref="eat_food"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<properties>
+		<!-- The environment may throw exceptions when executing property listeners
+			and these listeners are not valid any longer. This leads to normal plan
+			failure and can therefore be ignored. -->
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<property name="debugging">false</property>
+    </properties>
+
+	<configurations>
+		<configuration name="Clever">
+			<goals>
+				<initialgoal ref="wander_around"/>
+			</goals>
+		</configuration>
+	</configurations>
+</agent>

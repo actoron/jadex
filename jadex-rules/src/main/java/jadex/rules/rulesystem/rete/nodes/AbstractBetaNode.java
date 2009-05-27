@@ -217,8 +217,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			for(Iterator it=bmem.getResultMemory().iterator(); it.hasNext(); )
 			{
 				Tuple next = (Tuple)it.next();
-//				if(next.getLastTuple().equals(left))
-//					System.out.println("driss: "+this+" "+next);
+				if(next.getLastTuple().equals(left))
+					System.out.println("driss: "+this+" "+next);
 				assert !next.getLastTuple().equals(left) : "Tuple not removed: "+left+", "+this;
 			}
 		}

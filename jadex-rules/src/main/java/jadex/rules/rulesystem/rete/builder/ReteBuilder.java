@@ -110,7 +110,7 @@ public class ReteBuilder
 	 */
 	public ReteBuilder()
 	{
-		this.indexing	= true;
+//		this.indexing	= true;
 		this.nodesharing	= true;
 		this.notjoin	= true;
 		
@@ -608,6 +608,30 @@ public class ReteBuilder
 	 */
 	protected void connectRight(INode source, INode consumer, BuildContext context)
 	{
+		// Check if the right node is also on the left tree.
+		// If yes, a copy node needs to be inserted to assure correct removal propagations.
+//		if(consumer.getNodeId()==420)
+//			System.out.println("yxckl kl");
+		boolean	isleft	= false;
+		List	test	= new ArrayList();
+		test.add(consumer);
+		for(int i=0; !isleft && i<test.size(); i++)
+		{
+			isleft	= test.get(i)==source;
+			if(test.get(i) instanceof ITupleConsumerNode)
+				test.add(((ITupleConsumerNode)test.get(i)).getTupleSource());
+			if(test.get(i) instanceof IObjectConsumerNode)
+				test.add(((IObjectConsumerNode)test.get(i)).getObjectSource());
+		}
+		if(isleft)
+		{
+			// An alpha node without constraints provides the desired copy functionality.
+			assert context.getLastAlphaNode()==source : context.getLastAlphaNode()+", "+source;
+			addAlphaNode(null, context);
+			source	= context.getLastAlphaNode();
+			System.out.println("Inserted copy node: "+source);
+		}
+		
 		// Connect compatible nodes directly.
 		if(source instanceof IObjectSourceNode && consumer instanceof IObjectConsumerNode)
 		{
@@ -1080,6 +1104,34 @@ public class ReteBuilder
 				}
 			}
 			
+//			// When a copy node is required, look for it.
+//			if(context.getLastAlphaNode() instanceof IObjectSourceNode)
+//			{
+//				boolean	isleft	= false;
+//				List	test	= new ArrayList();
+//				test.add(context.getLastBetaNode());
+//				for(int i=0; !isleft && i<test.size(); i++)
+//				{
+//					isleft	= test.get(i)==context.getLastAlphaNode();
+//					if(test.get(i) instanceof ITupleConsumerNode)
+//						test.add(((ITupleConsumerNode)test.get(i)).getTupleSource());
+//					if(test.get(i) instanceof IObjectConsumerNode)
+//						test.add(((IObjectConsumerNode)test.get(i)).getObjectSource());
+//				}
+//				if(isleft && !(context.getLastAlphaNode() instanceof AlphaNode || ((AlphaNode)context.getLastAlphaNode()).getConstraintEvaluators()!=null))
+//				{
+//					IObjectConsumerNode[]	ocon	= ((IObjectSourceNode)context.getLastAlphaNode()).getObjectConsumers();
+//					for(int i=0; node==null && ocon!=null && i<ocon.length; i++)
+//					{
+//						if(ocon[i] instanceof AlphaNode && ((AlphaNode)ocon[i]).getConstraintEvaluators()==null)
+//						{
+//							context.setLastBetaNode(ocon[i]);
+//							break;
+//						}
+//					}
+//				}
+//			}
+
 			// Search for common join node with same constraints/indexers.
 			if(context.getLastBetaNode() instanceof ITupleSourceNode)
 			{
@@ -1105,8 +1157,8 @@ public class ReteBuilder
 		if(node==null)
 		{
 			node = new BetaNode(context.getRootNode().getNextNodeId(), evas, ids);
-			connectRight(context.getLastAlphaNode(), node, context);
 			connectLeft(context.getLastBetaNode(), node, context);
+			connectRight(context.getLastAlphaNode(), node, context);
 		}
 
 		context.setLastBetaNode(node);
@@ -1161,8 +1213,8 @@ public class ReteBuilder
 		if(node==null)
 		{
 			node = new NotNode(context.getRootNode().getNextNodeId(), evas, ids);
-			connectRight(context.getLastAlphaNode(), node, context);
 			connectLeft(context.getLastBetaNode(), node, context);
+			connectRight(context.getLastAlphaNode(), node, context);
 			//context.setLastBetaNode(nn);
 			//context.setTupleCount(tuplecnt);
 		}

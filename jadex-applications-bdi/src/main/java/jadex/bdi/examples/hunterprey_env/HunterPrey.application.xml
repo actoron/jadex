@@ -20,6 +20,7 @@
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbprey.*</import>
+		<import>jadex.bdi.examples.hunterprey_env.cleverprey.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbhunter.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 	</imports>
@@ -44,13 +45,13 @@
 			
 			<env:avatarmappings>
 				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
+				<env:avatarmapping agenttype="CleverPrey" objecttype="prey"/>
 				<env:avatarmapping agenttype="DumbHunter" objecttype="hunter"/>
 			</env:avatarmappings>
 
 			<env:actiontypes>
 				<env:actiontype name="move" class="MoveAction" />
 				<env:actiontype name="eat" class="EatAction" />
-				<env:actiontype name="create_obstacles" class="CreateObstaclesAction" />
 			</env:actiontypes>
 			
 			<env:processtypes>
@@ -74,6 +75,12 @@
 			<env:perceptgeneratortypes>
 				<env:perceptgeneratortype name="creaturevisiongen" class="CreatureVisionGenerator"/>
 				<env:perceptmapping agenttype="DumbPrey" class="DumbPreyVisionProcessor">
+					<!-- Todo: mapping per percept type? - ->
+					<env:percepttype name="object_appeared"/>
+					<env:percepttype name="object_disappeared"/>
+					<env:percepttype name="object_moved"/> -->
+				</env:perceptmapping>
+				<env:perceptmapping agenttype="CleverPrey" class="CleverPreyVisionProcessor">
 					<!-- Todo: mapping per percept type? - ->
 					<env:percepttype name="object_appeared"/>
 					<env:percepttype name="object_disappeared"/>
@@ -156,8 +163,8 @@
 	</spacetypes>
 
 	<agenttypes>
-		<agenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey_env/MicroPreyAgent.class"/>
 		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_env/dumbprey/DumbPrey.agent.xml"/>
+		<agenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey_env/cleverprey/CleverPrey.agent.xml"/>
 		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_env/dumbhunter/DumbHunter.agent.xml"/>
 	</agenttypes>
 
@@ -168,11 +175,31 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
+				
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">5</env:property>
+					</env:process>
+				</env:processes>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="One Clever Prey">
+ 			<agents>
+				<agent name="Harald" type="CleverPrey"/>
+			</agents>
+			
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 				
 				<env:processes>
 					<env:process type="create">
@@ -193,11 +220,9 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 				
 				<env:processes>
 					<env:process type="create">
@@ -213,11 +238,9 @@
 
 		<application name="Empty">			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
@@ -234,11 +257,9 @@
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 				
 				<env:processes>
 					<env:process type="create">
@@ -259,11 +280,9 @@
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 				
 				<env:processes>
 					<env:process type="create">
@@ -284,11 +303,9 @@
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
@@ -312,11 +329,9 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
