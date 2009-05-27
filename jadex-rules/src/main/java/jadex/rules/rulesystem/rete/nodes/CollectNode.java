@@ -242,7 +242,11 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		if(vals.isEmpty())
 		{
 			nodemem.removeWorkingTuple(indextuple);
-			nodemem.removeResultTuple(resulttuple);
+			if(nodemem.resultMemoryContains(resulttuple))
+			{
+				nodemem.removeResultTuple(resulttuple);
+				propagateRemovalToTupleConsumers(resulttuple, state, mem, agenda);
+			}
 		}
 		// Check constraints if at least one element.
 		else

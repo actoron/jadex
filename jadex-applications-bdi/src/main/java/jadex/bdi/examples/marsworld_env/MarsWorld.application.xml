@@ -1,5 +1,5 @@
 <!--
-	<H3>The marsworld application descriptor</H3>
+	<H3>The mars world application descriptor</H3>
 
 	Can be used to launch the mars world example.<br>
 
@@ -10,7 +10,7 @@
 	- <b>Carry agents</b> are able to carry ore to the base.<br><br>
 
 	Objective is to carry as much ore as possible to the<br>
-	homebase in a predefined mission time.<br>
+	home base in a predefined mission time.<br>
 -->
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:agr="http://jadex.sourceforge.net/jadex-agr"

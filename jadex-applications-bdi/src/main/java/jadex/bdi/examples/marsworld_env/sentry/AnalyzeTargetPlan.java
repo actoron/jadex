@@ -42,16 +42,23 @@ public class AnalyzeTargetPlan extends Plan
 		dispatchSubgoalAndWait(go_target);
 
 		// Analyse the target.
-		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
-		SyncResultListener	res	= new SyncResultListener();
-		myself.addTask(new AnalyzeTargetTask(target, res));
-		Number	ore	= (Number)res.waitForResult();
-		System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
-		if(ore.intValue()>0)
-			callProducerAgent(target);
-
-		// Hack??? Should be done in task, but aborts plan before producers are called.
-		target.setProperty(AnalyzeTargetTask.PROPERTY_STATE, AnalyzeTargetTask.STATE_ANALYZED);		
+		try
+		{
+			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
+			SyncResultListener	res	= new SyncResultListener();
+			myself.addTask(new AnalyzeTargetTask(target, res));
+			Number	ore	= (Number)res.waitForResult();
+			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
+			if(ore.intValue()>0)
+				callProducerAgent(target);
+	
+			// Hack??? Should be done in task, but aborts plan before producers are called.
+			target.setProperty(AnalyzeTargetTask.PROPERTY_STATE, AnalyzeTargetTask.STATE_ANALYZED);
+		}
+		catch(Exception e)
+		{
+			// Fails for one agent, when two agents try to analyze the same target at once.
+		}
 	}
 
 	/**
