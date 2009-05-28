@@ -330,9 +330,9 @@ public class Vector2Int implements IVector2
 	 */
 	public IVector1 getDistance(IVector2 vector)
 	{
-		double dx = x_ - vector.getXAsDouble();
-		double dy = y_ - vector.getYAsDouble();
-		return new Vector1Double(Math.sqrt((dx * dx) + (dy * dy)));
+		int dx = x_ - vector.getXAsInteger();
+		int dy = y_ - vector.getYAsInteger();
+		return new Vector1Double((int)Math.sqrt((dx * dx) + (dy * dy)));
 	}
 	
 	/** Returns the x-component of the vector.

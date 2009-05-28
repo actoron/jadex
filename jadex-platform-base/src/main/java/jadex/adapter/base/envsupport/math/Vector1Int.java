@@ -80,6 +80,26 @@ public class Vector1Int implements IVector1
 		return this;
 	}
 	
+	/**
+	 *  Calculate the square root.
+	 *  @return The square root.
+	 */
+	public IVector1 sqrt()
+	{
+		x_ = (int)Math.sqrt(x_);
+		return this;
+	}
+	
+	/**
+	 *  Calculate the modulo.
+	 *  @return The modulo value.
+	 */
+	public IVector1 mod(IVector1 mod)
+	{
+		x_ = x_ % mod.getAsInteger();
+		return this;
+	}
+	
 	/** Returns the distance to another vector
 	 *
 	 *  @param vector other vector 

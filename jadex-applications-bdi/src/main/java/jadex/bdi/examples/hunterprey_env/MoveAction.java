@@ -97,7 +97,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 			Collection	hunters	= grid.getSpaceObjectsByGridPosition((IVector2)avatar.getProperty(Space2D.POSITION), "hunter");
 			if(hunters!=null)
 			{
-				pos	= grid.getGridPosition(pos);	// Hack!!! Position only converted in setPosition().
+				pos	= grid.adjustPosition(pos);	// Hack!!! Position only converted in setPosition().
 				for(Iterator it=hunters.iterator(); it.hasNext(); )
 				{
 					ISpaceObject	hunter	= (ISpaceObject)it.next();

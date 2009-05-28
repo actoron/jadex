@@ -19,30 +19,30 @@ public class ContinuousSpace2D extends Space2D
 	 */
 	public ContinuousSpace2D()
 	{
-		this(null, null);
+		this(null, null, BORDER_TORUS);
 	}
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with the default name.
 	 * @param spaceexecutor executor for the space
 	 * @param actionexecutor executor for agent actions
-	 * @param areaSize the size of the 2D area
+	 * @param areasize the size of the 2D area
 	 */
-	public ContinuousSpace2D(IVector2 areaSize)
+	public ContinuousSpace2D(IVector2 areasize)
 	{
-		this(areaSize, DEFAULT_NAME);
+		this(DEFAULT_NAME, areasize, BORDER_TORUS);
 	}
 	
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with a special ID.
+	 * @param name the name of this space
+	 * @param areasize the size of the 2D area
 	 * @param actionexecutor executor for agent actions
-	 * @param areaSize the size of the 2D area
-	 * @param spaceName the name of this space
 	 */
-	public ContinuousSpace2D(IVector2 areaSize, Object spaceName)
+	public ContinuousSpace2D(Object name, IVector2 areasize, int bordermode)
 	{
-		super(areaSize);
-		setProperty("name", spaceName);
+		super(areasize, bordermode);
+		setProperty("name", name);
 	}
 	
 	//-------- methods --------

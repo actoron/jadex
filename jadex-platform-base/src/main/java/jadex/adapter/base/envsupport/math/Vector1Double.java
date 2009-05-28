@@ -71,6 +71,26 @@ public class Vector1Double implements IVector1
 		return this;
 	}
 	
+	/**
+	 *  Calculate the square root.
+	 *  @return The square root.
+	 */
+	public IVector1 sqrt()
+	{
+		x_ = Math.sqrt(x_);
+		return this;
+	}
+	
+	/**
+	 *  Calculate the modulo.
+	 *  @return The modulo value.
+	 */
+	public IVector1 mod(IVector1 mod)
+	{
+		x_ = x_ % mod.getAsDouble();
+		return this;
+	}
+	
 	public IVector1 getDistance(IVector1 vector)
 	{
 		double distance = Math.abs(Math.abs(x_) - Math.abs(vector.getAsDouble()));

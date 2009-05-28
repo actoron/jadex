@@ -5,6 +5,8 @@ import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.SVector;
+import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 
@@ -25,8 +27,19 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	/** The constant for the position property. */
 	public static final String POSITION = "position";
 	
+	/** Border strict mode. */
+	public static final int BORDER_STRICT = 0;
+
+	/** Border torus behavior. */
+	public static final int BORDER_TORUS = 1;
+
+	//-------- attributes --------
+	
 	/** Area size. */
 	protected IVector2 areasize;
+	
+	/** The behavior of the world */
+	public int bordermode;
 	
 	//-------- constructors --------
 	
@@ -36,9 +49,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(IVector2 areasize)
+	protected Space2D(IVector2 areasize, int bordermode)
 	{
 		this.areasize = areasize;
+		
 	}
 	
 	//-------- methods --------
@@ -94,6 +108,24 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	}
 	
 	/**
+	 *  Get the border mode.
+	 *  @return the border_mode
+	 */
+	public int getBorderMode()
+	{
+		return this.bordermode;
+	}
+
+	/**
+	 *  Set the border mode.
+	 *  @param border_mode The border mode to set.
+	 */
+	public void setBorderMode(int bordermode)
+	{
+		this.bordermode = bordermode;
+	}
+	
+	/**
 	 *  Get the position of an object.
 	 *  @param id The id.
 	 *  @return The position.
@@ -108,7 +140,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			return (IVector2)obj.getProperty(POSITION);
 		}
 	}*/
-	
+
 	/** 
 	 * Creates an object in this space.
 	 * @param type the object's type
@@ -141,12 +173,12 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	{
 		synchronized(monitor)
 		{
-			ISpaceObject obj = getSpaceObject(id); 
+			ISpaceObject obj = getSpaceObject(id);
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
-			Object oldpos = obj.getProperty(POSITION);
-			obj.setProperty(POSITION, pos);
 			
+			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
+			obj.setProperty(POSITION, adjustPosition(pos));
 			fireEnvironmentEvent(new EnvironmentEvent(EnvironmentEvent.OBJECT_POSITION_CHANGED, this, obj, oldpos));
 		}
 	}
@@ -156,13 +188,132 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 *  @param pos1	The first position.
 	 *  @param pos2	The second position.
 	 */
-	// Todo: border properties (e.g. torus) for generic 2D space?
 	public IVector1	getDistance(IVector2 pos1, IVector2 pos2)
 	{
 		synchronized(monitor)
 		{
-			return pos1.getDistance(pos2);
+			IVector1 ret;
+			
+			if(getBorderMode()==BORDER_TORUS)
+			{
+				IVector1 dx = getDistance(pos1.getX(), pos2.getX(), true);
+				IVector1 dy = getDistance(pos1.getY(), pos2.getY(), false);
+				
+				ret	= calculateDistance(dx, dy);
+			}
+			else
+			{
+				// Hack!!! todo:!
+				
+				ret	= pos1.getDistance(pos2);
+			}
+			
+			return ret;
 		}
+	}
+	
+	/**
+	 *  Get the distance between two positions.
+	 *  @param pos1	The first position.
+	 *  @param pos2	The second position.
+	 */
+	public IVector1	getDistance(IVector1 pos1, IVector1 pos2, boolean isx)
+	{
+		synchronized(monitor)
+		{
+			IVector1 ret = null;
+			
+			if(getBorderMode()==BORDER_TORUS)
+			{
+				IVector1 size = isx? areasize.getX(): areasize.getY();
+				
+				if(pos1.less(pos2))
+				{
+					IVector1 tmp = pos1;
+					pos1 = pos2;
+					pos2 = tmp;
+				}
+				IVector1 dx1 = pos2.copy().subtract(pos1);
+				IVector1 dx2 = pos1.copy().add(size).subtract(pos2);
+				if(dx1.less(dx2) || dx1.equals(dx2))
+				{
+					ret = dx1;
+				}
+				else
+				{
+					ret = dx2;
+				}
+			}
+			else
+			{
+				if(pos1.less(pos2))
+				{
+					ret = pos2.subtract(pos1);
+				}
+				else
+				{
+					ret = pos1.subtract(pos2);
+				}
+			}
+			
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Calculate the distance in the space.
+	 *  @param dx The distance in x.
+	 *  @param dy The distance in y.
+	 *  @return The distance according to the distance metrics of the space.
+	 */
+	public IVector1 calculateDistance(IVector1 dx, IVector1 dy)
+	{
+		IVector1 x2 = dx.copy().multiply(dx);
+		IVector1 y2 = dy.copy().multiply(dy);
+		return x2.add(y2).sqrt();
+	}
+	
+	/**
+	 *  Calculate a position according to the space borders.
+	 */
+	public IVector2 adjustPosition(IVector2 pos)
+	{
+		IVector2 ret = null;
+		
+		if(pos!=null)
+		{
+			if(BORDER_TORUS==getBorderMode())
+			{
+				IVector1 sizex = areasize.getX();
+				IVector1 sizey = areasize.getY();
+				
+				IVector1 x = pos.getX().copy();
+				IVector1 y = pos.getY().copy();
+				
+				while(x.less(Vector1Double.ZERO))
+					x.add(sizex);
+				while(y.less(Vector1Double.ZERO))
+					y.add(sizey);
+				
+				x = x.copy().mod(sizex);
+				y = y.copy().mod(sizey);
+				
+				ret = SVector.createVector2(x, y);
+			}
+			else if(BORDER_STRICT==getBorderMode())
+			{
+				IVector1 sizex = areasize.getX();
+				IVector1 sizey = areasize.getY();
+				
+				if(pos.getX().greater(sizex) || pos.getX().less(Vector1Double.ZERO)
+					|| pos.getY().greater(sizey) || pos.getY().less(Vector1Double.ZERO))
+				{
+					throw new RuntimeException("Position out of areasize: "+pos+" "+areasize);
+				}
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -191,10 +342,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * maximum distance from the position.
 	 * 
 	 * @param position position the object should be nearest to
-	 * @param maxDist maximum distance from the position, use null for unlimited distance
+	 * @param maxdist maximum distance from the position, use null for unlimited distance
 	 * @return nearest object's ID or null if none is found
 	 */
-	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxDist)
+	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxdist)
 	{
 		synchronized(monitor)
 		{
@@ -210,7 +361,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 					if(curobj.getProperty(Space2D.POSITION)!=null)
 					{
 						IVector1 objdist = ((IVector2)curobj.getProperty(Space2D.POSITION)).getDistance(position); 
-						if ((nearest == null) || (objdist.less(distance)))
+						if((nearest == null) || (objdist.less(distance)))
 						{
 							nearest = curobj;
 							distance = objdist;
@@ -218,7 +369,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 					}
 				}
 			}
-			if((maxDist != null) && (distance != null) && (maxDist.less(distance)))
+			if((maxdist != null) && (distance != null) && (maxdist.less(distance)))
 			{
 				return null;
 			}
@@ -246,10 +397,15 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			{
 				Map.Entry entry = (Entry)it.next();
 				ISpaceObject obj = (ISpaceObject)entry.getValue();
-				IVector1 dist = ((IVector2)obj.getProperty(Space2D.POSITION)).getDistance(position); 
-				if(dist.less(maxdist) || dist.equals(maxdist))
+				IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
+				
+				if(pos!=null)
 				{
-					ret.add(obj);
+					IVector1 dist = getDistance(pos, position);
+					if(dist.less(maxdist) || dist.equals(maxdist))
+					{
+						ret.add(obj);
+					}
 				}
 			}
 		
@@ -265,8 +421,6 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector2 maxdist)
 	{
-		// todo: make border aware!
-		
 		synchronized(monitor)
 		{
 			List ret = new ArrayList();
@@ -277,8 +431,12 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				Map.Entry entry = (Entry)it.next();
 				ISpaceObject obj = (ISpaceObject)entry.getValue();
 				IVector2 objpos = (IVector2)obj.getProperty(Space2D.POSITION);
-				if(Math.abs(objpos.getXAsDouble()-position.getXAsDouble())<=maxdist.getXAsDouble()
-					&& Math.abs(objpos.getYAsDouble()-position.getYAsDouble())<=maxdist.getYAsDouble())
+				
+				IVector1 dx = getDistance(objpos.getX(), position.getX(), true);
+				IVector1 dy = getDistance(objpos.getY(), position.getY(), false);
+
+				if(dx.less(maxdist.getX()) || dx.equals(maxdist.getX())
+					&& dy.less(maxdist.getY()) || dy.equals(maxdist.getY()))
 				{
 					ret.add(obj);
 				}

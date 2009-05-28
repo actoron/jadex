@@ -37,6 +37,18 @@ public interface IVector1
 	 */
 	public IVector1 negate();
 	
+	/**
+	 *  Calculate the square root.
+	 *  @return The square root.
+	 */
+	public IVector1 sqrt();
+	
+	/**
+	 *  Calculate the modulo.
+	 *  @return The modulo value.
+	 */
+	public IVector1 mod(IVector1 mod);
+	
 	/** Returns the distance to another vector
 	 *
 	 *  @param vector other vector 

@@ -33,31 +33,32 @@ public class GoPlanEnv extends Plan
 			int my = mypos.getYAsInteger();
 			int ty = target.getYAsInteger();
 
-			assert mx!=tx || my!=ty;
-
-			if(mx!=tx)
+			if(mx!=tx || my!=ty)
 			{
-				dir = GoAction.RIGHT;
-				int dx = Math.abs(mx-tx);
-				if(mx>tx && dx<=size.getXAsInteger()/2)
-					dir = GoAction.LEFT;
+				if(mx!=tx)
+				{
+					dir = GoAction.RIGHT;
+					int dx = Math.abs(mx-tx);
+					if(mx>tx && dx<=size.getXAsInteger()/2)
+						dir = GoAction.LEFT;
+				}
+				else
+				{
+					dir = GoAction.DOWN;
+					int dy = Math.abs(my-ty);
+					if(my>ty && dy<=size.getYAsInteger()/2)
+						dir = GoAction.UP;
+				}
+	
+	//			System.out.println("Wants to go: "+dir);
+				
+				Map params = new HashMap();
+				params.put(GoAction.DIRECTION, dir);
+				params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
+				SyncResultListener srl	= new SyncResultListener();
+				env.performSpaceAction("go", params, srl); 
+				srl.waitForResult();
 			}
-			else
-			{
-				dir = GoAction.DOWN;
-				int dy = Math.abs(my-ty);
-				if(my>ty && dy<=size.getYAsInteger()/2)
-					dir = GoAction.UP;
-			}
-
-//			System.out.println("Wants to go: "+dir);
-			
-			Map params = new HashMap();
-			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
-			SyncResultListener srl	= new SyncResultListener();
-			env.performSpaceAction("go", params, srl); 
-			srl.waitForResult();
 		}
 	}
 }
