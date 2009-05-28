@@ -106,6 +106,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			Double height = getProperty(properties, "height")!=null? (Double)getProperty(properties, "height"): (Double)getProperty(spacetype.getProperties(), "height");
 			
 			((Space2D)ret).setAreaSize(Vector2Double.getVector2(width, height));
+//			System.out.println("areasize: "+width+" "+height);
 		}
 		
 		// Create space object types.
@@ -171,22 +172,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				ret.addSpaceAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
 			}
 		}
-		
-		// Create agent actions.
-//		List agentactions = spacetype.getPropertyList("agentactiontypes");
-//		if(agentactions!=null)
-//		{
-//			for(int i=0; i<agentactions.size(); i++)
-//			{
-//				Map maction = (Map)agentactions.get(i);
-//				ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
-//				List props = (List)maction.get("properties");
-//				setProperties(action, props, fetcher);
-//				
-////				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
-//				ret.addAgentAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
-//			}
-//		}
 		
 		// Create processes.
 		List processes = spacetype.getPropertyList("processtypes");

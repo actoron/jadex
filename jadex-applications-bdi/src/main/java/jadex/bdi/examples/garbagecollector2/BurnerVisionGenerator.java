@@ -41,8 +41,8 @@ public class BurnerVisionGenerator extends SimplePropertyObject implements IPerc
 	 */
 	public void agentAdded(IAgentIdentifier agent, ISpace space)
 	{
-		// Only add agents of type "Burner"
-		if("Burner".equals(((IApplicationContext)space.getContext()).getAgentType(agent)))
+		String at = ((IApplicationContext)space.getContext()).getAgentType(agent);
+		if("Burner".equals(at) || "Collector".equals(at))
 		{
 			if(agents==null)
 				agents = new ArrayList();

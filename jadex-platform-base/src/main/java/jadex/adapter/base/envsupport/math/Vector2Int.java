@@ -519,4 +519,17 @@ public class Vector2Int implements IVector2
 		return buffer.toString();
 	}
 
+	/**
+	 *  Get a vector for two doubles.
+	 *  @param a The first value.
+	 *  @param b The second value.
+	 *  @return The vector (null if at least one of args is null).
+	 */
+	public static IVector2 getVector2(Integer a, Integer b)
+	{
+		IVector2 ret = null;
+		if(a!=null && b!=null)
+			ret = a.intValue()==0 && b.intValue()==0? ZERO: new Vector2Int(a.intValue(), b.intValue());
+		return ret;
+	}
 }

@@ -35,6 +35,8 @@ public class CheckingPlanEnv extends Plan
 	protected static IVector2 computeNextPosition(IVector2 pos, int sizex, int sizey)
 	{
 		// Go right in even lanes
+		if(pos==null)
+			System.out.println("testi2");
 		if(pos.getXAsInteger()+1<sizex && pos.getYAsInteger()%2==0)
 		{
 			pos = new Vector2Int(pos.getXAsInteger()+1, pos.getYAsInteger());

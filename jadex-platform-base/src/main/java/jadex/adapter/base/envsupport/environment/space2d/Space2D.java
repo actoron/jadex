@@ -52,37 +52,11 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	protected Space2D(IVector2 areasize, int bordermode)
 	{
 		this.areasize = areasize;
-		
+		this.bordermode = bordermode;
 	}
 	
 	//-------- methods --------
-	
-	/**
-	 * Retrieves a random position within the simulation area with a minimum
-	 * distance from the edge.
-	 * 
-	 * @param distance minimum distance from the edge, null or zero for no distance
-	 */
-//	public abstract IVector2 getRandomPosition(IVector2 distance);
-	
-	/**
-	 * Returns the ID of the nearest object to the given position within a
-	 * maximum distance from the position.
-	 * 
-	 * @param position position the object should be nearest to
-	 * @param maxDist maximum distance from the position, use null for unlimited distance
-	 * @return nearest object's ID or null if none is found
-	 */
-//	public abstract ISpaceObject getNearestObject(IVector2 position, IVector1 maxDist);
-	
-	/**
-	 * Retrieve all objects in the distance for a position
-	 * @param position
-	 * @param distance
-	 * @return The near objects. 
-	 */
-//	public abstract ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance);
-	
+		
 	/**
 	 * Returns the size of the simulated area.
 	 * @return size of the simulated area
@@ -97,13 +71,13 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	
 	/**
 	 *  Set the area size.
-	 *  @param areaSize The area size.
+	 *  @param areasize The area size.
 	 */
-	public void setAreaSize(IVector2 areaSize)
+	public void setAreaSize(IVector2 areasize)
 	{
 		synchronized(monitor)
 		{
-			areasize = areaSize;
+			this.areasize = areasize;
 		}
 	}
 	
@@ -124,22 +98,6 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	{
 		this.bordermode = bordermode;
 	}
-	
-	/**
-	 *  Get the position of an object.
-	 *  @param id The id.
-	 *  @return The position.
-	 * /
-	public IVector2 getPosition(Object id)
-	{
-		synchronized(monitor)
-		{
-			ISpaceObject obj = getSpaceObject(id); 
-			if(obj==null)
-				throw new RuntimeException("Space object not found: "+id);
-			return (IVector2)obj.getProperty(POSITION);
-		}
-	}*/
 
 	/** 
 	 * Creates an object in this space.
@@ -153,11 +111,12 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	{
 		ISpaceObject	ret	= super.createSpaceObject(typename, properties, tasks, listeners);
 		
-		IVector2 pos = ret.getPropertyNames().contains(POSITION)
-			? (IVector2) ret.getProperty(POSITION) : getRandomPosition(Vector2Int.ZERO);
+		IVector2 pos = ret.getPropertyNames().contains(POSITION)? 
+			(IVector2) ret.getProperty(POSITION) : getRandomPosition(Vector2Int.ZERO);
 
 		if(pos!=null)
 		{
+			ret.setProperty(POSITION, null);
 			setPosition(ret.getId(), pos);
 		}
 		
@@ -178,7 +137,8 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				throw new RuntimeException("Space object not found: "+id);
 			
 			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
-			obj.setProperty(POSITION, adjustPosition(pos));
+			IVector2 newpos = adjustPosition(pos);
+			obj.setProperty(POSITION, newpos);
 			fireEnvironmentEvent(new EnvironmentEvent(EnvironmentEvent.OBJECT_POSITION_CHANGED, this, obj, oldpos));
 		}
 	}
@@ -284,6 +244,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		{
 			if(BORDER_TORUS==getBorderMode())
 			{
+				if(areasize==null)
+					System.out.println("shit");
+				
 				IVector1 sizex = areasize.getX();
 				IVector1 sizey = areasize.getY();
 				
@@ -310,6 +273,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				{
 					throw new RuntimeException("Position out of areasize: "+pos+" "+areasize);
 				}
+				ret = pos;
 			}
 		}
 		
@@ -386,8 +350,6 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist)
 	{
-		// todo: make border aware!
-		
 		synchronized(monitor)
 		{
 			List ret = new ArrayList();

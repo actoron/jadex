@@ -45,11 +45,11 @@ public class Grid2D extends Space2D
 	 * Creates a new {@link ContinuousSpace2D} with the default name.
 	 * 
 	 * @param actionexecutor executor for agent actions
-	 * @param areaSize the size of the 2D area
+	 * @param areasize the size of the 2D area
 	 */
-	public Grid2D(IVector2 areaSize)
+	public Grid2D(IVector2 areasize)
 	{
-		this(DEFAULT_NAME, areaSize, BORDER_TORUS);
+		this(DEFAULT_NAME, areasize, BORDER_TORUS);
 	}
 	
 	/**
@@ -60,13 +60,25 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D(Object name, IVector2 areasize, int bordermode)
 	{
-		super(areasize, bordermode);
+		super(areasize==null? null: new Vector2Int(areasize.getXAsInteger(), areasize.getYAsInteger()), bordermode);
 		this.setProperty("name", name);
 		this.objectsygridpos = new MultiCollection();
 	}
 	
 	//-------- grid specific methods --------
 		
+	/**
+	 *  Set the area size.
+	 *  @param areasize The area size.
+	 */
+	public void setAreaSize(IVector2 areasize)
+	{
+		synchronized(monitor)
+		{
+			this.areasize = areasize==null? null: new Vector2Int(areasize.getXAsInteger(), areasize.getYAsInteger());
+		}
+	}
+	
 	/**
 	 * Get all SimObjects from a specific type at a specific grid position
 	 */
@@ -161,13 +173,17 @@ public class Grid2D extends Space2D
 			ISpaceObject obj = getSpaceObject(id);
 			
 			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
-			if(objectsygridpos.containsKey(oldpos))
+			if(objectsygridpos.containsKey(oldpos) && oldpos!=null)
+			{
+//				System.out.println("remove: "+oldpos+" "+obj);
 				objectsygridpos.remove(oldpos, obj);
+			}
 			
-			pos = adjustPosition(pos);
-			objectsygridpos.put(pos, obj);
+			IVector2 newpos = adjustPosition(pos);
+			objectsygridpos.put(newpos, obj);
+//			System.out.println("add: "+newpos+" "+obj);
 			
-			super.setPosition(id, pos);
+			super.setPosition(id, newpos);
 		}
 	}
 		

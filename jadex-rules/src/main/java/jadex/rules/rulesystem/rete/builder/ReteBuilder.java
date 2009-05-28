@@ -629,7 +629,7 @@ public class ReteBuilder
 			assert context.getLastAlphaNode()==source : context.getLastAlphaNode()+", "+source;
 			addAlphaNode(null, context);
 			source	= context.getLastAlphaNode();
-			System.out.println("Inserted copy node: "+source);
+//			System.out.println("Inserted copy node: "+source);
 		}
 		
 		// Connect compatible nodes directly.

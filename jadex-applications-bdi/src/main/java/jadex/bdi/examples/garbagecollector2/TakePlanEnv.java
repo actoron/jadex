@@ -23,8 +23,10 @@ public class TakePlanEnv extends Plan
 		Space2D grid = (Space2D)getBeliefbase().getBelief("env").getFact();
 
 		// Pickup the garbarge.
+		System.out.println("Pick started: "+getAgentName());
 		IGoal pickup = createGoal("pick");
 		dispatchSubgoalAndWait(pickup);
+		System.out.println("Pick ended: "+getAgentName());
 
 		// Go to the burner.
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
@@ -50,17 +52,17 @@ public class TakePlanEnv extends Plan
 
 	public void aborted()
 	{
-//		System.out.println("aborted: "+getAgentName()+" "+this);
+		System.out.println("aborted: "+getAgentName()+" "+this);
 	}
 
 	public void failed()
 	{
-//		System.out.println("failed: "+getAgentName()+" "+this+" "+getException());
+		System.out.println("failed: "+getAgentName()+" "+this+" "+getException());
 	}
 
 	public void passed()
 	{
-//		System.out.println("passed: "+getAgentName()+" "+this);
+		System.out.println("passed: "+getAgentName()+" "+this);
 	}
 	
 }
