@@ -454,10 +454,12 @@ public abstract class AbstractViewport implements IViewport
 		
 		public void mouseWheelMoved(MouseWheelEvent e)
 		{
-			double zoomShift = -e.getWheelRotation();
+			IVector2 oldMousePos = getWorldCoordinates(e.getX(), e.getY());
+			IVector2 zoomShift = size_.copy().multiply(0.1 * -e.getWheelRotation());
 			IVector2 size = size_.copy().subtract(zoomShift);
 			setSize(size);
-			IVector2 pos = getPosition().copy().add(zoomShift / 2.0);
+			IVector2 newMousePos = getWorldCoordinates(e.getX(), e.getY());
+			IVector2 pos = getPosition().copy().subtract(newMousePos.subtract(oldMousePos));
 			setPosition(pos);
 		}
 		

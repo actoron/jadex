@@ -87,34 +87,10 @@ public class GridLayer implements ILayer
 	public void draw(IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
 		g.setColor(c_);
-		/*Stroke s = g.getStroke();
-		g.setStroke(new BasicStroke(areaSize.getXAsFloat()
-				/ vp.getCanvas().getWidth()));
-		Line2D.Float line = new Line2D.Float();
-		line.y1 = 0.0f;
-		line.y2 = areaSize.getYAsFloat();
-		for(float x = 0.0f; x <= areaSize.getXAsFloat(); x = x
-				+ gridSize_.getXAsFloat())
-		{
-			line.x1 = x;
-			line.x2 = x;
-			g.draw(line);
-		}
-		g.setStroke(new BasicStroke(areaSize.getYAsFloat()
-				/ vp.getCanvas().getHeight()));
-		line.x1 = 0.0f;
-		line.x2 = areaSize.getXAsFloat();
-		for(float y = 0.0f; y <= areaSize.getYAsFloat(); y = y
-				+ gridSize_.getYAsFloat())
-		{
-			line.y1 = y;
-			line.y2 = y;
-			g.draw(line);
-		}
-		g.setStroke(s);*/
 		
 		IVector2 pixSize = vp.getPixelSize();
 		
+		//Hack
 		IVector2 step = areaSize.copy().subtract(pixSize).divide(areaSize.copy().divide(gridSize_));
 		
 		for (float x = 0.0f; x < areaSize.getXAsFloat(); x = x + step.getXAsFloat())

@@ -237,8 +237,6 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		{
 			return;
 		}
-		
-		Graphics2D g = vp.getContext();
 
 		//System.out.println("draw: "+obj+" "+size+" "+rot+" "+position);
 		for(Iterator it = drawList.iterator(); it.hasNext();)
@@ -262,8 +260,6 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		{
 			return;
 		}
-		
-		GL gl = vp.getContext();
 		
 //		System.out.println("draw: "+obj+" "+size+" "+rot+" "+position);
 		for(Iterator it = drawList.iterator(); it.hasNext();)

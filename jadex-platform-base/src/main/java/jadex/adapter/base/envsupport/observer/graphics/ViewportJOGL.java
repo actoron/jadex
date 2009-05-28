@@ -212,6 +212,7 @@ public class ViewportJOGL extends AbstractViewport
 		if (tr == null)
 		{
 			tr = new TextRenderer(font);
+			tr.setUseVertexArrays(false);
 			textRenderers_.put(font, tr);
 		}
 		return tr;
@@ -297,15 +298,20 @@ public class ViewportJOGL extends AbstractViewport
 		double yFac = canvas_.getHeight() / paddedSize_.getYAsDouble();
 		
 		IVector2 shift = position_.copy();
-		if (!getInvertX())
+		/*if (!getInvertX())
 			shift.negateX();
-		if (!getInvertY())
-			shift.negateY();
-		int x = (int)Math.round(shift.getXAsDouble() * xFac);
-		int y = (int)Math.round(shift.getYAsDouble() * yFac);
+		if (getInvertY())
+			shift.negateY();*/
+		int x = -(int)Math.floor(shift.getXAsDouble() * xFac);
+		int y = -(int)Math.floor(shift.getYAsDouble() * yFac);
 		
-		int w = (int)Math.round(areaSize_.getXAsDouble() * xFac);
-		int h = (int)Math.round(areaSize_.getYAsDouble() * yFac);
+		int w = (int)Math.ceil(areaSize_.getXAsDouble() * xFac);
+		int h = (int)Math.ceil(areaSize_.getYAsDouble() * yFac);
+		
+		if (getInvertX())
+			x = canvas_.getWidth() - x - w;
+		if (getInvertY())
+			y = canvas_.getHeight() - y - h;
 		
 		gl.glScissor(x, y, w, h);
 	}
@@ -568,6 +574,7 @@ public class ViewportJOGL extends AbstractViewport
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 				int height)
 		{
+			System.out.println("RESHAPE");
 			if ((canvas_.getWidth() < MIN_SIZE) ||
 				(canvas_.getHeight() < MIN_SIZE))
 			{

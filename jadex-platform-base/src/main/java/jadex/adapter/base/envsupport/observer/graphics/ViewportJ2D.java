@@ -50,8 +50,8 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	/** The current draw context */
 	private Graphics2D context_;
 	
-	/** Cache for text-images */
-	protected Map 		textCache_;
+	/** The default transform */
+	private AffineTransform defaultTransform_;
 
 	/**
 	 * Creates a new Viewport.
@@ -64,7 +64,6 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 		libService_ = libService;
 		imageCache_ = Collections.synchronizedMap(new HashMap());
-		textCache_ = Collections.synchronizedMap(new ImageLRUCache(100));
 		
 		canvas_ = new ViewportCanvas();
 		canvas_.addComponentListener(this);
@@ -110,6 +109,15 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	{
 		return context_;
 	}
+	
+	/**
+	 * Returns the default transform.
+	 * @return the default transform
+	 */
+	public AffineTransform getDefaultTransform()
+	{
+		return defaultTransform_;
+	}
 
 	/**
 	 * Sets up the image transform.
@@ -128,26 +136,6 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				/ (double)sizeY);
 		return imageTransform;
 	}
-	
-	/**
-	 *  Returns the image of a text
-	 *  
-	 *  @param info information on the text
-	 */
-	public BufferedImage getTextImage(TextInfo info)
-	{
-		synchronized (textCache_)
-		{
-			BufferedImage image = (BufferedImage) textCache_.get(info);
-			if (image == null)
-			{
-				image = convertTextToImage(info.getFont(), info.getColor(), info.getText());
-				textCache_.put(info, image);
-			}
-			
-			return image;
-		}
-	}
 
 	// Component events
 	public void componentHidden(ComponentEvent e)
@@ -165,35 +153,6 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 	public void componentShown(ComponentEvent e)
 	{
-	}
-	
-	/**
-	 * Returns an image for texturing of a text.
-	 * 
-	 * @param text the text
-	 */
-	private static final BufferedImage convertTextToImage(Font font, Color color, String text)
-	{
-		TextLayout textLayout = new TextLayout(text, font, new FontRenderContext(null, true, true));
-		
-		int width = (int) Math.ceil(textLayout.getAdvance());
-		int height = (int) Math.ceil(textLayout.getDescent() + textLayout.getAscent());
-		if ((width == 0) || (height == 0))
-			return null;
-		
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-		g.fillRect(0, 0, image.getWidth(), image.getHeight());
-		g.setColor(color);
-		textLayout.draw(g, 0, image.getHeight() - 1);
-		g.dispose();
-		AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-	    tx.translate(0, -image.getHeight(null));
-	    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BICUBIC);
-	    image = op.filter(image, null);
-
-		return image;
 	}
 
 	/**
@@ -228,13 +187,10 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 		private Rectangle.Double	clearRectangle_;
 
-		private GeneralPath			scissorPolygon_;
-
 		public ViewportCanvas()
 		{
 			backBuffer_ = new BufferedImage(1, 1,
 					BufferedImage.TYPE_4BYTE_ABGR_PRE);
-			scissorPolygon_ = new GeneralPath();
 			clearRectangle_ = new Rectangle.Double();
 			clearRectangle_.x = 0.0;
 			clearRectangle_.y = 0.0;
@@ -264,6 +220,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				}
 
 				Graphics2D g = (Graphics2D)backBuffer_.getGraphics();
+				defaultTransform_ = g.getTransform();
 				g.setColor(java.awt.Color.BLACK);
 				g.fillRect(0, 0, getWidth(), getHeight());
 				
@@ -347,11 +304,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				}
 				
 				context_ = null;
-				
-				// glScissor replacement
-				g.setColor(java.awt.Color.BLACK);
-				g.fill(scissorPolygon_);
-
+				g.setTransform(defaultTransform_);
 				g.dispose();
 
 				gfx.drawImage(backBuffer_, 0, 0, null);
@@ -378,41 +331,6 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 					(backBuffer_.getHeight() / paddedSize_.getYAsDouble())
 							* ((inversionFlag_.getYAsInteger() << 1) - 1));
 			g.translate(-position_.getXAsDouble(), -position_.getYAsDouble());
-		}
-
-		/*private void setupScissorPolygon()
-		{
-			float pixShiftX = (paddedSize_.getXAsFloat() / backBuffer_.getWidth());
-			float pixShiftY = (paddedSize_.getYAsFloat() / backBuffer_.getHeight());
-			scissorPolygon_.reset();
-			scissorPolygon_.moveTo(position_.getXAsDouble(), position_.getYAsDouble());
-			scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), position_.getYAsDouble());
-			scissorPolygon_.lineTo(paddedSize_.getXAsFloat(), paddedSize_
-					.getYAsFloat());
-			scissorPolygon_.lineTo(position_.getXAsDouble(), paddedSize_.getYAsFloat());
-			scissorPolygon_.lineTo(position_.getXAsDouble(), size_.getYAsFloat() + pixShiftY);
-			scissorPolygon_.lineTo(size_.getXAsFloat() + pixShiftX, size_.getYAsFloat() + pixShiftY);
-			scissorPolygon_.lineTo(size_.getXAsFloat() + pixShiftX, 0.0f);
-			scissorPolygon_.lineTo(-pixShiftX, 0.0f);
-			scissorPolygon_.lineTo(-pixShiftX, size_.getYAsFloat() + pixShiftY);
-			scissorPolygon_.lineTo(position_.getXAsDouble(), size_.getYAsFloat() + pixShiftY);
-			scissorPolygon_.closePath();
-		}*/
-	}
-	
-	private class ImageLRUCache extends LinkedHashMap
-	{
-		private int maxSize;
-		
-		public ImageLRUCache(int maxSize)
-		{
-			super(16, 0.75f, true);
-			this.maxSize = maxSize;
-		}
-		
-		protected boolean removeEldestEntry(Map.Entry eldest)
-		{
-			return (size() > maxSize);
 		}
 	}
 }

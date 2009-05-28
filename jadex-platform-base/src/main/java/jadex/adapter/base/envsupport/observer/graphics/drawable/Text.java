@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.font.TextMeasurer;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -127,31 +128,18 @@ public final class Text implements IDrawable
 			IVector2 pos = vp.getPosition().copy().negate().add(vp.getObjectShift()).add(dcPos).add(position).divide(vp.getPaddedSize()).multiply(new Vector2Double(canvas.getWidth(), canvas.getHeight()));
 			if (vp.getInvertX())
 				pos.negateX().add(new Vector2Double(canvas.getWidth(), 0));
-			if (vp.getInvertY())
+			if (!vp.getInvertY())
 				pos.negateY().add(new Vector2Double(0, canvas.getHeight()));
 			Rectangle2D bounds = font.getStringBounds(text, new FontRenderContext(null, true, true));
 			pos.subtract(new Vector2Double(bounds.getWidth() / 2.0, bounds.getHeight() / 2.0));
 			
 			g.setColor(color);
 			g.setFont(font);
-			g.drawString(text, pos.getXAsInteger(), pos.getYAsInteger());
-			
-			/*AffineTransform t = g.getTransform();
-			float fontscale = dcScale.getMean().getAsFloat() * (vp.getCanvas().getHeight() / BASE_VIEWPORT_HEIGHT);
-			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
-			BufferedImage image = vp.getTextImage(new TextInfo(font, color, getReplacedText(obj)));
-			Canvas canvas = vp.getCanvas();
-			IVector2 size = vp.getPaddedSize().copy().divide(new Vector2Double(canvas.getWidth(), canvas.getHeight())).
-			multiply(new Vector2Double(image.getWidth(), image.getHeight()));
-
-			
-			g.translate(dcPos.getXAsDouble(), dcPos.getYAsDouble());
-			g.translate(position.getXAsDouble() - (size.getXAsDouble() / 2.0),
-					position.getYAsDouble() - (size.getYAsDouble() / 2.0));
-			g.scale(size.getXAsDouble(), size.getYAsDouble());
-			
-			g.drawImage(image, vp.getImageTransform(image.getWidth(), image.getHeight()), null);
-			g.setTransform(t);*/
+			AffineTransform t = g.getTransform();
+			g.setTransform(vp.getDefaultTransform());
+			TextLayout tl = new TextLayout(text, font, new FontRenderContext(null, true, true));
+			tl.draw(g, pos.getXAsInteger(), pos.getYAsInteger());
+			g.setTransform(t);
 		}
 	}
 	
