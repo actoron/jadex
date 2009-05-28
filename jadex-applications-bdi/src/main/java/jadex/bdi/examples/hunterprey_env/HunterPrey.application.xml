@@ -62,6 +62,7 @@
 
 			<env:percepttypes>
 				<env:percepttype name="food_seen" objecttype="food" agenttype="CleverPrey" />
+				<env:percepttype name="food_out_of_sight" objecttype="food" agenttype="CleverPrey" />
 				<env:percepttype name="food_eaten" objecttype="food" agenttype="CleverPrey"/>
 				<env:percepttype name="prey_moved" objecttype="prey">
 					<env:agenttypes>
@@ -80,6 +81,7 @@
 						new Object[]
 						{
 							new String[]{"food_seen", "appeared", "created"}, 
+							new String[]{"food_out_of_sight", "disappeared"}, 
 							new String[]{"food_eaten", "destroyed"},
 							new String[]{"prey_moved", "moved"}
 						}

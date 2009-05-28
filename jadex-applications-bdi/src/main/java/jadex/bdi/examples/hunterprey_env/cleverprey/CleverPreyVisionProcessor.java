@@ -36,7 +36,7 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 //		System.out.println("Percept: "+type+", "+percept+", "+agent.getLocalName());
 		
 		// Add newly seen food / remove eaten food.
-		if(type.equals("food_seen") || type.equals("food_eaten"))
+		if(type.equals("food_seen") || type.equals("food_eaten") || type.equals("food_out_of_sight"))
 		{
 			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 			ams.getExternalAccess(agent, new IResultListener()
@@ -55,20 +55,34 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 						{
 							try
 							{
-								IBeliefSet	foodbelset	= exta.getBeliefbase().getBeliefSet("food");
+								IBeliefSet	seen_food	= exta.getBeliefbase().getBeliefSet("seen_food");
+								IBeliefSet	known_food	= exta.getBeliefbase().getBeliefSet("known_food");
 
 								// Add seen food, if not already known.
 								// Todo: object updates (position) recognized, even if not in vision!?
 								// -> only post object copies in percepts!?
-								if(type.equals("food_seen") && !foodbelset.containsFact(percept))
+								if(type.equals("food_seen"))
 								{
-									foodbelset.addFact(percept);
+									if(!seen_food.containsFact(percept))
+										seen_food.addFact(percept);
+									if(!known_food.containsFact(percept))
+										known_food.addFact(percept);
 								}
 
 								// Remove eaten food, if known.
-								else if(type.equals("food_eaten") && foodbelset.containsFact(percept))
+								else if(type.equals("food_eaten"))
 								{
-									foodbelset.removeFact(percept);
+									if(seen_food.containsFact(percept))
+										seen_food.removeFact(percept);
+									if(known_food.containsFact(percept))
+										known_food.removeFact(percept);
+								}
+
+								// Remove seen food, when out of sight known.
+								else if(type.equals("food_out_of_sight"))
+								{
+									if(seen_food.containsFact(percept))
+										seen_food.removeFact(percept);
 								}
 							}
 							catch(Exception e)
@@ -109,15 +123,18 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 								int vision	= 2; // Todo: set in creature.
 								Space2D	space2d	= (Space2D)space;
 								IVector2	mypos	= (IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION);
-								IBeliefSet	foodbelset	= exta.getBeliefbase().getBeliefSet("food");
-								ISpaceObject[]	known	= (ISpaceObject[])foodbelset.getFacts();
+								IBeliefSet	seen_food	= exta.getBeliefbase().getBeliefSet("seen_food");
+								IBeliefSet	known_food	= exta.getBeliefbase().getBeliefSet("known_food");
+								ISpaceObject[]	known	= (ISpaceObject[])known_food.getFacts();
 								Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, new Vector1Int(vision))));
 								for(int i=0; i<known.length; i++)
 								{
 									if(!seen.contains(known[i]) && space2d.getDistance(mypos, (IVector2)known[i].getProperty(Space2D.POSITION)).getAsInteger()<=vision)
 									{
 										System.out.println("Removing disappeared food: "+percept+", "+known[i]);
-										foodbelset.removeFact(known[i]);
+										known_food.removeFact(known[i]);
+										if(seen_food.containsFact(known[i]))
+											seen_food.removeFact(known[i]);
 									}
 								}
 							}

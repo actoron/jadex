@@ -55,8 +55,12 @@ public class EatPlan extends Plan
 //			System.err.println("Eat plan failed: "+e);
 			
 			// Move or eat failed, forget food until seen again.
-			if(getBeliefbase().getBeliefSet("food").containsFact(food))
-				getBeliefbase().getBeliefSet("food").removeFact(food);
+			startAtomic();
+			if(getBeliefbase().getBeliefSet("known_food").containsFact(food))
+				getBeliefbase().getBeliefSet("known_food").removeFact(food);
+			if(getBeliefbase().getBeliefSet("seen_food").containsFact(food))
+				getBeliefbase().getBeliefSet("seen_food").removeFact(food);
+			endAtomic();
 			
 			fail();
 		}
