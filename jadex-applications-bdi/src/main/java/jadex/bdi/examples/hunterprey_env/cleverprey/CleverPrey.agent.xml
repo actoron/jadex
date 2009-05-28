@@ -59,6 +59,9 @@
  				ISpaceObject $food &amp;&amp; $food.getType().equals("food")
  				&amp;&amp; Arrays.asList($beliefbase.seen_food).contains($food)
 			</creationcondition>
+			<dropcondition language="jcl">
+ 				!Arrays.asList($beliefbase.seen_food).contains($goal.food)
+			</dropcondition>
 			<deliberation>
 				<inhibits ref="eat_food" language="jcl">
 					$beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$goal.food.position).getAsInteger()
@@ -81,11 +84,11 @@
 				<goal ref="find_food"/>
 			</trigger>
 		</plan>
-		<plan name="move_plan">
+		<plan name="move_plan" priority="1">
 			<parameter name="food" class="ISpaceObject">
 				<value>
 					select one $food from ISpaceObject $food in $beliefbase.known_food
-					order by $beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$food.position).getAsInteger()
+					order by $beliefbase.env.getDistance((IVector2)$beliefbase.myself.getProperty("position"), (IVector2)$food.getProperty("position")).getAsInteger()
 				</value>
 			</parameter>
 			<body class="EatPlan"/>	<!-- Eat plan starts moving towards food and gets aborted when food come sin vision range. -->
