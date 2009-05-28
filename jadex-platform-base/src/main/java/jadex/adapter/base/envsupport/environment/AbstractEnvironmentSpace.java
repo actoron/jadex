@@ -44,8 +44,8 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** The percept generators. */
 	protected Map perceptgenerators;
 
-	/** The percept mappings. */
-	protected Map perceptmappings;
+	/** The percept processors. */
+	protected Map perceptprocessors;
 	
 	/** Avatar mappings. */
 	protected MultiCollection avatarmappings;
@@ -96,7 +96,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		this.processes = new HashMap();
 		this.percepttypes = new HashMap();
 		this.perceptgenerators = new HashMap();
-		this.perceptmappings = new HashMap();
+		this.perceptprocessors = new HashMap();
 		this.objecttypes = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
@@ -535,10 +535,10 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 //			if(!percepttypes.containsKey(typename))
 //				throw new RuntimeException("Unknown percept type: "+typename);
 			
-			System.out.println("New percept: "+typename+", "+data+", "+agent);
+//			System.out.println("New percept: "+typename+", "+data+", "+agent);
 			
 			String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
-			IPerceptProcessor proc	= (IPerceptProcessor)perceptmappings.get(agenttype);
+			IPerceptProcessor proc	= (IPerceptProcessor)perceptprocessors.get(agenttype);
 			if(proc!=null)
 				perceptlist.schedulePercept(typename, data, agent, proc);
 			else
@@ -751,30 +751,30 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	}
 
 	/**
-	 *  Add a percept mapping.
+	 *  Add a percept processor.
 	 *  @param	agenttype	The agent type.
 	 *  @param	proc	The percept processor.
 	 */
 	// Todo: multiple processors per agent -> mapping per percept type.
-	public void addPerceptMapping(String agenttype, IPerceptProcessor proc)
+	public void addPerceptProcessor(String agenttype, IPerceptProcessor proc)
 	{
 		synchronized(monitor)
 		{
-			perceptmappings.put(agenttype, proc);
+			perceptprocessors.put(agenttype, proc);
 		}
 	}
 	
 	/**
-	 *  remove a percept mapping.
+	 *  remove a percept processor.
 	 *  @param	agenttype	The agent type.
 	 *  @param	proc	The percept processor.
 	 */
 	// Todo: multiple processors per agent -> mapping per percept type.
-	public void removePerceptMapping(String agenttype, IPerceptProcessor proc)
+	public void removePerceptProcessor(String agenttype, IPerceptProcessor proc)
 	{
 		synchronized(monitor)
 		{
-			perceptmappings.remove(agenttype);
+			perceptprocessors.remove(agenttype);
 		}
 	}
 	

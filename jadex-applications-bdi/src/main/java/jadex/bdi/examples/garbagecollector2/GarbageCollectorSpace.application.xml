@@ -58,23 +58,21 @@
 				</env:processtype>
 			</env:processtypes>
 			
-			<env:perceptgeneratortypes>
-				<env:percepttypes>
-					<!-- <env:percepttype name="garbage_appeared" objecttype="garbage" >
-						<env:objecttypes>
-							<env:objecttype name="garbage"/>
-						</env:objecttypes>
-						<env:agenttypes>
-							<env:agenttype name="collector"/>
-							<env:agenttype name="burner"/>
-						</env:agenttypes>
-					</env:percepttype> -->
+			<env:percepttypes>
+				<!-- <env:percepttype name="garbage_appeared" objecttype="garbage" >
+					<env:objecttypes>
+						<env:objecttype name="garbage"/>
+					</env:objecttypes>
+					<env:agenttypes>
+						<env:agenttype name="collector"/>
+						<env:agenttype name="burner"/>
+					</env:agenttypes>
+				</env:percepttype> -->
+				
+				<env:percepttype name="garbage_appeared" objecttype="garbage"/>
+				<env:percepttype name="garbage_disappeared" objecttype="garbage" />
 					
-					<env:percepttype name="garbage_appeared" objecttype="garbage"/>
-					<env:percepttype name="garbage_disappeared" objecttype="garbage" />
-				</env:percepttypes>
-					
-				<env:perceptgeneratortype name="visiongen" class="AbstractVisionGenerator">
+				<env:perceptgenerator name="visiongen" class="AbstractVisionGenerator">
 					<env:property name="range">0</env:property>
 					<!-- percept types are declared with associated action types: 
 						percepttype, actiontype1, actiontype2, ... -->
@@ -85,16 +83,15 @@
 							new String[]{"garbage_disappeared", "disappeared", "destroyed"}
 						}
 					</env:property>
-				</env:perceptgeneratortype>
+				</env:perceptgenerator>
 				
-				<env:perceptmapping agenttype="Burner" class="VisionProcessor">
+				<env:perceptprocessor agenttype="Burner" class="VisionProcessor">
 					<!-- Todo: mapping per percept type? - ->
 					<env:percepttype name="garbage_appeared"/>
 					<env:percepttype name="garbage_disappeared"/> -->
-				</env:perceptmapping>
-				<env:perceptmapping agenttype="Collector" class="VisionProcessor">
-				</env:perceptmapping>
-			</env:perceptgeneratortypes>
+				</env:perceptprocessor>
+				<env:perceptprocessor agenttype="Collector" class="VisionProcessor"/>
+			</env:percepttypes>
 			
 			<env:views>
 				<env:view name="view_all" class="GeneralDataView2D" />

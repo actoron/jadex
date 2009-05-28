@@ -51,9 +51,8 @@
 			</env:avatarmappings>
 
 			<env:actiontypes>
-				<env:agentactiontype name="move" class="MoveAction" />
-				<env:agentactiontype name="eat" class="EatAction" />
-				<env:spaceactiontype name="create_obstacles" class="CreateObstaclesAction" />
+				<env:actiontype name="move" class="MoveAction" />
+				<env:actiontype name="eat" class="EatAction" />
 			</env:actiontypes>
 			
 			<env:processtypes>
@@ -110,7 +109,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D">
+				<env:perspective name="icons" class="Perspective2D" opengl="true">
 					<env:drawable objecttype="food" width="1.0" height="1.0">
 						<env:texturedrectangle layer="0" size="size" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
 					</env:drawable>
@@ -177,11 +176,9 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
@@ -202,11 +199,9 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
@@ -222,11 +217,9 @@
 
 		<application name="Empty">			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
@@ -249,11 +242,9 @@
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace" width="100" height="100">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">1250</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="1250"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
@@ -274,11 +265,9 @@
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace" width="100" height="100">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">1250</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="1250"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
@@ -299,11 +288,9 @@
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace" width="100" height="100">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">1250</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="1250"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">
@@ -327,11 +314,9 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
-				<env:initactions>
-					<env:spaceaction type="create_obstacles">
-						<env:parameter name="count">125</env:parameter>
-					</env:spaceaction>
-				</env:initactions>
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
 
 				<env:processes>
 					<env:process type="create">

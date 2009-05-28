@@ -159,12 +159,12 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, "")}), null));
 		
-		types.add(new TypeInfo("perceptgeneratortype", MultiCollection.class, null, null,
+		types.add(new TypeInfo("perceptgenerator", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, "")}), null));
 
-		types.add(new TypeInfo("perceptmapping", MultiCollection.class, null, null,
+		types.add(new TypeInfo("perceptprocessor", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "agenttype"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, "")}), null));
@@ -647,7 +647,7 @@ public class MEnvSpaceType	extends MSpaceType
 //			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 //			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
-		types.add(new TypeInfo("perceptgeneratortype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+		types.add(new TypeInfo("perceptgenerator/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
@@ -748,8 +748,8 @@ public class MEnvSpaceType	extends MSpaceType
 //		linkinfos.add(new LinkInfo("agentactiontype", new BeanAttributeInfo("agentactiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("actiontype", new BeanAttributeInfo("actiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("processtype", new BeanAttributeInfo("processtypes", null, "property")));
-		linkinfos.add(new LinkInfo("perceptgeneratortype", new BeanAttributeInfo("perceptgeneratortypes", null, "property")));
-		linkinfos.add(new LinkInfo("perceptmapping", new BeanAttributeInfo("perceptmappings", null, "property")));
+		linkinfos.add(new LinkInfo("perceptgenerator", new BeanAttributeInfo("perceptgenerators", null, "property")));
+		linkinfos.add(new LinkInfo("perceptprocessor", new BeanAttributeInfo("perceptprocessors", null, "property")));
 		linkinfos.add(new LinkInfo("view", new BeanAttributeInfo("views", null, "property")));
 		linkinfos.add(new LinkInfo("spaceexecutor", new BeanAttributeInfo(null, null, "property")));
 		linkinfos.add(new LinkInfo("perspective", new BeanAttributeInfo("perspectives", null, "property")));
@@ -791,7 +791,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("objecttype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("drawable/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("spaceexecutor/property", new BeanAttributeInfo("properties", null, "")));
-		linkinfos.add(new LinkInfo("perceptgeneratortype/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("perceptgenerator/property", new BeanAttributeInfo("properties", null, "")));
 		
 		// percepts
 		linkinfos.add(new LinkInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttypes", null, "")));

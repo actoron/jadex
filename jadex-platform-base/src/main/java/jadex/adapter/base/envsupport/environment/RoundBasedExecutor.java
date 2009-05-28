@@ -1,10 +1,13 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.bridge.ITimedObject;
+import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Comparator;
@@ -17,6 +20,14 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 {
 	//-------- constants --------
 	
+	/** The property for the action execution mode. */
+	public static final String	PROPERTY_MODE	= "mode";
+	
+	/** The value for the last action execution mode. */
+	public static final String	MODE_LASTACTION	= "lastaction";
+	
+	//-------- attributes --------
+	
 	/** Current time stamp */
 	protected long timestamp;
 	
@@ -24,9 +35,6 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	
 	/**
 	 *  Creates a new round based executor.
-	 *  @param space	The space.
-	 *  @param clockservice	The clock service.
-	 *  @param acomp	The action comparator.
 	 */
 	public RoundBasedExecutor()
 	{
@@ -66,7 +74,39 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		final IClockService clockservice = (IClockService)getProperty("clockservice");
 		Comparator comp = (Comparator)getProperty("comparator");
 		if(comp!=null)
+		{
 			space.getAgentActionList().setOrdering(comp);
+		}
+		if(MODE_LASTACTION.equals(getProperty(PROPERTY_MODE)))
+		{
+			space.getAgentActionList().setScheduleCommand(new ICommand()
+			{
+				public void execute(Object args)
+				{
+					ActionEntry	entry	= (ActionEntry)args;
+					ActionEntry	entries[]	= space.getAgentActionList().getActionEntries();
+					
+					if(entries.length>0)
+					{
+						IAgentIdentifier	actor	= entry.parameters!=null ?
+							(IAgentIdentifier)entry.parameters.get(ISpaceAction.ACTOR_ID) : null;
+						
+						for(int i=0; actor!=null && i<entries.length; i++)
+						{
+							IAgentIdentifier	actor2	= entries[i].parameters!=null ?
+								(IAgentIdentifier)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
+							if(actor.equals(actor2))
+							{
+								System.out.println("Removing duplicate action: "+entries[i]);
+								space.getAgentActionList().removeAgentAction(entries[i]);
+							}
+						}
+					}
+					
+					space.getAgentActionList().addAgentAction(entry);
+				}
+			});
+		}
 		
 		this.timestamp = clockservice.getTime();
 		
@@ -79,9 +119,10 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		}
 		
 		// In the first round only percepts are distributed.
-		final boolean[] first = new boolean[]{true};
 		clockservice.createTickTimer(new ITimedObject()
 		{
+			boolean first = true;
+			
 			public void timeEventOccurred(long currenttime)
 			{
 				IVector1 progress = new Vector1Long(currenttime - timestamp);
@@ -89,7 +130,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 				
 				synchronized(space.getMonitor())
 				{
-					if(!first[0])
+					if(!first)
 					{
 						// Update the environment objects.
 						for(Iterator it = space.getSpaceObjectsCollection().iterator(); it.hasNext(); )
@@ -123,7 +164,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 					// Wakeup the agents.
 					space.getAgentActionList().wakeupAgents(null);
 					
-					first[0] = false;
+					first = false;
 				}
 
 				clockservice.createTickTimer(this);

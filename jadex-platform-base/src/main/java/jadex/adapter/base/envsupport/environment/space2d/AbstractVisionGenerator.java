@@ -1,4 +1,4 @@
-package jadex.bdi.examples.garbagecollector2;
+package jadex.adapter.base.envsupport.environment.space2d;
 
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
@@ -6,7 +6,6 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.PerceptType;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
@@ -206,7 +205,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), DESTROYED);
+						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DESTROYED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner);
 					}
@@ -222,8 +221,8 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 	{
 		String ret = null;
 		
-		if(agenttype.equals("Collector") && objecttype.equals("garbage") && actiontype.equals(APPEARED))
-			System.out.println("here");
+//		if(agenttype.equals("Collector") && objecttype.equals("garbage") && actiontype.equals(APPEARED))
+//			System.out.println("here");
 		
 		Object[] percepttypes = getPerceptTypes();
 		for(int i=0; i<percepttypes.length; i++)

@@ -7,7 +7,6 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bdi.examples.hunterprey_env.CreatureVisionGenerator;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
@@ -34,9 +33,10 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 	 */
 	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent)
 	{
-		// Add newly seen food.
-		if(((ISpaceObject)percept).getType().equals("food")
-			&& type.equals(CreatureVisionGenerator.OBJECT_APPEARED))
+		System.out.println("Percept: "+type+", "+percept+", "+agent.getLocalName());
+		
+		// Add newly seen food / remove eaten food.
+		if(type.equals("food_seen") || type.equals("food_eaten"))
 		{
 			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 			ams.getExternalAccess(agent, new IResultListener()
@@ -55,12 +55,21 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 						{
 							try
 							{
-								// Add, if not already known.
+								IBeliefSet	foodbelset	= exta.getBeliefbase().getBeliefSet("food");
+
+								// Add seen food, if not already known.
 								// Todo: object updates (position) recognized, even if not in vision!?
 								// -> only post object copies in percepts!?
-								IBeliefSet	foodbelset	= exta.getBeliefbase().getBeliefSet("food");
-								if(!foodbelset.containsFact(percept))
+								if(type.equals("food_seen") && !foodbelset.containsFact(percept))
+								{
 									foodbelset.addFact(percept);
+								}
+
+								// Remove eaten food, if known.
+								else if(type.equals("food_eaten") && foodbelset.containsFact(percept))
+								{
+									foodbelset.removeFact(percept);
+								}
 							}
 							catch(Exception e)
 							{
@@ -74,11 +83,10 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 				}
 			});
 		}
-		// Todo: remove on object destroyed.
-		
+
 		// Remove disappeared known food, when creature moves.
 		else if(percept.equals(((AbstractEnvironmentSpace)space).getOwnedObjects(agent)[0])
-			&& type.equals(CreatureVisionGenerator.OBJECT_MOVED))
+			&& type.equals("prey_moved"))
 		{
 			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 			ams.getExternalAccess(agent, new IResultListener()

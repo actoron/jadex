@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 
@@ -32,6 +33,9 @@ public class AgentActionList
 	/** The executed actions where actors still need to be woken up. */
 	protected Collection	executed;
 	
+	/** The schedule command. */
+	protected ICommand	cmd;
+	
 	//-------- constructors --------
 	
 	/**
@@ -52,10 +56,56 @@ public class AgentActionList
 	 */
 	public void scheduleAgentAction(ISpaceAction action, Map parameters, IResultListener listener)
 	{
+		ActionEntry	entry	= new ActionEntry(action, parameters, listener);
+		
+		// If command is set, invoke it.
+		if(cmd!=null)
+			cmd.execute(entry);
+
+		// Otherwise queue action (default).
+		else
+			addAgentAction(entry);
+	}
+	
+	/**
+	 * Add an agent action.
+	 * @param entry	The action entry.
+	 */
+	public void addAgentAction(ActionEntry entry)
+	{
 		if(actions==null)
 			actions	= new LinkedHashSet();
 		
-		actions.add(new ActionEntry(action, parameters, listener));
+		actions.add(entry);
+	}
+
+	/**
+	 * Remove an agent action.
+	 * @param entry	The action entry.
+	 */
+	public void removeAgentAction(ActionEntry entry)
+	{
+		if(actions!=null)
+		{		
+			actions.remove(entry);
+		}
+	}
+
+	/**
+	 *  Get the queued entries, which have not yet been executed.
+	 */
+	public ActionEntry[]	getActionEntries()
+	{
+		ActionEntry[]	ret;
+		if(actions!=null)
+		{
+			ret	= (ActionEntry[])actions.toArray(new ActionEntry[actions.size()]);
+		}
+		else
+		{
+			ret	= new ActionEntry[0];
+		}
+		return ret;
 	}
 
 	/**
@@ -175,6 +225,19 @@ public class AgentActionList
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Set the schedule command to be invoked, when an action should be scheduled.
+	 *  Per default, an action is added to the list, but custom commands
+	 *  might decide to execute action immediately or alter the list in arbitrary ways.
+	 *  The command parameter is of type ActionEntry.
+	 */
+	public void	setScheduleCommand(ICommand cmd)
+	{
+		if(this.cmd!=null)
+			throw new RuntimeException("Can set command only once");
+		this.cmd	= cmd;
 	}
 	
 	//-------- helper classes --------

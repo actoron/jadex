@@ -59,40 +59,35 @@
 					<env:property name="rate">5</env:property>
 				</env:processtype>
 			</env:processtypes>
-<!-- 			
+
 			<env:percepttypes>
-				<env:percepttype name="new_food">
-					<env:parameter name="$prey" objecttype="prey">
-						<env:property name="location" />
-					</env:parameter>
-					<env:parameter name="$food" objecttype="food">
-						<env:property name="location" />
-					</env:parameter>
+				<env:percepttype name="food_seen" objecttype="food" agenttype="CleverPrey" />
+				<env:percepttype name="food_eaten" objecttype="food" agenttype="CleverPrey"/>
+				<env:percepttype name="prey_moved" objecttype="prey">
+					<env:agenttypes>
+						<!-- Todo: Use avatar types for mapping? -->
+						<env:agenttype name="CleverPrey"/>
+<!-- 						<env:agenttype name="DumbPrey"/>
+						<env:agenttype name="DumbHunter"/> -->
+					</env:agenttypes>
 				</env:percepttype>
+					
+				<env:perceptgenerator name="visiongen" class="AbstractVisionGenerator">
+					<env:property name="range">2</env:property>
+					<!-- percept types are declared with associated action types: 
+						percepttype, actiontype1, actiontype2, ... -->
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "appeared", "created"}, 
+							new String[]{"food_eaten", "destroyed"},
+							new String[]{"prey_moved", "moved"}
+						}
+					</env:property>
+				</env:perceptgenerator>
+				
+				<env:perceptprocessor agenttype="CleverPrey" class="CleverPreyVisionProcessor"/>
 			</env:percepttypes>
- -->
-  			
-			<env:perceptgeneratortypes>
-				<env:perceptgeneratortype name="creaturevisiongen" class="CreatureVisionGenerator"/>
-				<env:perceptmapping agenttype="DumbPrey" class="DumbPreyVisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
-					<env:percepttype name="object_appeared"/>
-					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> -->
-				</env:perceptmapping>
-				<env:perceptmapping agenttype="CleverPrey" class="CleverPreyVisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
-					<env:percepttype name="object_appeared"/>
-					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> -->
-				</env:perceptmapping>
-				<env:perceptmapping agenttype="DumbHunter" class="DumbHunterVisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
-					<env:percepttype name="object_appeared"/>
-					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> -->
-				</env:perceptmapping>
-			</env:perceptgeneratortypes>
 			
 			<env:views>
 				<env:view name="all_view" class="GeneralDataView2D" />
@@ -155,9 +150,11 @@
 			</env:perspective>
 			
 			<!-- executor -->
-			<env:spaceexecutor>
-				new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class),
-					new CreatureActionComparator($space))
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="clockservice">$platform.getService(IClockService.class)</env:property>
+				<env:property name="comparator">new CreatureActionComparator($space)</env:property>
+				<env:property name="mode">"lastaction"</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>

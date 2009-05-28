@@ -210,7 +210,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create percept generators.
-		List gens = spacetype.getPropertyList("perceptgeneratortypes");
+		List gens = spacetype.getPropertyList("perceptgenerators");
 		if(gens!=null)
 		{
 			for(int i=0; i<gens.size(); i++)
@@ -225,15 +225,15 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		// Create percept mappings.
-		List pmaps = spacetype.getPropertyList("perceptmappings");
+		// Create percept processors.
+		List pmaps = spacetype.getPropertyList("perceptprocessors");
 		if(pmaps!=null)
 		{
 			for(int i=0; i<pmaps.size(); i++)
 			{
 				Map mgen = (Map)pmaps.get(i);
 				IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
-				ret.addPerceptMapping((String)MEnvSpaceInstance.getProperty(mgen, "agenttype"), proc);
+				ret.addPerceptProcessor((String)MEnvSpaceInstance.getProperty(mgen, "agenttype"), proc);
 			}
 		}
 

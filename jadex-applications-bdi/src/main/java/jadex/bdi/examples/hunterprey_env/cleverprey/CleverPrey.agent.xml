@@ -67,7 +67,7 @@
 				// ?rbelset_forbidden_food	= (beliefset (element_has_model ?mbelset_forbidden_food) (beliefset_has_facts excludes ?food))
 				// ?mbelset_forbidden_food	= (mbeliefset (melement_has_name "forbidden_food"))
 			</creationcondition>
-			<deliberation>
+			<deliberation cardinality="1">
 				<inhibits ref="wander_around"/>
 				<inhibits ref="eat_food" language="jcl">
 					// $beliefbase.my_self.getDistance($goal.$food)
