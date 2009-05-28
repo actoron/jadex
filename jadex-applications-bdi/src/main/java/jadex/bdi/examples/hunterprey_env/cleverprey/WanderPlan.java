@@ -46,12 +46,12 @@ public class WanderPlan extends Plan
 				params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 				env.performSpaceAction("move", params, srl);
 				srl.waitForResult();
-				System.out.println("Moved (wander): "+lastdir+", "+getAgentName());
+//				System.out.println("Moved (wander): "+lastdir+", "+getAgentName());
 				failed	= false;
 			}
 			catch(RuntimeException e)
 			{
-				System.err.println("Wander plan failed: "+e);
+//				System.err.println("Wander plan failed: "+e);
 				// Move failed, turn 90° on next move.
 				failed	= true;
 			}

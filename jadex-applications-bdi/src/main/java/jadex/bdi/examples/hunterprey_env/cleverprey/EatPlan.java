@@ -38,7 +38,7 @@ public class EatPlan extends Plan
 				params.put(MoveAction.PARAMETER_DIRECTION, move);
 				env.performSpaceAction("move", params, srl);
 				srl.waitForResult();
-				System.out.println("Moved (eat): "+move+", "+getAgentName());
+//				System.out.println("Moved (eat): "+move+", "+getAgentName());
 			}
 	
 			// Eat food.
@@ -48,11 +48,11 @@ public class EatPlan extends Plan
 			params.put(ISpaceAction.OBJECT_ID, food);
 			env.performSpaceAction("eat", params, srl);
 			srl.waitForResult();
-			System.out.println("Eaten (eat): "+food+", "+getAgentName());
+//			System.out.println("Eaten (eat): "+food+", "+getAgentName());
 		}
 		catch(Exception e)
 		{
-			System.err.println("Eat plan failed: "+e);
+//			System.err.println("Eat plan failed: "+e);
 			
 			// Move or eat failed, forget food until seen again.
 			if(getBeliefbase().getBeliefSet("food").containsFact(food))

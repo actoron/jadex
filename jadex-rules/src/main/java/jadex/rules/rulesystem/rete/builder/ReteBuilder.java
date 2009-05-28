@@ -110,7 +110,7 @@ public class ReteBuilder
 	 */
 	public ReteBuilder()
 	{
-//		this.indexing	= true;
+		this.indexing	= true;
 		this.nodesharing	= true;
 		this.notjoin	= true;
 		

@@ -33,7 +33,7 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 	 */
 	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent)
 	{
-		System.out.println("Percept: "+type+", "+percept+", "+agent.getLocalName());
+//		System.out.println("Percept: "+type+", "+percept+", "+agent.getLocalName());
 		
 		// Add newly seen food / remove eaten food.
 		if(type.equals("food_seen") || type.equals("food_eaten"))
