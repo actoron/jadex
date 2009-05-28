@@ -153,7 +153,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					{
 						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DISAPPEARED);
 						if(percepttype!=null)
-							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, oldobjects[i], owner);
+							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner);
 					}
 					owner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)	
@@ -237,8 +237,8 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 			}
 		}
 		
-		if(ret==null)
-			System.out.println("No percept found for: "+agenttype+" "+objecttype+" "+actiontype);
+//		if(ret==null)
+//			System.out.println("No percept found for: "+agenttype+" "+objecttype+" "+actiontype);
 		
 		return ret;
 	}

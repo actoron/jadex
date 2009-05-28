@@ -37,13 +37,13 @@ public class BurnerVisionProcessor implements IPerceptProcessor
 				IBeliefSet garbages = exta.getBeliefbase().getBeliefSet("garbages");
 				if(BurnerVisionGenerator.GARBAGE_APPEARED.equals(type))
 				{
-//					System.out.println("garbage appeared: "+percept);
+					System.out.println("garbage appeared: "+percept);
 					if(!garbages.containsFact(percept))
 						garbages.addFact(percept);
 				}
 				else if(BurnerVisionGenerator.GARBAGE_DISAPPEARED.equals(type))
 				{
-//					System.out.println("garbage disappeared: "+percept);
+					System.out.println("garbage disappeared: "+percept);
 					if(garbages.containsFact(percept))
 						garbages.removeFact(percept);
 				}
