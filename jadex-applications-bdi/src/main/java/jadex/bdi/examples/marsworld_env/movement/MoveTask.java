@@ -67,7 +67,7 @@ public class MoveTask extends ListenableTask
 
 		// Process vision at new location.
 		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
-		final ISpaceObject[]	objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.POSITION), new Vector1Double(vision));
+		final ISpaceObject[]	objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.POSITION), new Vector1Double(vision), null);
 		if(objects!=null && objects.length>0)
 		{
 			scope.invokeLater(new Runnable()

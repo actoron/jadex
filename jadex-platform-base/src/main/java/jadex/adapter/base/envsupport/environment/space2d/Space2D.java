@@ -290,8 +290,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param maxdist maximum distance from the position, use null for unlimited distance
 	 * @return nearest object's ID or null if none is found
 	 */
-	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxdist)
+	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxdist, String type)
 	{
+		ISpaceObject ret = null;
+		
 		synchronized(monitor)
 		{
 			ISpaceObject nearest = null;
@@ -303,7 +305,8 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				{
 					Map.Entry entry = (Entry)it.next();
 					ISpaceObject curobj = (ISpaceObject)entry.getValue();
-					if(curobj.getProperty(Space2D.POSITION)!=null)
+					if(curobj.getProperty(Space2D.POSITION)!=null &&
+						(type==null || type.equals(curobj.getType())))
 					{
 						IVector1 objdist = ((IVector2)curobj.getProperty(Space2D.POSITION)).getDistance(position); 
 						if((nearest == null) || (objdist.less(distance)))
@@ -314,12 +317,11 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 					}
 				}
 			}
-			if((maxdist != null) && (distance != null) && (maxdist.less(distance)))
-			{
-				return null;
-			}
 			
-			return nearest;
+			if(maxdist== null || distance==null || !maxdist.less(distance))
+				ret = nearest;
+			
+			return ret;
 		}
 	}
 	
@@ -329,7 +331,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist)
+	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist, String type)
 	{
 		synchronized(monitor)
 		{
@@ -342,10 +344,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				ISpaceObject obj = (ISpaceObject)entry.getValue();
 				IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
 				
-				if(pos!=null)
+				if(pos!=null && (type==null || type.equals(obj.getType())))
 				{
 					IVector1 dist = getDistance(pos, position);
-					if(dist.less(maxdist) || dist.equals(maxdist))
+					if(maxdist==null || !maxdist.less(dist))
 					{
 						ret.add(obj);
 					}
@@ -362,7 +364,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public ISpaceObject[] getNearObjects(IVector2 position, IVector2 maxdist)
+	public ISpaceObject[] getNearObjects(IVector2 position, IVector2 maxdist, String type)
 	{
 		synchronized(monitor)
 		{
@@ -373,15 +375,18 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			{
 				Map.Entry entry = (Entry)it.next();
 				ISpaceObject obj = (ISpaceObject)entry.getValue();
-				IVector2 objpos = (IVector2)obj.getProperty(Space2D.POSITION);
+				IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
 				
-				IVector1 dx = getDistance(objpos.getX(), position.getX(), true);
-				IVector1 dy = getDistance(objpos.getY(), position.getY(), false);
-
-				if(dx.less(maxdist.getX()) || dx.equals(maxdist.getX())
-					&& dy.less(maxdist.getY()) || dy.equals(maxdist.getY()))
+				if(pos!=null && (type==null || type.equals(obj.getType())))
 				{
-					ret.add(obj);
+					IVector1 dx = getDistance(pos.getX(), position.getX(), true);
+					IVector1 dy = getDistance(pos.getY(), position.getY(), false);
+	
+					if(dx.less(maxdist.getX()) || dx.equals(maxdist.getX())
+						&& dy.less(maxdist.getY()) || dy.equals(maxdist.getY()))
+					{
+						ret.add(obj);
+					}
 				}
 			}
 		

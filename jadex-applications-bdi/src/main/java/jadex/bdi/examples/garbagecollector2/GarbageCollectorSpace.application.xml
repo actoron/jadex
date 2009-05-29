@@ -237,6 +237,25 @@
 			</env:envspace>
 		</application>
 		
+		<application name="Two Burners / Three Collectors">
+			<agents>
+				<agent type="Collector" number="3"/>
+				<agent type="Burner" number="2"/>
+			</agents>
+			
+			<env:envspace name="mygc2dspace" type="gc2dspace">
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">3</env:property>
+					</env:process>
+				</env:processes>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" perspective="abstract" />
+				</env:observers>
+			</env:envspace>
+		</application>
+		
 		<application name="Many Burners / Too Many Collectors">
 			<agents>
 				<agent type="Collector" number="30"/>

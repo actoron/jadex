@@ -32,7 +32,8 @@ public class TakePlanEnv extends Plan
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 oldpos =(IVector2)myself.getProperty(Space2D.POSITION);
 		IGoal go = createGoal("go");
-		IVector2 pos = (IVector2)grid.getSpaceObjectsByType("burner")[0].getProperty(Space2D.POSITION);
+		ISpaceObject burner = grid.getNearestObject(oldpos, null, "burner");
+		IVector2 pos = (IVector2)burner.getProperty(Space2D.POSITION);
 		go.getParameter("pos").setValue(pos);
 		dispatchSubgoalAndWait(go);
 

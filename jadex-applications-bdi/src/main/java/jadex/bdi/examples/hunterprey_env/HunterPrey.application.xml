@@ -33,7 +33,8 @@
 				<env:objecttype name="obstacle" />
 				<env:objecttype name="food" >
 					<env:property name="size" dynamic="true">
-						new Vector2Double(
+						new Vector2Double
+						(
 							Math.min(1, ($object.getProperty("clock").getTick()-
 							$object.getProperty("creation_age").doubleValue())/32.0),
 							Math.min(0.8, ($object.getProperty("clock").getTick()-

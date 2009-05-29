@@ -70,12 +70,12 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 		{
 			IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.POSITION);
 			IVector2 oldpos = (IVector2)event.getInfo();
-			ISpaceObject[]	objects	= space.getNearObjects(pos, range);
+			ISpaceObject[]	objects	= space.getNearObjects(pos, range, null);
 			Set	unchanged;
 			ISpaceObject[]	oldobjects	= null;
 			if(oldpos!=null)
 			{
-				oldobjects	= space.getNearObjects(oldpos, range);
+				oldobjects	= space.getNearObjects(oldpos, range, null);
 				unchanged	= new HashSet(Arrays.asList(objects));
 				unchanged.retainAll(Arrays.asList(oldobjects));
 			}
@@ -134,7 +134,7 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 		else if(EnvironmentEvent.OBJECT_CREATED.equals(event.getType()))
 		{
 			IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.POSITION);
-			ISpaceObject[]	objects	= space.getNearObjects(pos, range);
+			ISpaceObject[]	objects	= space.getNearObjects(pos, range, null);
 			
 			// Post appearance for object itself (if prey) as well as all preys in vision range
 			for(int i=0; i<objects.length; i++)
@@ -154,7 +154,7 @@ public class CreatureVisionGenerator extends SimplePropertyObject implements IPe
 		else if(EnvironmentEvent.OBJECT_DESTROYED.equals(event.getType()))
 		{
 			IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.POSITION);
-			ISpaceObject[]	objects	= space.getNearObjects(pos, range);
+			ISpaceObject[]	objects	= space.getNearObjects(pos, range, null);
 			
 			// Post disappearance for all preys in vision range
 			for(int i=0; i<objects.length; i++)

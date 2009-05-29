@@ -126,7 +126,7 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 								IBeliefSet	seen_food	= exta.getBeliefbase().getBeliefSet("seen_food");
 								IBeliefSet	known_food	= exta.getBeliefbase().getBeliefSet("known_food");
 								ISpaceObject[]	known	= (ISpaceObject[])known_food.getFacts();
-								Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, new Vector1Int(vision))));
+								Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, new Vector1Int(vision), null)));
 								for(int i=0; i<known.length; i++)
 								{
 									if(!seen.contains(known[i]) && space2d.getDistance(mypos, (IVector2)known[i].getProperty(Space2D.POSITION)).getAsInteger()<=vision)

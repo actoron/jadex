@@ -47,9 +47,9 @@ public class LocalDataView2D implements IDataView
 			ISpaceObject[] ret;
 			IVector2 pos = (IVector2)object.getProperty(Space2D.POSITION);
 			if(range instanceof IVector1)
-				ret = space.getNearObjects(pos, (IVector1)range);
+				ret = space.getNearObjects(pos, (IVector1)range, null);
 			else if(range instanceof IVector2)
-				ret = space.getNearObjects(pos, (IVector2)range);
+				ret = space.getNearObjects(pos, (IVector2)range, null);
 			else
 				throw new RuntimeException("Range must be vector1 or vector2: "+range);
 			return ret;

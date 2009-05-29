@@ -29,7 +29,7 @@ public class VisionProcessor implements IPerceptProcessor
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+//				exception.printStackTrace();
 			}
 			public void resultAvailable(Object result)
 			{
