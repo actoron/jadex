@@ -155,7 +155,6 @@
 			<!-- executor -->
 			<env:spaceexecutor class="RoundBasedExecutor">
 				<env:property name="space">$space</env:property>
-				<env:property name="clockservice">$platform.getService(IClockService.class)</env:property>
 				<env:property name="comparator">new CreatureActionComparator($space)</env:property>
 				<env:property name="mode">"lastaction"</env:property>
 			</env:spaceexecutor>

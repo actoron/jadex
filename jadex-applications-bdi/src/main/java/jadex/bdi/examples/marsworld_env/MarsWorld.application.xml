@@ -159,8 +159,8 @@
 			</env:perspectives>
 
 			<!-- executor -->
-			<env:spaceexecutor>
-				new DeltaTimeExecutor($space, (IClockService)$platform.getService(IClockService.class))
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>

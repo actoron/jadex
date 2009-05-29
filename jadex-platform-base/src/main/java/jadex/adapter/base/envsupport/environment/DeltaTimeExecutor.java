@@ -1,12 +1,16 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
+import jadex.adapter.base.execution.IExecutionService;
 import jadex.bridge.IClockService;
+import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.IExecutable;
 
 import java.util.Iterator;
 
@@ -37,10 +41,9 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	 * @param timecoefficient the time coefficient
 	 * @param clockservice the clock service
 	 */
-	public DeltaTimeExecutor(final AbstractEnvironmentSpace space, final IClockService clockservice)
+	public DeltaTimeExecutor(final AbstractEnvironmentSpace space)
 	{
 		setProperty("space", space);
-		setProperty("clockservice", clockservice);
 	}
 	
 	//-------- methods --------
@@ -51,22 +54,14 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		final IClockService clockservice = (IClockService)getProperty("clockservice");
+		IPlatform	platform	= ((ApplicationContext)space.getContext()).getPlatform();
+		final IClockService clockservice = (IClockService)platform.getService(IClockService.class);
+		final IExecutionService exeservice = (IExecutionService)platform.getService(IExecutionService.class);
 		
-		this.timestamp = clockservice.getTime();
-		
-		// Start the processes.
-		Object[] procs = space.getProcesses().toArray();
-		for(int i = 0; i < procs.length; ++i)
+		final IExecutable	executable	= new IExecutable()
 		{
-			ISpaceProcess process = (ISpaceProcess) procs[i];
-			process.start(clockservice, space);
-		}
-
-		clockservice.addChangeListener(new IChangeListener()
-		{
-			public void changeOccurred(ChangeEvent e)
-			{				
+			public boolean execute()
+			{
 				long currenttime = clockservice.getTime();
 				IVector1 progress = new Vector1Long(currenttime - timestamp);
 				timestamp = currenttime;
@@ -103,6 +98,25 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 					// Send the percepts to the agents.
 					space.getPerceptList().processPercepts(null);
 				}
+				return false;
+			}
+		};
+		
+		this.timestamp = clockservice.getTime();
+		
+		// Start the processes.
+		Object[] procs = space.getProcesses().toArray();
+		for(int i = 0; i < procs.length; ++i)
+		{
+			ISpaceProcess process = (ISpaceProcess) procs[i];
+			process.start(clockservice, space);
+		}
+
+		clockservice.addChangeListener(new IChangeListener()
+		{
+			public void changeOccurred(ChangeEvent e)
+			{
+				exeservice.execute(executable);
 			}
 		});
 	}

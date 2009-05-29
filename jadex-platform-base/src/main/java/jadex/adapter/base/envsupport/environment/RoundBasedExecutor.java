@@ -1,14 +1,18 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
+import jadex.adapter.base.execution.IExecutionService;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
+import jadex.bridge.IPlatform;
 import jadex.bridge.ITimedObject;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.IExecutable;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -28,8 +32,11 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	
 	//-------- attributes --------
 	
-	/** Current time stamp */
+	/** Last time stamp. */
 	protected long timestamp;
+	
+	/** Current time. */
+	protected long currenttime;
 	
 	//-------- constructors--------
 	
@@ -45,9 +52,9 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	 *  @param space	The space.
 	 *  @param clockservice	The clock service.
 	 */
-	public RoundBasedExecutor(final AbstractEnvironmentSpace space, final IClockService clockservice)
+	public RoundBasedExecutor(AbstractEnvironmentSpace space)
 	{
-		this(space, clockservice, null);
+		this(space, null);
 	}
 	
 	/**
@@ -56,10 +63,9 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	 *  @param clockservice	The clock service.
 	 *  @param acomp	The action comparator.
 	 */
-	public RoundBasedExecutor(AbstractEnvironmentSpace space, IClockService clockservice, Comparator acomp)
+	public RoundBasedExecutor(AbstractEnvironmentSpace space, Comparator acomp)
 	{
 		setProperty("space", space);
-		setProperty("clockservice", clockservice);
 		setProperty("comparator", acomp);
 	}
 	
@@ -71,7 +77,10 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		final IClockService clockservice = (IClockService)getProperty("clockservice");
+		IPlatform	platform	= ((ApplicationContext)space.getContext()).getPlatform();
+		final IClockService clockservice = (IClockService)platform.getService(IClockService.class);
+		final IExecutionService exeservice = (IExecutionService)platform.getService(IExecutionService.class);
+
 		Comparator comp = (Comparator)getProperty("comparator");
 		if(comp!=null)
 		{
@@ -108,22 +117,11 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 			});
 		}
 		
-		this.timestamp = clockservice.getTime();
-		
-		// Start the processes.
-		Object[] procs = space.getProcesses().toArray();
-		for(int i = 0; i < procs.length; ++i)
-		{
-			ISpaceProcess process = (ISpaceProcess) procs[i];
-			process.start(clockservice, space);
-		}
-		
-		// In the first round only percepts are distributed.
-		clockservice.createTickTimer(new ITimedObject()
+		final IExecutable	executable	= new IExecutable()
 		{
 			boolean first = true;
 			
-			public void timeEventOccurred(long currenttime)
+			public boolean execute()
 			{
 				IVector1 progress = new Vector1Long(currenttime - timestamp);
 				timestamp = currenttime;
@@ -166,9 +164,30 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 					
 					first = false;
 				}
-
-				clockservice.createTickTimer(this);
 //				System.out.println("-------------------------------------------");
+
+				return false;
+			}
+		};
+		
+		this.timestamp = clockservice.getTime();
+		
+		// Start the processes.
+		Object[] procs = space.getProcesses().toArray();
+		for(int i = 0; i < procs.length; ++i)
+		{
+			ISpaceProcess process = (ISpaceProcess) procs[i];
+			process.start(clockservice, space);
+		}
+		
+		// In the first round only percepts are distributed.
+		clockservice.createTickTimer(new ITimedObject()
+		{
+			public void timeEventOccurred(long currenttime)
+			{
+				RoundBasedExecutor.this.currenttime = currenttime;
+				exeservice.execute(executable);
+				clockservice.createTickTimer(this);
 			}
 		});
 	}
