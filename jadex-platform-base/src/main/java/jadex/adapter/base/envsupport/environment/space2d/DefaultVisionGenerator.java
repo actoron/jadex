@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  *  Percept generator for moving agents.
  */
-public class AbstractVisionGenerator extends SimplePropertyObject implements IPerceptGenerator
+public class DefaultVisionGenerator extends SimplePropertyObject implements IPerceptGenerator
 {
 	//-------- constants --------
 
@@ -117,7 +117,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), APPEARED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), APPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner);
 					}
@@ -126,7 +126,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					owner = (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), APPEARED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), APPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, objects[i], owner);
 					}
@@ -136,7 +136,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 				IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 				if(owner!=null)
 				{
-					String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), MOVED);
+					String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), MOVED);
 					if(percepttype!=null)
 						((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner);
 				}
@@ -150,14 +150,14 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					IAgentIdentifier owner = (IAgentIdentifier)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DISAPPEARED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DISAPPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner);
 					}
 					owner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)	
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), oldobjects[i].getType(), DISAPPEARED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), oldobjects[i].getType(), DISAPPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, oldobjects[i], owner);
 					}
@@ -177,7 +177,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), CREATED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), CREATED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner);
 					}
@@ -185,7 +185,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					owner = (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), CREATED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), CREATED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, objects[i], owner);
 					}
@@ -205,7 +205,7 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						String percepttype = getPerceptTypeForObject(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DESTROYED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DESTROYED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner);
 					}
@@ -215,9 +215,14 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 	}
 
 	/**
-	 * 
+	 *  Get the percept type.
+	 *  @param space The space.
+	 *  @param agenttype The agent type.
+	 *  @param objecttype The object type.
+	 *  @param actiontype The action type.
+	 *  @return The matching percept. 
 	 */
-	protected String getPerceptTypeForObject(IEnvironmentSpace space, String agenttype, String objecttype, String actiontype)
+	protected String getPerceptType(IEnvironmentSpace space, String agenttype, String objecttype, String actiontype)
 	{
 		String ret = null;
 		
@@ -243,7 +248,8 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 	}
 	
 	/**
-	 * 
+	 *  Get the action types for a percept.
+	 *  @param pt The percept type.
 	 */
 	protected Set getActionTypes(PerceptType pt)
 	{
@@ -265,7 +271,8 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 	}
 	
 	/**
-	 * 
+	 *  Get the percept types defined for this generator.
+	 *  @return The percept types.
 	 */
 	protected Object[] getPerceptTypes()
 	{
@@ -273,7 +280,8 @@ public class AbstractVisionGenerator extends SimplePropertyObject implements IPe
 	}
 	
 	/**
-	 * 
+	 *  Get the range.
+	 *  @return The range.
 	 */
 	protected IVector1 getRange()
 	{

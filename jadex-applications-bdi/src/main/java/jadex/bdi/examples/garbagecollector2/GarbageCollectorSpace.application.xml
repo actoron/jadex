@@ -72,7 +72,7 @@
 				<env:percepttype name="garbage_appeared" objecttype="garbage"/>
 				<env:percepttype name="garbage_disappeared" objecttype="garbage" />
 					
-				<env:perceptgenerator name="visiongen" class="AbstractVisionGenerator">
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
 					<env:property name="range">0</env:property>
 					<!-- percept types are declared with associated action types: 
 						percepttype, actiontype1, actiontype2, ... -->
@@ -106,7 +106,7 @@
 			</env:views>
 			
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="false">
+				<env:perspective name="icons" class="Perspective2D" opengl="true">
 					<env:drawable objecttype="collector" width="1.0" height="1.0" rotation="rotation">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>
 						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
@@ -119,6 +119,9 @@
 					<env:drawable objecttype="burner" width="1" height="1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>
 						<env:texturedrectangle width="0.8" height="0.8" layer="1" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
+						<env:texturedrectangle width="0.6" height="0.6" layer="2" imagepath="jadex/bdi/examples/garbagecollector2/images/flames.png" >
+							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
+						</env:texturedrectangle>
 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/>
 						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
 					</env:drawable>

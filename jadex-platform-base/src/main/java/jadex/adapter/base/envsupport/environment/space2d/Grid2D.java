@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.commons.collection.MultiCollection;
 
@@ -253,6 +254,53 @@ public class Grid2D extends Space2D
 			dy.negate();
 		
 		return dx.add(dy);
+	}
+	
+	/**
+	 *  Get the shortest (direct) direction between two coordinates.
+	 *  @param pos1 The first position.
+	 *  @param pos2 The second position.
+	 *  @param isx The flag indicating if x or y).
+	 *  @return -1: left/down, +1: right/up, 0: no move
+	 */
+	public IVector1 getShortestDirection(IVector1 pos1, IVector1 pos2, boolean isx)
+	{
+		IVector1 ret = Vector1Int.ZERO;
+		
+		if(getBorderMode()==BORDER_TORUS)
+		{
+			IVector1 size = isx? areasize.getX(): areasize.getY();
+			
+			if(pos1.less(pos2))
+			{
+				IVector1 d1 = pos2.copy().subtract(pos1);
+				IVector1 d2 = pos1.copy().add(size).subtract(pos2);
+				
+				if(d1.less(d2))
+					ret = new Vector1Int(1);
+				else 
+					ret = new Vector1Int(-1);
+			}
+			else if(pos1.greater(pos2))
+			{
+				IVector1 d1 = pos1.copy().subtract(pos2);
+				IVector1 d2 = pos2.copy().add(size).subtract(pos1);
+				
+				if(d1.less(d2))
+					ret = new Vector1Int(-1);
+				else
+					ret = new Vector1Int(1);
+			}
+		}
+		else
+		{
+			if(pos1.less(pos2))
+				ret = new Vector1Int(1);
+			else if(pos1.greater(pos2))
+				ret = new Vector1Int(-1);
+		}
+		
+		return ret;
 	}
 	
 	/**

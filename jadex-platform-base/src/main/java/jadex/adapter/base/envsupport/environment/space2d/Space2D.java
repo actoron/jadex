@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.SVector;
 import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 
@@ -152,28 +153,15 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	{
 		synchronized(monitor)
 		{
-			IVector1 ret;
+			IVector1 dx = getDistance(pos1.getX(), pos2.getX(), true);
+			IVector1 dy = getDistance(pos1.getY(), pos2.getY(), false);
 			
-			if(getBorderMode()==BORDER_TORUS)
-			{
-				IVector1 dx = getDistance(pos1.getX(), pos2.getX(), true);
-				IVector1 dy = getDistance(pos1.getY(), pos2.getY(), false);
-				
-				ret	= calculateDistance(dx, dy);
-			}
-			else
-			{
-				// Hack!!! todo:!
-				
-				ret	= pos1.getDistance(pos2);
-			}
-			
-			return ret;
+			return calculateDistance(dx, dy);
 		}
 	}
 	
 	/**
-	 *  Get the distance between two positions.
+	 *  Get the distance between two coordinates (x or y).
 	 *  @param pos1	The first position.
 	 *  @param pos2	The second position.
 	 */
@@ -193,27 +181,20 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 					pos1 = pos2;
 					pos2 = tmp;
 				}
-				IVector1 dx1 = pos2.copy().subtract(pos1);
-				IVector1 dx2 = pos1.copy().add(size).subtract(pos2);
-				if(dx1.less(dx2) || dx1.equals(dx2))
+				IVector1 d1 = pos2.copy().subtract(pos1);
+				IVector1 d2 = pos1.copy().add(size).subtract(pos2);
+				if(d1.less(d2) || d1.equals(d2))
 				{
-					ret = dx1;
+					ret = d1;
 				}
 				else
 				{
-					ret = dx2;
+					ret = d2;
 				}
 			}
 			else
 			{
-				if(pos1.less(pos2))
-				{
-					ret = pos2.subtract(pos1);
-				}
-				else
-				{
-					ret = pos1.subtract(pos2);
-				}
+				ret = pos1.copy().getDistance(pos2);
 			}
 			
 			return ret;

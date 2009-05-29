@@ -65,9 +65,11 @@
 				<value>?garbage</value>
 			</parameter>
 			<!-- todo: remove unique support? <unique/> -->
-			<creationcondition>
-				?garbage = (ISpaceObject)
-				?rbeliefset = (beliefset (element_has_model.melement_has_name "garbages") (beliefset_has_facts contains ?garbage))
+			<creationcondition language="jcl">
+				ISpaceObject $garbage &amp;&amp; !$beliefbase.garbages.contains(?garbage)
+				
+				// ?garbage = (ISpaceObject)
+				// ?rbeliefset = (beliefset (element_has_model.melement_has_name "garbages") (beliefset_has_facts contains ?garbage))
 			</creationcondition>
 			<creationcondition>
 				// unique (?rcapa and ?mgoal are provided internally)

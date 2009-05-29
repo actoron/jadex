@@ -107,8 +107,8 @@ public class Vector1Int implements IVector1
 	 */
 	public IVector1 getDistance(IVector1 vector)
 	{
-		double distance = Math.abs(x_) - Math.abs(vector.getAsDouble());
-		return new Vector1Double(distance);
+		int distance = Math.abs(x_) - Math.abs(vector.getAsInteger());
+		return new Vector1Int(distance);
 	}
 	
 	/** Returns the vector as integer.

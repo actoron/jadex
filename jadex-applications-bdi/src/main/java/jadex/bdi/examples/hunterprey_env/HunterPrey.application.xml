@@ -73,7 +73,7 @@
 					</env:agenttypes>
 				</env:percepttype>
 					
-				<env:perceptgenerator name="visiongen" class="AbstractVisionGenerator">
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
 					<env:property name="range">2</env:property>
 					<!-- percept types are declared with associated action types: 
 						percepttype, actiontype1, actiontype2, ... -->
