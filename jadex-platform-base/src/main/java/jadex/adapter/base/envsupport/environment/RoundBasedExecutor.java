@@ -106,7 +106,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 								(IAgentIdentifier)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
 							if(actor.equals(actor2))
 							{
-								System.out.println("Removing duplicate action: "+entries[i]);
+//								System.out.println("Removing duplicate action: "+entries[i]);
 								space.getAgentActionList().removeAgentAction(entries[i]);
 							}
 						}

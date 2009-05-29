@@ -131,7 +131,7 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 								{
 									if(!seen.contains(known[i]) && space2d.getDistance(mypos, (IVector2)known[i].getProperty(Space2D.POSITION)).getAsInteger()<=vision)
 									{
-										System.out.println("Removing disappeared food: "+percept+", "+known[i]);
+//										System.out.println("Removing disappeared food: "+percept+", "+known[i]);
 										known_food.removeFact(known[i]);
 										if(seen_food.containsFact(known[i]))
 											seen_food.removeFact(known[i]);

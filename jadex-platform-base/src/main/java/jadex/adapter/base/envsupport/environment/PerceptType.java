@@ -1,7 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**

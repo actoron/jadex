@@ -5,7 +5,6 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bdi.examples.hunterprey_env.CreatureVisionGenerator;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
@@ -28,7 +27,8 @@ public class DumbPreyVisionProcessor implements IPerceptProcessor
 	 */
 	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent)
 	{
-		if(((ISpaceObject)percept).getType().equals("food"))
+		// Add newly seen food / remove eaten food.
+		if(type.equals("food_seen") || type.equals("food_eaten") || type.equals("food_out_of_sight"))
 		{
 			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 			ams.getExternalAccess(agent, new IResultListener()
@@ -40,7 +40,6 @@ public class DumbPreyVisionProcessor implements IPerceptProcessor
 				}
 				public void resultAvailable(Object result)
 				{
-					final Space2D	space2d	= (Space2D)space;
 					final IExternalAccess	exta	= (IExternalAccess)result;
 					exta.invokeLater(new Runnable()
 					{
@@ -48,12 +47,13 @@ public class DumbPreyVisionProcessor implements IPerceptProcessor
 						{
 							try
 							{
+								Space2D	space2d	= (Space2D)space;
 								ISpaceObject	myself	= space2d.getOwnedObjects(agent)[0];
 								IBelief	nearfoodbel	= exta.getBeliefbase().getBelief("nearest_food");
 								ISpaceObject	nearfood	= (ISpaceObject)nearfoodbel.getFact();
 								
 								// Remember new food only if nearer than other known food (if any).
-								if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))
+								if(type.equals("food_seen"))
 								{
 									if(nearfood==null
 										|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
@@ -66,9 +66,10 @@ public class DumbPreyVisionProcessor implements IPerceptProcessor
 									}
 								}
 								// Remove disappeared food from belief.
-								else if(percept.equals(nearfood) && type.equals(CreatureVisionGenerator.OBJECT_DISAPPEARED))
+								else if(type.equals("food_eaten") || type.equals("food_out_of_sight"))
 								{
-									nearfoodbel.setFact(null);
+									if(nearfood!=null && nearfood.equals(percept))
+										nearfoodbel.setFact(null);
 								}
 							}
 							catch(Exception e)

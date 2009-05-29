@@ -647,11 +647,15 @@ public class MEnvSpaceType	extends MSpaceType
 //			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 //			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
+		types.add(new TypeInfo("percepttype/agenttypes/agenttype", HashMap.class, null, null,
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
+		
 		types.add(new TypeInfo("perceptgenerator/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
-	
+		
 		types.add(new TypeInfo("view/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""), 
@@ -795,7 +799,18 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		// percepts
 		linkinfos.add(new LinkInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttypes", null, "")));
-		linkinfos.add(new LinkInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("agenttypes", null, "")));
+		linkinfos.add(new LinkInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("agenttypes", new ITypeConverter()
+		{
+			public boolean acceptsInputType(Class inputtype)
+			{
+				return true;
+			}
+			public Object convertObject(Object val, Object root,
+					ClassLoader classloader)
+			{
+				return ((Map)val).get("name");
+			}
+		}, "")));
 
 		return linkinfos;
 	}

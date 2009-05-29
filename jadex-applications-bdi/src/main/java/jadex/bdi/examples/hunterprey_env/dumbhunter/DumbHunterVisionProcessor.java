@@ -5,7 +5,6 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bdi.examples.hunterprey_env.CreatureVisionGenerator;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
@@ -28,18 +27,19 @@ public class DumbHunterVisionProcessor implements IPerceptProcessor
 	 */
 	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent)
 	{
-		if(((ISpaceObject)percept).getType().equals("prey"))
+		// Add newly seen prey / remove disappeared prey.
+		if(type.equals("prey_seen") || type.equals("prey_moved") || type.equals("prey_gone"))
 		{
 			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 			ams.getExternalAccess(agent, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					exception.printStackTrace();
+					// May happen when agent has been killed concurrently.
+//					exception.printStackTrace();
 				}
 				public void resultAvailable(Object result)
 				{
-					final Space2D	space2d	= (Space2D)space;
 					final IExternalAccess	exta	= (IExternalAccess)result;
 					exta.invokeLater(new Runnable()
 					{
@@ -47,12 +47,13 @@ public class DumbHunterVisionProcessor implements IPerceptProcessor
 						{
 							try
 							{
+								Space2D	space2d	= (Space2D)space;
 								ISpaceObject	myself	= space2d.getOwnedObjects(agent)[0];
 								IBelief	nearpreybel	= exta.getBeliefbase().getBelief("nearest_prey");
 								ISpaceObject	nearprey	= (ISpaceObject)nearpreybel.getFact();
 								
 								// Remember new prey only if nearer than other known prey (if any).
-								if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))
+								if(type.equals("prey_seen") || type.equals("prey_moved"))
 								{
 									if(nearprey==null
 										|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
@@ -65,9 +66,10 @@ public class DumbHunterVisionProcessor implements IPerceptProcessor
 									}
 								}
 								// Remove disappeared prey from belief.
-								else if(percept.equals(nearprey) && type.equals(CreatureVisionGenerator.OBJECT_DISAPPEARED))
+								else if(type.equals("prey_gone"))
 								{
-									nearpreybel.setFact(null);
+									if(nearprey!=null && nearprey.equals(percept))
+										nearpreybel.setFact(null);
 								}
 							}
 							catch(Exception e)

@@ -62,15 +62,39 @@
 			</env:processtypes>
 
 			<env:percepttypes>
-				<env:percepttype name="food_seen" objecttype="food" agenttype="CleverPrey" />
-				<env:percepttype name="food_out_of_sight" objecttype="food" agenttype="CleverPrey" />
-				<env:percepttype name="food_eaten" objecttype="food" agenttype="CleverPrey"/>
+				<env:percepttype name="food_seen" objecttype="food">
+					<env:agenttypes>
+						<env:agenttype name="DumbPrey"/>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_out_of_sight" objecttype="food">
+					<env:agenttypes>
+						<env:agenttype name="DumbPrey"/>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_eaten" objecttype="food">
+					<env:agenttypes>
+						<env:agenttype name="DumbPrey"/>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
 				<env:percepttype name="prey_moved" objecttype="prey">
 					<env:agenttypes>
 						<!-- Todo: Use avatar types for mapping? -->
 						<env:agenttype name="CleverPrey"/>
-<!-- 						<env:agenttype name="DumbPrey"/>
-						<env:agenttype name="DumbHunter"/> -->
+						<env:agenttype name="DumbHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_seen" objecttype="prey">
+					<env:agenttypes>
+						<env:agenttype name="DumbHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_gone" objecttype="prey">
+					<env:agenttypes>
+						<env:agenttype name="DumbHunter"/>
 					</env:agenttypes>
 				</env:percepttype>
 					
@@ -84,12 +108,16 @@
 							new String[]{"food_seen", "appeared", "created"}, 
 							new String[]{"food_out_of_sight", "disappeared"}, 
 							new String[]{"food_eaten", "destroyed"},
-							new String[]{"prey_moved", "moved"}
+							new String[]{"prey_moved", "moved"},
+							new String[]{"prey_seen", "appeared", "created"}, 
+							new String[]{"prey_gone", "disappeared", "destroyed"}
 						}
 					</env:property>
 				</env:perceptgenerator>
 				
 				<env:perceptprocessor agenttype="CleverPrey" class="CleverPreyVisionProcessor"/>
+				<env:perceptprocessor agenttype="DumbPrey" class="DumbPreyVisionProcessor"/>
+				<env:perceptprocessor agenttype="DumbHunter" class="DumbHunterVisionProcessor"/>
 			</env:percepttypes>
 			
 			<env:views>
@@ -216,6 +244,29 @@
  			<agents>
 				<agent name="Dumbo" type="DumbPrey"/>
 				<agent name="Lupo" type="DumbHunter"/>
+			</agents>
+			
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:objects>
+					<env:object type="obstacle" number="125"/>
+				</env:objects>
+				
+				<env:processes>
+					<env:process type="create">
+						<env:property name="rate">10</env:property>
+					</env:process>
+				</env:processes>
+
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+
+		<application name="Dumb vs. Clever">
+ 			<agents>
+				<agent name="Dumbo" type="DumbPrey"/>
+				<agent name="Heinz" type="CleverPrey"/>
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
