@@ -7,7 +7,6 @@ import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.SVector;
 import jadex.adapter.base.envsupport.math.Vector1Double;
-import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 
@@ -175,7 +174,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			{
 				IVector1 size = isx? areasize.getX(): areasize.getY();
 				
-				if(pos1.less(pos2))
+				if(pos1.greater(pos2))
 				{
 					IVector1 tmp = pos1;
 					pos1 = pos2;
@@ -183,18 +182,11 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				}
 				IVector1 d1 = pos2.copy().subtract(pos1);
 				IVector1 d2 = pos1.copy().add(size).subtract(pos2);
-				if(d1.less(d2) || d1.equals(d2))
-				{
-					ret = d1;
-				}
-				else
-				{
-					ret = d2;
-				}
+				ret = d1.less(d2) ? d1 : d2;
 			}
 			else
 			{
-				ret = pos1.copy().getDistance(pos2);
+				ret = pos1.getDistance(pos2);
 			}
 			
 			return ret;
@@ -298,27 +290,22 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		{
 			ISpaceObject nearest = null;
 			IVector1 distance = null;
-			synchronized(spaceobjects)
+			ISpaceObject[] objects = type!=null ? getSpaceObjectsByType(type) : (ISpaceObject[])getSpaceObjects();
+			for(int i=0; objects!=null && i<objects.length; i++)
 			{
-				Set objects = spaceobjects.entrySet();
-				for(Iterator it = objects.iterator(); it.hasNext();)
+				IVector2	curpos	= (IVector2)objects[i].getProperty(Space2D.POSITION);
+				if(curpos!=null)
 				{
-					Map.Entry entry = (Entry)it.next();
-					ISpaceObject curobj = (ISpaceObject)entry.getValue();
-					if(curobj.getProperty(Space2D.POSITION)!=null &&
-						(type==null || type.equals(curobj.getType())))
+					IVector1 objdist = getDistance(curpos, position); 
+					if(nearest==null || objdist.less(distance))
 					{
-						IVector1 objdist = ((IVector2)curobj.getProperty(Space2D.POSITION)).getDistance(position); 
-						if((nearest == null) || (objdist.less(distance)))
-						{
-							nearest = curobj;
-							distance = objdist;
-						}
+						nearest = objects[i];
+						distance = objdist;
 					}
 				}
 			}
 			
-			if(maxdist== null || distance==null || !maxdist.less(distance))
+			if(maxdist==null || distance!=null && !maxdist.less(distance))
 				ret = nearest;
 			
 			return ret;

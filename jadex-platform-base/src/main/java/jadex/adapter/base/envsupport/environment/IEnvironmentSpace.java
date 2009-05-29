@@ -116,37 +116,37 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @param type The space object type.
 	 * @return The space objects of the desired type.
 	 */
-	public ISpaceObject[] getSpaceObjectsByType(Object type);
+	public ISpaceObject[] getSpaceObjectsByType(String type);
 			
 	/**
 	 * Adds an space action.
-	 * @param actionId the action ID
+	 * @param name the action ID
 	 * @param action the action
 	 */
-	public void addSpaceAction(Object id, ISpaceAction action);
+	public void addSpaceAction(String name, ISpaceAction action);
 	
 	/**
 	 * Removes an space action.
-	 * @param actionId the action ID
+	 * @param name the action ID
 	 */
-	public void removeSpaceAction(Object id);
+	public void removeSpaceAction(String name);
 	
 	/**
 	 * Perform an space action. It will be executed
 	 * according to the space execution policy (e.g. at the end of a round). 
-	 * @param id Id of the action
+	 * @param name Id of the action
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void performSpaceAction(Object id, Map parameters, IResultListener listener);
+	public void performSpaceAction(String name, Map parameters, IResultListener listener);
 
 	/**
 	 * Performs a space action.
-	 * @param id Id of the action
+	 * @param name Id of the action
 	 * @param parameters parameters for the action (may be null)
 	 * @return return value of the action
 	 */
-	public Object performSpaceAction(final Object id, final Map parameters);
+	public Object performSpaceAction(String name, Map parameters);
 	
 	/**
 	 *  Get the owner of an object.

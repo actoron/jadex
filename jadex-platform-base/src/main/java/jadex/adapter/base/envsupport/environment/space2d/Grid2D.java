@@ -249,9 +249,9 @@ public class Grid2D extends Space2D
 	public IVector1 calculateDistance(IVector1 dx, IVector1 dy)
 	{
 		if(dx.less(Vector1Double.ZERO))
-			dx.negate();
+			dx	= dx.copy().negate();
 		if(dy.less(Vector1Double.ZERO))
-			dy.negate();
+			dy	= dy.copy().negate();
 		
 		return dx.add(dy);
 	}

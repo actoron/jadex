@@ -169,7 +169,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				setProperties(action, props, fetcher);
 				
 //				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
-				ret.addSpaceAction(MEnvSpaceInstance.getProperty(maction, "name"), action);
+				ret.addSpaceAction((String)MEnvSpaceInstance.getProperty(maction, "name"), action);
 			}
 		}
 		
@@ -294,7 +294,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				}
 				
 //				System.out.println("Performing initial space action: "+getProperty(action, "type"));
-				ret.performSpaceAction(getProperty(action, "type"), params);
+				ret.performSpaceAction((String)getProperty(action, "type"), params);
 			}
 		}
 		

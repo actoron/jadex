@@ -224,7 +224,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * Removes a space process.
 	 * @param id ID of the space process
 	 */
-	public void removeSpaceProcess(final Object id)
+	public void removeSpaceProcess(Object id)
 	{
 		synchronized(monitor)
 		{
@@ -418,7 +418,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * @param type The space object type.
 	 * @return The space objects of the desired type.
 	 */
-	public ISpaceObject[] getSpaceObjectsByType(Object type)
+	public ISpaceObject[] getSpaceObjectsByType(String type)
 	{
 		List obs = (List)spaceobjectsbytype.get(type);
 		return obs==null? new ISpaceObject[0]: (ISpaceObject[])obs.toArray(new ISpaceObject[obs.size()]); 
@@ -456,7 +456,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * @param actionId the action ID
 	 * @param action the action
 	 */
-	public void addSpaceAction(Object id, ISpaceAction action)
+	public void addSpaceAction(String id, ISpaceAction action)
 	{
 		synchronized(monitor)
 		{
@@ -469,7 +469,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * @param actionId the action ID
 	 * @param action the action
 	 */
-	protected ISpaceAction	getSpaceAction(Object id)
+	protected ISpaceAction	getSpaceAction(String id)
 	{
 		ISpaceAction	ret	= (ISpaceAction)actions.get(id);
 		if(ret==null)
@@ -483,7 +483,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * Removes an space action.
 	 * @param actionId the action ID
 	 */
-	public void removeSpaceAction(Object id)
+	public void removeSpaceAction(String id)
 	{
 		synchronized(monitor)
 		{	
@@ -497,7 +497,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void performSpaceAction(Object id, Map parameters, IResultListener listener)
+	public void performSpaceAction(String id, Map parameters, IResultListener listener)
 	{
 		synchronized(monitor)
 		{
@@ -511,7 +511,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * @param parameters parameters for the action (may be null)
 	 * @return return value of the action
 	 */
-	public Object performSpaceAction(final Object id, final Map parameters)
+	public Object performSpaceAction(String id, Map parameters)
 	{
 		synchronized(monitor)
 		{
