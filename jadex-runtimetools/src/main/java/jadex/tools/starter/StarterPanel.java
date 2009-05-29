@@ -12,6 +12,7 @@ import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IReport;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
+import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -98,6 +99,7 @@ public class StarterPanel extends JPanel
 	/** The application name. */
 	protected JComboBox appname;
 	protected JLabel appnamel;
+	protected DefaultComboBoxModel appmodel;
 	
 	protected JLabel confl;
 	protected JLabel confdummy = new JLabel("Configuration"); // Hack! only for reading sizes
@@ -275,6 +277,24 @@ public class StarterPanel extends JPanel
 		agentname = new JTextField();
 		
 		// The application name.
+		appmodel = new DefaultComboBoxModel();
+		appmodel.addElement("");
+		IContextService cs = (IContextService)starter.getJCC()
+			.getAgent().getPlatform().getService(IContextService.class);
+		cs.addContextListener(new IChangeListener()
+		{
+			public void changeOccurred(jadex.commons.ChangeEvent event)
+			{
+				if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
+				{
+					appmodel.addElement(((IContext)event.getValue()).getName());
+				}
+				else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
+				{
+					appmodel.removeElement(((IContext)event.getValue()).getName());
+				}
+			}
+		});
 		appname = new JComboBox();
 
 		// The generate flag for the agentname;
@@ -727,25 +747,25 @@ public class StarterPanel extends JPanel
 //		if(model.getName()!=null && SXML.isAgentFilename(adf))
 		if(model.getName()!=null && model instanceof ApplicationModel)
 		{
-			appname.removeAllItems();
-			appname.addItem(model.getName());
+			appname.setModel(new DefaultComboBoxModel(new String[]{model.getName()}));
 			appname.setEditable(true);
 		}
 		else if(model.isStartable())
 		{
+			appname.setModel(appmodel);
 			agentname.setText(model.getName());
-			appname.removeAllItems();
-			appname.addItem("");
-			appname.setSelectedItem("");
-			IContextService cs = (IContextService)starter.getJCC().getAgent().getPlatform().getService(IContextService.class);
-			if(cs!=null)
-			{
-				IContext[] contexts =  cs.getContexts(IApplicationContext.class);
-				for(int i=0; contexts!=null && i<contexts.length; i++)
-				{
-					appname.addItem(contexts[i].getName());
-				}
-			}
+//			appname.removeAllItems();
+//			appname.addItem("");
+//			appname.setSelectedItem("");
+//			IContextService cs = (IContextService)starter.getJCC().getAgent().getPlatform().getService(IContextService.class);
+//			if(cs!=null)
+//			{
+//				IContext[] contexts =  cs.getContexts(IApplicationContext.class);
+//				for(int i=0; contexts!=null && i<contexts.length; i++)
+//				{
+//					appname.addItem(contexts[i].getName());
+//				}
+//			}
 			appname.setEditable(false);
 		}
 		else
@@ -1151,3 +1171,4 @@ public class StarterPanel extends JPanel
 		f.setVisible(true);
 	}
 }
+

@@ -430,7 +430,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					if(cs!=null)
 					{
 						IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
-						if(tmp.length==1)
+						if(tmp!=null && tmp.length==1)
 							object = tmp[0];
 					}
 				}
@@ -444,7 +444,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			if(cs!=null)
 			{
 				IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
-				if(tmp.length==1)
+				if(tmp!=null && tmp.length==1)
 					ret = (IApplicationContext)tmp[0];
 			}
 			return ret;

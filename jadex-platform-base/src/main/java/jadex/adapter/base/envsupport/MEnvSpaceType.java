@@ -4,6 +4,7 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
@@ -20,6 +21,8 @@ import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
+import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ISpace;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -168,6 +171,10 @@ public class MEnvSpaceType	extends MSpaceType
 			SUtil.createHashMap(new String[]{"class", "agenttype"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, "")}), null));
+		
+		types.add(new TypeInfo("perceptprocessor/percepttype", HashMap.class, null, null,
+			SUtil.createHashMap(new String[]{"name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("view", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name", "objecttype", "creator"}, 
@@ -738,6 +745,7 @@ public class MEnvSpaceType	extends MSpaceType
 		Set linkinfos = new HashSet();
 
 		ITypeConverter expconv = new ExpressionConverter();
+		ITypeConverter nameconv = new NameAttributeToObjectConverter();
 		
 		// applicationtype
 		linkinfos.add(new LinkInfo("envspacetype", new BeanAttributeInfo("MSpaceType")));
@@ -812,6 +820,10 @@ public class MEnvSpaceType	extends MSpaceType
 			}
 		}, "")));
 
+		// perceptprocessors
+		linkinfos.add(new LinkInfo("perceptprocessor/percepttype", new BeanAttributeInfo("percepttypes", nameconv, "")));
+		
+		
 		return linkinfos;
 	}
 	
@@ -991,6 +1003,31 @@ public class MEnvSpaceType	extends MSpaceType
 		public boolean acceptsInputType(Class inputtype)
 		{
 			return String.class.isAssignableFrom(inputtype);
+		}
+	}
+	
+	/**
+	 *  Name attribute to object converter.
+	 */
+	static class NameAttributeToObjectConverter implements ITypeConverter
+	{
+		/**
+		 *  Convert a string value to another type.
+		 *  @param val The string value to convert.
+		 */
+		public boolean acceptsInputType(Class inputtype)
+		{
+			return true;
+		}
+		
+		/**
+		 *  Test if a converter accepts a specific input type.
+		 *  @param inputtype The input type.
+		 *  @return True, if accepted.
+		 */
+		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		{
+			return (String)((Map)val).get("name");
 		}
 	}
 }

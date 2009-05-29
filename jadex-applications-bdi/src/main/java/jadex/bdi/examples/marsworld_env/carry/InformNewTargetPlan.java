@@ -34,6 +34,6 @@ public class InformNewTargetPlan extends Plan
 		mevent.getParameter(SFipa.CONTENT).setValue(target);
 		sendMessage(mevent);
 
-		System.out.println("Informing sentries: "+getScope().getAgentName());
+//		System.out.println("Informing sentries: "+getScope().getAgentName());
 	}
 }

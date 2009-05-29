@@ -218,7 +218,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mgen = (Map)pmaps.get(i);
 				IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
-				ret.addPerceptProcessor((String)MEnvSpaceInstance.getProperty(mgen, "agenttype"), proc);
+				String agenttype = (String)MEnvSpaceInstance.getProperty(mgen, "agenttype");
+				List ptypes = (List)mgen.get("percepttypes");
+				ret.addPerceptProcessor(agenttype, ptypes==null? null: new HashSet(ptypes), proc);
 			}
 		}
 

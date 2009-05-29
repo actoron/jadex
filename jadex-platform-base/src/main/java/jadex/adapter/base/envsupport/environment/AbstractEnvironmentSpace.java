@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  
@@ -45,7 +46,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	protected Map perceptgenerators;
 
 	/** The percept processors. */
-	protected Map perceptprocessors;
+	protected MultiCollection perceptprocessors;
 	
 	/** Avatar mappings. */
 	protected MultiCollection avatarmappings;
@@ -96,7 +97,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		this.processes = new HashMap();
 		this.percepttypes = new HashMap();
 		this.perceptgenerators = new HashMap();
-		this.perceptprocessors = new HashMap();
+		this.perceptprocessors = new MultiCollection();
 		this.objecttypes = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
@@ -538,7 +539,18 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 //			System.out.println("New percept: "+typename+", "+data+", "+agent);
 			
 			String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
-			IPerceptProcessor proc	= (IPerceptProcessor)perceptprocessors.get(agenttype);
+			List procs	= (List)perceptprocessors.get(agenttype);
+			IPerceptProcessor proc = null;
+			if(procs!=null)
+			{
+				for(int i=0; i<procs.size() && proc==null; i++)
+				{
+					Object[] tmp = (Object[])procs.get(i);
+					if(tmp[0]==null || ((Collection)tmp[0]).contains(typename))
+						proc = (IPerceptProcessor)tmp[1];
+				}
+			}
+			
 			if(proc!=null)
 				perceptlist.schedulePercept(typename, data, agent, proc);
 			else
@@ -755,12 +767,11 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 *  @param	agenttype	The agent type.
 	 *  @param	proc	The percept processor.
 	 */
-	// Todo: multiple processors per agent -> mapping per percept type.
-	public void addPerceptProcessor(String agenttype, IPerceptProcessor proc)
+	public void addPerceptProcessor(String agenttype, Set percepttypes, IPerceptProcessor proc)
 	{
 		synchronized(monitor)
 		{
-			perceptprocessors.put(agenttype, proc);
+			perceptprocessors.put(agenttype, new Object[]{percepttypes, proc});
 		}
 	}
 	
@@ -769,12 +780,20 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 *  @param	agenttype	The agent type.
 	 *  @param	proc	The percept processor.
 	 */
-	// Todo: multiple processors per agent -> mapping per percept type.
 	public void removePerceptProcessor(String agenttype, IPerceptProcessor proc)
 	{
 		synchronized(monitor)
 		{
-			perceptprocessors.remove(agenttype);
+			List procs = (List)perceptprocessors.get(agenttype);
+			for(int i=0; i<procs.size(); i++)
+			{
+				Object[] tmp = (Object[])procs.get(i);
+				if(proc.equals(tmp[1]))
+				{
+					perceptprocessors.remove(agenttype, tmp);
+					break;
+				}
+			}
 		}
 	}
 	

@@ -79,7 +79,7 @@ public class MoveTask extends ListenableTask
 					{
 						if(objects[i].getType().equals("target") && !targetsbel.containsFact(objects[i]))
 						{
-							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+//							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
 							targetsbel.addFact(objects[i]);
 						}
 					}

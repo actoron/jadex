@@ -40,6 +40,6 @@ public class ProduceOrePlan extends Plan
 		SyncResultListener	res	= new SyncResultListener();
 		myself.addTask(new ProduceOreTask(target, res));
 		Number	ore	= (Number)res.waitForResult();
-		System.out.println("Produced ore at target: "+getAgentName()+", "+ore+" ore produced.");
+//		System.out.println("Produced ore at target: "+getAgentName()+", "+ore+" ore produced.");
 	}
 }

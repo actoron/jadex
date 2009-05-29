@@ -86,9 +86,8 @@
 				</env:perceptgenerator>
 				
 				<env:perceptprocessor agenttype="Burner" class="VisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
 					<env:percepttype name="garbage_appeared"/>
-					<env:percepttype name="garbage_disappeared"/> -->
+					<env:percepttype name="garbage_disappeared"/>
 				</env:perceptprocessor>
 				<env:perceptprocessor agenttype="Collector" class="VisionProcessor"/>
 			</env:percepttypes>
@@ -175,8 +174,8 @@
 	<applications>
 		<application name="One Burner / One Collector">
 			<agents>
-				<agent name="Collector1" type="Collector"/>
-				<agent name="Burner1" type="Burner"/>
+				<agent type="Collector"/>
+				<agent type="Burner"/>
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
@@ -209,9 +208,12 @@
 		
 		<application name="One Burner / Two Collectors">
 			<agents>
-				<agent name="Collector2" type="Collector"/>
+				<!-- Using names for agents is problemat -->
+				<!-- <agent name="Collector2" type="Collector"/>
 				<agent name="Collector1" type="Collector"/>
-				<agent name="Burner1" type="Burner"/>
+				<agent name="Burner1" type="Burner"/> -->
+				<agent type="Collector" number="2"/>
+				<agent type="Burner" number="1"/>
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
@@ -242,7 +244,7 @@
 				<agent type="Burner" number="2"/>
 			</agents>
 			
-			<env:envspace name="mygc2dspace" type="gc2dspace">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 				<env:processes>
 					<env:process type="create">
 						<env:property name="rate">3</env:property>

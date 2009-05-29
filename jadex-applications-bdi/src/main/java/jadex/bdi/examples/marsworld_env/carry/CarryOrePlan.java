@@ -45,7 +45,7 @@ public class CarryOrePlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			myself.addTask(new LoadOreTask(target, true, res));
 			Number	ore	= (Number)res.waitForResult();
-			System.out.println("Loaded ore at target: "+getAgentName()+", "+ore+" ore loaded.");
+//			System.out.println("Loaded ore at target: "+getAgentName()+", "+ore+" ore loaded.");
 			// Todo: use return value to determine finished state?
 			finished	= ((Number)target.getProperty(ProduceOreTask.PROPERTY_CAPACITY)).intValue()==0;
 			if(ore.intValue()==0)
@@ -62,7 +62,7 @@ public class CarryOrePlan extends Plan
 			res	= new SyncResultListener();
 			myself.addTask(new LoadOreTask(homebase, false, res));
 			res.waitForResult();
-			System.out.println("Unloaded ore at homebase: "+getAgentName()+", "+ore+" ore unloaded.");
+//			System.out.println("Unloaded ore at homebase: "+getAgentName()+", "+ore+" ore unloaded.");
 		}
 	}
 }

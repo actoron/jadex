@@ -48,7 +48,7 @@ public class AnalyzeTargetPlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			myself.addTask(new AnalyzeTargetTask(target, res));
 			Number	ore	= (Number)res.waitForResult();
-			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
+//			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
 			if(ore.intValue()>0)
 				callProducerAgent(target);
 	
