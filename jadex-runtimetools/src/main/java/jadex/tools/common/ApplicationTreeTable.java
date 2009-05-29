@@ -242,7 +242,7 @@ public class ApplicationTreeTable extends JScrollPane
 		DefaultTreeTableNode child = platform.getChild(appcontext);
 		if(child != null)
 		{
-			platform.remove(child);
+			platform.remove(platform.getIndex(child));
 		}
 	}
 
@@ -251,6 +251,8 @@ public class ApplicationTreeTable extends JScrollPane
 	 */
 	public void removeApplications()
 	{
+		// todo: methods must be called on DefaultTreeTableNode
+		// to get the model informed about the changes
 		platform.removeAllChildren();
 	}
 	

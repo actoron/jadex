@@ -164,13 +164,29 @@ public class DefaultTreeTableNode	extends DefaultMutableTreeNode
 	public void remove(int index)
 	{
 		Object	child	= getChildAt(index);
-		super.remove(index);
 		if(getModel()!=null)
 		{
 			getModel().fireTreeNodesRemoved(this, this.getPath(),
 				new int[]{index}, new Object[]{child});
 		}
+		super.remove(index);
 	}
+	
+	// Does not work, don't know why.
+	/**
+	 *  Removes the child at from the receiver.
+	 *  Overridden to generate tree event.
+	 * /
+	public void remove(MutableTreeNode child)
+	{
+		int index = getIndex(child);
+		super.remove(child);
+		if(getModel()!=null)
+		{
+			getModel().fireTreeNodesRemoved(this, this.getPath(),
+				new int[]{index}, new Object[]{child});
+		}
+	}*/
 
 	/**
 	 *  Get a child for the specified user object.

@@ -24,8 +24,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -253,7 +255,7 @@ public class AgentTreeTable extends JScrollPane
 		DefaultTreeTableNode child = platform.getChild(description);
 		if(child != null)
 		{
-			platform.remove(child);
+			platform.remove(platform.getIndex(child));
 		}
 	}
 
@@ -262,6 +264,8 @@ public class AgentTreeTable extends JScrollPane
 	 */
 	public void removeAgents()
 	{
+		// todo: methods must be called on DefaultTreeTableNode
+		// to get the model informed about the changes
 		platform.removeAllChildren();
 	}
 	
