@@ -32,6 +32,8 @@ public class EatPlan extends Plan
 			{
 				String	move	= MoveAction.getDirection(env, (IVector2)myself.getProperty(Space2D.POSITION),
 					(IVector2)food.getProperty(Space2D.POSITION));
+				if(MoveAction.DIRECTION_NONE.equals(move))
+					fail();
 				SyncResultListener srl	= new SyncResultListener();
 				Map params = new HashMap();
 				params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());

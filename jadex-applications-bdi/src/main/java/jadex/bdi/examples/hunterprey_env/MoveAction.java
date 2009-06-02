@@ -1,7 +1,7 @@
 package jadex.bdi.examples.hunterprey_env;
 
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -40,6 +40,9 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 	/** The move direction down. */
 	public static final String	DIRECTION_DOWN	= "down"; 
 
+	/** Placeholder for "no move" action. */
+	public static final String	DIRECTION_NONE	= "none"; 
+
 	//--------- IAgentAction interface --------
 	
 	/**
@@ -63,6 +66,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 		}
 		
 		IVector2	pos	= (IVector2)avatar.getProperty(Space2D.POSITION);
+		boolean	skip	= false;
 		if(DIRECTION_LEFT.equals(direction))
 		{
 			pos	= new Vector2Int(pos.getXAsInteger()-1, pos.getYAsInteger());
@@ -79,56 +83,53 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 		{
 			pos	= new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger()+1);
 		}
+		else if(DIRECTION_NONE.equals(direction))
+		{
+			skip	= true;
+		}
 		else
 		{
 			throw new RuntimeException("Unknown move direction: "+direction);
 		}
 		
-		Collection	obstacles	= grid.getSpaceObjectsByGridPosition(pos, "obstacle");
-		if(obstacles!=null && !obstacles.isEmpty())
+		if(!skip)
 		{
-			throw new RuntimeException("Cannot move '"+direction+"' due to obstacles: "+obstacles);
-		}
-		
-		// Preys can not "tunnel" through hunters, i.e. move from the field
-		// where the hunter is now to the field where the hunter was before.
-		if(avatar.getType().equals("prey"))
-		{
-			Collection	hunters	= grid.getSpaceObjectsByGridPosition((IVector2)avatar.getProperty(Space2D.POSITION), "hunter");
-			if(hunters!=null)
+			Collection	obstacles	= grid.getSpaceObjectsByGridPosition(pos, "obstacle");
+			if(obstacles!=null && !obstacles.isEmpty())
 			{
-				pos	= grid.adjustPosition(pos);	// Hack!!! Position only converted in setPosition().
-				for(Iterator it=hunters.iterator(); it.hasNext(); )
+				throw new RuntimeException("Cannot move '"+direction+"' due to obstacles: "+obstacles);
+			}
+			
+			// Preys can not "tunnel" through hunters, i.e. move from the field
+			// where the hunter is now to the field where the hunter was before.
+			if(avatar.getType().equals("prey"))
+			{
+				Collection	hunters	= grid.getSpaceObjectsByGridPosition((IVector2)avatar.getProperty(Space2D.POSITION), "hunter");
+				if(hunters!=null)
 				{
-					ISpaceObject	hunter	= (ISpaceObject)it.next();
-					if(pos.equals(hunter.getProperty(PROPERTY_LASTPOS)))
+					pos	= grid.adjustPosition(pos);	// Hack!!! Position only converted in setPosition().
+					for(Iterator it=hunters.iterator(); it.hasNext(); )
 					{
-//						System.out.println("Cannot move '"+direction+"' due to hunter: "+hunter);
-						throw new RuntimeException("Cannot move '"+direction+"' due to hunter: "+hunter);
+						ISpaceObject	hunter	= (ISpaceObject)it.next();
+						if(pos.equals(hunter.getProperty(PROPERTY_LASTPOS)))
+						{
+//							System.out.println("Cannot move '"+direction+"' due to hunter: "+hunter);
+							throw new RuntimeException("Cannot move '"+direction+"' due to hunter: "+hunter);
+						}
 					}
 				}
 			}
+			
+			// Remember last position of hunter (required for detecting "tunneling").
+			else if(avatar.getType().equals("hunter"))
+			{
+				avatar.setProperty(PROPERTY_LASTPOS, avatar.getProperty(Space2D.POSITION));
+			}
+			
+			grid.setPosition(avatar.getId(), pos);
 		}
-		
-		// Remember last position of hunter (required for detecting "tunneling").
-		else if(avatar.getType().equals("hunter"))
-		{
-			avatar.setProperty(PROPERTY_LASTPOS, avatar.getProperty(Space2D.POSITION));
-		}
-		
-		grid.setPosition(avatar.getId(), pos);
 		
 		return null;
-	}
-
-	/**
-	 * Returns the ID of the action.
-	 * @return ID of the action
-	 */
-	public Object getId()
-	{
-		// todo: remove here or from application xml?
-		return "move";
 	}
 
 	/**
@@ -139,57 +140,118 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 	 * 	@return The way to go (if any).
 	 */
 	// Todo: A*
-	public static String	getDirection(Grid2D space, IVector2 sourcepos, IVector2 targetpos)
+	public static String	getDirection(final Grid2D space, IVector2 sourcepos, final IVector2 targetpos)
+	{
+		String	ret	= evaluateMoves(space, sourcepos, new IMoveEvaluator()
+		{
+			public double evaluateMove(IVector2 position)
+			{
+				// The smaller the distance, the better the move. 
+				return -space.getDistance(position, targetpos).getAsDouble();
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 *  Move to stay away from the given objects.
+	 *  @param space	The 2D space to move in.
+	 *  @param sourcepos	The source position.
+	 * 	@param objects	The objects to avoid.
+	 * 	@return The direction to go ('none', if no move at all is better than moving in any direction).
+	 */
+	public static String	getAvoidanceDirection(final Grid2D space, IVector2 sourcepos, final ISpaceObject[] objects)
+	{
+		String	ret	= evaluateMoves(space, sourcepos, new IMoveEvaluator()
+		{
+			public double evaluateMove(IVector2 position)
+			{
+				// The bigger the minimal distance, the better the move.
+				double	 mindist	= Double.POSITIVE_INFINITY;
+				for(int i=0; i<objects.length; i++)
+				{
+					mindist	= Math.min(mindist, space.getDistance(position,
+						(IVector2)objects[i].getProperty(Space2D.POSITION)).getAsDouble());
+				}
+				return mindist;
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 *  Get the best move.
+	 *  @param space	The 2D space to move in.
+	 *  @param sourcepos	The source position.
+	 * 	@param eval	The move evaluator.
+	 * 	@return The direction to go ('none', if no move at all is better than moving in any direction).
+	 */
+	public static String	evaluateMoves(Grid2D space, IVector2 sourcepos, IMoveEvaluator eval)
 	{
 		String	ret	= null;
 		
-		if(!sourcepos.equals(targetpos))
-		{
-			Map	moves	= new HashMap();
-			moves.put(DIRECTION_LEFT, new Vector2Int(sourcepos.getXAsInteger()-1, sourcepos.getYAsInteger()));
-			moves.put(DIRECTION_RIGHT, new Vector2Int(sourcepos.getXAsInteger()+1, sourcepos.getYAsInteger()));
-			moves.put(DIRECTION_UP, new Vector2Int(sourcepos.getXAsInteger(), sourcepos.getYAsInteger()-1));
-			moves.put(DIRECTION_DOWN, new Vector2Int(sourcepos.getXAsInteger(), sourcepos.getYAsInteger()+1));
+		Map	moves	= new HashMap();
+		moves.put(DIRECTION_NONE, new Vector2Int(sourcepos.getXAsInteger(), sourcepos.getYAsInteger()));
+		moves.put(DIRECTION_LEFT, new Vector2Int(sourcepos.getXAsInteger()-1, sourcepos.getYAsInteger()));
+		moves.put(DIRECTION_RIGHT, new Vector2Int(sourcepos.getXAsInteger()+1, sourcepos.getYAsInteger()));
+		moves.put(DIRECTION_UP, new Vector2Int(sourcepos.getXAsInteger(), sourcepos.getYAsInteger()-1));
+		moves.put(DIRECTION_DOWN, new Vector2Int(sourcepos.getXAsInteger(), sourcepos.getYAsInteger()+1));
 
-			// Get min distance of positions not filled with obstacles.
-			double	mindist	= space.getDistance(sourcepos, targetpos).getAsDouble();
-			for(Iterator it=moves.keySet().iterator(); it.hasNext(); )
+		// Get max value of positions not filled with obstacles.
+		double	maxval	= Double.NEGATIVE_INFINITY;
+		for(Iterator it=moves.keySet().iterator(); it.hasNext(); )
+		{
+			IVector2	pos	= (IVector2)moves.get(it.next());
+			Collection	obstacles	= space.getSpaceObjectsByGridPosition(pos, "obstacle");
+			if(obstacles!=null && !obstacles.isEmpty())
 			{
-				IVector2	pos	= (IVector2)moves.get(it.next());
-				Collection	obstacles	= space.getSpaceObjectsByGridPosition(pos, "obstacle");
-				if(obstacles!=null && !obstacles.isEmpty())
-				{
-					it.remove();
-				}
-				else
-				{
-					mindist	= Math.min(mindist, space.getDistance(pos, targetpos).getAsDouble());
-				}
+				it.remove();
 			}
-			// Retain only the best move(s).
-			for(Iterator it=moves.keySet().iterator(); it.hasNext(); )
+			else
 			{
-				IVector2	pos	= (IVector2)moves.get(it.next());
-				if(space.getDistance(pos, targetpos).getAsDouble()>mindist)
-				{
-					it.remove();
-				}
+				maxval	= Math.max(maxval, eval.evaluateMove(pos));
 			}
+		}
+		// Retain only the best move(s).
+		for(Iterator it=moves.keySet().iterator(); it.hasNext(); )
+		{
+			IVector2	pos	= (IVector2)moves.get(it.next());
+			if(eval.evaluateMove(pos)<maxval)
+			{
+				it.remove();
+			}
+		}
 
 //			System.out.println("Moves: "+moves);
 			
-			// Chose randomly one of the remaining equally good moves.
-			if(moves.size()>0)
+		// Chose randomly one of the remaining equally good moves.
+		if(moves.size()>0)
+		{
+			int	chosen	= (int)(Math.random()*moves.size());
+			Iterator	it	= moves.keySet().iterator();
+			for(int i=0; i<=chosen; i++)
 			{
-				int	chosen	= (int)(Math.random()*moves.size());
-				Iterator	it	= moves.keySet().iterator();
-				for(int i=0; i<=chosen; i++)
-				{
-					ret	= (String)it.next();
-				}
+				ret	= (String)it.next();
 			}
 		}
 		
 		return ret;
+	}
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  Interface for evaluating moves.
+	 */
+	public static interface IMoveEvaluator
+	{
+		/**
+		 *  Evaluate the move to the given position.
+		 *  @param position	The position to move to.
+		 *  @return A number representing the move value (bigger=better).
+		 */
+		public double	evaluateMove(IVector2 position);
 	}
 }

@@ -97,6 +97,16 @@
 						<env:agenttype name="DumbHunter"/>
 					</env:agenttypes>
 				</env:percepttype>
+				<env:percepttype name="hunter_seen" objecttype="hunter">
+					<env:agenttypes>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="hunter_gone" objecttype="hunter">
+					<env:agenttypes>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
 					
 				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
 					<env:property name="range">2</env:property>
@@ -110,7 +120,9 @@
 							new String[]{"food_eaten", "destroyed"},
 							new String[]{"prey_moved", "moved"},
 							new String[]{"prey_seen", "appeared", "created"}, 
-							new String[]{"prey_gone", "disappeared", "destroyed"}
+							new String[]{"prey_gone", "disappeared", "destroyed"},
+							new String[]{"hunter_seen", "appeared", "created"}, 
+							new String[]{"hunter_gone", "disappeared", "destroyed"}
 						}
 					</env:property>
 				</env:perceptgenerator>
@@ -196,9 +208,32 @@
 	</agenttypes>
 
 	<applications>
-		<application name="One Dumb Prey">
+		<application name="Classic">
  			<agents>
-				<agent name="Dummy1" type="DumbPrey"/>
+<!-- 
+						<value>new StartAgentInfo("jadex.examples.hunterprey.environment.Environment", "Environment_%n", 2000, null)</value>
+						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.dumbprey.DumbPrey", "Dumbo_%n", 0, null)</value>
+						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.dumbprey.DumbPrey", "Duffy_%n", 0, null)</value>- ->
+						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.lazyprey.LazyPrey", "Heinz_%n", 0, null)</value>
+						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.lazyprey.LazyPrey", "Harald_%n", 0, null)</value>- ->
+						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.cleverprey.CleverPrey", "Clever_%n", 0, null)</value>
+						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.cleverprey.CleverPrey", "Charlton_%n", 0, null)</value>- ->
+						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.dumbhunter.DumbHunter", "Lenny_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.dumbhunter.DumbHunter", "Louis_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.ldahunter.LAHunter", "Willy_%n", 0, null)</value>
+						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.ldahunter.LAHunter", "Wolfram_%n", 0, null)</value>- ->
+ -->
+				<agent type="DumbPrey" name="Dumbo"/>
+				<!-- <agent type="DumbPrey" name="Duffy"/> -->
+				<agent type="CleverPrey" name="Heinz" configuration="Lazy"/>
+				<!-- <agent type="CleverPrey" name="Harald" configuration="Lazy"/> -->
+				<agent type="CleverPrey" name="Otto" configuration="Opportunistic"/>
+				<agent type="CleverPrey" name="Clever" configuration="Clever"/>
+				<!-- <agent type="CleverPrey" name="Charlton" configuration="Clever"/> -->
+				<agent type="DumbHunter" name="Lenny"/>
+				<agent type="DumbHunter" name="Louis"/>
+				<!-- <agent type="LAHunter" name="Willy"/> -->
+				<!-- <agent type="LAHunter" name="Wolfram"/> -->
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace">
@@ -218,92 +253,11 @@
  			</env:envspace>
  		</application>
 
-		<application name="One Clever Prey">
- 			<agents>
-				<agent name="Harald" type="CleverPrey"/>
-			</agents>
-			
-			<env:envspace name="my2dspace" type="2dspace">
-				<env:objects>
-					<env:object type="obstacle" number="125"/>
-				</env:objects>
-				
-				<env:processes>
-					<env:process type="create">
-						<env:property name="rate">5</env:property>
-					</env:process>
-				</env:processes>
-
-				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
-				</env:observers>
- 			</env:envspace>
- 		</application>
-
-		<application name="One Prey / One Hunter">
- 			<agents>
-				<agent name="Dumbo" type="DumbPrey"/>
-				<agent name="Lupo" type="DumbHunter"/>
-			</agents>
-			
-			<env:envspace name="my2dspace" type="2dspace">
-				<env:objects>
-					<env:object type="obstacle" number="125"/>
-				</env:objects>
-				
-				<env:processes>
-					<env:process type="create">
-						<env:property name="rate">10</env:property>
-					</env:process>
-				</env:processes>
-
-				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
-				</env:observers>
- 			</env:envspace>
- 		</application>
-
-		<application name="Dumb vs. Clever">
- 			<agents>
-				<agent name="Dumbo" type="DumbPrey"/>
-				<agent name="Heinz" type="CleverPrey"/>
-			</agents>
-			
-			<env:envspace name="my2dspace" type="2dspace">
-				<env:objects>
-					<env:object type="obstacle" number="125"/>
-				</env:objects>
-				
-				<env:processes>
-					<env:process type="create">
-						<env:property name="rate">10</env:property>
-					</env:process>
-				</env:processes>
-
-				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
-				</env:observers>
- 			</env:envspace>
- 		</application>
-
-		<application name="Empty">			
-			<env:envspace name="my2dspace" type="2dspace">
-				<env:objects>
-					<env:object type="obstacle" number="125"/>
-				</env:objects>
-
-				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
-				</env:observers>
- 			</env:envspace>
- 		</application>
-
-		<application name="Multi">
+		<application name="Land of Peace">
 			<agents>
-				<agent type="DumbPrey" number="100"/>
+				<agent type="DumbPrey" number="50"/>
+				<agent type="CleverPrey" number="40" configuration="Clever"/>
+				<agent type="CleverPrey" number="10" configuration="Opportunistic"/>
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace">
@@ -325,7 +279,10 @@
  		
 		<application name="Lupo's Paradise">
 			<agents>
-				<agent type="DumbPrey" number="100"/>
+				<agent type="DumbPrey" number="80"/>
+				<agent type="CleverPrey" number="10" configuration="Clever"/>
+				<agent type="CleverPrey" number="5" configuration="Opportunistic"/>
+				<agent type="CleverPrey" number="5" configuration="Lazy"/>
 				<agent name="Lupo" type="DumbHunter"/>
 			</agents>
 				
@@ -348,7 +305,10 @@
 
 		<application name="Battlefield">
 			<agents>
-				<agent type="DumbPrey" number="200"/>
+				<agent type="DumbPrey" number="100"/>
+				<agent type="CleverPrey" number="50" configuration="Clever"/>
+				<agent type="CleverPrey" number="25" configuration="Opportunistic"/>
+				<agent type="CleverPrey" number="25" configuration="Lazy"/>
 				<agent type="DumbHunter" number="30"/>
 			</agents>
 				
@@ -369,15 +329,7 @@
  			</env:envspace>
  		</application>
 
-		<application name="Five Dumb Preys">
- 			<agents>
-				<agent name="Duffy" type="DumbPrey"/>
-				<agent name="Dumbo" type="DumbPrey"/>
-				<agent name="Dimitri" type="DumbPrey"/>
-				<agent name="Dork" type="DumbPrey"/>
-				<agent name="Django" type="DumbPrey"/>
-			</agents>
-			
+		<application name="Empty (no creatures)">			
 			<env:envspace name="my2dspace" type="2dspace">
 				<env:objects>
 					<env:object type="obstacle" number="125"/>
@@ -388,12 +340,14 @@
 						<env:property name="rate">10</env:property>
 					</env:process>
 				</env:processes>
-	
+
 				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
+						<env:plugins>
+						</env:plugins>
+					</env:observer>
 				</env:observers>
  			</env:envspace>
  		</application>
 	</applications>
-
 </applicationtype>

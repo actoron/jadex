@@ -39,13 +39,32 @@
 
  		<!-- The known food (seen and out of sight). -->
  		<beliefset name="known_food" class="ISpaceObject"/>
+
+ 		<!-- The currently seen hunters. -->
+ 		<beliefset name="seen_hunters" class="ISpaceObject"/>
+
+ 		<!-- A flag to activate eating -->
+ 		<belief name="eating_allowed" class="boolean">
+ 			<fact>true</fact>
+ 		</belief>
 	</beliefs>
 	
 	<goals>
-		<!-- A goal to find some food. -->
-		<maintaingoal name="find_food">
+		<!-- A goal to find some food, when there is no food around. -->
+		<maintaingoal name="food_seen">
 			<maintaincondition language="jcl">
 				$beliefbase.seen_food.length>0
+			</maintaincondition>
+		</maintaingoal>
+		
+		<!-- A goal to stay away from hunters. -->
+		<maintaingoal name="keep_alone" exclude="never">
+			<deliberation>
+				<inhibits ref="food_seen" inhibit="when_in_process"/>
+				<inhibits ref="eat_food" inhibit="when_in_process"/>
+			</deliberation>
+			<maintaincondition language="jcl">
+				$beliefbase.seen_hunters.length==0
 			</maintaincondition>
 		</maintaingoal>
 		
@@ -81,7 +100,7 @@
 		<plan name="wander_plan">
 			<body class="WanderPlan"/>
 			<trigger>
-				<goal ref="find_food"/>
+				<goal ref="food_seen"/>
 			</trigger>
 		</plan>
 		<plan name="move_plan" priority="1">
@@ -91,9 +110,9 @@
 					order by $beliefbase.env.getDistance((IVector2)$beliefbase.myself.getProperty("position"), (IVector2)$food.getProperty("position")).getAsInteger()
 				</value>
 			</parameter>
-			<body class="EatPlan"/>	<!-- Eat plan starts moving towards food and gets aborted when food come sin vision range. -->
+			<body class="EatPlan"/>	<!-- Eat plan starts moving towards food and gets aborted when food comes in vision range. -->
 			<trigger>
-				<goal ref="find_food"/>
+				<goal ref="food_seen"/>
 			</trigger>
 			<precondition>$beliefbase.known_food.length>0</precondition>
 		</plan>
@@ -104,6 +123,12 @@
 			<body class="EatPlan"/>
 			<trigger>
 				<goal ref="eat_food"/>
+			</trigger>
+		</plan>
+		<plan name="escape_plan">
+			<body class="EscapePlan"/>
+			<trigger>
+				<goal ref="keep_alone"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -117,9 +142,38 @@
     </properties>
 
 	<configurations>
+		<!-- Wander, flee and eat behavior. -->
 		<configuration name="Clever">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
 			<goals>
-				<initialgoal ref="find_food"/>
+				<initialgoal ref="food_seen"/>
+				<initialgoal ref="keep_alone"/>
+			</goals>
+		</configuration>
+		<!-- Flee and eat behavior, but no wandering. -->
+		<configuration name="Opportunistic">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="keep_alone"/>
+			</goals>
+		</configuration>
+		<!-- No wander and eat behavior, but flees from hunters. -->
+		<configuration name="Lazy">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>false</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="keep_alone"/>
 			</goals>
 		</configuration>
 	</configurations>

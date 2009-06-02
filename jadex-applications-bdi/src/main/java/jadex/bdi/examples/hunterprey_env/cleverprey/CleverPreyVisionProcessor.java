@@ -150,5 +150,56 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 				}
 			});
 		}
+		
+		// Add newly seen hunters / remove disappeared hunter.
+		if(type.equals("hunter_seen") || type.equals("hunter_gone"))
+		{
+			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
+			ams.getExternalAccess(agent, new IResultListener()
+			{
+				public void exceptionOccurred(Exception exception)
+				{
+					// May happen when agent has been killed concurrently.
+//					exception.printStackTrace();
+				}
+				public void resultAvailable(Object result)
+				{
+					final IExternalAccess	exta	= (IExternalAccess)result;
+					exta.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							try
+							{
+								IBeliefSet	seen_hunters	= exta.getBeliefbase().getBeliefSet("seen_hunters");
+
+								// Add seen hunter, if not already known.
+								// Todo: object updates (position) recognized, even if not in vision!?
+								// -> only post object copies in percepts!?
+								if(type.equals("hunter_seen"))
+								{
+									if(!seen_hunters.containsFact(percept))
+										seen_hunters.addFact(percept);
+								}
+
+								// Remove disappeared, if known.
+								else if(type.equals("hunter_gone"))
+								{
+									if(seen_hunters.containsFact(percept))
+										seen_hunters.removeFact(percept);
+								}
+							}
+							catch(Exception e)
+							{
+								// Todo: fix agent init.
+								// Exception might be thrown, when agent not yet initialized
+								// -> AgentRules.findValue() fails due to missing initparents,
+								// when belief is initialized on demand.
+							}
+						}
+					});
+				}
+			});
+		}
 	}
 }

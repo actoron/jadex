@@ -78,14 +78,4 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		
 		return null;
 	}
-
-	/**
-	 * Returns the ID of the action.
-	 * @return ID of the action
-	 */
-	public Object getId()
-	{
-		// todo: remove here or from application xml?
-		return "eat";
-	}
 }

@@ -57,7 +57,7 @@ public class DumbPreyPlan extends Plan
 				if(food!=null)
 				{
 					String	newdir	= MoveAction.getDirection(env, pos, (IVector2)food.getProperty(Space2D.POSITION));
-					if(newdir!=null)
+					if(!MoveAction.DIRECTION_NONE.equals(newdir))
 					{
 						lastdir	= newdir;
 					}
