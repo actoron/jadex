@@ -73,7 +73,8 @@
 				<env:percepttype name="garbage_disappeared" objecttype="garbage" />
 					
 				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
-					<env:property name="range">0</env:property>
+					<env:property name="maxrange">0</env:property>
+					<env:property name="range_property">"vision_range"</env:property>
 					<!-- percept types are declared with associated action types: 
 						percepttype, actiontype1, actiontype2, ... -->
 					<env:property name="percepttypes">
@@ -86,8 +87,8 @@
 				</env:perceptgenerator>
 				
 				<env:perceptprocessor agenttype="Burner" class="VisionProcessor">
-					<env:percepttype name="garbage_appeared"/>
-					<env:percepttype name="garbage_disappeared"/>
+					<!-- <env:percepttype name="garbage_appeared"/>
+					<env:percepttype name="garbage_disappeared"/> -->
 				</env:perceptprocessor>
 				<env:perceptprocessor agenttype="Collector" class="VisionProcessor"/>
 			</env:percepttypes>
