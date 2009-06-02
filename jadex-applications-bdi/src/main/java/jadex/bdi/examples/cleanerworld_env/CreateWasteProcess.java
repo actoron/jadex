@@ -1,4 +1,4 @@
-package jadex.bdi.examples.garbagecollector2;
+package jadex.bdi.examples.cleanerworld_env;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
@@ -20,7 +20,7 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 	//-------- attributes --------
 	
 	/** The last executed tick. */
-	protected double	lasttick;
+	protected double lasttick;
 	
 	//-------- constructors --------
 	
@@ -65,7 +65,7 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 	{
 //		System.out.println("create waste process called: "+deltat);
 		
-		Grid2D grid = (Grid2D)space;
+		Space2D grid = (Space2D)space;
 		
 		double	delta	= clock.getTick() - lasttick;
 		
@@ -81,7 +81,7 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 			{
 				Map props = new HashMap();
 				props.put(Space2D.POSITION, pos);
-				grid.createSpaceObject("garbage", props, null, null);
+				grid.createSpaceObject("waste", props, null, null);
 //				System.out.println("Created waste: "+obj);
 			}
 		}

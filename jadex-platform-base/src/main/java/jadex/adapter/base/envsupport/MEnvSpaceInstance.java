@@ -15,7 +15,6 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
@@ -366,11 +365,12 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					args.put("object", sourcepers);
 					args.put("fetcher", fetcher);
 					IPerspective persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
-					// TODO: Add attributes
-					if(ret.getClass().getName().indexOf("2D")!=-1)
-						((Perspective2D)persp).setInvertYAxis(true);
-					if(ret.getClass().getName().indexOf("Grid")!=-1)
-						((Perspective2D)persp).setObjectShift(new Vector2Double(0.5));
+					
+//					if(ret.getClass().getName().indexOf("2D")!=-1)
+//						((Perspective2D)persp).setInvertYAxis(true);
+//					if(ret.getClass().getName().indexOf("Grid")!=-1)
+//						((Perspective2D)persp).setObjectShift(new Vector2Double(0.5));
+
 					oc.addPerspective((String)getProperty(sourcepers, "name"), persp);
 				}
 			}

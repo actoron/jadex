@@ -4,7 +4,7 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
+import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
@@ -21,8 +21,6 @@ import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
-import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.ISpace;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -205,10 +203,14 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("perspective", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "name", "opengl", "creator"}, 
+			SUtil.createHashMap(new String[]{"class", "name", "opengl", "invertxaxis", "invertyaxis", "objectshiftx", "objectshifty", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.TRUE),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -222,6 +224,24 @@ public class MEnvSpaceType	extends MSpaceType
 					ret.setOpenGl(opengl);
 					String name = (String)MEnvSpaceInstance.getProperty(args, "name");
 					System.out.println("Perspective: "+name+" using opengl="+opengl);
+					
+					// Hack!!!
+					if(ret instanceof Perspective2D)
+					{
+						Perspective2D pers = (Perspective2D)ret;
+						Boolean invertx = (Boolean)MEnvSpaceInstance.getProperty(args, "invertxaxis");
+						pers.setInvertYAxis(invertx.booleanValue());
+						Boolean inverty = (Boolean)MEnvSpaceInstance.getProperty(args, "invertyaxis");
+						pers.setInvertYAxis(inverty.booleanValue());
+						
+						Double xshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshiftx");
+						Double yshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshifty");
+						IVector2 shift;
+						if(xshift!=null && yshift!=null)
+							pers.setObjectShift(Vector2Double.getVector2(xshift, yshift));
+						else if(ret instanceof Grid2D)
+							pers.setObjectShift(new Vector2Double(0.5));
+					}
 					
 					List drawables = (List)args.get("drawables");
 					if(drawables!=null)
