@@ -12,6 +12,7 @@ import jadex.commons.concurrent.IResultListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -205,6 +206,18 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 				throw new RuntimeException("Could not create space process: "+typename);
 			}
 //			process.start(this);	// Done by executor.
+		}
+	}
+	
+	/**
+	 * Returns then names of the space processes.
+	 * @return the names of the space processes
+	 */
+	public Set getSpaceProcessNames()
+	{
+		synchronized(monitor)
+		{
+			return new HashSet(processes.keySet());
 		}
 	}
 

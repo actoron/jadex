@@ -1,27 +1,28 @@
 package jadex.adapter.base.envsupport.observer.gui.plugin;
 
-import jadex.adapter.base.envsupport.dataview.IDataView;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.ISpaceProcess;
+import jadex.adapter.base.envsupport.environment.SpaceObject;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -39,19 +40,34 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	
 	/** The main panel
 	 */
-	private JPanel mainPanel_;
+	private JTabbedPane mainPane_;
+	
+	/** Space property table */
+	private JTable spacePropertyTable_;
+	
+	/** Process list */
+	private JList processList_;
+	
+	/** Process property table */
+	private JTable processPropertyTable_;
+	
+	/** Task list */
+	private JList taskList_;
+	
+	/** Task property table */
+	private JTable taskPropertyTable_;
 	
 	/** The ID label
 	 */
-	private JLabel idLabel_;
+	private JLabel objIdLabel_;
 	
 	/** The type label
 	 */
-	private JLabel typeLabel_;
+	private JLabel objTypeLabel_;
 	
-	/** Property table
+	/** Object property table
 	 */
-	private JTable propertyTable_;
+	private JTable objPropertyTable_;
 	
 	/** The observer center
 	 */
@@ -59,40 +75,162 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	
 	public ObjectIntrospectorPlugin()
 	{
-		mainPanel_ = new JPanel(new GridBagLayout());
-		mainPanel_.setBorder(new TitledBorder(NAME));
+		mainPane_ = new JTabbedPane();
+		mainPane_.setMinimumSize(new Dimension(200, 300));
 		
-		mainPanel_.setMinimumSize(new Dimension(200, 200));
+		JPanel spacePanel = new JPanel();
+		spacePanel.setBorder(new TitledBorder("Space"));
+		spacePanel.setLayout(new GridBagLayout());
 		
-		JPanel objectPanel = new JPanel();
-		objectPanel.setBorder(new TitledBorder("Object"));
-		objectPanel.setLayout(new GridLayout(2, 2));
-		JLabel idLabelDesc = new JLabel("Object ID");
-		objectPanel.add(idLabelDesc, BorderLayout.WEST);
-		idLabel_ = new JLabel("");
-		objectPanel.add(idLabel_, BorderLayout.EAST);
-		JLabel typeLabelDesc = new JLabel("Type");
-		objectPanel.add(typeLabelDesc);
-		typeLabel_ = new JLabel("");
-		objectPanel.add(typeLabel_);
+		spacePropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
+		JScrollPane spcPropScrollPane = new JScrollPane(spacePropertyTable_);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weighty = 1.0;
 		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		mainPanel_.add(objectPanel, c);
-		propertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
-		JScrollPane tableScrollPane = new JScrollPane(propertyTable_);
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		spacePanel.add(spcPropScrollPane, c);
+		
+		JPanel processPanel = new JPanel();
+		processPanel.setBorder(new TitledBorder("Processes"));
+		processPanel.setLayout(new GridBagLayout());
+		
+		processList_ = new JList(new DefaultComboBoxModel());
+		processList_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		processList_.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		processPanel.add(processList_, c);
+		
+		processPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
+		JScrollPane procPropScrollPane = new JScrollPane(processPropertyTable_);
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;
-		c.weighty = 9.0;
+		c.weighty = 2.0;
 		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTH;
+		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.BOTH;
-		mainPanel_.add(tableScrollPane, c);
+		processPanel.add(procPropScrollPane, c);
+		
+		
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.weighty = 2.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		spacePanel.add(processPanel, c);
+		
+		mainPane_.add("Space", spacePanel);
+		
+		JPanel objectPanel = new JPanel();
+		objectPanel.setBorder(new TitledBorder("Object"));
+		objectPanel.setLayout(new GridBagLayout());
+		
+		JLabel idLabelDesc = new JLabel("Object ID");
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weighty = 0.0;
+		c.weightx = 0.0;
+		c.ipadx = 10;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		objectPanel.add(idLabelDesc, c);
+		
+		objIdLabel_ = new JLabel("");
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = 0;
+		c.weighty = 0.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		objectPanel.add(objIdLabel_, c);
+		
+		JLabel typeLabelDesc = new JLabel("Type");
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.weighty = 0.0;
+		c.weightx = 0.0;
+		c.ipadx = 10;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		objectPanel.add(typeLabelDesc, c);
+		
+		objTypeLabel_ = new JLabel("");
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = 1;
+		c.weighty = 0.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		objectPanel.add(objTypeLabel_, c);
+		
+		objPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
+		JScrollPane tableScrollPane = new JScrollPane(objPropertyTable_);
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 2;
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		objectPanel.add(tableScrollPane, c);
+		
+		/////
+		JPanel taskPanel = new JPanel();
+		taskPanel.setBorder(new TitledBorder("Tasks"));
+		taskPanel.setLayout(new GridBagLayout());
+		
+		taskList_ = new JList(new DefaultComboBoxModel());
+		taskList_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		taskList_.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		taskPanel.add(taskList_, c);
+		
+		taskPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
+		JScrollPane taskPropScrollPane = new JScrollPane(taskPropertyTable_);
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.weighty = 2.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		taskPanel.add(taskPropScrollPane, c);
+		
+		
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		c.weighty = 2.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		objectPanel.add(taskPanel, c);
+		/////
+		
+		mainPane_.add("Object", objectPanel);
 	}
 
 	public synchronized void start(ObserverCenter main)
@@ -120,43 +258,92 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	
 	public synchronized Component getView()
 	{
-		return mainPanel_;
+		return mainPane_;
 	}
 	
 	public synchronized void refresh()
 	{
+		fillPropertyTable(spacePropertyTable_, observerCenter_.getSpace());
+		
+		DefaultComboBoxModel plModel = (DefaultComboBoxModel) processList_.getModel();
+		Object selection = processList_.getSelectedValue();
+		plModel.removeAllElements();
+		Set processIds = observerCenter_.getSpace().getSpaceProcessNames();
+		for (Iterator it = processIds.iterator(); it.hasNext(); )
+		{
+			Object id = it.next();
+			plModel.addElement(id);
+		}
+		processList_.setSelectedValue(selection, true);
+		ISpaceProcess proc = observerCenter_.getSpace().getSpaceProcess(selection);
+		if (proc != null)
+			fillPropertyTable(processPropertyTable_, proc);
+		else
+			((DefaultTableModel) processPropertyTable_.getModel()).setRowCount(0);
 		
 		IPerspective p = observerCenter_.getSelectedPerspective();
 		Object observedObj = p.getSelectedObject();
 		if (observedObj == null)
 		{
-			idLabel_.setText("");
-			typeLabel_.setText("");
-			propertyTable_.setModel(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
+			objIdLabel_.setText("");
+			objTypeLabel_.setText("");
+			objPropertyTable_.setModel(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 			return;
 		}
 		
-		Set propNames = SObjectInspector.getPropertyNames(observedObj);
-		String type = SObjectInspector.getType(observedObj).toString();
-		if ((propNames == null) || (type == null))
+		if (!fillPropertyTable(objPropertyTable_, observedObj))
 		{
 			p.setSelectedObject(null);
 			return;
 		}
 		
-		idLabel_.setText(String.valueOf(SObjectInspector.getId(observedObj)));
-		typeLabel_.setText(type);
+		objIdLabel_.setText(String.valueOf(SObjectInspector.getId(observedObj)));
+		String type = String.valueOf(SObjectInspector.getType(observedObj));
+		objTypeLabel_.setText(type);
+		
+		if (observedObj instanceof SpaceObject)
+		{
+			DefaultComboBoxModel tlModel = (DefaultComboBoxModel) taskList_.getModel();
+			SpaceObject sObj = (SpaceObject) observedObj;
+			Set tasks = sObj.getTasks();
+			selection = taskList_.getSelectedValue();
+			tlModel.removeAllElements();
+			for (Iterator it = tasks.iterator(); it.hasNext(); )
+				tlModel.addElement(it.next());
+			if (tasks.contains(selection))
+				taskList_.setSelectedValue(selection, true);
+		}
+		if (selection != null)
+			fillPropertyTable(taskPropertyTable_, selection);
+		else
+			((DefaultTableModel) taskPropertyTable_.getModel()).setRowCount(0);
+	}
+	
+	private static boolean fillPropertyTable(JTable table, Object propHolder)
+	{
+		Set propNames = SObjectInspector.getPropertyNames(propHolder);
+		if (propNames == null)
+		{
+			return false;
+		}
+		
+		
 		Object[][] dataSet = new Object[propNames.size()][2];
 		int i = 0;
 		for (Iterator it = propNames.iterator(); it.hasNext(); )
 		{
 			String name = (String) it.next();
 			dataSet[i][0] = name;
-			dataSet[i][1] = String.valueOf(SObjectInspector.getProperty(observedObj, name));
+			dataSet[i][1] = String.valueOf(SObjectInspector.getProperty(propHolder, name));
 			++i;
 		}
-		DefaultTableModel model = (DefaultTableModel) propertyTable_.getModel();
-		model.setDataVector(dataSet, COLUMM_NAMES);
-		model.fireTableStructureChanged();
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		model.setRowCount(dataSet.length);
+		for (i = 0; i < dataSet.length; ++i)
+		{
+			model.setValueAt(dataSet[i][0], i, 0);
+			model.setValueAt(dataSet[i][1], i, 1);
+		}
+		return true;
 	}
 }

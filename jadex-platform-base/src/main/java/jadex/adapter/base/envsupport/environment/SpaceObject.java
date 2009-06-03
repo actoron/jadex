@@ -177,6 +177,18 @@ public class SpaceObject extends PropertyHolder implements ISpaceObject
 	}
 	
 	/**
+	 * Returns all tasks of the object for introspection.
+	 * @return all tasks of the object
+	 */
+	public Set getTasks()
+	{
+		synchronized(monitor)
+		{
+			return new LinkedHashSet(tasks);
+		}
+	}
+	
+	/**
 	 * Removes all tasks from the object.
 	 */
 	public void clearTasks()

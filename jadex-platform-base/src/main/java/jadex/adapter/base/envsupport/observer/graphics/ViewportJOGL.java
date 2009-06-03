@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
@@ -103,7 +104,7 @@ public class ViewportJOGL extends AbstractViewport
 		clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
 		repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
 		displayLists_ = Collections.synchronizedMap(new HashMap());
-		textRenderers_ = Collections.synchronizedMap(new HashMap());
+		textRenderers_ = Collections.synchronizedMap(new TextRendererLRUMap(15));
 
 		try
 		{
@@ -609,6 +610,27 @@ public class ViewportJOGL extends AbstractViewport
 		public Dimension getMinimumSize()
 		{
 			return new Dimension(1, 1);
+		}
+	}
+	
+	private class TextRendererLRUMap extends LinkedHashMap
+	{
+		private int size;
+		
+		public TextRendererLRUMap(int size)
+		{
+			this.size = size;
+		}
+		
+		protected boolean removeEldestEntry(java.util.Map.Entry entry)
+		{
+			if (size() > size)
+			{
+				TextRenderer tr = (TextRenderer) entry.getValue();
+				tr.dispose();
+				return true;
+			}
+			return false;
 		}
 	}
 }

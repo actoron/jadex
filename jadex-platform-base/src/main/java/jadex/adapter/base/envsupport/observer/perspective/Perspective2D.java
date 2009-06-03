@@ -353,7 +353,7 @@ public class Perspective2D implements IPerspective
 	 */
 	public synchronized IVector2 getObjectShift()
 	{
-		return objectShift;
+		return objectShift.copy();
 	}
 	
 	/**

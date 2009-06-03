@@ -329,6 +329,16 @@ public class ObserverCenter
 			mainwindow.setPerspectiveView(perspective.getView());
 		}
 	}
+	
+	/**
+	 * Returns the space.
+	 * @return the space
+	 */
+	public Space2D getSpace()
+	{
+		return space;
+	}
+	
 	/**
 	 * Loads all available plugins
 	 * @param customplugins custom plugins used in addition to standard plugins
