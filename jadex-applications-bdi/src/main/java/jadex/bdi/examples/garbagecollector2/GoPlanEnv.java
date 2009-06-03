@@ -25,10 +25,10 @@ public class GoPlanEnv extends Plan
 		IVector2 target = (IVector2)getParameter("pos").getValue();
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		
-		while(!target.equals(myself.getProperty(Space2D.POSITION)))
+		while(!target.equals(myself.getProperty(Space2D.PROPERTY_POSITION)))
 		{
 			String dir = null;
-			IVector2 mypos = (IVector2)myself.getProperty(Space2D.POSITION);
+			IVector2 mypos = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 			
 			IVector1 md = env.getShortestDirection(mypos.getX(), target.getX(), true);
 			if(md.getAsInteger()==1)

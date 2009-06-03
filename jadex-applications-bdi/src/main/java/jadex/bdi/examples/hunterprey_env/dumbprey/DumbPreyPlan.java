@@ -30,10 +30,10 @@ public class DumbPreyPlan extends Plan
 //			System.out.println("nearest food for: "+getAgentName()+", "+getBeliefbase().getBelief("nearest_food").getFact());
 			
 			// Get current position.
-			IVector2	pos	= (IVector2)myself.getProperty(Space2D.POSITION);
+			IVector2	pos	= (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 			
 			ISpaceObject	food	= (ISpaceObject)getBeliefbase().getBelief("nearest_food").getFact();
-			if(food!=null && pos.equals(food.getProperty(Space2D.POSITION)))
+			if(food!=null && pos.equals(food.getProperty(Space2D.PROPERTY_POSITION)))
 			{
 				// Perform eat action.
 				try
@@ -56,7 +56,7 @@ public class DumbPreyPlan extends Plan
 				// Move towards the food, if any
 				if(food!=null)
 				{
-					String	newdir	= MoveAction.getDirection(env, pos, (IVector2)food.getProperty(Space2D.POSITION));
+					String	newdir	= MoveAction.getDirection(env, pos, (IVector2)food.getProperty(Space2D.PROPERTY_POSITION));
 					if(!MoveAction.DIRECTION_NONE.equals(newdir))
 					{
 						lastdir	= newdir;

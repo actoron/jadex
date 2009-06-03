@@ -43,7 +43,7 @@ public class GoAction extends SimplePropertyObject implements ISpaceAction
 		String dir = (String)parameters.get(DIRECTION);
 		Object oid = parameters.get(ISpaceAction.OBJECT_ID);
 		ISpaceObject obj = space.getSpaceObject(oid);
-		IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
+		IVector2 pos = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		
 //		IVector2 size = ((Space2D)space).getAreaSize();
 //		int sizex = size.getXAsInteger();
@@ -75,7 +75,7 @@ public class GoAction extends SimplePropertyObject implements ISpaceAction
 		
 		obj.setProperty("lastmove", dir);
 		
-//		System.out.println("Go action: "+obj.getProperty(IAgentAction.ACTOR_ID)+" "+pos);
+//		System.out.println("Go action: "+obj.getProperty(ISpaceAction.ACTOR_ID)+" "+pos);
 		
 //		obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));
 		

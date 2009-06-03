@@ -96,7 +96,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 			int gravitationDistance = 1;
 
 			Map props = new HashMap();
-			props.put(Space2D.POSITION, (IVector2)pos);
+			props.put(Space2D.PROPERTY_POSITION, (IVector2)pos);
 			props.put(GRAVITATION_DISTANCE, new Integer(gravitationDistance));
 			props.put(GRAVITATION_CENTER_ID, "ABC");
 			props.put(ABSORBED_OBJECTS, new Integer(0));
@@ -109,7 +109,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 			ArrayList gravitationField = getGravitationField(xPos, yPos);
 			for(int i=0; i < gravitationField.size(); i++){
 				props = new HashMap();
-				props.put(Space2D.POSITION, gravitationField.get(i));
+				props.put(Space2D.PROPERTY_POSITION, gravitationField.get(i));
 				props.put(GRAVITATION_CENTER_ID, "ABC");
 				props.put(GRAVITATION_CENTER_POS, pos);
 				props.put(GRAVITATION_STRENGTH, new Integer(10));

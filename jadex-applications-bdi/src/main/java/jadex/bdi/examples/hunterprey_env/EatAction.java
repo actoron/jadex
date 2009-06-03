@@ -44,7 +44,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 			throw new RuntimeException("No such object in space: "+target);
 		}
 		
-		if(!avatar.getProperty(Space2D.POSITION).equals(target.getProperty(Space2D.POSITION)))
+		if(!avatar.getProperty(Space2D.PROPERTY_POSITION).equals(target.getProperty(Space2D.PROPERTY_POSITION)))
 		{
 			throw new RuntimeException("Can only eat objects at same position.");
 		}

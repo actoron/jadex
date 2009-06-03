@@ -30,15 +30,15 @@ public class TakePlanEnv extends Plan
 
 		// Go to the burner.
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		IVector2 oldpos =(IVector2)myself.getProperty(Space2D.POSITION);
+		IVector2 oldpos =(IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 		IGoal go = createGoal("go");
 		ISpaceObject burner = grid.getNearestObject(oldpos, null, "burner");
-		IVector2 pos = (IVector2)burner.getProperty(Space2D.POSITION);
+		IVector2 pos = (IVector2)burner.getProperty(Space2D.PROPERTY_POSITION);
 		go.getParameter("pos").setValue(pos);
 		dispatchSubgoalAndWait(go);
 
 		// Put down the garbarge.
-		//System.out.println("Calling drop: "+getAgentName()+" "+getRootGoal());
+//		System.out.println("Calling drop: "+getAgentName());
 		Map params = new HashMap();
 		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();

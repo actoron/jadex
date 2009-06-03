@@ -39,13 +39,13 @@ public class VisionProcessor implements IPerceptProcessor
 					IBeliefSet garbages = exta.getBeliefbase().getBeliefSet("garbages");
 					if("garbage_appeared".equals(type))
 					{
-	//					System.out.println("garbage appeared: "+percept);
+//						System.out.println("garbage appeared: "+percept);
 						if(!garbages.containsFact(percept))
 							garbages.addFact(percept);
 					}
 					else if("garbage_disappeared".equals(type))
 					{
-	//					System.out.println("garbage disappeared: "+percept);
+//						System.out.println("garbage disappeared: "+percept);
 						if(garbages.containsFact(percept))
 							garbages.removeFact(percept);
 					}

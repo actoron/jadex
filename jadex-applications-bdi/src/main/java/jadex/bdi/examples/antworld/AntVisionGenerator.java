@@ -96,11 +96,11 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 			for (int i = 0; i < agents.size(); i++) {
 				IAgentIdentifier agent = (IAgentIdentifier) agents.get(i);				
 				if (EnvironmentEvent.OBJECT_POSITION_CHANGED.equals(event.getType())) {
-					IVector2 pos = (IVector2) event.getSpaceObject().getProperty(Space2D.POSITION);
+					IVector2 pos = (IVector2) event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
 					// IVector2 oldpos = (IVector2) event.getInfo();
 					ISpaceObject agentobj = event.getSpace().getOwnedObjects(agent)[0];
 
-					if (agentobj.getProperty(Space2D.POSITION).equals(pos)) {
+					if (agentobj.getProperty(Space2D.PROPERTY_POSITION).equals(pos)) {
 						IVector2 gravitationCenter = checkForGravitation(event.getSpace(), pos);
 						// percept felt gravitation
 						if (gravitationCenter != null) {
@@ -145,7 +145,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	private IVector2 checkForGravitation(IEnvironmentSpace space, IVector2 pos) {
 		ISpaceObject[] gravitationFields = space.getSpaceObjectsByType(ManageGravitationProcess.GRAVITATION_FIELD);
 		for (int i = 0; i < gravitationFields.length; i++) {
-			if (pos.equals(gravitationFields[i].getProperty(Space2D.POSITION))) {
+			if (pos.equals(gravitationFields[i].getProperty(Space2D.PROPERTY_POSITION))) {
 				return new Vector2Int((IVector2) gravitationFields[i].getProperty(ManageGravitationProcess.GRAVITATION_CENTER_POS));
 			}
 		}

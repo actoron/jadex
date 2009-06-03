@@ -173,7 +173,7 @@ public class Grid2D extends Space2D
 		{
 			ISpaceObject obj = getSpaceObject(id);
 			
-			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
+			IVector2 oldpos = (IVector2)obj.getProperty(PROPERTY_POSITION);
 			if(objectsygridpos.containsKey(oldpos) && oldpos!=null)
 			{
 //				System.out.println("remove: "+oldpos+" "+obj);
@@ -205,10 +205,10 @@ public class Grid2D extends Space2D
 			{
 				properties	= new HashMap();
 			}
-			if(!properties.containsKey(Space2D.POSITION))
+			if(!properties.containsKey(Space2D.PROPERTY_POSITION))
 			{
 				// Todo: Fail, when no empty position.
-				properties.put(Space2D.POSITION, getEmptyGridPosition());
+				properties.put(Space2D.PROPERTY_POSITION, getEmptyGridPosition());
 			}
 			
 			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks, listeners);
@@ -227,7 +227,7 @@ public class Grid2D extends Space2D
 			synchronized(monitor)
 			{
 				// remove the object from grid
-				IVector2 pos = (IVector2)getSpaceObject(id).getProperty(Space2D.POSITION);
+				IVector2 pos = (IVector2)getSpaceObject(id).getProperty(Space2D.PROPERTY_POSITION);
 				if(pos!=null)
 					objectsygridpos.remove(pos, spaceobjects.get(id));
 				

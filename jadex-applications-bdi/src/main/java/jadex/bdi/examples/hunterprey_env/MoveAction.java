@@ -65,7 +65,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 			throw new RuntimeException("No such object in space: "+avatar);
 		}
 		
-		IVector2	pos	= (IVector2)avatar.getProperty(Space2D.POSITION);
+		IVector2	pos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 		boolean	skip	= false;
 		if(DIRECTION_LEFT.equals(direction))
 		{
@@ -104,7 +104,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 			// where the hunter is now to the field where the hunter was before.
 			if(avatar.getType().equals("prey"))
 			{
-				Collection	hunters	= grid.getSpaceObjectsByGridPosition((IVector2)avatar.getProperty(Space2D.POSITION), "hunter");
+				Collection	hunters	= grid.getSpaceObjectsByGridPosition((IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION), "hunter");
 				if(hunters!=null)
 				{
 					pos	= grid.adjustPosition(pos);	// Hack!!! Position only converted in setPosition().
@@ -123,7 +123,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 			// Remember last position of hunter (required for detecting "tunneling").
 			else if(avatar.getType().equals("hunter"))
 			{
-				avatar.setProperty(PROPERTY_LASTPOS, avatar.getProperty(Space2D.POSITION));
+				avatar.setProperty(PROPERTY_LASTPOS, avatar.getProperty(Space2D.PROPERTY_POSITION));
 			}
 			
 			grid.setPosition(avatar.getId(), pos);
@@ -172,7 +172,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 				for(int i=0; i<objects.length; i++)
 				{
 					mindist	= Math.min(mindist, space.getDistance(position,
-						(IVector2)objects[i].getProperty(Space2D.POSITION)).getAsDouble());
+						(IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION)).getAsDouble());
 				}
 				return mindist;
 			}

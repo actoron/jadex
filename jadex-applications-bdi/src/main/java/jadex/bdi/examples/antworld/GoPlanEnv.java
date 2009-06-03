@@ -37,9 +37,9 @@ public class GoPlanEnv extends Plan
 		env.performSpaceAction("updateDestination", params, srl); 
 		srl.waitForResult();
 		
-		while(!target.equals(myself.getProperty(Space2D.POSITION)))
+		while(!target.equals(myself.getProperty(Space2D.PROPERTY_POSITION)))
 		{
-			IVector2 mypos = (IVector2)myself.getProperty(Space2D.POSITION);
+			IVector2 mypos = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 			String dir = null;
 			int mx = mypos.getXAsInteger();
 			int tx = target.getXAsInteger();

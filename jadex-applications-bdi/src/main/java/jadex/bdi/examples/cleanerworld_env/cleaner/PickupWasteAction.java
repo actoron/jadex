@@ -36,7 +36,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 		
 		assert so.getProperty("garbage")==null: so;
 		
-		Collection wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.POSITION), "garbage");
+		Collection wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "garbage");
 		ISpaceObject waste = (ISpaceObject)(wastes!=null? wastes.iterator().next(): null);
 //		System.out.println("pickup waste action: "+so+" "+so.getProperty(Grid2D.POSITION)+" "+waste);
 		if(wastes!=null)

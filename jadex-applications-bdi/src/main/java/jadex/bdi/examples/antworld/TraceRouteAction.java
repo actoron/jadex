@@ -40,7 +40,7 @@ public class TraceRouteAction extends SimplePropertyObject implements ISpaceActi
 		
 		// add this position to trace route
 		Map props = new HashMap();
-		props.put(Space2D.POSITION, position);
+		props.put(Space2D.PROPERTY_POSITION, position);
 		props.put(ANT_ID, ownerAgentId.toString());
 		props.put(ROUND, new Integer(0));		
 //		props.put("creation_age", new Double(clock.getTick()));

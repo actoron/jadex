@@ -28,10 +28,10 @@ public class EatPlan extends Plan
 		try
 		{
 			// Move towards food until position reached.
-			while(!myself.getProperty(Space2D.POSITION).equals(food.getProperty(Space2D.POSITION)))
+			while(!myself.getProperty(Space2D.PROPERTY_POSITION).equals(food.getProperty(Space2D.PROPERTY_POSITION)))
 			{
-				String	move	= MoveAction.getDirection(env, (IVector2)myself.getProperty(Space2D.POSITION),
-					(IVector2)food.getProperty(Space2D.POSITION));
+				String	move	= MoveAction.getDirection(env, (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION),
+					(IVector2)food.getProperty(Space2D.PROPERTY_POSITION));
 				if(MoveAction.DIRECTION_NONE.equals(move))
 					fail();
 				SyncResultListener srl	= new SyncResultListener();

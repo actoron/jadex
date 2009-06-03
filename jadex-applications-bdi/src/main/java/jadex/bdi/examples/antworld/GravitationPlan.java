@@ -29,7 +29,7 @@ public class GravitationPlan extends Plan
 		//increase absorption count of gravitation center
 		Map params = new HashMap();
 //		params.put(IAgentAction.OBJECT_ID, getExternalAccess().getAgentIdentifier().getLocalName());
-		params.put(Space2D.POSITION, target);		
+		params.put(Space2D.PROPERTY_POSITION, target);		
 		SyncResultListener srl = new SyncResultListener();
 		env.performSpaceAction("absorbObject", params, srl); 
 		srl.waitForResult();

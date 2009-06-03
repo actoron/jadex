@@ -37,7 +37,7 @@ public class CarryOrePlan extends Plan
 		{
 			// Move to the target.
 			IGoal go_target = createGoal("move.move_dest");
-			go_target.getParameter("destination").setValue(target.getProperty(Space2D.POSITION));
+			go_target.getParameter("destination").setValue(target.getProperty(Space2D.PROPERTY_POSITION));
 			dispatchSubgoalAndWait(go_target);
 	
 			// Load ore at the target.
@@ -55,7 +55,7 @@ public class CarryOrePlan extends Plan
 			IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
 			ISpaceObject	homebase	= env.getSpaceObjectsByType("homebase")[0];
 			IGoal go_home = createGoal("move.move_dest");
-			go_home.getParameter("destination").setValue(homebase.getProperty(Space2D.POSITION));
+			go_home.getParameter("destination").setValue(homebase.getProperty(Space2D.PROPERTY_POSITION));
 			dispatchSubgoalAndWait(go_home);
 	
 			// Unload ore at the homebase.

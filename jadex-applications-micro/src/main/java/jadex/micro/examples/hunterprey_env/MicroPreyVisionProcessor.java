@@ -53,11 +53,11 @@ public class MicroPreyVisionProcessor implements IPerceptProcessor
 							if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))
 							{
 								if(nearfood==null
-									|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-											(IVector2)nearfood.getProperty(Space2D.POSITION))
+									|| space2d.getDistance((IVector2)myself.getProperty(Space2D.PROPERTY_POSITION),
+											(IVector2)nearfood.getProperty(Space2D.PROPERTY_POSITION))
 									.greater(
-										space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-											(IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION))))
+										space2d.getDistance((IVector2)myself.getProperty(Space2D.PROPERTY_POSITION),
+											(IVector2)((ISpaceObject)percept).getProperty(Space2D.PROPERTY_POSITION))))
 								{
 									mp.setNearestFood((ISpaceObject)percept);
 								}

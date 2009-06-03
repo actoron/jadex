@@ -69,7 +69,7 @@ public class ConstraintEvaluator implements IConstraintEvaluator
 		catch(Exception e)
 		{
 			// Catch extractor exception and return false in this case.
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return ret;
 	}

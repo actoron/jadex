@@ -28,7 +28,7 @@ public class EscapePlan extends Plan
 		ISpaceObject[]	hunters	= (ISpaceObject[])getBeliefbase().getBeliefSet("seen_hunters").getFacts();
 
 		String	move	= MoveAction.getAvoidanceDirection(env,
-			(IVector2)myself.getProperty(Space2D.POSITION), hunters);
+			(IVector2)myself.getProperty(Space2D.PROPERTY_POSITION), hunters);
 		SyncResultListener srl	= new SyncResultListener();
 		Map params = new HashMap();
 		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());

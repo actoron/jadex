@@ -25,7 +25,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	//-------- constants --------
 	
 	/** The constant for the position property. */
-	public static final String POSITION = "position";
+	public static final String PROPERTY_POSITION = "position";
 	
 	/** Border strict mode. */
 	public static final int BORDER_STRICT = 0;
@@ -111,12 +111,12 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	{
 		ISpaceObject	ret	= super.createSpaceObject(typename, properties, tasks, listeners);
 		
-		IVector2 pos = ret.getPropertyNames().contains(POSITION)? 
-			(IVector2) ret.getProperty(POSITION) : getRandomPosition(Vector2Int.ZERO);
+		IVector2 pos = ret.getPropertyNames().contains(PROPERTY_POSITION)? 
+			(IVector2) ret.getProperty(PROPERTY_POSITION) : getRandomPosition(Vector2Int.ZERO);
 
 		if(pos!=null)
 		{
-			ret.setProperty(POSITION, null);
+			ret.setProperty(PROPERTY_POSITION, null);
 			setPosition(ret.getId(), pos);
 		}
 		
@@ -136,9 +136,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
 			
-			IVector2 oldpos = (IVector2)obj.getProperty(POSITION);
+			IVector2 oldpos = (IVector2)obj.getProperty(PROPERTY_POSITION);
 			IVector2 newpos = adjustPosition(pos);
-			obj.setProperty(POSITION, newpos);
+			obj.setProperty(PROPERTY_POSITION, newpos);
 			fireEnvironmentEvent(new EnvironmentEvent(EnvironmentEvent.OBJECT_POSITION_CHANGED, this, obj, oldpos));
 		}
 	}
@@ -301,7 +301,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			ISpaceObject[] objects = type!=null ? getSpaceObjectsByType(type) : (ISpaceObject[])getSpaceObjects();
 			for(int i=0; objects!=null && i<objects.length; i++)
 			{
-				IVector2	curpos	= (IVector2)objects[i].getProperty(Space2D.POSITION);
+				IVector2	curpos	= (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 				if(curpos!=null)
 				{
 					IVector1 objdist = getDistance(curpos, position); 
@@ -337,7 +337,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			{
 				Map.Entry entry = (Entry)it.next();
 				ISpaceObject obj = (ISpaceObject)entry.getValue();
-				IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
+				IVector2 pos = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 				
 				if(pos!=null && (type==null || type.equals(obj.getType())))
 				{
@@ -370,7 +370,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			{
 				Map.Entry entry = (Entry)it.next();
 				ISpaceObject obj = (ISpaceObject)entry.getValue();
-				IVector2 pos = (IVector2)obj.getProperty(Space2D.POSITION);
+				IVector2 pos = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 				
 				if(pos!=null && (type==null || type.equals(obj.getType())))
 				{

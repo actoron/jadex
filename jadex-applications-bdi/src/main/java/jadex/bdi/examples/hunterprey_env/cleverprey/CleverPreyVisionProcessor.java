@@ -122,14 +122,14 @@ public class CleverPreyVisionProcessor implements IPerceptProcessor
 								// Remove known food, which is in vision range but not seen.
 								int vision	= 2; // Todo: set in creature.
 								Space2D	space2d	= (Space2D)space;
-								IVector2	mypos	= (IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION);
+								IVector2	mypos	= (IVector2)((ISpaceObject)percept).getProperty(Space2D.PROPERTY_POSITION);
 								IBeliefSet	seen_food	= exta.getBeliefbase().getBeliefSet("seen_food");
 								IBeliefSet	known_food	= exta.getBeliefbase().getBeliefSet("known_food");
 								ISpaceObject[]	known	= (ISpaceObject[])known_food.getFacts();
 								Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, new Vector1Int(vision), null)));
 								for(int i=0; i<known.length; i++)
 								{
-									if(!seen.contains(known[i]) && space2d.getDistance(mypos, (IVector2)known[i].getProperty(Space2D.POSITION)).getAsInteger()<=vision)
+									if(!seen.contains(known[i]) && space2d.getDistance(mypos, (IVector2)known[i].getProperty(Space2D.PROPERTY_POSITION)).getAsInteger()<=vision)
 									{
 //										System.out.println("Removing disappeared food: "+percept+", "+known[i]);
 										known_food.removeFact(known[i]);

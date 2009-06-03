@@ -183,10 +183,10 @@ public class PackageProcess extends SimplePropertyObject implements ISpaceProces
 			// System.out.println("RoundInt: " + roundInt + ", border: " +
 			// border);
 			if (roundInt >= border && !objectType.equals("house")) {
-				IVector2 pos = (IVector2) objects[i].getProperty(Space2D.POSITION);
+				IVector2 pos = (IVector2) objects[i].getProperty(Space2D.PROPERTY_POSITION);
 				space.destroySpaceObject(objects[i].getId());
 				Map props = new HashMap();
-				props.put(Space2D.POSITION, pos);
+				props.put(Space2D.PROPERTY_POSITION, pos);
 				props.put("round", new Integer(roundInt));
 				props.put("age", objectType);
 				space.createSpaceObject(objectType, props, null, null);

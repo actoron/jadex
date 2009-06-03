@@ -56,11 +56,11 @@ public class DumbHunterVisionProcessor implements IPerceptProcessor
 								if(type.equals("prey_seen") || type.equals("prey_moved"))
 								{
 									if(nearprey==null
-										|| space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-												(IVector2)nearprey.getProperty(Space2D.POSITION))
+										|| space2d.getDistance((IVector2)myself.getProperty(Space2D.PROPERTY_POSITION),
+												(IVector2)nearprey.getProperty(Space2D.PROPERTY_POSITION))
 										.greater(
-											space2d.getDistance((IVector2)myself.getProperty(Space2D.POSITION),
-												(IVector2)((ISpaceObject)percept).getProperty(Space2D.POSITION))))
+											space2d.getDistance((IVector2)myself.getProperty(Space2D.PROPERTY_POSITION),
+												(IVector2)((ISpaceObject)percept).getProperty(Space2D.PROPERTY_POSITION))))
 									{
 										nearpreybel.setFact(percept);
 									}

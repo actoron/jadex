@@ -64,8 +64,8 @@ public class AnalyzeTargetTask extends ListenableTask
 	 */
 	public void start(ISpaceObject obj)
 	{
-		IVector2	loc	= (IVector2)obj.getProperty(Space2D.POSITION);
-		IVector2	tloc	= (IVector2)target.getProperty(Space2D.POSITION);
+		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
+		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
 		if(!loc.equals(tloc))
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
@@ -83,8 +83,8 @@ public class AnalyzeTargetTask extends ListenableTask
 	 */
 	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
-		IVector2	loc	= (IVector2)obj.getProperty(Space2D.POSITION);
-		IVector2	tloc	= (IVector2)target.getProperty(Space2D.POSITION);
+		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
+		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
 		if(!loc.equals(tloc))
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		

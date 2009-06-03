@@ -30,11 +30,11 @@ public class AbsorbObjectAction extends SimplePropertyObject implements ISpaceAc
 		 System.out.println("Absorb objects action: "+parameters);
 
 		ISpaceObject[] objects = space.getSpaceObjectsByType(ManageGravitationProcess.GRAVITATION_CENTER);
-		Vector2Int target = (Vector2Int) parameters.get(Space2D.POSITION);
+		Vector2Int target = (Vector2Int) parameters.get(Space2D.PROPERTY_POSITION);
 
 		//increase count of absorbed objects
 		for (int i = 0; i < objects.length; i++) {
-			if (target.equals(objects[i].getProperty(Space2D.POSITION))) {
+			if (target.equals(objects[i].getProperty(Space2D.PROPERTY_POSITION))) {
 				int objectCount = ((Integer) objects[i].getProperty(ManageGravitationProcess.ABSORBED_OBJECTS)).intValue();
 				objectCount++;
 				objects[i].setProperty(ManageGravitationProcess.ABSORBED_OBJECTS, Integer.valueOf(objectCount));
