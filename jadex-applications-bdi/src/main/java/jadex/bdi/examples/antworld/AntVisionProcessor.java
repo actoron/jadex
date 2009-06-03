@@ -9,13 +9,14 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.ISpace;
+import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
 /**
  * Simple ant vision processer. Updates the agent's beliefset according to the
  * percepts felt gravitation.
  */
-public class AntVisionProcessor implements IPerceptProcessor {
+public class AntVisionProcessor extends SimplePropertyObject implements IPerceptProcessor {
 	/**
 	 * Process a new percept.
 	 * 

@@ -20,6 +20,7 @@
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -86,11 +87,30 @@
 					</env:property>
 				</env:perceptgenerator>
 				
-				<env:perceptprocessor agenttype="Burner" class="VisionProcessor">
-					<!-- <env:percepttype name="garbage_appeared"/>
-					<env:percepttype name="garbage_disappeared"/> -->
+				<!-- <env:perceptprocessor agenttype="Burner" class="VisionProcessor">
+					<env:percepttype name="garbage_appeared"/>
+					<env:percepttype name="garbage_disappeared"/>
+				</env:perceptprocessor> -->
+				
+				<env:perceptprocessor agenttype="Collector" class="DefaultBDIVisionProcessor" >
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"garbage_appeared", "add", "garbages"}, 
+							new String[]{"garbage_disappeared", "remove", "garbages"}
+						}
+					</env:property>
 				</env:perceptprocessor>
-				<env:perceptprocessor agenttype="Collector" class="VisionProcessor"/>
+				
+				<env:perceptprocessor agenttype="Burner" class="DefaultBDIVisionProcessor" >
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"garbage_appeared", "add", "garbages"}, 
+							new String[]{"garbage_disappeared", "remove", "garbages"}
+						}
+					</env:property>
+				</env:perceptprocessor>
 			</env:percepttypes>
 			
 			<env:views>

@@ -10,13 +10,14 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
+import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Dumb hunter vision processer.
  *  Updates the agent's "nearest_prey" belief.
  */
-public class DumbHunterVisionProcessor implements IPerceptProcessor
+public class DumbHunterVisionProcessor extends SimplePropertyObject implements IPerceptProcessor
 {
 	/**
 	 *  Process a new percept.

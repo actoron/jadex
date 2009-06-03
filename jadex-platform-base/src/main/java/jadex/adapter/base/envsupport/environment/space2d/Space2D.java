@@ -270,14 +270,14 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	{
 		synchronized(monitor)
 		{
-			if (distance == null)
-			{
+			if(distance == null)
 				distance = Vector2Double.ZERO;
-			}
 			IVector2 position = areasize.copy();
 			position.subtract(distance);
 			position.randomX(distance.getX(), position.getX());
 			position.randomY(distance.getY(), position.getY());
+			
+			System.out.println("position: "+position);
 			return position;
 		}
 	}

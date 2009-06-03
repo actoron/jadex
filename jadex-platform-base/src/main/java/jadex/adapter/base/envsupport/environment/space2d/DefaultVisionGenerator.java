@@ -125,7 +125,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						if(!getRange(objects[i]).greater(space.getDistance(pos==null? oldpos: pos, objpos)))
+						if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(objects[i])))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), APPEARED);
 							if(percepttype!=null)
@@ -136,7 +136,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					// Create event for moving agent.
 					if(eventowner!=null)
 					{
-						if(!getRange(event.getSpaceObject()).greater(space.getDistance(pos==null? oldpos: pos, objpos)))
+						if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(event.getSpaceObject())))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), APPEARED);
 							if(percepttype!=null)
@@ -149,7 +149,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 				if(owner!=null)
 				{
-					if(!getRange(objects[i]).greater(space.getDistance(pos==null? oldpos: pos, objpos)))
+					if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(objects[i])))
 					{
 						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), MOVED);
 						if(percepttype!=null)
@@ -166,7 +166,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 
 				if(owner!=null)
 				{
-					if(!getRange(oldobjects[i]).greater(space.getDistance(pos==null? oldpos: pos, objpos)))
+					if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(oldobjects[i])))
 					{
 						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DISAPPEARED);
 						if(percepttype!=null)
@@ -178,7 +178,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				{
 					if(eventowner!=null)	
 					{
-						if(!getRange(event.getSpaceObject()).greater(space.getDistance(pos==null? oldpos: pos, objpos)))
+						if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(event.getSpaceObject())))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), oldobjects[i].getType(), DISAPPEARED);
 							if(percepttype!=null)
@@ -201,7 +201,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 					if(owner!=null)
 					{
-						if(!getRange(objects[i]).greater(space.getDistance(pos, objpos)))
+						if(!space.getDistance(pos, objpos).greater(getRange(objects[i])))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), CREATED);
 							if(percepttype!=null)
@@ -211,7 +211,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					
 					if(eventowner!=null)
 					{
-						if(!getRange(event.getSpaceObject()).greater(space.getDistance(pos==null? oldpos: pos, objpos)))
+						if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(event.getSpaceObject())))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), CREATED);
 							if(percepttype!=null)
@@ -234,7 +234,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if(owner!=null)
 					{
 						IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
-						if(!getRange(objects[i]).greater(space.getDistance(pos, objpos)))
+						if(!space.getDistance(pos, objpos).greater(getRange(objects[i])))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DESTROYED);
 							if(percepttype!=null)

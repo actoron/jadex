@@ -18,6 +18,7 @@
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -60,7 +61,7 @@
 				<env:percepttype name="chargingstation_disappeared" objecttype="chargingstation"/>
 					
 				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
-					<env:property name="maxrange">0.1</env:property>
+					<env:property name="range">0.1</env:property>
 					<env:property name="range_property">"vision_range"</env:property>
 					<env:property name="percepttypes">
 						new Object[]
@@ -75,7 +76,7 @@
 					</env:property>
 				</env:perceptgenerator>
 				
-				<env:perceptprocessor agenttype="Cleaner" class="DefaultVisionProcessor" >
+				<env:perceptprocessor agenttype="Cleaner" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -84,10 +85,9 @@
 							new String[]{"wastebin_appeared", "add", "wastebins"}, 
 							new String[]{"wastebin_disappeared", "remove", "wastebins"},
 							new String[]{"chargingstation_appeared", "add", "chargingstations"}, 
-							new String[]{"chargingstation_disappeared", "chargingstations"}
+							new String[]{"chargingstation_disappeared", "remove", "chargingstations"}
 						}
 					</env:property>
-			
 				</env:perceptprocessor>
 			</env:percepttypes>
 			

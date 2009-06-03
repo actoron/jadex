@@ -12,6 +12,7 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
+import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Arrays;
@@ -22,7 +23,7 @@ import java.util.Set;
  *  Clever prey vision processor.
  *  Updates the agent's "food" belief set.
  */
-public class CleverPreyVisionProcessor implements IPerceptProcessor
+public class CleverPreyVisionProcessor extends SimplePropertyObject implements IPerceptProcessor
 {
 	/**
 	 *  Process a new percept.

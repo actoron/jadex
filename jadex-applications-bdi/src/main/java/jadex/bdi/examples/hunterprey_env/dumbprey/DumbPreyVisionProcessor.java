@@ -10,13 +10,14 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
+import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Dumb prey vision processer.
  *  Updates the agent's "nearest_food" belief.
  */
-public class DumbPreyVisionProcessor implements IPerceptProcessor
+public class DumbPreyVisionProcessor extends SimplePropertyObject implements IPerceptProcessor
 {
 	/**
 	 *  Process a new percept.
