@@ -54,6 +54,41 @@
 			<env:percepttypes>
 				<env:percepttype name="waste_appeared" objecttype="waste"/>
 				<env:percepttype name="waste_disappeared" objecttype="waste" />
+				<env:percepttype name="wastebin_appeared" objecttype="wastebin"/>
+				<env:percepttype name="wastebin_disappeared" objecttype="wastebin"/>
+				<env:percepttype name="chargingstation_appeared" objecttype="chargingstation"/>
+				<env:percepttype name="chargingstation_disappeared" objecttype="chargingstation"/>
+					
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
+					<env:property name="maxrange">0.1</env:property>
+					<env:property name="range_property">"vision_range"</env:property>
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"waste_appeared", "appeared", "created"}, 
+							new String[]{"waste_disappeared", "destroyed"},
+							new String[]{"wastebin_appeared", "appeared", "created"}, 
+							new String[]{"wastebin_disappeared", "destroyed"},
+							new String[]{"chargingstation_appeared", "appeared", "created"}, 
+							new String[]{"chargingstation_disappeared", "destroyed"}
+						}
+					</env:property>
+				</env:perceptgenerator>
+				
+				<env:perceptprocessor agenttype="Cleaner" class="DefaultVisionProcessor" >
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"waste_appeared", "add", "wastes"}, 
+							new String[]{"waste_disappeared", "remove", "wastes"},
+							new String[]{"wastebin_appeared", "add", "wastebins"}, 
+							new String[]{"wastebin_disappeared", "remove", "wastebins"},
+							new String[]{"chargingstation_appeared", "add", "chargingstations"}, 
+							new String[]{"chargingstation_disappeared", "chargingstations"}
+						}
+					</env:property>
+			
+				</env:perceptprocessor>
 			</env:percepttypes>
 			
 			<env:views>

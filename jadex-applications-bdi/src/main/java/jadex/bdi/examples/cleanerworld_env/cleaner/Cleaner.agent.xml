@@ -235,14 +235,29 @@
 		</querygoal>-->
 
 		<!-- Find the nearest charging station. -->
-		<!--  <querygoal name="querychargingstation" exclude="never">
+		<querygoal name="querychargingstation" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
-				<!- - <value evaluationmode="dynamic">
+				<!-- <value evaluationmode="dynamic">
 					select one Chargingstation $station
 					from $beliefbase.getBeliefSet("chargingstations").getFacts()
 					order by $beliefbase.getBelief("my_location").getFact().getDistance($station.getLocation())
-				</value>- ->
+				</value>-->
+				
 				<value language="clips">
+					?ret = (ISpaceObject (position ?loc))
+					?rbeliefset = (beliefset (element_has_model.melement_has_name "chargingstations") (beliefset_has_facts contains ?ret))
+					?rbelief = (belief (element_has_model.melement_has_name "my_location") (belief_has_fact ?myloc))
+					(not 
+						(and
+							?other = (ISpaceObject (type "chargingstation") (position ?otherloc))
+							?otherloc = (IVector2 (getDistance(?myloc) ?otherdist))
+							?loc = (IVector2 (getDistance(?myloc) &gt; ?otherdist))
+						)
+					)
+					// todo: fix not condition, should not use Location object condition, locations are not directly in state
+				</value>
+				
+				<!-- <value language="clips">
 					?ret = (Chargingstation (location ?loc))
 					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
 					?mbeliefset = (mbeliefset (melement_has_name "chargingstations"))
@@ -256,9 +271,9 @@
 						)
 					)
 					// todo: fix not condition, should not use Location object condition, locations are not directly in state
-				</value>
+				</value> -->
 			</parameter>
-		</querygoal>-->
+		</querygoal>
 		
 		<!-- Basic environment actions modelled as goals to handle failures. -->
 
