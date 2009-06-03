@@ -252,7 +252,6 @@ public class Perspective2D implements IPerspective
 	public void setOpenGl(boolean opengl)
 	{
 		this.tryopengl = opengl;
-		this.tryopengl = true;
 	}
 	
 	/**
@@ -460,7 +459,6 @@ public class Perspective2D implements IPerspective
 		{
 			viewport = new ViewportJ2D(libService);
 		}
-		System.out.println(viewport.getClass().getName());
 		return viewport;
 	}
 	
