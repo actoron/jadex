@@ -33,7 +33,7 @@ import jadex.javaparser.SimpleValueFetcher;
 public final class Text implements IDrawable
 {
 	/** Viewport Height on which the base font size is relative to */
-	private float BASE_VIEWPORT_HEIGHT = 300.0f;
+	private final static IVector2 BASE_VIEWPORT_SIZE = new Vector2Double(300.0);
 	
 	/** Relative position or binding */
 	private Object position;
@@ -128,7 +128,7 @@ public final class Text implements IDrawable
 			Font font = baseFont;
 			if (fontscaling)
 			{
-				float fontscale = dcScale.getMean().getAsFloat() * (canvas.getHeight() / BASE_VIEWPORT_HEIGHT) * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat();
+				float fontscale = dcScale.getMean().getAsFloat() * (new Vector2Double(canvas.getWidth(), canvas.getHeight())).divide(BASE_VIEWPORT_SIZE).getMean().getAsFloat() * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat();
 				font = font.deriveFont(baseFont.getSize() * fontscale);
 			}
 			String text = getReplacedText(obj);
@@ -182,8 +182,8 @@ public final class Text implements IDrawable
 			Font font = baseFont;
 			if (fontscaling)
 			{
-				float fontscale = dcScale.getMean().getAsFloat() * (canvas.getHeight() / BASE_VIEWPORT_HEIGHT);
-				font = font.deriveFont(baseFont.getSize() * fontscale * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat());
+				float fontscale = dcScale.getMean().getAsFloat() * (new Vector2Double(canvas.getWidth(), canvas.getHeight())).divide(BASE_VIEWPORT_SIZE).getMean().getAsFloat() * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat();
+				font = font.deriveFont(baseFont.getSize() * fontscale);
 			}
 			String text = getReplacedText(obj);
 			
