@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -13,7 +14,7 @@ import java.awt.image.BufferedImage;
 import javax.media.opengl.GL;
 
 
-public class TexturedRectangle extends RotatingPrimitive
+public class TexturedRectangle extends ColoredPrimitive
 {
 	static private final long	serialVersionUID	= 0L;
 
@@ -48,11 +49,12 @@ public class TexturedRectangle extends RotatingPrimitive
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
 	 * @param absFlags flags for setting position, size and rotation as absolutes
+	 * @param c modulation color
 	 * @param texturePath resource path of the texture
 	 */
-	public TexturedRectangle(Object position, Object rotation, Object size, int absFlags, String texturePath, IParsedExpression drawcondition)
+	public TexturedRectangle(Object position, Object rotation, Object size, int absFlags, Color c, String texturePath, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, absFlags, drawcondition);
+		super(position, rotation, size, absFlags, c, drawcondition);
 		texturePath_ = texturePath;
 		texture_ = 0;
 		image_ = null;
@@ -77,7 +79,6 @@ public class TexturedRectangle extends RotatingPrimitive
 		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		if (!setupMatrix(dc, obj, g))
 			return;
-		
 		g.drawImage(image_, vp.getImageTransform(image_.getWidth(), image_
 				.getHeight()), null);
 	}
@@ -88,9 +89,10 @@ public class TexturedRectangle extends RotatingPrimitive
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 		
+		gl.glColor4fv(oglColor_, 0);
+		
 		if(setupMatrix(dc, obj, gl));
 		{
-			gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			gl.glBegin(GL.GL_QUADS);
 			gl.glTexCoord2f(0.0f, 0.0f);
 			gl.glVertex2f(-0.5f, -0.5f);

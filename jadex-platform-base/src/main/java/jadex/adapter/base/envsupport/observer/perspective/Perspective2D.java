@@ -247,7 +247,7 @@ public class Perspective2D implements IPerspective
 	public void setOpenGl(boolean opengl)
 	{
 		this.tryopengl = opengl;
-		this.tryopengl = false;
+		this.tryopengl = true;
 	}
 	
 	/**

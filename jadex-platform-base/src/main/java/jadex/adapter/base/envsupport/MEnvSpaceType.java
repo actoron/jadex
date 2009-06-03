@@ -353,7 +353,7 @@ public class MEnvSpaceType	extends MSpaceType
 
 		types.add(new TypeInfo("texturedrectangle", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", "rotatex", "rotatey", "rotatez", "width", "height", 
-				"position", "rotation", "size", "abspos", "abssize", "absrot", "imagepath", "layer", "creator"}, 
+				"position", "rotation", "size", "abspos", "abssize", "absrot", "color", "imagepath", "layer", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -368,6 +368,7 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -399,7 +400,7 @@ public class MEnvSpaceType	extends MSpaceType
 						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
 
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new TexturedRectangle(position, rotation, size, absFlags, (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
+						return new TexturedRectangle(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
 					}
 				})
 			}), null));
