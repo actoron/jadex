@@ -498,7 +498,6 @@ public class Perspective2D implements IPerspective
 			
 			if ((!closest.isEmpty()) && (minDist.less(selectorDistance)))
 			{
-				System.out.println(closest.size());
 				++selectCycle;
 				selectCycle %= closest.size();
 				selectedobject = closest.get(selectCycle);
