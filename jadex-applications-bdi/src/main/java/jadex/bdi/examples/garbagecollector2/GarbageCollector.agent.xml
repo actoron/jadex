@@ -42,7 +42,7 @@
 			</fact>
  		</belief>
 
-		<!-- The garbages at the current posistion. -->
+		<!-- The garbages at the current position. -->
 		<beliefset name="garbages" class="ISpaceObject"/>
 
 		<!-- When at least one piece of waste is present on the
@@ -52,21 +52,6 @@
 				$beliefbase.garbages.length>0
 			</fact>
 		</belief>
-
-		<!-- When at least one piece of waste is present on the
-			current position the actual position is perceived as dirty. - ->
-		<belief name="is_dirty" class="boolean" evaluationmode="push">
- 			<fact language="jcl">
- 				$beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "garbage").size()>0
- 				
- 				// ((Environment)$beliefbase.getBelief("env").getFact()).isDirty((Position)$beliefbase.getBelief("pos").getFact())
-				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				// ?mbel_env = (mbelief (melement_has_name "env"))
-				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				// ?mbel_pos = (mbelief (melement_has_name "pos"))
- 				// ?env = (Environment (isDirty (?pos) ?ret))
- 			</fact>
-		</belief>-->
 		
 		<!-- Flag indicating if the agent currently carries garbage. -->
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
@@ -84,29 +69,9 @@
  			whenever the actual position is dirty and there is no
  			burner present. -->
 		<achievegoal name="take">
-			<!-- <unique/>  -->
-			<creationcondition>
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?adopted	= (goal (element_has_model ?mgoal))
-					?rcapa		= (capability (capability_has_goals contains ?adopted))
-				))
-
-				// $beliefbase.is_dirty &amp;&amp; !$beliefbase.env.isBurnerPresent($beliefbase.pos)
-				?rbelief = (belief (element_has_model.melement_has_name "is_dirty") (belief_has_fact true))	
-				?rbel_pos = (belief (element_has_model.melement_has_name "pos") (belief_has_fact ?pos))
-				?rbel_env = (belief (element_has_model.melement_has_name "env") (belief_has_fact ?env))
-				?env = (Grid2D (getSpaceObjectsByGridPosition (?pos "burner") null))
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
- 				// (not (and
-				//	?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				//	?mbel_pos = (mbelief (melement_has_name "pos"))
-				//	?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				//	?mbel_env = (mbelief (melement_has_name "env"))
-				//	?env	= (Environment (isBurnerPresent (?pos) true))
-				//))
+			<unique dummy="true"/>
+			<creationcondition language="jcl">
+				$beliefbase.is_dirty &amp;&amp; $beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "burner")==null
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="check"/>
@@ -126,11 +91,6 @@
 		<achievegoal name="pick" exclude="never" retrydelay="100">
  			<dropcondition language="jcl">
  				!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
-				// ?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))
-				// ?mbelief2 = (mbelief (melement_has_name "has_garbage"))
  			</dropcondition>
 		</achievegoal>
 	</goals>

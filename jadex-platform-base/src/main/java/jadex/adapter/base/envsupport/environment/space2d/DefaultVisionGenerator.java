@@ -309,15 +309,15 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 */
 	protected IVector1 getRange(IPropertyObject avatar)
 	{
-		Object tmp = avatar.getProperty(getRangeProperty());
-		return tmp==null? Vector1Double.ZERO: tmp instanceof Number? new Vector1Double(((Number)tmp).doubleValue()): (IVector1)tmp;
+		Object tmp = avatar.getProperty(getRangePropertyName());
+		return tmp==null? (IVector1)getProperty(MAXRANGE): tmp instanceof Number? new Vector1Double(((Number)tmp).doubleValue()): (IVector1)tmp;
 	}
 	
 	/**
-	 *  Get the range property.
-	 *  @return The range property.
+	 *  Get the range property name.
+	 *  @return The range property name.
 	 */
-	protected String getRangeProperty()
+	protected String getRangePropertyName()
 	{
 		Object tmp = getProperty(RANGE_PROPERTY);
 		return tmp==null? "range": (String)tmp;

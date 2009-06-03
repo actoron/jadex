@@ -39,7 +39,8 @@ public class ProduceOrePlan extends Plan
 		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
 		SyncResultListener	res	= new SyncResultListener();
 		myself.addTask(new ProduceOreTask(target, res));
-		Number	ore	= (Number)res.waitForResult();
+		res.waitForResult();
+//		Number	ore	= (Number)res.waitForResult();
 //		System.out.println("Produced ore at target: "+getAgentName()+", "+ore+" ore produced.");
 	}
 }

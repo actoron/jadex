@@ -109,7 +109,7 @@
 				</env:percepttype>
 					
 				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
-					<env:property name="range">2</env:property>
+					<env:property name="range">new Vector1Int(2)</env:property>
 					<!-- percept types are declared with associated action types: 
 						percepttype, actiontype1, actiontype2, ... -->
 					<env:property name="percepttypes">
@@ -146,7 +146,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D">
+				<env:perspective name="icons" class="Perspective2D" objectshiftx="0.5" objectshifty="0.5">
 					<env:drawable objecttype="food" width="1.0" height="1.0">
 						<env:texturedrectangle layer="0" size="size" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
 					</env:drawable>
@@ -162,7 +162,7 @@
 						<env:rectangle layer="-1" width="5" height="5" color="#ff00007f" />
 					</env:drawable>
 					<env:prelayers>
-						<env:tiledlayer width="17.5" height="17.5" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
+						<env:tiledlayer width="0.4" height="0.4" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
 					</env:prelayers>
 					<env:postlayers>
 						<env:gridlayer width="1.0" height="1.0" color="black" />

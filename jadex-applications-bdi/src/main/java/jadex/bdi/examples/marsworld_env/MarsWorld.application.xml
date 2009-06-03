@@ -87,7 +87,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="true">
+				<env:perspective name="icons" class="Perspective2D" opengl="false">
 				
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
@@ -153,7 +153,7 @@
 					</env:drawable>
 
 					<env:prelayers>
-						<env:tiledlayer width="1.7" height="1.7" imagepath="jadex/bdi/examples/marsworld_env/images/mars.png" />
+						<env:tiledlayer width="0.6" height="0.6" imagepath="jadex/bdi/examples/marsworld_env/images/mars.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>

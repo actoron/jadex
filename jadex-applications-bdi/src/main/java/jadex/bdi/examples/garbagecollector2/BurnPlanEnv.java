@@ -1,15 +1,12 @@
 package jadex.bdi.examples.garbagecollector2;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.Plan.SyncResultListener;
-import jadex.bridge.IAgentIdentifier;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Burn a piece of garbage.

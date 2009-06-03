@@ -18,6 +18,7 @@
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IContextService</import>
+		<import>java.util.Arrays</import>
 	</imports>
 
 	<beliefs>
@@ -39,7 +40,7 @@
 			</fact>
  		</belief>
 		
-		<!-- The garbages at the current posistion. -->
+		<!-- The garbages at the current position. -->
 		<beliefset name="garbages" class="ISpaceObject"/>
 	</beliefs>
 
@@ -48,37 +49,13 @@
 			its position a new goal is craeted (see binding).
  			The unique tag avoids creating more than one goal
  			per specific piece of garbage. -->
-		<!-- <achievegoal name="burn">
-			<parameter name="garbage" class="String">
-				<bindingoptions>$beliefbase.garbages</bindingoptions>
-			</parameter>
-			<unique/>
-			<creationcondition>true</creationcondition>
-			<deliberation cardinality="1"/>
-		</achievegoal> -->
-		
 		<achievegoal name="burn">
 			<parameter name="garbage" class="ISpaceObject">
-				<!--  <bindingoptions>$beliefbase.garbages</bindingoptions>-->
-				<!-- Bind against variable from creation condition. -->
-				<!--  <bindingoptions>"?garbage"</bindingoptions>-->
-				<value>?garbage</value>
+				<value>$garbage</value>
 			</parameter>
-			<!-- todo: remove unique support? <unique/> -->
+			<unique dummy="true"/>
 			<creationcondition language="jcl">
-				ISpaceObject $garbage &amp;&amp; !$beliefbase.garbages.contains(?garbage)
-				
-				// ?garbage = (ISpaceObject)
-				// ?rbeliefset = (beliefset (element_has_model.melement_has_name "garbages") (beliefset_has_facts contains ?garbage))
-			</creationcondition>
-			<creationcondition>
-				// unique (?rcapa and ?mgoal are provided internally)
-				(not (and
-					?adopted	= (goal (element_has_model ?mgoal))
-					?rcapa		= (capability (capability_has_goals contains ?adopted))
-				))
-
-				?rbeliefset = (beliefset (element_has_model.melement_has_name "garbages") (beliefset_has_facts $?x ?garbage $?y))
+				ISpaceObject $garbage &amp;&amp; !Arrays.asList($beliefbase.garbages).contains($garbage)
 			</creationcondition>
 			<deliberation cardinality="1"/>
 		</achievegoal>
