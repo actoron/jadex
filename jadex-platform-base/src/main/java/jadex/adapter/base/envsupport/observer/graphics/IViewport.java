@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.util.List;
 
 
@@ -18,7 +19,13 @@ public interface IViewport
 	 * Sets the position of the bottom left corner of the viewport.
 	 */
 	public void setPosition(IVector2 pos);
-
+	
+	/**
+	 * Sets the background color.
+	 * @param bgColor the background color
+	 */
+	public void setBackground(Color bgColor);
+	
 	/**
 	 * Sets the viewport size.
 	 * 

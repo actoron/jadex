@@ -87,7 +87,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="true">
+				<env:perspective name="icons" class="Perspective2D" opengl="false">
 				
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
@@ -129,8 +129,7 @@
 					<!-- Sentry -->
 					<env:drawable objecttype="sentry" width="0.07" height="0.07">
 						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
-						<!-- <env:regularpolygon layer="1" size="visionsize" abssize="true" vertices="36" color="#FAFA1E32" /> -->
-						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
+						<env:regularpolygon layer="1" size="visionsize" abssize="true" vertices="36" color="#FAFA1E32" />
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/sentry.png" />
 					</env:drawable>
 

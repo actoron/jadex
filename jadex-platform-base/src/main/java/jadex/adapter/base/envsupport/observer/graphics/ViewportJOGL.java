@@ -28,6 +28,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -175,7 +176,7 @@ public class ViewportJOGL extends AbstractViewport
 		Integer texture = (Integer)repeatingTextureCache_.get(path);
 		if(texture == null)
 		{
-			texture = loadTexture(gl, path, GL.GL_REPEAT);
+			texture = loadTexture(gl, path, GL.GL_REPEAT, GL.GL_LINEAR_MIPMAP_LINEAR);
 			repeatingTextureCache_.put(path, texture);
 		}
 
@@ -195,7 +196,7 @@ public class ViewportJOGL extends AbstractViewport
 		Integer texture = (Integer)clampedTextureCache_.get(path);
 		if(texture == null)
 		{
-			texture = loadTexture(gl, path, GL.GL_CLAMP_TO_EDGE);
+			texture = loadTexture(gl, path, GL.GL_CLAMP_TO_EDGE, GL.GL_LINEAR);
 			clampedTextureCache_.put(path, texture);
 		}
 
@@ -330,7 +331,7 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param path texture resource path
 	 * @param wrapParam wrap parameter
 	 */
-	private synchronized Integer loadTexture(GL gl, String path, int wrapMode)
+	private synchronized Integer loadTexture(GL gl, String path, int wrapMode, int ipMode)
 	{
 		// Load image
 		ClassLoader cl = libService_.getClassLoader();
@@ -352,7 +353,7 @@ public class ViewportJOGL extends AbstractViewport
 		}
 		
 //		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, GL.GL_LINEAR_MIPMAP_LINEAR);
-		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, GL.GL_LINEAR);
+		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, ipMode);
 	}
 	
 	/**
@@ -414,7 +415,7 @@ public class ViewportJOGL extends AbstractViewport
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
 				ipMode);
 		
-		if (ipMode == GL.GL_LINEAR_MIPMAP_LINEAR)
+		if ((ipMode == GL.GL_LINEAR_MIPMAP_LINEAR) || (ipMode == GL.GL_LINEAR_MIPMAP_NEAREST) || (ipMode == GL.GL_NEAREST_MIPMAP_NEAREST) || (ipMode == GL.GL_NEAREST_MIPMAP_LINEAR))
 		{
 			GLU glu = new GLU();
 			glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, intFormat, image
@@ -444,7 +445,9 @@ public class ViewportJOGL extends AbstractViewport
 			GL gl = drawable.getGL();
 			
 			setupMatrix(gl);
-
+			
+			float[] bgc = bgColor_.getRGBComponents(null);
+			gl.glClearColor(bgc[0], bgc[1], bgc[2], bgc[3]);
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 
 			gl.glEnable(GL.GL_SCISSOR_TEST);
@@ -532,10 +535,10 @@ public class ViewportJOGL extends AbstractViewport
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			gl.glDisable(GL.GL_DEPTH_TEST);
+			gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
 			setupMatrix(gl);
 			setupTexMatrix(gl);
-			gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			
 			// Check for OpenGL version or extensions if needed
 			if(gl.isExtensionAvailable("GL_VERSION_2_0")
@@ -573,7 +576,9 @@ public class ViewportJOGL extends AbstractViewport
 				return;
 			}
 			GL gl = drawable.getGL();
+			IVector2 oldPaddedSize = paddedSize_.copy();
 			setSize(size_);
+			setPosition(paddedSize_.copy().subtract(oldPaddedSize).multiply(0.5).negate().add(position_));
 			setupMatrix(gl);
 		}
 

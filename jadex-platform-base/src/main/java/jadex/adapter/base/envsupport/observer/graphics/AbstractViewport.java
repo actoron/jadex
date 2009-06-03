@@ -60,6 +60,9 @@ public abstract class AbstractViewport implements IViewport
 
 	/** Library service for loading resources. */
 	protected ILibraryService	libService_;
+	
+	/** The background color. */
+	protected Color bgColor_;
 
 	/** Virtual Viewport position. */
 	protected IVector2			position_;
@@ -105,6 +108,7 @@ public abstract class AbstractViewport implements IViewport
 
 	public AbstractViewport()
 	{
+		bgColor_ = Color.BLACK;
 		inversionFlag_ = new Vector2Int(0);
 		position_ = Vector2Double.ZERO.copy();
 		preserveAR_ = true;
@@ -117,6 +121,15 @@ public abstract class AbstractViewport implements IViewport
 		preLayers_ = new ILayer[0];
 		postLayers_ = new ILayer[0];
 		listeners_ = Collections.synchronizedSet(new HashSet());
+	}
+	
+	/**
+	 * Sets the background color.
+	 * @param bgColor the background color
+	 */
+	public void setBackground(Color bgColor)
+	{
+		bgColor_ = bgColor;
 	}
 
 	/**
@@ -180,6 +193,17 @@ public abstract class AbstractViewport implements IViewport
 			}
 		}
 	}
+	
+	/**
+	 * Gets the size of the display area.
+	 * 
+	 * @return size of the display area, may be padded to preserve aspect
+	 *        ratio
+	 */
+	public IVector2 getSize()
+	{
+		return size_;
+	}
 
 	/**
 	 * Sets the size of the display area.
@@ -221,6 +245,16 @@ public abstract class AbstractViewport implements IViewport
 		}
 
 		paddedSize_ = new Vector2Double(width, height);
+	}
+	
+	/**
+	 * Gets the maximum displayable size.
+	 * 
+	 * @return maximum area size.
+	 */
+	public IVector2 getAreaSize()
+	{
+		return areaSize_;
 	}
 	
 	/**

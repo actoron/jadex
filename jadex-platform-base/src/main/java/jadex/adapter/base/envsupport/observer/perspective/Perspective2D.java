@@ -18,6 +18,7 @@ import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.bridge.ILibraryService;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.util.ArrayList;
@@ -71,6 +72,9 @@ public class Perspective2D implements IPerspective
 	/** Try OpenGL if true */
 	protected boolean tryopengl;
 	
+	/** The background color. */
+	protected Color bgColor;
+	
 	/** The visuals (DrawableCombiners) */
 	protected Map visuals;
 	
@@ -88,6 +92,7 @@ public class Perspective2D implements IPerspective
 	 */
 	public Perspective2D()
 	{
+		setBackground(null);
 		this.visuals = Collections.synchronizedMap(new HashMap());
 		this.prelayers = new ILayer[0];
 		this.postlayers = new ILayer[0];
@@ -290,6 +295,20 @@ public class Perspective2D implements IPerspective
 		invertyaxis = invert;
 	}
 	
+	/**
+	 * Sets the background color.
+	 * @param bgColor the background color
+	 */
+	public void setBackground(Color bgColor)
+	{
+		System.out.println(bgColor);
+		if (bgColor == null)
+			bgColor = Color.BLACK;
+		this.bgColor = bgColor;
+		if (viewport != null)
+			setBackground(bgColor);
+	}
+	
 	/** 
 	 * Sets the maximum distance for selecting objects.
 	 * 
@@ -459,6 +478,8 @@ public class Perspective2D implements IPerspective
 		{
 			viewport = new ViewportJ2D(libService);
 		}
+		
+		viewport.setBackground(bgColor);
 		return viewport;
 	}
 	

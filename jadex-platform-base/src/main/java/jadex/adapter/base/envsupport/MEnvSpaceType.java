@@ -204,7 +204,7 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("perspective", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "name", "opengl", "invertxaxis", "invertyaxis", "objectshiftx", "objectshifty", "creator"}, 
+			SUtil.createHashMap(new String[]{"class", "name", "opengl", "invertxaxis", "invertyaxis", "objectshiftx", "objectshifty", "bgcolor", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
@@ -212,6 +212,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.TRUE),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, colorconv, ""),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -234,6 +235,8 @@ public class MEnvSpaceType	extends MSpaceType
 						pers.setInvertYAxis(invertx.booleanValue());
 						Boolean inverty = (Boolean)MEnvSpaceInstance.getProperty(args, "invertyaxis");
 						pers.setInvertYAxis(inverty.booleanValue());
+						
+						pers.setBackground((Color)MEnvSpaceInstance.getProperty(args, "bgcolor"));
 						
 						Double xshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshiftx");
 						Double yshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshifty");
@@ -625,7 +628,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo("text", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", 
-				"position", "font", "style", "basesize", "color", "layer", "text", "creator"}, 
+				"position", "font", "style", "basesize", "fontscaling", "color", "layer", "text", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -633,6 +636,7 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
@@ -664,13 +668,13 @@ public class MEnvSpaceType	extends MSpaceType
 						}
 						Font font = new Font(fontname, fontstyle.intValue(), fontsize.intValue());
 						
-						
+						boolean fontscaling = !Boolean.FALSE.equals(MEnvSpaceInstance.getProperty(args, "fontscaling"));
 						
 						String text = (String) MEnvSpaceInstance.getProperty(args, "text");
 						text = String.valueOf(text);
 						
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, exp);
+						return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, fontscaling, exp);
 					}
 				})
 			}), null));

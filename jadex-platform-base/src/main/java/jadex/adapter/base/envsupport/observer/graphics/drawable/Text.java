@@ -47,16 +47,20 @@ public final class Text implements IDrawable
 	/** Fixed text */
 	private String text;
 	
+	/** Font scaling flag */
+	private boolean fontscaling;
+	
 	/** The condition deciding if the drawable should be drawn. */
 	private IParsedExpression drawcondition;
 	
 	public Text()
 	{
-		this(null, null, null, null, null);
+		this(null, null, null, null, true, null);
 	}
 	
-	public Text(Object position, Font baseFont, Color color, String text, IParsedExpression drawcondition)
+	public Text(Object position, Font baseFont, Color color, String text, boolean fontscaling, IParsedExpression drawcondition)
 	{
+		this.fontscaling = fontscaling;
 		if (position == null)
 			position = Vector2Double.ZERO.copy();
 		this.position = position;
@@ -121,8 +125,12 @@ public final class Text implements IDrawable
 			
 			Graphics2D g = vp.getContext();
 			Canvas canvas = vp.getCanvas();
-			float fontscale = dcScale.getMean().getAsFloat() * (canvas.getHeight() / BASE_VIEWPORT_HEIGHT);
-			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
+			Font font = baseFont;
+			if (fontscaling)
+			{
+				float fontscale = dcScale.getMean().getAsFloat() * (canvas.getHeight() / BASE_VIEWPORT_HEIGHT) * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat();
+				font = font.deriveFont(baseFont.getSize() * fontscale);
+			}
 			String text = getReplacedText(obj);
 			
 			IVector2 pos = vp.getPosition().copy().negate().add(vp.getObjectShift()).add(dcPos).add(position).divide(vp.getPaddedSize()).multiply(new Vector2Double(canvas.getWidth(), canvas.getHeight()));
@@ -171,8 +179,12 @@ public final class Text implements IDrawable
 			}
 			
 			Canvas canvas = vp.getCanvas();
-			float fontscale = dcScale.getMean().getAsFloat() * (canvas.getHeight() / BASE_VIEWPORT_HEIGHT);
-			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
+			Font font = baseFont;
+			if (fontscaling)
+			{
+				float fontscale = dcScale.getMean().getAsFloat() * (canvas.getHeight() / BASE_VIEWPORT_HEIGHT);
+				font = font.deriveFont(baseFont.getSize() * fontscale * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat());
+			}
 			String text = getReplacedText(obj);
 			
 			TextRenderer tr = vp.getTextRenderer(font);
