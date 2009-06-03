@@ -12,7 +12,6 @@ import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
-import jadex.commons.IPropertyObject;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.collection.MultiCollection;
 
@@ -93,9 +92,9 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	public void dispatchEnvironmentEvent(EnvironmentEvent event)
 	{
 		Space2D	space = (Space2D)event.getSpace();
-		IVector1 maxrange = getRange(this);
+		IVector1 maxrange = getDefaultRange();
 		
-		IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.POSITION);
+		IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
 		IVector2 oldpos = (IVector2)event.getInfo();
 		IAgentIdentifier eventowner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 
@@ -118,7 +117,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			// Objects, which are in current range, but not previously seen.
 			for(int i=0; i<objects.length; i++)
 			{
-				IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.POSITION);
+				IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 
 				if(!unchanged.contains(objects[i]))
 				{
@@ -163,7 +162,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			for(int i=0; oldobjects!=null && i<oldobjects.length; i++)
 			{
 				IAgentIdentifier owner = (IAgentIdentifier)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
-				IVector2 objpos = (IVector2)oldobjects[i].getProperty(Space2D.POSITION);
+				IVector2 objpos = (IVector2)oldobjects[i].getProperty(Space2D.PROPERTY_POSITION);
 
 				if(owner!=null)
 				{
@@ -199,7 +198,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				for(int i=0; i<objects.length; i++)
 				{
 					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
-					IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.POSITION);
+					IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 					if(owner!=null)
 					{
 						if(!getRange(objects[i]).greater(space.getDistance(pos, objpos)))
@@ -234,7 +233,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.POSITION);
+						IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 						if(!getRange(objects[i]).greater(space.getDistance(pos, objpos)))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DESTROYED);
@@ -316,11 +315,20 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  Get the range.
 	 *  @return The range.
 	 */
-	protected IVector1 getRange(IPropertyObject avatar)
+	protected IVector1 getRange(ISpaceObject avatar)
 	{
 		Object tmp = avatar.getProperty(getRangePropertyName());
-		return tmp==null? (IVector1)getProperty(PROPERTY_MAXRANGE): 
-			tmp instanceof Number? new Vector1Double(((Number)tmp).doubleValue()): (IVector1)tmp;
+		return tmp==null? getDefaultRange(): tmp instanceof Number? new Vector1Double(((Number)tmp).doubleValue()): (IVector1)tmp;
+	}
+	
+	/**
+	 *  Get the default range.
+	 *  @return The range.
+	 */
+	protected IVector1 getDefaultRange()
+	{
+		Object tmp = getProperty(PROPERTY_MAXRANGE);
+		return tmp==null? Vector1Double.ZERO: tmp instanceof Number? new Vector1Double(((Number)tmp).doubleValue()): (IVector1)tmp;
 	}
 	
 	/**
