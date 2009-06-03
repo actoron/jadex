@@ -87,7 +87,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="false">
+				<env:perspective name="icons" class="Perspective2D" opengl="true">
 				
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
