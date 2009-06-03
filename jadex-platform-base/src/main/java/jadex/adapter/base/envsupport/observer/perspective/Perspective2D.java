@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,9 @@ public class Perspective2D implements IPerspective
 	
 	/** The selected object */
 	protected Object selectedobject;
+	
+	/** Selection cycle for stacked objects */
+	protected int selectCycle;
 	
 	/** Order in which objects are displayed */
 	protected Comparator displayorder;
@@ -90,6 +94,7 @@ public class Perspective2D implements IPerspective
 		
 		this.objectShift = new Vector2Double();
 		this.selectorDistance = new Vector1Double(1.0);
+		this.selectCycle = 0;
 		this.tryopengl = true;
 		
 		this.displayorder = null;
@@ -247,6 +252,7 @@ public class Perspective2D implements IPerspective
 	public void setOpenGl(boolean opengl)
 	{
 		this.tryopengl = opengl;
+		this.tryopengl = true;
 	}
 	
 	/**
@@ -468,7 +474,7 @@ public class Perspective2D implements IPerspective
 			position = position.copy().subtract(objectShift);
 			
 			IVector1 minDist = null;
-			Object closest = null;
+			List closest = new LinkedList();
 			Object[] objects = dataview.getObjects();
 			for (int i = 0; i < objects.length; ++i)
 			{
@@ -478,16 +484,24 @@ public class Perspective2D implements IPerspective
 				{
 					continue;
 				}
-				if((closest == null) || (position.getDistance(objPos).less(minDist)))
+				if((closest.isEmpty()) || (position.getDistance(objPos).less(minDist)))
 				{
-					closest = objects[i];
+					closest.clear();
+					closest.add(objects[i]);
 					minDist = position.getDistance(objPos);
+				}
+				else if ((minDist != null) && (position.getDistance(objPos).equals(minDist)))
+				{
+					closest.add(objects[i]);
 				}
 			}
 			
-			if ((closest != null) && (minDist.less(selectorDistance)))
+			if ((!closest.isEmpty()) && (minDist.less(selectorDistance)))
 			{
-				selectedobject = closest;
+				System.out.println(closest.size());
+				++selectCycle;
+				selectCycle %= closest.size();
+				selectedobject = closest.get(selectCycle);
 			}
 		}
 	}
