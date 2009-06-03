@@ -224,19 +224,8 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				g.setColor(java.awt.Color.BLACK);
 				g.fillRect(0, 0, getWidth(), getHeight());
 				
-				double xFac = backBuffer_.getWidth() / paddedSize_.getXAsDouble();
-				double yFac = backBuffer_.getHeight() / paddedSize_.getYAsDouble();
-				IVector2 shift = position_.copy();
-				if (!getInvertX())
-					shift.negateX();
-				if (getInvertY())
-					shift.negateY();
-				int x = (int)(shift.getXAsDouble() * xFac);
-				int y = (int)(shift.getYAsDouble() * yFac);
-				
-				int w = (int)Math.round(areaSize_.getXAsDouble() * xFac);
-				int h = (int)Math.round(areaSize_.getYAsDouble() * yFac);
-				g.setClip(x, y, w, h);
+				Rectangle clipRect = getClippingBox();
+				g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 				
 				setupTransform(g);
 				context_ = g;
@@ -330,7 +319,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 					* -((inversionFlag_.getXAsInteger() << 1) - 1),
 					(backBuffer_.getHeight() / paddedSize_.getYAsDouble())
 							* ((inversionFlag_.getYAsInteger() << 1) - 1));
-			g.translate(-position_.getXAsDouble(), -position_.getYAsDouble());
+			g.translate(-pixPosition_.getXAsDouble(), -pixPosition_.getYAsDouble());
 		}
 	}
 }

@@ -2,6 +2,7 @@ package jadex.adapter.base.envsupport.observer.graphics;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
@@ -13,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
@@ -291,29 +293,17 @@ public class ViewportJOGL extends AbstractViewport
 						* inversionFlag_.getYAsInteger(), paddedSize_
 						.getYAsDouble()
 						* (inversionFlag_.getYAsInteger() ^ 1), -0.5, 0.5);
-		gl.glTranslated(-position_.getXAsDouble(), -position_.getYAsDouble(), 0.0);
+		//gl.glTranslated(-position_.getXAsDouble(), -position_.getYAsDouble(), 0.0);
+		gl.glTranslated(-pixPosition_.getXAsDouble(), -pixPosition_.getYAsDouble(), 0.0);
 		
 		// Setup the scissor box
-		double xFac = canvas_.getWidth() / paddedSize_.getXAsDouble();
-		double yFac = canvas_.getHeight() / paddedSize_.getYAsDouble();
 		
-		IVector2 shift = position_.copy();
-		/*if (!getInvertX())
-			shift.negateX();
-		if (getInvertY())
-			shift.negateY();*/
-		int x = -(int)Math.floor(shift.getXAsDouble() * xFac);
-		int y = -(int)Math.floor(shift.getYAsDouble() * yFac);
 		
-		int w = (int)Math.ceil(areaSize_.getXAsDouble() * xFac);
-		int h = (int)Math.ceil(areaSize_.getYAsDouble() * yFac);
+		//System.out.println(x + " " + y + " " + w + " " + h);
 		
-		if (getInvertX())
-			x = canvas_.getWidth() - x - w;
-		if (getInvertY())
-			y = canvas_.getHeight() - y - h;
+		Rectangle clipRect = getClippingBox();
 		
-		gl.glScissor(x, y, w, h);
+		gl.glScissor(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 	}
 	
 	/**
@@ -574,7 +564,6 @@ public class ViewportJOGL extends AbstractViewport
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 				int height)
 		{
-			System.out.println("RESHAPE");
 			if ((canvas_.getWidth() < MIN_SIZE) ||
 				(canvas_.getHeight() < MIN_SIZE))
 			{

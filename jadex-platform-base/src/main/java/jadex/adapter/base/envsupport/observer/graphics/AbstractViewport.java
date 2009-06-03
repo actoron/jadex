@@ -12,6 +12,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.color.ColorSpace;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -60,8 +61,11 @@ public abstract class AbstractViewport implements IViewport
 	/** Library service for loading resources. */
 	protected ILibraryService	libService_;
 
-	/** X-Coordinate of the viewport position. */
+	/** Virtual Viewport position. */
 	protected IVector2			position_;
+	
+	/** Pixel-corrected viewport position. */
+	protected IVector2			pixPosition_;
 
 	/** Object shift x-coordinate. */
 	protected float				objShiftX_;
@@ -73,13 +77,13 @@ public abstract class AbstractViewport implements IViewport
 	protected boolean			preserveAR_;
 
 	/** Size of the viewport without padding. */
-	protected IVector2			size_;
+	protected Vector2Double		size_;
 	
 	/** Maximum displayable area */
-	protected IVector2			areaSize_;
+	protected Vector2Double		areaSize_;
 
 	/** Real size of the viewport including padding. */
-	protected IVector2			paddedSize_;
+	protected Vector2Double		paddedSize_;
 
 	/** Known drawable Objects. */
 	protected Set				drawObjects_;
@@ -106,7 +110,7 @@ public abstract class AbstractViewport implements IViewport
 		preserveAR_ = true;
 		size_ = new Vector2Double(1.0);
 		areaSize_ = new Vector2Double(1.0);
-		paddedSize_ = size_.copy();
+		paddedSize_ = new Vector2Double(1.0);
 		drawObjects_ = Collections.synchronizedSet(new HashSet());
 		objectLayers_ = Collections.synchronizedSortedSet(new TreeSet());
 		objectList_ = Collections.synchronizedList(new ArrayList());
@@ -185,7 +189,7 @@ public abstract class AbstractViewport implements IViewport
 	 */
 	public void setSize(IVector2 size)
 	{
-		size_ = size;
+		size_ = new Vector2Double(size);
 
 		double width = 1.0;
 		double height = 1.0;
@@ -198,12 +202,16 @@ public abstract class AbstractViewport implements IViewport
 			if(sizeAR > windowAR)
 			{
 				width = size.getXAsDouble();
-				height = size.getXAsDouble() / windowAR;
+				//height = size.getXAsDouble() / windowAR;
+				double pixX = width / canvas_.getWidth();
+				height = canvas_.getHeight() * pixX;
 			}
 			else
 			{
-				width = size.getYAsDouble() * windowAR;
+				//width = size.getYAsDouble() * windowAR;
 				height = size.getYAsDouble();
+				double pixY = height / canvas_.getHeight();
+				width = canvas_.getWidth() * pixY;
 			}
 		}
 		else
@@ -226,7 +234,7 @@ public abstract class AbstractViewport implements IViewport
 		{
 			public void run()
 			{
-				areaSize_ = areaSize;
+				areaSize_ = new Vector2Double(areaSize);
 				setSize(areaSize.copy());
 
 				if (preserveAR_)
@@ -244,6 +252,29 @@ public abstract class AbstractViewport implements IViewport
 	public IVector2 getPaddedSize()
 	{
 		return paddedSize_;
+	}
+	
+	/**
+	 * Returns the clipping box.
+	 * @return clipping box
+	 */
+	public Rectangle getClippingBox()
+	{
+		Rectangle box = new Rectangle();
+		IVector2 pixSize = getPixelSize();
+		IVector2 boxStart = pixPosition_.copy().divide(pixSize).negate();
+		box.x = (int)Math.round(boxStart.getXAsDouble());
+		box.y = (int)Math.round(boxStart.getYAsDouble());
+		IVector2 boxSize = areaSize_.copy().divide(pixSize);
+		box.width = (int) Math.ceil(boxSize.getXAsDouble());
+		box.height = (int) Math.ceil(boxSize.getYAsDouble());
+		
+		if (getInvertX())
+			box.x = canvas_.getWidth() - box.x - box.width;
+		if (getInvertY())
+			box.y = canvas_.getHeight() - box.y - box.height;
+		
+		return box;
 	}
 	
 	/**
@@ -269,6 +300,9 @@ public abstract class AbstractViewport implements IViewport
 	public void setPosition(IVector2 pos)
 	{
 		position_ = pos;
+		IVector2 pixSize = getPixelSize();
+		pixPosition_ = position_.copy().divide(pixSize);
+		pixPosition_ = (new Vector2Double(new Vector2Int(pixPosition_))).multiply(pixSize);
 	}
 
 	public void setPreserveAspectRation(boolean preserveAR)
