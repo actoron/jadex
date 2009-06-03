@@ -225,6 +225,10 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				g.fillRect(0, 0, getWidth(), getHeight());
 				
 				Rectangle clipRect = getClippingBox();
+				if (getInvertX())
+					clipRect.x = canvas_.getWidth() - clipRect.x - clipRect.width;
+				if (!getInvertY())
+					clipRect.y = canvas_.getHeight() - clipRect.y - clipRect.height;
 				g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 				
 				setupTransform(g);

@@ -26,9 +26,6 @@ public class TexturedRectangle extends RotatingPrimitive
 	/** Image for Java2D operations. */
 	private BufferedImage		image_;
 
-	/** AffineTransform from image space to user space for Java2D. */
-	private AffineTransform		imageToUser_;
-
 	/**
 	 * Creates default TexturedRectangle.
 	 * 
@@ -64,8 +61,6 @@ public class TexturedRectangle extends RotatingPrimitive
 	public void init(ViewportJ2D vp)
 	{
 		image_ = vp.getImage(texturePath_);
-		imageToUser_ = new AffineTransform();
-		imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_.getHeight());
 	}
 
 	public void init(ViewportJOGL vp)
@@ -79,9 +74,9 @@ public class TexturedRectangle extends RotatingPrimitive
 		
 		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize());
 		
+		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		if (!setupMatrix(dc, obj, g))
 			return;
-		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		
 		g.drawImage(image_, vp.getImageTransform(image_.getWidth(), image_
 				.getHeight()), null);

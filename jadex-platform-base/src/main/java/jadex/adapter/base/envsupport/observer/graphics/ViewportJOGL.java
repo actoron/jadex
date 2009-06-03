@@ -302,7 +302,10 @@ public class ViewportJOGL extends AbstractViewport
 		//System.out.println(x + " " + y + " " + w + " " + h);
 		
 		Rectangle clipRect = getClippingBox();
-		
+		if (getInvertX())
+			clipRect.x = canvas_.getWidth() - clipRect.x - clipRect.width;
+		if (getInvertY())
+			clipRect.y = canvas_.getHeight() - clipRect.y - clipRect.height;
 		gl.glScissor(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 	}
 	

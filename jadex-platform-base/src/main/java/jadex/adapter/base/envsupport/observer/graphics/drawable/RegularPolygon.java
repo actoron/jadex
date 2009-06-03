@@ -6,6 +6,7 @@ import jadex.javaparser.IParsedExpression;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 
 import javax.media.opengl.GL;
@@ -16,8 +17,8 @@ public class RegularPolygon extends ColoredPrimitive
 	/** Vertex count. */
 	private int			vertices_;
 
-	/** Path for Java2D. */
-	private GeneralPath	path_;
+	/** Shape for Java2D. */
+	protected Shape	shape_;
 
 	/** Display list for OpenGL. */
 	private int			dList_;
@@ -51,16 +52,17 @@ public class RegularPolygon extends ColoredPrimitive
 
 	public void init(ViewportJ2D vp)
 	{
-		path_ = new GeneralPath();
-		path_.moveTo(0.5f, 0.0f);
+		GeneralPath path = new GeneralPath();
+		path.moveTo(0.5f, 0.0f);
 		for(int i = 1; i < vertices_; ++i)
 		{
 			double x = Math.PI * 2 / vertices_ * i;
-			path_
+			path
 					.lineTo((float)(Math.cos(x) / 2.0),
 							(float)(Math.sin(x) / 2.0));
 		}
-		path_.closePath();
+		path.closePath();
+		shape_ = path;
 	}
 
 	public void init(ViewportJOGL vp)
@@ -99,7 +101,7 @@ public class RegularPolygon extends ColoredPrimitive
 		if(!setupMatrix(dc, obj, g))
 			return;
 		g.setColor(c_);
-		g.fill(path_);
+		g.fill(shape_);
 	}
 
 	public void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)

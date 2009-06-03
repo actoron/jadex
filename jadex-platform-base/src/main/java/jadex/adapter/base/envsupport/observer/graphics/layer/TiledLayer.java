@@ -33,6 +33,9 @@ public class TiledLayer implements ILayer
 
 	/** Size of the tiles. */
 	private IVector2			tileSize_;
+	
+	/** Inverted size of the tiles. */
+	private IVector2			invTileSize_;
 
 	/**
 	 * Creates a new TiledLayer.
@@ -51,6 +54,7 @@ public class TiledLayer implements ILayer
 	public TiledLayer(IVector2 tileSize, String texturePath)
 	{
 		this.tileSize_ = tileSize.copy();
+		this.invTileSize_ = (new Vector2Double(1.0)).divide(tileSize_);
 		this.texturePath_ = texturePath;
 		texture_ = 0;
 	}
@@ -91,7 +95,7 @@ public class TiledLayer implements ILayer
 				AffineTransform transform = g.getTransform();
 				g.translate(x, y);
 				g.scale(tileSize_.getXAsDouble(), tileSize_.getYAsDouble());
-				g.drawImage(image_, imageToUser_, null);
+				g.drawImage(image_, vp.getImageTransform(image_.getWidth(), image_.getHeight()), null);
 				g.setTransform(transform);
 			}
 		}
@@ -106,7 +110,7 @@ public class TiledLayer implements ILayer
 		
 		gl.glMatrixMode(GL.GL_TEXTURE);
 		gl.glPushMatrix();
-		gl.glScalef(tileSize_.getXAsFloat(), tileSize_.getYAsFloat(), 1.0f);
+		gl.glScalef(invTileSize_.getXAsFloat(), invTileSize_.getYAsFloat(), 1.0f);
 		gl.glBegin(GL.GL_QUADS);
 		gl.glTexCoord2f(0.0f, 0.0f);
 		gl.glVertex2f(0.0f, 0.0f);

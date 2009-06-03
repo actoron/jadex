@@ -269,11 +269,6 @@ public abstract class AbstractViewport implements IViewport
 		box.width = (int) Math.ceil(boxSize.getXAsDouble());
 		box.height = (int) Math.ceil(boxSize.getYAsDouble());
 		
-		if (getInvertX())
-			box.x = canvas_.getWidth() - box.x - box.width;
-		if (getInvertY())
-			box.y = canvas_.getHeight() - box.y - box.height;
-		
 		return box;
 	}
 	

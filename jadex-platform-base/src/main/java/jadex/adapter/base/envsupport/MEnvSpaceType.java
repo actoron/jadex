@@ -12,6 +12,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Rectangle;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.RegularPolygon;
+import jadex.adapter.base.envsupport.observer.graphics.drawable.Ellipse;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.RotatingPrimitive;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.Text;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangle;
@@ -568,6 +569,60 @@ public class MEnvSpaceType	extends MSpaceType
 					})
 				}), null));
 		
+		types.add(new TypeInfo("ellipse", MultiCollection.class, null, null,
+				SUtil.createHashMap(new String[]{"x", "y", "rotatex", "rotatey", "rotatez", "width", "height", 
+					"position", "rotation", "size", "abspos", "abssize", "absrot", "color", "layer", "creator"}, 
+				new BeanAttributeInfo[]{
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+					new BeanAttributeInfo(null, null, ""),
+					new BeanAttributeInfo(null, null, ""),
+					new BeanAttributeInfo(null, null, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+					new BeanAttributeInfo(null, colorconv, ""),
+					new BeanAttributeInfo(null, tintconv, ""),
+					new BeanAttributeInfo(null, null, "", new IObjectCreator()
+					{
+						public Object createObject(Map args) throws Exception
+						{
+							Object position = MEnvSpaceInstance.getProperty(args, "position");
+							if(position==null)
+							{
+								position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
+									(Double)MEnvSpaceInstance.getProperty(args, "y"));
+							}				
+							Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
+							if(rotation==null)
+							{
+								Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
+								Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
+								Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
+								rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							}
+							Object size = MEnvSpaceInstance.getProperty(args, "size");
+							if(size==null)
+							{
+								size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
+									(Double)MEnvSpaceInstance.getProperty(args, "height"));
+							}
+							
+							int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
+							absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
+							absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+							
+							IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
+							return new Ellipse(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
+						}
+					})
+				}), null));
+		
 		types.add(new TypeInfo("text", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", 
 				"position", "font", "style", "basesize", "color", "layer", "text", "creator"}, 
@@ -799,6 +854,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("triangle", new BeanAttributeInfo("parts", null, "")));		
 		linkinfos.add(new LinkInfo("rectangle", new BeanAttributeInfo("parts", null, "")));		
 		linkinfos.add(new LinkInfo("regularpolygon", new BeanAttributeInfo("parts", null, "")));
+		linkinfos.add(new LinkInfo("ellipse", new BeanAttributeInfo("parts", null, "")));
 		linkinfos.add(new LinkInfo("text", new BeanAttributeInfo("parts", null, "")));
 		
 		// all drawable elems
