@@ -73,14 +73,17 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						if(!belset.containsFact(percept))
 						{
 							belset.addFact(percept);
-//							System.out.println("");
+							System.out.println("added: "+percept+" to: "+belset);
 						}
 					}
 					else if(REMOVE.equals(metainfo[0]))
 					{
 						IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfo[1]);
 						if(belset.containsFact(percept))
+						{
 							belset.removeFact(percept);
+							System.out.println("removed: "+percept+" from: "+belset);
+						}
 					}
 					else if(SET.equals(metainfo[0]))
 					{
