@@ -83,13 +83,12 @@
 			</env:processtypes>
 			
 			<env:perceptgeneratortypes>
-				<env:perceptgeneratortype name="antvisiongen"
-					class="AntVisionGenerator"/>
-				<env:perceptmapping agenttype="Ant" class="AntVisionProcessor">
+				<env:perceptgenerator name="antvisiongen" class="AntVisionGenerator"/>
+				<env:perceptprocessor agenttype="Ant" class="AntVisionProcessor">
 					<!-- Todo: mapping per percept type? - ->
 					<env:percepttype name="garbage_appeared"/>
 					<env:percepttype name="garbage_disappeared"/> -->
-				</env:perceptmapping>
+				</env:perceptprocessor>
 			</env:perceptgeneratortypes>
 			
 			<env:views>

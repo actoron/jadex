@@ -31,11 +31,11 @@ public class MoveToLocationPlan extends Plan
 	 */
 	public void body()
 	{
-		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		IVector2	dest	= (IVector2)getParameter("destination").getValue();
+		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+		IVector2 dest = (IVector2)getParameter("location").getValue();
 		
 		SyncResultListener	res	= new SyncResultListener();
-		move	= new MoveTask(dest, res, getExternalAccess());
+		move = new MoveTask(dest, res, getExternalAccess());
 		myself.addTask(move);
 		res.waitForResult();
 	}

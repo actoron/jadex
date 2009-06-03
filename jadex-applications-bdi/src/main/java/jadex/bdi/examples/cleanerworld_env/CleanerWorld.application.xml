@@ -27,7 +27,7 @@
 				<env:objecttype name="cleaner">
 					<env:property name="vision_range">0.1</env:property>
 					<env:property name="speed">0.1</env:property>
-					<env:property name="chargestate">100</env:property>
+					<env:property name="chargestate">1.0</env:property>
 				</env:objecttype>
 				<env:objecttype name="waste" />
 				<env:objecttype name="chargingstation" />
@@ -83,7 +83,7 @@
 					</env:drawable>
 					
 					<env:prelayers>
-						<env:tiledlayer width="4" height="4" imagepath="jadex/bdi/examples/cleanerworld_env/images/background.png" />
+						<env:tiledlayer width="0.25" height="0.25" imagepath="jadex/bdi/examples/cleanerworld_env/images/background.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>

@@ -24,6 +24,9 @@ public class MoveTask extends ListenableTask
 	/** The vision property (radius in units). */
 	public static final String	PROPERTY_VISION	= "vision";
 	
+	/** The energy charge state. */
+	public static final String	PROPERTY_CHARGESTATE	= "chargestate";
+	
 	//-------- attributes --------
 	
 	/** The destination. */
@@ -43,7 +46,7 @@ public class MoveTask extends ListenableTask
 	public MoveTask(IVector2 destination, IResultListener listener, IExternalAccess scope)
 	{
 		super(listener);
-		this.destination	= destination;
+		this.destination = destination;
 		this.scope	= scope;
 	}
 	
@@ -57,35 +60,23 @@ public class MoveTask extends ListenableTask
 	 */
 	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
-		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
-		double	maxdist	= progress.getAsDouble()*speed*0.001;
-		IVector2	loc	= (IVector2)obj.getProperty(Space2D.POSITION);
+		double speed = ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
+		double maxdist = progress.getAsDouble()*speed*0.001;
+		double energy = ((Double)obj.getProperty(PROPERTY_CHARGESTATE)).doubleValue();
+		IVector2 loc = (IVector2)obj.getProperty(Space2D.POSITION);
 		// Todo: how to handle border conditions!?
-		IVector2	newloc	= ((Space2D)space).getDistance(loc, destination).getAsDouble()<=maxdist
-			? destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
+		IVector2 newloc	= ((Space2D)space).getDistance(loc, destination).getAsDouble()<=maxdist? 
+			destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
 
-		((Space2D)space).setPosition(obj.getId(), newloc);
-
-		// Process vision at new location.
-		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
-		final ISpaceObject[]	objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.POSITION), new Vector1Double(vision), null);
-		if(objects!=null && objects.length>0)
+		if(energy>0)
 		{
-			scope.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					IBeliefSet	targetsbel	= scope.getBeliefbase().getBeliefSet("my_targets");
-					for(int i=0; i<objects.length; i++)
-					{
-						if(objects[i].getType().equals("target") && !targetsbel.containsFact(objects[i]))
-						{
-//							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-							targetsbel.addFact(objects[i]);
-						}
-					}
-				}
-			});
+			energy = Math.max(energy-maxdist/5, 0);
+			obj.setProperty(PROPERTY_CHARGESTATE, new Double(energy));
+			((Space2D)space).setPosition(obj.getId(), newloc);
+		}
+		else
+		{
+			throw new RuntimeException("Energy too low.");
 		}
 		
 		if(newloc==destination)

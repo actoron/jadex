@@ -237,11 +237,10 @@ public class MEnvSpaceType	extends MSpaceType
 						
 						Double xshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshiftx");
 						Double yshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshifty");
-						IVector2 shift;
 						if(xshift!=null && yshift!=null)
 							pers.setObjectShift(Vector2Double.getVector2(xshift, yshift));
-						else if(ret instanceof Grid2D)
-							pers.setObjectShift(new Vector2Double(0.5));
+//						else if(ret instanceof Grid2D)
+//							pers.setObjectShift(new Vector2Double(0.5));
 					}
 					
 					List drawables = (List)args.get("drawables");

@@ -110,38 +110,30 @@
 		<!-- Observe the battery state. -->
 		<maintaingoal name="maintainbatteryloaded">
 			<deliberation>
-				<inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-				<inhibits ref="achievecleanup" inhibit="when_in_process"/>
+				<!--  <inhibits ref="performlookforwaste" inhibit="when_in_process"/>
+				<inhibits ref="achievecleanup" inhibit="when_in_process"/>-->
 				<inhibits ref="performpatrol" inhibit="when_in_process"/>
 			</deliberation>
-			<!-- Engage in actions when the state is below 0.2. -->
  			<maintaincondition language="jcl">
  				$beliefbase.my_chargestate > 0.2
  			</maintaincondition>
-			<!-- The goal is satisfied when the charge state is 1.0. -->
 			<targetcondition language="jcl">
  				$beliefbase.my_chargestate >= 1.0
  			</targetcondition>
 		</maintaingoal>
 
 		<!-- Clean up some waste. -->
-		<achievegoal name="achievecleanup" retry="true" exclude="when_failed">
+		<!-- <achievegoal name="achievecleanup" retry="true" exclude="when_failed">
 			<parameter name="waste" class="ISpaceObject">
-				<!-- Bind against variable from creation condition. -->
-				<!-- <bindingoptions>"?waste"</bindingoptions> -->
 				<value>$waste</value>
 			</parameter>
-			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
 			<unique dummy="true"/>
 			<creationcondition language="jcl">
 				ISpaceObject $waste
 			</creationcondition>
-			<!-- Suspend the goal when it is night. -->
 			<contextcondition language="jcl">
 				$beliefbase.daytime
  			</contextcondition>
-			<!-- The goal will be dropped when
- 				the agent currently walks to the waste and the waste has vanished. -->
 			<dropcondition language="jcl">
 				// $beliefbase.carriedwaste==null &amp;&amp;
 				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
@@ -149,20 +141,19 @@
 				$beliefbase.carriedwaste==null &amp;&amp;
 				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
  			</dropcondition>
-			<!-- <deliberation cardinality="1"> - ->
+			<!- - <deliberation cardinality="1"> - ->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup" language="jcl">
 					$beliefbase.my_location.getDistance($goal.waste.getLocation())
 					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
 				</inhibits>
-			</deliberation>-->
-			<!-- The goal is achieved when the waste is in some wastebin. - ->
+			</deliberation>
 			<targetcondition>
 				(select one Wastebin $wastebin from $beliefbase.wastebins
 				where $wastebin.contains($goal.waste))!=null
-			</targetcondition>-->
-		</achievegoal>
+			</targetcondition>- ->
+		</achievegoal>-->
 
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
@@ -314,16 +305,16 @@
 			</trigger>
 		</plan>-->
 
-		<!-- Perform patrols. - ->
+		<!-- Perform patrols. -->
 		<plan name="patrol">
 			<body class="PatrolPlan"/>
 			<trigger>
 				<goal ref="performpatrol"/>
 			</trigger>
-		</plan>-->
+		</plan>
 
 		<!-- Clean up waste by picking it up
-			and carrying it to a waste bin. -->
+			and carrying it to a waste bin. - ->
 		<plan name="cleanup">
 			<parameter name="waste" class="ISpaceObject">
  				<goalmapping ref="achievecleanup.waste"/>
@@ -332,7 +323,7 @@
 			<trigger>
 				<goal ref="achievecleanup"/>
 			</trigger>
-		</plan>
+		</plan>-->
 
 		<!-- Pick up a waste. -->
 		<plan name="pickupwaste">
@@ -470,8 +461,8 @@
 			<goals>
 				<!-- <initialgoal ref="performlookforwaste"/>-->
   				<initialgoal ref="performpatrol"/>
-		  		<!-- <initialgoal ref="maintainbatteryloaded"/>
-				<initialgoal ref="performmemorizepositions"/>-->
+		  		<initialgoal ref="maintainbatteryloaded"/>
+				<!-- <initialgoal ref="performmemorizepositions"/>-->
 			</goals>
 		</configuration>
 	</configurations>

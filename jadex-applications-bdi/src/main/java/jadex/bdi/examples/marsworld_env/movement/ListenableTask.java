@@ -105,5 +105,5 @@ public abstract class ListenableTask	implements IObjectTask
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public abstract void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress);
+	public abstract void doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress);
 }
