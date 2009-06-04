@@ -168,7 +168,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if(!space.getDistance(oldpos, objpos).greater(getRange(event.getSpaceObject()))
 						&& (pos==null || space.getDistance(pos, objpos).greater(getRange(event.getSpaceObject()))))
 					{
-						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), oldobjects[i].getType(), DISAPPEARED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(eventowner), oldobjects[i].getType(), DISAPPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, oldobjects[i], eventowner);
 					}
@@ -200,7 +200,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					{
 						if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(event.getSpaceObject())))
 						{
-							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), CREATED);
+							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(eventowner), objects[i].getType(), CREATED);
 							if(percepttype!=null)
 								((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, objects[i], eventowner);
 						}
