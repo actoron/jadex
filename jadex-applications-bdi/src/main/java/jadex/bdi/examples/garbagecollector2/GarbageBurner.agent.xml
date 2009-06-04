@@ -55,13 +55,13 @@
 			</parameter>
 			<unique dummy="true"/>
 			<creationcondition language="jcl">
-				ISpaceObject $garbage &amp;&amp; !Arrays.asList($beliefbase.garbages).contains($garbage)
+				ISpaceObject $garbage &amp;&amp; Arrays.asList($beliefbase.garbages).contains($garbage)
 			</creationcondition>
 			<deliberation cardinality="1"/>
 		</achievegoal>
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
-		<achievegoal name="pick" exclude="never" retrydelay="100"/>
+		<achievegoal name="pick" exclude="never"/>
 	</goals>
 
 	<plans>

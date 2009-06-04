@@ -127,7 +127,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if((oldpos==null || space.getDistance(oldpos, objpos).greater(getRange(event.getSpaceObject())))
 						&& !space.getDistance(pos, objpos).greater(getRange(event.getSpaceObject())))
 					{
-						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), objects[i].getType(), APPEARED);
+						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(eventowner), objects[i].getType(), APPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, objects[i], eventowner);
 					}

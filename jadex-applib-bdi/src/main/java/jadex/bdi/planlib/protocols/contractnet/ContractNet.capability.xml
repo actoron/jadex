@@ -82,7 +82,7 @@
 			<parameter name="cfp" class="Object"/>
 			<!-- The call-for-proposals info (local information). -->
 			<parameter name="cfp_info" class="Object" optional="true" direction="inout"/>
-			<!-- Dummy paramter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
+			<!-- Dummy parameter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
 			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
 				<value language="clips">
 					// ($goal.acceptables.length>0 ||

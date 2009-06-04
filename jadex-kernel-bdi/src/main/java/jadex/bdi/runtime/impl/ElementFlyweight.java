@@ -154,7 +154,9 @@ public abstract class ElementFlyweight implements IElement
 	 *  Remove the external usage preventing
 	 *  the state object from being garbage
 	 *  collected.
-	 */
+	 * /
+	// Hack!!! finalize() is required to call state.removeExternalObjectUsage(...)
+	// unless ContentIDState is used, which ignores external object usages.
 	protected void finalize() throws Throwable
 	{
 		// Must be done on agent thread, not
@@ -189,7 +191,7 @@ public abstract class ElementFlyweight implements IElement
 //			System.err.println("cleaned up: "+id+", "+cnt[0]);
 		}
 		super.finalize();
-	}
+	}*/
 	
 	/**
 	 *  Cleanup the flyweight.
