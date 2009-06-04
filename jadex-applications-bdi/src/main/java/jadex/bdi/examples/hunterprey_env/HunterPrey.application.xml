@@ -23,6 +23,7 @@
 		<import>jadex.bdi.examples.hunterprey_env.cleverprey.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbhunter.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -48,8 +49,9 @@
 				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
 				<env:avatarmapping agenttype="CleverPrey" objecttype="prey"/>
 				<env:avatarmapping agenttype="DumbHunter" objecttype="hunter"/>
+				<env:avatarmapping agenttype="LAHunter" objecttype="hunter"/>
 			</env:avatarmappings>
-
+			
 			<env:actiontypes>
 				<env:actiontype name="move" class="MoveAction" />
 				<env:actiontype name="eat" class="EatAction" />
@@ -90,11 +92,23 @@
 				<env:percepttype name="prey_seen" objecttype="prey">
 					<env:agenttypes>
 						<env:agenttype name="DumbHunter"/>
+						<env:agenttype name="LAHunter"/>
 					</env:agenttypes>
 				</env:percepttype>
 				<env:percepttype name="prey_gone" objecttype="prey">
 					<env:agenttypes>
 						<env:agenttype name="DumbHunter"/>
+						<env:agenttype name="LAHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="obstacle_seen" objecttype="obstacle">
+					<env:agenttypes>
+						<env:agenttype name="LAHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="obstacle_gone" objecttype="obstacle">
+					<env:agenttypes>
+						<env:agenttype name="LAHunter"/>
 					</env:agenttypes>
 				</env:percepttype>
 				<env:percepttype name="hunter_seen" objecttype="hunter">
@@ -122,7 +136,9 @@
 							new String[]{"prey_seen", "appeared", "created"}, 
 							new String[]{"prey_gone", "disappeared", "destroyed"},
 							new String[]{"hunter_seen", "appeared", "created"}, 
-							new String[]{"hunter_gone", "disappeared", "destroyed"}
+							new String[]{"hunter_gone", "disappeared", "destroyed"},
+							new String[]{"obstacle_seen", "appeared", "created"}, 
+							new String[]{"obstacle_gone", "disappeared", "destroyed"}
 						}
 					</env:property>
 				</env:perceptgenerator>
@@ -130,6 +146,17 @@
 				<env:perceptprocessor agenttype="CleverPrey" class="CleverPreyVisionProcessor"/>
 				<env:perceptprocessor agenttype="DumbPrey" class="DumbPreyVisionProcessor"/>
 				<env:perceptprocessor agenttype="DumbHunter" class="DumbHunterVisionProcessor"/>
+				<env:perceptprocessor agenttype="LAHunter" class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"prey_seen", "add", "vision"}, 
+							new String[]{"prey_gone", "remove", "vision"},
+							new String[]{"obstacle_seen", "add", "vision"}, 
+							new String[]{"obstacle_gone", "remove", "vision"}
+						}
+					</env:property>
+				</env:perceptprocessor>
 			</env:percepttypes>
 			
 			<env:views>
@@ -213,6 +240,7 @@
 		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_env/dumbprey/DumbPrey.agent.xml"/>
 		<agenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey_env/cleverprey/CleverPrey.agent.xml"/>
 		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_env/dumbhunter/DumbHunter.agent.xml"/>
+		<agenttype name="LAHunter" filename="jadex/bdi/examples/hunterprey_env/ldahunter/LAHunter.agent.xml"/>
 	</agenttypes>
 
 	<applications>
@@ -240,7 +268,7 @@
 				<!-- <agent type="CleverPrey" name="Charlton" configuration="Clever"/> -->
 				<agent type="DumbHunter" name="Lenny"/>
 				<agent type="DumbHunter" name="Louis"/>
-				<!-- <agent type="LAHunter" name="Willy"/> -->
+				<agent type="LAHunter" name="Willy"/>
 				<!-- <agent type="LAHunter" name="Wolfram"/> -->
 			</agents>
 			
@@ -350,12 +378,36 @@
 				</env:processes>
 
 				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons"/>
 				</env:observers>
  			</env:envspace>
  		</application>
+ 		
+		<application name="debug">
+			<agents>
+				<agent type="DumbPrey" name="testprey" />
+				<agent type="DumbPrey" name="foodprey" />
+				<agent type="LAHunter" name="testhunter"/>
+			</agents>
+
+			<env:envspace name="my2dspace" type="2dspace">
+				<env:avatars>
+					<env:avatar type="prey" owner="testprey">
+						<env:property name="position">new Vector2Int(10, 14)</env:property>
+					</env:avatar>
+					<env:avatar type="prey" owner="foodprey">
+						<env:property name="position">new Vector2Int(11, 15)</env:property>
+					</env:avatar>
+					<env:avatar type="hunter" owner="testhunter">
+						<env:property name="position">new Vector2Int(11, 15)</env:property>
+					</env:avatar>
+				</env:avatars>
+				
+				<env:observers>
+					<env:observer name="HunterPrey World" view="view_all" perspective="icons"/>
+				</env:observers>
+ 			</env:envspace>
+ 		</application>
+ 		
 	</applications>
 </applicationtype>

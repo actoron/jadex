@@ -9,7 +9,6 @@ import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.PerceptType;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -233,19 +232,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<objects.size(); i++)
 			{
 				Map mobj = (Map)objects.get(i);
-			
 				List mprops = (List)mobj.get("properties");
-				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
-				IAgentIdentifier	ownerid	= null;
-				if(owner!=null)
-				{
-					IAMS	ams	= ((IAMS)app.getPlatform().getService(IAMS.class));
-					if(owner.indexOf("@")!=-1)
-						ownerid	= ams.createAgentIdentifier((String)owner, false);
-					else
-						ownerid	= ams.createAgentIdentifier((String)owner, true);
-				}
-				
 				int num	= 1;
 				if(mobj.containsKey("number"))
 				{
@@ -255,11 +242,32 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				for(int j=0; j<num; j++)
 				{
 					Map props = convertProperties(mprops, fetcher);
-					if(props==null)
-						props	= new HashMap();
-					props.put(ISpaceObject.PROPERTY_OWNER, ownerid);
-					ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null, null);
+					ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null);
 				}
+			}
+		}
+		
+		// Register initial avatars
+		List avatars = (List)getPropertyList("avatars");
+		if(avatars!=null)
+		{
+			for(int i=0; i<avatars.size(); i++)
+			{
+				Map mobj = (Map)avatars.get(i);
+			
+				List mprops = (List)mobj.get("properties");
+				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
+				if(owner==null)
+					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
+				IAgentIdentifier	ownerid	= null;
+				IAMS	ams	= ((IAMS)app.getPlatform().getService(IAMS.class));
+				if(owner.indexOf("@")!=-1)
+					ownerid	= ams.createAgentIdentifier((String)owner, false);
+				else
+					ownerid	= ams.createAgentIdentifier((String)owner, true);
+				
+				Map props = convertProperties(mprops, fetcher);
+				ret.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);
 			}
 		}
 		

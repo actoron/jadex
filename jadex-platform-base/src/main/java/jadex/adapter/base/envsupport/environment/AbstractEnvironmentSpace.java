@@ -52,6 +52,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	/** Avatar mappings. */
 	protected MultiCollection avatarmappings;
 
+	/** Initial avatar settings (aid -> [type, props]). */
+	protected Map initialavatars;
+
 	/** Data view mappings. */
 	protected MultiCollection	dataviewmappings;
 	
@@ -256,7 +259,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks)
 	{
 		if(!objecttypes.containsKey(typename))
 			throw new RuntimeException("Unknown space object type: "+typename);
@@ -288,7 +291,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 			}
 			
 			// Create the object.
-			ret = new SpaceObject(id, typename, properties, tasks, listeners, monitor, this);
+			ret = new SpaceObject(id, typename, properties, tasks, null, monitor, this);
 			spaceobjects.put(id, ret);
 
 			// Store in type objects.
@@ -549,7 +552,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 //			if(!percepttypes.containsKey(typename))
 //				throw new RuntimeException("Unknown percept type: "+typename);
 			
-//			System.out.println("New percept: "+typename+", "+data+", "+agent);
+			System.out.println("New percept: "+typename+", "+data+", "+agent);
 			
 			String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
 			List procs	= (List)perceptprocessors.get(agenttype);
@@ -859,16 +862,29 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		synchronized(monitor)
 		{
 			// Add avatar(s) if any.
-			String	agenttype	= ((ApplicationContext)getContext()).getAgentType(aid);
-			if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)
+			if(initialavatars!=null && initialavatars.containsKey(aid))
 			{
-				for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
+				Object[]	ia	= (Object[])initialavatars.get(aid);
+				String	objecttype	=	(String)ia[0];
+				Map	props	=	(Map)ia[1];
+				if(props==null)
+					props	= new HashMap();
+				props.put(ISpaceObject.PROPERTY_OWNER, aid);
+				createSpaceObject(objecttype, props, null);
+			}
+			else
+			{
+				String	agenttype	= ((ApplicationContext)getContext()).getAgentType(aid);
+				if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)
 				{
-					String	objecttype	= (String)it.next();
-					// Hmm local name as owner? better would be agent id, but agents are created after space?
-					Map	props	= new HashMap();
-					props.put(ISpaceObject.PROPERTY_OWNER, aid);
-					createSpaceObject(objecttype, props, null, null);
+					for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
+					{
+						String	objecttype	= (String)it.next();
+						// Hmm local name as owner? better would be agent id, but agents are created after space?
+						Map	props	= new HashMap();
+						props.put(ISpaceObject.PROPERTY_OWNER, aid);
+						createSpaceObject(objecttype, props, null);
+					}
 				}
 			}
 			
@@ -1033,6 +1049,23 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		public synchronized Long getNext()
 		{
 			return new Long(count_++);
+		}
+	}
+
+	/**
+	 *  Initial settings for the avatar of a specific agent.
+	 *  @param ownerid	The agent id.
+	 *  @param type	The object type.
+	 *  @param props	The properties for the object (if any).
+	 */
+	public void addInitialAvatar(IAgentIdentifier ownerid, String type,	Map props)
+	{
+		synchronized(monitor)
+		{
+			if(initialavatars==null)
+				initialavatars	= new HashMap();
+
+			initialavatars.put(ownerid, new Object[]{type, props});
 		}
 	}
 }

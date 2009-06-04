@@ -101,7 +101,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 			props.put(GRAVITATION_CENTER_ID, "ABC");
 			props.put(ABSORBED_OBJECTS, new Integer(0));
 			props.put(GRAVITATION_STRENGTH, new Integer(10));
-			grid.createSpaceObject(GRAVITATION_CENTER, props, null, null);
+			grid.createSpaceObject(GRAVITATION_CENTER, props, null);
 
 			// compute and add surrounding gravitation field for 2D-Environment
 			int xPos = pos.getXAsInteger();
@@ -113,7 +113,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 				props.put(GRAVITATION_CENTER_ID, "ABC");
 				props.put(GRAVITATION_CENTER_POS, pos);
 				props.put(GRAVITATION_STRENGTH, new Integer(10));
-				grid.createSpaceObject(GRAVITATION_FIELD, props, null, null);
+				grid.createSpaceObject(GRAVITATION_FIELD, props, null);
 			}
 			firstTime = false; 
 		}

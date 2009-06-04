@@ -158,7 +158,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					{
 						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DISAPPEARED);
 						if(percepttype!=null)
-							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
+							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, oldobjects[i]);
 					}
 				}
 				
@@ -225,7 +225,13 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), DESTROYED);
 							if(percepttype!=null)
 								((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
+//							else
+//								System.out.println("No destroyed notification for: "+objects[i]+", "+event.getSpaceObject()+", percepttype="+percepttype);
 						}
+//						else
+//						{
+//							System.out.println("No destroyed notification for: "+objects[i]+", "+event.getSpaceObject()+", distance="+space.getDistance(pos, objpos)+", range="+getRange(objects[i]));
+//						}
 					}
 				}
 			}

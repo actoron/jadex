@@ -193,10 +193,9 @@ public class Grid2D extends Space2D
 	 * @param type the object's type
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
-	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks)
 	{
 		synchronized(monitor)
 		{
@@ -211,7 +210,7 @@ public class Grid2D extends Space2D
 				properties.put(Space2D.PROPERTY_POSITION, getEmptyGridPosition());
 			}
 			
-			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks, listeners);
+			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks);
 			return obj;
 		}
 	}

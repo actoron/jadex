@@ -189,7 +189,7 @@ public class PackageProcess extends SimplePropertyObject implements ISpaceProces
 				props.put(Space2D.PROPERTY_POSITION, pos);
 				props.put("round", new Integer(roundInt));
 				props.put("age", objectType);
-				space.createSpaceObject(objectType, props, null, null);
+				space.createSpaceObject(objectType, props, null);
 			}
 		}
 	}

@@ -240,6 +240,33 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 		return ret;
 	}
 	
+	/**
+	 *  Get the possible moves.
+	 *  @param space	The 2D space to move in.
+	 *  @param sourcepos	The source position.
+	 * 	@return The directions to go (i.e. all possible directions excluding 'none' or an array with only 'none').
+	 */
+	public static String[]	getPossibleDirections(Grid2D space, IVector2 sourcepos)
+	{
+		Map	moves	= new HashMap();
+		moves.put(DIRECTION_LEFT, new Vector2Int(sourcepos.getXAsInteger()-1, sourcepos.getYAsInteger()));
+		moves.put(DIRECTION_RIGHT, new Vector2Int(sourcepos.getXAsInteger()+1, sourcepos.getYAsInteger()));
+		moves.put(DIRECTION_UP, new Vector2Int(sourcepos.getXAsInteger(), sourcepos.getYAsInteger()-1));
+		moves.put(DIRECTION_DOWN, new Vector2Int(sourcepos.getXAsInteger(), sourcepos.getYAsInteger()+1));
+
+		for(Iterator it=moves.keySet().iterator(); it.hasNext(); )
+		{
+			IVector2	pos	= (IVector2)moves.get(it.next());
+			Collection	obstacles	= space.getSpaceObjectsByGridPosition(pos, "obstacle");
+			if(obstacles!=null && !obstacles.isEmpty())
+			{
+				it.remove();
+			}
+		}
+
+		return moves.isEmpty() ? new String[]{DIRECTION_NONE} : (String[])moves.keySet().toArray(new String[moves.size()]);
+	}
+	
 	//-------- helper classes --------
 	
 	/**

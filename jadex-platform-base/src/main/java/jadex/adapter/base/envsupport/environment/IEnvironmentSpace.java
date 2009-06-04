@@ -80,10 +80,9 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @param typename the object's type
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
-	 * @param listeners initial listeners (may be null)
 	 * @return the object.
 	 */
-	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners);
+	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks);
 	
 	/**
 	 *  Add a space object type.

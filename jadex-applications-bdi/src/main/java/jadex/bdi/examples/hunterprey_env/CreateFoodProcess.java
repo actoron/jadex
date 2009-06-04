@@ -84,7 +84,7 @@ public class CreateFoodProcess extends SimplePropertyObject implements ISpacePro
 					props.put(Space2D.PROPERTY_POSITION, pos);
 					props.put("creation_age", new Double(clock.getTick()));
 					props.put("clock", clock);
-					grid.createSpaceObject("food", props, null, null);
+					grid.createSpaceObject("food", props, null);
 //					System.out.println("Created food: "+obj);
 				}
 			}

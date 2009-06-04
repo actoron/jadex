@@ -13,8 +13,6 @@
 	package="jadex.bdi.examples.hunterprey_env.dumbhunter">
 
 	<imports>
-		<import>jadex.adapter.base.contextservice.*</import>
-		<import>jadex.adapter.base.appdescriptor.*</import>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>

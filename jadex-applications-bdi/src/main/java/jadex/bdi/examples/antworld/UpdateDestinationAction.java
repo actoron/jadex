@@ -57,7 +57,7 @@ public class UpdateDestinationAction extends SimplePropertyObject implements ISp
 		Map props = new HashMap();
 		props.put(Space2D.PROPERTY_POSITION, destination);
 		props.put(ANT_ID, ownerAgentId.toString());
-		space.createSpaceObject("destinationSign", props, null, null);		
+		space.createSpaceObject("destinationSign", props, null);		
 		return null;
 	}
 

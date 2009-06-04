@@ -104,12 +104,11 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param type the object's type
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
-	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks, List listeners)
+	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks)
 	{
-		ISpaceObject	ret	= super.createSpaceObject(typename, properties, tasks, listeners);
+		ISpaceObject	ret	= super.createSpaceObject(typename, properties, tasks);
 		
 		IVector2 pos = ret.getPropertyNames().contains(PROPERTY_POSITION)? 
 			(IVector2) ret.getProperty(PROPERTY_POSITION) : getRandomPosition(Vector2Int.ZERO);

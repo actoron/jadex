@@ -752,9 +752,14 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("object/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
+				SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
+
+		types.add(new TypeInfo("avatar/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+				SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("process/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
@@ -787,13 +792,19 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("object", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"name", "type", "owner", "number"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "")
-			}), null));
-		
+				SUtil.createHashMap(new String[]{"name", "type", "number"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "")
+				}), null));
+			
+		types.add(new TypeInfo("avatar", MultiCollection.class, null, null,
+				SUtil.createHashMap(new String[]{"name", "type", "owner"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, null, ""),
+				new BeanAttributeInfo(null, null, "")
+				}), null));
+			
 		types.add(new TypeInfo("process", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "type"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
@@ -870,6 +881,7 @@ public class MEnvSpaceType	extends MSpaceType
 
 		// space instance
 		linkinfos.add(new LinkInfo("object", new BeanAttributeInfo("objects", null, "property")));
+		linkinfos.add(new LinkInfo("avatar", new BeanAttributeInfo("avatars", null, "property")));
 		linkinfos.add(new LinkInfo("process", new BeanAttributeInfo("processes", null, "property")));
 		linkinfos.add(new LinkInfo("spaceaction", new BeanAttributeInfo("spaceactions", null, "property")));
 		linkinfos.add(new LinkInfo("observer", new BeanAttributeInfo("observers", null, "property")));
@@ -881,6 +893,7 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("processtype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("actiontype/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("object/property", new BeanAttributeInfo("properties", null, "")));
+		linkinfos.add(new LinkInfo("avatar/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("process/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("view/property", new BeanAttributeInfo("properties", null, "")));
 		linkinfos.add(new LinkInfo("objecttype/property", new BeanAttributeInfo("properties", null, "")));

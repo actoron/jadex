@@ -45,7 +45,7 @@ public class TraceRouteAction extends SimplePropertyObject implements ISpaceActi
 		props.put(ROUND, new Integer(0));		
 //		props.put("creation_age", new Double(clock.getTick()));
 //		props.put("clock", clock);
-		space.createSpaceObject("traceRoute", props, null, null);
+		space.createSpaceObject("traceRoute", props, null);
 
 		// ((Space2D)space).setPosition(destinationSign, destination);
 
