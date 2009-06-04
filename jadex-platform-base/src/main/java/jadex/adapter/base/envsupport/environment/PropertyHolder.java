@@ -1,13 +1,10 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.commons.SimplePropertyObject;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 

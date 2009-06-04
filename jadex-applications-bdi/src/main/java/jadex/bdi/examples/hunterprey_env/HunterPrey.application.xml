@@ -155,11 +155,19 @@
 					</env:drawable>
 					<env:drawable objecttype="prey" width="1.0" height="1.0">
 						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/prey.png" />
-						<env:rectangle layer="-1" width="5" height="5" color="#ffff007f" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="hunter" width="1.0" height="1.0">
 						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/hunter.png" />
-						<env:rectangle layer="-1" width="5" height="5" color="#ff00007f" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ff00007f" />
 					</env:drawable>
 					<env:prelayers>
 						<env:tiledlayer width="0.4" height="0.4" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />

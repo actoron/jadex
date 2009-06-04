@@ -2,6 +2,7 @@ package jadex.bdi.examples.antworld;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.fipa.IAMS;
@@ -18,19 +19,14 @@ import jadex.commons.concurrent.IResultListener;
  */
 public class AntVisionProcessor extends SimplePropertyObject implements IPerceptProcessor {
 	/**
-	 * Process a new percept.
-	 * 
-	 * @param space
-	 *            The space.
-	 * @param type
-	 *            The type.
-	 * @param percept
-	 *            The percept.
-	 * @param agent
-	 *            The agent identifier.
+	 *  Process a new percept.
+	 *  @param space The space.
+	 *  @param type The type.
+	 *  @param percept The percept.
+	 *  @param agent The agent identifier.
+	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(ISpace space, final String type, final Object percept, IAgentIdentifier agent) {
-
+	public void processPercept(ISpace space, final String type, final Object percept, IAgentIdentifier agent, ISpaceObject avatar) {
 		IAMS ams = (IAMS) ((ApplicationContext) space.getContext()).getPlatform().getService(IAMS.class);
 		ams.getExternalAccess(agent, new IResultListener() {
 			public void exceptionOccurred(Exception exception) {

@@ -1,7 +1,7 @@
 package jadex.bdi.planlib;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
@@ -49,8 +49,9 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	 *  @param type The type.
 	 *  @param percept The percept.
 	 *  @param agent The agent identifier.
+	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, IAgentIdentifier agent)
+	public void processPercept(ISpace space, final String type, final Object percept, IAgentIdentifier agent, ISpaceObject avatar)
 	{
 		IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 		ams.getExternalAccess(agent, new IResultListener()

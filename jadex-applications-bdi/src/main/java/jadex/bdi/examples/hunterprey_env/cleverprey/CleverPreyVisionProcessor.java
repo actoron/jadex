@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey_env.cleverprey;
 
-import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -31,8 +30,9 @@ public class CleverPreyVisionProcessor extends SimplePropertyObject implements I
 	 *  @param type The type.
 	 *  @param percept The percept.
 	 *  @param agent The agent identifier.
+	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent)
+	public void processPercept(final ISpace space, final String type, final Object percept, IAgentIdentifier agent, ISpaceObject avatar)
 	{
 //		System.out.println("Percept: "+type+", "+percept+", "+agent.getLocalName());
 		
@@ -100,8 +100,7 @@ public class CleverPreyVisionProcessor extends SimplePropertyObject implements I
 		}
 
 		// Remove disappeared known food, when creature moves.
-		else if(percept.equals(((AbstractEnvironmentSpace)space).getOwnedObjects(agent)[0])
-			&& type.equals("prey_moved"))
+		else if(percept.equals(avatar) && type.equals("prey_moved"))
 		{
 			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 			ams.getExternalAccess(agent, new IResultListener()

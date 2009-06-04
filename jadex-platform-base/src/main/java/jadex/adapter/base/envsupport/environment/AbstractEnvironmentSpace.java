@@ -542,7 +542,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	 *  @param data	The content of the percept (if any).
 	 *  @param agent The agent that should receive the percept.
 	 */
-	public void createPercept(String typename, Object data, IAgentIdentifier agent)
+	public void createPercept(String typename, Object data, IAgentIdentifier agent, ISpaceObject avatar)
 	{
 		synchronized(monitor)
 		{
@@ -565,9 +565,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 			}
 			
 			if(proc!=null)
-				perceptlist.schedulePercept(typename, data, agent, proc);
+				perceptlist.schedulePercept(typename, data, agent, avatar, proc);
 			else
-				System.out.println("Warning: No processor for percept: "+typename+", "+data+", "+agent);
+				System.out.println("Warning: No processor for percept: "+typename+", "+data+", "+agent+", "+avatar);
 		}
 	}
 

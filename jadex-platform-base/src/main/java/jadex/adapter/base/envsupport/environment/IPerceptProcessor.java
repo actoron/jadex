@@ -18,6 +18,7 @@ public interface IPerceptProcessor extends IPropertyObject
 	 *  @param type The type.
 	 *  @param percept The percept.
 	 *  @param agent The agent identifier.
+	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(ISpace space, String type, Object percept, IAgentIdentifier agent);
+	public void processPercept(ISpace space, String type, Object percept, IAgentIdentifier agent, ISpaceObject avatar);
 }

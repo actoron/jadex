@@ -105,7 +105,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 						// percept felt gravitation
 						if (gravitationCenter != null) {
 							System.out.println("GRAVITATION Percept created for: " + agent.toString() + ", event: " + event.getSpaceObject().toString());
-							((AbstractEnvironmentSpace) event.getSpace()).createPercept(GRAVITATION_FELT, gravitationCenter, agent);
+							((AbstractEnvironmentSpace) event.getSpace()).createPercept(GRAVITATION_FELT, gravitationCenter, agent, agentobj);
 						}
 						// } else if
 						// (agentobj.getProperty(Space2D.POSITION).equals(oldpos))

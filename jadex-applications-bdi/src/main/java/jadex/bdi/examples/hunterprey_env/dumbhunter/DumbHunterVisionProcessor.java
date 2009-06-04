@@ -25,8 +25,9 @@ public class DumbHunterVisionProcessor extends SimplePropertyObject implements I
 	 *  @param type The type.
 	 *  @param percept The percept.
 	 *  @param agent The agent identifier.
+	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent)
+	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent, ISpaceObject avatar)
 	{
 		// Add newly seen prey / remove disappeared prey.
 		if(type.equals("prey_seen") || type.equals("prey_moved") || type.equals("prey_gone"))

@@ -1641,6 +1641,7 @@ public class EventProcessingRules
 			state.setAttributeValue(mplancandidate, OAVBDIRuntimeModel.mplancandidate_has_rcapa, rcapa);
 			// Must be added and removed to allow being used in state (otherwise state does not know object)
 			state.addAttributeValue(apl, OAVBDIRuntimeModel.apl_has_plancandidates, mplancandidate);
+//			System.out.println("EventProcessingRules.createMPlanCandidate() add: "+apl+", "+mplancandidate);
 			
 			if(bindings!=null)
 			{

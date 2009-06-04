@@ -1116,22 +1116,29 @@ public class PlanRules
 							{
 								if(mcand!=null)
 								{
-									state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_plancandidates, mcand);
+									// Hack!!! When apl rebuilding is used, apl can be already a new object.
+									if(state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_plancandidates).contains(mcand))
+										state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_plancandidates, mcand);
 									state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_plancandidate, null);
+//									System.out.println("PlanRules.createPlanRemovalRule() remove: "+apl+", "+mcand);
 								}
 								else
 								{
 									Object rcand = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_planinstancecandidate);
 									if(rcand!=null)
 									{
-										state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates, rcand);
+										// Hack!!! When apl rebuilding is used, apl can be already a new object.
+										if(state.getAttributeValues(apl, OAVBDIRuntimeModel.plan_has_planinstancecandidate).contains(rcand))
+											state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_planinstancecandidates, rcand);
 										state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_planinstancecandidate, null);
 									}
 									else
 									{
 										Object wcand = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate);
 										assert wcand!=null;
-										state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, rcand);
+										// Hack!!! When apl rebuilding is used, apl can be already a new object.
+										if(state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates).contains(rcand))
+											state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, rcand);
 										state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate, null);
 									}
 								}

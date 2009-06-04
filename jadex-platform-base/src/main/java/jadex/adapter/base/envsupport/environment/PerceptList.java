@@ -43,14 +43,15 @@ public class PerceptList
 	 *  @param type	The percept type.
 	 *  @param data	The content of the percept (if any).
 	 *  @param agent	The agent that should receive the percept.
+	 *  @param avatar	The avatar of the agent (if any).
 	 *  @param processor	The percept processor.
 	 */
-	public void schedulePercept(String type, Object data, IAgentIdentifier agent, IPerceptProcessor processor)
+	public void schedulePercept(String type, Object data, IAgentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
 	{
 		if(percepts==null)
 			percepts	= new LinkedHashSet();
 		
-		percepts.add(new PerceptEntry(type, data, agent, processor));
+		percepts.add(new PerceptEntry(type, data, agent, avatar, processor));
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class PerceptList
 						it.remove();
 						try
 						{
-							entry.processor.processPercept(space, entry.type, entry.data, entry.agent);
+							entry.processor.processPercept(space, entry.type, entry.data, entry.agent, entry.avatar);
 						}
 						catch(Exception e)
 						{
@@ -123,6 +124,9 @@ public class PerceptList
 		/** The receiving agent. */
 		public IAgentIdentifier	agent;
 		
+		/** The avatar of the agent (if any). */
+		public ISpaceObject	avatar;
+		
 		/** The processor. */
 		public IPerceptProcessor	processor;
 		
@@ -131,11 +135,12 @@ public class PerceptList
 		/**
 		 *  Convenience constructor for inline entry creation.
 		 */
-		public PerceptEntry(String type, Object data, IAgentIdentifier agent, IPerceptProcessor processor)
+		public PerceptEntry(String type, Object data, IAgentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
 		{
 			this.type	= type;
 			this.data	= data;
 			this.agent	= agent;
+			this.avatar	= avatar;
 			this.processor	= processor;
 		}
 	}

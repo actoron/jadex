@@ -25,8 +25,9 @@ public class DumbPreyVisionProcessor extends SimplePropertyObject implements IPe
 	 *  @param type The type.
 	 *  @param percept The percept.
 	 *  @param agent The agent identifier.
+	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent)
+	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent, ISpaceObject avatar)
 	{
 		// Add newly seen food / remove eaten food.
 		if(type.equals("food_seen") || type.equals("food_eaten") || type.equals("food_out_of_sight"))

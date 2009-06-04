@@ -34,6 +34,14 @@ public class EscapePlan extends Plan
 		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 		params.put(MoveAction.PARAMETER_DIRECTION, move);
 		env.performSpaceAction("move", params, srl);
-		srl.waitForResult();
+		try
+		{
+			srl.waitForResult();
+		}
+		catch(RuntimeException e)
+		{
+			// When move fails ignore exception.
+			fail();
+		}
 	}
 }
