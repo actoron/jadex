@@ -1,27 +1,21 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
-import jadex.bdi.examples.cleanerworld.Location;
-import jadex.bdi.examples.cleanerworld.Waste;
+import java.util.HashMap;
+import java.util.Map;
+
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-
 
 /**
  *  Clean-up some waste.
  */
 public class PickUpWastePlan extends Plan
 {
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public PickUpWastePlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -29,56 +23,25 @@ public class PickUpWastePlan extends Plan
 	 */
 	public void body()
 	{
-		Waste waste = (Waste)getParameter("waste").getValue();
+		ISpaceObject waste = (ISpaceObject)getParameter("waste").getValue();
 
 		// Move to the waste position when necessary
 //		getLogger().info("Moving to waste!");
 		IGoal moveto = createGoal("achievemoveto");
-		Location location = waste.getLocation();
-		moveto.getParameter("location").setValue(waste.getLocation());
-//		System.out.println("Created: "+location+" "+this);
+		IVector2 location = (IVector2)waste.getProperty(Space2D.PROPERTY_POSITION);
+		moveto.getParameter("location").setValue(location);
+		System.out.println("Created puw: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
 //		System.out.println("Reached: "+location+" "+this);
 
-		//----- new -----
-		IGoal dg = createGoal("pickup_waste_action");
-		dg.getParameter("waste").setValue(waste);
-		dispatchSubgoalAndWait(dg);
+		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
+		Map params = new HashMap();
+		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.OBJECT_ID, getParameter("waste").getValue());
+		SyncResultListener srl	= new SyncResultListener();
+		env.performSpaceAction("pickup_waste", params, srl);
+		if(!((Boolean)srl.waitForResult()).booleanValue()) 
+			fail();
 		getBeliefbase().getBelief("carriedwaste").setFact(waste);
-		getBeliefbase().getBeliefSet("wastes").removeFact(waste);
-//		getLogger().info("Picked up-waste!");
-
-		//----- old -----
-//		// Needed???
-//		if(!getBeliefbase().getBeliefSet("wastes").containsFact(waste))
-//			throw new PlanFailureException();
-//
-//		// Hack to block that other achieve goals can't be created
-//		// while requesting to pick up.
-//		getBeliefbase().getBelief("carriedwaste").setFact(waste);
-//
-//		//IEnvironment env = (IEnvironment)getBeliefbase().getBelief("environment").getFact();
-//		//boolean success = env.pickUpWaste(waste);
-//
-//		IGoal dg = createGoal("pickup_waste_action");
-//		dg.getParameter("waste").setValue(waste);
-//		dispatchSubgoalAndWait(dg);
-//
-//		if(dg.isSucceeded())
-//		{
-//			getLogger().info("Picking up-waste!");
-//			getBeliefbase().getBeliefSet("wastes").removeFact(waste);
-//		}
-//		else
-//		{
-//			// Remove the waste from my beliefs to avoid
-//			// creating a new clean up goal for it.
-//			getBeliefbase().getBeliefSet("wastes").removeFact(waste);
-//			getBeliefbase().getBelief("carriedwaste").setFact(null);
-//			getLogger().warning("Failed to pick up waste: "+waste);
-//			getLogger().warning("wastes: "+jadex.commons.SUtil.arrayToString(getBeliefbase()
-//				.getBeliefSet("wastes").getFacts()));
-//			throw new PlanFailureException();
-//		}
 	}
 }

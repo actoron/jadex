@@ -64,6 +64,10 @@ public class MoveTask extends ListenableTask
 		double maxdist = progress.getAsDouble()*speed*0.001;
 		double energy = ((Double)obj.getProperty(PROPERTY_CHARGESTATE)).doubleValue();
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
+		
+		if(loc==null || destination==null)
+			System.out.println("test: "+loc+" "+destination);
+		
 		// Todo: how to handle border conditions!?
 		IVector2 newloc	= ((Space2D)space).getDistance(loc, destination).getAsDouble()<=maxdist? 
 			destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);

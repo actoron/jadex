@@ -1,5 +1,6 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
+import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.bdi.examples.cleanerworld.Location;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -30,7 +31,7 @@ public class RandomWalkPlan extends Plan
 	{
 		double x_dest = Math.random();
 		double y_dest = Math.random();
-		Location dest = new Location(x_dest, y_dest);
+		Vector2Double dest = new Vector2Double(x_dest, y_dest);
 		IGoal moveto = createGoal("achievemoveto");
 		moveto.getParameter("location").setValue(dest);
 //		System.out.println("Created: "+dest+" "+this);

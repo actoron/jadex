@@ -34,6 +34,9 @@ public class MoveToLocationPlan extends Plan
 		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 dest = (IVector2)getParameter("location").getValue();
 		
+		if(dest==null)
+			System.out.println("shit");
+		
 		SyncResultListener	res	= new SyncResultListener();
 		move = new MoveTask(dest, res, getExternalAccess());
 		myself.addTask(move);
@@ -45,8 +48,11 @@ public class MoveToLocationPlan extends Plan
 	 */
 	public void aborted()
 	{
-		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		myself.removeTask(move);
+		if(move!=null)
+		{
+			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+			myself.removeTask(move);
+		}
 	}
 }
 	

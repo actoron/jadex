@@ -56,7 +56,7 @@
 		</beliefset> -->
 
 		<belief name="daytime" class="boolean">
-			<fact>false</fact>
+			<fact>true</fact>
 		</belief>
 
 		<belief name="my_location" class="IVector2" evaluationmode="push">
@@ -110,8 +110,8 @@
 		<!-- Observe the battery state. -->
 		<maintaingoal name="maintainbatteryloaded">
 			<deliberation>
-				<!--  <inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-				<inhibits ref="achievecleanup" inhibit="when_in_process"/>-->
+				<inhibits ref="performlookforwaste" inhibit="when_in_process"/>
+				<inhibits ref="achievecleanup" inhibit="when_in_process"/>
 				<inhibits ref="performpatrol" inhibit="when_in_process"/>
 			</deliberation>
  			<maintaincondition language="jcl">
@@ -123,13 +123,13 @@
 		</maintaingoal>
 
 		<!-- Clean up some waste. -->
-		<!-- <achievegoal name="achievecleanup" retry="true" exclude="when_failed">
+		<achievegoal name="achievecleanup" retry="true" exclude="when_failed">
 			<parameter name="waste" class="ISpaceObject">
 				<value>$waste</value>
 			</parameter>
 			<unique dummy="true"/>
 			<creationcondition language="jcl">
-				ISpaceObject $waste
+				ISpaceObject $waste &amp;&amp; $waste.getType().equals("waste")
 			</creationcondition>
 			<contextcondition language="jcl">
 				$beliefbase.daytime
@@ -141,19 +141,20 @@
 				$beliefbase.carriedwaste==null &amp;&amp;
 				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
  			</dropcondition>
-			<!- - <deliberation cardinality="1"> - ->
+			<!-- <deliberation cardinality="1"> -->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup" language="jcl">
-					$beliefbase.my_location.getDistance($goal.waste.getLocation())
-					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+					$goal.waste==$beliefbase.carriedwaste ||
+					$beliefbase.my_location.getDistance((IVector2)$goal.waste.getProperty(Space2D.PROPERTY_POSITION))
+						.less($beliefbase.my_location.getDistance((IVector2)$ref.waste.getProperty(Space2D.PROPERTY_POSITION)))
 				</inhibits>
 			</deliberation>
-			<targetcondition>
-				(select one Wastebin $wastebin from $beliefbase.wastebins
+			<!-- <targetcondition>
+				(select one ISpaceObject $wastebin from $beliefbase.wastebins
 				where $wastebin.contains($goal.waste))!=null
-			</targetcondition>- ->
-		</achievegoal>-->
+			</targetcondition>-->
+		</achievegoal>
 
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
@@ -207,32 +208,31 @@
 		</achievegoal>
 
 		<!-- Try to find a not full waste bin that
-			is as near as possible to the agent. - ->
+			is as near as possible to the agent. -->
 		<querygoal name="querywastebin" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
-				<!- - <value evaluationmode="dynamic">
+				<!-- <value evaluationmode="dynamic">
 					select one Wastebin $wastebin
 					from $beliefbase.getBeliefSet("wastebins").getFacts()
 					where !$wastebin.isFull()
 					order by $beliefbase.getBelief("my_location").getFact().getDistance($wastebin.getLocation())
-				</value> - ->
+				</value> -->
 				<value language="clips">
-					?ret = (Wastebin (location ?loc) (isFull() false))
-					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
-					?mbeliefset = (mbeliefset (melement_has_name "wastebins"))
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (melement_has_name "my_location"))
-					(not 
-						(and
-							?other = (Wastebin (location ?otherloc))
-							?otherloc = (Location (getDistance(?myloc) ?otherdist))
-							?loc = (Location (getDistance(?myloc) &gt; ?otherdist))
-						)
-					)
+					?ret = (ISpaceObject (position ?loc) (full false))
+					?rbeliefset = (beliefset (element_has_model.melement_has_name "wastebins") (beliefset_has_facts contains ?ret))
+					?rbelief = (belief (element_has_model.melement_has_name "my_location") (belief_has_fact ?myloc))
+					
+					//(not 
+					//	(and
+					//		?other = (ISpaceObject (position ?otherloc))
+					//		?otherloc = (IVector2 (getDistance(?myloc) ?otherdist))
+					//		?loc = (IVector2 (getDistance(?myloc) &gt; ?otherdist))
+					//	)
+					//)
 					// todo: fix not condition, should not use Location object condition, locations are not directly in state
 				</value>
 			</parameter>
-		</querygoal>-->
+		</querygoal>
 
 		<!-- Find the nearest charging station. -->
 		<querygoal name="querychargingstation" exclude="never">
@@ -247,13 +247,14 @@
 					?ret = (ISpaceObject (position ?loc))
 					?rbeliefset = (beliefset (element_has_model.melement_has_name "chargingstations") (beliefset_has_facts contains ?ret))
 					?rbelief = (belief (element_has_model.melement_has_name "my_location") (belief_has_fact ?myloc))
-					(not 
-						(and
-							?other = (ISpaceObject (type "chargingstation") (position ?otherloc))
-							?otherloc = (IVector2 (getDistance(?myloc) ?otherdist))
-							?loc = (IVector2 (getDistance(?myloc) &gt; ?otherdist))
-						)
-					)
+					
+					// (not 
+					// 	(and
+					//		?other = (ISpaceObject (type "chargingstation") (position ?otherloc))
+					//		?otherloc = (IVector2 (getDistance(?myloc) ?otherdist))
+					//		?loc = (IVector2 (getDistance(?myloc) &gt; ?otherdist))
+					//	)
+					// )
 					// todo: fix not condition, should not use Location object condition, locations are not directly in state
 				</value>
 				
@@ -277,11 +278,6 @@
 		
 		<!-- Basic environment actions modelled as goals to handle failures. -->
 
-		<!-- Get the current vision. -->
-		<!-- <achievegoal name="get_vision_action">
-			<parameter name="vision" class="Vision" direction="out"/>
-		</achievegoal>-->
-
 		<!-- Pick up a piece of waste. -->
 		<achievegoal name="pickup_waste_action">
 			<parameter name="waste" class="ISpaceObject"/>
@@ -301,9 +297,17 @@
 	<plans>
 		<!-- Walk to the least seen positions.
  			Position just visited have value 1. The longer the position
- 			was not visted the lower the value. Good for seeking movable targets. -->
+ 			was not visted the lower the value. Good for seeking movable targets. - ->
 		<plan name="leastseenwalk">
 			<body class="LeastSeenWalkPlan"/>
+			<trigger>
+				<goal ref="performlookforwaste"/>
+			</trigger>
+		</plan>-->
+		
+		<!-- Walk to random positions. -->
+		<plan name="randomwalk">
+			<body class="RandomWalkPlan"/>
 			<trigger>
 				<goal ref="performlookforwaste"/>
 			</trigger>
@@ -329,7 +333,7 @@
 		</plan>
 
 		<!-- Clean up waste by picking it up
-			and carrying it to a waste bin. - ->
+			and carrying it to a waste bin. -->
 		<plan name="cleanup">
 			<parameter name="waste" class="ISpaceObject">
  				<goalmapping ref="achievecleanup.waste"/>
@@ -338,7 +342,7 @@
 			<trigger>
 				<goal ref="achievecleanup"/>
 			</trigger>
-		</plan>-->
+		</plan>
 
 		<!-- Pick up a waste. -->
 		<plan name="pickupwaste">
@@ -352,7 +356,7 @@
 		</plan>
 
 		<!-- Drop a waste into a waste bin. -->
-		<plan name="dropwaste">
+		<!-- <plan name="dropwaste">
 			<parameter name="wastebin" class="ISpaceObject">
  				<goalmapping ref="achievedropwaste.wastebin"/>
 			</parameter>
@@ -360,7 +364,7 @@
 			<trigger>
 				<goal ref="achievedropwaste"/>
 			</trigger>
-		</plan>
+		</plan> -->
 
 		<!-- Load the battery. -->
 		<plan name="loadbattery">
@@ -389,59 +393,9 @@
 				<goal ref="performmemorizepositions"/>
 			</trigger>
 		</plan>-->
-
-
-		<!-- Pickup waste action. -->
-		<plan name="localpickupwasteaction" priority="1">
-			<parameter name="waste" class="ISpaceObject">
- 				<goalmapping ref="pickup_waste_action.waste"/>
-			</parameter>
-			<body class="LocalPickUpWasteActionPlan"/>
-			<trigger>
-				<goal ref="pickup_waste_action"/>
-			</trigger>
-		</plan>
-
-		<!-- Drop waste action. -->
-		<plan name="localdropwasteaction" priority="1">
-			<parameter name="waste" class="ISpaceObject">
- 				<goalmapping ref="drop_waste_action.waste"/>
-			</parameter>
-			<parameter name="wastebin" class="ISpaceObject">
- 				<goalmapping ref="drop_waste_action.wastebin"/>
- 			</parameter>
- 			<body class="LocalDropWasteActionPlan"/>
-			<trigger>
-				<goal ref="drop_waste_action"/>
-			</trigger>
-		</plan>
-
-		<!-- Drop waste action. -->
-		<!-- <plan name="localgetvisionaction" priority="1">
-			<parameter name="vision" class="Vision" direction="out">
- 				<goalmapping ref="get_vision_action.vision"/>
-			</parameter>
-			<body class="LocalGetVisionActionPlan"/>
-			<trigger>
-				<goal ref="get_vision_action"/>
-			</trigger>
-		</plan> -->
 	</plans>
 
 	<expressions>
-		<!-- Query all objects from the beliefs that are currently in sight.- ->
-		<expression name="query_in_vision_objects">
-			select LocationObject $object
-			from SUtil.joinArbitraryArrays(new Object[]
- 				{
- 					$beliefbase.getBeliefSet("wastes").getFacts(),
- 					$beliefbase.getBeliefSet("wastebins").getFacts(),
- 					$beliefbase.getBeliefSet("chargingstations").getFacts(),
- 					$beliefbase.getBeliefSet("cleaners").getFacts()
-				})
-			where $beliefbase.getBelief("my_location").getFact().isNear($object.getLocation(), $beliefbase.getBelief("my_vision").getFact())
-		</expression>-->
-
 		<!-- Query the max quantity map point. - ->
 		<expression name="query_max_quantity">
 			select one MapPoint $mp
@@ -474,9 +428,9 @@
 	<configurations>
 		<configuration name="default">
 			<goals>
-				<!-- <initialgoal ref="performlookforwaste"/>-->
-  				<initialgoal ref="performpatrol"/>
-		  		<initialgoal ref="maintainbatteryloaded"/>
+				<initialgoal ref="performlookforwaste"/>
+  				<!-- <initialgoal ref="performpatrol"/> -->
+		  		<!-- <initialgoal ref="maintainbatteryloaded"/>-->
 				<!-- <initialgoal ref="performmemorizepositions"/>-->
 			</goals>
 		</configuration>

@@ -35,6 +35,7 @@
 				<env:objecttype name="wastebin">
 					<env:property name="wastes">0</env:property>
 					<env:property name="max_wastes">20</env:property>
+					<env:property name="full" dynamic="true">$object.getProperty("wastes") &gt;= $object.getProperty("max_wastes")</env:property>
 				</env:objecttype>
 			</env:objecttypes>
 			
@@ -42,9 +43,10 @@
 				<env:avatarmapping agenttype="Cleaner" objecttype="cleaner"/>
 			</env:avatarmappings>
 		
-			<!-- <env:actiontypes>
+			<env:actiontypes>
 				<env:actiontype name="pickup_waste" class="PickupWasteAction"/>
-			</env:actiontypes> -->
+				<env:actiontype name="drop_waste" class="DropWasteAction"/>
+			</env:actiontypes>
 			
 			<env:processtypes>
 				<env:processtype name="create" class="CreateWasteProcess" >

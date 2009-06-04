@@ -1,10 +1,13 @@
-package jadex.bdi.examples.cleanerworld_env.cleaner;
+package jadex.bdi.examples.cleanerworld_env;
 
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
@@ -16,6 +19,8 @@ import java.util.Map;
  */
 public class PickupWasteAction extends SimplePropertyObject implements ISpaceAction
 {
+	protected static final IVector1 TOLERANCE = new Vector1Double(0.05);
+	
 	/**
 	 * Performs the action.
 	 * @param parameters parameters for the action
@@ -26,54 +31,38 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 	{	
 		boolean ret = false;
 				
-		Grid2D grid = (Grid2D)space;
+		Space2D env = (Space2D)space;
 		
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
-		ISpaceObject so = grid.getOwnedObjects(owner)[0];
+		ISpaceObject waste = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
+		ISpaceObject avatar = env.getOwnedObjects(owner)[0];
 
 //		if(so.getProperty("garbage")!=null)
 //			System.out.println("pickup failed: "+so);
 		
-		assert so.getProperty("garbage")==null: so;
+		assert avatar.getProperty("waste")==null: avatar;
 		
-		Collection wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "garbage");
-		ISpaceObject waste = (ISpaceObject)(wastes!=null? wastes.iterator().next(): null);
+		if(env.getDistance((IVector2)waste.getProperty(Space2D.PROPERTY_POSITION), (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION)).greater(TOLERANCE))
+			throw new RuntimeException("Not near enough to waste: "+waste+" "+avatar);
+			
 //		System.out.println("pickup waste action: "+so+" "+so.getProperty(Grid2D.POSITION)+" "+waste);
-		if(wastes!=null)
+//		if(Math.random()>0.5)
 		{
-//			if(Math.random()>0.5)
-			{
-				wastes.remove(waste);
-//				System.out.println("pickup: "+waste);
-				so.setProperty("garbage", waste);
-				
-				grid.setPosition(waste.getId(), null);
-				ret = true;
-				//pcs.firePropertyChange("worldObjects", garb, null);
+//			System.out.println("pickup: "+waste);
+			avatar.setProperty("waste", waste);
+			
+//			env.setPosition(waste.getId(), null);
+			ret = true;
+			//pcs.firePropertyChange("worldObjects", garb, null);
 //				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
-			}
+		}
 //			else
 //			{
-	//			System.out.println("Agent picked up failed: "+name+" "+getPosition(name));
+//			System.out.println("Agent picked up failed: "+name+" "+getPosition(name));
 //			}
-		}
-		else
-		{
-//			System.out.println("Agent picked up failed: "+so);
-		}
 
 //		System.out.println("pickup waste action "+parameters);
 
 		return ret? Boolean.TRUE: Boolean.FALSE;
-	}
-
-	/**
-	 * Returns the ID of the action.
-	 * @return ID of the action
-	 */
-	public Object getId()
-	{
-		// todo: remove here or from application xml?
-		return "pickup";
 	}
 }

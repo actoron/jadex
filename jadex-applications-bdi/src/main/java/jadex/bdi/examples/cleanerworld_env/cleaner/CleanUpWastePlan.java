@@ -1,5 +1,6 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.cleanerworld.Waste;
 import jadex.bdi.examples.cleanerworld.Wastebin;
 import jadex.bdi.runtime.IGoal;
@@ -11,17 +12,6 @@ import jadex.bdi.runtime.Plan;
  */
 public class CleanUpWastePlan extends Plan
 {
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public CleanUpWastePlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -29,11 +19,11 @@ public class CleanUpWastePlan extends Plan
 	 */
 	public void body()
 	{
-		//System.out.println("Clean-up waste plan started.");
+		System.out.println("Clean-up waste plan started: "+getParameter("waste").getValue()+" "+getReason());
 
 		if(getBeliefbase().getBelief("carriedwaste").getFact()==null)
 		{
-			Waste waste = (Waste)getParameter("waste").getValue();
+			ISpaceObject waste = (ISpaceObject)getParameter("waste").getValue();
 			// the following is only for debugging
 			
 //			if(waste==null)
@@ -54,12 +44,12 @@ public class CleanUpWastePlan extends Plan
 			// Move to a not full waste-bin
 			IGoal findbin = createGoal("querywastebin");
 			dispatchSubgoalAndWait(findbin);
-			Wastebin wastebin = (Wastebin)findbin.getParameter("result").getValue();
+			ISpaceObject wastebin = (ISpaceObject)findbin.getParameter("result").getValue();
 
 			// Retry, when wastebin is full in meantime.
 			try
 			{
-				IGoal	drop = createGoal("achievedropwaste");
+				IGoal drop = createGoal("achievedropwaste");
 				drop.getParameter("wastebin").setValue(wastebin);
 				dispatchSubgoalAndWait(drop);
 				dropped	= true;

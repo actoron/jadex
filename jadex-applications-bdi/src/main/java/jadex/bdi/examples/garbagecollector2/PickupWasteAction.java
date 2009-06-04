@@ -66,14 +66,4 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 
 		return ret? Boolean.TRUE: Boolean.FALSE;
 	}
-
-	/**
-	 * Returns the ID of the action.
-	 * @return ID of the action
-	 */
-	public Object getId()
-	{
-		// todo: remove here or from application xml?
-		return "pickup";
-	}
 }

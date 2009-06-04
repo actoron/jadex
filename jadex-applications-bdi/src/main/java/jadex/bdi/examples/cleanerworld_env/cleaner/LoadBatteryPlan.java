@@ -1,7 +1,9 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
-import jadex.bdi.examples.cleanerworld.Chargingstation;
-import jadex.bdi.examples.cleanerworld.Location;
+import jadex.adapter.base.envsupport.environment.IObjectTask;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -11,15 +13,10 @@ import jadex.bdi.runtime.Plan;
  */
 public class LoadBatteryPlan extends Plan
 {
-	//-------- constructors --------
+	//-------- attributes --------
 
-	/**
-	 *  Create a new plan.
-	 */
-	public LoadBatteryPlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
+	/** The load task. */
+	protected IObjectTask load;
 
 	//-------- methods --------
 
@@ -36,35 +33,49 @@ public class LoadBatteryPlan extends Plan
 		IGoal findstation = createGoal("querychargingstation");
 //		System.out.println("Findstation start: "+findstation);
 		dispatchSubgoalAndWait(findstation);
-		Chargingstation station = (Chargingstation)findstation.getParameter("result").getValue();
+		ISpaceObject station = (ISpaceObject)findstation.getParameter("result").getValue();
 //		System.out.println("Findstation end: "+station);
 
 		if(station!=null)
 		{
 			IGoal moveto = createGoal("achievemoveto");
-			Location location = station.getLocation();
+			IVector2 location = (IVector2)station.getProperty(Space2D.PROPERTY_POSITION);
 			moveto.getParameter("location").setValue(location);
 //			System.out.println("Created: "+location+" "+this);
 			dispatchSubgoalAndWait(moveto);
 //			System.out.println("Reached: "+location+" "+this);
 
-			location = (Location)getBeliefbase().getBelief("my_location").getFact();
-			double	charge	= ((Double)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-
-			while(location.getDistance(station.getLocation())<0.01 && charge<1.0)
-			{
-				waitFor(100);
-				charge	= ((Double)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-				charge	= Math.min(charge + 0.01, 1.0);
-				getBeliefbase().getBelief("my_chargestate").setFact(new Double(charge));
-				location = (Location)getBeliefbase().getBelief("my_location").getFact();
-				IGoal dg = createGoal("get_vision_action");
-				dispatchSubgoalAndWait(dg);
-			}
+			SyncResultListener	res	= new SyncResultListener();
+			load = new LoadBatteryTask(station, res);
+			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+			myself.addTask(load);
 		}
 
 //		getLogger().info("Loading finished.");
 		//getBeliefbase().getBelief("is_loading").setFact(new Boolean(false));
 	}
 
+	/**
+	 *  Remove the task, when the plan is aborted. 
+	 */
+	public void aborted()
+	{
+		if(load!=null)
+		{
+			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+			myself.removeTask(load);
+		}
+	}
+	
+	/**
+	 *  Remove the task, when the plan is aborted. 
+	 */
+	public void failed()
+	{
+		if(load!=null)
+		{
+			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+			myself.removeTask(load);
+		}
+	}
 }
