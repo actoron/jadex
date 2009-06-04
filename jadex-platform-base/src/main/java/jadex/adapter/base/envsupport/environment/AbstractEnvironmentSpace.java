@@ -549,7 +549,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 //			if(!percepttypes.containsKey(typename))
 //				throw new RuntimeException("Unknown percept type: "+typename);
 			
-			System.out.println("New percept: "+typename+", "+data+", "+agent);
+//			System.out.println("New percept: "+typename+", "+data+", "+agent);
 			
 			String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
 			List procs	= (List)perceptprocessors.get(agenttype);

@@ -277,7 +277,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			position.randomX(distance.getX(), position.getX());
 			position.randomY(distance.getY(), position.getY());
 			
-			System.out.println("position: "+position);
+//			System.out.println("position: "+position);
 			return position;
 		}
 	}

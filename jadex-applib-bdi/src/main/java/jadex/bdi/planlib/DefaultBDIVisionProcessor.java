@@ -73,7 +73,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						if(!belset.containsFact(percept))
 						{
 							belset.addFact(percept);
-							System.out.println("added: "+percept+" to: "+belset);
+//							System.out.println("added: "+percept+" to: "+belset);
 						}
 					}
 					else if(REMOVE.equals(metainfo[0]))
@@ -82,13 +82,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						if(belset.containsFact(percept))
 						{
 							belset.removeFact(percept);
-							System.out.println("removed: "+percept+" from: "+belset);
+//							System.out.println("removed: "+percept+" from: "+belset);
 						}
 					}
 					else if(SET.equals(metainfo[0]))
 					{
 						IBelief bel = exta.getBeliefbase().getBelief(metainfo[1]);
 						bel.setFact(percept);
+//						System.out.println("set: "+percept+" in bel: "+bel);
 					}
 				}
 				catch(Exception e)
