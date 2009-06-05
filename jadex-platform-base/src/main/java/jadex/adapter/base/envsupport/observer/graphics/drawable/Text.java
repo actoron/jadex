@@ -178,8 +178,7 @@ public final class Text implements IDrawable
 				
 				if (i != 0)
 					yPos += tl.getAscent();
-				
-				tl.draw(g, (int) (xPos + getAlignment(tl)), (int) yPos);
+				tl.draw(g, (int) (xPos + getAlignment(tl)), (int) (yPos));
 				
 				yPos += (tl.getDescent() + tl.getLeading());
 			}
