@@ -73,7 +73,7 @@ public final class Text implements IDrawable
 	private Color color;
 	
 	/** Lines of text */
-	private String[] lines;
+	private String text;
 	
 	/** Text alignment */
 	private int align;
@@ -101,7 +101,7 @@ public final class Text implements IDrawable
 		this.baseFont = baseFont;
 		if (text == null)
 			text = "";
-		lines = text.split("(\n\r?)|(\r)");
+		this.text = text;
 		if (color == null)
 			color = Color.WHITE;
 		this.color = color;
@@ -148,12 +148,13 @@ public final class Text implements IDrawable
 		if (draw)
 		{
 			IVector2 position = (IVector2)dc.getBoundValue(obj, this.position);
-			IVector2 dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());//SObjectInspector.getVector2(obj, dc.getPosition());
-			IVector2 dcScale = (IVector2)dc.getBoundValue(obj, dc.getSize());//SObjectInspector.getVector2(obj, dc.getSize());
+			IVector2 dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());
+			IVector2 dcScale = (IVector2)dc.getBoundValue(obj, dc.getSize());
 			if((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
 			}
+			position.multiply(dcScale);
 			
 			Graphics2D g = vp.getContext();
 			IVector2 canvasSize = vp.getCanvasSize();
@@ -165,15 +166,15 @@ public final class Text implements IDrawable
 			double xPos = pos.getXAsDouble();
 			double yPos = pos.getYAsDouble();
 			
-			//String text = getReplacedText(obj);
+			String text = getReplacedText(obj, this.text);
+			String[] lines = text.split("(\n\r?)|(\r)");
+			
 			AffineTransform t = g.getTransform();
 			g.setTransform(vp.getDefaultTransform());
 			g.setColor(color);
 			for (int i = 0; i < lines.length; ++i)
 			{
-				String text = getReplacedText(obj, lines[i]);
-				
-				TextLayout tl = new TextLayout(text, font, DUMMY_FRC);
+				TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
 				
 				if (i != 0)
 					yPos += tl.getAscent();
@@ -212,6 +213,7 @@ public final class Text implements IDrawable
 			{
 				return;
 			}
+			position.multiply(dcScale);
 			
 			IVector2 canvasSize = vp.getCanvasSize();
 			Font font = baseFont;
@@ -226,17 +228,19 @@ public final class Text implements IDrawable
 			double xPos = pos.getXAsDouble();
 			double yPos = pos.getYAsDouble();
 			
+			String text = getReplacedText(obj, this.text);
+			String[] lines = text.split("(\n\r?)|(\r)");
+			
 			for (int i = 0; i < lines.length; ++i)
 			{
-				String text = getReplacedText(obj, lines[i]);
 				
-				TextLayout tl = new TextLayout(text, font, DUMMY_FRC);
+				TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
 				
 				if (i != 0)
 					yPos -= tl.getAscent();
 
 				tr.beginRendering(canvasSize.getXAsInteger(), canvasSize.getYAsInteger());
-				tr.draw(text, (int) (xPos + getAlignment(tl)), (int) yPos);
+				tr.draw(lines[i], (int) (xPos + getAlignment(tl)), (int) yPos);
 				tr.endRendering();
 				
 				yPos -= (tl.getDescent() + tl.getLeading());
