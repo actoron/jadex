@@ -196,11 +196,13 @@ public class ContextService	implements IContextService
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					listener.exceptionOccurred(exception);
+					if(listener!=null)
+						listener.exceptionOccurred(exception);
 				}
 				public void resultAvailable(Object result)
 				{
-					listener.resultAvailable(result);
+					if(listener!=null)
+						listener.resultAvailable(result);
 					notifyListeners(new ChangeEvent(this, EVENT_TYPE_CONTEXT_DELETED, context));
 				}
 			});
@@ -286,8 +288,47 @@ public class ContextService	implements IContextService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdown(final IResultListener listener)
 	{
-		// Todo: delete contexts and therefore agents before AMS gets shut down???
+		final IContext[]	cs	=  getContexts();
+		if(cs!=null)
+		{
+			// Per-context listener to inform global listener, when all contexts deleted. 
+			IResultListener	rl	= null;			
+			if(listener!=null)
+			{
+				rl	= new IResultListener()
+				{
+					int finished	= 0;
+					Exception	exception	= null;
+					public void exceptionOccurred(Exception exception)
+					{
+						finished(exception);
+					}
+					public void resultAvailable(Object result)
+					{
+						finished(null);
+					}
+					protected synchronized void finished(Exception e)
+					{
+						if(exception==null && e!=null)
+							exception	= e;
+						finished++;
+						if(finished==cs.length)
+						{
+							if(exception==null)
+								listener.resultAvailable(null);
+							else
+								listener.exceptionOccurred(exception);
+						}
+					}
+				};
+			}
+
+			for(int i=0; i<cs.length; i++)
+			{
+				deleteContext(cs[i], rl);
+			}
+		}
 	}
 }

@@ -15,8 +15,6 @@ public class Vector3Double implements IVector3, Cloneable
 	private double y_;
 	private double z_;
 
-	private static final double PI2 = 2*Math.PI;
-
 	/** Creates a new Vector2Double with the value (0,0).
 	 */
 	public Vector3Double()

@@ -14,8 +14,6 @@ public class Vector2Double implements IVector2, Cloneable
 	private double x_;
 	private double y_;
 
-	private static final double PI2 = 2*Math.PI;
-
 	/** Creates a new Vector2Double with the value (0,0).
 	 */
 	public Vector2Double()

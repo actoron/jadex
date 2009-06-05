@@ -14,8 +14,6 @@ import jadex.commons.concurrent.IThreadPool;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.ChangeListener;
-
 /**
  *  A clock service abstracts away from clock implementations.
  *  The clock service is menat to be kept constant during runtime.
