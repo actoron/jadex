@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.lang.reflect.Method;
@@ -49,10 +50,18 @@ public class MethodCallFunction implements IFunction
 		
 //		if(method!=null)
 //		{
-			obj	= paramvalues[0];
+		
+			obj	= paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0];
 			params	= new Object[paramvalues.length-1];
 			if(params.length>0)
-				System.arraycopy(paramvalues, 1, params, 0, params.length);
+			{
+				for(int i=0; i<params.length; i++)
+				{
+					params[i] = paramvalues[i+1] instanceof ILazyValue? ((ILazyValue)paramvalues[i+1]).getValue(): paramvalues[i+1];
+				}
+			}
+//			if(params.length>0)
+//				System.arraycopy(paramvalues, 1, params, 0, params.length);
 //		}
 		
 //		else

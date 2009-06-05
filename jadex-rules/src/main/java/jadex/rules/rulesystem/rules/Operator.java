@@ -28,6 +28,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+			
 			return val1 instanceof Number && val2 instanceof Number
 				? compare(val1,val2)==0
 				: (val1==null && val2==null) || val1!=null && val1.equals(val2);
@@ -58,6 +61,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			return val1 instanceof Number && val2 instanceof Number
 				? compare(val1,val2)!=0
 				: (val1==null && val2!=null) || val1!=null && !val1.equals(val2);
@@ -88,6 +94,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			return val1!=null && val2!=null && compare(val1, val2)<0;
 		}
 		
@@ -116,6 +125,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			return val1!=null && val2!=null && compare(val1, val2)<=0;
 		}
 		
@@ -144,6 +156,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			return val1!=null && val2!=null && compare(val1, val2)>0;
 		}
 		
@@ -172,6 +187,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			return val1!=null && val2!=null && compare(val1, val2)>=0;
 		}
 		
@@ -201,6 +219,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			if(!(val1 instanceof String))
 				throw new IllegalArgumentException("Matches operator only applies for strings: +"+val1);
 			if(!(val2 instanceof String))
@@ -238,6 +259,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			if(!(val1 instanceof String))
 				throw new IllegalArgumentException("Matches operator only applies for strings: +"+val1);
 			if(!(val2 instanceof String))
@@ -274,6 +298,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			return contains(val1, val2);
 		}
 		
@@ -302,6 +329,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			return !contains(val1, val2);
 		}
 		
@@ -330,6 +360,9 @@ public class Operator
 		 */
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
+			val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+			val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 			boolean ret;
 			if(val2 instanceof Class)
 			{
@@ -363,6 +396,9 @@ public class Operator
 	 */
 	protected static int compare(Object val1, Object val2)
 	{
+		val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+		val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+
 		// Should support some external comparators???
 
 		// Check for null values.
@@ -408,6 +444,9 @@ public class Operator
 	 */
 	protected static boolean contains(Object val1, Object val2)
 	{
+		val1 = val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1; 
+		val2 = val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2; 
+		
 		if(val1==null)
 			return false;
 		

@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -49,7 +50,9 @@ public class ExtractMulti implements IFunction
 		if(paramvalues==null || paramvalues.length!=1)
 			throw new IllegalArgumentException("Function needs one parameter: "+paramvalues);
 			
-		Collection objects = (Collection)paramvalues[0];
+		Object val1 = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
+
+		Collection objects = (Collection)val1;
 		if(objects==null)
 			throw new IllegalArgumentException("Objects are null.");
 		

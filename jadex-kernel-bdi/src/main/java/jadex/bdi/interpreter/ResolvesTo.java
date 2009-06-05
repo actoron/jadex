@@ -1,5 +1,6 @@
 package jadex.bdi.interpreter;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
@@ -34,10 +35,10 @@ public class ResolvesTo implements IFunction
 		if(paramvalues==null || paramvalues.length!=4)
 			throw new IllegalArgumentException("Function needs four parameters: "+paramvalues);
 			
-		Object rstartcapa	= paramvalues[0];
-		String ref	 = (String)paramvalues[1];
-		Object relem	= paramvalues[2];
-		Object rtargetcapa = paramvalues[3];
+		Object rstartcapa	= paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0];
+		String ref	 = (String)(paramvalues[1] instanceof ILazyValue? ((ILazyValue)paramvalues[1]).getValue(): paramvalues[1]);
+		Object relem	= paramvalues[2] instanceof ILazyValue? ((ILazyValue)paramvalues[2]).getValue(): paramvalues[2];
+		Object rtargetcapa = paramvalues[3] instanceof ILazyValue? ((ILazyValue)paramvalues[3]).getValue(): paramvalues[3];
 		
 		// Ensure that startcapa -(ref)-> targetcapa && relem.getModelElement().getName()==<ref>.<name>
 		Object melem	= state.getAttributeValue(relem, OAVBDIRuntimeModel.element_has_model);

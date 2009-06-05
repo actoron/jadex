@@ -50,8 +50,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 		{
 //			System.out.println("pickup: "+waste);
 			avatar.setProperty("waste", waste);
-			
-//			env.setPosition(waste.getId(), null);
+			env.setPosition(waste.getId(), null);
 			ret = true;
 			//pcs.firePropertyChange("worldObjects", garb, null);
 //				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));

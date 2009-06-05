@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collections;
@@ -21,7 +22,9 @@ public class Identity implements IFunction
 		if(paramvalues==null || paramvalues.length!=1)
 			throw new IllegalArgumentException("Function needs one parameter: "+paramvalues);
 			
-		return paramvalues[0];
+		Object val1 = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
+
+		return val1;
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 package jadex.rules.rulesystem.rules.functions;
 
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -32,7 +33,9 @@ public class Length implements IFunction
 		if(paramvalues==null || paramvalues.length!=1)
 			throw new IllegalArgumentException("Function needs one parameter: "+paramvalues);
 
-		Collection col = (Collection)paramvalues[0];
+		Object val1 = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
+		
+		Collection col = (Collection)val1;
 		return col==null? ZERO: new Integer(col.size());
 	}
 		

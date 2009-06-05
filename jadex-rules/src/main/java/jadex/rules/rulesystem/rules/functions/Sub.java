@@ -1,6 +1,7 @@
 package jadex.rules.rulesystem.rules.functions;
 
 import jadex.commons.SReflect;
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collections;
@@ -26,7 +27,9 @@ public class Sub implements IFunction
 			
 		if(paramvalues.length==1)
 		{
-			Iterator it = SReflect.getIterator(paramvalues[0]);
+			Object val = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
+
+			Iterator it = SReflect.getIterator(val);
 			if(it==null)
 				throw new IllegalArgumentException("Sum is undefined for null.");
 			boolean	first	= true;
@@ -43,10 +46,12 @@ public class Sub implements IFunction
 		{
 			for(int i=0; i<paramvalues.length; i++)
 			{
+				Object val = paramvalues[i] instanceof ILazyValue? ((ILazyValue)paramvalues[i]).getValue(): paramvalues[i]; 
+
 				if(i==0)
-					ret = ((Number)paramvalues[i]).doubleValue();
+					ret = ((Number)val).doubleValue();
 				else
-					ret -= ((Number)paramvalues[i]).doubleValue();					
+					ret -= ((Number)val).doubleValue();					
 			}
 		}
 		

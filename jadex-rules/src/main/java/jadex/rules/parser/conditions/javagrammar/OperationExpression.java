@@ -1,5 +1,6 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
@@ -17,7 +18,8 @@ public class OperationExpression	extends Expression
 	{
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
-			return ((Boolean)val1).booleanValue() || ((Boolean)val2).booleanValue();
+			return ((Boolean)(val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1)).booleanValue() 
+				|| ((Boolean)(val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2)).booleanValue();
 		}
 
 		public String toString()
@@ -31,7 +33,8 @@ public class OperationExpression	extends Expression
 	{
 		public boolean evaluate(IOAVState state, Object val1, Object val2)
 		{
-			return ((Boolean)val1).booleanValue() && ((Boolean)val2).booleanValue();
+			return ((Boolean)(val1 instanceof ILazyValue? ((ILazyValue)val1).getValue(): val1)).booleanValue() 
+				&& ((Boolean)(val2 instanceof ILazyValue? ((ILazyValue)val2).getValue(): val2)).booleanValue();
 		}
 
 		public String toString()

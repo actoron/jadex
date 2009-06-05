@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collections;
@@ -22,13 +23,16 @@ public class Modulo implements IFunction
 		if(paramvalues.length != 2)
 			throw new RuntimeException("Modulo requires two parameters: "+paramvalues);
 		
-		if(!(paramvalues[0] instanceof Number))
+		Object val1 = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
+		Object val2 = paramvalues[1] instanceof ILazyValue? ((ILazyValue)paramvalues[1]).getValue(): paramvalues[1]; 
+		
+		if(!(val1 instanceof Number))
 			throw new RuntimeException("Modulo requires Number parameters: "+paramvalues[0]);
-		if(!(paramvalues[1] instanceof Number))
+		if(!(val2 instanceof Number))
 			throw new RuntimeException("Modulo requires Number parameters: "+paramvalues[1]);
 		
-		Number a = (Number)paramvalues[0];
-		Number b = (Number)paramvalues[1];
+		Number a = (Number)val1;
+		Number b = (Number)val2;
 		
 		// todo: support long/double/...
 		ret = new Long(a.longValue() % b.longValue());

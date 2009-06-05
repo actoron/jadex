@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.extractors;
 
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
@@ -43,13 +44,23 @@ public class FunctionExtractor implements IValueExtractor
 	 *  @param prefix The prefix input object (last value from previous extractor in a chain).
 	 *  @param state The working memory.
 	 */
-	public Object getValue(Tuple left, Object right, Object prefix, IOAVState state)
+	public Object getValue(final Tuple left, final Object right, final Object prefix, final IOAVState state)
 	{
 		// Fetch the parameter values.
 		Object[] paramvalues = new Object[extractors.length];
 		for(int i=0; i<paramvalues.length; i++)
-			paramvalues[i] = extractors[i].getValue(left, right, prefix, state);
-	
+		{
+			//paramvalues[i] = extractors[i].getValue(left, right, prefix, state);
+			final IValueExtractor ex = extractors[i]; 
+			paramvalues[i] = new ILazyValue()
+			{
+				public Object getValue()
+				{
+					return ex.getValue(left, right, prefix, state);
+				}
+			};
+		}
+		
 		// Invoke the function and return the value.
 		Object ret = function.invoke(paramvalues, state);
 //		System.out.println("Funcall result: "+this+" "+ret);

@@ -1,5 +1,6 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 
@@ -32,7 +33,9 @@ public class ConditionalExpression	extends Expression
 			if(paramvalues==null || paramvalues.length!=3)
 				throw new IllegalArgumentException("Conditional requires three parameters.");
 			
-			return ((Boolean)paramvalues[0]).booleanValue() ? paramvalues[1] : paramvalues[2];
+			return ((Boolean)(paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0])).booleanValue()
+			? (paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]): 
+				paramvalues[2] instanceof ILazyValue? ((ILazyValue)(paramvalues[2])).getValue(): paramvalues[2];
 		}
 		public String	toString()
 		{

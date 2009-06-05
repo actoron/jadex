@@ -231,6 +231,8 @@ public class Vector2Double implements IVector2, Cloneable
 
 	public IVector1 getDistance(IVector2 vector)
 	{
+		if(vector==null)
+			System.out.println("test");
 		double dx = x_ - vector.getXAsDouble();
 		double dy = y_ - vector.getYAsDouble();
 		return new Vector1Double(Math.sqrt((dx * dx) + (dy * dy)));

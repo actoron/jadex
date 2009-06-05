@@ -186,7 +186,7 @@ public class ConstraintBuilder
 				IOperator	operator	= (IOperator)opex.getOperator();
 				if(invert)
 				{
-					IOperator	inverse	= OperationExpression.getInverseOperator0((IOperator)opex.getOperator());
+					IOperator	inverse	= OperationExpression.getInverseOperator0(operator);
 					if(inverse==null)
 					{
 						buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), IOperator.NOTEQUAL, context);

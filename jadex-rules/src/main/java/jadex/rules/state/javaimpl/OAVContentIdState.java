@@ -52,6 +52,8 @@ public class OAVContentIdState	extends OAVAbstractState
 	public void addExternalObjectUsage(Object id, Object external)
 	{
 		// #ifndef MIDP
+		if(!generator.isId(id))
+			System.out.println("driss");
 		assert nocheck || generator.isId(id);
 		// #endif
 	}

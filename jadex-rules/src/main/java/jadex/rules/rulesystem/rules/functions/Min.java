@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collections;
@@ -21,11 +22,11 @@ public class Min implements IFunction
 		Comparable ret = null;
 		if(paramvalues.length > 0)
 		{
-			ret = (Comparable)paramvalues[0];
+			ret = (Comparable)(paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]);
 		
 			for(int i=1; i<paramvalues.length; i++)
 			{
-				Comparable tmp = (Comparable)paramvalues[i];
+				Comparable tmp = (Comparable)(paramvalues[i] instanceof ILazyValue? ((ILazyValue)paramvalues[i]).getValue(): paramvalues[i]);
 				if(tmp.compareTo(ret)<0)
 					ret = tmp;
 			}

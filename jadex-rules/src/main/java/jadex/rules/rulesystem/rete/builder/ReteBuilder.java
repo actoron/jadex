@@ -127,8 +127,8 @@ public class ReteBuilder
 	 */
 	public ReteNode addRule(ReteNode root, IRule rule)
 	{
-//		if(rule.getName().indexOf("maintaingoal_maintain")!=-1)
-//			System.out.println("ysfklk");
+		if(rule.getName().indexOf("achievecleanup")!=-1)
+			System.out.println("ysfklk");
 		
 		// todo: or, exists conditions
 		
@@ -916,6 +916,9 @@ public class ReteBuilder
 	protected IValueExtractor buildVariableExtractor(Variable var, BuildContext context)
 	{
 		IValueExtractor ret = null;
+		
+		if(var.getName().indexOf("var_2")!=-1)
+			System.out.println("hhhhzzz");
 		
 		// Special case for fetching the whole state.
 		if(var.equals(Variable.STATE))

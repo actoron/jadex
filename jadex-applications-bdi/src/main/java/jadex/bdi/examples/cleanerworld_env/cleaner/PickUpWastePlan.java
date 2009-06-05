@@ -43,7 +43,7 @@ public class PickUpWastePlan extends Plan
 		if(!((Boolean)srl.waitForResult()).booleanValue()) 
 			fail();
 		getBeliefbase().getBelief("carriedwaste").setFact(waste);
-		getBeliefbase().getBeliefSet("wastes").removeFact(waste);
+//		getBeliefbase().getBeliefSet("wastes").removeFact(waste);
 	}
 	
 	public void failed()

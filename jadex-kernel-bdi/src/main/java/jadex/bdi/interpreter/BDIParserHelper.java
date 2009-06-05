@@ -11,6 +11,7 @@ import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.Constant;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.LiteralReturnValueConstraint;
@@ -287,7 +288,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 				}
 				public Object invoke(Object[] paramvalues, IOAVState state)
 				{
-					return BeliefbaseFlyweight.getBeliefbaseFlyweight(state, paramvalues[0]);
+					return BeliefbaseFlyweight.getBeliefbaseFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]);
 				}
 			}, new Object[]{capvar});
 			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
@@ -313,7 +314,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 				}
 				public Object invoke(Object[] paramvalues, IOAVState state)
 				{
-					return new CapabilityFlyweight(state, paramvalues[0]);
+					return new CapabilityFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0]);
 				}
 			}, new Object[]{capvar});
 			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
@@ -368,7 +369,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 			if(paramvalues==null || paramvalues.length!=1)
 				throw new RuntimeException("SetToArray requires one parameter: "+this);
 			
-			Collection	coll	= (Collection)paramvalues[0];
+			Collection	coll	= (Collection)(paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]);
 			return coll!= null
 				? coll.toArray((Object[])Array.newInstance(type.getComponentType(), coll.size()))
 				: Array.newInstance(type.getComponentType(), 0);
