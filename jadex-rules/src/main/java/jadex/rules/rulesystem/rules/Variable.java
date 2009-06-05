@@ -24,6 +24,9 @@ public class Variable
 	/** Flag if it is a multi variable. */
 	protected boolean multi;
 	
+	/** Flag indicating a temporary variable (not used in rhs). */
+	protected boolean temporary;
+	
 	//-------- constructors --------
 	
 	/**
@@ -31,19 +34,20 @@ public class Variable
 	 */
 	public Variable(String name, OAVObjectType type)
 	{
-		this(name, type, false);
+		this(name, type, false, false);
 	}
 	
 	/**
 	 *  Create a new variable.
 	 */
-	public Variable(String name, OAVObjectType type, boolean multi)
+	public Variable(String name, OAVObjectType type, boolean multi, boolean temporary)
 	{
 //		if(name==null || type==null)
 //			throw new IllegalArgumentException("Name or type must not null");
 		this.name = name;
 		this.type = type;
 		this.multi = multi;
+		this.temporary = temporary;
 	}
 	
 	//-------- methods --------
@@ -83,6 +87,15 @@ public class Variable
 	public boolean isMulti()
 	{
 		return multi;
+	}
+	
+	/**
+	 *  Test if variable is temporary.
+	 *  @return True, if temporary.
+	 */
+	public boolean isTemporary()
+	{
+		return this.temporary;
 	}
 
 	/**

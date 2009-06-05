@@ -68,10 +68,10 @@ public class MultifieldSplitTest extends TestCase
 		// Numberbox ($?c1, ?x, ?y, $?c2)
 		ObjectCondition	cond = new ObjectCondition(Numberbox.numberbox_type);
 		List pattern = new ArrayList();
-		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true, false));
 		pattern.add(new Variable("?x", OAVJavaType.java_integer_type));
 		pattern.add(new Variable("?y", OAVJavaType.java_integer_type));
-		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true, false));
 		cond.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, pattern, IOperator.EQUAL));
 
 		IRule	rule	= new Rule("neibors(x,y)", cond, new IAction()
@@ -117,10 +117,10 @@ public class MultifieldSplitTest extends TestCase
 		// Numberbox ($?c1 ?x ?x $?c2)
 		ObjectCondition	cond = new ObjectCondition(Numberbox.numberbox_type);
 		List pattern = new ArrayList();
-		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true, false));
 		pattern.add(new Variable("?x", OAVJavaType.java_integer_type));
 		pattern.add(new Variable("?x", OAVJavaType.java_integer_type));
-		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true, false));
 		cond.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, pattern, IOperator.EQUAL));
 
 		IRule	rule	= new Rule("neibors(x,x)", cond, new IAction()
@@ -169,10 +169,10 @@ public class MultifieldSplitTest extends TestCase
 		// Numberbox ($?c1 ?x ?y $?c2) &:(?x<?y)
 		ObjectCondition	cond = new ObjectCondition(Numberbox.numberbox_type);
 		List pattern = new ArrayList();
-		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true, false));
 		pattern.add(new Variable("?x", OAVJavaType.java_integer_type));
 		pattern.add(new Variable("?y", OAVJavaType.java_integer_type));
-		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true, false));
 		cond.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, pattern, IOperator.EQUAL));
 		FunctionCall fc = new FunctionCall(new OperatorFunction(IOperator.LESS), 
 			new Variable[]{
@@ -224,17 +224,17 @@ public class MultifieldSplitTest extends TestCase
 		// Numberbox (numbers $?c1 ?x ?y $?c2) (numbers2 $?c3 ?y ?x $?c4) 
 		ObjectCondition	cond = new ObjectCondition(Numberbox.numberbox_type);
 		List pattern = new ArrayList();
-		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true, false));
 		pattern.add(new Variable("?x", OAVJavaType.java_integer_type));
 		pattern.add(new Variable("?y", OAVJavaType.java_integer_type));
-		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true, false));
 		cond.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, pattern, IOperator.EQUAL));
 		
 		List pattern2 = new ArrayList();
-		pattern2.add(new Variable("$?c3", OAVJavaType.java_integer_type, true));
+		pattern2.add(new Variable("$?c3", OAVJavaType.java_integer_type, true, false));
 		pattern2.add(new Variable("?y", OAVJavaType.java_integer_type));
 		pattern2.add(new Variable("?x", OAVJavaType.java_integer_type));
-		pattern2.add(new Variable("$?c4", OAVJavaType.java_integer_type, true));
+		pattern2.add(new Variable("$?c4", OAVJavaType.java_integer_type, true, false));
 		cond.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers2, pattern2, IOperator.EQUAL));
 		
 		IRule	rule	= new Rule("neibors_numbers(x,y) && neibors_numbers2(y,x)", cond, new IAction()
@@ -286,18 +286,18 @@ public class MultifieldSplitTest extends TestCase
 		// Numberbox (numbers $?c3 ?y ?x $?c4) 
 		ObjectCondition	cond1 = new ObjectCondition(Numberbox.numberbox_type);
 		List pattern = new ArrayList();
-		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c1", OAVJavaType.java_integer_type, true, false));
 		pattern.add(new Variable("?x", OAVJavaType.java_integer_type));
 		pattern.add(new Variable("?y", OAVJavaType.java_integer_type));
-		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true));
+		pattern.add(new Variable("$?c2", OAVJavaType.java_integer_type, true, false));
 		cond1.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, pattern, IOperator.EQUAL));
 		
 		ObjectCondition	cond2 = new ObjectCondition(Numberbox.numberbox_type);
 		List pattern2 = new ArrayList();
-		pattern2.add(new Variable("$?c3", OAVJavaType.java_integer_type, true));
+		pattern2.add(new Variable("$?c3", OAVJavaType.java_integer_type, true, false));
 		pattern2.add(new Variable("?y", OAVJavaType.java_integer_type));
 		pattern2.add(new Variable("?x", OAVJavaType.java_integer_type));
-		pattern2.add(new Variable("$?c4", OAVJavaType.java_integer_type, true));
+		pattern2.add(new Variable("$?c4", OAVJavaType.java_integer_type, true, false));
 		cond2.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, pattern2, IOperator.EQUAL));
 		
 		IRule rule = new Rule("neibors_numbers(x,y) && neibors_numbers(y,x)", 

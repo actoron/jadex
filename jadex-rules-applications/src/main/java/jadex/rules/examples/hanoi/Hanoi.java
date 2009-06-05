@@ -614,9 +614,9 @@ public class Hanoi
 		// Condition for agent with multi-pattern.
 		ObjectCondition oc2c = new ObjectCondition(agent_type);
 		List	vars	= new ArrayList();
-		vars.add(new Variable("$?g1", movegoal_type, true));
+		vars.add(new Variable("$?g1", movegoal_type, true, false));
 		vars.add(new Variable("goal", movegoal_type));
-		vars.add(new Variable("$?g2", movegoal_type, true));
+		vars.add(new Variable("$?g2", movegoal_type, true, false));
 		oc2c.addConstraint(new BoundConstraint(agent_has_movegoals, vars, IOperator.CONTAINS));
 		oc2c.addConstraint(new BoundConstraint(null, new Variable("agent", agent_type)));
 

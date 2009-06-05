@@ -56,7 +56,7 @@ public class GoalDeliberationRules
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
 		Variable inmode = new Variable("?inmode", OAVJavaType.java_string_type);
-		Variable rinhibitors = new Variable("?rinhibitors", OAVBDIRuntimeModel.goal_type, true);
+		Variable rinhibitors = new Variable("?rinhibitors", OAVBDIRuntimeModel.goal_type, true, false);
 
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, ringoal));
@@ -120,7 +120,7 @@ public class GoalDeliberationRules
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		Variable inmode = new Variable("?inmode", OAVJavaType.java_string_type);
-		Variable rinhibitors = new Variable("?rinhibitors", OAVBDIRuntimeModel.goal_type, true);
+		Variable rinhibitors = new Variable("?rinhibitors", OAVBDIRuntimeModel.goal_type, true, false);
 
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, ringoal));
@@ -341,7 +341,7 @@ public class GoalDeliberationRules
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable samegoals = new Variable("$?same_goals", OAVBDIRuntimeModel.goal_type, true);
+		Variable samegoals = new Variable("$?same_goals", OAVBDIRuntimeModel.goal_type, true, false);
 		Variable cardinality = new Variable("?cardinality", OAVJavaType.java_integer_type);
 
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);

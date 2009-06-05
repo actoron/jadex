@@ -124,8 +124,8 @@ public class MessageEventRules
 		
 		Variable rawmsg = new Variable("?rawmsg", OAVBDIRuntimeModel.java_imessageadapter_type);
 		Variable mevent = new Variable("?mevent", OAVBDIMetaModel.messageevent_type);
-		Variable params = new Variable("$?params", OAVBDIMetaModel.parameter_type, true);
-		Variable paramsets = new Variable("$?paramsets", OAVBDIMetaModel.parameterset_type, true);
+		Variable params = new Variable("$?params", OAVBDIMetaModel.parameter_type, true, false);
+		Variable paramsets = new Variable("$?paramsets", OAVBDIMetaModel.parameterset_type, true, false);
 		Variable paramname = new Variable("?paramname", OAVJavaType.java_string_type);
 		Variable paramsetname = new Variable("?paramsetname", OAVJavaType.java_string_type);
 		Variable matchexp = new Variable("?matchexp", OAVBDIMetaModel.expression_type);
@@ -232,8 +232,8 @@ public class MessageEventRules
 		
 		Variable rawmsg = new Variable("?rawmsg", OAVBDIRuntimeModel.java_imessageadapter_type);
 		Variable mevent = new Variable("?mevent", OAVBDIMetaModel.messageevent_type);
-		Variable params = new Variable("$?params", OAVBDIMetaModel.parameter_type, true);
-		Variable paramsets = new Variable("$?paramsets", OAVBDIMetaModel.parameterset_type, true);
+		Variable params = new Variable("$?params", OAVBDIMetaModel.parameter_type, true, false);
+		Variable paramsets = new Variable("$?paramsets", OAVBDIMetaModel.parameterset_type, true, false);
 		Variable paramname = new Variable("?paramname", OAVJavaType.java_string_type);
 		Variable paramsetname = new Variable("?paramsetname", OAVJavaType.java_string_type);
 		Variable matchexp = new Variable("?matchexp", OAVBDIMetaModel.expression_type);

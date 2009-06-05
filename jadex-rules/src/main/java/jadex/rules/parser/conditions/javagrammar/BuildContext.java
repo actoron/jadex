@@ -199,7 +199,7 @@ public class BuildContext
 	 */
 	public Variable	generateVariableBinding(ObjectCondition	condition, String name, OAVObjectType type, Object valuesource)
 	{
-		Variable	tmpvar	= new Variable(name, type);
+		Variable	tmpvar	= new Variable(name, type, false, true);
 		variables.put(name, tmpvar);
 		BoundConstraint	bc	= new BoundConstraint(valuesource, tmpvar);
 		boundconstraints.put(tmpvar, bc);

@@ -56,9 +56,9 @@ public class FunctionTest extends TestCase
 		
 		final List triggers = new ArrayList();
 		
-		FunctionCall fc = new FunctionCall(new Sum(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true)});
+		FunctionCall fc = new FunctionCall(new Sum(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true, false)});
 		ObjectCondition xc = new ObjectCondition(Numberbox.numberbox_type);
-		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n", OAVJavaType.java_integer_type, true)));
+		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n", OAVJavaType.java_integer_type, true, false)));
 		xc.addConstraint(new ValueSourceReturnValueConstraint(Numberbox.numberbox_has_solution, fc, IOperator.LESS));
 				
 		AndCondition cond = new AndCondition(new ICondition[]{xc});
@@ -113,9 +113,9 @@ public class FunctionTest extends TestCase
 
 		final List triggers = new ArrayList();
 		
-		FunctionCall fc = new FunctionCall(new Length(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true)});
+		FunctionCall fc = new FunctionCall(new Length(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true, false)});
 		ObjectCondition xc = new ObjectCondition(Numberbox.numberbox_type);
-		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n", OAVJavaType.java_integer_type, true)));
+		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n", OAVJavaType.java_integer_type, true, false)));
 		xc.addConstraint(new ValueSourceReturnValueConstraint(Numberbox.numberbox_has_solution, fc));
 			
 		AndCondition cond = new AndCondition(new ICondition[]{xc});
@@ -167,12 +167,12 @@ public class FunctionTest extends TestCase
 	
 		final List triggers = new ArrayList();
 		
-		FunctionCall fc_sum = new FunctionCall(new Sum(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true)});
-		FunctionCall fc_length = new FunctionCall(new Length(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true)});
+		FunctionCall fc_sum = new FunctionCall(new Sum(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true, false)});
+		FunctionCall fc_length = new FunctionCall(new Length(), new Object[]{new Variable("$?n", OAVJavaType.java_integer_type, true, false)});
 		FunctionCall fc = new FunctionCall(new Div(), new Object[]{fc_sum, fc_length});
 		
 		ObjectCondition xc = new ObjectCondition(Numberbox.numberbox_type);
-		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n", OAVJavaType.java_integer_type, true)));
+		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n", OAVJavaType.java_integer_type, true, false)));
 		xc.addConstraint(new ValueSourceReturnValueConstraint(Numberbox.numberbox_has_solution, fc));
 			
 		AndCondition cond = new AndCondition(new ICondition[]{xc});
@@ -223,17 +223,17 @@ public class FunctionTest extends TestCase
 	
 		final List triggers = new ArrayList();
 		
-		FunctionCall fc_length1 = new FunctionCall(new Length(), new Object[]{new Variable("$?n1", OAVJavaType.java_integer_type, true)});
-		FunctionCall fc_length2 = new FunctionCall(new Length(), new Object[]{new Variable("$?n2", OAVJavaType.java_integer_type, true)});
+		FunctionCall fc_length1 = new FunctionCall(new Length(), new Object[]{new Variable("$?n1", OAVJavaType.java_integer_type, true, false)});
+		FunctionCall fc_length2 = new FunctionCall(new Length(), new Object[]{new Variable("$?n2", OAVJavaType.java_integer_type, true, false)});
 		FunctionCall fc = new FunctionCall(new OperatorFunction(IOperator.EQUAL), new Object[]{fc_length1, fc_length2});
 		
 		ObjectCondition xc = new ObjectCondition(Numberbox.numberbox_type);
-		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n1", OAVJavaType.java_integer_type, true)));
+		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n1", OAVJavaType.java_integer_type, true, false)));
 		xc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_solution, new Variable("?s1", OAVJavaType.java_integer_type)));
 		xc.addConstraint(new BoundConstraint(null, new Variable("?x", OAVJavaType.java_integer_type)));
 			
 		ObjectCondition yc = new ObjectCondition(Numberbox.numberbox_type);
-		yc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n2", OAVJavaType.java_integer_type, true)));
+		yc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_numbers, new Variable("$?n2", OAVJavaType.java_integer_type, true, false)));
 		yc.addConstraint(new BoundConstraint(Numberbox.numberbox_has_solution, new Variable("?s2", OAVJavaType.java_integer_type)));
 		yc.addConstraint(new PredicateConstraint(fc));
 		yc.addConstraint(new BoundConstraint(null, new Variable("?y", OAVJavaType.java_integer_type)));

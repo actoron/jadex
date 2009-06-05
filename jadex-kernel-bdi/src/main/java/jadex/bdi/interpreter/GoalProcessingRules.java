@@ -389,7 +389,7 @@ public class GoalProcessingRules
 	{
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true);
+		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true, false);
 		Variable target = new Variable("?target", OAVBDIMetaModel.condition_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
@@ -479,7 +479,7 @@ public class GoalProcessingRules
 	{
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true);
+		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true, false);
 		Variable target = new Variable("?target", OAVBDIMetaModel.condition_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
@@ -542,10 +542,10 @@ public class GoalProcessingRules
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.querygoal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
-		Variable mparams = new Variable("$?mparams", OAVBDIMetaModel.parameter_type, true);
-		Variable mparamsets = new Variable("$?mparamsets", OAVBDIMetaModel.parameterset_type, true);
-		Variable rparams = new Variable("$?rparams", OAVBDIRuntimeModel.parameter_type, true);
-		Variable rparamsets = new Variable("$?rparamsets", OAVBDIRuntimeModel.parameterset_type, true);
+		Variable mparams = new Variable("$?mparams", OAVBDIMetaModel.parameter_type, true, false);
+		Variable mparamsets = new Variable("$?mparamsets", OAVBDIMetaModel.parameterset_type, true, false);
+		Variable rparams = new Variable("$?rparams", OAVBDIRuntimeModel.parameter_type, true, false);
+		Variable rparamsets = new Variable("$?rparamsets", OAVBDIRuntimeModel.parameterset_type, true, false);
 		Variable paramname = new Variable("?paramname", OAVJavaType.java_string_type);
 		Variable paramsetname = new Variable("?paramsetname", OAVJavaType.java_string_type);
 		
@@ -729,7 +729,7 @@ public class GoalProcessingRules
 	{
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true);
+		Variable fplans	= new Variable("$?fplans", OAVBDIRuntimeModel.plan_type, true, false);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));

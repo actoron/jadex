@@ -698,7 +698,7 @@ public class ConstraintBuilder
 				}
 			}
 			
-			BoundConstraint	bc	= new BoundConstraint(null, new Variable(context.generateVariableName(),((ObjectCondition)con).getObjectType()));
+			BoundConstraint	bc	= new BoundConstraint(null, new Variable(context.generateVariableName(),((ObjectCondition)con).getObjectType(), false, true));
 			List	constraints2	= new ArrayList(((ObjectCondition)con).getConstraints());
 			constraints2.removeAll(constraints);
 			constraints.add(bc);

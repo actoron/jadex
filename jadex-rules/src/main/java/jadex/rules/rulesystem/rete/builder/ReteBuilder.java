@@ -1283,7 +1283,8 @@ public class ReteBuilder
 		for(Iterator it=varinfos.keySet().iterator(); it.hasNext(); )
 		{
 			Variable var = (Variable)it.next();
-			extractors.put(var.getName(), getLeftVariableExtractor(context, var));
+			if(!var.isTemporary())
+				extractors.put(var.getName(), getLeftVariableExtractor(context, var));
 		}
 		
 		TerminalNode tnode = new TerminalNode(context.getRootNode().getNextNodeId(), rule, extractors);

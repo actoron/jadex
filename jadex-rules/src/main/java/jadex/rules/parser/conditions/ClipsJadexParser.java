@@ -2154,7 +2154,7 @@ public class ClipsJadexParser extends Parser {
             		var = (Variable)vars.get(vn);
             		if(var==null)
             		{
-            			var = new Variable(vn, type, true);
+            			var = new Variable(vn, type, true, false);
             			vars.put(vn, var);
             		}
             		else if(type!=null)

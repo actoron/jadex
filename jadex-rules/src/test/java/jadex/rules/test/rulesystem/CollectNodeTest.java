@@ -188,12 +188,12 @@ public class CollectNodeTest extends TestCase
 		
 		// Collect music belonging to the same store and check that length==3.
 		CollectCondition collect	= new CollectCondition(new ObjectCondition[]{cmusic, cstore}, null);
-		collect.addConstraint(new BoundConstraint(null, new Variable("$?collection", music_type, true)));
-		FunctionCall fc_length = new FunctionCall(new Length(), new Object[]{new Variable("$?collection", music_type, true)});
+		collect.addConstraint(new BoundConstraint(null, new Variable("$?collection", music_type, true, false)));
+		FunctionCall fc_length = new FunctionCall(new Length(), new Object[]{new Variable("$?collection", music_type, true, false)});
 		FunctionCall fc_length3 = new FunctionCall(new OperatorFunction(IOperator.EQUAL), new Object[]{fc_length, new Integer(3)});
 		collect.addConstraint(new PredicateConstraint(fc_length3));
 		
-		FunctionCall fc_extract = new FunctionCall(new ExtractMulti(music_has_price), new Object[]{new Variable("$?collection", music_type, true)});
+		FunctionCall fc_extract = new FunctionCall(new ExtractMulti(music_has_price), new Object[]{new Variable("$?collection", music_type, true, false)});
 		FunctionCall fc_sum = new FunctionCall(new Sum(), new Object[]{fc_extract});
 		FunctionCall fc_sum30 = new FunctionCall(new OperatorFunction(IOperator.LESS), new Object[]{fc_sum, new Integer(30)});
 		collect.addConstraint(new PredicateConstraint(fc_sum30));

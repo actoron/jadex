@@ -845,8 +845,8 @@ public class PlanRules
 	protected static Rule createPlanInstanceGoalFinishedRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
-		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true);
-		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true);
+		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true, false);
+		Variable mgoals = new Variable("$?mgoal", OAVBDIMetaModel.goal_type, true, false);
 //		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -925,7 +925,7 @@ public class PlanRules
 //		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
 //		Variable wa2 = new Variable("?wa2", OAVBDIRuntimeModel.waitabstraction_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
-		Variable rplans = new Variable("$?rplans", OAVBDIRuntimeModel.plan_type, true);
+		Variable rplans = new Variable("$?rplans", OAVBDIRuntimeModel.plan_type, true, false);
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
@@ -1339,7 +1339,7 @@ public class PlanRules
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true, false);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
@@ -1374,7 +1374,7 @@ public class PlanRules
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true, false);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 			
@@ -1409,7 +1409,7 @@ public class PlanRules
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
-		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true);
+		Variable	rtels	= new Variable("$?rtels", OAVBDIRuntimeModel.element_type, true, false);
 		Variable	change	= new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
@@ -1616,9 +1616,9 @@ public class PlanRules
 		mtricon.addConstraint(new BoundConstraint(null, trigger));
 		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_factchangeds, Arrays.asList(new Variable[]
 		{
-			new Variable("$?x", OAVJavaType.java_string_type, true),
+			new Variable("$?x", OAVJavaType.java_string_type, true, false),
 			ref,
-			new Variable("$?y", OAVJavaType.java_string_type, true),
+			new Variable("$?y", OAVJavaType.java_string_type, true, false),
 		}), IOperator.EQUAL));
 
 		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
@@ -1675,9 +1675,9 @@ public class PlanRules
 		mtricon.addConstraint(new BoundConstraint(null, trigger));
 		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_factaddeds, Arrays.asList(new Variable[]
 		{
-			new Variable("$?x", OAVJavaType.java_string_type, true),
+			new Variable("$?x", OAVJavaType.java_string_type, true, false),
 			ref,
-			new Variable("$?y", OAVJavaType.java_string_type, true),
+			new Variable("$?y", OAVJavaType.java_string_type, true, false),
 		}), IOperator.EQUAL));
 
 		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
@@ -1729,9 +1729,9 @@ public class PlanRules
 		mtricon.addConstraint(new BoundConstraint(null, trigger));
 		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_factremoveds, Arrays.asList(new Variable[]
 		{
-				new Variable("$?x", OAVJavaType.java_string_type, true),
+				new Variable("$?x", OAVJavaType.java_string_type, true, false),
 				ref,
-				new Variable("$?y", OAVJavaType.java_string_type, true),
+				new Variable("$?y", OAVJavaType.java_string_type, true, false),
 		}), IOperator.EQUAL));
 
 		ObjectCondition	mplancon = new ObjectCondition(OAVBDIMetaModel.plan_type);
@@ -1784,9 +1784,9 @@ public class PlanRules
 		mtricon.addConstraint(new BoundConstraint(null, trigger));
 		mtricon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_goalfinisheds, Arrays.asList(new Variable[]
 		{
-			new Variable("$?x", OAVJavaType.java_string_type, true),
+			new Variable("$?x", OAVJavaType.java_string_type, true, false),
 			refelem,
-			new Variable("$?y", OAVJavaType.java_string_type, true),
+			new Variable("$?y", OAVJavaType.java_string_type, true, false),
 		}), IOperator.EQUAL));
 
 		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);

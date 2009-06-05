@@ -465,7 +465,7 @@ public class GoalLifecycleRules
 	protected static Rule createGoalDropRule()
 	{
 		Variable	rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
-		Variable	rplans	= new Variable("$?rplans", OAVBDIRuntimeModel.plan_type, true);
+		Variable	rplans	= new Variable("$?rplans", OAVBDIRuntimeModel.plan_type, true, false);
 		Variable	rcapa	= new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
 		
 		ObjectCondition	goalcon	= new ObjectCondition(rgoal.getType());
