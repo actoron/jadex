@@ -5,7 +5,7 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
-import jadex.adapter.base.envsupport.observer.gui.plugin.ObjectIntrospectorPlugin;
+import jadex.adapter.base.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
@@ -347,7 +347,7 @@ public class ObserverCenter
 	{
 		ArrayList plugins = new ArrayList();
 		
-		IObserverCenterPlugin plugin = new ObjectIntrospectorPlugin();
+		IObserverCenterPlugin plugin = new IntrospectorPlugin();
 		// default plugins
 		// TODO: remove hard coding
 		plugins.add(plugin);

@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -26,9 +27,9 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-/** The object introspector
+/** The Introspector
  */
-public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
+public class IntrospectorPlugin implements IObserverCenterPlugin
 {
 	/** Plugin name
 	 */
@@ -73,68 +74,74 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 	 */
 	private ObserverCenter observerCenter_;
 	
-	public ObjectIntrospectorPlugin()
+	public IntrospectorPlugin()
 	{
 		mainPane_ = new JTabbedPane();
 		mainPane_.setMinimumSize(new Dimension(200, 300));
 		
-		JPanel spacePanel = new JPanel();
-		spacePanel.setBorder(new TitledBorder("Space"));
-		spacePanel.setLayout(new GridBagLayout());
+		JSplitPane spacePane = new JSplitPane();
+		spacePane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		spacePane.setOneTouchExpandable(true);
+		spacePane.setDividerLocation(100);
+		spacePane.setResizeWeight(0.33);
+		GridBagConstraints c = new GridBagConstraints();
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.BOTH;
+		mainPane_.add("Space", spacePane);
+		
+		JPanel spacePropertyPanel = new JPanel();
+		spacePropertyPanel.setLayout(new GridBagLayout());
+		spacePane.setTopComponent(spacePropertyPanel);
 		
 		spacePropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane spcPropScrollPane = new JScrollPane(spacePropertyTable_);
-		GridBagConstraints c = new GridBagConstraints();
+		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weighty = 1.0;
 		c.weightx = 1.0;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.BOTH;
-		spacePanel.add(spcPropScrollPane, c);
+		spacePropertyPanel.add(spcPropScrollPane, c);
 		
 		JPanel processPanel = new JPanel();
 		processPanel.setBorder(new TitledBorder("Processes"));
 		processPanel.setLayout(new GridBagLayout());
+		spacePane.setBottomComponent(processPanel);
+		
+		JSplitPane processPane = new JSplitPane();
+		processPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		processPane.setOneTouchExpandable(true);
+		processPane.setDividerLocation(60);
+		processPane.setResizeWeight(0.5);
+		c = new GridBagConstraints();
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.BOTH;
+		processPanel.add(processPane, c);
 		
 		processList_ = new JList(new DefaultComboBoxModel());
 		processList_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		processList_.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.BOTH;
-		processPanel.add(processList_, c);
+		processPane.setTopComponent(processList_);
 		
 		processPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane procPropScrollPane = new JScrollPane(processPropertyTable_);
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.weighty = 2.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.BOTH;
-		processPanel.add(procPropScrollPane, c);
+		processPane.setBottomComponent(procPropScrollPane);
 		
+		JSplitPane objectPane = new JSplitPane();
+		objectPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		objectPane.setOneTouchExpandable(true);
+		objectPane.setDividerLocation(100);
+		objectPane.setResizeWeight(0.33);
+		mainPane_.add("Object", objectPane);
 		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.weighty = 2.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.BOTH;
-		spacePanel.add(processPanel, c);
-		
-		mainPane_.add("Space", spacePanel);
-		
-		JPanel objectPanel = new JPanel();
-		objectPanel.setBorder(new TitledBorder("Object"));
-		objectPanel.setLayout(new GridBagLayout());
+		JPanel objectPropertyPanel = new JPanel();
+		objectPropertyPanel.setLayout(new GridBagLayout());
+		objectPane.setTopComponent(objectPropertyPanel);
 		
 		JLabel idLabelDesc = new JLabel("Object ID");
 		c = new GridBagConstraints();
@@ -145,7 +152,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		c.ipadx = 10;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.NONE;
-		objectPanel.add(idLabelDesc, c);
+		objectPropertyPanel.add(idLabelDesc, c);
 		
 		objIdLabel_ = new JLabel("");
 		c = new GridBagConstraints();
@@ -155,7 +162,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		c.weightx = 1.0;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.NONE;
-		objectPanel.add(objIdLabel_, c);
+		objectPropertyPanel.add(objIdLabel_, c);
 		
 		JLabel typeLabelDesc = new JLabel("Type");
 		c = new GridBagConstraints();
@@ -166,7 +173,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		c.ipadx = 10;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.NONE;
-		objectPanel.add(typeLabelDesc, c);
+		objectPropertyPanel.add(typeLabelDesc, c);
 		
 		objTypeLabel_ = new JLabel("");
 		c = new GridBagConstraints();
@@ -176,7 +183,7 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		c.weightx = 1.0;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.NONE;
-		objectPanel.add(objTypeLabel_, c);
+		objectPropertyPanel.add(objTypeLabel_, c);
 		
 		objPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane tableScrollPane = new JScrollPane(objPropertyTable_);
@@ -188,49 +195,34 @@ public class ObjectIntrospectorPlugin implements IObserverCenterPlugin
 		c.weightx = 1.0;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.BOTH;
-		objectPanel.add(tableScrollPane, c);
+		objectPropertyPanel.add(tableScrollPane, c);
 		
 		/////
-		JPanel taskPanel = new JPanel();
-		taskPanel.setBorder(new TitledBorder("Tasks"));
-		taskPanel.setLayout(new GridBagLayout());
+		JPanel taskPanell = new JPanel();
+		taskPanell.setBorder(new TitledBorder("Tasks"));
+		taskPanell.setLayout(new GridBagLayout());
+		objectPane.setBottomComponent(taskPanell);
+		
+		JSplitPane taskPane = new JSplitPane();
+		taskPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		taskPane.setOneTouchExpandable(true);
+		taskPane.setDividerLocation(60);
+		taskPane.setResizeWeight(0.5);
+		c = new GridBagConstraints();
+		c.weighty = 1.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.BOTH;
+		taskPanell.add(taskPane, c);
 		
 		taskList_ = new JList(new DefaultComboBoxModel());
 		taskList_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		taskList_.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.BOTH;
-		taskPanel.add(taskList_, c);
+		taskPane.setTopComponent(taskList_);
 		
 		taskPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane taskPropScrollPane = new JScrollPane(taskPropertyTable_);
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.weighty = 2.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.BOTH;
-		taskPanel.add(taskPropScrollPane, c);
-		
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 3;
-		c.gridwidth = 2;
-		c.weighty = 2.0;
-		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.BOTH;
-		objectPanel.add(taskPanel, c);
-		/////
-		
-		mainPane_.add("Object", objectPanel);
+		taskPane.setBottomComponent(taskPropScrollPane);
 	}
 
 	public synchronized void start(ObserverCenter main)
