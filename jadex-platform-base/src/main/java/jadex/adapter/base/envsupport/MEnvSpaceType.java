@@ -627,7 +627,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo("text", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", 
-				"position", "font", "style", "basesize", "fontscaling", "color", "layer", "text", "creator"}, 
+				"position", "font", "style", "basesize", "fontscaling", "color", "layer", "text", "align", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -638,6 +638,7 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
 				{
@@ -672,8 +673,19 @@ public class MEnvSpaceType	extends MSpaceType
 						String text = (String) MEnvSpaceInstance.getProperty(args, "text");
 						text = String.valueOf(text);
 						
+						// Hack! Upstream needs to provide _proper_ newlines not a \n literal
+						// Attributes are probably not the right place for text...
+						text = text.replaceAll("\\\\n", "\n").replaceAll("\\\\\\\\", "\\");
+						
+						String aligntxt = String.valueOf(MEnvSpaceInstance.getProperty(args, "align"));
+						int align = Text.ALIGN_LEFT;
+						if (aligntxt.equals("right"))
+							align = Text.ALIGN_RIGHT;
+						else if (aligntxt.equals("center"))
+							align = Text.ALIGN_CENTER;
+						
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, fontscaling, exp);
+						return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, align, fontscaling, exp);
 					}
 				})
 			}), null));

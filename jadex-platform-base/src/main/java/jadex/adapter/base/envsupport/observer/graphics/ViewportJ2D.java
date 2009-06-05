@@ -148,7 +148,11 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 	public void componentResized(ComponentEvent e)
 	{
+		if ((canvas_.getWidth() == 0) || (canvas_.getHeight() == 0))
+			return;
+		IVector2 oldPaddedSize = paddedSize_.copy();
 		setSize(size_);
+		setPosition(paddedSize_.copy().subtract(oldPaddedSize).multiply(0.5).negate().add(position_));
 	}
 
 	public void componentShown(ComponentEvent e)
@@ -212,11 +216,14 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 		{
 			try
 			{
+				if ((getWidth() == 0) || (getHeight() == 0))
+					return;
 				if((backBuffer_.getWidth() != getWidth())
 						|| (backBuffer_.getHeight() != getHeight()))
 				{
 					backBuffer_ = new BufferedImage(getWidth(), getHeight(),
 							BufferedImage.TYPE_4BYTE_ABGR_PRE);
+					ViewportJ2D.this.setSize(size_);
 				}
 
 				Graphics2D g = (Graphics2D)backBuffer_.getGraphics();

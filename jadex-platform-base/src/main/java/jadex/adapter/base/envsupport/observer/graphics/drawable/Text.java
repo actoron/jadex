@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
 import java.awt.font.TextLayout;
 import java.awt.font.TextMeasurer;
 import java.awt.geom.AffineTransform;
@@ -14,12 +15,16 @@ import java.awt.image.BufferedImage;
 
 import javax.media.opengl.GL;
 
+import org.codehaus.janino.Java.ThisReference;
+
 import com.sun.opengl.util.j2d.TextRenderer;
 
 
 import jadex.adapter.base.envsupport.environment.space2d.action.GetPosition;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport;
+import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.TextInfo;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
@@ -32,8 +37,31 @@ import jadex.javaparser.SimpleValueFetcher;
  */
 public final class Text implements IDrawable
 {
-	/** Viewport Height on which the base font size is relative to */
-	private final static IVector2 BASE_VIEWPORT_SIZE = new Vector2Double(300.0);
+	/** Left Alignment */
+	public final static int ALIGN_LEFT		= 0;
+	
+	/** Center Alignment */
+	public final static int ALIGN_CENTER 	= 1;
+	
+	/** Right Alignment */
+	public final static int ALIGN_RIGHT 	= 2;
+	
+	
+	/** Top Alignment */
+	//public final static int ALIGN_TOP 		= 0;
+	
+	/** Middles Alignment */
+	//public final static int ALIGN_MIDDLES 	= 256;
+	
+	/** Bottom Alignment */
+	//public final static int ALIGN_BOTTOM 	= 512;
+	
+	
+	/** Viewport size (in pixels) on which the base font size is relative to */
+	private final static float BASE_VIEWPORT_SIZE = 300.0f;
+	
+	/** Dummy FontRenderContext since we don't use FRCs */
+	private final static FontRenderContext DUMMY_FRC = new FontRenderContext(null, true, true);
 	
 	/** Relative position or binding */
 	private Object position;
@@ -44,8 +72,11 @@ public final class Text implements IDrawable
 	/** Color of the font */
 	private Color color;
 	
-	/** Fixed text */
-	private String text;
+	/** Lines of text */
+	private String[] lines;
+	
+	/** Text alignment */
+	private int align;
 	
 	/** Font scaling flag */
 	private boolean fontscaling;
@@ -55,12 +86,13 @@ public final class Text implements IDrawable
 	
 	public Text()
 	{
-		this(null, null, null, null, true, null);
+		this(null, null, null, null, 0, true, null);
 	}
 	
-	public Text(Object position, Font baseFont, Color color, String text, boolean fontscaling, IParsedExpression drawcondition)
+	public Text(Object position, Font baseFont, Color color, String text, int align, boolean fontscaling, IParsedExpression drawcondition)
 	{
 		this.fontscaling = fontscaling;
+		this.align = align;
 		if (position == null)
 			position = Vector2Double.ZERO.copy();
 		this.position = position;
@@ -69,7 +101,7 @@ public final class Text implements IDrawable
 		this.baseFont = baseFont;
 		if (text == null)
 			text = "";
-		this.text = text;
+		lines = text.split("(\n\r?)|(\r)");
 		if (color == null)
 			color = Color.WHITE;
 		this.color = color;
@@ -124,29 +156,32 @@ public final class Text implements IDrawable
 			}
 			
 			Graphics2D g = vp.getContext();
-			Canvas canvas = vp.getCanvas();
+			IVector2 canvasSize = vp.getCanvasSize();
 			Font font = baseFont;
 			if (fontscaling)
-			{
-				float fontscale = dcScale.getMean().getAsFloat() * (new Vector2Double(canvas.getWidth(), canvas.getHeight())).divide(BASE_VIEWPORT_SIZE).getMean().getAsFloat() * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat();
-				font = font.deriveFont(baseFont.getSize() * fontscale);
-			}
-			String text = getReplacedText(obj);
+				font = font.deriveFont(baseFont.getSize() * getFontScale(dcScale, canvasSize, vp.getAreaSize(), vp.getSize()));
 			
-			IVector2 pos = vp.getPosition().copy().negate().add(vp.getObjectShift()).add(dcPos).add(position).divide(vp.getPaddedSize()).multiply(new Vector2Double(canvas.getWidth(), canvas.getHeight()));
-			if (vp.getInvertX())
-				pos.negateX().add(new Vector2Double(canvas.getWidth(), 0));
-			if (!vp.getInvertY())
-				pos.negateY().add(new Vector2Double(0, canvas.getHeight()));
-			Rectangle2D bounds = font.getStringBounds(text, new FontRenderContext(null, true, true));
-			pos.subtract(new Vector2Double(bounds.getWidth() / 2.0, bounds.getHeight() / 2.0));
+			IVector2 pos = getBasePosition(vp, dcPos, position, canvasSize, vp.getInvertX(), !vp.getInvertY());
+			double xPos = pos.getXAsDouble();
+			double yPos = pos.getYAsDouble();
 			
-			g.setColor(color);
-			g.setFont(font);
+			//String text = getReplacedText(obj);
 			AffineTransform t = g.getTransform();
 			g.setTransform(vp.getDefaultTransform());
-			TextLayout tl = new TextLayout(text, font, new FontRenderContext(null, true, true));
-			tl.draw(g, pos.getXAsInteger(), pos.getYAsInteger());
+			g.setColor(color);
+			for (int i = 0; i < lines.length; ++i)
+			{
+				String text = getReplacedText(obj, lines[i]);
+				
+				TextLayout tl = new TextLayout(text, font, DUMMY_FRC);
+				
+				if (i != 0)
+					yPos += tl.getAscent();
+				
+				tl.draw(g, (int) (xPos + getAlignment(tl)), (int) yPos);
+				
+				yPos += (tl.getDescent() + tl.getLeading());
+			}
 			g.setTransform(t);
 		}
 	}
@@ -178,33 +213,71 @@ public final class Text implements IDrawable
 				return;
 			}
 			
-			Canvas canvas = vp.getCanvas();
+			IVector2 canvasSize = vp.getCanvasSize();
 			Font font = baseFont;
 			if (fontscaling)
-			{
-				float fontscale = dcScale.getMean().getAsFloat() * (new Vector2Double(canvas.getWidth(), canvas.getHeight())).divide(BASE_VIEWPORT_SIZE).getMean().getAsFloat() * vp.getAreaSize().copy().divide(vp.getSize()).getMean().getAsFloat();
-				font = font.deriveFont(baseFont.getSize() * fontscale);
-			}
-			String text = getReplacedText(obj);
-			
+				font = font.deriveFont(baseFont.getSize() * getFontScale(dcScale, canvasSize, vp.getAreaSize(), vp.getSize()));
 			TextRenderer tr = vp.getTextRenderer(font);
-			tr.setColor(color);
-			IVector2 pos = vp.getPosition().copy().negate().add(vp.getObjectShift()).add(dcPos).add(position).divide(vp.getPaddedSize()).multiply(new Vector2Double(canvas.getWidth(), canvas.getHeight()));
-			if (vp.getInvertX())
-				pos.negateX().add(new Vector2Double(canvas.getWidth(), 0));
-			if (vp.getInvertY())
-				pos.negateY().add(new Vector2Double(0, canvas.getHeight()));
-			Rectangle2D bounds = tr.getBounds(text);
-			pos.subtract(new Vector2Double(bounds.getWidth() / 2.0, bounds.getHeight() / 2.0));
 			
-			tr.beginRendering(canvas.getWidth(), canvas.getHeight());
-			tr.draw(text, pos.getXAsInteger(), pos.getYAsInteger());
-			tr.endRendering();
+			tr.setColor(color);
+			
+			IVector2 pos = getBasePosition(vp, dcPos, position, canvasSize, vp.getInvertX(), vp.getInvertY());
+			
+			double xPos = pos.getXAsDouble();
+			double yPos = pos.getYAsDouble();
+			
+			for (int i = 0; i < lines.length; ++i)
+			{
+				String text = getReplacedText(obj, lines[i]);
+				
+				TextLayout tl = new TextLayout(text, font, DUMMY_FRC);
+				
+				if (i != 0)
+					yPos -= tl.getAscent();
+
+				tr.beginRendering(canvasSize.getXAsInteger(), canvasSize.getYAsInteger());
+				tr.draw(text, (int) (xPos + getAlignment(tl)), (int) yPos);
+				tr.endRendering();
+				
+				yPos -= (tl.getDescent() + tl.getLeading());
+			}
 		}
 	}
 	
-	private String getReplacedText(Object obj)
+	private double getAlignment(TextLayout tl)
 	{
+		double xAlign = 0.0;
+		switch(align)
+		{
+			case ALIGN_RIGHT:
+				xAlign -= tl.getAdvance();
+				break;
+			case ALIGN_CENTER:
+				xAlign -= tl.getAdvance() / 2.0f;
+			case ALIGN_LEFT:
+			default:
+		}
+		return xAlign;
+	}
+	
+	private final static IVector2 getBasePosition(AbstractViewport vp, IVector2 dcPos, IVector2 position, IVector2 canvasSize, boolean invX, boolean invY)
+	{
+		IVector2 pos = vp.getPosition().copy().negate().add(vp.getObjectShift()).add(dcPos).add(position).divide(vp.getPaddedSize()).multiply(canvasSize);
+		if (invX)
+			pos.negateX().add(new Vector2Double(canvasSize.getXAsDouble(), 0));
+		if (invY)
+			pos.negateY().add(new Vector2Double(0, canvasSize.getYAsDouble()));
+		return pos;
+	}
+	
+	private final static float getFontScale(IVector2 dcScale, IVector2 canvasSize, IVector2 areaSize, IVector2 size)
+	{
+		return (dcScale.getMean().getAsFloat() * (Math.min(canvasSize.getXAsFloat(), canvasSize.getYAsFloat()) / BASE_VIEWPORT_SIZE) * areaSize.copy().divide(size).getMean().getAsFloat());
+	}
+	
+	private final static String getReplacedText(Object obj, String text)
+	{
+		
 		String[] tokens = text.split("\\$");
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < tokens.length; ++i)
@@ -225,6 +298,7 @@ public final class Text implements IDrawable
 				}
 			}
 		}
+		
 		return sb.toString();
 	}
 }

@@ -105,7 +105,7 @@
 								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
 							</env:drawcondition>
 						</env:texturedrectangle>
-						<env:text layer="2" x="0.0" y="0.02" basesize="90" text="ore: $ore$\ncapacity: $capacity$" color="black">
+						<env:text layer="2" x="0.0" y="0.02" basesize="90" text="ore: $ore$\ncapacity: $capacity$" align="center" color="black">
 							<env:drawcondition>
 								$object.getProperty("state").equals("analyzed")
 							</env:drawcondition>
@@ -120,7 +120,7 @@
 						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
 						<env:property name="oreposition" dynamic="true">new Vector2Double(0, 0.3-((Vector2Double)$drawable.getBoundValue($object, "oresize")).getXAsDouble()/2)</env:property>
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
-						<env:text layer="2" x="0.0" y="0.08" basesize="70" text="$text$" color="black"/>
+						<env:text layer="2" x="0.0" y="0.08" basesize="70" text="$text$" align="center" color="black"/>
 						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdi/examples/marsworld_env/images/ore.png">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 						</env:texturedrectangle>

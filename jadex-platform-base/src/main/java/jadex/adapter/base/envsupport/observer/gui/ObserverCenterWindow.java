@@ -60,6 +60,7 @@ public class ObserverCenterWindow extends JFrame
 
 				mainpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 				mainpane.setDividerLocation(200 + mainpane.getInsets().left);
+				mainpane.setOneTouchExpandable(true);
 				getContentPane().add(mainpane, BorderLayout.CENTER);
 
 				mainpane.setLeftComponent(new JPanel());

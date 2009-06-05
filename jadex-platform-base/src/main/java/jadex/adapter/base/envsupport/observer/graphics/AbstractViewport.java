@@ -316,6 +316,15 @@ public abstract class AbstractViewport implements IViewport
 	}
 	
 	/**
+	 * Returns the size of the canvas as a vector.
+	 * @return size of the canvas in pixel
+	 */
+	public IVector2 getCanvasSize()
+	{
+		return new Vector2Double(canvas_.getWidth(), canvas_.getHeight());
+	}
+	
+	/**
 	 * Gets the position of the viewport.
 	 */
 	public IVector2 getPosition()
