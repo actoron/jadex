@@ -627,7 +627,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo("text", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"x", "y", 
-				"position", "font", "style", "basesize", "fontscaling", "color", "layer", "text", "align", "creator"}, 
+				"position", "font", "style", "basesize", "abspos", "abssize", "color", "layer", "text", "align", "creator"}, 
 			new BeanAttributeInfo[]{
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
@@ -635,6 +635,7 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.STRING_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, ""),
+				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, colorconv, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
@@ -684,8 +685,11 @@ public class MEnvSpaceType	extends MSpaceType
 						else if (aligntxt.equals("center"))
 							align = Text.ALIGN_CENTER;
 						
+						int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
+						
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, align, fontscaling, exp);
+						return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, align, absFlags, exp);
 					}
 				})
 			}), null));

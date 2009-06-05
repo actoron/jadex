@@ -47,16 +47,6 @@ public final class Text implements IDrawable
 	public final static int ALIGN_RIGHT 	= 2;
 	
 	
-	/** Top Alignment */
-	//public final static int ALIGN_TOP 		= 0;
-	
-	/** Middles Alignment */
-	//public final static int ALIGN_MIDDLES 	= 256;
-	
-	/** Bottom Alignment */
-	//public final static int ALIGN_BOTTOM 	= 512;
-	
-	
 	/** Viewport size (in pixels) on which the base font size is relative to */
 	private final static float BASE_VIEWPORT_SIZE = 300.0f;
 	
@@ -78,20 +68,24 @@ public final class Text implements IDrawable
 	/** Text alignment */
 	private int align;
 	
-	/** Font scaling flag */
-	private boolean fontscaling;
+	/** Enable DrawableCombiner position */
+	protected boolean enableDCPos;
+	
+	/** Enable DrawableCombiner position */
+	protected boolean enableDCSize;
 	
 	/** The condition deciding if the drawable should be drawn. */
 	private IParsedExpression drawcondition;
 	
 	public Text()
 	{
-		this(null, null, null, null, 0, true, null);
+		this(null, null, null, null, 0, 0, null);
 	}
 	
-	public Text(Object position, Font baseFont, Color color, String text, int align, boolean fontscaling, IParsedExpression drawcondition)
+	public Text(Object position, Font baseFont, Color color, String text, int align, int absFlags, IParsedExpression drawcondition)
 	{
-		this.fontscaling = fontscaling;
+		enableDCPos = (absFlags & RotatingPrimitive.ABSOLUTE_POSITION) == 0;
+		enableDCSize = (absFlags & RotatingPrimitive.ABSOLUTE_SIZE) == 0;
 		this.align = align;
 		if (position == null)
 			position = Vector2Double.ZERO.copy();
@@ -147,20 +141,26 @@ public final class Text implements IDrawable
 		
 		if (draw)
 		{
-			IVector2 position = (IVector2)dc.getBoundValue(obj, this.position);
-			IVector2 dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());
+			IVector2 position = ((IVector2)dc.getBoundValue(obj, this.position)).copy();
+			IVector2 dcPos = Vector2Double.ZERO;
+			if (enableDCPos)
+				dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());
 			IVector2 dcScale = (IVector2)dc.getBoundValue(obj, dc.getSize());
 			if((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
 			}
-			position.multiply(dcScale);
+			
+			IVector2 canvasSize = vp.getCanvasSize();
+			float fontscale = getBasicFontScale(canvasSize, vp.getAreaSize(), vp.getSize());
+			if (enableDCSize)
+			{
+				position.multiply(dcScale);
+				fontscale *= dcScale.getMean().getAsFloat();
+			}
+			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
 			
 			Graphics2D g = vp.getContext();
-			IVector2 canvasSize = vp.getCanvasSize();
-			Font font = baseFont;
-			if (fontscaling)
-				font = font.deriveFont(baseFont.getSize() * getFontScale(dcScale, canvasSize, vp.getAreaSize(), vp.getSize()));
 			
 			IVector2 pos = getBasePosition(vp, dcPos, position, canvasSize, vp.getInvertX(), !vp.getInvertY());
 			double xPos = pos.getXAsDouble();
@@ -205,19 +205,25 @@ public final class Text implements IDrawable
 		
 		if (draw)
 		{
-			IVector2 position = (IVector2)dc.getBoundValue(obj, this.position);
-			IVector2 dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());//SObjectInspector.getVector2(obj, dc.getPosition());
-			IVector2 dcScale = (IVector2)dc.getBoundValue(obj, dc.getSize());//SObjectInspector.getVector2(obj, dc.getSize());
+			IVector2 position = ((IVector2)dc.getBoundValue(obj, this.position)).copy();
+			IVector2 dcPos = Vector2Double.ZERO;
+			if (enableDCPos)
+				dcPos = (IVector2)dc.getBoundValue(obj, dc.getPosition());//SObjectInspector.getVector2(obj, dc.getPosition());
+			IVector2 dcScale = (IVector2)dc.getBoundValue(obj, dc.getSize());
 			if((position == null) || (dcPos == null) || (dcScale == null))
 			{
 				return;
 			}
-			position.multiply(dcScale);
 			
 			IVector2 canvasSize = vp.getCanvasSize();
-			Font font = baseFont;
-			if (fontscaling)
-				font = font.deriveFont(baseFont.getSize() * getFontScale(dcScale, canvasSize, vp.getAreaSize(), vp.getSize()));
+			float fontscale = getBasicFontScale(canvasSize, vp.getAreaSize(), vp.getSize());
+			if (enableDCSize)
+			{
+				position = position.copy().multiply(dcScale);
+				fontscale *= dcScale.getMean().getAsFloat();
+			}
+			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);;
+				
 			TextRenderer tr = vp.getTextRenderer(font);
 			
 			tr.setColor(color);
@@ -273,9 +279,9 @@ public final class Text implements IDrawable
 		return pos;
 	}
 	
-	private final static float getFontScale(IVector2 dcScale, IVector2 canvasSize, IVector2 areaSize, IVector2 size)
+	private final static float getBasicFontScale(IVector2 canvasSize, IVector2 areaSize, IVector2 size)
 	{
-		return (dcScale.getMean().getAsFloat() * (Math.min(canvasSize.getXAsFloat(), canvasSize.getYAsFloat()) / BASE_VIEWPORT_SIZE) * areaSize.copy().divide(size).getMean().getAsFloat());
+		return ((Math.min(canvasSize.getXAsFloat(), canvasSize.getYAsFloat()) / BASE_VIEWPORT_SIZE) * areaSize.copy().divide(size).getMean().getAsFloat());
 	}
 	
 	private final static String getReplacedText(Object obj, String text)
