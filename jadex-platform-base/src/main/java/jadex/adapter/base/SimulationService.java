@@ -345,7 +345,7 @@ public class SimulationService implements ISimulationService
 	{
 		if(executing!=this.executing)
 		{
-			System.out.println("executing: "+executing);
+//			System.out.println("executing: "+executing);
 			this.executing = executing;
 			notifyListeners(new ChangeEvent(this, "executing", executing? Boolean.TRUE: Boolean.FALSE));
 		}

@@ -368,12 +368,14 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 			if(obj==null)
 				throw new RuntimeException("No object found for id: "+id);
 			
+			String	objecttype	= obj.getType();
+			
 			// shutdown and jettison tasks
 			obj.clearTasks();
 
 			// remove object
 			spaceobjects.remove(id);
-			List typeobjs = (List)spaceobjectsbytype.get(obj.getType());
+			List typeobjs = (List)spaceobjectsbytype.get(objecttype);
 			typeobjs.remove(obj);
 			if(typeobjs.size()==0)
 				spaceobjectsbytype.remove(obj.getType());
@@ -384,6 +386,16 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 				ownedobjs.remove(obj);
 				if(ownedobjs.size()==0)
 					spaceobjectsbyowner.remove(obj.getProperty(ISpaceObject.PROPERTY_OWNER));
+			}
+
+			// Remove view(s) for the object if any.
+			if(dataviewmappings!=null && dataviewmappings.getCollection(objecttype)!=null)
+			{
+				for(Iterator it=dataviewmappings.getCollection(objecttype).iterator(); it.hasNext(); )
+				{
+					Map	sourceview	= (Map)it.next();
+					removeDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id);
+				}
 			}
 		}
 		
@@ -555,7 +567,7 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 //			if(!percepttypes.containsKey(typename))
 //				throw new RuntimeException("Unknown percept type: "+typename);
 			
-			System.out.println("New percept: "+typename+", "+data+", "+agent);
+//			System.out.println("New percept: "+typename+", "+data+", "+agent);
 			
 			String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
 			List procs	= (List)perceptprocessors.get(agenttype);

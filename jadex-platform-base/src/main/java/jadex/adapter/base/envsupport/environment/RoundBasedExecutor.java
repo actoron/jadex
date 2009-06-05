@@ -123,7 +123,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 			
 			public boolean execute()
 			{
-				System.out.println("---+++--- New round: "+currenttime+" ---+++---");
+//				System.out.println("---+++--- New round: "+currenttime+" ---+++---");
 				
 				IVector1 progress = new Vector1Long(currenttime - timestamp);
 				timestamp = currenttime;

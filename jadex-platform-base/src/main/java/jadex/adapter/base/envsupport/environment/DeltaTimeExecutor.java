@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
+import jadex.bridge.ITimedObject;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
@@ -41,9 +42,10 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	 * @param timecoefficient the time coefficient
 	 * @param clockservice the clock service
 	 */
-	public DeltaTimeExecutor(final AbstractEnvironmentSpace space)
+	public DeltaTimeExecutor(AbstractEnvironmentSpace space, boolean tick)
 	{
 		setProperty("space", space);
+		setProperty("tick", new Boolean(tick));
 	}
 	
 	//-------- methods --------
@@ -54,6 +56,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
+		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
 		IPlatform	platform	= ((ApplicationContext)space.getContext()).getPlatform();
 		final IClockService clockservice = (IClockService)platform.getService(IClockService.class);
 		final IExecutionService exeservice = (IExecutionService)platform.getService(IExecutionService.class);
@@ -112,12 +115,26 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 			process.start(clockservice, space);
 		}
 
-		clockservice.addChangeListener(new IChangeListener()
+		if(tick)
 		{
-			public void changeOccurred(ChangeEvent e)
+			clockservice.createTickTimer(new ITimedObject()
 			{
-				exeservice.execute(executable);
-			}
-		});
+				public void timeEventOccurred(long currenttime)
+				{
+					exeservice.execute(executable);
+					clockservice.createTickTimer(this);
+				}
+			});
+		}
+		else
+		{
+			clockservice.addChangeListener(new IChangeListener()
+			{
+				public void changeOccurred(ChangeEvent e)
+				{
+					exeservice.execute(executable);
+				}
+			});
+		}
 	}
 }

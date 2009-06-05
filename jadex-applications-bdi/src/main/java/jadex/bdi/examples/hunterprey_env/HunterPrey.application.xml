@@ -206,7 +206,7 @@
 			</env:perspectives>
 
 
-			<env:perspective name="abstract" class="Perspective2D">
+			<env:perspective name="abstract" class="Perspective2D" objectshiftx="0.5" objectshifty="0.5">
 				<env:drawable objecttype="food" width="1.0" height="1.0">
 					<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
 				</env:drawable>
@@ -345,7 +345,8 @@
 				<agent type="CleverPrey" number="50" configuration="Clever"/>
 				<agent type="CleverPrey" number="25" configuration="Opportunistic"/>
 				<agent type="CleverPrey" number="25" configuration="Lazy"/>
-				<agent type="DumbHunter" number="30"/>
+				<agent type="DumbHunter" number="25"/>
+				<agent type="LAHunter" number="5"/>
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace">
@@ -382,7 +383,7 @@
 				</env:observers>
  			</env:envspace>
  		</application>
- 		
+ 		<!-- 
 		<application name="debug">
 			<agents>
 				<agent type="DumbPrey" name="testprey" />
@@ -408,6 +409,6 @@
 				</env:observers>
  			</env:envspace>
  		</application>
- 		
+ 		 -->
 	</applications>
 </applicationtype>

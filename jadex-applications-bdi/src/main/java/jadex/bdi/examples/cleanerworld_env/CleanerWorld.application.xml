@@ -128,6 +128,7 @@
 			<!-- executor -->
 			<env:spaceexecutor class="DeltaTimeExecutor">
 				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>

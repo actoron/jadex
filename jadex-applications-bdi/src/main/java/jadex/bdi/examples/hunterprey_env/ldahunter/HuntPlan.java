@@ -45,13 +45,18 @@ public class HuntPlan extends Plan {
 
 		if(prey!=null)
 		{
+			IVector2	ppos	= (IVector2)prey.getProperty(Space2D.PROPERTY_POSITION);
+			if(env.getDistance(myLoc, ppos).getAsInteger()>2)
+				throw new RuntimeException("Wurks0: "+getScope().getAgentName()+", "+prey);			
+				
+			
 			try
 			{
 				env.getSpaceObject(prey.getId());
 			}
 			catch(Exception e)
 			{
-				System.out.println("Wurks: "+getScope().getAgentName()+", "+prey);			
+				throw new RuntimeException("Wurks1: "+getScope().getAgentName()+", "+prey);			
 			}
 		}
 		
@@ -72,14 +77,14 @@ public class HuntPlan extends Plan {
 
 				try
 				{
-					System.out.println("Eating: "+getScope().getAgentName()+", "+prey);
+//					System.out.println("Eating: "+getScope().getAgentName()+", "+prey);
 					SyncResultListener srl	= new SyncResultListener();
 					Map params = new HashMap();
 					params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 					params.put(ISpaceAction.OBJECT_ID, prey);
 					env.performSpaceAction("eat", params, srl);
 					srl.waitForResult();
-					System.out.println("Ate: "+getScope().getAgentName()+", "+prey);
+//					System.out.println("Ate: "+getScope().getAgentName()+", "+prey);
 				}
 				catch(RuntimeException e)
 				{
@@ -124,18 +129,18 @@ public class HuntPlan extends Plan {
 			}
 		}
 
-		getLogger().info("Moving " + dir + " to " + to);
+//		getLogger().info("Moving " + dir + " to " + to);
 
 		getBeliefbase().getBelief("last_direction").setFact(dir);
 
-		System.out.println("Moving: "+myself);
+//		System.out.println("Moving: "+myself);
 		SyncResultListener srl	= new SyncResultListener();
 		Map params = new HashMap();
 		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 		params.put(MoveAction.PARAMETER_DIRECTION, dir);
 		env.performSpaceAction("move", params, srl);
 		srl.waitForResult();
-		System.out.println("Moved: "+myself);
+//		System.out.println("Moved: "+myself);
 	}
 
 	/**
