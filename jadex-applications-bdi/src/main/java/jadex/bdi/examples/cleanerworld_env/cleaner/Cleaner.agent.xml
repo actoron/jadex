@@ -181,6 +181,7 @@
 		<!-- Drop a piece of waste into a wastebin. -->
 		<achievegoal name="achievedropwaste" retry="true" exclude="never">
 			<parameter name="wastebin" class="ISpaceObject"/>
+			<parameter name="waste" class="ISpaceObject"/>
 			
 			<!-- The goal has failed when the aimed wastebin is full. - ->
 			<failurecondition>
@@ -306,10 +307,12 @@
 		</plan>-->
 		
 		<!-- Walk to random positions. -->
-		<plan name="randomwalk">
+		<plan name="randomwalk" priority="-1">
 			<body class="RandomWalkPlan"/>
 			<trigger>
 				<goal ref="performlookforwaste"/>
+				<goal ref="querywastebin"/>
+				<goal ref="querychargingstation"/>
 			</trigger>
 		</plan>
 
@@ -356,15 +359,18 @@
 		</plan>
 
 		<!-- Drop a waste into a waste bin. -->
-		<!-- <plan name="dropwaste">
+		<plan name="dropwaste">
 			<parameter name="wastebin" class="ISpaceObject">
  				<goalmapping ref="achievedropwaste.wastebin"/>
+			</parameter>
+			<parameter name="waste" class="ISpaceObject">
+ 				<goalmapping ref="achievedropwaste.waste"/>
 			</parameter>
 			<body class="DropWastePlan"/>
 			<trigger>
 				<goal ref="achievedropwaste"/>
 			</trigger>
-		</plan> -->
+		</plan>
 
 		<!-- Load the battery. -->
 		<plan name="loadbattery">
@@ -430,7 +436,7 @@
 			<goals>
 				<initialgoal ref="performlookforwaste"/>
   				<!-- <initialgoal ref="performpatrol"/> -->
-		  		<!-- <initialgoal ref="maintainbatteryloaded"/>-->
+		  		<initialgoal ref="maintainbatteryloaded"/>
 				<!-- <initialgoal ref="performmemorizepositions"/>-->
 			</goals>
 		</configuration>

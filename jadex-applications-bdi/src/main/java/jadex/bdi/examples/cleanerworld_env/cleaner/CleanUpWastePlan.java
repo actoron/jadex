@@ -49,7 +49,9 @@ public class CleanUpWastePlan extends Plan
 			// Retry, when wastebin is full in meantime.
 			try
 			{
+				ISpaceObject waste = (ISpaceObject)getParameter("waste").getValue();
 				IGoal drop = createGoal("achievedropwaste");
+				drop.getParameter("waste").setValue(waste);
 				drop.getParameter("wastebin").setValue(wastebin);
 				dispatchSubgoalAndWait(drop);
 				dropped	= true;
@@ -59,5 +61,16 @@ public class CleanUpWastePlan extends Plan
 			{
 			}
 		}
+	}
+	
+	public void failed()
+	{
+		System.out.println("failed: "+this);
+		getException().printStackTrace();
+	}
+
+	public void aborted()
+	{
+		System.out.println("aborted: "+this);
 	}
 }

@@ -52,6 +52,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 				int wastes = ((Integer)wastebin.getProperty("wastes")).intValue();
 				wastebin.setProperty("wastes", new Integer(wastes+1));
 				env.destroySpaceObject(waste.getId());
+				avatar.setProperty("waste", null);
 				ret = true;
 			}
 			//pcs.firePropertyChange("worldObjects", garb, null);

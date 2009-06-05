@@ -54,5 +54,17 @@ public class MoveToLocationPlan extends Plan
 			myself.removeTask(move);
 		}
 	}
+	
+	/**
+	 *  Remove the task, when the plan has failed. 
+	 */
+	public void failed()
+	{
+		if(move!=null)
+		{
+			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+			myself.removeTask(move);
+		}
+	}
 }
 	

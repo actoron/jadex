@@ -365,6 +365,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 		synchronized(monitor)
 		{
 			obj = (ISpaceObject)spaceobjects.get(id);
+			if(obj==null)
+				throw new RuntimeException("No object found for id: "+id);
+			
 			// shutdown and jettison tasks
 			obj.clearTasks();
 
