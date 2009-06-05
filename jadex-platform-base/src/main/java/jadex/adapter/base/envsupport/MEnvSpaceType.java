@@ -669,8 +669,6 @@ public class MEnvSpaceType	extends MSpaceType
 						}
 						Font font = new Font(fontname, fontstyle.intValue(), fontsize.intValue());
 						
-						boolean fontscaling = !Boolean.FALSE.equals(MEnvSpaceInstance.getProperty(args, "fontscaling"));
-						
 						String text = (String) MEnvSpaceInstance.getProperty(args, "text");
 						text = String.valueOf(text);
 						
