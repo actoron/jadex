@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.nodes;
 
 
 import jadex.rules.rulesystem.AbstractAgenda;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -38,7 +39,7 @@ public interface INode extends Cloneable
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes();
+	public AttributeSet getRelevantAttributes();
 	
 	/**
 	 *  Get the set of indirect attribute types.
@@ -46,7 +47,7 @@ public interface INode extends Cloneable
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes();
+	public AttributeSet getIndirectAttributes();
 
 	/**
 	 *  Create the node memory.

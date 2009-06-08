@@ -1,5 +1,6 @@
 package jadex.bdi.interpreter;
 
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
@@ -20,7 +21,7 @@ public class ResolvesTo implements IFunction
 	//-------- attributes --------
 	
 	/** The set with the attribute. */
-	protected Set relevants;
+	protected AttributeSet relevants;
 	
 	//-------- IFunction interface --------
 	
@@ -60,20 +61,20 @@ public class ResolvesTo implements IFunction
 	 *  Get the set of relevant attribute types.
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
-			relevants = new HashSet();
-			relevants.add(OAVBDIRuntimeModel.element_has_model);
-			relevants.add(OAVBDIMetaModel.modelelement_has_name);
-			relevants.add(OAVBDIRuntimeModel.capability_has_beliefs);
-			relevants.add(OAVBDIRuntimeModel.capability_has_beliefsets);
-			relevants.add(OAVBDIRuntimeModel.capability_has_goals);
-			relevants.add(OAVBDIRuntimeModel.capability_has_internalevents);
-			relevants.add(OAVBDIRuntimeModel.capability_has_messageevents);
-			relevants.add(OAVBDIRuntimeModel.capability_has_subcapabilities);
-			relevants.add(OAVBDIRuntimeModel.capabilityreference_has_capability);
+			relevants = new AttributeSet();
+			relevants.addAttribute(OAVBDIRuntimeModel.element_has_model);
+			relevants.addAttribute(OAVBDIMetaModel.modelelement_has_name);
+			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_beliefs);
+			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_beliefsets);
+			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_goals);
+			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_internalevents);
+			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_messageevents);
+			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_subcapabilities);
+			relevants.addAttribute(OAVBDIRuntimeModel.capabilityreference_has_capability);
 			
 		}
 		return relevants;

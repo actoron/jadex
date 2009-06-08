@@ -1,8 +1,10 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import jadex.commons.collection.SCollection;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.rete.builder.ReteBuilder;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
@@ -45,7 +47,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	protected ReteBuilder builder;
 	
 	/** The set of relevant attributes. */
-	protected Set relevants;
+	protected AttributeSet relevants;
 	
 	/** Do a consistency check after each state change (requires asserts). */
 	protected boolean	check;
@@ -146,8 +148,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		
-//		if(attr.getName().indexOf("garbage")!=-1)
-//			System.out.println("test");
+		if(attr.getName().indexOf("wastes")!=-1)
+			System.out.println("test");
 		
 		if(getRelevantAttributes().contains(attr))
 		{
@@ -361,7 +363,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -369,7 +371,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					for(Iterator it=typenodes.values().iterator(); it.hasNext(); )
 					{
 						relevants.addAll(((INode)it.next()).getRelevantAttributes());
@@ -386,9 +388,9 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	/**
@@ -433,10 +435,10 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	
 	/**
 	 *  Get the set of indirectly affected nodes for an attribute type.
-	 *  @param type The attribute type.
+	 *  @param attrtype The attribute type.
 	 *  @return The set of indirectly affected nodes for that attribute type.
 	 */
-	protected Set	getIndirectNodes(OAVAttributeType type)
+	protected Set getIndirectNodes(OAVAttributeType attrtype)
 	{
 		if(indirectnodesets==null)
 		{
@@ -444,18 +446,19 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 			{
 				if(indirectnodesets==null)
 				{
-					indirectnodesets	= new HashMap();
-					List	nodelist	= new ArrayList();
-					List	nodeset	= new ArrayList();
+					indirectnodesets = new HashMap();
+					List nodelist	= new ArrayList();
+					List nodeset	= new ArrayList();
 					nodelist.addAll(typenodes.values());
 					nodeset.addAll(nodelist);
 					
 					for(int i=0; i<nodelist.size(); i++)
 					{
-						INode	node	= (INode)nodelist.get(i);
-						if(!node.getIndirectAttributes().isEmpty())
+						INode node = (INode)nodelist.get(i);
+						AttributeSet attrset = node.getIndirectAttributes();
+						if(attrset.getAttributeSet()!=null)
 						{
-							for(Iterator it=node.getIndirectAttributes().iterator(); it.hasNext(); )
+							for(Iterator it=attrset.getAttributeSet().iterator(); it.hasNext(); )
 							{
 								Object	attr	= it.next();
 								Set	indinodes	= (Set)indirectnodesets.get(attr);
@@ -463,6 +466,20 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 								{
 									indinodes	= new HashSet();
 									indirectnodesets.put(attr, indinodes);
+								}
+								indinodes.add(node);
+							}
+						}
+						if(attrset.getAllTypesSet()!=null)
+						{
+							for(Iterator it=attrset.getAllTypesSet().iterator(); it.hasNext(); )
+							{
+								Object objtype	= it.next();
+								Set	indinodes	= (Set)indirectnodesets.get(objtype);
+								if(indinodes==null)
+								{
+									indinodes	= new HashSet();
+									indirectnodesets.put(objtype, indinodes);
 								}
 								indinodes.add(node);
 							}
@@ -496,7 +513,20 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 				}
 			}
 		}
-		return (Set)indirectnodesets.get(type);
+		
+		Set tmp1 = (Set)indirectnodesets.get(attrtype);
+		Set tmp2 = (Set)indirectnodesets.get(attrtype.getType());
+		
+		Set ret = tmp1;
+		if(tmp2!=null)
+		{
+			if(ret!=null)
+				ret.addAll(tmp2);
+			else
+				ret = tmp2;
+		}
+		
+		return ret;
 	}
 	
 	//-------- cloneable --------
@@ -577,7 +607,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			clone.relevants = (Set)((HashSet)relevants).clone();
+			clone.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 	}
 	
 	//-------- checking --------

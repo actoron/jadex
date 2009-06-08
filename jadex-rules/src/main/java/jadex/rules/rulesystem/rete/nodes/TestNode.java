@@ -3,6 +3,7 @@ package jadex.rules.rulesystem.rete.nodes;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
@@ -30,10 +31,10 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	final protected IConstraintEvaluator evaluator;
 	
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet relevants;
 	
 	/** The set of indirect attributes. */
-	protected Set	indirects;
+	protected AttributeSet indirects;
 	
 	//-------- constructors --------
 	
@@ -253,7 +254,7 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -261,7 +262,7 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					relevants.addAll(evaluator.getRelevantAttributes());
 					for(int i=0; tconsumers!=null && i<tconsumers.length; i++)
 					{
@@ -279,7 +280,7 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
 		if(indirects==null)
 		{
@@ -287,7 +288,7 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 			{
 				if(indirects==null)
 				{
-					indirects	= new HashSet();
+					indirects	= new AttributeSet();
 					indirects.addAll(evaluator.getIndirectAttributes());
 				}
 			}
@@ -384,7 +385,7 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			clone.relevants = (Set)((HashSet)relevants).clone();
+			clone.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 	}
 	
 }

@@ -110,11 +110,11 @@ public class TupleExtractor implements IValueExtractor
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet ret = new AttributeSet();
 		if(attr!=null)
-			ret.add(attr);
+			ret.addAttribute(attr);
 		return ret;
 	}
 	
@@ -124,9 +124,9 @@ public class TupleExtractor implements IValueExtractor
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	/**

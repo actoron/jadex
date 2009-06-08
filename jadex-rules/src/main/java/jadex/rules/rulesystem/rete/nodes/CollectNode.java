@@ -3,6 +3,7 @@ package jadex.rules.rulesystem.rete.nodes;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
@@ -38,10 +39,10 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	protected IConstraintEvaluator[] evaluators;
 	
 	/** The set of relevant attributes. */
-	protected Set relevants;
+	protected AttributeSet relevants;
 	
 	/** The set of indirect attributes. */
-	protected Set indirects;
+	protected AttributeSet indirects;
 	
 	/** The tuple index to collect. */
 	protected int tupleindex;
@@ -416,7 +417,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -424,7 +425,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						relevants.addAll(evaluators[i].getRelevantAttributes());
@@ -445,7 +446,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
 		if(indirects==null)
 		{
@@ -453,7 +454,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			{
 				if(indirects==null)
 				{
-					indirects	= new HashSet();
+					indirects	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						indirects.addAll(evaluators[i].getIndirectAttributes());
@@ -512,7 +513,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			clone.relevants = (Set)((HashSet)relevants).clone();
+			clone.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 	}
 	
 	//-------- helpers --------

@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.constraints;
 
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -69,9 +70,9 @@ public class OrConstraintEvaluator implements IConstraintEvaluator
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet	ret	= new AttributeSet();
 		for(int i=0; i<evaluators.length; i++)
 		{
 			ret.addAll(evaluators[i].getRelevantAttributes());
@@ -85,9 +86,9 @@ public class OrConstraintEvaluator implements IConstraintEvaluator
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet ret = new AttributeSet();
 		for(int i=0; i<evaluators.length; i++)
 		{
 			ret.addAll(evaluators[i].getIndirectAttributes());

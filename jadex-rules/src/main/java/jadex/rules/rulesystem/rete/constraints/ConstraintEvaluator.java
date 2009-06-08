@@ -2,7 +2,9 @@ package jadex.rules.rulesystem.rete.constraints;
 
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
+import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
@@ -57,13 +59,26 @@ public class ConstraintEvaluator implements IConstraintEvaluator
 	 *  @param left The left input tuple. 
 	 *  @param state The working memory.
 	 */
-	public boolean evaluate(Object right, Tuple left, IOAVState state)
+	public boolean evaluate(final Object right, final Tuple left, final IOAVState state)
 	{
 		boolean ret = false;
 		try
 		{
-			ret = operator.evaluate(state, extractor1.getValue(left, right, null, state), 
-				extractor2.getValue(left, right, null, state));
+			ILazyValue val1 = new ILazyValue()
+			{
+				public Object getValue()
+				{
+					return extractor1.getValue(left, right, null, state);
+				}
+			};
+			ILazyValue val2 = new ILazyValue()
+			{
+				public Object getValue()
+				{
+					return extractor2.getValue(left, right, null, state);
+				}
+			};
+			ret = operator.evaluate(state, val1, val2); 
 //			System.out.println(toString()+" "+ret);//+" "+extractor1.getValue(left, right, state)+" "+extractor2.getValue(left, right, state));
 		}
 		catch(Exception e)
@@ -91,9 +106,9 @@ public class ConstraintEvaluator implements IConstraintEvaluator
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet ret = new AttributeSet();
 		ret.addAll(extractor1.getRelevantAttributes());
 		ret.addAll(extractor2.getRelevantAttributes());
 		return ret;
@@ -105,9 +120,9 @@ public class ConstraintEvaluator implements IConstraintEvaluator
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet ret = new AttributeSet();
 		ret.addAll(extractor1.getIndirectAttributes());
 		ret.addAll(extractor2.getIndirectAttributes());
 		return ret;

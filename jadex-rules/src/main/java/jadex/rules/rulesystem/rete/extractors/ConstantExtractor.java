@@ -66,9 +66,9 @@ public class ConstantExtractor implements IValueExtractor
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	/**
@@ -77,9 +77,9 @@ public class ConstantExtractor implements IValueExtractor
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	/**

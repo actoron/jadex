@@ -130,6 +130,7 @@
 			<unique dummy="true"/>
 			<creationcondition language="jcl">
 				ISpaceObject $waste &amp;&amp; $waste.getType().equals("waste")
+				&amp;&amp; $waste.position!=null
 			</creationcondition>
 			<contextcondition language="jcl">
 				$beliefbase.daytime
@@ -146,10 +147,10 @@
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup" language="jcl">
 					//$goal.waste==$beliefbase.carriedwaste || 
-					$goal.waste.getProperty(Space2D.PROPERTY_POSITION)==null ||
-					$goal.waste.getProperty(Space2D.PROPERTY_POSITION)!=null &amp;&amp;
-					$beliefbase.my_location.getDistance((IVector2)$goal.waste.getProperty(Space2D.PROPERTY_POSITION))
-						.less($beliefbase.my_location.getDistance((IVector2)$ref.waste.getProperty(Space2D.PROPERTY_POSITION)))
+					$goal.waste.position==null ||
+					$ref.waste.position!=null &amp;&amp;
+					$beliefbase.my_location.getDistance((IVector2)$goal.waste.position)
+						.less($beliefbase.my_location.getDistance((IVector2)$ref.waste.position))
 				</inhibits>
 			</deliberation>
 			<!-- <targetcondition>
@@ -221,7 +222,7 @@
 					order by $beliefbase.getBelief("my_location").getFact().getDistance($wastebin.getLocation())
 				</value> -->
 				<value language="clips">
-					?ret = (ISpaceObject (position ?loc) (full false))
+					?ret = (ISpaceObject (position ?loc) (getProperty("full") false))
 					?rbeliefset = (beliefset (element_has_model.melement_has_name "wastebins") (beliefset_has_facts contains ?ret))
 					?rbelief = (belief (element_has_model.melement_has_name "my_location") (belief_has_fact ?myloc))
 					

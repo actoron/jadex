@@ -5,6 +5,7 @@ import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
@@ -38,10 +39,10 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	protected IRule	rule;
 
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet relevants;
 
 	/** The set of indirect attributes. */
-	protected Set	indirects;
+	protected AttributeSet indirects;
 
 	//-------- constructors --------
 	
@@ -216,7 +217,7 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -226,11 +227,11 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 				{
 					if(extractors.isEmpty())
 					{
-						relevants	= Collections.EMPTY_SET;
+						relevants = AttributeSet.EMPTY_ATTRIBUTESET;
 					}
 					else
 					{
-						relevants	= new HashSet();
+						relevants	= new AttributeSet();
 						for(Iterator it=extractors.values().iterator(); it.hasNext(); )
 						{
 							IValueExtractor ex = (IValueExtractor)it.next();
@@ -249,7 +250,7 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
 		if(indirects==null)
 		{
@@ -259,11 +260,11 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 				{
 					if(extractors.isEmpty())
 					{
-						indirects	= Collections.EMPTY_SET;
+						indirects	= AttributeSet.EMPTY_ATTRIBUTESET;
 					}
 					else
 					{
-						indirects	= new HashSet();
+						indirects	= new AttributeSet();
 						for(Iterator it=extractors.values().iterator(); it.hasNext(); )
 						{
 							IValueExtractor ex = (IValueExtractor)it.next();

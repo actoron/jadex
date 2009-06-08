@@ -4,6 +4,7 @@ import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
@@ -40,10 +41,10 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	protected ConstraintIndexer[] indexers;
 
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet relevants;
 
 	/** The set of indirect attributes. */
-	protected Set	indirects;
+	protected AttributeSet indirects;
 
 	//-------- constructors --------
 	
@@ -732,7 +733,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -740,7 +741,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					for(int i=0; indexers!=null && i<indexers.length; i++)
 					{
 						relevants.addAll(indexers[i].getRelevantAttributes());
@@ -765,7 +766,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
 		if(indirects==null)
 		{
@@ -773,7 +774,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			{
 				if(indirects==null)
 				{
-					indirects	= new HashSet();
+					indirects	= new AttributeSet();
 					for(int i=0; indexers!=null && i<indexers.length; i++)
 					{
 						indirects.addAll(indexers[i].getIndirectAttributes());
@@ -837,7 +838,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			clone.relevants = (Set)((HashSet)relevants).clone();
+			clone.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 	}
 	
 	//-------- template methods --------

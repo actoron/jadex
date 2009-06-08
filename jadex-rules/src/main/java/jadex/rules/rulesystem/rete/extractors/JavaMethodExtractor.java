@@ -4,6 +4,7 @@ import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,16 +20,16 @@ public class JavaMethodExtractor implements IValueExtractor
 	//-------- attributes --------
 	
 	/** The object extractor. */
-	protected IValueExtractor	objex;
+	protected IValueExtractor objex;
 	
 	/** The method call descriptor. */
-	protected MethodCall	methodcall;
+	protected MethodCall methodcall;
 
 	/** The parameter extractors. */
 	protected IValueExtractor[]	parameters;
 	
 	/** The relevant attributes. */
-	protected Set	relevants;
+//	protected Set	relevants;
 	
 	//-------- constructors --------
 	
@@ -107,21 +108,30 @@ public class JavaMethodExtractor implements IValueExtractor
 	 *  Get the set of relevant attribute types.
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		if(relevants==null)
-		{
-			relevants	= new HashSet();
-			OAVObjectType	type	= methodcall.getType();
-			while(type!=null)
-			{
-				relevants.addAll(type.getDeclaredAttributeTypes());
-				type	= type.getSupertype();
-			}
-			
-			for(int i=0; i<parameters.length; i++)
-				relevants.addAll(parameters[i].getRelevantAttributes());
-		}
+//		if(relevants==null)
+//		{
+//			relevants	= new HashSet();
+//			OAVObjectType	type	= methodcall.getType();
+//			while(type!=null)
+//			{
+//				relevants.addAll(type.getDeclaredAttributeTypes());
+//				type	= type.getSupertype();
+//			}
+//			
+//			for(int i=0; i<parameters.length; i++)
+//				relevants.addAll(parameters[i].getRelevantAttributes());
+//		}
+//		return relevants;
+		
+		AttributeSet relevants	= new AttributeSet();
+		OAVJavaType	type = methodcall.getType();
+		relevants.addAllType(type);
+		
+		for(int i=0; i<parameters.length; i++)
+			relevants.addAll(parameters[i].getRelevantAttributes());
+		
 		return relevants;
 	}
 	
@@ -131,9 +141,9 @@ public class JavaMethodExtractor implements IValueExtractor
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	/**

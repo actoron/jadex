@@ -34,7 +34,7 @@ public interface IValueExtractor
 	 *  Get the set of relevant attribute types.
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getRelevantAttributes();
+	public AttributeSet	getRelevantAttributes();
 
 
 	/**
@@ -43,5 +43,5 @@ public interface IValueExtractor
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes();
+	public AttributeSet	getIndirectAttributes();
 }

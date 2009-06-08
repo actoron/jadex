@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.nodes;
 
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.AbstractAgenda;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
@@ -44,10 +45,10 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	protected IObjectConsumerNode[]	oconsumers;
 
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet relevants;
 	
 	/** The set of indirect attributes. */
-	protected Set	indirects;
+	protected AttributeSet indirects;
 
 	/** The values extractor. */
 	// Needed as long as multifield extractor is based on attribute
@@ -396,7 +397,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	 *  Get the set of relevant attribute types.
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -404,7 +405,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					relevants.addAll(extractor.getRelevantAttributes());
 					for(int i=0; oconsumers!=null && i<oconsumers.length; i++)
 					{
@@ -422,7 +423,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
 		if(indirects==null)
 		{
@@ -430,7 +431,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(indirects==null)
 				{
-					indirects	= new HashSet();
+					indirects	= new AttributeSet();
 					indirects.addAll(extractor.getIndirectAttributes());
 				}
 			}
@@ -587,7 +588,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			ret.relevants = (Set)((HashSet)relevants).clone();
+			ret.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 		
 		// Keep extractor
 		

@@ -1,6 +1,7 @@
 package jadex.rules.rulesystem.rules.functions;
 
 import jadex.commons.SReflect;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
@@ -58,9 +59,9 @@ public class Mult implements IFunction
 	 *  Get the set of relevant attribute types.
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 	
 	/**

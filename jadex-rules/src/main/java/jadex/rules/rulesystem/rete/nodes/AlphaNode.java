@@ -3,6 +3,7 @@ package jadex.rules.rulesystem.rete.nodes;
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
@@ -31,10 +32,10 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	protected IConstraintEvaluator[] evaluators;
 	
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet	relevants;
 
 	/** The set of indirect attributes. */
-	protected Set	indirects;
+	protected AttributeSet indirects;
 
 	//-------- constructors --------
 	
@@ -351,7 +352,7 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -359,7 +360,7 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						relevants.addAll(evaluators[i].getRelevantAttributes());
@@ -380,7 +381,7 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
 		if(indirects==null)
 		{
@@ -388,7 +389,7 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(indirects==null)
 				{
-					indirects	= new HashSet();
+					indirects	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						indirects.addAll(evaluators[i].getIndirectAttributes());
@@ -444,6 +445,6 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			clone.relevants = (Set)((HashSet)relevants).clone();
+			clone.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 	}
 }

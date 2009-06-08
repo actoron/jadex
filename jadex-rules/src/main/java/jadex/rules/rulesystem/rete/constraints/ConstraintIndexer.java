@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.constraints;
 
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
 import jadex.rules.rulesystem.rete.extractors.ObjectExtractor;
 import jadex.rules.rulesystem.rete.extractors.TupleExtractor;
@@ -161,9 +162,9 @@ public class ConstraintIndexer
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet ret = new AttributeSet();
 		ret.addAll(extractor1.getRelevantAttributes());
 		ret.addAll(extractor2.getRelevantAttributes());
 		return ret;
@@ -175,9 +176,9 @@ public class ConstraintIndexer
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet ret	= new AttributeSet();
 		ret.addAll(extractor1.getIndirectAttributes());
 		ret.addAll(extractor2.getIndirectAttributes());
 		return ret;

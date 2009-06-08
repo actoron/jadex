@@ -254,8 +254,8 @@ public class OAVJavaType extends OAVObjectType
 			if(clazz.isArray())
 			{
 				attributes.put("length", new OAVJavaAttributeType(this, "length",
-						getTypeModel().getJavaType(int.class),
-						OAVAttributeType.NONE, null, null));
+					getTypeModel().getJavaType(int.class),
+					OAVAttributeType.NONE, null, null));
 			}
 		}
 		return attributes.values();

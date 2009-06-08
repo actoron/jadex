@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.nodes;
 
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -30,7 +31,7 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	protected IObjectSourceNode osource;
 
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet	relevants;
 
 	/** The initial fact tuple. */
 	protected Tuple	initial_fact_tuple;
@@ -209,7 +210,7 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -217,7 +218,7 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					for(int i=0; tconsumers!=null && i<tconsumers.length; i++)
 					{
 						relevants.addAll(tconsumers[i].getRelevantAttributes());
@@ -234,9 +235,9 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	//-------- cloneable --------

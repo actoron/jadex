@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.nodes;
 
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
@@ -26,7 +27,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 	protected IObjectSourceNode osource;
 	
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet	relevants;
 
 	//-------- object consumer node --------
 	
@@ -223,7 +224,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -231,7 +232,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					for(int i=0; tconsumers!=null && i<tconsumers.length; i++)
 					{
 						relevants.addAll(tconsumers[i].getRelevantAttributes());
@@ -248,9 +249,9 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	//-------- cloneable --------
@@ -279,7 +280,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 			
 			// Shallow copy the relevant attributes
 			if(relevants!=null)
-				ret.relevants = (Set)((HashSet)relevants).clone();
+				ret.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 		}
 		catch(Exception e)
 		{
@@ -311,6 +312,6 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			clone.relevants = (Set)((HashSet)relevants).clone();
+			clone.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 	}
 }

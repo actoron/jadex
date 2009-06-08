@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
@@ -22,9 +23,6 @@ public class ExtractMulti implements IFunction
 	
 	/** The attribute. */
 	protected OAVAttributeType attr;
-	
-	/** The set with the attribute. */
-	protected Set relevants;
 	
 	//-------- constructors -------- 
 	
@@ -80,15 +78,15 @@ public class ExtractMulti implements IFunction
 	 *  Get the set of relevant attribute types.
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		if(relevants==null)
-		{
-			relevants = new HashSet();
-			relevants.add(attr);
-		}
-		return relevants;
+		AttributeSet ret = new AttributeSet();
+		if(attr!=null)
+			ret.addAttribute(attr);
+		return ret;
 	}
+	
+	
 	
 	/**
 	 *  Get the string representation.

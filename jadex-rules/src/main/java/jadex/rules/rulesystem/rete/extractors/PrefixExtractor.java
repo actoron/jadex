@@ -87,9 +87,9 @@ public class PrefixExtractor implements IValueExtractor
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	/**
@@ -98,11 +98,11 @@ public class PrefixExtractor implements IValueExtractor
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		Set	ret	= new HashSet();
+		AttributeSet ret = new AttributeSet();
 		if(attr!=null)
-			ret.add(attr);
+			ret.addAttribute(attr);
 		return ret;
 	}
 

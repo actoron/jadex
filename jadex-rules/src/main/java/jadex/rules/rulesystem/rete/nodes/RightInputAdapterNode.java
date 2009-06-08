@@ -2,6 +2,7 @@ package jadex.rules.rulesystem.rete.nodes;
 
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
@@ -24,7 +25,7 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 	protected ITupleSourceNode tsource;
 	
 	/** The set of relevant attributes. */
-	protected Set	relevants;
+	protected AttributeSet	relevants;
 
 	//-------- ITupleConsumer interface --------
 
@@ -192,7 +193,7 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet getRelevantAttributes()
 	{
 		if(relevants==null)
 		{
@@ -200,7 +201,7 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 			{
 				if(relevants==null)
 				{
-					relevants	= new HashSet();
+					relevants	= new AttributeSet();
 					for(int i=0; oconsumers!=null && i<oconsumers.length; i++)
 					{
 						relevants.addAll(oconsumers[i].getRelevantAttributes());
@@ -217,9 +218,9 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 
 	//-------- cloneable --------
@@ -243,6 +244,6 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 		
 		// Shallow copy the relevant attributes
 		if(relevants!=null)
-			clone.relevants = (Set)((HashSet)relevants).clone();
+			clone.relevants = (AttributeSet)((AttributeSet)relevants).clone();
 	}
 }

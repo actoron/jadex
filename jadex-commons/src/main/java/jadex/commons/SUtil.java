@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -283,6 +284,20 @@ public class SUtil
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Join two sets.
+	 *  @param a The first set.
+	 *  @param b The second set.
+	 *  @return A set with elements from a and b.
+	 * /
+	public static Set joinSets(Set a, Set b)
+	{
+		Set ret = new HashSet();
+		ret.addAll(a);
+		ret.addAll(b);
+		return ret;
+	}*/
 
 	/**
 	 *  Transform an iterator to a list.

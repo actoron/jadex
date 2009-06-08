@@ -38,15 +38,6 @@ public class OAVJavaAttributeType extends OAVAttributeType
 		this.propdesc = propdesc;
 	}
 	
-	/**
-	 *  Get the property descriptor.
-	 *  @return The property descriptor.
-	 * /
-	public PropertyDescriptor getPropertyDescriptor()
-	{
-		return propdesc;
-	}*/
-	
 	//-------- methods --------
 	
 	/**
@@ -93,10 +84,13 @@ public class OAVJavaAttributeType extends OAVAttributeType
 	{
 		Object	ret;
 		
+		// Length of arrays.
 		if("length".equals(getName()) && ((OAVJavaType)getObjectType()).getClazz().isArray())
 		{
 			ret	= new Integer(Array.getLength(object));
 		}
+		
+		// A property of an IPropertyObject.
 		else if(IPropertyObject.class.isAssignableFrom(((OAVJavaType)getObjectType()).getClazz()))
 		{
 			try
@@ -110,6 +104,8 @@ public class OAVJavaAttributeType extends OAVAttributeType
 				throw new RuntimeException(e);
 			}
 		}
+		
+		// Bean method.
 		else
 		{
 			Method rm = propdesc.getReadMethod();

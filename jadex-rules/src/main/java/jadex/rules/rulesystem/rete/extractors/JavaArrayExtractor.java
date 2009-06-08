@@ -67,26 +67,32 @@ public class JavaArrayExtractor implements IValueExtractor
 	 *  Get the set of relevant attribute types.
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		Set	ret;
-		Set	objrel	= objex.getRelevantAttributes();
-		Set	indrel	= index.getRelevantAttributes();
-		if(!objrel.isEmpty() && !indrel.isEmpty())
-		{
-			ret	= new HashSet();
-			ret.addAll(objrel);
-			ret.addAll(indrel);
-		}
-		else if(objrel.isEmpty())
-		{
-			ret	= indrel;
-		}
-		else
-		{
-			ret	= objrel;
-		}
+		AttributeSet ret = new AttributeSet();
+		AttributeSet objrel	= objex.getRelevantAttributes();
+		AttributeSet indrel	= index.getRelevantAttributes();
+		
+		ret.addAll(objrel);
+		ret.addAll(indrel);
+		
 		return ret;
+		
+//		if(!objrel.isEmpty() && !indrel.isEmpty())
+//		{
+//			ret	= new HashSet();
+//			ret.addAll(objrel);
+//			ret.addAll(indrel);
+//		}
+//		else if(objrel.isEmpty())
+//		{
+//			ret	= indrel;
+//		}
+//		else
+//		{
+//			ret	= objrel;
+//		}
+//		return ret;
 	}
 
 	/**
@@ -95,9 +101,9 @@ public class JavaArrayExtractor implements IValueExtractor
 	 *  (e.g. for chained extractors) 
 	 *  @return The relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
 		// Todo... also in method extractor!?
-		return Collections.EMPTY_SET;
+		return AttributeSet.EMPTY_ATTRIBUTESET;
 	}
 }

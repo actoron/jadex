@@ -1,11 +1,9 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
-
-import java.util.Collections;
-import java.util.Set;
 
 
 /**
@@ -19,9 +17,9 @@ public class ConditionalExpression	extends Expression
 	/** A function to evaluate conditionals. */
 	public static final IFunction	FUNCTION_CONDITIONAL	= new IFunction()
 	{
-		public Set getRelevantAttributes()
+		public AttributeSet getRelevantAttributes()
 		{
-			return Collections.EMPTY_SET;
+			return AttributeSet.EMPTY_ATTRIBUTESET;
 		}
 		public Class getReturnType()
 		{

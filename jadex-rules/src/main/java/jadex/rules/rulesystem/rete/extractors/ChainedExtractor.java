@@ -86,9 +86,9 @@ public class ChainedExtractor implements IValueExtractor
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getRelevantAttributes()
+	public AttributeSet	getRelevantAttributes()
 	{
-		Set ret = new HashSet();
+		AttributeSet ret = new AttributeSet();
 		ret.addAll(extractors[0].getRelevantAttributes());
 		return ret;
 	}
@@ -96,9 +96,9 @@ public class ChainedExtractor implements IValueExtractor
 	/**
 	 *  Get the set of relevant attribute types.
 	 */
-	public Set	getIndirectAttributes()
+	public AttributeSet	getIndirectAttributes()
 	{
-		Set ret = new HashSet();
+		AttributeSet ret = new AttributeSet();
 		for(int i=0; i<extractors.length; i++)
 		{
 			ret.addAll(extractors[i].getIndirectAttributes());

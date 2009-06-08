@@ -7,6 +7,7 @@ import jadex.bdi.runtime.impl.CapabilityFlyweight;
 import jadex.commons.SReflect;
 import jadex.rules.parser.conditions.javagrammar.DefaultParserHelper;
 import jadex.rules.rulesystem.ICondition;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.Constant;
 import jadex.rules.rulesystem.rules.FunctionCall;
@@ -278,9 +279,9 @@ public class BDIParserHelper extends	DefaultParserHelper
 				throw new RuntimeException("Capability condition required to build beliefbase constraint: "+name);
 			Object	valuesource	= new FunctionCall(new IFunction()
 			{
-				public Set getRelevantAttributes()
+				public AttributeSet getRelevantAttributes()
 				{
-					return Collections.EMPTY_SET;
+					return AttributeSet.EMPTY_ATTRIBUTESET;
 				}
 				public Class getReturnType()
 				{
@@ -304,9 +305,9 @@ public class BDIParserHelper extends	DefaultParserHelper
 				throw new RuntimeException("Capability condition required to build beliefbase constraint: "+name);
 			Object	valuesource	= new FunctionCall(new IFunction()
 			{
-				public Set getRelevantAttributes()
+				public AttributeSet getRelevantAttributes()
 				{
-					return Collections.EMPTY_SET;
+					return AttributeSet.EMPTY_ATTRIBUTESET;
 				}
 				public Class getReturnType()
 				{
@@ -387,9 +388,9 @@ public class BDIParserHelper extends	DefaultParserHelper
 		 *  Get the set of relevant attribute types.
 		 *  @return The relevant attribute types.
 		 */
-		public Set	getRelevantAttributes()
+		public AttributeSet	getRelevantAttributes()
 		{
-			return Collections.EMPTY_SET;
+			return AttributeSet.EMPTY_ATTRIBUTESET;
 		}
 
 		/**
