@@ -56,7 +56,7 @@
 <java.util.Date n:id="2e" v="2008-12-23T15:29:17"/>
 <java.util.Date n:id="2f" v="2008-12-23T15:29:06"/>
 <java.util.HashMap n:id="a">b c d e f 10 24 2e 26 2f</java.util.HashMap>
-<JarNode n:id="7" relativePath="jadex-applications-bdi-2.0-beta2.jar" r:parent="8" r:properties="a"/>
+<JarNode n:id="7" relativePath="jadex-applications-bdi-2.0-beta3.jar" r:parent="8" r:properties="a"/>
 <java.lang.Boolean n:id="31" v="false"/>
 <java.util.Date n:id="32" v="2008-12-23T14:58:52"/>
 <java.util.ArrayList n:id="33">5</java.util.ArrayList>
@@ -1801,11 +1801,11 @@
 <ModelExplorer_24_ModelExplorerProperties n:id="1" r:selectedNode="2" r:rootNode="8" r:expandedNodes="6f7"/>
 </n:root>
 ]]></property>
-			<property type="lastpath">C:\Files\Checkouts\jadex_releases\jadex-2.0-beta2\lib\jadex-applications-bdi-2.0-beta2.jar</property>
+			<property type="lastpath">C:\Files\Checkouts\jadex_releases\jadex-2.0-beta3\lib\jadex-applications-bdi-2.0-beta3.jar</property>
 			<property type="refresh">false</property>
 		</properties>
 		<properties type="spanel">
-			<property type="model">jar:file:/C:\Files\Checkouts\jadex_releases\jadex-2.0-beta2\lib\jadex-applications-bdi-2.0-beta2.jar!/jadex/bdi/examples/puzzle/Sokrates.agent.xml</property>
+			<property type="model">jar:file:/C:\Files\Checkouts\jadex_releases\jadex-2.0-beta3\lib\jadex-applications-bdi-2.0-beta3.jar!/jadex/bdi/examples/puzzle/Sokrates.agent.xml</property>
 			<property type="config">5x5 board (standard)</property>
 			<property type="autogenerate">false</property>
 			<property type="name">Sokrates</property>

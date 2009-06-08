@@ -334,10 +334,15 @@ public class MultifieldSplitTest extends TestCase
 //		try{synchronized(system){system.wait();}} catch(Exception e){}
 		
 		List test = new ArrayList();
-		test.add("(4,5)");
 		test.add("(5,4)");
-		test.add("(3,4)");
+		test.add("(4,5)");
 		test.add("(4,3)");
+		test.add("(3,4)");
+		// Todo: which order would be correct?
+//		test.add("(4,5)");
+//		test.add("(5,4)");
+//		test.add("(3,4)");
+//		test.add("(4,3)");
 		system.fireAllRules();
 		assertEquals("The condition should trigger with: "+test, test, result);
 		

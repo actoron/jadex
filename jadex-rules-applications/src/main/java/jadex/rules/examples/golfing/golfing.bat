@@ -1,2 +1,2 @@
 cd ..\..\..\..\..\..\..\..\lib
-java -cp jadex-rules-applications-2.0-beta2.jar jadex.rules.examples.golfing.Golfing
+java -cp jadex-rules-applications-2.0-beta3.jar jadex.rules.examples.golfing.Golfing

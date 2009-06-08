@@ -1,6 +1,8 @@
 package jadex.rules.examples.helloworld;
 
+import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.rulesystem.IAction;
+import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.LIFOAgenda;
 import jadex.rules.rulesystem.RuleSystem;
@@ -33,22 +35,39 @@ public class JavaHelloWorld
 		// Create simple OAV type model.
 		OAVTypeModel helloworld_type_model = new OAVTypeModel("helloworld_type_model");
 		helloworld_type_model.addTypeModel(OAVJavaType.java_type_model);
-		OAVObjectType message_type = new OAVJavaType(Message.class,OAVJavaType.KIND_BEAN, helloworld_type_model);
+		OAVObjectType message_type = helloworld_type_model.createJavaType(Message.class,OAVJavaType.KIND_BEAN);
 		
 		// Create rete system.
 		IOAVState state = OAVStateFactory.createOAVState(helloworld_type_model); // Create the production memory.
 		Rulebase rb	= new Rulebase();
 		RuleSystem rete = new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb), new LIFOAgenda());
 		
+		// The following five code fragments represent alternatives for condition creation
+		
+//		// Create rule condition manually.
+//		Variable message = new Variable("?message", message_type);
+//		ObjectCondition msgcon = new ObjectCondition(message_type);
+//		msgcon.addConstraint(new BoundConstraint(null, message));
+
+//		// Create rule condition using clips parser with imports.
+//		ICondition	msgcon	= ParserHelper.parseClipsCondition("?message <- (Message)", helloworld_type_model, new String[]{"jadex.rules.examples.helloworld.*"});
+
+//		// Create rule condition using clips parser with fully qualified java type name.
+//		ICondition	msgcon	= ParserHelper.parseClipsCondition("?message <- (jadex.rules.examples.helloworld.Message)", helloworld_type_model);
+
+		// Create rule condition using jcl (java condition language) parser with imports.
+		ICondition	msgcon	= ParserHelper.parseJavaCondition("Message $message", helloworld_type_model, new String[]{"jadex.rules.examples.helloworld.*"});
+
+//		// Create rule condition using jcl (java condition language) parser with fully qualified java type name.
+//		ICondition	msgcon	= ParserHelper.parseJavaCondition("jadex.rules.examples.helloworld.Message $message", helloworld_type_model);
+
 		// Add rule to rulebase.
-		Variable message = new Variable("?message", message_type);
-		ObjectCondition msgcon = new ObjectCondition(message_type);
-		msgcon.addConstraint(new BoundConstraint(null, message));
 		rete.getRulebase().addRule(new Rule("new_message", msgcon, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
-				Message message = (Message)assignments.getVariableValue("?message");
+//				Message message = (Message)assignments.getVariableValue("?message");	// Use for manual/clips conditions
+				Message message = (Message)assignments.getVariableValue("$message");	// Use for jcl conditions
 				System.out.println("New message found: "+message.getText());
 			}
 		}));

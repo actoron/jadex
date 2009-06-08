@@ -68,6 +68,18 @@ public class ParserHelper
 	 *  Parse a condition.
 	 *  @param text The text.
 	 *  @param model The model.
+	 *  @param imports The imports.
+	 *  @return The condition.
+	 */
+	public static ICondition parseClipsCondition(String text, OAVTypeModel model, String[] imports)
+	{
+		return parseClipsCondition(text, model, imports, null);
+	}	
+
+	/**
+	 *  Parse a condition.
+	 *  @param text The text.
+	 *  @param model The model.
 	 *  @return The condition.
 	 */
 	public static ICondition parseClipsCondition(String text, OAVTypeModel model, String[] imports, List errors)
@@ -119,6 +131,18 @@ public class ParserHelper
 	public static ICondition parseJavaCondition(String text, OAVTypeModel model)
 	{
 		return parseJavaCondition(text, null, null, new DefaultParserHelper(null, model), null, false);
+	}
+
+	/**
+	 *  Parse a condition.
+	 *  @param text The text.
+	 *  @param model The model.
+	 *  @param imports The imports.
+	 *  @return The condition.
+	 */
+	public static ICondition parseJavaCondition(String text, OAVTypeModel model, String[] imports)
+	{
+		return parseJavaCondition(text, imports, null, new DefaultParserHelper(null, model), null, false);
 	}
 
 	/**

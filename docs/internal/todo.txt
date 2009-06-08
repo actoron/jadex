@@ -3,6 +3,10 @@ jadex to do
 $Revision: 6097 $
 $Date: 2008-04-11 12:26:12 +0200 (Fr, 11 Apr 2008) $
 
+-------- Jadex Rules --------
+
+- include only rules api in maven-generated apidocs
+
 
 ---- clean up this old mess ;-) ----
 
@@ -27,22 +31,16 @@ Release 0.97
 	- solve problem of clock->executor loop (if a timed object does not lead
 		to executor execution the loop breaks down)
 	- do we want waitForTicks(int num)?
-	- allow changing clocks at runtime of a simulation
 	- allow arbitrary many simulations running in their specific execution context
 	- allow resetting an experiment an rerunning it from start
 	- allow running simulations in batch mode
 	- allow specifying experiment setups
-	- create new environment default classes for easy simulation setup
-	- rewrite examples using these environments
-	
 	- filter time point view?
-	- remove garbage collection actions
 	- sometimes very slow execution when pressing run/step button?
 		
 - kernel
 ***	- fix BrowserPane memory leak caused by Java bug #6406218 (use new document, but what about stylesheet?)
 *	- fix BrowserPane memory leak due to history (use history limit?, clear history method?, activate/deactivate history?)
-	- initial platform interface
 	- model checking
 		- check reference parameter names and types (used in triggers)
 		- check assignment of abstract elements in inner capabilities
@@ -92,10 +90,6 @@ Release 0.97
 		- support also key command for popup (e.g. windows context menu key)
 		- move tool reply code to tool adapters to cleanup outstanding messages, when tool deregisters.
 	- jcc
-?		- shared tree/classpath for starter/testcenter
-?		- initial project option for jcc
-?			- example project included in jar
-?				- save relative path names
 *		- list of recent projects in file menu
 	- starter
 		- display jar nodes as broken
@@ -164,7 +158,6 @@ Release 0.97
 		- split up jar
 		- readme.txt
 		- build.xml
-?	- maven build process
 	- remove distconf.properties from release dir
 ?	- ready to run bundles
 	- add expression testcase for both parsers (how?)

@@ -5,34 +5,34 @@
   <artifactId>jadex-platform-base</artifactId>
   <packaging>jar</packaging>
   <name>jadex-platform-base</name>
-  <version>2.0-beta2</version>
+  <version>2.0-beta3</version>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-beta2</version>
+    <version>2.0-beta3</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <dependencies>
   	<dependency>
   		<groupId>jadex</groupId>
   		<artifactId>jadex-commons</artifactId>
-  		<version>2.0-beta2</version>
+  		<version>2.0-beta3</version>
   	</dependency>
   	<dependency>
   		<groupId>jadex</groupId>
   		<artifactId>jadex-javaparser</artifactId>
-  		<version>2.0-beta2</version>
+  		<version>2.0-beta3</version>
   	</dependency>
   	<dependency>
   		<groupId>jadex</groupId>
   		<artifactId>jadex-bridge</artifactId>
-  		<version>2.0-beta2</version>
+  		<version>2.0-beta3</version>
   	</dependency>
   	<dependency>
   		<groupId>jadex</groupId>
   		<artifactId>jadex-nuggets</artifactId>
-  		<version>2.0-beta2</version>
+  		<version>2.0-beta3</version>
   	</dependency>
   	<dependency>
   		<groupId>jogl</groupId>

@@ -49,10 +49,10 @@ public class SJavaParser
 		    		{
 		    			type	= tmodel.getJavaType(clazz);
 		    		}
-		    		else if(input.get(index+1).equals("."))
+		    		else if(".".equals(input.LT(index+1).getText()))
 		    		{
 		    			index	+= 2;
-		    			typename	+= "." + input.get(index).getText();
+		    			typename	+= "." + input.LT(index).getText();
 		    		}
 		    		else
 		    		{
@@ -114,7 +114,12 @@ public class SJavaParser
      */
     protected static boolean	lookaheadCast(TokenStream input, OAVTypeModel tmodel, String[] imports)
     {
-    	int index	= lookaheadType(2, input, tmodel, imports);
-    	return "(".equals(input.LT(1).getText()) && index!=-1 && ")".equals(input.LT(index+1).getText());
+    	boolean	ret	= "(".equals(input.LT(1).getText());
+    	if(ret)
+    	{
+    		int index	= lookaheadType(2, input, tmodel, imports);
+    		ret	= index!=-1 && ")".equals(input.LT(index+1).getText());
+    	}
+    	return ret;
     }
 }

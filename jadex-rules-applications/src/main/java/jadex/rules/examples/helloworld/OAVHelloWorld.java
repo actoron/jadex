@@ -1,6 +1,9 @@
 package jadex.rules.examples.helloworld;
 
+import jadex.rules.examples.manners.Manners;
+import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.rulesystem.IAction;
+import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
 import jadex.rules.rulesystem.LIFOAgenda;
 import jadex.rules.rulesystem.RuleSystem;
@@ -34,7 +37,7 @@ public class OAVHelloWorld
 		// Create simple OAV type model.
 		OAVTypeModel helloworld_type_model = new OAVTypeModel("helloworld_type_model");
 		helloworld_type_model.addTypeModel(OAVJavaType.java_type_model);
-		OAVObjectType message_type = helloworld_type_model.createType("message_type"); 
+		OAVObjectType message_type = helloworld_type_model.createType("message"); 
 		final OAVAttributeType message_has_text = message_type.createAttributeType("message_has_text", OAVJavaType.java_string_type);
 		
 		// Create rete system.
@@ -42,15 +45,26 @@ public class OAVHelloWorld
 		Rulebase rb	= new Rulebase();
 		RuleSystem rete = new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb), new LIFOAgenda());
 		
+		// The following three code fragments represent alternatives for condition creation
+		
+//		// Create rule condition manually.
+//		Variable message = new Variable("?message", message_type);
+//		ObjectCondition msgcon = new ObjectCondition(message_type);
+//		msgcon.addConstraint(new BoundConstraint(null, message));
+
+//		// Create rule condition using clips parser.
+//		ICondition	msgcon	= ParserHelper.parseClipsCondition("?message <- (message)", helloworld_type_model);
+
+		// Create rule condition using jcl (java condition language) parser.
+		ICondition	msgcon	= ParserHelper.parseJavaCondition("message $message", helloworld_type_model);
+
 		// Add rule to rulebase.
-		Variable message = new Variable("?message", message_type);
-		ObjectCondition msgcon = new ObjectCondition(message_type);
-		msgcon.addConstraint(new BoundConstraint(null, message));
 		rete.getRulebase().addRule(new Rule("new_message", msgcon, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
-				Object message = assignments.getVariableValue("?message");
+//				Object message = assignments.getVariableValue("?message");	// Use for manual/clips condition
+				Object message = assignments.getVariableValue("$message");	// Use for jcl condition
 				System.out.println("New message found: "+state.getAttributeValue(message, message_has_text));
 			}
 		}));
