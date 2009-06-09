@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  *  Default implementation of a space object. 
  */
-public class SpaceObject extends PropertyHolder implements ISpaceObject
+public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObject
 {
 	//-------- attributes --------
 	

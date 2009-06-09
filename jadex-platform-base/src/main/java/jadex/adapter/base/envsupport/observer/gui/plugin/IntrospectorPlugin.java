@@ -338,10 +338,9 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 			return false;
 		}
 		
-		
 		Object[][] dataSet = new Object[propNames.size()][2];
 		int i = 0;
-		for (Iterator it = propNames.iterator(); it.hasNext(); )
+		for(Iterator it = propNames.iterator(); it.hasNext(); )
 		{
 			String name = (String) it.next();
 			dataSet[i][0] = name;

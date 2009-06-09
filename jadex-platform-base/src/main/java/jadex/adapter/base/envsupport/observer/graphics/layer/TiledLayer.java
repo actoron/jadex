@@ -64,7 +64,7 @@ public class TiledLayer implements ILayer
 	public TiledLayer(IVector2 tileSize, Color color, String texturePath)
 	{
 		this.tileSize_ = tileSize.copy();
-		this.modColor_ = color;
+		this.modColor_ = color==null? Color.WHITE: color;
 		this.invTileSize_ = (new Vector2Double(1.0)).divide(tileSize_);
 		this.texturePath_ = texturePath;
 		texture_ = 0;
@@ -80,8 +80,7 @@ public class TiledLayer implements ILayer
 	{
 		image_ = vp.getImage(texturePath_);
 		imageToUser_ = new AffineTransform();
-		imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_
-				.getHeight());
+		imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_.getHeight());
 		modComposite_ = new ModulateComposite()
 			{
 				protected Color getColor()

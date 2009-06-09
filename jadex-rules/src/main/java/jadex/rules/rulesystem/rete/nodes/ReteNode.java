@@ -148,7 +148,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		
-		if(attr.getName().indexOf("wastes")!=-1)
+		if(attr.getName().indexOf("daytime")!=-1)
 			System.out.println("test");
 		
 		if(getRelevantAttributes().contains(attr))

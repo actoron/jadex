@@ -108,12 +108,12 @@ public class SObjectInspector
 	public static Object getProperty(Object obj, String name)
 	{
 		Object ret = null;
-		if (obj instanceof IPropertyObject)
+		if(obj instanceof IPropertyObject)
 		{
 			ret = ((IPropertyObject)obj).getProperty(name); 
 		}
 		
-		if (ret == null)
+		if(ret == null)
 		{
 			try
 			{
@@ -146,8 +146,7 @@ public class SObjectInspector
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
-//			fetcher.setValue("$space", space);
-			ret = ((IParsedExpression) ret).getValue(fetcher);
+			ret = ((IParsedExpression)ret).getValue(fetcher);
 		}
 		
 		return ret;

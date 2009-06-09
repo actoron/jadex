@@ -19,7 +19,7 @@ public class CleanUpWastePlan extends Plan
 	 */
 	public void body()
 	{
-		System.out.println("Clean-up waste plan started: "+getParameter("waste").getValue()+" "+getReason());
+//		System.out.println("Clean-up waste plan started: "+getParameter("waste").getValue()+" "+getReason());
 
 		if(getBeliefbase().getBelief("carriedwaste").getFact()==null)
 		{

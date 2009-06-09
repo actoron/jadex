@@ -46,7 +46,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 			
 //		if(Math.random()>0.5)
 		{
-			System.out.println("drop: "+waste);
+//			System.out.println("drop: "+waste);
 			if(!((Boolean)wastebin.getProperty("full")).booleanValue())
 			{
 				int wastes = ((Integer)wastebin.getProperty("wastes")).intValue();

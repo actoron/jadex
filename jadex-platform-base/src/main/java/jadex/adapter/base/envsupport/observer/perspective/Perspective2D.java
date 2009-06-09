@@ -310,7 +310,7 @@ public class Perspective2D implements IPerspective
 	 */
 	public void setBackground(Color bgColor)
 	{
-		System.out.println(bgColor);
+		//System.out.println("bgcolor: "+bgColor);
 		if (bgColor == null)
 			bgColor = Color.BLACK;
 		this.bgColor = bgColor;

@@ -82,14 +82,20 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	public ISpace createSpace(final IApplicationContext app) throws Exception
 	{
 		MApplicationType mapt = ((ApplicationContext)app).getApplicationType();
-		MEnvSpaceType spacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
-
+		MEnvSpaceType mspacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
+		
 		// Create and init space.
-		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)((Class)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "clazz")).newInstance();
+		AbstractEnvironmentSpace ret = (AbstractEnvironmentSpace)((Class)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "clazz")).newInstance();
 		
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$space", ret);
 		fetcher.setValue("$platform", app.getPlatform());
+		ret.setFetcher(fetcher);
+		
+		List mspaceprops = mspacetype.getPropertyList("properties");
+		setProperties(ret, mspaceprops, fetcher);
+		List spaceprops = getPropertyList("properties");
+		setProperties(ret, spaceprops, fetcher);
 		
 		ret.setContext(app);
 		
@@ -100,15 +106,15 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		
 		if(ret instanceof Space2D) // Hack?
 		{
-			Double width = getProperty(properties, "width")!=null? (Double)getProperty(properties, "width"): (Double)getProperty(spacetype.getProperties(), "width");
-			Double height = getProperty(properties, "height")!=null? (Double)getProperty(properties, "height"): (Double)getProperty(spacetype.getProperties(), "height");
+			Double width = getProperty(properties, "width")!=null? (Double)getProperty(properties, "width"): (Double)getProperty(mspacetype.getProperties(), "width");
+			Double height = getProperty(properties, "height")!=null? (Double)getProperty(properties, "height"): (Double)getProperty(mspacetype.getProperties(), "height");
 			
 			((Space2D)ret).setAreaSize(Vector2Double.getVector2(width, height));
 //			System.out.println("areasize: "+width+" "+height);
 		}
 		
 		// Create space object types.
-		List objecttypes = spacetype.getPropertyList("objecttypes");
+		List objecttypes = mspacetype.getPropertyList("objecttypes");
 		if(objecttypes!=null)
 		{
 			for(int i=0; i<objecttypes.size(); i++)
@@ -122,7 +128,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Add avatar mappings.
-		List avmappings = spacetype.getPropertyList("avatarmappings");
+		List avmappings = mspacetype.getPropertyList("avatarmappings");
 		if(avmappings!=null)
 		{
 			for(int i=0; i<avmappings.size(); i++)
@@ -133,7 +139,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		// Create space percept types.
-		List percepttypes = spacetype.getPropertyList("percepttypes");
+		List percepttypes = mspacetype.getPropertyList("percepttypes");
 		if(percepttypes!=null)
 		{
 			for(int i=0; i<percepttypes.size(); i++)
@@ -150,13 +156,13 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				List otypes = (List)mpercepttype.get("objecttypes");
 				pt.setObjectTypes(otypes==null? null: new HashSet(otypes));
 				
-				System.out.println("Adding environment percept type: "+pt);
+//				System.out.println("Adding environment percept type: "+pt);
 				ret.addPerceptType(pt);
 			}
 		}
 		
 		// Create space actions.
-		List spaceactions = spacetype.getPropertyList("actiontypes");
+		List spaceactions = mspacetype.getPropertyList("actiontypes");
 		if(spaceactions!=null)
 		{
 			for(int i=0; i<spaceactions.size(); i++)
@@ -172,7 +178,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create processes.
-		List processes = spacetype.getPropertyList("processtypes");
+		List processes = mspacetype.getPropertyList("processtypes");
 		if(processes!=null)
 		{
 			for(int i=0; i<processes.size(); i++)
@@ -193,7 +199,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create percept generators.
-		List gens = spacetype.getPropertyList("perceptgenerators");
+		List gens = mspacetype.getPropertyList("perceptgenerators");
 		if(gens!=null)
 		{
 			for(int i=0; i<gens.size(); i++)
@@ -209,7 +215,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create percept processors.
-		List pmaps = spacetype.getPropertyList("perceptprocessors");
+		List pmaps = mspacetype.getPropertyList("perceptprocessors");
 		if(pmaps!=null)
 		{
 			for(int i=0; i<pmaps.size(); i++)
@@ -281,7 +287,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				List mprops = (List)mproc.get("properties");
 				Map props = convertProperties(mprops, fetcher);
 				ret.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
-				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
+//				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
 			}
 		}
 		
@@ -311,7 +317,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 //		Map themes = new HashMap();
-		List sourceviews = spacetype.getPropertyList("views");
+		List sourceviews = mspacetype.getPropertyList("views");
 		if(sourceviews!=null)
 		{
 			for(int i=0; i<sourceviews.size(); i++)
@@ -368,7 +374,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				//perspective.setObjectShift(new Vector2Double(0.5));
 				//oc.addPerspective("Simple 2D Space", perspective);
 				
-				List perspectives = spacetype.getPropertyList("perspectives");
+				List perspectives = mspacetype.getPropertyList("perspectives");
 				for(int j=0; j<perspectives.size(); j++)
 				{
 					Map sourcepers = (Map)perspectives.get(j);
@@ -388,7 +394,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create the environment executor.
-		Map mse = (Map)MEnvSpaceInstance.getProperty(spacetype.getProperties(), "spaceexecutor");
+		Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");
 		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
 		ISpaceExecutor exe = null;
 		if(exp!=null)
@@ -463,7 +469,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				if(dyn)
 					ret.put((String)prop.get("name"), exp);
 				else
-					ret.put((String)prop.get("name"), exp.getValue(fetcher));
+					ret.put((String)prop.get("name"), exp==null? null: exp.getValue(fetcher));
 			}
 		}
 		return ret;

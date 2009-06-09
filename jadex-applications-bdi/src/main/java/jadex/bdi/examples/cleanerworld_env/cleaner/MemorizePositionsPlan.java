@@ -1,32 +1,15 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
-import jadex.bdi.examples.cleanerworld.Location;
-import jadex.bdi.examples.cleanerworld.MapPoint;
+import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.Plan;
-
 
 /**
  *  Memorize the visited positions.
  */
 public class MemorizePositionsPlan extends Plan
 {
-	//-------- attributes --------
-
-	/** The forget factor. */
-	protected double forget;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public MemorizePositionsPlan()
-	{
-//		getLogger().info("Created: "+this);
-
-		this.forget = 0.01;
-	}
-
 	//-------- methods --------
 
 	/**
@@ -34,14 +17,18 @@ public class MemorizePositionsPlan extends Plan
 	 */
 	public void body()
 	{
+		double forget = 0.01;
+		
 		while(true)
 		{
-			Location	my_location	= (Location)getBeliefbase().getBelief("my_location").getFact();
-			double	my_vision	= ((Double)getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
+			IVector2 my_location	= (IVector2)getBeliefbase().getBelief("my_location").getFact();
 			MapPoint[] mps = (MapPoint[])getBeliefbase().getBeliefSet("visited_positions").getFacts();
+			double	my_vision	= ((Double)getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
+			IVector1 dist = new Vector1Double(my_vision);
+
 			for(int i=0; i<mps.length; i++)
 			{
-				if(my_location.isNear(mps[i].getLocation(), my_vision))
+				if(dist.greater(my_location.getDistance(mps[i].getLocation())))
 				{
 					mps[i].setQuantity(mps[i].getQuantity()+1);
 					mps[i].setSeen(1);

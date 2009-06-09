@@ -44,43 +44,40 @@
 
 		<beliefset name="cleaners" class="ISpaceObject" />
 
-		<!-- <beliefset name="raster" class="Integer">
+		<beliefset name="raster" class="Integer">
 			<fact>10</fact>
 			<fact>10</fact>
-		</beliefset> -->
-
-		<!-- <beliefset name="visited_positions" class="MapPoint">
+		</beliefset>
+		
+		<beliefset name="visited_positions" class="MapPoint">
 			<facts>
- 				MapPoint.getMapPointRaster($beliefbase.raster[0].intValue(), $beliefbase.raster[1].intValue(), 1, 1)
+ 				MapPoint.getMapPointRaster($beliefbase.raster[0].intValue(), $beliefbase.raster[1].intValue(),
+ 					$beliefbase.environment.getAreaSize().getXAsDouble(), $beliefbase.environment.getAreaSize().getYAsDouble())
 			</facts>
-		</beliefset> -->
+		</beliefset>
 
-		<belief name="daytime" class="boolean">
-			<fact>true</fact>
+		<!-- <belief name="daytime" class="boolean" evaluationmode="push">
+			<fact language="jcl">$beliefbase.environment.daytime</fact>
+		</belief> //does not work because environment does not throw change event for time :-( ? -->
+		
+		<belief name="daytime" class="boolean" evaluationmode="pull" updaterate="1000">
+			<fact>$beliefbase.environment.getProperty("daytime")</fact>
 		</belief>
 
 		<belief name="my_location" class="IVector2" evaluationmode="push">
-			<fact language="jcl">
-				$beliefbase.myself.position
-			</fact>
+			<fact language="jcl">$beliefbase.myself.position</fact>
  		</belief>
  		
  		<belief name="my_speed" class="double" evaluationmode="push">
-			<fact language="jcl">
-				$beliefbase.myself.speed
-			</fact>
+			<fact language="jcl">$beliefbase.myself.speed</fact>
  		</belief>
  		
  		<belief name="my_vision" class="double" evaluationmode="push">
-			<fact language="jcl">
-				$beliefbase.myself.vision_range
-			</fact>
+			<fact language="jcl">$beliefbase.myself.vision_range</fact>
  		</belief>
  		
  		<belief name="my_chargestate" class="double" evaluationmode="push">
-			<fact language="jcl">
-				$beliefbase.myself.chargestate
-			</fact>
+			<fact language="jcl">$beliefbase.myself.chargestate</fact>
  		</belief>
 
 		<belief name="carriedwaste" class="ISpaceObject"/>
@@ -98,10 +95,10 @@
 			<fact>new Vector2Double(0.9, 0.9)</fact>
 		</beliefset>
 		
-		<!-- <belief name="gui" class="jadex.bdi.planlib.GuiCreator">
+		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
 			<fact>new jadex.bdi.planlib.GuiCreator(CleanerGui.class, new Class[]{jadex.bdi.runtime.IExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
-		</belief> -->
+		</belief>
 	</beliefs>
 
 	<goals>
@@ -261,22 +258,6 @@
 					// )
 					// todo: fix not condition, should not use Location object condition, locations are not directly in state
 				</value>
-				
-				<!-- <value language="clips">
-					?ret = (Chargingstation (location ?loc))
-					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
-					?mbeliefset = (mbeliefset (melement_has_name "chargingstations"))
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (melement_has_name "my_location"))
-					(not 
-						(and
-							?other = (Chargingstation (location ?otherloc))
-							?otherloc = (Location (getDistance(?myloc) ?otherdist))
-							?loc = (Location (getDistance(?myloc) &gt; ?otherdist))
-						)
-					)
-					// todo: fix not condition, should not use Location object condition, locations are not directly in state
-				</value> -->
 			</parameter>
 		</querygoal>
 		
@@ -301,13 +282,13 @@
 	<plans>
 		<!-- Walk to the least seen positions.
  			Position just visited have value 1. The longer the position
- 			was not visted the lower the value. Good for seeking movable targets. - ->
+ 			was not visted the lower the value. Good for seeking movable targets. -->
 		<plan name="leastseenwalk">
 			<body class="LeastSeenWalkPlan"/>
 			<trigger>
 				<goal ref="performlookforwaste"/>
 			</trigger>
-		</plan>-->
+		</plan>
 		
 		<!-- Walk to random positions. -->
 		<plan name="randomwalk" priority="-1">
@@ -321,14 +302,14 @@
 
 		<!-- This plan explores the map by walking to unknown positions.
  			Uses the absolute quantity of visits at the map points.
- 			Good for seeking firm targets.- ->
+ 			Good for seeking firm targets.-->
 		<plan name="exploremap">
 			<body class="ExploreMapPlan"/>
 			<trigger>
 				<goal ref="querywastebin"/>
 				<goal ref="querychargingstation"/>
 			</trigger>
-		</plan>-->
+		</plan>
 
 		<!-- Perform patrols. -->
 		<plan name="patrol">
@@ -395,38 +376,38 @@
 			<!-- <contextcondition>$beliefbase.my_chargestate &gt; 0</contextcondition>-->
 		</plan>
 
-		<!-- This plan memorizes the positions. - ->
+		<!-- This plan memorizes the positions. -->
 		<plan name="memorizepositions">
 			<body class="MemorizePositionsPlan"/>
 			<trigger>
 				<goal ref="performmemorizepositions"/>
 			</trigger>
-		</plan>-->
+		</plan>
 	</plans>
 
 	<expressions>
-		<!-- Query the max quantity map point. - ->
+		<!-- Query the max quantity map point. -->
 		<expression name="query_max_quantity">
 			select one MapPoint $mp
 			from $beliefbase.getBeliefSet("visited_positions").getFacts()
 			order by $mp.getQuantity() desc
-		</expression>-->
+		</expression>
 
 		<!-- Query the map points ordered by their quantity
- 			(least ones first). - ->
+ 			(least ones first). -->
 		<expression name="query_min_quantity">
 			select MapPoint $mp
 			from $beliefbase.getBeliefSet("visited_positions").getFacts()
 			order by $mp.getQuantity()
-		</expression>-->
+		</expression>
 
 		<!-- Query the map points ordered by their seen value
- 			(least ones first). - ->
+ 			(least ones first). -->
 		<expression name="query_min_seen">
 			select MapPoint $mp
 			from $beliefbase.getBeliefSet("visited_positions").getFacts()
 			order by $mp.getSeen()
-		</expression>-->
+		</expression>
 	</expressions>
 
 	<properties>
@@ -438,9 +419,9 @@
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="performlookforwaste"/>
-  				<!-- <initialgoal ref="performpatrol"/> -->
+  				<initialgoal ref="performpatrol"/>
 		  		<initialgoal ref="maintainbatteryloaded"/>
-				<!-- <initialgoal ref="performmemorizepositions"/>-->
+				<initialgoal ref="performmemorizepositions"/>
 			</goals>
 		</configuration>
 	</configurations>

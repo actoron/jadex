@@ -1,7 +1,6 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
-import jadex.bdi.examples.cleanerworld.Location;
-import jadex.bdi.examples.cleanerworld.MapPoint;
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -45,7 +44,7 @@ public class LeastSeenWalkPlan extends Plan
 //		MapPoint[]	mps = (MapPoint[])getBeliefbase().getBeliefSet("visited_positions").getFacts();
 //		MapPoint mp = mps[(int)(Math.random()*mps.length)];
 
-		Location dest = mp.getLocation();
+		IVector2 dest = mp.getLocation();
 		IGoal moveto = createGoal("achievemoveto");
 		moveto.getParameter("location").setValue(dest);
 //		System.out.println("Created: "+dest+" "+this);

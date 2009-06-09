@@ -14,16 +14,6 @@ public class MoveToLocationPlan extends Plan
 	/** The move task. */
 	protected MoveTask	move;
 	
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public MoveToLocationPlan()
-	{
-		//getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

@@ -1,11 +1,8 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
-import jadex.bdi.examples.cleanerworld.Chargingstation;
-import jadex.bdi.examples.cleanerworld.Cleaner;
-import jadex.bdi.examples.cleanerworld.Location;
-import jadex.bdi.examples.cleanerworld.MapPoint;
-import jadex.bdi.examples.cleanerworld.Waste;
-import jadex.bdi.examples.cleanerworld.Wastebin;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExpression;
@@ -99,28 +96,28 @@ public class CleanerGui	extends JFrame
 					}
 	
 					// Paint the cleaners.
-					Cleaner[] cleaners = (Cleaner[])agent.getBeliefbase().getBeliefSet("cleaners").getFacts();
+					ISpaceObject[] cleaners = (ISpaceObject[])agent.getBeliefbase().getBeliefSet("cleaners").getFacts();
 					for(int i=0; i<cleaners.length; i++)
 					{
 						// Paint agent.
-						Point	p	= onScreenLocation(cleaners[i].getLocation(), bounds);
-						int w	= (int)(cleaners[i].getVisionRange()*bounds.width);
-						int h	= (int)(cleaners[i].getVisionRange()*bounds.height);
+						Point	p	= onScreenLocation((IVector2)cleaners[i].getProperty(Space2D.PROPERTY_POSITION), bounds);
+						int w	= (int)(((Double)cleaners[i].getProperty("vision_range")).doubleValue()*bounds.width);
+						int h	= (int)(((Double)cleaners[i].getProperty("vision_range")).doubleValue()*bounds.height);
 						g.setColor(new Color(100, 100, 100));	// Vision
 						g.fillOval(p.x-w, p.y-h, w*2, h*2);
 						g.setColor(new Color(50, 50, 50, 180));
 						g.fillOval(p.x-3, p.y-3, 7, 7);
-						g.drawString(cleaners[i].getName(),
+						g.drawString(cleaners[i].getProperty(ISpaceObject.PROPERTY_OWNER).toString(),
 							p.x+5, p.y-5);
-						g.drawString("battery: " + (int)(cleaners[i].getChargestate()*100.0) + "%",
+						g.drawString("battery: " + (int)(((Double)cleaners[i].getProperty("chargestate")).doubleValue()*100.0) + "%",
 							p.x+5, p.y+5);
-						g.drawString("waste: " + (cleaners[i].getCarriedWaste()!=null ? "yes" : "no"),
+						g.drawString("waste: " + (cleaners[i].getProperty("waste")!=null ? "yes" : "no"),
 							p.x+5, p.y+15);
 					}
 	
 					// Draw me additionally.
 					// Get world state from beliefs.
-					Location	agentloc	= (Location)agent.getBeliefbase().getBelief("my_location").getFact();
+					IVector2 agentloc = (IVector2)agent.getBeliefbase().getBelief("my_location").getFact();
 					double	vision	= ((Double)agent.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
 					double	charge	= ((Double)agent.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
 					boolean	waste	= agent.getBeliefbase().getBelief("carriedwaste").getFact()!=null;
@@ -141,35 +138,40 @@ public class CleanerGui	extends JFrame
 						p.x+5, p.y+15);
 	
 					// Paint charge Stations.
-					Chargingstation[] stations = (Chargingstation[])agent.getBeliefbase()
+					ISpaceObject[] stations = (ISpaceObject[])agent.getBeliefbase()
 						.getBeliefSet("chargingstations").getFacts();
 					for(int i=0; i<stations.length; i++)
 					{
 						g.setColor(Color.blue);
-						p	= onScreenLocation(stations[i].getLocation(), bounds);
+						p	= onScreenLocation((IVector2)stations[i].getProperty(Space2D.PROPERTY_POSITION), bounds);
 						g.drawRect(p.x-10, p.y-10, 20, 20);
 						g.setColor(daytime ? Color.black : Color.white);
-						g.drawString(stations[i].getName(), p.x+14, p.y+5);
+						g.drawString(""+stations[i].getType(), p.x+14, p.y+5);
 					}
 	
 					// Paint waste bins.
-					Wastebin[] wastebins = (Wastebin[])agent.getBeliefbase().getBeliefSet("wastebins").getFacts();
+					ISpaceObject[] wastebins = (ISpaceObject[])agent.getBeliefbase().getBeliefSet("wastebins").getFacts();
 					for(int i=0; i<wastebins.length; i++)
 					{
 						g.setColor(Color.red);
-						p	= onScreenLocation(wastebins[i].getLocation(), bounds);
+						p	= onScreenLocation((IVector2)wastebins[i].getProperty(Space2D.PROPERTY_POSITION), bounds);
 						g.drawOval(p.x-10, p.y-10, 20, 20);
 						g.setColor(daytime ? Color.black : Color.white);
-						g.drawString(wastebins[i].getName()+" ("+wastebins[i].getWastes().length+"/"+wastebins[i].getCapacity()+")", p.x+14, p.y+5);
+//						g.drawString(wastebins[i].getName()+" ("+wastebins[i].getWastes().length+"/"+wastebins[i].getCapacity()+")", p.x+14, p.y+5);
+						g.drawString(""+wastebins[i].getType()+" ("+wastebins[i].getProperty("wastes")+"/"+wastebins[i].getProperty("capacity")+")", p.x+14, p.y+5);
 					}
 	
 					// Paint waste.
-					Waste[] wastes = (Waste[])agent.getBeliefbase().getBeliefSet("wastes").getFacts();
+					ISpaceObject[] wastes = (ISpaceObject[])agent.getBeliefbase().getBeliefSet("wastes").getFacts();
 					for(int i=0; i<wastes.length; i++)
 					{
 						g.setColor(Color.red);
-						p	= onScreenLocation(wastes[i].getLocation(), bounds);
-						g.fillOval(p.x-3, p.y-3, 7, 7);
+						IVector2 pos = (IVector2)wastes[i].getProperty(Space2D.PROPERTY_POSITION);
+						if(pos!=null)
+						{
+							p = onScreenLocation(pos, bounds);
+							g.fillOval(p.x-3, p.y-3, 7, 7);
+						}
 					}
 	
 					// Paint movement targets.
@@ -177,7 +179,7 @@ public class CleanerGui	extends JFrame
 					for(int i=0; i<targets.length; i++)
 					{
 						g.setColor(Color.black);
-						p	= onScreenLocation((Location)targets[i].getParameter("location").getValue(), bounds);
+						p = onScreenLocation((IVector2)targets[i].getParameter("location").getValue(), bounds);
 						g.drawOval(p.x-5, p.y-5, 10, 10);
 						g.drawLine(p.x-7, p.y, p.x+7, p.y);
 						g.drawLine(p.x, p.y-7, p.x, p.y+7);
@@ -239,12 +241,12 @@ public class CleanerGui	extends JFrame
 	/**
 	 *  Get the on screen location for a location in  the world.
 	 */
-	protected static Point	onScreenLocation(Location loc, Rectangle bounds)
+	protected static Point	onScreenLocation(IVector2 loc, Rectangle bounds)
 	{
 		assert loc!=null;
 		assert bounds!=null;
-		return new Point((int)(bounds.width*loc.getX()),
-			(int)(bounds.height*(1.0-loc.getY())));
+		return new Point((int)(bounds.width*loc.getXAsDouble()),
+			(int)(bounds.height*(1.0-loc.getYAsDouble())));
 	}
 }
 

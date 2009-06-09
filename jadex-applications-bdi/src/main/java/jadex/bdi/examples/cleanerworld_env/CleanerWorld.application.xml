@@ -23,19 +23,24 @@
 	
 	<spacetypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
+			<env:property name="time" dynamic="true">$platform.getService(IClockService.class).getTime()</env:property>
+			<env:property name="daytime" dynamic="true">((Long)$space.getProperty("time")).longValue()%86400 &lt; 43200</env:property>
 			
 			<env:objecttypes>
 				<env:objecttype name="cleaner">
 					<env:property name="vision_range">0.1</env:property>
 					<env:property name="speed">0.1</env:property>
 					<env:property name="chargestate">1.0</env:property>
+					<env:property name="waste"></env:property>
 				</env:objecttype>
 				<env:objecttype name="waste" />
-				<env:objecttype name="chargingstation" />
+				<env:objecttype name="chargingstation">
+					<!-- <property name="name">"Chargingstation%n"</property>  -->
+				</env:objecttype>
 				<env:objecttype name="wastebin">
 					<env:property name="wastes">0</env:property>
-					<env:property name="max_wastes">3</env:property>
-					<env:property name="full" dynamic="true">$object.getProperty("wastes") &gt;= $object.getProperty("max_wastes")</env:property>
+					<env:property name="capacity">3</env:property>
+					<env:property name="full" dynamic="true">$object.getProperty("wastes") &gt;= $object.getProperty("capacity")</env:property>
 				</env:objecttype>
 			</env:objecttypes>
 			
@@ -105,16 +110,24 @@
 				<env:perspective name="icons" class="Perspective2D" opengl="true" invertyaxis="false">
 					<env:drawable objecttype="cleaner" width="0.1" height="0.1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*20)</env:property>
-						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld_env/images/cleaner.png" />
+						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld_env/images/cleaner.png" />
 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/>
 						<env:ellipse layer="-1" size="vision_size" color="#ffff007f" />
 					</env:drawable>
+					
 					<env:drawable objecttype="waste" width="0.03" height="0.03">
 						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/cleanerworld_env/images/waste.png" />
 					</env:drawable>
+					
 					<env:drawable objecttype="wastebin" width="0.06" height="0.06">
-						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/cleanerworld_env/images/wastebin.png" />
+						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/cleanerworld_env/images/wastebin.png" >
+							<env:drawcondition>!$object.getProperty("full")</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/cleanerworld_env/images/wastebin_full.png" >
+							<env:drawcondition>$object.getProperty("full")</env:drawcondition> 
+						</env:texturedrectangle>
 					</env:drawable>
+					
 					<env:drawable objecttype="chargingstation" width="0.06" height="0.06">
 						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/cleanerworld_env/images/chargingstation.png" />
 					</env:drawable>
@@ -139,7 +152,7 @@
 	
 	<applications>
 		<application name="Zero cleaners">
-			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
+			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">			
 				<env:objects>
 					<env:object type="chargingstation">
 						<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
@@ -185,6 +198,8 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
+				<!-- <env:property name="daytime">true</env:property>-->
+				
 				<env:objects>
 					<env:object type="chargingstation">
 						<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
@@ -212,11 +227,11 @@
 					</env:object>
 				</env:objects>
 				
-				<env:processes>
+				<!-- <env:processes>
 					<env:process type="create">
 						<env:property name="rate">30</env:property>
 					</env:process>
-				</env:processes>
+				</env:processes> -->
 				
 				<env:observers>
 					<env:observer name="Observer" view="view_all" perspective="abstract" />

@@ -30,7 +30,7 @@ public class PickUpWastePlan extends Plan
 		IGoal moveto = createGoal("achievemoveto");
 		IVector2 location = (IVector2)waste.getProperty(Space2D.PROPERTY_POSITION);
 		moveto.getParameter("location").setValue(location);
-		System.out.println("Created puw: "+location+" "+this);
+//		System.out.println("Created puw: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
 //		System.out.println("Reached: "+location+" "+this);
 
@@ -46,13 +46,13 @@ public class PickUpWastePlan extends Plan
 //		getBeliefbase().getBeliefSet("wastes").removeFact(waste);
 	}
 	
-	public void failed()
-	{
-		System.out.println("failed: "+this);
-	}
-
-	public void aborted()
-	{
-		System.out.println("aborted: "+this);
-	}
+//	public void failed()
+//	{
+//		System.out.println("failed: "+this);
+//	}
+//
+//	public void aborted()
+//	{
+//		System.out.println("aborted: "+this);
+//	}
 }

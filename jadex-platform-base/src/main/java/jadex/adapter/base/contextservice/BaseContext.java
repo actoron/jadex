@@ -194,7 +194,7 @@ public class BaseContext	implements IContext
 			}
 		}
 		
-		System.out.println("Added space: "+space);
+//		System.out.println("Added space: "+space);
 	}
 	
 	/**

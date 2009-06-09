@@ -8,6 +8,8 @@ import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IContext;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +23,7 @@ import java.util.Set;
 /**
  *  
  */
-public abstract class AbstractEnvironmentSpace extends PropertyHolder implements IEnvironmentSpace
+public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObject implements IEnvironmentSpace
 {
 	//-------- attributes --------
 	
@@ -84,6 +86,9 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 
 	/** The environment listeners. */
 	protected List listeners;
+	
+	/** The fetcher. */
+	protected SimpleValueFetcher fetcher;
 
 	//-------- constructors --------
 	
@@ -951,6 +956,49 @@ public abstract class AbstractEnvironmentSpace extends PropertyHolder implements
 	public void setContext(IContext context)
 	{
 		this.context = context;
+	}
+
+	/**
+	 * Returns a property.
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public Object getProperty(String name)
+	{
+		synchronized(monitor)
+		{
+			Object ret = super.getProperty(name);
+			
+			if(ret instanceof IParsedExpression)
+			{
+				ret = ((IParsedExpression) ret).getValue(getFetcher());
+			}
+			
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Get the value fetcher.
+	 *  @return The fetcher.
+	 */
+	public SimpleValueFetcher getFetcher()
+	{
+		if(fetcher==null)
+		{
+			this.fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$space", this);
+		}
+		return this.fetcher;
+	}
+
+	/**
+	 *  Set the fetcher.
+	 *  @param fetcher The fetcher to set.
+	 */
+	public void setFetcher(SimpleValueFetcher fetcher)
+	{
+		this.fetcher = fetcher;
 	}
 
 	/**

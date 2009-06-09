@@ -164,7 +164,7 @@ public class ApplicationFactory implements IApplicationFactory
 					{
 						for(int i=0; i<spaces.size(); i++)
 						{
-							System.out.println(spaces.get(i));
+//							System.out.println(spaces.get(i));
 							
 							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
 							ISpace space = si.createSpace(context);
@@ -179,7 +179,7 @@ public class ApplicationFactory implements IApplicationFactory
 				{
 					final MAgentInstance agent = (MAgentInstance)agents.get(i);
 					
-					System.out.println("Create: "+agent.getName()+" "+agent.getTypeName()+" "+agent.getConfiguration());
+//					System.out.println("Create: "+agent.getName()+" "+agent.getTypeName()+" "+agent.getConfiguration());
 					int num = agent.getNumber();
 					for(int j=0; j<num; j++)
 					{

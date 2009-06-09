@@ -428,8 +428,8 @@ public class ObserverCenter
 			ClassLoader cl = libService.getClassLoader();
 			try
 			{
-				System.out.println(iconPath);
-				System.out.println(cl.getResource(iconPath));
+//				System.out.println(iconPath);
+//				System.out.println(cl.getResource(iconPath));
 				BufferedImage image = ImageIO.read(cl.getResource(iconPath));
 				ImageIcon icon = new ImageIcon(image);
 				mainwindow.addToolbarItem(plugin.getName(), icon, new PluginAction(plugin));
