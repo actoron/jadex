@@ -25,6 +25,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
 /** The Introspector
@@ -73,6 +75,11 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	/** The observer center
 	 */
 	private ObserverCenter observerCenter_;
+	
+	/** 
+	 * Object selection listener.
+	 */
+	private ChangeListener selectionListener;
 	
 	public IntrospectorPlugin()
 	{
@@ -132,7 +139,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		JScrollPane procPropScrollPane = new JScrollPane(processPropertyTable_);
 		processPane.setBottomComponent(procPropScrollPane);
 		
-		JSplitPane objectPane = new JSplitPane();
+		final JSplitPane objectPane = new JSplitPane();
 		objectPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		objectPane.setOneTouchExpandable(true);
 		objectPane.setDividerLocation(100);
@@ -223,15 +230,27 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		taskPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane taskPropScrollPane = new JScrollPane(taskPropertyTable_);
 		taskPane.setBottomComponent(taskPropScrollPane);
+		
+		selectionListener = new ChangeListener()
+			{
+				public void stateChanged(ChangeEvent e)
+				{
+					Object selection = observerCenter_.getSelectedPerspective().getSelectedObject();
+					if (selection != null)
+						mainPane_.setSelectedComponent(objectPane);
+				}
+			};
 	}
 
 	public synchronized void start(ObserverCenter main)
 	{
 		observerCenter_ = main;
+		observerCenter_.addSelectedObjectListener(selectionListener);
 	}
 	
 	public synchronized void shutdown()
 	{
+		observerCenter_.removeSelectedObjectListener(selectionListener);
 	}
 	
 	public synchronized String getName()

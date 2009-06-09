@@ -21,10 +21,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +151,7 @@ public class Perspective2D implements IPerspective
 	public void setSelectedObject(Object obj)
 	{
 		selectedobject = obj;
+		obscenter.fireSelectedObjectChange();
 	}
 	
 	/**
@@ -371,6 +375,15 @@ public class Perspective2D implements IPerspective
 	}
 	
 	/**
+	 * Gets the maximum zoom.
+	 * @return the zoom limit
+	 */
+	public double getZoomLimit()
+	{
+		return zoomlimit;
+	}
+	
+	/**
 	 * Sets the maximum zoom.
 	 * @param zoomlimit the zoom limit
 	 */
@@ -379,6 +392,50 @@ public class Perspective2D implements IPerspective
 		this.zoomlimit = zoomlimit;
 		if (viewport != null)
 			viewport.setZoomLimit(zoomlimit);
+	}
+	
+	/** Returns the current zoom stepping
+	 *  @return the zoom stepping
+	 */
+	public double getZoomStepping()
+	{
+		return viewport.getAreaSize().copy().divide(viewport.getSize().copy().multiply(0.9)).getMean().getAsDouble() - getZoom();
+	}
+	
+	/** Returns the zoom factor
+	 *  @return the zoom factor
+	 */
+	public double getZoom()
+	{
+		return viewport.getAreaSize().copy().divide(viewport.getSize()).getMean().getAsDouble();
+	}
+	
+	/** Sets a new zoom factor
+	 *  @param zoom new zoom factor
+	 */
+	public void setZoom(double zoom)
+	{
+		IVector2 newSize = viewport.getAreaSize().copy().divide(new Vector2Double(zoom));
+		IVector2 oldSize = viewport.getSize().copy();
+		IVector2 pos = viewport.getPosition();
+		viewport.setSize(newSize);
+		pos.add(oldSize.subtract(newSize).multiply(0.5));
+		viewport.setPosition(pos);
+	}
+	
+	/**
+	 * Shifts the viewport position.
+	 * @param shift relative (to current zoom/size) shift vector
+	 */
+	public void shiftPosition(IVector2 shift)
+	{
+		if (invertxaxis)
+			shift.negateX();
+		if (invertyaxis)
+			shift.negateY();
+		IVector2 pos = viewport.getPosition().copy();
+		pos.add(viewport.getSize().copy().multiply(shift));
+		viewport.setPosition(pos);
 	}
 	
 	/**
@@ -434,7 +491,7 @@ public class Perspective2D implements IPerspective
 				}
 				else
 				{
-					selectedobject = null;
+					setSelectedObject(null);
 				}
 
 				if (displayorder != null)
@@ -535,7 +592,7 @@ public class Perspective2D implements IPerspective
 			{
 				++selectCycle;
 				selectCycle %= closest.size();
-				selectedobject = closest.get(selectCycle);
+				setSelectedObject(closest.get(selectCycle));
 			}
 		}
 	}

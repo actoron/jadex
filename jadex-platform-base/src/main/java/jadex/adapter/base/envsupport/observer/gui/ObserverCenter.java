@@ -13,6 +13,7 @@ import jadex.bridge.ILibraryService;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
@@ -20,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /** The default observer center
  */
@@ -81,6 +85,9 @@ public class ObserverCenter
 	/** Area size of the space */
 	private IVector2 areasize;
 	
+	/** Selected object listeners */
+	protected List selectedObjectListeners;
+	
 	/** Creates an observer center.
 	 *  
 	 *  @param windowTitle title of the observer window
@@ -90,6 +97,7 @@ public class ObserverCenter
 	 */
 	public ObserverCenter(final String windowTitle, final IEnvironmentSpace space, ILibraryService libSrvc, List customplugins)
 	{
+		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (Space2D) space;
 		areasize = ((Space2D)space).getAreaSize().copy();
 		perspectives = Collections.synchronizedMap(new HashMap());
@@ -262,6 +270,7 @@ public class ObserverCenter
 	public void setSelectedDataView(String name)
 	{
 		selecteddataviewname = name;
+		selectedperspective.setSelectedObject(null);
 	}
 	
 	/**
@@ -327,6 +336,7 @@ public class ObserverCenter
 			perspective.setObserverCenter(this);
 			selectedperspective = perspective;
 			mainwindow.setPerspectiveView(perspective.getView());
+			perspective.setSelectedObject(null);
 		}
 	}
 	
@@ -337,6 +347,39 @@ public class ObserverCenter
 	public Space2D getSpace()
 	{
 		return space;
+	}
+	
+	/**
+	 *  Adds a listener for change of the selected object
+	 *  @param object listener
+	 */
+	public void addSelectedObjectListener(ChangeListener listener)
+	{
+		selectedObjectListeners.add(listener);
+	}
+	
+	/**
+	 *  Removes a listener for change of the selected object
+	 *  @param object listener
+	 */
+	public void removeSelectedObjectListener(ChangeListener listener)
+	{
+		selectedObjectListeners.remove(listener);
+	}
+	
+	/**
+	 * Fires a selected object change event.
+	 */
+	public void fireSelectedObjectChange()
+	{
+		synchronized(selectedObjectListeners)
+		{
+			for (Iterator it = selectedObjectListeners.iterator(); it.hasNext(); )
+			{
+				ChangeListener l = (ChangeListener) it.next();
+				l.stateChanged(new ChangeEvent(this));
+			}
+		}
 	}
 	
 	/**

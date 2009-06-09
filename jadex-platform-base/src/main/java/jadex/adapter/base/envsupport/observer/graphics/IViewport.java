@@ -16,6 +16,11 @@ import java.util.List;
 public interface IViewport
 {
 	/**
+	 * Gets the position of the viewport.
+	 */
+	public IVector2 getPosition();
+	
+	/**
 	 * Sets the position of the bottom left corner of the viewport.
 	 */
 	public void setPosition(IVector2 pos);
@@ -25,6 +30,21 @@ public interface IViewport
 	 * @param bgColor the background color
 	 */
 	public void setBackground(Color bgColor);
+	
+	/**
+	 * Gets the maximum displayable size.
+	 * 
+	 * @return maximum area size.
+	 */
+	public IVector2 getAreaSize();
+	
+	/**
+	 * Gets the size of the display area.
+	 * 
+	 * @return size of the display area, may be padded to preserve aspect
+	 *        ratio
+	 */
+	public IVector2 getSize();
 	
 	/**
 	 * Sets the viewport size.

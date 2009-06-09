@@ -68,7 +68,7 @@ public class ObserverCenterWindow extends JFrame
 				setResizable(true);
 				setBackground(null);
 				pack();
-				setSize(600, 400);
+				setSize(600, 450);
 				setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 				setVisible(true);
 			}

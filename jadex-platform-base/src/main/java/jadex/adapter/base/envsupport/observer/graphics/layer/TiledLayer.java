@@ -2,9 +2,12 @@ package jadex.adapter.base.envsupport.observer.graphics.layer;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.adapter.base.envsupport.observer.graphics.ModulateComposite;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 
+import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -36,24 +39,32 @@ public class TiledLayer implements ILayer
 	
 	/** Inverted size of the tiles. */
 	private IVector2			invTileSize_;
+	
+	/** Modulation color */
+	private Color				modColor_;
+	
+	/** Composite for modulating in Java2D */
+	private Composite modComposite_;
 
 	/**
 	 * Creates a new TiledLayer.
 	 */
 	public TiledLayer()
 	{
-		this(new Vector2Double(1.0), "");
+		this(new Vector2Double(1.0), Color.WHITE, "");
 	}
 
 	/**
 	 * Creates a new TiledLayer.
 	 * 
 	 * @param tileSize size of an individual tile
+	 * @param color the modulation color
 	 * @param texturePath resource path of the texture
 	 */
-	public TiledLayer(IVector2 tileSize, String texturePath)
+	public TiledLayer(IVector2 tileSize, Color color, String texturePath)
 	{
 		this.tileSize_ = tileSize.copy();
+		this.modColor_ = color;
 		this.invTileSize_ = (new Vector2Double(1.0)).divide(tileSize_);
 		this.texturePath_ = texturePath;
 		texture_ = 0;
@@ -71,6 +82,13 @@ public class TiledLayer implements ILayer
 		imageToUser_ = new AffineTransform();
 		imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_
 				.getHeight());
+		modComposite_ = new ModulateComposite()
+			{
+				protected Color getColor()
+				{
+					return modColor_;
+				}
+			};
 	}
 
 	/**
@@ -86,6 +104,10 @@ public class TiledLayer implements ILayer
 
 	public void draw(IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
+		Composite c = g.getComposite();
+		if (!Color.WHITE.equals(modColor_))
+			g.setComposite(modComposite_);
+		
 		for(double x = 0.0; x < areaSize.getXAsDouble(); x = x
 				+ tileSize_.getXAsDouble())
 		{
@@ -99,6 +121,8 @@ public class TiledLayer implements ILayer
 				g.setTransform(transform);
 			}
 		}
+		
+		g.setComposite(c);
 	}
 
 	public synchronized void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
@@ -106,7 +130,7 @@ public class TiledLayer implements ILayer
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 
-		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		gl.glColor4fv(modColor_.getComponents(null), 0);
 		
 		gl.glMatrixMode(GL.GL_TEXTURE);
 		gl.glPushMatrix();
@@ -125,11 +149,6 @@ public class TiledLayer implements ILayer
 		gl.glMatrixMode(GL.GL_MODELVIEW);
 
 		gl.glDisable(GL.GL_TEXTURE_2D);
-	}
-
-	public ILayer copy()
-	{
-		return new TiledLayer(tileSize_, texturePath_);
 	}
 
 	public boolean equals(Object obj)

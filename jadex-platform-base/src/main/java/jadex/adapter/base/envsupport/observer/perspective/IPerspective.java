@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.observer.perspective;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 
 import java.awt.Component;
+import java.awt.event.ItemListener;
 
 /**
  * A perspective responsible for displaying information gathered using a view.
@@ -68,5 +69,4 @@ public interface IPerspective
 	 *  @param opengl true, if attempt should be made to use OpenGL
 	 */
 	public void setOpenGl(boolean opengl);
-
 }

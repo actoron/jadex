@@ -122,6 +122,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		ITypeConverter typeconv = new ClassConverter();
 		ITypeConverter colorconv = new ColorConverter();
+		ITypeConverter tcolorconv = new TolerantColorConverter();
 		ITypeConverter expconv = new ExpressionConverter();
 //		ITypeConverter tdoubleconv = new TolerantDoubleTypeConverter();
 		ITypeConverter tintconv = new TolerantIntegerTypeConverter();
@@ -374,7 +375,7 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-				new BeanAttributeInfo(null, colorconv, ""),
+				new BeanAttributeInfo(null, tcolorconv, ""),
 				new BeanAttributeInfo(null, null, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -428,7 +429,7 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-				new BeanAttributeInfo(null, colorconv, ""),
+				new BeanAttributeInfo(null, tcolorconv, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
 				{
@@ -482,7 +483,7 @@ public class MEnvSpaceType	extends MSpaceType
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 				new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-				new BeanAttributeInfo(null, colorconv, ""),
+				new BeanAttributeInfo(null, tcolorconv, ""),
 				new BeanAttributeInfo(null, tintconv, ""),
 				new BeanAttributeInfo(null, null, "", new IObjectCreator()
 				{
@@ -535,7 +536,7 @@ public class MEnvSpaceType	extends MSpaceType
 					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-					new BeanAttributeInfo(null, colorconv, ""),
+					new BeanAttributeInfo(null, tcolorconv, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.INTEGER_CONVERTER, "", new Integer(3)),
 					new BeanAttributeInfo(null, tintconv, ""),
 					new BeanAttributeInfo(null, null, "", new IObjectCreator()
@@ -593,7 +594,7 @@ public class MEnvSpaceType	extends MSpaceType
 					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 					new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-					new BeanAttributeInfo(null, colorconv, ""),
+					new BeanAttributeInfo(null, tcolorconv, ""),
 					new BeanAttributeInfo(null, tintconv, ""),
 					new BeanAttributeInfo(null, null, "", new IObjectCreator()
 					{
@@ -715,10 +716,11 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 
 		types.add(new TypeInfo("tiledlayer", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "type", "creator"}, 
+			SUtil.createHashMap(new String[]{"imagepath", "width", "height", "color", "type", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
+			new BeanAttributeInfo(null, colorconv, ""),
 			new BeanAttributeInfo(null, null, "", "tiledlayer"),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
@@ -726,7 +728,7 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
-					return new TiledLayer(size, (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
+					return new TiledLayer(size, (Color)MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
 				}
 			})
 			}), null));
@@ -1035,9 +1037,6 @@ public class MEnvSpaceType	extends MSpaceType
 			String	str	= (String)val;
 			String	alpha	= null;
 			
-			// Hack! Do we need a separate attribute for color bindings?
-			if(!str.startsWith("#") && (ss.stringToColor(str) == null))
-				return str;
 			if ((str.startsWith("#")) && (str.length()==9))
 			{
 				alpha	= str.substring(7);
@@ -1112,6 +1111,39 @@ public class MEnvSpaceType	extends MSpaceType
 			Object ret = val;
 			try{ret = new Integer((String)val);}
 			catch(Exception e){}
+			return ret;
+		}
+		
+		/**
+		 *  Test if a converter accepts a specific input type.
+		 *  @param inputtype The input type.
+		 *  @return True, if accepted.
+		 */
+		public boolean acceptsInputType(Class inputtype)
+		{
+			return String.class.isAssignableFrom(inputtype);
+		}
+	}
+	
+	/**
+	 *  String -> Double/String converter.
+	 *  Converts to a integer if possible. Otherwise string will be kept.
+	 */
+	static class TolerantColorConverter implements ITypeConverter
+	{
+		/**
+		 *  Convert a string value to another type.
+		 *  @param val The string value to convert.
+		 */
+		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		{
+			if(!(val instanceof String))
+				throw new RuntimeException("Source value must be string: "+val);
+			
+			Object ret = (new ColorConverter()).convertObject(val, root, classloader);
+			if (ret == null)
+				ret = val;
+			
 			return ret;
 		}
 		

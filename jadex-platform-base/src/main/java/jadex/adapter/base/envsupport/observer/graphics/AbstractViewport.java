@@ -562,7 +562,6 @@ public abstract class AbstractViewport implements IViewport
 					diff.negateY();
 				lastDragPos = position;
 				setPosition(getPosition().copy().subtract(diff));
-				
 			}
 		}
 		
