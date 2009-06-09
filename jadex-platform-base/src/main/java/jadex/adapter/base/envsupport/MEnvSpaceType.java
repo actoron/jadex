@@ -203,12 +203,13 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("perspective", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "name", "opengl", "invertxaxis", "invertyaxis", "objectshiftx", "objectshifty", "bgcolor", "creator"}, 
+			SUtil.createHashMap(new String[]{"class", "name", "opengl", "invertxaxis", "invertyaxis", "objectshiftx", "objectshifty", "zoomlimit", "bgcolor", "creator"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.TRUE),
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, colorconv, ""),
@@ -243,6 +244,10 @@ public class MEnvSpaceType	extends MSpaceType
 							pers.setObjectShift(Vector2Double.getVector2(xshift, yshift));
 //						else if(ret instanceof Grid2D)
 //							pers.setObjectShift(new Vector2Double(0.5));
+						
+						Double zoomlimit = (Double)MEnvSpaceInstance.getProperty(args, "zoomlimit");
+						if (zoomlimit != null)
+							pers.setZoomLimit(zoomlimit.doubleValue());
 					}
 					
 					List drawables = (List)args.get("drawables");
@@ -401,7 +406,7 @@ public class MEnvSpaceType	extends MSpaceType
 						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
 
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new TexturedRectangle(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
+						return new TexturedRectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
 					}
 				})
 			}), null));
@@ -455,7 +460,7 @@ public class MEnvSpaceType	extends MSpaceType
 						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
 						
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new Triangle(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
+						return new Triangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 					}
 				})
 			}), null));
@@ -508,7 +513,7 @@ public class MEnvSpaceType	extends MSpaceType
 						absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
 						
 						IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-						return new Rectangle(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
+						return new Rectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 					}
 				})
 			}), null));
@@ -566,7 +571,7 @@ public class MEnvSpaceType	extends MSpaceType
 								((Integer)MEnvSpaceInstance.getProperty(args, "vertices")).intValue();
 							
 							IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-							return new RegularPolygon(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
+							return new RegularPolygon(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
 						}
 					})
 				}), null));
@@ -620,7 +625,7 @@ public class MEnvSpaceType	extends MSpaceType
 							absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
 							
 							IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-							return new Ellipse(position, rotation, size, absFlags, (Color)MEnvSpaceInstance.getProperty(args, "color"), exp);
+							return new Ellipse(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 						}
 					})
 				}), null));
@@ -1029,7 +1034,11 @@ public class MEnvSpaceType	extends MSpaceType
 			
 			String	str	= (String)val;
 			String	alpha	= null;
-			if(str.startsWith("#") && str.length()==9)
+			
+			// Hack! Do we need a separate attribute for color bindings?
+			if(!str.startsWith("#") && (ss.stringToColor(str) == null))
+				return str;
+			if ((str.startsWith("#")) && (str.length()==9))
 			{
 				alpha	= str.substring(7);
 				str	= str.substring(0, 7);

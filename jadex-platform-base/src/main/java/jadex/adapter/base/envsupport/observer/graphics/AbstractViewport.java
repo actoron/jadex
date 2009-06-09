@@ -105,6 +105,9 @@ public abstract class AbstractViewport implements IViewport
 
 	/** The listeners of the viewport. */
 	private Set					listeners_;
+	
+	/** The zoom limit */
+	private double				zoomLimit_;
 
 	public AbstractViewport()
 	{
@@ -121,6 +124,7 @@ public abstract class AbstractViewport implements IViewport
 		preLayers_ = new ILayer[0];
 		postLayers_ = new ILayer[0];
 		listeners_ = Collections.synchronizedSet(new HashSet());
+		zoomLimit_ = 20.0;
 	}
 	
 	/**
@@ -213,6 +217,8 @@ public abstract class AbstractViewport implements IViewport
 	 */
 	public void setSize(IVector2 size)
 	{
+		if (areaSize_.copy().divide(size).getMean().getAsDouble() > zoomLimit_)
+			return;
 		size_ = new Vector2Double(size);
 
 		double width = 1.0;
@@ -419,6 +425,15 @@ public abstract class AbstractViewport implements IViewport
 	{
 		objShiftX_ = objectShift.getXAsFloat();
 		objShiftY_ = objectShift.getYAsFloat();
+	}
+	
+	/**
+	 * Sets the maximum zoom.
+	 * @param zoomlimit the zoom limit
+	 */
+	public void setZoomLimit(double zoomlimit)
+	{
+		zoomLimit_ = zoomlimit;
 	}
 
 	/**

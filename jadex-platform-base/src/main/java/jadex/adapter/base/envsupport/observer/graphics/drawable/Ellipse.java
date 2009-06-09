@@ -18,10 +18,9 @@ public class Ellipse extends RegularPolygon
 	 * @param rotation rotation or rotation-binding
 	 * @param size size or size-binding
 	 * @param absFlags flags for setting position, size and rotation as absolutes
-	 * @param c the drawable's color
-	 * @param vertices number of vertices (corners)
+	 * @param c the drawable's color or binding
 	 */
-	public Ellipse(Object position, Object rotation, Object size, int absFlags, Color c, IParsedExpression drawcondition)
+	public Ellipse(Object position, Object rotation, Object size, int absFlags, Object c, IParsedExpression drawcondition)
 	{
 		super(position, rotation, size, absFlags, c, OPENGL_NUM_VERTICES, drawcondition);
 	}

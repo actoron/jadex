@@ -42,10 +42,10 @@ public class RegularPolygon extends ColoredPrimitive
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
 	 * @param absFlags flags for setting position, size and rotation as absolutes
-	 * @param c the drawable's color
+	 * @param c the drawable's color or binding
 	 * @param vertices number of vertices (corners)
 	 */
-	public RegularPolygon(Object position, Object rotation, Object size, int absFlags, Color c, int vertices, IParsedExpression drawcondition)
+	public RegularPolygon(Object position, Object rotation, Object size, int absFlags, Object c, int vertices, IParsedExpression drawcondition)
 	{
 		super(position, rotation, size, absFlags, c, drawcondition);
 		vertices_ = vertices;
@@ -101,14 +101,16 @@ public class RegularPolygon extends ColoredPrimitive
 		Graphics2D g = vp.getContext();
 		if(!setupMatrix(dc, obj, g))
 			return;
-		g.setColor(c_);
+		Color c = (Color) dc.getBoundValue(obj, color_);
+		g.setColor(c);
 		g.fill(shape_);
 	}
 
 	public void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
-		gl.glColor4fv(oglColor_, 0);
+		Color c = (Color) dc.getBoundValue(obj, color_);
+		gl.glColor4fv(c.getComponents(null), 0);
 		if (setupMatrix(dc, obj, gl))
 			gl.glCallList(dList_);
 	}

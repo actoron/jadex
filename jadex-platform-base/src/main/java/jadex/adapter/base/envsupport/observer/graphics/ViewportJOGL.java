@@ -28,12 +28,14 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -85,6 +87,9 @@ public class ViewportJOGL extends AbstractViewport
 	
 	/** The text renderers */
 	private Map textRenderers_;
+	
+	/** OpenGL thread execution queue */
+	private List glQueue_;
 
 	/**
 	 * Creates a new OpenGL-based viewport. May throw UnsatisfiedLinkError and
@@ -105,6 +110,7 @@ public class ViewportJOGL extends AbstractViewport
 		repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
 		displayLists_ = Collections.synchronizedMap(new HashMap());
 		textRenderers_ = Collections.synchronizedMap(new TextRendererLRUMap(15));
+		glQueue_ = Collections.synchronizedList(new ArrayList());
 
 		try
 		{
@@ -137,6 +143,26 @@ public class ViewportJOGL extends AbstractViewport
 				((GLCanvas)ViewportJOGL.this.canvas_).display();
 			}
 		};
+	}
+	
+	public void setSize(IVector2 size)
+	{
+		glQueue_.add(new Runnable()
+			{
+				public void run()
+				{
+					synchronized(textRenderers_)
+					{
+						for (Iterator it = textRenderers_.values().iterator(); it.hasNext(); )
+						{
+							TextRenderer tr = (TextRenderer) it.next();
+							tr.dispose();
+						}
+						textRenderers_.clear();
+					}
+				}
+			});
+		super.setSize(size);
 	}
 
 	public void refresh()
@@ -438,6 +464,15 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		public void display(GLAutoDrawable drawable)
 		{
+			synchronized(glQueue_)
+			{
+				for (Iterator it = glQueue_.iterator(); it.hasNext(); )
+				{
+					Runnable r = (Runnable) it.next();
+					r.run();
+				}
+			}
+			
 			if ((canvas_.getWidth() < MIN_SIZE) ||
 				(canvas_.getHeight() < MIN_SIZE))
 			{
@@ -536,7 +571,6 @@ public class ViewportJOGL extends AbstractViewport
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			gl.glDisable(GL.GL_DEPTH_TEST);
-			gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
 			setupMatrix(gl);
 			setupTexMatrix(gl);

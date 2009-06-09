@@ -43,9 +43,9 @@ public class Triangle extends ColoredPrimitive
 	 * @param yrotation yrotation or rotation-binding
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
-	 * @param c the drawable's color
+	 * @param c the drawable's color or binding
 	 */
-	public Triangle(Object position, Object rotation, Object size, int absFlags, Color c, IParsedExpression drawcondition)
+	public Triangle(Object position, Object rotation, Object size, int absFlags, Object c, IParsedExpression drawcondition)
 	{
 		super(position, rotation, size, absFlags, c, drawcondition);
 	}
@@ -84,7 +84,8 @@ public class Triangle extends ColoredPrimitive
 		AffineTransform transform = g.getTransform();
 		if(!setupMatrix(dc, obj, g))
 			return;
-		g.setColor(c_);
+		Color c = (Color) dc.getBoundValue(obj, color_);
+		g.setColor(c);
 		g.fill(J2D_TRIANGLE);
 		g.setTransform(transform);
 	}
@@ -92,7 +93,8 @@ public class Triangle extends ColoredPrimitive
 	public void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
-		gl.glColor4fv(oglColor_, 0);
+		Color c = (Color) dc.getBoundValue(obj, color_);
+		gl.glColor4fv(c.getComponents(null), 0);
 		if (setupMatrix(dc, obj, gl))
 			gl.glCallList(dList_);
 	}

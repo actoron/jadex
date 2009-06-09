@@ -198,8 +198,35 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	public void refresh()
 	{
 		String selection = observerCenter_.getSelectedPerspective().getName();
+		Map perspectives = observerCenter_.getPerspectives();
+		perspectivelist.removeListSelectionListener(perspectiveController_);
+		((DefaultComboBoxModel) perspectivelist.getModel()).removeAllElements();
+		synchronized(perspectives)
+		{
+			Set themeNames = perspectives.keySet();
+			for (Iterator it = themeNames.iterator(); it.hasNext(); )
+			{
+				String name = (String) it.next();
+				((DefaultComboBoxModel) perspectivelist.getModel()).addElement(name);
+			}
+		}
 		perspectivelist.setSelectedValue(selection, true);
+		perspectivelist.addListSelectionListener(perspectiveController_);
+		
 		selection = observerCenter_.getSelectedDataViewName();
+		Map dataviews = observerCenter_.getDataViews();
+		dataviewlist.removeListSelectionListener(dataviewController_);
+		((DefaultComboBoxModel) dataviewlist.getModel()).removeAllElements();
+		synchronized(dataviews)
+		{
+			Set dataviewnames = dataviews.keySet();
+			for (Iterator it = dataviewnames.iterator(); it.hasNext(); )
+			{
+				String name = (String) it.next();
+				((DefaultComboBoxModel) dataviewlist.getModel()).addElement(name);
+			}
+		}
 		dataviewlist.setSelectedValue(selection, true);
+		dataviewlist.addListSelectionListener(dataviewController_);
 	}
 }

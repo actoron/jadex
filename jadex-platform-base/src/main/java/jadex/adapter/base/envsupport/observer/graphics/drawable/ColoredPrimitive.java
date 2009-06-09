@@ -7,11 +7,8 @@ import java.awt.Color;
 
 public abstract class ColoredPrimitive extends RotatingPrimitive
 {
-	/** Color of the primitive. */
-	protected Color		c_;
-
-	/** OpenGL color cache. */
-	protected float[]	oglColor_;
+	/** Color or Color binding of the primitive. */
+	protected Object	color_;
 	
 	/**
 	 * Initializes the drawable.
@@ -31,9 +28,9 @@ public abstract class ColoredPrimitive extends RotatingPrimitive
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
 	 * @param absFlags flags for setting position, size and rotation as absolutes
-	 * @param c the drawable's color
+	 * @param c the drawable's color or color binding
 	 */
-	protected ColoredPrimitive(Object position, Object rotation, Object size, int absFlags, Color c, IParsedExpression drawcondition)
+	protected ColoredPrimitive(Object position, Object rotation, Object size, int absFlags, Object c, IParsedExpression drawcondition)
 	{
 		super(position, rotation, size, absFlags, drawcondition);
 		if (c == null)
@@ -42,27 +39,22 @@ public abstract class ColoredPrimitive extends RotatingPrimitive
 	}
 
 	/**
-	 * Gets the color of the drawable
+	 * Gets the color or color binding of the drawable
 	 * 
-	 * @return color of the drawable
+	 * @return color or color binding of the drawable
 	 */
-	public Color getColor()
+	public Object getColor()
 	{
-		return c_;
+		return color_;
 	}
 
 	/**
-	 * Sets a new color for the drawable
+	 * Sets a new color or binding for the drawable
 	 * 
-	 * @param c new color
+	 * @param c new color or binding
 	 */
-	public void setColor(Color c)
+	public void setColor(Object c)
 	{
-		c_ = c;
-		oglColor_ = new float[4];
-		oglColor_[0] = c_.getRed() / 255.0f;
-		oglColor_[1] = c_.getGreen() / 255.0f;
-		oglColor_[2] = c_.getBlue() / 255.0f;
-		oglColor_[3] = c_.getAlpha() / 255.0f;
+		color_ = c;
 	}
 }

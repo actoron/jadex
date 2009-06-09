@@ -102,6 +102,12 @@ public interface IViewport
 	 * @param objectList objects that should be drawn
 	 */
 	public void setObjectList(List objectList);
+	
+	/**
+	 * Sets the maximum zoom.
+	 * @param zoomlimit the zoom limit
+	 */
+	public void setZoomLimit(double zoomlimit);
 
 	/**
 	 * Returns the canvas that is used for displaying the objects.

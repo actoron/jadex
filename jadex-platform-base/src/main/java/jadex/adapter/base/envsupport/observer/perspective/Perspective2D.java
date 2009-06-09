@@ -87,11 +87,15 @@ public class Perspective2D implements IPerspective
 	/** The marker drawable combiner */
 	protected DrawableCombiner marker;
 	
+	/** The maximum zoom */
+	protected double zoomlimit;
+	
 	/**
 	 * Creates a 2D-Perspective.
 	 */
 	public Perspective2D()
 	{
+		zoomlimit = 20.0;
 		setBackground(null);
 		this.visuals = Collections.synchronizedMap(new HashMap());
 		this.prelayers = new ILayer[0];
@@ -246,6 +250,7 @@ public class Perspective2D implements IPerspective
 			viewport = createViewport(obscenter.getLibraryService(), tryopengl);
 			viewport.setAreaSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);
+			viewport.setZoomLimit(zoomlimit);
 		}
 		return viewport.getCanvas();
 	}
@@ -363,6 +368,17 @@ public class Perspective2D implements IPerspective
 	public synchronized void setObjectShift(IVector2 shift)
 	{
 		objectShift = shift.copy();
+	}
+	
+	/**
+	 * Sets the maximum zoom.
+	 * @param zoomlimit the zoom limit
+	 */
+	public void setZoomLimit(double zoomlimit)
+	{
+		this.zoomlimit = zoomlimit;
+		if (viewport != null)
+			viewport.setZoomLimit(zoomlimit);
 	}
 	
 	/**
