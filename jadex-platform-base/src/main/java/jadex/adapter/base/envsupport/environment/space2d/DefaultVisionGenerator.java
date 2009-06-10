@@ -102,7 +102,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			ISpaceObject[] objects = pos==null? EMPTY_SPACEOBJECTS: space.getNearObjects(pos, maxrange, null);
 			ISpaceObject[] oldobjects = oldpos==null? EMPTY_SPACEOBJECTS: space.getNearObjects(oldpos, maxrange, null);
 			
-			// Objects, which are in current range, but not previously seen.
+			// Objects, which are in current range, but maybe not previously seen.
 			for(int i=0; i<objects.length; i++)
 			{
 				IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
@@ -135,7 +135,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				// Post movement to agents that stayed in vision range
 				if(owner!=null)
 				{
-					if((oldpos==null || space.getDistance(oldpos, objpos).greater(getRange(objects[i])))
+					if(oldpos!=null && !space.getDistance(oldpos, objpos).greater(getRange(objects[i]))
 						&& !space.getDistance(pos, objpos).greater(getRange(objects[i])))
 					{
 						String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(owner), event.getSpaceObject().getType(), MOVED);

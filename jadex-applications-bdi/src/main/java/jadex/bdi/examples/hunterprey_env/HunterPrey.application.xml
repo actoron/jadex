@@ -143,7 +143,23 @@
 					</env:property>
 				</env:perceptgenerator>
 				
-				<env:perceptprocessor agenttype="CleverPrey" class="CleverPreyVisionProcessor"/>
+				<env:perceptprocessor agenttype="CleverPrey" class="DefaultBDIVisionProcessor">
+					<env:property name="range">new Vector1Int(2)</env:property>
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "add", "seen_food"},
+							new String[]{"food_seen", "add", "known_food"},
+							new String[]{"food_eaten", "remove", "seen_food"},
+							new String[]{"food_eaten", "remove", "known_food"},
+							new String[]{"food_out_of_sight", "remove", "seen_food"},
+							new String[]{"hunter_seen", "add", "seen_hunters"},
+							new String[]{"hunter_gone", "remove", "seen_hunters"},
+							new String[]{"prey_moved", "remove_outdated", "known_food"}
+
+						}
+					</env:property>
+				</env:perceptprocessor>
 				<env:perceptprocessor agenttype="DumbPrey" class="DumbPreyVisionProcessor"/>
 				<env:perceptprocessor agenttype="DumbHunter" class="DumbHunterVisionProcessor"/>
 				<env:perceptprocessor agenttype="LAHunter" class="DefaultBDIVisionProcessor">
@@ -383,32 +399,41 @@
 				</env:observers>
  			</env:envspace>
  		</application>
- 		<!-- 
+		<!-- 
 		<application name="debug">
 			<agents>
-				<agent type="DumbPrey" name="testprey" />
-				<agent type="DumbPrey" name="foodprey" />
-				<agent type="LAHunter" name="testhunter"/>
+				<agent type="CleverPrey" name="testprey" />
+				<agent type="CleverPrey" name="foodprey" />
 			</agents>
 
 			<env:envspace name="my2dspace" type="2dspace">
 				<env:avatars>
 					<env:avatar type="prey" owner="testprey">
-						<env:property name="position">new Vector2Int(10, 14)</env:property>
+						<env:property name="position">new Vector2Int(10, 10)</env:property>
 					</env:avatar>
 					<env:avatar type="prey" owner="foodprey">
-						<env:property name="position">new Vector2Int(11, 15)</env:property>
-					</env:avatar>
-					<env:avatar type="hunter" owner="testhunter">
-						<env:property name="position">new Vector2Int(11, 15)</env:property>
+						<env:property name="position">new Vector2Int(6, 10)</env:property>
 					</env:avatar>
 				</env:avatars>
 				
+				<env:objects>
+					<env:object type="food">
+						<env:property name="position">new Vector2Int(12, 10)</env:property>
+						<env:property name="creation_age">new Double($space.getContext().getPlatform().getService(IClockService.class).getTick()-40)</env:property>
+						<env:property name="clock">$space.getContext().getPlatform().getService(IClockService.class)</env:property>
+					</env:object>
+					<env:object type="food">
+						<env:property name="position">new Vector2Int(8, 10)</env:property>
+						<env:property name="creation_age">new Double($space.getContext().getPlatform().getService(IClockService.class).getTick()-40)</env:property>
+						<env:property name="clock">$space.getContext().getPlatform().getService(IClockService.class)</env:property>
+					</env:object>
+				</env:objects>
+
 				<env:observers>
 					<env:observer name="HunterPrey World" view="view_all" perspective="icons"/>
 				</env:observers>
  			</env:envspace>
  		</application>
- 		 -->
+		 -->
 	</applications>
 </applicationtype>
