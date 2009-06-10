@@ -120,7 +120,7 @@ public abstract class OAVAbstractState	implements IOAVState
 	public OAVAbstractState(OAVTypeModel tmodel)
 	{
 		this.tmodel = tmodel;
-		this.javaidentity = false;
+		this.javaidentity = true;
 		
 		// OID data structures
 		this.deletedobjects	= new LinkedHashMap();

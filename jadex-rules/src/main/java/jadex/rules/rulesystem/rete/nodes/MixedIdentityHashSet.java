@@ -7,6 +7,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -38,33 +39,43 @@ public class MixedIdentityHashSet	implements Set
 	public MixedIdentityHashSet(IOAVState state)
 	{
 		this.state	= state;
-		this.equality	= new LinkedHashSet();
-		this.identity	= new IdentityHashSet();
 	}
 	
 	//-------- Set interface --------
 
 	public void clear()
 	{
-		equality.clear();
-		identity.clear();
+		if(equality!=null) equality.clear();
+		if(identity!=null) identity.clear();
 	}
 	
 	public boolean contains(Object value)
 	{
-		return equality.contains(value) || identity.contains(value);
+		return equality!=null && equality.contains(value) || identity!=null && identity.contains(value);
 	}
 	
 	public boolean isEmpty()
 	{
-		return equality.isEmpty() && identity.isEmpty();
+		return (equality==null || equality.isEmpty()) && (identity==null ||	identity.isEmpty());
 	}
 	
 	public boolean add(Object value)
 	{
 		OAVObjectType	type	= value!=null && !(value instanceof Tuple) ? state.getType(value) : null;
-		return type instanceof OAVJavaType && !OAVJavaType.KIND_VALUE.equals(((OAVJavaType)type).getKind())
-			? identity.add(value) : equality.add(value);
+		boolean	ret;
+		if(type instanceof OAVJavaType && !OAVJavaType.KIND_VALUE.equals(((OAVJavaType)type).getKind()))
+		{
+			if(identity==null)
+				identity	= new IdentityHashSet();
+			ret	= identity.add(value);
+		}
+		else
+		{
+			if(equality==null)
+				equality	= new LinkedHashSet();
+			ret	= equality.add(value);
+		}
+		return ret;
 	}
 	
 	public boolean	addAll(Collection coll)
@@ -79,12 +90,12 @@ public class MixedIdentityHashSet	implements Set
 	
 	public boolean remove(Object value)
 	{
-		return equality.contains(value) ? equality.remove(value) : identity.remove(value); 
+		return equality!=null && equality.contains(value) ? equality.remove(value) : identity!=null ? identity.remove(value) : false; 
 	}
 	
 	public int size()
 	{
-		return equality.size() + identity.size();
+		return (equality!=null ? equality.size() : 0) + (identity!=null ? identity.size() : 0);
 	}
 	
 	public boolean containsAll(Collection coll)
@@ -101,22 +112,22 @@ public class MixedIdentityHashSet	implements Set
 	{
 		return new Iterator()
 		{
-			Iterator it1 = equality.iterator();
-			Iterator it2 = identity.iterator();
+			Iterator it1 = equality!=null ? equality.iterator() : null;
+			Iterator it2 = identity!=null ? identity.iterator() : null;
 			
 			public boolean hasNext()
 			{
-				return it1.hasNext() || it2.hasNext();
+				return it1!=null && it1.hasNext() || it2!=null && it2.hasNext();
 			}
 			
 			public Object next()
 			{
 				Object ret = null;
-				if(it1.hasNext())
+				if(it1!=null && it1.hasNext())
 				{
 					ret = it1.next();
 				}
-				else if(it2.hasNext())
+				else if(it2!=null && it2.hasNext())
 				{
 					ret = it2.next();
 				}
@@ -161,13 +172,18 @@ public class MixedIdentityHashSet	implements Set
 	
 	public Object[] toArray()
 	{
-		return (Object[]) SUtil.joinArrays(equality.toArray(), identity.toArray());
+		return equality!=null && identity!=null ? (Object[]) SUtil.joinArrays(equality.toArray(), identity.toArray())
+			: equality!=null ? equality.toArray() : identity!=null ? identity.toArray() : new Object[0];
 	}
 	
 	public Object[] toArray(Object[] ret)
 	{
-		if(ret.length>=size())
+		if(equality!=null && identity!=null)
 		{
+			if(ret.length<size())
+			{
+				ret	= (Object[])Array.newInstance(ret.getClass().getComponentType(), size());
+			}
 			Object[]	evals	= equality.toArray();
 			Object[]	ivals	= identity.toArray();
 			System.arraycopy(evals, 0, ret, 0, evals.length);
@@ -175,21 +191,20 @@ public class MixedIdentityHashSet	implements Set
 		}
 		else
 		{
-			ret	= toArray();
+			ret	= equality!=null ? equality.toArray(ret) : identity!=null ? identity.toArray(ret) : ret;
 		}
 		return ret;
 	}
 	
 	public boolean equals(Object obj)
 	{
-		assert !(obj instanceof MixedIdentityHashSet) && obj instanceof Collection;
 		return obj instanceof MixedIdentityHashSet
-			&& equality.equals(((MixedIdentityHashSet)obj).equality)
-			&& identity.equals(((MixedIdentityHashSet)obj).identity);
+			&& SUtil.equals(equality, ((MixedIdentityHashSet)obj).equality)
+			&& SUtil.equals(identity, ((MixedIdentityHashSet)obj).identity);
 	}
 	
 	public int hashCode()
 	{
-		return equality.hashCode() + identity.hashCode();
+		return (equality!=null ? equality.hashCode() : 0) + (identity!=null ? identity.hashCode() : 0);
 	}		
 }
