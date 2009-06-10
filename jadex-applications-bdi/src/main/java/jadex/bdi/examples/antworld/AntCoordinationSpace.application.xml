@@ -70,6 +70,7 @@
 					class="UpdateDestinationAction"/>
 				<env:actiontype name="updateTraceRoute" class="TraceRouteAction"/>
 				<env:actiontype name="absorbObject" class="AbsorbObjectAction"/>
+				<env:actiontype name="testAction" class="TestAction"/>
 			</env:actiontypes>
 			
 			<env:processtypes>

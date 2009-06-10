@@ -27,6 +27,21 @@ public class GoPlanEnv extends Plan
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();		
 		myself.setProperty(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 		
+		//TEST**************************************
+//		SyncResultListener srl1 = new SyncResultListener();
+//		env.performSpaceAction("testAction", null, srl1);
+//		srl1.waitForResult();
+//		
+////		waitFor(5000);
+//		
+//		SyncResultListener srl2 = new SyncResultListener();
+//		Map props1 = new HashMap();
+//		props1.put("SecondTime", new String("yes"));
+//		env.performSpaceAction("testAction", props1, srl2);
+//		srl2.waitForResult();
+		
+		
+		//TEST**************************************
 		
 		//Update destination and gravitationSensor of ant on space 
 		Map params = new HashMap();

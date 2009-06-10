@@ -83,15 +83,16 @@ public class PackageProcess extends SimplePropertyObject implements ISpaceProces
 			// Create new package
 			lasttick = clock.getTick();
 
-//			 IVector2 pos = grid.getRandomPosition(Vector2Int.ZERO); grid.getEmptyGridPosition();
-//			 if (pos != null) {
-//			 Map props = new HashMap();
-//			 props.put(Space2D.POSITION, pos);
-//			 props.put("round", new Integer(0));
-//			 props.put("age", "Child");
-//			 grid.createSpaceObject("packageChild", props, null, null);
-//			
-//			 }
+			// IVector2 pos = grid.getRandomPosition(Vector2Int.ZERO);
+			// grid.getEmptyGridPosition();
+			// if (pos != null) {
+			// Map props = new HashMap();
+			// props.put(Space2D.POSITION, pos);
+			// props.put("round", new Integer(0));
+			// props.put("age", "Child");
+			// grid.createSpaceObject("packageChild", props, null, null);
+			//			
+			// }
 
 			// Just testing
 			// Map props = new HashMap();
