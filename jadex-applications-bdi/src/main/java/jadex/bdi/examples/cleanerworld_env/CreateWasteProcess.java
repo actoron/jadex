@@ -2,11 +2,11 @@ package jadex.bdi.examples.cleanerworld_env;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bridge.IClockService;
+import jadex.commons.SReflect;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;
@@ -86,4 +86,13 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 			}
 		}
 	}
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 * /
+	public String toString()
+	{
+		return SReflect.getUnqualifiedClassName(this.getClass());
+	}*/
 }

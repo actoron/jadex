@@ -132,17 +132,19 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "width", "height", "depth"}, 
+			SUtil.createHashMap(new String[]{"class", "width", "height", "depth", "border"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, "property"),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property")
+				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
+				new BeanAttributeInfo(null, null, "property")
 			}), null));
 		
 		types.add(new TypeInfo("avatarmapping", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"agenttype", "objecttype"}, 
+			SUtil.createHashMap(new String[]{"agenttype", "objecttype", "delete"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			}), null));
 		
 		types.add(new TypeInfo("percepttype", MultiCollection.class, null, null,

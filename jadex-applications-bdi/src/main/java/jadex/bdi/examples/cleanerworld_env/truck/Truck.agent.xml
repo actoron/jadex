@@ -1,0 +1,93 @@
+<!--
+	<H3>The Truck Agent.</H3>
+
+	The agent has the purpose to drive to the full
+	wastebins and empty them.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="Cleaner"
+	package="jadex.bdi.examples.cleanerworld_env.truck">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.bdi.examples.cleanerworld_env.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="environment" class="ContinuousSpace2D">
+ 			<fact>(ContinuousSpace2D)$scope.getApplicationContext().getSpace("my2dspace")</fact>
+ 		</belief>
+ 		
+ 		<belief name="myself" class="ISpaceObject" exported="true">
+ 			<fact>$beliefbase.environment.getOwnedObjects($scope.getAgentIdentifier())[0]</fact>
+ 		</belief>
+
+		<beliefset name="wastebins"  class="ISpaceObject" exported="true"/>
+
+		<belief name="my_location" class="IVector2" evaluationmode="push">
+			<fact language="jcl">$beliefbase.myself.position</fact>
+ 		</belief>
+ 		
+ 		<belief name="my_speed" class="double" evaluationmode="push">
+			<fact language="jcl">$beliefbase.myself.speed</fact>
+ 		</belief>
+ 		
+ 		<belief name="my_vision" class="double" evaluationmode="push">
+			<fact language="jcl">$beliefbase.myself.vision_range</fact>
+ 		</belief>
+	</beliefs>
+
+	<goals>
+		<!-- Perform empty wastebins. -->
+		<performgoal name="performempty"></performgoal>
+
+		<!-- Try to move to the specified location. -->
+		<achievegoal name="achievemoveto">
+			<parameter name="location" class="IVector2"/>
+		</achievegoal>
+ 	</goals>
+
+	<plans>
+		<!-- Perform patrols. -->
+		<plan name="empty">
+			<body class="EmptyPlan"/>
+			<trigger>
+				<goal ref="performempty"/>
+			</trigger>
+		</plan>
+
+		<!-- Move to a location. -->
+		<plan name="moveto">
+			<parameter name="location" class="IVector2">
+				<goalmapping ref="achievemoveto.location"/>
+			</parameter>
+			<body class="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="achievemoveto"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!--<property name="logging.level">Level.FINE</property>-->
+		<!-- <property name="debugging">true</property> -->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="performempty"/>
+			</goals>
+		</configuration>
+	</configurations>
+</agent>
+

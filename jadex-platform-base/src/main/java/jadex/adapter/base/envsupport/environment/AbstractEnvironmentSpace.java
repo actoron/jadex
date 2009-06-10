@@ -153,6 +153,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
+			if(properties==null)
+				properties = new HashMap();
 			properties.put("_clazz", clazz);
 			processtypes.put(typename, properties);
 		}
@@ -195,10 +197,13 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			{
 				ISpaceProcess process = (ISpaceProcess)((Class)procinfo.get("_clazz")).newInstance();
 				
-				for(Iterator it = properties.keySet().iterator(); it.hasNext(); )
+				if(properties!=null)
 				{
-					String propname = (String)it.next();
-					process.setProperty(propname, properties.get(propname)); 
+					for(Iterator it = properties.keySet().iterator(); it.hasNext(); )
+					{
+						String propname = (String)it.next();
+						process.setProperty(propname, properties.get(propname)); 
+					}
 				}
 				for(Iterator it = procinfo.keySet().iterator(); it.hasNext(); )
 				{
@@ -211,7 +216,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException("Could not create space process: "+typename);
+				throw new RuntimeException("Could not create space process: "+typename, e);
 			}
 //			process.start(this);	// Done by executor.
 		}
@@ -234,7 +239,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 * @param id ID of the space process
 	 * @return the space process or null if not found
 	 */
-	public ISpaceProcess getSpaceProcess(Object id )
+	public ISpaceProcess getSpaceProcess(Object id)
 	{
 		synchronized(monitor)
 		{
@@ -461,7 +466,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		return obs==null? new ISpaceObject[0]: (ISpaceObject[])obs.toArray(new ISpaceObject[obs.size()]); 
 	}
 	
-
 	/**
 	 * Adds an avatar mapping.
 	 * @param agenttype The agent type.

@@ -28,10 +28,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	public static final String PROPERTY_POSITION = "position";
 	
 	/** Border strict mode. */
-	public static final int BORDER_STRICT = 0;
+	public static final String BORDER_STRICT = "strict";
 
 	/** Border torus behavior. */
-	public static final int BORDER_TORUS = 1;
+	public static final String BORDER_TORUS = "torus";
 
 	//-------- attributes --------
 	
@@ -39,7 +39,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	protected IVector2 areasize;
 	
 	/** The behavior of the world */
-	public int bordermode;
+	public String bordermode;
 	
 	//-------- constructors --------
 	
@@ -49,10 +49,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(IVector2 areasize, int bordermode)
-	{
+	protected Space2D(IVector2 areasize, String bordermode)
+	{		
 		this.areasize = areasize;
-		this.bordermode = bordermode;
+		setBorderMode(bordermode);
 	}
 	
 	//-------- methods --------
@@ -85,7 +85,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 *  Get the border mode.
 	 *  @return the border_mode
 	 */
-	public int getBorderMode()
+	public String getBorderMode()
 	{
 		return this.bordermode;
 	}
@@ -94,8 +94,11 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 *  Set the border mode.
 	 *  @param border_mode The border mode to set.
 	 */
-	public void setBorderMode(int bordermode)
+	public void setBorderMode(String bordermode)
 	{
+		System.out.println("bordemode: "+bordermode);
+		if(!BORDER_STRICT.equals(bordermode) && !BORDER_TORUS.equals(bordermode))
+			throw new RuntimeException("Unknown border mode: "+bordermode);
 		this.bordermode = bordermode;
 	}
 
@@ -108,15 +111,20 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks)
 	{
-		ISpaceObject	ret	= super.createSpaceObject(typename, properties, tasks);
+		ISpaceObject ret = super.createSpaceObject(typename, properties, tasks);
 		
 		IVector2 pos = ret.getPropertyNames().contains(PROPERTY_POSITION)? 
-			(IVector2) ret.getProperty(PROPERTY_POSITION) : getRandomPosition(Vector2Int.ZERO);
+			(IVector2)ret.getProperty(PROPERTY_POSITION): getRandomPosition(Vector2Int.ZERO);
 
 		if(pos!=null)
 		{
+//			System.out.println("setting pos to: "+ret+" "+pos);
 			ret.setProperty(PROPERTY_POSITION, null);
 			setPosition(ret.getId(), pos);
+		}
+		else
+		{
+			System.out.println("setting no pos to: "+ret);
 		}
 		
 		return ret;
@@ -222,7 +230,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		
 		if(pos!=null)
 		{
-			if(BORDER_TORUS==getBorderMode())
+			if(BORDER_TORUS.equals(getBorderMode()))
 			{
 				if(areasize==null)
 					System.out.println("shit");
@@ -243,7 +251,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				
 				ret = SVector.createVector2(x, y);
 			}
-			else if(BORDER_STRICT==getBorderMode())
+			else if(BORDER_STRICT.equals(getBorderMode()))
 			{
 				IVector1 sizex = areasize.getX();
 				IVector1 sizey = areasize.getY();
@@ -254,6 +262,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 					throw new RuntimeException("Position out of areasize: "+pos+" "+areasize);
 				}
 				ret = pos;
+			}
+			else
+			{
+				throw new RuntimeException("Unknown bordermode: "+bordermode);
 			}
 		}
 		

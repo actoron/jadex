@@ -108,8 +108,12 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		{
 			Double width = getProperty(properties, "width")!=null? (Double)getProperty(properties, "width"): (Double)getProperty(mspacetype.getProperties(), "width");
 			Double height = getProperty(properties, "height")!=null? (Double)getProperty(properties, "height"): (Double)getProperty(mspacetype.getProperties(), "height");
-			
 			((Space2D)ret).setAreaSize(Vector2Double.getVector2(width, height));
+			
+			String bordermode = (String)getProperty(properties, "border")!=null? (String)getProperty(properties, "border"): (String)getProperty(mspacetype.getProperties(), "border");
+			if(bordermode!=null)
+				((Space2D)ret).setBorderMode(bordermode);
+			
 //			System.out.println("areasize: "+width+" "+height);
 		}
 		
@@ -190,8 +194,11 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
 				
 				Map tmp = convertProperties(props, fetcher);
-				tmp.remove("name");
-				tmp.remove("clazz");
+				if(tmp!=null)
+				{
+					tmp.remove("name");
+					tmp.remove("clazz");
+				}
 				
 //				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
 				ret.addSpaceProcessType(name, clazz, tmp);

@@ -59,7 +59,7 @@ public class Grid2D extends Space2D
 	 * @param areasize the size of the 2D area
 	 * @param actionexecutor executor for agent actions
 	 */
-	public Grid2D(Object name, IVector2 areasize, int bordermode)
+	public Grid2D(Object name, IVector2 areasize, String bordermode)
 	{
 		super(areasize==null? null: new Vector2Int(areasize.getXAsInteger(), areasize.getYAsInteger()), bordermode);
 		this.setProperty("name", name);
@@ -266,7 +266,7 @@ public class Grid2D extends Space2D
 	{
 		IVector1 ret = Vector1Int.ZERO;
 		
-		if(getBorderMode()==BORDER_TORUS)
+		if(getBorderMode().equals(BORDER_TORUS))
 		{
 			IVector1 size = isx? areasize.getX(): areasize.getY();
 			
@@ -301,156 +301,4 @@ public class Grid2D extends Space2D
 		
 		return ret;
 	}
-	
-	/**
-	 * Retrieve all objects in the distance for a position
-	 * @param position
-	 * @param distance
-	 * @return {@link ISpaceObject}[] 
-	 * /
-	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance)
-	{
-		synchronized(monitor)
-		{
-			Collection ret = new ArrayList();
-			
-			int sizex = areasize.getXAsInteger();
-			int sizey = areasize.getYAsInteger();
-	
-			int x = position.getXAsInteger();
-			int y = position.getYAsInteger();
-			
-			int range = distance.getAsInteger();
-	
-			if(border_mode==BORDER_TORUS)
-			{
-				for(int i = x - range; i <= x + range; i++)
-				{
-					for(int j = y - range; j <= y + range; j++)
-					{
-						Collection tmp = objectsygridpos.getCollection(
-							new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
-						if(tmp != null)
-							ret.addAll(tmp);
-					}
-				}
-			}
-			else if(border_mode==BORDER_STRICT)
-			{
-				int minx = (x - range >= 0 ? x - range : 0);
-				int maxx = (x + range <= sizex ? x + range : sizex);
-
-				int miny = (y - range >= 0 ? y - range : 0);
-				int maxy = (y + range <= sizey ? y + range : sizey);
-
-				for (int i = minx; i <= maxx; i++)
-				{
-					for (int j = miny; j <= maxy; j++)
-					{
-						Collection tmp = objectsygridpos.getCollection(
-								new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
-						if (tmp != null)
-							ret.addAll(tmp);
-					}
-				}
-			}
-			
-			return(ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
-		}
-	}*/
-	
-	/**
-	 *  Get the distance between two positions.
-	 *  @param pos1	The first position.
-	 *  @param pos2	The second position.
-	 * /
-	public IVector1	getDistance(IVector2 pos1, IVector2 pos2)
-	{
-		synchronized(monitor)
-		{
-			IVector1	ret;
-			
-			if(BORDER_TORUS==border_mode)
-			{
-				int	x1	= pos1.getXAsInteger();
-				int	y1	= pos1.getYAsInteger();
-				int	x2	= pos2.getXAsInteger();
-				int	y2	= pos2.getYAsInteger();
-				int sizex	= areasize.getXAsInteger();
-				int sizey	= areasize.getYAsInteger();
-				
-				int dx	= x1<x2	? Math.min(x2-x1, x1+sizex-x2) : Math.min(x1-x2, x2+sizex-x1);
-				int dy	= y1<y2	? Math.min(y2-y1, y1+sizey-y2) : Math.min(y1-y2, y2+sizey-y1);
-				
-				ret	= new Vector1Double(Math.sqrt((dx * dx) + (dy * dy)));
-			}
-			else
-			{
-				ret	= pos1.getDistance(pos2);
-			}
-			
-			return ret;
-		}
-	}*/
-	
-	/**
-	 * Get all SimObjects at a specific grid position
-	 * /
-	public ISpaceObject[] getSpaceObjectsByGridPosition(IVector2 position)
-	{
-		synchronized(monitor)
-		{
-			return getSpaceObjectsByGridPosition(position, null);
-		}
-	}*/
-
-	/**
-	 * Get all SimObjects from a specific type at a specific grid position
-	 * /
-	public ISpaceObject[] getSpaceObjectsByGridPosition(IVector2 position, Object type)
-	{
-		synchronized(monitor)
-		{
-			ISpaceObject[] ret = null;
-			Collection simobjs = objectsygridpos.getCollection(position);
-			if (null == type)
-			{
-				ret = (ISpaceObject[])simobjs.toArray(new ISpaceObject[simobjs.size()]);
-			}
-			else
-			{
-				List l = new ArrayList();
-				for (Iterator objs = simobjs.iterator(); objs.hasNext();)
-				{
-					ISpaceObject currentObj = (ISpaceObject)objs.next();
-					if (type.equals(currentObj.getType()))
-					{
-						l.add(currentObj);
-					}
-				}
-				ret = (ISpaceObject[])l.toArray(new ISpaceObject[l.size()]);
-			}
-			return ret;
-		}
-	}*/
-	
-	/**
-	 *  Get a position on the grid.
-	 *  Applies torus or strict border settings as necessary.
-	 *  @param position	The position.
-	 *  @return	The position converted to a correct grid position (if necessary).
-	 * /
-	public IVector2	getGridPosition(IVector2 position)
-	{
-		IVector2 ret	= position;
-		if(border_mode==BORDER_TORUS)
-		{
-			int sizex = areasize.getXAsInteger();
-			int sizey = areasize.getYAsInteger();
-			ret	= new Vector2Int((position.getXAsInteger()%sizex+sizex)%sizex,
-				(position.getYAsInteger()%sizey+sizey)%sizey);
-		}
-		
-		return ret;
-	}*/
 }

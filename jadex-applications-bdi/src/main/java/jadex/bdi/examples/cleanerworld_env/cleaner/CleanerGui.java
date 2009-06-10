@@ -43,7 +43,8 @@ public class CleanerGui	extends JFrame
 		super(agent.getAgentName());
 		final JPanel map = new JPanel()
 		{
-			IExpression	query_max_quantity;
+			protected IExpression	query_max_quantity;
+			protected boolean printed;
 			
 			// overridden paint method.
 			protected void	paintComponent(Graphics g)
@@ -190,7 +191,12 @@ public class CleanerGui	extends JFrame
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					if(!printed)
+					{
+						System.out.println("Paint problem: "+e);
+						e.printStackTrace();
+					}
+					printed = true;
 				}
 			}
 		};

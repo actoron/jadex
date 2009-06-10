@@ -1,4 +1,4 @@
-package jadex.bdi.examples.cleanerworld_env.cleaner;
+package jadex.bdi.examples.cleanerworld_env;
 
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -24,13 +24,17 @@ public class MoveToLocationPlan extends Plan
 		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 dest = (IVector2)getParameter("location").getValue();
 		
-		if(dest==null)
-			System.out.println("shit");
-		
 		SyncResultListener	res	= new SyncResultListener();
 		move = new MoveTask(dest, res, getExternalAccess());
 		myself.addTask(move);
-		res.waitForResult();
+		try
+		{
+			res.waitForResult();
+		}
+		catch(Exception e)
+		{
+			fail(e);
+		}
 	}
 
 	/**
@@ -40,7 +44,7 @@ public class MoveToLocationPlan extends Plan
 	{
 		if(move!=null)
 		{
-			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			myself.removeTask(move);
 		}
 	}
@@ -52,7 +56,7 @@ public class MoveToLocationPlan extends Plan
 	{
 		if(move!=null)
 		{
-			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			myself.removeTask(move);
 		}
 	}

@@ -1,4 +1,4 @@
-package jadex.bdi.examples.cleanerworld_env.cleaner;
+package jadex.bdi.examples.cleanerworld_env;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
@@ -9,6 +9,7 @@ import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bdi.examples.marsworld_env.movement.ListenableTask;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -86,4 +87,13 @@ public class MoveTask extends ListenableTask
 		if(newloc==destination)
 			taskFinished(obj, null);
 	}
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 * /
+	public String toString()
+	{
+		return SReflect.getUnqualifiedClassName(this.getClass());
+	}*/
 }

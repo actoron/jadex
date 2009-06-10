@@ -39,94 +39,9 @@ public class ContinuousSpace2D extends Space2D
 	 * @param areasize the size of the 2D area
 	 * @param actionexecutor executor for agent actions
 	 */
-	public ContinuousSpace2D(Object name, IVector2 areasize, int bordermode)
+	public ContinuousSpace2D(Object name, IVector2 areasize, String bordermode)
 	{
 		super(areasize, bordermode);
 		setProperty("name", name);
 	}
-	
-	//-------- methods --------
-//	
-//	/**
-//	 * Retrieves a random position within the simulation area with a minimum
-//	 * distance from the edge.
-//	 * 
-//	 * @param distance minimum distance from the edge, null or zero for no distance
-//	 */
-//	public IVector2 getRandomPosition(IVector2 distance)
-//	{
-//		if (distance == null)
-//		{
-//			distance = Vector2Double.ZERO;
-//		}
-//		IVector2 position = areaSize_.copy();
-//		position.subtract(distance);
-//		position.randomX(distance.getX(), position.getX());
-//		position.randomY(distance.getY(), position.getY());
-//		return position;
-//	}
-//	
-//	/**
-//	 * Returns the ID of the nearest object to the given position within a
-//	 * maximum distance from the position.
-//	 * 
-//	 * @param position position the object should be nearest to
-//	 * @param maxDist maximum distance from the position, use null for unlimited distance
-//	 * @return nearest object's ID or null if none is found
-//	 */
-//	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxDist)
-//	{
-//		ISpaceObject nearest = null;
-//		IVector1 distance = null;
-//		synchronized(spaceObjects_)
-//		{
-//			Set objects = spaceObjects_.entrySet();
-//			for(Iterator it = objects.iterator(); it.hasNext();)
-//			{
-//				Map.Entry entry = (Entry)it.next();
-//				ISpaceObject currentObj = (ISpaceObject) entry.getValue();
-//				IVector1 objDist = ((IVector2) currentObj.getProperty(Space2D.POSITION)).getDistance(position); 
-//				if ((nearest == null) || (objDist.less(distance)))
-//				{
-//					nearest = currentObj;
-//					distance = objDist;
-//				}
-//			}
-//		}
-//		if((maxDist != null) && (distance != null) && (maxDist.less(distance)))
-//		{
-//			return null;
-//		}
-//		
-//		return nearest;
-//	}
-//	
-//	/**
-//	 * Retrieve all objects in the distance for a position
-//	 * @param position
-//	 * @param distance
-//	 * @return The near objects. 
-//	 */
-//	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist)
-//	{
-//		List ret = new ArrayList();
-//		
-//		synchronized(spaceObjects_)
-//		{
-//			Set objects = spaceObjects_.entrySet();
-//			for(Iterator it = objects.iterator(); it.hasNext();)
-//			{
-//				Map.Entry entry = (Entry)it.next();
-//				ISpaceObject obj = (ISpaceObject)entry.getValue();
-//				IVector1 dist = ((IVector2)obj.getProperty(Space2D.POSITION)).getDistance(position); 
-//				if(dist.less(maxdist) || dist.equals(maxdist))
-//				{
-//					ret.add(obj);
-//				}
-//			}
-//		}
-//		
-//		return (ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
-//	}
-
 }

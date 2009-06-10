@@ -1,11 +1,12 @@
 package jadex.adapter.base.envsupport.observer.gui.plugin;
 
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.IObjectTask;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.SpaceObject;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
+import jadex.commons.SReflect;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -283,12 +284,15 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		for (Iterator it = processIds.iterator(); it.hasNext(); )
 		{
 			Object id = it.next();
-			plModel.addElement(id);
+//			String str = SReflect.getUnqualifiedClassName(it.next().getClass())+"( id="+id+")";
+			ISpaceProcess proc = observerCenter_.getSpace().getSpaceProcess(id);
+			if(proc!=null)
+				plModel.addElement(proc);
 		}
 		processList_.setSelectedValue(selection, true);
-		ISpaceProcess proc = observerCenter_.getSpace().getSpaceProcess(selection);
-		if (proc != null)
-			fillPropertyTable(processPropertyTable_, proc);
+//		ISpaceProcess proc = observerCenter_.getSpace().getSpaceProcess(selection);
+		if (selection != null)
+			fillPropertyTable(processPropertyTable_, selection);
 		else
 			((DefaultTableModel) processPropertyTable_.getModel()).setRowCount(0);
 		
@@ -312,15 +316,19 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		String type = String.valueOf(SObjectInspector.getType(observedObj));
 		objTypeLabel_.setText(type);
 		
-		if (observedObj instanceof SpaceObject)
+		if(observedObj instanceof SpaceObject)
 		{
 			DefaultComboBoxModel tlModel = (DefaultComboBoxModel) taskList_.getModel();
 			SpaceObject sObj = (SpaceObject) observedObj;
 			Set tasks = sObj.getTasks();
 			selection = taskList_.getSelectedValue();
 			tlModel.removeAllElements();
-			for (Iterator it = tasks.iterator(); it.hasNext(); )
-				tlModel.addElement(it.next());
+			for(Iterator it = tasks.iterator(); it.hasNext(); )
+			{
+				IObjectTask task = (IObjectTask)it.next();
+//				String str = SReflect.getUnqualifiedClassName(it.next().getClass())+" "+task;
+				tlModel.addElement(task);
+			}
 			if (tasks.contains(selection))
 				taskList_.setSelectedValue(selection, true);
 		}

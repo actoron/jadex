@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
@@ -99,6 +100,17 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	}
 	
 	/**
+	 *  Only for debugging.
+	 * /
+	public void setProperty(String name, Object value)
+	{
+		if(getType().equals("cleaner") && name.equals(Space2D.PROPERTY_POSITION))
+			System.out.println("Setting: "+name+" "+value);
+		
+		super.setProperty(name, value);
+	}*/
+	
+	/**
 	 *  Get the objects id.
 	 *  @return The object id.
 	 */
@@ -169,10 +181,14 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	{
 		synchronized(monitor)
 		{
-			if(!tasks.contains(task))
-				throw new RuntimeException("Task does not exist: "+this+", "+task);
-			task.shutdown(this);
-			tasks.remove(task);
+//			if(!tasks.contains(task))
+//			throw new RuntimeException("Task does not exist: "+this+", "+task);
+
+			if(tasks.contains(task))
+			{
+				task.shutdown(this);
+				tasks.remove(task);
+			}
 		}
 	}
 	
@@ -196,7 +212,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		synchronized(monitor)
 		{
 			IObjectTask[] atasks = (IObjectTask[])tasks.toArray(new IObjectTask[tasks.size()]);
-			for (int i = 0; i < atasks.length; ++i)
+			for(int i = 0; i < atasks.length; ++i)
 			{
 				removeTask(atasks[i]);
 			}
