@@ -98,7 +98,7 @@
 			</env:views>
 			
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D">
+				<env:perspective name="icons" class="Perspective2D" objectshiftx="0.5" objectshifty="0.5">
 					<!--<env:drawable objecttype="collector" width="0.9" height="0.9">
 					<env:texturedrectangle layer="2"
 					imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png"/>
@@ -141,7 +141,7 @@
 					</env:drawable>
 					
 					<env:prelayers>
-						<env:tiledlayer width="3.5" height="3.5"
+						<env:tiledlayer width="0.3" height="0.3"
 							imagepath="jadex/bdi/examples/antworld/images/bg.png"/>
 						<env:gridlayer width="1.0" height="1.0" color="WHITE"/>
 					</env:prelayers>
