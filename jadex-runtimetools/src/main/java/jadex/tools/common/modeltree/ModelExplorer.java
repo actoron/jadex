@@ -244,7 +244,7 @@ public class ModelExplorer extends JTree
 			public void urlRemoved(URL url)
 			{
 				List cs = getRootNode().getChildren();
-				for(int i=0; i<cs.size(); i++)
+				for(int i=0; cs!=null && i<cs.size(); i++)
 				{
 					try
 					{
@@ -500,6 +500,25 @@ public class ModelExplorer extends JTree
 //			usertask.nodes_user.clear();
 //			usertask.nodes_out.clear();
 //		}		
+
+		// Remove libraries.
+		Object[] cs = getRootNode().getChildCount()>0 ? getRootNode().getChildren().toArray() : null;
+		if(cs!=null)
+		{
+			ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+			for(int i=0; i<cs.length; i++)
+			{
+				try
+				{
+					FileNode fn = (FileNode)cs[i];
+					ls.removeURL(fn.getFile().toURI().toURL());
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 
 		root.reset();
 		

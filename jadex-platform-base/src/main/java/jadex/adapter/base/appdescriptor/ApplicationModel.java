@@ -34,6 +34,16 @@ public class ApplicationModel implements ILoadableElementModel
 	//-------- methods --------
 	
 	/**
+	 *  Get the application type.
+	 */
+	public MApplicationType	getApplicationType()
+	{
+		return apptype;
+	}
+	
+	//-------- ILoadableElementModel interface --------
+	
+	/**
 	 *  Get the name.
 	 *  @return The name.
 	 */

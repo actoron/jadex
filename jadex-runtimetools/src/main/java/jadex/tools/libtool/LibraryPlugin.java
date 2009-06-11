@@ -338,6 +338,13 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	public void	reset()
 	{
+		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		URL[]	urls	= (URL[])ls.getURLs().toArray(new URL[ls.getURLs().size()]);
+
+		for(int i=0; i<urls.length; i++)
+		{
+			ls.removeURL(urls[i]);
+		}
 	}
 	
 	/**
