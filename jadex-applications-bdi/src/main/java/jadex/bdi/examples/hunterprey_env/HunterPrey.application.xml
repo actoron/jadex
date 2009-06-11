@@ -1,4 +1,4 @@
-	<!--
+<!--
 	<H3>The hunter prey application descriptor</H3>
 
 	Two kinds of creatures live on a grid world.
@@ -14,6 +14,7 @@
 	name="HunterPrey" package="jadex.bdi.examples.hunterprey_env">
 	
 	<imports>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
@@ -156,12 +157,52 @@
 							new String[]{"hunter_seen", "add", "seen_hunters"},
 							new String[]{"hunter_gone", "remove", "seen_hunters"},
 							new String[]{"prey_moved", "remove_outdated", "known_food"}
-
 						}
 					</env:property>
 				</env:perceptprocessor>
-				<env:perceptprocessor agenttype="DumbPrey" class="DumbPreyVisionProcessor"/>
-				<env:perceptprocessor agenttype="DumbHunter" class="DumbHunterVisionProcessor"/>
+				
+				<env:perceptprocessor agenttype="DumbPrey"	class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "set", "nearest_food", "isNearer"},
+							new String[]{"food_eaten", "unset", "nearest_food", "isFact"},
+							new String[]{"food_out_of_sight", "unset", "nearest_food", "isFact"}
+						}
+					</env:property>
+					<env:property name="isNearer" dynamic="true">
+						$fact==null
+						|| $space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$fact).getProperty(Space2D.PROPERTY_POSITION))
+							.greater($space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$percept).getProperty(Space2D.PROPERTY_POSITION)))
+					</env:property>
+					<env:property name="isFact" dynamic="true">
+						$percept.equals($fact)
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor agenttype="DumbHunter"	class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"prey_seen", "set", "nearest_prey", "isNearer"},
+							new String[]{"prey_moved", "set", "nearest_prey", "isNearer"},
+							new String[]{"prey_gone", "unset", "nearest_prey", "isFact"}
+						}
+					</env:property>
+					<env:property name="isNearer" dynamic="true">
+						$fact==null
+						|| $space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$fact).getProperty(Space2D.PROPERTY_POSITION))
+							.greater($space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$percept).getProperty(Space2D.PROPERTY_POSITION)))
+					</env:property>
+					<env:property name="isFact" dynamic="true">
+						$percept.equals($fact)
+					</env:property>
+				</env:perceptprocessor>
+				
 				<env:perceptprocessor agenttype="LAHunter" class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]

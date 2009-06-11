@@ -16,6 +16,9 @@ import jadex.bridge.ISpace;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,6 +50,9 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	/** The set action. */
 	public static String SET = "set";
 	
+	/** The unset action (sets a belief fact to null). */
+	public static String UNSET = "unset";
+	
 	/** The maxrange property. */
 	public static String PROPERTY_MAXRANGE = "range";
 
@@ -68,7 +74,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, IAgentIdentifier agent, final ISpaceObject avatar)
+	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent, final ISpaceObject avatar)
 	{
 		boolean	invoke	= false;
 		final String[][] metainfos = getMetaInfos(type);
@@ -77,6 +83,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 			invoke	= ADD.equals(metainfos[i][0])
 				|| REMOVE.equals(metainfos[i][0])
 				|| SET.equals(metainfos[i][0])
+				|| UNSET.equals(metainfos[i][0])
 				|| REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar);
 		}
 		
@@ -91,61 +98,105 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 				}
 				public void resultAvailable(Object result)
 				{
-					try
+					final IExternalAccess exta = (IExternalAccess)result;
+					exta.invokeLater(new Runnable()
 					{
-						IExternalAccess exta = (IExternalAccess)result;
-						
-						
-						for(int i=0; i<metainfos.length; i++)
+						public void run()
 						{
-							if(ADD.equals(metainfos[i][0]))
+							try
 							{
-								IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-								if(!belset.containsFact(percept))
+								for(int i=0; i<metainfos.length; i++)
 								{
-									belset.addFact(percept);
-//									System.out.println("added: "+percept+" to: "+belset);
-								}
-							}
-							else if(REMOVE.equals(metainfos[i][0]))
-							{
-								IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-								if(belset.containsFact(percept))
-								{
-									belset.removeFact(percept);
-//									System.out.println("removed: "+percept+" from: "+belset);
-								}
-							}
-							else if(SET.equals(metainfos[i][0]))
-							{
-								IBelief bel = exta.getBeliefbase().getBelief(metainfos[i][1]);
-								bel.setFact(percept);
-//								System.out.println("set: "+percept+" in bel: "+bel);
-							}
-							else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
-							{
-								IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-								IVector1 vision	= getRange(avatar);
-								Space2D	space2d	= (Space2D)space;
-								IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-								ISpaceObject[]	known	= (ISpaceObject[])belset.getFacts();
-								Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, vision, null)));
-								for(int j=0; j<known.length; j++)
-								{
-									if(!seen.contains(known[j]) && !vision.less(space2d.getDistance(mypos, (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION))))
+									IParsedExpression	cond	= metainfos[i].length==2 ? null
+										: (IParsedExpression)getProperty(metainfos[i][2]);
+									SimpleValueFetcher	fetcher	= null;
+									if(cond!=null)
 									{
-//										System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-										belset.removeFact(known[i]);
+										fetcher	= new SimpleValueFetcher();
+										fetcher.setValue("$space", space);
+										fetcher.setValue("$percept", percept);
+										fetcher.setValue("$avatar", avatar);
+										fetcher.setValue("$type", type);
+										fetcher.setValue("$aid", agent);
+										fetcher.setValue("$scope", exta);
+									}
+
+									if(ADD.equals(metainfos[i][0]))
+									{
+										IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+										if(cond!=null)
+											fetcher.setValue("$facts", belset.getFacts());
+										if(!belset.containsFact(percept) && (cond==null || evaluate(cond, fetcher)))
+										{
+											belset.addFact(percept);
+//											System.out.println("added: "+percept+" to: "+belset);
+										}
+									}
+									else if(REMOVE.equals(metainfos[i][0]))
+									{
+										IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+										if(cond!=null)
+											fetcher.setValue("$facts", belset.getFacts());
+										if(belset.containsFact(percept) && (cond==null || evaluate(cond, fetcher)))
+										{
+											belset.removeFact(percept);
+//											System.out.println("removed: "+percept+" from: "+belset);
+										}
+									}
+									else if(SET.equals(metainfos[i][0]))
+									{
+										IBelief bel = exta.getBeliefbase().getBelief(metainfos[i][1]);
+										if(cond!=null)
+											fetcher.setValue("$fact", bel.getFact());
+										if(cond==null || evaluate(cond, fetcher))
+											bel.setFact(percept);
+//										System.out.println("set: "+percept+" in bel: "+bel);
+									}
+									else if(UNSET.equals(metainfos[i][0]))
+									{
+										IBelief bel = exta.getBeliefbase().getBelief(metainfos[i][1]);
+										if(cond!=null)
+											fetcher.setValue("$fact", bel.getFact());
+										if(cond==null || evaluate(cond, fetcher))
+											bel.setFact(null);
+//										System.out.println("unset: "+percept+" in bel: "+bel);
+									}
+									else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
+									{
+										IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+										if(cond!=null)
+											fetcher.setValue("$facts", belset.getFacts());
+										if(cond==null || evaluate(cond, fetcher))
+										{
+											IVector1 vision	= getRange(avatar);
+											Space2D	space2d	= (Space2D)space;
+											IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
+											ISpaceObject[]	known	= (ISpaceObject[])belset.getFacts();
+											Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, vision, null)));
+											for(int j=0; j<known.length; j++)
+											{
+												if(!seen.contains(known[j]) && !vision.less(space2d.getDistance(mypos, (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION))))
+												{
+//													System.out.println("Removing disappeared object: "+percept+", "+known[j]);
+													belset.removeFact(known[i]);
+												}
+											}
+										}
 									}
 								}
 							}
+							catch(Exception e)
+							{
+								// try catch for the case that the agent is not yet inited and
+								// the belief value is not accessible
+								// Todo: fix agent init.
+								// Exception might be thrown, when agent not yet initialized
+								// -> AgentRules.findValue() fails due to missing initparents,
+								// when belief is initialized on demand.
+								// -> AMS should not provide external access to agent when not yet inited.  
+							}
 						}
-					}
-					catch(Exception e)
-					{
-						// try catch for the case that the agent is not yet inited and
-						// the belief value is not accessible
-					}
+					});
 				}
 			});
 		}
@@ -172,7 +223,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 			for(int i=0; i<percepttypes.length; i++)
 			{
 				String[]	per = (String[])percepttypes[i];
-				String[][]	newmis	= new String[][]{{per[1], per[2]}};
+				String[][]	newmis	= per.length==3 ? new String[][]{{per[1], per[2]}} : new String[][]{{per[1], per[2], per[3]}};
 				String[][]	oldmis	= (String[][])this.percepttypes.get(per[0]);
 				if(oldmis!=null)
 					newmis	= (String[][])SUtil.joinArrays(oldmis, newmis);
@@ -212,5 +263,24 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	{
 		Object tmp = getProperty(PROPERTY_RANGE);
 		return tmp==null? "range": (String)tmp;
+	}
+	
+	/**
+	 *  Evaluate a condition.
+	 *  @param exp	The expression.
+	 *  @param fetcher	The value fetcher.
+	 */
+	protected boolean	evaluate(IParsedExpression exp, IValueFetcher fetcher)
+	{
+		boolean	ret	= false;
+		try
+		{
+			ret	= ((Boolean)exp.getValue(fetcher)).booleanValue();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
 	}
 }
