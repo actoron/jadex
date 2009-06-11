@@ -141,9 +141,12 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("avatarmapping", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"agenttype", "objecttype", "delete"}, 
+			SUtil.createHashMap(new String[]{"agenttype", "objecttype", "createavatar", "createagent", "killavatar", "killagent"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
 			}), null));
 		

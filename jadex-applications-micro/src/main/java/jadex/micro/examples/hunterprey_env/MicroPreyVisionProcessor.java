@@ -47,7 +47,7 @@ public class MicroPreyVisionProcessor implements IPerceptProcessor
 //						{
 							MicroPreyAgent	mp	= (MicroPreyAgent)exta.getAgent();
 							ISpaceObject	nearfood	= mp.getNearestFood();
-							ISpaceObject	myself	= space2d.getOwnedObjects(agent)[0];
+							ISpaceObject	myself	= space2d.getAvatar(agent);
 							
 							// Remember new food only if nearer than other known food (if any).
 							if(type.equals(CreatureVisionGenerator.OBJECT_APPEARED) || type.equals(CreatureVisionGenerator.OBJECT_MOVED))

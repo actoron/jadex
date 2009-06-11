@@ -44,9 +44,9 @@ public class CreatureActionComparator implements Comparator
 		if(ret!=0)
 		{
 			IAgentIdentifier actor1 = (IAgentIdentifier)entry1.parameters.get(ISpaceAction.ACTOR_ID);
-			ISpaceObject avatar1 = space.getOwnedObjects(actor1)[0];
+			ISpaceObject avatar1 = space.getAvatar(actor1);
 			IAgentIdentifier actor2 = (IAgentIdentifier)entry2.parameters.get(ISpaceAction.ACTOR_ID);
-			ISpaceObject avatar2 = space.getOwnedObjects(actor2)[0];
+			ISpaceObject avatar2 = space.getAvatar(actor2);
 
 			if(ret>0 && avatar1.getType().equals("hunter") && avatar2.getType().equals("prey")
 				|| ret<0 && avatar1.getType().equals("prey") && avatar2.getType().equals("hunter"))

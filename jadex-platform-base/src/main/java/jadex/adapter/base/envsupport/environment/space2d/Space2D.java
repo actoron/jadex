@@ -96,7 +96,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public void setBorderMode(String bordermode)
 	{
-		System.out.println("bordemode: "+bordermode);
+//		System.out.println("bordemode: "+bordermode);
 		if(!BORDER_STRICT.equals(bordermode) && !BORDER_TORUS.equals(bordermode))
 			throw new RuntimeException("Unknown border mode: "+bordermode);
 		this.bordermode = bordermode;
@@ -122,10 +122,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			ret.setProperty(PROPERTY_POSITION, null);
 			setPosition(ret.getId(), pos);
 		}
-		else
-		{
-			System.out.println("setting no pos to: "+ret);
-		}
+//		else
+//		{
+//			System.out.println("setting no pos to: "+ret);
+//		}
 		
 		return ret;
 	}

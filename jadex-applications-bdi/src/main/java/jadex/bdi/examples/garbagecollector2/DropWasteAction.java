@@ -28,7 +28,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 		Grid2D grid = (Grid2D)space;
 		
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
-		ISpaceObject so = grid.getOwnedObjects(owner)[0];
+		ISpaceObject so = grid.getAvatar(owner);
 		IVector2 pos = (IVector2)so.getProperty(Grid2D.PROPERTY_POSITION);
 		
 		assert so.getProperty("garbage")!=null;

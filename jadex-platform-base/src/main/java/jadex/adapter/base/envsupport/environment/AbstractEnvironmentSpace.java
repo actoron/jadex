@@ -4,6 +4,7 @@ import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.IObjectCreator;
 import jadex.adapter.base.envsupport.MEnvSpaceInstance;
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IContext;
 import jadex.commons.collection.MultiCollection;
@@ -350,6 +351,18 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 				}
 			}
+			
+			// Possibly create agent.
+			for(Iterator it=avatarmappings.keySet().iterator(); it.hasNext(); )
+			{
+				String agenttype = (String)it.next();
+				AvatarMapping mapping = getAvatarMapping(agenttype, typename);
+				if(mapping.isCreateAgent())
+				{
+					// todo: what about arguments etc.?
+					((ApplicationContext)getContext()).createAgent(null, agenttype, null, null, true, false, null, null);
+				}
+			}
 		}
 		
 		if(listeners!=null)
@@ -377,8 +390,20 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			obj = (ISpaceObject)spaceobjects.get(id);
 			if(obj==null)
 				throw new RuntimeException("No object found for id: "+id);
-			
 			String	objecttype	= obj.getType();
+			
+			// Possibly kill agent.
+			IAgentIdentifier agent = (IAgentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+			if(agent!=null)
+			{
+				String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
+				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
+				if(mapping.isKillAgent())
+				{
+					IAMS ams = (IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class);
+					ams.destroyAgent(agent, null);
+				}
+			}
 			
 			// shutdown and jettison tasks
 			obj.clearTasks();
@@ -471,11 +496,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 * @param agenttype The agent type.
 	 * @param objecttype The object type to represent the agent.
 	 */
-	public void addAvatarMappings(String agenttype, String objecttype)
+	public void addAvatarMappings(AvatarMapping mapping)
 	{
 		synchronized(monitor)
 		{
-			this.avatarmappings.put(agenttype, objecttype);			
+			this.avatarmappings.put(mapping.getAgentType(), mapping);			
 		}
 	}
 
@@ -484,11 +509,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 * @param agenttype The agent type.
 	 * @param objecttype The object type to represent the agent.
 	 */
-	public void removeAvatarMappings(String agenttype, String objecttype)
+	public void removeAvatarMappings(AvatarMapping mapping)
 	{
 		synchronized(monitor)
 		{
-			this.avatarmappings.remove(agenttype, objecttype);			
+			this.avatarmappings.remove(mapping.getAgentType(), mapping);			
 		}
 	}
 	
@@ -673,15 +698,36 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 	
 	/**
-	 *  Get the owned objects.
-	 *  @return The owned objects. 
+	 *  Get the avatar objects.
+	 *  @return The avatar objects. 
 	 */
-	public ISpaceObject[] getOwnedObjects(IAgentIdentifier owner)
+	public ISpaceObject[] getAvatars(IAgentIdentifier owner)
 	{
 		synchronized(monitor)
 		{
 			List ownedobjs = (List)spaceobjectsbyowner.get(owner);
 			return ownedobjs==null? new ISpaceObject[0]: (ISpaceObject[])ownedobjs.toArray(new ISpaceObject[ownedobjs.size()]);
+		}
+	}
+	
+	/**
+	 *  Get the avatar object.
+	 *  @return The avatar object. 
+	 */
+	public ISpaceObject getAvatar(IAgentIdentifier owner)
+	{
+		synchronized(monitor)
+		{
+			ISpaceObject ret = null;
+			List ownedobjs = (List)spaceobjectsbyowner.get(owner);
+			if(ownedobjs!=null)
+			{
+				if(ownedobjs.size()>1)
+					throw new RuntimeException("More than one avatar for agent: "+owner);
+				else if(ownedobjs.size()==1)
+					ret = (ISpaceObject)ownedobjs.get(0);
+			}
+			return ret;
 		}
 	}
 	
@@ -885,7 +931,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			// Add avatar(s) if any.
+			// Possibly add or create avatar(s) if any.
 			if(initialavatars!=null && initialavatars.containsKey(aid))
 			{
 				Object[]	ia	= (Object[])initialavatars.get(aid);
@@ -903,11 +949,13 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				{
 					for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
 					{
-						String	objecttype	= (String)it.next();
-						// Hmm local name as owner? better would be agent id, but agents are created after space?
-						Map	props	= new HashMap();
-						props.put(ISpaceObject.PROPERTY_OWNER, aid);
-						createSpaceObject(objecttype, props, null);
+						AvatarMapping mapping = (AvatarMapping)it.next();
+						if(mapping.isCreateAvatar())
+						{
+							Map	props	= new HashMap();
+							props.put(ISpaceObject.PROPERTY_OWNER, aid);
+							createSpaceObject(mapping.getAvatarType(), props, null);
+						}
 					}
 				}
 			}
@@ -930,6 +978,27 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
+			String	agenttype	= ((ApplicationContext)getContext()).getAgentType(aid);
+			
+			// Possibly kill avatars of that agent.
+			if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)
+			{
+				ISpaceObject[] avatars = getAvatars(aid);
+				if(avatars!=null)
+				{
+					for(int i=0; i<avatars.length; i++)
+					{
+						String avatartype = avatars[i].getType();
+						AvatarMapping mapping = getAvatarMapping(agenttype, avatartype);
+						
+						if(mapping!=null && mapping.isKillAvatar())
+						{
+							destroySpaceObject(avatars[i].getId());
+						}
+					}
+				}
+			}
+			
 			if(perceptgenerators!=null)
 			{
 				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
@@ -942,8 +1011,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		
 		// Remove the owned object too?
 	}
-	
-	
+		
 	/**
 	 *  Get the context.
 	 *  @return The context.
@@ -1134,5 +1202,20 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 
 			initialavatars.put(ownerid, new Object[]{type, props});
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected AvatarMapping getAvatarMapping(String agenttype, String avatartype)
+	{
+		AvatarMapping mapping = null;
+		for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
+		{
+			mapping = (AvatarMapping)it.next();
+			if(avatartype.equals(mapping.getAvatarType()))
+				break;
+		}
+		return mapping;
 	}
 }

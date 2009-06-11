@@ -5,6 +5,7 @@ import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceInstance;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.AvatarMapping;
 import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
@@ -137,9 +138,25 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		{
 			for(int i=0; i<avmappings.size(); i++)
 			{
-				Map mapping = (Map)avmappings.get(i);
-				ret.addAvatarMappings((String)MEnvSpaceInstance.getProperty(mapping, "agenttype"), 
-					(String)MEnvSpaceInstance.getProperty(mapping, "objecttype"));
+				Map mmapping = (Map)avmappings.get(i);
+				String agenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "agenttype");
+				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
+				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
+				Boolean createagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createagent");
+				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
+				Boolean killagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killagent");
+				
+				AvatarMapping mapping = new AvatarMapping(agenttype, avatartype);
+				if(createavatar!=null)
+					mapping.setCreateAvatar(createavatar.booleanValue());
+				if(createagent!=null)
+					mapping.setCreateAgent(createagent.booleanValue());
+				if(killavatar!=null)
+					mapping.setKillAvatar(killavatar.booleanValue());
+				if(killagent!=null)
+					mapping.setKillAgent(killagent.booleanValue());
+				
+				ret.addAvatarMappings(mapping);
 			}
 		}
 		// Create space percept types.

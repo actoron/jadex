@@ -43,7 +43,7 @@ public class MicroPreyAgent extends MicroAgent
 	public void executeBody()
 	{
 		this.env	= (Grid2D)getApplicationContext().getSpace("my2dspace");
-		this.myself	= env.getOwnedObjects(getAgentIdentifier())[0];
+		this.myself	= env.getAvatar(getAgentIdentifier());
 		this.listener	= new IResultListener()
 		{
 			public void exceptionOccurred(Exception e)

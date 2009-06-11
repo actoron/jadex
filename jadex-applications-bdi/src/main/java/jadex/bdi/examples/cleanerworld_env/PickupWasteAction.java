@@ -35,7 +35,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 		
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject waste = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
-		ISpaceObject avatar = env.getOwnedObjects(owner)[0];
+		ISpaceObject avatar = env.getAvatar(owner);
 
 //		if(so.getProperty("garbage")!=null)
 //			System.out.println("pickup failed: "+so);

@@ -34,7 +34,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject wastebin = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
 		ISpaceObject waste = (ISpaceObject)parameters.get("waste");
-		ISpaceObject avatar = env.getOwnedObjects(owner)[0];
+		ISpaceObject avatar = env.getAvatar(owner);
 
 //		if(so.getProperty("garbage")!=null)
 //			System.out.println("pickup failed: "+so);

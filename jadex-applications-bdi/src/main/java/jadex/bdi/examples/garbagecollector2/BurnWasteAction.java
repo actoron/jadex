@@ -27,7 +27,7 @@ public class BurnWasteAction extends SimplePropertyObject implements ISpaceActio
 		Grid2D grid = (Grid2D)space;
 		
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
-		ISpaceObject so = grid.getOwnedObjects(owner)[0];
+		ISpaceObject so = grid.getAvatar(owner);
 		
 		assert so.getProperty("garbage")!=null;
 		

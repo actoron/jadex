@@ -36,7 +36,7 @@ public class GravitationPlan extends Plan
 
 		//remove the destination sign of the agent
 		params = new HashMap();
-		params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
+		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier()).getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);		
 		params.put(GravitationListener.FEELS_GRAVITATION,hasGravitation);
 		srl = new SyncResultListener();

@@ -98,7 +98,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 				if (EnvironmentEvent.OBJECT_POSITION_CHANGED.equals(event.getType())) {
 					IVector2 pos = (IVector2) event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
 					// IVector2 oldpos = (IVector2) event.getInfo();
-					ISpaceObject agentobj = event.getSpace().getOwnedObjects(agent)[0];
+					ISpaceObject agentobj = event.getSpace().getAvatar(agent);
 
 					if (agentobj.getProperty(Space2D.PROPERTY_POSITION).equals(pos)) {
 						IVector2 gravitationCenter = checkForGravitation(event.getSpace(), pos);

@@ -36,7 +36,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		
 		Grid2D grid = (Grid2D)space;
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
-		ISpaceObject avatar = grid.getOwnedObjects(owner)[0];
+		ISpaceObject avatar = grid.getAvatar(owner);
 		ISpaceObject target = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
 		
 		if(null==space.getSpaceObject(target.getId()))

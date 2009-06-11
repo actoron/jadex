@@ -58,7 +58,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 		Grid2D grid = (Grid2D)space;
 		IAgentIdentifier actor = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		String direction = (String)parameters.get(PARAMETER_DIRECTION);
-		ISpaceObject avatar = grid.getOwnedObjects(actor)[0];
+		ISpaceObject avatar = grid.getAvatar(actor);
 
 		if(null==space.getSpaceObject(avatar.getId()))
 		{

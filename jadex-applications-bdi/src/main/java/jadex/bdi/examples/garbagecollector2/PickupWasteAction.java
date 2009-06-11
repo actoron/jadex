@@ -29,7 +29,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 		Grid2D grid = (Grid2D)space;
 		
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
-		ISpaceObject so = grid.getOwnedObjects(owner)[0];
+		ISpaceObject so = grid.getAvatar(owner);
 
 //		if(so.getProperty("garbage")!=null)
 //			System.out.println("pickup failed: "+so);

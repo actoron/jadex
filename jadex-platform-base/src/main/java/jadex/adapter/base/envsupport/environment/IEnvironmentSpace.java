@@ -178,7 +178,13 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 *  Get the owned objects.
 	 *  @return The owned objects. 
 	 */
-	public ISpaceObject[] getOwnedObjects(IAgentIdentifier owner);
+	public ISpaceObject[] getAvatars(IAgentIdentifier owner);
+	
+	/**
+	 *  Get the avatar.
+	 *  @return The avatar. 
+	 */
+	public ISpaceObject getAvatar(IAgentIdentifier owner);
 	
 	/**
 	 * Adds a dataview to the space.

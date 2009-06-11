@@ -50,8 +50,9 @@ public class EmptyPlan extends Plan
 		moveto.getParameter("location").setValue(new Vector2Double(1, 0.5));
 		dispatchSubgoalAndWait(moveto);
 		
-		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		env.destroySpaceObject(myself.getId());
+		// Not needed due to 'killavatar' in avatar mappings.
+//		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+//		env.destroySpaceObject(myself.getId());
 		
 		killAgent();
 	}

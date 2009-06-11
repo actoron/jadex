@@ -45,7 +45,7 @@ public class GoPlanEnv extends Plan
 		
 		//Update destination and gravitationSensor of ant on space 
 		Map params = new HashMap();
-		params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
+		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier()).getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);		
 		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 		SyncResultListener srl = new SyncResultListener();
@@ -82,14 +82,14 @@ public class GoPlanEnv extends Plan
 					
 			params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());			
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatars(getAgentIdentifier())[0].getId());			
 			srl	= new SyncResultListener();
 			env.performSpaceAction("go", params, srl); 
 			srl.waitForResult();
 			
 			//Update trace route of ant in space 
 			params = new HashMap();
-			params.put(ISpaceAction.OBJECT_ID, env.getOwnedObjects(getAgentIdentifier())[0].getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatars(getAgentIdentifier())[0].getId());
 			params.put(TraceRouteAction.POSITION, mypos);
 			params.put(TraceRouteAction.ROUND, new Integer(1));
 			srl = new SyncResultListener();
