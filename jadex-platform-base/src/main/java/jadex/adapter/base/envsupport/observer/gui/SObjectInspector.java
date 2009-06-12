@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -107,6 +108,28 @@ public class SObjectInspector
 	 */
 	public static Object getProperty(Object obj, String name)
 	{
+		return getProperty(obj, name, "$object");
+	}
+	
+	/**
+	 * Retrieves a property from an IPropertyObject.
+	 * @param obj the object being inspected
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public static Object getProperty(Object obj, String name, String objname)
+	{
+		return getProperty(obj, name, objname, null);
+	}
+	
+	/**
+	 * Retrieves a property from an IPropertyObject.
+	 * @param obj the object being inspected
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public static Object getProperty(Object obj, String name, String objname, Map prevals)
+	{
 		Object ret = null;
 		if(obj instanceof IPropertyObject)
 		{
@@ -145,7 +168,15 @@ public class SObjectInspector
 		if(ret instanceof IParsedExpression)
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$object", obj);
+			fetcher.setValue(objname, obj);
+			if(prevals!=null)
+			{
+				for(Iterator it=prevals.keySet().iterator(); it.hasNext(); )
+				{
+					String valname = (String)it.next();
+					fetcher.setValue(valname, prevals.get(valname));
+				}
+			}
 			ret = ((IParsedExpression)ret).getValue(fetcher);
 		}
 		
@@ -160,7 +191,7 @@ public class SObjectInspector
 	 * @param prop the property or the name of the property
 	 * @param clazz target class
 	 * @return the property
-	 */
+	 * /
 	public static final Object getPropertyAsClass(Object obj, Object prop, Class clazz)
 	{
 		if (!clazz.isInstance(prop))
@@ -168,7 +199,7 @@ public class SObjectInspector
 			prop = getProperty(obj, (String) prop);
 		}
 		return prop;
-	}
+	}*/
 	
 	/**
 	 * Retrieves a 1-vector given an object and either a string-based binding or

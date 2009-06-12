@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SUtil;
@@ -96,9 +97,9 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param layerObject object holding properties for pre/postlayers
 	 * @param libService library service for loading resources.
 	 */
-	public ViewportJOGL(IPropertyObject layerObject, ILibraryService libService)
+	public ViewportJOGL(IPerspective persp, ILibraryService libService)
 	{
-		super(layerObject);
+		super(persp);
 		libService_ = libService;
 		uninitialized_ = true;
 		valid_ = false;
@@ -466,7 +467,7 @@ public class ViewportJOGL extends AbstractViewport
 					{
 						l.init(ViewportJOGL.this, gl);
 					}
-					l.draw(layerObject_, areaSize_, ViewportJOGL.this, gl);
+					l.draw(perspective, areaSize_, ViewportJOGL.this, gl);
 				}
 			}
 			
@@ -515,7 +516,7 @@ public class ViewportJOGL extends AbstractViewport
 					{
 						l.init(ViewportJOGL.this, gl);
 					}
-					l.draw(layerObject_, areaSize_, ViewportJOGL.this, gl);
+					l.draw(perspective, areaSize_, ViewportJOGL.this, gl);
 				}
 			}
 			

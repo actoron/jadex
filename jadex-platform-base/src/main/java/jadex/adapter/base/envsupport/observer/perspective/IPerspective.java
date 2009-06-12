@@ -4,7 +4,6 @@ import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.commons.IPropertyObject;
 
 import java.awt.Component;
-import java.awt.event.ItemListener;
 
 /**
  * A perspective responsible for displaying information gathered using a view.
@@ -40,6 +39,12 @@ public interface IPerspective extends IPropertyObject
 	 *  @param obscenter the ObserverCenter
 	 */
 	public void setObserverCenter(ObserverCenter obscenter);
+	
+	/**
+	 *  Get the ObserverCenter.
+	 *  @return The observer center.
+	 */
+	public ObserverCenter getObserverCenter();
 	
 	/**
 	 *  Adds a new visual object.

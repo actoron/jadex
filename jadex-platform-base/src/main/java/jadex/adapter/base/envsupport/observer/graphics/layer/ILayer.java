@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.commons.IPropertyObject;
 
 import java.awt.Graphics2D;
@@ -43,7 +44,7 @@ public interface ILayer extends Serializable
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJ2D vp, Graphics2D g);
+	public void draw(IPerspective persp, IVector2 areaSize, ViewportJ2D vp, Graphics2D g);
 
 	/**
 	 * Draws the layer to an OpenGL viewport
@@ -53,5 +54,5 @@ public interface ILayer extends Serializable
 	 * @param vp the viewport
 	 * @param gl OpenGL context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJOGL vp, GL gl);
+	public void draw(IPerspective persp, IVector2 areaSize, ViewportJOGL vp, GL gl);
 }

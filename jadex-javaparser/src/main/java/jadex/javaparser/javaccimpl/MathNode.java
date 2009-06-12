@@ -1,5 +1,6 @@
 package jadex.javaparser.javaccimpl;
 
+import jadex.commons.SReflect;
 import jadex.javaparser.IValueFetcher;
 
 
@@ -113,8 +114,8 @@ public class MathNode	extends ExpressionNode
 			ExpressionNode	left	= (ExpressionNode)jjtGetChild(0);
 			ExpressionNode	right	= (ExpressionNode)jjtGetChild(1);
 			// Hack??? No distinction between wrapper and primitive types?
-			Class	cleft	= left.getStaticType()!=null ? left.getStaticType() : null; 
-			Class	cright	= right.getStaticType()!=null ? right.getStaticType() : null; 
+			Class	cleft	= left.getStaticType()!=null ? SReflect.getWrappedType(left.getStaticType()) : null; 
+			Class	cright	= right.getStaticType()!=null ? SReflect.getWrappedType(right.getStaticType()) : null; 
 			if(cleft==null && cright==null)
  			{
 				// Check ok, static type undeterminable.

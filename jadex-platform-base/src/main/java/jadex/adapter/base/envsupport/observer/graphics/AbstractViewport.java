@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
 import jadex.commons.IPropertyObject;
 
@@ -80,7 +81,7 @@ public abstract class AbstractViewport implements IViewport
 	protected ILayer[]				postLayers_;
 	
 	/** IPropertyObject holding properties for layers. */
-	protected IPropertyObject layerObject_;
+	protected IPerspective perspective;
 
 	/** The listeners of the viewport. */
 	private Set					listeners_;
@@ -88,9 +89,9 @@ public abstract class AbstractViewport implements IViewport
 	/** The zoom limit */
 	private double				zoomLimit_;
 
-	public AbstractViewport(IPropertyObject layerObject)
+	public AbstractViewport(IPerspective perspective)
 	{
-		layerObject_ = layerObject;
+		this.perspective = perspective;
 		bgColor_ = Color.BLACK;
 		inversionFlag_ = new Vector2Int(0);
 		position_ = Vector2Double.ZERO.copy();

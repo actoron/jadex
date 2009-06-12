@@ -6,13 +6,18 @@ import jadex.adapter.base.envsupport.observer.graphics.ModulateComposite;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.commons.IPropertyObject;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.media.opengl.GL;
 
@@ -46,10 +51,10 @@ public class TiledLayer implements ILayer
 	private Object				modColor_;
 	
 	/** Composite for modulating in Java2D */
-	private Composite modComposite_;
+//	private Composite modComposite_;
 	
 	/** The current property object */
-	private Object propObject;
+//	private Object propObject;
 
 	/**
 	 * Creates a new TiledLayer.
@@ -86,13 +91,14 @@ public class TiledLayer implements ILayer
 		image_ = vp.getImage(texturePath_);
 		imageToUser_ = new AffineTransform();
 		imageToUser_.scale(1.0 / image_.getWidth(), 1.0 / image_.getHeight());
-		modComposite_ = new ModulateComposite()
-			{
-				protected Color getColor()
-				{
-					return (Color) SObjectInspector.getPropertyAsClass(propObject, modColor_, Color.class);
-				}
-			};
+//		modComposite_ = new ModulateComposite()
+//		{
+//			protected Color getColor()
+//			{
+//				return modColor_ instanceof Color? (Color)modColor_: (Color)SObjectInspector.getProperty(propObject, (String)modColor_, "$perspective");
+////					return (Color) SObjectInspector.getPropertyAsClass(propObject, modColor_, Color.class);
+//			}
+//		};
 	}
 
 	/**
@@ -114,12 +120,22 @@ public class TiledLayer implements ILayer
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
+	public void draw(final IPerspective perspective, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
-		propObject = layerObject;
 		Composite c = g.getComposite();
 		if (!Color.WHITE.equals(modColor_))
-			g.setComposite(modComposite_);
+		{
+			g.setComposite(new ModulateComposite()
+			{
+				protected Color getColor()
+				{
+					Map prevals = new HashMap();
+					prevals.put("$space", perspective.getObserverCenter().getSpace());
+					return modColor_ instanceof Color? (Color)modColor_: (Color)SObjectInspector.getProperty(perspective, (String)modColor_, "$perspective", prevals);
+//						return (Color) SObjectInspector.getPropertyAsClass(propObject, modColor_, Color.class);
+				}
+			});
+		}
 		
 		for(double x = 0.0; x < areaSize.getXAsDouble(); x = x
 				+ tileSize_.getXAsDouble())
@@ -146,12 +162,16 @@ public class TiledLayer implements ILayer
 	 * @param vp the viewport
 	 * @param gl OpenGL context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJOGL vp, GL gl)
+	public void draw(IPerspective perspective, IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 
-		gl.glColor4fv(((Color) SObjectInspector.getPropertyAsClass(layerObject, modColor_, Color.class)).getComponents(null), 0);
+		Map prevals = new HashMap();
+		prevals.put("$space", perspective.getObserverCenter().getSpace());
+		Color c = modColor_ instanceof Color? (Color)modColor_: (Color)SObjectInspector.getProperty(perspective, (String)modColor_, "$perspective", prevals);
+		gl.glColor4fv(c.getComponents(null), 0);
+//		gl.glColor4fv(((Color) SObjectInspector.getPropertyAsClass(layerObject, modColor_, Color.class)).getComponents(null), 0);
 		
 		gl.glMatrixMode(GL.GL_TEXTURE);
 		gl.glPushMatrix();

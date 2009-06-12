@@ -4,11 +4,14 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.commons.IPropertyObject;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.media.opengl.GL;
 
@@ -57,9 +60,11 @@ public class ColorLayer implements ILayer
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
+	public void draw(IPerspective persp, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
-		Color c = (Color) SObjectInspector.getPropertyAsClass(layerObject, color, Color.class);
+		Map prevals = new HashMap();
+		prevals.put("$space", persp.getObserverCenter().getSpace());
+		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(persp, (String)color, "$perspective", prevals);
 		g.setColor(c);
 		Rectangle2D r = new Rectangle2D.Double(0.0, 0.0, areaSize.getXAsDouble(), areaSize.getYAsDouble());
 		g.fill(r);
@@ -73,9 +78,11 @@ public class ColorLayer implements ILayer
 	 * @param vp the viewport
 	 * @param gl OpenGL context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJOGL vp, GL gl)
+	public void draw(IPerspective persp, IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
-		Color c = (Color) SObjectInspector.getPropertyAsClass(layerObject, color, Color.class);
+		Map prevals = new HashMap();
+		prevals.put("$space", persp.getObserverCenter().getSpace());
+		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(persp, (String)color, "$perspective", prevals);
 		
 		gl.glColor4fv(c.getComponents(null), 0);
 		

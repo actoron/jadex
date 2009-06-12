@@ -407,6 +407,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					args.put("fetcher", fetcher);
 					IPerspective persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
 					
+					List props = (List)sourcepers.get("properties");
+					setProperties(persp, props, fetcher);
+					
 //					if(ret.getClass().getName().indexOf("2D")!=-1)
 //						((Perspective2D)persp).setInvertYAxis(true);
 //					if(ret.getClass().getName().indexOf("Grid")!=-1)

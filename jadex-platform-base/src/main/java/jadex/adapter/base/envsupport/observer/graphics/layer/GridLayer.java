@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.commons.IPropertyObject;
 
 import java.awt.BasicStroke;
@@ -15,6 +16,8 @@ import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.media.opengl.GL;
 
@@ -48,7 +51,6 @@ public class GridLayer implements ILayer
 	{
 		this.gridSize = gridSize.copy();
 		color	= c;
-		
 	}
 	
 	/**
@@ -79,9 +81,12 @@ public class GridLayer implements ILayer
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
+	public void draw(IPerspective perspective, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
-		Color c = (Color) SObjectInspector.getPropertyAsClass(layerObject, color, Color.class);
+		Map prevals = new HashMap();
+		prevals.put("$space", perspective.getObserverCenter().getSpace());
+		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(perspective, (String)color, "$perspective", prevals);
+
 		g.setColor(c);
 		
 		IVector2 pixSize = vp.getPixelSize();
@@ -109,9 +114,12 @@ public class GridLayer implements ILayer
 	 * @param vp the viewport
 	 * @param gl OpenGL context
 	 */
-	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJOGL vp, GL gl)
+	public void draw(IPerspective perspective, IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
-		Color c = (Color) SObjectInspector.getPropertyAsClass(layerObject, color, Color.class);
+		Map prevals = new HashMap();
+		prevals.put("$space", perspective.getObserverCenter().getSpace());
+		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(perspective, (String)color, "$perspective", prevals);
+		
 		gl.glColor4fv(c.getComponents(null), 0);
 		
 		IVector2 pixSize = vp.getPixelSize();

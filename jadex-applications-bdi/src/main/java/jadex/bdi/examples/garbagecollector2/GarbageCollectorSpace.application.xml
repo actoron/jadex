@@ -60,16 +60,6 @@
 			</env:processtypes>
 			
 			<env:percepttypes>
-				<!-- <env:percepttype name="garbage_appeared" objecttype="garbage" >
-					<env:objecttypes>
-						<env:objecttype name="garbage"/>
-					</env:objecttypes>
-					<env:agenttypes>
-						<env:agenttype name="collector"/>
-						<env:agenttype name="burner"/>
-					</env:agenttypes>
-				</env:percepttype> -->
-				
 				<env:percepttype name="garbage_appeared" objecttype="garbage"/>
 				<env:percepttype name="garbage_disappeared" objecttype="garbage" />
 					
@@ -86,11 +76,6 @@
 						}
 					</env:property>
 				</env:perceptgenerator>
-				
-				<!-- <env:perceptprocessor agenttype="Burner" class="VisionProcessor">
-					<env:percepttype name="garbage_appeared"/>
-					<env:percepttype name="garbage_disappeared"/>
-				</env:perceptprocessor> -->
 				
 				<env:perceptprocessor agenttype="Collector" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
@@ -180,7 +165,6 @@
 			</env:perspectives>
 			
 			<!-- executor -->
-			<!-- <env:spaceexecutor>new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class))</env:spaceexecutor> -->
 			<env:spaceexecutor class="RoundBasedExecutor">
 				<property name="space">$space</property>
 			</env:spaceexecutor>

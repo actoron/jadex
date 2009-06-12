@@ -5,6 +5,7 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport.MouseController;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.ILibraryService;
 import jadex.commons.IPropertyObject;
 
@@ -60,9 +61,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	 * @param layerObject object holding properties for pre/postlayers
 	 * @param libService the library service
 	 */
-	public ViewportJ2D(IPropertyObject layerObject, ILibraryService libService)
+	public ViewportJ2D(IPerspective persp, ILibraryService libService)
 	{
-		super(layerObject);
+		super(persp);
 
 		libService_ = libService;
 		imageCache_ = Collections.synchronizedMap(new HashMap());
@@ -252,7 +253,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						{
 							l.init(ViewportJ2D.this, g);
 						}
-						l.draw(layerObject_, areaSize_, ViewportJ2D.this, g);
+						l.draw(perspective, areaSize_, ViewportJ2D.this, g);
 					}
 				}
 
@@ -301,7 +302,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						{
 							l.init(ViewportJ2D.this, g);
 						}
-						l.draw(layerObject_, areaSize_, ViewportJ2D.this, g);
+						l.draw(perspective, areaSize_, ViewportJ2D.this, g);
 					}
 				}
 				

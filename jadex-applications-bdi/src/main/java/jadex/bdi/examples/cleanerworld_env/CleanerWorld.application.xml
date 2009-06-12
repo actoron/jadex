@@ -24,8 +24,10 @@
 	<spacetypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1" border="strict">
 			<env:property name="time" dynamic="true">$platform.getService(IClockService.class).getTime()</env:property>
-			<env:property name="daytime" dynamic="true">((Long)$space.getProperty("time")).longValue()%86400 &lt; 43200</env:property>
-			
+			<env:property name="timeofday" dynamic="true">(int)(((Long)$space.getProperty("time")).longValue()%86400)</env:property>
+			<env:property name="daytime" dynamic="true">$space.getProperty("timeofday") &lt; 43200</env:property>
+			<env:property name="t1" dynamic="true">100-(int)(Math.sin($space.getProperty("timeofday")/86400.0*2*Math.PI)*50+50)</env:property>
+	
 			<env:objecttypes>
 				<env:objecttype name="cleaner">
 					<env:property name="vision_range">0.1</env:property>
@@ -49,7 +51,7 @@
 				
 				<env:objecttype name="wastebin">
 					<env:property name="wastes">0</env:property>
-					<env:property name="capacity">5</env:property>
+					<env:property name="capacity">1</env:property>
 					<env:property name="full" dynamic="true">$object.getProperty("wastes") &gt;= $object.getProperty("capacity")</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -120,12 +122,14 @@
 				</env:view>
 			</env:views>
 			
-			<env:perspectives>
+			<env:perspectives>			
 				<env:perspective name="icons" class="Perspective2D" opengl="true" invertyaxis="false">
+					<env:property name="color" dynamic="true">new java.awt.Color(0,0,0, $space.getProperty("t1"))</env:property>
+					
 					<env:drawable objecttype="cleaner" width="0.1" height="0.1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*20)</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld_env/images/cleaner.png" />
-						<env:text layer="4" align="center" y="1.0" color="black" text="$owner$" basesize="8"/>
+						<env:text layer="4" align="center" y="-0.6" color="black" text="$owner$" basesize="8"/>
 						<env:ellipse layer="-1" size="vision_size" color="#ffff007f" />
 						<env:texturedrectangle layer="0" x="0.3" y="0.4" width="0.3" height="0.3" imagepath="jadex/bdi/examples/cleanerworld_env/images/waste.png">
 							<env:drawcondition>$object.getProperty("waste")!=null</env:drawcondition>
@@ -134,7 +138,7 @@
 					
 					<env:drawable objecttype="truck" width="0.2" height="0.15">
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld_env/images/truck.png" />
-						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/>
+						<env:text layer="4" align="center" y="-0.5" color="black" text="$owner$" basesize="8"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="waste" width="0.03" height="0.03">
@@ -157,6 +161,10 @@
 					<env:prelayers>
 						<env:tiledlayer width="0.25" height="0.25" imagepath="jadex/bdi/examples/cleanerworld_env/images/background.png" />
 					</env:prelayers>
+					
+					<env:postlayers>
+						<env:colorlayer color="color" />
+					</env:postlayers>
 				</env:perspective>
 			</env:perspectives>
 			
@@ -221,7 +229,7 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
-				<env:property name="daytime">true</env:property>
+				<!-- <env:property name="daytime">true</env:property> -->
 				
 				<env:objects>
 					<env:object type="chargingstation">
@@ -270,7 +278,7 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
-				<env:property name="daytime">true</env:property>
+				<!-- <env:property name="daytime">true</env:property> -->
 				
 				<env:objects>
 					<env:object type="chargingstation">

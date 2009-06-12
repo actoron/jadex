@@ -1,7 +1,6 @@
 package jadex.adapter.base.envsupport.observer.perspective;
 
 import jadex.adapter.base.envsupport.dataview.IDataView;
-import jadex.adapter.base.envsupport.environment.SynchronizedPropertyObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
@@ -18,18 +17,16 @@ import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.bridge.ILibraryService;
 import jadex.commons.IPropertyObject;
+import jadex.commons.SimplePropertyObject;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +36,7 @@ import javax.swing.JFrame;
 /**
  *  Perspective for viewing in 2D.
  */
-public class Perspective2D extends SynchronizedPropertyObject implements IPerspective
+public class Perspective2D extends SimplePropertyObject implements IPerspective
 {
 	/** Name of the presentation */
 	protected String name;
@@ -100,7 +97,6 @@ public class Perspective2D extends SynchronizedPropertyObject implements IPerspe
 	 */
 	public Perspective2D()
 	{
-		super(new Object());
 		zoomlimit = 20.0;
 		setBackground(null);
 		this.visuals = Collections.synchronizedMap(new HashMap());
@@ -164,6 +160,15 @@ public class Perspective2D extends SynchronizedPropertyObject implements IPerspe
 	public void setObserverCenter(ObserverCenter obscenter)
 	{
 		this.obscenter = obscenter;
+	}
+	
+	/**
+	 *  Get the ObserverCenter.
+	 *  @return The observer center.
+	 */
+	public ObserverCenter getObserverCenter()
+	{
+		return obscenter;
 	}
 	
 	/**
@@ -515,7 +520,7 @@ public class Perspective2D extends SynchronizedPropertyObject implements IPerspe
 		});
 	}
 	
-	private static final IViewport createViewport(IPropertyObject layerObject, ILibraryService libService, Color bgColor, boolean tryopengl)
+	private static final IViewport createViewport(IPerspective persp, ILibraryService libService, Color bgColor, boolean tryopengl)
 	{
 		final JFrame frame = new JFrame("");
 		frame.setLayout(new BorderLayout());
@@ -528,7 +533,7 @@ public class Perspective2D extends SynchronizedPropertyObject implements IPerspe
 			// Try OpenGL...
 			try
 			{
-				ViewportJOGL vp = new ViewportJOGL(layerObject, libService);
+				ViewportJOGL vp = new ViewportJOGL(persp, libService);
 				frame.add(vp.getCanvas());
 				frame.setVisible(true);
 				if (!vp.isValid())
@@ -555,11 +560,11 @@ public class Perspective2D extends SynchronizedPropertyObject implements IPerspe
 		IViewport viewport = null;
 		if (tryopengl)
 		{
-			viewport = new ViewportJOGL(layerObject, libService);
+			viewport = new ViewportJOGL(persp, libService);
 		}
 		else
 		{
-			viewport = new ViewportJ2D(layerObject, libService);
+			viewport = new ViewportJ2D(persp, libService);
 		}
 		
 		viewport.setBackground(bgColor);
