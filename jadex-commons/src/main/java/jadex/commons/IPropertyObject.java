@@ -1,6 +1,5 @@
 package jadex.commons;
 
-import java.beans.PropertyChangeListener;
 import java.util.Set;
 
 /** Interface for property-holding objects.

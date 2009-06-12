@@ -14,12 +14,14 @@
 	name="HunterPrey" package="jadex.micro.examples.hunterprey_env">
 	
 	<imports>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.micro.examples.hunterprey_env.*</import>
+		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbprey.*</import>
 		<import>jadex.bdi.examples.hunterprey_env.dumbhunter.*</import>
@@ -60,41 +62,164 @@
 					<env:property name="rate">5</env:property>
 				</env:processtype>
 			</env:processtypes>
-<!-- 			
-			<env:percepttypes>
-				<env:percepttype name="new_food">
-					<env:parameter name="$prey" objecttype="prey">
-						<env:property name="location" />
-					</env:parameter>
-					<env:parameter name="$food" objecttype="food">
-						<env:property name="location" />
-					</env:parameter>
-				</env:percepttype>
-			</env:percepttypes>
- -->
-  			
-			<env:perceptgeneratortypes>
-				<env:perceptgeneratortype name="creaturevisiongen" class="CreatureVisionGenerator"/>
-				<env:perceptmapping agenttype="MicroPrey" class="MicroPreyVisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
-					<env:percepttype name="object_appeared"/>
-					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> -->
-				</env:perceptmapping>
-				<env:perceptmapping agenttype="DumbPrey" class="DumbPreyVisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
-					<env:percepttype name="object_appeared"/>
-					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> -->
-				</env:perceptmapping>
-				<env:perceptmapping agenttype="DumbHunter" class="DumbHunterVisionProcessor">
-					<!-- Todo: mapping per percept type? - ->
-					<env:percepttype name="object_appeared"/>
-					<env:percepttype name="object_disappeared"/>
-					<env:percepttype name="object_moved"/> -->
-				</env:perceptmapping>
-			</env:perceptgeneratortypes>
 			
+			<env:percepttypes>
+				<env:percepttype name="food_seen" objecttype="food">
+					<env:agenttypes>
+						<env:agenttype name="MicroPrey"/>
+						<env:agenttype name="DumbPrey"/>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_out_of_sight" objecttype="food">
+					<env:agenttypes>
+						<env:agenttype name="MicroPrey"/>
+						<env:agenttype name="DumbPrey"/>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_eaten" objecttype="food">
+					<env:agenttypes>
+						<env:agenttype name="MicroPrey"/>
+						<env:agenttype name="DumbPrey"/>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_moved" objecttype="prey">
+					<env:agenttypes>
+						<!-- Todo: Use avatar types for mapping? -->
+						<env:agenttype name="CleverPrey"/>
+						<env:agenttype name="DumbHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_seen" objecttype="prey">
+					<env:agenttypes>
+						<env:agenttype name="DumbHunter"/>
+						<env:agenttype name="LAHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_gone" objecttype="prey">
+					<env:agenttypes>
+						<env:agenttype name="DumbHunter"/>
+						<env:agenttype name="LAHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="obstacle_seen" objecttype="obstacle">
+					<env:agenttypes>
+						<env:agenttype name="LAHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="obstacle_gone" objecttype="obstacle">
+					<env:agenttypes>
+						<env:agenttype name="LAHunter"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="hunter_seen" objecttype="hunter">
+					<env:agenttypes>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+				<env:percepttype name="hunter_gone" objecttype="hunter">
+					<env:agenttypes>
+						<env:agenttype name="CleverPrey"/>
+					</env:agenttypes>
+				</env:percepttype>
+					
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
+					<env:property name="range">new Vector1Int(2)</env:property>
+					<!-- percept types are declared with associated action types: 
+						percepttype, actiontype1, actiontype2, ... -->
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "appeared", "created"}, 
+							new String[]{"food_out_of_sight", "disappeared"}, 
+							new String[]{"food_eaten", "destroyed"},
+							new String[]{"prey_moved", "moved"},
+							new String[]{"prey_seen", "appeared", "created"}, 
+							new String[]{"prey_gone", "disappeared", "destroyed"},
+							new String[]{"hunter_seen", "appeared", "created"}, 
+							new String[]{"hunter_gone", "disappeared", "destroyed"},
+							new String[]{"obstacle_seen", "appeared", "created"}, 
+							new String[]{"obstacle_gone", "disappeared", "destroyed"}
+						}
+					</env:property>
+				</env:perceptgenerator>
+				
+				<env:perceptprocessor agenttype="MicroPrey" class="MicroPreyVisionProcessor"/>
+
+				<env:perceptprocessor agenttype="CleverPrey" class="DefaultBDIVisionProcessor">
+					<env:property name="range">new Vector1Int(2)</env:property>
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "add", "seen_food"},
+							new String[]{"food_seen", "add", "known_food"},
+							new String[]{"food_eaten", "remove", "seen_food"},
+							new String[]{"food_eaten", "remove", "known_food"},
+							new String[]{"food_out_of_sight", "remove", "seen_food"},
+							new String[]{"hunter_seen", "add", "seen_hunters"},
+							new String[]{"hunter_gone", "remove", "seen_hunters"},
+							new String[]{"prey_moved", "remove_outdated", "known_food"}
+						}
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor agenttype="DumbPrey"	class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "set", "nearest_food", "isNearer"},
+							new String[]{"food_eaten", "unset", "nearest_food", "isFact"},
+							new String[]{"food_out_of_sight", "unset", "nearest_food", "isFact"}
+						}
+					</env:property>
+					<env:property name="isNearer" dynamic="true">
+						$fact==null
+						|| $space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$fact).getProperty(Space2D.PROPERTY_POSITION))
+							.greater($space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$percept).getProperty(Space2D.PROPERTY_POSITION)))
+					</env:property>
+					<env:property name="isFact" dynamic="true">
+						$percept.equals($fact)
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor agenttype="DumbHunter"	class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"prey_seen", "set", "nearest_prey", "isNearer"},
+							new String[]{"prey_moved", "set", "nearest_prey", "isNearer"},
+							new String[]{"prey_gone", "unset", "nearest_prey", "isFact"}
+						}
+					</env:property>
+					<env:property name="isNearer" dynamic="true">
+						$fact==null
+						|| $space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$fact).getProperty(Space2D.PROPERTY_POSITION))
+							.greater($space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$percept).getProperty(Space2D.PROPERTY_POSITION)))
+					</env:property>
+					<env:property name="isFact" dynamic="true">
+						$percept.equals($fact)
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor agenttype="LAHunter" class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"prey_seen", "add", "vision"}, 
+							new String[]{"prey_gone", "remove", "vision"},
+							new String[]{"obstacle_seen", "add", "vision"}, 
+							new String[]{"obstacle_gone", "remove", "vision"}
+						}
+					</env:property>
+				</env:perceptprocessor>
+			</env:percepttypes>
+
 			<env:views>
 				<env:view name="all_view" class="GeneralDataView2D" />
 				<!-- <env:view name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:view> -->
@@ -109,7 +234,7 @@
 			</env:views>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="true">
+				<env:perspective name="icons" class="Perspective2D" objectshiftx="0.5" objectshifty="0.5">
 					<env:drawable objecttype="food" width="1.0" height="1.0">
 						<env:texturedrectangle layer="0" size="size" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
 					</env:drawable>
@@ -118,14 +243,22 @@
 					</env:drawable>
 					<env:drawable objecttype="prey" width="1.0" height="1.0">
 						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/prey.png" />
-						<env:rectangle layer="-1" width="5" height="5" color="#ffff007f" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="hunter" width="1.0" height="1.0">
 						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/hunter.png" />
-						<env:rectangle layer="-1" width="5" height="5" color="#ff00007f" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ff00007f" />
 					</env:drawable>
 					<env:prelayers>
-						<env:tiledlayer width="17.5" height="17.5" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
+						<env:tiledlayer width="0.4" height="0.4" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
 					</env:prelayers>
 					<env:postlayers>
 						<env:gridlayer width="1.0" height="1.0" color="black" />
@@ -134,7 +267,7 @@
 			</env:perspectives>
 
 
-			<env:perspective name="abstract" class="Perspective2D">
+			<env:perspective name="abstract" class="Perspective2D" objectshiftx="0.5" objectshifty="0.5">
 				<env:drawable objecttype="food" width="1.0" height="1.0">
 					<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
 				</env:drawable>
@@ -154,11 +287,12 @@
 				<env:postlayers>
 				</env:postlayers>
 			</env:perspective>
-			
+						
 			<!-- executor -->
-			<env:spaceexecutor>
-				new RoundBasedExecutor($space, (IClockService)$platform.getService(IClockService.class),
-					new CreatureActionComparator($space))
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="comparator">new CreatureActionComparator($space)</env:property>
+				<env:property name="mode">"lastaction"</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
@@ -283,8 +417,8 @@
 
 		<application name="Battlefield">
 			<agents>
-				<agent type="MicroPrey" number="5000"/>
-				<agent type="DumbHunter" number="50"/>
+				<agent type="MicroPrey" number="100"/>
+				<agent type="DumbHunter" number="10"/>
 			</agents>
 				
 			<env:envspace name="my2dspace" type="2dspace" width="100" height="100">

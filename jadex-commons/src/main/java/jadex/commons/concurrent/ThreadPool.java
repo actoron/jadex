@@ -198,6 +198,7 @@ public class ThreadPool implements IThreadPool
 					this.task = ((Runnable)tasks.dequeue(strategy.getThreadTimeout()));
 					threads.put(task, this);
 					this.start = System.currentTimeMillis();
+					String	oldname	= this.getName();
 					this.setName(task.toString());
 
 					try
@@ -209,6 +210,7 @@ public class ThreadPool implements IThreadPool
 					{
 						e.printStackTrace();
 					}
+					this.setName(oldname);
 				}
 				catch(IBlockingQueue.ClosedException e)
 				{

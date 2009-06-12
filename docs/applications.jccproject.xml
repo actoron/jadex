@@ -53,14 +53,14 @@
 <java.util.HashMap n:id="12">b 13 d 14 f 15 24 2c 26 2d</java.util.HashMap>
 <DirNode n:id="11" relativePath="META-INF/" r:parent="7" r:properties="12"/>
 <java.util.ArrayList n:id="10">11 6</java.util.ArrayList>
-<java.util.Date n:id="2e" v="2008-12-23T15:29:17"/>
+<java.util.Date n:id="2e" v="2009-06-12T17:16:50"/>
 <java.util.Date n:id="2f" v="2008-12-23T15:29:06"/>
 <java.util.HashMap n:id="a">b c d e f 10 24 2e 26 2f</java.util.HashMap>
 <JarNode n:id="7" relativePath="jadex-applications-bdi-2.0-beta3.jar" r:parent="8" r:properties="a"/>
 <java.lang.Boolean n:id="31" v="false"/>
 <java.util.Date n:id="32" v="2008-12-23T14:58:52"/>
 <java.util.ArrayList n:id="33">5</java.util.ArrayList>
-<java.util.Date n:id="34" v="2008-12-23T15:29:17"/>
+<java.util.Date n:id="34" v="2009-06-12T17:16:49"/>
 <java.util.Date n:id="35" v="2008-12-23T15:29:06"/>
 <java.util.HashMap n:id="30">b 31 d 32 f 33 24 34 26 35</java.util.HashMap>
 <DirNode n:id="6" relativePath="jadex/" r:parent="7" r:properties="30"/>
@@ -899,917 +899,1204 @@
 <java.util.HashMap n:id="302">b 303 d 304 f 305 24 378 26 379</java.util.HashMap>
 <DirNode n:id="301" relativePath="jadex/bdi/tutorial/" r:parent="5" r:properties="302"/>
 <java.util.ArrayList n:id="39">3a 4 53 301</java.util.ArrayList>
-<java.util.Date n:id="37a" v="2008-12-23T15:29:17"/>
+<java.util.Date n:id="37a" v="2009-06-12T17:16:49"/>
 <java.util.Date n:id="37b" v="2008-12-23T15:29:06"/>
 <java.util.HashMap n:id="36">b 37 d 38 f 39 24 37a 26 37b</java.util.HashMap>
 <DirNode n:id="5" relativePath="jadex/bdi/" r:parent="6" r:properties="36"/>
 <java.lang.Boolean n:id="37d" v="true"/>
-<java.util.Date n:id="37e" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="382" v="true"/>
-<java.util.Date n:id="383" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="387" v="true"/>
-<java.util.Date n:id="388" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="389" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="38a" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="386">b 387 d 388 24 389 26 38a</java.util.HashMap>
-<DirNode n:id="385" relativePath="jadex/bdi/examples/alarmclock/images/" r:parent="380" r:properties="386"/>
-<java.lang.Boolean n:id="38d" v="true"/>
-<java.util.Date n:id="38e" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="38f" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="390" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="38c">b 38d d 38e 24 38f 26 390</java.util.HashMap>
-<FileNode n:id="38b" relativePath="jadex/bdi/examples/alarmclock/Alarmclock.agent.xml" r:parent="380" r:properties="38c"/>
-<java.util.ArrayList n:id="384">385 38b</java.util.ArrayList>
-<java.util.Date n:id="391" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="392" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="381">b 382 d 383 f 384 24 391 26 392</java.util.HashMap>
+<java.util.Date n:id="37e" v="2009-06-12T16:41:36"/>
+<java.lang.String n:id="382">valid</java.lang.String>
+<java.lang.Boolean n:id="383" v="true"/>
+<java.lang.String n:id="384">last_modified</java.lang.String>
+<java.util.Date n:id="385" v="2009-06-12T16:41:36"/>
+<java.lang.String n:id="386">children</java.lang.String>
+<java.lang.Boolean n:id="38a" v="true"/>
+<java.util.Date n:id="38b" v="2009-06-12T16:41:32"/>
+<java.lang.String n:id="38c">valid_date</java.lang.String>
+<java.util.Date n:id="38d" v="2009-06-12T17:14:30"/>
+<java.lang.String n:id="38e">children_date</java.lang.String>
+<java.util.Date n:id="38f" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="389">382 38a 384 38b 38c 38d 38e 38f</java.util.HashMap>
+<DirNode n:id="388" relativePath="jadex/bdi/examples/alarmclock/images/" r:parent="380" r:properties="389"/>
+<java.lang.Boolean n:id="392" v="true"/>
+<java.util.Date n:id="393" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="394" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="395" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="391">382 392 384 393 38c 394 38e 395</java.util.HashMap>
+<FileNode n:id="390" relativePath="jadex/bdi/examples/alarmclock/Alarmclock.agent.xml" r:parent="380" r:properties="391"/>
+<java.util.ArrayList n:id="387">388 390</java.util.ArrayList>
+<java.util.Date n:id="396" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="397" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="381">382 383 384 385 386 387 38c 396 38e 397</java.util.HashMap>
 <DirNode n:id="380" relativePath="jadex/bdi/examples/alarmclock/" r:parent="4" r:properties="381"/>
-<java.lang.Boolean n:id="395" v="true"/>
-<java.util.Date n:id="396" v="2008-12-23T14:58:56"/>
 <java.lang.Boolean n:id="39a" v="true"/>
-<java.util.Date n:id="39b" v="2008-12-23T14:58:56"/>
+<java.util.Date n:id="39b" v="2009-06-12T16:41:38"/>
 <java.lang.Boolean n:id="39f" v="true"/>
-<java.util.Date n:id="3a0" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="3a1" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3a2" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="39e">b 39f d 3a0 24 3a1 26 3a2</java.util.HashMap>
-<FileNode n:id="39d" relativePath="jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml" r:parent="398" r:properties="39e"/>
-<java.util.ArrayList n:id="39c">39d</java.util.ArrayList>
-<java.util.Date n:id="3a3" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3a4" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="399">b 39a d 39b f 39c 24 3a3 26 3a4</java.util.HashMap>
-<DirNode n:id="398" relativePath="jadex/bdi/examples/blackjack/dealer/" r:parent="393" r:properties="399"/>
-<java.lang.Boolean n:id="3a7" v="true"/>
-<java.util.Date n:id="3a8" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="3ac" v="true"/>
-<java.util.Date n:id="3ad" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="3ae" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="3af" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="3ab">b 3ac d 3ad 24 3ae 26 3af</java.util.HashMap>
-<DirNode n:id="3aa" relativePath="jadex/bdi/examples/blackjack/gui/images/" r:parent="3a5" r:properties="3ab"/>
-<java.util.ArrayList n:id="3a9">3aa</java.util.ArrayList>
-<java.util.Date n:id="3b0" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3b1" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="3a6">b 3a7 d 3a8 f 3a9 24 3b0 26 3b1</java.util.HashMap>
-<DirNode n:id="3a5" relativePath="jadex/bdi/examples/blackjack/gui/" r:parent="393" r:properties="3a6"/>
-<java.lang.Boolean n:id="3b4" v="true"/>
-<java.util.Date n:id="3b5" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="3b9" v="true"/>
-<java.util.Date n:id="3ba" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="3bb" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3bc" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="3b8">b 3b9 d 3ba 24 3bb 26 3bc</java.util.HashMap>
-<FileNode n:id="3b7" relativePath="jadex/bdi/examples/blackjack/manager/Manager.agent.xml" r:parent="3b2" r:properties="3b8"/>
-<java.util.ArrayList n:id="3b6">3b7</java.util.ArrayList>
-<java.util.Date n:id="3bd" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3be" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="3b3">b 3b4 d 3b5 f 3b6 24 3bd 26 3be</java.util.HashMap>
-<DirNode n:id="3b2" relativePath="jadex/bdi/examples/blackjack/manager/" r:parent="393" r:properties="3b3"/>
-<java.lang.Boolean n:id="3c1" v="true"/>
-<java.util.Date n:id="3c2" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="3c6" v="true"/>
-<java.util.Date n:id="3c7" v="2008-12-23T14:58:56"/>
-<java.util.Date n:id="3c8" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="3c9" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="3c5">b 3c6 d 3c7 24 3c8 26 3c9</java.util.HashMap>
-<DirNode n:id="3c4" relativePath="jadex/bdi/examples/blackjack/player/strategies/" r:parent="3bf" r:properties="3c5"/>
-<java.lang.Boolean n:id="3cc" v="true"/>
-<java.util.Date n:id="3cd" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="3ce" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="3cf" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="3cb">b 3cc d 3cd 24 3ce 26 3cf</java.util.HashMap>
-<FileNode n:id="3ca" relativePath="jadex/bdi/examples/blackjack/player/Player.agent.xml" r:parent="3bf" r:properties="3cb"/>
-<java.util.ArrayList n:id="3c3">3c4 3ca</java.util.ArrayList>
-<java.util.Date n:id="3d0" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3d1" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="3c0">b 3c1 d 3c2 f 3c3 24 3d0 26 3d1</java.util.HashMap>
-<DirNode n:id="3bf" relativePath="jadex/bdi/examples/blackjack/player/" r:parent="393" r:properties="3c0"/>
-<java.util.ArrayList n:id="397">398 3a5 3b2 3bf</java.util.ArrayList>
-<java.util.Date n:id="3d2" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="3d3" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="394">b 395 d 396 f 397 24 3d2 26 3d3</java.util.HashMap>
-<DirNode n:id="393" relativePath="jadex/bdi/examples/blackjack/" r:parent="4" r:properties="394"/>
+<java.util.Date n:id="3a0" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="3a4" v="true"/>
+<java.util.Date n:id="3a5" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3a6" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="3a3">382 3a4 384 3a5 38c 3a6</java.util.HashMap>
+<FileNode n:id="3a2" relativePath="jadex/bdi/examples/antworld/environment/Environment.agent.xml" r:parent="39d" r:properties="3a3"/>
+<java.util.ArrayList n:id="3a1">3a2</java.util.ArrayList>
+<java.util.Date n:id="3a7" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="3a8" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="39e">382 39f 384 3a0 386 3a1 38c 3a7 38e 3a8</java.util.HashMap>
+<DirNode n:id="39d" relativePath="jadex/bdi/examples/antworld/environment/" r:parent="398" r:properties="39e"/>
+<java.lang.Boolean n:id="3ab" v="true"/>
+<java.util.Date n:id="3ac" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3ad" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="3ae" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="3aa">382 3ab 384 3ac 38c 3ad 38e 3ae</java.util.HashMap>
+<DirNode n:id="3a9" relativePath="jadex/bdi/examples/antworld/images/" r:parent="398" r:properties="3aa"/>
+<java.lang.Boolean n:id="3b1" v="true"/>
+<java.util.Date n:id="3b2" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3b3" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="3b4" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="3b0">382 3b1 384 3b2 38c 3b3 38e 3b4</java.util.HashMap>
+<FileNode n:id="3af" relativePath="jadex/bdi/examples/antworld/Ant.agent.xml" r:parent="398" r:properties="3b0"/>
+<java.lang.Boolean n:id="3b7" v="true"/>
+<java.util.Date n:id="3b8" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3b9" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="3ba" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="3b6">382 3b7 384 3b8 38c 3b9 38e 3ba</java.util.HashMap>
+<FileNode n:id="3b5" relativePath="jadex/bdi/examples/antworld/AntCoordinationSpace.application.xml" r:parent="398" r:properties="3b6"/>
+<java.util.ArrayList n:id="39c">39d 3a9 3af 3b5</java.util.ArrayList>
+<java.util.Date n:id="3bb" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="3bc" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="399">382 39a 384 39b 386 39c 38c 3bb 38e 3bc</java.util.HashMap>
+<DirNode n:id="398" relativePath="jadex/bdi/examples/antworld/" r:parent="4" r:properties="399"/>
+<java.lang.Boolean n:id="3bf" v="true"/>
+<java.util.Date n:id="3c0" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="3c4" v="true"/>
+<java.util.Date n:id="3c5" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="3c9" v="true"/>
+<java.util.Date n:id="3ca" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3cb" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="3cc" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="3c8">382 3c9 384 3ca 38c 3cb 38e 3cc</java.util.HashMap>
+<FileNode n:id="3c7" relativePath="jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml" r:parent="3c2" r:properties="3c8"/>
+<java.util.ArrayList n:id="3c6">3c7</java.util.ArrayList>
+<java.util.Date n:id="3cd" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="3ce" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="3c3">382 3c4 384 3c5 386 3c6 38c 3cd 38e 3ce</java.util.HashMap>
+<DirNode n:id="3c2" relativePath="jadex/bdi/examples/blackjack/dealer/" r:parent="3bd" r:properties="3c3"/>
+<java.lang.Boolean n:id="3d1" v="true"/>
+<java.util.Date n:id="3d2" v="2009-06-12T16:41:38"/>
 <java.lang.Boolean n:id="3d6" v="true"/>
-<java.util.Date n:id="3d7" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="3db" v="true"/>
-<java.util.Date n:id="3dc" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="3dd" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="3de" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="3da">b 3db d 3dc 24 3dd 26 3de</java.util.HashMap>
-<FileNode n:id="3d9" relativePath="jadex/bdi/examples/blocksworld/Blocksworld.agent.xml" r:parent="3d4" r:properties="3da"/>
-<java.util.ArrayList n:id="3d8">3d9</java.util.ArrayList>
-<java.util.Date n:id="3df" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3e0" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="3d5">b 3d6 d 3d7 f 3d8 24 3df 26 3e0</java.util.HashMap>
-<DirNode n:id="3d4" relativePath="jadex/bdi/examples/blocksworld/" r:parent="4" r:properties="3d5"/>
+<java.util.Date n:id="3d7" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3d8" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="3d9" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="3d5">382 3d6 384 3d7 38c 3d8 38e 3d9</java.util.HashMap>
+<DirNode n:id="3d4" relativePath="jadex/bdi/examples/blackjack/gui/images/" r:parent="3cf" r:properties="3d5"/>
+<java.util.ArrayList n:id="3d3">3d4</java.util.ArrayList>
+<java.util.Date n:id="3da" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="3db" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="3d0">382 3d1 384 3d2 386 3d3 38c 3da 38e 3db</java.util.HashMap>
+<DirNode n:id="3cf" relativePath="jadex/bdi/examples/blackjack/gui/" r:parent="3bd" r:properties="3d0"/>
+<java.lang.Boolean n:id="3de" v="true"/>
+<java.util.Date n:id="3df" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="3e3" v="true"/>
-<java.util.Date n:id="3e4" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="3e8" v="true"/>
-<java.util.Date n:id="3e9" v="2008-12-23T14:58:54"/>
-<java.lang.Boolean n:id="3ed" v="true"/>
-<java.util.Date n:id="3ee" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="3ef" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3f0" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="3ec">b 3ed d 3ee 24 3ef 26 3f0</java.util.HashMap>
-<FileNode n:id="3eb" relativePath="jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml" r:parent="3e6" r:properties="3ec"/>
-<java.util.ArrayList n:id="3ea">3eb</java.util.ArrayList>
-<java.util.Date n:id="3f1" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="3f2" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="3e7">b 3e8 d 3e9 f 3ea 24 3f1 26 3f2</java.util.HashMap>
-<DirNode n:id="3e6" relativePath="jadex/bdi/examples/booktrading/buyer/" r:parent="3e1" r:properties="3e7"/>
-<java.lang.Boolean n:id="3f5" v="true"/>
-<java.util.Date n:id="3f6" v="2008-12-23T14:58:56"/>
-<java.util.Date n:id="3f7" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="3f8" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="3f4">b 3f5 d 3f6 24 3f7 26 3f8</java.util.HashMap>
-<DirNode n:id="3f3" relativePath="jadex/bdi/examples/booktrading/common/" r:parent="3e1" r:properties="3f4"/>
-<java.lang.Boolean n:id="3fb" v="true"/>
-<java.util.Date n:id="3fc" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="400" v="true"/>
-<java.util.Date n:id="401" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="402" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="403" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="3ff">b 400 d 401 24 402 26 403</java.util.HashMap>
-<FileNode n:id="3fe" relativePath="jadex/bdi/examples/booktrading/manager/Manager.agent.xml" r:parent="3f9" r:properties="3ff"/>
-<java.util.ArrayList n:id="3fd">3fe</java.util.ArrayList>
-<java.util.Date n:id="404" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="405" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="3fa">b 3fb d 3fc f 3fd 24 404 26 405</java.util.HashMap>
-<DirNode n:id="3f9" relativePath="jadex/bdi/examples/booktrading/manager/" r:parent="3e1" r:properties="3fa"/>
-<java.lang.Boolean n:id="408" v="true"/>
-<java.util.Date n:id="409" v="2008-12-23T14:58:54"/>
-<java.lang.Boolean n:id="40d" v="true"/>
-<java.util.Date n:id="40e" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="40f" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="410" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="40c">b 40d d 40e 24 40f 26 410</java.util.HashMap>
-<FileNode n:id="40b" relativePath="jadex/bdi/examples/booktrading/seller/Seller.agent.xml" r:parent="406" r:properties="40c"/>
-<java.util.ArrayList n:id="40a">40b</java.util.ArrayList>
-<java.util.Date n:id="411" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="412" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="407">b 408 d 409 f 40a 24 411 26 412</java.util.HashMap>
-<DirNode n:id="406" relativePath="jadex/bdi/examples/booktrading/seller/" r:parent="3e1" r:properties="407"/>
-<java.util.ArrayList n:id="3e5">3e6 3f3 3f9 406</java.util.ArrayList>
-<java.util.Date n:id="413" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="414" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="3e2">b 3e3 d 3e4 f 3e5 24 413 26 414</java.util.HashMap>
-<DirNode n:id="3e1" relativePath="jadex/bdi/examples/booktrading/" r:parent="4" r:properties="3e2"/>
-<java.lang.Boolean n:id="417" v="true"/>
-<java.util.Date n:id="418" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="41c" v="true"/>
-<java.util.Date n:id="41d" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="421" v="true"/>
-<java.util.Date n:id="422" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="423" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="424" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="420">b 421 d 422 24 423 26 424</java.util.HashMap>
-<FileNode n:id="41f" relativePath="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml" r:parent="41a" r:properties="420"/>
-<java.lang.Boolean n:id="427" v="true"/>
-<java.util.Date n:id="428" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="429" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="42a" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="426">b 427 d 428 24 429 26 42a</java.util.HashMap>
-<FileNode n:id="425" relativePath="jadex/bdi/examples/cleanerworld/cleaner/CleanerLocal.agent.xml" r:parent="41a" r:properties="426"/>
-<java.util.ArrayList n:id="41e">41f 425</java.util.ArrayList>
-<java.util.Date n:id="42b" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="42c" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="41b">b 41c d 41d f 41e 24 42b 26 42c</java.util.HashMap>
-<DirNode n:id="41a" relativePath="jadex/bdi/examples/cleanerworld/cleaner/" r:parent="415" r:properties="41b"/>
-<java.lang.Boolean n:id="42f" v="true"/>
-<java.util.Date n:id="430" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="434" v="true"/>
-<java.util.Date n:id="435" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="436" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="437" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="433">b 434 d 435 24 436 26 437</java.util.HashMap>
-<FileNode n:id="432" relativePath="jadex/bdi/examples/cleanerworld/environment/Environment.agent.xml" r:parent="42d" r:properties="433"/>
-<java.lang.Boolean n:id="43a" v="true"/>
-<java.util.Date n:id="43b" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="43c" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="43d" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="439">b 43a d 43b 24 43c 26 43d</java.util.HashMap>
-<FileNode n:id="438" relativePath="jadex/bdi/examples/cleanerworld/environment/EnvironmentLocal.agent.xml" r:parent="42d" r:properties="439"/>
-<java.util.ArrayList n:id="431">432 438</java.util.ArrayList>
-<java.util.Date n:id="43e" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="43f" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="42e">b 42f d 430 f 431 24 43e 26 43f</java.util.HashMap>
-<DirNode n:id="42d" relativePath="jadex/bdi/examples/cleanerworld/environment/" r:parent="415" r:properties="42e"/>
-<java.lang.Boolean n:id="442" v="true"/>
-<java.util.Date n:id="443" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="444" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="445" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="441">b 442 d 443 24 444 26 445</java.util.HashMap>
-<DirNode n:id="440" relativePath="jadex/bdi/examples/cleanerworld/images/" r:parent="415" r:properties="441"/>
-<java.lang.Boolean n:id="448" v="true"/>
-<java.util.Date n:id="449" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="44d" v="true"/>
-<java.util.Date n:id="44e" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="44f" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="450" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="44c">b 44d d 44e 24 44f 26 450</java.util.HashMap>
-<FileNode n:id="44b" relativePath="jadex/bdi/examples/cleanerworld/manager/Manager.agent.xml" r:parent="446" r:properties="44c"/>
-<java.lang.Boolean n:id="453" v="true"/>
-<java.util.Date n:id="454" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="455" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="456" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="452">b 453 d 454 24 455 26 456</java.util.HashMap>
-<FileNode n:id="451" relativePath="jadex/bdi/examples/cleanerworld/manager/ManagerLocal.agent.xml" r:parent="446" r:properties="452"/>
-<java.util.ArrayList n:id="44a">44b 451</java.util.ArrayList>
-<java.util.Date n:id="457" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="458" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="447">b 448 d 449 f 44a 24 457 26 458</java.util.HashMap>
-<DirNode n:id="446" relativePath="jadex/bdi/examples/cleanerworld/manager/" r:parent="415" r:properties="447"/>
-<java.util.ArrayList n:id="419">41a 42d 440 446</java.util.ArrayList>
-<java.util.Date n:id="459" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="45a" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="416">b 417 d 418 f 419 24 459 26 45a</java.util.HashMap>
-<DirNode n:id="415" relativePath="jadex/bdi/examples/cleanerworld/" r:parent="4" r:properties="416"/>
+<java.util.Date n:id="3e4" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3e5" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="3e6" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="3e2">382 3e3 384 3e4 38c 3e5 38e 3e6</java.util.HashMap>
+<FileNode n:id="3e1" relativePath="jadex/bdi/examples/blackjack/manager/Manager.agent.xml" r:parent="3dc" r:properties="3e2"/>
+<java.util.ArrayList n:id="3e0">3e1</java.util.ArrayList>
+<java.util.Date n:id="3e7" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="3e8" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="3dd">382 3de 384 3df 386 3e0 38c 3e7 38e 3e8</java.util.HashMap>
+<DirNode n:id="3dc" relativePath="jadex/bdi/examples/blackjack/manager/" r:parent="3bd" r:properties="3dd"/>
+<java.lang.Boolean n:id="3eb" v="true"/>
+<java.util.Date n:id="3ec" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="3f0" v="true"/>
+<java.util.Date n:id="3f1" v="2009-06-12T16:41:38"/>
+<java.util.Date n:id="3f2" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="3f3" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="3ef">382 3f0 384 3f1 38c 3f2 38e 3f3</java.util.HashMap>
+<DirNode n:id="3ee" relativePath="jadex/bdi/examples/blackjack/player/strategies/" r:parent="3e9" r:properties="3ef"/>
+<java.lang.Boolean n:id="3f6" v="true"/>
+<java.util.Date n:id="3f7" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="3f8" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="3f9" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="3f5">382 3f6 384 3f7 38c 3f8 38e 3f9</java.util.HashMap>
+<FileNode n:id="3f4" relativePath="jadex/bdi/examples/blackjack/player/Player.agent.xml" r:parent="3e9" r:properties="3f5"/>
+<java.util.ArrayList n:id="3ed">3ee 3f4</java.util.ArrayList>
+<java.util.Date n:id="3fa" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="3fb" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="3ea">382 3eb 384 3ec 386 3ed 38c 3fa 38e 3fb</java.util.HashMap>
+<DirNode n:id="3e9" relativePath="jadex/bdi/examples/blackjack/player/" r:parent="3bd" r:properties="3ea"/>
+<java.lang.Boolean n:id="3fe" v="true"/>
+<java.util.Date n:id="3ff" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="400" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="401" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="3fd">382 3fe 384 3ff 38c 400 38e 401</java.util.HashMap>
+<FileNode n:id="3fc" relativePath="jadex/bdi/examples/blackjack/BlackJack.application.xml" r:parent="3bd" r:properties="3fd"/>
+<java.util.ArrayList n:id="3c1">3c2 3cf 3dc 3e9 3fc</java.util.ArrayList>
+<java.util.Date n:id="402" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="403" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="3be">382 3bf 384 3c0 386 3c1 38c 402 38e 403</java.util.HashMap>
+<DirNode n:id="3bd" relativePath="jadex/bdi/examples/blackjack/" r:parent="4" r:properties="3be"/>
+<java.lang.Boolean n:id="406" v="true"/>
+<java.util.Date n:id="407" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="40b" v="true"/>
+<java.util.Date n:id="40c" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="40d" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="40e" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="40a">382 40b 384 40c 38c 40d 38e 40e</java.util.HashMap>
+<FileNode n:id="409" relativePath="jadex/bdi/examples/blocksworld/Blocksworld.agent.xml" r:parent="404" r:properties="40a"/>
+<java.util.ArrayList n:id="408">409</java.util.ArrayList>
+<java.util.Date n:id="40f" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="410" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="405">382 406 384 407 386 408 38c 40f 38e 410</java.util.HashMap>
+<DirNode n:id="404" relativePath="jadex/bdi/examples/blocksworld/" r:parent="4" r:properties="405"/>
+<java.lang.Boolean n:id="413" v="true"/>
+<java.util.Date n:id="414" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="418" v="true"/>
+<java.util.Date n:id="419" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="41d" v="true"/>
+<java.util.Date n:id="41e" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="41f" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="420" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="41c">382 41d 384 41e 38c 41f 38e 420</java.util.HashMap>
+<FileNode n:id="41b" relativePath="jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml" r:parent="416" r:properties="41c"/>
+<java.util.ArrayList n:id="41a">41b</java.util.ArrayList>
+<java.util.Date n:id="421" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="422" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="417">382 418 384 419 386 41a 38c 421 38e 422</java.util.HashMap>
+<DirNode n:id="416" relativePath="jadex/bdi/examples/booktrading/buyer/" r:parent="411" r:properties="417"/>
+<java.lang.Boolean n:id="425" v="true"/>
+<java.util.Date n:id="426" v="2009-06-12T16:41:36"/>
+<java.util.Date n:id="427" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="428" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="424">382 425 384 426 38c 427 38e 428</java.util.HashMap>
+<DirNode n:id="423" relativePath="jadex/bdi/examples/booktrading/common/" r:parent="411" r:properties="424"/>
+<java.lang.Boolean n:id="42b" v="true"/>
+<java.util.Date n:id="42c" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="430" v="true"/>
+<java.util.Date n:id="431" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="432" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="433" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="42f">382 430 384 431 38c 432 38e 433</java.util.HashMap>
+<FileNode n:id="42e" relativePath="jadex/bdi/examples/booktrading/seller/Seller.agent.xml" r:parent="429" r:properties="42f"/>
+<java.util.ArrayList n:id="42d">42e</java.util.ArrayList>
+<java.util.Date n:id="434" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="435" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="42a">382 42b 384 42c 386 42d 38c 434 38e 435</java.util.HashMap>
+<DirNode n:id="429" relativePath="jadex/bdi/examples/booktrading/seller/" r:parent="411" r:properties="42a"/>
+<java.lang.Boolean n:id="438" v="true"/>
+<java.util.Date n:id="439" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="43a" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="43b" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="437">382 438 384 439 38c 43a 38e 43b</java.util.HashMap>
+<FileNode n:id="436" relativePath="jadex/bdi/examples/booktrading/BookTrading.application.xml" r:parent="411" r:properties="437"/>
+<java.util.ArrayList n:id="415">416 423 429 436</java.util.ArrayList>
+<java.util.Date n:id="43c" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="43d" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="412">382 413 384 414 386 415 38c 43c 38e 43d</java.util.HashMap>
+<DirNode n:id="411" relativePath="jadex/bdi/examples/booktrading/" r:parent="4" r:properties="412"/>
+<java.lang.Boolean n:id="440" v="true"/>
+<java.util.Date n:id="441" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="445" v="true"/>
+<java.util.Date n:id="446" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="44a" v="true"/>
+<java.util.Date n:id="44b" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="44c" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="44d" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="449">382 44a 384 44b 38c 44c 38e 44d</java.util.HashMap>
+<FileNode n:id="448" relativePath="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml" r:parent="443" r:properties="449"/>
+<java.lang.Boolean n:id="450" v="true"/>
+<java.util.Date n:id="451" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="452" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="453" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="44f">382 450 384 451 38c 452 38e 453</java.util.HashMap>
+<FileNode n:id="44e" relativePath="jadex/bdi/examples/cleanerworld/cleaner/CleanerLocal.agent.xml" r:parent="443" r:properties="44f"/>
+<java.util.ArrayList n:id="447">448 44e</java.util.ArrayList>
+<java.util.Date n:id="454" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="455" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="444">382 445 384 446 386 447 38c 454 38e 455</java.util.HashMap>
+<DirNode n:id="443" relativePath="jadex/bdi/examples/cleanerworld/cleaner/" r:parent="43e" r:properties="444"/>
+<java.lang.Boolean n:id="458" v="true"/>
+<java.util.Date n:id="459" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="45d" v="true"/>
-<java.util.Date n:id="45e" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="462" v="true"/>
-<java.util.Date n:id="463" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="467" v="true"/>
-<java.util.Date n:id="468" v="2008-12-23T14:58:56"/>
-<java.util.Date n:id="469" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="46a" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="466">b 467 d 468 24 469 26 46a</java.util.HashMap>
-<DirNode n:id="465" relativePath="jadex/bdi/examples/cleanerworld2/cleaner/task/" r:parent="460" r:properties="466"/>
-<java.lang.Boolean n:id="46d" v="true"/>
-<java.util.Date n:id="46e" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="46f" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="470" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="46c">b 46d d 46e 24 46f 26 470</java.util.HashMap>
-<FileNode n:id="46b" relativePath="jadex/bdi/examples/cleanerworld2/cleaner/Cleaner.agent.xml" r:parent="460" r:properties="46c"/>
-<java.util.ArrayList n:id="464">465 46b</java.util.ArrayList>
-<java.util.Date n:id="471" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="472" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="461">b 462 d 463 f 464 24 471 26 472</java.util.HashMap>
-<DirNode n:id="460" relativePath="jadex/bdi/examples/cleanerworld2/cleaner/" r:parent="45b" r:properties="461"/>
-<java.lang.Boolean n:id="475" v="true"/>
-<java.util.Date n:id="476" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="47a" v="true"/>
-<java.util.Date n:id="47b" v="2008-12-23T14:58:56"/>
-<java.util.Date n:id="47c" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="47d" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="479">b 47a d 47b 24 47c 26 47d</java.util.HashMap>
-<DirNode n:id="478" relativePath="jadex/bdi/examples/cleanerworld2/environment/action/" r:parent="473" r:properties="479"/>
-<java.lang.Boolean n:id="480" v="true"/>
-<java.util.Date n:id="481" v="2008-12-23T14:58:56"/>
-<java.util.Date n:id="482" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="483" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="47f">b 480 d 481 24 482 26 483</java.util.HashMap>
-<DirNode n:id="47e" relativePath="jadex/bdi/examples/cleanerworld2/environment/process/" r:parent="473" r:properties="47f"/>
-<java.lang.Boolean n:id="486" v="true"/>
-<java.util.Date n:id="487" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="488" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="489" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="485">b 486 d 487 24 488 26 489</java.util.HashMap>
-<FileNode n:id="484" relativePath="jadex/bdi/examples/cleanerworld2/environment/Environment.agent.xml" r:parent="473" r:properties="485"/>
-<java.util.ArrayList n:id="477">478 47e 484</java.util.ArrayList>
-<java.util.Date n:id="48a" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="48b" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="474">b 475 d 476 f 477 24 48a 26 48b</java.util.HashMap>
-<DirNode n:id="473" relativePath="jadex/bdi/examples/cleanerworld2/environment/" r:parent="45b" r:properties="474"/>
-<java.lang.Boolean n:id="48e" v="true"/>
-<java.util.Date n:id="48f" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="490" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="491" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="48d">b 48e d 48f 24 490 26 491</java.util.HashMap>
-<DirNode n:id="48c" relativePath="jadex/bdi/examples/cleanerworld2/images/" r:parent="45b" r:properties="48d"/>
-<java.lang.Boolean n:id="494" v="true"/>
-<java.util.Date n:id="495" v="2008-12-23T14:58:54"/>
-<java.lang.Boolean n:id="499" v="true"/>
-<java.util.Date n:id="49a" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="49b" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="49c" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="498">b 499 d 49a 24 49b 26 49c</java.util.HashMap>
-<FileNode n:id="497" relativePath="jadex/bdi/examples/cleanerworld2/manager/Manager.agent.xml" r:parent="492" r:properties="498"/>
-<java.util.ArrayList n:id="496">497</java.util.ArrayList>
-<java.util.Date n:id="49d" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="49e" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="493">b 494 d 495 f 496 24 49d 26 49e</java.util.HashMap>
-<DirNode n:id="492" relativePath="jadex/bdi/examples/cleanerworld2/manager/" r:parent="45b" r:properties="493"/>
-<java.lang.Boolean n:id="4a1" v="true"/>
-<java.util.Date n:id="4a2" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="4a6" v="true"/>
-<java.util.Date n:id="4a7" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4a8" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="4a9" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4a5">b 4a6 d 4a7 24 4a8 26 4a9</java.util.HashMap>
-<FileNode n:id="4a4" relativePath="jadex/bdi/examples/cleanerworld2/observer/Observer.agent.xml" r:parent="49f" r:properties="4a5"/>
-<java.util.ArrayList n:id="4a3">4a4</java.util.ArrayList>
-<java.util.Date n:id="4aa" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="4ab" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="4a0">b 4a1 d 4a2 f 4a3 24 4aa 26 4ab</java.util.HashMap>
-<DirNode n:id="49f" relativePath="jadex/bdi/examples/cleanerworld2/observer/" r:parent="45b" r:properties="4a0"/>
-<java.util.ArrayList n:id="45f">460 473 48c 492 49f</java.util.ArrayList>
-<java.util.Date n:id="4ac" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="4ad" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="45c">b 45d d 45e f 45f 24 4ac 26 4ad</java.util.HashMap>
-<DirNode n:id="45b" relativePath="jadex/bdi/examples/cleanerworld2/" r:parent="4" r:properties="45c"/>
+<java.util.Date n:id="45e" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="45f" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="460" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="45c">382 45d 384 45e 38c 45f 38e 460</java.util.HashMap>
+<FileNode n:id="45b" relativePath="jadex/bdi/examples/cleanerworld/environment/Environment.agent.xml" r:parent="456" r:properties="45c"/>
+<java.lang.Boolean n:id="463" v="true"/>
+<java.util.Date n:id="464" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="465" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="466" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="462">382 463 384 464 38c 465 38e 466</java.util.HashMap>
+<FileNode n:id="461" relativePath="jadex/bdi/examples/cleanerworld/environment/EnvironmentLocal.agent.xml" r:parent="456" r:properties="462"/>
+<java.util.ArrayList n:id="45a">45b 461</java.util.ArrayList>
+<java.util.Date n:id="467" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="468" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="457">382 458 384 459 386 45a 38c 467 38e 468</java.util.HashMap>
+<DirNode n:id="456" relativePath="jadex/bdi/examples/cleanerworld/environment/" r:parent="43e" r:properties="457"/>
+<java.lang.Boolean n:id="46b" v="true"/>
+<java.util.Date n:id="46c" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="46d" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="46e" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="46a">382 46b 384 46c 38c 46d 38e 46e</java.util.HashMap>
+<DirNode n:id="469" relativePath="jadex/bdi/examples/cleanerworld/images/" r:parent="43e" r:properties="46a"/>
+<java.lang.Boolean n:id="471" v="true"/>
+<java.util.Date n:id="472" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="473" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="474" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="470">382 471 384 472 38c 473 38e 474</java.util.HashMap>
+<FileNode n:id="46f" relativePath="jadex/bdi/examples/cleanerworld/CleanerWorld.application.xml" r:parent="43e" r:properties="470"/>
+<java.util.ArrayList n:id="442">443 456 469 46f</java.util.ArrayList>
+<java.util.Date n:id="475" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="476" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="43f">382 440 384 441 386 442 38c 475 38e 476</java.util.HashMap>
+<DirNode n:id="43e" relativePath="jadex/bdi/examples/cleanerworld/" r:parent="4" r:properties="43f"/>
+<java.lang.Boolean n:id="479" v="true"/>
+<java.util.Date n:id="47a" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="47e" v="true"/>
+<java.util.Date n:id="47f" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="483" v="true"/>
+<java.util.Date n:id="484" v="2009-06-12T16:41:38"/>
+<java.util.Date n:id="485" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="486" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="482">382 483 384 484 38c 485 38e 486</java.util.HashMap>
+<DirNode n:id="481" relativePath="jadex/bdi/examples/cleanerworld2/cleaner/task/" r:parent="47c" r:properties="482"/>
+<java.lang.Boolean n:id="489" v="true"/>
+<java.util.Date n:id="48a" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="48b" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="48c" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="488">382 489 384 48a 38c 48b 38e 48c</java.util.HashMap>
+<FileNode n:id="487" relativePath="jadex/bdi/examples/cleanerworld2/cleaner/Cleaner.agent.xml" r:parent="47c" r:properties="488"/>
+<java.util.ArrayList n:id="480">481 487</java.util.ArrayList>
+<java.util.Date n:id="48d" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="48e" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="47d">382 47e 384 47f 386 480 38c 48d 38e 48e</java.util.HashMap>
+<DirNode n:id="47c" relativePath="jadex/bdi/examples/cleanerworld2/cleaner/" r:parent="477" r:properties="47d"/>
+<java.lang.Boolean n:id="491" v="true"/>
+<java.util.Date n:id="492" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="496" v="true"/>
+<java.util.Date n:id="497" v="2009-06-12T16:41:38"/>
+<java.util.Date n:id="498" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="499" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="495">382 496 384 497 38c 498 38e 499</java.util.HashMap>
+<DirNode n:id="494" relativePath="jadex/bdi/examples/cleanerworld2/environment/action/" r:parent="48f" r:properties="495"/>
+<java.lang.Boolean n:id="49c" v="true"/>
+<java.util.Date n:id="49d" v="2009-06-12T16:41:38"/>
+<java.util.Date n:id="49e" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="49f" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="49b">382 49c 384 49d 38c 49e 38e 49f</java.util.HashMap>
+<DirNode n:id="49a" relativePath="jadex/bdi/examples/cleanerworld2/environment/process/" r:parent="48f" r:properties="49b"/>
+<java.lang.Boolean n:id="4a2" v="true"/>
+<java.util.Date n:id="4a3" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4a4" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="4a5" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="4a1">382 4a2 384 4a3 38c 4a4 38e 4a5</java.util.HashMap>
+<FileNode n:id="4a0" relativePath="jadex/bdi/examples/cleanerworld2/environment/Environment.agent.xml" r:parent="48f" r:properties="4a1"/>
+<java.util.ArrayList n:id="493">494 49a 4a0</java.util.ArrayList>
+<java.util.Date n:id="4a6" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4a7" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="490">382 491 384 492 386 493 38c 4a6 38e 4a7</java.util.HashMap>
+<DirNode n:id="48f" relativePath="jadex/bdi/examples/cleanerworld2/environment/" r:parent="477" r:properties="490"/>
+<java.lang.Boolean n:id="4aa" v="true"/>
+<java.util.Date n:id="4ab" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4ac" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="4ad" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4a9">382 4aa 384 4ab 38c 4ac 38e 4ad</java.util.HashMap>
+<DirNode n:id="4a8" relativePath="jadex/bdi/examples/cleanerworld2/images/" r:parent="477" r:properties="4a9"/>
 <java.lang.Boolean n:id="4b0" v="true"/>
-<java.util.Date n:id="4b1" v="2008-12-23T14:58:56"/>
+<java.util.Date n:id="4b1" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="4b5" v="true"/>
-<java.util.Date n:id="4b6" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4b7" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="4b8" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="4b4">b 4b5 d 4b6 24 4b7 26 4b8</java.util.HashMap>
-<DirNode n:id="4b3" relativePath="jadex/bdi/examples/garbagecollector/images/" r:parent="4ae" r:properties="4b4"/>
-<java.lang.Boolean n:id="4bb" v="true"/>
-<java.util.Date n:id="4bc" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4bd" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="4be" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4ba">b 4bb d 4bc 24 4bd 26 4be</java.util.HashMap>
-<FileNode n:id="4b9" relativePath="jadex/bdi/examples/garbagecollector/Environment.agent.xml" r:parent="4ae" r:properties="4ba"/>
-<java.lang.Boolean n:id="4c1" v="true"/>
-<java.util.Date n:id="4c2" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4c3" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="4c4" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4c0">b 4c1 d 4c2 24 4c3 26 4c4</java.util.HashMap>
-<FileNode n:id="4bf" relativePath="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml" r:parent="4ae" r:properties="4c0"/>
-<java.lang.Boolean n:id="4c7" v="true"/>
-<java.util.Date n:id="4c8" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4c9" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="4ca" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4c6">b 4c7 d 4c8 24 4c9 26 4ca</java.util.HashMap>
-<FileNode n:id="4c5" relativePath="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml" r:parent="4ae" r:properties="4c6"/>
-<java.lang.Boolean n:id="4cd" v="true"/>
-<java.util.Date n:id="4ce" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4cf" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="4d0" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4cc">b 4cd d 4ce 24 4cf 26 4d0</java.util.HashMap>
-<FileNode n:id="4cb" relativePath="jadex/bdi/examples/garbagecollector/Manager.agent.xml" r:parent="4ae" r:properties="4cc"/>
-<java.util.ArrayList n:id="4b2">4b3 4b9 4bf 4c5 4cb</java.util.ArrayList>
-<java.util.Date n:id="4d1" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="4d2" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="4af">b 4b0 d 4b1 f 4b2 24 4d1 26 4d2</java.util.HashMap>
-<DirNode n:id="4ae" relativePath="jadex/bdi/examples/garbagecollector/" r:parent="4" r:properties="4af"/>
-<java.lang.Boolean n:id="4d5" v="true"/>
-<java.util.Date n:id="4d6" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="4da" v="true"/>
-<java.util.Date n:id="4db" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4dc" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="4dd" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4d9">b 4da d 4db 24 4dc 26 4dd</java.util.HashMap>
-<FileNode n:id="4d8" relativePath="jadex/bdi/examples/helloworld/GoodbyeWorld.agent.xml" r:parent="4d3" r:properties="4d9"/>
-<java.lang.Boolean n:id="4e0" v="true"/>
-<java.util.Date n:id="4e1" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4e2" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="4e3" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4df">b 4e0 d 4e1 24 4e2 26 4e3</java.util.HashMap>
-<FileNode n:id="4de" relativePath="jadex/bdi/examples/helloworld/HelloWorld.agent.xml" r:parent="4d3" r:properties="4df"/>
-<java.util.ArrayList n:id="4d7">4d8 4de</java.util.ArrayList>
-<java.util.Date n:id="4e4" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="4e5" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="4d4">b 4d5 d 4d6 f 4d7 24 4e4 26 4e5</java.util.HashMap>
-<DirNode n:id="4d3" relativePath="jadex/bdi/examples/helloworld/" r:parent="4" r:properties="4d4"/>
-<java.lang.Boolean n:id="4e8" v="true"/>
-<java.util.Date n:id="4e9" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="4ed" v="true"/>
-<java.util.Date n:id="4ee" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="4f2" v="true"/>
-<java.util.Date n:id="4f3" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="4f7" v="true"/>
-<java.util.Date n:id="4f8" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="4f9" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="4fa" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4f6">b 4f7 d 4f8 24 4f9 26 4fa</java.util.HashMap>
-<FileNode n:id="4f5" relativePath="jadex/bdi/examples/hunterprey/creature/actsense/Creature.capability.xml" r:parent="4f0" r:properties="4f6"/>
-<java.util.ArrayList n:id="4f4">4f5</java.util.ArrayList>
-<java.util.Date n:id="4fb" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="4fc" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4f1">b 4f2 d 4f3 f 4f4 24 4fb 26 4fc</java.util.HashMap>
-<DirNode n:id="4f0" relativePath="jadex/bdi/examples/hunterprey/creature/actsense/" r:parent="4eb" r:properties="4f1"/>
-<java.lang.Boolean n:id="4ff" v="true"/>
-<java.util.Date n:id="500" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="504" v="true"/>
-<java.util.Date n:id="505" v="2008-12-23T14:58:54"/>
+<java.util.Date n:id="4b6" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4b7" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4b8" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="4b4">382 4b5 384 4b6 38c 4b7 38e 4b8</java.util.HashMap>
+<FileNode n:id="4b3" relativePath="jadex/bdi/examples/cleanerworld2/manager/Manager.agent.xml" r:parent="4ae" r:properties="4b4"/>
+<java.util.ArrayList n:id="4b2">4b3</java.util.ArrayList>
+<java.util.Date n:id="4b9" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4ba" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4af">382 4b0 384 4b1 386 4b2 38c 4b9 38e 4ba</java.util.HashMap>
+<DirNode n:id="4ae" relativePath="jadex/bdi/examples/cleanerworld2/manager/" r:parent="477" r:properties="4af"/>
+<java.lang.Boolean n:id="4bd" v="true"/>
+<java.util.Date n:id="4be" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="4c2" v="true"/>
+<java.util.Date n:id="4c3" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4c4" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="4c5" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="4c1">382 4c2 384 4c3 38c 4c4 38e 4c5</java.util.HashMap>
+<FileNode n:id="4c0" relativePath="jadex/bdi/examples/cleanerworld2/observer/Observer.agent.xml" r:parent="4bb" r:properties="4c1"/>
+<java.util.ArrayList n:id="4bf">4c0</java.util.ArrayList>
+<java.util.Date n:id="4c6" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4c7" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4bc">382 4bd 384 4be 386 4bf 38c 4c6 38e 4c7</java.util.HashMap>
+<DirNode n:id="4bb" relativePath="jadex/bdi/examples/cleanerworld2/observer/" r:parent="477" r:properties="4bc"/>
+<java.util.ArrayList n:id="47b">47c 48f 4a8 4ae 4bb</java.util.ArrayList>
+<java.util.Date n:id="4c8" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4c9" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="478">382 479 384 47a 386 47b 38c 4c8 38e 4c9</java.util.HashMap>
+<DirNode n:id="477" relativePath="jadex/bdi/examples/cleanerworld2/" r:parent="4" r:properties="478"/>
+<java.lang.Boolean n:id="4cc" v="true"/>
+<java.util.Date n:id="4cd" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="4d1" v="true"/>
+<java.util.Date n:id="4d2" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="4d6" v="true"/>
+<java.util.Date n:id="4d7" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4d8" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4d9" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="4d5">382 4d6 384 4d7 38c 4d8 38e 4d9</java.util.HashMap>
+<FileNode n:id="4d4" relativePath="jadex/bdi/examples/cleanerworld_env/cleaner/Cleaner.agent.xml" r:parent="4cf" r:properties="4d5"/>
+<java.util.ArrayList n:id="4d3">4d4</java.util.ArrayList>
+<java.util.Date n:id="4da" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4db" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4d0">382 4d1 384 4d2 386 4d3 38c 4da 38e 4db</java.util.HashMap>
+<DirNode n:id="4cf" relativePath="jadex/bdi/examples/cleanerworld_env/cleaner/" r:parent="4ca" r:properties="4d0"/>
+<java.lang.Boolean n:id="4de" v="true"/>
+<java.util.Date n:id="4df" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4e0" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="4e1" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4dd">382 4de 384 4df 38c 4e0 38e 4e1</java.util.HashMap>
+<DirNode n:id="4dc" relativePath="jadex/bdi/examples/cleanerworld_env/images/" r:parent="4ca" r:properties="4dd"/>
+<java.lang.Boolean n:id="4e4" v="true"/>
+<java.util.Date n:id="4e5" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="4e9" v="true"/>
+<java.util.Date n:id="4ea" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4eb" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="4ec" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="4e8">382 4e9 384 4ea 38c 4eb 38e 4ec</java.util.HashMap>
+<FileNode n:id="4e7" relativePath="jadex/bdi/examples/cleanerworld_env/truck/Truck.agent.xml" r:parent="4e2" r:properties="4e8"/>
+<java.util.ArrayList n:id="4e6">4e7</java.util.ArrayList>
+<java.util.Date n:id="4ed" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4ee" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4e3">382 4e4 384 4e5 386 4e6 38c 4ed 38e 4ee</java.util.HashMap>
+<DirNode n:id="4e2" relativePath="jadex/bdi/examples/cleanerworld_env/truck/" r:parent="4ca" r:properties="4e3"/>
+<java.lang.Boolean n:id="4f1" v="true"/>
+<java.util.Date n:id="4f2" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="4f3" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="4f4" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="4f0">382 4f1 384 4f2 38c 4f3 38e 4f4</java.util.HashMap>
+<FileNode n:id="4ef" relativePath="jadex/bdi/examples/cleanerworld_env/CleanerWorld.application.xml" r:parent="4ca" r:properties="4f0"/>
+<java.util.ArrayList n:id="4ce">4cf 4dc 4e2 4ef</java.util.ArrayList>
+<java.util.Date n:id="4f5" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="4f6" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4cb">382 4cc 384 4cd 386 4ce 38c 4f5 38e 4f6</java.util.HashMap>
+<DirNode n:id="4ca" relativePath="jadex/bdi/examples/cleanerworld_env/" r:parent="4" r:properties="4cb"/>
+<java.lang.Boolean n:id="4f9" v="true"/>
+<java.util.Date n:id="4fa" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="4fe" v="true"/>
+<java.util.Date n:id="4ff" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="503" v="true"/>
+<java.util.Date n:id="504" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="505" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="506" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="502">382 503 384 504 38c 505 38e 506</java.util.HashMap>
+<FileNode n:id="501" relativePath="jadex/bdi/examples/continuation/helloworld/GoodbyeWorld.agent.xml" r:parent="4fc" r:properties="502"/>
 <java.lang.Boolean n:id="509" v="true"/>
-<java.util.Date n:id="50a" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="50b" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="50c" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="508">b 509 d 50a 24 50b 26 50c</java.util.HashMap>
-<FileNode n:id="507" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/DumbHunter.agent.xml" r:parent="502" r:properties="508"/>
-<java.util.ArrayList n:id="506">507</java.util.ArrayList>
-<java.util.Date n:id="50d" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="50e" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="503">b 504 d 505 f 506 24 50d 26 50e</java.util.HashMap>
-<DirNode n:id="502" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/" r:parent="4fd" r:properties="503"/>
-<java.lang.Boolean n:id="511" v="true"/>
-<java.util.Date n:id="512" v="2008-12-23T14:58:54"/>
-<java.lang.Boolean n:id="516" v="true"/>
-<java.util.Date n:id="517" v="2008-12-23T14:58:54"/>
-<java.util.Date n:id="518" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="519" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="515">b 516 d 517 24 518 26 519</java.util.HashMap>
-<DirNode n:id="514" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/potentialfield/" r:parent="50f" r:properties="515"/>
-<java.lang.Boolean n:id="51c" v="true"/>
-<java.util.Date n:id="51d" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="51e" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="51f" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="51b">b 51c d 51d 24 51e 26 51f</java.util.HashMap>
-<FileNode n:id="51a" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/LAHunter.agent.xml" r:parent="50f" r:properties="51b"/>
-<java.util.ArrayList n:id="513">514 51a</java.util.ArrayList>
-<java.util.Date n:id="520" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="521" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="510">b 511 d 512 f 513 24 520 26 521</java.util.HashMap>
-<DirNode n:id="50f" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/" r:parent="4fd" r:properties="510"/>
-<java.util.ArrayList n:id="501">502 50f</java.util.ArrayList>
-<java.util.Date n:id="522" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="523" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="4fe">b 4ff d 500 f 501 24 522 26 523</java.util.HashMap>
-<DirNode n:id="4fd" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/" r:parent="4eb" r:properties="4fe"/>
-<java.lang.Boolean n:id="526" v="true"/>
-<java.util.Date n:id="527" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="52b" v="true"/>
-<java.util.Date n:id="52c" v="2008-12-23T14:58:54"/>
+<java.util.Date n:id="50a" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="50b" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="50c" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="508">382 509 384 50a 38c 50b 38e 50c</java.util.HashMap>
+<FileNode n:id="507" relativePath="jadex/bdi/examples/continuation/helloworld/HelloWorld.agent.xml" r:parent="4fc" r:properties="508"/>
+<java.util.ArrayList n:id="500">501 507</java.util.ArrayList>
+<java.util.Date n:id="50d" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="50e" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4fd">382 4fe 384 4ff 386 500 38c 50d 38e 50e</java.util.HashMap>
+<DirNode n:id="4fc" relativePath="jadex/bdi/examples/continuation/helloworld/" r:parent="4f7" r:properties="4fd"/>
+<java.util.ArrayList n:id="4fb">4fc</java.util.ArrayList>
+<java.util.Date n:id="50f" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="510" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="4f8">382 4f9 384 4fa 386 4fb 38c 50f 38e 510</java.util.HashMap>
+<DirNode n:id="4f7" relativePath="jadex/bdi/examples/continuation/" r:parent="4" r:properties="4f8"/>
+<java.lang.Boolean n:id="513" v="true"/>
+<java.util.Date n:id="514" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="518" v="true"/>
+<java.util.Date n:id="519" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="51a" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="51b" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="517">382 518 384 519 38c 51a 38e 51b</java.util.HashMap>
+<DirNode n:id="516" relativePath="jadex/bdi/examples/garbagecollector/images/" r:parent="511" r:properties="517"/>
+<java.lang.Boolean n:id="51e" v="true"/>
+<java.util.Date n:id="51f" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="520" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="521" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="51d">382 51e 384 51f 38c 520 38e 521</java.util.HashMap>
+<FileNode n:id="51c" relativePath="jadex/bdi/examples/garbagecollector/Environment.agent.xml" r:parent="511" r:properties="51d"/>
+<java.lang.Boolean n:id="524" v="true"/>
+<java.util.Date n:id="525" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="526" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="527" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="523">382 524 384 525 38c 526 38e 527</java.util.HashMap>
+<FileNode n:id="522" relativePath="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml" r:parent="511" r:properties="523"/>
+<java.lang.Boolean n:id="52a" v="true"/>
+<java.util.Date n:id="52b" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="52c" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="52d" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="529">382 52a 384 52b 38c 52c 38e 52d</java.util.HashMap>
+<FileNode n:id="528" relativePath="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml" r:parent="511" r:properties="529"/>
 <java.lang.Boolean n:id="530" v="true"/>
-<java.util.Date n:id="531" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="532" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="533" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="52f">b 530 d 531 24 532 26 533</java.util.HashMap>
-<FileNode n:id="52e" relativePath="jadex/bdi/examples/hunterprey/creature/preys/basicbehaviour/BasicBehaviour.capability.xml" r:parent="529" r:properties="52f"/>
-<java.util.ArrayList n:id="52d">52e</java.util.ArrayList>
-<java.util.Date n:id="534" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="535" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="52a">b 52b d 52c f 52d 24 534 26 535</java.util.HashMap>
-<DirNode n:id="529" relativePath="jadex/bdi/examples/hunterprey/creature/preys/basicbehaviour/" r:parent="524" r:properties="52a"/>
-<java.lang.Boolean n:id="538" v="true"/>
-<java.util.Date n:id="539" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="53d" v="true"/>
-<java.util.Date n:id="53e" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="53f" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="540" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="53c">b 53d d 53e 24 53f 26 540</java.util.HashMap>
-<FileNode n:id="53b" relativePath="jadex/bdi/examples/hunterprey/creature/preys/cleverprey/CleverPrey.agent.xml" r:parent="536" r:properties="53c"/>
-<java.util.ArrayList n:id="53a">53b</java.util.ArrayList>
-<java.util.Date n:id="541" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="542" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="537">b 538 d 539 f 53a 24 541 26 542</java.util.HashMap>
-<DirNode n:id="536" relativePath="jadex/bdi/examples/hunterprey/creature/preys/cleverprey/" r:parent="524" r:properties="537"/>
-<java.lang.Boolean n:id="545" v="true"/>
-<java.util.Date n:id="546" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="54a" v="true"/>
-<java.util.Date n:id="54b" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="54c" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="54d" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="549">b 54a d 54b 24 54c 26 54d</java.util.HashMap>
-<FileNode n:id="548" relativePath="jadex/bdi/examples/hunterprey/creature/preys/dumbprey/DumbPrey.agent.xml" r:parent="543" r:properties="549"/>
-<java.util.ArrayList n:id="547">548</java.util.ArrayList>
-<java.util.Date n:id="54e" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="54f" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="544">b 545 d 546 f 547 24 54e 26 54f</java.util.HashMap>
-<DirNode n:id="543" relativePath="jadex/bdi/examples/hunterprey/creature/preys/dumbprey/" r:parent="524" r:properties="544"/>
-<java.lang.Boolean n:id="552" v="true"/>
-<java.util.Date n:id="553" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="557" v="true"/>
-<java.util.Date n:id="558" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="559" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="55a" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="556">b 557 d 558 24 559 26 55a</java.util.HashMap>
-<FileNode n:id="555" relativePath="jadex/bdi/examples/hunterprey/creature/preys/lazyprey/LazyPrey.agent.xml" r:parent="550" r:properties="556"/>
-<java.util.ArrayList n:id="554">555</java.util.ArrayList>
-<java.util.Date n:id="55b" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="55c" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="551">b 552 d 553 f 554 24 55b 26 55c</java.util.HashMap>
-<DirNode n:id="550" relativePath="jadex/bdi/examples/hunterprey/creature/preys/lazyprey/" r:parent="524" r:properties="551"/>
-<java.lang.Boolean n:id="55f" v="true"/>
-<java.util.Date n:id="560" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="564" v="true"/>
-<java.util.Date n:id="565" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="566" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="567" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="563">b 564 d 565 24 566 26 567</java.util.HashMap>
-<FileNode n:id="562" relativePath="jadex/bdi/examples/hunterprey/creature/preys/sleepingprey/SleepingPrey.agent.xml" r:parent="55d" r:properties="563"/>
-<java.util.ArrayList n:id="561">562</java.util.ArrayList>
-<java.util.Date n:id="568" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="569" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="55e">b 55f d 560 f 561 24 568 26 569</java.util.HashMap>
-<DirNode n:id="55d" relativePath="jadex/bdi/examples/hunterprey/creature/preys/sleepingprey/" r:parent="524" r:properties="55e"/>
-<java.util.ArrayList n:id="528">529 536 543 550 55d</java.util.ArrayList>
-<java.util.Date n:id="56a" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="56b" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="525">b 526 d 527 f 528 24 56a 26 56b</java.util.HashMap>
-<DirNode n:id="524" relativePath="jadex/bdi/examples/hunterprey/creature/preys/" r:parent="4eb" r:properties="525"/>
-<java.util.ArrayList n:id="4ef">4f0 4fd 524</java.util.ArrayList>
-<java.util.Date n:id="56c" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="56d" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="4ec">b 4ed d 4ee f 4ef 24 56c 26 56d</java.util.HashMap>
-<DirNode n:id="4eb" relativePath="jadex/bdi/examples/hunterprey/creature/" r:parent="4e6" r:properties="4ec"/>
+<java.util.Date n:id="531" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="532" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="533" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="52f">382 530 384 531 38c 532 38e 533</java.util.HashMap>
+<FileNode n:id="52e" relativePath="jadex/bdi/examples/garbagecollector/GarbageCollector.application.xml" r:parent="511" r:properties="52f"/>
+<java.lang.Boolean n:id="536" v="true"/>
+<java.util.Date n:id="537" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="538" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="539" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="535">382 536 384 537 38c 538 38e 539</java.util.HashMap>
+<FileNode n:id="534" relativePath="jadex/bdi/examples/garbagecollector/Manager.agent.xml" r:parent="511" r:properties="535"/>
+<java.util.ArrayList n:id="515">516 51c 522 528 52e 534</java.util.ArrayList>
+<java.util.Date n:id="53a" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="53b" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="512">382 513 384 514 386 515 38c 53a 38e 53b</java.util.HashMap>
+<DirNode n:id="511" relativePath="jadex/bdi/examples/garbagecollector/" r:parent="4" r:properties="512"/>
+<java.lang.Boolean n:id="53e" v="true"/>
+<java.util.Date n:id="53f" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="543" v="true"/>
+<java.util.Date n:id="544" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="545" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="546" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="542">382 543 384 544 38c 545 38e 546</java.util.HashMap>
+<DirNode n:id="541" relativePath="jadex/bdi/examples/garbagecollector2/images/" r:parent="53c" r:properties="542"/>
+<java.lang.Boolean n:id="549" v="true"/>
+<java.util.Date n:id="54a" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="54b" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="54c" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="548">382 549 384 54a 38c 54b 38e 54c</java.util.HashMap>
+<FileNode n:id="547" relativePath="jadex/bdi/examples/garbagecollector2/GarbageBurner.agent.xml" r:parent="53c" r:properties="548"/>
+<java.lang.Boolean n:id="54f" v="true"/>
+<java.util.Date n:id="550" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="551" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="552" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="54e">382 54f 384 550 38c 551 38e 552</java.util.HashMap>
+<FileNode n:id="54d" relativePath="jadex/bdi/examples/garbagecollector2/GarbageCollector.agent.xml" r:parent="53c" r:properties="54e"/>
+<java.lang.Boolean n:id="555" v="true"/>
+<java.util.Date n:id="556" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="557" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="558" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="554">382 555 384 556 38c 557 38e 558</java.util.HashMap>
+<FileNode n:id="553" relativePath="jadex/bdi/examples/garbagecollector2/GarbageCollectorSpace.application.xml" r:parent="53c" r:properties="554"/>
+<java.util.ArrayList n:id="540">541 547 54d 553</java.util.ArrayList>
+<java.util.Date n:id="559" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="55a" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="53d">382 53e 384 53f 386 540 38c 559 38e 55a</java.util.HashMap>
+<DirNode n:id="53c" relativePath="jadex/bdi/examples/garbagecollector2/" r:parent="4" r:properties="53d"/>
+<java.lang.Boolean n:id="55d" v="true"/>
+<java.util.Date n:id="55e" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="562" v="true"/>
+<java.util.Date n:id="563" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="564" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="565" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="561">382 562 384 563 38c 564 38e 565</java.util.HashMap>
+<FileNode n:id="560" relativePath="jadex/bdi/examples/helloworld/GoodbyeWorld.agent.xml" r:parent="55b" r:properties="561"/>
+<java.lang.Boolean n:id="568" v="true"/>
+<java.util.Date n:id="569" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="56a" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="56b" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="567">382 568 384 569 38c 56a 38e 56b</java.util.HashMap>
+<FileNode n:id="566" relativePath="jadex/bdi/examples/helloworld/HelloWorld.agent.xml" r:parent="55b" r:properties="567"/>
+<java.util.ArrayList n:id="55f">560 566</java.util.ArrayList>
+<java.util.Date n:id="56c" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="56d" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="55c">382 55d 384 55e 386 55f 38c 56c 38e 56d</java.util.HashMap>
+<DirNode n:id="55b" relativePath="jadex/bdi/examples/helloworld/" r:parent="4" r:properties="55c"/>
 <java.lang.Boolean n:id="570" v="true"/>
-<java.util.Date n:id="571" v="2008-12-23T14:58:56"/>
+<java.util.Date n:id="571" v="2009-06-12T16:41:38"/>
 <java.lang.Boolean n:id="575" v="true"/>
-<java.util.Date n:id="576" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="577" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="578" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="574">b 575 d 576 24 577 26 578</java.util.HashMap>
-<FileNode n:id="573" relativePath="jadex/bdi/examples/hunterprey/environment/Environment.agent.xml" r:parent="56e" r:properties="574"/>
-<java.lang.Boolean n:id="57b" v="true"/>
-<java.util.Date n:id="57c" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="57d" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="57e" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="57a">b 57b d 57c 24 57d 26 57e</java.util.HashMap>
-<FileNode n:id="579" relativePath="jadex/bdi/examples/hunterprey/environment/Observer.agent.xml" r:parent="56e" r:properties="57a"/>
-<java.lang.Boolean n:id="581" v="true"/>
-<java.util.Date n:id="582" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="583" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="584" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="580">b 581 d 582 24 583 26 584</java.util.HashMap>
-<FileNode n:id="57f" relativePath="jadex/bdi/examples/hunterprey/environment/RemoteObserver.agent.xml" r:parent="56e" r:properties="580"/>
-<java.util.ArrayList n:id="572">573 579 57f</java.util.ArrayList>
-<java.util.Date n:id="585" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="586" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="56f">b 570 d 571 f 572 24 585 26 586</java.util.HashMap>
-<DirNode n:id="56e" relativePath="jadex/bdi/examples/hunterprey/environment/" r:parent="4e6" r:properties="56f"/>
-<java.lang.Boolean n:id="589" v="true"/>
-<java.util.Date n:id="58a" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="58b" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="58c" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="588">b 589 d 58a 24 58b 26 58c</java.util.HashMap>
-<DirNode n:id="587" relativePath="jadex/bdi/examples/hunterprey/images/" r:parent="4e6" r:properties="588"/>
-<java.lang.Boolean n:id="58f" v="true"/>
-<java.util.Date n:id="590" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="594" v="true"/>
-<java.util.Date n:id="595" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="596" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="597" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="593">b 594 d 595 24 596 26 597</java.util.HashMap>
-<FileNode n:id="592" relativePath="jadex/bdi/examples/hunterprey/manager/Manager.agent.xml" r:parent="58d" r:properties="593"/>
-<java.util.ArrayList n:id="591">592</java.util.ArrayList>
-<java.util.Date n:id="598" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="599" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="58e">b 58f d 590 f 591 24 598 26 599</java.util.HashMap>
-<DirNode n:id="58d" relativePath="jadex/bdi/examples/hunterprey/manager/" r:parent="4e6" r:properties="58e"/>
-<java.util.ArrayList n:id="4ea">4eb 56e 587 58d</java.util.ArrayList>
-<java.util.Date n:id="59a" v="2008-12-23T15:29:16"/>
-<java.util.Date n:id="59b" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="4e7">b 4e8 d 4e9 f 4ea 24 59a 26 59b</java.util.HashMap>
-<DirNode n:id="4e6" relativePath="jadex/bdi/examples/hunterprey/" r:parent="4" r:properties="4e7"/>
-<java.lang.Boolean n:id="59e" v="true"/>
-<java.util.Date n:id="59f" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="5a3" v="true"/>
-<java.util.Date n:id="5a4" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="5a8" v="true"/>
-<java.util.Date n:id="5a9" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="5ad" v="true"/>
-<java.util.Date n:id="5ae" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="5af" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5b0" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5ac">b 5ad d 5ae 24 5af 26 5b0</java.util.HashMap>
-<FileNode n:id="5ab" relativePath="jadex/bdi/examples/hunterprey2/creature/actsense/Creature.capability.xml" r:parent="5a6" r:properties="5ac"/>
-<java.util.ArrayList n:id="5aa">5ab</java.util.ArrayList>
-<java.util.Date n:id="5b1" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5b2" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5a7">b 5a8 d 5a9 f 5aa 24 5b1 26 5b2</java.util.HashMap>
-<DirNode n:id="5a6" relativePath="jadex/bdi/examples/hunterprey2/creature/actsense/" r:parent="5a1" r:properties="5a7"/>
+<java.util.Date n:id="576" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="57a" v="true"/>
+<java.util.Date n:id="57b" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="57f" v="true"/>
+<java.util.Date n:id="580" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="581" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="57e">382 57f 384 580 38c 581</java.util.HashMap>
+<FileNode n:id="57d" relativePath="jadex/bdi/examples/hunterprey/creature/actsense/Creature.capability.xml" r:parent="578" r:properties="57e"/>
+<java.util.ArrayList n:id="57c">57d</java.util.ArrayList>
+<java.util.Date n:id="582" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="583" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="579">382 57a 384 57b 386 57c 38c 582 38e 583</java.util.HashMap>
+<DirNode n:id="578" relativePath="jadex/bdi/examples/hunterprey/creature/actsense/" r:parent="573" r:properties="579"/>
+<java.lang.Boolean n:id="586" v="true"/>
+<java.util.Date n:id="587" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="58b" v="true"/>
+<java.util.Date n:id="58c" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="590" v="true"/>
+<java.util.Date n:id="591" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="592" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="58f">382 590 384 591 38c 592</java.util.HashMap>
+<FileNode n:id="58e" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/DumbHunter.agent.xml" r:parent="589" r:properties="58f"/>
+<java.util.ArrayList n:id="58d">58e</java.util.ArrayList>
+<java.util.Date n:id="593" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="594" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="58a">382 58b 384 58c 386 58d 38c 593 38e 594</java.util.HashMap>
+<DirNode n:id="589" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/" r:parent="584" r:properties="58a"/>
+<java.lang.Boolean n:id="597" v="true"/>
+<java.util.Date n:id="598" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="59c" v="true"/>
+<java.util.Date n:id="59d" v="2009-06-12T16:41:36"/>
+<java.util.Date n:id="59e" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="59f" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="59b">382 59c 384 59d 38c 59e 38e 59f</java.util.HashMap>
+<DirNode n:id="59a" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/potentialfield/" r:parent="595" r:properties="59b"/>
+<java.lang.Boolean n:id="5a2" v="true"/>
+<java.util.Date n:id="5a3" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5a4" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="5a1">382 5a2 384 5a3 38c 5a4</java.util.HashMap>
+<FileNode n:id="5a0" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/LAHunter.agent.xml" r:parent="595" r:properties="5a1"/>
+<java.util.ArrayList n:id="599">59a 5a0</java.util.ArrayList>
+<java.util.Date n:id="5a5" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5a6" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="596">382 597 384 598 386 599 38c 5a5 38e 5a6</java.util.HashMap>
+<DirNode n:id="595" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/" r:parent="584" r:properties="596"/>
+<java.util.ArrayList n:id="588">589 595</java.util.ArrayList>
+<java.util.Date n:id="5a7" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5a8" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="585">382 586 384 587 386 588 38c 5a7 38e 5a8</java.util.HashMap>
+<DirNode n:id="584" relativePath="jadex/bdi/examples/hunterprey/creature/hunters/" r:parent="573" r:properties="585"/>
+<java.lang.Boolean n:id="5ab" v="true"/>
+<java.util.Date n:id="5ac" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="5b0" v="true"/>
+<java.util.Date n:id="5b1" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="5b5" v="true"/>
-<java.util.Date n:id="5b6" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="5ba" v="true"/>
-<java.util.Date n:id="5bb" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="5bf" v="true"/>
-<java.util.Date n:id="5c0" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="5c1" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5c2" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5be">b 5bf d 5c0 24 5c1 26 5c2</java.util.HashMap>
-<FileNode n:id="5bd" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/dumbhunter/DumbHunter.agent.xml" r:parent="5b8" r:properties="5be"/>
-<java.util.ArrayList n:id="5bc">5bd</java.util.ArrayList>
-<java.util.Date n:id="5c3" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5c4" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5b9">b 5ba d 5bb f 5bc 24 5c3 26 5c4</java.util.HashMap>
-<DirNode n:id="5b8" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/dumbhunter/" r:parent="5b3" r:properties="5b9"/>
-<java.lang.Boolean n:id="5c7" v="true"/>
-<java.util.Date n:id="5c8" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="5cc" v="true"/>
-<java.util.Date n:id="5cd" v="2008-12-23T14:58:56"/>
-<java.util.Date n:id="5ce" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5cf" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5cb">b 5cc d 5cd 24 5ce 26 5cf</java.util.HashMap>
-<DirNode n:id="5ca" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/potentialfield/" r:parent="5c5" r:properties="5cb"/>
-<java.lang.Boolean n:id="5d2" v="true"/>
-<java.util.Date n:id="5d3" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="5d4" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5d5" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5d1">b 5d2 d 5d3 24 5d4 26 5d5</java.util.HashMap>
-<FileNode n:id="5d0" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/LAHunter.agent.xml" r:parent="5c5" r:properties="5d1"/>
-<java.util.ArrayList n:id="5c9">5ca 5d0</java.util.ArrayList>
-<java.util.Date n:id="5d6" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5d7" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5c6">b 5c7 d 5c8 f 5c9 24 5d6 26 5d7</java.util.HashMap>
-<DirNode n:id="5c5" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/" r:parent="5b3" r:properties="5c6"/>
-<java.util.ArrayList n:id="5b7">5b8 5c5</java.util.ArrayList>
-<java.util.Date n:id="5d8" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="5d9" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5b4">b 5b5 d 5b6 f 5b7 24 5d8 26 5d9</java.util.HashMap>
-<DirNode n:id="5b3" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/" r:parent="5a1" r:properties="5b4"/>
-<java.lang.Boolean n:id="5dc" v="true"/>
-<java.util.Date n:id="5dd" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="5e1" v="true"/>
-<java.util.Date n:id="5e2" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="5e6" v="true"/>
-<java.util.Date n:id="5e7" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="5e8" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5e9" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5e5">b 5e6 d 5e7 24 5e8 26 5e9</java.util.HashMap>
-<FileNode n:id="5e4" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/basicbehaviour/BasicBehaviour.capability.xml" r:parent="5df" r:properties="5e5"/>
-<java.util.ArrayList n:id="5e3">5e4</java.util.ArrayList>
-<java.util.Date n:id="5ea" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5eb" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5e0">b 5e1 d 5e2 f 5e3 24 5ea 26 5eb</java.util.HashMap>
-<DirNode n:id="5df" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/basicbehaviour/" r:parent="5da" r:properties="5e0"/>
-<java.lang.Boolean n:id="5ee" v="true"/>
-<java.util.Date n:id="5ef" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="5f3" v="true"/>
-<java.util.Date n:id="5f4" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="5f5" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5f6" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5f2">b 5f3 d 5f4 24 5f5 26 5f6</java.util.HashMap>
-<FileNode n:id="5f1" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/cleverprey/CleverPrey.agent.xml" r:parent="5ec" r:properties="5f2"/>
-<java.util.ArrayList n:id="5f0">5f1</java.util.ArrayList>
-<java.util.Date n:id="5f7" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="5f8" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5ed">b 5ee d 5ef f 5f0 24 5f7 26 5f8</java.util.HashMap>
-<DirNode n:id="5ec" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/cleverprey/" r:parent="5da" r:properties="5ed"/>
-<java.lang.Boolean n:id="5fb" v="true"/>
-<java.util.Date n:id="5fc" v="2008-12-23T14:58:54"/>
-<java.lang.Boolean n:id="600" v="true"/>
-<java.util.Date n:id="601" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="602" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="603" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5ff">b 600 d 601 24 602 26 603</java.util.HashMap>
-<FileNode n:id="5fe" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/dumbprey/DumbPrey.agent.xml" r:parent="5f9" r:properties="5ff"/>
-<java.util.ArrayList n:id="5fd">5fe</java.util.ArrayList>
-<java.util.Date n:id="604" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="605" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5fa">b 5fb d 5fc f 5fd 24 604 26 605</java.util.HashMap>
-<DirNode n:id="5f9" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/dumbprey/" r:parent="5da" r:properties="5fa"/>
-<java.lang.Boolean n:id="608" v="true"/>
-<java.util.Date n:id="609" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="60d" v="true"/>
-<java.util.Date n:id="60e" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="60f" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="610" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="60c">b 60d d 60e 24 60f 26 610</java.util.HashMap>
-<FileNode n:id="60b" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/lazyprey/LazyPrey.agent.xml" r:parent="606" r:properties="60c"/>
-<java.util.ArrayList n:id="60a">60b</java.util.ArrayList>
-<java.util.Date n:id="611" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="612" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="607">b 608 d 609 f 60a 24 611 26 612</java.util.HashMap>
-<DirNode n:id="606" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/lazyprey/" r:parent="5da" r:properties="607"/>
-<java.lang.Boolean n:id="615" v="true"/>
-<java.util.Date n:id="616" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="61a" v="true"/>
-<java.util.Date n:id="61b" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="61c" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="61d" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="619">b 61a d 61b 24 61c 26 61d</java.util.HashMap>
-<FileNode n:id="618" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/sleepingprey/SleepingPrey.agent.xml" r:parent="613" r:properties="619"/>
-<java.util.ArrayList n:id="617">618</java.util.ArrayList>
-<java.util.Date n:id="61e" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="61f" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="614">b 615 d 616 f 617 24 61e 26 61f</java.util.HashMap>
-<DirNode n:id="613" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/sleepingprey/" r:parent="5da" r:properties="614"/>
-<java.util.ArrayList n:id="5de">5df 5ec 5f9 606 613</java.util.ArrayList>
-<java.util.Date n:id="620" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="621" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="5db">b 5dc d 5dd f 5de 24 620 26 621</java.util.HashMap>
-<DirNode n:id="5da" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/" r:parent="5a1" r:properties="5db"/>
-<java.util.ArrayList n:id="5a5">5a6 5b3 5da</java.util.ArrayList>
-<java.util.Date n:id="622" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="623" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="5a2">b 5a3 d 5a4 f 5a5 24 622 26 623</java.util.HashMap>
-<DirNode n:id="5a1" relativePath="jadex/bdi/examples/hunterprey2/creature/" r:parent="59c" r:properties="5a2"/>
-<java.lang.Boolean n:id="626" v="true"/>
-<java.util.Date n:id="627" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="62b" v="true"/>
-<java.util.Date n:id="62c" v="2008-12-23T14:58:54"/>
-<java.util.Date n:id="62d" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="62e" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="62a">b 62b d 62c 24 62d 26 62e</java.util.HashMap>
-<DirNode n:id="629" relativePath="jadex/bdi/examples/hunterprey2/engine/process/" r:parent="624" r:properties="62a"/>
-<java.lang.Boolean n:id="631" v="true"/>
-<java.util.Date n:id="632" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="633" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="634" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="630">b 631 d 632 24 633 26 634</java.util.HashMap>
-<FileNode n:id="62f" relativePath="jadex/bdi/examples/hunterprey2/engine/SimEngine.agent.xml" r:parent="624" r:properties="630"/>
-<java.util.ArrayList n:id="628">629 62f</java.util.ArrayList>
-<java.util.Date n:id="635" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="636" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="625">b 626 d 627 f 628 24 635 26 636</java.util.HashMap>
-<DirNode n:id="624" relativePath="jadex/bdi/examples/hunterprey2/engine/" r:parent="59c" r:properties="625"/>
-<java.lang.Boolean n:id="639" v="true"/>
-<java.util.Date n:id="63a" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="63e" v="true"/>
-<java.util.Date n:id="63f" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="640" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="641" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="63d">b 63e d 63f 24 640 26 641</java.util.HashMap>
-<FileNode n:id="63c" relativePath="jadex/bdi/examples/hunterprey2/environment/Environment.agent.xml" r:parent="637" r:properties="63d"/>
-<java.lang.Boolean n:id="644" v="true"/>
-<java.util.Date n:id="645" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="646" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="647" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="643">b 644 d 645 24 646 26 647</java.util.HashMap>
-<FileNode n:id="642" relativePath="jadex/bdi/examples/hunterprey2/environment/Observer.agent.xml" r:parent="637" r:properties="643"/>
-<java.lang.Boolean n:id="64a" v="true"/>
-<java.util.Date n:id="64b" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="64c" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="64d" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="649">b 64a d 64b 24 64c 26 64d</java.util.HashMap>
-<FileNode n:id="648" relativePath="jadex/bdi/examples/hunterprey2/environment/RemoteObserver.agent.xml" r:parent="637" r:properties="649"/>
-<java.util.ArrayList n:id="63b">63c 642 648</java.util.ArrayList>
-<java.util.Date n:id="64e" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="64f" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="638">b 639 d 63a f 63b 24 64e 26 64f</java.util.HashMap>
-<DirNode n:id="637" relativePath="jadex/bdi/examples/hunterprey2/environment/" r:parent="59c" r:properties="638"/>
-<java.lang.Boolean n:id="652" v="true"/>
-<java.util.Date n:id="653" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="654" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="655" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="651">b 652 d 653 24 654 26 655</java.util.HashMap>
-<DirNode n:id="650" relativePath="jadex/bdi/examples/hunterprey2/images/" r:parent="59c" r:properties="651"/>
-<java.lang.Boolean n:id="658" v="true"/>
-<java.util.Date n:id="659" v="2008-12-23T14:58:52"/>
-<java.lang.Boolean n:id="65d" v="true"/>
-<java.util.Date n:id="65e" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="65f" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="660" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="65c">b 65d d 65e 24 65f 26 660</java.util.HashMap>
-<FileNode n:id="65b" relativePath="jadex/bdi/examples/hunterprey2/manager/Manager.agent.xml" r:parent="656" r:properties="65c"/>
-<java.util.ArrayList n:id="65a">65b</java.util.ArrayList>
-<java.util.Date n:id="661" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="662" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="657">b 658 d 659 f 65a 24 661 26 662</java.util.HashMap>
-<DirNode n:id="656" relativePath="jadex/bdi/examples/hunterprey2/manager/" r:parent="59c" r:properties="657"/>
-<java.util.ArrayList n:id="5a0">5a1 624 637 650 656</java.util.ArrayList>
-<java.util.Date n:id="663" v="2008-12-23T15:29:16"/>
-<java.util.Date n:id="664" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="59d">b 59e d 59f f 5a0 24 663 26 664</java.util.HashMap>
-<DirNode n:id="59c" relativePath="jadex/bdi/examples/hunterprey2/" r:parent="4" r:properties="59d"/>
-<java.lang.Boolean n:id="667" v="true"/>
-<java.util.Date n:id="668" v="2008-12-23T14:58:56"/>
+<java.util.Date n:id="5b6" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5b7" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="5b4">382 5b5 384 5b6 38c 5b7</java.util.HashMap>
+<FileNode n:id="5b3" relativePath="jadex/bdi/examples/hunterprey/creature/preys/basicbehaviour/BasicBehaviour.capability.xml" r:parent="5ae" r:properties="5b4"/>
+<java.util.ArrayList n:id="5b2">5b3</java.util.ArrayList>
+<java.util.Date n:id="5b8" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5b9" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="5af">382 5b0 384 5b1 386 5b2 38c 5b8 38e 5b9</java.util.HashMap>
+<DirNode n:id="5ae" relativePath="jadex/bdi/examples/hunterprey/creature/preys/basicbehaviour/" r:parent="5a9" r:properties="5af"/>
+<java.lang.Boolean n:id="5bc" v="true"/>
+<java.util.Date n:id="5bd" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="5c1" v="true"/>
+<java.util.Date n:id="5c2" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5c3" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="5c0">382 5c1 384 5c2 38c 5c3</java.util.HashMap>
+<FileNode n:id="5bf" relativePath="jadex/bdi/examples/hunterprey/creature/preys/cleverprey/CleverPrey.agent.xml" r:parent="5ba" r:properties="5c0"/>
+<java.util.ArrayList n:id="5be">5bf</java.util.ArrayList>
+<java.util.Date n:id="5c4" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5c5" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="5bb">382 5bc 384 5bd 386 5be 38c 5c4 38e 5c5</java.util.HashMap>
+<DirNode n:id="5ba" relativePath="jadex/bdi/examples/hunterprey/creature/preys/cleverprey/" r:parent="5a9" r:properties="5bb"/>
+<java.lang.Boolean n:id="5c8" v="true"/>
+<java.util.Date n:id="5c9" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="5cd" v="true"/>
+<java.util.Date n:id="5ce" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5cf" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="5cc">382 5cd 384 5ce 38c 5cf</java.util.HashMap>
+<FileNode n:id="5cb" relativePath="jadex/bdi/examples/hunterprey/creature/preys/dumbprey/DumbPrey.agent.xml" r:parent="5c6" r:properties="5cc"/>
+<java.util.ArrayList n:id="5ca">5cb</java.util.ArrayList>
+<java.util.Date n:id="5d0" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5d1" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="5c7">382 5c8 384 5c9 386 5ca 38c 5d0 38e 5d1</java.util.HashMap>
+<DirNode n:id="5c6" relativePath="jadex/bdi/examples/hunterprey/creature/preys/dumbprey/" r:parent="5a9" r:properties="5c7"/>
+<java.lang.Boolean n:id="5d4" v="true"/>
+<java.util.Date n:id="5d5" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="5d9" v="true"/>
+<java.util.Date n:id="5da" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5db" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="5d8">382 5d9 384 5da 38c 5db</java.util.HashMap>
+<FileNode n:id="5d7" relativePath="jadex/bdi/examples/hunterprey/creature/preys/lazyprey/LazyPrey.agent.xml" r:parent="5d2" r:properties="5d8"/>
+<java.util.ArrayList n:id="5d6">5d7</java.util.ArrayList>
+<java.util.Date n:id="5dc" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5dd" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="5d3">382 5d4 384 5d5 386 5d6 38c 5dc 38e 5dd</java.util.HashMap>
+<DirNode n:id="5d2" relativePath="jadex/bdi/examples/hunterprey/creature/preys/lazyprey/" r:parent="5a9" r:properties="5d3"/>
+<java.lang.Boolean n:id="5e0" v="true"/>
+<java.util.Date n:id="5e1" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="5e5" v="true"/>
+<java.util.Date n:id="5e6" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5e7" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="5e4">382 5e5 384 5e6 38c 5e7</java.util.HashMap>
+<FileNode n:id="5e3" relativePath="jadex/bdi/examples/hunterprey/creature/preys/sleepingprey/SleepingPrey.agent.xml" r:parent="5de" r:properties="5e4"/>
+<java.util.ArrayList n:id="5e2">5e3</java.util.ArrayList>
+<java.util.Date n:id="5e8" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5e9" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="5df">382 5e0 384 5e1 386 5e2 38c 5e8 38e 5e9</java.util.HashMap>
+<DirNode n:id="5de" relativePath="jadex/bdi/examples/hunterprey/creature/preys/sleepingprey/" r:parent="5a9" r:properties="5df"/>
+<java.util.ArrayList n:id="5ad">5ae 5ba 5c6 5d2 5de</java.util.ArrayList>
+<java.util.Date n:id="5ea" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="5eb" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="5aa">382 5ab 384 5ac 386 5ad 38c 5ea 38e 5eb</java.util.HashMap>
+<DirNode n:id="5a9" relativePath="jadex/bdi/examples/hunterprey/creature/preys/" r:parent="573" r:properties="5aa"/>
+<java.util.ArrayList n:id="577">578 584 5a9</java.util.ArrayList>
+<java.util.Date n:id="5ec" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="5ed" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="574">382 575 384 576 386 577 38c 5ec 38e 5ed</java.util.HashMap>
+<DirNode n:id="573" relativePath="jadex/bdi/examples/hunterprey/creature/" r:parent="56e" r:properties="574"/>
+<java.lang.Boolean n:id="5f0" v="true"/>
+<java.util.Date n:id="5f1" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="5f5" v="true"/>
+<java.util.Date n:id="5f6" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5f7" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="5f4">382 5f5 384 5f6 38c 5f7</java.util.HashMap>
+<FileNode n:id="5f3" relativePath="jadex/bdi/examples/hunterprey/environment/Environment.agent.xml" r:parent="5ee" r:properties="5f4"/>
+<java.lang.Boolean n:id="5fa" v="true"/>
+<java.util.Date n:id="5fb" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="5fc" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="5f9">382 5fa 384 5fb 38c 5fc</java.util.HashMap>
+<FileNode n:id="5f8" relativePath="jadex/bdi/examples/hunterprey/environment/Observer.agent.xml" r:parent="5ee" r:properties="5f9"/>
+<java.lang.Boolean n:id="5ff" v="true"/>
+<java.util.Date n:id="600" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="601" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="5fe">382 5ff 384 600 38c 601</java.util.HashMap>
+<FileNode n:id="5fd" relativePath="jadex/bdi/examples/hunterprey/environment/RemoteObserver.agent.xml" r:parent="5ee" r:properties="5fe"/>
+<java.util.ArrayList n:id="5f2">5f3 5f8 5fd</java.util.ArrayList>
+<java.util.Date n:id="602" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="603" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="5ef">382 5f0 384 5f1 386 5f2 38c 602 38e 603</java.util.HashMap>
+<DirNode n:id="5ee" relativePath="jadex/bdi/examples/hunterprey/environment/" r:parent="56e" r:properties="5ef"/>
+<java.lang.Boolean n:id="606" v="true"/>
+<java.util.Date n:id="607" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="608" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="609" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="605">382 606 384 607 38c 608 38e 609</java.util.HashMap>
+<DirNode n:id="604" relativePath="jadex/bdi/examples/hunterprey/images/" r:parent="56e" r:properties="605"/>
+<java.lang.Boolean n:id="60c" v="true"/>
+<java.util.Date n:id="60d" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="60e" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="60f" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="60b">382 60c 384 60d 38c 60e 38e 60f</java.util.HashMap>
+<FileNode n:id="60a" relativePath="jadex/bdi/examples/hunterprey/HunterPrey.application.xml" r:parent="56e" r:properties="60b"/>
+<java.util.ArrayList n:id="572">573 5ee 604 60a</java.util.ArrayList>
+<java.util.Date n:id="610" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="611" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="56f">382 570 384 571 386 572 38c 610 38e 611</java.util.HashMap>
+<DirNode n:id="56e" relativePath="jadex/bdi/examples/hunterprey/" r:parent="4" r:properties="56f"/>
+<java.lang.Boolean n:id="614" v="true"/>
+<java.util.Date n:id="615" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="619" v="true"/>
+<java.util.Date n:id="61a" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="61e" v="true"/>
+<java.util.Date n:id="61f" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="623" v="true"/>
+<java.util.Date n:id="624" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="625" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="622">382 623 384 624 38c 625</java.util.HashMap>
+<FileNode n:id="621" relativePath="jadex/bdi/examples/hunterprey2/creature/actsense/Creature.capability.xml" r:parent="61c" r:properties="622"/>
+<java.util.ArrayList n:id="620">621</java.util.ArrayList>
+<java.util.Date n:id="626" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="627" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="61d">382 61e 384 61f 386 620 38c 626 38e 627</java.util.HashMap>
+<DirNode n:id="61c" relativePath="jadex/bdi/examples/hunterprey2/creature/actsense/" r:parent="617" r:properties="61d"/>
+<java.lang.Boolean n:id="62a" v="true"/>
+<java.util.Date n:id="62b" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="62f" v="true"/>
+<java.util.Date n:id="630" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="634" v="true"/>
+<java.util.Date n:id="635" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="636" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="633">382 634 384 635 38c 636</java.util.HashMap>
+<FileNode n:id="632" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/dumbhunter/DumbHunter.agent.xml" r:parent="62d" r:properties="633"/>
+<java.util.ArrayList n:id="631">632</java.util.ArrayList>
+<java.util.Date n:id="637" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="638" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="62e">382 62f 384 630 386 631 38c 637 38e 638</java.util.HashMap>
+<DirNode n:id="62d" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/dumbhunter/" r:parent="628" r:properties="62e"/>
+<java.lang.Boolean n:id="63b" v="true"/>
+<java.util.Date n:id="63c" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="640" v="true"/>
+<java.util.Date n:id="641" v="2009-06-12T16:41:36"/>
+<java.util.Date n:id="642" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="643" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="63f">382 640 384 641 38c 642 38e 643</java.util.HashMap>
+<DirNode n:id="63e" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/potentialfield/" r:parent="639" r:properties="63f"/>
+<java.lang.Boolean n:id="646" v="true"/>
+<java.util.Date n:id="647" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="648" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="645">382 646 384 647 38c 648</java.util.HashMap>
+<FileNode n:id="644" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/LAHunter.agent.xml" r:parent="639" r:properties="645"/>
+<java.util.ArrayList n:id="63d">63e 644</java.util.ArrayList>
+<java.util.Date n:id="649" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="64a" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="63a">382 63b 384 63c 386 63d 38c 649 38e 64a</java.util.HashMap>
+<DirNode n:id="639" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/ldahunter/" r:parent="628" r:properties="63a"/>
+<java.util.ArrayList n:id="62c">62d 639</java.util.ArrayList>
+<java.util.Date n:id="64b" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="64c" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="629">382 62a 384 62b 386 62c 38c 64b 38e 64c</java.util.HashMap>
+<DirNode n:id="628" relativePath="jadex/bdi/examples/hunterprey2/creature/hunters/" r:parent="617" r:properties="629"/>
+<java.lang.Boolean n:id="64f" v="true"/>
+<java.util.Date n:id="650" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="654" v="true"/>
+<java.util.Date n:id="655" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="659" v="true"/>
+<java.util.Date n:id="65a" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="65b" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="658">382 659 384 65a 38c 65b</java.util.HashMap>
+<FileNode n:id="657" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/basicbehaviour/BasicBehaviour.capability.xml" r:parent="652" r:properties="658"/>
+<java.util.ArrayList n:id="656">657</java.util.ArrayList>
+<java.util.Date n:id="65c" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="65d" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="653">382 654 384 655 386 656 38c 65c 38e 65d</java.util.HashMap>
+<DirNode n:id="652" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/basicbehaviour/" r:parent="64d" r:properties="653"/>
+<java.lang.Boolean n:id="660" v="true"/>
+<java.util.Date n:id="661" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="665" v="true"/>
+<java.util.Date n:id="666" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="667" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="664">382 665 384 666 38c 667</java.util.HashMap>
+<FileNode n:id="663" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/cleverprey/CleverPrey.agent.xml" r:parent="65e" r:properties="664"/>
+<java.util.ArrayList n:id="662">663</java.util.ArrayList>
+<java.util.Date n:id="668" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="669" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="65f">382 660 384 661 386 662 38c 668 38e 669</java.util.HashMap>
+<DirNode n:id="65e" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/cleverprey/" r:parent="64d" r:properties="65f"/>
 <java.lang.Boolean n:id="66c" v="true"/>
-<java.util.Date n:id="66d" v="2008-12-23T14:58:56"/>
+<java.util.Date n:id="66d" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="671" v="true"/>
-<java.util.Date n:id="672" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="673" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="674" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="670">b 671 d 672 24 673 26 674</java.util.HashMap>
-<FileNode n:id="66f" relativePath="jadex/bdi/examples/marsworld/carrier/Carry.agent.xml" r:parent="66a" r:properties="670"/>
+<java.util.Date n:id="672" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="673" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="670">382 671 384 672 38c 673</java.util.HashMap>
+<FileNode n:id="66f" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/dumbprey/DumbPrey.agent.xml" r:parent="66a" r:properties="670"/>
 <java.util.ArrayList n:id="66e">66f</java.util.ArrayList>
-<java.util.Date n:id="675" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="676" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="66b">b 66c d 66d f 66e 24 675 26 676</java.util.HashMap>
-<DirNode n:id="66a" relativePath="jadex/bdi/examples/marsworld/carrier/" r:parent="665" r:properties="66b"/>
-<java.lang.Boolean n:id="679" v="true"/>
-<java.util.Date n:id="67a" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="67b" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="67c" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="678">b 679 d 67a 24 67b 26 67c</java.util.HashMap>
-<DirNode n:id="677" relativePath="jadex/bdi/examples/marsworld/images/" r:parent="665" r:properties="678"/>
-<java.lang.Boolean n:id="67f" v="true"/>
-<java.util.Date n:id="680" v="2008-12-23T14:58:56"/>
+<java.util.Date n:id="674" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="675" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="66b">382 66c 384 66d 386 66e 38c 674 38e 675</java.util.HashMap>
+<DirNode n:id="66a" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/dumbprey/" r:parent="64d" r:properties="66b"/>
+<java.lang.Boolean n:id="678" v="true"/>
+<java.util.Date n:id="679" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="67d" v="true"/>
+<java.util.Date n:id="67e" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="67f" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="67c">382 67d 384 67e 38c 67f</java.util.HashMap>
+<FileNode n:id="67b" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/lazyprey/LazyPrey.agent.xml" r:parent="676" r:properties="67c"/>
+<java.util.ArrayList n:id="67a">67b</java.util.ArrayList>
+<java.util.Date n:id="680" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="681" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="677">382 678 384 679 386 67a 38c 680 38e 681</java.util.HashMap>
+<DirNode n:id="676" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/lazyprey/" r:parent="64d" r:properties="677"/>
 <java.lang.Boolean n:id="684" v="true"/>
-<java.util.Date n:id="685" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="686" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="687" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="683">b 684 d 685 24 686 26 687</java.util.HashMap>
-<FileNode n:id="682" relativePath="jadex/bdi/examples/marsworld/manager/Manager.agent.xml" r:parent="67d" r:properties="683"/>
-<java.util.ArrayList n:id="681">682</java.util.ArrayList>
-<java.util.Date n:id="688" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="689" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="67e">b 67f d 680 f 681 24 688 26 689</java.util.HashMap>
-<DirNode n:id="67d" relativePath="jadex/bdi/examples/marsworld/manager/" r:parent="665" r:properties="67e"/>
-<java.lang.Boolean n:id="68c" v="true"/>
-<java.util.Date n:id="68d" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="691" v="true"/>
-<java.util.Date n:id="692" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="693" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="694" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="690">b 691 d 692 24 693 26 694</java.util.HashMap>
-<FileNode n:id="68f" relativePath="jadex/bdi/examples/marsworld/movement/Movement.capability.xml" r:parent="68a" r:properties="690"/>
-<java.util.ArrayList n:id="68e">68f</java.util.ArrayList>
-<java.util.Date n:id="695" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="696" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="68b">b 68c d 68d f 68e 24 695 26 696</java.util.HashMap>
-<DirNode n:id="68a" relativePath="jadex/bdi/examples/marsworld/movement/" r:parent="665" r:properties="68b"/>
+<java.util.Date n:id="685" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="689" v="true"/>
+<java.util.Date n:id="68a" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="68b" v="2009-06-12T17:14:32"/>
+<java.util.HashMap n:id="688">382 689 384 68a 38c 68b</java.util.HashMap>
+<FileNode n:id="687" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/sleepingprey/SleepingPrey.agent.xml" r:parent="682" r:properties="688"/>
+<java.util.ArrayList n:id="686">687</java.util.ArrayList>
+<java.util.Date n:id="68c" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="68d" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="683">382 684 384 685 386 686 38c 68c 38e 68d</java.util.HashMap>
+<DirNode n:id="682" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/sleepingprey/" r:parent="64d" r:properties="683"/>
+<java.util.ArrayList n:id="651">652 65e 66a 676 682</java.util.ArrayList>
+<java.util.Date n:id="68e" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="68f" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="64e">382 64f 384 650 386 651 38c 68e 38e 68f</java.util.HashMap>
+<DirNode n:id="64d" relativePath="jadex/bdi/examples/hunterprey2/creature/preys/" r:parent="617" r:properties="64e"/>
+<java.util.ArrayList n:id="61b">61c 628 64d</java.util.ArrayList>
+<java.util.Date n:id="690" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="691" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="618">382 619 384 61a 386 61b 38c 690 38e 691</java.util.HashMap>
+<DirNode n:id="617" relativePath="jadex/bdi/examples/hunterprey2/creature/" r:parent="612" r:properties="618"/>
+<java.lang.Boolean n:id="694" v="true"/>
+<java.util.Date n:id="695" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="699" v="true"/>
-<java.util.Date n:id="69a" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="69e" v="true"/>
-<java.util.Date n:id="69f" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6a0" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="6a1" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="69d">b 69e d 69f 24 6a0 26 6a1</java.util.HashMap>
-<FileNode n:id="69c" relativePath="jadex/bdi/examples/marsworld/producer/Production.agent.xml" r:parent="697" r:properties="69d"/>
-<java.util.ArrayList n:id="69b">69c</java.util.ArrayList>
-<java.util.Date n:id="6a2" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="6a3" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="698">b 699 d 69a f 69b 24 6a2 26 6a3</java.util.HashMap>
-<DirNode n:id="697" relativePath="jadex/bdi/examples/marsworld/producer/" r:parent="665" r:properties="698"/>
-<java.lang.Boolean n:id="6a6" v="true"/>
-<java.util.Date n:id="6a7" v="2008-12-23T14:58:54"/>
-<java.lang.Boolean n:id="6ab" v="true"/>
-<java.util.Date n:id="6ac" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6ad" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="6ae" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6aa">b 6ab d 6ac 24 6ad 26 6ae</java.util.HashMap>
-<FileNode n:id="6a9" relativePath="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" r:parent="6a4" r:properties="6aa"/>
-<java.util.ArrayList n:id="6a8">6a9</java.util.ArrayList>
-<java.util.Date n:id="6af" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="6b0" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="6a5">b 6a6 d 6a7 f 6a8 24 6af 26 6b0</java.util.HashMap>
-<DirNode n:id="6a4" relativePath="jadex/bdi/examples/marsworld/sentry/" r:parent="665" r:properties="6a5"/>
-<java.util.ArrayList n:id="669">66a 677 67d 68a 697 6a4</java.util.ArrayList>
-<java.util.Date n:id="6b1" v="2008-12-23T15:29:15"/>
-<java.util.Date n:id="6b2" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="666">b 667 d 668 f 669 24 6b1 26 6b2</java.util.HashMap>
-<DirNode n:id="665" relativePath="jadex/bdi/examples/marsworld/" r:parent="4" r:properties="666"/>
-<java.lang.Boolean n:id="6b5" v="true"/>
-<java.util.Date n:id="6b6" v="2008-12-23T14:58:54"/>
-<java.lang.Boolean n:id="6ba" v="true"/>
-<java.util.Date n:id="6bb" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6bc" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="6bd" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6b9">b 6ba d 6bb 24 6bc 26 6bd</java.util.HashMap>
-<FileNode n:id="6b8" relativePath="jadex/bdi/examples/ping/Echo.agent.xml" r:parent="6b3" r:properties="6b9"/>
+<java.util.Date n:id="69a" v="2009-06-12T16:41:36"/>
+<java.util.Date n:id="69b" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="69c" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="698">382 699 384 69a 38c 69b 38e 69c</java.util.HashMap>
+<DirNode n:id="697" relativePath="jadex/bdi/examples/hunterprey2/engine/action/" r:parent="692" r:properties="698"/>
+<java.lang.Boolean n:id="69f" v="true"/>
+<java.util.Date n:id="6a0" v="2009-06-12T16:41:36"/>
+<java.util.Date n:id="6a1" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="6a2" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="69e">382 69f 384 6a0 38c 6a1 38e 6a2</java.util.HashMap>
+<DirNode n:id="69d" relativePath="jadex/bdi/examples/hunterprey2/engine/process/" r:parent="692" r:properties="69e"/>
+<java.util.ArrayList n:id="696">697 69d</java.util.ArrayList>
+<java.util.Date n:id="6a3" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6a4" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="693">382 694 384 695 386 696 38c 6a3 38e 6a4</java.util.HashMap>
+<DirNode n:id="692" relativePath="jadex/bdi/examples/hunterprey2/engine/" r:parent="612" r:properties="693"/>
+<java.lang.Boolean n:id="6a7" v="true"/>
+<java.util.Date n:id="6a8" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="6ac" v="true"/>
+<java.util.Date n:id="6ad" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6ae" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6af" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="6ab">382 6ac 384 6ad 38c 6ae 38e 6af</java.util.HashMap>
+<FileNode n:id="6aa" relativePath="jadex/bdi/examples/hunterprey2/environment/Environment.agent.xml" r:parent="6a5" r:properties="6ab"/>
+<java.lang.Boolean n:id="6b2" v="true"/>
+<java.util.Date n:id="6b3" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6b4" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6b5" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="6b1">382 6b2 384 6b3 38c 6b4 38e 6b5</java.util.HashMap>
+<FileNode n:id="6b0" relativePath="jadex/bdi/examples/hunterprey2/environment/Observer.agent.xml" r:parent="6a5" r:properties="6b1"/>
+<java.lang.Boolean n:id="6b8" v="true"/>
+<java.util.Date n:id="6b9" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6ba" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6bb" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="6b7">382 6b8 384 6b9 38c 6ba 38e 6bb</java.util.HashMap>
+<FileNode n:id="6b6" relativePath="jadex/bdi/examples/hunterprey2/environment/RemoteObserver.agent.xml" r:parent="6a5" r:properties="6b7"/>
+<java.util.ArrayList n:id="6a9">6aa 6b0 6b6</java.util.ArrayList>
+<java.util.Date n:id="6bc" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6bd" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="6a6">382 6a7 384 6a8 386 6a9 38c 6bc 38e 6bd</java.util.HashMap>
+<DirNode n:id="6a5" relativePath="jadex/bdi/examples/hunterprey2/environment/" r:parent="612" r:properties="6a6"/>
 <java.lang.Boolean n:id="6c0" v="true"/>
-<java.util.Date n:id="6c1" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6c2" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="6c3" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6bf">b 6c0 d 6c1 24 6c2 26 6c3</java.util.HashMap>
-<FileNode n:id="6be" relativePath="jadex/bdi/examples/ping/Manager.agent.xml" r:parent="6b3" r:properties="6bf"/>
+<java.util.Date n:id="6c1" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6c2" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="6c3" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="6bf">382 6c0 384 6c1 38c 6c2 38e 6c3</java.util.HashMap>
+<DirNode n:id="6be" relativePath="jadex/bdi/examples/hunterprey2/images/" r:parent="612" r:properties="6bf"/>
 <java.lang.Boolean n:id="6c6" v="true"/>
-<java.util.Date n:id="6c7" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6c8" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="6c9" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6c5">b 6c6 d 6c7 24 6c8 26 6c9</java.util.HashMap>
-<FileNode n:id="6c4" relativePath="jadex/bdi/examples/ping/Ping.agent.xml" r:parent="6b3" r:properties="6c5"/>
-<java.lang.Boolean n:id="6cc" v="true"/>
-<java.util.Date n:id="6cd" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6ce" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="6cf" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6cb">b 6cc d 6cd 24 6ce 26 6cf</java.util.HashMap>
-<FileNode n:id="6ca" relativePath="jadex/bdi/examples/ping/Pinging.agent.xml" r:parent="6b3" r:properties="6cb"/>
-<java.lang.Boolean n:id="6d2" v="true"/>
-<java.util.Date n:id="6d3" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6d4" v="2008-12-23T15:29:07"/>
-<java.util.Date n:id="6d5" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6d1">b 6d2 d 6d3 24 6d4 26 6d5</java.util.HashMap>
-<FileNode n:id="6d0" relativePath="jadex/bdi/examples/ping/Pong.agent.xml" r:parent="6b3" r:properties="6d1"/>
-<java.util.ArrayList n:id="6b7">6b8 6be 6c4 6ca 6d0</java.util.ArrayList>
-<java.util.Date n:id="6d6" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="6d7" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="6b4">b 6b5 d 6b6 f 6b7 24 6d6 26 6d7</java.util.HashMap>
-<DirNode n:id="6b3" relativePath="jadex/bdi/examples/ping/" r:parent="4" r:properties="6b4"/>
+<java.util.Date n:id="6c7" v="2009-06-12T16:41:32"/>
+<java.lang.Boolean n:id="6cb" v="true"/>
+<java.util.Date n:id="6cc" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6cd" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6ce" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="6ca">382 6cb 384 6cc 38c 6cd 38e 6ce</java.util.HashMap>
+<FileNode n:id="6c9" relativePath="jadex/bdi/examples/hunterprey2/manager/Manager.agent.xml" r:parent="6c4" r:properties="6ca"/>
+<java.util.ArrayList n:id="6c8">6c9</java.util.ArrayList>
+<java.util.Date n:id="6cf" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6d0" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="6c5">382 6c6 384 6c7 386 6c8 38c 6cf 38e 6d0</java.util.HashMap>
+<DirNode n:id="6c4" relativePath="jadex/bdi/examples/hunterprey2/manager/" r:parent="612" r:properties="6c5"/>
+<java.util.ArrayList n:id="616">617 692 6a5 6be 6c4</java.util.ArrayList>
+<java.util.Date n:id="6d1" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6d2" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="613">382 614 384 615 386 616 38c 6d1 38e 6d2</java.util.HashMap>
+<DirNode n:id="612" relativePath="jadex/bdi/examples/hunterprey2/" r:parent="4" r:properties="613"/>
+<java.lang.Boolean n:id="6d5" v="true"/>
+<java.util.Date n:id="6d6" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="6da" v="true"/>
-<java.util.Date n:id="6db" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6dc" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="6dd" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6d9">b 6da d 6db 24 6dc 26 6dd</java.util.HashMap>
-<FileNode n:id="6d8" relativePath="jadex/bdi/examples/BeliefListener.agent.xml" r:parent="4" r:properties="6d9"/>
-<java.util.ArrayList n:id="37f">380 393 3d4 3e1 415 45b 4ae 4d3 4e6 59c 665 6b3 3 6d8</java.util.ArrayList>
-<java.util.Date n:id="6de" v="2008-12-23T15:29:16"/>
-<java.util.Date n:id="6df" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="37c">b 37d d 37e f 37f 24 6de 26 6df</java.util.HashMap>
-<DirNode n:id="4" relativePath="jadex/bdi/examples/" r:parent="5" r:properties="37c"/>
-<java.lang.Boolean n:id="6e1" v="true"/>
-<java.util.Date n:id="6e2" v="2008-12-23T14:58:56"/>
-<java.lang.Boolean n:id="6e6" v="true"/>
-<java.util.Date n:id="6e7" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6e8" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="6e9" v="2008-12-23T15:29:07"/>
-<java.util.HashMap n:id="6e5">b 6e6 d 6e7 24 6e8 26 6e9</java.util.HashMap>
-<DirNode n:id="6e4" relativePath="jadex/bdi/examples/puzzle/images/" r:parent="3" r:properties="6e5"/>
+<java.util.Date n:id="6db" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="6df" v="true"/>
+<java.util.Date n:id="6e0" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6e1" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6e2" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="6de">382 6df 384 6e0 38c 6e1 38e 6e2</java.util.HashMap>
+<FileNode n:id="6dd" relativePath="jadex/bdi/examples/hunterprey_env/cleverprey/CleverPrey.agent.xml" r:parent="6d8" r:properties="6de"/>
+<java.util.ArrayList n:id="6dc">6dd</java.util.ArrayList>
+<java.util.Date n:id="6e3" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6e4" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="6d9">382 6da 384 6db 386 6dc 38c 6e3 38e 6e4</java.util.HashMap>
+<DirNode n:id="6d8" relativePath="jadex/bdi/examples/hunterprey_env/cleverprey/" r:parent="6d3" r:properties="6d9"/>
+<java.lang.Boolean n:id="6e7" v="true"/>
+<java.util.Date n:id="6e8" v="2009-06-12T16:41:36"/>
 <java.lang.Boolean n:id="6ec" v="true"/>
-<java.util.Date n:id="6ed" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6ee" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="6ef" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6eb">b 6ec d 6ed 24 6ee 26 6ef</java.util.HashMap>
-<FileNode n:id="6ea" relativePath="jadex/bdi/examples/puzzle/Benchmark.agent.xml" r:parent="3" r:properties="6eb"/>
-<java.util.ArrayList n:id="6e3">6e4 6ea 2</java.util.ArrayList>
-<java.util.Date n:id="6f0" v="2008-12-23T15:29:08"/>
-<java.util.Date n:id="6f1" v="2008-12-23T15:29:06"/>
-<java.util.HashMap n:id="6e0">b 6e1 d 6e2 f 6e3 24 6f0 26 6f1</java.util.HashMap>
-<DirNode n:id="3" relativePath="jadex/bdi/examples/puzzle/" r:parent="4" r:properties="6e0"/>
-<java.lang.Boolean n:id="6f3" v="true"/>
-<java.util.Date n:id="6f4" v="2008-12-23T14:58:52"/>
-<java.util.Date n:id="6f5" v="2008-12-23T15:29:06"/>
-<java.util.Date n:id="6f6" v="2008-12-23T15:29:08"/>
-<java.util.HashMap n:id="6f2">b 6f3 d 6f4 24 6f5 26 6f6</java.util.HashMap>
-<FileNode n:id="2" relativePath="jadex/bdi/examples/puzzle/Sokrates.agent.xml" r:parent="3" r:properties="6f2"/>
-<java.util.ArrayList n:id="6f7">4 5 3 6 7</java.util.ArrayList>
-<ModelExplorer_24_ModelExplorerProperties n:id="1" r:selectedNode="2" r:rootNode="8" r:expandedNodes="6f7"/>
+<java.util.Date n:id="6ed" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6ee" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6ef" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="6eb">382 6ec 384 6ed 38c 6ee 38e 6ef</java.util.HashMap>
+<FileNode n:id="6ea" relativePath="jadex/bdi/examples/hunterprey_env/dumbhunter/DumbHunter.agent.xml" r:parent="6e5" r:properties="6eb"/>
+<java.util.ArrayList n:id="6e9">6ea</java.util.ArrayList>
+<java.util.Date n:id="6f0" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6f1" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="6e6">382 6e7 384 6e8 386 6e9 38c 6f0 38e 6f1</java.util.HashMap>
+<DirNode n:id="6e5" relativePath="jadex/bdi/examples/hunterprey_env/dumbhunter/" r:parent="6d3" r:properties="6e6"/>
+<java.lang.Boolean n:id="6f4" v="true"/>
+<java.util.Date n:id="6f5" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="6f9" v="true"/>
+<java.util.Date n:id="6fa" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="6fb" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6fc" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="6f8">382 6f9 384 6fa 38c 6fb 38e 6fc</java.util.HashMap>
+<FileNode n:id="6f7" relativePath="jadex/bdi/examples/hunterprey_env/dumbprey/DumbPrey.agent.xml" r:parent="6f2" r:properties="6f8"/>
+<java.util.ArrayList n:id="6f6">6f7</java.util.ArrayList>
+<java.util.Date n:id="6fd" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="6fe" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="6f3">382 6f4 384 6f5 386 6f6 38c 6fd 38e 6fe</java.util.HashMap>
+<DirNode n:id="6f2" relativePath="jadex/bdi/examples/hunterprey_env/dumbprey/" r:parent="6d3" r:properties="6f3"/>
+<java.lang.Boolean n:id="701" v="true"/>
+<java.util.Date n:id="702" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="703" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="704" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="700">382 701 384 702 38c 703 38e 704</java.util.HashMap>
+<DirNode n:id="6ff" relativePath="jadex/bdi/examples/hunterprey_env/images/" r:parent="6d3" r:properties="700"/>
+<java.lang.Boolean n:id="707" v="true"/>
+<java.util.Date n:id="708" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="70c" v="true"/>
+<java.util.Date n:id="70d" v="2009-06-12T16:41:36"/>
+<java.util.Date n:id="70e" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="70f" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="70b">382 70c 384 70d 38c 70e 38e 70f</java.util.HashMap>
+<DirNode n:id="70a" relativePath="jadex/bdi/examples/hunterprey_env/ldahunter/potentialfield/" r:parent="705" r:properties="70b"/>
+<java.lang.Boolean n:id="712" v="true"/>
+<java.util.Date n:id="713" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="714" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="715" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="711">382 712 384 713 38c 714 38e 715</java.util.HashMap>
+<FileNode n:id="710" relativePath="jadex/bdi/examples/hunterprey_env/ldahunter/LAHunter.agent.xml" r:parent="705" r:properties="711"/>
+<java.util.ArrayList n:id="709">70a 710</java.util.ArrayList>
+<java.util.Date n:id="716" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="717" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="706">382 707 384 708 386 709 38c 716 38e 717</java.util.HashMap>
+<DirNode n:id="705" relativePath="jadex/bdi/examples/hunterprey_env/ldahunter/" r:parent="6d3" r:properties="706"/>
+<java.lang.Boolean n:id="71a" v="true"/>
+<java.util.Date n:id="71b" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="71c" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="71d" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="719">382 71a 384 71b 38c 71c 38e 71d</java.util.HashMap>
+<FileNode n:id="718" relativePath="jadex/bdi/examples/hunterprey_env/HunterPrey.application.xml" r:parent="6d3" r:properties="719"/>
+<java.util.ArrayList n:id="6d7">6d8 6e5 6f2 6ff 705 718</java.util.ArrayList>
+<java.util.Date n:id="71e" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="71f" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="6d4">382 6d5 384 6d6 386 6d7 38c 71e 38e 71f</java.util.HashMap>
+<DirNode n:id="6d3" relativePath="jadex/bdi/examples/hunterprey_env/" r:parent="4" r:properties="6d4"/>
+<java.lang.Boolean n:id="722" v="true"/>
+<java.util.Date n:id="723" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="727" v="true"/>
+<java.util.Date n:id="728" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="72c" v="true"/>
+<java.util.Date n:id="72d" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="72e" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="72f" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="72b">382 72c 384 72d 38c 72e 38e 72f</java.util.HashMap>
+<FileNode n:id="72a" relativePath="jadex/bdi/examples/marsworld/carrier/Carry.agent.xml" r:parent="725" r:properties="72b"/>
+<java.lang.Boolean n:id="732" v="true"/>
+<java.util.Date n:id="733" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="734" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="735" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="731">382 732 384 733 38c 734 38e 735</java.util.HashMap>
+<FileNode n:id="730" relativePath="jadex/bdi/examples/marsworld/carrier/CarryAGR.agent.xml" r:parent="725" r:properties="731"/>
+<java.util.ArrayList n:id="729">72a 730</java.util.ArrayList>
+<java.util.Date n:id="736" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="737" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="726">382 727 384 728 386 729 38c 736 38e 737</java.util.HashMap>
+<DirNode n:id="725" relativePath="jadex/bdi/examples/marsworld/carrier/" r:parent="720" r:properties="726"/>
+<java.lang.Boolean n:id="73a" v="true"/>
+<java.util.Date n:id="73b" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="73f" v="true"/>
+<java.util.Date n:id="740" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="741" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="742" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="73e">382 73f 384 740 38c 741 38e 742</java.util.HashMap>
+<FileNode n:id="73d" relativePath="jadex/bdi/examples/marsworld/environment/Environment.agent.xml" r:parent="738" r:properties="73e"/>
+<java.util.ArrayList n:id="73c">73d</java.util.ArrayList>
+<java.util.Date n:id="743" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="744" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="739">382 73a 384 73b 386 73c 38c 743 38e 744</java.util.HashMap>
+<DirNode n:id="738" relativePath="jadex/bdi/examples/marsworld/environment/" r:parent="720" r:properties="739"/>
+<java.lang.Boolean n:id="747" v="true"/>
+<java.util.Date n:id="748" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="749" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="74a" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="746">382 747 384 748 38c 749 38e 74a</java.util.HashMap>
+<DirNode n:id="745" relativePath="jadex/bdi/examples/marsworld/images/" r:parent="720" r:properties="746"/>
+<java.lang.Boolean n:id="74d" v="true"/>
+<java.util.Date n:id="74e" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="752" v="true"/>
+<java.util.Date n:id="753" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="754" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="755" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="751">382 752 384 753 38c 754 38e 755</java.util.HashMap>
+<FileNode n:id="750" relativePath="jadex/bdi/examples/marsworld/movement/Movement.capability.xml" r:parent="74b" r:properties="751"/>
+<java.util.ArrayList n:id="74f">750</java.util.ArrayList>
+<java.util.Date n:id="756" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="757" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="74c">382 74d 384 74e 386 74f 38c 756 38e 757</java.util.HashMap>
+<DirNode n:id="74b" relativePath="jadex/bdi/examples/marsworld/movement/" r:parent="720" r:properties="74c"/>
+<java.lang.Boolean n:id="75a" v="true"/>
+<java.util.Date n:id="75b" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="75f" v="true"/>
+<java.util.Date n:id="760" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="761" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="762" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="75e">382 75f 384 760 38c 761 38e 762</java.util.HashMap>
+<FileNode n:id="75d" relativePath="jadex/bdi/examples/marsworld/producer/Production.agent.xml" r:parent="758" r:properties="75e"/>
+<java.lang.Boolean n:id="765" v="true"/>
+<java.util.Date n:id="766" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="767" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="768" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="764">382 765 384 766 38c 767 38e 768</java.util.HashMap>
+<FileNode n:id="763" relativePath="jadex/bdi/examples/marsworld/producer/ProductionAGR.agent.xml" r:parent="758" r:properties="764"/>
+<java.util.ArrayList n:id="75c">75d 763</java.util.ArrayList>
+<java.util.Date n:id="769" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="76a" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="759">382 75a 384 75b 386 75c 38c 769 38e 76a</java.util.HashMap>
+<DirNode n:id="758" relativePath="jadex/bdi/examples/marsworld/producer/" r:parent="720" r:properties="759"/>
+<java.lang.Boolean n:id="76d" v="true"/>
+<java.util.Date n:id="76e" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="772" v="true"/>
+<java.util.Date n:id="773" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="774" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="775" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="771">382 772 384 773 38c 774 38e 775</java.util.HashMap>
+<FileNode n:id="770" relativePath="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" r:parent="76b" r:properties="771"/>
+<java.lang.Boolean n:id="778" v="true"/>
+<java.util.Date n:id="779" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="77a" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="77b" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="777">382 778 384 779 38c 77a 38e 77b</java.util.HashMap>
+<FileNode n:id="776" relativePath="jadex/bdi/examples/marsworld/sentry/SentryAGR.agent.xml" r:parent="76b" r:properties="777"/>
+<java.util.ArrayList n:id="76f">770 776</java.util.ArrayList>
+<java.util.Date n:id="77c" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="77d" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="76c">382 76d 384 76e 386 76f 38c 77c 38e 77d</java.util.HashMap>
+<DirNode n:id="76b" relativePath="jadex/bdi/examples/marsworld/sentry/" r:parent="720" r:properties="76c"/>
+<java.lang.Boolean n:id="780" v="true"/>
+<java.util.Date n:id="781" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="782" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="783" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="77f">382 780 384 781 38c 782 38e 783</java.util.HashMap>
+<FileNode n:id="77e" relativePath="jadex/bdi/examples/marsworld/MarsWorld.application.xml" r:parent="720" r:properties="77f"/>
+<java.lang.Boolean n:id="786" v="true"/>
+<java.util.Date n:id="787" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="788" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="789" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="785">382 786 384 787 38c 788 38e 789</java.util.HashMap>
+<FileNode n:id="784" relativePath="jadex/bdi/examples/marsworld/MarsWorldAGR.application.xml" r:parent="720" r:properties="785"/>
+<java.util.ArrayList n:id="724">725 738 745 74b 758 76b 77e 784</java.util.ArrayList>
+<java.util.Date n:id="78a" v="2009-06-12T17:14:32"/>
+<java.util.Date n:id="78b" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="721">382 722 384 723 386 724 38c 78a 38e 78b</java.util.HashMap>
+<DirNode n:id="720" relativePath="jadex/bdi/examples/marsworld/" r:parent="4" r:properties="721"/>
+<java.lang.Boolean n:id="78e" v="true"/>
+<java.util.Date n:id="78f" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="793" v="true"/>
+<java.util.Date n:id="794" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="795" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="796" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="792">382 793 384 794 38c 795 38e 796</java.util.HashMap>
+<FileNode n:id="791" relativePath="jadex/bdi/examples/ping/Echo.agent.xml" r:parent="78c" r:properties="792"/>
+<java.lang.Boolean n:id="799" v="true"/>
+<java.util.Date n:id="79a" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="79b" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="79c" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="798">382 799 384 79a 38c 79b 38e 79c</java.util.HashMap>
+<FileNode n:id="797" relativePath="jadex/bdi/examples/ping/Manager.agent.xml" r:parent="78c" r:properties="798"/>
+<java.lang.Boolean n:id="79f" v="true"/>
+<java.util.Date n:id="7a0" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7a1" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7a2" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="79e">382 79f 384 7a0 38c 7a1 38e 7a2</java.util.HashMap>
+<FileNode n:id="79d" relativePath="jadex/bdi/examples/ping/Ping.agent.xml" r:parent="78c" r:properties="79e"/>
+<java.lang.Boolean n:id="7a5" v="true"/>
+<java.util.Date n:id="7a6" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7a7" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7a8" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="7a4">382 7a5 384 7a6 38c 7a7 38e 7a8</java.util.HashMap>
+<FileNode n:id="7a3" relativePath="jadex/bdi/examples/ping/Pinging.agent.xml" r:parent="78c" r:properties="7a4"/>
+<java.lang.Boolean n:id="7ab" v="true"/>
+<java.util.Date n:id="7ac" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7ad" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7ae" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="7aa">382 7ab 384 7ac 38c 7ad 38e 7ae</java.util.HashMap>
+<FileNode n:id="7a9" relativePath="jadex/bdi/examples/ping/Pong.agent.xml" r:parent="78c" r:properties="7aa"/>
+<java.util.ArrayList n:id="790">791 797 79d 7a3 7a9</java.util.ArrayList>
+<java.util.Date n:id="7af" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="7b0" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="78d">382 78e 384 78f 386 790 38c 7af 38e 7b0</java.util.HashMap>
+<DirNode n:id="78c" relativePath="jadex/bdi/examples/ping/" r:parent="4" r:properties="78d"/>
+<java.lang.Boolean n:id="7b3" v="true"/>
+<java.util.Date n:id="7b4" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="7b8" v="true"/>
+<java.util.Date n:id="7b9" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7ba" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7bb" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7b7">382 7b8 384 7b9 38c 7ba 38e 7bb</java.util.HashMap>
+<DirNode n:id="7b6" relativePath="jadex/bdi/examples/puzzle/images/" r:parent="7b1" r:properties="7b7"/>
+<java.lang.Boolean n:id="7be" v="true"/>
+<java.util.Date n:id="7bf" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7c0" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7c1" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="7bd">382 7be 384 7bf 38c 7c0 38e 7c1</java.util.HashMap>
+<FileNode n:id="7bc" relativePath="jadex/bdi/examples/puzzle/Benchmark.agent.xml" r:parent="7b1" r:properties="7bd"/>
+<java.lang.Boolean n:id="7c4" v="true"/>
+<java.util.Date n:id="7c5" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7c6" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7c7" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="7c3">382 7c4 384 7c5 38c 7c6 38e 7c7</java.util.HashMap>
+<FileNode n:id="7c2" relativePath="jadex/bdi/examples/puzzle/Sokrates.agent.xml" r:parent="7b1" r:properties="7c3"/>
+<java.util.ArrayList n:id="7b5">7b6 7bc 7c2</java.util.ArrayList>
+<java.util.Date n:id="7c8" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="7c9" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7b2">382 7b3 384 7b4 386 7b5 38c 7c8 38e 7c9</java.util.HashMap>
+<DirNode n:id="7b1" relativePath="jadex/bdi/examples/puzzle/" r:parent="4" r:properties="7b2"/>
+<java.lang.Boolean n:id="7cc" v="true"/>
+<java.util.Date n:id="7cd" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7ce" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7cf" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7cb">382 7cc 384 7cd 38c 7ce 38e 7cf</java.util.HashMap>
+<FileNode n:id="7ca" relativePath="jadex/bdi/examples/BeliefListener.agent.xml" r:parent="4" r:properties="7cb"/>
+<java.util.ArrayList n:id="37f">380 398 3bd 404 411 43e 477 4ca 4f7 511 53c 55b 56e 612 6d3 720 3 78c 7b1 7ca</java.util.ArrayList>
+<java.util.Date n:id="7d0" v="2009-06-12T17:16:49"/>
+<java.util.Date n:id="7d1" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="37c">b 37d d 37e f 37f 24 7d0 26 7d1</java.util.HashMap>
+<DirNode n:id="4" relativePath="jadex/bdi/examples/" r:parent="5" r:properties="37c"/>
+<java.lang.Boolean n:id="7d3" v="true"/>
+<java.util.Date n:id="7d4" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="7d8" v="true"/>
+<java.util.Date n:id="7d9" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="7dd" v="true"/>
+<java.util.Date n:id="7de" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7df" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="7e0" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="7dc">382 7dd 384 7de 38c 7df 38e 7e0</java.util.HashMap>
+<FileNode n:id="7db" relativePath="jadex/bdi/examples/marsworld_env/carry/Carry.agent.xml" r:parent="7d6" r:properties="7dc"/>
+<java.util.ArrayList n:id="7da">7db</java.util.ArrayList>
+<java.util.Date n:id="7e1" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="7e2" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7d7">382 7d8 384 7d9 386 7da 38c 7e1 38e 7e2</java.util.HashMap>
+<DirNode n:id="7d6" relativePath="jadex/bdi/examples/marsworld_env/carry/" r:parent="3" r:properties="7d7"/>
+<java.lang.Boolean n:id="7e5" v="true"/>
+<java.util.Date n:id="7e6" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7e7" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="7e8" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7e4">382 7e5 384 7e6 38c 7e7 38e 7e8</java.util.HashMap>
+<DirNode n:id="7e3" relativePath="jadex/bdi/examples/marsworld_env/images/" r:parent="3" r:properties="7e4"/>
+<java.lang.Boolean n:id="7eb" v="true"/>
+<java.util.Date n:id="7ec" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="7f0" v="true"/>
+<java.util.Date n:id="7f1" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7f2" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="7f3" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="7ef">382 7f0 384 7f1 38c 7f2 38e 7f3</java.util.HashMap>
+<FileNode n:id="7ee" relativePath="jadex/bdi/examples/marsworld_env/movement/Movement.capability.xml" r:parent="7e9" r:properties="7ef"/>
+<java.util.ArrayList n:id="7ed">7ee</java.util.ArrayList>
+<java.util.Date n:id="7f4" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="7f5" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7ea">382 7eb 384 7ec 386 7ed 38c 7f4 38e 7f5</java.util.HashMap>
+<DirNode n:id="7e9" relativePath="jadex/bdi/examples/marsworld_env/movement/" r:parent="3" r:properties="7ea"/>
+<java.lang.Boolean n:id="7f8" v="true"/>
+<java.util.Date n:id="7f9" v="2009-06-12T16:41:36"/>
+<java.lang.Boolean n:id="7fd" v="true"/>
+<java.util.Date n:id="7fe" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="7ff" v="2009-06-12T17:14:30"/>
+<java.util.Date n:id="800" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="7fc">382 7fd 384 7fe 38c 7ff 38e 800</java.util.HashMap>
+<FileNode n:id="7fb" relativePath="jadex/bdi/examples/marsworld_env/producer/Producer.agent.xml" r:parent="7f6" r:properties="7fc"/>
+<java.util.ArrayList n:id="7fa">7fb</java.util.ArrayList>
+<java.util.Date n:id="801" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="802" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7f7">382 7f8 384 7f9 386 7fa 38c 801 38e 802</java.util.HashMap>
+<DirNode n:id="7f6" relativePath="jadex/bdi/examples/marsworld_env/producer/" r:parent="3" r:properties="7f7"/>
+<java.lang.Boolean n:id="805" v="true"/>
+<java.util.Date n:id="806" v="2009-06-12T16:41:38"/>
+<java.lang.Boolean n:id="80a" v="true"/>
+<java.util.Date n:id="80b" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="80c" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="80d" v="2009-06-12T17:14:31"/>
+<java.util.HashMap n:id="809">382 80a 384 80b 38c 80c 38e 80d</java.util.HashMap>
+<FileNode n:id="808" relativePath="jadex/bdi/examples/marsworld_env/sentry/Sentry.agent.xml" r:parent="803" r:properties="809"/>
+<java.util.ArrayList n:id="807">808</java.util.ArrayList>
+<java.util.Date n:id="80e" v="2009-06-12T17:14:31"/>
+<java.util.Date n:id="80f" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="804">382 805 384 806 386 807 38c 80e 38e 80f</java.util.HashMap>
+<DirNode n:id="803" relativePath="jadex/bdi/examples/marsworld_env/sentry/" r:parent="3" r:properties="804"/>
+<java.util.ArrayList n:id="7d5">7d6 7e3 7e9 7f6 803 2</java.util.ArrayList>
+<java.util.Date n:id="810" v="2009-06-12T17:14:32"/>
+<java.util.Date n:id="811" v="2009-06-12T17:14:29"/>
+<java.util.HashMap n:id="7d2">382 7d3 384 7d4 386 7d5 38c 810 38e 811</java.util.HashMap>
+<DirNode n:id="3" relativePath="jadex/bdi/examples/marsworld_env/" r:parent="4" r:properties="7d2"/>
+<java.lang.Boolean n:id="813" v="true"/>
+<java.util.Date n:id="814" v="2009-06-12T16:41:32"/>
+<java.util.Date n:id="815" v="2009-06-12T17:14:29"/>
+<java.util.Date n:id="816" v="2009-06-12T17:14:30"/>
+<java.util.HashMap n:id="812">382 813 384 814 38c 815 38e 816</java.util.HashMap>
+<FileNode n:id="2" relativePath="jadex/bdi/examples/marsworld_env/MarsWorld.application.xml" r:parent="3" r:properties="812"/>
+<java.util.ArrayList n:id="817">7 4 6 5 3</java.util.ArrayList>
+<ModelExplorer_24_ModelExplorerProperties n:id="1" r:selectedNode="2" r:rootNode="8" r:expandedNodes="817"/>
 </n:root>
 ]]></property>
 			<property type="lastpath">C:\Files\Checkouts\jadex_releases\jadex-2.0-beta3\lib\jadex-applications-bdi-2.0-beta3.jar</property>
 			<property type="refresh">false</property>
 		</properties>
 		<properties type="spanel">
-			<property type="model">jar:file:/C:\Files\Checkouts\jadex_releases\jadex-2.0-beta3\lib\jadex-applications-bdi-2.0-beta3.jar!/jadex/bdi/examples/puzzle/Sokrates.agent.xml</property>
-			<property type="config">5x5 board (standard)</property>
+			<property type="model">jar:file:/C:\Files\Checkouts\jadexv2\target\jadex-2.0-beta3-dist.dir\jadex-2.0-beta3\lib\jadex-applications-bdi-2.0-beta3.jar!/jadex/bdi/examples/marsworld_env/MarsWorld.application.xml</property>
+			<property type="config">1 Sentry / 2 Producers / 3 Carries</property>
 			<property type="autogenerate">false</property>
 			<property type="name">Sokrates</property>
-			<property type="argument"></property>
 		</properties>
 		<properties type="agents">
 			<property type="0">75</property>

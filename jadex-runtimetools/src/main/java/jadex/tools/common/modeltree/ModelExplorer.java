@@ -1,6 +1,7 @@
 package jadex.tools.common.modeltree;
 
 import jadex.adapter.base.ThreadPoolService;
+import jadex.bridge.IApplicationFactory;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.Properties;
@@ -633,13 +634,22 @@ public class ModelExplorer extends JTree
 		String[] ft2 = jcc.getAgent().getPlatform().getApplicationFactory().getFileTypes();
 		String[] filetypes = (String[])SUtil.joinArrays(ft1, ft2);
 		
-		if(filetypes!=null && filetypes.length>1)
+		if(filetypes.length>1)
 		{
+			Icon[]	icons	= new Icon[filetypes.length];
+			for(int i=0; i<ft1.length; i++)
+			{
+				icons[i]	= jcc.getAgent().getPlatform().getAgentFactory().getFileTypeIcon(ft1[i]);
+			}
+			for(int i=0; i<ft2.length; i++)
+			{
+				icons[ft1.length+i]	= jcc.getAgent().getPlatform().getApplicationFactory().getFileTypeIcon(ft2[i]);
+			}
+
 			filtermenu = new JMenu("File filter");
 			for(int i=0; i<filetypes.length; i++)
 			{
-				Icon	icon	= jcc.getAgent().getPlatform().getAgentFactory().getFileTypeIcon(filetypes[i]);
-				JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], icon, true);
+				JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], icons[i], true);
 				filtermenu.add(ff);
 				ff.addActionListener(new ActionListener()
 				{

@@ -127,23 +127,31 @@ public class Executor implements Runnable
 	/**
 	 *  Make sure a thread is executing the code.
 	 */
-	public synchronized void execute()
+	public void execute()
 	{
-//		System.out.println("executing: "+this+" "+running);
-//		Thread.dumpStack();
-		if(!shutdown)
-		{		
-			// Indicate that thread should continue to run (if running).
-			wanttorun	= true;
-			
-			if(!running)
-			{
-				running	= true;
-				// Invoke the code of the executor object using the thread pool,
-				// which allows thread to be shared, when code is idle.
-				threadpool.execute(this);
+		boolean	execute	= false;
+		
+		synchronized(this)
+		{
+//			System.out.println("executing: "+this+" "+running);
+//			Thread.dumpStack();
+			if(!shutdown)
+			{		
+				// Indicate that thread should continue to run (if running).
+				wanttorun	= true;
+				
+				if(!running)
+				{
+					running	= true;
+					// Invoke the code of the executor object using the thread pool,
+					// which allows thread to be shared, when code is idle.
+					execute	= true;
+				}
 			}
 		}
+
+		if(execute)
+			threadpool.execute(this);
 	}
 
 	/**

@@ -240,6 +240,64 @@ public class Grid2D extends Space2D
 	}
 	
 	/**
+	 *  Retrieve all objects in the distance for a position.
+	 *  Uses position->object mapping, for fast operation.
+	 *  @param position	The position.
+	 *  @param distance	The distance.
+	 */
+	// Todo: implement type
+	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance, String type)
+	{
+		synchronized(monitor)
+		{
+			Collection ret = new ArrayList();
+			
+			int sizex = areasize.getXAsInteger();
+			int sizey = areasize.getYAsInteger();
+	
+			int x = position.getXAsInteger();
+			int y = position.getYAsInteger();
+			
+			int range = distance.getAsInteger();
+	
+			if(getBorderMode().equals(BORDER_TORUS))
+			{
+				for(int i = x - range; i <= x + range; i++)
+				{
+					for(int j = y - range; j <= y + range; j++)
+					{
+						Collection tmp = objectsygridpos.getCollection(
+							new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
+						if(tmp != null)
+							ret.addAll(tmp);
+					}
+				}
+			}
+			else if(getBorderMode().equals(BORDER_STRICT))
+			{
+				int minx = (x - range >= 0 ? x - range : 0);
+				int maxx = (x + range <= sizex ? x + range : sizex);
+
+				int miny = (y - range >= 0 ? y - range : 0);
+				int maxy = (y + range <= sizey ? y + range : sizey);
+
+				for (int i = minx; i <= maxx; i++)
+				{
+					for (int j = miny; j <= maxy; j++)
+					{
+						Collection tmp = objectsygridpos.getCollection(
+								new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
+						if (tmp != null)
+							ret.addAll(tmp);
+					}
+				}
+			}
+			
+			return(ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+		}
+	}
+	
+	/**
 	 *  Calculate the distance in the space.
 	 *  @param dx The distance in x.
 	 *  @param dy The distance in y.
