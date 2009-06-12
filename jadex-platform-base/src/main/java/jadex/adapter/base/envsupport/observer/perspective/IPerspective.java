@@ -1,6 +1,7 @@
 package jadex.adapter.base.envsupport.observer.perspective;
 
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
+import jadex.commons.IPropertyObject;
 
 import java.awt.Component;
 import java.awt.event.ItemListener;
@@ -8,7 +9,7 @@ import java.awt.event.ItemListener;
 /**
  * A perspective responsible for displaying information gathered using a view.
  */
-public interface IPerspective
+public interface IPerspective extends IPropertyObject
 {
 	/**
 	 *  Returns the name of the perspective

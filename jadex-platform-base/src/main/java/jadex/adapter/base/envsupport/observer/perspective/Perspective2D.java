@@ -1,6 +1,7 @@
 package jadex.adapter.base.envsupport.observer.perspective;
 
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.envsupport.environment.SynchronizedPropertyObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
@@ -38,7 +39,7 @@ import javax.swing.JFrame;
 /**
  *  Perspective for viewing in 2D.
  */
-public class Perspective2D implements IPerspective
+public class Perspective2D extends SynchronizedPropertyObject implements IPerspective
 {
 	/** Name of the presentation */
 	protected String name;
@@ -99,6 +100,7 @@ public class Perspective2D implements IPerspective
 	 */
 	public Perspective2D()
 	{
+		super(new Object());
 		zoomlimit = 20.0;
 		setBackground(null);
 		this.visuals = Collections.synchronizedMap(new HashMap());
@@ -252,7 +254,7 @@ public class Perspective2D implements IPerspective
 				marker.addDrawable(markerDrawable, Integer.MAX_VALUE);
 			}
 //			System.out.println("Persp: "+name+" opengl="+tryopengl);
-			viewport = createViewport(obscenter.getSpace(), obscenter.getLibraryService(), bgColor, tryopengl);
+			viewport = createViewport(this, obscenter.getLibraryService(), bgColor, tryopengl);
 			viewport.setAreaSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);
 			viewport.setZoomLimit(zoomlimit);
