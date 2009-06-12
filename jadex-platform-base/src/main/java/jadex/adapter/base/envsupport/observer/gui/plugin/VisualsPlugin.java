@@ -220,7 +220,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.fill = GridBagConstraints.NONE;
 		zoomPanel.add(zoomSpinner, c);
 		
-		/*JPanel invertPanel = new JPanel(new GridBagLayout());
+		JPanel invertPanel = new JPanel(new GridBagLayout());
 		c.gridx = 0;
 		c.gridy = 2;
 		c.weighty = 0.0;
@@ -273,7 +273,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.ipadx = 0;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.NONE;
-		invertPanel.add(invertYBox, c);*/
+		invertPanel.add(invertYBox, c);
 		
 		JPanel dummy = new JPanel();
 		c = new GridBagConstraints();

@@ -5,6 +5,8 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.ModulateComposite;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
+import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.commons.IPropertyObject;
 
 import java.awt.Color;
 import java.awt.Composite;
@@ -40,11 +42,14 @@ public class TiledLayer implements ILayer
 	/** Inverted size of the tiles. */
 	private IVector2			invTileSize_;
 	
-	/** Modulation color */
-	private Color				modColor_;
+	/** Modulation color or color binding */
+	private Object				modColor_;
 	
 	/** Composite for modulating in Java2D */
 	private Composite modComposite_;
+	
+	/** The current property object */
+	private Object propObject;
 
 	/**
 	 * Creates a new TiledLayer.
@@ -61,7 +66,7 @@ public class TiledLayer implements ILayer
 	 * @param color the modulation color
 	 * @param texturePath resource path of the texture
 	 */
-	public TiledLayer(IVector2 tileSize, Color color, String texturePath)
+	public TiledLayer(IVector2 tileSize, Object color, String texturePath)
 	{
 		this.tileSize_ = tileSize.copy();
 		this.modColor_ = color==null? Color.WHITE: color;
@@ -85,7 +90,7 @@ public class TiledLayer implements ILayer
 			{
 				protected Color getColor()
 				{
-					return modColor_;
+					return (Color) SObjectInspector.getPropertyAsClass(propObject, modColor_, Color.class);
 				}
 			};
 	}
@@ -101,8 +106,17 @@ public class TiledLayer implements ILayer
 		texture_ = vp.getRepeatingTexture(gl, texturePath_);
 	}
 
-	public void draw(IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
+	/**
+	 * Draws the layer to a Java2D viewport
+	 * 
+	 * @param layerObject object with properties for the layer
+	 * @param areaSize size of the area this layer covers
+	 * @param vp the viewport
+	 * @param g Graphics2D context
+	 */
+	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
+		propObject = layerObject;
 		Composite c = g.getComposite();
 		if (!Color.WHITE.equals(modColor_))
 			g.setComposite(modComposite_);
@@ -124,12 +138,20 @@ public class TiledLayer implements ILayer
 		g.setComposite(c);
 	}
 
-	public synchronized void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
+	/**
+	 * Draws the layer to an OpenGL viewport
+	 * 
+	 * @param layerObject object with properties for the layer
+	 * @param areaSize size of the area this layer covers
+	 * @param vp the viewport
+	 * @param gl OpenGL context
+	 */
+	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 
-		gl.glColor4fv(modColor_.getComponents(null), 0);
+		gl.glColor4fv(((Color) SObjectInspector.getPropertyAsClass(layerObject, modColor_, Color.class)).getComponents(null), 0);
 		
 		gl.glMatrixMode(GL.GL_TEXTURE);
 		gl.glPushMatrix();

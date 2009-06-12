@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport.MouseCon
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
+import jadex.commons.IPropertyObject;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -56,11 +57,12 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	/**
 	 * Creates a new Viewport.
 	 * 
+	 * @param layerObject object holding properties for pre/postlayers
 	 * @param libService the library service
 	 */
-	public ViewportJ2D(ILibraryService libService)
+	public ViewportJ2D(IPropertyObject layerObject, ILibraryService libService)
 	{
-		super();
+		super(layerObject);
 
 		libService_ = libService;
 		imageCache_ = Collections.synchronizedMap(new HashMap());
@@ -250,7 +252,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						{
 							l.init(ViewportJ2D.this, g);
 						}
-						l.draw(areaSize_, ViewportJ2D.this, g);
+						l.draw(layerObject_, areaSize_, ViewportJ2D.this, g);
 					}
 				}
 
@@ -299,7 +301,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						{
 							l.init(ViewportJ2D.this, g);
 						}
-						l.draw(areaSize_, ViewportJ2D.this, g);
+						l.draw(layerObject_, areaSize_, ViewportJ2D.this, g);
 					}
 				}
 				

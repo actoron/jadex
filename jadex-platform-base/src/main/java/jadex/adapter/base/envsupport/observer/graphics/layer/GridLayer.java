@@ -5,6 +5,8 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
+import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.commons.IPropertyObject;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -22,20 +24,16 @@ import javax.media.opengl.GL;
  */
 public class GridLayer implements ILayer
 {
-	private IVector2	gridSize_;
-
-	/** Color of the grid. */
-	protected Color		c_;
-
-	/** OpenGL color cache. */
-	protected float[]	oglColor_;
+	private IVector2	gridSize;
+	
+	private Color 		color;
 	
 	/**
 	 * Creates a new gridlayer with a grid size of 1.0.
 	 * 
-	 * @param c color of the grid
+	 * @param c color or color binding of the grid
 	 */
-	public GridLayer(Color c)
+	public GridLayer(Object c)
 	{
 		this(new Vector2Double(1.0), c);
 	}
@@ -44,17 +42,11 @@ public class GridLayer implements ILayer
 	 * Creates a new gridlayer.
 	 * 
 	 * @param gridSize size of each grid rectangle
-	 * @param c color of the grid
+	 * @param c color or color binding of the grid
 	 */
-	public GridLayer(IVector2 gridSize, Color c)
+	public GridLayer(IVector2 gridSize, Object c)
 	{
-		gridSize_ = gridSize.copy();
-		c_ = c;
-		oglColor_ = new float[4];
-		oglColor_[0] = c_.getRed() / 255.0f;
-		oglColor_[1] = c_.getGreen() / 255.0f;
-		oglColor_[2] = c_.getBlue() / 255.0f;
-		oglColor_[3] = c_.getAlpha() / 255.0f;
+		this.gridSize = gridSize.copy();
 	}
 	
 	/**
@@ -80,18 +72,19 @@ public class GridLayer implements ILayer
 	/**
 	 * Draws the layer to a Java2D viewport
 	 * 
+	 * @param layerObject object with properties for the layer
 	 * @param areaSize size of the area this layer covers
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void draw(IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
+	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
-		g.setColor(c_);
+		Color c = (Color) SObjectInspector.getPropertyAsClass(layerObject, color, Color.class);
+		g.setColor(c);
 		
 		IVector2 pixSize = vp.getPixelSize();
 		
-		//Hack
-		IVector2 step = areaSize.copy().subtract(pixSize).divide(areaSize.copy().divide(gridSize_));
+		IVector2 step = areaSize.copy().subtract(pixSize).divide(areaSize.copy().divide(gridSize));
 		
 		for (float x = 0.0f; x < areaSize.getXAsFloat(); x = x + step.getXAsFloat())
 		{
@@ -109,19 +102,21 @@ public class GridLayer implements ILayer
 	/**
 	 * Draws the layer to an OpenGL viewport
 	 * 
+	 * @param layerObject object with properties for the layer
 	 * @param areaSize size of the area this layer covers
 	 * @param vp the viewport
 	 * @param gl OpenGL context
 	 */
-	public void draw(IVector2 areaSize, ViewportJOGL vp, GL gl)
+	public void draw(IPropertyObject layerObject, IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
-		gl.glColor4fv(oglColor_, 0);
+		Color c = (Color) SObjectInspector.getPropertyAsClass(layerObject, color, Color.class);
+		gl.glColor4fv(c.getComponents(null), 0);
 		
 		IVector2 pixSize = vp.getPixelSize();
 		
 		gl.glBegin(GL.GL_QUADS);
 		
-		IVector2 step = areaSize.copy().subtract(pixSize).divide(areaSize.copy().divide(gridSize_));
+		IVector2 step = areaSize.copy().subtract(pixSize).divide(areaSize.copy().divide(gridSize));
 		
 		for (float x = 0.0f; x < areaSize.getXAsFloat(); x = x + step.getXAsFloat())
 		{
@@ -140,13 +135,5 @@ public class GridLayer implements ILayer
 		}
 		
 		gl.glEnd();
-	}
-
-	/**
-	 * Provides a copy of the layer.
-	 */
-	public ILayer copy()
-	{
-		return new GridLayer(gridSize_, c_);
 	}
 }

@@ -16,6 +16,7 @@ import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.bridge.ILibraryService;
+import jadex.commons.IPropertyObject;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -251,7 +252,7 @@ public class Perspective2D implements IPerspective
 				marker.addDrawable(markerDrawable, Integer.MAX_VALUE);
 			}
 //			System.out.println("Persp: "+name+" opengl="+tryopengl);
-			viewport = createViewport(obscenter.getLibraryService(), tryopengl);
+			viewport = createViewport(obscenter.getSpace(), obscenter.getLibraryService(), bgColor, tryopengl);
 			viewport.setAreaSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);
 			viewport.setZoomLimit(zoomlimit);
@@ -505,7 +506,7 @@ public class Perspective2D implements IPerspective
 		});
 	}
 	
-	private IViewport createViewport(ILibraryService libService, boolean tryopengl)
+	private static final IViewport createViewport(IPropertyObject layerObject, ILibraryService libService, Color bgColor, boolean tryopengl)
 	{
 		final JFrame frame = new JFrame("");
 		frame.setLayout(new BorderLayout());
@@ -518,7 +519,7 @@ public class Perspective2D implements IPerspective
 			// Try OpenGL...
 			try
 			{
-				ViewportJOGL vp = new ViewportJOGL(libService);
+				ViewportJOGL vp = new ViewportJOGL(layerObject, libService);
 				frame.add(vp.getCanvas());
 				frame.setVisible(true);
 				if (!vp.isValid())
@@ -545,11 +546,11 @@ public class Perspective2D implements IPerspective
 		IViewport viewport = null;
 		if (tryopengl)
 		{
-			viewport = new ViewportJOGL(libService);
+			viewport = new ViewportJOGL(layerObject, libService);
 		}
 		else
 		{
-			viewport = new ViewportJ2D(libService);
+			viewport = new ViewportJ2D(layerObject, libService);
 		}
 		
 		viewport.setBackground(bgColor);

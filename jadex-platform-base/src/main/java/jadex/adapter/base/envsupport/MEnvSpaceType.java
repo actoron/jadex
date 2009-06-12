@@ -705,7 +705,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo("gridlayer", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"color", "width", "height", "type", "creator"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, colorconv, ""),
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, tcolorconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, null, "", "gridlayer"),
@@ -715,7 +715,7 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
-					return new GridLayer(size, (Color)MEnvSpaceInstance.getProperty(args, "color"));
+					return new GridLayer(size, MEnvSpaceInstance.getProperty(args, "color"));
 				}
 			})
 			}), null));
@@ -725,7 +725,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo(null, colorconv, ""),
+			new BeanAttributeInfo(null, tcolorconv, ""),
 			new BeanAttributeInfo(null, null, "", "tiledlayer"),
 			new BeanAttributeInfo(null, null, "", new IObjectCreator()
 			{
@@ -733,7 +733,7 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 						(Double)MEnvSpaceInstance.getProperty(args, "height"));
-					return new TiledLayer(size, (Color)MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
+					return new TiledLayer(size, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
 				}
 			})
 			}), null));

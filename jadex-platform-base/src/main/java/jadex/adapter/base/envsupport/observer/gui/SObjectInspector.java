@@ -154,6 +154,23 @@ public class SObjectInspector
 	}
 	
 	/**
+	 * Returns the given property if the target class is met or looks it up on the property object.
+	 * 
+	 * @param obj the object being inspected
+	 * @param prop the property or the name of the property
+	 * @param clazz target class
+	 * @return the property
+	 */
+	public static final Object getPropertyAsClass(Object obj, Object prop, Class clazz)
+	{
+		if (!clazz.isInstance(prop))
+		{
+			prop = getProperty(obj, (String) prop);
+		}
+		return prop;
+	}
+	
+	/**
 	 * Retrieves a 1-vector given an object and either a string-based binding or
 	 * the vector itself.
 	 * 

@@ -6,6 +6,7 @@ import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
+import jadex.commons.IPropertyObject;
 import jadex.commons.SUtil;
 
 import java.awt.AlphaComposite;
@@ -95,13 +96,12 @@ public class ViewportJOGL extends AbstractViewport
 	 * Creates a new OpenGL-based viewport. May throw UnsatisfiedLinkError and
 	 * RuntimeException if linking to OpenGL fails.
 	 * 
-	 * @param title Title of the window.
-	 * @param fps target frames per second or no autmatic refresh if zero
+	 * @param layerObject object holding properties for pre/postlayers
 	 * @param libService library service for loading resources.
 	 */
-	public ViewportJOGL(ILibraryService libService)
+	public ViewportJOGL(IPropertyObject layerObject, ILibraryService libService)
 	{
-		super();
+		super(layerObject);
 		libService_ = libService;
 		uninitialized_ = true;
 		valid_ = false;
@@ -247,37 +247,6 @@ public class ViewportJOGL extends AbstractViewport
 		}
 		return tr;
 	}
-	
-	/**
-	 *  Returns the texture of a text
-	 *  
-	 *  @param info information on the text
-	 *  @return the texture
-	 */
-	/*public GlyphTexture getTextTexture(TextInfo info)
-	{
-		synchronized (textCache_)
-		{
-			GlyphTexture ret = (GlyphTexture) textCache_.get(info);
-			if (ret == null)
-			{
-				BufferedImage image = convertTextToImage(info.getFont(), info.getColor(), info.getText());
-				
-				if (image != null)
-				{
-					TextLayout textLayout = new TextLayout(info.getText(), info.getFont(), new FontRenderContext(null, true, true));
-					IVector2 size = new Vector2Double(image.getWidth(), image.getHeight());
-					Integer tex = prepareTexture(context_, image, GL.GL_RGBA, GL.GL_CLAMP_TO_EDGE, GL.GL_LINEAR);
-					ret = new GlyphTexture(tex.intValue(), size, 0);
-				}
-				else
-					ret  = new GlyphTexture(0, Vector2Double.ZERO, 0.0f);
-				textCache_.put(info, ret);
-			}
-			
-			return ret;
-		}
-	}*/
 
 	/**
 	 * Returns a previous generated display list or null if it doesn't exist
@@ -481,6 +450,7 @@ public class ViewportJOGL extends AbstractViewport
 			GL gl = drawable.getGL();
 			
 			setupMatrix(gl);
+			setupTexMatrix(gl);
 			
 			float[] bgc = bgColor_.getRGBComponents(null);
 			gl.glClearColor(bgc[0], bgc[1], bgc[2], bgc[3]);
@@ -499,7 +469,7 @@ public class ViewportJOGL extends AbstractViewport
 					{
 						l.init(ViewportJOGL.this, gl);
 					}
-					l.draw(areaSize_, ViewportJOGL.this, gl);
+					l.draw(layerObject_, areaSize_, ViewportJOGL.this, gl);
 				}
 			}
 			
@@ -548,7 +518,7 @@ public class ViewportJOGL extends AbstractViewport
 					{
 						l.init(ViewportJOGL.this, gl);
 					}
-					l.draw(areaSize_, ViewportJOGL.this, gl);
+					l.draw(layerObject_, areaSize_, ViewportJOGL.this, gl);
 				}
 			}
 			
