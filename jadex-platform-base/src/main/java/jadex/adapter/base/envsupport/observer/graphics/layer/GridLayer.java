@@ -26,7 +26,7 @@ public class GridLayer implements ILayer
 {
 	private IVector2	gridSize;
 	
-	private Color 		color;
+	private Object 		color;
 	
 	/**
 	 * Creates a new gridlayer with a grid size of 1.0.
@@ -47,6 +47,8 @@ public class GridLayer implements ILayer
 	public GridLayer(IVector2 gridSize, Object c)
 	{
 		this.gridSize = gridSize.copy();
+		color	= c;
+		
 	}
 	
 	/**

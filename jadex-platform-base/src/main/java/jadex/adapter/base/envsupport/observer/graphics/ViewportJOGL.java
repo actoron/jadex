@@ -2,7 +2,6 @@ package jadex.adapter.base.envsupport.observer.graphics;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.bridge.ILibraryService;
@@ -30,7 +29,6 @@ import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -38,7 +36,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
@@ -339,7 +336,7 @@ public class ViewportJOGL extends AbstractViewport
 			AffineTransform tf = AffineTransform.getScaleInstance(1, -1);
 			tf.translate(0, -tmpImage.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tf,
-					AffineTransformOp.TYPE_BICUBIC);
+					AffineTransformOp.TYPE_BILINEAR);
 			tmpImage = op.filter(tmpImage, null);
 		}
 		catch(Exception e)
