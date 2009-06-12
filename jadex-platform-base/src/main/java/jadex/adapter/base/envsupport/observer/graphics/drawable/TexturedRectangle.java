@@ -4,26 +4,18 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ModulateComposite;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
-import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.CompositeContext;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 
 import javax.media.opengl.GL;
 
-import sun.security.action.GetBooleanAction;
-
-
+/**
+ * 
+ */
 public class TexturedRectangle extends ColoredPrimitive
 {
 	private static final long	serialVersionUID	= 0L;

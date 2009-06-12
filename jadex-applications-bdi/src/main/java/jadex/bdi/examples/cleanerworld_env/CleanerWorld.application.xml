@@ -125,7 +125,7 @@
 					<env:drawable objecttype="cleaner" width="0.1" height="0.1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*20)</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld_env/images/cleaner.png" />
-						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/>
+						<env:text layer="4" align="center" y="1.0" color="black" text="$owner$" basesize="8"/>
 						<env:ellipse layer="-1" size="vision_size" color="#ffff007f" />
 						<env:texturedrectangle layer="0" x="0.3" y="0.4" width="0.3" height="0.3" imagepath="jadex/bdi/examples/cleanerworld_env/images/waste.png">
 							<env:drawcondition>$object.getProperty("waste")!=null</env:drawcondition>

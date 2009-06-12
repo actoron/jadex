@@ -156,7 +156,8 @@ public final class Text implements IDrawable
 			if (enableDCSize)
 			{
 				position.multiply(dcScale);
-				fontscale *= dcScale.getMean().getAsFloat();
+				// Do not scale fintsize wrt. drawable combiner size.
+//				fontscale *= dcScale.getMean().getAsFloat();
 			}
 			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);
 			
@@ -220,7 +221,8 @@ public final class Text implements IDrawable
 			if (enableDCSize)
 			{
 				position = position.copy().multiply(dcScale);
-				fontscale *= dcScale.getMean().getAsFloat();
+				// Do not scale fintsize wrt. drawable combiner size.
+//				fontscale *= dcScale.getMean().getAsFloat();
 			}
 			Font font = baseFont.deriveFont(baseFont.getSize() * fontscale);;
 				
