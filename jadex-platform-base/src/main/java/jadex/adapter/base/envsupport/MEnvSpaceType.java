@@ -19,6 +19,7 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.Triangle;
 import jadex.adapter.base.envsupport.observer.graphics.layer.GridLayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
+import jadex.adapter.base.envsupport.observer.graphics.layer.ColorLayer;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
@@ -738,6 +739,19 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}), null));
 		
+		types.add(new TypeInfo("colorlayer", MultiCollection.class, null, null,
+				SUtil.createHashMap(new String[]{"color", "type", "creator"}, 
+				new BeanAttributeInfo[]{new BeanAttributeInfo(null, tcolorconv, ""),
+				new BeanAttributeInfo(null, null, "", "colorlayer"),
+				new BeanAttributeInfo(null, null, "", new IObjectCreator()
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						return new ColorLayer(MEnvSpaceInstance.getProperty(args, "color"));
+					}
+				})
+				}), null));
+		
 		types.add(new TypeInfo("spaceexecutor", MultiCollection.class, null, new BeanAttributeInfo("expression", expconv, ""),
 			SUtil.createHashMap(new String[]{"class"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
@@ -901,8 +915,10 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("drawable", new BeanAttributeInfo("drawables", null, "")));
 		linkinfos.add(new LinkInfo("prelayers/gridlayer", new BeanAttributeInfo("prelayers", null, "")));
 		linkinfos.add(new LinkInfo("prelayers/tiledlayer", new BeanAttributeInfo("prelayers", null, "")));
+		linkinfos.add(new LinkInfo("prelayers/colorlayer", new BeanAttributeInfo("prelayers", null, "")));
 		linkinfos.add(new LinkInfo("postlayers/gridlayer", new BeanAttributeInfo("postlayers", null, "")));
 		linkinfos.add(new LinkInfo("postlayers/tiledlayer", new BeanAttributeInfo("postlayers", null, "")));
+		linkinfos.add(new LinkInfo("postlayers/colorlayer", new BeanAttributeInfo("postlayers", null, "")));
 		
 		// drawable
 		linkinfos.add(new LinkInfo("texturedrectangle", new BeanAttributeInfo("parts", null, "")));		
