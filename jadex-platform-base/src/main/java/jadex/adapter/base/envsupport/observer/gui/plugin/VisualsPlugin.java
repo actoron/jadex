@@ -4,6 +4,7 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
+import jadex.commons.SUtil;
 
 import java.awt.BorderLayout;
 import java.awt.Checkbox;
@@ -11,15 +12,20 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -142,16 +148,20 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		controlPanel.setBorder(new TitledBorder("Controls"));
 		mainPane.setBottomComponent(controlPanel);
 		
-		JPanel movePanel = new JPanel(new BorderLayout());
-		String[] moveButtonNames = {"Up", "Right", "Down", "Left"};
-		String[] moveButtonPos = {BorderLayout.NORTH, BorderLayout.EAST, BorderLayout.SOUTH, BorderLayout.WEST};
+		JPanel movePanel = new JPanel(new GridBagLayout());
+		//String[] moveButtonNames = {"Up", "Right", "Down", "Left"};
+		String baseImgLoc = "/jadex/adapter/base/envsupport/observer/images/";
+		String[] moveImgNames = {"arrow_up.png", "arrow_right.png", "arrow_down.png", "arrow_left.png"};
+		int[] moveButtonPos = {1, 2, 1, 0};
 		for (int i = 0; i < 4; ++i)
 		{
 			final Vector2Double direction = new Vector2Double((i == 1)||(i == 3)? 0.1:0.0, (i == 0)||(i== 2)? 0.1:0.0);
 			if ((i & 2) == 0)
 				direction.negate();
 			
-			JButton b = new JButton(new AbstractAction()
+			JButton b = new JButton();
+			
+			b.setAction(new AbstractAction()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
@@ -163,8 +173,28 @@ public class VisualsPlugin implements IObserverCenterPlugin
 						}
 					}
 				});
-			b.setText(moveButtonNames[i]);
-			movePanel.add(b, moveButtonPos[i]);
+			
+			try
+			{
+				b.setIcon(new ImageIcon(ImageIO.read(SUtil.getResource(baseImgLoc + moveImgNames[i], getClass().getClassLoader()))));
+			}
+			catch (IOException e1)
+			{
+				e1.printStackTrace();
+				System.exit(1);
+			}
+			
+			b.setBorderPainted(false);
+			
+			c = new GridBagConstraints();
+			c.gridx = moveButtonPos[i];
+			c.gridy = moveButtonPos[(i + 3) % 4];
+			c.weighty = 0.0;
+			c.weightx = 0.0;
+			c.ipady = 10;
+			c.anchor = GridBagConstraints.CENTER;
+			c.fill = GridBagConstraints.NONE;
+			movePanel.add(b, c);
 		}
 		c = new GridBagConstraints();
 		c.gridx = 0;
