@@ -663,6 +663,7 @@ public class MEnvSpaceType	extends MSpaceType
 							position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
 								(Double)MEnvSpaceInstance.getProperty(args, "y"));
 						}
+						System.out.println("position: " + position.toString());
 						
 						String fontname = (String) MEnvSpaceInstance.getProperty(args, "font");
 						if(fontname==null)

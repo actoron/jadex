@@ -140,7 +140,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.gridy = 0;
 		c.weighty = 1.0;
 		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.CENTER;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.BOTH;
 		dataviewPanel.add(dataviewScrollPane, c);
 		
@@ -151,17 +151,39 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		JPanel movePanel = new JPanel(new GridBagLayout());
 		//String[] moveButtonNames = {"Up", "Right", "Down", "Left"};
 		String baseImgLoc = "/jadex/adapter/base/envsupport/observer/images/";
-		String[] moveImgNames = {"arrow_up.png", "arrow_right.png", "arrow_down.png", "arrow_left.png"};
+		String[] moveImgNames = {"arrow_up.png", "arrow_right.png", "arrow_down.png", "arrow_left.png", "x_small.png"};
 		int[] moveButtonPos = {1, 2, 1, 0};
-		for (int i = 0; i < 4; ++i)
+		for (int i = 0; i < 5; ++i)
 		{
-			final Vector2Double direction = new Vector2Double((i == 1)||(i == 3)? 0.1:0.0, (i == 0)||(i== 2)? 0.1:0.0);
-			if ((i & 2) == 0)
-				direction.negate();
-			
 			JButton b = new JButton();
+			c = new GridBagConstraints();
 			
-			b.setAction(new AbstractAction()
+			if (i < 4)
+			{
+				c.gridx = moveButtonPos[i];
+				c.gridy = moveButtonPos[(i + 3) % 4];
+				final Vector2Double direction = new Vector2Double((i == 1)||(i == 3)? 0.1:0.0, (i == 0)||(i== 2)? 0.1:0.0);
+				if ((i & 2) != 0)
+					direction.negate();
+
+				b.setAction(new AbstractAction()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							IPerspective p = observerCenter_.getSelectedPerspective();
+							if (p instanceof Perspective2D)
+							{
+								Perspective2D pers = (Perspective2D) p;
+								pers.shiftPosition(direction.copy());
+							}
+						}
+					});
+			}
+			else if (i == 4)
+			{
+				c.gridx = 1;
+				c.gridy = 1;
+				b.setAction(new AbstractAction()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
@@ -169,10 +191,11 @@ public class VisualsPlugin implements IObserverCenterPlugin
 						if (p instanceof Perspective2D)
 						{
 							Perspective2D pers = (Perspective2D) p;
-							pers.shiftPosition(direction.copy());
+							pers.reset();
 						}
 					}
 				});
+			}
 			
 			try
 			{
@@ -181,28 +204,26 @@ public class VisualsPlugin implements IObserverCenterPlugin
 			catch (IOException e1)
 			{
 				e1.printStackTrace();
-				System.exit(1);
 			}
 			
 			b.setBorderPainted(false);
 			
-			c = new GridBagConstraints();
-			c.gridx = moveButtonPos[i];
-			c.gridy = moveButtonPos[(i + 3) % 4];
+			b.setContentAreaFilled(false);
+			
 			c.weighty = 0.0;
 			c.weightx = 0.0;
-			c.ipady = 10;
 			c.anchor = GridBagConstraints.CENTER;
 			c.fill = GridBagConstraints.NONE;
 			movePanel.add(b, c);
 		}
+		
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weighty = 0.0;
 		c.weightx = 0.0;
 		c.ipady = 10;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 		controlPanel.add(movePanel, c);
 		
@@ -211,7 +232,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.gridy = 1;
 		c.weighty = 0.0;
 		c.weightx = 0.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 		controlPanel.add(zoomPanel, c);
 		
@@ -222,7 +243,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.weighty = 0.0;
 		c.weightx = 0.0;
 		c.ipadx = 30;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 		zoomPanel.add(zoomDesc, c);
 		
@@ -246,7 +267,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.gridy = 0;
 		c.weighty = 0.0;
 		c.weightx = 0.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 		zoomPanel.add(zoomSpinner, c);
 		
@@ -255,7 +276,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.gridy = 2;
 		c.weighty = 0.0;
 		c.weightx = 0.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 		controlPanel.add(invertPanel, c);
 		
@@ -277,8 +298,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.gridy = 0;
 		c.weighty = 0.0;
 		c.weightx = 0.0;
-		c.ipadx = 30;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 		invertPanel.add(invertXBox, c);
 		
@@ -300,8 +320,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.gridy = 1;
 		c.weighty = 0.0;
 		c.weightx = 0.0;
-		c.ipadx = 0;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 		invertPanel.add(invertYBox, c);
 		
@@ -311,7 +330,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		c.gridy = 2;
 		c.weighty = 1.0;
 		c.weightx = 1.0;
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.BOTH;
 		controlPanel.add(dummy, c);
 	}

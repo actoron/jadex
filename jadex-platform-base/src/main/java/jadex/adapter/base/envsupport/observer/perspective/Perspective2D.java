@@ -439,6 +439,14 @@ public class Perspective2D implements IPerspective
 	}
 	
 	/**
+	 * Resets the zoom and position.
+	 */
+	public void reset()
+	{
+		viewport.setAreaSize(viewport.getAreaSize());
+	}
+	
+	/**
 	 * Refreshes the perspective.
 	 */
 	public void refresh()

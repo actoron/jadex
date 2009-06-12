@@ -391,6 +391,8 @@ public class Vector2Double implements IVector2, Cloneable
 		IVector2 ret = null;
 		if(a!=null && b!=null)
 			ret = a.doubleValue()==0 && b.doubleValue()==0? ZERO: new Vector2Double(a.doubleValue(), b.doubleValue());
+		else if (a!=null || b !=null)
+			ret = new Vector2Double(a == null? 0.0:a.doubleValue(), b == null? 0.0:b.doubleValue());
 		return ret;
 	}
 }
