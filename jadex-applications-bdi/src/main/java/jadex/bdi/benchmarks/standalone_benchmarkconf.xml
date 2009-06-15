@@ -19,8 +19,7 @@
 		<!-- <propertiesref ref="kernel_v2_bdi"/>-->
 		
 		<property type="application_factory">
-			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
-				new java.util.Set[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
+			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform, null, null)
 		</property>
 		
 		<!-- Platform services. -->

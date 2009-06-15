@@ -258,7 +258,7 @@ public abstract class OAVAbstractState	implements IOAVState
 		
 		// Remove this object from all places where it is referenced
 		Map refs = getObjectUsages(id);
-		if(refs!=null)
+		if(refs!=null && !refs.isEmpty())
 		{
 			OAVObjectUsage[]	usages = (OAVObjectUsage[])refs.keySet().toArray(new OAVObjectUsage[refs.keySet().size()]);
 			for(int u=0; u<usages.length; u++)

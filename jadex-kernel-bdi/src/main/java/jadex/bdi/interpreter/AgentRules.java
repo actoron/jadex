@@ -268,6 +268,18 @@ public class AgentRules
 			}
 		}
 		
+		// Cleanup precandidates (required to break cycles in runtime state).
+		Collection precands = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_precandidates);
+		if(precands!=null)
+		{
+			Object[]	aprecands	= precands.toArray();
+			for(int i=0; i<aprecands.length; i++)
+			{
+				Object	key	= state.getAttributeValue(aprecands[i], OAVBDIRuntimeModel.capability_has_precandidates.getIndexAttribute());
+				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_precandidates, key);
+			}
+		}
+		
 		// External accesses must be reactivated, otherwise external threads would sleep forever.
 		Collection extas = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_externalaccesses);
 		if(extas!=null)

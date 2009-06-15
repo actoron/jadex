@@ -6,7 +6,6 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bridge.IClockService;
-import jadex.commons.SReflect;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;
@@ -19,8 +18,8 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 {
 	//-------- attributes --------
 	
-	/** The last executed tick. */
-	protected double lasttick;
+	/** The last waste creation time. */
+	protected long	lasttime;
 	
 	//-------- constructors --------
 	
@@ -41,7 +40,7 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 	 */
 	public void start(IClockService clock, IEnvironmentSpace space)
 	{
-		this.lasttick	= clock.getTick();
+		this.lasttime	= clock.getTime();
 //		System.out.println("create waste process started.");
 	}
 
@@ -67,21 +66,18 @@ public class CreateWasteProcess extends SimplePropertyObject implements ISpacePr
 		
 		Space2D grid = (Space2D)space;
 		
-		double	delta	= clock.getTick() - lasttick;
+		long rate = getProperty("rate")!=null? 
+			((Number)getProperty("rate")).longValue(): 3000;
 		
-		int rate = getProperty("rate")!=null? 
-			((Integer)getProperty("rate")).intValue(): 5;
-		
-		if(delta>rate)
+		while(lasttime+rate<clock.getTime())
 		{
-			lasttick	= clock.getTick();
-		
+			lasttime	+= rate;
 			IVector2 pos = grid.getRandomPosition(Vector2Int.ZERO);
 			if(pos!=null)
 			{
 				Map props = new HashMap();
 				props.put(Space2D.PROPERTY_POSITION, pos);
-				Object obj = grid.createSpaceObject("waste", props, null);
+				grid.createSpaceObject("waste", props, null);
 //				System.out.println("Created waste: "+obj);
 			}
 		}

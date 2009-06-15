@@ -1,4 +1,4 @@
-package jadex.bdi.examples.hunterprey_env;
+package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  *  Process for continuously creating food.
  */
-public class CreateFoodProcess extends SimplePropertyObject implements ISpaceProcess
+public class DefaultObjectCreationProcess extends SimplePropertyObject implements ISpaceProcess
 {
 	//-------- attributes --------
 	
@@ -26,7 +26,7 @@ public class CreateFoodProcess extends SimplePropertyObject implements ISpacePro
 	/**
 	 *  Create a new create food process.
 	 */
-	public CreateFoodProcess()
+	public DefaultObjectCreationProcess()
 	{		
 	}
 	

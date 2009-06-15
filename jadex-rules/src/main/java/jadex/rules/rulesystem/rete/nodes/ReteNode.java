@@ -1,6 +1,5 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.commons.collection.SCollection;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.rete.builder.ReteBuilder;
@@ -8,7 +7,9 @@ import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -148,8 +149,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		
-		if(attr.getName().indexOf("daytime")!=-1)
-			System.out.println("test");
+//		if(attr.getName().indexOf("daytime")!=-1)
+//			System.out.println("test");
 		
 		if(getRelevantAttributes().contains(attr))
 		{
@@ -172,7 +173,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 //				System.out.println("No typenode(s) available for: "+value);
 		}
 		
-		Set	ins	= getIndirectNodes(attr);
+		Set	ins	= getIndirectNodes(attr, state.getTypeModel());
 		if(ins!=null)
 		{
 			for(Iterator it=ins.iterator(); it.hasNext(); )
@@ -436,9 +437,10 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	/**
 	 *  Get the set of indirectly affected nodes for an attribute type.
 	 *  @param attrtype The attribute type.
+	 *  @param tmodel The OAV type model.
 	 *  @return The set of indirectly affected nodes for that attribute type.
 	 */
-	protected Set getIndirectNodes(OAVAttributeType attrtype)
+	protected Set getIndirectNodes(OAVAttributeType attrtype, OAVTypeModel tmodel)
 	{
 		if(indirectnodesets==null)
 		{
@@ -515,8 +517,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		}
 		
 		Set tmp1 = (Set)indirectnodesets.get(attrtype);
-		Set tmp2 = (Set)indirectnodesets.get(attrtype.getType());
-		
+		Set tmp2 = (Set)indirectnodesets.get(attrtype.getObjectType());
+
 		Set ret = tmp1;
 		if(tmp2!=null)
 		{
@@ -525,7 +527,45 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 			else
 				ret = tmp2;
 		}
-		
+
+		if(attrtype.getObjectType() instanceof OAVJavaType)
+		{
+			List	classes	= new ArrayList();
+			Set	sclasses	= new HashSet();
+			classes.add(((OAVJavaType)attrtype.getObjectType()).getClazz());
+			for(int i=0; i<classes.size(); i++)
+			{
+				Class	clazz	= (Class)classes.get(i);
+				if(clazz.getSuperclass()!=null && !sclasses.contains(clazz.getSuperclass()))
+				{
+					classes.add(clazz.getSuperclass());
+					sclasses.add(clazz.getSuperclass());
+				}
+				Class[]	ifs	= clazz.getInterfaces();
+				for(int j=0; j<ifs.length; j++)
+				{
+					if(!sclasses.contains(ifs[j]))
+					{
+						classes.add(ifs[j]);
+						sclasses.add(ifs[j]);
+					}
+				}
+			}
+			
+			for(Iterator it=sclasses.iterator(); it.hasNext(); )
+			{
+				Class	clazz	= (Class)it.next();
+				tmp2	= (Set)indirectnodesets.get(tmodel.getJavaType(clazz));
+				if(tmp2!=null)
+				{
+					if(ret!=null)
+						ret.addAll(tmp2);
+					else
+						ret = tmp2;
+				}
+			}
+		}
+				
 		return ret;
 	}
 	
