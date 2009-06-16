@@ -2,10 +2,10 @@ package jadex.bdi.examples.marsworld_env.sentry;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.bdi.examples.marsworld_env.movement.ListenableTask;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -14,6 +14,13 @@ import jadex.commons.concurrent.IResultListener;
 public class AnalyzeTargetTask extends ListenableTask
 {
 	//-------- constants --------
+	
+	/** The type name property. */
+	public static final String	PROPERTY_TYPENAME = "analyze";
+	
+	/** The property for the target. */
+	public static final String PROPERTY_TARGET = "target";
+	
 	
 	/** The state for targets (unknown, analyzing, analyzed). */
 	public static final String	PROPERTY_STATE	= "state";
@@ -47,13 +54,13 @@ public class AnalyzeTargetTask extends ListenableTask
 	 *  Create a new analyze task.
 	 *  @param destination	The destination. 
 	 *  @param listener	The result listener to be informed when the destination is reached. 
-	 */
+	 * /
 	public AnalyzeTargetTask(ISpaceObject target, IResultListener listener)
 	{
 		super(listener);
 		this.target	= target;
 		this.time	= TIME;
-	}
+	}*/
 	
 	//-------- ListenableTask methods --------
 	
@@ -64,6 +71,9 @@ public class AnalyzeTargetTask extends ListenableTask
 	 */
 	public void start(ISpaceObject obj)
 	{
+		this.target = (ISpaceObject)getProperty(PROPERTY_TARGET);
+		this.time = TIME;
+
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
 		if(!loc.equals(tloc))
@@ -92,7 +102,7 @@ public class AnalyzeTargetTask extends ListenableTask
 		
 		if(time<=0)
 		{
-			taskFinished(obj, target.getProperty(PROPERTY_ORE));
+			taskFinished(space, obj, target.getProperty(PROPERTY_ORE));
 		}
 	}
 }

@@ -2,11 +2,10 @@ package jadex.bdi.examples.cleanerworld_env.cleaner;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.bdi.examples.marsworld_env.movement.ListenableTask;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Move an object towards a destination.
@@ -14,6 +13,13 @@ import jadex.commons.concurrent.IResultListener;
 public class LoadBatteryTask extends ListenableTask
 {
 	//-------- constants --------
+	
+	/** The destination property. */
+	public static final String	PROPERTY_TYPENAME = "load";
+	
+	/** The property for the target. */
+	public static final String PROPERTY_TARGET = "target";
+
 	
 	/** The time required for loading full energy. */
 	public static final int	TIME = 10000;
@@ -23,25 +29,8 @@ public class LoadBatteryTask extends ListenableTask
 	
 	//-------- attributes --------
 	
-	/** The target. */
-	protected ISpaceObject	target;
-	
 	/** The remaining time. */
 	protected int	time;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new move task.
-	 *  @param target	The target or home base.
-	 *  @param load	The loading (or unloading) flag. 
-	 *  @param listsner	The result listener to be informed when the destination is reached. 
-	 */
-	public LoadBatteryTask(ISpaceObject target, IResultListener listener)
-	{
-		super(listener);
-		this.target	= target;
-	}
 	
 	//-------- ListenableTask methods --------
 	
@@ -53,6 +42,7 @@ public class LoadBatteryTask extends ListenableTask
 	 */
 	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
+		ISpaceObject target	= (ISpaceObject)getProperty(PROPERTY_TARGET);
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		IVector2 tloc = (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
 		if(!loc.equals(tloc))
@@ -70,6 +60,6 @@ public class LoadBatteryTask extends ListenableTask
 //		System.out.println("Increased chargestate to: "+chargestate);
 		
 		if(chargestate==1.0)
-			taskFinished(obj, null);
+			taskFinished(space, obj, null);
 	}
 }

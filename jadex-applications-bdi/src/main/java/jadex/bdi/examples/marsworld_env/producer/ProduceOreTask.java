@@ -2,10 +2,10 @@ package jadex.bdi.examples.marsworld_env.producer;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.bdi.examples.marsworld_env.movement.ListenableTask;
 import jadex.bdi.examples.marsworld_env.sentry.AnalyzeTargetTask;
 import jadex.commons.concurrent.IResultListener;
 
@@ -15,6 +15,13 @@ import jadex.commons.concurrent.IResultListener;
 public class ProduceOreTask extends ListenableTask
 {
 	//-------- constants --------
+	
+	/** The type name property. */
+	public static final String	PROPERTY_TYPENAME = "produce";
+	
+	/** The property for the target. */
+	public static final String PROPERTY_TARGET = "target";
+
 	
 	/** The property for the produced ore amount. */
 	public static final String	PROPERTY_CAPACITY	= "capacity";
@@ -36,12 +43,12 @@ public class ProduceOreTask extends ListenableTask
 	 *  Create a new move task.
 	 *  @param destination	The destination. 
 	 *  @param listsner	The result listener to be informed when the destination is reached. 
-	 */
+	 * /
 	public ProduceOreTask(ISpaceObject target, IResultListener listener)
 	{
 		super(listener);
 		this.target	= target;
-	}
+	}*/
 	
 	//-------- ListenableTask methods --------
 	
@@ -53,6 +60,8 @@ public class ProduceOreTask extends ListenableTask
 	 */
 	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
+		ISpaceObject target = (ISpaceObject)getProperty(PROPERTY_TARGET);
+		
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
 		if(!loc.equals(tloc))
@@ -68,7 +77,7 @@ public class ProduceOreTask extends ListenableTask
 		
 		if(ore==0)
 		{
-			taskFinished(obj, target.getProperty(PROPERTY_CAPACITY));
+			taskFinished(space, obj, target.getProperty(PROPERTY_CAPACITY));
 		}
 	}
 }

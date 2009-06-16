@@ -12,6 +12,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -320,7 +321,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		{
 			DefaultComboBoxModel tlModel = (DefaultComboBoxModel) taskList_.getModel();
 			SpaceObject sObj = (SpaceObject) observedObj;
-			Set tasks = sObj.getTasks();
+			Collection tasks = sObj.getTasks();
 			selection = taskList_.getSelectedValue();
 			tlModel.removeAllElements();
 			for(Iterator it = tasks.iterator(); it.hasNext(); )

@@ -19,6 +19,7 @@
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
+		<import>jadex.bdi.examples.cleanerworld_env.cleaner.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -66,6 +67,11 @@
 				<env:actiontype name="drop_waste" class="DropWasteAction"/>
 				<env:actiontype name="empty_wastebin" class="EmptyWastebinAction"/>
 			</env:actiontypes>
+			
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="load" class="LoadBatteryTask" />
+			</env:tasktypes>
 			
 			<env:processtypes>
 				<env:processtype name="create" class="CreateWasteProcess" >

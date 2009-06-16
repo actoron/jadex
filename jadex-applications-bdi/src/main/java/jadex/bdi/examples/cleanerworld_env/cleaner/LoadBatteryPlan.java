@@ -1,11 +1,14 @@
 package jadex.bdi.examples.cleanerworld_env.cleaner;
 
-import jadex.adapter.base.envsupport.environment.IObjectTask;
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -16,7 +19,7 @@ public class LoadBatteryPlan extends Plan
 	//-------- attributes --------
 
 	/** The load task. */
-	protected IObjectTask load;
+	protected Object taskid;
 
 	//-------- methods --------
 
@@ -46,9 +49,14 @@ public class LoadBatteryPlan extends Plan
 //			System.out.println("Reached: "+location+" "+this);
 
 			SyncResultListener	res	= new SyncResultListener();
-			load = new LoadBatteryTask(station, res);
+			Map props = new HashMap();
+			props.put(LoadBatteryTask.PROPERTY_TARGET, station);
+			props.put(LoadBatteryTask.PROPERTY_LISTENER, res);
+			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			myself.addTask(load);
+			taskid = space.createObjectTask(LoadBatteryTask.PROPERTY_TYPENAME, props, myself.getId());
+//			load = new LoadBatteryTask(station, res);
+//			myself.addTask(load);
 		}
 
 //		getLogger().info("Loading finished.");
@@ -60,10 +68,11 @@ public class LoadBatteryPlan extends Plan
 	 */
 	public void aborted()
 	{
-		if(load!=null)
+		if(taskid!=null)
 		{
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			myself.removeTask(load);
+			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
+			space.removeObjectTask(taskid, myself.getId());
 		}
 	}
 	
@@ -72,10 +81,11 @@ public class LoadBatteryPlan extends Plan
 	 */
 	public void failed()
 	{
-		if(load!=null)
+		if(taskid!=null)
 		{
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			myself.removeTask(load);
+			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
+			space.removeObjectTask(taskid, myself.getId());
 		}
 	}
 }

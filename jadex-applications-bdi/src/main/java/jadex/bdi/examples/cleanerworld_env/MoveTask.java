@@ -2,15 +2,11 @@ package jadex.bdi.examples.cleanerworld_env;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Double;
-import jadex.bdi.examples.marsworld_env.movement.ListenableTask;
-import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.commons.SReflect;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Move an object towards a destination.
@@ -18,6 +14,16 @@ import jadex.commons.concurrent.IResultListener;
 public class MoveTask extends ListenableTask
 {
 	//-------- constants --------
+
+	/** The destination property. */
+	public static final String	PROPERTY_TYPENAME = "move";
+	
+	/** The destination property. */
+	public static final String	PROPERTY_DESTINATION = "destination";
+
+	/** The scope property. */
+//	public static final String	PROPERTY_SCOPE = "scope";
+	
 	
 	/** The speed property (units per second). */
 	public static final String	PROPERTY_SPEED	= "speed";
@@ -27,29 +33,6 @@ public class MoveTask extends ListenableTask
 	
 	/** The energy charge state. */
 	public static final String	PROPERTY_CHARGESTATE	= "chargestate";
-	
-	//-------- attributes --------
-	
-	/** The destination. */
-	protected IVector2	destination;
-	
-	/** The external access for notifying seen targets. */
-	// Todo: use vision generator / processors instead!?
-	protected IExternalAccess	scope;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new move task.
-	 *  @param destination	The destination. 
-	 *  @param listsner	The result listener to be informed when the destination is reached. 
-	 */
-	public MoveTask(IVector2 destination, IResultListener listener, IExternalAccess scope)
-	{
-		super(listener);
-		this.destination = destination;
-		this.scope	= scope;
-	}
 	
 	//-------- ListenableTask methods --------
 	
@@ -61,13 +44,12 @@ public class MoveTask extends ListenableTask
 	 */
 	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
+		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
+		
 		double speed = ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
 		double maxdist = progress.getAsDouble()*speed*0.001;
 		double energy = ((Double)obj.getProperty(PROPERTY_CHARGESTATE)).doubleValue();
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		
-		if(loc==null || destination==null)
-			System.out.println("test: "+loc+" "+destination);
 		
 		// Todo: how to handle border conditions!?
 		IVector2 newloc	= ((Space2D)space).getDistance(loc, destination).getAsDouble()<=maxdist? 
@@ -85,7 +67,7 @@ public class MoveTask extends ListenableTask
 		}
 		
 		if(newloc==destination)
-			taskFinished(obj, null);
+			taskFinished(space, obj, null);
 	}
 	
 	/**

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  
+ *  Abstract base class for environment space. 
  */
 public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObject implements IEnvironmentSpace
 {
@@ -36,6 +36,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	
 	/** The space object types. */
 	protected Map objecttypes;
+	
+	/** The object task types. */
+	protected Map tasktypes;
 	
 	/** The space process types. */
 	protected Map processtypes;
@@ -76,6 +79,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** Object id counter for new ids. */
 	protected AtomicCounter objectidcounter;
 	
+	/** Task id counter for new ids. */
+	protected AtomicCounter taskidcounter;
+	
 	/** The list of scheduled agent actions. */
 	protected AgentActionList actionlist;
 	
@@ -104,6 +110,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		this.dataviewmappings = new MultiCollection();
 		this.actions = new HashMap();
 		this.processtypes = new HashMap();
+		this.tasktypes = new HashMap();
 		this.processes = new HashMap();
 		this.percepttypes = new HashMap();
 		this.perceptgenerators = new HashMap();
@@ -112,7 +119,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
+		
 		this.objectidcounter = new AtomicCounter();
+		this.taskidcounter = new AtomicCounter();
 		this.actionlist	= new AgentActionList(this);
 		this.perceptlist = new PerceptList(this);
 	}
@@ -220,6 +229,99 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				throw new RuntimeException("Could not create space process: "+typename, e);
 			}
 //			process.start(this);	// Done by executor.
+		}
+	}
+	
+	/**
+	 *  Add a object task type.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 */
+	public void addObjectTaskType(String typename, Class clazz, Map properties)
+	{
+		synchronized(monitor)
+		{
+			if(properties==null)
+				properties = new HashMap();
+			properties.put("_clazz", clazz);
+			tasktypes.put(typename, properties);
+		}
+	}
+	
+	/**
+	 *  Remove an object task type.
+	 *  @param typename The type name.
+	 */
+	public void removeObjectTaskType(String typename)
+	{
+		synchronized(monitor)
+		{
+			tasktypes.remove(typename);
+		}
+	}
+	
+	/**
+	 *  Creates an object task.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 *  @return The task id.
+	 */
+	public Object createObjectTask(String typename, Map properties, Object objectid)
+	{
+		synchronized(monitor)
+		{
+//			System.out.println("add task: "+typename+" "+objectid+" "+properties);
+
+			// Prepare properties (runtime props override type props).
+			Map taskinfo = (Map)tasktypes.get(typename);
+			if(taskinfo==null)
+				throw new RuntimeException("Unknown space task: "+typename);
+			
+			try
+			{
+				IObjectTask task = (IObjectTask)((Class)taskinfo.get("_clazz")).newInstance();
+				// todo: ensure uniqueness?!
+				Object id = taskidcounter.getNext();
+				task.setProperty(IObjectTask.ID, id);
+				
+				if(properties!=null)
+				{
+					for(Iterator it = properties.keySet().iterator(); it.hasNext(); )
+					{
+						String propname = (String)it.next();
+						task.setProperty(propname, properties.get(propname)); 
+					}
+				}
+				for(Iterator it = taskinfo.keySet().iterator(); it.hasNext(); )
+				{
+					String propname = (String)it.next();
+					if(!"_clazz".equals(propname) && !properties.containsKey(propname))
+						task.setProperty(propname, taskinfo.get(propname)); 
+				}
+				
+				SpaceObject object = (SpaceObject)getSpaceObject(objectid);
+				object.addTask(task);
+				return id;
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException("Could not create space task: "+typename, e);
+			}
+		}
+	}
+	
+	/**
+	 *  Remove an object task.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 */
+	public void removeObjectTask(Object taskid, Object objectid)
+	{
+		synchronized(monitor)
+		{
+//			System.out.println("remove task: "+taskid+" "+objectid);
+			SpaceObject so = (SpaceObject)getSpaceObject(objectid);
+			so.removeTask(taskid);
 		}
 	}
 	
@@ -384,10 +486,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	public void destroySpaceObject(final Object id)
 	{
-		ISpaceObject obj;
+		SpaceObject obj;
 		synchronized(monitor)
 		{
-			obj = (ISpaceObject)spaceobjects.get(id);
+			obj = (SpaceObject)spaceobjects.get(id);
 			if(obj==null)
 				throw new RuntimeException("No object found for id: "+id);
 			String	objecttype	= obj.getType();

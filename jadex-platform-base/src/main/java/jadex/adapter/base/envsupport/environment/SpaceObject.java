@@ -1,16 +1,15 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Default implementation of a space object. 
@@ -26,7 +25,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	protected String typename;
 	
 	/** The object's tasks. */
-	protected Set	tasks;
+	protected Map tasks;
 
 	/** Event listeners. */
 	protected List listeners;
@@ -54,13 +53,13 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		this.properties = properties;
 		this.listeners = listeners;
 		
-		this.tasks = new LinkedHashSet();
+		this.tasks = new LinkedHashMap();
 		if(tasks != null)
 		{
 			for(Iterator it = tasks.iterator(); it.hasNext(); )
 			{
-				IObjectTask task = (IObjectTask) it.next();
-				this.tasks.add(task);
+				IObjectTask task = (IObjectTask)it.next();
+				this.tasks.put(task.getId(), task);
 			}
 		}
 		this.fetcher = new SimpleValueFetcher();
@@ -166,10 +165,10 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	{
 		synchronized(monitor)
 		{
-			if(tasks.contains(task))
+			if(tasks.containsKey(task.getId()))
 				throw new RuntimeException("Task already exists: "+this+", "+task);
 			task.start(this);
-			tasks.add(task);
+			tasks.put(task.getId(), task);
 		}
 	}
 
@@ -177,30 +176,41 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 * Removes a task from the object.
 	 * @param task	The task.
 	 */
-	public void removeTask(IObjectTask task)
+	public void removeTask(Object taskid)
 	{
 		synchronized(monitor)
 		{
-//			if(!tasks.contains(task))
-//			throw new RuntimeException("Task does not exist: "+this+", "+task);
-
-			if(tasks.contains(task))
+			IObjectTask task = getTask(taskid);
+			if(task!=null)
 			{
 				task.shutdown(this);
-				tasks.remove(task);
+				tasks.remove(taskid);
 			}
 		}
 	}
 	
 	/**
-	 * Returns all tasks of the object for introspection.
-	 * @return all tasks of the object
+	 *  Returns all tasks of the object for introspection.
+	 *  @return all tasks of the object
 	 */
-	public Set getTasks()
+	public Collection getTasks()
 	{
 		synchronized(monitor)
 		{
-			return new LinkedHashSet(tasks);
+			return tasks.values();
+		}
+	}
+	
+	/**
+	 *  Get a specific task.
+	 *  @param id The task id.
+	 *  @return The task.
+	 */
+	public IObjectTask getTask(Object id)
+	{
+		synchronized(monitor)
+		{
+			return (IObjectTask)tasks.get(id);
 		}
 	}
 	
@@ -211,7 +221,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	{
 		synchronized(monitor)
 		{
-			IObjectTask[] atasks = (IObjectTask[])tasks.toArray(new IObjectTask[tasks.size()]);
+			IObjectTask[] atasks = (IObjectTask[])tasks.values().toArray(new IObjectTask[tasks.size()]);
 			for(int i = 0; i < atasks.length; ++i)
 			{
 				removeTask(atasks[i]);
@@ -228,7 +238,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	{
 		synchronized(monitor)
 		{
-			IObjectTask[] atasks = (IObjectTask[])tasks.toArray(new IObjectTask[tasks.size()]);
+			IObjectTask[] atasks = (IObjectTask[])tasks.values().toArray(new IObjectTask[tasks.size()]);
 			for(int i = 0; i < atasks.length; ++i)
 			{
 				atasks[i].execute(space, this, progress);

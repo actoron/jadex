@@ -701,7 +701,7 @@ public class StarterPanel extends JPanel
 				//e.printStackTrace();
 				model = null;
 				StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
+//				e.printStackTrace(new PrintWriter(sw));
 				error	= sw.toString();
 			}
 			

@@ -68,7 +68,7 @@ public class ProducerPlan extends Plan
 		Group group = agrs.getGroup("mymarsteam");
 		IAgentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		
-		if(carriers.length>0)
+		if(carriers!=null && carriers.length>0)
 		{
 			//System.out.println("Carry Agent: Found Carry Agents: "+carriers.length);
 

@@ -198,7 +198,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		// Create processes.
+		// Create process types.
 		List processes = mspacetype.getPropertyList("processtypes");
 		if(processes!=null)
 		{
@@ -219,6 +219,30 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				
 //				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
 				ret.addSpaceProcessType(name, clazz, tmp);
+			}
+		}
+		
+
+		// Create task types.
+		List tasks = mspacetype.getPropertyList("tasktypes");
+		if(tasks!=null)
+		{
+			for(int i=0; i<tasks.size(); i++)
+			{
+				Map mtask = (Map)tasks.get(i);
+				List props = (List)mtask.get("properties");
+				String name = (String)MEnvSpaceInstance.getProperty(mtask, "name");
+				Class clazz = (Class)MEnvSpaceInstance.getProperty(mtask, "clazz");
+				
+				Map tmp = convertProperties(props, fetcher);
+				if(tmp!=null)
+				{
+					tmp.remove("name");
+					tmp.remove("clazz");
+				}
+				
+//				System.out.println("Adding object task: "+MEnvSpaceInstance.getProperty(mtask, "name"));
+				ret.addObjectTaskType(name, clazz, tmp);
 			}
 		}
 		

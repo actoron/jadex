@@ -1,9 +1,7 @@
-package jadex.bdi.examples.marsworld_env.movement;
+package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IObjectTask;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -11,12 +9,17 @@ import jadex.commons.concurrent.IResultListener;
  *  Subclasses should override doExecute() and call taskFinished() when the task
  *  is completed.
  */
-public abstract class ListenableTask	implements IObjectTask
+public abstract class ListenableTask extends SimplePropertyObject implements IObjectTask
 {
+	//-------- constants --------
+	
+	/** Property for listener parameter. */
+	public static final String PROPERTY_LISTENER = "listener";
+	
 	//-------- attributes --------
 	
 	/** The result listener. */
-	protected IResultListener	listener;
+//	protected IResultListener	listener;
 	
 	/** The result of the task (if any). */
 	protected Object	result;
@@ -28,13 +31,23 @@ public abstract class ListenableTask	implements IObjectTask
 	
 	/**
 	 *  Create a new listenable task.
-	 */
-	public ListenableTask(IResultListener listener)
+	 * /
+	public ListenableTask()//IResultListener listener)
 	{
-		this.listener	= listener;
-	}
+//		this.listener	= listener;
+//		this.listener = (IResultListener)getProperty(PROPERTY_LISTENER);
+	}*/
 	
 	//-------- IObjectTask --------
+	
+	/**
+	 *  Get the objects id.
+	 *  @return The object id.
+	 */
+	public Object getId()
+	{
+		return getProperty(IObjectTask.ID);
+	}
 	
 	/**
 	 *  This method will be executed by the object before the task gets added to
@@ -56,6 +69,7 @@ public abstract class ListenableTask	implements IObjectTask
 	 */
 	public void shutdown(/*IEnvironmentSpace space,*/ ISpaceObject obj)
 	{
+		IResultListener listener = (IResultListener)getProperty(PROPERTY_LISTENER);
 		if(exception!=null)
 			listener.exceptionOccurred(exception);
 		else
@@ -78,7 +92,7 @@ public abstract class ListenableTask	implements IObjectTask
 		catch(Exception e)
 		{
 			this.exception	= e;
-			obj.removeTask(this);
+			space.removeObjectTask(this.getId(), obj.getId());
 		}
 	}
 	
@@ -90,10 +104,10 @@ public abstract class ListenableTask	implements IObjectTask
 	 *  @param obj	The environment object that is executing the task.
 	 *  @param result	A result (if any).
 	 */
-	public void	taskFinished(ISpaceObject obj, Object result)
+	public void	taskFinished(IEnvironmentSpace space, ISpaceObject obj, Object result)
 	{
 		this.result	= result;
-		obj.removeTask(this);
+		space.removeObjectTask(this.getId(), obj.getId());
 	}
 	
 	//-------- template methods --------

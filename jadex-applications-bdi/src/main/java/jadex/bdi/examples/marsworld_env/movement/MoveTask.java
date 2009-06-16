@@ -2,6 +2,7 @@ package jadex.bdi.examples.marsworld_env.movement;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -17,6 +18,16 @@ public class MoveTask extends ListenableTask
 {
 	//-------- constants --------
 	
+	/** The destination property. */
+	public static final String	PROPERTY_TYPENAME = "move";
+	
+	/** The destination property. */
+	public static final String	PROPERTY_DESTINATION = "destination";
+
+	/** The scope property. */
+	public static final String	PROPERTY_SCOPE = "scope";
+
+	
 	/** The speed property (units per second). */
 	public static final String	PROPERTY_SPEED	= "speed";
 	
@@ -26,11 +37,11 @@ public class MoveTask extends ListenableTask
 	//-------- attributes --------
 	
 	/** The destination. */
-	protected IVector2	destination;
+//	protected IVector2	destination;
 	
 	/** The external access for notifying seen targets. */
 	// Todo: use vision generator / processors instead!?
-	protected IExternalAccess	scope;
+//	protected IExternalAccess	scope;
 	
 	//-------- constructors --------
 	
@@ -38,13 +49,13 @@ public class MoveTask extends ListenableTask
 	 *  Create a new move task.
 	 *  @param destination	The destination. 
 	 *  @param listsner	The result listener to be informed when the destination is reached. 
-	 */
+	 * /
 	public MoveTask(IVector2 destination, IResultListener listener, IExternalAccess scope)
 	{
 		super(listener);
 		this.destination	= destination;
 		this.scope	= scope;
-	}
+	}*/
 	
 	//-------- ListenableTask methods --------
 	
@@ -56,6 +67,9 @@ public class MoveTask extends ListenableTask
 	 */
 	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
+		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
+		final IExternalAccess scope = (IExternalAccess)getProperty(PROPERTY_SCOPE);
+
 		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
 		double	maxdist	= progress.getAsDouble()*speed*0.001;
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
@@ -88,6 +102,6 @@ public class MoveTask extends ListenableTask
 		}
 		
 		if(newloc==destination)
-			taskFinished(obj, null);
+			taskFinished(space, obj, null);
 	}
 }

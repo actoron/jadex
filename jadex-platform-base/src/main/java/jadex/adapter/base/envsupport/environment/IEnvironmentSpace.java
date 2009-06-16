@@ -7,6 +7,8 @@ import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -116,6 +118,34 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 * @return The space objects of the desired type.
 	 */
 	public ISpaceObject[] getSpaceObjectsByType(String type);
+	
+	/**
+	 *  Add a object task type.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 */
+	public void addObjectTaskType(String typename, Class clazz, Map properties);
+	
+	/**
+	 *  Remove an object task type.
+	 *  @param typename The type name.
+	 */
+	public void removeObjectTaskType(String typename);
+	
+	/**
+	 *  Creates an object task.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 *  @return The task id.
+	 */
+	public Object createObjectTask(String typename, Map properties, Object objectid);
+	
+	/**
+	 *  Remove an object task.
+	 *  @param typename The type name.
+	 *  @param properties The properties.
+	 */
+	public void removeObjectTask(Object taskid, Object objectid);
 			
 	/**
 	 * Adds an space action.

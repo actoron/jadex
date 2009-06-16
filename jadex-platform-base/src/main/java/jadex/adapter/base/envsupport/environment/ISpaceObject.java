@@ -50,7 +50,7 @@ public interface ISpaceObject extends IPropertyObject
 	 *  Adds a new task for the object.
 	 *  @param task new task
 	 */
-	public void addTask(IObjectTask task);
+//	public void addTask(IObjectTask task);
 
 	/**
 	 *  Returns a task by its id.
@@ -63,12 +63,12 @@ public interface ISpaceObject extends IPropertyObject
 	 *  Removes a task from the object.
 	 *  @param task	The task.
 	 */
-	public void removeTask(IObjectTask task);
+//	public void removeTask(IObjectTask task);
 	
 	/**
 	 *  Removes all tasks from the object.
 	 */
-	public void clearTasks();
+//	public void clearTasks();
 	
 	/**
 	 *  Updates the object to the current time.

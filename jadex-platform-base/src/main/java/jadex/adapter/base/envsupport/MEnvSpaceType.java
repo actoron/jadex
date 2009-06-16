@@ -167,6 +167,11 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, null, "")}), null));
 		
+		types.add(new TypeInfo("tasktype", MultiCollection.class, null, null,
+			SUtil.createHashMap(new String[]{"class", "name"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
+			new BeanAttributeInfo(null, null, "")}), null));
+		
 		types.add(new TypeInfo("perceptgenerator", MultiCollection.class, null, null,
 			SUtil.createHashMap(new String[]{"class", "name"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, ""),
@@ -772,6 +777,11 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
+		types.add(new TypeInfo("tasktype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
+			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
+		
 		types.add(new TypeInfo("actiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
 			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
@@ -898,12 +908,11 @@ public class MEnvSpaceType	extends MSpaceType
 		linkinfos.add(new LinkInfo("envspace", new BeanAttributeInfo("MSpaceInstance")));
 	
 		// spacetype
-//		linkinfos.add(new LinkInfo("dimension", new BeanAttributeInfo("dimensions", BasicTypeConverter.DOUBLE_CONVERTER, "property")));
 		linkinfos.add(new LinkInfo("objecttype", new BeanAttributeInfo("objecttypes", null, "property")));
 		linkinfos.add(new LinkInfo("avatarmapping", new BeanAttributeInfo("avatarmappings", null, "property")));
-//		linkinfos.add(new LinkInfo("agentactiontype", new BeanAttributeInfo("agentactiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("actiontype", new BeanAttributeInfo("actiontypes", null, "property")));
 		linkinfos.add(new LinkInfo("processtype", new BeanAttributeInfo("processtypes", null, "property")));
+		linkinfos.add(new LinkInfo("tasktype", new BeanAttributeInfo("tasktypes", null, "property")));
 		linkinfos.add(new LinkInfo("perceptgenerator", new BeanAttributeInfo("perceptgenerators", null, "property")));
 		linkinfos.add(new LinkInfo("perceptprocessor", new BeanAttributeInfo("perceptprocessors", null, "property")));
 		linkinfos.add(new LinkInfo("view", new BeanAttributeInfo("views", null, "property")));

@@ -1,12 +1,21 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.commons.IPropertyObject;
 
 /**
  *  Interface for a task of an object.
  */
-public interface IObjectTask
+public interface IObjectTask extends IPropertyObject
 {
+	public static final String ID = "task_id";
+	
+	/**
+	 *  Get the objects id.
+	 *  @return The object id.
+	 */
+	public Object getId();
+	
 	/**
 	 *  This method will be executed by the object before the task gets added to
 	 *  the execution queue.

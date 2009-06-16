@@ -1,11 +1,17 @@
 package jadex.bdi.examples.marsworld_env.sentry;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.examples.cleanerworld_env.cleaner.LoadBatteryTask;
 import jadex.bdi.examples.marsworld_env.RequestProduction;
+import jadex.bdi.examples.marsworld_env.producer.ProduceOreTask;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
@@ -46,7 +52,13 @@ public class AnalyzeTargetPlan extends Plan
 		{
 			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
 			SyncResultListener	res	= new SyncResultListener();
-			myself.addTask(new AnalyzeTargetTask(target, res));
+			Map props = new HashMap();
+			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
+			props.put(AnalyzeTargetTask.PROPERTY_LISTENER, res);
+			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
+			space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
+
+//			myself.addTask(new AnalyzeTargetTask(target, res));
 			Number	ore	= (Number)res.waitForResult();
 //			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
 			if(ore.intValue()>0)
@@ -57,6 +69,7 @@ public class AnalyzeTargetPlan extends Plan
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			// Fails for one agent, when two agents try to analyze the same target at once.
 		}
 	}
@@ -74,7 +87,7 @@ public class AnalyzeTargetPlan extends Plan
 		Group group = agrs.getGroup("mymarsteam");
 		IAgentIdentifier[]	producers	= group.getAgentsForRole("producer");
 
-		if(producers.length>0)
+		if(producers!=null && producers.length>0)
 		{
 			int sel = (int)(Math.random()*producers.length); // todo: Select not randomly
 //			System.out.println("Found agents: "+producers.length+" selected: "+sel);

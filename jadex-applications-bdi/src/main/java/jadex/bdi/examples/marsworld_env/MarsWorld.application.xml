@@ -29,6 +29,10 @@
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.examples.marsworld_env.carry.*</import>
+		<import>jadex.bdi.examples.marsworld_env.producer.*</import>
+		<import>jadex.bdi.examples.marsworld_env.sentry.*</import>
+		<import>jadex.bdi.examples.marsworld_env.movement.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -81,6 +85,13 @@
 				<env:avatarmapping agenttype="Producer" objecttype="producer"/>
 				<env:avatarmapping agenttype="Carry" objecttype="carry"/>
 			</env:avatarmappings>
+			
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
+				<env:tasktype name="produce" class="ProduceOreTask" />
+				<env:tasktype name="load" class="LoadOreTask" />
+			</env:tasktypes>
 
 			<env:views>
 				<env:view name="all_view" class="GeneralDataView2D" />
