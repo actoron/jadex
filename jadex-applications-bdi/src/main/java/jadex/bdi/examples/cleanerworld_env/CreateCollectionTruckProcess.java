@@ -73,7 +73,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 		
 			if(todo.size()>0)
 			{
-				System.out.println("Creating garbage collection truck.");
+//				System.out.println("Creating garbage collection truck.");
 				final IApplicationContext app = (IApplicationContext)space.getContext();
 				Map params = new HashMap();
 				params.put("wastebins", todo.toArray());

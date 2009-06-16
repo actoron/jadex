@@ -69,8 +69,8 @@ public class CleanUpWastePlan extends Plan
 		getException().printStackTrace();
 	}
 
-	public void aborted()
-	{
-		System.out.println("aborted: "+this);
-	}
+//	public void aborted()
+//	{
+//		System.out.println("aborted: "+this);
+//	}
 }

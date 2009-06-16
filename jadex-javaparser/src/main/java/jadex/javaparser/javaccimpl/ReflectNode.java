@@ -1,5 +1,6 @@
 package jadex.javaparser.javaccimpl;
 
+import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IValueFetcher;
@@ -472,6 +473,12 @@ public class ReflectNode	extends ExpressionNode
 			{
 				value	= new Integer(Array.getLength(ref));
  			}
+			
+			// Handle IPropertyObject
+			else if(type==FIELD && ref!=null && ref instanceof IPropertyObject)
+			{
+				value = ((IPropertyObject)ref).getProperty(getText());
+			}
 
 			// Handle normal fields.
 			else
