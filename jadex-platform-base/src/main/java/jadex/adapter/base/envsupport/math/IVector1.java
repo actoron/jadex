@@ -127,4 +127,10 @@ public interface IVector1
 	 * @return true if the vector is less than the given vector.
 	 */
 	public boolean less(IVector1 vector);
+	
+	/**
+	 *  Create a vector2 from this and another vector.
+	 *  @param sec The second vector.
+	 */
+	public IVector2 createVector2(IVector1 sec);
 }

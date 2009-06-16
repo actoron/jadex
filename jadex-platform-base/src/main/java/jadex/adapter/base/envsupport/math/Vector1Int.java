@@ -234,6 +234,15 @@ public class Vector1Int implements IVector1
 		return (x_ < vector.getAsInteger());
 	}
 	
+	/**
+	 *  Create a vector2 from this and another vector.
+	 *  @param sec The second vector.
+	 */
+	public IVector2 createVector2(IVector1 sec)
+	{
+		return new Vector2Double(this.getAsInteger(), sec.getAsInteger());
+	}
+	
 	public String toString()
 	{
 		return Integer.toString(x_);

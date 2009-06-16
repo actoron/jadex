@@ -192,4 +192,13 @@ public class Vector1Double implements IVector1
 			ret = val.doubleValue()==0 ? ZERO: new Vector1Double(val.doubleValue());
 		return ret;
 	}
+	
+	/**
+	 *  Create a vector2 from this and another vector.
+	 *  @param sec The second vector.
+	 */
+	public IVector2 createVector2(IVector1 sec)
+	{
+		return new Vector2Double(this.getAsDouble(), sec.getAsDouble());
+	}
 }

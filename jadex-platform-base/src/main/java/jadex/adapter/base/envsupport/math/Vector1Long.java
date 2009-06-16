@@ -234,6 +234,15 @@ public class Vector1Long implements IVector1
 		return (x_ < vector.getAsLong());
 	}
 	
+	/**
+	 *  Create a vector2 from this and another vector.
+	 *  @param sec The second vector.
+	 */
+	public IVector2 createVector2(IVector1 sec)
+	{
+		return new Vector2Double(this.getAsLong(), sec.getAsLong());
+	}
+	
 	public String toString()
 	{
 		return Long.toString(x_);

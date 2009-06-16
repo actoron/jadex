@@ -18,6 +18,8 @@ import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.bridge.ILibraryService;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SimplePropertyObject;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -92,6 +94,9 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 	/** The maximum zoom */
 	protected double zoomlimit;
 	
+	/** The fetcher. */
+	protected SimpleValueFetcher fetcher;
+	
 	/**
 	 * Creates a 2D-Perspective.
 	 */
@@ -113,6 +118,38 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 		this.name = getClass().getName();
 		viewport = null;
 		selectioncontroller = new SelectionController();
+	}
+	
+	/**
+	 * Returns a property.
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public Object getProperty(String name)
+	{
+		Object ret = super.getProperty(name);
+		
+		if(ret instanceof IParsedExpression)
+		{
+			ret = ((IParsedExpression) ret).getValue(getFetcher());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the value fetcher.
+	 *  @return The fetcher.
+	 */
+	public SimpleValueFetcher getFetcher()
+	{
+		if(fetcher==null)
+		{
+			this.fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$space", obscenter.getSpace());
+			fetcher.setValue("$perspective", this);
+		}
+		return this.fetcher;
 	}
 	
 	/**

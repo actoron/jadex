@@ -5,7 +5,6 @@ import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.SVector;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
@@ -249,7 +248,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				x = x.copy().mod(sizex);
 				y = y.copy().mod(sizey);
 				
-				ret = SVector.createVector2(x, y);
+				ret = x.createVector2(y);
 			}
 			else if(BORDER_STRICT.equals(getBorderMode()))
 			{

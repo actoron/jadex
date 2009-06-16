@@ -28,11 +28,14 @@ public class InformNewTargetPlan extends Plan
 		Group group = agrs.getGroup("mymarsteam");
 		IAgentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		
-		IMessageEvent mevent = createMessageEvent("inform_target");
-		for(int i=0; i<sentries.length; i++)
-			mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i]);
-		mevent.getParameter(SFipa.CONTENT).setValue(target);
-		sendMessage(mevent);
+		if(sentries!=null)
+		{
+			IMessageEvent mevent = createMessageEvent("inform_target");
+			for(int i=0; i<sentries.length; i++)
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i]);
+			mevent.getParameter(SFipa.CONTENT).setValue(target);
+			sendMessage(mevent);
+		}
 
 //		System.out.println("Informing sentries: "+getScope().getAgentName());
 	}
