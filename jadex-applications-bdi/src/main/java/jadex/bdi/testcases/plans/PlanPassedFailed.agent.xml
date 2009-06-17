@@ -41,7 +41,7 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="init" retry="false">
+		<achievegoal name="init" retry="true" exclude="never">	<!-- Hack!!! goal triggers only once, because condition uses only temporary variables -->
 			<creationcondition language="jcl">
 				$beliefbase.cnt&lt;4
 				
@@ -62,8 +62,8 @@
 	</plans>
 
 	<properties>
-		<!--<property name="logging.level">java.util.logging.Level.INFO</property>-->
-        <!-- Reduce level from severe to warning, as exception is part of the test. -->
+		<property name="logging.level">java.util.logging.Level.OFF</property>
+        <!-- Todo: Reduce level from severe to warning, as exception is part of the test. -->
         <!-- <property name="logging.level.exceptions">java.util.logging.Level.WARNING</property> -->
     </properties>
 

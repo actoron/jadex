@@ -528,7 +528,7 @@ public class EventProcessingRules
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
 		Variable rtargetcapa = new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
 
-		Variable triggerref = new Variable("?triggerref", OAVBDIMetaModel.triggerreference_type);
+		Variable triggerrefs = new Variable("?triggerrefs", OAVBDIMetaModel.triggerreference_type, true, false);
 		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
 		
 		// There is a ?mmetagoal with a trigger (?mgoaltrigger)
@@ -560,20 +560,19 @@ public class EventProcessingRules
 		targetcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, 
 			rpe, IOperator.CONTAINS));
 		
-		// There is a trigger reference (?triggerref) that maps to the ?rpe.
-		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
-		trcon.addConstraint(new BoundConstraint(null, triggerref));
-		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
-		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
-
 		// The ?triggerref belongs to the metagoal trigger.
 		ObjectCondition	metagoaltriggercon	= new ObjectCondition(OAVBDIMetaModel.metagoaltrigger_type);
 		metagoaltriggercon.addConstraint(new BoundConstraint(null, mgoaltrigger));
-		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoaltrigger_has_goals, 
-			triggerref, IOperator.CONTAINS));
+		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.metagoaltrigger_has_goals,	triggerrefs));
 			
+		// There is a trigger reference (?triggerref) that maps to the ?rpe.
+		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
+		trcon.addConstraint(new BoundConstraint(null, triggerrefs, IOperator.CONTAINS));
+		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
+		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
+
 		Rule metalevel_reasoning = new Rule("metalevel_reasoning_for_goal", 
-			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, trcon, metagoaltriggercon}), METALEVEL_ACTION);
+			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, metagoaltriggercon, trcon}), METALEVEL_ACTION);
 		return metalevel_reasoning;
 	}
 	
@@ -591,7 +590,7 @@ public class EventProcessingRules
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
 		Variable rtargetcapa = new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
 
-		Variable triggerref = new Variable("?triggerref", OAVBDIMetaModel.triggerreference_type);
+		Variable triggerrefs = new Variable("?triggerrefs", OAVBDIMetaModel.triggerreference_type, true, false);
 		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
 		
 		// There is a ?mmetagoal with a trigger (?mgoaltrigger)
@@ -623,20 +622,19 @@ public class EventProcessingRules
 		targetcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, 
 			rpe, IOperator.CONTAINS));
 		
-		// There is a trigger reference (?triggerref) that maps to the ?rpe.
-		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
-		trcon.addConstraint(new BoundConstraint(null, triggerref));
-		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
-		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
-
 		// The ?triggerref belongs to the metagoal trigger.
 		ObjectCondition	metagoaltriggercon	= new ObjectCondition(OAVBDIMetaModel.metagoaltrigger_type);
 		metagoaltriggercon.addConstraint(new BoundConstraint(null, mgoaltrigger));
-		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_internalevents, 
-			triggerref, IOperator.CONTAINS));
+		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_internalevents, triggerrefs));
 			
+		// There is a trigger reference (?triggerref) that maps to the ?rpe.
+		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
+		trcon.addConstraint(new BoundConstraint(null, triggerrefs, IOperator.CONTAINS));
+		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
+		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
+
 		Rule metalevel_reasoning = new Rule("metalevel_reasoning_for_internalevent", 
-			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, trcon, metagoaltriggercon}), METALEVEL_ACTION);
+			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, metagoaltriggercon, trcon}), METALEVEL_ACTION);
 		return metalevel_reasoning;
 	}
 	
@@ -654,7 +652,7 @@ public class EventProcessingRules
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
 		Variable rtargetcapa = new Variable("?rtargetcapa", OAVBDIRuntimeModel.capability_type);
 
-		Variable triggerref = new Variable("?triggerref", OAVBDIMetaModel.triggerreference_type);
+		Variable triggerrefs = new Variable("?triggerrefs", OAVBDIMetaModel.triggerreference_type, true, false);
 		Variable ref = new Variable("?ref", OAVJavaType.java_string_type);
 		
 		// There is a ?mmetagoal with a trigger (?mgoaltrigger)
@@ -686,20 +684,19 @@ public class EventProcessingRules
 		targetcapacon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, 
 			rpe, IOperator.CONTAINS));
 		
-		// There is a trigger reference (?triggerref) that maps to the ?rpe.
-		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
-		trcon.addConstraint(new BoundConstraint(null, triggerref));
-		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
-		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
-
 		// The ?triggerref belongs to the metagoal trigger.
 		ObjectCondition	metagoaltriggercon	= new ObjectCondition(OAVBDIMetaModel.metagoaltrigger_type);
 		metagoaltriggercon.addConstraint(new BoundConstraint(null, mgoaltrigger));
-		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_messageevents, 
-			triggerref, IOperator.CONTAINS));
+		metagoaltriggercon.addConstraint(new BoundConstraint(OAVBDIMetaModel.trigger_has_messageevents,	triggerrefs));
 			
+		// There is a trigger reference (?triggerref) that maps to the ?rpe.
+		ObjectCondition trcon = new ObjectCondition(OAVBDIMetaModel.triggerreference_type);
+		trcon.addConstraint(new BoundConstraint(null, triggerrefs, IOperator.CONTAINS));
+		trcon.addConstraint(new BoundConstraint(OAVBDIMetaModel.triggerreference_has_ref, ref));
+		trcon.addConstraint(new LiteralReturnValueConstraint(Boolean.TRUE, new FunctionCall(new ResolvesTo(), new Object[]{rcapa, ref, rpe, rtargetcapa})));
+
 		Rule metalevel_reasoning = new Rule("metalevel_reasoning_for_messageevent", 
-			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, trcon, metagoaltriggercon}), METALEVEL_ACTION);
+			new AndCondition(new ICondition[]{metagoalcon, mcapacon, capacon, pecon, targetcapacon, metagoaltriggercon, trcon}), METALEVEL_ACTION);
 		return metalevel_reasoning;
 	}
 	

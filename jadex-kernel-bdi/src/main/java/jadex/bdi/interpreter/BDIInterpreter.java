@@ -844,8 +844,14 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 			{
 				e.printStackTrace();
 			}
-			if(exception[0]!=null)
+			if(exception[0] instanceof RuntimeException)
+			{
+				throw (RuntimeException)exception[0];
+			}
+			else if(exception[0]!=null)
+			{
 				throw new RuntimeException(exception[0]);
+			}
 		}
 		else
 		{

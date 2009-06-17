@@ -89,8 +89,8 @@ public class BDIParserHelper extends	DefaultParserHelper
 			{
 				// Build belief condition to bind fact variable.
 				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
-				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
-				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.belief_type);
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.belief_type, false, true);
 				context.createObjectCondition(OAVBDIRuntimeModel.belief_type, new IConstraint[]{
 					new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
 					new BoundConstraint(OAVBDIRuntimeModel.belief_has_fact, ret),
@@ -103,8 +103,8 @@ public class BDIParserHelper extends	DefaultParserHelper
 				// Build belief set condition to bind facts variable.
 				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
 				clazz	= Array.newInstance(SReflect.getWrappedType(clazz), 0).getClass();
-				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
-				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.beliefset_type);
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.beliefset_type, false, true);
 				Object	valuesource	= new FunctionCall(new SetToArray(clazz), new Object[]{OAVBDIRuntimeModel.beliefset_has_facts});
 				context.createObjectCondition(OAVBDIRuntimeModel.beliefset_type, new IConstraint[]{
 					new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
@@ -142,13 +142,13 @@ public class BDIParserHelper extends	DefaultParserHelper
 				
 				// Build belief condition to bind fact variable.
 				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
-				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
-				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.belief_type);
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.belief_type, false, true);
 				context.createObjectCondition(OAVBDIRuntimeModel.belief_type, new IConstraint[]{
 					new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
 					new BoundConstraint(OAVBDIRuntimeModel.belief_has_fact, ret),
 					new BoundConstraint(null, belvar)});
-				Variable	belcapvar	= new Variable(name+"_belcap", OAVBDIRuntimeModel.capability_type);
+				Variable	belcapvar	= new Variable(name+"_belcap", OAVBDIRuntimeModel.capability_type, false, true);
 
 				context.createObjectCondition(OAVBDIRuntimeModel.capability_type, new IConstraint[]{
 						new BoundConstraint(null, belcapvar),
@@ -185,14 +185,14 @@ public class BDIParserHelper extends	DefaultParserHelper
 				// Build belief set condition to bind facts variable.
 				Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
 				clazz	= Array.newInstance(SReflect.getWrappedType(clazz), 0).getClass();
-				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
-				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.beliefset_type);
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	belvar	= new Variable(name+"_bel", OAVBDIRuntimeModel.beliefset_type, false, true);
 				Object	valuesource	= new FunctionCall(new SetToArray(clazz), new Object[]{OAVBDIRuntimeModel.beliefset_has_facts});
 				context.createObjectCondition(OAVBDIRuntimeModel.beliefset_type, new IConstraint[]{
 					new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, mbel),
 					new BoundConstraint(valuesource, ret),
 					new BoundConstraint(null, belvar)});
-				Variable	belcapvar	= new Variable(name+"_belcap", OAVBDIRuntimeModel.capability_type);
+				Variable	belcapvar	= new Variable(name+"_belcap", OAVBDIRuntimeModel.capability_type, false, true);
 
 				context.createObjectCondition(OAVBDIRuntimeModel.capability_type, new IConstraint[]{
 						new BoundConstraint(null, belcapvar),
@@ -233,32 +233,32 @@ public class BDIParserHelper extends	DefaultParserHelper
 
 			Object	mpar;
 			if((mpar=state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parameters, parname))!=null)
-			{
+			{				
 				// Build parameter condition to bind value variable.
 				Class	clazz	= SReflect.getWrappedType((Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class));
-				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
-				Variable	parvar	= new Variable(name+"par", OAVBDIRuntimeModel.parameter_type);
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	parvar	= new Variable(context.generateVariableName(), OAVBDIRuntimeModel.parameter_type, true, true);
 				context.createObjectCondition(OAVBDIRuntimeModel.parameter_type, new IConstraint[]{
 					new LiteralConstraint(OAVBDIRuntimeModel.parameter_has_name, parname),
 					new BoundConstraint(OAVBDIRuntimeModel.parameter_has_value, ret),
-					new BoundConstraint(null, parvar)});
+					new BoundConstraint(null, parvar, IOperator.CONTAINS)});
 
-				rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parameters, parvar, IOperator.CONTAINS));
+				rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parameters, parvar));
 			}
 			else if((mpar=state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parametersets, parname))!=null)
 			{
 				// Build parameter set condition to bind values variable.
 				Class	clazz	= SReflect.getWrappedType((Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class));
 				clazz	= Array.newInstance(SReflect.getWrappedType(clazz), 0).getClass();
-				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz));
-				Variable	parvar	= new Variable(name+"par", OAVBDIRuntimeModel.parameterset_type);
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	parvar	= new Variable(context.generateVariableName(), OAVBDIRuntimeModel.parameterset_type, true, true);
 				Object	valuesource	= new FunctionCall(new SetToArray(clazz), new Object[]{OAVBDIRuntimeModel.parameterset_has_values});
 				context.createObjectCondition(OAVBDIRuntimeModel.parameterset_type, new IConstraint[]{
 					new LiteralConstraint(OAVBDIRuntimeModel.parameterset_has_name, parname),
 					new BoundConstraint(valuesource, ret),
-					new BoundConstraint(null, parvar)});
+					new BoundConstraint(null, parvar, IOperator.CONTAINS)});
 
-				rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parametersets, parvar, IOperator.CONTAINS));
+				rgoalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parametersets, parvar));
 			}
 
 			if(mpar==null)
