@@ -39,13 +39,13 @@
 	</plans>
 
 	<expressions>
-		<expression name="exp" class="String">
+		<expression name="exp">
 			new String[]{"a","b","c"}[$num]
 			<!-- bug in jibx :-( text must be before subtags. -->
 			<!-- <parameter name="$num" class="int"/>  -->
 		</expression>
 
-		<expression name="join" class="String">
+		<expression name="join">
 			select "("+$p1+", "+$p2+")"
  			from Person $p1 in $beliefbase.persons, Person $p2 in $beliefbase.persons
 			where $p1!=$p2 &amp;&amp; $p1.getAddress().equals($p2.getAddress())

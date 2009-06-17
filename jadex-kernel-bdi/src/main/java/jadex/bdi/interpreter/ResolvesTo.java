@@ -6,9 +6,6 @@ import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  *  Test if a reference string resolves to a given element.
  *  E.g. dfcap.register resolves to any register goal in a dfcap subcapability.

@@ -9,7 +9,6 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Move an object towards a destination.

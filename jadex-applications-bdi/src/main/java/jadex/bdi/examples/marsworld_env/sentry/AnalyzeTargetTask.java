@@ -6,7 +6,6 @@ import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Analyze a given target.

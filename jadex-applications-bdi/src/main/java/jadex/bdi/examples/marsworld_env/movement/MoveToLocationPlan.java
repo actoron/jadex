@@ -42,7 +42,7 @@ public class MoveToLocationPlan extends Plan
 		SyncResultListener	res	= new SyncResultListener();
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
-		props.put(MoveTask.PROPERTY_SCOPE, getExternalAccess());
+		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
 		props.put(LoadOreTask.PROPERTY_LISTENER, res);
 		IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 		taskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());

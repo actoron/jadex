@@ -336,6 +336,12 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
 					}
 				}
+
+//				// Assert for testing state consistency (slow -> comment out for release!)
+//				assert rulesystem.getState().getUnreferencedObjects().isEmpty()
+//					: getAgentAdapter().getAgentIdentifier().getLocalName()
+//					+ ", " + entries[i]
+//					+ ", " + rulesystem.getState().getUnreferencedObjects();
 			}
 
 			boolean	execute	= true;
@@ -388,11 +394,11 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	//					}
 	//				}
 					
-					// Assert for testing state consistency (slow -> comment out for release!)
-					assert rulesystem.getState().getUnreferencedObjects().size()==0
-						: getAgentAdapter().getAgentIdentifier().getLocalName()
-						+ ", " + rulesystem.getAgenda().getLastActivation()
-						+ ", " + rulesystem.getState().getUnreferencedObjects();
+//					// Assert for testing state consistency (slow -> comment out for release!)
+//					assert rulesystem.getState().getUnreferencedObjects().isEmpty()
+//						: getAgentAdapter().getAgentIdentifier().getLocalName()
+//						+ ", " + rulesystem.getAgenda().getLastActivation()
+//						+ ", " + rulesystem.getState().getUnreferencedObjects();
 
 					rulesystem.getAgenda().fireRule();
 				}
@@ -786,7 +792,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 //			Thread.dumpStack();
 
 			final boolean[] notified = new boolean[1];
-			final RuntimeException[] exception = new RuntimeException[1];
+			final Throwable[] exception = new Throwable[1];
 			
 			// Add external will throw exception if action execution cannot be done.
 //			System.err.println("invokeSynchonized("+code+"): adding");
@@ -797,8 +803,14 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 					try
 					{
 						code.run();
+
+//						// Assert for testing state consistency (slow -> comment out for release!)
+//						assert rulesystem.getState().getUnreferencedObjects().isEmpty()
+//							: getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+ ", " + code
+//							+ ", " + rulesystem.getState().getUnreferencedObjects();
 					}
-					catch(RuntimeException e)
+					catch(Throwable e)
 					{
 						exception[0]	= e;
 					}
@@ -833,7 +845,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 				e.printStackTrace();
 			}
 			if(exception[0]!=null)
-				throw exception[0];
+				throw new RuntimeException(exception[0]);
 		}
 		else
 		{

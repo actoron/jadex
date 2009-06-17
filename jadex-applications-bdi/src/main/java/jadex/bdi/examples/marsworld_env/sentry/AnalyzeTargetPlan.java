@@ -1,21 +1,19 @@
 package jadex.bdi.examples.marsworld_env.sentry;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.examples.cleanerworld_env.cleaner.LoadBatteryTask;
 import jadex.bdi.examples.marsworld_env.RequestProduction;
-import jadex.bdi.examples.marsworld_env.producer.ProduceOreTask;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IAgentIdentifier;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

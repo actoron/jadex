@@ -1871,7 +1871,12 @@ public abstract class OAVAbstractState	implements IOAVState
 
 		if(isManaged(value))
 		{
-//			System.out.println("Creating reference: "+whichid+" "+whichattr.getName()+" "+value);
+//			if((""+whichid).indexOf("goal_")!=-1 || (""+value).indexOf("goal_")!=-1)
+//			{
+//				System.err.println("Creating reference: "+whichid+" "+whichattr.getName()+" "+value);
+//				if(whichattr.getName().equals("parameterelement_has_parameters"))
+//					Thread.dumpStack();
+//			}
 
 			// Set would be better
 			Map usages = (Map)objectusages.get(value);
@@ -1929,7 +1934,7 @@ public abstract class OAVAbstractState	implements IOAVState
 
 		if(isManaged(value))
 		{
-//			System.out.println("Removing reference: "+whichid+" "+whichattr.getName()+" "+value);
+//			System.err.println("Removing reference: "+whichid+" "+whichattr.getName()+" "+value);
 
 			// Increase external usage counter, if source object is externally referenced.
 			if(keepalive && generator.isId(value))

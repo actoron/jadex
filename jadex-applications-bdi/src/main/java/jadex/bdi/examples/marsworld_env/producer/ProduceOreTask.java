@@ -7,7 +7,6 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.examples.marsworld_env.sentry.AnalyzeTargetTask;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Move an object towards a destination.

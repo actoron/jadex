@@ -413,7 +413,7 @@ public class ListenerRules
 	}
 	
 	/**
-	 *  Create a rule to goal listeners.
+	 *  Create a rule to notify goal listeners.
 	 */
 	protected static Rule createGoalListenerRule()
 	{
@@ -471,6 +471,8 @@ public class ListenerRules
 					lis.goalAdded(ae);
 				else
 					lis.goalFinished(ae);
+				
+//				System.err.println("listener_goal rule: "+rgoal+", "+lis+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier());
 			}
 		};
 		

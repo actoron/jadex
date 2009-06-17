@@ -24,7 +24,7 @@ public class MessageForwardPlan extends AbstractMultipleAgentsPlan
 		if(((Boolean)getBeliefbase().getBelief("testcap.off").getFact()).booleanValue())
 		{
 //			System.out.println("Received forwarded message succesfully!");
-			killAgent();
+//			killAgent();
 			return;
 		}
 

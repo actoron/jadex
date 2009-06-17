@@ -393,7 +393,7 @@ public class AgentRules
 				Object changeevent = assignments.getVariableValue("?changeevent");
 				Object ragent = assignments.getVariableValue("?ragent");
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_changeevents, changeevent);
-//				System.out.println("removing: "+changeevent);
+//				System.err.println("removing: "+changeevent+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier());
 			}
 		};
 		

@@ -23,8 +23,6 @@ import jadex.rules.state.IOAVState;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  *  Handler for BDI-specific parsing issues ($beliefbase etc.)

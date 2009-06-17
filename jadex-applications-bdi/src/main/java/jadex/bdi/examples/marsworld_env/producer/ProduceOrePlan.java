@@ -1,15 +1,14 @@
 package jadex.bdi.examples.marsworld_env.producer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.bdi.examples.cleanerworld_env.cleaner.LoadBatteryTask;
-import jadex.bdi.examples.marsworld_env.movement.MoveTask;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

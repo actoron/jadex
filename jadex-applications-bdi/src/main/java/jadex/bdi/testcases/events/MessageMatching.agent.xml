@@ -85,7 +85,8 @@
 
 	<properties>
 		<property name="debugging">false</property>
-		<!-- <property name="logging.level">Level.INFO</property> -->
+		<!-- Logging turned off, as SEVERE message gets logged for non-matched message. -->
+		<property name="logging.level">Level.OFF</property>
 	</properties>
 
 	<configurations>
