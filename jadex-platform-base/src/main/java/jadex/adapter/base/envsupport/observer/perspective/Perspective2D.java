@@ -16,7 +16,6 @@ import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.bridge.ILibraryService;
-import jadex.commons.IPropertyObject;
 import jadex.commons.SimplePropertyObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
@@ -534,7 +533,7 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 				if (selectedobject != null)
 				{
 					DrawableCombiner dc =(DrawableCombiner)visuals.get(SObjectInspector.getType(selectedobject));
-					IVector2 size = (IVector2)dc.getBoundValue(selectedobject, dc.getSize());
+					IVector2 size = (IVector2)dc.getBoundValue(selectedobject, dc.getSize(), viewport);
 					Object[] viewObj = new Object[2];
 					marker.setSize((IVector2) size);
 					viewObj[0] = selectedobject;
@@ -623,7 +622,7 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 			for (int i = 0; i < objects.length; ++i)
 			{
 				DrawableCombiner dc = (DrawableCombiner)visuals.get(SObjectInspector.getType(objects[i]));
-				IVector2 objPos = (IVector2)dc.getBoundValue(objects[i], dc.getPosition()); 
+				IVector2 objPos = (IVector2)dc.getBoundValue(objects[i], dc.getPosition(), viewport); 
 				if (objPos == null)
 				{
 					continue;

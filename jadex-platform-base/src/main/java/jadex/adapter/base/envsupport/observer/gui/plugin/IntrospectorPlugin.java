@@ -8,6 +8,7 @@ import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.commons.SReflect;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -50,6 +51,9 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	/** Space property table */
 	private JTable spacePropertyTable_;
 	
+	/** Perspective property table */
+	private JTable perspPropertyTable_;
+	
 	/** Process list */
 	private JList processList_;
 	
@@ -86,7 +90,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	public IntrospectorPlugin()
 	{
 		mainPane_ = new JTabbedPane();
-		mainPane_.setMinimumSize(new Dimension(200, 300));
+		mainPane_.setMinimumSize(new Dimension(250, 400));
 		
 		JSplitPane spacePane = new JSplitPane();
 		spacePane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -147,6 +151,12 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		objectPane.setDividerLocation(100);
 		objectPane.setResizeWeight(0.33);
 		mainPane_.add("Object", objectPane);
+		
+		final JPanel perspPropertyPane = new JPanel(new BorderLayout());
+		mainPane_.add("Perspective", perspPropertyPane);
+		perspPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
+		JScrollPane sp = new JScrollPane(perspPropertyTable_);
+		perspPropertyPane.add(sp, BorderLayout.CENTER);
 		
 		JPanel objectPropertyPanel = new JPanel();
 		objectPropertyPanel.setLayout(new GridBagLayout());
@@ -282,7 +292,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		Object selection = processList_.getSelectedValue();
 		plModel.removeAllElements();
 		Set processIds = observerCenter_.getSpace().getSpaceProcessNames();
-		for (Iterator it = processIds.iterator(); it.hasNext(); )
+		for(Iterator it = processIds.iterator(); it.hasNext(); )
 		{
 			Object id = it.next();
 //			String str = SReflect.getUnqualifiedClassName(it.next().getClass())+"( id="+id+")";
@@ -292,57 +302,70 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		}
 		processList_.setSelectedValue(selection, true);
 //		ISpaceProcess proc = observerCenter_.getSpace().getSpaceProcess(selection);
-		if (selection != null)
+		if(selection != null)
+		{
 			fillPropertyTable(processPropertyTable_, selection);
+		}
 		else
+		{
 			((DefaultTableModel) processPropertyTable_.getModel()).setRowCount(0);
+		}
 		
 		IPerspective p = observerCenter_.getSelectedPerspective();
 		Object observedObj = p.getSelectedObject();
-		if (observedObj == null)
+		if(observedObj == null)
 		{
 			objIdLabel_.setText("");
 			objTypeLabel_.setText("");
 			objPropertyTable_.setModel(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
-			return;
 		}
-		
-		if (!fillPropertyTable(objPropertyTable_, observedObj))
-		{
-			p.setSelectedObject(null);
-			return;
-		}
-		
-		objIdLabel_.setText(String.valueOf(SObjectInspector.getId(observedObj)));
-		String type = String.valueOf(SObjectInspector.getType(observedObj));
-		objTypeLabel_.setText(type);
-		
-		if(observedObj instanceof SpaceObject)
-		{
-			DefaultComboBoxModel tlModel = (DefaultComboBoxModel) taskList_.getModel();
-			SpaceObject sObj = (SpaceObject) observedObj;
-			Collection tasks = sObj.getTasks();
-			selection = taskList_.getSelectedValue();
-			tlModel.removeAllElements();
-			for(Iterator it = tasks.iterator(); it.hasNext(); )
-			{
-				IObjectTask task = (IObjectTask)it.next();
-//				String str = SReflect.getUnqualifiedClassName(it.next().getClass())+" "+task;
-				tlModel.addElement(task);
-			}
-			if (tasks.contains(selection))
-				taskList_.setSelectedValue(selection, true);
-		}
-		if (selection != null)
-			fillPropertyTable(taskPropertyTable_, selection);
 		else
-			((DefaultTableModel) taskPropertyTable_.getModel()).setRowCount(0);
+		{
+			if(!fillPropertyTable(objPropertyTable_, observedObj))
+			{
+				p.setSelectedObject(null);
+			}
+			else
+			{
+				objIdLabel_.setText(String.valueOf(SObjectInspector.getId(observedObj)));
+				String type = String.valueOf(SObjectInspector.getType(observedObj));
+				objTypeLabel_.setText(type);
+				
+				if(observedObj instanceof SpaceObject)
+				{
+					DefaultComboBoxModel tlModel = (DefaultComboBoxModel) taskList_.getModel();
+					SpaceObject sObj = (SpaceObject) observedObj;
+					Collection tasks = sObj.getTasks();
+					selection = taskList_.getSelectedValue();
+					tlModel.removeAllElements();
+					for(Iterator it = tasks.iterator(); it.hasNext(); )
+					{
+						IObjectTask task = (IObjectTask)it.next();
+		//				String str = SReflect.getUnqualifiedClassName(it.next().getClass())+" "+task;
+						tlModel.addElement(task);
+					}
+					if (tasks.contains(selection))
+						taskList_.setSelectedValue(selection, true);
+				}
+				if(selection != null)
+				{
+					fillPropertyTable(taskPropertyTable_, selection);
+				}
+				else
+				{
+					((DefaultTableModel) taskPropertyTable_.getModel()).setRowCount(0);
+				}
+			}
+		}
+			
+		fillPropertyTable(perspPropertyTable_, observerCenter_.getSelectedPerspective());
 	}
 	
 	private static boolean fillPropertyTable(JTable table, Object propHolder)
 	{
 		Set propNames = SObjectInspector.getPropertyNames(propHolder);
-		if (propNames == null)
+//		System.out.println("prop holder: "+propHolder+" "+propNames);
+		if(propNames == null)
 		{
 			return false;
 		}

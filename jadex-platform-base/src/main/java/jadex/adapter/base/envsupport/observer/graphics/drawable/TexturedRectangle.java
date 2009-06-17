@@ -90,15 +90,15 @@ public class TexturedRectangle extends ColoredPrimitive
 	{
 		Graphics2D g = vp.getContext();
 		
-		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize());
+		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize(), vp);
 		
 		BufferedImage image = image_;
 		
 		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
-		if (!setupMatrix(dc, obj, g))
+		if (!setupMatrix(dc, obj, g, vp))
 			return;
 		
-		currentColor_ = (Color) dc.getBoundValue(obj, color_);
+		currentColor_ = (Color) dc.getBoundValue(obj, color_, vp);
 		
 		if (!Color.WHITE.equals(currentColor_))
 		{
@@ -121,11 +121,11 @@ public class TexturedRectangle extends ColoredPrimitive
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
 		
-		currentColor_ = (Color) dc.getBoundValue(obj, color_);
+		currentColor_ = (Color) dc.getBoundValue(obj, color_, vp);
 		
 		gl.glColor4fv(currentColor_.getComponents(null), 0);
 		
-		if(setupMatrix(dc, obj, gl));
+		if(setupMatrix(dc, obj, gl, vp));
 		{
 			gl.glBegin(GL.GL_QUADS);
 			gl.glTexCoord2f(0.0f, 0.0f);

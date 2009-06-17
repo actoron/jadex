@@ -82,9 +82,9 @@ public class Triangle extends ColoredPrimitive
 	{
 		Graphics2D g = vp.getContext();
 		AffineTransform transform = g.getTransform();
-		if(!setupMatrix(dc, obj, g))
+		if(!setupMatrix(dc, obj, g, vp))
 			return;
-		Color c = (Color) dc.getBoundValue(obj, color_);
+		Color c = (Color)dc.getBoundValue(obj, color_, vp);
 		g.setColor(c);
 		g.fill(J2D_TRIANGLE);
 		g.setTransform(transform);
@@ -93,9 +93,9 @@ public class Triangle extends ColoredPrimitive
 	public void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
-		Color c = (Color) dc.getBoundValue(obj, color_);
+		Color c = (Color) dc.getBoundValue(obj, color_, vp);
 		gl.glColor4fv(c.getComponents(null), 0);
-		if (setupMatrix(dc, obj, gl))
+		if (setupMatrix(dc, obj, gl, vp))
 			gl.glCallList(dList_);
 	}
 

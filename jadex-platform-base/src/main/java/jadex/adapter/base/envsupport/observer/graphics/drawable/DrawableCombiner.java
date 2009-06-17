@@ -1,12 +1,15 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.IVector3;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
+import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.javaparser.IParsedExpression;
@@ -153,11 +156,11 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 	 * @param enableSize enables size setup
 	 * @param enableRot enables rotation setup
 	 */
-	public boolean setupMatrix(Object obj, Graphics2D g, boolean enablePos, boolean enableSize, boolean enableRot)
+	public boolean setupMatrix(Object obj, Graphics2D g, boolean enablePos, boolean enableSize, boolean enableRot, IViewport vp)
 	{
 		if(enablePos)
 		{
-			IVector2 position = (IVector2)getBoundValue(obj, getPosition());
+			IVector2 position = (IVector2)getBoundValue(obj, getPosition(), vp);
 			if(position==null)
 				return false;
 			g.translate(position.getXAsDouble(), position.getYAsDouble());
@@ -165,7 +168,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		
 		if(enableSize)
 		{
-			IVector2 size = (IVector2)getBoundValue(obj, getSize());
+			IVector2 size = (IVector2)getBoundValue(obj, getSize(), vp);
 			if(size==null)
 				size = new Vector2Double(1,0);
 			g.scale(size.getXAsDouble(), size.getYAsDouble());
@@ -173,7 +176,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		
 		if(enableRot)
 		{
-			IVector3 rot = (IVector3)getBoundValue(obj, getRotation());
+			IVector3 rot = (IVector3)getBoundValue(obj, getRotation(), vp);
 			if(rot==null)
 				rot = Vector3Double.ZERO.copy();
 			g.scale(Math.cos(rot.getYAsDouble()), Math.cos(rot.getXAsDouble()));
@@ -192,11 +195,11 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 	 * @param enableSize enables size setup
 	 * @param enableRot enables rotation setup
 	 */
-	public boolean setupMatrix(Object obj, GL gl, boolean enablePos, boolean enableSize, boolean enableRot)
+	public boolean setupMatrix(Object obj, GL gl, boolean enablePos, boolean enableSize, boolean enableRot, IViewport vp)
 	{
 		if(enablePos)
 		{
-			IVector2 position = (IVector2)getBoundValue(obj, getPosition());
+			IVector2 position = (IVector2)getBoundValue(obj, getPosition(), vp);
 			if(position==null)
 				return false;
 			gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
@@ -204,7 +207,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		
 		if(enableSize)
 		{
-			IVector2 size = (IVector2)getBoundValue(obj, getSize());
+			IVector2 size = (IVector2)getBoundValue(obj, getSize(), vp);
 			if(size==null)
 				size = new Vector2Double(1,0);
 			gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
@@ -212,7 +215,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		
 		if(enableRot)
 		{
-			IVector3 rot = (IVector3)getBoundValue(obj, getRotation());
+			IVector3 rot = (IVector3)getBoundValue(obj, getRotation(), vp);
 			if(rot==null)
 				rot = Vector3Double.ZERO.copy();
 			gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
@@ -284,7 +287,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 	 * Gets the bound value for a property.
 	 * @return The bound value.
 	 */
-	public Object getBoundValue(Object obj, Object prop)
+	public Object getBoundValue(Object obj, Object prop, IViewport viewport)
 	{
 		Object ret = prop;
 		if(prop instanceof String)
@@ -296,6 +299,8 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 				SimpleValueFetcher fetcher = new SimpleValueFetcher();
 				fetcher.setValue("$drawable", this);
 				fetcher.setValue("$object", obj);
+				fetcher.setValue("$perspective", viewport.getPerspective());
+				fetcher.setValue("$space", viewport.getPerspective().getObserverCenter().getSpace());
 				ret = ((IParsedExpression)ret).getValue(fetcher);
 			}
 			

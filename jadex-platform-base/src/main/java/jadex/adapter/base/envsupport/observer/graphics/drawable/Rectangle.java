@@ -76,9 +76,9 @@ public class Rectangle extends ColoredPrimitive
 	public void doDraw(DrawableCombiner dc, Object obj, ViewportJ2D vp)
 	{
 		Graphics2D g = vp.getContext();
-		if(!setupMatrix(dc, obj, g))
+		if(!setupMatrix(dc, obj, g, vp))
 			return;
-		Color c = (Color) dc.getBoundValue(obj, color_);
+		Color c = (Color) dc.getBoundValue(obj, color_, vp);
 		g.setColor(c);
 		g.fill(J2D_RECTANGLE);
 	}
@@ -86,9 +86,9 @@ public class Rectangle extends ColoredPrimitive
 	public void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
 	{
 		GL gl = vp.getContext();
-		Color c = (Color) dc.getBoundValue(obj, color_);
+		Color c = (Color) dc.getBoundValue(obj, color_, vp);
 		gl.glColor4fv(c.getComponents(null), 0);
-		if(setupMatrix(dc, obj, gl))
+		if(setupMatrix(dc, obj, gl, vp))
 			gl.glCallList(dList_);
 	}
 

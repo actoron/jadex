@@ -2,9 +2,9 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.IVector3;
+import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
-import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -72,11 +72,11 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param g graphics context
 	 * @return true, if the setup was successful
 	 */
-	protected boolean setupMatrix(DrawableCombiner dc, Object obj, Graphics2D g)
+	protected boolean setupMatrix(DrawableCombiner dc, Object obj, Graphics2D g, IViewport vp)
 	{
-		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize());
-		IVector3 rot = (IVector3)dc.getBoundValue(obj, getRotation());
-		IVector2 position = (IVector2)dc.getBoundValue(obj, getPosition());
+		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize(), vp);
+		IVector3 rot = (IVector3)dc.getBoundValue(obj, getRotation(), vp);
+		IVector2 position = (IVector2)dc.getBoundValue(obj, getPosition(), vp);
 		
 		if((position == null) || (size == null) || (rot == null))
 		{
@@ -97,11 +97,11 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 	 * @param obj object being drawn
 	 * @param gl OpenGL context
 	 */
-	protected boolean setupMatrix(DrawableCombiner dc, Object obj, GL gl)
+	protected boolean setupMatrix(DrawableCombiner dc, Object obj, GL gl, IViewport vp)
 	{
-		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize());
-		IVector3 rot = (IVector3)dc.getBoundValue(obj, getRotation());
-		IVector2 position = (IVector2)dc.getBoundValue(obj, getPosition());
+		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize(), vp);
+		IVector3 rot = (IVector3)dc.getBoundValue(obj, getRotation(), vp);
+		IVector2 position = (IVector2)dc.getBoundValue(obj, getPosition(), vp);
 		
 		if((position == null) || (size == null) || (rot == null))
 		{
@@ -137,7 +137,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			Graphics2D g = vp.getContext();
 			AffineTransform t = g.getTransform();
-			if(!dc.setupMatrix(obj, g, enableDCPos, enableDCSize, enableDCRot))
+			if(!dc.setupMatrix(obj, g, enableDCPos, enableDCSize, enableDCRot, vp))
 				return;
 			doDraw(dc, obj, vp);
 			g.setTransform(t);
@@ -165,7 +165,7 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			GL gl = vp.getContext();
 			gl.glPushMatrix();
-			if(!dc.setupMatrix(obj, gl, enableDCPos, enableDCSize, enableDCRot))
+			if(!dc.setupMatrix(obj, gl, enableDCPos, enableDCSize, enableDCRot, vp))
 				return;
 			doDraw(dc, obj, vp);
 			gl.glPopMatrix();

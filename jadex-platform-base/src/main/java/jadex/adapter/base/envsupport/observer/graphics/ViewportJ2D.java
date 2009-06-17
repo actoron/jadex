@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.observer.graphics;
 
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport.MouseController;
@@ -161,7 +162,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	public void componentShown(ComponentEvent e)
 	{
 	}
-
+	
 	/**
 	 * Loads an image.
 	 * 

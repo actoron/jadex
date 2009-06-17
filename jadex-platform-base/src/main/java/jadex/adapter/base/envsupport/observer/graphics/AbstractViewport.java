@@ -446,6 +446,15 @@ public abstract class AbstractViewport implements IViewport
 	{
 		listeners_.remove(listener);
 	}
+	
+	/**
+	 *  Get the perspective.
+	 *  @return The perspective.
+	 */
+	public IPerspective getPerspective()
+	{
+		return perspective;
+	}
 
 	/**
 	 * Fires a left mouse click event

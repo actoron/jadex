@@ -4,6 +4,7 @@ package jadex.adapter.base.envsupport.observer.graphics;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
+import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -159,4 +160,10 @@ public interface IViewport
 	 * @param listener the listener
 	 */
 	public void removeViewportListener(IViewportListener listener);
+	
+	/**
+	 *  Get the perspective.
+	 *  @return The perspective.
+	 */
+	public IPerspective getPerspective();
 }
