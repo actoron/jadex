@@ -31,6 +31,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 /** The Introspector
  */
@@ -118,6 +119,10 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.BOTH;
 		spacePropertyPanel.add(spcPropScrollPane, c);
+		TableColumn col = spacePropertyTable_.getColumnModel().getColumn(0);
+		col.setPreferredWidth(80);
+		col.setMaxWidth(300);
+
 		
 		JPanel processPanel = new JPanel();
 		processPanel.setBorder(new TitledBorder("Processes"));
@@ -144,6 +149,9 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		processPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane procPropScrollPane = new JScrollPane(processPropertyTable_);
 		processPane.setBottomComponent(procPropScrollPane);
+		col = processPropertyTable_.getColumnModel().getColumn(0);
+		col.setPreferredWidth(80);
+		col.setMaxWidth(300);
 		
 		final JSplitPane objectPane = new JSplitPane();
 		objectPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -157,7 +165,10 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		perspPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane sp = new JScrollPane(perspPropertyTable_);
 		perspPropertyPane.add(sp, BorderLayout.CENTER);
-		
+		col = perspPropertyTable_.getColumnModel().getColumn(0);
+		col.setPreferredWidth(80);
+		col.setMaxWidth(300);
+				
 		JPanel objectPropertyPanel = new JPanel();
 		objectPropertyPanel.setLayout(new GridBagLayout());
 		objectPane.setTopComponent(objectPropertyPanel);
@@ -215,6 +226,9 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.BOTH;
 		objectPropertyPanel.add(tableScrollPane, c);
+		col = objPropertyTable_.getColumnModel().getColumn(0);
+		col.setPreferredWidth(80);
+		col.setMaxWidth(300);
 		
 		/////
 		JPanel taskPanell = new JPanel();
@@ -242,16 +256,19 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		taskPropertyTable_ = new JTable(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
 		JScrollPane taskPropScrollPane = new JScrollPane(taskPropertyTable_);
 		taskPane.setBottomComponent(taskPropScrollPane);
+		col = taskPropertyTable_.getColumnModel().getColumn(0);
+		col.setPreferredWidth(80);
+		col.setMaxWidth(300);
 		
 		selectionListener = new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
 			{
-				public void stateChanged(ChangeEvent e)
-				{
-					Object selection = observerCenter_.getSelectedPerspective().getSelectedObject();
-					if (selection != null)
-						mainPane_.setSelectedComponent(objectPane);
-				}
-			};
+				Object selection = observerCenter_.getSelectedPerspective().getSelectedObject();
+				if (selection != null)
+					mainPane_.setSelectedComponent(objectPane);
+			}
+		};
 	}
 
 	public synchronized void start(ObserverCenter main)
@@ -308,7 +325,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		}
 		else
 		{
-			((DefaultTableModel) processPropertyTable_.getModel()).setRowCount(0);
+			((DefaultTableModel)processPropertyTable_.getModel()).setRowCount(0);
 		}
 		
 		IPerspective p = observerCenter_.getSelectedPerspective();
@@ -318,6 +335,9 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 			objIdLabel_.setText("");
 			objTypeLabel_.setText("");
 			objPropertyTable_.setModel(new DefaultTableModel(new Object[0][2], COLUMM_NAMES));
+			TableColumn col = objPropertyTable_.getColumnModel().getColumn(0);
+			col.setPreferredWidth(80);
+			col.setMaxWidth(300);
 		}
 		else
 		{
@@ -365,27 +385,25 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	{
 		Set propNames = SObjectInspector.getPropertyNames(propHolder);
 //		System.out.println("prop holder: "+propHolder+" "+propNames);
-		if(propNames == null)
+		if(propNames != null)
 		{
-			return false;
+			Object[][] dataSet = new Object[propNames.size()][2];
+			int i = 0;
+			for(Iterator it = propNames.iterator(); it.hasNext(); )
+			{
+				String name = (String) it.next();
+				dataSet[i][0] = name;
+				dataSet[i][1] = String.valueOf(SObjectInspector.getProperty(propHolder, name));
+				++i;
+			}
+			DefaultTableModel model = (DefaultTableModel) table.getModel();
+			model.setRowCount(dataSet.length);
+			for (i = 0; i < dataSet.length; ++i)
+			{
+				model.setValueAt(dataSet[i][0], i, 0);
+				model.setValueAt(dataSet[i][1], i, 1);
+			}
 		}
-		
-		Object[][] dataSet = new Object[propNames.size()][2];
-		int i = 0;
-		for(Iterator it = propNames.iterator(); it.hasNext(); )
-		{
-			String name = (String) it.next();
-			dataSet[i][0] = name;
-			dataSet[i][1] = String.valueOf(SObjectInspector.getProperty(propHolder, name));
-			++i;
-		}
-		DefaultTableModel model = (DefaultTableModel) table.getModel();
-		model.setRowCount(dataSet.length);
-		for (i = 0; i < dataSet.length; ++i)
-		{
-			model.setValueAt(dataSet[i][0], i, 0);
-			model.setValueAt(dataSet[i][1], i, 1);
-		}
-		return true;
+		return propNames!=null;
 	}
 }

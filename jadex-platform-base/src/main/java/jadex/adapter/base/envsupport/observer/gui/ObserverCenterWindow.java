@@ -70,7 +70,7 @@ public class ObserverCenterWindow extends JFrame
 				setSize(800, 600);
 				setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 				setVisible(true);
-				mainpane.setDividerLocation(0.4);
+//				mainpane.setDividerLocation(100);
 			}
 		};
 		
@@ -153,6 +153,6 @@ public class ObserverCenterWindow extends JFrame
 	public void setPerspectiveView(Component view)
 	{
 		mainpane.setRightComponent(view);
-		mainpane.setDividerLocation(200 + mainpane.getInsets().left);
+		mainpane.setDividerLocation(250 + mainpane.getInsets().left);
 	}
 }
