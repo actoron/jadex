@@ -54,8 +54,32 @@
 	</spacetypes>
 	
 	<applications>
-		<application name="Normal">
-			<env:envspace name="mygc2dspace" type="gc2dspace">
+		<application name="50x50">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
+				<env:processes>
+					<env:process type="gol"/>
+				</env:processes>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" perspective="main"/>
+				</env:observers>
+			</env:envspace>
+		</application>
+		
+		<application name="70x70">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="70" height="70">
+				<env:processes>
+					<env:process type="gol"/>
+				</env:processes>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" perspective="main"/>
+				</env:observers>
+			</env:envspace>
+		</application>
+		
+		<application name="100x100">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="100" height="100">
 				<env:processes>
 					<env:process type="gol"/>
 				</env:processes>
