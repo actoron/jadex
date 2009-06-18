@@ -173,7 +173,6 @@
 				<initialgoal ref="move.walk_around"/>
 				<!-- Create a goal for finding targets. -->
 				<initialgoal ref="find_targets"/>
-				<endgoal ref="dfcap.df_deregister"/>
 			</goals>
 		</configuration>
 	</configurations>

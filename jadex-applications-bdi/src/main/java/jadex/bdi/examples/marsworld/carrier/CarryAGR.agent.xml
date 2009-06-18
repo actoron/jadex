@@ -135,7 +135,6 @@
 				<initialgoal ref="move.walk_around"/>
 				<!-- Create a goal for watching for targets. -->
 				<initialgoal ref="move.watch_targets"/>
-				<endgoal ref="dfcap.df_deregister"/>
 			</goals>
 			<plans>
 				<initialplan ref="carry"/>

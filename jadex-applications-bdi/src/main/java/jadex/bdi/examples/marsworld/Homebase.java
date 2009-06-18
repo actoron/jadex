@@ -1,6 +1,6 @@
 package jadex.bdi.examples.marsworld;
 
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bridge.IClockService;
 import jadex.commons.SReflect;
 
 /**
@@ -20,14 +20,14 @@ public class Homebase extends LocationObject
 	protected long starttime;
 	
 	/** The clock. */
-	protected IExternalAccess	clock;
+	protected IClockService clock;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new homebase.
 	 */
-	public Homebase(Location loc, long missiontime, IExternalAccess clock)
+	public Homebase(Location loc, long missiontime, IClockService clock)
 	{
 		super("homebase", loc);
 		this.clock	= clock;

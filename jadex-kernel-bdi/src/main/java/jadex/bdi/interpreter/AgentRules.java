@@ -1287,6 +1287,8 @@ public class AgentRules
 					Object	exp = state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_fact);
 					try
 					{
+						Object agent = BDIInterpreter.getInterpreter(state).getAgent();
+						String name = (String)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_name);
 						Object value = evaluateExpression(state, exp, fet);
 						BeliefRules.setBeliefValue(state, rbel, value);
 					}

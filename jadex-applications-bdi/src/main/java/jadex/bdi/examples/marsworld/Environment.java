@@ -1,6 +1,6 @@
 package jadex.bdi.examples.marsworld;
 
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bridge.IClockService;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,7 @@ public class Environment
 	/**
 	 *  Create a new environment
 	 */
-	private Environment(IExternalAccess clock)
+	private Environment(IClockService clock)
 	{
 		this.agentinfos = new ArrayList();
 		this.targets = new ArrayList();
@@ -81,7 +81,7 @@ public class Environment
 	/**
 	 *  Create a new instance.
 	 */
-	public static Environment createInstance(IExternalAccess clock)
+	public static Environment createInstance(IClockService clock)
 	{
 		instance = new Environment(clock);
 		return instance;

@@ -8,6 +8,7 @@ import jadex.bdi.examples.marsworld.Target;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
+import jadex.bridge.IContextService;
 import jadex.commons.SGUI;
 
 import java.awt.Color;
@@ -106,7 +107,9 @@ public class MarsworldGui	extends JFrame
 					}
 					catch(GoalFailureException gfe) {}
 				}*/
-				agent.killAgent();
+//				agent.killAgent();
+				IContextService ics = (IContextService)agent.getPlatform().getService(IContextService.class);
+				ics.deleteContext(agent.getApplicationContext(), null);
 			}
 		});
 		
