@@ -257,6 +257,8 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		for(int i=0; i<percepttypes.length; i++)
 		{
 			PerceptType pt = (PerceptType)space.getPerceptType(((String[])percepttypes[i])[0]);
+			if(pt==null)
+				throw new RuntimeException("Unknown percept type: "+pt);
 			if((pt.getAgentTypes()==null || pt.getAgentTypes().contains(agenttype))
 				&& (pt.getObjectTypes()==null || pt.getObjectTypes().contains(objecttype))
 				&& (getActionTypes(pt)==null || getActionTypes(pt).contains(actiontype)))

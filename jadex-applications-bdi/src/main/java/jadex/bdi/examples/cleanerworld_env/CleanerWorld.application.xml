@@ -82,6 +82,7 @@
 			</env:processtypes>
 			
 			<env:percepttypes>
+				<env:percepttype name="cleaner_moved" objecttype="cleaner" agenttype="Cleaner" />
 				<env:percepttype name="waste_appeared" objecttype="waste" agenttype="Cleaner" />
 				<env:percepttype name="waste_disappeared" objecttype="waste" agenttype="Cleaner" />
 				<env:percepttype name="wastebin_appeared" objecttype="wastebin" agenttype="Cleaner" />
@@ -95,6 +96,7 @@
 					<env:property name="percepttypes">
 						new Object[]
 						{
+							new String[]{"cleaner_moved", "moved"},
 							new String[]{"waste_appeared", "appeared", "created"}, 
 							new String[]{"waste_disappeared", "destroyed"},
 							new String[]{"wastebin_appeared", "appeared", "created"}, 
@@ -109,6 +111,7 @@
 					<env:property name="percepttypes">
 						new Object[]
 						{
+							new String[]{"cleaner_moved", "remove_outdated", "wastes"},
 							new String[]{"waste_appeared", "add", "wastes"}, 
 							new String[]{"waste_disappeared", "remove", "wastes"},
 							new String[]{"wastebin_appeared", "add", "wastebins"}, 
