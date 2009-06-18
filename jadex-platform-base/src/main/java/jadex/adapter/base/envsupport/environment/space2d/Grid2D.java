@@ -28,6 +28,18 @@ public class Grid2D extends Space2D
 	/** All simobject id's accessible per position. */
 	protected MultiCollection objectsygridpos;
 	
+	/** Standard vector for left movement. */
+	public static final IVector2	LEFT	= new Vector2Int(-1, 0);
+	
+	/** Standard vector for right movement. */
+	public static final IVector2	RIGHT	= new Vector2Int(1, 0);
+	
+	/** Standard vector for up movement. */
+	public static final IVector2	UP	= new Vector2Int(0, 1);
+	
+	/** Standard vector for down movement. */
+	public static final IVector2	DOWN	= new Vector2Int(0, -1);
+	
 	//-------- constructors --------
 	
 	/**
@@ -244,9 +256,20 @@ public class Grid2D extends Space2D
 	 *  Uses position->object mapping, for fast operation.
 	 *  @param position	The position.
 	 *  @param distance	The distance.
+	 *  @param type	The type (or null for all objects).
 	 */
-	// Todo: implement type
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance, String type)
+	{
+		return getNearObjects(position, distance.createVector2(distance), type);
+	}
+	
+	/**
+	 * Retrieve all objects in the distance for a position
+	 * @param position
+	 * @param distance
+	 * @return The near objects. 
+	 */
+	public ISpaceObject[] getNearObjects(IVector2 position, IVector2 maxdist, String type)
 	{
 		synchronized(monitor)
 		{
@@ -258,37 +281,36 @@ public class Grid2D extends Space2D
 			int x = position.getXAsInteger();
 			int y = position.getYAsInteger();
 			
-			int range = distance.getAsInteger();
+			int rangex = maxdist.getXAsInteger();
+			int rangey = maxdist.getYAsInteger();
 	
-			if(getBorderMode().equals(BORDER_TORUS))
+			int minx = x - rangex >= 0 || getBorderMode().equals(BORDER_TORUS) ? x - rangex : 0;
+			int maxx = x + rangex <= sizex || getBorderMode().equals(BORDER_TORUS) ? x + rangex : sizex;
+
+			int miny = y - rangey >= 0 || getBorderMode().equals(BORDER_TORUS) ? y - rangey : 0;
+			int maxy = y + rangey <= sizey || getBorderMode().equals(BORDER_TORUS) ? y + rangey : sizey;
+
+			for (int i = minx; i <= maxx; i++)
 			{
-				for(int i = x - range; i <= x + range; i++)
+				for (int j = miny; j <= maxy; j++)
 				{
-					for(int j = y - range; j <= y + range; j++)
-					{
-						Collection tmp = objectsygridpos.getCollection(
+					Collection tmp = objectsygridpos.getCollection(
 							new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
-						if(tmp != null)
-							ret.addAll(tmp);
-					}
-				}
-			}
-			else if(getBorderMode().equals(BORDER_STRICT))
-			{
-				int minx = (x - range >= 0 ? x - range : 0);
-				int maxx = (x + range <= sizex ? x + range : sizex);
-
-				int miny = (y - range >= 0 ? y - range : 0);
-				int maxy = (y + range <= sizey ? y + range : sizey);
-
-				for (int i = minx; i <= maxx; i++)
-				{
-					for (int j = miny; j <= maxy; j++)
+					if(tmp != null)
 					{
-						Collection tmp = objectsygridpos.getCollection(
-								new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey));
-						if (tmp != null)
+						if(type==null)
+						{
 							ret.addAll(tmp);
+						}
+						else
+						{
+							for(Iterator it=tmp.iterator(); it.hasNext(); )
+							{
+								ISpaceObject	obj	= (ISpaceObject)it.next();
+								if(obj.getType().equals(type))
+									ret.add(obj);
+							}
+						}
 					}
 				}
 			}
@@ -297,6 +319,93 @@ public class Grid2D extends Space2D
 		}
 	}
 	
+	/**
+	 * Returns the nearest object to the given position within a
+	 * maximum distance from the position.
+	 * 
+	 * @param position position the object should be nearest to
+	 * @param maxdist maximum distance from the position, use null for unlimited distance
+	 * @return nearest object's ID or null if none is found
+	 * /
+	// Todo: doesn't work and needs termination condition.
+	public ISpaceObject getNearestObject(IVector2 position, IVector1 maxdist, String type)
+	{
+		
+		synchronized(monitor)
+		{
+			int	cnt	= 0;
+			ISpaceObject	ret = null;
+			IVector1	retdist	= null;
+			IVector2	testpos	= position.copy();
+			IVector1	testdist	= getDistance(position, testpos);
+			IVector1	mindist	= testdist;			
+			
+			System.out.println("Nearest object: "+testpos);
+			if((maxdist==null || !testdist.greater(maxdist)) && (ret==null || testdist.less(retdist)))
+			{
+				Collection	tmp	= getSpaceObjectsByGridPosition(testpos, type);
+				if(tmp!=null && !tmp.isEmpty())
+				{
+					ret	= (ISpaceObject)tmp.iterator().next();
+					retdist	= testdist;
+					System.out.println("Nearest object found "+cnt+" steps: "+retdist+", "+ret);
+				}
+			}
+			cnt++;
+			
+			for(int i=1; (ret==null || retdist.greater(mindist)) && (maxdist==null || !mindist.greater(maxdist)); i++)
+			{
+				// Move left / right
+				for(int j=0; j<i; j++)
+				{
+					testpos	= adjustPosition(i%2==0 ? testpos.add(LEFT) : testpos.add(RIGHT));
+					testdist	= getDistance(position, testpos);
+					mindist	= j==0 ? testdist : testdist.less(mindist) ? testdist : mindist;
+					System.out.println("Nearest object: "+testpos);
+					if((maxdist==null || !testdist.greater(maxdist)) && (ret==null || testdist.less(retdist)))
+					{
+						Collection	tmp	= getSpaceObjectsByGridPosition(testpos, type);
+						if(tmp!=null && !tmp.isEmpty())
+						{
+							ret	= (ISpaceObject)tmp.iterator().next();
+							retdist	= testdist;
+							System.out.println("Nearest object found "+cnt+" steps: "+retdist+", "+ret);
+						}
+					}
+					cnt++;
+				}
+				
+				// Todo: join both inner loops!?
+				if(!(ret==null || retdist.greater(mindist)) && (maxdist==null || !mindist.greater(maxdist)))
+					break;
+				
+				// Move up / down
+				for(int j=0; j<i; j++)
+				{
+					testpos	= adjustPosition(i%2==0 ? testpos.add(UP) : testpos.add(DOWN));
+					testdist	= getDistance(position, testpos);
+					mindist	= j==0 ? testdist : testdist.less(mindist) ? testdist : mindist;
+					System.out.println("Nearest object: "+testpos);
+					if((maxdist==null || !testdist.greater(maxdist)) && (ret==null || testdist.less(retdist)))
+					{
+						Collection	tmp	= getSpaceObjectsByGridPosition(testpos, type);
+						if(tmp!=null && !tmp.isEmpty())
+						{
+							ret	= (ISpaceObject)tmp.iterator().next();
+							retdist	= testdist;
+							System.out.println("Nearest object found "+cnt+" steps: "+retdist+", "+ret);
+						}
+					}
+					cnt++;
+				}
+			}
+			
+			System.out.println("Nearest object took "+cnt+" steps: "+retdist+", "+ret);
+			
+			return ret;
+		}
+	}*/
+
 	/**
 	 *  Calculate the distance in the space.
 	 *  @param dx The distance in x.

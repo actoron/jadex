@@ -175,10 +175,12 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 											Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, vision, null)));
 											for(int j=0; j<known.length; j++)
 											{
-												if(!seen.contains(known[j]) && !vision.less(space2d.getDistance(mypos, (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION))))
+												IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
+												// Hack!!! Shouldn't react to knownpos==null
+												if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
 												{
 //													System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-													belset.removeFact(known[i]);
+													belset.removeFact(known[j]);
 												}
 											}
 										}

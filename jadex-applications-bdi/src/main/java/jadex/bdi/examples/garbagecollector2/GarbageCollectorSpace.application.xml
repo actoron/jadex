@@ -184,21 +184,9 @@
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<!-- <env:objects>
-					<env:object type="collector" owner="Collector1" >
-						<env:property name="rotation">
-							$object.getProperty("lastmove")==null || $object.getProperty("lastmove").equals("right")? Math.PI:
-							$object.getProperty("lastmove").equals("left")? Math.PI:
-							$object.getProperty("lastmove").equals("up")? Math.PI/2:
-							Math.PI*3/2
-						</env:property>
-					</env:object>
-					<env:object type="burner" owner="Burner1" />
-				</env:objects> -->
-				
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">10</env:property>
+						<env:property name="rate">15</env:property>
 					</env:process>
 				</env:processes>
 				
@@ -222,15 +210,9 @@
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<!-- <env:objects>
-					<env:object type="collector" owner="Collector1" />
-					<env:object type="collector" owner="Collector2" />
-					<env:object type="burner" owner="Burner1" />
-				</env:objects> -->
-				
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="rate">8</env:property>
 					</env:process>
 				</env:processes>
 				
@@ -249,10 +231,10 @@
 				<agent type="Burner" number="2"/>
 			</agents>
 			
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="14" height="14">
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">3</env:property>
+						<env:property name="rate">5</env:property>
 					</env:process>
 				</env:processes>
 				
