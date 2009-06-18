@@ -1,0 +1,70 @@
+<!--
+	<H3>The game of life application descriptor</H3>
+
+	It can be started to launch a game of life scenario.
+	It is simulated as environment process without any agents.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-env"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	name="GameOfLife" package="jadex.bdi.examples.gameoflife">
+	
+	<imports>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.adapter.base.envsupport.dataview.*</import>
+		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
+	</imports>
+	
+	<spacetypes>
+		<env:envspacetype name="gc2dspace" width="20" height="20" class="Grid2D">
+			<env:objecttypes>
+				<env:objecttype name="cell">
+					<env:property name="alive"></env:property>
+				</env:objecttype>
+			</env:objecttypes>
+		
+			<env:processtypes>
+				<env:processtype name="gol" class="GameOfLifeProcess" />
+			</env:processtypes>
+			
+			<env:views>
+				<env:view name="view_all" class="GeneralDataView2D" />
+			</env:views>
+			
+			<env:perspectives>
+				<env:perspective name="main" class="Perspective2D" opengl="false" objectshiftx="0.5" objectshifty="0.5">
+					<env:drawable objecttype="cell" width="1.0" height="1.0">
+						<env:rectangle color="yellow">
+							<env:drawcondition>$object.alive</env:drawcondition> 
+						</env:rectangle>
+					</env:drawable>
+				</env:perspective>
+			</env:perspectives>
+			
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<property name="space">$space</property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</spacetypes>
+	
+	<applications>
+		<application name="Normal">
+			<env:envspace name="mygc2dspace" type="gc2dspace">
+				<env:processes>
+					<env:process type="gol"/>
+				</env:processes>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" perspective="main"/>
+				</env:observers>
+			</env:envspace>
+		</application>
+	</applications>
+
+</applicationtype>

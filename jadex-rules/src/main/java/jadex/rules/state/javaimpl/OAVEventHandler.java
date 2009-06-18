@@ -235,6 +235,8 @@ public class OAVEventHandler
 	 */
 	public void objectAdded(Object id, OAVObjectType type, boolean root)
 	{
+//		System.out.println("added: "+id+" "+type);
+//		Thread.dumpStack();
 //		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
 //		{
 //			System.out.println("added: "+id);

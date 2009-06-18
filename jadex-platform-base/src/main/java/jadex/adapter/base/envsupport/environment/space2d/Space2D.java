@@ -231,9 +231,6 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		{
 			if(BORDER_TORUS.equals(getBorderMode()))
 			{
-				if(areasize==null)
-					System.out.println("shit");
-				
 				IVector1 sizex = areasize.getX();
 				IVector1 sizey = areasize.getY();
 				
