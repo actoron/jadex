@@ -78,4 +78,12 @@ public class MoveTask extends ListenableTask
 	{
 		return SReflect.getUnqualifiedClassName(this.getClass());
 	}*/
+	
+	/**
+	 * 
+	 */
+	public static boolean isGreater(IVector2 pos, IVector2 pos1, IVector2 pos2)
+	{
+		return pos.getDistance(pos1).greater(pos.getDistance(pos2));
+	}
 }

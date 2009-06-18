@@ -53,6 +53,7 @@ public class MoveToLocationPlan extends Plan
 	 */
 	public void aborted()
 	{
+//		System.out.println("aborted: "+this);
 		if(taskid!=null)
 		{
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
@@ -66,6 +67,8 @@ public class MoveToLocationPlan extends Plan
 	 */
 	public void failed()
 	{
+//		System.out.println("failed: "+this);
+//		getException().printStackTrace();
 		if(taskid!=null)
 		{
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();

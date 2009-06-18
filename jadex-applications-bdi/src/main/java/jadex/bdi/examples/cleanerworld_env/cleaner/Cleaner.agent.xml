@@ -220,18 +220,16 @@
 					order by $beliefbase.getBelief("my_location").getFact().getDistance($wastebin.getLocation())
 				</value> -->
 				<value language="clips">
-					?ret = (ISpaceObject (position ?loc) (getProperty("full") false))
+					?ret = (ISpaceObject (position ?loc) (getProperty("full") false) (getType() "wastebin"))
 					?rbeliefset = (beliefset (element_has_model.melement_has_name "wastebins") (beliefset_has_facts contains ?ret))
 					?rbelief = (belief (element_has_model.melement_has_name "my_location") (belief_has_fact ?myloc))
 					
-					//(not 
-					//	(and
-					//		?other = (ISpaceObject (position ?otherloc))
-					//		?otherloc = (IVector2 (getDistance(?myloc) ?otherdist))
-					//		?loc = (IVector2 (getDistance(?myloc) &gt; ?otherdist))
-					//	)
-					//)
-					// todo: fix not condition, should not use Location object condition, locations are not directly in state
+					(not 
+						(and
+							?other = (ISpaceObject (position ?otherloc) (getType() "wastebin") (this!=?ret))
+							(test (MethodCallFunction "MoveTask" "isGreater" null ?myloc ?loc ?otherloc))
+						)
+					)
 				</value>
 			</parameter>
 		</querygoal>
@@ -250,14 +248,12 @@
 					?rbeliefset = (beliefset (element_has_model.melement_has_name "chargingstations") (beliefset_has_facts contains ?ret))
 					?rbelief = (belief (element_has_model.melement_has_name "my_location") (belief_has_fact ?myloc))
 					
-					// (not 
-					// 	(and
-					//		?other = (ISpaceObject (type "chargingstation") (position ?otherloc))
-					//		?otherloc = (IVector2 (getDistance(?myloc) ?otherdist))
-					//		?loc = (IVector2 (getDistance(?myloc) &gt; ?otherdist))
-					//	)
-					// )
-					// todo: fix not condition, should not use Location object condition, locations are not directly in state
+					(not 
+						(and
+							?other = (ISpaceObject (position ?otherloc) (getType() "chargingstation") (this!=?ret))
+							(test (MethodCallFunction "MoveTask" "isGreater" null ?myloc ?loc ?otherloc))
+						)
+					)
 				</value>
 			</parameter>
 		</querygoal>

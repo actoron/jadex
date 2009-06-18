@@ -252,7 +252,13 @@ public class SConditions
     protected static Object	convertAttributeTypes(OAVTypeModel tmodel, OAVObjectType otype, String slotname, String[] imports)
     {
     	Object	ret;
-    	if(slotname.indexOf(".")!=-1)
+    	
+    	// Value source is null for this.
+    	if(slotname.toLowerCase().equals("this"))
+    	{
+    		ret = null;
+    	}
+    	else if(slotname.indexOf(".")!=-1)
     	{
     		StringTokenizer	stok	= new StringTokenizer(slotname, ".");
     		List aret = new ArrayList();

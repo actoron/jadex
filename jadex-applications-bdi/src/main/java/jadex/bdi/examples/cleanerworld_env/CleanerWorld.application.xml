@@ -195,7 +195,7 @@
 			</agents>
 			
 			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
-				<!-- <env:property name="daytime">true</env:property> -->
+				<env:property name="daytime">true</env:property>
 				
 				<env:objects>
 					<env:object type="chargingstation">
