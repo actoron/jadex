@@ -237,7 +237,7 @@ public class MEnvSpaceType	extends MSpaceType
 						((Boolean)MEnvSpaceInstance.getProperty(args, "opengl")).booleanValue(): true;
 					ret.setOpenGl(opengl);
 					String name = (String)MEnvSpaceInstance.getProperty(args, "name");
-					System.out.println("Perspective: "+name+" using opengl="+opengl);
+//					System.out.println("Perspective: "+name+" using opengl="+opengl);
 					
 					// Hack!!!
 					if(ret instanceof Perspective2D)

@@ -585,8 +585,8 @@ public class ControlCenter implements IControlCenter
 		}
 		else
 		{
-			System.out.println("Plugin has no saved properties: "
-					+ plugin.getName());
+//			System.out.println("Plugin has no saved properties: "
+//					+ plugin.getName());
 			plugin.reset();
 		}
 	}

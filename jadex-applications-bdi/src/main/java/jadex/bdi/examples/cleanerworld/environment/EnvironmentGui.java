@@ -266,7 +266,7 @@ public class EnvironmentGui	extends JFrame
 						+ "waste: " + (cleaners[i].getCarriedWaste()!=null ? "yes" : "no")+"</html>");
 					cleaner.setForeground(daytime ? new Color(age*2,age*2,age*2)
 						: new Color(255-age*2,255-age*2,255-age*2));
-					render(g, cleaner, new Point(p.x+35, p.y));	// Hack!!!
+					render(g, cleaner, new Point(p.x+45, p.y));	// Hack!!!
 				}
 			}
 		};

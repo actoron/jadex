@@ -300,7 +300,7 @@ public class ConstraintBuilder
 				valuesource	= new FunctionCall(new Identity(), new Object[]{c});
 				ocon	= context.getDummyCondition();
 				if(c.getValue()!=null)
-					type	= context.getTypeModel().getJavaType(c.getClass());
+					type	= context.getTypeModel().getJavaType(c.getValue().getClass());
 				else
 					type	= OAVJavaType.java_object_type;
 			}
@@ -333,8 +333,6 @@ public class ConstraintBuilder
 			{
 				if(suffixes[i] instanceof FieldAccess)
 				{
-					if(type==null)
-						System.out.println("kldfhgib");
 					OAVAttributeType	attr	= type.getAttributeType(
 						((FieldAccess)suffixes[i]).getName());
 					suffs.add(attr);

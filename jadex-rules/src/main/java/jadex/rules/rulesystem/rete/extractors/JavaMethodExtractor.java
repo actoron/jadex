@@ -5,12 +5,8 @@ import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Call a method on an object.

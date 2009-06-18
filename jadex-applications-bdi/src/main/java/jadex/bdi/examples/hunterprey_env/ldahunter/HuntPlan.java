@@ -5,7 +5,6 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bdi.examples.hunterprey_env.MoveAction;
 import jadex.bdi.examples.hunterprey_env.ldahunter.potentialfield.JointField;
 import jadex.bdi.examples.hunterprey_env.ldahunter.potentialfield.PotentialFrame;
@@ -88,7 +87,7 @@ public class HuntPlan extends Plan {
 				}
 				catch(RuntimeException e)
 				{
-					System.out.println("Eating failed: "+getScope().getAgentName()+", "+prey);
+//					System.out.println("Eating failed: "+getScope().getAgentName()+", "+prey);
 					// Ignore when eating fails.
 					fail();
 				}
@@ -109,7 +108,7 @@ public class HuntPlan extends Plan {
 		pf.update(jf, myLoc, to.getXAsInteger(), to.getYAsInteger());
 
 		while (env.getDistance(myLoc, to).getAsInteger() > 1
-				&& jf.getNearerLocation((Vector2Int)to)) {/**/
+				&& jf.getNearerLocation((IVector2)to)) {/**/
 		}
 
 		if (env.getDistance(myLoc, to).getAsInteger() == 1) {

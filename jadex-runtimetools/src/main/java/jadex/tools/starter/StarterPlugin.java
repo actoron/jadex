@@ -363,7 +363,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					{
 						public void run()
 						{
-							System.out.println("Remove elem: "+event.getValue());
+//							System.out.println("Remove elem: "+event.getValue());
 							applications.removeApplication((IApplicationContext)event.getValue());
 						}
 					});

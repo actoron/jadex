@@ -4,6 +4,7 @@ import jadex.rules.state.OAVJavaType;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,7 +35,15 @@ public class MethodCall
 	{
 		this(type, method, new ArrayList());
 	}
-	
+		
+	/**
+	 *  Create a new Java method call.
+	 */
+	public MethodCall(OAVJavaType type, Method method, Object[] paramsources)
+	{
+		this(type, method, new ArrayList(Arrays.asList(paramsources)));
+	}
+
 	/**
 	 *  Create a new Java method call.
 	 */
@@ -43,18 +52,6 @@ public class MethodCall
 		this.type = type;
 		this.method = method;
 		this.paramsources = paramsources;
-	}
-	
-	/**
-	 *  Create a new Java method call.
-	 */
-	public MethodCall(OAVJavaType type, Method method, Object[] paramsources)
-	{
-		this.type = type;
-		this.method = method;
-		this.paramsources = new ArrayList();
-		for(int i=0; i<paramsources.length; i++)
-			this.paramsources.add(paramsources[i]);
 	}
 	
 	//-------- methods --------

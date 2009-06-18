@@ -53,7 +53,7 @@ public class BaseContext	implements IContext
 //		this.parent	= parent;
 		this.properties	= properties!=null ? new HashMap(properties) : null;
 		
-		System.out.println("Created: "+this);
+//		System.out.println("Created: "+this);
 	}
 
 	//-------- IContext interface --------
@@ -212,7 +212,7 @@ public class BaseContext	implements IContext
 			}
 		}
 
-		System.out.println("Removed space: "+name);
+//		System.out.println("Removed space: "+name);
 	}
 	
 	/**
@@ -252,7 +252,7 @@ public class BaseContext	implements IContext
 	 */
 	public void	deleteContext(IResultListener listener)
 	{
-		System.out.println("Deleted: "+this);
+//		System.out.println("Deleted: "+this);
 
 		if(listener!=null)
 			listener.resultAvailable(this);

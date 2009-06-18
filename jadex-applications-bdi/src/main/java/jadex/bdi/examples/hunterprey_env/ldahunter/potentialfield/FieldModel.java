@@ -10,8 +10,7 @@
  */
 package jadex.bdi.examples.hunterprey_env.ldahunter.potentialfield;
 
-import jadex.adapter.base.envsupport.math.Vector1Int;
-import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.adapter.base.envsupport.math.*;
 
 
 /**
@@ -52,7 +51,7 @@ public final class FieldModel
 	 * @param loc the location the values should be stored to (in, out)
 	 * @return false if this location has distance &lt;= 0, true if location changed
 	 */
-	public final boolean getNearerLocation(final Vector2Int loc)
+	public final boolean getNearerLocation(final IVector2 loc)
 	{
 		final int ix = loc.getXAsInteger();
 		final int iy = loc.getYAsInteger();
@@ -85,8 +84,16 @@ public final class FieldModel
 			oy = (iy+h-1)%h;
 		}
 
-		loc.setX(new Vector1Int(ox));
-		loc.setY(new Vector1Int(oy));
+		if(loc instanceof Vector2Int)
+		{
+			((Vector2Int)loc).setX(new Vector1Int(ox));
+			((Vector2Int)loc).setY(new Vector1Int(oy));
+		}
+		else
+		{
+			((Vector2Double)loc).setX(new Vector1Double(ox));
+			((Vector2Double)loc).setY(new Vector1Double(oy));
+		}
 		return ox!=ix || oy!=iy;
 	}
 

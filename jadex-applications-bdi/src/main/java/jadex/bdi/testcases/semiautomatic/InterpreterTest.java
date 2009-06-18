@@ -1,4 +1,4 @@
-package jadex.bdi.examples;
+package jadex.bdi.testcases.semiautomatic;
 
 import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;

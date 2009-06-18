@@ -169,7 +169,7 @@ public class JointField extends HashMap
 	 * @param loc
 	 * @return true if location changed
 	 */
-	public boolean getNearerLocation(Vector2Int loc)
+	public boolean getNearerLocation(IVector2 loc)
 	{
 		return field.getNearerLocation(loc);
 	}

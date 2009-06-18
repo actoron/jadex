@@ -15,7 +15,6 @@ import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.Reader;
 import jadex.commons.xml.TypeInfo;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;

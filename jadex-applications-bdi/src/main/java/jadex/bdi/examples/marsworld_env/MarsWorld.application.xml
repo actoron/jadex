@@ -103,7 +103,7 @@
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
 						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))</env:property>
-						<env:property name="oreposition" dynamic="true">new Vector2Double(-0.5, 0.1-((Vector2Double)$drawable.getBoundValue($object, "oresize")).getXAsDouble()/2)</env:property>
+						<env:property name="oreposition" dynamic="true">new Vector2Double(-0.5, 0.1-Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0)/2)</env:property>
 						<env:ellipse layer="0" width="0.2" height="0.2" color="#C8000096">
 							<env:drawcondition>!$object.getProperty("state").equals("analyzed") || $object.getProperty("ore")!=0</env:drawcondition>
 						</env:ellipse>
@@ -129,7 +129,7 @@
 					<!-- Homebase -->
 					<env:drawable objecttype="homebase" width="0.14" height="0.12">
 						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
-						<env:property name="oreposition" dynamic="true">new Vector2Double(0, 0.3-((Vector2Double)$drawable.getBoundValue($object, "oresize")).getXAsDouble()/2)</env:property>
+						<env:property name="oreposition" dynamic="true">new Vector2Double(0, 0.3-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
 						<env:text layer="2" x="-0.07" y="0.09" basesize="8" font="Arial" abssize="true" text="$text$" align="left" color="black"/>
 						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdi/examples/marsworld_env/images/ore.png">
@@ -157,7 +157,7 @@
 						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld_env/images/carry.png" />
 						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
-						<env:property name="oreposition" dynamic="true">new Vector2Double(0.3, -0.08-((Vector2Double)$drawable.getBoundValue($object, "oresize")).getXAsDouble()/2)</env:property>
+						<env:property name="oreposition" dynamic="true">new Vector2Double(0.3, -0.08-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
 						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdi/examples/marsworld_env/images/ore.png">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 						</env:texturedrectangle>

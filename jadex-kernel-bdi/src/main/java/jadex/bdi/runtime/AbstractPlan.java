@@ -278,7 +278,6 @@ public abstract class AbstractPlan implements java.io.Serializable
 	 *  todo: remove
 	 *  Get the plans root goal.
 	 *  @return The goal.
-	 *  @deprecated
 	 * /
 	public IProcessGoal getRootGoal()
 	{

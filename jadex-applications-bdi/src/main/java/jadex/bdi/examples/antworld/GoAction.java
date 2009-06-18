@@ -103,7 +103,7 @@ public class GoAction extends SimplePropertyObject implements ISpaceAction
 		
 		for (int i = 0; i < objects.length; i++) {
 			// System.out.println(objects[i].getId());
-			Vector2Int gravitationPos = (Vector2Int) objects[i].getProperty(Space2D.PROPERTY_POSITION);
+			IVector2 gravitationPos = (IVector2) objects[i].getProperty(Space2D.PROPERTY_POSITION);
 			if(gravitationPos.equals(pos)){
 				System.out.println("Desired Position has gravitation: " + pos.toString());
 				obj.setProperty(AntVisionGenerator.GRAVITATION_FELT, new Boolean(true));

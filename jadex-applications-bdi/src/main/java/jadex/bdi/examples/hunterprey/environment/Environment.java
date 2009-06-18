@@ -256,7 +256,7 @@ public class Environment implements IEnvironment
 			// via the SimTickerPlan AFTER the condition has triggered. In single core machines this
 			// seems to happen not very often. But in multicore machines this is a very bad race condition
 			// that happens very very very very often.
-			System.out.println("Creature tried to cheat: '"+me.getName()+"' Do we have a multicore problem?");
+//			System.out.println("Creature tried to cheat: '"+me.getName()+"' Do we have a multicore problem?");
 		}
 		//block(); todo: make blocking for local case
 		return ret;

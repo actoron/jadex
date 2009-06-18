@@ -147,7 +147,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 				listener.resultAvailable(this);
 		}
 
-		System.out.println("Deleted: "+this);
+//		System.out.println("Deleted: "+this);
 	}
 
 	//-------- methods --------
