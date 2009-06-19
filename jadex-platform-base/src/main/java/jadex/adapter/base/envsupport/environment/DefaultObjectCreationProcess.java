@@ -1,18 +1,25 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bridge.IClockService;
 import jadex.commons.SimplePropertyObject;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Process for continuously creating food.
+ *  Process for continuously creating objects in the space.
+ *  The following properties are supported:
+ *  <ul>
+ *  <li><code>type</code>: The type of the object to be created (String, required).
+ *  <li><code>properties</code>: The initial properties of the object (Map, optional).
+ *  <li><code>condition</code>: A condition to enable/disable object creation (boolean, optional).
+ *  <li><code>tickrate</code>: Number of ticks between object creation (double, optional, 0 == off).
+ *  <li><code>timerate</code>: Number of seconds between object creation (double, optional, 0 == off).
+ *  </ul>
+ *  Properties may be dynamic and refer to the environment space using <code>$space</code>
+ *  and to the clock service using <code>$clock</code>.
  */
 public class DefaultObjectCreationProcess extends SimplePropertyObject implements ISpaceProcess
 {
@@ -20,6 +27,12 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 	
 	/** The last executed tick. */
 	protected double	lasttick;
+
+	/** The last executed time. */
+	protected double	lasttime;
+
+	/** The fetcher. */
+	protected SimpleValueFetcher fetcher;
 
 	//-------- constructors --------
 	
@@ -41,7 +54,10 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 	public void start(IClockService clock, IEnvironmentSpace space)
 	{
 		this.lasttick	= clock.getTick();
-		System.out.println("create food process started.");
+		this.lasttime	= clock.getTime();
+		this.fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$space", space);
+		fetcher.setValue("$clock", clock);
 	}
 
 	/**
@@ -52,7 +68,6 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 	 */
 	public void shutdown(IEnvironmentSpace space)
 	{
-		System.out.println("create food process shutdowned.");
 	}
 
 	/**
@@ -62,26 +77,61 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 	 */
 	public void execute(IClockService clock, IEnvironmentSpace space)
 	{
-//		System.out.println("create food process called: "+deltat);
-		
-		Grid2D grid = (Grid2D)space;
-		
-		double	rate	= getProperty("rate")!=null? 
-			((Number)getProperty("rate")).doubleValue(): 5.0;
-		
-		while(lasttick+rate<clock.getTick())
+		if(getProperty("tickrate")!=null)
 		{
-			lasttick	+= rate;
-			IVector2 pos = grid.getEmptyGridPosition();
-			if(pos!=null)
+			double	rate	= ((Number)getProperty("tickrate")).doubleValue();
+			double	current	= clock.getTick();
+			while(rate>0 && lasttick+rate<current)
 			{
-				Map props = new HashMap();
-				props.put(Space2D.PROPERTY_POSITION, pos);
-				props.put("creation_age", new Double(clock.getTick()));
-				props.put("clock", clock);
-				grid.createSpaceObject("food", props, null);
-//				System.out.println("Created food: "+obj);
+				Boolean	cond	= (Boolean)getProperty("condition");
+				if(cond!=null && !cond.booleanValue())
+				{
+					lasttick	= clock.getTick();
+				}
+				else
+				{
+					lasttick	+= rate;
+					String	type	= (String)getProperty("type");
+					Map	props	= new HashMap((Map)getProperty("properties"));
+					space.createSpaceObject(type, props, null);
+				}
 			}
 		}
+	
+		if(getProperty("timerate")!=null)
+		{
+			double	rate	= ((Number)getProperty("timerate")).doubleValue()*1000;
+			double	current	= clock.getTime();
+			while(rate>0 && lasttime+rate<current)
+			{
+				Boolean	cond	= (Boolean)getProperty("condition");
+				if(cond!=null && !cond.booleanValue())
+				{
+					lasttime	= clock.getTime();
+				}
+				else
+				{
+					lasttime	+= rate;
+					String	type	= (String)getProperty("type");
+					Map	props	= new HashMap((Map)getProperty("properties"));
+					space.createSpaceObject(type, props, null);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Returns a property.
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public Object getProperty(String name)
+	{
+		Object	ret	= super.getProperty(name);
+		if(ret instanceof IParsedExpression)
+		{
+			ret	= ((IParsedExpression)ret).getValue(fetcher);
+		}
+		return ret;
 	}
 }

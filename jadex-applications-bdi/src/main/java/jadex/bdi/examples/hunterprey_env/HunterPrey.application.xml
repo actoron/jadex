@@ -59,10 +59,20 @@
 			</env:actiontypes>
 			
 			<env:processtypes>
-				<env:processtype name="create" class="CreateFoodProcess">
-					<env:property name="rate">5</env:property>
+				<env:processtype name="create" class="DefaultObjectCreationProcess">
+					<env:property name="tickrate">5</env:property>
+					<env:property name="type">"food"</env:property>
+					<env:property name="properties" dynamic="true">
+						jadex.commons.SUtil.createHashMap(
+							new String[]{Space2D.PROPERTY_POSITION, "creation_age", "clock"},
+							new Object[]{((Grid2D)$space).getEmptyGridPosition(), new Double($clock.getTick()), $clock})
+					</env:property>
+					<env:property name="condition" dynamic="true">
+						((Grid2D)$space).getEmptyGridPosition()!=null
+					</env:property>
 				</env:processtype>
 			</env:processtypes>
+			
 
 			<env:percepttypes>
 				<env:percepttype name="food_seen" objecttype="food">
@@ -336,7 +346,7 @@
 				
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 
@@ -360,7 +370,7 @@
 				
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 
@@ -386,7 +396,7 @@
 				
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 
@@ -413,7 +423,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">1</env:property>
+						<env:property name="tickrate">1</env:property>
 					</env:process>
 				</env:processes>
 
@@ -431,7 +441,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">10</env:property>
+						<env:property name="tickrate">10</env:property>
 					</env:process>
 				</env:processes>
 
