@@ -1,0 +1,180 @@
+<!--
+	<H3>The clever prey.</H3>
+
+	Wander, flee and eat behavior for preys.
+
+	Three goal types are supported:<br>
+	- Running away from hunters (maintain keep alone).<br>
+	- Eating food if discovered (achieve eat_food).<br>
+	- Searching for food (perform wander around).
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="CleverPrey"
+	package="jadex.bdi.examples.hunterprey.cleverprey">
+
+	<imports>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>java.util.Arrays</import>
+	</imports>
+
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="env" class="Grid2D">
+			<fact>(Grid2D)$scope.getApplicationContext().getSpace("my2dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject">
+ 			<fact>$beliefbase.env.getAvatar($scope.getAgentIdentifier())</fact>
+ 		</belief>
+
+ 		<!-- The currently seen food. -->
+ 		<beliefset name="seen_food" class="ISpaceObject"/>
+
+ 		<!-- The known food (seen and out of sight). -->
+ 		<beliefset name="known_food" class="ISpaceObject"/>
+
+ 		<!-- The currently seen hunters. -->
+ 		<beliefset name="seen_hunters" class="ISpaceObject"/>
+
+ 		<!-- A flag to activate eating -->
+ 		<belief name="eating_allowed" class="boolean">
+ 			<fact>true</fact>
+ 		</belief>
+	</beliefs>
+	
+	<goals>
+		<!-- A goal to find some food, when there is no food around. -->
+		<maintaingoal name="food_seen">
+			<maintaincondition language="jcl">
+				$beliefbase.seen_food.length>0
+			</maintaincondition>
+		</maintaingoal>
+		
+		<!-- A goal to stay away from hunters. -->
+		<maintaingoal name="keep_alone" exclude="never">
+			<deliberation>
+				<inhibits ref="food_seen" inhibit="when_in_process"/>
+				<inhibits ref="eat_food" inhibit="when_in_process"/>
+			</deliberation>
+			<maintaincondition language="jcl">
+				$beliefbase.seen_hunters.length==0
+			</maintaincondition>
+		</maintaingoal>
+		
+		<!-- Goal to eat any seen food (activated in order of distance). -->
+		<achievegoal name="eat_food">
+			<parameter name="food" class="ISpaceObject">
+				<value>$food</value>
+			</parameter>
+			<unique dummy="true"/>
+			<creationcondition language="jcl">
+ 				ISpaceObject $food &amp;&amp; $food.getType().equals("food")
+ 				&amp;&amp; Arrays.asList($beliefbase.seen_food).contains($food)
+			</creationcondition>
+			<dropcondition language="jcl">
+ 				!Arrays.asList($beliefbase.seen_food).contains($goal.food)
+			</dropcondition>
+			<deliberation>
+				<inhibits ref="eat_food" language="jcl">
+					$beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$goal.food.position).getAsInteger()
+					&lt; $beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$ref.food.position).getAsInteger()
+					
+					// Hack!!! Required, because cardinality=1 not supported in conjunction with instance-level inhibition.
+					// When same distance order by space object id.
+					|| ($beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$goal.food.position).getAsInteger()
+						==$beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$ref.food.position).getAsInteger()
+						&amp;&amp; $goal.food.getId() &lt; $ref.food.getId())					
+				</inhibits>
+			</deliberation>
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<plan name="wander_plan">
+			<body class="WanderPlan"/>
+			<trigger>
+				<goal ref="food_seen"/>
+			</trigger>
+		</plan>
+		<plan name="move_plan" priority="1">
+			<parameter name="food" class="ISpaceObject">
+				<value>
+					select one $food from ISpaceObject $food in $beliefbase.known_food
+					order by $beliefbase.env.getDistance((IVector2)$beliefbase.myself.getProperty("position"), (IVector2)$food.getProperty("position")).getAsInteger()
+				</value>
+			</parameter>
+			<body class="EatPlan"/>	<!-- Eat plan starts moving towards food and gets aborted when food comes in vision range. -->
+			<trigger>
+				<goal ref="food_seen"/>
+			</trigger>
+			<precondition>$beliefbase.known_food.length>0</precondition>
+		</plan>
+		<plan name="eat_plan">
+			<parameter name="food" class="ISpaceObject">
+				<goalmapping ref="eat_food.food"/>
+			</parameter>
+			<body class="EatPlan"/>
+			<trigger>
+				<goal ref="eat_food"/>
+			</trigger>
+		</plan>
+		<plan name="escape_plan">
+			<body class="EscapePlan"/>
+			<trigger>
+				<goal ref="keep_alone"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<properties>
+		<!-- The environment may throw exceptions when executing property listeners
+			and these listeners are not valid any longer. This leads to normal plan
+			failure and can therefore be ignored. -->
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<property name="debugging">false</property>
+    </properties>
+
+	<configurations>
+		<!-- Wander, flee and eat behavior. -->
+		<configuration name="Clever">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="food_seen"/>
+				<initialgoal ref="keep_alone"/>
+			</goals>
+		</configuration>
+		<!-- Flee and eat behavior, but no wandering. -->
+		<configuration name="Opportunistic">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="keep_alone"/>
+			</goals>
+		</configuration>
+		<!-- No wander and eat behavior, but flees from hunters. -->
+		<configuration name="Lazy">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>false</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="keep_alone"/>
+			</goals>
+		</configuration>
+	</configurations>
+</agent>

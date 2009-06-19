@@ -1,0 +1,93 @@
+<!--
+	<H3>Intelligent hunter using a search algorithm.</H3>
+	
+	Uses Joint Field as internal world model.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="LAHunter"
+	package="jadex.bdi.examples.hunterprey.ldahunter">
+
+	<imports>
+		<import>jadex.bdi.examples.hunterprey.*</import>
+		<import>jadex.bdi.examples.hunterprey.ldahunter.potentialfield.*</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey.creature.actsense.Creature"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="env" class="Grid2D">
+ 			<fact>(Grid2D)$scope.getApplicationContext().getSpace("my2dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject">
+ 			<fact>$beliefbase.env.getAvatar($scope.getAgentIdentifier())</fact>
+ 		</belief>
+
+ 		<!-- The known objects. -->
+ 		<beliefset name="vision" class="ISpaceObject"/>
+
+		<belief name="last_direction" class="String"/>
+
+		<belief name="next_sheep" class="ISpaceObject" evaluationmode="pull">
+			<fact>
+				select one ISpaceObject $obj
+				from $beliefbase.vision
+				where $obj.getType().equals("prey")
+				order by $beliefbase.env.getDistance($beliefbase.myself.getProperty(Space2D.PROPERTY_POSITION), $obj.getProperty(Space2D.PROPERTY_POSITION)).getAsInteger()
+			</fact>
+		</belief>
+
+		<belief name="potential_field" class="JointField">
+			<fact>
+				new JointField (30,30,3,new Evaluator(0.0, 1.0, 0.0, 0.001))
+		    </fact>
+		</belief>
+
+		<belief name="potential_window" class="PotentialFrame">
+			<fact>
+				new PotentialFrame($scope.getExternalAccess(), "World of "+$scope.getAgentName())
+			</fact>
+		</belief>
+
+	</beliefs>
+
+	<goals>
+		<performgoal name="hunt" retry="true" exclude="never"/>
+	</goals>
+
+	<plans>
+		<plan name="do_hunt">
+			<body class="HuntPlan"/>
+			<trigger><goal ref="hunt"/></trigger>
+		</plan>
+	</plans>
+	
+<!--	<properties>
+        <property name="tracing.goals">"*"</property>
+        <property name="tracing.plans">"*"</property>
+        <property name="tracing.beliefs">"*"</property> 
+        <property name="tracing.messages">new MessageFilter(MessageTemplate.MatchAll())</property>
+    </properties>-->
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="hunt"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+
+
+
