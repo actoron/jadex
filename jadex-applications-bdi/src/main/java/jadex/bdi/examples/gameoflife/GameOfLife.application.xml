@@ -22,7 +22,7 @@
 	</imports>
 	
 	<spacetypes>
-		<env:envspacetype name="gc2dspace" width="20" height="20" class="Grid2D">
+		<env:envspacetype name="gc2dspace" width="20" height="20" neighborhood="moore" class="Grid2D">
 			<env:objecttypes>
 				<env:objecttype name="cell">
 					<env:property name="alive"></env:property>
@@ -54,6 +54,18 @@
 	</spacetypes>
 	
 	<applications>
+		<application name="10x10">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="10" height="10">
+				<env:processes>
+					<env:process type="gol"/>
+				</env:processes>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" perspective="main"/>
+				</env:observers>
+			</env:envspace>
+		</application>
+	
 		<application name="50x50">
 			<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 				<env:processes>

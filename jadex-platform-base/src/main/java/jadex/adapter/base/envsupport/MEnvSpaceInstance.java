@@ -11,6 +11,7 @@ import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.PerceptType;
+import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
@@ -115,6 +116,12 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			if(bordermode!=null)
 				((Space2D)ret).setBorderMode(bordermode);
 			
+			if(ret instanceof Grid2D)
+			{
+				String neighborhood = (String)getProperty(properties, "neighborhood")!=null? (String)getProperty(properties, "neighborhood"): (String)getProperty(mspacetype.getProperties(), "neighborhood");
+				if(neighborhood!=null)
+					((Grid2D)ret).setNeighborhood(neighborhood);
+			}
 //			System.out.println("areasize: "+width+" "+height);
 		}
 		

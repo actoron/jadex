@@ -133,11 +133,12 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("envspacetype", MEnvSpaceType.class, null, null,
-			SUtil.createHashMap(new String[]{"class", "width", "height", "depth", "border"}, 
+			SUtil.createHashMap(new String[]{"class", "width", "height", "depth", "border", "neighborhood"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("clazz", typeconv, "property"),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
 				new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
+				new BeanAttributeInfo(null, null, "property"),
 				new BeanAttributeInfo(null, null, "property")
 			}), null));
 		
@@ -844,11 +845,13 @@ public class MEnvSpaceType	extends MSpaceType
 		// type instance declarations.
 		
 		types.add(new TypeInfo("envspace", MEnvSpaceInstance.class, null, null,
-			SUtil.createHashMap(new String[]{"type", "width", "height", "depth"}, 
+			SUtil.createHashMap(new String[]{"type", "width", "height", "depth", "border", "neighborhood"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("typeName"),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
 			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property")
+			new BeanAttributeInfo(null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
+			new BeanAttributeInfo(null, null, "property"),
+			new BeanAttributeInfo(null, null, "property")
 			}), null));
 		
 		types.add(new TypeInfo("object", MultiCollection.class, null, null,

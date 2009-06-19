@@ -365,7 +365,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param position
 	 * @param distance
 	 * @return The near objects. 
-	 */
+	 * /
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector2 maxdist, String type)
 	{
 		synchronized(monitor)
@@ -394,7 +394,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		
 			return (ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Get all space objects.

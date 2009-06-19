@@ -48,10 +48,10 @@ public class LocalDataView2D implements IDataView
 			IVector2 pos = (IVector2)object.getProperty(Space2D.PROPERTY_POSITION);
 			if(range instanceof IVector1)
 				ret = space.getNearObjects(pos, (IVector1)range, null);
-			else if(range instanceof IVector2)
-				ret = space.getNearObjects(pos, (IVector2)range, null);
+//			else if(range instanceof IVector2)
+//				ret = space.getNearObjects(pos, (IVector2)range, null);
 			else
-				throw new RuntimeException("Range must be vector1 or vector2: "+range);
+				throw new RuntimeException("Range must be vector1: "+range);
 			return ret;
 		}
 	}

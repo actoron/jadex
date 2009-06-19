@@ -22,23 +22,32 @@ public class Grid2D extends Space2D
 {
 	//-------- constants --------
 
-	/** The default ID for this space */
+	/** The default ID for this space. */
 	public static final String DEFAULT_NAME = Grid2D.class.getName();
+	
+	/** The moore neighborhood. */
+	public static final String NEIGHBORHOOD_MOORE = "moore";
+	
+	/** The von neumann neighborhood. */
+	public static final String NEIGHBORHOOD_VON_NEUMANN = "von_neumann";
 	
 	/** All simobject id's accessible per position. */
 	protected MultiCollection objectsygridpos;
 	
+	/** The neighborhhod. */
+	protected String neighborhood;
+	
 	/** Standard vector for left movement. */
-	public static final IVector2	LEFT	= new Vector2Int(-1, 0);
+//	public static final IVector2	LEFT	= new Vector2Int(-1, 0);
 	
 	/** Standard vector for right movement. */
-	public static final IVector2	RIGHT	= new Vector2Int(1, 0);
+//	public static final IVector2	RIGHT	= new Vector2Int(1, 0);
 	
 	/** Standard vector for up movement. */
-	public static final IVector2	UP	= new Vector2Int(0, 1);
+//	public static final IVector2	UP	= new Vector2Int(0, 1);
 	
 	/** Standard vector for down movement. */
-	public static final IVector2	DOWN	= new Vector2Int(0, -1);
+//	public static final IVector2	DOWN	= new Vector2Int(0, -1);
 	
 	//-------- constructors --------
 	
@@ -51,7 +60,7 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D()
 	{
-		this(null, null, BORDER_TORUS);
+		this(null, null, BORDER_TORUS, null);
 	}
 	
 	/**
@@ -60,9 +69,9 @@ public class Grid2D extends Space2D
 	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	public Grid2D(IVector2 areasize)
+	public Grid2D(IVector2 areasize, String neighborhood)
 	{
-		this(DEFAULT_NAME, areasize, BORDER_TORUS);
+		this(DEFAULT_NAME, areasize, BORDER_TORUS, neighborhood);
 	}
 	
 	/**
@@ -71,10 +80,11 @@ public class Grid2D extends Space2D
 	 * @param areasize the size of the 2D area
 	 * @param actionexecutor executor for agent actions
 	 */
-	public Grid2D(Object name, IVector2 areasize, String bordermode)
+	public Grid2D(Object name, IVector2 areasize, String bordermode, String neighborhood)
 	{
 		super(areasize==null? null: new Vector2Int(areasize.getXAsInteger(), areasize.getYAsInteger()), bordermode);
-		this.setProperty("name", name);
+		this.setProperty("name", name);	
+		setNeighborhood(neighborhood==null? NEIGHBORHOOD_VON_NEUMANN: neighborhood);
 		this.objectsygridpos = new MultiCollection();
 	}
 	
@@ -92,6 +102,29 @@ public class Grid2D extends Space2D
 		}
 	}
 	
+	/**
+	 *  Get the neighborhood.
+	 *  @return Set the neighborhood.
+	 */
+	public String getNeighborhood()
+	{
+		return this.neighborhood;
+	}
+
+	/**
+	 *  Set the neighborhood.
+	 *  @param neighborhood the neighborhood to set.
+	 */
+	public void setNeighborhood(String neighborhood)
+	{
+		if(!NEIGHBORHOOD_MOORE.equals(neighborhood)
+			&& !NEIGHBORHOOD_VON_NEUMANN.equals(neighborhood))
+		{
+			throw new RuntimeException("Unknown neighborhood: "+neighborhood);
+		}
+		this.neighborhood = neighborhood;
+	}
+
 	/**
 	 * Get all SimObjects from a specific type at a specific grid position
 	 */
@@ -260,7 +293,54 @@ public class Grid2D extends Space2D
 	 */
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance, String type)
 	{
-		return getNearObjects(position, distance.createVector2(distance), type);
+		synchronized(monitor)
+		{
+			Collection ret = new ArrayList();
+			
+			int sizex = areasize.getXAsInteger();
+			int sizey = areasize.getYAsInteger();
+	
+			int x = position.getXAsInteger();
+			int y = position.getYAsInteger();
+			
+			int range = distance.getAsInteger();
+			
+			int minx = x - range >= 0 || getBorderMode().equals(BORDER_TORUS) ? x - range : 0;
+			int maxx = x + range <= sizex || getBorderMode().equals(BORDER_TORUS) ? x + range : sizex;
+
+			int miny = y - range >= 0 || getBorderMode().equals(BORDER_TORUS) ? y - range : 0;
+			int maxy = y + range <= sizey || getBorderMode().equals(BORDER_TORUS) ? y + range : sizey;
+
+			for (int i = minx; i <= maxx; i++)
+			{
+				for (int j = miny; j <= maxy; j++)
+				{
+					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
+					if(!getDistance(testpos, position).greater(distance))
+					{
+						Collection tmp = objectsygridpos.getCollection(testpos);
+						if(tmp != null)
+						{
+							if(type==null)
+							{
+								ret.addAll(tmp);
+							}
+							else
+							{
+								for(Iterator it=tmp.iterator(); it.hasNext(); )
+								{
+									ISpaceObject	obj	= (ISpaceObject)it.next();
+									if(obj.getType().equals(type))
+										ret.add(obj);
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			return(ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+		}
 	}
 	
 	/**
@@ -268,7 +348,7 @@ public class Grid2D extends Space2D
 	 * @param position
 	 * @param distance
 	 * @return The near objects. 
-	 */
+	 * /
 	public ISpaceObject[] getNearObjects(IVector2 position, IVector2 maxdist, String type)
 	{
 		synchronized(monitor)
@@ -317,7 +397,7 @@ public class Grid2D extends Space2D
 			
 			return(ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
 		}
-	}
+	}*/
 	
 	/**
 	 * Returns the nearest object to the given position within a
@@ -414,11 +494,17 @@ public class Grid2D extends Space2D
 	 */
 	public IVector1 calculateDistance(IVector1 dx, IVector1 dy)
 	{
-		if(dx.less(Vector1Double.ZERO))
-			dx	= dx.copy().negate();
-		if(dy.less(Vector1Double.ZERO))
-			dy	= dy.copy().negate();
-		
+		if(NEIGHBORHOOD_MOORE.equals(getNeighborhood()))
+		{
+			return dx.greater(dy)? dx: dy;
+		}
+		else if(NEIGHBORHOOD_VON_NEUMANN.equals(getNeighborhood()))
+		{
+			if(dx.less(Vector1Double.ZERO))
+				dx	= dx.copy().negate();
+			if(dy.less(Vector1Double.ZERO))
+				dy	= dy.copy().negate();
+		}
 		return dx.add(dy);
 	}
 	

@@ -77,7 +77,7 @@ public class GameOfLifeProcess extends SimplePropertyObject implements ISpacePro
 		Grid2D grid = (Grid2D)space;
 		
 		long rate = getProperty("rate")!=null? 
-			((Number)getProperty("rate")).longValue(): 1;
+			((Number)getProperty("rate")).longValue(): 3;
 		
 		if(lasttick+rate<clock.getTick())
 		{
@@ -99,6 +99,7 @@ public class GameOfLifeProcess extends SimplePropertyObject implements ISpacePro
 							&& !cell.equals(neighbors[i]))
 							nbcnt++;
 					}
+//					System.out.println("cells: "+neighbors.length);
 					
 					if(!((Boolean)cell.getProperty("alive")).booleanValue())
 					{
