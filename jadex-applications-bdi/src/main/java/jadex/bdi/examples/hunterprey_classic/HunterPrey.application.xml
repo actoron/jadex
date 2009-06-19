@@ -21,18 +21,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="HunterPrey" package="jadex.bdi.examples.hunterprey">
+	name="HunterPrey" package="jadex.bdi.examples.hunterprey_classic">
 	
 	<agenttypes>
-		<agenttype name="Environment" filename="jadex/bdi/examples/hunterprey/environment/Environment.agent.xml"/>
+		<agenttype name="Environment" filename="jadex/bdi/examples/hunterprey_classic/environment/Environment.agent.xml"/>
 		
-		<agenttype name="SleepingPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/sleepingprey/SleepingPrey.agent.xml"/>
-		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/dumbprey/DumbPrey.agent.xml"/>
-		<agenttype name="LazyPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/lazyprey/LazyPrey.agent.xml"/>
-		<agenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey/creature/preys/cleverprey/CleverPrey.agent.xml"/>
+		<agenttype name="SleepingPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/sleepingprey/SleepingPrey.agent.xml"/>
+		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/dumbprey/DumbPrey.agent.xml"/>
+		<agenttype name="LazyPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/lazyprey/LazyPrey.agent.xml"/>
+		<agenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/cleverprey/CleverPrey.agent.xml"/>
 		
-		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/creature/hunters/dumbhunter/DumbHunter.agent.xml"/>
-		<agenttype name="CleverHunter" filename="jadex/bdi/examples/hunterprey/creature/hunters/ldahunter/LAHunter.agent.xml"/>
+		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/dumbhunter/DumbHunter.agent.xml"/>
+		<agenttype name="CleverHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/ldahunter/LAHunter.agent.xml"/>
 	</agenttypes>
 	
 	<applications>

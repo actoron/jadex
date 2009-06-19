@@ -11,7 +11,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="Manager"
-	package="jadex.bdi.examples.garbagecollector">
+	package="jadex.bdi.examples.garbagecollector_classic">
 	
 	<imports>
 		<import>jadex.bdi.planlib.starter.StartAgentInfo</import>
@@ -41,11 +41,11 @@
 			<goals>
 				<initialgoal ref="startercap.start_agents">
 					<parameterset ref="agentinfos">
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/Environment.agent.xml", "Environment_%n", 2000, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml", "Environment_%n", 2000, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
 					</parameterset>
 				</initialgoal><!-- 
 				<initialgoal ref="ams_destroy_agent">
@@ -59,9 +59,9 @@
 			<goals>
 				<initialgoal ref="startercap.start_agents">
 					<parameterset ref="agentinfos">
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/Environment.agent.xml", "Environment_%n", 2000, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml", "Environment_%n", 2000, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
 					</parameterset>
 				</initialgoal> <!-- 
 				<initialgoal ref="ams_destroy_agent">
@@ -75,15 +75,15 @@
 			<goals>
 				<initialgoal ref="startercap.start_agents">
 					<parameterset ref="agentinfos">
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/Environment.agent.xml", "Environment_%n", 2000, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml", "Environment_%n", 2000, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml", "Burner_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
+						<value>new StartAgentInfo("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml", "Collector_%n", 0, null)</value>
 					</parameterset>
 				</initialgoal><!-- 
 				<initialgoal ref="ams_destroy_agent">

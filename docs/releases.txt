@@ -1,5 +1,11 @@
 Jadex Releases Overview
 
+Release 2.0 beta3 (Environment support release 06/2009)
+	- Jadex V1 Java condition language (JCL) support
+	- New application descriptor XML for defining whole agent applications
+	- Generic environment support for simulation examples
+	- New environment versions of example plus new game of life example
+
 Release 2.0 beta2 (1/2009)
 	- JADE adapter included
 	- Some minor bugfixes

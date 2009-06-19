@@ -15,10 +15,10 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="Cleaner"
-	package="jadex.bdi.examples.cleanerworld.cleaner">
+	package="jadex.bdi.examples.cleanerworld_classic.cleaner">
 
 	<imports>
-		<import>jadex.bdi.examples.cleanerworld.*</import>
+		<import>jadex.bdi.examples.cleanerworld_classic.*</import>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.commons.*</import>
@@ -204,7 +204,7 @@
 					//
 					// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
 					// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-					// ?waste = (jadex.bdi.examples.cleanerworld.Waste (location ?wasteloc))
+					// ?waste = (jadex.bdi.examples.cleanerworld_classic.Waste (location ?wasteloc))
 					//
 					// ?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
 					// ?refgoal = (goal (parameterelement_has_parameters contains ?refparam))

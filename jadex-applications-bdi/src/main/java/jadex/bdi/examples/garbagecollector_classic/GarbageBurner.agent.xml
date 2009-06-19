@@ -9,7 +9,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="GarbageBurner"
-	package="jadex.bdi.examples.garbagecollector">
+	package="jadex.bdi.examples.garbagecollector_classic">
 
 	<beliefs>
 		<!-- Environment object as singleton.

@@ -57,12 +57,12 @@ public class MarsworldGui	extends JFrame
 	/** The image icons. */
 	private static UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"background", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld/images/mars.png"),
-		"homebase", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld/images/homebase.png"),
-		"target", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld/images/target.png"),
-		"sentry", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld/images/sentryagent.png"),
-		"production", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld/images/productionagent.png"),
-		"carry", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld/images/carryagent.png")
+		"background", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld_classic/images/mars.png"),
+		"homebase", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld_classic/images/homebase.png"),
+		"target", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld_classic/images/target.png"),
+		"sentry", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld_classic/images/sentryagent.png"),
+		"production", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld_classic/images/productionagent.png"),
+		"carry", SGUI.makeIcon(MarsworldGui.class, "/jadex/bdi/examples/marsworld_classic/images/carryagent.png")
 	});
 
 	//-------- attributes --------

@@ -13,10 +13,10 @@
 	</structuringtypes> -->
 	
 	<agenttypes>
-		<agenttype name="EnvironmentLocal" filename="jadex/bdi/examples/cleanerworld/environment/EnvironmentLocal.agent.xml"/>
-		<agenttype name="CleanerLocal" filename="jadex/bdi/examples/cleanerworld/cleaner/CleanerLocal.agent.xml"/>
-		<agenttype name="EnvironmentRemote" filename="jadex/bdi/examples/cleanerworld/environment/Environment.agent.xml"/>
-		<agenttype name="CleanerRemote" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
+		<agenttype name="EnvironmentLocal" filename="jadex/bdi/examples/cleanerworld_classic/environment/EnvironmentLocal.agent.xml"/>
+		<agenttype name="CleanerLocal" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/CleanerLocal.agent.xml"/>
+		<agenttype name="EnvironmentRemote" filename="jadex/bdi/examples/cleanerworld_classic/environment/Environment.agent.xml"/>
+		<agenttype name="CleanerRemote" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/Cleaner.agent.xml"/>
 	</agenttypes>
 	
 	<applications>

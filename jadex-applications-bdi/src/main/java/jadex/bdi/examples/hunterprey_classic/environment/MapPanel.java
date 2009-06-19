@@ -39,12 +39,12 @@ public class MapPanel	extends JPanel
 	/** The image icons. */
 	public static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"food",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey/images/food.png"),
-		"obstacle",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey/images/obstacle.png"),
-		"hunter", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey/images/hunter.png"),
-		"prey", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey/images/prey.png"),
-		"observer", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey/images/observer.png"),
-		"background", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey/images/background.png")
+		"food",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/food.png"),
+		"obstacle",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/obstacle.png"),
+		"hunter", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/hunter.png"),
+		"prey", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/prey.png"),
+		"observer", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/observer.png"),
+		"background", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/background.png")
 	});
 
 	//-------- attributes --------

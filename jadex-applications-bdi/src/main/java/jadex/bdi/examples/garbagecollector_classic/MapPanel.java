@@ -27,9 +27,9 @@ public class MapPanel extends JPanel
 	/** The image icons. */
 	public static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"burner",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/garbagecollector/images/burner.png"),
-		"collector",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/garbagecollector/images/collector.png"),
-		"garbage", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/garbagecollector/images/garbage.png"),
+		"burner",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/garbagecollector_classic/images/burner.png"),
+		"collector",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/garbagecollector_classic/images/collector.png"),
+		"garbage", SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/garbagecollector_classic/images/garbage.png"),
 	});
 
 	//-------- attributes --------

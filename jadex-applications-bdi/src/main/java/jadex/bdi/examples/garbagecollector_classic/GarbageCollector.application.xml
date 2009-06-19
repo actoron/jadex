@@ -13,9 +13,9 @@
 	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
 	
 	<agenttypes>
-		<agenttype name="Environment" filename="jadex/bdi/examples/garbagecollector/Environment.agent.xml"/>
-		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml"/>
-		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
+		<agenttype name="Environment" filename="jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml"/>
+		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml"/>
+		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml"/>
 	</agenttypes>
 	
 	<applications>

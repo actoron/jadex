@@ -5,7 +5,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.bdi.examples.hunterprey_env.MoveAction;
+import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bridge.AgentTerminatedException;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;

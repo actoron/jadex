@@ -17,13 +17,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="MarsWorld" package="jadex.bdi.examples.marsworld">
+	name="MarsWorld" package="jadex.bdi.examples.marsworld_classic">
 	
 	<agenttypes>
-		<agenttype name="Environment" filename="jadex/bdi/examples/marsworld/environment/Environment.agent.xml"/>
-		<agenttype name="Carrier" filename="jadex/bdi/examples/marsworld/carrier/Carry.agent.xml"/>
-		<agenttype name="Producer" filename="jadex/bdi/examples/marsworld/producer/Production.agent.xml"/>
-		<agenttype name="Sentry" filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml"/>
+		<agenttype name="Environment" filename="jadex/bdi/examples/marsworld_classic/environment/Environment.agent.xml"/>
+		<agenttype name="Carrier" filename="jadex/bdi/examples/marsworld_classic/carrier/Carry.agent.xml"/>
+		<agenttype name="Producer" filename="jadex/bdi/examples/marsworld_classic/producer/Production.agent.xml"/>
+		<agenttype name="Sentry" filename="jadex/bdi/examples/marsworld_classic/sentry/Sentry.agent.xml"/>
 	</agenttypes>
 	
 	<applications>

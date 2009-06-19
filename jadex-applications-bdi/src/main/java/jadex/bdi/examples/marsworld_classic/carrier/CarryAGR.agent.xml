@@ -10,17 +10,17 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="CarryAGR"
-	package="jadex.bdi.examples.marsworld.carrier">
+	package="jadex.bdi.examples.marsworld_classic.carrier">
 
 	<imports>
-		<import>jadex.bdi.examples.marsworld.*</import>
-		<import>jadex.bdi.examples.marsworld.movement.*</import>
+		<import>jadex.bdi.examples.marsworld_classic.*</import>
+		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
 	</imports>
 
 	<capabilities>
 		<!-- Include the move capability as move for basic movement. -->
-		<capability name="move" file="jadex.bdi.examples.marsworld.movement.Movement"/>
+		<capability name="move" file="jadex.bdi.examples.marsworld_classic.movement.Movement"/>
 	</capabilities>
 
 	<beliefs>

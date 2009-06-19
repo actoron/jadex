@@ -6,11 +6,11 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-0.96.xsd"
 	name="Observer"
-	package="jadex.examples.hunterprey.environment">
+	package="jadex.examples.hunterprey_classic.environment">
 
 	<imports>
-		<import>jadex.bdi.examples.hunterprey.*</import>
-		<import>jadex.bdi.examples.hunterprey.environment.*</import>
+		<import>jadex.bdi.examples.hunterprey_classic.*</import>
+		<import>jadex.bdi.examples.hunterprey_classic.environment.*</import>
 		<import>jadex.runtime.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.*</import>
@@ -18,8 +18,8 @@
 	</imports>
 
 	<capabilities>
-		<!--  <capability name="actsensecap" file="jadex/bdi/examples/hunterprey/creature/actsense/Creature.capability.xml"/> -->
-		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey.creature.actsense.Creature"/>
+		<!--  <capability name="actsensecap" file="jadex/bdi/examples/hunterprey_classic/creature/actsense/Creature.capability.xml"/> -->
+		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey_classic.creature.actsense.Creature"/>
 	</capabilities>
 
 	<beliefs>

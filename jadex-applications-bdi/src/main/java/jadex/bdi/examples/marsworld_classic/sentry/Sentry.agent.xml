@@ -10,11 +10,11 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="Sentry"
-	package="jadex.bdi.examples.marsworld.sentry">
+	package="jadex.bdi.examples.marsworld_classic.sentry">
 
 	<imports>
-		<import>jadex.bdi.examples.marsworld.*</import>
-		<import>jadex.bdi.examples.marsworld.movement.*</import>
+		<import>jadex.bdi.examples.marsworld_classic.*</import>
+		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
@@ -25,7 +25,7 @@
 			and registering the sentry service. -->
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<!-- Include the move capability as move for basic movement. -->
-		<capability name="move" file="jadex.bdi.examples.marsworld.movement.Movement" />
+		<capability name="move" file="jadex.bdi.examples.marsworld_classic.movement.Movement" />
 	</capabilities>
 
 	<beliefs>
