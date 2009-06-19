@@ -175,28 +175,25 @@ public class Grid2D extends Space2D
 			// Enumerating all empty fields would cause big
 			// memory consumption on big grids
 			
-			if(objectsygridpos.keySet().size()<areasize.getYAsInteger()*areasize.getXAsInteger())
+			// first try n times random value 
+			int n = 5;
+			for(int i=0; i<n && ret==null; i++)
 			{
-				// first try n times random value 
-				int n = 5;
-				for(int i=0; i<n && ret==null; i++)
+				ret = new Vector2Int(getRandomPosition(Vector2Int.ZERO));
+				if(objectsygridpos.containsKey(ret))
+					ret = null;
+			}
+			
+			// Just find first empty field
+			if(ret==null)
+			{
+				for(int y=0; ret==null && y<areasize.getYAsInteger(); y++)
 				{
-					ret = new Vector2Int(getRandomPosition(Vector2Int.ZERO));
-					if(objectsygridpos.containsKey(ret))
-						ret = null;
-				}
-				
-				// Just find first empty field
-				if(ret==null)
-				{
-					for(int y=0; y<areasize.getYAsInteger(); y++)
+					for(int x=0; ret==null && x<areasize.getXAsInteger(); x++)
 					{
-						for(int x=0; x<areasize.getXAsInteger(); x++)
-						{
-							ret = new Vector2Int(x, y);
-							if(objectsygridpos.containsKey(ret))
-								ret = null;
-						}
+						ret = new Vector2Int(x, y);
+						if(objectsygridpos.containsKey(ret))
+							ret = null;
 					}
 				}
 			}

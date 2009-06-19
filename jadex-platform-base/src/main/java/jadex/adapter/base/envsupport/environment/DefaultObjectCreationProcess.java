@@ -93,7 +93,8 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 					lasttick	+= rate;
 					String	type	= (String)getProperty("type");
 					Map	props	= new HashMap((Map)getProperty("properties"));
-					space.createSpaceObject(type, props, null);
+					Object	obj	= space.createSpaceObject(type, props, null);
+//					System.out.println("Created: "+obj);
 				}
 			}
 		}
@@ -114,7 +115,8 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 					lasttime	+= rate;
 					String	type	= (String)getProperty("type");
 					Map	props	= new HashMap((Map)getProperty("properties"));
-					space.createSpaceObject(type, props, null);
+					Object	obj	= space.createSpaceObject(type, props, null);
+//					System.out.println("Created: "+obj);
 				}
 			}
 		}
