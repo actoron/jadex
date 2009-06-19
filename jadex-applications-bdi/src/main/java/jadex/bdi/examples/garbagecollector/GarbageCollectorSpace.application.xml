@@ -11,7 +11,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="GarbageCollectorSpace" package="jadex.bdi.examples.garbagecollector2">
+	name="GarbageCollectorSpace" package="jadex.bdi.examples.garbagecollector">
 	
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
@@ -114,8 +114,8 @@
 				<env:perspective name="icons" class="Perspective2D" opengl="false" objectshiftx="0.5" objectshifty="0.5">
 					<env:drawable objecttype="collector" width="1.0" height="1.0" rotation="rotation">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>
-						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png" />
-						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.3" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
+						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector/images/collector.png" />
+						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.3" imagepath="jadex/bdi/examples/garbagecollector/images/garbage.png">
 							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
 						</env:texturedrectangle>
 <!-- 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/> -->
@@ -123,18 +123,18 @@
 					</env:drawable>
 					<env:drawable objecttype="burner" width="1" height="1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.getProperty("vision_range")*2+1)</env:property>
-						<env:texturedrectangle width="0.8" height="0.8" layer="1" imagepath="jadex/bdi/examples/garbagecollector2/images/burner.png" />
-						<env:texturedrectangle width="0.6" height="0.6" layer="2" imagepath="jadex/bdi/examples/garbagecollector2/images/flames.png" >
+						<env:texturedrectangle width="0.8" height="0.8" layer="1" imagepath="jadex/bdi/examples/garbagecollector/images/burner.png" />
+						<env:texturedrectangle width="0.6" height="0.6" layer="2" imagepath="jadex/bdi/examples/garbagecollector/images/flames.png" >
 							<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
 						</env:texturedrectangle>
 <!-- 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/> -->
 						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="garbage" width="0.7" height="0.7">
-						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png" />
+						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/garbagecollector/images/garbage.png" />
 					</env:drawable>
 					<env:prelayers>
-						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector2/images/bg.jpg" />
+						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector/images/bg.jpg" />
 						<env:gridlayer width="1.0" height="1.0" color="white" />
 					</env:prelayers>
 				</env:perspective>
@@ -172,8 +172,8 @@
 	</spacetypes>
 	
 	<agenttypes>
-		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector2/GarbageCollector.agent.xml"/>
-		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector2/GarbageBurner.agent.xml"/>
+		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml"/>
+		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
 	</agenttypes>
 	
 	<applications>

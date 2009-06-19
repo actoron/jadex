@@ -9,7 +9,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="GarbageBurner"
-	package="jadex.bdi.examples.garbagecollector2">
+	package="jadex.bdi.examples.garbagecollector">
 
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>

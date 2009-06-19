@@ -18,10 +18,6 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>
 	</imports>
 
-	<capabilities>
-		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey.creature.actsense.Creature"/>
-	</capabilities>
-
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">

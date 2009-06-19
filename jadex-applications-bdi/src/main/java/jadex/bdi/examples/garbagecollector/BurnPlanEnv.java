@@ -1,4 +1,4 @@
-package jadex.bdi.examples.garbagecollector2;
+package jadex.bdi.examples.garbagecollector;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;

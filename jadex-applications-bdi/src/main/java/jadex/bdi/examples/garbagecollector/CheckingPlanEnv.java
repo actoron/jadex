@@ -1,4 +1,4 @@
-package jadex.bdi.examples.garbagecollector2;
+package jadex.bdi.examples.garbagecollector;
 
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
