@@ -53,7 +53,7 @@ public class ObserverCenterWindow extends JFrame
 			{
 				menubar = new JMenuBar();
 //				menubar.add(new JMenu("Test"));
-//				setJMenuBar(menubar);
+				setJMenuBar(menubar);
 
 				toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
 				getContentPane().add(toolbar, BorderLayout.NORTH);

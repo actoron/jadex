@@ -38,7 +38,7 @@
 			</env:views>
 			
 			<env:perspectives>
-				<env:perspective name="main" class="Perspective2D" opengl="false" objectshiftx="0.5" objectshifty="0.5">
+				<env:perspective name="main" class="Perspective2D" opengl="true" objectshiftx="0.5" objectshifty="0.5">
 					<env:drawable objecttype="cell" width="1.0" height="1.0">
 						<env:rectangle color="yellow">
 							<env:drawcondition>$object.alive</env:drawcondition> 

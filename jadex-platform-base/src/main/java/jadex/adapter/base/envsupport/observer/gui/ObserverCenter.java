@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.observer.gui;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -8,12 +9,13 @@ import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
+import jadex.bridge.IClockService;
 import jadex.bridge.ILibraryService;
+import jadex.commons.IChangeListener;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
@@ -41,7 +43,8 @@ public class ObserverCenter
 {
 	private static final int[] PLUGIN_REFRESH_TIMES = { 0, 50, 100, 250, 500, 1000};
 	
-	private static final int[] VIEWPORT_RATES = { 5, 10, 20, 30, 50, 60, 70, 75, 85, 100, 120 };
+	private static final int[] VIEWPORT_RATES = { -1, 0, 5, 10, 20, 30, 50, 60, 70, 75, 85, 100, 120 };
+	private static final int DEFAULT_VIEWPORT_RATE = -1;
 	
 	/** The main window.
 	 */
@@ -88,6 +91,9 @@ public class ObserverCenter
 	/** Selected object listeners */
 	protected List selectedObjectListeners;
 	
+	/** The clock listener for sync gui updates. */
+	protected IChangeListener	clocklistener;
+	
 	/** Creates an observer center.
 	 *  
 	 *  @param windowTitle title of the observer window
@@ -133,15 +139,31 @@ public class ObserverCenter
 				}
 				refreshMenu.add(pluginMenu);
 				
+				vptimer = new Timer(33, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						updateDisplay();
+					}
+				});
+				clocklistener	= new IChangeListener()
+				{
+					public void changeOccurred(jadex.commons.ChangeEvent event)
+					{
+						updateDisplay();
+					}
+				};
+
 				JMenu viewportMenu = new JMenu("Viewport Refresh");
 				group = new ButtonGroup();
 				
 				for(int i = 0; i < VIEWPORT_RATES.length; ++i)
 				{
 					JRadioButtonMenuItem item = new JRadioButtonMenuItem(new ViewportRefreshAction(VIEWPORT_RATES[i]));
-					if (VIEWPORT_RATES[i] == 30)
+					if (VIEWPORT_RATES[i] == DEFAULT_VIEWPORT_RATE)
 					{
 						item.setSelected(true);
+						item.getAction().actionPerformed(null);
 					}
 					group.add(item);
 					viewportMenu.add(item);
@@ -164,16 +186,7 @@ public class ObserverCenter
 					}
 				});
 				plugintimer.start();
-				
-				vptimer = new Timer(33, new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						updateDisplay();
-					}
-				});
-				vptimer.start();
-				
+								
 				mainwindow.addWindowListener(new ObserverWindowController());
 			}
 		};
@@ -529,26 +542,44 @@ public class ObserverCenter
 		 */
 		public ViewportRefreshAction(int fps)
 		{
-			delay = 1000 / fps;
-			if (fps < 0)
+			if(fps==-1)
 			{
-				fps = 0;
+				delay	= -1;
+				putValue(NAME, "Sync on Clock");
 			}
-			if (fps == 0)
+			else if(fps==0)
 			{
-				putValue(NAME, "Unlimited");
+				delay	= 0;
+				putValue(NAME, "Off");
 			}
 			else
 			{
+				delay = 1000 / fps;
 				putValue(NAME, Integer.toString(fps) + " FPS");
 			}
 		}
 		
 		public void actionPerformed(ActionEvent e)
 		{
-			vptimer.stop();
-			vptimer.setDelay(delay);
-			vptimer.start();
+			if(delay==-1)
+			{
+				vptimer.stop();
+				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getPlatform().getService(IClockService.class);
+				clock.addChangeListener(clocklistener);
+			}
+			else if(delay==0)
+			{
+				vptimer.stop();
+				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getPlatform().getService(IClockService.class);
+				clock.removeChangeListener(clocklistener);
+			}
+			else
+			{
+				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getPlatform().getService(IClockService.class);
+				clock.removeChangeListener(clocklistener);
+				vptimer.setDelay(delay);
+				vptimer.start();
+			}
 		}
 	}
 	

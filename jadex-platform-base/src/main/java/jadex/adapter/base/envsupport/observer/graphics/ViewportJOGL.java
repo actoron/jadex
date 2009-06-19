@@ -78,6 +78,9 @@ public class ViewportJOGL extends AbstractViewport
 	/** True, if non-power-of-two texture support is available. */
 	private boolean				npot_;
 
+	/** Flag to indicate that rendering has been called but not yet started. */
+	private boolean			rendering;
+	
 	/** Action that renders the frame. */
 	private Runnable			renderFrameAction_;
 	
@@ -138,6 +141,7 @@ public class ViewportJOGL extends AbstractViewport
 		{
 			public void run()
 			{
+				rendering	= false;
 				((GLCanvas)ViewportJOGL.this.canvas_).display();
 			}
 		};
@@ -165,7 +169,11 @@ public class ViewportJOGL extends AbstractViewport
 
 	public void refresh()
 	{
-		EventQueue.invokeLater(renderFrameAction_);
+		if(!rendering)
+		{
+			rendering	= true;
+			EventQueue.invokeLater(renderFrameAction_);
+		}
 	}
 
 	/**

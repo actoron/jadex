@@ -96,6 +96,9 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 	/** The fetcher. */
 	protected SimpleValueFetcher fetcher;
 	
+	/** Flag to indicate that rendering has been called but not yet started. */
+	private boolean			rendering;
+
 	/**
 	 * Creates a 2D-Perspective.
 	 */
@@ -499,61 +502,66 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 		{
 			return;
 		}
-		
-		EventQueue.invokeLater(new Runnable()
+			
+		if(!rendering)
 		{
-			public void run()
+			rendering	= true;
+			EventQueue.invokeLater(new Runnable()
 			{
-				viewport.setInvertX(invertxaxis);
-				viewport.setInvertY(invertyaxis);
-				viewport.setObjectShift(objectShift);
-				
-				// Set pre- and postlayers
-				viewport.setPreLayers(prelayers);
-				viewport.setPostLayers(postlayers);
-				
-				Object[] objects = dataview.getObjects();
-
-				List objectList = null;
-				objectList = new ArrayList(objects.length + 1);
-				for (int j = 0; j < objects.length; ++j )
+				public void run()
 				{
-					Object obj = objects[j];
-					DrawableCombiner d = (DrawableCombiner) visuals.get(SObjectInspector.getType(obj));
-					if (d == null)
+					rendering	= false;
+					viewport.setInvertX(invertxaxis);
+					viewport.setInvertY(invertyaxis);
+					viewport.setObjectShift(objectShift);
+					
+					// Set pre- and postlayers
+					viewport.setPreLayers(prelayers);
+					viewport.setPostLayers(postlayers);
+					
+					Object[] objects = dataview.getObjects();
+	
+					List objectList = null;
+					objectList = new ArrayList(objects.length + 1);
+					for (int j = 0; j < objects.length; ++j )
 					{
-						continue;
+						Object obj = objects[j];
+						DrawableCombiner d = (DrawableCombiner) visuals.get(SObjectInspector.getType(obj));
+						if (d == null)
+						{
+							continue;
+						}
+						Object[] viewObj = new Object[2];
+						viewObj[0] = obj;
+						viewObj[1] = d;
+						objectList.add(viewObj);
 					}
-					Object[] viewObj = new Object[2];
-					viewObj[0] = obj;
-					viewObj[1] = d;
-					objectList.add(viewObj);
+	
+					if (selectedobject != null)
+					{
+						DrawableCombiner dc =(DrawableCombiner)visuals.get(SObjectInspector.getType(selectedobject));
+						IVector2 size = (IVector2)dc.getBoundValue(selectedobject, dc.getSize(), viewport);
+						Object[] viewObj = new Object[2];
+						marker.setSize((IVector2) size);
+						viewObj[0] = selectedobject;
+						viewObj[1] = marker;
+						objectList.add(viewObj);
+					}
+					else
+					{
+						setSelectedObject(null);
+					}
+	
+					if (displayorder != null)
+					{
+						Collections.sort(objectList, displayorder);
+					}
+	
+					viewport.setObjectList(objectList);
+					viewport.refresh();
 				}
-
-				if (selectedobject != null)
-				{
-					DrawableCombiner dc =(DrawableCombiner)visuals.get(SObjectInspector.getType(selectedobject));
-					IVector2 size = (IVector2)dc.getBoundValue(selectedobject, dc.getSize(), viewport);
-					Object[] viewObj = new Object[2];
-					marker.setSize((IVector2) size);
-					viewObj[0] = selectedobject;
-					viewObj[1] = marker;
-					objectList.add(viewObj);
-				}
-				else
-				{
-					setSelectedObject(null);
-				}
-
-				if (displayorder != null)
-				{
-					Collections.sort(objectList, displayorder);
-				}
-
-				viewport.setObjectList(objectList);
-				viewport.refresh();
-			}
-		});
+			});
+		}
 	}
 	
 	private static final IViewport createViewport(IPerspective persp, ILibraryService libService, Color bgColor, boolean tryopengl)
