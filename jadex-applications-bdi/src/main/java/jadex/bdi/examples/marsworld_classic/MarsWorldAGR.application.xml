@@ -1,0 +1,71 @@
+<!--
+	<H3>The marsworld application descriptor</H3>
+
+	Can be used to launch the mars world example.<br>
+
+	It consists of three different kinds of agents:<br>
+	- <b>Sentry agents</b> are responsible for examining ore locations<br>
+		A ore capacity is shown on the map when an ore location was examined.<br>
+	- <b>Production agents</b> produce ore at available ore location.<br>
+	- <b>Carry agents</b> are able to carry ore to the base.<br><br>
+
+	Objective is to carry as much ore as possible to the<br>
+	homebase in a predefined mission time.<br>
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
+	xmlns:agr="http://jadex.sourceforge.net/jadex-agr"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/application.xsd"
+	name="MarsWorldAGR" package="jadex.bdi.examples.marsworld">
+	
+	<spacetypes>
+		<!-- <spacetype xsi:type="spacetype"	name="marsspace"/> -->
+		<agr:agrspacetype name="marsagrspace">
+			<agr:grouptype name="marsteam">
+				<agr:roles>
+					<agr:role name="sentry" min="1" max="1" />
+					<agr:role name="producer" min="1" />
+					<agr:role name="carrier" min="1" max="-1" />
+				</agr:roles>
+			</agr:grouptype>
+		</agr:agrspacetype>
+	</spacetypes>
+	
+	<agenttypes>
+		<agenttype name="Environment" filename="jadex/bdi/examples/marsworld/environment/Environment.agent.xml"/>
+		<agenttype name="Carrier" filename="jadex/bdi/examples/marsworld/carrier/CarryAGR.agent.xml"/>
+		<agenttype name="Producer" filename="jadex/bdi/examples/marsworld/producer/ProductionAGR.agent.xml"/>
+		<agenttype name="Sentry" filename="jadex/bdi/examples/marsworld/sentry/SentryAGR.agent.xml"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="1 Sentry / 2 Producers / 3 Carriers">
+			<agents>
+				<agent type="Environment"/>
+				<agent type="Sentry"/>
+				<agent type="Producer" number="2"/>
+				<agent type="Carrier" number="3"/>
+			</agents>
+			
+			<agr:agrspace name="myagrspace" type="marsagrspace">
+				<agr:group name="mymarsteam" type="marsteam">
+					<agr:position role="sentry" agenttype="Sentry" />
+					<agr:position role="producer" agenttype="Producer" />
+					<agr:position role="carrier" agenttype="Carrier" />
+				</agr:group>
+			</agr:agrspace>
+			
+			<!--  <twod:space type="mars2dspace">
+				<twod:position agenttype="Sentry" x="1" y="1"/>
+				<twod:position agenttype="Producer" x="2" y="2" number="0"/>
+				<twod:position agenttype="Producer" x="3" y="3" number="1"/>
+				<twod:position agenttype="Carrier" x="4" y="4" number="0"/>
+				<twod:position agenttype="Carrier" x="5" y="5" number="1"/>
+				<twod:position agenttype="Carrier" x="6" y="6" number="2"/>
+			</twod:space>-->
+		</application>
+	</applications>	
+
+</applicationtype>
