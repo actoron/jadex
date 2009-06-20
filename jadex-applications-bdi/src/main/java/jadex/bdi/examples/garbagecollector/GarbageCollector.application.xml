@@ -278,7 +278,7 @@
 			<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 				<env:processes>
 					<env:process type="create">
-						<env:property name="tickrate">1</env:property>
+						<env:property name="tickrate">2</env:property>
 					</env:process>
 				</env:processes>
 				
