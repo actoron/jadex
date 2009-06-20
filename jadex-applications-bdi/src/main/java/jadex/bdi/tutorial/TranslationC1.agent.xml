@@ -70,7 +70,7 @@
  		<!-- The default parent handler prints out log messages on the console. -->
 		<property name="logging.useParentHandlers">true</property>
 		<!-- Debugging flag. -->
-		<property name="debugging">true</property>
+		<!-- <property name="debugging">true</property> -->
     </properties>
 
 </agent>

@@ -52,7 +52,7 @@ public class GUIPlanF1 extends Plan
 		{
 			public void agentTerminating(AgentEvent ae)
 			{
-				System.out.println("terminating");
+//				System.out.println("terminating");
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()

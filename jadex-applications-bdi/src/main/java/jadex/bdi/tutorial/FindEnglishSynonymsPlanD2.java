@@ -64,7 +64,7 @@ public class FindEnglishSynonymsPlanD2 extends Plan
 			String gword = (String)querytranslate.execute("$eword", eword);
 //			queryfind.setParameter("$gword", gword);
 //			queryfind.setParameter("$eword", eword);
-			List syns = (List)queryfind.execute(new String[]{"$gword, $eword"},  new Object[]{gword, eword});
+			List syns = (List)queryfind.execute(new String[]{"$gword", "$eword"},  new Object[]{gword, eword});
 			getLogger().info("Synonyms for eword: "+syns);
 			reply	= "transcap.inform";
 			cont	= "Synonyms for "+eword+" : "+syns;
