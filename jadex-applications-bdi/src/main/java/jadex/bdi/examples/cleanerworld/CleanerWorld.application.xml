@@ -74,8 +74,9 @@
 			</env:tasktypes>
 			
 			<env:processtypes>
-				<env:processtype name="create" class="CreateWasteProcess" >
-					<env:property name="rate">5</env:property>
+				<env:processtype name="create" class="DefaultObjectCreationProcess">
+					<env:property name="timerate">10000</env:property>
+					<env:property name="type">"waste"</env:property>
 				</env:processtype>
 				<env:processtype name="empty" class="CreateCollectionTruckProcess" >
 				</env:processtype>
@@ -229,7 +230,7 @@
 				
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">15000</env:property>
+						<env:property name="timerate">15000</env:property>
 					</env:process>
 					<env:process type="empty">
 					</env:process>
@@ -278,7 +279,7 @@
 				
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">7000</env:property>
+						<env:property name="timerate">7000</env:property>
 					</env:process>
 					<env:process type="empty">
 					</env:process>

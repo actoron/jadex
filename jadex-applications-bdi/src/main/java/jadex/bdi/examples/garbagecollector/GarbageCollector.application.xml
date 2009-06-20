@@ -14,6 +14,7 @@
 	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
 	
 	<imports>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
@@ -46,7 +47,7 @@
 				<env:objecttype name="garbage" />
 			</env:objecttypes>
 			
-			<!-- Declaration of the relationships between agents and their avatars in the space. -->
+			<!-- Declaration of the relationships between agents and their avatar objects in the space. -->
 			<env:avatarmappings>
 				<env:avatarmapping agenttype="Collector" objecttype="collector"/>
 				<env:avatarmapping agenttype="Burner" objecttype="burner"/>
@@ -60,10 +61,16 @@
 				<env:actiontype name="go" class="GoAction" />
 			</env:actiontypes>
 			
-			<!-- Processes run on their in the environment. -->
+			<!-- Processes run on their own in the environment. -->
 			<env:processtypes>
-				<env:processtype name="create" class="CreateWasteProcess" >
-					<env:property name="rate">5</env:property>
+				<env:processtype name="create" class="DefaultObjectCreationProcess">
+					<env:property name="tickrate">5</env:property>
+					<env:property name="type">"garbage"</env:property>
+					<env:property name="properties" dynamic="true">
+						jadex.commons.SUtil.createHashMap(
+							new String[]{Space2D.PROPERTY_POSITION},
+							new Object[]{((Space2D)$space).getRandomPosition(Vector2Int.ZERO)})
+					</env:property>
 				</env:processtype>
 			</env:processtypes>
 			
@@ -204,7 +211,7 @@
 			<env:envspace name="mygc2dspace" type="gc2dspace">
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">15</env:property>
+						<env:property name="tickrate">15</env:property>
 					</env:process>
 				</env:processes>
 				
@@ -230,7 +237,7 @@
 			<env:envspace name="mygc2dspace" type="gc2dspace">
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">8</env:property>
+						<env:property name="tickrate">8</env:property>
 					</env:process>
 				</env:processes>
 				
@@ -252,7 +259,7 @@
 			<env:envspace name="mygc2dspace" type="gc2dspace" width="14" height="14">
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 				
@@ -271,7 +278,7 @@
 			<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">1</env:property>
+						<env:property name="tickrate">1</env:property>
 					</env:process>
 				</env:processes>
 				
