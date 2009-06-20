@@ -44,7 +44,7 @@
 	</events>
 	
 	<properties>
-		<property name="debugging">true</property>
+		<!-- <property name="debugging">true</property> -->
     </properties>
 
 </agent>

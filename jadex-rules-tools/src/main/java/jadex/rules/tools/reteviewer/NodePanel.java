@@ -303,9 +303,21 @@ public class NodePanel extends JPanel
 		{
 			// Use state synchronizator for accessing rete memory (hack???)
 			if(state.getSynchronizator()!=null)
-				state.getSynchronizator().invokeLater(runrefresh);
+			{
+				try
+				{
+					state.getSynchronizator().invokeLater(runrefresh);
+				}
+				catch(Exception e)
+				{
+					//System.out.println("refresh problem");
+					// Refresh did not work.
+				}
+			}
 			else
+			{
 				runrefresh.run();
+			}
 		}
 	}
 }

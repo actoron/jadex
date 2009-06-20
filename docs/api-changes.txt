@@ -2,12 +2,44 @@ Changes from Jadex 0.96 to Jadex V2 beta1
 
 This is a short (probably incomplete) list of
 the major changes regarding the programming
-of Jadex V2 BDI agents. Please look at the
+of Jadex V2 agents. Please look at the
 example sources to learn more about the details.
 Full documentation will be available with the
 final V2 release. 
 
 New Features:
+	Application features:
+	- Jadex V2 introduces agent application descriptors, which help to define
+	  the components of an application. In addition to the normal agent type
+	  and instance definitions you can define arbitrary kinds of spaces for
+	  the agents.
+	- Applications have been introduced as key concept besides agents. Agents
+	  can belong to (0-1) applications and can access their application context.
+	  Furthermore, the tools can be used to handle them (currently the starter 
+	  allows for starting/stopping whole application and starting agents in 
+	  certain running applications).
+	- A generic environment support (envsupport) has been realized as specific 
+	  space. This environment space is available (envsupport) that allows for 
+	  designing 2D grid/continuous worlds including an easy way for their presentation
+	  (you may have a look at the examples for further details).
+	Platform features:
+	- In V2 multi-kernel support has been realized, which means that you can
+	  program heterogenious agent systems consisting of different kinds of agent,
+	  currently BDI and micro agents. On advantage of micro agents is that they
+	  require very few resources in terms of memery and threads.
+	- The Standalone platform has been realized in a service-oriented extensible
+	  way. All functionalities of the platform are realized via platform services.
+	  These services are declaratively defined in a configuration file 
+	  (in spring beans or a proprietary Jadex format). This allows to customize
+	  the platform features in a very easy and convenient way.
+	- Hybrid execution model, which supports simulation as well as application modes.
+	  Jadex V2 contains a simulation plugin that allows to control the time
+	  advancement of the system without changing any line of code in the
+	  agents. It is possible to execute the application in realtime as well as 
+	  in simulation mode. Regarding the simulation mode you can choose among event 
+	  or time driven execution.
+	  
+	BDI Features:
 	- V2 supports direct referencing of elements from inner capabilities
 	  (e.g. "dfcap.df_search"), i.e. it is not necessary to declare local 
 	  reference elements for exported elements of direct subcapabilities. 
