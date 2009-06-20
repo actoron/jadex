@@ -1,4 +1,4 @@
-Changes from Jadex 0.96 to Jadex V2 beta1
+Changes from Jadex 0.96 to Jadex V2 beta3
 
 This is a short (probably incomplete) list of
 the major changes regarding the programming
