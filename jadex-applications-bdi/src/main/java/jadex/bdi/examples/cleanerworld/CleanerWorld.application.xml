@@ -52,7 +52,7 @@
 				
 				<env:objecttype name="wastebin">
 					<env:property name="wastes">0</env:property>
-					<env:property name="capacity">1</env:property>
+					<env:property name="capacity">3</env:property>
 					<env:property name="full" dynamic="true">$object.wastes &gt;= $object.capacity</env:property>
 				</env:objecttype>
 			</env:objecttypes>

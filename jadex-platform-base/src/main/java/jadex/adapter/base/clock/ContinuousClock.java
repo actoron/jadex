@@ -341,7 +341,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 							catch(InterruptedException e){}
 						}
 					}
-				//}
+				}
 	
 					// Handle due entry (must not be synchronized to avoid
 					// deadlock when timed object concurrently accesses timetable).
@@ -354,7 +354,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 						// which will otherwise be removed aftwerwards.
 						removeTimer(next);
 					}
-				}
+//				}
 				
 				if(diff<=0)
 				{

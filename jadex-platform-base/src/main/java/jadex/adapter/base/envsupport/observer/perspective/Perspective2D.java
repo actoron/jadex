@@ -497,12 +497,6 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 	 */
 	public void refresh()
 	{
-		final IDataView dataview = obscenter.getSelectedDataView();
-		if (dataview == null)
-		{
-			return;
-		}
-			
 		if(!rendering)
 		{
 			rendering	= true;
@@ -511,6 +505,12 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 				public void run()
 				{
 					rendering	= false;
+					IDataView dataview = obscenter.getSelectedDataView();
+					if (dataview == null)
+					{
+						return;
+					}
+
 					viewport.setInvertX(invertxaxis);
 					viewport.setInvertY(invertyaxis);
 					viewport.setObjectShift(objectShift);
