@@ -47,9 +47,6 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 {
 	private Map			imageCache_;
 
-	/** Flag to indicate that rendering has been called but not yet started. */
-	private boolean			rendering;
-
 	/** Action that renders the frame. */
 	private Runnable	renderFrameAction_;
 	

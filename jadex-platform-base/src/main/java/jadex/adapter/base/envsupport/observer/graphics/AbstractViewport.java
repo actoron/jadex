@@ -82,6 +82,9 @@ public abstract class AbstractViewport implements IViewport
 	
 	/** IPropertyObject holding properties for layers. */
 	protected IPerspective perspective;
+	
+	/** Flag to indicate that rendering is in progress. */
+	protected volatile boolean	rendering;
 
 	/** The listeners of the viewport. */
 	private Set					listeners_;
@@ -91,6 +94,7 @@ public abstract class AbstractViewport implements IViewport
 
 	public AbstractViewport(IPerspective perspective)
 	{
+		rendering = false;
 		this.perspective = perspective;
 		bgColor_ = Color.BLACK;
 		inversionFlag_ = new Vector2Int(0);
