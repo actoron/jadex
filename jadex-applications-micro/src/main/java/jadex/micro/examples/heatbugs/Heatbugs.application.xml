@@ -1,0 +1,68 @@
+<!--
+	<H3>The heatbugs application descriptor</H3>
+
+	It can be started to launch a heatbugs scenario.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-env"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	name="Heatbugs" package="jadex.bdi.examples.heatbugs">
+	
+	<imports>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.adapter.base.envsupport.dataview.*</import>
+		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
+	</imports>
+	
+	<spacetypes>
+		<env:envspacetype name="gc2dspace" width="20" height="20" neighborhood="moore" class="Grid2D">
+			<env:objecttypes>
+				<env:objecttype name="patch">
+					<env:property name="heat">0</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+		
+			<env:processtypes>
+				<env:processtype name="diffuse" class="DiffusionProcess" />
+			</env:processtypes>
+			
+			<env:views>
+				<env:view name="view_all" class="GeneralDataView2D" />
+			</env:views>
+			
+			<env:perspectives>
+				<env:perspective name="main" class="Perspective2D" opengl="true" objectshiftx="0.5" objectshifty="0.5">
+					<env:drawable objecttype="patch" width="1.0" height="1.0">
+						<env:property name="color" dynamic="true">new java.awt.Color((int)($object.heat*255),0,0)</env:property>
+						<env:rectangle color="color" />
+					</env:drawable>
+				</env:perspective>
+			</env:perspectives>
+			
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<property name="space">$space</property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</spacetypes>
+	
+	<applications>
+		<application name="50x50">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
+				<env:processes>
+					<env:process type="diffuse"/>
+				</env:processes>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" perspective="main"/>
+				</env:observers>
+			</env:envspace>
+		</application>
+	</applications>
+
+</applicationtype>
