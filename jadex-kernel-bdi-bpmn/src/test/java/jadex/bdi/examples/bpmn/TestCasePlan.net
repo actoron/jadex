@@ -1,0 +1,36 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="Start" label="1" xposition="-314" yposition="-90" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Task1" tail="Start" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Task1" label="2" xposition="-95" yposition="-95" >
+    <attribute name="MsgImplementation" value="simple test" />
+    <attribute name="Role" value="User" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="End" tail="Task1" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="End" label="3" xposition="124" yposition="-104" >
+    <description>EndNode-3</description>
+  </node>
+
+</net>
