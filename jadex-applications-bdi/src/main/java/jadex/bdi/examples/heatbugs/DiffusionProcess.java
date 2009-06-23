@@ -12,7 +12,9 @@ import jadex.bridge.IClockService;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Diffusion process.
@@ -94,21 +96,20 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 				for(int y=0; y<sizey; y++)
 				{
 					ISpaceObject patch = (ISpaceObject)grid.getSpaceObjectsByGridPosition(new Vector2Int(x,y), "patch").iterator().next();
-					ISpaceObject[] neighbors = grid.getNearObjects(new Vector2Int(x,y), new Vector1Int(1), "patch");
+					Set neighbors = grid.getNearObjects(new Vector2Int(x,y), new Vector1Int(1), "patch");
+					neighbors.remove(patch);
 					
 					double myoldheat = ((Double)patch.getProperty("heat")).doubleValue();
 					double mysub = myoldheat*diffusion;
-					double otheradd = mysub/(neighbors.length-1);
+					double otheradd = mysub/(neighbors.size());
 
 					adds[x][y] -= mysub;
 					
-					for(int i=0; i<neighbors.length; i++)
+					for(Iterator it=neighbors.iterator(); it.hasNext(); )
 					{
-						if(patch!=neighbors[i])
-						{
-							IVector2 otherpos = (IVector2)neighbors[i].getProperty(Space2D.PROPERTY_POSITION);
-							adds[otherpos.getXAsInteger()][otherpos.getYAsInteger()] += otheradd;
-						}
+						ISpaceObject neighbor = (ISpaceObject)it.next();
+						IVector2 otherpos = (IVector2)neighbor.getProperty(Space2D.PROPERTY_POSITION);
+						adds[otherpos.getXAsInteger()][otherpos.getYAsInteger()] += otheradd;
 					}
 //					System.out.println("cells: "+neighbors.length);
 				}

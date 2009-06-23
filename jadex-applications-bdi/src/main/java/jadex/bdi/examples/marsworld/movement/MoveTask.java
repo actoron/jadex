@@ -1,5 +1,8 @@
 package jadex.bdi.examples.marsworld.movement;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ListenableTask;
@@ -80,20 +83,21 @@ public class MoveTask extends ListenableTask
 
 		// Process vision at new location.
 		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
-		final ISpaceObject[]	objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision), null);
-		if(objects!=null && objects.length>0)
+		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision), null);
+		if(objects!=null)
 		{
 			scope.invokeLater(new Runnable()
 			{
 				public void run()
 				{
 					IBeliefSet	targetsbel	= scope.getBeliefbase().getBeliefSet("my_targets");
-					for(int i=0; i<objects.length; i++)
+					for(Iterator it=objects.iterator(); it.hasNext(); )
 					{
-						if(objects[i].getType().equals("target") && !targetsbel.containsFact(objects[i]))
+						ISpaceObject so = (ISpaceObject)it.next();
+						if(so.getType().equals("target") && !targetsbel.containsFact(so))
 						{
 //							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-							targetsbel.addFact(objects[i]);
+							targetsbel.addFact(so);
 						}
 					}
 				}

@@ -172,7 +172,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 											Space2D	space2d	= (Space2D)space;
 											IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 											ISpaceObject[]	known	= (ISpaceObject[])belset.getFacts();
-											Set	seen	= new HashSet(Arrays.asList(space2d.getNearObjects(mypos, vision, null)));
+											Set	seen	= space2d.getNearObjects(mypos, vision, null);
 											for(int j=0; j<known.length; j++)
 											{
 												IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);

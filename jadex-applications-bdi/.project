@@ -20,4 +20,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.maven.ide.eclipse.maven2Nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src2</name>
+			<type>2</type>
+			<location>C:/Dokumente und Einstellungen/Administrator/Desktop/bugreport/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>

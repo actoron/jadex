@@ -11,7 +11,9 @@ import jadex.bridge.IClockService;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Environment process for creating wastes.
@@ -91,12 +93,14 @@ public class GameOfLifeProcess extends SimplePropertyObject implements ISpacePro
 				for(int y=0; y<sizey; y++)
 				{
 					ISpaceObject cell = (ISpaceObject)grid.getSpaceObjectsByGridPosition(new Vector2Int(x,y), "cell").iterator().next();
-					ISpaceObject[] neighbors = grid.getNearObjects(new Vector2Int(x,y), new Vector1Int(1), "cell");
+					Set neighbors = grid.getNearObjects(new Vector2Int(x,y), new Vector1Int(1), "cell");
+					neighbors.remove(cell);
+					
 					int nbcnt = 0;
-					for(int i=0; i<neighbors.length; i++)
+					for(Iterator it=neighbors.iterator(); it.hasNext(); )
 					{
-						if(((Boolean)neighbors[i].getProperty("alive")).booleanValue()
-							&& !cell.equals(neighbors[i]))
+						ISpaceObject neighbor = (ISpaceObject)it.next();
+						if(((Boolean)neighbor.getProperty("alive")).booleanValue())
 							nbcnt++;
 					}
 //					System.out.println("cells: "+neighbors.length);

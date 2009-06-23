@@ -1,7 +1,5 @@
 package jadex.micro.examples.heatbugs;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentListener;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -9,10 +7,10 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IArgument;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.microkernel.MicroAgent;
 import jadex.microkernel.MicroAgentMetaInfo;
+
+import java.util.Set;
 
 /**
  *  The heatbug agent.
@@ -43,8 +41,8 @@ public class HeatbugAgent extends MicroAgent
 		IApplicationContext app = getApplicationContext();
 		Grid2D grid = (Grid2D)app.getSpace("mygc2dspace");
 		ISpaceObject avatar = grid.getAvatar(getAgentIdentifier());
-		ISpaceObject patch = grid.getNearObjects((IVector2)avatar.getProperty(
-			Space2D.PROPERTY_POSITION), Vector1Int.ZERO, "patch")[0];
+		ISpaceObject patch = (ISpaceObject)grid.getNearObjects((IVector2)avatar.getProperty(
+			Space2D.PROPERTY_POSITION), Vector1Int.ZERO, "patch").iterator().next();
 		double myheat = ((Double)patch.getProperty("heat")).doubleValue();
 		double temp = ((Double)patch.getProperty("heat")).doubleValue();
 		
@@ -52,12 +50,21 @@ public class HeatbugAgent extends MicroAgent
 		
 		if(unhappiness>0)
 		{
-			ISpaceObject[] neighbors = grid.getNearObjects((IVector2)avatar.getProperty(
+			Set tmp = grid.getNearObjects((IVector2)avatar.getProperty(
 				Space2D.PROPERTY_POSITION), new Vector1Int(0), "patch");
+			tmp.remove(patch);
+			ISpaceObject[] neighbors = (ISpaceObject[])tmp.toArray(new ISpaceObject[tmp.size()]); 
 			
+			IVector2 target = null;
 			if(Math.random()<randomchance)
 			{
-				
+//				for(int tries=0; target==null && tries<10; tries++)
+//				{
+					int choice = (int)(Math.random()*neighbors.length);
+					IVector2 choicepos = (IVector2)neighbors[choice].getProperty(Space2D.PROPERTY_POSITION);
+//					if(grid.getSpaceObjectsByGridPosition(choicepos, "heatbug")==null)
+					target = choicepos;
+//				}
 			}
 			else
 			{
@@ -67,16 +74,14 @@ public class HeatbugAgent extends MicroAgent
 					double minheat = myheat;
 					for(int i=0; i<neighbors.length; i++)
 					{
-						if(!neighbors[i].equals(patch))
+						double heat = ((Double)neighbors[i].getProperty("heat")).doubleValue();
+						if(heat<minheat)
 						{
-							double heat = ((Double)neighbors[i].getProperty("heat")).doubleValue();
-							if(heat<minheat)
-							{
-								min = neighbors[i];
-								minheat = heat;
-							}
+							min = neighbors[i];
+							minheat = heat;
 						}
 					}
+					target = (IVector2)min.getProperty(Space2D.PROPERTY_POSITION);
 				}
 				else
 				{
@@ -84,20 +89,17 @@ public class HeatbugAgent extends MicroAgent
 					double maxheat = myheat;
 					for(int i=0; i<neighbors.length; i++)
 					{
-						if(!neighbors[i].equals(patch))
+						double heat = ((Double)neighbors[i].getProperty("heat")).doubleValue();
+						if(heat>maxheat)
 						{
-							double heat = ((Double)neighbors[i].getProperty("heat")).doubleValue();
-							if(heat>maxheat)
-							{
-								max = neighbors[i];
-								maxheat = heat;
-							}
+							max = neighbors[i];
+							maxheat = heat;
 						}
 					}
+					target = (IVector2)max.getProperty(Space2D.PROPERTY_POSITION);
 				}
 			}
 		}
-
 	}
 	
 	//-------- static methods --------

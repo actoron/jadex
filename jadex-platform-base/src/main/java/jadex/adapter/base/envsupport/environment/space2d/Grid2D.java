@@ -11,9 +11,11 @@ import jadex.commons.collection.MultiCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  2D grid environment.
@@ -288,11 +290,11 @@ public class Grid2D extends Space2D
 	 *  @param distance	The distance.
 	 *  @param type	The type (or null for all objects).
 	 */
-	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 distance, String type)
+	public Set getNearObjects(IVector2 position, IVector1 distance, String type)
 	{
 		synchronized(monitor)
 		{
-			Collection ret = new ArrayList();
+			Set ret = new HashSet();
 			
 			int sizex = areasize.getXAsInteger();
 			int sizey = areasize.getYAsInteger();
@@ -336,7 +338,7 @@ public class Grid2D extends Space2D
 				}
 			}
 			
-			return(ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+			return ret;
 		}
 	}
 	

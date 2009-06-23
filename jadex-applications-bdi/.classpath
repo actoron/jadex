@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="jadex/bdi/examples/cleanerworld2/|jadex/bdi/examples/hunterprey_old/|jadex/bdi/examples/hunterprey2/" kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry kind="src" path="src2"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>

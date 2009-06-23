@@ -10,6 +10,7 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -333,11 +334,11 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public ISpaceObject[] getNearObjects(IVector2 position, IVector1 maxdist, String type)
+	public Set getNearObjects(IVector2 position, IVector1 maxdist, String type)
 	{
 		synchronized(monitor)
 		{
-			List ret = new ArrayList();
+			Set ret = new HashSet();
 		
 			Set objects = spaceobjects.entrySet();
 			for(Iterator it = objects.iterator(); it.hasNext();)
@@ -356,7 +357,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				}
 			}
 		
-			return (ISpaceObject[])ret.toArray(new ISpaceObject[ret.size()]);
+			return ret;
 		}
 	}
 	
