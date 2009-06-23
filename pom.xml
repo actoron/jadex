@@ -77,6 +77,7 @@
 			<module>jadex-platform-jade</module>
 			<!-- <module>jadex-xwiki</module> -->
 			<!-- <module>jadex-kernel-bdi-continuations</module> -->
+			<module>jadex-kernel-bdi-bpmn</module>
 		</modules>
   	</profile>
   	<profile>
