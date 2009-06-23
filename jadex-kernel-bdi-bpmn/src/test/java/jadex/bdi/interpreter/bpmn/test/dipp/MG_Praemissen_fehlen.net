@@ -1,0 +1,87 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="start" label="start" xposition="-369" yposition="1" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Informieren_Planer" tail="start" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="end" label="end" xposition="151" yposition="5" >
+    <description>EndNode-2</description>
+  </node>
+
+  <node type="Task" id="Informieren_Planer" label="Informieren_Planer" xposition="-279" yposition="2" >
+    <attribute name="MsgImplementation" value="show text at GUI" />
+    <attribute name="Role" value="ProzessPlaner" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; &#60;font color=red&#62; DiPP - Prämissen fehlen &#60;/H1&#62; &#60;BR&#62; &#60;H2&#62; Für die Durchführung von DiPP-1 konnten folgende Prämissen nicht abgeglichen werden: &#60;br&#62; %Praemissen_fehlend% &#60;BR&#62; &#60;br&#62; Bitte stellen Sie den Abgleich sicher, bevor DiPP-1 durchgeführt werden kann. &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-3</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Ruecksetzen_Kontext" tail="Informieren_Planer" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="reaktivieren_Praemissen_abgleichen" label="Reaktivieren_Praemissen_abgleichen" xposition="20" yposition="2" >
+    <attribute name="MsgImplementation" value="activate goals" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>DiPP1_LOG_Planungspraemissen_abgeglichen</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Re-Aktivieren:
+DiPP1_LOG_Planungspraemissen_abgeglichen</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="end" tail="reaktivieren_Praemissen_abgleichen" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Ruecksetzen_Kontext" label="Ruecksetzen_Kontext" xposition="-156" yposition="2" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Praemissen_ok</td>
+        <td>TRUE</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>Praemissen_fehlend</td>
+        <td>[]</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-5</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="reaktivieren_Praemissen_abgleichen" tail="Ruecksetzen_Kontext" >
+    <description></description>
+  </edge>
+
+</net>

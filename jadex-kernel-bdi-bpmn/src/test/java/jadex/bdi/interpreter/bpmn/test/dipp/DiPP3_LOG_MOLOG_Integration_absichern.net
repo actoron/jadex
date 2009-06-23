@@ -1,0 +1,70 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="start" label="start" xposition="-297" yposition="-20" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Optimieren_und_Absichern_MaZo" tail="start" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Optimieren_und_Absichern_MaZo" label="Optimieren_und_Absichern_MaZo" xposition="-144" yposition="8" >
+    <attribute name="MsgImplementation" value="show text at GUI" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP3 - Absicherung MOLOG &#60;/H1&#62; &#60;br&#62;  &#60;H2&#62; Absichern der optimierten (nach IPV-Prozess) Materialzonen-Planung &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-3</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Absicherung_3D" tail="Optimieren_und_Absichern_MaZo" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Absicherung_3D" label="Absicherung_3D" xposition="-4" yposition="-18" >
+    <attribute name="MsgImplementation" value="show text at GUI" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP3 - Absicherung MOLOG &#60;/H1&#62; &#60;br&#62;  &#60;H2&#62; Nochmalige 3D-Absicherung der Materialzone &#60;br&#62; &#60;img src=&#34;/images/DiFa_Absicherung_MaZo_3D.jpg&#34;&#62; &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+    </table>
+    <description>Task-4</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Absichern_Set_Komm_VM" tail="Absicherung_3D" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Absichern_Set_Komm_VM" label="Absichern_Set_Komm_VM" xposition="140" yposition="20" >
+    <attribute name="MsgImplementation" value="show text at GUI" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP3 - Absicherung MOLOG &#60;/H1&#62; &#60;br&#62;  &#60;H2&#62; nochmalige Absicherung Set- und Kommissionierflächen und Vormontagen (gemeinsam mit Montage) &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-5</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="end" tail="Absichern_Set_Komm_VM" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="end" label="end" xposition="264" yposition="-18" >
+    <description>EndNode-2</description>
+  </node>
+
+</net>

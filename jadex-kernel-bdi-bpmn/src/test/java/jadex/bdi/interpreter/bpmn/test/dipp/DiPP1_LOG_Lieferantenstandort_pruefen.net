@@ -1,0 +1,36 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="start" label="start" xposition="-234" yposition="2" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Pruefen_Lieferantenstandort" tail="start" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Pruefen_Lieferantenstandort" label="Pruefen_Lieferantenstandort" xposition="-117" yposition="-1" >
+    <attribute name="MsgImplementation" value="show text at GUI" />
+    <attribute name="Role" value="LieferantenManager" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP1 - Absicherung Lieferanten &#60;/H1&#62; &#60;br&#62; &#60;H2&#62;Durchrechnen von Logistikkosten mit potentiellen Lieferanten (genannt von Einkauf) &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Durchrechnen von Logistikkosten mit potentiellen Lieferanten (genannt von Einkauf)</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="end" tail="Pruefen_Lieferantenstandort" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="end" label="end" xposition="9" yposition="-2" >
+    <description>EndNode-3</description>
+  </node>
+
+</net>
