@@ -118,7 +118,8 @@
 						"planexecutor_standard", 
 						"standard.timeout", 
 						"tooladapter.introspector",
-						"microplansteps"
+						"microplansteps",
+						"planexecutor_bpmn"
 					},
 					new Object[]
 					{
@@ -126,7 +127,8 @@
 						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						jadex.tools.introspector.IntrospectorAdapter.class,
-						Boolean.TRUE
+						Boolean.TRUE,
+						new jadex.bdi.runtime.BpmnPlanExecutor()
 					}
 				), $platform)
 			</property>
