@@ -103,10 +103,10 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 			throw new RuntimeException("Plan body could not be created: "+impl);
 
 		// create the body data structure
-		BpmnPlanContext body = new BpmnPlanContext(interpreter, rcapability, rplan, planModel);
-		interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
+		BpmnPlanContext context = new BpmnPlanContext(interpreter, rcapability, rplan, planModel);
+		interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, context);
 		
-		return body;
+		return context;
 	}
 
 	/**
@@ -119,11 +119,12 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 	public boolean	executeStep(BDIInterpreter interpreter, Object rcapability, Object rplan, String steptype)	throws Exception
 	{
 		// Get or create a new plan body for the plan instance info.
-		BpmnPlanContext context;
 		Object	tmp	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
-		if(tmp==null)
+		if(tmp == null)
+		{
 			tmp = createPlanBody(interpreter, rcapability, rplan);
-		context = (BpmnPlanContext) tmp;
+		}
+		BpmnPlanContext context = (BpmnPlanContext) tmp;
 		
 		Throwable throwable = null;
 		IBpmnState state = context.getCurrentState();
@@ -136,15 +137,23 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 				if (state != null)
 				{
 					context = (BpmnPlanContext) state.execute(context);
-					// first, simply activate all edges
+					
+					// executed, remove from executable
+					context.getExecutableStateIds().remove(state.getId());
+					
+					// FIXME: for test, simply activate all edges
+					// TODO: check preconditions of last returned successors and add to activated
 					List activatedStates = state.getOutgoingEdges();
 					for (Iterator edges = activatedStates.iterator(); edges.hasNext();)
 					{
 						IBpmnTransition edge = (IBpmnTransition) edges.next();
 						context.getExecutableStateIds().add(edge.getTargetId());
+						
+						System.out.println("Activate a BPMN state: " + edge.getTargetId());
+						
 					}
 					
-					// TODO: check preconditions of last returned successors and add to activated
+					
 				}
 				else
 				{
@@ -159,11 +168,16 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 				throwable = t;
 			}
 		}
-		else 
+		else if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED))
+		{
+			// Abort plan, free resources
+		}
+		else
 		{
 			// TO DO: check exception
 			throwable = new RuntimeException("Invalid steptype='"+steptype+"' currently only steptype='"
-					+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY+"' is supported");
+					+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY+"' and '"
+					+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED+"' are supported");
 		}
 		
 		// check for errors / exception / final state
@@ -172,25 +186,28 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 			// no exception nor a final state, resume plan
 			
 			// activate next state
-			// TODO: Remove linear activation of states to support pseudo parallel execution
+			// FIXME: Remove linear activation of states to support pseudo parallel execution of tasks
 			// HACK!
 			context.setCurrentStateId((String)context.getExecutableStateIds().get(0));
 			
-			// Set processing state to "waiting"
+			System.out.println("Next step selected: " + context.getCurrentStateId());
+			
+			// Set processing state to "ready"
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 
-			// will always return false? A BPMN step is not interruptible (expect of a second IO thread??)
+			// a BPMN plan is not interruptible
 			return false;
 		}
-		
 		else
 		{
 			// Exception or final state, finish plan
 			PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan, true);
 			
 			// Hack!!! Should not change state?
+			// set plan lifecycle state
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
 				throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
+
 			
 			// in case of an error / exception, throw it
 			if(throwable instanceof Exception)
@@ -205,6 +222,7 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 			// Set plan processing state.
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
 
+			
 //			// Cleanup the plan execution task.
 //			tasks.remove(rplan);
 			

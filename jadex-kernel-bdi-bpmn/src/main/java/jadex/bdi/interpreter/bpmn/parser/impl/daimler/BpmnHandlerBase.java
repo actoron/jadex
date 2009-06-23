@@ -248,21 +248,21 @@ public class BpmnHandlerBase extends AEM_XmlHandler
 				}
 			}
 			
-			// check and set XOR Gateway conditions from conditional flows
-			if (sourceState instanceof XORGatewayState && currentTransition instanceof ConditionalFlow)
-			{
-				String condition = ((ConditionalFlow) currentTransition).getCondition();
-				if (condition != null)
-					((XORGatewayState) sourceState).addSuccessor(condition, targetState);
-				else
-				{
-					System.err.println("WARNING: No condition specified for conditional flow from "
-							+ sourceState.getId() + " to " + targetState.getId()
-							+ "!\n Replacing it with alsway-true-condition \";\"");
-					
-					((XORGatewayState) sourceState).addSuccessor("true", targetState);
-				}
-			}
+//			// check and set XOR Gateway conditions from conditional flows
+//			if (sourceState instanceof XORGatewayState && currentTransition instanceof ConditionalFlow)
+//			{
+//				String condition = ((ConditionalFlow) currentTransition).getCondition();
+//				if (condition != null)
+//					((XORGatewayState) sourceState).addSuccessor(condition, targetState);
+//				else
+//				{
+//					System.err.println("WARNING: No condition specified for conditional flow from "
+//							+ sourceState.getId() + " to " + targetState.getId()
+//							+ "!\n Replacing it with alsway-true-condition \";\"");
+//					
+//					((XORGatewayState) sourceState).addSuccessor("true", targetState);
+//				}
+//			}
 			
 		}
 		

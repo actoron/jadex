@@ -60,7 +60,9 @@ public abstract class AbstractState extends SelfParsingElement implements IBpmnS
 	public IBpmnPlanContext execute(IBpmnPlanContext context)
 	{
 		// Nothing to do in an abstract state
-		System.out.println("This was a call to execute from AbstractState, IBpmnPlanContext: " + context);
+		System.out.println("This was a call to execute(context) in AbstractState "
+				+ "from '"+ this.getClass().getSimpleName() 
+				+ "' with IBpmnPlanContext: " + context);
 //		setFinished(true);
 		return context;
 	}

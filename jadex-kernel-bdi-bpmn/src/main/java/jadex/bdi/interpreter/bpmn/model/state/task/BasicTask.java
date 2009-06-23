@@ -44,7 +44,8 @@ public class BasicTask extends AbstractState implements IBpmnTask
 	/** An text to explain this task */
 	protected String taskExplanantionText;
 	
-	// TODO: move to runtime class / --> save properties map in executor /  execution-task ???
+	// these properties are NOT runtime values, they where provided during modeling
+	// and should not be changed during runtime.
 	/** Properties list for this task */
 	protected Map taskProperties;
 	
@@ -60,7 +61,7 @@ public class BasicTask extends AbstractState implements IBpmnTask
 	
 	public IBpmnPlanContext execute(IBpmnPlanContext body)
 	{
-		// TODO: implement ability to start sub threads in a task processor
+		// TODO: implement ability to start sub threads in a task processor?
 		
 //		setFinished(false);
 		

@@ -115,6 +115,14 @@ public class BpmnPlanContext implements IBpmnPlanContext
 		this.executableStateIds = executableStateIds;
 	}
 
+	/* (non-Javadoc)
+	 * @see jadex.bdi.runtime.IBpmnPlanContext#activateState(jadex.bdi.interpreter.bpmn.model.IBpmnState)
+	 */
+	public void activateState(IBpmnState state)
+	{
+		this.executableStateIds.add(state.getId());
+	}
+
 	
 	
 	

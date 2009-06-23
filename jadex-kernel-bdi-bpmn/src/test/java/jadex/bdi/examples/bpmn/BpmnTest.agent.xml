@@ -9,7 +9,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
-	name="HelloWorld"
+	name="BpmnTest"
 	package="jadex.bdi.examples.bpmn">
 	
 	<beliefs>
@@ -22,7 +22,7 @@
 		<!-- a simple test case plan -->
 		<plan name="testbpmn">
 			<!-- <body impl="jadex/bdi/interpreter/bpmn/test/TestCasePlan.net" type="bpmn"/> -->
-			<body impl="TestCasePlan.net" type="bpmn"/>
+			<body impl="jadex/bdi/examples/bpmn/TestCasePlan.net" type="bpmn"/>
 		</plan>
 	</plans>
 	

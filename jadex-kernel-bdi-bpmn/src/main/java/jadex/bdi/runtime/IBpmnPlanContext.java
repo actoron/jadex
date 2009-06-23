@@ -14,6 +14,8 @@ import jadex.bdi.interpreter.bpmn.model.IBpmnState;
 public interface IBpmnPlanContext {
 
     public IBpmnState getCurrentState();
+    
+    public void activateState(IBpmnState state);
 	
 	public Boolean evalJadexOQLCondition(String condition);
 
