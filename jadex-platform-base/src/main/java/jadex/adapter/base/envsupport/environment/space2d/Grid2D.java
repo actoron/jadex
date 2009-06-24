@@ -220,7 +220,7 @@ public class Grid2D extends Space2D
 			IVector2 oldpos = (IVector2)obj.getProperty(PROPERTY_POSITION);
 			if(objectsygridpos.containsKey(oldpos) && oldpos!=null)
 			{
-//				System.out.println("remove: "+oldpos+" "+obj);
+				System.out.println("remove: "+oldpos+" "+obj);
 				objectsygridpos.remove(oldpos, obj);
 			}
 			
@@ -250,8 +250,9 @@ public class Grid2D extends Space2D
 			}
 			if(!properties.containsKey(Space2D.PROPERTY_POSITION))
 			{
-				// Todo: Fail, when no empty position.
-				properties.put(Space2D.PROPERTY_POSITION, getEmptyGridPosition());
+				IVector2 pos = getEmptyGridPosition();
+				if(pos!=null)
+					properties.put(Space2D.PROPERTY_POSITION, pos);
 			}
 			
 			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks);

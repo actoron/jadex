@@ -19,7 +19,7 @@ public class SetPosition extends SimplePropertyObject implements ISpaceAction
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
 		Object id = parameters.get(ISpaceAction.OBJECT_ID);
-		IVector2 pos = (IVector2)parameters.get(GetPosition.POSITION_ID);
+		IVector2 pos = (IVector2)parameters.get(GetPosition.PARAMETER_POSITION);
 		((Space2D)space).setPosition(id, pos);
 		return null;
 	}

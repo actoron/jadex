@@ -116,6 +116,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		IVector2 pos = ret.getPropertyNames().contains(PROPERTY_POSITION)? 
 			(IVector2)ret.getProperty(PROPERTY_POSITION): getRandomPosition(Vector2Int.ZERO);
 
+		if("heatbug".equals(typename) && pos==null)
+			System.out.println("th: "+ret.getPropertyNames()+" "+properties+" "+objecttypes.get(typename));
+
 		if(pos!=null)
 		{
 //			System.out.println("setting pos to: "+ret+" "+pos);

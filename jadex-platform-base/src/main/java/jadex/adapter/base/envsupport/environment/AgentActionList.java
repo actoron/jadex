@@ -146,7 +146,7 @@ public class AgentActionList
 						it.remove();
 						try
 						{
-//							System.out.println("Action: "+entry);
+							System.out.println("Action: "+entry);
 							
 							Object ret = entry.action.perform(entry.parameters, space);
 							if(entry.listener!=null)
