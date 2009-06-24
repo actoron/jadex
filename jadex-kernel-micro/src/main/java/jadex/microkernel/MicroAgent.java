@@ -160,10 +160,26 @@ public abstract class MicroAgent implements IMicroAgent
 	/**
 	 *  Wait for an secified amount of time.
 	 *  @param time The time.
+	 *  @param run The runnable.
 	 */
 	public void waitFor(long time, final Runnable run)
 	{
 		((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
+		{
+			public void timeEventOccurred(long currenttime)
+			{
+				interpreter.invokeLater(run);
+			}
+		});
+	}
+	
+	/**
+	 *  Wait for the next tick.
+	 *  @param time The time.
+	 */
+	public void waitForTick(final Runnable run)
+	{
+		((IClockService)getPlatform().getService(IClockService.class)).createTickTimer(new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{

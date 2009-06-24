@@ -62,7 +62,7 @@ public class HeatbugAgent extends MicroAgent
 				if(unhappiness>0)
 				{
 					Set tmp = grid.getNearObjects((IVector2)avatar.getProperty(
-						Space2D.PROPERTY_POSITION), new Vector1Int(0), "patch");
+						Space2D.PROPERTY_POSITION), new Vector1Int(1), "patch");
 					tmp.remove(patch);
 					ISpaceObject[] neighbors = (ISpaceObject[])tmp.toArray(new ISpaceObject[tmp.size()]); 
 					
@@ -79,7 +79,7 @@ public class HeatbugAgent extends MicroAgent
 					}
 					else
 					{
-						if(mytemp<ideal_temp)
+						if(mytemp>ideal_temp)
 						{
 							ISpaceObject min = patch;
 							double minheat = mytemp;
@@ -113,19 +113,19 @@ public class HeatbugAgent extends MicroAgent
 					
 					if(!target.equals(mypos))
 					{
-						System.out.println("res: "+avatar.getProperty(ISpaceObject.PROPERTY_OWNER)+" "+target);
+//						System.out.println("res: "+avatar.getProperty(ISpaceObject.PROPERTY_OWNER)+" "+target);
 						Map params = new HashMap();
-						params.put(GetPosition.OBJECT_ID, avatar);
+						params.put(GetPosition.OBJECT_ID, avatar.getId());
 						params.put(GetPosition.PARAMETER_POSITION, target);
-						grid.performSpaceAction("setpos", params, null);
+						grid.performSpaceAction("move", params, null);
 					}
 				}
 				
-				waitFor(100, this);
+				waitForTick(this);
 			}
 		};
 		
-		waitFor(100, runnable);
+		waitForTick(runnable);
 	}
 	
 	//-------- static methods --------

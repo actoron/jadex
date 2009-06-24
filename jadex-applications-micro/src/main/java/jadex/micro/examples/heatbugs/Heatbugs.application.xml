@@ -9,7 +9,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="Heatbugs" package="jadex.bdi.examples.heatbugs">
+	name="Heatbugs" package="jadex.micro.examples.heatbugs">
 	
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
@@ -18,7 +18,6 @@
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
-		<import>jadex.adapter.base.envsupport.environment.space2d.action.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -29,9 +28,9 @@
 					<env:property name="heat">0</env:property>
 				</env:objecttype>
 				<env:objecttype name="heatbug">
-					<env:property name="ideal_temp">Math.random()</env:property>
-					<env:property name="output_heat">Math.random()</env:property>
-					<env:property name="randomchance">0.0</env:property>
+					<env:property name="ideal_temp">Math.random()*0.5+0.5</env:property>
+					<env:property name="output_heat">Math.random()*0.5</env:property>
+					<env:property name="randomchance">Math.random()*0.5+0.3</env:property>
 					<env:property name="unhappiness" dynamic="true">Math.abs($object.ideal_temp - $object.temp)</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -41,7 +40,7 @@
 			</env:avatarmappings>
 		
 			<env:actiontypes>
-				<env:actiontype name="setpos" class="SetPosition" />
+				<env:actiontype name="move" class="MoveAction" />
 			</env:actiontypes>
 		
 			<env:processtypes>
@@ -61,7 +60,7 @@
 					</env:drawable>
 					
 					<env:drawable objecttype="heatbug" width="0.5" height="0.5">
-						<env:property name="color" dynamic="true">new java.awt.Color((int)($object.heat*255),255,0)</env:property>
+						<env:property name="color" dynamic="true">new java.awt.Color(0,(int)($object.ideal_temp*255),0)</env:property>
 						<env:rectangle color="color" />
 					</env:drawable>
 				

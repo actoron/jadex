@@ -83,6 +83,8 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 			((Number)getProperty("rate")).longValue(): 3;
 		double diffusion = getProperty("diffusion")!=null? 
 			((Number)getProperty("diffusion")).doubleValue(): 0.1;
+		double cooling = getProperty("cooling")!=null? 
+			((Number)getProperty("cooling")).doubleValue(): 0.1;
 		
 		if(lasttick+rate<clock.getTick())
 		{
@@ -122,7 +124,8 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 				{
 					ISpaceObject patch = (ISpaceObject)grid.getSpaceObjectsByGridPosition(new Vector2Int(x,y), "patch").iterator().next();
 					double oldheat = ((Double)patch.getProperty("heat")).doubleValue();
-					double newheat = oldheat+adds[x][y];
+					double cool = oldheat*cooling;
+					double newheat = Math.max(0, oldheat+adds[x][y]-cool);
 					patch.setProperty("heat", new Double(newheat));
 					sum += newheat;
 				}

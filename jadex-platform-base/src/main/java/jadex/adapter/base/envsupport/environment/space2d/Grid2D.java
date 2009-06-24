@@ -220,7 +220,7 @@ public class Grid2D extends Space2D
 			IVector2 oldpos = (IVector2)obj.getProperty(PROPERTY_POSITION);
 			if(objectsygridpos.containsKey(oldpos) && oldpos!=null)
 			{
-				System.out.println("remove: "+oldpos+" "+obj);
+//				System.out.println("remove: "+oldpos+" "+obj);
 				objectsygridpos.remove(oldpos, obj);
 			}
 			
