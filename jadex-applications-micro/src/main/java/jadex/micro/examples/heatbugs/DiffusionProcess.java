@@ -37,8 +37,12 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 	public void start(IClockService clock, IEnvironmentSpace space)
 	{
 		this.lasttick	= clock.getTick();
-		
+
+		boolean random_init  = getProperty("random_init")!=null? 
+			((Boolean)getProperty("random_init")).booleanValue(): false;
+
 		// Initialize the field.
+		
 		Space2D grid = (Space2D)space;
 		int sizex = grid.getAreaSize().getXAsInteger();
 		int sizey = grid.getAreaSize().getYAsInteger();
@@ -48,8 +52,11 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 			for(int y=0; y<sizey; y++)
 			{
 				Map props = new HashMap();
-				double heat = Math.random();
-				props.put("heat", new Double(heat));
+				if(random_init)
+				{
+					double heat = Math.random()*100;
+					props.put("heat", new Double(heat));
+				}
 				props.put(Space2D.PROPERTY_POSITION, new Vector2Int(x, y));
 				grid.createSpaceObject("patch", props, null);
 			}
@@ -81,10 +88,10 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 		
 		long rate = getProperty("rate")!=null? 
 			((Number)getProperty("rate")).longValue(): 3;
-		double diffusion = getProperty("diffusion")!=null? 
-			((Number)getProperty("diffusion")).doubleValue(): 0.1;
-		double cooling = getProperty("cooling")!=null? 
-			((Number)getProperty("cooling")).doubleValue(): 0.1;
+		double diffusion = getProperty("diffusion_rate")!=null? 
+			((Number)getProperty("diffusion_rate")).doubleValue(): 0.1;
+		double cooling = getProperty("evaporation_rate")!=null? 
+			((Number)getProperty("evaporation_rate")).doubleValue(): 0.1;
 		
 		if(lasttick+rate<clock.getTick())
 		{
@@ -92,7 +99,7 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 			int sizex = grid.getAreaSize().getXAsInteger();
 			int sizey = grid.getAreaSize().getYAsInteger();
 			
-			double[][] adds = new double[sizex][sizey];
+			int[][] adds = new int[sizex][sizey];
 			for(int x=0; x<sizex; x++)
 			{
 				for(int y=0; y<sizey; y++)

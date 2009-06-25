@@ -46,7 +46,7 @@ public class HeatbugAgent extends MicroAgent
 		ISpaceObject avatar = grid.getAvatar(getAgentIdentifier());
 		
 //		unhappiness = Math.abs(ideal_temp - temp);
-		final double randomchance = ((Double)avatar.getProperty("randomchance")).doubleValue();
+		final double randomchance = ((Double)avatar.getProperty("random_move_chance")).doubleValue();
 		final double ideal_temp = ((Double)avatar.getProperty("ideal_temp")).doubleValue();
 	
 		Runnable runnable = new Runnable()

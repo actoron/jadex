@@ -22,15 +22,26 @@
 	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" width="20" height="20" neighborhood="moore" class="Grid2D">
+			<env:property name="min_ideal_temp">10.0</env:property>
+			<env:property name="max_ideal_temp">40.0</env:property>
+			<!-- <env:property name="min_ideal_temp">0</env:property>-->
+			<!-- <env:property name="max_ideal_temp">200</env:property>-->
+			<env:property name="min_output_heat">5.0</env:property>
+			<env:property name="max_output_heat">25.0</env:property>
+			<!-- <env:property name="min_output_heat">0</env:property> -->
+			<!-- <env:property name="max_output_heat">100</env:property> -->
+			<env:property name="diffusion_rate">0.1</env:property>
+			<env:property name="evaporation_rate">0.01</env:property>
+			<env:property name="random_move_chance">0.05</env:property>
 			
 			<env:objecttypes>
 				<env:objecttype name="patch">
-					<env:property name="heat">0</env:property>
+					<env:property name="heat">0.0</env:property>
 				</env:objecttype>
 				<env:objecttype name="heatbug">
-					<env:property name="ideal_temp">Math.random()*0.5+0.5</env:property>
-					<env:property name="output_heat">Math.random()*0.5</env:property>
-					<env:property name="randomchance">Math.random()*0.5+0.3</env:property>
+					<env:property name="ideal_temp">$space.min_ideal_temp + Math.random()*($space.max_ideal_temp - $space.min_ideal_temp)</env:property>
+					<env:property name="output_heat">$space.min_output_heat + Math.random()*($space.max_output_heat - $space.min_output_heat)</env:property>
+					<env:property name="random_move_chance">$space.random_move_chance</env:property>
 					<env:property name="unhappiness" dynamic="true">Math.abs($object.ideal_temp - $object.temp)</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -44,7 +55,10 @@
 			</env:actiontypes>
 		
 			<env:processtypes>
-				<env:processtype name="diffuse" class="DiffusionProcess" />
+				<env:processtype name="diffuse" class="DiffusionProcess">
+					<env:property name="diffusion_rate">$space.diffusion_rate</env:property>
+					<env:property name="evaporation_rate">$space.diffusion_rate</env:property>
+				</env:processtype>
 			</env:processtypes>
 			
 			<env:views>
@@ -55,12 +69,12 @@
 				<env:perspective name="main" class="Perspective2D" opengl="true" objectshiftx="0.5" objectshifty="0.5">
 					
 					<env:drawable objecttype="patch" width="1.0" height="1.0">
-						<env:property name="color" dynamic="true">new java.awt.Color((int)($object.heat*255),0,0)</env:property>
+						<env:property name="color" dynamic="true">new java.awt.Color((int)(Math.min(255, $object.heat*2)),0,0)</env:property>
 						<env:rectangle color="color" />
 					</env:drawable>
 					
 					<env:drawable objecttype="heatbug" width="0.5" height="0.5">
-						<env:property name="color" dynamic="true">new java.awt.Color(0,(int)($object.ideal_temp*255),0)</env:property>
+						<env:property name="color" dynamic="true">new java.awt.Color(0,(int)(Math.min(255, $object.ideal_temp)),255)</env:property>
 						<env:rectangle color="color" />
 					</env:drawable>
 				
@@ -80,7 +94,7 @@
 	<applications>
 		<application name="50x50">
 			<agents>
-				<agent type="Heatbug" number="50"/>
+				<agent type="Heatbug" number="200"/>
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">

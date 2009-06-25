@@ -137,6 +137,7 @@ public class MicroAgentInterpreter implements IKernelAgent
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					getLogger().severe("Execution of agent led to exeception: "+e);
 				}
 			}

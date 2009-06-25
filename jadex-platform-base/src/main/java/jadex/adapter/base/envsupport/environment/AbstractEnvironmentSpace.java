@@ -218,7 +218,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(Iterator it = procinfo.keySet().iterator(); it.hasNext(); )
 				{
 					String propname = (String)it.next();
-					if(!"_clazz".equals(propname) && !properties.containsKey(propname))
+					if(!"_clazz".equals(propname) && (properties==null || !properties.containsKey(propname)))
 						process.setProperty(propname, procinfo.get(propname)); 
 				}
 				
@@ -226,6 +226,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
 				throw new RuntimeException("Could not create space process: "+typename, e);
 			}
 //			process.start(this);	// Done by executor.

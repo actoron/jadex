@@ -47,7 +47,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 		// Emit heat.
 		ISpaceObject patch = (ISpaceObject)grid.getSpaceObjectsByGridPosition(pos, "patch").iterator().next();
 		double heat = ((Double)patch.getProperty("heat")).doubleValue();
-		patch.setProperty("heat", new Double(Math.min(1, heat+output_heat)));
+		patch.setProperty("heat", new Double(heat+output_heat));
 		
 		return null;
 	}
