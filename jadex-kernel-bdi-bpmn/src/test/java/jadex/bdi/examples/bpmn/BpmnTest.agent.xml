@@ -12,6 +12,11 @@
 	name="BpmnTest"
 	package="jadex.bdi.examples.bpmn">
 	
+	<imports>
+		<!-- HACK! to load the processors at runtime -->
+		<import>jadex.bdi.interpreter.bpmn.model.state.task.*</import>
+	</imports>
+	
 	<beliefs>
 		<belief name="msg" class="String" exported="true">
 			<fact>"Welcome to Jadex."</fact>

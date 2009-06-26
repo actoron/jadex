@@ -1,11 +1,13 @@
 package jadex.bdi.interpreter.bpmn.model.state.task;
 
-
+import jadex.bdi.interpreter.bpmn.model.state.task.*;
 import jadex.bdi.interpreter.bpmn.model.IBpmnTask;
 import jadex.bdi.interpreter.bpmn.model.ITaskProcessor;
 import jadex.bdi.interpreter.bpmn.model.ITaskProperty;
 import jadex.bdi.interpreter.bpmn.model.state.AbstractState;
 import jadex.bdi.runtime.IBpmnPlanContext;
+import jadex.commons.SReflect;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -159,8 +161,7 @@ public class BasicTask extends AbstractState implements IBpmnTask
 		{
 			try
 			{
-				// TO DO: use ClassLoader from LibService?
-				Class clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
+				Class clazz = SReflect.classForName(className, Thread.currentThread().getContextClassLoader());
 				return clazz.newInstance();
 			}
 			catch (Exception e)
