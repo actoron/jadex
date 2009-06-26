@@ -46,8 +46,8 @@ public class HeatbugAgent extends MicroAgent
 		ISpaceObject avatar = grid.getAvatar(getAgentIdentifier());
 		
 //		unhappiness = Math.abs(ideal_temp - temp);
-		final double randomchance = ((Double)avatar.getProperty("random_move_chance")).doubleValue();
-		final double ideal_temp = ((Double)avatar.getProperty("ideal_temp")).doubleValue();
+		final double randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
+		final double ideal_temp = ((Number)avatar.getProperty("ideal_temp")).doubleValue();
 	
 		Runnable runnable = new Runnable()
 		{
@@ -111,7 +111,7 @@ public class HeatbugAgent extends MicroAgent
 						}
 					}
 					
-					if(!target.equals(mypos))
+//					if(!target.equals(mypos))
 					{
 //						System.out.println("res: "+avatar.getProperty(ISpaceObject.PROPERTY_OWNER)+" "+target);
 						Map params = new HashMap();

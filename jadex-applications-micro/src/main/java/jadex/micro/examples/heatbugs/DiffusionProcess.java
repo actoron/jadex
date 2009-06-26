@@ -87,7 +87,7 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 		Grid2D grid = (Grid2D)space;
 		
 		long rate = getProperty("rate")!=null? 
-			((Number)getProperty("rate")).longValue(): 3;
+			((Number)getProperty("rate")).longValue(): 1;
 		double diffusion = getProperty("diffusion_rate")!=null? 
 			((Number)getProperty("diffusion_rate")).doubleValue(): 0.1;
 		double cooling = getProperty("evaporation_rate")!=null? 
