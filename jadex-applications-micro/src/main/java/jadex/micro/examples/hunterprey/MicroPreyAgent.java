@@ -1,4 +1,4 @@
-package jadex.micro.examples.hunterprey_env;
+package jadex.micro.examples.hunterprey;
 
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;

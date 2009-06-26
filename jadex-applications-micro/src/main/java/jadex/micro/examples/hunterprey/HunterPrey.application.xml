@@ -20,7 +20,7 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
-		<import>jadex.micro.examples.hunterprey_env.*</import>
+		<import>jadex.micro.examples.hunterprey.*</import>
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.bdi.examples.hunterprey.*</import>
 		<import>jadex.bdi.examples.hunterprey.dumbprey.*</import>
