@@ -1,4 +1,4 @@
-	<!--
+<!--
 	<H3>The hunter prey application descriptor</H3>
 
 	Two kinds of creatures live on a grid world.
@@ -22,9 +22,9 @@
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.micro.examples.hunterprey_env.*</import>
 		<import>jadex.bdi.planlib.*</import>
-		<import>jadex.bdi.examples.hunterprey_env.*</import>
-		<import>jadex.bdi.examples.hunterprey_env.dumbprey.*</import>
-		<import>jadex.bdi.examples.hunterprey_env.dumbhunter.*</import>
+		<import>jadex.bdi.examples.hunterprey.*</import>
+		<import>jadex.bdi.examples.hunterprey.dumbprey.*</import>
+		<import>jadex.bdi.examples.hunterprey.dumbhunter.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 	</imports>
 	
@@ -58,8 +58,17 @@
 			</env:actiontypes>
 			
 			<env:processtypes>
-				<env:processtype name="create" class="CreateFoodProcess">
-					<env:property name="rate">5</env:property>
+				<env:processtype name="create" class="DefaultObjectCreationProcess">
+					<env:property name="tickrate">5</env:property>
+					<env:property name="type">"food"</env:property>
+					<env:property name="properties" dynamic="true">
+						jadex.commons.SUtil.createHashMap(
+							new String[]{Space2D.PROPERTY_POSITION, "creation_age", "clock"},
+							new Object[]{((Grid2D)$space).getEmptyGridPosition(), new Double($clock.getTick()), $clock})
+					</env:property>
+					<env:property name="condition" dynamic="true">
+						((Grid2D)$space).getEmptyGridPosition()!=null
+					</env:property>
 				</env:processtype>
 			</env:processtypes>
 			
@@ -236,13 +245,13 @@
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" objectshiftx="0.5" objectshifty="0.5">
 					<env:drawable objecttype="food" width="1.0" height="1.0">
-						<env:texturedrectangle layer="0" size="size" imagepath="jadex/bdi/examples/hunterprey_env/images/food.png" />
+						<env:texturedrectangle layer="0" size="size" imagepath="jadex/bdi/examples/hunterprey/images/food.png" />
 					</env:drawable>
 					<env:drawable objecttype="obstacle" width="1.0" height="1.0">
-						<env:texturedrectangle layer="0" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/obstacle.png" />
+						<env:texturedrectangle layer="0" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey/images/obstacle.png" />
 					</env:drawable>
 					<env:drawable objecttype="prey" width="1.0" height="1.0">
-						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/prey.png" />
+						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey/images/prey.png" />
 						<env:rectangle layer="-1" width="3" height="3" color="#ffff007f" />
 						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ffff007f" />
 						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ffff007f" />
@@ -250,7 +259,7 @@
 						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="hunter" width="1.0" height="1.0">
-						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey_env/images/hunter.png" />
+						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey/images/hunter.png" />
 						<env:rectangle layer="-1" width="3" height="3" color="#ff00007f" />
 						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ff00007f" />
 						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ff00007f" />
@@ -258,7 +267,7 @@
 						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ff00007f" />
 					</env:drawable>
 					<env:prelayers>
-						<env:tiledlayer width="0.4" height="0.4" imagepath="jadex/bdi/examples/hunterprey_env/images/background.png" />
+						<env:tiledlayer width="0.4" height="0.4" imagepath="jadex/bdi/examples/hunterprey/images/background.png" />
 					</env:prelayers>
 					<env:postlayers>
 						<env:gridlayer width="1.0" height="1.0" color="black" />
@@ -298,9 +307,9 @@
 	</spacetypes>
 
 	<agenttypes>
-		<agenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey_env/MicroPreyAgent.class"/>
-		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_env/dumbprey/DumbPrey.agent.xml"/>
-		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_env/dumbhunter/DumbHunter.agent.xml"/>
+		<agenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey/MicroPreyAgent.class"/>
+		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/dumbprey/DumbPrey.agent.xml"/>
+		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/dumbhunter/DumbHunter.agent.xml"/>
 	</agenttypes>
 
 	<applications>
@@ -316,7 +325,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 
@@ -339,7 +348,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 
@@ -357,7 +366,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 
@@ -382,7 +391,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">0.1</env:property>
+						<env:property name="tickrate">0.1</env:property>
 					</env:process>
 				</env:processes>
 
@@ -405,7 +414,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">0.1</env:property>
+						<env:property name="tickrate">0.1</env:property>
 					</env:process>
 				</env:processes>
 
@@ -428,7 +437,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">0.1</env:property>
+						<env:property name="tickrate">0.1</env:property>
 					</env:process>
 				</env:processes>
 
@@ -454,7 +463,7 @@
 
 				<env:processes>
 					<env:process type="create">
-						<env:property name="rate">5</env:property>
+						<env:property name="tickrate">5</env:property>
 					</env:process>
 				</env:processes>
 

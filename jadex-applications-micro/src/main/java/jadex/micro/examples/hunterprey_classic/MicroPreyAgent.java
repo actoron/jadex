@@ -1,4 +1,4 @@
-package jadex.micro.examples.hunterprey;
+package jadex.micro.examples.hunterprey_classic;
 
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
