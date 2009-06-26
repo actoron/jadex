@@ -128,12 +128,12 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 		
 		Throwable throwable = null;
 		IBpmnState state = context.getCurrentState();
-		
+		try
+		{
 		// execute a body step
 		if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY))
 		{
-			try
-			{
+			
 				if (state != null)
 				{
 					context = (BpmnPlanContext) state.execute(context);
@@ -161,23 +161,25 @@ public class BpmnPlanExecutor	implements IPlanExecutor, Serializable
 					throw new NullPointerException("Missing state for '" + context 
 							+ "' in BpmnPlanModel '" + context.getMbody() + "'");
 				}
+			
 			}
-			catch(Throwable t)
+			else if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED))
 			{
-				// Throwable in task/state will be thrown in agent.
-				throwable = t;
+				// Abort plan, free resources
+			}
+			else
+			{
+				// TO DO: check exception --> remove (simply ignore other step types?)
+				throw new RuntimeException("Invalid steptype='"+steptype+"'. "
+						+"currently only steptype='"
+						+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY+"' and '"
+						+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED+"' are supported");
 			}
 		}
-		else if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED))
+		catch(Throwable t)
 		{
-			// Abort plan, free resources
-		}
-		else
-		{
-			// TO DO: check exception
-			throwable = new RuntimeException("Invalid steptype='"+steptype+"' currently only steptype='"
-					+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY+"' and '"
-					+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED+"' are supported");
+			// Throwable in body task will be thrown later
+			throwable = t;
 		}
 		
 		// check for errors / exception / final state
