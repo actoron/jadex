@@ -491,6 +491,7 @@ public class PlanRules
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable step = new Variable("?step", OAVJavaType.java_integer_type);
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
@@ -500,6 +501,7 @@ public class PlanRules
 			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW),
 			new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY)
 		}));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_step, step));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
@@ -513,9 +515,13 @@ public class PlanRules
 				
 				Object	rplan	= assignments.getVariableValue("?rplan");
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
+				
 				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
 				boolean interrupted = false;
 
+				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
+				
 				try
 				{
 					ip.setCurrentPlan(rplan);
@@ -580,13 +586,15 @@ public class PlanRules
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-
+		Variable step = new Variable("?step", OAVJavaType.java_integer_type);
+		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_processingstate, 
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
 			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_step, step));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
@@ -602,6 +610,9 @@ public class PlanRules
 //				System.out.println("Passed: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
 //					rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+
+				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
 				
 				boolean interrupted = false;
 				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
@@ -661,6 +672,7 @@ public class PlanRules
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable step = new Variable("?step", OAVJavaType.java_integer_type);
 		
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
@@ -668,6 +680,7 @@ public class PlanRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
 			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_step, step));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
@@ -683,6 +696,9 @@ public class PlanRules
 //				System.out.println("Passed: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
 //					rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+				
+				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
 				
 				boolean interrupted = false;
 				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
@@ -740,6 +756,7 @@ public class PlanRules
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
+		Variable step = new Variable("?step", OAVJavaType.java_integer_type);
 
 		ObjectCondition	plancon	= new ObjectCondition(OAVBDIRuntimeModel.plan_type);
 		plancon.addConstraint(new BoundConstraint(null, rplan));
@@ -747,6 +764,8 @@ public class PlanRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY));
 		plancon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.plan_has_lifecyclestate, 
 			OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED));
+		plancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.plan_has_step, step));
+		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, 
@@ -762,6 +781,9 @@ public class PlanRules
 //				System.out.println("Aborted: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(
 //					rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+				
+				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
 				
 				boolean interrupted = false;
 				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
