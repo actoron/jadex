@@ -160,7 +160,8 @@ public class XMLPropertiesReader
 
 	protected static void internalWriteProperties(Properties props, XMLStreamWriter writer, int indent) throws XMLStreamException
 	{
-		writer.writeCharacters("\r\n");
+		String lf = (String)System.getProperty("line.separator");
+		writer.writeCharacters(lf);
 		for(int i=0; i<indent; i++)
 			writer.writeCharacters("\t");
 		writer.writeStartElement("properties");
@@ -174,7 +175,7 @@ public class XMLPropertiesReader
 		Property[]	ps	= props.getProperties();
 		for(int i=0; i<ps.length; i++)
 		{
-			writer.writeCharacters("\r\n");
+			writer.writeCharacters(lf);
 			for(int j=0; j<=indent; j++)
 				writer.writeCharacters("\t");
 			writer.writeStartElement("property");
@@ -200,7 +201,7 @@ public class XMLPropertiesReader
 			internalWriteProperties(subs[i], writer, indent+1);
 		}
 
-		writer.writeCharacters("\r\n");
+		writer.writeCharacters(lf);
 		for(int i=0; i<indent; i++)
 			writer.writeCharacters("\t");
 		writer.writeEndElement();
