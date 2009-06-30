@@ -1,6 +1,7 @@
 package jadex.commons.xml;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Interface for object handler.
@@ -16,7 +17,7 @@ public interface IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context, ClassLoader classloader) throws Exception;
+	public Object createObject(Object type, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception;
 	
 	/**
 	 *  Handle the attribute of an object.

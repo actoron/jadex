@@ -91,11 +91,25 @@ public class Reader
 				String fullpath = getXMLPath(stack)+"/"+parser.getLocalName();
 				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath);
 				
+				// Fetch for info when creating attributes.
+				Map attrvals = null;
+				if(parser.getAttributeCount()>0)
+				{
+					attrvals = new HashMap();
+					Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getAttributeNames();
+					for(int i=0; i<parser.getAttributeCount(); i++)
+					{
+						String attrname = parser.getAttributeLocalName(i);
+						String attrval = parser.getAttributeValue(i);
+						attrvals.put(attrname, attrval);
+					}
+				}
+				
 				// Create object.
 				Object object = null;
 				if(typeinfo!=null && typeinfo.getTypeInfo()!=null)
 				{
-					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context, classloader);
+					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context, attrvals, classloader);
 				}
 				else
 				{

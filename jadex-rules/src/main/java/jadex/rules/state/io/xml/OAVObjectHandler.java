@@ -8,6 +8,7 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Handler for reading XML into OAV objects.
@@ -23,7 +24,7 @@ public class OAVObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context, ClassLoader classloader) throws Exception
+	public Object createObject(Object type, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception
 	{
 		Object ret = null;
 		IOAVState state = (IOAVState)context;

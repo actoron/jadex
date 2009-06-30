@@ -3,6 +3,7 @@ package jadex.bpmn.model;
 import jadex.commons.SUtil;
 import jadex.commons.xml.BeanAttributeInfo;
 import jadex.commons.xml.BeanObjectHandler;
+import jadex.commons.xml.IBeanObjectCreator;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.Reader;
@@ -96,7 +97,31 @@ public class MBpmnDiagram extends MIdElement
 		
 		types.add(new TypeInfo("pools", MPool.class));
 		
-		types.add(new TypeInfo("vertices", MVertex.class, null, null,
+		IBeanObjectCreator oc = new IBeanObjectCreator()
+		{
+			public Object createObject(Object context, Map rawattributes,
+				ClassLoader classloader) throws Exception
+			{
+				Object ret = null;
+				String type = (String)rawattributes.get("type");
+				if(type.endsWith("Activity"))
+				{
+					ret = new MActivity();
+				}
+//				else if(type.endsWith("SubProcess"))
+//				{
+//					ret = new MSubProcess();
+//				}
+				else
+				{
+					throw new RuntimeException("Unknown vertex type: "+type);
+				}
+				
+				return ret;
+			}
+		};
+		
+		types.add(new TypeInfo("vertices", oc, null, null,
 			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
 			new BeanAttributeInfo("incomingEdgesDescription")}), new VertexPostProcessor()));
@@ -253,26 +278,5 @@ public class MBpmnDiagram extends MIdElement
 			return false;
 		}
 	}
-	
-	/**
-	 * 
-	 */
-	public static void main(String[] args)
-	{
-		try
-		{
-			Set ignored = new HashSet();
-			ignored.add("xmi");
-			ignored.add("iD");
-			ignored.add("version");
-			Reader reader = new Reader(new BeanObjectHandler(), MBpmnDiagram.getXMLMapping(), MBpmnDiagram.getXMLLinkInfos(), ignored);
-			FileInputStream fis = new FileInputStream("C:/projects/jadexv2/jadex-applications-bdi/src/main/java/jadex/bdi/examples/helloworld/HelloWorldProcess.bpmn");
-			Object ret = reader.read(fis, null, null);
-			System.out.println("Loaded model: "+ret);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+
 }

@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Handler for reading XML into Java beans.
@@ -20,14 +21,21 @@ public class BeanObjectHandler implements IObjectHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context, ClassLoader classloader) throws Exception
+	public Object createObject(Object type, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception
 	{
 		Object ret = null;
-		Class clazz = (Class)type;
-		if(!BasicTypeConverter.isBuiltInType(clazz))
+		if(type instanceof Class)
 		{
-			// Must have empty constructor.
-			ret = clazz.newInstance();
+			Class clazz = (Class)type;
+			if(!BasicTypeConverter.isBuiltInType(clazz))
+			{
+				// Must have empty constructor.
+				ret = clazz.newInstance();
+			}
+		}
+		else if(type instanceof IBeanObjectCreator)
+		{
+			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
 		}
 		return ret;
 	}
