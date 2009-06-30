@@ -60,7 +60,7 @@ public class Reader
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public Object read(InputStream input, ClassLoader classloader, Object context) throws Exception
+	public Object read(InputStream input, final ClassLoader classloader, final Object context) throws Exception
 	{
 		XMLInputFactory	factory	= XMLInputFactory.newInstance();
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
@@ -68,6 +68,7 @@ public class Reader
 		List stack = new ArrayList();
 		StackElement topse	= null;
 		String comment = null;
+		List secpasspostprocs = new ArrayList();
 		
 		while(parser.hasNext())
 		{
@@ -184,7 +185,7 @@ public class Reader
 				// Link current object to parent
 				if(topse.getObject()!=null)
 				{
-					TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack));
+					final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack));
 
 					// Handle content.
 					if(topse.getContent()!=null && topse.getContent().trim().length()>0)
@@ -200,10 +201,27 @@ public class Reader
 					}
 					
 					// Handle post-processing
+					
 					if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
 					{
-//						topse.object = 
-						typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
+						final IPostProcessor postproc = typeinfo.getPostProcessor();
+						if(postproc.isFirstPass())
+						{
+//							topse.object = 
+							typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
+						}
+						else
+						{
+							final Object object = topse.getObject();
+							final Object ro = root;
+							secpasspostprocs.add(new Runnable()
+							{
+								public void run()
+								{
+									postproc.postProcess(context, object, ro, classloader);
+								}
+							});
+						}
 					}
 
 					// Handle linking
@@ -228,6 +246,12 @@ public class Reader
 			}
 		}
 		parser.close();
+		
+		// Handle second pass post-processors.
+		for(int i=0; i<secpasspostprocs.size(); i++)
+		{
+			((Runnable)secpasspostprocs.get(i)).run();
+		}
 		
 		return root;
 	}

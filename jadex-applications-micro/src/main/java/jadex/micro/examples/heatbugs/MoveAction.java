@@ -1,18 +1,17 @@
 package jadex.micro.examples.heatbugs;
 
-import java.util.Map;
-
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.environment.space2d.action.GetPosition;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.commons.SimplePropertyObject;
 
+import java.util.Map;
+
 /**
- * 
+ *  Action for moving a bug to one of its neighbor fields.
  */
 public class MoveAction extends SimplePropertyObject implements ISpaceAction
 {
@@ -22,6 +21,8 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 	// Default Action Parameters
 	public static final String PARAMETER_HEAT = "heat";
 
+	/** The position parameter. */
+	public static final String PARAMETER_POSITION = "position";
 	
 	/**
 	 *  Perform an action.
@@ -32,7 +33,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 		Object id = parameters.get(ISpaceAction.OBJECT_ID);
 		ISpaceObject heatbug = grid.getSpaceObject(id);
 		double output_heat = ((Double)heatbug.getProperty("output_heat")).doubleValue();
-		IVector2 pos = (IVector2)parameters.get(GetPosition.PARAMETER_POSITION);		
+		IVector2 pos = (IVector2)parameters.get(PARAMETER_POSITION);		
 		
 		// Move if patch is not occupied
 		if(grid.getSpaceObjectsByGridPosition(pos, "heatbug")==null)

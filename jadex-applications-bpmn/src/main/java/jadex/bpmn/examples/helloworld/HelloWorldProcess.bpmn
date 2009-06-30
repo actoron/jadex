@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_zLLYgGJnEd6rasIGpuxRsw" iD="_zLBngGJnEd6rasIGpuxRsw">
+  <pools xmi:type="bpmn:Pool" xmi:id="_SjfUYWV3Ed6rasIGpuxRsw" iD="_SjfUYGV3Ed6rasIGpuxRsw" name="Pool0">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TsXA8WV3Ed6rasIGpuxRsw" iD="_TsXA8GV3Ed6rasIGpuxRsw" outgoingEdges="_U7ftkWV3Ed6rasIGpuxRsw" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ULgbEWV3Ed6rasIGpuxRsw" iD="_ULgbEGV3Ed6rasIGpuxRsw" outgoingEdges="_f0AIMWV3Ed6rasIGpuxRsw" activityType="EventStartMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_U7V8kWV3Ed6rasIGpuxRsw" iD="_U7V8kGV3Ed6rasIGpuxRsw" outgoingEdges="_XisZUWV3Ed6rasIGpuxRsw" incomingEdges="_U7ftkWV3Ed6rasIGpuxRsw _f0AIMWV3Ed6rasIGpuxRsw" name="SayHello" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XiioUWV3Ed6rasIGpuxRsw" iD="_XiioUGV3Ed6rasIGpuxRsw" outgoingEdges="_fJ-60WV3Ed6rasIGpuxRsw" incomingEdges="_XisZUWV3Ed6rasIGpuxRsw" name="SayGoodbye" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eQwz0WV3Ed6rasIGpuxRsw" iD="_eQwz0GV3Ed6rasIGpuxRsw" incomingEdges="_fJ-60WV3Ed6rasIGpuxRsw" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_U7ftkWV3Ed6rasIGpuxRsw" iD="_U7ftkGV3Ed6rasIGpuxRsw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_XisZUWV3Ed6rasIGpuxRsw" iD="_XisZUGV3Ed6rasIGpuxRsw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fJ-60WV3Ed6rasIGpuxRsw" iD="_fJ-60GV3Ed6rasIGpuxRsw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_f0AIMWV3Ed6rasIGpuxRsw" iD="_f0AIMGV3Ed6rasIGpuxRsw"/>
+  </pools>
+</bpmn:BpmnDiagram>

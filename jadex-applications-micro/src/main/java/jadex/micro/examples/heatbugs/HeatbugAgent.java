@@ -1,9 +1,9 @@
 package jadex.micro.examples.heatbugs;
 
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.environment.space2d.action.GetPosition;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.bridge.IApplicationContext;
@@ -115,8 +115,8 @@ public class HeatbugAgent extends MicroAgent
 					{
 //						System.out.println("res: "+avatar.getProperty(ISpaceObject.PROPERTY_OWNER)+" "+target);
 						Map params = new HashMap();
-						params.put(GetPosition.OBJECT_ID, avatar.getId());
-						params.put(GetPosition.PARAMETER_POSITION, target);
+						params.put(ISpaceAction.OBJECT_ID, avatar.getId());
+						params.put(MoveAction.PARAMETER_POSITION, target);
 						grid.performSpaceAction("move", params, null);
 					}
 				}

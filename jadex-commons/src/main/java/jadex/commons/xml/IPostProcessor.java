@@ -1,7 +1,7 @@
 package jadex.commons.xml;
 
 /**
- *  Post-processes OAV objects after an XML has been loaded.
+ *  Post-processes objects after an XML has been loaded.
  */
 public interface IPostProcessor
 {
@@ -12,4 +12,10 @@ public interface IPostProcessor
 	 *  @param root	The root object in the state.
 	 */
 	public void postProcess(Object context, Object object, Object root, ClassLoader classloader);
+	
+	/**
+	 *  Test if this post processor can be executed in first pass.
+	 *  @return True if can be executed on first pass.
+	 */
+	public boolean isFirstPass();
 }

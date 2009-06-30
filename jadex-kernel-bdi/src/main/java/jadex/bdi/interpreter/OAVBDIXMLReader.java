@@ -309,6 +309,15 @@ public class OAVBDIXMLReader
 			if(ret!=null)
 				state.setAttributeValue(object, OAVBDIMetaModel.expression_has_content, ret);
 		}
+		
+		/**
+		 *  Test if this post processor can be executed in first pass.
+		 *  @return True if can be executed on first pass.
+		 */
+		public boolean isFirstPass()
+		{
+			return true;
+		}
 	}
 	
 	/**
@@ -357,6 +366,15 @@ public class OAVBDIXMLReader
 					e.printStackTrace();
 				}
 			}
+		}
+		
+		/**
+		 *  Test if this post processor can be executed in first pass.
+		 *  @return True if can be executed on first pass.
+		 */
+		public boolean isFirstPass()
+		{
+			return true;
 		}
 	}
 
