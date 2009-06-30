@@ -55,10 +55,10 @@ public class HeatbugAgent extends MicroAgent
 			{
 				ISpaceObject avatar = grid.getAvatar(getAgentIdentifier());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-				ISpaceObject patch = (ISpaceObject)grid.getNearObjects(mypos, Vector1Int.ZERO, "patch").iterator().next();
-				double mytemp = ((Double)patch.getProperty("heat")).doubleValue();
+				ISpaceObject patch = (ISpaceObject)grid.getSpaceObjectsByGridPosition(mypos, "patch").iterator().next();
+				double mytemp = ((Number)patch.getProperty("heat")).doubleValue();
 
-				double unhappiness = ((Double)avatar.getProperty("unhappiness")).doubleValue();
+				double unhappiness = ((Number)avatar.getProperty("unhappiness")).doubleValue();
 				if(unhappiness>0)
 				{
 					Set tmp = grid.getNearObjects((IVector2)avatar.getProperty(
@@ -85,7 +85,7 @@ public class HeatbugAgent extends MicroAgent
 							double minheat = mytemp;
 							for(int i=0; i<neighbors.length; i++)
 							{
-								double heat = ((Double)neighbors[i].getProperty("heat")).doubleValue();
+								double heat = ((Number)neighbors[i].getProperty("heat")).doubleValue();
 								if(heat<minheat)
 								{
 									min = neighbors[i];
@@ -100,7 +100,7 @@ public class HeatbugAgent extends MicroAgent
 							double maxheat = mytemp;
 							for(int i=0; i<neighbors.length; i++)
 							{
-								double heat = ((Double)neighbors[i].getProperty("heat")).doubleValue();
+								double heat = ((Number)neighbors[i].getProperty("heat")).doubleValue();
 								if(heat>maxheat)
 								{
 									max = neighbors[i];
