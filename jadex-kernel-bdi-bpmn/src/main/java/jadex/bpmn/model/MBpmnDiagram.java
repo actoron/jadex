@@ -27,6 +27,9 @@ public class MBpmnDiagram extends MIdElement
 	/** The pools. */
 	protected List pools;
 	
+	/** The artifacts. */
+	protected List artifacts;
+	
 	/** The messages. */
 //	protected List messages;
 	
@@ -35,8 +38,6 @@ public class MBpmnDiagram extends MIdElement
 	
 	/** The name of the model. */
 	protected String	name;
-	
-	//-------- constructors --------
 	
 	//-------- methods --------
 
@@ -67,6 +68,33 @@ public class MBpmnDiagram extends MIdElement
 			pools.remove(pool);
 	}
 	
+	/**
+	 * 
+	 */
+	public List getArtifacts()
+	{
+		return artifacts;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addArtifact(MArtifact artifact)
+	{
+		if(artifacts==null)
+			artifacts = new ArrayList();
+		artifacts.add(artifact);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removePool(MArtifact artifact)
+	{
+		if(artifacts!=null)
+			artifacts.remove(artifact);
+	}
+	
 	//-------- helper methods --------
 	
 	/**
@@ -87,7 +115,7 @@ public class MBpmnDiagram extends MIdElement
 					MPool tmp = (MPool)pools.get(i);
 					addEdges(tmp.getSequenceEdges(), alledges);
 					
-					List acts = tmp.getVertices();
+					List acts = tmp.getActivities();
 					if(acts!=null)
 					{
 						for(int j=0; j<acts.size(); j++)
@@ -229,7 +257,13 @@ public class MBpmnDiagram extends MIdElement
 		
 		types.add(new TypeInfo("BpmnDiagram", MBpmnDiagram.class));
 		
-		types.add(new TypeInfo("pools", MPool.class));
+		types.add(new TypeInfo("pools", MPool.class, null, null,
+			SUtil.createHashMap(new String[]{"associations"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("associationsDescription")}), null));
+		
+		types.add(new TypeInfo("artifacts", MArtifact.class));
+		
+		types.add(new TypeInfo("associations", MAssociation.class));
 		
 		types.add(new TypeInfo("lanes", MLane.class, null, null,
 			SUtil.createHashMap(new String[]{"activities"}, 
@@ -241,10 +275,11 @@ public class MBpmnDiagram extends MIdElement
 			new BeanAttributeInfo("incomingEdgesDescription")}), new VertexPostProcessor()));
 		
 		types.add(new TypeInfo("vertices", MActivity.class, null, null,
-			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges", "lanes"}, 
+			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges", "lanes", "associations"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
 			new BeanAttributeInfo("incomingEdgesDescription"),
-			new BeanAttributeInfo("laneDescription")}), new VertexPostProcessor(),
+			new BeanAttributeInfo("laneDescription"),
+			new BeanAttributeInfo("associationsDescription")}), new VertexPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)
@@ -255,10 +290,11 @@ public class MBpmnDiagram extends MIdElement
 			}));
 		
 		types.add(new TypeInfo("vertices", MSubProcess.class, null, null,
-			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges", "lanes"}, 
+			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges", "lanes", "associations"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
 			new BeanAttributeInfo("incomingEdgesDescription"),
-			new BeanAttributeInfo("laneDescription")}), new VertexPostProcessor(),
+			new BeanAttributeInfo("laneDescription"),
+			new BeanAttributeInfo("associationsDescription")}), new VertexPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)
@@ -282,76 +318,24 @@ public class MBpmnDiagram extends MIdElement
 
 		// bpmn diagram
 		linkinfos.add(new LinkInfo("pools", new BeanAttributeInfo("pool")));
+		linkinfos.add(new LinkInfo("artifacts", new BeanAttributeInfo("artifact")));
 
 		// pool
-		linkinfos.add(new LinkInfo("vertices", new BeanAttributeInfo("vertex")));
+		linkinfos.add(new LinkInfo("vertices", new BeanAttributeInfo("activity")));
 		linkinfos.add(new LinkInfo("sequenceEdges", new BeanAttributeInfo("sequenceEdge")));
 		linkinfos.add(new LinkInfo("lanes", new BeanAttributeInfo("lane")));
 		
 		// subprocesses
 		linkinfos.add(new LinkInfo("eventHandlers", new BeanAttributeInfo("eventHandler")));
 
+		// artifacts
+		linkinfos.add(new LinkInfo("associations", new BeanAttributeInfo("association")));
+		
 		return linkinfos;
 	}
 	
 	/**
-	 *  Get the XML mapping.
-	 * /
-	public static Set getXMLMapping()
-	{
-		Set types = new HashSet();
-		
-		types.add(new TypeInfo("BpmnDiagram", MBpmnDiagram.class, null, null,
-			SUtil.createHashMap(new String[]{"id", "version"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("", null, "property"),
-			new BeanAttributeInfo("", null, "property")
-			}), null));
-		
-		types.add(new TypeInfo("pools", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"id", "name", "type"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, "")}), null));
-		
-		types.add(new TypeInfo("vertices", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"id", "name", "activityType", "type", "outgoingEdges", "incomingEdges"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, "")}), null));
-		
-		types.add(new TypeInfo("sequenceEdges", MultiCollection.class, null, null,
-			SUtil.createHashMap(new String[]{"id", "name", "type"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, ""),
-			new BeanAttributeInfo(null, null, "")
-			}), null));
-		
-		
-		return types;
-	}*/
-	
-	/**
-	 *  Get the XML link infos.
-	 * /
-	public static Set getXMLLinkInfos()
-	{
-		Set linkinfos = new HashSet();
-
-		// bpmn diagram
-		linkinfos.add(new LinkInfo("pools", new BeanAttributeInfo("pools", null, "property")));
-
-		// pool
-		linkinfos.add(new LinkInfo("vertices", new BeanAttributeInfo("vertices", null, "")));
-		linkinfos.add(new LinkInfo("sequenceEdges", new BeanAttributeInfo("vertices", null, "")));
-		
-		return linkinfos;
-	}*/
-	
-	/**
-	 *  Load class.
+	 *  Vertex post processor.
 	 */
 	static class VertexPostProcessor implements IPostProcessor
 	{
@@ -363,10 +347,10 @@ public class MBpmnDiagram extends MIdElement
 		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnDiagram dia = (MBpmnDiagram)root;
-			MVertex v = (MVertex)object;
+			MActivity act = (MActivity)object;
 			Map edges = dia.getAllEdges();
 			
-			String indesc = v.getIncomingEdgesDescription();
+			String indesc = act.getIncomingEdgesDescription();
 			if(indesc!=null)
 			{
 				StringTokenizer stok = new StringTokenizer(indesc);
@@ -374,12 +358,12 @@ public class MBpmnDiagram extends MIdElement
 				{
 					String edgeid = stok.nextToken(); 
 					MSequenceEdge edge = (MSequenceEdge)edges.get(edgeid);
-					v.addIncomingEdge(edge);
-					edge.setTarget(v);
+					act.addIncomingEdge(edge);
+					edge.setTarget(act);
 				}
 			}
 			
-			String outdesc = v.getOutgoingEdgesDescription();
+			String outdesc = act.getOutgoingEdgesDescription();
 			if(outdesc!=null)
 			{
 				StringTokenizer stok = new StringTokenizer(outdesc);
@@ -387,8 +371,8 @@ public class MBpmnDiagram extends MIdElement
 				{
 					String edgeid = stok.nextToken(); 
 					MSequenceEdge edge = (MSequenceEdge)edges.get(edgeid);
-					v.addOutgoingEdge(edge);
-					edge.setSource(v);
+					act.addOutgoingEdge(edge);
+					edge.setSource(act);
 				}
 			}
 		}

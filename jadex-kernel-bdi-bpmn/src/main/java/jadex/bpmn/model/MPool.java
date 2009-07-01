@@ -10,11 +10,12 @@ public class MPool extends MNamedIdElement
 {
 	//-------- attributes --------
 	
-	/** The associations. */
-	// protected List associations;
+	/** The association description. */
+	protected String associationsdescription;
+	
 	
 	/** The vertices. */
-	protected List vertices;
+	protected List activities;
 	
 	/** The sequence edges. */
 	protected List sequenceedges;
@@ -22,63 +23,62 @@ public class MPool extends MNamedIdElement
 	/** The pools. */
 	protected List lanes;
 	
+	/** The artifacs. */
+	protected List artifacts;
+	
+	/** The associations. */
+	protected List associations;
+	
 	/** The messages. */
 //	protected List messages;
 	
 	/** The type. */
 	protected String type;
 	
-	//-------- constructors --------
-	
 	//-------- methods --------
 	
 	/**
+	 * @return the associationsdescription
+	 */
+	public String getAssociationsDescription()
+	{
+		return this.associationsdescription;
+	}
+
+	/**
+	 * @param associationsdescription the associationsdescription to set
+	 */
+	public void setAssociationsDescription(String associationsdescription)
+	{
+		this.associationsdescription = associationsdescription;
+	}
+
+
+	/**
 	 * 
 	 */
-	public List getVertices()
+	public List getActivities()
 	{
-		return vertices;
-	}
-	
-	/**
-	 *  Get all start events of the pool.
-	 *  @return A non-empty List of start events or null, if none.
-	 */
-	public List getStartEvents()
-	{
-		List	ret	= null;
-		for(int i=0; vertices!=null && i<vertices.size(); i++)
-		{
-			MVertex	vertex	= (MVertex) vertices.get(i);
-			// Todo: use constants
-			// Todo: other start event types.
-			if(vertex.getActivityType().equals("EventStartEmpty"))
-			{
-				if(ret==null)
-					ret	= new ArrayList();
-				ret.add(vertex);
-			}
-		}
-		return ret;
+		return activities;
 	}
 	
 	/**
 	 * 
 	 */
-	public void addVertex(MVertex vertex)
+	public void addActivity(MActivity activity)
 	{
-		if(vertices==null)
-			vertices = new ArrayList();
-		vertices.add(vertex);
+		if(activities==null)
+			activities = new ArrayList();
+		activities.add(activity);
 	}
 	
 	/**
 	 * 
 	 */
-	public void removeVertex(MVertex vertex)
+	public void removeActivity(MActivity activity)
 	{
-		if(vertices!=null)
-			vertices.remove(vertex);
+		if(activities!=null)
+			activities.remove(activity);
 	}
 	
 	/**
@@ -136,6 +136,60 @@ public class MPool extends MNamedIdElement
 	}
 	
 	/**
+	 * 
+	 */
+	public List getArtifacts()
+	{
+		return artifacts;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addArtifacts(MArtifact artifact)
+	{
+		if(artifacts==null)
+			artifacts = new ArrayList();
+		artifacts.add(artifact);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeArtifact(MArtifact artifact)
+	{
+		if(artifacts!=null)
+			artifacts.remove(artifact);
+	}
+	
+	/**
+	 * 
+	 */
+	public List getAssociations()
+	{
+		return associations;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addAssociation(MAssociation association)
+	{
+		if(associations==null)
+			associations = new ArrayList();
+		associations.add(association);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeAssociation(MAssociation association)
+	{
+		if(associations!=null)
+			associations.remove(association);
+	}
+	
+	/**
 	 * @return the type
 	 */
 	public String getType()
@@ -150,4 +204,28 @@ public class MPool extends MNamedIdElement
 	{
 		this.type = type;
 	}
+	
+	/**
+	 *  Get all start events of the pool.
+	 *  @return A non-empty List of start events or null, if none.
+	 */
+	public List getStartEvents()
+	{
+		List	ret	= null;
+		for(int i=0; activities!=null && i<activities.size(); i++)
+		{
+			MActivity	act	= (MActivity)activities.get(i);
+			// Todo: use constants
+			// Todo: other start event types.
+			if("EventStartEmpty".equals(act.getActivityType()))
+			{
+				if(ret==null)
+					ret	= new ArrayList();
+				ret.add(act);
+			}
+		}
+		return ret;
+	}
+	
+	
 }

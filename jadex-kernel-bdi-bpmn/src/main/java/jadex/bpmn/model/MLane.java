@@ -50,20 +50,20 @@ public class MLane extends MNamedIdElement
 	/**
 	 * 
 	 */
-	public void addActivities(MVertex vertex)
+	public void addActivities(MActivity activity)
 	{
 		if(activities==null)
 			activities = new ArrayList();
-		activities.add(vertex);
+		activities.add(activity);
 	}
 	
 	/**
 	 * 
 	 */
-	public void removeVertex(MVertex vertex)
+	public void removeVertex(MActivity activity)
 	{
 		if(activities!=null)
-			activities.remove(vertex);
+			activities.remove(activity);
 	}
 
 	/**

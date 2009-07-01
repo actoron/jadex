@@ -26,8 +26,9 @@ public class Test
 			ignored.add("iD");
 			ignored.add("version");
 			Reader reader = new Reader(new BeanObjectHandler(), MBpmnDiagram.getXMLMapping(), MBpmnDiagram.getXMLLinkInfos(), ignored);
-//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
-			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test.bpmn", null);
+			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
+//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test.bpmn", null);
+//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test2.bpmn", null);
 			MBpmnDiagram	model	= (MBpmnDiagram) reader.read(rinfo.getInputStream(), null, null);
 			String	name	= new File(rinfo.getFilename()).getName();
 			name	= name.substring(0, name.length()-5);

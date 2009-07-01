@@ -11,15 +11,13 @@ public class MSubProcess extends MActivity
 	//-------- attributes --------
 	
 	/** The vertices. */
-	protected List vertices;
+	protected List activities;
 	
 	/** The sequence edges. */
 	protected List sequenceedges;
 	
 	/** The event handlers. */
 	protected List eventhandlers;
-	
-	//-------- constructors --------
 	
 	//-------- methods --------
 	
@@ -28,26 +26,26 @@ public class MSubProcess extends MActivity
 	 */
 	public List getVertices()
 	{
-		return vertices;
+		return activities;
 	}
 	
 	/**
 	 * 
 	 */
-	public void addVertex(MVertex vertex)
+	public void addVertex(MActivity vertex)
 	{
-		if(vertices==null)
-			vertices = new ArrayList();
-		vertices.add(vertex);
+		if(activities==null)
+			activities = new ArrayList();
+		activities.add(vertex);
 	}
 	
 	/**
 	 * 
 	 */
-	public void removeVertex(MVertex vertex)
+	public void removeVertex(MActivity vertex)
 	{
-		if(vertices!=null)
-			vertices.remove(vertex);
+		if(activities!=null)
+			activities.remove(vertex);
 	}
 	
 	/**

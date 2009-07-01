@@ -8,10 +8,10 @@ public class MSequenceEdge extends MNamedIdElement
 	//-------- attributes --------
 	
 	/** The outgoing edges. */
-	protected MVertex source;
+	protected MActivity source;
 	
 	/** The incoming edges. */
-	protected MVertex target;
+	protected MActivity target;
 	
 	/** The type. */
 	protected String type;
@@ -23,7 +23,7 @@ public class MSequenceEdge extends MNamedIdElement
 	/**
 	 * 
 	 */
-	public MVertex getSource()
+	public MActivity getSource()
 	{
 		return source;
 	}
@@ -31,7 +31,7 @@ public class MSequenceEdge extends MNamedIdElement
 	/**
 	 * 
 	 */
-	public MVertex getTarget()
+	public MActivity getTarget()
 	{
 		return target;
 	}
@@ -39,7 +39,7 @@ public class MSequenceEdge extends MNamedIdElement
 	/**
 	 * 
 	 */
-	public void setSource(MVertex source)
+	public void setSource(MActivity source)
 	{
 		this.source = source;
 	}
@@ -47,7 +47,7 @@ public class MSequenceEdge extends MNamedIdElement
 	/**
 	 * 
 	 */
-	public void setTarget(MVertex target)
+	public void setTarget(MActivity target)
 	{
 		this.target = target;
 	}
