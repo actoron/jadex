@@ -363,7 +363,7 @@ public class OAVBDIModelLoader
 				model.addSubcapabilityModel(cmodel);
 				if(!cmodel.getReport().isEmpty())
 				{
-					StackElement se	= new StackElement("capability", mcaparef);
+					StackElement se	= new StackElement("capability", mcaparef, null);
 //					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
 //					se.object	= mcaparef;
 					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getFilename()+"\">"+cmodel.getName()+"</a> has errors.");

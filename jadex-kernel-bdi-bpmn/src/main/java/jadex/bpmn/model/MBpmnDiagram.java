@@ -1,5 +1,6 @@
 package jadex.bpmn.model;
 
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.xml.BeanAttributeInfo;
@@ -28,6 +29,9 @@ public class MBpmnDiagram extends MIdElement
 	
 	/** The messages. */
 //	protected List messages;
+	
+	/** The cached edges of the model. */
+	protected Map alledges;
 	
 	/** The name of the model. */
 	protected String	name;
@@ -62,6 +66,102 @@ public class MBpmnDiagram extends MIdElement
 		if(pools!=null)
 			pools.remove(pool);
 	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 * 
+	 */
+	public Map getAllEdges()
+	{
+		if(this.alledges==null)
+		{
+			this.alledges = new HashMap();
+			// todo: hierarchical search also in lanes of pools?!
+			
+			List pools = getPools();
+			if(pools!=null)
+			{
+				for(int i=0; i<pools.size(); i++)
+				{
+					MPool tmp = (MPool)pools.get(i);
+					addEdges(tmp.getSequenceEdges(), alledges);
+					
+					List acts = tmp.getVertices();
+					if(acts!=null)
+					{
+						for(int j=0; j<acts.size(); j++)
+						{
+							if(acts.get(j) instanceof MSubProcess)
+							{
+								getAllEdges((MSubProcess)acts.get(j), alledges);
+							}
+						}
+					}
+					
+				}
+			}
+		}
+		
+		return alledges;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void getAllEdges(MSubProcess sub, Map edges)
+	{
+		addEdges(sub.getSequenceEdges(), edges);
+		
+		List acts = sub.getVertices();
+		if(acts!=null)
+		{
+			for(int j=0; j<acts.size(); j++)
+			{
+				if(acts.get(j) instanceof MSubProcess)
+				{
+					getAllEdges((MSubProcess)acts.get(j), edges);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected void addEdges(List tmp, Map edges)
+	{
+		if(tmp!=null)
+		{
+			for(int i=0; i<tmp.size(); i++)
+			{
+				MSequenceEdge edge = (MSequenceEdge)tmp.get(i);
+				edges.put(edge.getId(), edge);
+			}
+		}
+	}
+	
+//	/**
+//	 *  Get a string representation of this AGR space type.
+//	 *  @return A string representation of this AGR space type.
+//	 */
+//	public String	toString()
+//	{
+//		StringBuffer	sbuf	= new StringBuffer();
+//		sbuf.append(SReflect.getInnerClassName(getClass()));
+//		sbuf.append("(name=");
+//		sbuf.append(getName());
+//		sbuf.append(", dimensions=");
+//		sbuf.append(getDimensions());
+//		sbuf.append(", agent action types=");
+//		sbuf.append(getMEnvAgentActionTypes());
+//		sbuf.append(", space action types=");
+//		sbuf.append(getMEnvSpaceActionTypes());
+//		sbuf.append(", class=");
+//		sbuf.append(getClazz());
+//		sbuf.append(")");
+//		return sbuf.toString();
+//	}
 	
 	/**
 	 *  Get the name of the model.
@@ -131,34 +231,42 @@ public class MBpmnDiagram extends MIdElement
 		
 		types.add(new TypeInfo("pools", MPool.class));
 		
-		IBeanObjectCreator oc = new IBeanObjectCreator()
-		{
-			public Object createObject(Object context, Map rawattributes,
-				ClassLoader classloader) throws Exception
-			{
-				Object ret = null;
-				String type = (String)rawattributes.get("type");
-				if(type.endsWith("Activity"))
-				{
-					ret = new MActivity();
-				}
-//				else if(type.endsWith("SubProcess"))
-//				{
-//					ret = new MSubProcess();
-//				}
-				else
-				{
-					throw new RuntimeException("Unknown vertex type: "+type);
-				}
-				
-				return ret;
-			}
-		};
+		types.add(new TypeInfo("lanes", MLane.class, null, null,
+			SUtil.createHashMap(new String[]{"activities"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("activitiesDescription")}), null));
 		
-		types.add(new TypeInfo("vertices", oc, null, null,
+		types.add(new TypeInfo("eventHandlers", MActivity.class, null, null,
 			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
 			new BeanAttributeInfo("incomingEdgesDescription")}), new VertexPostProcessor()));
+		
+		types.add(new TypeInfo("vertices", MActivity.class, null, null,
+			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges", "lanes"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
+			new BeanAttributeInfo("incomingEdgesDescription"),
+			new BeanAttributeInfo("laneDescription")}), new VertexPostProcessor(),
+			new IFilter()
+			{
+				public boolean filter(Object obj)
+				{
+					String type = (String)((Map)obj).get("type");
+					return type.endsWith("Activity");
+				}
+			}));
+		
+		types.add(new TypeInfo("vertices", MSubProcess.class, null, null,
+			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges", "lanes"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
+			new BeanAttributeInfo("incomingEdgesDescription"),
+			new BeanAttributeInfo("laneDescription")}), new VertexPostProcessor(),
+			new IFilter()
+			{
+				public boolean filter(Object obj)
+				{
+					String type = (String)((Map)obj).get("type");
+					return type.endsWith("SubProcess");
+				}
+			}));
 		
 		types.add(new TypeInfo("sequenceEdges", MSequenceEdge.class));
 		
@@ -178,7 +286,11 @@ public class MBpmnDiagram extends MIdElement
 		// pool
 		linkinfos.add(new LinkInfo("vertices", new BeanAttributeInfo("vertex")));
 		linkinfos.add(new LinkInfo("sequenceEdges", new BeanAttributeInfo("sequenceEdge")));
+		linkinfos.add(new LinkInfo("lanes", new BeanAttributeInfo("lane")));
 		
+		// subprocesses
+		linkinfos.add(new LinkInfo("eventHandlers", new BeanAttributeInfo("eventHandler")));
+
 		return linkinfos;
 	}
 	
@@ -252,29 +364,7 @@ public class MBpmnDiagram extends MIdElement
 		{
 			MBpmnDiagram dia = (MBpmnDiagram)root;
 			MVertex v = (MVertex)object;
-
-			// Search container of vertex
-			// todo: hierarchical search in nested subprocesses and also in lanes of pools?!
-			MPool container = null;
-			List pools = dia.getPools();
-			if(pools!=null)
-			{
-				for(int i=0; container==null && i<pools.size(); i++)
-				{
-					MPool tmp = (MPool)pools.get(i);
-					if(tmp.getVertices().contains(v))
-						container = tmp;
-				}
-			}
-			if(container==null)
-				throw new RuntimeException("Vertex container not found: "+v);
-			List tmp = container.getSequenceEdges();
-			Map edges = new HashMap();
-			for(int i=0; i<tmp.size(); i++)
-			{
-				MSequenceEdge edge = (MSequenceEdge)tmp.get(i);
-				edges.put(edge.getId(), edge);
-			}
+			Map edges = dia.getAllEdges();
 			
 			String indesc = v.getIncomingEdgesDescription();
 			if(indesc!=null)

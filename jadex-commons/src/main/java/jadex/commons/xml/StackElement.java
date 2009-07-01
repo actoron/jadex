@@ -1,5 +1,7 @@
 package jadex.commons.xml;
 
+import java.util.Map;
+
 /**
  *  A struct to represent an element on the stack while parsing.
  */
@@ -16,15 +18,19 @@ public class StackElement
 	/** The collected content. */
 	public String content;
 	
+	/** The raw attributes. */
+	public Map rawattrs;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(String tag, Object object)
+	public StackElement(String tag, Object object, Map rawattrs)
 	{
 		this.tag = tag;
 		this.object = object;
+		this.rawattrs = rawattrs;
 	}
 	
 	//-------- methods --------
@@ -54,6 +60,15 @@ public class StackElement
 	public String getContent()
 	{
 		return this.content;
+	}
+	
+	/**
+	 *  Get the raw attributes.
+	 *  @return The raw attributes.
+	 */
+	public Map getRawAttributes()
+	{
+		return this.rawattrs;
 	}
 
 	/**

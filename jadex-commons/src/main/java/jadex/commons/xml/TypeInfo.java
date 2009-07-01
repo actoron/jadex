@@ -1,5 +1,7 @@
 package jadex.commons.xml;
 
+import jadex.commons.IFilter;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +39,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(String xmlpath, Object typeinfo)
 	{
-		this(xmlpath, typeinfo, null, null, null, null);
+		this(xmlpath, typeinfo, null, null, null, null, null);
 	}
 	
 	/**
@@ -49,7 +51,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo)
 	{
-		this(xmlpath, typeinfo, commentinfo, contentinfo, null, null);
+		this(xmlpath, typeinfo, commentinfo, contentinfo, null, null, null);
 	}
 	
 	/**
@@ -64,7 +66,22 @@ public class TypeInfo	extends AbstractInfo
 	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
 		Map attributesinfo, IPostProcessor postproc)
 	{
-		super(xmlpath);
+		this(xmlpath, typeinfo, commentinfo, contentinfo, attributesinfo, postproc, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param typeinfo The type of object to create.
+	 *  @param commentinfo The commnent.
+	 *  @param contentinfo The content.
+	 *  @param attributesinfo The attributes map.
+	 *  @param postproc The post processor. 
+	 */
+	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
+		Map attributesinfo, IPostProcessor postproc, IFilter filter)
+	{
+		super(xmlpath, filter);
 		this.typeinfo = typeinfo;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;

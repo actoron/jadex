@@ -88,35 +88,34 @@ public class Reader
 			
 			else if(next==XMLStreamReader.START_ELEMENT)
 			{
-				String fullpath = getXMLPath(stack)+"/"+parser.getLocalName();
-				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath);
-				
 				// Fetch for info when creating attributes.
-				Map attrvals = null;
+				Map rawattrs = null;
 				if(parser.getAttributeCount()>0)
 				{
-					attrvals = new HashMap();
-					Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getAttributeNames();
+					rawattrs = new HashMap();
 					for(int i=0; i<parser.getAttributeCount(); i++)
 					{
 						String attrname = parser.getAttributeLocalName(i);
 						String attrval = parser.getAttributeValue(i);
-						attrvals.put(attrname, attrval);
+						rawattrs.put(attrname, attrval);
 					}
 				}
+				
+				String fullpath = getXMLPath(stack)+"/"+parser.getLocalName();
+				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath, rawattrs);
 				
 				// Create object.
 				Object object = null;
 				if(typeinfo!=null && typeinfo.getTypeInfo()!=null)
 				{
-					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context, attrvals, classloader);
+					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context, rawattrs, classloader);
 				}
 				else
 				{
 					if(DEBUG)
 						System.out.println("No mapping found: "+parser.getLocalName());
 				}
-				topse	= new StackElement(parser.getLocalName(), object);
+				topse	= new StackElement(parser.getLocalName(), object, rawattrs);
 				stack.add(topse);
 				if(stack.size()==1)
 				{
@@ -192,15 +191,15 @@ public class Reader
 				// Hack. Change object to content when it is element of its own.
 				if(topse.getContent()!=null && topse.getContent().trim().length()>0 && topse.getObject()==null)
 				{
-					topse = new StackElement(topse.getTag(), topse.getContent());
+					topse = new StackElement(topse.getTag(), topse.getContent(), topse.getRawAttributes());
 					stack.set(stack.size()-1, topse);
 				}
 				
 				// Link current object to parent
 				if(topse.getObject()!=null)
 				{
-					final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack));
-
+					final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
+					
 					// Handle content.
 					if(topse.getContent()!=null && topse.getContent().trim().length()>0)
 					{
@@ -241,13 +240,13 @@ public class Reader
 					// Handle linking
 					if(stack.size()>1)
 					{
-						StackElement	pse = (StackElement)stack.get(stack.size()-2);
+						StackElement pse = (StackElement)stack.get(stack.size()-2);
 						for(int i=stack.size()-3; i>=0 && pse.getObject()==null; i--)
 						{
 							pse = (StackElement)stack.get(i);
 						}
 						
-						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack));
+						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack), pse.getRawAttributes());
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader, root);
 					}
 				}
@@ -276,7 +275,7 @@ public class Reader
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	protected TypeInfo getTypeInfo(String tag, String fullpath)
+	protected TypeInfo getTypeInfo(String tag, String fullpath, Map rawattributes)
 	{
 		TypeInfo ret = null;
 		Set maps = (Set)typeinfos.get(tag);
@@ -285,7 +284,7 @@ public class Reader
 			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
 			{
 				TypeInfo tmp = (TypeInfo)it.next();
-				if(fullpath.endsWith(tmp.getXMLPath()))
+				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
 					ret = tmp;
 			}
 		}
@@ -298,7 +297,7 @@ public class Reader
 	 *  @param fullpath The full path.
 	 *  @return The most specific link info.
 	 */
-	protected LinkInfo getLinkInfo(String tag, String fullpath)
+	protected LinkInfo getLinkInfo(String tag, String fullpath, Map rawattributes)
 	{
 		LinkInfo ret = null;
 		Set links = (Set)linkinfos.get(tag);
@@ -307,7 +306,7 @@ public class Reader
 			for(Iterator it=links.iterator(); ret==null && it.hasNext(); )
 			{
 				LinkInfo tmp = (LinkInfo)it.next();
-				if(fullpath.endsWith(tmp.getXMLPath()))
+				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
 					ret = tmp;
 			}
 		}

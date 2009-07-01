@@ -20,7 +20,7 @@ public class MPool extends MNamedIdElement
 	protected List sequenceedges;
 	
 	/** The pools. */
-//	protected List lanes;
+	protected List lanes;
 	
 	/** The messages. */
 //	protected List messages;
@@ -110,30 +110,30 @@ public class MPool extends MNamedIdElement
 	
 	/**
 	 * 
-	 * /
+	 */
 	public List getLanes()
 	{
 		return lanes;
-	}*/
+	}
 	
 	/**
 	 * 
-	 * /
+	 */
 	public void addLane(MLane lane)
 	{
 		if(lanes==null)
 			lanes = new ArrayList();
 		lanes.add(lane);
-	}*/
+	}
 	
 	/**
 	 * 
-	 * /
+	 */
 	public void removeLane(MLane lane)
 	{
 		if(lanes!=null)
 			lanes.remove(lane);
-	}*/
+	}
 	
 	/**
 	 * @return the type
@@ -150,12 +150,4 @@ public class MPool extends MNamedIdElement
 	{
 		this.type = type;
 	}
-	
-	/**
-	 * 
-	 * /
-	public List getStartStates()
-	{
-		
-	}*/
 }

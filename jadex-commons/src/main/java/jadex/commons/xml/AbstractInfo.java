@@ -1,6 +1,8 @@
 package jadex.commons.xml;
 
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 import java.util.Comparator;
 
@@ -21,14 +23,28 @@ public class AbstractInfo
 	/** The xml path depth. */
 	protected int xmlpathdepth;
 	
+	/** The procedural filter. */
+	protected IFilter filter;
+	
+	/** The info id. */
+	protected int id;
+	
+	/** The id cnt. */
+	protected static int idcnt;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an abstract OAV info.
 	 */
-	public AbstractInfo(String xmlpath)
+	public AbstractInfo(String xmlpath, IFilter filter)
 	{
 		this.xmlpath = xmlpath;
+		this.filter = filter;
+		synchronized(AbstractInfo.class)
+		{
+			this.id = idcnt++;
+		}
 	}
 	
 	//-------- methods --------
@@ -85,6 +101,33 @@ public class AbstractInfo
 	}
 	
 	/**
+	 *  Get the filter.
+	 *  @return the filter
+	 */
+	public IFilter getFilter()
+	{
+		return this.filter;
+	}
+
+	/**
+	 *  Set the filter.
+	 *  @param filter The filter to set.
+	 */
+	public void setFilter(IFilter filter)
+	{
+		this.filter = filter;
+	}
+	
+	/**
+	 *  Get the id.
+	 *  @return The id.
+	 */
+	public int getId()
+	{
+		return this.id;
+	}
+
+	/**
 	 *  Get a string representation of this mapping.
 	 */
 	public String	toString()
@@ -114,6 +157,11 @@ public class AbstractInfo
 				ret = m2.getXMLPath().length() - m1.getXMLPath().length();
 			if(ret==0)
 				ret = m2.getXMLPath().compareTo(m1.getXMLPath());
+			if(ret==0)
+				ret = m1.filter!=null && m2.filter==null? 1: 
+					m1.filter==null && m2.filter!=null? -1: 
+					m1.filter!=null && m2.filter!=null? m1.getId()-m2.getId()
+					: 0;
 			if(ret==0)
 				throw new RuntimeException("Info should differ: "+m1+" "+m2);
 			return ret;
