@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="jadex.tools.bpmn.editor.JadexBpmnEditor"
+            contributorClass="org.eclipse.stp.bpmn.sample.bugeditor.JadexBpmnEditorContributor"
+            extensions="bpmn_diagram"
+            icon="icons/jadex_bpmn_editor.gif"
+            id="jadex.tools.bpmn.editor.JadexBpmnEditorID"
+            name="Jadex BPMN Editor">
+      </editor>
+   </extension>
+   
+   <!-- add a jadex property tab to the editor-->
+   <extension
+        point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+     <propertyContributor
+           contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertyCategory category="Jadex"/>
+     </propertyContributor>
+  </extension>
+  <extension 
+  		point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+     <propertyTabs 
+     	contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertyTab
+              category="Jadex"
+              id="Jadex"
+              indented="false"
+              label="Jadex"/>
+     </propertyTabs>
+   </extension>
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexPropertySection"
+              id="JadexSection"
+              tab="Jadex">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+           <input type="java.lang.Object"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+	
+	<!-- the default palette -->
+   <extension point="org.eclipse.gmf.runtime.diagram.ui.paletteProviders">
+      <paletteProvider class="org.eclipse.stp.bpmn.diagram.providers.BpmnPaletteProvider">
+         <Priority name="Lowest"/>
+         <editor id="jadex.tools.bpmn.editor.JadexBpmnEditorID"/>
+      </paletteProvider>
+   </extension>
+   
+	<!-- some global action handlers -->
+	<extension point="org.eclipse.gmf.runtime.common.ui.services.action.globalActionHandlerProviders">
+      <GlobalActionHandlerProvider
+         class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramGlobalActionHandlerProvider"
+         id="BpmnPresentation">
+         <Priority name="Lowest"/>
+         <ViewId id="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="delete"/>
+            </ElementType>
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart">
+               <GlobalActionId actionId="save"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+      <GlobalActionHandlerProvider
+         class="org.eclipse.gmf.runtime.diagram.ui.providers.ide.providers.DiagramIDEGlobalActionHandlerProvider"
+         id="BpmnPresentationIDE">
+         <Priority name="Lowest"/>
+         <ViewId id="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="bookmark"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+      <GlobalActionHandlerProvider
+            class="org.eclipse.gmf.runtime.diagram.ui.render.providers.DiagramUIRenderGlobalActionHandlerProvider"
+            id="BpmnRender">
+         <Priority name="Lowest"/>
+         <ViewId id="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="cut"/>
+               <GlobalActionId actionId="copy"/>
+               <GlobalActionId actionId="paste"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+   </extension>
+   
+   <!-- the appereance properties tab -->
+   <extension
+       point="org.eclipse.ui.views.properties.tabbed.propertySections">
+    <propertySections
+          contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+       <propertySection
+             class="org.eclipse.gmf.runtime.diagram.ui.properties.sections.appearance.ShapeColorsAndFontsPropertySection"
+             id="Appearance"
+             tab="Appearance">
+          <input
+                type="java.lang.Object">
+          </input>
+       </propertySection>
+    </propertySections>
+ </extension>
+ <extension
+       point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+    <propertyTabs
+          contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+       <propertyTab
+             category="Appearance"
+             id="Appearance"
+             indented="false"
+             label="Appearance">
+       </propertyTab>
+    </propertyTabs>
+ </extension>
+ <extension
+       point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+    <propertyContributor
+          contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+       <propertyCategory
+             category="Appearance"></propertyCategory>
+    </propertyContributor>
+ </extension>
+ 
+ <!-- ruler & grid tab -->
+ <extension
+       point="org.eclipse.ui.views.properties.tabbed.propertySections">
+    <propertySections
+          contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+       <propertySection
+             class="org.eclipse.gmf.runtime.diagram.ui.properties.sections.grid.RulerGridPropertySection"
+             id="Ruler &amp; Grid"
+             tab="Ruler &amp; Grid">
+          <input
+                type="java.lang.Object">
+          </input>
+       </propertySection>
+    </propertySections>
+ </extension>
+ <extension
+       point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+    <propertyTabs
+          contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+       <propertyTab
+             category="Ruler &amp; Grid"
+             id="Ruler &amp; Grid"
+             label="Ruler &amp; Grid">
+       </propertyTab>
+    </propertyTabs>
+ </extension>
+ <extension
+       point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+    <propertyContributor
+          contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+       <propertyCategory
+             category="Ruler &amp; Grid">
+       </propertyCategory>
+    </propertyContributor>
+ </extension>
+</plugin>

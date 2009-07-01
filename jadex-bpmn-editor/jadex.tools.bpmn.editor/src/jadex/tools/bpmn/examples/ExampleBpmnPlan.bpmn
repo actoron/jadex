@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_TZHxQGY6Ed6p59VdNdsdRw" iD="_TZGjIWY6Ed6p59VdNdsdRw">
+  <pools xmi:type="bpmn:Pool" xmi:id="_TakiwWY6Ed6p59VdNdsdRw" iD="_TakiwGY6Ed6p59VdNdsdRw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TbQfQWY6Ed6p59VdNdsdRw" iD="_TbQfQGY6Ed6p59VdNdsdRw" outgoingEdges="_s4ThYGY6Ed6p59VdNdsdRw" incomingEdges="_g_03gWY6Ed6p59VdNdsdRw" name="Task" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ggcz4WY6Ed6p59VdNdsdRw" iD="_ggcz4GY6Ed6p59VdNdsdRw" outgoingEdges="_g_03gWY6Ed6p59VdNdsdRw" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_jKuo0WY6Ed6p59VdNdsdRw" iD="_jKuo0GY6Ed6p59VdNdsdRw" incomingEdges="_tboQ4WY6Ed6p59VdNdsdRw" activityType="EventEndMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_sV9pUWY6Ed6p59VdNdsdRw" iD="_sV9pUGY6Ed6p59VdNdsdRw" outgoingEdges="_tboQ4WY6Ed6p59VdNdsdRw _D-5pgWY7Ed6p59VdNdsdRw" incomingEdges="_s4ThYGY6Ed6p59VdNdsdRw" documentation="" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_vf_VUWY6Ed6p59VdNdsdRw" iD="_vf_VUGY6Ed6p59VdNdsdRw" outgoingEdges="_yA-EUWY6Ed6p59VdNdsdRw" incomingEdges="_D-5pgWY7Ed6p59VdNdsdRw"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xeGn0GY6Ed6p59VdNdsdRw" iD="_xeGAwGY6Ed6p59VdNdsdRw" incomingEdges="_yA-EUWY6Ed6p59VdNdsdRw" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_g_03gWY6Ed6p59VdNdsdRw" iD="_g_03gGY6Ed6p59VdNdsdRw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_s4ThYGY6Ed6p59VdNdsdRw" iD="_s4S6UGY6Ed6p59VdNdsdRw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_tboQ4WY6Ed6p59VdNdsdRw" iD="_tboQ4GY6Ed6p59VdNdsdRw" name="ToMessageEnd"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_yA-EUWY6Ed6p59VdNdsdRw" iD="_yA-EUGY6Ed6p59VdNdsdRw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_D-5pgWY7Ed6p59VdNdsdRw" iD="_D-5pgGY7Ed6p59VdNdsdRw" name="ToEmptyEnd"/>
+  </pools>
+</bpmn:BpmnDiagram>
