@@ -41,6 +41,28 @@ public class MPool extends MNamedIdElement
 	}
 	
 	/**
+	 *  Get all start events of the pool.
+	 *  @return A non-empty List of start events or null, if none.
+	 */
+	public List getStartEvents()
+	{
+		List	ret	= null;
+		for(int i=0; vertices!=null && i<vertices.size(); i++)
+		{
+			MVertex	vertex	= (MVertex) vertices.get(i);
+			// Todo: use constants
+			// Todo: other start event types.
+			if(vertex.getActivityType().equals("EventStartEmpty"))
+			{
+				if(ret==null)
+					ret	= new ArrayList();
+				ret.add(vertex);
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 * 
 	 */
 	public void addVertex(MVertex vertex)

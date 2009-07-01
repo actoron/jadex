@@ -1,15 +1,13 @@
 package jadex.bpmn.model;
 
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.xml.BeanAttributeInfo;
-import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.IBeanObjectCreator;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.LinkInfo;
-import jadex.commons.xml.Reader;
 import jadex.commons.xml.TypeInfo;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +28,9 @@ public class MBpmnDiagram extends MIdElement
 	
 	/** The messages. */
 //	protected List messages;
+	
+	/** The name of the model. */
+	protected String	name;
 	
 	//-------- constructors --------
 	
@@ -62,27 +63,60 @@ public class MBpmnDiagram extends MIdElement
 			pools.remove(pool);
 	}
 	
-//	/**
-//	 *  Get a string representation of this AGR space type.
-//	 *  @return A string representation of this AGR space type.
-//	 */
-//	public String	toString()
-//	{
-//		StringBuffer	sbuf	= new StringBuffer();
-//		sbuf.append(SReflect.getInnerClassName(getClass()));
-//		sbuf.append("(name=");
-//		sbuf.append(getName());
-//		sbuf.append(", dimensions=");
-//		sbuf.append(getDimensions());
-//		sbuf.append(", agent action types=");
-//		sbuf.append(getMEnvAgentActionTypes());
-//		sbuf.append(", space action types=");
-//		sbuf.append(getMEnvSpaceActionTypes());
-//		sbuf.append(", class=");
-//		sbuf.append(getClazz());
-//		sbuf.append(")");
-//		return sbuf.toString();
-//	}
+	/**
+	 *  Get the name of the model.
+	 *  @return The name of the model.
+	 */
+	public String	getName()
+	{
+		return name;
+	}
+	
+	/**
+	 *  Set the name of the model.
+	 *  @param name	The name to set.
+	 */
+	public void	setName(String name)
+	{
+		this.name	= name;
+	}
+	
+	/**
+	 *  Get all start events of the model.
+	 *  @return A non-empty List of start events or null, if none.
+	 */
+	public List getStartEvents()
+	{
+		List	ret	= null;
+		for(int i=0; pools!=null && i<pools.size(); i++)
+		{
+			MPool	pool	= (MPool) pools.get(i);
+			List	tmp	= pool.getStartEvents();
+			if(tmp!=null)
+			{
+				if(ret!=null)
+					ret.addAll(tmp);
+				else
+					ret	= tmp;
+			}
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Get a string representation of this AGR space type.
+	 *  @return A string representation of this AGR space type.
+	 */
+	public String	toString()
+	{
+		StringBuffer	sbuf	= new StringBuffer();
+		sbuf.append(SReflect.getInnerClassName(getClass()));
+		sbuf.append("(name=");
+		sbuf.append(getName());
+		sbuf.append(")");
+		return sbuf.toString();
+	}
 	
 	//-------- static part --------
 	

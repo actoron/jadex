@@ -71,22 +71,6 @@ public class MVertex extends MNamedIdElement
 	{
 		return outedges;
 	}
-	
-	/**
-	 * @return the incomingedges
-	 */
-	public String getIncomingedges()
-	{
-		return this.incomingedges;
-	}
-
-	/**
-	 * @param incomingedges the incomingedges to set
-	 */
-	public void setIncomingedges(String incomingedges)
-	{
-		this.incomingedges = incomingedges;
-	}
 
 	/**
 	 * 
