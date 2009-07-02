@@ -764,28 +764,33 @@ public class MEnvSpaceType	extends MSpaceType
 			}), null));
 		
 		types.add(new TypeInfo("envspacetype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "class", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("envspace/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "class", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("processtype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "class", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("tasktype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("actiontype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("percepttype/agenttypes/agenttype", HashMap.class, null, null,
@@ -793,53 +798,63 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, "")}), null));
 		
 		types.add(new TypeInfo("perceptgenerator/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("perceptprocessor/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("view/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""), 
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("perspective/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		types.add(new TypeInfo("object/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("avatar/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),			
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("process/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("objecttype/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("drawable/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 
 		types.add(new TypeInfo("spaceexecutor/property", HashMap.class, null, new BeanAttributeInfo("value", expconv, ""),
-			SUtil.createHashMap(new String[]{"name", "dynamic"}, 
+			SUtil.createHashMap(new String[]{"name", "clazz", "dynamic"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo("clazz", typeconv, ""),
 			new BeanAttributeInfo(null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}), null));
 		
 		// type instance declarations.
