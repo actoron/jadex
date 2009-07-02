@@ -66,6 +66,24 @@
         <element xmi:type="bpmn:SubProcess" href="test2.bpmn#_OKN40Wb9Ed6TJPLkvvM0QA"/>
         <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OO_EFWb9Ed6TJPLkvvM0QA" x="14" y="93"/>
       </children>
+      <children xmi:type="notation:Node" xmi:id="_FRUwEGb-Ed6TJPLkvvM0QA" type="2007">
+        <children xmi:type="notation:Node" xmi:id="_FRUwFmb-Ed6TJPLkvvM0QA" type="4007"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_FRUwEWb-Ed6TJPLkvvM0QA" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_FRUwEmb-Ed6TJPLkvvM0QA"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_FRUwE2b-Ed6TJPLkvvM0QA" fillColor="16771304"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_FRUwFGb-Ed6TJPLkvvM0QA" lineColor="0"/>
+        <element xmi:type="bpmn:Lane" href="test2.bpmn#_FRK_EWb-Ed6TJPLkvvM0QA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_FRUwFWb-Ed6TJPLkvvM0QA" y="5" width="602" height="94"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_F11LUmb-Ed6TJPLkvvM0QA" type="2007">
+        <children xmi:type="notation:Node" xmi:id="_F11LWGb-Ed6TJPLkvvM0QA" type="4007"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_F11LU2b-Ed6TJPLkvvM0QA" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_F11LVGb-Ed6TJPLkvvM0QA"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_F11LVWb-Ed6TJPLkvvM0QA" fillColor="16771304"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_F11LVmb-Ed6TJPLkvvM0QA" lineColor="0"/>
+        <element xmi:type="bpmn:Lane" href="test2.bpmn#_F11LUWb-Ed6TJPLkvvM0QA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_F11LV2b-Ed6TJPLkvvM0QA" y="101" height="94"/>
+      </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_oZuioWZNEd61o7naRN8Qig"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_oZuiomZNEd61o7naRN8Qig"/>
       <styles xmi:type="notation:FilteringStyle" xmi:id="_oZuio2ZNEd61o7naRN8Qig"/>

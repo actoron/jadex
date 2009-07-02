@@ -16,10 +16,12 @@
     <artifacts xmi:type="bpmn:Group" xmi:id="_0h7qkWZNEd61o7naRN8Qig" iD="_0h7qkGZNEd61o7naRN8Qig" name="group">
       <associations xmi:type="bpmn:Association" xmi:id="_0ihgcGZNEd61o7naRN8Qig"/>
     </artifacts>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_oZkxo2ZNEd61o7naRN8Qig" iD="_oZkxomZNEd61o7naRN8Qig" associations="_vdFQoGZNEd61o7naRN8Qig _xyisIGZNEd61o7naRN8Qig _0ihgcGZNEd61o7naRN8Qig" name="Task" activityType="Task"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_46qlYWZNEd61o7naRN8Qig" iD="_46qlYGZNEd61o7naRN8Qig" associations="_B5aCAGZOEd61o7naRN8Qig _DShKAGZOEd61o7naRN8Qig" name="t2"/>
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_OKN40Wb9Ed6TJPLkvvM0QA" iD="_OKN40Gb9Ed6TJPLkvvM0QA" associations="_SfrdMGb9Ed6TJPLkvvM0QA _XG3qwGb9Ed6TJPLkvvM0QA">
-      <vertices xmi:type="bpmn:Activity" xmi:id="_OLHQsWb9Ed6TJPLkvvM0QA" iD="_OLHQsGb9Ed6TJPLkvvM0QA"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_oZkxo2ZNEd61o7naRN8Qig" iD="_oZkxomZNEd61o7naRN8Qig" associations="_vdFQoGZNEd61o7naRN8Qig _xyisIGZNEd61o7naRN8Qig _0ihgcGZNEd61o7naRN8Qig" name="Task" lanes="_FRK_EWb-Ed6TJPLkvvM0QA" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_46qlYWZNEd61o7naRN8Qig" iD="_46qlYGZNEd61o7naRN8Qig" associations="_B5aCAGZOEd61o7naRN8Qig _DShKAGZOEd61o7naRN8Qig" name="t2" lanes="_F11LUWb-Ed6TJPLkvvM0QA"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_OKN40Wb9Ed6TJPLkvvM0QA" iD="_OKN40Gb9Ed6TJPLkvvM0QA" associations="_SfrdMGb9Ed6TJPLkvvM0QA _XG3qwGb9Ed6TJPLkvvM0QA" lanes="_F11LUWb-Ed6TJPLkvvM0QA">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_OLHQsWb9Ed6TJPLkvvM0QA" iD="_OLHQsGb9Ed6TJPLkvvM0QA" lanes="_F11LUWb-Ed6TJPLkvvM0QA"/>
     </vertices>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_FRK_EWb-Ed6TJPLkvvM0QA" iD="_FRK_EGb-Ed6TJPLkvvM0QA" name="lane" activities="_oZkxo2ZNEd61o7naRN8Qig"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_F11LUWb-Ed6TJPLkvvM0QA" iD="_F11LUGb-Ed6TJPLkvvM0QA" name="lane0" activities="_OLHQsWb9Ed6TJPLkvvM0QA _46qlYWZNEd61o7naRN8Qig _OKN40Wb9Ed6TJPLkvvM0QA"/>
   </pools>
 </bpmn:BpmnDiagram>

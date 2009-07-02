@@ -263,7 +263,8 @@ public class MBpmnDiagram extends MIdElement
 		
 		types.add(new TypeInfo("artifacts", MArtifact.class));
 		
-		types.add(new TypeInfo("associations", MAssociation.class));
+		types.add(new TypeInfo("associations", MAssociation.class, null, null, 
+			null, new AssociationPostProcessor()));
 		
 		types.add(new TypeInfo("lanes", MLane.class, null, null,
 			SUtil.createHashMap(new String[]{"activities"}, 
@@ -375,6 +376,38 @@ public class MBpmnDiagram extends MIdElement
 					edge.setSource(act);
 				}
 			}
+		}
+		
+		/**
+		 *  Test if this post processor can be executed in first pass.
+		 *  @return True if can be executed on first pass.
+		 */
+		public boolean isFirstPass()
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 *  Association post processor.
+	 */
+	static class AssociationPostProcessor implements IPostProcessor
+	{
+		//-------- IPostProcessor interface --------
+		
+		/**
+		 *  Load class.
+		 */
+		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		{
+			MBpmnDiagram dia = (MBpmnDiagram)root;
+			MAssociation asso = (MAssociation)object;
+			
+//			MIdElement source = findSource(asso);
+//			MIdElement target = findTarget(asso);
+//			
+//			asso.setSource(source);
+//			asso.setTarget(target);
 		}
 		
 		/**
