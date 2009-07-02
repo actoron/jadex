@@ -403,48 +403,55 @@ public class MBpmnDiagram extends MIdElement
 			MBpmnDiagram dia = (MBpmnDiagram)root;
 			MAssociation asso = (MAssociation)object;
 			
-			MIdElement source = findSource(dia, asso);
-			MIdElement target = findTarget(asso);
-			
-			asso.setSource(source);
-			asso.setTarget(target);
+//			MIdElement source = findSource(dia, asso);
+////			MIdElement target = findTarget(asso);
+//			
+//			asso.setSource(source);
+//			asso.setTarget(target);
 		}
 		
 		/**
 		 * 
-		 */
+		 * /
 		protected MIdElement findSource(MBpmnDiagram dia, MAssociation asso)
 		{
 			MIdElement ret = null;
 
-			List artifacts = dia.getArtifacts();
+			ret = searchArtifacts(dia.getArtifacts());
 			
-			
-			List pools = dia.getPools();
-			if(pools!=null)
+			if(ret==null)
 			{
-				for(int i=0; i<pools.size(); i++)
+				List pools = dia.getPools();
+				if(pools!=null)
 				{
-					MPool tmp = (MPool)pools.get(i);
-					
-					List artifacts = tmp.getArtifacts();
-					if(artifacts!=null)
+					for(int i=0; i<pools.size(); i++)
 					{
-						for(int j=0; j<artifacts.size(); j++)
-						{
-							if(artifacts.get(j) instanceof MSubProcess)
-							{
-								getAllEdges((MSubProcess)artifacts.get(j), alledges);
-							}
-						}
+						MPool tmp = (MPool)pools.get(i);
+						ret = searchArtifacts(tmp.getArtifacts());
+						
+//						List acts = tmp.getActivities();
+//						if(acts!=null)
+//						{
+//							for(int j=0; j<acts.size(); j++)
+//							{
+//								MActivity act = (MActivity)acts.get(j);
+//								act.getAr
+//								ret = searchArtifacts(artifacts)
+//								
+//								if(acts.get(j) instanceof MSubProcess)
+//								{
+//									getAllEdges((MSubProcess)artifacts.get(j), alledges);
+//								}
+//							}
+//						}
 					}
 				}
 			}
-		}
+		}*/
 		
 		/**
 		 * 
-		 */
+		 * /
 		public MIdElement searchArtifacts(List artifacts)
 		{
 			MIdElement ret = null;
@@ -460,42 +467,7 @@ public class MBpmnDiagram extends MIdElement
 			}
 			
 			return ret;
-		}
-		
-		/**
-		 * 
-		 */
-		protected void getAllEdges(MSubProcess sub, Map edges)
-		{
-			addEdges(sub.getSequenceEdges(), edges);
-			
-			List acts = sub.getActivities();
-			if(acts!=null)
-			{
-				for(int j=0; j<acts.size(); j++)
-				{
-					if(acts.get(j) instanceof MSubProcess)
-					{
-						getAllEdges((MSubProcess)acts.get(j), edges);
-					}
-				}
-			}
-		}
-
-		/**
-		 * 
-		 */
-		protected void addEdges(List tmp, Map edges)
-		{
-			if(tmp!=null)
-			{
-				for(int i=0; i<tmp.size(); i++)
-				{
-					MSequenceEdge edge = (MSequenceEdge)tmp.get(i);
-					edges.put(edge.getId(), edge);
-				}
-			}
-		}
+		}*/
 		
 		/**
 		 *  Test if this post processor can be executed in first pass.
