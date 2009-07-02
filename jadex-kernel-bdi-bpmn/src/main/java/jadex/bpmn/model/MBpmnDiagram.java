@@ -141,7 +141,7 @@ public class MBpmnDiagram extends MIdElement
 	{
 		addEdges(sub.getSequenceEdges(), edges);
 		
-		List acts = sub.getVertices();
+		List acts = sub.getActivities();
 		if(acts!=null)
 		{
 			for(int j=0; j<acts.size(); j++)

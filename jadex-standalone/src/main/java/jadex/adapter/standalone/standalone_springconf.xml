@@ -37,9 +37,20 @@
 			</map>
 		</property>
 		
-		<property name="application_factory">
+		<property name="applicationFactory">
 			<bean id="app_fac" class="jadex.adapter.base.appdescriptor.ApplicationFactory">
 				<constructor-arg ref="platform"/>
+				<constructor-arg>
+					<list>
+						<bean class="jadex.adapter.base.agr.MAGRSpaceType" factory-method="getXMLMapping"/>
+						<bean class="jadex.adapter.base.envsupport.MEnvSpaceType" factory-method="getXMLMapping"/>
+					</list>
+				</constructor-arg>
+				<constructor-arg>
+					<list>
+						<bean class="jadex.adapter.base.envsupport.MEnvSpaceType" factory-method="getXMLLinkInfos"/>
+					</list>
+				</constructor-arg>
 			</bean>
 		</property>
 			
@@ -201,7 +212,7 @@
 								<constructor-arg>
 									<bean class="jadex.adapter.base.clock.SystemClock">
 										<constructor-arg type="java.lang.String" value="system_clock"/>
-										<constructor-arg type="long" value="1"/>
+										<constructor-arg type="long" value="100"/>
 										<constructor-arg type="jadex.commons.concurrent.IThreadPool" ref="threadPool"/>
 									</bean>
 								</constructor-arg>
@@ -242,7 +253,37 @@
 						</entry>
 					</map>
 				</entry>
-			
+				
+				<entry>
+					<key>
+						<value type="java.lang.Class">jadex.bridge.IContextService</value>
+					</key>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">context_service</value>
+							</key>
+							<bean class="jadex.adapter.base.contextservice.ContextService">
+								<constructor-arg>
+									<list>
+										<value type="java.lang.Class">jadex.bridge.IContext</value>
+										<value type="java.lang.Class">jadex.adapter.base.contextservice.BaseContext</value>
+										<value type="java.lang.Class">jadex.bridge.IApplicationContext</value>
+									</list>
+								</constructor-arg>
+								<constructor-arg>
+									<list>
+										<bean class="jadex.adapter.base.contextservice.DefaultContextFactory"></bean>
+										<bean class="jadex.adapter.base.contextservice.DefaultContextFactory"></bean>
+										<bean class="jadex.adapter.base.appdescriptor.ApplicationContextFactory">
+											<constructor-arg ref="platform"></constructor-arg>
+										</bean>
+									</list>
+								</constructor-arg>
+							</bean>
+						</entry>
+					</map>
+				</entry>
 			</map>
 		</property>
 		

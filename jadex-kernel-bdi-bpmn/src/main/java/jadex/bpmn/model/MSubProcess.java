@@ -24,7 +24,7 @@ public class MSubProcess extends MActivity
 	/**
 	 * 
 	 */
-	public List getVertices()
+	public List getActivities()
 	{
 		return activities;
 	}
@@ -32,7 +32,7 @@ public class MSubProcess extends MActivity
 	/**
 	 * 
 	 */
-	public void addVertex(MActivity vertex)
+	public void addActivity(MActivity vertex)
 	{
 		if(activities==null)
 			activities = new ArrayList();
@@ -42,7 +42,7 @@ public class MSubProcess extends MActivity
 	/**
 	 * 
 	 */
-	public void removeVertex(MActivity vertex)
+	public void removeActivity(MActivity vertex)
 	{
 		if(activities!=null)
 			activities.remove(vertex);

@@ -134,7 +134,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Map mobjecttype = (Map)objecttypes.get(i);
 				List props = (List)mobjecttype.get("properties");
 				Map properties = convertProperties(props, fetcher);
-				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
+//				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
 				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
 			}
 		}

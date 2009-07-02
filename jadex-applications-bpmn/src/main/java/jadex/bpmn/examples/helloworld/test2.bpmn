@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_oWclIWZNEd61o7naRN8Qig" iD="_oWclIGZNEd61o7naRN8Qig">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_WkJ_QWb9Ed6TJPLkvvM0QA" iD="_WkJ_QGb9Ed6TJPLkvvM0QA" name="außen">
+    <associations xmi:type="bpmn:Association" xmi:id="_XG3qwGb9Ed6TJPLkvvM0QA"/>
+  </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_oZkxoWZNEd61o7naRN8Qig" iD="_oZkxoGZNEd61o7naRN8Qig" name="Pool">
     <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_vbcR4WZNEd61o7naRN8Qig" iD="_vbcR4GZNEd61o7naRN8Qig" name="text">
       <associations xmi:type="bpmn:Association" xmi:id="_vdFQoGZNEd61o7naRN8Qig"/>
       <associations xmi:type="bpmn:Association" xmi:id="_DShKAGZOEd61o7naRN8Qig"/>
+      <associations xmi:type="bpmn:Association" xmi:id="_SfrdMGb9Ed6TJPLkvvM0QA"/>
     </artifacts>
     <artifacts xmi:type="bpmn:DataObject" xmi:id="_xxpUQWZNEd61o7naRN8Qig" iD="_xxpUQGZNEd61o7naRN8Qig" name="data">
       <associations xmi:type="bpmn:Association" xmi:id="_xyisIGZNEd61o7naRN8Qig"/>
@@ -14,5 +18,8 @@
     </artifacts>
     <vertices xmi:type="bpmn:Activity" xmi:id="_oZkxo2ZNEd61o7naRN8Qig" iD="_oZkxomZNEd61o7naRN8Qig" associations="_vdFQoGZNEd61o7naRN8Qig _xyisIGZNEd61o7naRN8Qig _0ihgcGZNEd61o7naRN8Qig" name="Task" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_46qlYWZNEd61o7naRN8Qig" iD="_46qlYGZNEd61o7naRN8Qig" associations="_B5aCAGZOEd61o7naRN8Qig _DShKAGZOEd61o7naRN8Qig" name="t2"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_OKN40Wb9Ed6TJPLkvvM0QA" iD="_OKN40Gb9Ed6TJPLkvvM0QA" associations="_SfrdMGb9Ed6TJPLkvvM0QA _XG3qwGb9Ed6TJPLkvvM0QA">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_OLHQsWb9Ed6TJPLkvvM0QA" iD="_OLHQsGb9Ed6TJPLkvvM0QA"/>
+    </vertices>
   </pools>
 </bpmn:BpmnDiagram>

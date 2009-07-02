@@ -343,33 +343,36 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		applications.setColumnWidths(new int[]{200});
 		
 		IContextService cs = (IContextService)jcc.getAgent().getPlatform().getService(IContextService.class);
-		cs.addContextListener(new IChangeListener()
+		if(cs!=null)
 		{
-			public void changeOccurred(final ChangeEvent event)
+			cs.addContextListener(new IChangeListener()
 			{
-				if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
+				public void changeOccurred(final ChangeEvent event)
 				{
-					SwingUtilities.invokeLater(new Runnable()
+					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
 					{
-						public void run()
+						SwingUtilities.invokeLater(new Runnable()
 						{
-							applications.addApplication((IApplicationContext)event.getValue());
-						}
-					});
-				}
-				else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-				{
-					SwingUtilities.invokeLater(new Runnable()
+							public void run()
+							{
+								applications.addApplication((IApplicationContext)event.getValue());
+							}
+						});
+					}
+					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
 					{
-						public void run()
+						SwingUtilities.invokeLater(new Runnable()
 						{
-//							System.out.println("Remove elem: "+event.getValue());
-							applications.removeApplication((IApplicationContext)event.getValue());
-						}
-					});
-				}
-			}	
-		});
+							public void run()
+							{
+	//							System.out.println("Remove elem: "+event.getValue());
+								applications.removeApplication((IApplicationContext)event.getValue());
+							}
+						});
+					}
+				}	
+			});
+		}
 		
 		JTabbedPane tp = new JTabbedPane();
 		tp.addTab("agents", agents);

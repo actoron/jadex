@@ -211,7 +211,7 @@ public abstract class AbstractPlatform implements IPlatform
 	{
 		return appfactory;
 	}
-
+	
 	/**
 	 *  Check if the platform is currently shutting down.
 	 */

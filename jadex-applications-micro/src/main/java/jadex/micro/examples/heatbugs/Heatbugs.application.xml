@@ -97,7 +97,7 @@
 				<agent type="Heatbug" number="100"/>
 			</agents>
 			
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="40" height="40">
 				<env:processes>
 					<env:process type="diffuse"/>
 				</env:processes>

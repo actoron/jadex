@@ -146,7 +146,7 @@ public class MPool extends MNamedIdElement
 	/**
 	 * 
 	 */
-	public void addArtifacts(MArtifact artifact)
+	public void addArtifact(MArtifact artifact)
 	{
 		if(artifacts==null)
 			artifacts = new ArrayList();

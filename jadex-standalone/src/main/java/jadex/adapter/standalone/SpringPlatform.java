@@ -4,6 +4,7 @@ import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
+import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IPlatformService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -153,6 +154,15 @@ public class SpringPlatform extends AbstractPlatform
 		this.agentfactory = new MetaAgentFactory(factories);
 	}
 
+	/**
+	 *  Set the application factory.
+	 *  @param appfactory The application factory.
+	 */
+	public void setApplicationFactory(IApplicationFactory appfactory)
+	{
+		this.appfactory = appfactory;
+	}
+	
 	/**
 	 *  Set the daemon agents.
 	 *  @param daemonagents The daemon agents.
