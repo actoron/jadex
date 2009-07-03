@@ -231,7 +231,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					Object	node = mpanel.getLastSelectedPathComponent();
 					if(node instanceof FileNode)
 					{
-						String model = ((FileNode)node).getFile().getAbsolutePath();
+						String model = ((FileNode)node).getRelativePath();
 //						if(SXML.isAgentFilename(model))
 						if(getJCC().getAgent().getPlatform()
 							.getAgentFactory().isStartable(model))
@@ -337,7 +337,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					
 				if(n instanceof FileNode && !(n instanceof DirNode))
 				{
-					String model = ((FileNode)n).getFile().getAbsolutePath();
+					String model = ((FileNode)n).getRelativePath();
 					if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(model)
 						&& nof.isTestcase((IExplorerTreeNode) n))
 					{
@@ -348,7 +348,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		}
 		else
 		{
-			String model = ((FileNode)node).getFile().getAbsolutePath();
+			String model = ((FileNode)node).getRelativePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
 			if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(model)
 				&& nof.isTestcase((IExplorerTreeNode) node))
@@ -366,7 +366,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		if(node instanceof FileNode)
 		{
-			String model = ((FileNode)node).getFile().getAbsolutePath();
+			String model = ((FileNode)node).getRelativePath();
 			tcpanel.getTestList().removeEntry(model);
 		}
 		else
@@ -382,7 +382,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					
 				if(n instanceof FileNode)
 				{
-					String model = ((FileNode)n).getFile().getAbsolutePath();
+					String model = ((FileNode)n).getRelativePath();
 					tcpanel.getTestList().removeEntry(model);
 				}
 			}

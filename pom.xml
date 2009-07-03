@@ -4,7 +4,7 @@
   <groupId>jadex</groupId>
   <artifactId>jadex</artifactId>
   <packaging>pom</packaging>
-  <version>2.0-beta3</version>
+  <version>2.0-beta4</version>
   <name>jadex</name>
   <profiles>
   	<profile>
@@ -41,7 +41,6 @@
 		    <module>jadex-kernel-bdi</module>
 		    <module>jadex-applib-bdi</module>
 		    <module>jadex-applications-bdi</module>
-		    <module>jadex-applications-bpmn</module>
 		    <module>jadex-runtimetools</module>
 		    <module>jadex-kernel-micro</module>
 		    <module>jadex-applications-micro</module>
@@ -107,7 +106,6 @@
 		    <module>jadex-kernel-bdi</module>
 		    <module>jadex-applib-bdi</module>
 		    <module>jadex-applications-bdi</module>
-		    <module>jadex-applications-bpmn</module>
 		    <module>jadex-runtimetools</module>
 		    <module>jadex-kernel-micro</module>
 		    <module>jadex-applications-micro</module>

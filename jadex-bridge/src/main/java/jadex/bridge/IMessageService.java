@@ -12,8 +12,9 @@ public interface IMessageService extends IPlatformService
 {
 	/**
 	 *  Send a message.
+	 *  @param cl	The class loader used by the sending agent (i.e. corresponding to classes of objects in the message map).
 	 */
-	public void sendMessage(Map message, MessageType msgtype, IAgentIdentifier sender);
+	public void sendMessage(Map message, MessageType msgtype, IAgentIdentifier sender, ClassLoader cl);
 	
 	/**
 	 *  Deliver a message to some agents.

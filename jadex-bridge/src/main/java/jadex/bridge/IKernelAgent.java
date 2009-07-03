@@ -55,4 +55,13 @@ public interface IKernelAgent
 	 *  @param listener	External access is delivered via result listener.
 	 */
 	public void getExternalAccess(IResultListener listener);
+
+	/**
+	 *  Get the class loader of the agent.
+	 *  The agent class loader is required to avoid incompatible class issues,
+	 *  when changing the platform class loader while agents are running. 
+	 *  This may occur e.g. when decoding messages and instantiating parameter values.
+	 *  @return	The agent class loader. 
+	 */
+	public ClassLoader getClassLoader();
 }

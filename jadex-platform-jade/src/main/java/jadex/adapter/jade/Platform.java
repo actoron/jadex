@@ -10,9 +10,15 @@ import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.SimulationService;
 import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.base.agr.MAGRSpaceType;
+import jadex.adapter.base.appdescriptor.ApplicationContextFactory;
 import jadex.adapter.base.appdescriptor.ApplicationFactory;
 import jadex.adapter.base.clock.ClockService;
 import jadex.adapter.base.clock.SystemClock;
+import jadex.adapter.base.contextservice.BaseContext;
+import jadex.adapter.base.contextservice.ContextService;
+import jadex.adapter.base.contextservice.DefaultContextFactory;
+import jadex.adapter.base.contextservice.IContextFactory;
+import jadex.adapter.base.envsupport.MEnvSpaceType;
 import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
@@ -20,8 +26,11 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.base.libraryservice.LibraryService;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IClockService;
+import jadex.bridge.IContext;
+import jadex.bridge.IContextService;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
@@ -83,15 +92,18 @@ public class Platform implements IPlatform
 		this.threadpool = ThreadPoolFactory.createThreadPool();
 		this.logger = Logger.getLogger("JADE_Platform");
 		this.services = new LinkedHashMap();
-		this.appfactory = new ApplicationFactory(this, new java.util.Set[]
-		    {
-				jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
-				jadex.adapter.base.envsupport.MEnvSpaceType.getXMLMapping()
-			}, 
-			new java.util.Set[]
-			{
-				jadex.adapter.base.envsupport.MEnvSpaceType.getXMLLinkInfos()
-			});
+		this.appfactory = new ApplicationFactory(this,
+			new Set[]
+  			{
+  				MAGRSpaceType.getXMLMapping(),
+  				MEnvSpaceType.getXMLMapping()
+  			}, 
+  			new Set[]
+  			{
+  				MEnvSpaceType.getXMLLinkInfos()
+  			}
+		);
+		
 		services.put(ILibraryService.class, new LibraryService());
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));
@@ -99,6 +111,20 @@ public class Platform implements IPlatform
 		services.put(IClockService.class, new ClockService(new SystemClock("system", 1000, threadpool), this));
 		services.put(ISimulationService.class, new SimulationService(this));
 		services.put(IMessageService.class, new MessageService(this));
+		services.put(IContextService.class, new ContextService(
+			new Class[]
+			{
+				IContext.class,
+				BaseContext.class,
+				IApplicationContext.class
+			},
+			new IContextFactory[]
+			{
+				new DefaultContextFactory(),
+				new DefaultContextFactory(),
+				new ApplicationContextFactory(this)
+			}
+		));
 		// Dummy execution service required for simulation service.
 		services.put(IExecutionService.class, new IExecutionService()
 		{
@@ -122,9 +148,16 @@ public class Platform implements IPlatform
 				throw new UnsupportedOperationException(); 
 			}
 			
-			public void execute(IExecutable task)
+			public void execute(final IExecutable task)
 			{
-				throw new UnsupportedOperationException(); 
+				// Hack!!! Required for environment executors.
+				threadpool.execute(new Runnable()
+				{
+					public void run()
+					{
+						while(task.execute());
+					}
+				});
 			}
 			
 			public void shutdown(IResultListener listener)
@@ -432,4 +465,5 @@ public class Platform implements IPlatform
 		gc.start();
 	}
 }
+
 

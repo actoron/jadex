@@ -344,7 +344,8 @@ public class ModelExplorer extends JTree
 		File sf = filechooser.getSelectedFile();
 		if(sf!=null)
 		{
-			props.addProperty(new Property("lastpath", sf.getAbsolutePath()));
+			String	lastpath	= SUtil.convertPathToRelative(sf.getAbsolutePath());
+			props.addProperty(new Property("lastpath", lastpath));
 		}
 
 		// Save refresh/checking flags.
@@ -1001,6 +1002,7 @@ public class ModelExplorer extends JTree
 		}
 	};
 }
+
 
 
 

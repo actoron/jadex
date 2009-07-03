@@ -709,7 +709,7 @@ public class MessageEventRules
 				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
 				((IMessageService)interpreter.getAgentAdapter().getPlatform()
 					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
-						msg.getMessageType(), interpreter.getAgentAdapter().getAgentIdentifier());
+						msg.getMessageType(), interpreter.getAgentAdapter().getAgentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
 
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rme);
 				

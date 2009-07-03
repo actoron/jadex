@@ -101,7 +101,7 @@ public class MessageService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map message, MessageType type, IAgentIdentifier sender)
+	public void sendMessage(Map message, MessageType type, IAgentIdentifier sender, ClassLoader cl)
 	{
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+message);
@@ -303,8 +303,6 @@ public class MessageService implements IMessageService
 			IContentCodec	codec	= type.findContentCodec(DEFCODECS, message, name);
 			if(codec!=null)
 			{
-				// todo: use agent specific classloader
-				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
 				message.put(name, codec.encode(value, cl));
 			}
 			else if(value!=null && !(value instanceof String) 
@@ -372,4 +370,5 @@ public class MessageService implements IMessageService
 	{
 	}
 }
+
 

@@ -373,7 +373,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 
 	/**
 	 *  Called when a message was sent to the agent.
-	 */
+	 * /
 	public void	receiveMessage(Map message, MessageType type)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
@@ -386,7 +386,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 //			message.put(rd, new Long(getClock().getTime()));
 		
 		agent.messageArrived(new DefaultMessageAdapter(message, type));
-	}
+	}*/
 	
 	/**
 	 *  Set the state of the agent.
@@ -1044,4 +1044,5 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 		message.addUserDefinedParameter("message-id", agent.getLocalName()+":"+msgevent.getName());
    	}*/
 }
+
 

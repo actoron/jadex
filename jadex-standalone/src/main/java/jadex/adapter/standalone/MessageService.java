@@ -20,6 +20,7 @@ import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class MessageService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map message, MessageType type, IAgentIdentifier sender)
+	public void sendMessage(Map message, MessageType type, IAgentIdentifier sender, ClassLoader cl)
 	{
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+message);
@@ -134,8 +135,6 @@ public class MessageService implements IMessageService
 			IContentCodec	codec	= type.findContentCodec(DEFCODECS, message, name);
 			if(codec!=null)
 			{
-				// todo: use agent specific classloader
-				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
 				message.put(name, codec.encode(value, cl));
 			}
 			else if(value!=null && !(value instanceof String) 
@@ -323,25 +322,11 @@ public class MessageService implements IMessageService
 	/**
 	 *  Deliver a message to the receivers.
 	 */
-	protected void internalDeliverMessage(final Map message, final String type, IAgentIdentifier[] receivers)
+	protected void internalDeliverMessage(final Map msg, final String type, final IAgentIdentifier[] receivers)
 	{
 		final MessageType	messagetype	= platform.getMessageType(type);
+		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		// Conversion via platform specific codecs
-		for(Iterator it=message.keySet().iterator(); it.hasNext(); )
-		{
-			String	name	= (String)it.next();
-			Object	value	= message.get(name);
-			IContentCodec	codec	= messagetype.findContentCodec(DEFCODECS, message, name);
-			if(codec!=null)
-			{
-				// todo: use agent specific classloader
-				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
-				message.put(name, codec.decode((String)value, cl));
-			}
-		}
-
-
 		for(int i = 0; i < receivers.length; i++)
 		{
 			((IAMS)platform.getService(IAMS.class)).getAgentAdapter(receivers[i], new IResultListener()
@@ -351,6 +336,34 @@ public class MessageService implements IMessageService
 					StandaloneAgentAdapter agent = (StandaloneAgentAdapter)result;
 					if(agent != null)
 					{
+						ClassLoader cl = agent.getKernelAgent().getClassLoader();
+						Map	message	= (Map) decoded.get(cl);
+						if(message==null)
+						{
+							if(receivers.length>1)
+							{
+								message	= new HashMap(msg);
+								decoded.put(cl, message);
+							}
+							else
+							{
+								// Skip creation of copy when only one receiver.
+								message	= msg;
+							}
+
+							// Conversion via platform specific codecs
+							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
+							{
+								String	name	= (String)it.next();
+								Object	value	= message.get(name);
+								IContentCodec	codec	= messagetype.findContentCodec(DEFCODECS, message, name);
+								if(codec!=null)
+								{
+									message.put(name, codec.decode((String)value, cl));
+								}
+							}
+						}
+
 						try
 						{
 							agent.receiveMessage(message, messagetype);
@@ -366,7 +379,7 @@ public class MessageService implements IMessageService
 					}
 					else
 					{
-						logger.warning("Message could not be delivered to receiver(s): " + message);
+						logger.warning("Message could not be delivered to receiver(s): " + msg);
 
 						// todo: notify sender that message could not be delivered!
 						// Problem: there is no connection back to the sender, so that
@@ -474,4 +487,5 @@ public class MessageService implements IMessageService
 		}
 	}
 }
+
 

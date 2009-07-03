@@ -267,7 +267,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					//  +-classes2
 					//  |  +- MyAgent.agent.xml
 
-					String model = ((FileNode)node).getFile().getAbsolutePath();
+					String model = ((FileNode)node).getRelativePath();
 					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
 					{
 						loadModel(model);
@@ -895,4 +895,5 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	}*/
 
 }
+
 

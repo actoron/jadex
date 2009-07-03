@@ -1,5 +1,8 @@
 package jadex.adapter.jade;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jade.content.Concept;
 import jade.content.ContentElementList;
 import jade.content.ContentManager;
@@ -154,6 +157,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 //				IMessageAdapter ma = new DefaultMessageAdapter();
 //				agent.messageArrived(ma);
 				
+				Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 				JadeMessageAdapter ma = new JadeMessageAdapter(msg, ams);
 				
 				// Conversion via platform specific codecs
@@ -168,8 +172,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 							String	val	= (String)ma.getValue(params[i]);
 							if(val!=null)
 							{
-								// todo: use agent specific classloader
-								ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+								ClassLoader	cl	= agent.getClassLoader();
 								ma.setDecodedValue(params[i], codec.decode(val, cl));
 							}
 						}

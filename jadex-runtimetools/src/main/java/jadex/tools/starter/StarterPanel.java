@@ -869,7 +869,7 @@ public class StarterPanel extends JPanel
 	{
 		Properties	props	= new Properties();
 		
-		String m = filename.getText();
+		String m = SUtil.convertPathToRelative(filename.getText());
 		if(m!=null) props.addProperty(new Property("model", m));
 
 		String c = (String)config.getSelectedItem();
@@ -1171,4 +1171,5 @@ public class StarterPanel extends JPanel
 		f.setVisible(true);
 	}
 }
+
 

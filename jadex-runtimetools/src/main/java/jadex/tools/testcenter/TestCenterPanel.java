@@ -489,7 +489,10 @@ public class TestCenterPanel extends JSplitPane
 		Properties	props	= new Properties();
 		String[]	entries	= teststable.getEntries();
 		for(int i=0; i<entries.length; i++)
-			props.addProperty(new Property("entry", entries[i]));
+		{
+			String	entry	= SUtil.convertPathToRelative(entries[i]);
+			props.addProperty(new Property("entry", entry));
+		}
 
 		props.addProperty(new Property("timeout", tfto.getText()));
 		props.addProperty(new Property("concurrency", ""+concurrency));

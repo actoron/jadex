@@ -20,6 +20,9 @@ public class MicroAgentModel implements ILoadableElementModel
 	/** The microagent. */
 	protected Class microagent;
 	
+	/** The class loader. */
+	protected ClassLoader classloader;
+	
 	/** The filename. */
 	protected String filename;
 	
@@ -31,10 +34,11 @@ public class MicroAgentModel implements ILoadableElementModel
 	/**
 	 *  Create a model.
 	 */
-	public MicroAgentModel(Class microagent, String filename)
+	public MicroAgentModel(Class microagent, String filename, ClassLoader classloader)
 	{
 		this.microagent = microagent;
 		this.filename = filename;
+		this.classloader = classloader;
 		
 		// Try to read meta information from class.
 		try
@@ -185,5 +189,13 @@ public class MicroAgentModel implements ILoadableElementModel
 	public String toString()
 	{
 		return "MicroAgentModel("+microagent+", "+filename+")";
+	}
+
+	/**
+	 *  Return the class loader corresponding to the micro agent class.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
 	}
 }
