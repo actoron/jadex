@@ -4,7 +4,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.commons.SReflect;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

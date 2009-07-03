@@ -2,11 +2,15 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnDiagram;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,14 +23,16 @@ public class BpmnInstance
 	//-------- static part --------
 	
 	/** The activity execution handlers (activity type -> handler). */
-	protected static final Map	HANDLERS	= new HashMap();
+	public static final Map	DEFAULT_HANDLERS;
 	
 	static
 	{
-		HANDLERS.put("EventStartEmpty", new DefaultActivityHandler());
-		HANDLERS.put("EventEndEmpty", new DefaultActivityHandler());
-		HANDLERS.put("Task", new DefaultActivityHandler());
-		HANDLERS.put("GatewayParallel", new GatewayParallelActivityHandler());
+		Map	defhandlers	= new HashMap();
+		defhandlers.put("EventStartEmpty", new DefaultActivityHandler());
+		defhandlers.put("EventEndEmpty", new DefaultActivityHandler());
+		defhandlers.put("Task", new DefaultActivityHandler());
+		defhandlers.put("GatewayParallel", new GatewayParallelActivityHandler());
+		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	
 	//-------- attributes --------
@@ -34,20 +40,27 @@ public class BpmnInstance
 	/** The model. */
 	protected MBpmnDiagram model;
 
+	/** The activity handlers. */
+	protected Map	handlers;
+
 	/** The current threads. */
 	protected Set threads;
+	
+	/** The change listeners. */
+	protected List	listeners;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new BPMN process instance.
 	 *  @param model	The BMPN process model.
+	 *  @param handlers	The activity handlers.
 	 */
-	public BpmnInstance(MBpmnDiagram model)
+	public BpmnInstance(MBpmnDiagram model, Map handlers)
 	{
 		this.model = model;
-//		this.threads = new LinkedHashSet();
-		this.threads = new HashSet();
+		this.handlers = handlers;
+		this.threads = new LinkedHashSet();
 		
 		// Create initial thread(s). 
 		List	startevents	= model.getStartEvents();
@@ -101,12 +114,71 @@ public class BpmnInstance
 			ProcessThread	thread	= (ProcessThread)it.next();
 			if(!thread.isWaiting())
 			{
-				IActivityHandler	handler	= (IActivityHandler) HANDLERS.get(thread.getNextActivity().getActivityType());
+				IActivityHandler	handler	= (IActivityHandler) handlers.get(thread.getNextActivity().getActivityType());
 				if(handler==null)
 					throw new UnsupportedOperationException("No handler for activity: "+thread);
 				
 				handler.execute(thread.getNextActivity(), this, thread);
 				executed	= true;
+			}
+		}
+	}
+	
+	/**
+	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
+	 */
+	public boolean	isReady()
+	{
+		boolean	ready	= false;
+		for(Iterator it=threads.iterator(); !ready && it.hasNext(); )
+		{
+			ProcessThread	thread	= (ProcessThread)it.next();
+			ready	= !thread.isWaiting();
+		}
+		return ready;
+	}
+	
+	//-------- listener handling --------
+	
+	/**
+	 *  Add a change listener.
+	 *  The listener is informed, whenever the ready state of the process becomes true.
+	 */
+	public void	addChangeListener(IChangeListener listener)
+	{
+		if(listeners==null)
+			listeners	= new ArrayList();
+		
+		listeners.add(listener);
+	}
+
+	
+	/**
+	 *  Remove a change listener.
+	 */
+	public void	removeChangeListener(IChangeListener listener)
+	{
+		if(listeners!=null)
+		{
+			listeners.remove(listener);
+			if(listeners.isEmpty())
+				listeners	= null;
+		}
+	}
+	
+	/**
+	 *  Wake up the instance.
+	 *  Called from activity handlers when external events re-activate waiting process threads.
+	 *  Propagated to change listeners.
+	 */
+	public void	wakeUp()
+	{
+		if(listeners!=null)
+		{
+			ChangeEvent	ce	= new ChangeEvent(this, "ready");	
+			for(int i=0; i<listeners.size(); i++)
+			{
+				((IChangeListener)listeners.get(i)).changeOccurred(ce);
 			}
 		}
 	}

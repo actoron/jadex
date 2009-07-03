@@ -1,6 +1,5 @@
 package jadex.bpmn.model;
 
-import java.util.List;
 
 /**
  * 
