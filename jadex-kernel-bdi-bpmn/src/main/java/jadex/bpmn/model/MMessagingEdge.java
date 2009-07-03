@@ -6,19 +6,25 @@ import java.util.List;
 /**
  * 
  */
-public class MLane extends MNamedIdElement implements IAssociationTarget
+public class MMessagingEdge extends MNamedIdElement implements IAssociationTarget
 {
 	//-------- attributes --------
 	
 	/** The association description. */
 	protected String associationsdescription;
+
+	/** The source description. */
+	protected String sourcedescription;
+
+	/** The target description. */
+	protected String targetdescription;
 	
-	/** The activities description. */
-	protected String activitiesdescription;
 	
+	/** The outgoing edges. */
+	protected MActivity source;
 	
-	/** The activities. */
-	protected List activities;
+	/** The incoming edges. */
+	protected MActivity target;
 	
 	/** The type. */
 	protected String type;
@@ -27,7 +33,7 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	protected List associations;
 	
 	//-------- methods --------
-	
+
 	/**
 	 * @return the associationsdescription
 	 */
@@ -45,46 +51,67 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * @return the activitiesdescription
+	 * @return the sourcedescription
 	 */
-	public String getActivitiesDescription()
+	public String getSourceDescription()
 	{
-		return this.activitiesdescription;
+		return this.sourcedescription;
 	}
 
 	/**
-	 * @param activitiesdescription the activitiesdescription to set
+	 * @param sourcedescription the sourcedescription to set
 	 */
-	public void setActivitiesDescription(String activitiesdescription)
+	public void setSourceDescription(String sourcedescription)
 	{
-		this.activitiesdescription = activitiesdescription;
+		this.sourcedescription = sourcedescription;
+	}
+
+	/**
+	 * @return the targetdescription
+	 */
+	public String getTargetDescription()
+	{
+		return this.targetdescription;
+	}
+
+	/**
+	 * @param targetdescription the targetdescription to set
+	 */
+	public void setTargetDescription(String targetdescription)
+	{
+		this.targetdescription = targetdescription;
+	}
+
+	/**
+	 * 
+	 */
+	public MActivity getSource()
+	{
+		return source;
 	}
 	
 	/**
 	 * 
 	 */
-	public List getActivities()
+	public MActivity getTarget()
 	{
-		return activities;
+		return target;
 	}
 	
 	/**
 	 * 
 	 */
-	public void addActivity(MActivity activity)
+	public void setSource(MActivity source)
 	{
-		if(activities==null)
-			activities = new ArrayList();
-		activities.add(activity);
+		this.source = source;
 	}
 	
 	/**
 	 * 
 	 */
-	public void removeActivity(MActivity activity)
+	public void setTarget(MActivity target)
 	{
-		if(activities!=null)
-			activities.remove(activity);
+		this.target = target;
 	}
 
 	/**
@@ -102,7 +129,7 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	{
 		this.type = type;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -129,4 +156,5 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 		if(associations!=null)
 			associations.remove(association);
 	}
+
 }

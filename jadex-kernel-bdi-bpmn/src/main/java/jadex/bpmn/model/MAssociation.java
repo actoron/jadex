@@ -8,10 +8,10 @@ public class MAssociation extends MIdElement
 	//-------- attributes --------
 	
 	/** The source. */
-	protected MIdElement source;
+	protected MArtifact source;
 	
 	/** The target. */
-	protected MIdElement target;
+	protected IAssociationTarget target;
 
 	/** The type. */
 	protected String type;
@@ -21,7 +21,7 @@ public class MAssociation extends MIdElement
 	/**
 	 * @return the source
 	 */
-	public MIdElement getSource()
+	public MArtifact getSource()
 	{
 		return this.source;
 	}
@@ -29,7 +29,7 @@ public class MAssociation extends MIdElement
 	/**
 	 * @param source the source to set
 	 */
-	public void setSource(MIdElement source)
+	public void setSource(MArtifact source)
 	{
 		this.source = source;
 	}
@@ -37,7 +37,7 @@ public class MAssociation extends MIdElement
 	/**
 	 * @return the target
 	 */
-	public MIdElement getTarget()
+	public IAssociationTarget getTarget()
 	{
 		return this.target;
 	}
@@ -45,7 +45,7 @@ public class MAssociation extends MIdElement
 	/**
 	 * @param target the target to set
 	 */
-	public void setTarget(MIdElement target)
+	public void setTarget(IAssociationTarget target)
 	{
 		this.target = target;
 	}

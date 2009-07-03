@@ -8,7 +8,7 @@ import jadex.commons.SReflect;
 /**
  * 
  */
-public class MActivity extends MNamedIdElement
+public class MActivity extends MNamedIdElement implements IAssociationTarget
 {
 	//-------- attributes --------
 	
@@ -18,33 +18,83 @@ public class MActivity extends MNamedIdElement
 	/** The associations description. */
 	protected String associationsdescription;
 
+	/** The outgoing edges description. */
+	protected String outgoingedgesdescription;
 	
-	/** The outgoing edges. */
-	protected String outgoingedges;
+	/** The incoming edges description. */
+	protected String incomingedgesdescription;
 	
-	/** The incoming edges. */
-	protected String incomingedges;
+	/** The incoming messages description. */
+	protected List incomingmessagesdescriptions;
+	
+	/** The outgoing messages description. */
+	protected List outgoingmessagesdescriptions;
+
 	
 	/** The outgoing edges. */
 	protected List outedges;
 	
 	/** The incoming edges. */
 	protected List inedges;
+
+	/** The outgoing message edges. */
+	protected List outmsgedges;
+	
+	/** The incoming message edges. */
+	protected List inmsgedges;
+	
+	/** The associations. */
+	protected List associations;
 		
 	/** The type. */
 	protected String type;
 	
 	/** The activity type. */
 	protected String activitytype;
-		
+
+	/** The looping flag. */
+	protected boolean looping;
+	
 	//-------- methods --------
+	
+	/**
+	 * @return the lanedescription
+	 */
+	public String getLaneDescription()
+	{
+		return this.lanedescription;
+	}
+
+	/**
+	 * @param lanedescription the lanedescription to set
+	 */
+	public void setLaneDescription(String lanedescription)
+	{
+		this.lanedescription = lanedescription;
+	}
+	
+	/**
+	 * @return the associationsdescription
+	 */
+	public String getAssociationsDescription()
+	{
+		return this.associationsdescription;
+	}
+
+	/**
+	 * @param associationsdescription the associationsdescription to set
+	 */
+	public void setAssociationsDescription(String associationsdescription)
+	{
+		this.associationsdescription = associationsdescription;
+	}
 	
 	/**
 	 * @return the outgoingedges
 	 */
 	public String getOutgoingEdgesDescription()
 	{
-		return this.outgoingedges;
+		return this.outgoingedgesdescription;
 	}
 
 	/**
@@ -52,7 +102,7 @@ public class MActivity extends MNamedIdElement
 	 */
 	public void setOutgoingEdgesDescription(String outgoingedges)
 	{
-		this.outgoingedges = outgoingedges;
+		this.outgoingedgesdescription = outgoingedges;
 	}
 	
 	/**
@@ -60,7 +110,7 @@ public class MActivity extends MNamedIdElement
 	 */
 	public String getIncomingEdgesDescription()
 	{
-		return this.incomingedges;
+		return this.incomingedgesdescription;
 	}
 
 	/**
@@ -68,8 +118,63 @@ public class MActivity extends MNamedIdElement
 	 */
 	public void setIncomingEdgesDescription(String incomingedges)
 	{
-		this.incomingedges = incomingedges;
+		this.incomingedgesdescription = incomingedges;
 	}
+	
+	/**
+	 * 
+	 */
+	public List getOutgoingMessagesDescriptions()
+	{
+		return outgoingmessagesdescriptions;
+	}
+
+	/**
+	 * 
+	 */
+	public void addOutgoingMessageDescription(Object desc)
+	{
+		if(outgoingmessagesdescriptions==null)
+			outgoingmessagesdescriptions = new ArrayList();
+		outgoingmessagesdescriptions.add(desc);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeOutgoingMessageDescription(Object desc)
+	{
+		if(outgoingmessagesdescriptions!=null)
+			outgoingmessagesdescriptions.remove(desc);
+	}
+	
+	/**
+	 * 
+	 */
+	public List getIncomingMessagesDescriptions()
+	{
+		return incomingmessagesdescriptions;
+	}
+
+	/**
+	 * 
+	 */
+	public void addIncomingMessageDescription(Object desc)
+	{
+		if(incomingmessagesdescriptions==null)
+			incomingmessagesdescriptions = new ArrayList();
+		incomingmessagesdescriptions.add(desc);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeIncomingMessageDescription(Object desc)
+	{
+		if(incomingmessagesdescriptions!=null)
+			incomingmessagesdescriptions.remove(desc);
+	}
+	
 	
 	/**
 	 * 
@@ -124,6 +229,60 @@ public class MActivity extends MNamedIdElement
 		if(inedges!=null)
 			inedges.remove(edge);
 	}
+	
+	/**
+	 * 
+	 */
+	public List getOutgoingMessagingEdges()
+	{
+		return outmsgedges;
+	}
+
+	/**
+	 * 
+	 */
+	public void addOutgoingMessagingEdge(MMessagingEdge edge)
+	{
+		if(outmsgedges==null)
+			outmsgedges = new ArrayList();
+		outmsgedges.add(edge);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeOutgoingMessagingEdge(MMessagingEdge edge)
+	{
+		if(outmsgedges!=null)
+			outmsgedges.remove(edge);
+	}
+	
+	/**
+	 * 
+	 */
+	public List getIncomingMessagingEdges()
+	{
+		return inmsgedges;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addIncomingMessagingEdge(MMessagingEdge edge)
+	{
+		if(inmsgedges==null)
+			inmsgedges = new ArrayList();
+		inmsgedges.add(edge);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeIncomingMessagingEdge(MMessagingEdge edge)
+	{
+		if(inmsgedges!=null)
+			inmsgedges.remove(edge);
+	}
 
 	/**
 	 * @return the type
@@ -141,37 +300,7 @@ public class MActivity extends MNamedIdElement
 		this.type = type;
 	}
 	
-	/**
-	 * @return the lanedescription
-	 */
-	public String getLaneDescription()
-	{
-		return this.lanedescription;
-	}
-
-	/**
-	 * @param lanedescription the lanedescription to set
-	 */
-	public void setLaneDescription(String lanedescription)
-	{
-		this.lanedescription = lanedescription;
-	}
 	
-	/**
-	 * @return the associationsdescription
-	 */
-	public String getAssociationsDescription()
-	{
-		return this.associationsdescription;
-	}
-
-	/**
-	 * @param associationsdescription the associationsdescription to set
-	 */
-	public void setAssociationsDescription(String associationsdescription)
-	{
-		this.associationsdescription = associationsdescription;
-	}
 
 	/**
 	 * @return the activitytype
@@ -189,6 +318,49 @@ public class MActivity extends MNamedIdElement
 		this.activitytype = activitytype;
 	}
 	
+	/**
+	 * 
+	 */
+	public List getAssociations()
+	{
+		return associations;
+	}
+
+	/**
+	 * 
+	 */
+	public void addAssociation(MAssociation association)
+	{
+		if(associations==null)
+			associations = new ArrayList();
+		associations.add(association);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeAssociation(MAssociation association)
+	{
+		if(associations!=null)
+			associations.remove(association);
+	}
+	
+	/**
+	 * @return the looping
+	 */
+	public boolean isLooping()
+	{
+		return this.looping;
+	}
+
+	/**
+	 * @param looping the looping to set
+	 */
+	public void setLooping(boolean looping)
+	{
+		this.looping = looping;
+	}
+
 	/**
 	 *  Create a string representation of this activity.
 	 *  @return A string representation of this activity.

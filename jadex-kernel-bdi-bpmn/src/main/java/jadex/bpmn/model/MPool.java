@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * 
  */
-public class MPool extends MNamedIdElement
+public class MPool extends MNamedIdElement implements IAssociationTarget
 {
 	//-------- attributes --------
 	
@@ -52,7 +52,6 @@ public class MPool extends MNamedIdElement
 	{
 		this.associationsdescription = associationsdescription;
 	}
-
 
 	/**
 	 * 

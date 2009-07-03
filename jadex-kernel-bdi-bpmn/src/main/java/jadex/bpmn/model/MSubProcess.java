@@ -19,6 +19,9 @@ public class MSubProcess extends MActivity
 	/** The event handlers. */
 	protected List eventhandlers;
 	
+	/** The artifacts. */
+	protected List artifacts;
+	
 	//-------- methods --------
 	
 	/**
@@ -100,5 +103,32 @@ public class MSubProcess extends MActivity
 	{
 		if(eventhandlers!=null)
 			eventhandlers.remove(eventhandler);
+	}
+	
+	/**
+	 * 
+	 */
+	public List getArtifacts()
+	{
+		return artifacts;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addArtifact(MArtifact artifact)
+	{
+		if(artifacts==null)
+			artifacts = new ArrayList();
+		artifacts.add(artifact);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeArtifact(MArtifact artifact)
+	{
+		if(artifacts!=null)
+			artifacts.remove(artifact);
 	}
 }

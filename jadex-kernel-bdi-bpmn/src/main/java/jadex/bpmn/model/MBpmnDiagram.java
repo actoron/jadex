@@ -4,7 +4,6 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.xml.BeanAttributeInfo;
-import jadex.commons.xml.IBeanObjectCreator;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
@@ -12,6 +11,7 @@ import jadex.commons.xml.TypeInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,13 +31,24 @@ public class MBpmnDiagram extends MIdElement
 	protected List artifacts;
 	
 	/** The messages. */
-//	protected List messages;
+	protected List messages;
+	
+	/** The name of the model. */
+	protected String name;
+
+	//-------- init structures --------
 	
 	/** The cached edges of the model. */
 	protected Map alledges;
+
+	/** The association sources. */
+	protected Map associationsources;
 	
-	/** The name of the model. */
-	protected String	name;
+	/** The association targets. */
+	protected Map associationtargets;
+	
+	/** The messaging edges. */
+	protected Map allmessagingedges;
 	
 	//-------- methods --------
 
@@ -89,18 +100,67 @@ public class MBpmnDiagram extends MIdElement
 	/**
 	 * 
 	 */
-	public void removePool(MArtifact artifact)
+	public void removeArtifact(MArtifact artifact)
 	{
 		if(artifacts!=null)
 			artifacts.remove(artifact);
 	}
 	
-	//-------- helper methods --------
+	/**
+	 * 
+	 */
+	public List getMessagingEdges()
+	{
+		return messages;
+	}
 	
 	/**
 	 * 
 	 */
-	public Map getAllEdges()
+	public void addMessagingEdge(MMessagingEdge message)
+	{
+		if(messages==null)
+			messages = new ArrayList();
+		messages.add(message);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeMessagingEdge(MMessagingEdge message)
+	{
+		if(messages!=null)
+			messages.remove(message);
+	}
+	
+	//-------- helper init methods --------
+	
+	/**
+	 * 
+	 */
+	public Map getAllMessagingEdges()
+	{
+		if(this.allmessagingedges==null)
+		{
+			this.allmessagingedges = new HashMap();
+			
+			List messages = getMessagingEdges();
+			if(messages!=null)
+			{
+				for(int i=0; i<messages.size(); i++)
+				{
+					MMessagingEdge msg = (MMessagingEdge)messages.get(i);
+					allmessagingedges.put(msg.getId(), msg);
+				}
+			}
+		}
+		return allmessagingedges;
+	}
+	
+	/**
+	 * 
+	 */
+	public Map getAllSequenceEdges()
 	{
 		if(this.alledges==null)
 		{
@@ -167,6 +227,187 @@ public class MBpmnDiagram extends MIdElement
 				edges.put(edge.getId(), edge);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected Map getAllAssociationTargets()
+	{
+		if(this.associationtargets==null)
+		{
+			this.associationtargets = new HashMap();
+			
+			// Add pools
+			List pools = getPools();
+			if(pools!=null)
+			{
+				for(int i=0; i<pools.size(); i++)
+				{
+					MPool pool = (MPool)pools.get(i);
+					addAssociations(pool, associationtargets);
+					
+					// Add lanes
+					List lanes = pool.getLanes();
+					if(lanes!=null)
+					{
+						for(int j=0; j<lanes.size(); j++)
+						{
+							MLane lane = (MLane)lanes.get(j);
+							addAssociations(lane, associationtargets);
+						}
+					}
+					
+					// Add activities
+					List acts = pool.getActivities();
+					if(acts!=null)
+					{
+						for(int j=0; j<acts.size(); j++)
+						{
+							MActivity act = (MActivity)acts.get(j);
+							addActivityTargets(act);
+						}
+					}
+				}
+			}
+			
+			// Add edges
+			Map edges = getAllSequenceEdges();
+			for(Iterator it=edges.values().iterator(); it.hasNext(); )
+			{
+				MSequenceEdge edge = (MSequenceEdge)it.next();
+				addAssociations(edge, associationtargets);
+			}
+		}
+		return associationtargets;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addActivityTargets(MActivity act)
+	{
+		addAssociations(act, associationtargets);
+		if(act instanceof MSubProcess)
+		{
+			List acts = ((MSubProcess)act).getActivities();
+			if(acts!=null)
+			{
+				for(int i=0; i<acts.size(); i++)
+				{
+					MActivity subact = (MActivity)acts.get(i);
+					addActivityTargets(subact);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean addAssociations(IAssociationTarget target, Map targets)
+	{
+		boolean ret = false;
+		
+		String assosdesc = target.getAssociationsDescription();
+		if(assosdesc!=null)
+		{
+			StringTokenizer stok = new StringTokenizer(assosdesc);
+			while(stok.hasMoreElements() && !ret)
+			{
+				String assoid = stok.nextToken();
+				targets.put(assoid, target);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected Map getAllAssociationSources()
+	{
+		if(this.associationsources==null)
+		{
+			this.associationsources = new HashMap();
+		
+			addArtifacts(getArtifacts(), associationsources);
+		
+			List pools = getPools();
+			if(pools!=null)
+			{
+				for(int i=0; i<pools.size(); i++)
+				{
+					MPool pool = (MPool)pools.get(i);
+					addArtifacts(pool.getArtifacts(), associationsources);
+					
+					// Search subprocesses
+					List acts = pool.getActivities();
+					if(acts!=null)
+					{
+						for(int j=0; j<acts.size(); j++)
+						{
+							Object act = acts.get(j);
+							if(act instanceof MSubProcess)
+							{
+								addSubProcesses((MSubProcess)act, associationsources);
+							}
+						}
+					}
+				}
+			}
+		}
+		return associationsources;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addSubProcesses(MSubProcess subproc, Map sources)
+	{
+		List artifacts = subproc.getArtifacts();
+		addArtifacts(artifacts, sources);
+		
+		List acts = subproc.getActivities();
+		if(acts!=null)
+		{
+			for(int j=0; j<acts.size(); j++)
+			{
+				Object act = acts.get(j);
+				if(act instanceof MSubProcess)
+				{
+					addSubProcesses(((MSubProcess)act), sources);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected MArtifact addArtifacts(List artifacts, Map sources)
+	{
+		MArtifact ret = null;
+		
+		if(artifacts!=null)
+		{
+			for(int i=0; i<artifacts.size() && ret==null; i++)
+			{
+				MArtifact art = (MArtifact)artifacts.get(i);
+				List assos = art.getAssociations();
+				if(assos!=null)
+				{
+					for(int j=0; j<assos.size(); j++)
+					{
+						MAssociation asso = (MAssociation)assos.get(j);
+						sources.put(asso.getId(), art);
+					}
+				}
+			}
+		}
+		
+		return ret;
 	}
 	
 //	/**
@@ -273,14 +514,14 @@ public class MBpmnDiagram extends MIdElement
 		types.add(new TypeInfo("eventHandlers", MActivity.class, null, null,
 			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
-			new BeanAttributeInfo("incomingEdgesDescription")}), new VertexPostProcessor()));
+			new BeanAttributeInfo("incomingEdgesDescription")}), new ActivityPostProcessor()));
 		
 		types.add(new TypeInfo("vertices", MActivity.class, null, null,
 			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges", "lanes", "associations"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
 			new BeanAttributeInfo("incomingEdgesDescription"),
 			new BeanAttributeInfo("laneDescription"),
-			new BeanAttributeInfo("associationsDescription")}), new VertexPostProcessor(),
+			new BeanAttributeInfo("associationsDescription")}), new ActivityPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)
@@ -295,7 +536,7 @@ public class MBpmnDiagram extends MIdElement
 			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdgesDescription"),
 			new BeanAttributeInfo("incomingEdgesDescription"),
 			new BeanAttributeInfo("laneDescription"),
-			new BeanAttributeInfo("associationsDescription")}), new VertexPostProcessor(),
+			new BeanAttributeInfo("associationsDescription")}), new ActivityPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)
@@ -305,7 +546,29 @@ public class MBpmnDiagram extends MIdElement
 				}
 			}));
 		
-		types.add(new TypeInfo("sequenceEdges", MSequenceEdge.class));
+		types.add(new TypeInfo("sequenceEdges", MSequenceEdge.class, null, null,
+			SUtil.createHashMap(new String[]{"associations"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("associationsDescription")}), null));
+					
+		
+		types.add(new TypeInfo("messagingEdges", MMessagingEdge.class, null, null,
+			SUtil.createHashMap(new String[]{"associations"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("associationsDescription")}), null));
+		
+		types.add(new TypeInfo("incomingMessages", HashMap.class, null, null, 
+			SUtil.createHashMap(new String[]{"type", "href"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, null, "")}), null));
+
+		types.add(new TypeInfo("outgoingMessages", HashMap.class, null, null, 
+			SUtil.createHashMap(new String[]{"type", "href"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo(null, null, ""),
+			new BeanAttributeInfo(null, null, "")}), null));
+		
+		types.add(new TypeInfo("messages", MMessagingEdge.class, null, null, 
+			SUtil.createHashMap(new String[]{"source", "target"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("sourceDescription"),
+			new BeanAttributeInfo("targetDescription")}), null));
 		
 		return types;
 	}
@@ -320,11 +583,16 @@ public class MBpmnDiagram extends MIdElement
 		// bpmn diagram
 		linkinfos.add(new LinkInfo("pools", new BeanAttributeInfo("pool")));
 		linkinfos.add(new LinkInfo("artifacts", new BeanAttributeInfo("artifact")));
+		linkinfos.add(new LinkInfo("messages", new BeanAttributeInfo("messagingEdge")));
 
 		// pool
 		linkinfos.add(new LinkInfo("vertices", new BeanAttributeInfo("activity")));
 		linkinfos.add(new LinkInfo("sequenceEdges", new BeanAttributeInfo("sequenceEdge")));
 		linkinfos.add(new LinkInfo("lanes", new BeanAttributeInfo("lane")));
+		
+		// activities
+		linkinfos.add(new LinkInfo("incomingMessages", new BeanAttributeInfo("incomingMessageDescription")));
+		linkinfos.add(new LinkInfo("outgoingMessages", new BeanAttributeInfo("outgoingMessageDescription")));
 		
 		// subprocesses
 		linkinfos.add(new LinkInfo("eventHandlers", new BeanAttributeInfo("eventHandler")));
@@ -336,21 +604,22 @@ public class MBpmnDiagram extends MIdElement
 	}
 	
 	/**
-	 *  Vertex post processor.
+	 *  Activity post processor.
 	 */
-	static class VertexPostProcessor implements IPostProcessor
+	static class ActivityPostProcessor implements IPostProcessor
 	{
 		//-------- IPostProcessor interface --------
 		
 		/**
-		 *  Load class.
+		 *  Establish element connections.
 		 */
 		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnDiagram dia = (MBpmnDiagram)root;
 			MActivity act = (MActivity)object;
-			Map edges = dia.getAllEdges();
-			
+
+			// Make edge connections.
+			Map edges = dia.getAllSequenceEdges();
 			String indesc = act.getIncomingEdgesDescription();
 			if(indesc!=null)
 			{
@@ -374,6 +643,41 @@ public class MBpmnDiagram extends MIdElement
 					MSequenceEdge edge = (MSequenceEdge)edges.get(edgeid);
 					act.addOutgoingEdge(edge);
 					edge.setSource(act);
+				}
+			}
+			
+			// Make message connections.
+			// todo: message - pool connections
+			Map allmessages = dia.getAllMessagingEdges();
+			List inmsgs = act.getIncomingMessagesDescriptions();
+			if(inmsgs!=null)
+			{
+				for(int i=0; i<inmsgs.size(); i++)
+				{
+					Map msgdesc = (Map)inmsgs.get(i);
+					String id = ((String)msgdesc.get("href")).substring(1);
+					MMessagingEdge msg = (MMessagingEdge)allmessages.get(id);
+					if(msg==null)
+						throw new RuntimeException("Could not find message: "+id);
+					
+					act.addIncomingMessagingEdge(msg);
+					msg.setTarget(act);
+				}
+			}
+			
+			List outmsgs = act.getOutgoingMessagesDescriptions();
+			if(outmsgs!=null)
+			{
+				for(int i=0; i<outmsgs.size(); i++)
+				{
+					Map msgdesc = (Map)outmsgs.get(i);
+					String id = ((String)msgdesc.get("href")).substring(1);
+					MMessagingEdge msg = (MMessagingEdge)allmessages.get(id);
+					if(msg==null)
+						throw new RuntimeException("Could not find message: "+id);
+					
+					act.addOutgoingMessagingEdge(msg);
+					msg.setTarget(act);
 				}
 			}
 		}
@@ -403,72 +707,21 @@ public class MBpmnDiagram extends MIdElement
 			MBpmnDiagram dia = (MBpmnDiagram)root;
 			MAssociation asso = (MAssociation)object;
 			
-//			MIdElement source = findSource(dia, asso);
-////			MIdElement target = findTarget(asso);
-//			
-//			asso.setSource(source);
-//			asso.setTarget(target);
+			MArtifact source = (MArtifact)dia.getAllAssociationSources().get(asso.getId());
+			IAssociationTarget target = (IAssociationTarget)dia.getAllAssociationTargets().get(asso.getId());
+			
+			if(source==null)
+				throw new RuntimeException("Could not find association source: "+source);
+			if(target==null)
+				throw new RuntimeException("Could not find association target: "+target);
+			
+			asso.setSource(source);
+			asso.setTarget(target);
+			
+			source.addAssociation(asso);
+			target.addAssociation(asso);
 		}
-		
-		/**
-		 * 
-		 * /
-		protected MIdElement findSource(MBpmnDiagram dia, MAssociation asso)
-		{
-			MIdElement ret = null;
-
-			ret = searchArtifacts(dia.getArtifacts());
-			
-			if(ret==null)
-			{
-				List pools = dia.getPools();
-				if(pools!=null)
-				{
-					for(int i=0; i<pools.size(); i++)
-					{
-						MPool tmp = (MPool)pools.get(i);
-						ret = searchArtifacts(tmp.getArtifacts());
-						
-//						List acts = tmp.getActivities();
-//						if(acts!=null)
-//						{
-//							for(int j=0; j<acts.size(); j++)
-//							{
-//								MActivity act = (MActivity)acts.get(j);
-//								act.getAr
-//								ret = searchArtifacts(artifacts)
-//								
-//								if(acts.get(j) instanceof MSubProcess)
-//								{
-//									getAllEdges((MSubProcess)artifacts.get(j), alledges);
-//								}
-//							}
-//						}
-					}
-				}
-			}
-		}*/
-		
-		/**
-		 * 
-		 * /
-		public MIdElement searchArtifacts(List artifacts)
-		{
-			MIdElement ret = null;
-			
-			if(artifacts!=null)
-			{
-				for(int i=0; i<artifacts.size(); i++)
-				{
-					MArtifact art = (MArtifact)artifacts.get(i);
-					if(art.getAssociations()!=null && art.getAssociations().contains(asso))
-						ret = art;
-				}
-			}
-			
-			return ret;
-		}*/
-		
+	
 		/**
 		 *  Test if this post processor can be executed in first pass.
 		 *  @return True if can be executed on first pass.
@@ -478,5 +731,5 @@ public class MBpmnDiagram extends MIdElement
 			return false;
 		}
 	}
-
+	
 }
