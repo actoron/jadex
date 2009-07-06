@@ -14,13 +14,13 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 /**
  *  A node for a constructor or method invocation or field access.
  */
 // Todo: Allow conversions between basic number types.
-// Todo: Remove dependencies to jadex.runtime ???
 public class ReflectNode	extends ExpressionNode
 {
 	//-------- constants --------
@@ -65,8 +65,8 @@ public class ReflectNode	extends ExpressionNode
 	/** The possible methods (for static and nonstatic methods). */
 	protected transient Method[]	methods;
 
-//	/** The field accessor method (for static and nonstatic fields). */
-//	protected transient Method	accessor;
+	/** The field accessor method (for static and nonstatic fields). */
+	protected transient Method	accessor;
 
 	/** The field (for static and nonstatic fields). */
 	protected transient Field	field;
@@ -334,12 +334,14 @@ public class ReflectNode	extends ExpressionNode
 //					}
 
 					// Try map accessor.
-					/*if(accessor==null && SReflect.isSupertype(Map.class, clazz))
+					boolean	found	= false;
+					if(accessor==null && SReflect.isSupertype(Map.class, clazz))
 					{
 						try
 						{
 							accessor	= clazz.getMethod("get", new Class[]{Object.class});
 							args	= new Object[]{getText()};
+							found	= true;
 						}
 						catch(NoSuchMethodException e2)
 						{
@@ -347,10 +349,10 @@ public class ReflectNode	extends ExpressionNode
 						catch(SecurityException e2)
 						{
 						}
-					}*/
+					}
 
 					// If not found, throw original exception.
-//					if(type==null)
+					if(!found)
 					{
 						throwParseException(e);
 					}
@@ -744,63 +746,36 @@ public class ReflectNode	extends ExpressionNode
 
 	/**
 	 *  Access a field.
-	 *  Also tries bean property accessor methods.
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 * @throws NoSuchFieldException 
 	 */
 	protected Object	accessField(Object ref, Class clazz, IValueFetcher fetcher) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException
 	{
-		boolean	found	= false;
+		boolean	fetched	= false;
 		Object val = null;
-
-		try
-		{
-			val = fetcher.fetchValue(getText(), ref);
-			found = true;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
 		
-//		// Special access for beliefbase and parameter elements.
-//		if(ref instanceof RBeliefbase)
-//		{
-//			RBeliefbase	bb	= (RBeliefbase)ref;
-//			if(bb.containsBelief(getText()))
-//			{
-//				val	= bb.getBelief(getText()).getFact();
-//				found	= true;
-//			}
-//			else if(bb.containsBeliefSet(getText()))
-//			{
-//				val	= bb.getBeliefSet(getText()).getFacts();
-//				found	= true;
-//			}
-//		}
-//		else if(ref instanceof IRParameterElement)
-//		{
-//			IRParameterElement	pe	= (IRParameterElement)ref;
-//			if(pe.hasParameter(getText()))
-//			{
-//				val	= pe.getParameter(getText()).getValue();
-//				found	= true;
-//			}
-//			else if(pe.hasParameterSet(getText()))
-//			{
-//				val	= pe.getParameterSet(getText()).getValues();
-//				found	= true;
-//			}
-//		}
+		// When nothing precomputed, try fetcher first.
+		if(field==null && accessor==null)
+		{
+			try
+			{
+				val	= fetcher.fetchValue(getText(), ref);
+				fetched	= true;
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+			}
+		}
 
 		// Find field if not precomputed.
 		Field	field0	= this.field;
-		if(!found && field0==null)
+		NoSuchFieldException	nsfe	= null;
+		if(!fetched && field0==null)
 		{
-//			try
-//			{
-				//field0	= clazz.getField(getText());
+			try
+			{
 				field0	= SReflect.getCachedField(clazz, getText());
 
 				// Check if static modifier matches.
@@ -808,41 +783,23 @@ public class ReflectNode	extends ExpressionNode
 				{
 					throw new RuntimeException("Static reference to nonstatic field :"+this);
 				}
-//			}
-//			catch(NoSuchFieldException e)
-//			{
-//				throwEvaluationException(e);				
-//			}
-		}
-
-		// Try to access field (if found).
-		if(!found && field0!=null)
-		{
-//			try
-//			{
-				val	= field0.get(ref);
-				found	= true;
-//			}
-//			catch(IllegalAccessException e)
-//			{
-//				throwEvaluationException(e);
-//			}
-		}
-
-		assert found;
-		
-		// Try map interface.
-		/*else if(SReflect.isSupertype(Map.class, clazz))
-		{
-			try
-			{
-				accessor0	= clazz.getMethod("get", new Class[]{Object.class});
-				args0	= new Object[]{getText()};
 			}
-			catch(NoSuchMethodException e){}	// Shouldn't happen
-			catch(SecurityException e){}	// Shouldn't happen
-		}*/
-
+			catch(NoSuchFieldException e)
+			{
+				nsfe	= e;
+			}
+		}
+		
+		// Find map accessor if not precomputed.
+		Method	accessor0	= this.accessor;
+		Object[]	args0	= this.args;
+		if(!fetched && field0==null && accessor0==null && SReflect.isSupertype(Map.class, clazz))
+		{
+			accessor0	= SReflect.getMethod(clazz, "get", new Class[]{Object.class});
+			if(accessor0==null)
+				throw nsfe;
+			args0	= new Object[]{getText()};
+		}
 
 		// Try bean property
 //		else
@@ -857,8 +814,6 @@ public class ReflectNode	extends ExpressionNode
 //				throwEvaluationException(e);
 //			}
 //		}
-		return val;
-	}
 
 
 		// Try to find accessor method.
@@ -876,54 +831,47 @@ public class ReflectNode	extends ExpressionNode
 		}*/
 
 
-		// If not found, throw original exception.
-		/*if(field0==null && accessor0==null)
+		// Read field.
+		if(!fetched)
 		{
-			StringWriter	sw = new StringWriter();
-			nosuchfield.printStackTrace(new PrintWriter(sw));
-			throw new RuntimeException(""+sw);
+			try
+			{
+				if(accessor0==null)
+				{
+					val	= field0.get(ref);
+				}
+				else
+				{
+					val	= accessor0.invoke(ref, args0);
+				}
+			}
+	//		catch(IllegalAccessException e)
+	//		{
+	//			StringWriter	sw = new StringWriter();
+	//			e.printStackTrace(new PrintWriter(sw));
+	//			throw new RuntimeException(""+sw);
+	//		}
+	//		catch(IllegalArgumentException e)
+	//		{
+	//			StringWriter	sw = new StringWriter();
+	//			e.printStackTrace(new PrintWriter(sw));
+	//			throw new RuntimeException(""+sw);
+	//		}
+			catch(InvocationTargetException e)
+			{
+				if(e.getTargetException() instanceof RuntimeException)
+				{
+					throw (RuntimeException)e.getTargetException();
+				}
+				else
+				{
+					throw new RuntimeException(e);
+				}
+			}
 		}
 
-		// Read field.
-		Object value	= null;
-		try
-		{
-			if(accessor0==null)
-			{
-				value	= field0.get(ref);
-			}
-			else
-			{
-				value	= accessor0.invoke(ref, args0);
-			}
-		}
-		catch(IllegalAccessException e)
-		{
-			StringWriter	sw = new StringWriter();
-			e.printStackTrace(new PrintWriter(sw));
-			throw new RuntimeException(""+sw);
-		}
-		catch(IllegalArgumentException e)
-		{
-			StringWriter	sw = new StringWriter();
-			e.printStackTrace(new PrintWriter(sw));
-			throw new RuntimeException(""+sw);
-		}
-		catch(InvocationTargetException e)
-		{
-			if(e.getTargetException() instanceof RuntimeException)
-			{
-				throw (RuntimeException)e.getTargetException();
-			}
-			else
-			{
-				StringWriter	sw = new StringWriter();
-				e.getTargetException().printStackTrace(new PrintWriter(sw));
-				throw new RuntimeException(""+sw);
-			}
-		}
-		return value;
-	}*/
+		return val;
+	}
 	
 	/**
 	 *  Find method declared in public class for a given method. 
