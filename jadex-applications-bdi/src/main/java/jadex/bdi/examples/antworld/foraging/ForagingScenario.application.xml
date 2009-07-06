@@ -32,7 +32,7 @@
 					<env:property name="position">new Vector2Double(5, 5)</env:property>
 				</env:objecttype>
 				<env:objecttype name="destinationSign"/>
-				<env:objecttype name="gravitationCenter">
+				<!--<env:objecttype name="gravitationCenter">
 					<env:property name="text" dynamic="true">
 						$object.getProperty("absorbedObjects") </env:property>
 				</env:objecttype>
@@ -40,7 +40,7 @@
 					<env:property name="text" dynamic="true">
 						$object.getProperty("gravitation strength")
 						</env:property>
-				</env:objecttype>
+				</env:objecttype>-->
 				
 				<!-- The size of the objects decreases as time goes by.-->
 				<env:objecttype name="traceRoute">
@@ -91,18 +91,18 @@
 				<env:actiontype name="updateDestination"
 					class="UpdateDestinationAction"/>
 				<env:actiontype name="updateTraceRoute" class="TraceRouteAction"/>
-				<env:actiontype name="absorbObject" class="AbsorbObjectAction"/>
-				<env:actiontype name="testAction" class="TestAction"/>
+				<!--<env:actiontype name="absorbObject" class="AbsorbObjectAction"/>
+				<env:actiontype name="testAction" class="TestAction"/>-->
 			</env:actiontypes>
 			
 			<env:processtypes>
 				<env:processtype name="manageTraceRoutes" class="ManageTraceRoutesProcess">
 					<env:property name="rate">2</env:property>
 				</env:processtype>
-				<env:processtype name="manageGravitation"
+				<!--<env:processtype name="manageGravitation"
 					class="ManageGravitationProcess">
 					<env:property name="rate">1</env:property>
-				</env:processtype>
+				</env:processtype>-->
 				<env:processtype name="createWaste" class="DefaultObjectCreationProcess">
 					<env:property name="timerate">1000</env:property>
 					<env:property name="type">"waste"</env:property>
@@ -200,21 +200,7 @@
 							imagepath="jadex/bdi/examples/antworld/images/traceroute.png"/>
 					</env:drawable>
 					
-					<env:drawable objecttype="gravitationCenter" width="1.0"
-						height="1.0">
-						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/antworld/images/gravitationCenter.png"/>
-						<env:text layer="2" basesize="20" text="$text$"
-							color="white"/>
-					</env:drawable>
-					
-					<env:drawable objecttype="gravitationField" width="1.0"
-						height="1.0">
-						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/antworld/images/gravitationField.png"/>
-						<env:text layer="3" basesize="9" text="$text$"
-							color="white"/>
-					</env:drawable>
+							
 					
 					<env:drawable objecttype="waste" width="0.45" height="0.45">
 						<env:texturedrectangle layer="2"
@@ -238,24 +224,7 @@
 					</env:prelayers>
 					
 				</env:perspective>
-				
-				<!--<env:perspective name="abstract">
-				<env:drawable objecttype="collector" width="1.0" height="1.0">
-				<env:triangle layer="2" color="RED" />
-				<env:rectangle layer="3" color="YELLOW" width="0.2" height="0.2">
-				<env:drawcondition>$object.getProperty("garbage")!=null</env:drawcondition> 
-				</env:rectangle>
-				</env:drawable>
-				<env:drawable objecttype="burner" width="1.0" height="1.0">
-				<env:triangle layer="1" color="GREEN" />
-				</env:drawable>
-				<env:drawable objecttype="garbage" width="0.7" height="0.7">
-				<env:rectangle layer="0" color="YELLOW" />
-				</env:drawable>
-				<env:prelayers>
-				<env:gridlayer width="1.0" height="1.0" color="WHITE" />
-				</env:prelayers>
-				</env:perspective>-->
+							
 			</env:perspectives>
 			
 			<!-- executor -->
@@ -280,16 +249,7 @@
 			</agents>
 			
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:objects>
-				<!--<env:object type="collector" owner="Collector1" >
-				<env:property name="rotation">
-				$object.getProperty("lastmove")==null || $object.getProperty("lastmove").equals("right")? Math.PI:
-				$object.getProperty("lastmove").equals("left")? Math.PI:
-				$object.getProperty("lastmove").equals("up")? Math.PI/2:
-				Math.PI*3/2
-				</env:property>
-				</env:object>
-				<env:object type="burner" owner="Burner1" />-->
+				<env:objects>				
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(3,8)</env:property>
 					</env:object>
