@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_y65NcWpBEd6JtKkNrnCCNQ" iD="_y65NcGpBEd6JtKkNrnCCNQ">
+  <pools xmi:type="bpmn:Pool" xmi:id="_y65Nd2pBEd6JtKkNrnCCNQ" iD="_y65NdmpBEd6JtKkNrnCCNQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_0vuBEWpBEd6JtKkNrnCCNQ" iD="_0vuBEGpBEd6JtKkNrnCCNQ" outgoingEdges="_2BrYOGpBEd6JtKkNrnCCNQ" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_2BX2MWpBEd6JtKkNrnCCNQ" iD="_2BX2MGpBEd6JtKkNrnCCNQ" outgoingEdges="_B9XHGGpCEd6JtKkNrnCCNQ" incomingEdges="_2BrYOGpBEd6JtKkNrnCCNQ" name="Exception Task&#xD;&#xA;class = ExceptionTask.class" activityType="SubProcess">
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__U0-mmpBEd6JtKkNrnCCNQ" iD="__U0-mWpBEd6JtKkNrnCCNQ"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_9_cgAWpBEd6JtKkNrnCCNQ" iD="_9_cgAGpBEd6JtKkNrnCCNQ" outgoingEdges="__U0-mmpBEd6JtKkNrnCCNQ" activityType="EventIntermediateError"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="__U0-kWpBEd6JtKkNrnCCNQ" iD="__U0-kGpBEd6JtKkNrnCCNQ" outgoingEdges="_W1ZF4WpCEd6JtKkNrnCCNQ" incomingEdges="__U0-mmpBEd6JtKkNrnCCNQ" name="Exception Occurred" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_B9NWEWpCEd6JtKkNrnCCNQ" iD="_B9NWEGpCEd6JtKkNrnCCNQ" outgoingEdges="_YI_byGpCEd6JtKkNrnCCNQ" incomingEdges="_B9XHGGpCEd6JtKkNrnCCNQ" name="No Exception" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_W1P78WpCEd6JtKkNrnCCNQ" iD="_W1P78GpCEd6JtKkNrnCCNQ" incomingEdges="_W1ZF4WpCEd6JtKkNrnCCNQ" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_YI1qwWpCEd6JtKkNrnCCNQ" iD="_YI1qwGpCEd6JtKkNrnCCNQ" incomingEdges="_YI_byGpCEd6JtKkNrnCCNQ" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2BrYOGpBEd6JtKkNrnCCNQ" iD="_2BrYN2pBEd6JtKkNrnCCNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_B9XHGGpCEd6JtKkNrnCCNQ" iD="_B9XHF2pCEd6JtKkNrnCCNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_W1ZF4WpCEd6JtKkNrnCCNQ" iD="_W1ZF4GpCEd6JtKkNrnCCNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YI_byGpCEd6JtKkNrnCCNQ" iD="_YI_bx2pCEd6JtKkNrnCCNQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

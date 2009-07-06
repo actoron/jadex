@@ -33,5 +33,5 @@ public abstract class AbstractTask implements ITask
 	 *  @return	The result, if any.
 	 *  @throws	Exception When task execution fails.
 	 */
-	public abstract Object	doExecute(ITaskContext context);
+	public abstract Object	doExecute(ITaskContext context)	throws Exception;
 }
