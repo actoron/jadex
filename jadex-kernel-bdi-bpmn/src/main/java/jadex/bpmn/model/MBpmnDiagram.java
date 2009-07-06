@@ -7,6 +7,7 @@ import jadex.commons.xml.BeanAttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
@@ -819,5 +820,48 @@ public class MBpmnDiagram extends MIdElement
 			return false;
 		}
 	}
+	
+	/**
+	 *  Sequence edge post processor.
+	 * /
+	static class SequenceEdgePostProcessor implements IPostProcessor
+	{
+		//-------- IPostProcessor interface --------
+		
+		/**
+		 *  Establish element connections.
+		 * /
+		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		{
+			MBpmnDiagram dia = (MBpmnDiagram)root;
+			MSequenceEdge edge = (MSequenceEdge)object;
+
+			Object ret = null;
+			if(edge.getDescription()!=null)
+			{
+				StringTokenizer	stok = new StringTokenizer(act.getDescription(), "\r\n");
+	//			stok.nextToken();	// Skip first token (-> name).
+				while(stok.hasMoreTokens())
+				{
+					JavaCCExpressionParser parser = new JavaCCExpressionParser();
+					String prop = stok.nextToken();
+					if(prop.indexOf("=")==-1)
+					{
+						IParsedExpression cond = parser.parseExpression(prop, dia.getAllImports(), null, classloader);
+						edge.setCondition(cond);
+					}
+				}
+			}
+		}
+		
+		/**
+		 *  Test if this post processor can be executed in first pass.
+		 *  @return True if can be executed on first pass.
+		 * /
+		public boolean isFirstPass()
+		{
+			return false;
+		}
+	}*/
 	
 }

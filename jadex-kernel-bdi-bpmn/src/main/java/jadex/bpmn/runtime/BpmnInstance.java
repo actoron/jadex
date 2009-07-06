@@ -120,7 +120,8 @@ public class BpmnInstance
 				// Handle parameter passing in edge inscriptions.
 				if(thread.getLastEdge()!=null && thread.getLastEdge().getName()!=null)
 				{
-					final Map	oldvalues	= thread.getContext(thread.getLastEdge().getSource().getName());
+					// todo: moveto model
+					
 					StringTokenizer	stok	= new StringTokenizer(thread.getLastEdge().getName(), "\r\n");
 					while(stok.hasMoreTokens())
 					{
@@ -130,26 +131,7 @@ public class BpmnInstance
 						{
 							String	name	= stmt.substring(0, idx).trim();
 							String	exp	= stmt.substring(idx+1).trim();
-							Object	val	= new JavaCCExpressionParser().parseExpression(exp, null, null, getClass().getClassLoader()).getValue(new IValueFetcher()
-							{
-								public Object fetchValue(String name, Object object)
-								{
-									if(object instanceof Map)
-										return ((Map)object).get(name);
-									else
-										throw new UnsupportedOperationException();
-								}
-								
-								public Object fetchValue(String name)
-								{
-									Object	value	= oldvalues!=null ? oldvalues.get(name) : null;
-									if(value==null)
-									{
-										value	= thread.getContext(name);
-									}
-									return value;
-								}
-							});
+							Object	val	= new JavaCCExpressionParser().parseExpression(exp, null, null, getClass().getClassLoader()).getValue(new ProcessThreadValueFetcher(thread));
 							thread.setParameterValue(name, val);
 						}
 						else

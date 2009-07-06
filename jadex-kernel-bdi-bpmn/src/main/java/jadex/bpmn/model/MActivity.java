@@ -306,8 +306,6 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	{
 		this.type = type;
 	}
-	
-	
 
 	/**
 	 * @return the activitytype
@@ -366,28 +364,6 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	public void setLooping(boolean looping)
 	{
 		this.looping = looping;
-	}
-
-	/**
-	 * 
-	 */
-	public String getName()
-	{
-		String	name	= super.getName();
-		if(name!=null && name.indexOf("\r")!=-1)
-			name	= name.substring(0, name.indexOf("\r"));
-		if(name!=null && name.indexOf("\n")!=-1)
-			name	= name.substring(0, name.indexOf("\n"));
-		return name;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getDescription()
-	{
-		return super.getName();
 	}
 	
 	/**

@@ -1,7 +1,5 @@
 package jadex.bpmn.runtime;
 
-import java.util.StringTokenizer;
-
 import jadex.bpmn.model.MActivity;
 
 /**
@@ -18,21 +16,8 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 */
 	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
-		long	duration	= -1; 
-		StringTokenizer	stok	= new StringTokenizer(activity.getDescription(), "\r\n");
-		stok.nextToken();	// Skip first token (-> name).
-		while(stok.hasMoreTokens())
-		{
-			String	prop	= stok.nextToken();
-			if(prop.indexOf("=")!=-1)
-			{
-				String	name	= prop.substring(0, prop.indexOf("=")).trim();
-				String	value	= prop.substring(prop.indexOf("=")+1).trim();
-				if(name.equals("duration"))
-					duration	= Long.parseLong(value);
-			}
-			
-		}
+		Number dur = (Number)activity.getPropertyValue("duration");
+		long duration = dur==null? -1: dur.longValue(); 
 		thread.setWaiting(true);
 		doWait(activity, instance, thread, duration);
 	}

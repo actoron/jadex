@@ -1,5 +1,7 @@
 package jadex.bpmn.model;
 
+import jadex.javaparser.IParsedExpression;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,11 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	
 	/** The associations. */
 	protected List associations;
+	
+	//-------- additions --------
+	
+	/** The condition. */
+	protected IParsedExpression condition;
 	
 	//-------- methods --------
 
@@ -118,5 +125,20 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 		if(associations!=null)
 			associations.remove(association);
 	}
+	
+	/**
+	 * 
+	 */
+	public void setCondition(IParsedExpression condition)
+	{
+		this.condition = condition;
+	}
 
+	/**
+	 * 
+	 */
+	public IParsedExpression getCondition()
+	{
+		return this.condition;
+	}
 }
