@@ -1,18 +1,18 @@
 package jadex.bpmn.examples.helloworld;
 
-import jadex.bpmn.runtime.ITask;
+import jadex.bpmn.runtime.AbstractTask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Print goodbye on the console and print parameter 'y'.
  */
-public class SayGoodbyeTask implements ITask
+public class SayGoodbyeTask	extends AbstractTask
 {
-	public void execute(ITaskContext context, IResultListener listener)
+	public Object doExecute(ITaskContext context)
 	{
 		System.out.println("Goodbye BPMN world!");
 		int	y	= ((Number)context.getParameterValue("y")).intValue();
-		System.out.println("Parameter y: "+y);		
+		System.out.println("Parameter y: "+y);
+		return null;
 	}
 }
