@@ -94,6 +94,24 @@ public class GoPlanEnv extends Plan
 			srl = new SyncResultListener();
 			env.performSpaceAction("updateTraceRoute", params, srl); 
 			srl.waitForResult();
+
+//			String obj = new String("a");
+//			getBeliefbase().getBeliefSet("wastes").addFact(obj);
+			ISpaceObject[] wastes = null;
+			wastes = (ISpaceObject[])getBeliefbase().getBeliefSet("wastes").getFacts();			
+			System.out.println("#GoPlanEnv# Number of WasteObjects" + wastes.length );
+			for(int i=0; i<wastes.length; i++){
+				System.out.println(wastes[i].toString());
+			}
+			
+//			ISpaceObject wastes = null;
+//			wastes = (ISpaceObject)getBeliefbase().getBelief("wastes").getFact();
+//			if(wastes != null){
+//			System.out.println("#GoPlanEnv# WasteObjects: " + wastes.getId() );
+//			}else{
+//				System.out.println("#GoPlanEnv# WasteObjects == null!!");
+//			}
+			
 			
 		}
 	}
