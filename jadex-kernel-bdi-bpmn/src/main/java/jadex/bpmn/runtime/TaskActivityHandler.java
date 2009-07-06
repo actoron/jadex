@@ -14,7 +14,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
 	{
 		thread.setWaiting(true);
 		Class taskimpl = (Class)activity.getPropertyValue("class");
@@ -27,12 +27,12 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				
 				public void resultAvailable(Object result)
 				{
-					notify();
+					TaskActivityHandler.this.notify(activity, instance, thread);
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					notify();
+					TaskActivityHandler.this.notify(activity, instance, thread);
 					System.out.println("Exception during task execution: "+exception);
 				}
 			});
