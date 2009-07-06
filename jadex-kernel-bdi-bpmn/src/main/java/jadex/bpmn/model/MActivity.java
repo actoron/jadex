@@ -1,9 +1,13 @@
 package jadex.bpmn.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import jadex.commons.SReflect;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 /**
  * 
@@ -54,6 +58,9 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 
 	/** The looping flag. */
 	protected boolean looping;
+	
+	/** The properties. */
+	protected Map properties;
 	
 	//-------- methods --------
 	
@@ -361,6 +368,9 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 		this.looping = looping;
 	}
 
+	/**
+	 * 
+	 */
 	public String getName()
 	{
 		String	name	= super.getName();
@@ -371,9 +381,36 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 		return name;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getDescription()
 	{
 		return super.getName();
+	}
+	
+	/**
+	 *  Get a declared value from the model.
+	 *  @param name The name.
+	 */
+	public void setPropertyValue(String name, Object value)
+	{
+		if(properties==null)
+			properties = new HashMap();
+		properties.put(name, value);
+	}
+	
+	/**
+	 *  Get a property value from the model.
+	 *  @param name The name.
+	 */
+	public Object getPropertyValue(String name)
+	{
+		Object ret = null;
+		if(properties!=null)
+			ret = properties.get(name);
+		return ret;
 	}
 	
 	/**

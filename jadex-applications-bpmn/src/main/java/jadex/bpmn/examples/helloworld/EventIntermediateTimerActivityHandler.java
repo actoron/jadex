@@ -8,8 +8,15 @@ import jadex.bpmn.runtime.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
 
+/**
+ * 
+ *
+ */
 public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermediateTimerActivityHandler
 {
+	/**
+	 * 
+	 */
 	public void doWait(final MActivity activity, final BpmnInstance instance, final ProcessThread thread, long duration)
 	{
 		final Timer	timer	= new Timer();

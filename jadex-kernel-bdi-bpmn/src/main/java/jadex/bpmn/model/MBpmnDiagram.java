@@ -7,6 +7,7 @@ import jadex.commons.xml.BeanAttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class MBpmnDiagram extends MIdElement
 	
 	/** The name of the model. */
 	protected String name;
-
+	
 	//-------- init structures --------
 	
 	/** The cached edges of the model. */
@@ -49,6 +50,14 @@ public class MBpmnDiagram extends MIdElement
 	
 	/** The messaging edges. */
 	protected Map allmessagingedges;
+	
+	//-------- added structures --------
+	
+	/** The package. */
+	protected String packagename;
+	
+	/** The imports. */
+	protected String[] imports;
 	
 	//-------- methods --------
 
@@ -474,6 +483,65 @@ public class MBpmnDiagram extends MIdElement
 	}
 
 	/**
+	 *  Get all imports.
+	 *  @return The imports.
+	 */
+	public String[] getAllImports()
+	{
+		if(imports==null)
+			initImportsAndPackage();
+		return imports;
+	}
+	
+	/**
+	 *  Get the package name.
+	 *  @return The package name.
+	 */
+	public String getPackage()
+	{
+		if(imports==null)
+			initImportsAndPackage();
+		return packagename;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void initImportsAndPackage()
+	{
+		List arts = getArtifacts();
+		if(arts!=null)
+		{
+			if(arts.size()>1)
+				throw new RuntimeException("Diagram must have one artifact for imports/package");
+			
+			String desc = ((MArtifact)arts.get(0)).getName();
+			StringTokenizer	stok	= new StringTokenizer(desc, "\r\n");
+			List imports = new ArrayList();
+			while(stok.hasMoreTokens())
+			{
+				String	prop	= stok.nextToken().trim();
+				if(prop.startsWith("package"))
+				{
+					packagename = prop.substring(prop.indexOf("package")+8).trim();
+					if(packagename.endsWith(";"))
+						packagename = packagename.substring(0, packagename.length()-1);
+				}
+				else if(prop.startsWith("import"))
+				{
+					String imp = prop.substring(prop.indexOf("imports")+7).trim();
+					if(imp.endsWith(";"))
+						imp = imp.substring(0, imp.length()-1);
+					imports.add(imp);
+				}
+			}
+			if(packagename!=null)
+				imports.add(packagename+".*");
+			this.imports = (String[])imports.toArray(new String[imports.size()]);
+		}
+	}
+	
+	/**
 	 *  Get a string representation of this AGR space type.
 	 *  @return A string representation of this AGR space type.
 	 */
@@ -678,6 +746,26 @@ public class MBpmnDiagram extends MIdElement
 					
 					act.addOutgoingMessagingEdge(msg);
 					msg.setTarget(act);
+				}
+			}
+			
+			
+			Object ret = null;
+			if(act.getDescription()!=null)
+			{
+				StringTokenizer	stok	= new StringTokenizer(act.getDescription(), "\r\n");
+	//			stok.nextToken();	// Skip first token (-> name).
+				while(stok.hasMoreTokens())
+				{
+					JavaCCExpressionParser parser = new JavaCCExpressionParser();
+					String	prop	= stok.nextToken();
+					if(prop.indexOf("=")!=-1)
+					{
+						String name = prop.substring(0, prop.indexOf("=")).trim();
+						String valtext = prop.substring(prop.indexOf("=")+1).trim();
+						Object val = parser.parseExpression(valtext, dia.getAllImports(), null, classloader).getValue(null);
+						act.setPropertyValue(name, val);
+					}
 				}
 			}
 		}
