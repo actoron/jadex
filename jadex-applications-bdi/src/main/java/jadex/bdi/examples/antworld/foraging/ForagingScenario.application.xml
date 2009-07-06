@@ -114,13 +114,15 @@
 				
 				
 				<!-- Percepttypes that the environment produces and agents can consume. -->
-				<!-- TODO: disappear, etc..--->
+				<!-- TODO: disappear, etc..-->
 				<!--<env:percepttype name="waste_appeared" objecttype="waste"
 					agenttype="Ant"/>
 				<env:percepttype name="waste_disappeared" objecttype="waste"
 					agenttype="Ant"/>-->
 				<env:percepttype name="foodSource_appeared" objecttype="foodSource"
 					agenttype="Ant"/>				
+					<env:percepttype name="foodSource_disappeared" objecttype="foodSource"
+					agenttype="Ant"/>
 				
 				
 				<!-- Percept generators define which percepts should be created -->
@@ -236,7 +238,7 @@
 	
 	<agenttypes>
 		<agenttype name="Ant"
-			filename="jadex/bdi/examples/antworld/ForagingAnt.agent.xml"/>
+			filename="jadex/bdi/examples/antworld/foraging/ForagingAnt.agent.xml"/>
 		<agenttype name="Environment"
 			filename="jadex/bdi/examples/antworld/environment/Environment.agent.xml"/>
 	</agenttypes>

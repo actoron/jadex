@@ -42,7 +42,9 @@
 		<beliefset name="wastes" class="ISpaceObject"/>
 		
 		<!-- Food sources at the current position. -->
-		<beliefset name="foodSources" class="ISpaceObject"/>
+		<!-- <beliefset name="foodSources" class="ISpaceObject"/>-->
+		<!-- <belief name="foodSources" class="boolean"/>-->
+		
 
 				<!--<belief name="wastes" class="ISpaceObject"/>-->		
 		<belief name="hasGravitation" class="boolean"> 
@@ -112,16 +114,27 @@
 		<performgoal name="check" exclude="never"/>
 		
 		<!-- This goal is used to define the behaviour of the ant under the influence of gravitation.-->
-		<achievegoal name="gravitation_influence" exclude="never" retry="false">
+		<!-- <achievegoal name="gravitation_influence" exclude="never" retry="false">
 			<parameter name="gravitation_center" class="IVector2"/>
-			<unique/>
+			<unique/>-->
 			<!--<creationcondition> $beliefbase.hasGravitation </creationcondition>-->
+			<!-- <deliberation>
+				<inhibits ref="go"/>
+				<inhibits ref="check"/>
+			</deliberation>
+		</achievegoal>-->
+	
+	<!-- This goal is used to mine food.-->
+		<achievegoal name="food_mining" exclude="never" retry="false">		
+			<unique/>
+			<!-- <creationcondition> $beliefbase.hasGravitation </creationcondition>-->
+			<creationcondition> $beliefbase.hasGravitation </creationcondition>
 			<deliberation>
 				<inhibits ref="go"/>
 				<inhibits ref="check"/>
 			</deliberation>
 		</achievegoal>
-	
+		
 	</goals>
 
 	<plans>
@@ -134,6 +147,14 @@
 			</trigger>
 		</plan>-->
 
+	<!-- Plan for moving to a food source and bringing a piece of food back to a nest. -->
+		<plan name="foodMining">
+			<body class="FoodMiningPlan"/>
+			<trigger>
+				<goal ref="food_mining"/>
+			</trigger>
+		</plan>
+		
 		<!-- Plan for running on a predefined route and searching waste. -->
 		<!--<plan name="checking_plan">
 			<body class="CheckingPlanEnv"/>
@@ -167,12 +188,7 @@
 			<trigger>
 				<goal ref="go"/>
 			</trigger>
-		</plan>
-		
-		<!-- TestPlan for testing behaviour of Jadex V2-->
-		<plan name="test_plan">
-			<body class="TestPlan"/>
-		</plan>
+		</plan>			
 		
 		<!-- Plan to init the agent.-->
 		<plan name="init_plan">
@@ -180,7 +196,7 @@
 		</plan>
 		
 		<!-- Plan to be started if the ant is under the influence of gravitation. -->
-		<plan name="gravitation_plan">
+		<!-- <plan name="gravitation_plan">
 			<parameter name="gravitation_center" class="IVector2">
  				<goalmapping ref="gravitation_influence.gravitation_center"/>
 			</parameter>
@@ -188,7 +204,7 @@
 			<trigger>
 				<goal ref="gravitation_influence"/>
 			</trigger>
-		</plan>
+		</plan>-->
 	</plans>
 
 	<properties>
