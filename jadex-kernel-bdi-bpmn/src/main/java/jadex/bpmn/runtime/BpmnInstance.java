@@ -33,7 +33,7 @@ public class BpmnInstance
 		Map	defhandlers	= new HashMap();
 		defhandlers.put("EventStartEmpty", new DefaultActivityHandler());
 		defhandlers.put("EventEndEmpty", new DefaultActivityHandler());
-		defhandlers.put("Task", new DefaultActivityHandler());
+		defhandlers.put("Task", new TaskActivityHandler());
 		defhandlers.put("GatewayParallel", new GatewayParallelActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}

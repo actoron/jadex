@@ -2,11 +2,8 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.commons.xml.BasicTypeConverter;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.List;
-import java.util.StringTokenizer;
 
 
 /**
@@ -33,6 +30,17 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param thread	The process thread.
 	 */
 	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	{
+		executeDefault(activity, instance, thread);
+	}
+	
+	/**
+	 *  Execute an activity.
+	 *  @param activity	The activity to execute.
+	 *  @param instance	The process instance.
+	 *  @param thread	The process thread.
+	 */
+	public void executeDefault(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		doExecute(activity, instance, thread);
 		
@@ -72,5 +80,18 @@ public class DefaultActivityHandler implements IActivityHandler
 		}
 		
 		return ret; 
+	}
+	
+	/**
+	 *  Method that should be called, when the timer event occurs in the platform.
+	 *  @param activity	The timing event activity.
+	 *  @param instance	The process instance.
+	 *  @param thread	The process thread.
+	 */
+	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	{
+		thread.setWaiting(false);
+		executeDefault(activity, instance, thread);
+		instance.wakeUp();
 	}
 }

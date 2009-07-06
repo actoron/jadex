@@ -45,17 +45,4 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param duration	The duration to wait.
 	 */
 	public abstract void doWait(MActivity activity, BpmnInstance instance, ProcessThread thread, long duration);
-	
-	/**
-	 *  Method that should be called, when the timer event occurs in the platform.
-	 *  @param activity	The timing event activity.
-	 *  @param instance	The process instance.
-	 *  @param thread	The process thread.
-	 */
-	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread)
-	{
-		thread.setWaiting(false);
-		super.execute(activity, instance, thread);
-		instance.wakeUp();
-	}
 }
