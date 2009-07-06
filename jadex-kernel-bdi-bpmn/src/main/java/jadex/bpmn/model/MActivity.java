@@ -361,22 +361,31 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 		this.looping = looping;
 	}
 
+	public String getName()
+	{
+		String	name	= super.getName();
+		if(name!=null && name.indexOf("\r")!=-1)
+			name	= name.substring(0, name.indexOf("\r"));
+		if(name!=null && name.indexOf("\n")!=-1)
+			name	= name.substring(0, name.indexOf("\n"));
+		return name;
+	}
+	
+	public String getDescription()
+	{
+		return super.getName();
+	}
+	
 	/**
 	 *  Create a string representation of this activity.
 	 *  @return A string representation of this activity.
 	 */
 	public String	toString()
-	{
-		String	name	= getName();
-		if(name!=null && name.indexOf("\r")!=-1)
-			name	= name.substring(0, name.indexOf("\r"));
-		if(name!=null && name.indexOf("\n")!=-1)
-			name	= name.substring(0, name.indexOf("\n"));
-		
+	{		
 		StringBuffer buf = new StringBuffer();
 		buf.append(SReflect.getInnerClassName(this.getClass()));
 		buf.append("(name=");
-		buf.append(name);
+		buf.append(getName());
 		buf.append(", activityType=");
 		buf.append(getActivityType());
 		buf.append(")");
