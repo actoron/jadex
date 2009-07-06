@@ -10,7 +10,8 @@ public interface ITask
 {
 	/**
 	 *  Execute the task.
+	 *  @param context	The accessible values.
+	 *  @listener	To be notified, when the task has completed.
 	 */
-	// Todo: how to feed in parameters?
-	public void	execute(IResultListener listener);
+	public void	execute(ITaskContext context, IResultListener listener);
 }

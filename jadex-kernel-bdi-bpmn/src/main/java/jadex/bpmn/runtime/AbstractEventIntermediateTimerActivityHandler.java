@@ -19,7 +19,7 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		long	duration	= -1; 
-		StringTokenizer	stok	= new StringTokenizer(activity.getName(), "\r\n");
+		StringTokenizer	stok	= new StringTokenizer(activity.getDescription(), "\r\n");
 		stok.nextToken();	// Skip first token (-> name).
 		while(stok.hasMoreTokens())
 		{

@@ -5,6 +5,8 @@ import jadex.bpmn.model.MBpmnDiagram;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
+import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  *  Representation of a running BPMN process.
@@ -111,9 +114,51 @@ public class BpmnInstance
 		boolean	executed	= false;
 		for(Iterator it=threads.iterator(); !executed && it.hasNext(); )
 		{
-			ProcessThread	thread	= (ProcessThread)it.next();
+			final ProcessThread	thread	= (ProcessThread)it.next();
 			if(!thread.isWaiting())
 			{
+				// Handle parameter passing in edge inscriptions.
+				if(thread.getLastEdge()!=null && thread.getLastEdge().getName()!=null)
+				{
+					final Map	oldvalues	= thread.getContext(thread.getLastEdge().getSource().getName());
+					StringTokenizer	stok	= new StringTokenizer(thread.getLastEdge().getName(), "\r\n");
+					while(stok.hasMoreTokens())
+					{
+						String	stmt	= stok.nextToken();
+						int	idx	= stmt.indexOf("=");
+						if(idx!=-1)
+						{
+							String	name	= stmt.substring(0, idx).trim();
+							String	exp	= stmt.substring(idx+1).trim();
+							Object	val	= new JavaCCExpressionParser().parseExpression(exp, null, null, getClass().getClassLoader()).getValue(new IValueFetcher()
+							{
+								public Object fetchValue(String name, Object object)
+								{
+									if(object instanceof Map)
+										return ((Map)object).get(name);
+									else
+										throw new UnsupportedOperationException();
+								}
+								
+								public Object fetchValue(String name)
+								{
+									Object	value	= oldvalues!=null ? oldvalues.get(name) : null;
+									if(value==null)
+									{
+										value	= thread.getContext(name);
+									}
+									return value;
+								}
+							});
+							thread.setParameterValue(name, val);
+						}
+						else
+						{
+							System.err.println("Don't know what to do with edge inscription: "+stmt);
+						}
+					}
+				}
+				
 				IActivityHandler	handler	= (IActivityHandler) handlers.get(thread.getNextActivity().getActivityType());
 				if(handler==null)
 					throw new UnsupportedOperationException("No handler for activity: "+thread);

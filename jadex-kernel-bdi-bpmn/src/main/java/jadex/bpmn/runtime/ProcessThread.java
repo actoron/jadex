@@ -4,13 +4,14 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.commons.SReflect;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  *  Representation of a single control flow in a BPMN process instance,
  *  i.e. an instance of a sequence flow.
  */
-public class ProcessThread
+public class ProcessThread	implements ITaskContext
 {
 	//-------- attributes --------
 	
@@ -23,7 +24,10 @@ public class ProcessThread
 	/** Is the process in a waiting state. */
 	protected boolean	waiting;
 	
-	/** The currently available output values. */
+	/** The contexts (data) of previous activities (task name ->). */
+	protected Map	contexts;
+	
+	/** The contexts (data) of previous activities */
 	protected Map	values;
 	
 	//-------- constructors --------
@@ -49,6 +53,8 @@ public class ProcessThread
 		buf.append(SReflect.getInnerClassName(this.getClass()));
 		buf.append("(activity=");
 		buf.append(activity);
+		buf.append(", contexts=");
+		buf.append(contexts);
 		buf.append(")");
 		return buf.toString();
 	}
@@ -79,6 +85,7 @@ public class ProcessThread
 	{
 		this.edge	= edge;
 		this.activity	= (MActivity) edge.getTarget();
+		this.values	= null;	// Clean context for next activity;
 	}
 	
 	/**
@@ -107,8 +114,53 @@ public class ProcessThread
 		ProcessThread	ret	= new ProcessThread(null);
 		ret.activity	= activity;
 		ret.edge	= edge;
-//		ret.values	= new HashMap(values);
+		ret.contexts	= contexts;
+		ret.values	= null;
 		return ret;
 		
+	}
+	
+	//-------- ITaskContext --------
+	
+	/**
+	 *  Get the value of a parameter.
+	 *  @param name	The parameter name. 
+	 *  @return	The parameter value. 
+	 */
+	public Object	getParameterValue(String name)
+	{
+		return values!=null ? values.get(name) : null;
+	}
+
+	/**
+	 *  Set the value of a parameter.
+	 *  @param name	The parameter name. 
+	 *  @param value	The parameter value. 
+	 */
+	public void	setParameterValue(String name, Object value)
+	{
+		if(values==null)
+		{
+			values	= new HashMap();
+			
+			if(contexts==null)
+			{
+				contexts	= new HashMap();
+			}
+			
+			contexts.put(activity.getName(), values);
+		}
+		
+		values.put(name, value);
+	}
+
+	/**
+	 *  Get the context of a previously executed task.
+	 *  @param name	The name of the task.
+	 *  @return	The context (if any).
+	 */
+	public Map getContext(String name)
+	{
+		return contexts!=null ? (Map)contexts.get(name) : null;
 	}
 }
