@@ -1,7 +1,9 @@
 package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 
 import java.util.List;
 
@@ -43,46 +45,100 @@ public class DefaultActivityHandler implements IActivityHandler
 	 */
 	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
-		MSequenceEdge	next	= getOutgoingEdge(activity, instance, thread);
-		if(next!=null)
+		MNamedIdElement	next	= getOutgoingElement(activity, instance, thread);
+		if(next instanceof MSequenceEdge)
 		{
-			thread.setLastEdge(next);
+			thread.setLastEdge((MSequenceEdge) next);
+		}
+		else if(next instanceof MActivity)
+		{
+			thread.setNextActivity((MActivity) next);
+		}
+		else if(next!=null)
+		{
+			throw new UnsupportedOperationException("Unknown outgoing element type: "+next);
 		}
 		else
 		{
-			instance.getThreads().remove(thread);
+			ThreadContext	context	= thread.getThreadContext();
+			context.removeThread(thread);
+			
+			if(context.isFinished() && context.getParent()!=null)
+			{
+				context.getInitiator().setWaiting(false);
+				context.getParent().removeSubcontext(context);
+			}
 		}
 	}
 	
 	/**
-	 *  Get the outgoing edge.
+	 *  Get the outgoing edge or activity.
 	 *  @param activity	The current activity.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @return The outgoing edge or activity or null if the thread is finished.
 	 */
-	protected MSequenceEdge	getOutgoingEdge(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	protected MNamedIdElement	getOutgoingElement(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
-		MSequenceEdge	ret;
+		MNamedIdElement	ret;
 		
-		List	outgoing	= activity.getOutgoingSequenceEdges();
-		if(outgoing==null || outgoing.size()==0)
+		// Normal flow
+		if(thread.getException()==null)
 		{
-			ret	= null;
+			List	outgoing	= activity.getOutgoingSequenceEdges();
+			if(outgoing==null || outgoing.size()==0)
+			{
+				ret	= null;
+			}
+			else if(outgoing.size()==1)
+			{
+				ret	= (MSequenceEdge)outgoing.get(0);
+			}
+			else
+			{
+				throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge getOutgoingEdge() for disambiguation: "+activity);
+			}
 		}
-		else if(outgoing.size()==1)
+		
+		// Exception flow.
+		else if(activity instanceof MSubProcess)
 		{
-			ret	= (MSequenceEdge)outgoing.get(0);
+			// Todo: save stack frames (i.e. nested sub processes) in process thread.
+			List	handlers	= ((MSubProcess)activity).getEventHandlers();
+			MActivity	match	= null;
+			for(int i=0; handlers!=null && match==null && i<handlers.size(); i++)
+			{
+				MActivity	handler	= (MActivity) handlers.get(i);
+				if(handler.getActivityType().equals("EventIntermediateError"))
+				{
+					// Todo: match exception types.
+//					Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
+					match	= handler;
+				}
+			}
+
+			if(match!=null)
+			{
+				// Todo: store exception as parameter!?
+				thread.setException(null);
+				ret	= match;
+			}
+			else
+			{
+				throw new UnsupportedOperationException("Subsequent activity after exception cannot be determined: "+activity);
+			}
 		}
+
 		else
 		{
-			throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge getOutgoingEdge() for disambiguation: "+activity);
+			throw new UnsupportedOperationException("Subsequent activity after exception cannot be determined: "+activity, thread.getException());
 		}
-		
+
 		return ret; 
 	}
 	
 	/**
-	 *  Method that should be called, when the timer event occurs in the platform.
+	 *  Method that should be called, when an activity is finished and the following activity should be scheduled.
 	 *  @param activity	The timing event activity.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.

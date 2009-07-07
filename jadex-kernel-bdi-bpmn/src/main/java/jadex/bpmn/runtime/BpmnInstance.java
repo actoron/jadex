@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Representation of a running BPMN process.
@@ -32,7 +30,9 @@ public class BpmnInstance
 		Map	defhandlers	= new HashMap();
 		defhandlers.put("EventStartEmpty", new DefaultActivityHandler());
 		defhandlers.put("EventEndEmpty", new DefaultActivityHandler());
+		defhandlers.put("EventIntermediateError", new DefaultActivityHandler());
 		defhandlers.put("Task", new TaskActivityHandler());
+		defhandlers.put("SubProcess", new TaskActivityHandler());
 		defhandlers.put("GatewayParallel", new GatewayParallelActivityHandler());
 		defhandlers.put("GatewayDataBasedExclusive", new GatewayXORActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
@@ -40,14 +40,11 @@ public class BpmnInstance
 	
 	//-------- attributes --------
 	
-	/** The model. */
-	protected MBpmnModel model;
-
 	/** The activity handlers. */
 	protected Map	handlers;
 
-	/** The current threads. */
-	protected Set threads;
+	/** The thread context. */
+	protected ThreadContext	context;
 	
 	/** The change listeners. */
 	protected List	listeners;
@@ -61,15 +58,14 @@ public class BpmnInstance
 	 */
 	public BpmnInstance(MBpmnModel model, Map handlers)
 	{
-		this.model = model;
-		this.handlers = handlers;
-		this.threads = new LinkedHashSet();
+		this.handlers	= handlers;
+		this.context	= new ThreadContext(model);
 		
 		// Create initial thread(s). 
 		List	startevents	= model.getStartEvents();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			threads.add(new ProcessThread((MActivity) startevents.get(i)));
+			context.addThread(new ProcessThread((MActivity)startevents.get(i), context));
 		}
 	}
 	
@@ -81,17 +77,17 @@ public class BpmnInstance
 	 */
 	public MBpmnModel	getModel()
 	{
-		return model;
+		return (MBpmnModel)context.getModelElement();
 	}
 	
 	/**
 	 *  Get the currently executing control flows of the process instance.
 	 *  @return A set of currently running threads.
-	 */
+	 * /
 	public Set	getThreads()
 	{
 		return threads;
-	}
+	}*/
 	
 	/**
 	 *  Check, if the process has terminated.
@@ -99,7 +95,7 @@ public class BpmnInstance
 	 */
 	public boolean isFinished()
 	{
-		return threads.isEmpty();
+		return context.isFinished();
 	}
 
 	/**
@@ -108,40 +104,36 @@ public class BpmnInstance
 	// Todo: What about diagrams with multiple pools/lanes etc?
 	public void executeStep()
 	{
-		if(threads.isEmpty())
-			throw new UnsupportedOperationException("No more threads to execute: "+this);
+		if(isFinished())
+			throw new UnsupportedOperationException("Cannot execute a finished process: "+this);
 		
-		boolean	executed	= false;
-		for(Iterator it=threads.iterator(); !executed && it.hasNext(); )
+		if(!isReady())
+			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
+		
+		ProcessThread	thread	= context.getExecutableThread();
+		
+		// Handle parameter passing in edge inscriptions.
+		if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
 		{
-			final ProcessThread	thread	= (ProcessThread)it.next();
-			if(!thread.isWaiting())
+			Map mappings = thread.getLastEdge().getParameterMappings();
+			if(mappings!=null)
 			{
-				// Handle parameter passing in edge inscriptions.
-				if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
+				IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
+				for(Iterator it2=mappings.keySet().iterator(); it2.hasNext(); )
 				{
-					Map mappings = thread.getLastEdge().getParameterMappings();
-					if(mappings!=null)
-					{
-						IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
-						for(Iterator it2=mappings.keySet().iterator(); it2.hasNext(); )
-						{
-							String name = (String)it2.next();
-							IParsedExpression exp = (IParsedExpression)mappings.get(name);
-							Object value = exp.getValue(fetcher);
-							thread.setParameterValue(name, value);
-						}
-					}
+					String name = (String)it2.next();
+					IParsedExpression exp = (IParsedExpression)mappings.get(name);
+					Object value = exp.getValue(fetcher);
+					thread.setParameterValue(name, value);
 				}
-				
-				IActivityHandler	handler	= (IActivityHandler) handlers.get(thread.getNextActivity().getActivityType());
-				if(handler==null)
-					throw new UnsupportedOperationException("No handler for activity: "+thread);
-				
-				handler.execute(thread.getNextActivity(), this, thread);
-				executed	= true;
 			}
 		}
+		
+		// Find handler and execute activity.
+		IActivityHandler	handler	= (IActivityHandler) handlers.get(thread.getNextActivity().getActivityType());
+		if(handler==null)
+			throw new UnsupportedOperationException("No handler for activity: "+thread);
+		handler.execute(thread.getNextActivity(), this, thread);
 	}
 	
 	/**
@@ -149,13 +141,7 @@ public class BpmnInstance
 	 */
 	public boolean	isReady()
 	{
-		boolean	ready	= false;
-		for(Iterator it=threads.iterator(); !ready && it.hasNext(); )
-		{
-			ProcessThread	thread	= (ProcessThread)it.next();
-			ready	= !thread.isWaiting();
-		}
-		return ready;
+		return context.getExecutableThread()!=null;
 	}
 	
 	//-------- listener handling --------
@@ -224,10 +210,10 @@ public class BpmnInstance
 	{
 		StringBuffer buf = new StringBuffer();
 		buf.append(SReflect.getInnerClassName(this.getClass()));
-		buf.append("(model=");
-		buf.append(getModel());
-		buf.append(", threads=");
-		buf.append(getThreads());
+		buf.append("(name=");
+		buf.append(getModel().getName());
+		buf.append(", context=");
+		buf.append(context);
 		buf.append(")");
 		return buf.toString();
 	}

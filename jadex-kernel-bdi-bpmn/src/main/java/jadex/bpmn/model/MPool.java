@@ -176,8 +176,7 @@ public class MPool extends MAssociationTarget
 		{
 			MActivity	act	= (MActivity)activities.get(i);
 			// Todo: use constants
-			// Todo: other start event types.
-			if("EventStartEmpty".equals(act.getActivityType()))
+			if(act.getActivityType().startsWith("EventStart"))
 			{
 				if(ret==null)
 					ret	= new ArrayList();

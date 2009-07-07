@@ -4,7 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.commons.concurrent.IResultListener;
 
 /**
- *  Abstract handler for tasks.
+ *  Handler for (external) tasks.
  */
 public class TaskActivityHandler extends DefaultActivityHandler
 {
@@ -19,10 +19,10 @@ public class TaskActivityHandler extends DefaultActivityHandler
 		Class taskimpl = (Class)activity.getPropertyValue("class");
 		if(taskimpl!=null)
 		{
+			thread.setWaiting(true);
 			try
 			{
 				ITask task = (ITask)taskimpl.newInstance();
-				thread.setWaiting(true);
 				task.execute(thread, new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -32,16 +32,15 @@ public class TaskActivityHandler extends DefaultActivityHandler
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						thread.setException(exception);
 						TaskActivityHandler.this.notify(activity, instance, thread);
-						exception.printStackTrace();
-						System.out.println("Exception during task execution: "+exception);
 					}
 				});
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				throw new RuntimeException("Task lead to exception: "+e);
+				thread.setException(e);
+				TaskActivityHandler.this.notify(activity, instance, thread);
 			}
 		}
 		else

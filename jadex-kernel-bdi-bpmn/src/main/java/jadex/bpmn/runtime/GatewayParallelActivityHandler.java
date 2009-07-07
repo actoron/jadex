@@ -38,7 +38,6 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 				{
 					ProcessThread	newthread	= thread.createCopy();
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
-					instance.getThreads().add(newthread);
 				}
 			}
 		}
@@ -51,7 +50,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			Set	threads	= new HashSet();	// Threads to be deleted.
 			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
 			
-			for(Iterator it=instance.getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
+			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
 			{
 				ProcessThread	oldthread	= (ProcessThread) it.next();
 				if(edges.contains(oldthread.getLastEdge()))
@@ -64,7 +63,8 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			if(edges.isEmpty())
 			{
 				thread.setLastEdge((MSequenceEdge) outgoing.get(0));
-				instance.getThreads().removeAll(threads);
+				for(Iterator it=threads.iterator(); it.hasNext(); )
+					thread.getThreadContext().removeThread((ProcessThread) it.next());
 			}
 			else
 			{

@@ -24,11 +24,17 @@ public class ProcessThread	implements ITaskContext
 	/** Is the process in a waiting state. */
 	protected boolean	waiting;
 	
+	/** The execution context. */
+	protected ThreadContext	context;
+	
 	/** The contexts (data) of previous activities (task name ->). */
 	protected Map	contexts;
 	
-	/** The contexts (data) of previous activities */
+	/** The contexts (data) of previous activities. */
 	protected Map	values;
+	
+	/** The exception that has just occurred in the process (if any). */
+	protected Exception	exception;
 	
 	//-------- constructors --------
 
@@ -36,9 +42,10 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(MActivity activity)
+	public ProcessThread(MActivity activity, ThreadContext context)
 	{
 		this.activity	= activity;
+		this.context	= context;
 	}
 	
 	//-------- methods --------
@@ -69,6 +76,17 @@ public class ProcessThread	implements ITaskContext
 	}
 
 	/**
+	 *  Set the next activity. Sets the last edge to null.
+	 *  Should only be used, when no edge available (e.g. start events or event handlers of subprocesses).
+	 *  @return The activity.
+	 */
+	public void	setNextActivity(MActivity activity)
+	{
+		setLastEdge(null);
+		this.activity	= activity;
+	}
+	
+	/**
 	 *  Get the last edge (if any).
 	 *  @return The edge.
 	 */
@@ -84,7 +102,7 @@ public class ProcessThread	implements ITaskContext
 	public void setLastEdge(MSequenceEdge edge)
 	{
 		this.edge	= edge;
-		this.activity	= (MActivity) edge.getTarget();
+		this.activity	= edge!=null ? (MActivity) edge.getTarget() : null;
 		this.values	= null;	// Clean context for next activity;
 	}
 	
@@ -111,11 +129,11 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public ProcessThread	createCopy()
 	{
-		ProcessThread	ret	= new ProcessThread(null);
-		ret.activity	= activity;
+		ProcessThread	ret	= new ProcessThread(activity, context);
 		ret.edge	= edge;
 		ret.contexts	= contexts;
 		ret.values	= null;
+		context.addThread(ret);
 		return ret;
 		
 	}
@@ -162,5 +180,31 @@ public class ProcessThread	implements ITaskContext
 	public Map getContext(String name)
 	{
 		return contexts!=null ? (Map)contexts.get(name) : null;
+	}
+
+	/**
+	 *  Get the exception (if any).
+	 *  @return	The exception (if any).
+	 */
+	public Exception	getException()
+	{
+		return exception;
+	}
+
+	/**
+	 *  Set the exception.
+	 *  @param exception	The exception.
+	 */
+	public void	setException(Exception exception)
+	{
+		this.exception	= exception;
+	}
+	
+	/**
+	 *  Get the execution context of the thread.
+	 */
+	public ThreadContext	getThreadContext()
+	{
+		return context;
 	}
 }
