@@ -1,268 +1,308 @@
-<!--
-	<H3>The Foraging application descriptor</H3>
 
-	It can be started to launch an  foraging scenario.
-	Ant are looking for food and bringing it back to their nest.
--->
+	<!--
+		<H3>The Foraging application descriptor</H3> It can be started to
+		launch an foraging scenario. Ant are looking for food and bringing it
+		back to their nest.
+	-->
 
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:env="http://jadex.sourceforge.net/jadex-env"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:env="http://jadex.sourceforge.net/jadex-env" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
 	name="ForagingScenario" package="jadex.bdi.examples.antworld.foraging">
-	
+
 	<imports>
-		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>				        
-		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>		
-		<import>jadex.adapter.base.envsupport.environment.*</import>			
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor
+		</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
-		<import>jadex.bridge.IClockService</import>				
-		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D</import>
-		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>		
-		<import>jadex.bdi.planlib.*</import>					
-		<import>jadex.adapter.base.envsupport.dataview.*</import>						
+		<import>jadex.bridge.IClockService</import>
+		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D
+		</import>
+		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
+		<import>jadex.adapter.base.envsupport.dataview.*</import>
 	</imports>
-	
+
 	<spacetypes>
-		<env:envspacetype name="gc2dspace" width="15" height="15" class="Grid2D">
+		<env:envspacetype name="gc2dspace" width="11" height="11"
+			class="Grid2D">
 			<env:objecttypes>
 				<env:objecttype name="ant">
 					<env:property name="vision_range">3</env:property>
-					<env:property name="position">new Vector2Double(5, 5)</env:property>
+					<env:property name="position">new Vector2Double(5, 5)
+					</env:property>
 				</env:objecttype>
-				<env:objecttype name="destinationSign"/>
-				<!--<env:objecttype name="gravitationCenter">
-					<env:property name="text" dynamic="true">
-						$object.getProperty("absorbedObjects") </env:property>
-				</env:objecttype>
-				<env:objecttype name="gravitationField">
-					<env:property name="text" dynamic="true">
-						$object.getProperty("gravitation strength")
-						</env:property>
-				</env:objecttype>-->
-				
+				<env:objecttype name="destinationSign" />
+				<!--
+					<env:objecttype name="gravitationCenter"> <env:property name="text"
+					dynamic="true"> $object.getProperty("absorbedObjects")
+					</env:property> </env:objecttype> <env:objecttype
+					name="gravitationField"> <env:property name="text" dynamic="true">
+					$object.getProperty("gravitation strength") </env:property>
+					</env:objecttype>
+				-->
+
 				<!-- The size of the objects decreases as time goes by.-->
 				<env:objecttype name="traceRoute">
 					<env:property name="size" dynamic="true">
 						$object.getProperty("round") == null ? new
-						Vector2Double(3.0,3.0) : new Vector2Double( Math.max(0.1,
-						((20 - $object.getProperty("round"))/28.0)), Math.max(0.1, (
-						(20 - $object.getProperty("round"))/28.0) )) <!--new
-						Vector2Double(0.5,0.5)--> </env:property>
+						Vector2Double(3.0,3.0) :
+						new Vector2Double( Math.max(0.1,
+						((20 -
+						$object.getProperty("round"))/28.0)), Math.max(0.1, (
+						(20 -
+						$object.getProperty("round"))/28.0) )) <!--
+							new Vector2Double(0.5,0.5)
+						-->
+					</env:property>
 				</env:objecttype>
-				
-				<env:objecttype name="waste"/>
-				<!--<env:objecttype name="house">
-				<env:property name="size">new Vector2Double( Math.min(1.5,
-				($object.getProperty("clock").getTick()-
-				$object.getProperty("creation_age").doubleValue())/5.0),
-				Math.min(1.5, ($object.getProperty("clock").getTick()-
-				$object.getProperty("creation_age").doubleValue())/5.0) )
-				</env:property>
-				</env:objecttype>-->
-				
+
+				<env:objecttype name="waste" />
+				<!--
+					<env:objecttype name="house"> <env:property name="size">new
+					Vector2Double( Math.min(1.5,
+					($object.getProperty("clock").getTick()-
+					$object.getProperty("creation_age").doubleValue())/5.0),
+					Math.min(1.5, ($object.getProperty("clock").getTick()-
+					$object.getProperty("creation_age").doubleValue())/5.0) )
+					</env:property> </env:objecttype>
+				-->
+
 				<env:objecttype name="foodSource">
-					<env:property name="stock">10</env:property>
+					<env:property name="stock">3</env:property>
 					<env:property name="capacity">10</env:property>
 					<env:property name="empty" dynamic="true">$object.stock ==
-						0</env:property>
+						0
+					</env:property>
+					<env:property name="text" dynamic="true">
+						$object.getProperty("stock")
+						</env:property>
 				</env:objecttype>
-				
+
 				<env:objecttype name="nest">
-					<!--<env:property name="stock">10</env:property>
-					<env:property name="capacity">10</env:property>
-					
-					<env:property name="empty" dynamic="true">$object.stock == 0</env:property>-->
+
+					<env:property name="stock">0</env:property>
+					<env:property name="capacity">50</env:property>
+					<!--
+						<env:property name="full" dynamic="true">$object.stock ==
+						capacity</env:property>
+					-->
+					<env:property name="text" dynamic="true">
+						$object.getProperty("stock")
+						</env:property>
+
 				</env:objecttype>
-				
+
 			</env:objecttypes>
-			
+
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="Ant" objecttype="ant"/>					
+				<env:avatarmapping agenttype="Ant" objecttype="ant" />
 				<!--<env:avatarmapping agenttype="Burner" objecttype="burner"/>-->
 			</env:avatarmappings>
-			
+
 			<env:actiontypes>
-				<!--<env:agentactiontype name="pickup" class="PickupWasteAction" />
-				<env:agentactiontype name="drop" class="DropWasteAction" />
-				<env:agentactiontype name="burn" class="BurnWasteAction" />-->
-				<env:actiontype name="go" class="GoAction"/>
-				<env:actiontype name="updateDestination"
-					class="UpdateDestinationAction"/>
-				<env:actiontype name="updateTraceRoute" class="TraceRouteAction"/>
-				<!--<env:actiontype name="absorbObject" class="AbsorbObjectAction"/>
-				<env:actiontype name="testAction" class="TestAction"/>-->
+				<!--
+					<env:agentactiontype name="pickup" class="PickupWasteAction" />
+					<env:agentactiontype name="drop" class="DropWasteAction" />
+					<env:agentactiontype name="burn" class="BurnWasteAction" />
+				-->
+				<env:actiontype name="go" class="GoAction" />
+				<env:actiontype name="updateDestination" class="UpdateDestinationAction" />
+				<env:actiontype name="updateTraceRoute" class="TraceRouteAction" />
+				<!--
+					<env:actiontype name="absorbObject" class="AbsorbObjectAction"/>
+					<env:actiontype name="testAction" class="TestAction"/>
+				-->
 			</env:actiontypes>
-			
+
 			<env:processtypes>
 				<env:processtype name="manageTraceRoutes" class="ManageTraceRoutesProcess">
 					<env:property name="rate">2</env:property>
 				</env:processtype>
-				<!--<env:processtype name="manageGravitation"
-					class="ManageGravitationProcess">
-					<env:property name="rate">1</env:property>
-				</env:processtype>-->
+				<!--
+					<env:processtype name="manageGravitation"
+					class="ManageGravitationProcess"> <env:property
+					name="rate">1</env:property> </env:processtype>
+				-->
 				<env:processtype name="createWaste" class="DefaultObjectCreationProcess">
 					<env:property name="timerate">1000</env:property>
 					<env:property name="type">"waste"</env:property>
 				</env:processtype>
 			</env:processtypes>
-			
+
 			<!-- The percepttypes, generators and processors. -->
 			<env:percepttypes>
-				
-				
-				<!-- Percepttypes that the environment produces and agents can consume. -->
+
+
+				<!--
+					Percepttypes that the environment produces and agents can consume.
+				-->
 				<!-- TODO: disappear, etc..-->
-				<!--<env:percepttype name="waste_appeared" objecttype="waste"
-					agenttype="Ant"/>
-				<env:percepttype name="waste_disappeared" objecttype="waste"
-					agenttype="Ant"/>-->
-				<env:percepttype name="foodSource_appeared" objecttype="foodSource"
-					agenttype="Ant"/>				
-					<env:percepttype name="foodSource_disappeared" objecttype="foodSource"
-					agenttype="Ant"/>
-				
-				
+				<!--
+					<env:percepttype name="waste_appeared" objecttype="waste"
+					agenttype="Ant"/> <env:percepttype name="waste_disappeared"
+					objecttype="waste" agenttype="Ant"/>
+				-->
+				<env:percepttype name="foodSource_appeared"
+					objecttype="foodSource" agenttype="Ant" />
+				<env:percepttype name="foodSource_disappeared"
+					objecttype="foodSource" agenttype="Ant" />
+				<env:percepttype name="nest_appeared" objecttype="nest"
+					agenttype="Ant" />
+
+
 				<!-- Percept generators define which percepts should be created -->
 				<env:perceptgenerator name="visiongen"
 					class="DefaultVisionGenerator">
-					<env:property name="maxrange">10</env:property>
-					<!--<env:property name="range">10</env:property>-->
+					<!--  <env:property name="maxrange">10</env:property>-->
+					<env:property name="range">10</env:property>
 					<env:property name="range_property">
 						"vision_range"</env:property>
-					
-					<!-- percept types are declared with associated action types: 
-					percepttype, actiontype1, actiontype2, ... -->
-					<!--<env:property name="percepttypes"> new Object[] { new
+
+					<!--
+						percept types are declared with associated action types:
+						percepttype, actiontype1, actiontype2, ...
+					-->
+					<!--
+						<env:property name="percepttypes"> new Object[] { new
 						String[]{"waste_appeared", "appeared", "created"}, new
 						String[]{"waste_disappeared", "disappeared", "destroyed"} }
-						</env:property>-->
+						</env:property>
+					-->
 					<env:property name="percepttypes"> new Object[] { new
 						String[]{"foodSource_appeared", "appeared", "created"}, new
-						String[]{"foodSource_disappeared", "disappeared", "destroyed"} }
-						</env:property>
+						String[]{"foodSource_disappeared", "disappeared", "destroyed"},new
+						String[]{"nest_appeared", "appeared", "created"} }
+					</env:property>
 				</env:perceptgenerator>
-				
-				<!-- Percept processors consume percepts and push them into the agents. -->
+
+				<!--
+					Percept processors consume percepts and push them into the agents.
+				-->
 				<env:perceptprocessor agenttype="Ant"
 					class="DefaultBDIVisionProcessor">
-					<!--<env:property name="percepttypes"> new Object[] { new
+					<!--
+						<env:property name="percepttypes"> new Object[] { new
 						String[]{"waste_appeared", "add", "wastes"}, new
 						String[]{"waste_disappeared", "remove", "wastes"} }
-						</env:property>-->
-					<env:property name="percepttypes"> new Object[] { new
-						String[]{"foodSource_appeared", "add", "foodSource"}, new
-						String[]{"foodSource_disappeared", "remove", "foodSource"} }
 						</env:property>
+					-->
+					<env:property name="percepttypes"> new Object[] { new
+						String[]{"foodSource_appeared", "add", "foodSources"}, new
+						String[]{"foodSource_disappeared", "remove", "foodSources"},
+						new
+						String[]{"nest_appeared", "add", "nests"} }
+					</env:property>
 				</env:perceptprocessor>
-				
+
 			</env:percepttypes>
-						
-			
+
+
 			<!-- Data views for defining cut outs of the world objects. -->
 			<env:views>
 				<env:view name="view_all" class="GeneralDataView2D" />
-				<env:view name="ant_view" class="LocalDataView2D" objecttype="ant">
+				<env:view name="ant_view" class="LocalDataView2D"
+					objecttype="ant">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">$object.vision_range</env:property>
-				</env:view>			
+				</env:view>
 			</env:views>
-			
+
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D"
-					objectshiftx="0.5" objectshifty="0.5">
-					<!--<env:drawable objecttype="collector" width="0.9" height="0.9">
-					<env:texturedrectangle layer="2"
-					imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png"/>
-					<env:texturedrectangle layer="3" width="0.5" height="0.5"
-					x="0.3" y="-0.2"
-					imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
-					<env:drawcondition>
-					$object.getProperty("garbage")!=null</env:drawcondition>
-					</env:texturedrectangle>
-					</env:drawable>-->
-					
-					<env:drawable objecttype="ant" width="0.9" height="0.9">
-						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
+					opengl="false" objectshiftx="0.5" objectshifty="0.5">
+					<!--
+						<env:drawable objecttype="collector" width="0.9" height="0.9">
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/antworld/images/ant1.png"/>
-						
+						imagepath="jadex/bdi/examples/garbagecollector2/images/collector.png"/>
+						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3"
+						y="-0.2"
+						imagepath="jadex/bdi/examples/garbagecollector2/images/garbage.png">
+						<env:drawcondition>
+						$object.getProperty("garbage")!=null</env:drawcondition>
+						</env:texturedrectangle> </env:drawable>
+					-->
+
+					<env:drawable objecttype="ant" width="0.9" height="0.9">
+						<env:property name="vision_size" dynamic="true">new
+							Vector2Double($object.vision_range*2+1)</env:property>
+						<env:texturedrectangle layer="2"
+							imagepath="jadex/bdi/examples/antworld/images/ant1.png" />
+
 					</env:drawable>
-					
+
 					<env:drawable objecttype="destinationSign" width="0.6"
 						height="0.6">
 						<env:texturedrectangle layer="1"
-							imagepath="jadex/bdi/examples/antworld/images/destination.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/destination.png" />
 					</env:drawable>
-					
-					<env:drawable objecttype="traceRoute" width="1.0" height="1.0">
+
+					<env:drawable objecttype="traceRoute" width="1.0"
+						height="1.0">
 						<env:texturedrectangle layer="0" size="size"
-							imagepath="jadex/bdi/examples/antworld/images/traceroute.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/traceroute.png" />
 					</env:drawable>
-					
-							
-					
+
+
+
 					<env:drawable objecttype="waste" width="0.45" height="0.45">
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/antworld/images/waste.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/waste.png" />
 					</env:drawable>
-					
-					<env:drawable objecttype="foodSource" width="0.8" height="0.8">
+
+					<env:drawable objecttype="foodSource" width="0.8"
+						height="0.8">
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/antworld/images/food.png"/>
+							imagepath="jadex/bdi/examples/antworld/images/food.png" />
+						<env:text layer="2" basesize="20" text="$text$" color="black" />
 					</env:drawable>
-					
+
 					<env:drawable objecttype="nest" width="0.8" height="0.8">
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/antworld/images/nest.jpg"/>
+							imagepath="jadex/bdi/examples/antworld/images/nest.jpg" />
+						<env:text layer="2" basesize="20" text="$text$" color="black" />
 					</env:drawable>
-					
+
 					<env:prelayers>
 						<env:tiledlayer width="0.3" height="0.3"
-							imagepath="jadex/bdi/examples/antworld/images/bg.png"/>
-						<env:gridlayer width="1.0" height="1.0" color="WHITE"/>
+							imagepath="jadex/bdi/examples/antworld/images/bg.png" />
+						<env:gridlayer width="1.0" height="1.0" color="WHITE" />
 					</env:prelayers>
-					
+
 				</env:perspective>
-							
+
 			</env:perspectives>
-			
+
 			<!-- executor -->
 			<env:spaceexecutor class="RoundBasedExecutor">
 				<property name="space">$space</property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
-	
+
 	<agenttypes>
 		<agenttype name="Ant"
-			filename="jadex/bdi/examples/antworld/foraging/ForagingAnt.agent.xml"/>
+			filename="jadex/bdi/examples/antworld/foraging/ForagingAnt.agent.xml" />
 		<agenttype name="Environment"
-			filename="jadex/bdi/examples/antworld/environment/Environment.agent.xml"/>
+			filename="jadex/bdi/examples/antworld/environment/Environment.agent.xml" />
 	</agenttypes>
-	
+
 	<applications>
 		<application name="Ants with Environment">
 			<agents>
-				<agent type="Ant" number="3"/>				
+				<agent type="Ant" number="1" />
 				<!--<agent name="EnvironmentLocal" type="Environment"/>-->
 			</agents>
-			
+
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:objects>				
-					<env:object type="foodSource">
-						<env:property name="position">new Vector2Int(3,8)</env:property>
-					</env:object>
+				<env:objects>
 					<env:object type="nest">
 						<env:property name="position">new Vector2Int(8,1)</env:property>
 					</env:object>
 					<env:object type="foodSource">
-						<env:property name="position">new Vector2Int(7,1)</env:property>
-					</env:object>
-					<env:object type="foodSource">
-						<env:property name="position">new Vector2Int(7,1)</env:property>
+						<env:property name="position">new Vector2Int(3,8)</env:property>
 					</env:object>
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(3,6)</env:property>
@@ -288,20 +328,21 @@
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(4,4)</env:property>
 					</env:object>
-				</env:objects> 
-				
-			<env:processes>
+				</env:objects>
+
+				<env:processes>
 					<env:process type="manageTraceRoutes">
 						<env:property name="rate">2</env:property>
 					</env:process>
-				<!--<env:process type="manageGravitation">
-					<env:property name="rate">1</env:property>
-				</env:process>-->
-				<env:process type="createWaste">
+					<!--
+						<env:process type="manageGravitation"> <env:property
+						name="rate">1</env:property> </env:process>
+					-->
+					<env:process type="createWaste">
 						<env:property name="timerate">5000</env:property>
 					</env:process>
 				</env:processes>
-				
+
 				<env:observers>
 					<env:observer name="world" view="view_all"
 						perspective="abstract">
@@ -311,29 +352,20 @@
 				</env:observers>
 			</env:envspace>
 		</application>
-		
-		<!--<application name="One Burner / Two Collectors">
-			<agents>
-				<agent name="Collector2" type="Collector"/>
-				<agent name="Collector1" type="Collector"/>
-				<agent name="Burner1" type="Burner"/>
-			</agents>
-			
-			<env:envspace name="mygc2dspace" type="gc2dspace">
-				 <env:objects>
-					<env:object type="collector" owner="Collector1" />
-					<env:object type="collector" owner="Collector2" />
-					<env:object type="burner" owner="Burner1" />
-				</env:objects> 
-				
-				<env:observers>
-					<env:observer name="world" view="view_all" perspective="abstract">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
-				</env:observers>
-			</env:envspace>
-		</application>-->
+
+		<!--
+			<application name="One Burner / Two Collectors"> <agents> <agent
+			name="Collector2" type="Collector"/> <agent name="Collector1"
+			type="Collector"/> <agent name="Burner1" type="Burner"/> </agents>
+
+			<env:envspace name="mygc2dspace" type="gc2dspace"> <env:objects>
+			<env:object type="collector" owner="Collector1" /> <env:object
+			type="collector" owner="Collector2" /> <env:object type="burner"
+			owner="Burner1" /> </env:objects> <env:observers> <env:observer
+			name="world" view="view_all" perspective="abstract"> <env:plugins>
+			</env:plugins> </env:observer> </env:observers> </env:envspace>
+			</application>
+		-->
 	</applications>
 
 </applicationtype>
