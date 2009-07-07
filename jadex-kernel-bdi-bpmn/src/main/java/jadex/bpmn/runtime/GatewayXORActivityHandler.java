@@ -3,11 +3,9 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -25,61 +23,48 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	{
 		List	incoming	= activity.getIncomingEdges();
 		List	outgoing	= activity.getOutgoingEdges();
-
+		
 		// Split
 		if(incoming!=null && incoming.size()==1 && outgoing!=null && outgoing.size()>1)
 		{
+			MSequenceEdge def = null;
+			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
 			for(int i=0; i<outgoing.size(); i++)
 			{
+				// Take first out edge that is satisfied and not the default edge (without condition)
 				MSequenceEdge edge = (MSequenceEdge)outgoing.get(i);
 				IParsedExpression exp = edge.getCondition();
-//				exp.getValue(in)
-				
-				if(i==0)
+				if(exp!=null)
 				{
-					thread.setLastEdge((MSequenceEdge)outgoing.get(i));
+					if(((Boolean)exp.getValue(fetcher)).booleanValue())
+					{
+						thread.setLastEdge(edge);
+						def = null;
+						break;
+					}
 				}
 				else
 				{
-					ProcessThread	newthread	= thread.createCopy();
-					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
-					instance.getThreads().add(newthread);
+					def = edge;
 				}
+			}
+			
+			if(def!=null)
+			{
+				thread.setLastEdge(def);
 			}
 		}
 		
 		// Join
 		else if(incoming!=null && incoming.size()>1 && outgoing!=null && outgoing.size()==1)
 		{
-			// Try to find threads for all incoming edges.
-			Set	edges	= new HashSet(incoming);
-			Set	threads	= new HashSet();	// Threads to be deleted.
-			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
-			
-			for(Iterator it=instance.getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
-			{
-				ProcessThread	oldthread	= (ProcessThread) it.next();
-				if(edges.contains(oldthread.getLastEdge()))
-				{
-					threads.add(oldthread);
-					edges.remove(oldthread.getLastEdge());
-				}
-			}
-			
-			if(edges.isEmpty())
-			{
-				thread.setLastEdge((MSequenceEdge) outgoing.get(0));
-				instance.getThreads().removeAll(threads);
-			}
-			else
-			{
-				thread.setWaiting(true);
-			}
+			// Only one thread arrives.
+			thread.setLastEdge((MSequenceEdge)outgoing.get(0));
 		}
 		
 		else
 		{
-			throw new UnsupportedOperationException("Invalid number of edges for parallel split/join: "+activity+", "+instance);
+			throw new UnsupportedOperationException("Invalid number of edges for xor split/join: "+activity+", "+instance);
 		}
 	}
 }

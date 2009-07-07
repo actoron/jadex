@@ -13,6 +13,18 @@ import java.util.List;
 public class DefaultActivityHandler implements IActivityHandler
 {	
 	/**
+	 *  Execute an activity.
+	 *  @param activity	The activity to execute.
+	 *  @param instance	The process instance.
+	 *  @param thread	The process thread.
+	 */
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	{
+		doExecute(activity, instance, thread);
+		step(activity, instance, thread);
+	}
+	
+	/**
 	 *  Execute an activity. Empty default implementation.
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
@@ -22,28 +34,15 @@ public class DefaultActivityHandler implements IActivityHandler
 	{
 		System.out.println("Executed: "+activity+", "+instance);
 	}
-
-	/**
-	 *  Execute an activity.
-	 *  @param activity	The activity to execute.
-	 *  @param instance	The process instance.
-	 *  @param thread	The process thread.
-	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
-	{
-		executeDefault(activity, instance, thread);
-	}
 	
 	/**
-	 *  Execute an activity.
+	 *  Make a process step.
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void executeDefault(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
-		doExecute(activity, instance, thread);
-		
 		MSequenceEdge	next	= getOutgoingEdge(activity, instance, thread);
 		if(next!=null)
 		{
@@ -91,7 +90,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		thread.setWaiting(false);
-		executeDefault(activity, instance, thread);
+		step(activity, instance, thread);
 		instance.wakeUp();
 	}
 }

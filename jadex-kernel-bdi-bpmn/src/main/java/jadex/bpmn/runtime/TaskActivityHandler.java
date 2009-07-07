@@ -16,31 +16,36 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
 	{
-		thread.setWaiting(true);
 		Class taskimpl = (Class)activity.getPropertyValue("class");
-		try
+		if(taskimpl!=null)
 		{
-			ITask task = (ITask)taskimpl.newInstance();
-			thread.setWaiting(true);
-			task.execute(thread, new IResultListener()
+			try
 			{
-				
-				public void resultAvailable(Object result)
+				ITask task = (ITask)taskimpl.newInstance();
+				thread.setWaiting(true);
+				task.execute(thread, new IResultListener()
 				{
-					TaskActivityHandler.this.notify(activity, instance, thread);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					TaskActivityHandler.this.notify(activity, instance, thread);
-					System.out.println("Exception during task execution: "+exception);
-				}
-			});
+					public void resultAvailable(Object result)
+					{
+						TaskActivityHandler.this.notify(activity, instance, thread);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						TaskActivityHandler.this.notify(activity, instance, thread);
+						System.out.println("Exception during task execution: "+exception);
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException("Task lead to exception: "+e);
+			}
 		}
-		catch(Exception e)
+		else
 		{
-			e.printStackTrace();
-			throw new RuntimeException("");
+			super.execute(activity, instance, thread);
 		}
 	}
 }

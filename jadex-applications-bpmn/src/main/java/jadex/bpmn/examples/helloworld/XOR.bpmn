@@ -9,7 +9,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_ki5NIWpBEd6JtKkNrnCCNQ" iD="_ki5NIGpBEd6JtKkNrnCCNQ" incomingEdges="_ki5NKmpBEd6JtKkNrnCCNQ" activityType="EventEndEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_sCFYAWpAEd6JtKkNrnCCNQ" iD="_sCFYAGpAEd6JtKkNrnCCNQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_DvxVUWpBEd6JtKkNrnCCNQ" iD="_DvxVUGpBEd6JtKkNrnCCNQ" name="Math.random()>0.5"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_QugcqGpBEd6JtKkNrnCCNQ" iD="_Qugcp2pBEd6JtKkNrnCCNQ" name="\"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_QugcqGpBEd6JtKkNrnCCNQ" iD="_Qugcp2pBEd6JtKkNrnCCNQ" name=""/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_feMkOmpBEd6JtKkNrnCCNQ" iD="_feMkOWpBEd6JtKkNrnCCNQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_gDcmUWpBEd6JtKkNrnCCNQ" iD="_gDcmUGpBEd6JtKkNrnCCNQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ki5NKmpBEd6JtKkNrnCCNQ" iD="_ki5NKWpBEd6JtKkNrnCCNQ"/>

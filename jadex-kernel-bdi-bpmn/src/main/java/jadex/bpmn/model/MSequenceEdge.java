@@ -3,7 +3,9 @@ package jadex.bpmn.model;
 import jadex.javaparser.IParsedExpression;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -32,6 +34,9 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	
 	/** The condition. */
 	protected IParsedExpression condition;
+	
+	/** The parameter mappings. */
+	protected Map parametermappings;
 	
 	//-------- methods --------
 
@@ -126,6 +131,8 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 			associations.remove(association);
 	}
 	
+	//-------- additions --------
+	
 	/**
 	 * 
 	 */
@@ -140,5 +147,24 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	public IParsedExpression getCondition()
 	{
 		return this.condition;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addParameterMapping(String name, IParsedExpression exp)
+	{
+		if(parametermappings == null)
+			parametermappings = new HashMap();
+		
+		parametermappings.put(name, exp);
+	}
+	
+	/**
+	 * 
+	 */
+	public Map getParameterMappings()
+	{
+		return parametermappings;
 	}
 }

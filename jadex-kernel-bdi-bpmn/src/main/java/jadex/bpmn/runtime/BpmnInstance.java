@@ -5,6 +5,7 @@ import jadex.bpmn.model.MBpmnDiagram;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -35,6 +36,7 @@ public class BpmnInstance
 		defhandlers.put("EventEndEmpty", new DefaultActivityHandler());
 		defhandlers.put("Task", new TaskActivityHandler());
 		defhandlers.put("GatewayParallel", new GatewayParallelActivityHandler());
+		defhandlers.put("GatewayDataBasedExclusive", new GatewayXORActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	
@@ -121,22 +123,16 @@ public class BpmnInstance
 				if(thread.getLastEdge()!=null && thread.getLastEdge().getName()!=null)
 				{
 					// todo: moveto model
-					
-					StringTokenizer	stok	= new StringTokenizer(thread.getLastEdge().getName(), "\r\n");
-					while(stok.hasMoreTokens())
+					Map mappings = thread.getLastEdge().getParameterMappings();
+					if(mappings!=null)
 					{
-						String	stmt	= stok.nextToken();
-						int	idx	= stmt.indexOf("=");
-						if(idx!=-1)
+						IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
+						for(Iterator it2=mappings.keySet().iterator(); it2.hasNext(); )
 						{
-							String	name	= stmt.substring(0, idx).trim();
-							String	exp	= stmt.substring(idx+1).trim();
-							Object	val	= new JavaCCExpressionParser().parseExpression(exp, null, null, getClass().getClassLoader()).getValue(new ProcessThreadValueFetcher(thread));
-							thread.setParameterValue(name, val);
-						}
-						else
-						{
-							System.err.println("Don't know what to do with edge inscription: "+stmt);
+							String name = (String)it2.next();
+							IParsedExpression exp = (IParsedExpression)mappings.get(name);
+							Object value = exp.getValue(fetcher);
+							thread.setParameterValue(name, value);
 						}
 					}
 				}

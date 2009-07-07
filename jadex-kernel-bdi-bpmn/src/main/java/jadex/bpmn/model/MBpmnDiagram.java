@@ -1,5 +1,6 @@
 package jadex.bpmn.model;
 
+import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -617,7 +618,7 @@ public class MBpmnDiagram extends MIdElement
 		
 		types.add(new TypeInfo("sequenceEdges", MSequenceEdge.class, null, null,
 			SUtil.createHashMap(new String[]{"associations"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("associationsDescription")}), null));
+			new BeanAttributeInfo[]{new BeanAttributeInfo("associationsDescription")}), new SequenceEdgePostProcessor()));
 					
 		
 		types.add(new TypeInfo("messagingEdges", MMessagingEdge.class, null, null,
@@ -823,33 +824,51 @@ public class MBpmnDiagram extends MIdElement
 	
 	/**
 	 *  Sequence edge post processor.
-	 * /
+	 */
 	static class SequenceEdgePostProcessor implements IPostProcessor
 	{
 		//-------- IPostProcessor interface --------
 		
 		/**
 		 *  Establish element connections.
-		 * /
+		 */
 		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnDiagram dia = (MBpmnDiagram)root;
 			MSequenceEdge edge = (MSequenceEdge)object;
+			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
-			Object ret = null;
 			if(edge.getDescription()!=null)
 			{
-				StringTokenizer	stok = new StringTokenizer(act.getDescription(), "\r\n");
-	//			stok.nextToken();	// Skip first token (-> name).
+				// first line: name
+				// second line: condition
+				// lines with = in it: parameters
+				
+				StringTokenizer	stok = new StringTokenizer(edge.getDescription(), "\r\n");
+				String condtext = null;
 				while(stok.hasMoreTokens())
 				{
-					JavaCCExpressionParser parser = new JavaCCExpressionParser();
+					
 					String prop = stok.nextToken();
-					if(prop.indexOf("=")==-1)
+					int	idx	= prop.indexOf("=");
+					if(idx!=-1)
 					{
-						IParsedExpression cond = parser.parseExpression(prop, dia.getAllImports(), null, classloader);
-						edge.setCondition(cond);
+						String	name	= prop.substring(0, idx).trim();
+						String	exptext	= prop.substring(idx+1).trim();
+						IParsedExpression exp = parser.parseExpression(exptext, dia.getAllImports(), null, classloader);
+						edge.addParameterMapping(name, exp);
 					}
+					else
+					{
+						// last line without "=" is assumed to be condition
+						condtext = prop;
+					}
+				}
+				
+				if(condtext!=null)
+				{
+					IParsedExpression cond = parser.parseExpression(condtext, dia.getAllImports(), null, classloader);
+					edge.setCondition(cond);
 				}
 			}
 		}
@@ -857,11 +876,11 @@ public class MBpmnDiagram extends MIdElement
 		/**
 		 *  Test if this post processor can be executed in first pass.
 		 *  @return True if can be executed on first pass.
-		 * /
+		 */
 		public boolean isFirstPass()
 		{
 			return false;
 		}
-	}*/
+	}
 	
 }
