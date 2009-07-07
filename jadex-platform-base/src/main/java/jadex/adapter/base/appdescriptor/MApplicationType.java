@@ -67,7 +67,8 @@ public class MApplicationType
 	}
 	
 	/**
-	 * @return the packagename
+	 *  Get the package name.
+	 *  @return The package name.
 	 */
 	public String getPackage()
 	{
@@ -75,7 +76,8 @@ public class MApplicationType
 	}
 
 	/**
-	 * @param packagename the packagename to set
+	 *  Set the package.
+	 *  @param packagename The package name to set.
 	 */
 	public void setPackage(String packagename)
 	{

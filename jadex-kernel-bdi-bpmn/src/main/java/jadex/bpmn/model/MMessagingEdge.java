@@ -1,18 +1,15 @@
 package jadex.bpmn.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  A messaging edge is an edge describing a message flow between some sender and receiver.
+ *  Used only for communication across pools.
  */
-public class MMessagingEdge extends MNamedIdElement implements IAssociationTarget
+public class MMessagingEdge extends MAssociationTarget
 {
 	//-------- attributes --------
 	
-	/** The association description. */
-	protected String associationsdescription;
-
 	/** The source description. */
 	protected String sourcedescription;
 
@@ -35,23 +32,8 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	//-------- methods --------
 
 	/**
-	 * @return the associationsdescription
-	 */
-	public String getAssociationsDescription()
-	{
-		return this.associationsdescription;
-	}
-
-	/**
-	 * @param associationsdescription the associationsdescription to set
-	 */
-	public void setAssociationsDescription(String associationsdescription)
-	{
-		this.associationsdescription = associationsdescription;
-	}
-	
-	/**
-	 * @return the sourcedescription
+	 *  Get the xml source description.
+	 *  @return The source description.
 	 */
 	public String getSourceDescription()
 	{
@@ -59,7 +41,8 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 
 	/**
-	 * @param sourcedescription the sourcedescription to set
+	 *  Set the xml source description.
+	 *  @param sourcedescription The xml source description to set.
 	 */
 	public void setSourceDescription(String sourcedescription)
 	{
@@ -67,7 +50,8 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 
 	/**
-	 * @return the targetdescription
+	 *  Get the xml target description.
+	 *  @return The target description.
 	 */
 	public String getTargetDescription()
 	{
@@ -75,7 +59,8 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 
 	/**
-	 * @param targetdescription the targetdescription to set
+	 *  Set the xml target Description.
+	 *  @param targetdescription The target description to set.
 	 */
 	public void setTargetDescription(String targetdescription)
 	{
@@ -83,7 +68,8 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 
 	/**
-	 * 
+	 *  Get the source.
+	 *  @return The source.
 	 */
 	public MActivity getSource()
 	{
@@ -91,15 +77,8 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 	
 	/**
-	 * 
-	 */
-	public MActivity getTarget()
-	{
-		return target;
-	}
-	
-	/**
-	 * 
+	 *  Set the source.
+	 *  @param source The source.
 	 */
 	public void setSource(MActivity source)
 	{
@@ -107,7 +86,17 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 	
 	/**
-	 * 
+	 *  Get the target.
+	 *  @param target The target.
+	 */
+	public MActivity getTarget()
+	{
+		return target;
+	}
+	
+	/**
+	 *  Set the target.
+	 *  @param target The target.
 	 */
 	public void setTarget(MActivity target)
 	{
@@ -115,7 +104,8 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 
 	/**
-	 * @return the type
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -123,38 +113,12 @@ public class MMessagingEdge extends MNamedIdElement implements IAssociationTarge
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
 	public void setType(String type)
 	{
 		this.type = type;
-	}
-
-	/**
-	 * 
-	 */
-	public List getAssociations()
-	{
-		return associations;
-	}
-
-	/**
-	 * 
-	 */
-	public void addAssociation(MAssociation association)
-	{
-		if(associations==null)
-			associations = new ArrayList();
-		associations.add(association);
-	}
-	
-	/**
-	 * 
-	 */
-	public void removeAssociation(MAssociation association)
-	{
-		if(associations!=null)
-			associations.remove(association);
 	}
 
 }

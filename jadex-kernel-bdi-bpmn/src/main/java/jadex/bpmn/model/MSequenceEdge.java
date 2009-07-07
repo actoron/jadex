@@ -2,21 +2,16 @@ package jadex.bpmn.model;
 
 import jadex.javaparser.IParsedExpression;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  A sequence edge is a control flow edge between activities.
  */
-public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
+public class MSequenceEdge extends MAssociationTarget
 {
 	//-------- attributes --------
-	
-	/** The association description. */
-	protected String associationsdescription;
-
 	
 	/** The outgoing edges. */
 	protected MActivity source;
@@ -41,23 +36,8 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	//-------- methods --------
 
 	/**
-	 * @return the associationsdescription
-	 */
-	public String getAssociationsDescription()
-	{
-		return this.associationsdescription;
-	}
-
-	/**
-	 * @param associationsdescription the associationsdescription to set
-	 */
-	public void setAssociationsDescription(String associationsdescription)
-	{
-		this.associationsdescription = associationsdescription;
-	}
-	
-	/**
-	 * 
+	 *  Get the source.
+	 *  @return The source.
 	 */
 	public MActivity getSource()
 	{
@@ -65,15 +45,8 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
-	 */
-	public MActivity getTarget()
-	{
-		return target;
-	}
-	
-	/**
-	 * 
+	 *  Set the source.
+	 *  @return The source.
 	 */
 	public void setSource(MActivity source)
 	{
@@ -81,7 +54,17 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the target.
+	 *  @return The target.
+	 */
+	public MActivity getTarget()
+	{
+		return target;
+	}
+	
+	/**
+	 *  Set the target.
+	 *  @param target The target.
 	 */
 	public void setTarget(MActivity target)
 	{
@@ -89,7 +72,8 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @return the type
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -97,44 +81,19 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
 	public void setType(String type)
 	{
 		this.type = type;
 	}
 
-	/**
-	 * 
-	 */
-	public List getAssociations()
-	{
-		return associations;
-	}
-
-	/**
-	 * 
-	 */
-	public void addAssociation(MAssociation association)
-	{
-		if(associations==null)
-			associations = new ArrayList();
-		associations.add(association);
-	}
-	
-	/**
-	 * 
-	 */
-	public void removeAssociation(MAssociation association)
-	{
-		if(associations!=null)
-			associations.remove(association);
-	}
-	
 	//-------- additions --------
 	
 	/**
-	 * 
+	 *  Set the condition.
+	 *  @param condition The condition.
 	 */
 	public void setCondition(IParsedExpression condition)
 	{
@@ -142,7 +101,8 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * 
+	 *  Get the condition.
+	 *  @return The condition.
 	 */
 	public IParsedExpression getCondition()
 	{
@@ -150,7 +110,9 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Add a parameter mapping.
+	 *  @param name The parameter name.
+	 *  @param exp The expression.
 	 */
 	public void addParameterMapping(String name, IParsedExpression exp)
 	{
@@ -161,7 +123,8 @@ public class MSequenceEdge extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the parameter mappings map.
+	 *  @return The parameter mappings.
 	 */
 	public Map getParameterMappings()
 	{

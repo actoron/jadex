@@ -1,13 +1,12 @@
 package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnDiagram;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +16,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  *  Representation of a running BPMN process.
@@ -43,7 +41,7 @@ public class BpmnInstance
 	//-------- attributes --------
 	
 	/** The model. */
-	protected MBpmnDiagram model;
+	protected MBpmnModel model;
 
 	/** The activity handlers. */
 	protected Map	handlers;
@@ -61,7 +59,7 @@ public class BpmnInstance
 	 *  @param model	The BMPN process model.
 	 *  @param handlers	The activity handlers.
 	 */
-	public BpmnInstance(MBpmnDiagram model, Map handlers)
+	public BpmnInstance(MBpmnModel model, Map handlers)
 	{
 		this.model = model;
 		this.handlers = handlers;
@@ -81,7 +79,7 @@ public class BpmnInstance
 	 *  Get the model of the BPMN process instance.
 	 *  @return The model.
 	 */
-	public MBpmnDiagram	getModel()
+	public MBpmnModel	getModel()
 	{
 		return model;
 	}
@@ -120,9 +118,8 @@ public class BpmnInstance
 			if(!thread.isWaiting())
 			{
 				// Handle parameter passing in edge inscriptions.
-				if(thread.getLastEdge()!=null && thread.getLastEdge().getName()!=null)
+				if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
 				{
-					// todo: moveto model
 					Map mappings = thread.getLastEdge().getParameterMappings();
 					if(mappings!=null)
 					{

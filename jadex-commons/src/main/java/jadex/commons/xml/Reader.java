@@ -1,5 +1,7 @@
 package jadex.commons.xml;
 
+import jadex.commons.collection.MultiCollection;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +70,7 @@ public class Reader
 		List stack = new ArrayList();
 		StackElement topse	= null;
 		String comment = null;
-		List secpasspostprocs = new ArrayList();
+		MultiCollection postprocs = new MultiCollection();
 		
 		while(parser.hasNext())
 		{
@@ -218,7 +220,7 @@ public class Reader
 					if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
 					{
 						final IPostProcessor postproc = typeinfo.getPostProcessor();
-						if(postproc.isFirstPass())
+						if(postproc.getPass()==1)
 						{
 //							topse.object = 
 							typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
@@ -227,7 +229,7 @@ public class Reader
 						{
 							final Object object = topse.getObject();
 							final Object ro = root;
-							secpasspostprocs.add(new Runnable()
+							postprocs.put(new Integer(postproc.getPass()), new Runnable()
 							{
 								public void run()
 								{
@@ -260,12 +262,19 @@ public class Reader
 		}
 		parser.close();
 		
-		// Handle second pass post-processors.
-		for(int i=0; i<secpasspostprocs.size(); i++)
+		// Handle post-processors.
+		for(int i=2; postprocs.size()>0; i++)
 		{
-			((Runnable)secpasspostprocs.get(i)).run();
+			List ps = (List)postprocs.remove(new Integer(i));
+			if(ps!=null)
+			{
+				for(int j=0; j<ps.size(); j++)
+				{
+					((Runnable)ps.get(j)).run();
+				}
+			}
 		}
-		
+			
 		return root;
 	}
 	

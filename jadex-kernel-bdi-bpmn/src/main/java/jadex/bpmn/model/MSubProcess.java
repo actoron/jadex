@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  A sub process represents an activity with and a sub activity flow. 
  */
 public class MSubProcess extends MActivity
 {
@@ -25,7 +25,8 @@ public class MSubProcess extends MActivity
 	//-------- methods --------
 	
 	/**
-	 * 
+	 *  Get the activities.
+	 *  @return The activities.
 	 */
 	public List getActivities()
 	{
@@ -33,17 +34,19 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
-	 */
-	public void addActivity(MActivity vertex)
+	 *  Add an activity.
+	 *  @param activity The activity.
+	 */ 
+	public void addActivity(MActivity activity)
 	{
 		if(activities==null)
 			activities = new ArrayList();
-		activities.add(vertex);
+		activities.add(activity);
 	}
 	
 	/**
-	 * 
+	 *  Remove an activity.
+	 *  @param activity The activity. 
 	 */
 	public void removeActivity(MActivity vertex)
 	{
@@ -52,7 +55,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Get the sequence edges.
+	 *  @return The sequence edges.
 	 */
 	public List getSequenceEdges()
 	{
@@ -60,7 +64,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Add a sequence edge.
+	 *  @param edge The edge.
 	 */
 	public void addSequenceEdge(MSequenceEdge edge)
 	{
@@ -70,7 +75,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Remove a sequence edge.
+	 *  @param edge The edge.
 	 */
 	public void removeSequenceEdge(MSequenceEdge edge)
 	{
@@ -79,7 +85,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Get the event handlers.
+	 *  @return The event handlers.
 	 */
 	public List getEventHandlers()
 	{
@@ -87,7 +94,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Add an event handler.
+	 *  @param eventhandler The event handler.
 	 */
 	public void addEventHandler(MActivity eventhandler)
 	{
@@ -97,7 +105,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Remove an event handler.
+	 *  @param eventhandler The event handler.
 	 */
 	public void removeEventHandler(MActivity eventhandler)
 	{
@@ -106,7 +115,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Get the artifacts.
+	 *  @return The artifacts.
 	 */
 	public List getArtifacts()
 	{
@@ -114,7 +124,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Add an artifact.
+	 *  @param artifact The artifact.
 	 */
 	public void addArtifact(MArtifact artifact)
 	{
@@ -124,7 +135,8 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 * 
+	 *  Remove an artifact.
+	 *  @param artifact The artifact.
 	 */
 	public void removeArtifact(MArtifact artifact)
 	{

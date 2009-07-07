@@ -1,7 +1,8 @@
 package jadex.bpmn.model;
 
 /**
- * 
+ *  An association is a connection between an 
+ *  artifact and some other thing.
  */
 public class MAssociation extends MIdElement
 {
@@ -11,7 +12,7 @@ public class MAssociation extends MIdElement
 	protected MArtifact source;
 	
 	/** The target. */
-	protected IAssociationTarget target;
+	protected MAssociationTarget target;
 
 	/** The type. */
 	protected String type;
@@ -19,7 +20,8 @@ public class MAssociation extends MIdElement
 	//-------- methods --------
 	
 	/**
-	 * @return the source
+	 *  Get the source.
+	 *  @return The source.
 	 */
 	public MArtifact getSource()
 	{
@@ -27,7 +29,8 @@ public class MAssociation extends MIdElement
 	}
 
 	/**
-	 * @param source the source to set
+	 *  Set the source.
+	 *  @param source The source to set.
 	 */
 	public void setSource(MArtifact source)
 	{
@@ -35,23 +38,26 @@ public class MAssociation extends MIdElement
 	}
 
 	/**
-	 * @return the target
+	 *  Get the target.
+	 *  @return The target.
 	 */
-	public IAssociationTarget getTarget()
+	public MAssociationTarget getTarget()
 	{
 		return this.target;
 	}
 
 	/**
-	 * @param target the target to set
+	 *  Set the target.
+	 *  @param target The target to set.
 	 */
-	public void setTarget(IAssociationTarget target)
+	public void setTarget(MAssociationTarget target)
 	{
 		this.target = target;
 	}
 	
 	/**
-	 * @return the type
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -59,7 +65,8 @@ public class MAssociation extends MIdElement
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
 	public void setType(String type)
 	{

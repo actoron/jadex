@@ -1,32 +1,25 @@
 package jadex.bpmn.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import jadex.commons.SReflect;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 
+ *  Base class for all kinds of activities.
  */
-public class MActivity extends MNamedIdElement implements IAssociationTarget
+public class MActivity extends MAssociationTarget
 {
 	//-------- attributes --------
 	
 	/** The lane description. */
 	protected String lanedescription;
 
-	/** The associations description. */
-	protected String associationsdescription;
-
-	/** The outgoing edges description. */
-	protected String outgoingedgesdescription;
+	/** The outgoing sequence edges description. */
+	protected String outgoingsequenceedgesdescription;
 	
-	/** The incoming edges description. */
-	protected String incomingedgesdescription;
+	/** The incoming sequence edges description. */
+	protected String incomingsequenceedgesdescription;
 	
 	/** The incoming messages description. */
 	protected List incomingmessagesdescriptions;
@@ -35,11 +28,11 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	protected List outgoingmessagesdescriptions;
 
 	
-	/** The outgoing edges. */
-	protected List outedges;
+	/** The outgoing sequence edges. */
+	protected List outseqedges;
 	
-	/** The incoming edges. */
-	protected List inedges;
+	/** The incoming sequence edges. */
+	protected List inseqedges;
 
 	/** The outgoing message edges. */
 	protected List outmsgedges;
@@ -47,9 +40,6 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	/** The incoming message edges. */
 	protected List inmsgedges;
 	
-	/** The associations. */
-	protected List associations;
-		
 	/** The type. */
 	protected String type;
 	
@@ -58,14 +48,17 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 
 	/** The looping flag. */
 	protected boolean looping;
+		
+	//-------- added --------
 	
-	/** The properties. */
-	protected Map properties;
+	/** The parameters. */
+	protected List parameters;
 	
 	//-------- methods --------
 	
 	/**
-	 * @return the lanedescription
+	 *  Get the xml lane description.
+	 *  @return The lane description.
 	 */
 	public String getLaneDescription()
 	{
@@ -73,7 +66,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param lanedescription the lanedescription to set
+	 *  Set the xml lane description.
+	 *  @param lanedescription The lane description to set.
 	 */
 	public void setLaneDescription(String lanedescription)
 	{
@@ -81,7 +75,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * @return the associationsdescription
+	 *  Get the xml associations description.
+	 *  @return The associations description.
 	 */
 	public String getAssociationsDescription()
 	{
@@ -89,7 +84,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param associationsdescription the associationsdescription to set
+	 *  Set the xml associations description.
+	 *  @param associationsdescription The associations description to set.
 	 */
 	public void setAssociationsDescription(String associationsdescription)
 	{
@@ -97,39 +93,44 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * @return the outgoingedges
+	 *  Get the xml outgoing sequence edges desription.
+	 *  @return The outgoing sequence edges description.
 	 */
-	public String getOutgoingEdgesDescription()
+	public String getOutgoingSequenceEdgesDescription()
 	{
-		return this.outgoingedgesdescription;
+		return this.outgoingsequenceedgesdescription;
 	}
 
 	/**
-	 * @param outgoingedges the outgoingedges to set
+	 *  Set the xml outgoing edges desription.
+	 *  @param outgoingedges The outgoing edges to set.
 	 */
-	public void setOutgoingEdgesDescription(String outgoingedges)
+	public void setOutgoingSequenceEdgesDescription(String outgoingedges)
 	{
-		this.outgoingedgesdescription = outgoingedges;
+		this.outgoingsequenceedgesdescription = outgoingedges;
 	}
 	
 	/**
-	 * @return the incomingedges
+	 *  Get the xml incoming edges description.
+	 *  @return The incoming edges description.
 	 */
-	public String getIncomingEdgesDescription()
+	public String getIncomingSequenceEdgesDescription()
 	{
-		return this.incomingedgesdescription;
+		return this.incomingsequenceedgesdescription;
 	}
 
 	/**
-	 * @param incomingedges the incomingedges to set
+	 *  Set the xml incoming edges description.
+	 *  @param incomingedges The incoming edges to set.
 	 */
-	public void setIncomingEdgesDescription(String incomingedges)
+	public void setIncomingSequenceEdgesDescription(String incomingedges)
 	{
-		this.incomingedgesdescription = incomingedges;
+		this.incomingsequenceedgesdescription = incomingedges;
 	}
 	
 	/**
-	 * 
+	 *  Get the xml outgoing messages descriptions.
+	 *  @return The outgoing messages descriptions. 
 	 */
 	public List getOutgoingMessagesDescriptions()
 	{
@@ -137,7 +138,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * 
+	 *  Add an outgoing message description.
+	 *  @param desc The description.
 	 */
 	public void addOutgoingMessageDescription(Object desc)
 	{
@@ -147,7 +149,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove an outgoing message description.
+	 *  @param desc The description.
 	 */
 	public void removeOutgoingMessageDescription(Object desc)
 	{
@@ -156,7 +159,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the incoming messages description.
+	 *  @return The incoming messages descriptions.
 	 */
 	public List getIncomingMessagesDescriptions()
 	{
@@ -164,7 +168,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * 
+	 *  Add an incoming message description.
+	 *  @param desc The description.
 	 */
 	public void addIncomingMessageDescription(Object desc)
 	{
@@ -174,7 +179,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove an incoming message description.
+	 *  @param desc The description.
 	 */
 	public void removeIncomingMessageDescription(Object desc)
 	{
@@ -184,61 +190,68 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	
 	
 	/**
-	 * 
+	 *  Get the outgoing sequence edges.
+	 *  @return The outgoing edges.
 	 */
-	public List getOutgoingEdges()
+	public List getOutgoingSequenceEdges()
 	{
-		return outedges;
+		return outseqedges;
 	}
 
 	/**
-	 * 
+	 *  Add an outgoing edge.
+	 *  @param edge The edge.
 	 */
-	public void addOutgoingEdge(MSequenceEdge edge)
+	public void addOutgoingSequenceEdge(MSequenceEdge edge)
 	{
-		if(outedges==null)
-			outedges = new ArrayList();
-		outedges.add(edge);
+		if(outseqedges==null)
+			outseqedges = new ArrayList();
+		outseqedges.add(edge);
 	}
 	
 	/**
-	 * 
+	 *  Remove an outgoing edge.
+	 *  @param edge The edge.
 	 */
-	public void removeOutgoingEdge(MSequenceEdge edge)
+	public void removeOutgoingSequenceEdge(MSequenceEdge edge)
 	{
-		if(outedges!=null)
-			outedges.remove(edge);
+		if(outseqedges!=null)
+			outseqedges.remove(edge);
 	}
 	
 	/**
-	 * 
+	 *  Get the incoming edges.
+	 *  @return The incoming edges.
 	 */
-	public List getIncomingEdges()
+	public List getIncomingSequenceEdges()
 	{
-		return inedges;
+		return inseqedges;
 	}
 	
 	/**
-	 * 
+	 *  Add an incoming edge.
+	 *  @param edge The edge.
 	 */
-	public void addIncomingEdge(MSequenceEdge edge)
+	public void addIncomingSequenceEdge(MSequenceEdge edge)
 	{
-		if(inedges==null)
-			inedges = new ArrayList();
-		inedges.add(edge);
+		if(inseqedges==null)
+			inseqedges = new ArrayList();
+		inseqedges.add(edge);
 	}
 	
 	/**
-	 * 
+	 *  Remove an incoming edge.
+	 *  @param edge The edge.
 	 */
-	public void removeIncomingEdge(MSequenceEdge edge)
+	public void removeIncomingSequenceEdge(MSequenceEdge edge)
 	{
-		if(inedges!=null)
-			inedges.remove(edge);
+		if(inseqedges!=null)
+			inseqedges.remove(edge);
 	}
 	
 	/**
-	 * 
+	 *  Get the outgoing message edges.
+	 *  @return The outgoing message edges.
 	 */
 	public List getOutgoingMessagingEdges()
 	{
@@ -246,7 +259,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * 
+	 *  Add an outgoing message edge.
+	 *  @param edge The edge.
 	 */
 	public void addOutgoingMessagingEdge(MMessagingEdge edge)
 	{
@@ -256,7 +270,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove an outgoing message edge.
+	 *  @param edge The edge.
 	 */
 	public void removeOutgoingMessagingEdge(MMessagingEdge edge)
 	{
@@ -265,7 +280,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the inconimg message edges.
+	 *  @return the incoming message edges.
 	 */
 	public List getIncomingMessagingEdges()
 	{
@@ -273,7 +289,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Add an incoming message edge.
+	 *  @param edge The edge.
 	 */
 	public void addIncomingMessagingEdge(MMessagingEdge edge)
 	{
@@ -283,7 +300,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove an incoming message edge.
+	 *  @param edge The edge.
 	 */
 	public void removeIncomingMessagingEdge(MMessagingEdge edge)
 	{
@@ -292,7 +310,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @return the type
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -300,7 +319,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
 	public void setType(String type)
 	{
@@ -308,7 +328,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @return the activitytype
+	 *  Get the activity type.
+	 *  @return The activity type.
 	 */
 	public String getActivityType()
 	{
@@ -316,7 +337,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param activitytype the activitytype to set
+	 *  Set the activity type.
+	 *  @param activitytype The activity type to set.
 	 */
 	public void setActivityType(String activitytype)
 	{
@@ -324,34 +346,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
-	 */
-	public List getAssociations()
-	{
-		return associations;
-	}
-
-	/**
-	 * 
-	 */
-	public void addAssociation(MAssociation association)
-	{
-		if(associations==null)
-			associations = new ArrayList();
-		associations.add(association);
-	}
-	
-	/**
-	 * 
-	 */
-	public void removeAssociation(MAssociation association)
-	{
-		if(associations!=null)
-			associations.remove(association);
-	}
-	
-	/**
-	 * @return the looping
+	 *  Test if the activity is looping.
+	 *  @return True, if looping.
 	 */
 	public boolean isLooping()
 	{
@@ -359,7 +355,8 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param looping the looping to set
+	 *  Set the looping state.
+	 *  @param looping The looping state to set.
 	 */
 	public void setLooping(boolean looping)
 	{
@@ -367,26 +364,77 @@ public class MActivity extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 *  Get a declared value from the model.
-	 *  @param name The name.
+	 *  Get the parameters.
+	 *  @return The parameters.
 	 */
-	public void setPropertyValue(String name, Object value)
+	public List getParameters()
 	{
-		if(properties==null)
-			properties = new HashMap();
-		properties.put(name, value);
+		return parameters;
 	}
 	
 	/**
-	 *  Get a property value from the model.
-	 *  @param name The name.
+	 *  Get the in and inout parameters.
+	 *  @return The in parameters.
 	 */
-	public Object getPropertyValue(String name)
+	public List getInParameters()
 	{
-		Object ret = null;
-		if(properties!=null)
-			ret = properties.get(name);
-		return ret;
+		List inparams = new ArrayList();
+		if(parameters!=null)
+		{
+			for(int i=0; i<parameters.size(); i++)
+			{
+				MParameter param = (MParameter)parameters.get(i);
+				if(MParameter.DIRECTION_IN.equals(param.getDirection())
+					|| MParameter.DIRECTION_INOUT.equals(param.getDirection()))
+				{
+					inparams.add(param);
+				}
+			}
+		}
+		return inparams;
+	}
+	
+	/**
+	 *  Get the out and inout parameters.
+	 *  @return The out parameters.
+	 */
+	public List getOutParameters()
+	{
+		List outparams = new ArrayList();
+		if(parameters!=null)
+		{
+			for(int i=0; i<parameters.size(); i++)
+			{
+				MParameter param = (MParameter)parameters.get(i);
+				if(MParameter.DIRECTION_OUT.equals(param.getDirection())
+					|| MParameter.DIRECTION_INOUT.equals(param.getDirection()))
+				{
+					outparams.add(param);
+				}
+			}
+		}
+		return outparams;
+	}
+	
+	/**
+	 *  Add a parameter.
+	 *  @param param The parameter.
+	 */
+	public void addParameter(MParameter param)
+	{
+		if(parameters==null)
+			parameters = new ArrayList();
+		parameters.add(param);
+	}
+	
+	/**
+	 *  Remove a parameter.
+	 *  @param param The parameter.
+	 */
+	public void removeParameter(MParameter param)
+	{
+		if(parameters!=null)
+			parameters.remove(param);
 	}
 	
 	/**

@@ -33,6 +33,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 					public void exceptionOccurred(Exception exception)
 					{
 						TaskActivityHandler.this.notify(activity, instance, thread);
+						exception.printStackTrace();
 						System.out.println("Exception during task execution: "+exception);
 					}
 				});

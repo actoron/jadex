@@ -4,21 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  An artifact is a thing such as a text associated to 
- *  some other thing such as an activity.
+ *  The target element of an association.
  */
-public class MArtifact extends MNamedIdElement
+public class MAssociationTarget extends MNamedIdElement
 {
 	//-------- attributes --------
 	
+	/** The associations description. */
+	protected String associationsdescription;
+	
 	/** The associations. */
 	protected List associations;
+
+	//-------- methods ---------
 	
-	/** The type. */
-	protected String type;
-	
-	//-------- methods --------
-	
+	/**
+	 *  Get the xml associations description.
+	 *  @return The associations description.
+	 */
+	public String getAssociationsDescription()
+	{
+		return this.associationsdescription;
+	}
+
+	/**
+	 *  Set the xml associations description.
+	 *  @param associationsdescription The associations description to set.
+	 */
+	public void setAssociationsDescription(String associationsdescription)
+	{
+		this.associationsdescription = associationsdescription;
+	}
+
 	/**
 	 *  Get the associations.
 	 *  return The associations.
@@ -47,23 +64,5 @@ public class MArtifact extends MNamedIdElement
 	{
 		if(associations!=null)
 			associations.remove(association);
-	}
-
-	/**
-	 *  Get the type.
-	 *  @return The type.
-	 */
-	public String getType()
-	{
-		return this.type;
-	}
-
-	/**
-	 *  Set the type.
-	 *  @param type The type to set.
-	 */
-	public void setType(String type)
-	{
-		this.type = type;
 	}
 }

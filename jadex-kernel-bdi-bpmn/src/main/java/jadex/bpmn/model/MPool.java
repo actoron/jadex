@@ -4,15 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  A pool represents some kind of unit inside a bpmn model.
  */
-public class MPool extends MNamedIdElement implements IAssociationTarget
+public class MPool extends MAssociationTarget
 {
 	//-------- attributes --------
-	
-	/** The association description. */
-	protected String associationsdescription;
-	
 	
 	/** The vertices. */
 	protected List activities;
@@ -26,35 +22,14 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	/** The artifacs. */
 	protected List artifacts;
 	
-	/** The associations. */
-	protected List associations;
-	
-	/** The messages. */
-//	protected List messages;
-	
 	/** The type. */
 	protected String type;
 	
 	//-------- methods --------
 	
 	/**
-	 * @return the associationsdescription
-	 */
-	public String getAssociationsDescription()
-	{
-		return this.associationsdescription;
-	}
-
-	/**
-	 * @param associationsdescription the associationsdescription to set
-	 */
-	public void setAssociationsDescription(String associationsdescription)
-	{
-		this.associationsdescription = associationsdescription;
-	}
-
-	/**
-	 * 
+	 *  Get the activities.
+	 *  @return The activities.
 	 */
 	public List getActivities()
 	{
@@ -62,7 +37,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Add an activity.
+	 *  @param activity The activity.
 	 */
 	public void addActivity(MActivity activity)
 	{
@@ -72,7 +48,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove an activity.
+	 *  @param activity The activity.
 	 */
 	public void removeActivity(MActivity activity)
 	{
@@ -81,7 +58,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the sequence edges.
+	 *  @return The edges. 
 	 */
 	public List getSequenceEdges()
 	{
@@ -89,7 +67,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Add a sequence edge.
+	 *  @param edge The edge.
 	 */
 	public void addSequenceEdge(MSequenceEdge edge)
 	{
@@ -99,7 +78,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove a sequence edge.
+	 *  @param edge The edge.
 	 */
 	public void removeSequenceEdge(MSequenceEdge edge)
 	{
@@ -108,7 +88,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the lanes.
+	 *  @return The lanes.
 	 */
 	public List getLanes()
 	{
@@ -116,7 +97,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Add a lane.
+	 *  @param lane The lane. 
 	 */
 	public void addLane(MLane lane)
 	{
@@ -126,7 +108,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove a lane.
+	 *  @param lane The lane.
 	 */
 	public void removeLane(MLane lane)
 	{
@@ -135,7 +118,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the artifacts.
+	 *  @return The artifacts.
 	 */
 	public List getArtifacts()
 	{
@@ -143,7 +127,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Add an artifact.
+	 *  @param artifact The artifact.
 	 */
 	public void addArtifact(MArtifact artifact)
 	{
@@ -153,7 +138,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove an artifact.
+	 *  @param artifact The artifact.
 	 */
 	public void removeArtifact(MArtifact artifact)
 	{
@@ -162,34 +148,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
-	 */
-	public List getAssociations()
-	{
-		return associations;
-	}
-	
-	/**
-	 * 
-	 */
-	public void addAssociation(MAssociation association)
-	{
-		if(associations==null)
-			associations = new ArrayList();
-		associations.add(association);
-	}
-	
-	/**
-	 * 
-	 */
-	public void removeAssociation(MAssociation association)
-	{
-		if(associations!=null)
-			associations.remove(association);
-	}
-	
-	/**
-	 * @return the type
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -197,7 +157,8 @@ public class MPool extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
 	public void setType(String type)
 	{

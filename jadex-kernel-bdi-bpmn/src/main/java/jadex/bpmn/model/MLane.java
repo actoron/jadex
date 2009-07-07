@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  A lane is a subpart of a pool representing e.g. a role or some
+ *  resposibility sphere.
  */
-public class MLane extends MNamedIdElement implements IAssociationTarget
+public class MLane extends MAssociationTarget
 {
 	//-------- attributes --------
-	
-	/** The association description. */
-	protected String associationsdescription;
 	
 	/** The activities description. */
 	protected String activitiesdescription;
@@ -23,29 +21,11 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	/** The type. */
 	protected String type;
 	
-	/** The associations. */
-	protected List associations;
-	
 	//-------- methods --------
 	
 	/**
-	 * @return the associationsdescription
-	 */
-	public String getAssociationsDescription()
-	{
-		return this.associationsdescription;
-	}
-
-	/**
-	 * @param associationsdescription the associationsdescription to set
-	 */
-	public void setAssociationsDescription(String associationsdescription)
-	{
-		this.associationsdescription = associationsdescription;
-	}
-	
-	/**
-	 * @return the activitiesdescription
+	 *  Get the activities description.
+	 *  @return The activities description.
 	 */
 	public String getActivitiesDescription()
 	{
@@ -53,7 +33,8 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param activitiesdescription the activitiesdescription to set
+	 *  Set the activities description.
+	 *  @param activitiesdescription The activities description to set.
 	 */
 	public void setActivitiesDescription(String activitiesdescription)
 	{
@@ -61,7 +42,8 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the activities.
+	 *  @return The activities.
 	 */
 	public List getActivities()
 	{
@@ -69,7 +51,8 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Add an activity.
+	 *  @param activity The activity.
 	 */
 	public void addActivity(MActivity activity)
 	{
@@ -79,7 +62,8 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Remove an activity.
+	 *  @param activity The activity.
 	 */
 	public void removeActivity(MActivity activity)
 	{
@@ -88,7 +72,8 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @return the type
+	 *  Get the type.
+	 *  @return The type.
 	 */
 	public String getType()
 	{
@@ -96,7 +81,8 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 
 	/**
-	 * @param type the type to set
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
 	public void setType(String type)
 	{
@@ -104,29 +90,11 @@ public class MLane extends MNamedIdElement implements IAssociationTarget
 	}
 	
 	/**
-	 * 
+	 *  Get the associations.
+	 *  return The associations.
 	 */
 	public List getAssociations()
 	{
 		return associations;
-	}
-
-	/**
-	 * 
-	 */
-	public void addAssociation(MAssociation association)
-	{
-		if(associations==null)
-			associations = new ArrayList();
-		associations.add(association);
-	}
-	
-	/**
-	 * 
-	 */
-	public void removeAssociation(MAssociation association)
-	{
-		if(associations!=null)
-			associations.remove(association);
 	}
 }

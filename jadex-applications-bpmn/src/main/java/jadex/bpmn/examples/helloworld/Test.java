@@ -1,6 +1,6 @@
 package jadex.bpmn.examples.helloworld;
 
-import jadex.bpmn.model.MBpmnDiagram;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -33,16 +33,16 @@ public class Test
 			ignored.add("xmi");
 			ignored.add("iD");
 			ignored.add("version");
-			Reader reader = new Reader(new BeanObjectHandler(), MBpmnDiagram.getXMLMapping(), MBpmnDiagram.getXMLLinkInfos(), ignored);
-//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
+			Reader reader = new Reader(new BeanObjectHandler(), MBpmnModel.getXMLMapping(), MBpmnModel.getXMLLinkInfos(), ignored);
+			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test2.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/all_activities.bpmn", null);
-			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/XOR.bpmn", null);
+//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/XOR.bpmn", null);
 
-			MBpmnDiagram	model	= (MBpmnDiagram) reader.read(rinfo.getInputStream(), null, null);
-			String	name	= new File(rinfo.getFilename()).getName();
-			name	= name.substring(0, name.length()-5);
+			MBpmnModel model = (MBpmnModel)reader.read(rinfo.getInputStream(), null, null);
+			String name = new File(rinfo.getFilename()).getName();
+			name = name.substring(0, name.length()-5);
 			model.setName(name);
 			rinfo.getInputStream().close();
 			System.out.println("Loaded model: "+model);

@@ -1,15 +1,20 @@
 package jadex.bpmn.model;
 
 /**
- * 
+ *  Base model element with an id. 
  */
 public class MIdElement
 {
+	//-------- attributes --------
+	
 	/** The id. */
 	protected String id;
 
+	//-------- methods ---------
+	
 	/**
-	 * @return the id
+	 *  Get the id.
+	 *  @return The id.
 	 */
 	public String getId()
 	{
@@ -17,7 +22,8 @@ public class MIdElement
 	}
 
 	/**
-	 * @param id the id to set
+	 *  Set the id.
+	 *  @param id the id to set.
 	 */
 	public void setId(String id)
 	{

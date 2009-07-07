@@ -311,12 +311,12 @@ public class OAVBDIXMLReader
 		}
 		
 		/**
-		 *  Test if this post processor can be executed in first pass.
-		 *  @return True if can be executed on first pass.
+		 *  Get the pass number.
+		 *  @return The pass number.
 		 */
-		public boolean isFirstPass()
+		public int getPass()
 		{
-			return true;
+			return 1;
 		}
 	}
 	
@@ -369,12 +369,12 @@ public class OAVBDIXMLReader
 		}
 		
 		/**
-		 *  Test if this post processor can be executed in first pass.
-		 *  @return True if can be executed on first pass.
+		 *  Get the pass number.
+		 *  @return The pass number.
 		 */
-		public boolean isFirstPass()
+		public int getPass()
 		{
-			return true;
+			return 1;
 		}
 	}
 

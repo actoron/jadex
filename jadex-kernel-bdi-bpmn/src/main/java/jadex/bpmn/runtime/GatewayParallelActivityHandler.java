@@ -22,8 +22,8 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 	 */
 	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
-		List	incoming	= activity.getIncomingEdges();
-		List	outgoing	= activity.getOutgoingEdges();
+		List	incoming	= activity.getIncomingSequenceEdges();
+		List	outgoing	= activity.getOutgoingSequenceEdges();
 		
 		// Split
 		if(incoming!=null && incoming.size()==1 && outgoing!=null && outgoing.size()>1)

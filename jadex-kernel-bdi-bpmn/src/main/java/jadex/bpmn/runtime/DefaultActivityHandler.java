@@ -64,7 +64,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	{
 		MSequenceEdge	ret;
 		
-		List	outgoing	= activity.getOutgoingEdges();
+		List	outgoing	= activity.getOutgoingSequenceEdges();
 		if(outgoing==null || outgoing.size()==0)
 		{
 			ret	= null;
