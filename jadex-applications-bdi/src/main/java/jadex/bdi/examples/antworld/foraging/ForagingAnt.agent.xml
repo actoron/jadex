@@ -59,10 +59,14 @@
 		<!-- Known nests. -->
 		<beliefset name="nests" class="ISpaceObject"/>
 
+		<!-- Smelled pheromones. -->
+		<beliefset name="pheromones" class="ISpaceObject"/>
+		
 		<!--<belief name="wastes" class="ISpaceObject"/>-->		
 		<belief name="hasGravitation" class="boolean"> 
 			<fact>false</fact>
 		</belief>
+		
 		
 	</beliefs>
 	
@@ -91,7 +95,7 @@
 	
 	<!-- This goal is used to mine food.-->
 		<achievegoal name="food_mining" exclude="never" retry="false">		
-			<unique dummy="true"/>
+			<unique/>
 			<!-- <creationcondition> $beliefbase.hasGravitation </creationcondition>-->
 			<!-- The zweite Teil der Bedingung soll verhindern das zwei Instanzen vom Goal zur selben Zeit gestartet sein können. -->
 			<!-- <creationcondition language="jcl"> Arrays.asList($beliefbase.foodSources).size() &gt; 0 &amp;&amp; Arrays.asList($beliefbase.carriedFood).size() == 0</creationcondition>-->

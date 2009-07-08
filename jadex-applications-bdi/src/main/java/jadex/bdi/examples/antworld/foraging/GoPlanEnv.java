@@ -17,7 +17,7 @@ public class GoPlanEnv extends Plan {
 	/**
 	 * The plan body.
 	 */
-	public void body() {		
+	public void body() {
 		Space2D env = (Space2D) getBeliefbase().getBelief("env").getFact();
 		Boolean hasGravitation = (Boolean) getBeliefbase().getBelief(
 				"hasGravitation").getFact();
@@ -28,21 +28,9 @@ public class GoPlanEnv extends Plan {
 		myself.setProperty(GravitationListener.FEELS_GRAVITATION,
 				hasGravitation);
 
-		System.out.println("#GoPlanEnv# Plan started to walk from " + myself.getProperty(Space2D.PROPERTY_POSITION) + " to " +target);
-		// TEST**************************************
-		// SyncResultListener srl1 = new SyncResultListener();
-		// env.performSpaceAction("testAction", null, srl1);
-		// srl1.waitForResult();
-		//		
-		// // waitFor(5000);
-		//		
-		// SyncResultListener srl2 = new SyncResultListener();
-		// Map props1 = new HashMap();
-		// props1.put("SecondTime", new String("yes"));
-		// env.performSpaceAction("testAction", props1, srl2);
-		// srl2.waitForResult();
-
-		// TEST**************************************
+		System.out.println("#GoPlanEnv# Plan started to walk from "
+				+ myself.getProperty(Space2D.PROPERTY_POSITION) + " to "
+				+ target);
 
 		// Update destination and gravitationSensor of ant on space
 		Map params = new HashMap();
@@ -76,9 +64,16 @@ public class GoPlanEnv extends Plan {
 				if (my > ty && dy <= size.getYAsInteger() / 2)
 					dir = GoAction.UP;
 			}
+			// Produce new pheromone
+			params = new HashMap();
+			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+			params.put(ProducePheromoneAction.POSITION, mypos);
+			params.put(ProducePheromoneAction.ROUND, new Integer(1));
+			srl = new SyncResultListener();
+			env.performSpaceAction("producePheromone", params, srl);
+			srl.waitForResult();
 
-			// System.out.println("Wants to go: "+dir);
-
+			// go to next position
 			params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
 			params.put(ISpaceAction.OBJECT_ID, env
@@ -87,42 +82,24 @@ public class GoPlanEnv extends Plan {
 			env.performSpaceAction("go", params, srl);
 			srl.waitForResult();
 
-			// Update trace route of ant in space
-			params = new HashMap();
-			params.put(ISpaceAction.OBJECT_ID, env
-					.getAvatars(getAgentIdentifier())[0].getId());
-			params.put(TraceRouteAction.POSITION, mypos);
-			params.put(TraceRouteAction.ROUND, new Integer(1));
-			srl = new SyncResultListener();
-			env.performSpaceAction("updateTraceRoute", params, srl);
-			srl.waitForResult();
-
-			// String obj = new String("a");
-			// getBeliefbase().getBeliefSet("wastes").addFact(obj);
 			ISpaceObject[] objects = null;
-			// objects =
-			// (ISpaceObject[])getBeliefbase().getBeliefSet("wastes").getFacts();
 			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet(
-					"foodSources").getFacts();
-			System.out.println("#GoPlanEnv# Number of food sources."
+					"pheromones").getFacts();
+			System.out.println("#GoPlanEnv# Number of pheromones."
 					+ objects.length);
 
 			for (int i = 0; i < objects.length; i++) {
-				System.out.println(objects[i].toString());
+				// System.out.println(objects[i].toString());
 			}
-			
-			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet(
-			"nests").getFacts();
-	System.out.println("#GoPlanEnv# Number of nests."
-			+ objects.length);
 
-	for (int i = 0; i < objects.length; i++) {
-		System.out.println(objects[i].toString());
-	}
+			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests")
+					.getFacts();
+			// System.out.println("#GoPlanEnv# Number of nests."
+			// + objects.length);
 
-			// check destination
-//			target = checkDestination(target, env);
-//			System.out.println("#GoPlaEnv# Target after checkDestination: " + target.toString());
+			for (int i = 0; i < objects.length; i++) {
+				// System.out.println(objects[i].toString());
+			}
 		}
 	}
 
@@ -138,16 +115,6 @@ public class GoPlanEnv extends Plan {
 
 		if (!newDestination.equals(target)) {
 			target = newDestination.copy();
-
-			// Update destination ant on space
-//			Map params = new HashMap();
-//			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(
-//					getAgentIdentifier()).getId());
-//			params.put(UpdateDestinationAction.DESTINATION, target);
-//			SyncResultListener srl1 = new SyncResultListener();
-//			env.performSpaceAction("updateDestination", params, srl1);
-//			srl1.waitForResult();
-//			System.out.println("#GoPlanEnv# Destination has changed.");			
 		}
 		return target;
 	}

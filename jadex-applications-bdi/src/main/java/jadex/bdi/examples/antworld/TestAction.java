@@ -8,7 +8,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bdi.examples.antworld.foraging.TraceRouteAction;
+import jadex.bdi.examples.antworld.foraging.ProducePheromoneAction;
 import jadex.commons.SimplePropertyObject;
 
 public class TestAction extends SimplePropertyObject implements ISpaceAction {
@@ -20,11 +20,11 @@ public class TestAction extends SimplePropertyObject implements ISpaceAction {
 		IVector2 position2 = new Vector2Int(8, 5);
 		Map props1 = new HashMap();
 		props1.put(Space2D.PROPERTY_POSITION, position1);
-		props1.put(TraceRouteAction.ROUND, new Integer(1));
+		props1.put(ProducePheromoneAction.ROUND, new Integer(1));
 
 		Map props2 = new HashMap();
 		props2.put(Space2D.PROPERTY_POSITION, position1);
-		props2.put(TraceRouteAction.ROUND, new Integer(1));
+		props2.put(ProducePheromoneAction.ROUND, new Integer(1));
 		// props.put("creation_age", new Double(clock.getTick()));
 		// props.put("clock", clock);
 
