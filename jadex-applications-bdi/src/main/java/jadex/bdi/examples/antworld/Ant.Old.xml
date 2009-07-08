@@ -180,15 +180,15 @@
 		</plan>-->
 
 		<!-- Plan for running on a predefined route and searching waste. -->
-		<plan name="checking_plan">
+		<!--  <plan name="checking_plan">
 			<body class="CheckingPlanEnv"/>
 			<trigger>
 				<goal ref="check"/>
 			</trigger>
-		</plan>
+		</plan>-->
 		
 		<!-- Plan for going to a target position. -->
-		<plan name="go_plan">
+		<!--  <plan name="go_plan">
 			<parameter name="pos" class="IVector2">
  				<goalmapping ref="go.pos"/>
 			</parameter>
@@ -196,17 +196,17 @@
 			<trigger>
 				<goal ref="go"/>
 			</trigger>
-		</plan>
+		</plan>-->
 		
 		<!-- TestPlan for testing behaviour of Jadex V2-->
-		<plan name="test_plan">
+		<!-- <plan name="test_plan">
 			<body class="TestPlan"/>
-		</plan>
+		</plan> -->
 		
 		<!-- Plan to init the agent.-->
-		<plan name="init_plan">
+		<!--  <plan name="init_plan">
 			<body class="InitPlan"/>		
-		</plan>
+		</plan>-->
 		
 		<!-- Plan to be started if the ant is under the influence of gravitation. -->
 		<plan name="gravitation_plan">
