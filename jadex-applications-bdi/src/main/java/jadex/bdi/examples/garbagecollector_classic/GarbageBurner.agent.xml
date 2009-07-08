@@ -56,7 +56,7 @@
 				<!-- Bind against variable from creation condition. -->
 				<value>?garbage</value>
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="clips">
 				// Garbage $garbage
 			

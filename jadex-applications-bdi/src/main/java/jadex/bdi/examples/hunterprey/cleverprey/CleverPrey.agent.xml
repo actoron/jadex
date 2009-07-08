@@ -73,7 +73,7 @@
 			<parameter name="food" class="ISpaceObject">
 				<value>$food</value>
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
  				ISpaceObject $food &amp;&amp; $food.getType().equals("food")
  				&amp;&amp; Arrays.asList($beliefbase.seen_food).contains($food)

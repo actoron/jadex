@@ -69,7 +69,7 @@
  			whenever the actual position is dirty and there is no
  			burner present. -->
 		<achievegoal name="take">
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
 				$beliefbase.is_dirty &amp;&amp; $beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "burner")==null
 			</creationcondition>

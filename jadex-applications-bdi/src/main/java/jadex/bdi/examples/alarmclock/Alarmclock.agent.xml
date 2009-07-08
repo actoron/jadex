@@ -48,7 +48,7 @@
 				<mapping variable="$alarm"/>
 				<variablemapping ref="$alarm"/>  -->
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
 				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime()!=Alarm.NO_ALARM
 				// alarm.isActive()

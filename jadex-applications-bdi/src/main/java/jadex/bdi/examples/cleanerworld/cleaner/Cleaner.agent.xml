@@ -125,7 +125,7 @@
 			<parameter name="waste" class="ISpaceObject">
 				<value>$waste</value>
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
 				ISpaceObject $waste &amp;&amp; $waste.getType().equals("waste")
 				&amp;&amp; $waste.position!=null

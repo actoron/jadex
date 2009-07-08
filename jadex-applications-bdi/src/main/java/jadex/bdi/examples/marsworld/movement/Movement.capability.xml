@@ -58,7 +58,7 @@
 			<parameter name="destination" class="IVector2">
 				<value>$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position")</value>
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
 				$beliefbase.missionend
 				  &amp;&amp; !$beliefbase.myself.position.equals(

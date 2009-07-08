@@ -53,7 +53,7 @@
 			<parameter name="target" class="Target">
 				<value>?target</value>
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<!-- Create a new goal when a target was added
 				and the mission is going on. -->
 			<creationcondition language="clips">

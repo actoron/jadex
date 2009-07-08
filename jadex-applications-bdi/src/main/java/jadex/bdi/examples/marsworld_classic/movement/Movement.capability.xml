@@ -80,7 +80,7 @@
 			<parameter name="destination" class="Location">
 				<value>$beliefbase.my_home</value>
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
 				$beliefbase.missionend
 				&amp;&amp; !$beliefbase.my_location.isNear($beliefbase.my_home)

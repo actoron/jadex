@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +88,7 @@ public class Reader
 			}
 			
 			else if(next==XMLStreamReader.START_ELEMENT)
-			{
+			{				
 				// Fetch for info when creating attributes.
 				Map rawattrs = null;
 				if(parser.getAttributeCount()>0)
@@ -249,6 +248,7 @@ public class Reader
 						}
 						
 						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack), pse.getRawAttributes());
+						
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader, root);
 					}
 				}

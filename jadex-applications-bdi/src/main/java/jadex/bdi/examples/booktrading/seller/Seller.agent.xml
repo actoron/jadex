@@ -63,7 +63,7 @@
 				<!-- <bindingoptions>$beliefbase.initial_orders</bindingoptions> -->
 				<value>$order</value>
 			</parameter>
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
 				// $beliefbase.initial_orders!=null
 				Order $order &amp;&amp; $order.getState()==Order.OPEN

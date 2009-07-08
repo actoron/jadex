@@ -2,7 +2,9 @@ package jadex.bdi.interpreter;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.xml.IBeanObjectCreator;
 import jadex.commons.xml.IPostProcessor;
+import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.Reader;
 import jadex.commons.xml.TypeInfo;
@@ -11,12 +13,15 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.io.xml.OAVAttributeInfo;
 import jadex.rules.state.io.xml.OAVObjectHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -71,6 +76,14 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo("metagoal/trigger", OAVBDIMetaModel.metagoaltrigger_type));
 		typeinfos.add(new TypeInfo("inhibits", OAVBDIMetaModel.inhibits_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new TypeInfo("deliberation", null));
+		typeinfos.add(new TypeInfo("unique", new IBeanObjectCreator()
+		{
+			public Object createObject(Object context, Map rawattributes,
+					ClassLoader classloader) throws Exception
+			{
+				return Boolean.TRUE;
+			}
+		}));
 
 		typeinfos.add(new TypeInfo("plan", OAVBDIMetaModel.plan_type));
 		typeinfos.add(new TypeInfo("body", OAVBDIMetaModel.body_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.body_has_classname}), bopost));
@@ -180,7 +193,7 @@ public class OAVBDIXMLReader
 		linkinfos.add(new LinkInfo("beliefsetref", OAVBDIMetaModel.capability_has_beliefsetrefs));
 		linkinfos.add(new LinkInfo("values", OAVBDIMetaModel.parameterset_has_valuesexpression));
 		linkinfos.add(new LinkInfo("facts", OAVBDIMetaModel.beliefset_has_factsexpression));
-			
+		
 		Set ignoredattrs = new HashSet();
 		ignoredattrs.add("schemaLocation");
 		

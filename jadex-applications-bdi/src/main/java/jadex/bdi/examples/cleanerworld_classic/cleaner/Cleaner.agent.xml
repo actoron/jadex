@@ -149,7 +149,7 @@
 				<value>$waste</value>
 			</parameter>
 			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
-			<unique dummy="true"/>
+			<unique/>
 			<creationcondition language="jcl">
 				Waste $waste
 			
