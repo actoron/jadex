@@ -5,10 +5,10 @@ import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -130,16 +130,8 @@ public class EnvironmentGui	extends JFrame
 				
 				dispose();
 				
-				try
-				{
-					IGoal eg = agent.createGoal("end_agent");
-					agent.dispatchTopLevelGoalAndWait(eg);
-				}
-				catch(GoalFailureException gfe) 
-				{
-				}
-				
-				agent.killAgent();
+				IGoal eg = agent.createGoal("end_agent");
+				agent.dispatchTopLevelGoal(eg);
 			}
 		});
 		

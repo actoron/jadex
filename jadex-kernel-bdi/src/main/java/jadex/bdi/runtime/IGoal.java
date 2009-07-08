@@ -103,7 +103,7 @@ public interface IGoal	extends IProcessableElement
 	 *  This is a convenience method, as the goal result
 	 *  is stored as property.
 	 *  @param result The result.
-	 *  @deprecated
+	 *  @ deprecated
 	 */
 //	public void	setResult(Object result);
 
@@ -112,7 +112,7 @@ public interface IGoal	extends IProcessableElement
 	 *  This is a convenience method, as the goal result
 	 *  is stored as property.
 	 *  @return The result value.
-	 *  @deprecated
+	 *  @ deprecated
 	 */
 //	public Object	getResult();
 
