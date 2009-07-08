@@ -157,6 +157,10 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 		me.getParameterSet(SFipa.RECEIVERS).addValues(nr.getParticipants());
 		me.getParameter(SFipa.CONVERSATION_ID).setValue(convid);
 		me.getParameter(SFipa.CONTENT).setValue(nr.getCFP());
+		if(getParameter(SFipa.LANGUAGE).getValue()!=null)
+			me.getParameter(SFipa.LANGUAGE).setValue(getParameter(SFipa.LANGUAGE).getValue());
+		if(getParameter(SFipa.ONTOLOGY).getValue()!=null)
+			me.getParameter(SFipa.ONTOLOGY).setValue(getParameter(SFipa.ONTOLOGY).getValue());
 		getWaitqueue().addReply(me);
 		endAtomic();
 		
