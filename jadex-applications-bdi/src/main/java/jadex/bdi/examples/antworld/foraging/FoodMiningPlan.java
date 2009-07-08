@@ -1,6 +1,7 @@
 package jadex.bdi.examples.antworld.foraging;
 
 
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
@@ -9,6 +10,7 @@ import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.bdi.examples.antworld.GravitationListener;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bdi.runtime.Plan.SyncResultListener;
 import jadex.bdi.runtime.impl.GoalFlyweight;
 
 import java.security.SecureRandom;
@@ -28,6 +30,7 @@ public class FoodMiningPlan extends Plan
 	public void body()
 	{	
 		System.out.println("Callend Food Mining Plan!!!!!!!!!");
+		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("env").getFact();
 		ISpaceObject[] foodSources = (ISpaceObject[]) getBeliefbase().getBeliefSet("foodSources").getFacts();
 		IVector2 sourcePos = (IVector2)foodSources[0].getProperty(Space2D.PROPERTY_POSITION);
 		System.out.println("#FoodMiningPlan# Destination of next point (foodSource): " + sourcePos.toString());
@@ -60,11 +63,17 @@ public class FoodMiningPlan extends Plan
 		go.getParameter("pos").setValue(sourcePos);
 		dispatchSubgoalAndWait(go);
 		
-		//Take a piece of food.
-		//TODO:
-		IVector2 tmp =  new Vector2Int(0,0);
-		
-		getBeliefbase().getBeliefSet("carriedFood").addFact(tmp);
+		//Take a piece of food.				
+		Map params = new HashMap();
+		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		SyncResultListener srl	= new SyncResultListener();
+		env.performSpaceAction("pickup", params, srl);
+		System.out.println("#FoodMiningPlan# trying ot pick up food.");
+		srl.waitForResult();
+		//TODO: Model failed situation!
+//		if(!((Boolean)srl.waitForResult()).booleanValue()) 
+//			fail();
+		System.out.println("#FoodMiningPlan# successfully picked up food.");
 		
 		//Move to the food source.
 		ISpaceObject[] nests = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests").getFacts();
@@ -87,9 +96,19 @@ public class FoodMiningPlan extends Plan
 		dispatchSubgoalAndWait(goToNest);
 		System.out.println("#FoodMiningPlan# Reached nest. Drop food and walk randomly on grid.");
 		
-		//drop the piece of food in the nest.
+		
 		//TODO:
-		getBeliefbase().getBeliefSet("carriedFood").removeFacts();
+//		getBeliefbase().getBeliefSet("carriedFood").removeFacts();
+		//Drop the piece of food in the nest.				
+		params = new HashMap();
+		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		srl	= new SyncResultListener();
+		env.performSpaceAction("drop", params, srl);		
+		srl.waitForResult();
+		//TODO: Model failed situation!
+//		if(!((Boolean)srl.waitForResult()).booleanValue()) 
+//			fail();
+		System.out.println("#FoodMiningPlan# successfully dropped food.");
 		
 		//walk randomly on the grid.
 		IGoal randomWalk = createGoal("check");

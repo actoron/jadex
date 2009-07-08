@@ -45,10 +45,13 @@
 		</belief>-->
 		
 		<!-- The garbages at the current position. -->
-		<beliefset name="wastes" class="ISpaceObject"/>
+		<!-- <beliefset name="wastes" class="ISpaceObject"/>-->
+		
 		
 		<!-- Piece of food carried at that moment. -->
-		<beliefset name="carriedFood" class="ISpaceObject"/>
+		<belief name="carriedFood" class="ISpaceObject" evaluationmode="push">
+			<fact language="jcl"> $beliefbase.myself.food </fact>
+		</belief>
 		
 		<!-- Food sources at the current position. -->
 		<beliefset name="foodSources" class="ISpaceObject"/>
@@ -88,7 +91,7 @@
 	
 	<!-- This goal is used to mine food.-->
 		<achievegoal name="food_mining" exclude="never" retry="false">		
-			<unique/>
+			<unique dummy="true"/>
 			<!-- <creationcondition> $beliefbase.hasGravitation </creationcondition>-->
 			<!-- The zweite Teil der Bedingung soll verhindern das zwei Instanzen vom Goal zur selben Zeit gestartet sein können. -->
 			<!-- <creationcondition language="jcl"> Arrays.asList($beliefbase.foodSources).size() &gt; 0 &amp;&amp; Arrays.asList($beliefbase.carriedFood).size() == 0</creationcondition>-->
