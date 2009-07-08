@@ -9,6 +9,7 @@ import jadex.bridge.IContextService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ITimedObject;
+import jadex.bridge.ITimer;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
 
@@ -27,6 +28,9 @@ public abstract class MicroAgent implements IMicroAgent
 	
 	/** The agent interpreter. */
 	protected MicroAgentInterpreter interpreter;
+	
+	/** The current timer. */
+	protected ITimer timer;
 	
 	//-------- constructors --------
 	
@@ -164,11 +168,18 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void waitFor(long time, final Runnable run)
 	{
-		((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
+		this.timer = ((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				interpreter.invokeLater(run);
+				interpreter.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						timer = null;
+						run.run();
+					}
+				});
 			}
 		});
 	}
@@ -179,11 +190,19 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void waitForTick(final Runnable run)
 	{
-		((IClockService)getPlatform().getService(IClockService.class)).createTickTimer(new ITimedObject()
+		this.timer = ((IClockService)getPlatform().getService(IClockService.class)).createTickTimer(new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				interpreter.invokeLater(run);
+//				interpreter.invokeLater(run);
+				interpreter.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						timer = null;
+						run.run();
+					}
+				});
 			}
 		});
 	}

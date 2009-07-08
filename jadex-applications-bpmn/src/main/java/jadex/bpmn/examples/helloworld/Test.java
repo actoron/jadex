@@ -34,11 +34,11 @@ public class Test
 			ignored.add("iD");
 			ignored.add("version");
 			Reader reader = new Reader(new BeanObjectHandler(), MBpmnModel.getXMLMapping(), MBpmnModel.getXMLLinkInfos(), ignored);
-			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
+//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test_parallel.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test2.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/all_activities.bpmn", null);
-//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/XOR.bpmn", null);
+			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/XOR.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/Exception.bpmn", null);
 
 			MBpmnModel model = (MBpmnModel)reader.read(rinfo.getInputStream(), null, null);
