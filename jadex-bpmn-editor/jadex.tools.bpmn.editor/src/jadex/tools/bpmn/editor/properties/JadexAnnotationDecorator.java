@@ -46,7 +46,9 @@ public class JadexAnnotationDecorator extends BpmnEAnnotationDecoratorProvider i
         
         if (annotation != null) {
             Label label = new Label();
-            label.setText(annotation.getDetails().get("class="+JadexProptertyConstants.JADEX_ACTIVITY_IMPL));
+            label.setText(
+            		"class="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_IMPL)
+            		+"\nparameter="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER));
             return label;
         }
         return null;
