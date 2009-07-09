@@ -2,6 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
@@ -130,8 +131,25 @@ public class BpmnInstance
 			}
 		}
 		
+		// Handle declared parameters with initial values.
+		
+		// todo: parameter direction / class
+		
+		List params = thread.getNextActivity().getParameters();
+		if(params!=null)
+		{	
+			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
+			for(int i=0; i<params.size(); i++)
+			{
+				MParameter param = (MParameter)params.get(i);
+				if(!thread.hasParameterValue(param.getName()))
+					thread.setParameterValue(param.getName(), param.getInitialval()==null? null: param.getInitialval().getValue(fetcher));
+			}
+		}
+		
+		
 		// Find handler and execute activity.
-		IActivityHandler	handler	= (IActivityHandler) handlers.get(thread.getNextActivity().getActivityType());
+		IActivityHandler handler = (IActivityHandler)handlers.get(thread.getNextActivity().getActivityType());
 		if(handler==null)
 			throw new UnsupportedOperationException("No handler for activity: "+thread);
 		handler.execute(thread.getNextActivity(), this, thread, ec);

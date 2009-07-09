@@ -9,7 +9,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_XiioUWV3Ed6rasIGpuxRsw" iD="_XiioUGV3Ed6rasIGpuxRsw" outgoingEdges="_fJ-60WV3Ed6rasIGpuxRsw" incomingEdges="_Vrg6oWWKEd66n90-5WZehg" name="SayGoodbye&#xD;&#xA;class = SayGoodbyeTask.class&#xD;&#xA;in int y" lanes="_z5xT4WWIEd66n90-5WZehg" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_eQwz0WV3Ed6rasIGpuxRsw" iD="_eQwz0GV3Ed6rasIGpuxRsw" incomingEdges="_fJ-60WV3Ed6rasIGpuxRsw" lanes="_z5xT4WWIEd66n90-5WZehg" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_SkIS8WWKEd66n90-5WZehg" iD="_SkIS8GWKEd66n90-5WZehg" outgoingEdges="_Vrg6oWWKEd66n90-5WZehg" incomingEdges="_SkSD8WWKEd66n90-5WZehg" name="Wait for 2 secs&#xD;&#xA;duration = 2000" lanes="_z5xT4WWIEd66n90-5WZehg" activityType="EventIntermediateTimer"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_U7ftkWV3Ed6rasIGpuxRsw" iD="_U7ftkGV3Ed6rasIGpuxRsw" name="x = 5"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_U7ftkWV3Ed6rasIGpuxRsw" iD="_U7ftkGV3Ed6rasIGpuxRsw" name=""/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fJ-60WV3Ed6rasIGpuxRsw" iD="_fJ-60GV3Ed6rasIGpuxRsw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_SkSD8WWKEd66n90-5WZehg" iD="_SkSD8GWKEd66n90-5WZehg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Vrg6oWWKEd66n90-5WZehg" iD="_Vrg6oGWKEd66n90-5WZehg" name="y = SayHello.x + 1"/>

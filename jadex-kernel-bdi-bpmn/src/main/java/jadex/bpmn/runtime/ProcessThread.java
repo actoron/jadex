@@ -137,11 +137,21 @@ public class ProcessThread	implements ITaskContext
 	//-------- ITaskContext --------
 	
 	/**
+	 *  Test if a parameter has been set on activity.
+	 *  @param name	The parameter name. 
+	 *  @return	True if parameter is known.
+	 */
+	public boolean hasParameterValue(String name)
+	{
+		return values!=null? values.containsKey(name): false;
+	}
+	
+	/**
 	 *  Get the value of a parameter.
 	 *  @param name	The parameter name. 
 	 *  @return	The parameter value. 
 	 */
-	public Object	getParameterValue(String name)
+	public Object getParameterValue(String name)
 	{
 		return values!=null ? values.get(name) : null;
 	}
