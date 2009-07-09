@@ -32,7 +32,7 @@ public class BpmnInstance
 		defhandlers.put("EventEndEmpty", new DefaultActivityHandler());
 		defhandlers.put("EventIntermediateError", new DefaultActivityHandler());
 		defhandlers.put("Task", new TaskActivityHandler());
-		defhandlers.put("SubProcess", new TaskActivityHandler());
+		defhandlers.put("SubProcess", new SubProcessActivityHandler());
 		defhandlers.put("GatewayParallel", new GatewayParallelActivityHandler());
 		defhandlers.put("GatewayDataBasedExclusive", new GatewayXORActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
@@ -62,10 +62,10 @@ public class BpmnInstance
 		this.context	= new ThreadContext(model);
 		
 		// Create initial thread(s). 
-		List	startevents	= model.getStartEvents();
+		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			context.addThread(new ProcessThread((MActivity)startevents.get(i), context));
+			context.addThread(new ProcessThread((MActivity)startevents.get(i)));
 		}
 	}
 	
@@ -110,7 +110,8 @@ public class BpmnInstance
 		if(!isReady())
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
 		
-		ProcessThread	thread	= context.getExecutableThread();
+		ThreadContext	ec	= context.getExecutableContext();
+		ProcessThread	thread	= ec.getExecutableThread();
 		
 		// Handle parameter passing in edge inscriptions.
 		if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
@@ -133,7 +134,7 @@ public class BpmnInstance
 		IActivityHandler	handler	= (IActivityHandler) handlers.get(thread.getNextActivity().getActivityType());
 		if(handler==null)
 			throw new UnsupportedOperationException("No handler for activity: "+thread);
-		handler.execute(thread.getNextActivity(), this, thread);
+		handler.execute(thread.getNextActivity(), this, thread, ec);
 	}
 	
 	/**
@@ -141,7 +142,7 @@ public class BpmnInstance
 	 */
 	public boolean	isReady()
 	{
-		return context.getExecutableThread()!=null;
+		return context.getExecutableContext()!=null;
 	}
 	
 	//-------- listener handling --------

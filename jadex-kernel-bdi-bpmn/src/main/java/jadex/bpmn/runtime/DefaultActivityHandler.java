@@ -19,11 +19,12 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
-		doExecute(activity, instance, thread);
-		step(activity, instance, thread);
+		doExecute(activity, instance, thread, context);
+		step(activity, instance, thread, context);
 	}
 	
 	/**
@@ -31,8 +32,9 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
 		System.out.println("Executed: "+activity+", "+instance);
 	}
@@ -42,10 +44,11 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
-		MNamedIdElement	next	= getOutgoingElement(activity, instance, thread);
+		MNamedIdElement	next	= getOutgoingElement(activity, instance, thread, context);
 		if(next instanceof MSequenceEdge)
 		{
 			thread.setLastEdge((MSequenceEdge) next);
@@ -60,7 +63,6 @@ public class DefaultActivityHandler implements IActivityHandler
 		}
 		else
 		{
-			ThreadContext	context	= thread.getThreadContext();
 			context.removeThread(thread);
 			
 			if(context.isFinished() && context.getParent()!=null)
@@ -76,9 +78,10 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The current activity.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 *  @return The outgoing edge or activity or null if the thread is finished.
 	 */
-	protected MNamedIdElement	getOutgoingElement(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	protected MNamedIdElement	getOutgoingElement(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
 		MNamedIdElement	ret;
 		
@@ -142,11 +145,12 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The timing event activity.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
 		thread.setWaiting(false);
-		step(activity, instance, thread);
+		step(activity, instance, thread, context);
 		instance.wakeUp();
 	}
 }

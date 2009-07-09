@@ -133,7 +133,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param typename The type name.
 	 *  @param properties The properties.
 	 */
-	public void addSpaceObjectType(String typename, Map properties)
+	public void addSpaceObjectType(String typename, List properties)
 	{
 		synchronized(monitor)
 		{
@@ -159,14 +159,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param typename The type name.
 	 *  @param properties The properties.
 	 */
-	public void addSpaceProcessType(String typename, Class clazz, Map properties)
+	public void addSpaceProcessType(String typename, Class clazz, List properties)
 	{
 		synchronized(monitor)
 		{
-			if(properties==null)
-				properties = new HashMap();
-			properties.put("_clazz", clazz);
-			processtypes.put(typename, properties);
+			processtypes.put(typename, new Object[]{clazz, properties});
 		}
 	}
 	
@@ -199,14 +196,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			while(spaceobjects.containsKey(id));
 			
 			// Prepare properties (runtime props override type props).
-			Map procinfo = (Map)processtypes.get(typename);
+			Object[] procinfo = (Object[])processtypes.get(typename);
 			if(procinfo==null)
 				throw new RuntimeException("Unknown space process: "+typename);
 			
 			try
 			{
-				ISpaceProcess process = (ISpaceProcess)((Class)procinfo.get("_clazz")).newInstance();
-				
+				ISpaceProcess process = (ISpaceProcess)((Class)procinfo[0]).newInstance();
+				properties	= mergeProperties((List)procinfo[1], properties);
 				if(properties!=null)
 				{
 					for(Iterator it = properties.keySet().iterator(); it.hasNext(); )
@@ -214,12 +211,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						String propname = (String)it.next();
 						process.setProperty(propname, properties.get(propname)); 
 					}
-				}
-				for(Iterator it = procinfo.keySet().iterator(); it.hasNext(); )
-				{
-					String propname = (String)it.next();
-					if(!"_clazz".equals(propname) && (properties==null || !properties.containsKey(propname)))
-						process.setProperty(propname, procinfo.get(propname)); 
 				}
 				
 				processes.put(id, process);
@@ -238,14 +229,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param typename The type name.
 	 *  @param properties The properties.
 	 */
-	public void addObjectTaskType(String typename, Class clazz, Map properties)
+	public void addObjectTaskType(String typename, Class clazz, List properties)
 	{
 		synchronized(monitor)
 		{
-			if(properties==null)
-				properties = new HashMap();
-			properties.put("_clazz", clazz);
-			tasktypes.put(typename, properties);
+			tasktypes.put(typename, new Object[]{clazz, properties});
 		}
 	}
 	
@@ -274,17 +262,18 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			System.out.println("add task: "+typename+" "+objectid+" "+properties);
 
 			// Prepare properties (runtime props override type props).
-			Map taskinfo = (Map)tasktypes.get(typename);
+			Object[] taskinfo = (Object[])tasktypes.get(typename);
 			if(taskinfo==null)
 				throw new RuntimeException("Unknown space task: "+typename);
 			
 			try
 			{
-				IObjectTask task = (IObjectTask)((Class)taskinfo.get("_clazz")).newInstance();
+				IObjectTask task = (IObjectTask)((Class)taskinfo[0]).newInstance();
 				// todo: ensure uniqueness?!
 				Object id = taskidcounter.getNext();
 				task.setProperty(IObjectTask.ID, id);
 				
+				properties	= mergeProperties((List) taskinfo[1], properties);
 				if(properties!=null)
 				{
 					for(Iterator it = properties.keySet().iterator(); it.hasNext(); )
@@ -292,12 +281,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						String propname = (String)it.next();
 						task.setProperty(propname, properties.get(propname)); 
 					}
-				}
-				for(Iterator it = taskinfo.keySet().iterator(); it.hasNext(); )
-				{
-					String propname = (String)it.next();
-					if(!"_clazz".equals(propname) && !properties.containsKey(propname))
-						task.setProperty(propname, taskinfo.get(propname)); 
 				}
 				
 				SpaceObject object = (SpaceObject)getSpaceObject(objectid);
@@ -391,18 +374,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			while(spaceobjects.containsKey(id));
 			
 			// Prepare properties (runtime props override type props).
-			Map typeprops = (Map)objecttypes.get(typename);
-			if(typeprops!=null)
-			{
-				if(properties==null)
-					properties = new HashMap();
-				for(Iterator it=typeprops.keySet().iterator(); it.hasNext(); )
-				{
-					String propname = (String)it.next();
-					if(!properties.containsKey(propname))
-						properties.put(propname, typeprops.get(propname));
-				}
-			}
+			properties = mergeProperties((List)objecttypes.get(typename), properties);
 			
 			// Create the object.
 			ret = new SpaceObject(id, typename, properties, tasks, null, monitor, this);
@@ -479,6 +451,37 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Add type properties to runtime properties.
+	 *  Runtime properties have precedence if specified.
+	 *  @param typeprops	The type properties (if any).
+	 *  @param properties	The runtime properties or null.
+	 *  @return	The merged runtime properties.
+	 */
+	protected Map mergeProperties(List typeprops, Map properties)
+	{
+		if(typeprops!=null)
+		{
+			if(properties==null)
+				properties = new HashMap();
+			for(Iterator it=typeprops.iterator(); it.hasNext(); )
+			{
+				Map	prop	= (Map) it.next();
+				String propname = (String)prop.get("name");
+				if(!properties.containsKey(propname))
+				{
+					IParsedExpression exp = (IParsedExpression)prop.get("value");
+					boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+					if(dyn)
+						properties.put(propname, exp);
+					else
+						properties.put(propname, exp==null? null: exp.getValue(fetcher));
+				}
+			}
+		}
+		return properties;
 	}
 	
 	/** 

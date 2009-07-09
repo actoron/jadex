@@ -21,7 +21,7 @@ start the helloworld example you can use the following command:
 java -cp jadex-rules-applications-2.0-beta4.jar jadex.rules.examples.helloworld.OAVHelloWorld
 
 Notes: 
-- write this command in one line
+- execute this command in the 'lib' directory
 - on some systems you have to write '-classpath' instead of '-cp'
 
 This document should help developers that want to understand 

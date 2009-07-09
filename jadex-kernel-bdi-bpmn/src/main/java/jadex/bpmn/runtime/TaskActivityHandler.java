@@ -13,8 +13,9 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread, final ThreadContext context)
 	{
 		Class taskimpl = (Class)activity.getPropertyValue("class");
 		if(taskimpl!=null)
@@ -27,25 +28,25 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				{
 					public void resultAvailable(Object result)
 					{
-						TaskActivityHandler.this.notify(activity, instance, thread);
+						TaskActivityHandler.this.notify(activity, instance, thread, context);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						thread.setException(exception);
-						TaskActivityHandler.this.notify(activity, instance, thread);
+						TaskActivityHandler.this.notify(activity, instance, thread, context);
 					}
 				});
 			}
 			catch(Exception e)
 			{
 				thread.setException(e);
-				TaskActivityHandler.this.notify(activity, instance, thread);
+				TaskActivityHandler.this.notify(activity, instance, thread, context);
 			}
 		}
 		else
 		{
-			super.execute(activity, instance, thread);
+			super.execute(activity, instance, thread, context);
 		}
 	}
 }

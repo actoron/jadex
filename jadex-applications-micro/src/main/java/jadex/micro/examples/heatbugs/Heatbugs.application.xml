@@ -22,17 +22,17 @@
 	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" width="20" height="20" neighborhood="moore" class="Grid2D">
-			<env:property name="min_ideal_temp">10.0</env:property>
-			<env:property name="max_ideal_temp">40.0</env:property>
+			<env:property name="min_ideal_temp">50.0</env:property>
+			<env:property name="max_ideal_temp">100.0</env:property>
 			<!-- <env:property name="min_ideal_temp">0</env:property>-->
 			<!-- <env:property name="max_ideal_temp">200</env:property>-->
 			<env:property name="min_output_heat">5.0</env:property>
 			<env:property name="max_output_heat">25.0</env:property>
 			<!-- <env:property name="min_output_heat">0</env:property> -->
 			<!-- <env:property name="max_output_heat">100</env:property> -->
-			<env:property name="diffusion_rate">0.1</env:property>
-			<env:property name="evaporation_rate">0.01</env:property>
-			<env:property name="random_move_chance">0</env:property>
+			<env:property name="diffusion_rate">0.2</env:property>
+			<env:property name="evaporation_rate">0.03</env:property>
+			<env:property name="random_move_chance">0.1</env:property>
 			
 			<env:objecttypes>
 				<env:objecttype name="patch">
@@ -69,7 +69,7 @@
 				<env:perspective name="main" class="Perspective2D" opengl="true" objectshiftx="0.5" objectshifty="0.5">
 					
 					<env:drawable objecttype="patch" width="1.0" height="1.0">
-						<env:property name="color" dynamic="true">new java.awt.Color((int)(Math.min(255, $object.heat*2)),0,0)</env:property>
+						<env:property name="color" dynamic="true">new java.awt.Color((int)(Math.min(255, $object.heat)),0,0)</env:property>
 						<env:rectangle color="color" />
 					</env:drawable>
 					
@@ -92,12 +92,28 @@
 	</agenttypes>
 	
 	<applications>
+		<application name="30x30">
+			<agents>
+				<agent type="Heatbug" number="40"/>
+			</agents>
+			
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
+				<env:processes>
+					<env:process type="diffuse"/>
+				</env:processes>
+				
+				<env:observers>
+					<env:observer name="world" view="view_all" perspective="main"/>
+				</env:observers>
+			</env:envspace>
+		</application>
+		
 		<application name="50x50">
 			<agents>
 				<agent type="Heatbug" number="100"/>
 			</agents>
 			
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="40" height="40">
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 				<env:processes>
 					<env:process type="diffuse"/>
 				</env:processes>

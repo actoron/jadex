@@ -24,9 +24,6 @@ public class ProcessThread	implements ITaskContext
 	/** Is the process in a waiting state. */
 	protected boolean	waiting;
 	
-	/** The execution context. */
-	protected ThreadContext	context;
-	
 	/** The contexts (data) of previous activities (task name ->). */
 	protected Map	contexts;
 	
@@ -42,10 +39,9 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(MActivity activity, ThreadContext context)
+	public ProcessThread(MActivity activity)
 	{
 		this.activity	= activity;
-		this.context	= context;
 	}
 	
 	//-------- methods --------
@@ -62,6 +58,8 @@ public class ProcessThread	implements ITaskContext
 		buf.append(activity);
 		buf.append(", contexts=");
 		buf.append(contexts);
+		buf.append(", waiting=");
+		buf.append(waiting);
 		buf.append(")");
 		return buf.toString();
 	}
@@ -129,13 +127,11 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public ProcessThread	createCopy()
 	{
-		ProcessThread	ret	= new ProcessThread(activity, context);
+		ProcessThread	ret	= new ProcessThread(activity);
 		ret.edge	= edge;
 		ret.contexts	= contexts;
 		ret.values	= null;
-		context.addThread(ret);
 		return ret;
-		
 	}
 	
 	//-------- ITaskContext --------
@@ -198,13 +194,5 @@ public class ProcessThread	implements ITaskContext
 	public void	setException(Exception exception)
 	{
 		this.exception	= exception;
-	}
-	
-	/**
-	 *  Get the execution context of the thread.
-	 */
-	public ThreadContext	getThreadContext()
-	{
-		return context;
 	}
 }

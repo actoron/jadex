@@ -20,20 +20,6 @@ import java.util.Set;
  */
 public class HeatbugAgent extends MicroAgent
 {
-	//-------- attributes --------
-	
-	/** The wanted temperature. */
-//	protected double ideal_temp;
-	
-	/** The heat emitted at each step. */
-//	protected double output_heat;
-
-	/** The random move chance. */
-//	protected double randomchance;
-	
-	/** The degree of unhappiness (difference between ideal temp and current temp). */
-//	protected double unhappiness;
-	
 	//-------- methods --------
 	
 	/**

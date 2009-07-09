@@ -3,7 +3,6 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSubProcess;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,27 +15,21 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
 		MSubProcess	proc	= (MSubProcess) activity;
-		List	stackframe	= new ArrayList();
-//		thread.addStackFrame(stackframe);
+		thread.setWaiting(true);
+		ThreadContext	subcontext	= new ThreadContext(proc, thread, context);
+		context.addSubcontext(subcontext);
 		
-		List	start	= proc.getStartEvents();
+		List	start	= proc.getStartActivities();
 		for(int i=0; i<start.size(); i++)
 		{
-			if(i==0)
-			{
-				stackframe.add(thread);
-				thread.setNextActivity((MActivity)start.get(i));
-			}
-			else
-			{
-				ProcessThread	newthread	= thread.createCopy();
-				newthread.setNextActivity((MActivity)start.get(i));
-//				instance.getThreads().add(newthread);
-			}
+			ProcessThread	newthread	= thread.createCopy();
+			newthread.setNextActivity((MActivity)start.get(i));
+			subcontext.addThread(newthread);
 		}
 	}
 }

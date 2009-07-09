@@ -7,8 +7,6 @@ import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,9 +45,9 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	/**
 	 *  Add a space process type.
 	 *  @param typename The type name.
-	 *  @param properties The properties.
+	 *  @param properties The properties (list of maps with name/value/dynamic).
 	 */
-	public void addSpaceProcessType(String typename, Class clazz, Map properties);
+	public void addSpaceProcessType(String typename, Class clazz, List properties);
 	
 	/**
 	 *  Remove a space process type.
@@ -89,9 +87,9 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	/**
 	 *  Add a space object type.
 	 *  @param typename The type name.
-	 *  @param properties The properties.
+	 *  @param properties The properties (list of maps with name/value/dynamic).
 	 */
-	public void addSpaceObjectType(String typename, Map properties);
+	public void addSpaceObjectType(String typename, List properties);
 	
 	/**
 	 *  Remove a space object type.
@@ -122,9 +120,9 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	/**
 	 *  Add a object task type.
 	 *  @param typename The type name.
-	 *  @param properties The properties.
+	 *  @param properties The properties (list of maps with name/value/dynamic).
 	 */
-	public void addObjectTaskType(String typename, Class clazz, Map properties);
+	public void addObjectTaskType(String typename, Class clazz, List properties);
 	
 	/**
 	 *  Remove an object task type.

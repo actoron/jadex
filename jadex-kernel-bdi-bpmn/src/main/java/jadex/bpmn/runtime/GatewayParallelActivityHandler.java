@@ -19,8 +19,9 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
 		List	incoming	= activity.getIncomingSequenceEdges();
 		List	outgoing	= activity.getOutgoingSequenceEdges();
@@ -38,6 +39,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 				{
 					ProcessThread	newthread	= thread.createCopy();
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
+					context.addThread(newthread);
 				}
 			}
 		}
@@ -50,7 +52,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			Set	threads	= new HashSet();	// Threads to be deleted.
 			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
 			
-			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
+			for(Iterator it=context.getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
 			{
 				ProcessThread	oldthread	= (ProcessThread) it.next();
 				if(edges.contains(oldthread.getLastEdge()))
@@ -64,7 +66,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			{
 				thread.setLastEdge((MSequenceEdge) outgoing.get(0));
 				for(Iterator it=threads.iterator(); it.hasNext(); )
-					thread.getThreadContext().removeThread((ProcessThread) it.next());
+					context.removeThread((ProcessThread) it.next());
 			}
 			else
 			{

@@ -5,13 +5,13 @@
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_y65Nd2pBEd6JtKkNrnCCNQ" iD="_y65NdmpBEd6JtKkNrnCCNQ" associations="_8fqS12pCEd6JtKkNrnCCNQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_0vuBEWpBEd6JtKkNrnCCNQ" iD="_0vuBEGpBEd6JtKkNrnCCNQ" outgoingEdges="_2BrYOGpBEd6JtKkNrnCCNQ" activityType="EventStartEmpty"/>
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_2BX2MWpBEd6JtKkNrnCCNQ" iD="_2BX2MGpBEd6JtKkNrnCCNQ" outgoingEdges="_B9XHGGpCEd6JtKkNrnCCNQ" incomingEdges="_2BrYOGpBEd6JtKkNrnCCNQ" name="Exception Process&#xD;&#xA;class = ExceptionTask.class" activityType="SubProcess">
-      <vertices xmi:type="bpmn:Activity" xmi:id="_zr6ukWrtEd6CydnA5mdgEg" iD="_zr6ukGrtEd6CydnA5mdgEg" outgoingEdges="_2lSIaGrtEd6CydnA5mdgEg" name="Sub 1"/>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_2lI-cWrtEd6CydnA5mdgEg" iD="_2lI-cGrtEd6CydnA5mdgEg" outgoingEdges="_6y2VAWrtEd6CydnA5mdgEg" incomingEdges="_2lSIaGrtEd6CydnA5mdgEg" name="Sub 2&#xD;&#xA;class = ExceptionTask.class" activityType="Task"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_2BX2MWpBEd6JtKkNrnCCNQ" iD="_2BX2MGpBEd6JtKkNrnCCNQ" outgoingEdges="_B9XHGGpCEd6JtKkNrnCCNQ" incomingEdges="_2BrYOGpBEd6JtKkNrnCCNQ" name="Exception Process&#xD;&#xA;" activityType="SubProcess">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_2lI-cWrtEd6CydnA5mdgEg" iD="_2lI-cGrtEd6CydnA5mdgEg" outgoingEdges="_6y2VAWrtEd6CydnA5mdgEg" incomingEdges="_D8Zc4WyCEd63w-5MJLkKtQ" name="Sub 2&#xD;&#xA;class = ExceptionTask.class" activityType="Task"/>
       <vertices xmi:type="bpmn:Activity" xmi:id="_6yskAWrtEd6CydnA5mdgEg" iD="_6yskAGrtEd6CydnA5mdgEg" incomingEdges="_6y2VAWrtEd6CydnA5mdgEg" name="Sub 3" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_DQcV0WyCEd63w-5MJLkKtQ" iD="_DQcV0GyCEd63w-5MJLkKtQ" outgoingEdges="_D8Zc4WyCEd63w-5MJLkKtQ" name="Sub 1" activityType="Task" looping="false"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__U0-mmpBEd6JtKkNrnCCNQ" iD="__U0-mWpBEd6JtKkNrnCCNQ"/>
-      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2lSIaGrtEd6CydnA5mdgEg" iD="_2lSIZ2rtEd6CydnA5mdgEg"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6y2VAWrtEd6CydnA5mdgEg" iD="_6y2VAGrtEd6CydnA5mdgEg"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_D8Zc4WyCEd63w-5MJLkKtQ" iD="_D8Zc4GyCEd63w-5MJLkKtQ"/>
       <eventHandlers xmi:type="bpmn:Activity" xmi:id="_9_cgAWpBEd6JtKkNrnCCNQ" iD="_9_cgAGpBEd6JtKkNrnCCNQ" outgoingEdges="__U0-mmpBEd6JtKkNrnCCNQ" activityType="EventIntermediateError"/>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="__U0-kWpBEd6JtKkNrnCCNQ" iD="__U0-kGpBEd6JtKkNrnCCNQ" outgoingEdges="_W1ZF4WpCEd6JtKkNrnCCNQ" incomingEdges="__U0-mmpBEd6JtKkNrnCCNQ" name="Exception Occurred" activityType="Task"/>

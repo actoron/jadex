@@ -1,5 +1,10 @@
 Jadex Releases Overview
 
+Release 2.0 beta4 (07/2009)
+	- New HeatBugs example based on micro kernel
+	- JADE adapter for JADE 3.7 included
+	- Some minor bugfixes
+	
 Release 2.0 beta3 (Environment support release 06/2009)
 	- Jadex V1 Java condition language (JCL) support
 	- New application descriptor XML for defining whole agent applications

@@ -133,9 +133,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mobjecttype = (Map)objecttypes.get(i);
 				List props = (List)mobjecttype.get("properties");
-				Map properties = convertProperties(props, fetcher);
+//				Map properties = convertProperties(props, fetcher);
 //				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
-				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
+				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), props);
 			}
 		}
 		
@@ -217,15 +217,15 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
 				Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
 				
-				Map tmp = convertProperties(props, fetcher);
-				if(tmp!=null)
-				{
-					tmp.remove("name");
-					tmp.remove("clazz");
-				}
+//				Map tmp = convertProperties(props, fetcher);
+//				if(tmp!=null)
+//				{
+//					tmp.remove("name");
+//					tmp.remove("clazz");
+//				}
 				
 //				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
-				ret.addSpaceProcessType(name, clazz, tmp);
+				ret.addSpaceProcessType(name, clazz, props);
 			}
 		}
 		
@@ -241,15 +241,15 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				String name = (String)MEnvSpaceInstance.getProperty(mtask, "name");
 				Class clazz = (Class)MEnvSpaceInstance.getProperty(mtask, "clazz");
 				
-				Map tmp = convertProperties(props, fetcher);
-				if(tmp!=null)
-				{
-					tmp.remove("name");
-					tmp.remove("clazz");
-				}
+//				Map tmp = convertProperties(props, fetcher);
+//				if(tmp!=null)
+//				{
+//					tmp.remove("name");
+//					tmp.remove("clazz");
+//				}
 				
 //				System.out.println("Adding object task: "+MEnvSpaceInstance.getProperty(mtask, "name"));
-				ret.addObjectTaskType(name, clazz, tmp);
+				ret.addObjectTaskType(name, clazz, props);
 			}
 		}
 		

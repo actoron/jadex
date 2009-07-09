@@ -463,16 +463,16 @@ public class MBpmnModel extends MIdElement
 	}
 	
 	/**
-	 *  Get all start events of the model.
-	 *  @return A non-empty List of start events or null, if none.
+	 *  Get all start activities of the model.
+	 *  @return A non-empty List of start activities or null, if none.
 	 */
-	public List getStartEvents()
+	public List getStartActivities()
 	{
 		List	ret	= null;
 		for(int i=0; pools!=null && i<pools.size(); i++)
 		{
 			MPool	pool	= (MPool) pools.get(i);
-			List	tmp	= pool.getStartEvents();
+			List	tmp	= pool.getStartActivities();
 			if(tmp!=null)
 			{
 				if(ret!=null)
@@ -1014,5 +1014,29 @@ public class MBpmnModel extends MIdElement
 		{
 			return 2;
 		}
+	}
+
+	/**
+	 *  Get all start activities form the supplied set of activities.
+	 *  Start activities are those without incoming edges. 
+	 *  @return A non-empty List of start activities or null, if none.
+	 */
+	public static List	getStartActivities(List activities)
+	{
+		List	ret	= null;
+		for(Iterator it=activities.iterator(); it.hasNext(); )
+		{
+			MActivity	activity	= (MActivity) it.next();
+			if(activity.getIncomingSequenceEdges()==null || activity.getIncomingSequenceEdges().isEmpty())
+			{
+				if(ret==null)
+				{
+					ret	= new ArrayList();
+				}
+				ret.add(activity);
+			}
+		}
+		
+		return ret;
 	}
 }

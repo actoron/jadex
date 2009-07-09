@@ -13,13 +13,14 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
 		Number dur = (Number)activity.getPropertyValue("duration");
 		long duration = dur==null? -1: dur.longValue(); 
 		thread.setWaiting(true);
-		doWait(activity, instance, thread, duration);
+		doWait(activity, instance, thread, context, duration);
 	}
 	
 	/**
@@ -27,7 +28,8 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param activity	The timing event activity.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param context	The thread context.
 	 *  @param duration	The duration to wait.
 	 */
-	public abstract void doWait(MActivity activity, BpmnInstance instance, ProcessThread thread, long duration);
+	public abstract void doWait(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context, long duration);
 }

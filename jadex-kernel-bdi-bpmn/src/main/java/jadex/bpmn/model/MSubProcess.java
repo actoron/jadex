@@ -55,25 +55,13 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
-	 *  Get all start events.
-	 *  @return A non-empty List of start events or null, if none.
+	 *  Get all start activities of the pool.
+	 *  @return A non-empty List of start activities or null, if none.
 	 */
-	public List getStartEvents()
+	public List getStartActivities()
 	{
-		List	ret	= null;
-		for(int i=0; activities!=null && i<activities.size(); i++)
-		{
-			MActivity	act	= (MActivity)activities.get(i);
-			// Todo: use constants
-			if(act.getActivityType().startsWith("EventStart"))
-			{
-				if(ret==null)
-					ret	= new ArrayList();
-				ret.add(act);
-			}
-		}
-		return ret;
-	}
+		return MBpmnModel.getStartActivities(activities);
+	}	
 	
 	/**
 	 *  Get the sequence edges.

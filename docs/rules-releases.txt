@@ -1,5 +1,10 @@
 Jadex Rules Releases Overview
 
+Release 2.0 beta4 (JCL Release 07/2009)
+	- Java condition language (JCL) support
+	- More efficient garbage collection in OAV state
+	- Minor bug fixes
+
 Release 2.0 beta1 (V2 Beta-Release 01/2009)
 	- Lightweight but functionally complete rule engine 
 	- Rule specification is done in CLIPS(JESS)-language dialect on condition and in Java on action side of rules 
