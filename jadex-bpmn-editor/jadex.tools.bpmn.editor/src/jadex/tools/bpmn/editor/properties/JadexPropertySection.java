@@ -3,6 +3,8 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
+import jadex.tools.bpmn.editor.JadexBpmnPlugin;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,7 +46,7 @@ public class JadexPropertySection extends AbstractPropertySection
 	private Text implText;
 
 	/** The text for the role */
-	private Text roleText;
+	private Text parameterText;
 
 	/** The activity (task) that holds impl and role, may be null. */
 	private Activity activity;
@@ -54,7 +56,7 @@ public class JadexPropertySection extends AbstractPropertySection
 	/**
 	 * Creates the UI of the section.
 	 */
-	// @Override
+	@Override
 	public void createControls(Composite parent,TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
@@ -64,22 +66,22 @@ public class JadexPropertySection extends AbstractPropertySection
 		GridData gd = new GridData(SWT.FILL);
 		gd.minimumWidth = 500;
 		gd.widthHint = 500;
-		getWidgetFactory().createCLabel(parent, "Implementing class");
+		getWidgetFactory().createCLabel(parent, "class");
 		implText = getWidgetFactory().createText(parent, "");
 		implText.setLayoutData(gd);
-		getWidgetFactory().createCLabel(parent, "Role");
-		roleText = getWidgetFactory().createText(parent, "");
-		roleText.setLayoutData(gd);
-		
-		implText.addModifyListener(new ModifyJadexInformation(JadexPropteryConstants.JADEX_TASK_IMPL, implText));
-		roleText.addModifyListener(new ModifyJadexInformation(JadexPropteryConstants.JADEX_TASK_ROLE, roleText));
+		getWidgetFactory().createCLabel(parent, "parameter");
+		parameterText = getWidgetFactory().createText(parent, "");
+		parameterText.setLayoutData(gd);
+
+		implText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_ACTIVITY_IMPL, implText));
+		parameterText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER, parameterText));
 
 	}
 
 	/**
 	 * Manages the input.
 	 */
-	// @Override
+	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 
@@ -95,23 +97,23 @@ public class JadexPropertySection extends AbstractPropertySection
 			if (unknownInput instanceof Activity)
 			{
 				Activity elt = (Activity) unknownInput;
-				EAnnotation ea = elt.getEAnnotation(JadexPropteryConstants.JADEX_PROP_ANNOTATION);
+				EAnnotation ea = elt.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
 				if (ea != null)
 				{
-					implText.setText((String) ea.getDetails().get(JadexPropteryConstants.JADEX_TASK_IMPL));
-					roleText.setText((String) ea.getDetails().get(JadexPropteryConstants.JADEX_TASK_ROLE));
+					implText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_IMPL));
+					parameterText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER));
 				}
 				activity = (Activity) elt;
 				implText.setEnabled(true);
-				roleText.setEnabled(true);
+				parameterText.setEnabled(true);
 				return;
 			}
 		}
 		activity = null;
 		implText.setText("");
-		roleText.setText("");
+		parameterText.setText("");
 		implText.setEnabled(false);
-		roleText.setEnabled(false);
+		parameterText.setEnabled(false);
 	}
 	
 	/**
@@ -158,14 +160,14 @@ public class JadexPropertySection extends AbstractPropertySection
 						IProgressMonitor arg0, IAdaptable arg1)
 						throws ExecutionException
 				{
-					EAnnotation annotation = activity.getEAnnotation(JadexPropteryConstants.JADEX_PROP_ANNOTATION);
+					EAnnotation annotation = activity.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
 					if (annotation == null)
 					{
 						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-						annotation.setSource(JadexPropteryConstants.JADEX_PROP_ANNOTATION);
+						annotation.setSource(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
 						annotation.setEModelElement(activity);
-						annotation.getDetails().put(JadexPropteryConstants.JADEX_TASK_IMPL, "");
-						annotation.getDetails().put(JadexPropteryConstants.JADEX_TASK_ROLE, "");
+						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_IMPL, "");
+						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER, "");
 					}
 					annotation.getDetails().put(key, field.getText());
 
@@ -178,10 +180,10 @@ public class JadexPropertySection extends AbstractPropertySection
 			}
 			catch (ExecutionException exception)
 			{
-//				STPEclipseConPlugin.getDefault().getLog().log(
-//						new Status(IStatus.ERROR,
-//								STPEclipseConPlugin.PLUGIN_ID, IStatus.ERROR,
-//								exception.getMessage(), exception));
+				JadexBpmnPlugin.getDefault().getLog().log(
+						new Status(IStatus.ERROR,
+								JadexBpmnPlugin.PLUGIN_ID, IStatus.ERROR,
+								exception.getMessage(), exception));
 			}
 		}
 	}

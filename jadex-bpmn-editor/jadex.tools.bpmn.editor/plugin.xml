@@ -43,6 +43,15 @@
         </propertySection>
      </propertySections>
    </extension>
+   
+   <!-- annotation decorator in diagram -->
+	<extension
+        point="org.eclipse.stp.bpmn.diagram.EAnnotationDecorator">
+     <decorator
+           class="jadex.tools.bpmn.editor.properties.JadexAnnotationDecorator"
+           source="jadex"/>
+  </extension>
+	
 	
 	<!-- the default palette -->
    <extension point="org.eclipse.gmf.runtime.diagram.ui.paletteProviders">
@@ -162,4 +171,5 @@
        </propertyCategory>
     </propertyContributor>
  </extension>
+ 
 </plugin>
