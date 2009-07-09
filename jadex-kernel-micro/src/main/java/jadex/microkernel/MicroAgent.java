@@ -168,18 +168,30 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void waitFor(long time, final Runnable run)
 	{
+		if(timer!=null)
+			throw new RuntimeException("timer should be null");
 		this.timer = ((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				interpreter.invokeLater(new Runnable()
+				synchronized(interpreter.ext_entries)
 				{
-					public void run()
+					if(!interpreter.ext_forbidden)
 					{
-						timer = null;
-						run.run();
+						interpreter.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								timer = null;
+								run.run();
+							}
+						});
 					}
-				});
+//					else
+//					{
+//						System.out.println("not: "+run);
+//					}
+				}
 			}
 		});
 	}
@@ -190,19 +202,31 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void waitForTick(final Runnable run)
 	{
+		if(timer!=null)
+			throw new RuntimeException("timer should be null");
 		this.timer = ((IClockService)getPlatform().getService(IClockService.class)).createTickTimer(new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
 //				interpreter.invokeLater(run);
-				interpreter.invokeLater(new Runnable()
+				synchronized(interpreter.ext_entries)
 				{
-					public void run()
+					if(!interpreter.ext_forbidden)
 					{
-						timer = null;
-						run.run();
+						interpreter.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								timer = null;
+								run.run();
+							}
+						});
 					}
-				});
+//					else
+//					{
+//						System.out.println("not: "+run);
+//					}
+				}
 			}
 		});
 	}

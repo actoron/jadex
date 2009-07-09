@@ -49,6 +49,9 @@ public class MicroAgentInterpreter implements IKernelAgent
 	/** Flag that indicates if the agent has been started. */
 	protected boolean started;
 	
+	/** The flag if external entries are forbidden. */
+	protected boolean ext_forbidden;
+	
 	//-------- constructors --------
 	
 	/**
@@ -190,12 +193,30 @@ public class MicroAgentInterpreter implements IKernelAgent
 		invokeLater(new Runnable()
 		{
 			public void run()
-			{
-				microagent.timer.cancel();
-				microagent.agentKilled();
-				listener.resultAvailable(adapter.getAgentIdentifier());
+			{	
+				// must synchronize to avoid other thread calling invokeLater at the same time
+				synchronized(ext_entries)
+				{
+					invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							if(microagent.timer!=null)
+							{
+								microagent.timer.cancel();
+								microagent.timer = null;
+							}
+							microagent.agentKilled();
+							listener.resultAvailable(adapter.getAgentIdentifier());
+						}
+					});
+					
+					ext_forbidden = true;
+					adapter.wakeup();
+				}
 			}
 		});
+		adapter.wakeup();
 	}
 	
 	/**
@@ -243,10 +264,12 @@ public class MicroAgentInterpreter implements IKernelAgent
 	{
 		synchronized(ext_entries)
 		{
-//			if(ext_forbidden)
-//				throw new AgentTerminatedException("External actions cannot be accepted " +
-//					"due to terminated agent state: "+ragent);
-			ext_entries.add(action);
+			if(ext_forbidden)
+				throw new AgentTerminatedException("External actions cannot be accepted " +
+					"due to terminated agent state: "+this);
+			{
+				ext_entries.add(action);
+			}
 		}
 		adapter.wakeup();
 	}

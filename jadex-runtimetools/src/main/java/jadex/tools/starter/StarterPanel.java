@@ -380,7 +380,7 @@ public class StarterPanel extends JPanel
 							}
 							catch(Exception e)
 							{
-								e.printStackTrace();
+//								e.printStackTrace();
 								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not start application: "+e, 
 									"Application Problem", JOptionPane.INFORMATION_MESSAGE);
 							}

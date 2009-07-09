@@ -723,7 +723,7 @@ public class AMS implements IAMS, IPlatformService
 			}
 			
 			// Deregister killed agent at contexts.
-			IContextService	cs	= (IContextService) platform.getService(IContextService.class);
+			IContextService	cs	= (IContextService)platform.getService(IContextService.class);
 			if(cs!=null)
 			{
 				IContext[]	contexts	= cs.getContexts(aid);
