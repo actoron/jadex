@@ -1,5 +1,7 @@
-package jadex.bpmn.runtime;
+package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.runtime.ITask;
+import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
 
 /**

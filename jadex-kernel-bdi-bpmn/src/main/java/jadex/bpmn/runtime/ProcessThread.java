@@ -147,6 +147,15 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 *  Get the model element.
+	 *  @return	The model of the task.
+	 */
+	public MActivity	getModelElement()
+	{
+		return activity;
+	}
+
+	/**
 	 *  Get the value of a parameter.
 	 *  @param name	The parameter name. 
 	 *  @return	The parameter value. 

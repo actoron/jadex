@@ -1,7 +1,7 @@
 package jadex.bpmn.examples.helloworld;
 
-import jadex.bpmn.runtime.AbstractTask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.runtime.task.AbstractTask;
 
 /**
  *  Print hello on the console and increment parameter 'x'.
