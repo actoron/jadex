@@ -5,8 +5,8 @@ import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MSubProcess;
 import jadex.commons.SReflect;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -93,7 +93,7 @@ public class ThreadContext
 	public void	addThread(ProcessThread thread)
 	{
 		if(threads==null)
-			threads	= new HashMap();
+			threads	= new LinkedHashMap();
 		
 		threads.put(thread, null);
 	}

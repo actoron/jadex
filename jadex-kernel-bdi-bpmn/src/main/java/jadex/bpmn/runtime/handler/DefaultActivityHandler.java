@@ -51,77 +51,86 @@ public class DefaultActivityHandler implements IActivityHandler
 	 */
 	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
-		MNamedIdElement	next;
-
+		MNamedIdElement	next	= null;
 		Exception	ex	= thread.getException();
 		
-		// Normal flow
-		if(ex==null)
+		// Find next element and context(s) to be removed.
+		boolean	outside	= false;
+		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
+		while(next==null && !outside)
 		{
-			List	outgoing	= activity.getOutgoingSequenceEdges();
-			if(outgoing==null || outgoing.size()==0)
+			// Normal flow
+			if(ex==null)
 			{
-				next	= null;
+				List	outgoing	= activity.getOutgoingSequenceEdges();
+				if(outgoing!=null && outgoing.size()==1)
+				{
+					next	= (MSequenceEdge)outgoing.get(0);
+				}
+				else if(outgoing!=null && outgoing.size()>1)
+				{
+					throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge step() for disambiguation: "+activity);
+				}
+				// else no outgoing edge -> check parent context, if any.
 			}
-			else if(outgoing.size()==1)
-			{
-				next	= (MSequenceEdge)outgoing.get(0);
-			}
+		
+			// Exception flow.
 			else
 			{
-				throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge getOutgoingEdge() for disambiguation: "+activity);
-			}
-		}
-		
-		// Exception flow.
-		else
-		{
-			MActivity	match	= null;
-			boolean	outside	= false;
-			ThreadContext	abort	= null;	// Context that needs to be aborted (if any).
-			while(match==null && !outside)
-			{
 				List	handlers	= activity.getEventHandlers();
-				for(int i=0; handlers!=null && match==null && i<handlers.size(); i++)
+				for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 				{
 					MActivity	handler	= (MActivity) handlers.get(i);
 					if(handler.getActivityType().equals("EventIntermediateError"))
 					{
 						// Todo: match exception types.
-//							Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
-						match	= handler;
+//						Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
+						next	= handler;
 					}
 				}
+			}
 				
-				outside	= context.getParent()==null;	// No event handlers for top-level context (i.e. process).
-				if(match==null && !outside)
+			outside	= context.getParent()==null;
+			if(next==null && !outside)
+			{
+				// When last thread or exception, mark current context for removal.
+				if(context.getThreads().size()==1 || ex!=null)
 				{
 					activity	= (MActivity)context.getModelElement();
-					abort	= context;
+					remove	= context;
 					context	= context.getParent();
 				}
-			}
-
-			if(match!=null)
-			{
-				if(abort!=null)
+				
+				// If more threads are available in current context just exit loop.
+				else if(context.getThreads().size()>1)
 				{
-					thread	= abort.getInitiator();
-					thread.setWaiting(false);
-					// Todo: Callbacks for aborted threads (to abort external activities)
-					context.removeSubcontext(abort);
+					outside	= true;
 				}
-
-				// Todo: store exception as parameter!?
-				thread.setException(null);
-				next	= match;
-			}
-			else
-			{
-				throw new RuntimeException("Unhandled exception in process: "+activity, ex);
 			}
 		}
+
+		// Remove inner context(s), if any.
+		if(remove!=null)
+		{
+			thread	= remove.getInitiator();
+			thread.setWaiting(false);
+			// Todo: Callbacks for aborted threads (to abort external activities)
+			context.removeSubcontext(remove);
+		}
+
+		if(next!=null)
+		{
+
+			// Todo: store exception as parameter!?
+			if(ex!=null)
+				thread.setException(null);
+		}
+		else if(ex!=null)
+		{
+			throw new RuntimeException("Unhandled exception in process: "+activity, ex);
+		}
 		
+		// Perform step settings, i.e. set next edge/activity or remove thread.
 		if(next instanceof MSequenceEdge)
 		{
 			thread.setLastEdge((MSequenceEdge) next);
@@ -130,19 +139,13 @@ public class DefaultActivityHandler implements IActivityHandler
 		{
 			thread.setNextActivity((MActivity) next);
 		}
-		else if(next!=null)
-		{
-			throw new UnsupportedOperationException("Unknown outgoing element type: "+next);
-		}
-		else
+		else if(next==null)
 		{
 			context.removeThread(thread);
-			
-			if(context.isFinished() && context.getParent()!=null)
-			{
-				context.getInitiator().setWaiting(false);
-				context.getParent().removeSubcontext(context);
-			}
+		} 
+		else
+		{
+			throw new UnsupportedOperationException("Unknown outgoing element type: "+next);
 		}
 	}
 	

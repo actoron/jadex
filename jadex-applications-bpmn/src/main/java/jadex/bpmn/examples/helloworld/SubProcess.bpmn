@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_I4gXMW1WEd6B3oAuT8wltw" iD="_I4gXMG1WEd6B3oAuT8wltw">
+  <pools xmi:type="bpmn:Pool" xmi:id="_I49DIW1WEd6B3oAuT8wltw" iD="_I49DIG1WEd6B3oAuT8wltw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_I49DI21WEd6B3oAuT8wltw" iD="_I49DIm1WEd6B3oAuT8wltw" outgoingEdges="_Kx9MNm1WEd6B3oAuT8wltw" name="" activityType="EventStartEmpty" looping="false"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_KxzbIW1WEd6B3oAuT8wltw" iD="_KxzbIG1WEd6B3oAuT8wltw" outgoingEdges="_TGq0Wm1WEd6B3oAuT8wltw" incomingEdges="_Kx9MNm1WEd6B3oAuT8wltw" activityType="SubProcess">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_KxzbI21WEd6B3oAuT8wltw" iD="_KxzbIm1WEd6B3oAuT8wltw" outgoingEdges="_M5_2um1WEd6B3oAuT8wltw" name="Sub 1a"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_M5_2sW1WEd6B3oAuT8wltw" iD="_M5_2sG1WEd6B3oAuT8wltw" incomingEdges="_eUVxMW1XEd6B3oAuT8wltw" name="Sub 2a" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_2v4vgW1WEd6B3oAuT8wltw" iD="_2v4vgG1WEd6B3oAuT8wltw" outgoingEdges="_S4sNSm1XEd6B3oAuT8wltw" name="Sub 1b"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_S4sNQW1XEd6B3oAuT8wltw" iD="_S4sNQG1XEd6B3oAuT8wltw" incomingEdges="_S4sNSm1XEd6B3oAuT8wltw" name="Sub 2b" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_dPpaAW1XEd6B3oAuT8wltw" iD="_dPpaAG1XEd6B3oAuT8wltw" outgoingEdges="_eUVxMW1XEd6B3oAuT8wltw" incomingEdges="_M5_2um1WEd6B3oAuT8wltw" name="duration = 2000" activityType="EventIntermediateTimer"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_M5_2um1WEd6B3oAuT8wltw" iD="_M5_2uW1WEd6B3oAuT8wltw"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_S4sNSm1XEd6B3oAuT8wltw" iD="_S4sNSW1XEd6B3oAuT8wltw"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_eUVxMW1XEd6B3oAuT8wltw" iD="_eUVxMG1XEd6B3oAuT8wltw"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TGq0UW1WEd6B3oAuT8wltw" iD="_TGq0UG1WEd6B3oAuT8wltw" outgoingEdges="_Xs0gGm1WEd6B3oAuT8wltw" incomingEdges="_TGq0Wm1WEd6B3oAuT8wltw" name="Outer" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Xs0gEW1WEd6B3oAuT8wltw" iD="_Xs0gEG1WEd6B3oAuT8wltw" incomingEdges="_Xs0gGm1WEd6B3oAuT8wltw" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Kx9MNm1WEd6B3oAuT8wltw" iD="_Kx9MNW1WEd6B3oAuT8wltw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TGq0Wm1WEd6B3oAuT8wltw" iD="_TGq0WW1WEd6B3oAuT8wltw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Xs0gGm1WEd6B3oAuT8wltw" iD="_Xs0gGW1WEd6B3oAuT8wltw"/>
+  </pools>
+</bpmn:BpmnDiagram>
