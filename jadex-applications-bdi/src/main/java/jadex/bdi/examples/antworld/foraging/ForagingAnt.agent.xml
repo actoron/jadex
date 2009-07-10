@@ -44,10 +44,6 @@
 			<fact language="jcl"> $beliefbase.myself.destination </fact>
 		</belief>-->
 		
-		<!-- The garbages at the current position. -->
-		<!-- <beliefset name="wastes" class="ISpaceObject"/>-->
-		
-		
 		<!-- Piece of food carried at that moment. -->
 		<belief name="carriedFood" class="ISpaceObject" evaluationmode="push">
 			<fact language="jcl"> $beliefbase.myself.food </fact>
@@ -95,17 +91,23 @@
 	
 	<!-- This goal is used to mine food.-->
 		<achievegoal name="food_mining" exclude="never" retry="false">		
-			<unique/>
-			<!-- <creationcondition> $beliefbase.hasGravitation </creationcondition>-->
-			<!-- The zweite Teil der Bedingung soll verhindern das zwei Instanzen vom Goal zur selben Zeit gestartet sein können. -->
-			<!-- <creationcondition language="jcl"> Arrays.asList($beliefbase.foodSources).size() &gt; 0 &amp;&amp; Arrays.asList($beliefbase.carriedFood).size() == 0</creationcondition>-->
-			<creationcondition language="jcl"> Arrays.asList($beliefbase.foodSources).size() &gt; 0</creationcondition>
-			<!-- !Arrays.asList($beliefbase.wastes).contains($goal.waste)-->
+			<unique/>									
+			<creationcondition language="jcl"> Arrays.asList($beliefbase.foodSources).size() &gt; 0</creationcondition>			
 <!-- 			<deliberation>
 				<inhibits ref="go"/> 
 				 <inhibits ref="check"/>
 			</deliberation>-->
 		</achievegoal>
+		
+		<!-- This goal is used to follow pheromones in order to find a food source.-->
+		<!--  <performgoal name="pheromone_follow" exclude="never" retry="false">		
+			<unique/>			
+			<creationcondition language="jcl"> Arrays.asList($beliefbase.pheromones).size() &gt; 0</creationcondition>-->			
+<!-- 			<deliberation>
+				<inhibits ref="go"/> 
+				 <inhibits ref="check"/>
+			</deliberation>-->
+<!-- 		</performgoal> -->
 		
 	</goals>
 
@@ -119,6 +121,14 @@
 			</trigger>
 		</plan>						
 
+	<!-- Plan for moving to a food source with the help of pheromones. -->
+		<!-- <plan name="pheromoneWalk">
+			<body class="PheromoneWalkPlan"/>
+			<trigger>
+				<goal ref="pheromone_follow"/>
+			</trigger>
+		</plan> -->		
+		
 		<!-- Plan for running on a predefined route and searching waste. -->
 		<plan name="checking_plan">
 			<body class="CheckingPlanEnv"/>

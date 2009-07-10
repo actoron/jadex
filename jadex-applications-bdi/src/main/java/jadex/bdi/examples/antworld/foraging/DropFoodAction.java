@@ -33,12 +33,12 @@ public class DropFoodAction extends SimplePropertyObject implements ISpaceAction
 		IVector2 pos = (IVector2)so.getProperty(Grid2D.PROPERTY_POSITION);
 		
 		//TODO:
-//		assert so.getProperty("food")!=null: so;
+		assert so.getProperty("food")!=null: so;
 		
 
-//		ISpaceObject food = (ISpaceObject)so.getProperty("food");
-//		grid.setPosition(food.getId(), pos);
-//		so.setProperty("food", null);
+		ISpaceObject food = (ISpaceObject)so.getProperty("food");
+		grid.setPosition(food.getId(), pos);
+		so.setProperty("food", null);
 
 		Collection nests = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "nest");
 		ISpaceObject nest = (ISpaceObject) nests.iterator().next();

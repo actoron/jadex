@@ -82,7 +82,8 @@
 						</env:property>
 				</env:objecttype>
 
-				<env:objecttype name="food" />
+				<env:objecttype name="food"/>					
+		
 
 				<env:objecttype name="nest">
 					<env:property name="stock">0</env:property>
@@ -107,12 +108,13 @@
 			<env:actiontypes>
 
 				<env:actiontype name="pickup" class="PickupFoodAction" />
-				
-					<env:actiontype name="drop" class="DropFoodAction" />
-				<!--	<env:agentactiontype name="burn" class="BurnWasteAction" />
+
+				<env:actiontype name="drop" class="DropFoodAction" />
+				<!--
+					<env:agentactiontype name="burn" class="BurnWasteAction" />
 				-->
 				<env:actiontype name="go" class="GoAction" />
-				<env:actiontype name="updateDestination" class="UpdateDestinationAction" />				
+				<env:actiontype name="updateDestination" class="UpdateDestinationAction" />
 				<env:actiontype name="producePheromone" class="ProducePheromoneAction" />
 				<!--
 					<env:actiontype name="absorbObject" class="AbsorbObjectAction"/>
@@ -156,10 +158,10 @@
 					objecttype="foodSource" agenttype="Ant" />
 				<env:percepttype name="nest_appeared" objecttype="nest"
 					agenttype="Ant" />
-					<env:percepttype name="pheromone_appeared" objecttype="pheromone"
-					agenttype="Ant" />
-					<env:percepttype name="pheromone_disappeared" objecttype="pheromone"
-					agenttype="Ant" />
+				<env:percepttype name="pheromone_appeared"
+					objecttype="pheromone" agenttype="Ant" />
+				<env:percepttype name="pheromone_disappeared"
+					objecttype="pheromone" agenttype="Ant" />
 
 
 				<!-- Percept generators define which percepts should be created -->
@@ -270,8 +272,14 @@
 					<env:drawable objecttype="foodSource" width="0.8"
 						height="0.8">
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/antworld/images/food.png" />
+							imagepath="jadex/bdi/examples/antworld/images/foodSource.png" />
 						<env:text layer="2" basesize="20" text="$text$" color="black" />
+					</env:drawable>
+					
+					<env:drawable objecttype="food" width="0.8"
+						height="0.8">
+						<env:texturedrectangle layer="0"
+							imagepath="jadex/bdi/examples/antworld/images/food.jpg" />						
 					</env:drawable>
 
 					<env:drawable objecttype="nest" width="0.8" height="0.8">
@@ -319,28 +327,55 @@
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(3,8)</env:property>
 					</env:object>
+					<env:object type="food" number="1">
+						<env:property name="position">new Vector2Int(3,8)</env:property>
+					</env:object>
 					<env:object type="foodSource">
+						<env:property name="position">new Vector2Int(3,6)</env:property>
+					</env:object>
+					<env:object type="food" number="1">
 						<env:property name="position">new Vector2Int(3,6)</env:property>
 					</env:object>
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(6,8)</env:property>
 					</env:object>
+					<env:object type="food" number="1">
+						<env:property name="position">new Vector2Int(6,8)</env:property>
+					</env:object>
 					<env:object type="foodSource">
+						<env:property name="position">new Vector2Int(3,4)</env:property>
+					</env:object>
+					<env:object type="food" number="1">
 						<env:property name="position">new Vector2Int(3,4)</env:property>
 					</env:object>
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(5,5)</env:property>
 					</env:object>
+					<env:object type="food" number="1">
+						<env:property name="position">new Vector2Int(5,5)</env:property>
+					</env:object>
 					<env:object type="foodSource">
+						<env:property name="position">new Vector2Int(1,5)</env:property>
+					</env:object>
+					<env:object type="food" number="1">
 						<env:property name="position">new Vector2Int(1,5)</env:property>
 					</env:object>
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(3,7)</env:property>
 					</env:object>
+					<env:object type="food" number="1">
+						<env:property name="position">new Vector2Int(3,7)</env:property>
+					</env:object>
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(8,8)</env:property>
 					</env:object>
+					<env:object type="food" number="1">
+						<env:property name="position">new Vector2Int(8,8)</env:property>
+					</env:object>
 					<env:object type="foodSource">
+						<env:property name="position">new Vector2Int(4,4)</env:property>
+					</env:object>
+					<env:object type="food" number="1">
 						<env:property name="position">new Vector2Int(4,4)</env:property>
 					</env:object>
 				</env:objects>
@@ -349,7 +384,7 @@
 					<env:process type="managePheromones">
 						<env:property name="rate">2</env:property>
 					</env:process>
-					
+
 					<env:process type="manageFoodSources">
 						<env:property name="rate">1</env:property>
 					</env:process>

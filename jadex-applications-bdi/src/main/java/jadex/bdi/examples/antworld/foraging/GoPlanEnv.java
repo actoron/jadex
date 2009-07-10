@@ -64,14 +64,16 @@ public class GoPlanEnv extends Plan {
 				if (my > ty && dy <= size.getYAsInteger() / 2)
 					dir = GoAction.UP;
 			}
-			// Produce new pheromone
-			params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
-			params.put(ProducePheromoneAction.POSITION, mypos);
-			params.put(ProducePheromoneAction.ROUND, new Integer(1));
-			srl = new SyncResultListener();
-			env.performSpaceAction("producePheromone", params, srl);
-			srl.waitForResult();
+			// Produce new pheromone, if ant carries food.
+			if (getBeliefbase().getBelief("carriedFood").getFact() != null) {
+				params = new HashMap();
+				params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+				params.put(ProducePheromoneAction.POSITION, mypos);
+				params.put(ProducePheromoneAction.ROUND, new Integer(1));
+				srl = new SyncResultListener();
+				env.performSpaceAction("producePheromone", params, srl);
+				srl.waitForResult();
+			}
 
 			// go to next position
 			params = new HashMap();

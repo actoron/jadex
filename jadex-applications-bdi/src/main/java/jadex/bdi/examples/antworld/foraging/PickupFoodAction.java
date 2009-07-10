@@ -38,18 +38,18 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 		
 		//TODO: atomic action?
 		Collection food = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "food");
-		ISpaceObject pickedFood = (ISpaceObject)(food!=null? food.iterator().next(): null);
-		
-		Collection foodSources = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "foodSource");
-		ISpaceObject foodSource = (ISpaceObject) foodSources.iterator().next();
-		int stock = ((Integer)foodSource.getProperty("stock")).intValue();
-		foodSource.setProperty("stock", new Integer(stock-1));
+		ISpaceObject pickedFood = (ISpaceObject)(food!=null? food.iterator().next(): null);		
 		
 		System.out.println("pickup food action: "+so+" "+so.getProperty(Grid2D.PROPERTY_POSITION)+" "+pickedFood);
 		if(food!=null)
 		{
 //			if(Math.random()>0.5)
 			{
+				Collection foodSources = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "foodSource");
+				ISpaceObject foodSource = (ISpaceObject) foodSources.iterator().next();
+				int stock = ((Integer)foodSource.getProperty("stock")).intValue();
+				foodSource.setProperty("stock", new Integer(stock-1));
+				
 				food.remove(pickedFood);
 //				System.out.println("pickup: "+waste);
 				so.setProperty("food", pickedFood);
