@@ -1,13 +1,13 @@
-package jadex.bpmn.examples.helloworld;
+package jadex.bpmn.runtime.handler.basic;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
+import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 
 /**
  *  Simple platform specific timer implementation.

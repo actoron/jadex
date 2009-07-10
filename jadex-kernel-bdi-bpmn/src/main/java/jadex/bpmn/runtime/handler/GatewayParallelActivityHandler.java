@@ -1,7 +1,11 @@
-package jadex.bpmn.runtime;
+package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.IActivityHandler;
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ThreadContext;
 
 import java.util.HashSet;
 import java.util.Iterator;

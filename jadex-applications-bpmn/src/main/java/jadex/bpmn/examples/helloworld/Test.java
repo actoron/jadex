@@ -14,9 +14,7 @@ import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.Reader;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Test
@@ -50,9 +48,7 @@ public class Test
 			System.out.println("Loaded model: "+model);
 			
 			// Create and execute instance.
-			Map	handlers	= new HashMap(BpmnInstance.DEFAULT_HANDLERS);
-			handlers.put("EventIntermediateTimer", new EventIntermediateTimerActivityHandler());
-			final BpmnInstance	instance	= new BpmnInstance(model, handlers);
+			final BpmnInstance	instance	= new BpmnInstance(model);
 			
 			final IThreadPool	pool	= ThreadPoolFactory.createThreadPool();
 			final Executor	exe	= new Executor(pool);

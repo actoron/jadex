@@ -3,6 +3,13 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
+import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
+import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
+import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
+import jadex.bpmn.runtime.handler.TaskActivityHandler;
+import jadex.bpmn.runtime.handler.basic.EventIntermediateTimerActivityHandler;
+import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
@@ -36,7 +43,8 @@ public class BpmnInstance
 		defhandlers.put("SubProcess", new SubProcessActivityHandler());
 		defhandlers.put("GatewayParallel", new GatewayParallelActivityHandler());
 		defhandlers.put("GatewayDataBasedExclusive", new GatewayXORActivityHandler());
-		defhandlers.put("EventIntermediateRule", new EventIntermediateRuleActivityHandler());
+		defhandlers.put("EventIntermediateRule", new UserInteractionActivityHandler());
+		defhandlers.put("EventIntermediateTimer", new EventIntermediateTimerActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	
@@ -53,6 +61,15 @@ public class BpmnInstance
 	
 	//-------- constructors --------
 	
+	/**
+	 *  Create a new BPMN process instance using default handler.
+	 *  @param model	The BMPN process model.
+	 */
+	public BpmnInstance(MBpmnModel model)
+	{
+		this(model, DEFAULT_HANDLERS);
+	}
+
 	/**
 	 *  Create a new BPMN process instance.
 	 *  @param model	The BMPN process model.

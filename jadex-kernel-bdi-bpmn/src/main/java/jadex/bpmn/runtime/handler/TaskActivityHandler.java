@@ -1,6 +1,10 @@
-package jadex.bpmn.runtime;
+package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.ITask;
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ThreadContext;
 import jadex.commons.concurrent.IResultListener;
 
 /**

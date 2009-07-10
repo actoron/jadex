@@ -1,4 +1,4 @@
-package jadex.bpmn.runtime;
+package jadex.bpmn.runtime.handler.basic;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -11,12 +11,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ThreadContext;
+import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.commons.SGUI;
 
 /**
- * 
+ *  Handler that opens a window and waits for the user to click a button.
  */
-public class EventIntermediateRuleActivityHandler extends DefaultActivityHandler
+public class UserInteractionActivityHandler extends DefaultActivityHandler
 {
 	/**
 	 *  Execute an activity.
@@ -36,7 +40,7 @@ public class EventIntermediateRuleActivityHandler extends DefaultActivityHandler
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				EventIntermediateRuleActivityHandler.this.notify(activity, instance, thread, context);
+				UserInteractionActivityHandler.this.notify(activity, instance, thread, context);
 				frame.dispose();
 			}
 		});
@@ -47,7 +51,7 @@ public class EventIntermediateRuleActivityHandler extends DefaultActivityHandler
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				EventIntermediateRuleActivityHandler.this.notify(activity, instance, thread, context);
+				UserInteractionActivityHandler.this.notify(activity, instance, thread, context);
 				System.exit(0);
 			}
 		});
