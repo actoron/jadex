@@ -100,13 +100,13 @@ public class BpmnInstance
 	}
 	
 	/**
-	 *  Get the currently executing control flows of the process instance.
-	 *  @return A set of currently running threads.
-	 * /
-	public Set	getThreads()
+	 *  Get the thread context.
+	 *  @return The thread context.
+	 */
+	public ThreadContext getThreadContext()
 	{
-		return threads;
-	}*/
+		return context;
+	}
 	
 	/**
 	 *  Check, if the process has terminated.

@@ -258,7 +258,7 @@ public class MBpmnModel extends MIdElement
 	 *  Get all association targets.
 	 *  @return A map of association targets (association id -> target).
 	 */
-	protected Map getAllAssociationTargets()
+	public Map getAllAssociationTargets()
 	{
 		if(this.associationtargets==null)
 		{
@@ -356,7 +356,7 @@ public class MBpmnModel extends MIdElement
 	 *  Get all association sources.
 	 *  @return The map of association sources (association id -> source).
 	 */
-	protected Map getAllAssociationSources()
+	public Map getAllAssociationSources()
 	{
 		if(this.associationsources==null)
 		{
@@ -536,6 +536,30 @@ public class MBpmnModel extends MIdElement
 	}
 	
 	//-------- static part --------
+	
+	/**
+	 *  Get all start activities form the supplied set of activities.
+	 *  Start activities are those without incoming edges. 
+	 *  @return A non-empty List of start activities or null, if none.
+	 */
+	public static List	getStartActivities(List activities)
+	{
+		List	ret	= null;
+		for(Iterator it=activities.iterator(); it.hasNext(); )
+		{
+			MActivity	activity	= (MActivity) it.next();
+			if(activity.getIncomingSequenceEdges()==null || activity.getIncomingSequenceEdges().isEmpty())
+			{
+				if(ret==null)
+				{
+					ret	= new ArrayList();
+				}
+				ret.add(activity);
+			}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Get the XML mapping.
@@ -1016,29 +1040,5 @@ public class MBpmnModel extends MIdElement
 		{
 			return 2;
 		}
-	}
-
-	/**
-	 *  Get all start activities form the supplied set of activities.
-	 *  Start activities are those without incoming edges. 
-	 *  @return A non-empty List of start activities or null, if none.
-	 */
-	public static List	getStartActivities(List activities)
-	{
-		List	ret	= null;
-		for(Iterator it=activities.iterator(); it.hasNext(); )
-		{
-			MActivity	activity	= (MActivity) it.next();
-			if(activity.getIncomingSequenceEdges()==null || activity.getIncomingSequenceEdges().isEmpty())
-			{
-				if(ret==null)
-				{
-					ret	= new ArrayList();
-				}
-				ret.add(activity);
-			}
-		}
-		
-		return ret;
 	}
 }

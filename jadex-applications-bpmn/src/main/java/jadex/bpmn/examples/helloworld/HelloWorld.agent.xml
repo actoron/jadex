@@ -14,7 +14,7 @@
 	<plans>
 		<!-- Plan which prints out a message and kills the agent. -->
 		<plan name="hello">
-			<body impl="HelloWorldProcess"/>
+			<body type="bpmn" impl="HelloWorldProcess"/>
 		</plan>
 	</plans>
 	

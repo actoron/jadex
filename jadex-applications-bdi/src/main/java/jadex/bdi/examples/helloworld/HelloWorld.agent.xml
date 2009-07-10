@@ -26,7 +26,6 @@
 	
 	<properties>
 	 	<property name="debugging">false</property>
-	 	<property name="profiling">false</property>
 	</properties>
 
 	<configurations>

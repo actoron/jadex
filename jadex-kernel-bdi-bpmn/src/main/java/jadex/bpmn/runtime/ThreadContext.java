@@ -5,6 +5,7 @@ import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MSubProcess;
 import jadex.commons.SReflect;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -120,6 +121,23 @@ public class ThreadContext
 	public Set	getThreads()
 	{
 		return threads.keySet();
+	}
+	
+	/**
+	 *  Get all threads of the context and all subcontexts.
+	 */
+	public Set getAllThreads()
+	{
+		Set ret = new HashSet();
+		for(Iterator it=threads.keySet().iterator(); it.hasNext(); )
+		{
+			ProcessThread pc = (ProcessThread)it.next();
+			ret.add(pc);
+			ThreadContext tc = (ThreadContext)threads.get(pc);
+			if(tc!=null)
+				ret.addAll(tc.getAllThreads());
+		}
+		return ret;
 	}
 	
 	/**

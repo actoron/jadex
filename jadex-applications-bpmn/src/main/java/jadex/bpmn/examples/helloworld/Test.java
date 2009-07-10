@@ -1,5 +1,6 @@
 package jadex.bpmn.examples.helloworld;
 
+import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.commons.ChangeEvent;
@@ -10,12 +11,9 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
-import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.Reader;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Test
 {
@@ -27,11 +25,7 @@ public class Test
 		try
 		{
 			// Load model.
-			Set ignored = new HashSet();
-			ignored.add("xmi");
-			ignored.add("iD");
-			ignored.add("version");
-			Reader reader = new Reader(new BeanObjectHandler(), MBpmnModel.getXMLMapping(), MBpmnModel.getXMLLinkInfos(), ignored);
+			Reader reader = BpmnXMLReader.getReader();
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test_parallel.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test2.bpmn", null);
