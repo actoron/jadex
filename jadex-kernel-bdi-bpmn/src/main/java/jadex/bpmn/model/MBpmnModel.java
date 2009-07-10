@@ -570,12 +570,14 @@ public class MBpmnModel extends MIdElement
 			new BeanAttributeInfo("incomingSequenceEdgesDescription")}), new ActivityPostProcessor()));
 		
 		types.add(new TypeInfo("vertices", MActivity.class, null, null,
-			SUtil.createHashMap(new String[]{"name", "outgoingEdges", "incomingEdges", "lanes", "associations"}, 
+			SUtil.createHashMap(new String[]{"name", "outgoingEdges", "incomingEdges", "lanes", "associations", "activityType"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("description"),
 			new BeanAttributeInfo("outgoingSequenceEdgesDescription"),
 			new BeanAttributeInfo("incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("laneDescription"),
-			new BeanAttributeInfo("associationsDescription")}), new ActivityPostProcessor(),
+			new BeanAttributeInfo("associationsDescription"),
+			new BeanAttributeInfo("activityType", null, null, "Task")}),
+			new ActivityPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)

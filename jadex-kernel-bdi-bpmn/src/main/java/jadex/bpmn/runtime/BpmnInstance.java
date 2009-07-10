@@ -36,6 +36,7 @@ public class BpmnInstance
 		defhandlers.put("SubProcess", new SubProcessActivityHandler());
 		defhandlers.put("GatewayParallel", new GatewayParallelActivityHandler());
 		defhandlers.put("GatewayDataBasedExclusive", new GatewayXORActivityHandler());
+		defhandlers.put("EventIntermediateRule", new EventIntermediateRuleActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	
