@@ -22,7 +22,8 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 	/** The destination and id of the ant. */
 	public static final String POSITION = "position";
 	public static final String ANT_ID = "antID";
-	public static final String ROUND = "round";
+//	public static final String ROUND = "round";
+	public static final String STRENGTH = "strength";
 
 	// -------- methods --------
 
@@ -44,7 +45,7 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 //		Object ownerAgentId = (Object) parameters.get(ISpaceAction.OBJECT_ID);
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject so = grid.getAvatar(owner);
-		Integer round = (Integer) parameters.get(ROUND);
+		Integer strength = (Integer) parameters.get(STRENGTH);
 		
 		Collection pheromones = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "pheromone");
 //		ISpaceObject pickedFood = (ISpaceObject)(pheromones!=null? pheromones.iterator().next(): null);
@@ -56,13 +57,13 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 			props.put(Space2D.PROPERTY_POSITION, position);
 //			props.put(ANT_ID, so.getProperty(ACTOR_ID));
 			props.put(ANT_ID, so.getId());
-			props.put(ROUND, new Integer(0));		
+			props.put(STRENGTH, new Integer(10));		
 			space.createSpaceObject("pheromone", props, null);
 		}
 		//update old pheromone
 		else{
 			pheromone.setProperty(ANT_ID, so.getId());
-			pheromone.setProperty(ROUND, new Integer(0));
+			pheromone.setProperty(STRENGTH, new Integer(10));
 		}
 		
 //		Collection foodSources = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "foodSource");

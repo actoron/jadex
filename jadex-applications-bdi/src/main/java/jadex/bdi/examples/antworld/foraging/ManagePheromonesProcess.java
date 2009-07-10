@@ -90,13 +90,13 @@ public class ManagePheromonesProcess extends SimplePropertyObject implements ISp
 	private void updateObjectProperties(ISpaceObject[] objects, IEnvironmentSpace space) {
 		for (int i = 0; i < objects.length; i++) {
 			// System.out.println(objects[i].getId());
-			Integer round = (Integer) objects[i].getProperty(ProducePheromoneAction.ROUND);
+			Integer round = (Integer) objects[i].getProperty(ProducePheromoneAction.STRENGTH);
 			int roundInt = round.intValue();
-			if (roundInt >= 15) {
+			if (roundInt == 0) {
 				space.destroySpaceObject(objects[i].getId());
 			} else {
-				roundInt++;
-				objects[i].setProperty("round", new Integer(roundInt));
+				roundInt--;
+				objects[i].setProperty(ProducePheromoneAction.STRENGTH, new Integer(roundInt));
 			}
 		}
 	}

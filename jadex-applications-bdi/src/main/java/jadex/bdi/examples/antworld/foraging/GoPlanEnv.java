@@ -10,6 +10,8 @@ import jadex.bdi.runtime.Plan;
 import java.util.HashMap;
 import java.util.Map;
 
+import sun.management.Agent;
+
 /**
  * Go to a specified position.
  */
@@ -38,6 +40,7 @@ public class GoPlanEnv extends Plan {
 				.getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);
 		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
+//		params.put("owner", myself.getId());
 		SyncResultListener srl = new SyncResultListener();
 		env.performSpaceAction("updateDestination", params, srl);
 		srl.waitForResult();
@@ -69,7 +72,7 @@ public class GoPlanEnv extends Plan {
 				params = new HashMap();
 				params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 				params.put(ProducePheromoneAction.POSITION, mypos);
-				params.put(ProducePheromoneAction.ROUND, new Integer(1));
+				params.put(ProducePheromoneAction.STRENGTH, new Integer(10));
 				srl = new SyncResultListener();
 				env.performSpaceAction("producePheromone", params, srl);
 				srl.waitForResult();

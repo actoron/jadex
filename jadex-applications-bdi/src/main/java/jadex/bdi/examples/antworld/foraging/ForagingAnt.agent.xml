@@ -93,21 +93,20 @@
 		<achievegoal name="food_mining" exclude="never" retry="false">		
 			<unique/>									
 			<creationcondition language="jcl"> Arrays.asList($beliefbase.foodSources).size() &gt; 0</creationcondition>			
-<!-- 			<deliberation>
-				<inhibits ref="go"/> 
-				 <inhibits ref="check"/>
-			</deliberation>-->
+ 			<deliberation>
+				<inhibits ref="pheromone_follow"/> 
+			</deliberation>
 		</achievegoal>
 		
 		<!-- This goal is used to follow pheromones in order to find a food source.-->
-		<!--  <performgoal name="pheromone_follow" exclude="never" retry="false">		
+  		<achievegoal name="pheromone_follow" exclude="never" retry="false">		
 			<unique/>			
-			<creationcondition language="jcl"> Arrays.asList($beliefbase.pheromones).size() &gt; 0</creationcondition>-->			
+			<creationcondition language="jcl"> Arrays.asList($beliefbase.pheromones).size() &gt; 0</creationcondition>			
 <!-- 			<deliberation>
 				<inhibits ref="go"/> 
 				 <inhibits ref="check"/>
 			</deliberation>-->
-<!-- 		</performgoal> -->
+ 	  	</achievegoal>
 		
 	</goals>
 
@@ -121,13 +120,13 @@
 			</trigger>
 		</plan>						
 
-	<!-- Plan for moving to a food source with the help of pheromones. -->
-		<!-- <plan name="pheromoneWalk">
+	<!-- Plan for moving to a food source with the help of pheromones.--> 
+		<plan name="pheromoneWalk">
 			<body class="PheromoneWalkPlan"/>
 			<trigger>
 				<goal ref="pheromone_follow"/>
 			</trigger>
-		</plan> -->		
+		</plan>
 		
 		<!-- Plan for running on a predefined route and searching waste. -->
 		<plan name="checking_plan">

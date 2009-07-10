@@ -46,6 +46,11 @@ public class FoodMiningPlan extends Plan
 			goals[i].drop();			
 		}
 		
+		goals = getGoalbase().getGoals("pheromone_follow");		
+		for(int i=0; i<goals.length; i++){
+			goals[i].drop();			
+		}
+				
 		goals = getGoalbase().getGoals();
 		System.out.println("#GoalBase after drop...");
 		for(int i=0; i<goals.length; i++){
