@@ -64,8 +64,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 				// Read the file and parse the state machine
 				InputStream isplan = SUtil.getResource(impl, interpreter.getState().getTypeModel().getClassLoader());
 				Reader reader = BpmnXMLReader.getReader(); 
-				MBpmnModel model = (MBpmnModel)reader.read(isplan, interpreter.getState().getTypeModel().getClassLoader(), null);
-				BpmnParser parser = BpmnParser.getInstance(isplan);
+				bodymodel = (MBpmnModel)reader.read(isplan, interpreter.getState().getTypeModel().getClassLoader(), null);
 
 				// HACK! Cache parsed body models
 //				planmodelcache.put(mbody, planmodel);
@@ -82,7 +81,6 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 
 		// Create the body data structure and update state
 		BpmnInstance bodyinstance = new BpmnInstance(bodymodel); 
-		interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, bodyinstance);
 		
 		return bodyinstance;
 	}
@@ -98,6 +96,11 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	{
 		// Get or create a new plan body for the plan instance info.
 		BpmnInstance bodyinstance = (BpmnInstance)interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
+		if(bodyinstance==null)
+		{
+			bodyinstance = (BpmnInstance)createPlanBody(interpreter, rcapability, rplan);
+			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, bodyinstance);
+		}
 		
 		Throwable throwable = null;
 		try
