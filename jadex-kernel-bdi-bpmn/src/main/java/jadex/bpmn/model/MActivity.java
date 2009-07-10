@@ -48,6 +48,10 @@ public class MActivity extends MAssociationTarget
 
 	/** The looping flag. */
 	protected boolean looping;
+
+	/** The event handlers. */
+	protected List eventhandlers;
+	
 		
 	//-------- added --------
 	
@@ -361,6 +365,37 @@ public class MActivity extends MAssociationTarget
 	public void setLooping(boolean looping)
 	{
 		this.looping = looping;
+	}
+	
+	
+	/**
+	 *  Get the event handlers.
+	 *  @return The event handlers.
+	 */
+	public List getEventHandlers()
+	{
+		return eventhandlers;
+	}
+	
+	/**
+	 *  Add an event handler.
+	 *  @param eventhandler The event handler.
+	 */
+	public void addEventHandler(MActivity eventhandler)
+	{
+		if(eventhandlers==null)
+			eventhandlers = new ArrayList();
+		eventhandlers.add(eventhandler);
+	}
+	
+	/**
+	 *  Remove an event handler.
+	 *  @param eventhandler The event handler.
+	 */
+	public void removeEventHandler(MActivity eventhandler)
+	{
+		if(eventhandlers!=null)
+			eventhandlers.remove(eventhandler);
 	}
 	
 	/**

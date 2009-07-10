@@ -16,9 +16,6 @@ public class MSubProcess extends MActivity
 	/** The sequence edges. */
 	protected List sequenceedges;
 	
-	/** The event handlers. */
-	protected List eventhandlers;
-	
 	/** The artifacts. */
 	protected List artifacts;
 	
@@ -91,36 +88,6 @@ public class MSubProcess extends MActivity
 	{
 		if(sequenceedges!=null)
 			sequenceedges.remove(edge);
-	}
-	
-	/**
-	 *  Get the event handlers.
-	 *  @return The event handlers.
-	 */
-	public List getEventHandlers()
-	{
-		return eventhandlers;
-	}
-	
-	/**
-	 *  Add an event handler.
-	 *  @param eventhandler The event handler.
-	 */
-	public void addEventHandler(MActivity eventhandler)
-	{
-		if(eventhandlers==null)
-			eventhandlers = new ArrayList();
-		eventhandlers.add(eventhandler);
-	}
-	
-	/**
-	 *  Remove an event handler.
-	 *  @param eventhandler The event handler.
-	 */
-	public void removeEventHandler(MActivity eventhandler)
-	{
-		if(eventhandlers!=null)
-			eventhandlers.remove(eventhandler);
 	}
 	
 	/**

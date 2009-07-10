@@ -3,7 +3,6 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.model.MSubProcess;
 
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	}
 	
 	/**
-	 *  Make a process step.
+	 *  Make a process step, i.e. find the next edge or activity for a just executed thread.
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
@@ -48,7 +47,77 @@ public class DefaultActivityHandler implements IActivityHandler
 	 */
 	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
-		MNamedIdElement	next	= getOutgoingElement(activity, instance, thread, context);
+		MNamedIdElement	next;
+
+		Exception	ex	= thread.getException();
+		
+		// Normal flow
+		if(ex==null)
+		{
+			List	outgoing	= activity.getOutgoingSequenceEdges();
+			if(outgoing==null || outgoing.size()==0)
+			{
+				next	= null;
+			}
+			else if(outgoing.size()==1)
+			{
+				next	= (MSequenceEdge)outgoing.get(0);
+			}
+			else
+			{
+				throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge getOutgoingEdge() for disambiguation: "+activity);
+			}
+		}
+		
+		// Exception flow.
+		else
+		{
+			MActivity	match	= null;
+			boolean	outside	= false;
+			ThreadContext	abort	= null;	// Context that needs to be aborted (if any).
+			while(match==null && !outside)
+			{
+				List	handlers	= activity.getEventHandlers();
+				for(int i=0; handlers!=null && match==null && i<handlers.size(); i++)
+				{
+					MActivity	handler	= (MActivity) handlers.get(i);
+					if(handler.getActivityType().equals("EventIntermediateError"))
+					{
+						// Todo: match exception types.
+//							Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
+						match	= handler;
+					}
+				}
+				
+				outside	= context.getParent()==null;	// No event handlers for top-level context (i.e. process).
+				if(match==null && !outside)
+				{
+					activity	= (MActivity)context.getModelElement();
+					abort	= context;
+					context	= context.getParent();
+				}
+			}
+
+			if(match!=null)
+			{
+				if(abort!=null)
+				{
+					thread	= abort.getInitiator();
+					thread.setWaiting(false);
+					// Todo: Callbacks for aborted threads (to abort external activities)
+					context.removeSubcontext(abort);
+				}
+
+				// Todo: store exception as parameter!?
+				thread.setException(null);
+				next	= match;
+			}
+			else
+			{
+				throw new RuntimeException("Unhandled exception in process: "+activity, ex);
+			}
+		}
+		
 		if(next instanceof MSequenceEdge)
 		{
 			thread.setLastEdge((MSequenceEdge) next);
@@ -71,73 +140,6 @@ public class DefaultActivityHandler implements IActivityHandler
 				context.getParent().removeSubcontext(context);
 			}
 		}
-	}
-	
-	/**
-	 *  Get the outgoing edge or activity.
-	 *  @param activity	The current activity.
-	 *  @param instance	The process instance.
-	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
-	 *  @return The outgoing edge or activity or null if the thread is finished.
-	 */
-	protected MNamedIdElement	getOutgoingElement(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
-	{
-		MNamedIdElement	ret;
-		
-		// Normal flow
-		if(thread.getException()==null)
-		{
-			List	outgoing	= activity.getOutgoingSequenceEdges();
-			if(outgoing==null || outgoing.size()==0)
-			{
-				ret	= null;
-			}
-			else if(outgoing.size()==1)
-			{
-				ret	= (MSequenceEdge)outgoing.get(0);
-			}
-			else
-			{
-				throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge getOutgoingEdge() for disambiguation: "+activity);
-			}
-		}
-		
-		// Exception flow.
-		else if(activity instanceof MSubProcess)
-		{
-			// Todo: save stack frames (i.e. nested sub processes) in process thread.
-			List	handlers	= ((MSubProcess)activity).getEventHandlers();
-			MActivity	match	= null;
-			for(int i=0; handlers!=null && match==null && i<handlers.size(); i++)
-			{
-				MActivity	handler	= (MActivity) handlers.get(i);
-				if(handler.getActivityType().equals("EventIntermediateError"))
-				{
-					// Todo: match exception types.
-//					Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
-					match	= handler;
-				}
-			}
-
-			if(match!=null)
-			{
-				// Todo: store exception as parameter!?
-				thread.setException(null);
-				ret	= match;
-			}
-			else
-			{
-				throw new UnsupportedOperationException("Subsequent activity after exception cannot be determined: "+activity);
-			}
-		}
-
-		else
-		{
-			throw new UnsupportedOperationException("Subsequent activity after exception cannot be determined: "+activity, thread.getException());
-		}
-
-		return ret; 
 	}
 	
 	/**
