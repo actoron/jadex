@@ -14,7 +14,8 @@
 	<plans>
 		<!-- Plan which prints out a message and kills the agent. -->
 		<plan name="hello">
-			<body type="bpmn" impl="jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn"/>
+			<!-- <body type="bpmn" impl="jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn"/> -->
+			<body type="bpmn" impl="jadex/bpmn/examples/helloworld/SubProcess.bpmn"/>
 		</plan>
 	</plans>
 	

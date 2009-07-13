@@ -2067,7 +2067,8 @@ public class PlanRules
 							throw new GoalFailureException("Goal failed: "+rgoal);
 						}
 						// Todo: Hack!!! wrong scope of goal
-						ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);							
+						ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);
+						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
 					}
 				}
 			}

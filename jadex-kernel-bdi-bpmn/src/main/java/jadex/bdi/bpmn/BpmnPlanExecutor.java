@@ -4,11 +4,9 @@ import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
-import jadex.bdi.interpreter.bpmn.parser.BpmnParser;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.runtime.BpmnInstance;
 import jadex.commons.SUtil;
 import jadex.commons.xml.Reader;
 
@@ -80,7 +78,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			throw new RuntimeException("Plan body could not be created: "+impl);
 
 		// Create the body data structure and update state
-		BpmnInstance bodyinstance = new BpmnInstance(bodymodel); 
+		BpmnPlanBodyInstance bodyinstance = new BpmnPlanBodyInstance(bodymodel, interpreter); 
 		
 		return bodyinstance;
 	}
@@ -92,41 +90,41 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	 *  May throw any kind of exception, when the plan execution fails
 	 *  @return True, if the plan step was interrupted (interrupted flag).
 	 */
-	public boolean	executeStep(BDIInterpreter interpreter, Object rcapability, Object rplan, String steptype)	throws Exception
+	public boolean	executeStep(BDIInterpreter interpreter, Object rcapa, Object rplan, String steptype)	throws Exception
 	{
 		// Get or create a new plan body for the plan instance info.
-		BpmnInstance bodyinstance = (BpmnInstance)interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
+		BpmnPlanBodyInstance bodyinstance = (BpmnPlanBodyInstance)interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
 		if(bodyinstance==null)
 		{
-			bodyinstance = (BpmnInstance)createPlanBody(interpreter, rcapability, rplan);
+			bodyinstance = (BpmnPlanBodyInstance)createPlanBody(interpreter, rcapa, rplan);
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, bodyinstance);
+		}
+		else
+		{
+			bodyinstance.updateTimers();
 		}
 		
 		Throwable throwable = null;
 		try
 		{
-			// execute a body step
-			if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY))
+			if(!steptype.equals(bodyinstance.getLastState()))
 			{
+				// Todo: abort BPMN process threads, if any
+				
+				// Todo: initialize lane corresponding to steptype.
+			}
 			
-				if(bodyinstance.isReady())
-				{
-					// Set processing state to "running"
-					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
-					bodyinstance.executeStep();
-				}
-			}
-			else if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED))
+			// execute a step
+			if(bodyinstance.isReady())
 			{
-				// Abort plan, free resources
+				// Set processing state to "running"
+				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+				bodyinstance.executeStep();
+				bodyinstance.setLastState(steptype);
 			}
-			else
+			else if(steptype.equals(bodyinstance.getLastState()) || !bodyinstance.isFinished())
 			{
-				// TO DO: check exception --> remove (simply ignore other step types?)
-				throw new RuntimeException("Invalid steptype='"+steptype+"'. "
-						+"currently only steptype='"
-						+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY+"' and '"
-						+OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED+"' are supported");
+				throw new RuntimeException("Invalid plan step: BPMN process instance is not ready: "+bodyinstance);
 			}
 		}
 		catch(Throwable t)
@@ -136,33 +134,58 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		}
 		
 		// check for errors / exception / final state
-		if(throwable == null && !bodyinstance.isFinished())
+		if(throwable==null && !bodyinstance.isFinished())
 		{
-			// Set processing state to "ready"
-			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+			long	timeout	= bodyinstance.getTimeout();
+			Object	wa	= null; // bodyinstance.getWaitAbstraction();
 
-			// A BPMN plan step is not interruptible
-			return false;
+			if(bodyinstance.isReady())
+			{
+//				if(timeout!=-1 || wa!=null)
+//					throw new UnsupportedOperationException("No combination of wait/execution supported: "+bodyinstance);
+				
+				// Set processing state to "ready"
+				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+			}
+			else if(timeout!=-1 || wa!=null)
+			{
+				Object[]	to	= PlanRules.initializeWait(wa, timeout, interpreter.getState(), rcapa, rplan);
+				// Set processing state to "ready"
+				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);
+			}
+			else
+			{
+				throw new RuntimeException("Plan not finished, not ready and not waiting !?: "+bodyinstance);
+			}
+			
 		}
 		else
 		{
 			// Exception or final state, finish plan
-			PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan, true);
+			PlanRules.endPlanPart(interpreter.getState(), rcapa, rplan, true);
 			
-			// Set plan processing state.
-			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
-			
-			// Hack!!! Should not change state?
-			// set plan lifecycle state
-			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
-				throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
+			if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY))
+			{
+				// Set plan processing state.
+				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				
+				// Hack!!! Should not change state?
+				// set plan lifecycle state
+				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
+					throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);	
+			}
+			else
+			{
+				// Set plan processing state.
+				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
+			}
 
 			// in case of an error / exception, throw it now
 			if(throwable instanceof Exception)
 			{
 	    		throw (Exception) throwable;
 			}
-	    	else if(throwable != null)
+	    	else if(throwable!=null)
 	    	{
 	    		throw new RuntimeException(throwable);
 	    	}
