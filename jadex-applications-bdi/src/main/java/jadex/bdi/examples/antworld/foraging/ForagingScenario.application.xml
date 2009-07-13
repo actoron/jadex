@@ -314,7 +314,7 @@
 	<applications>
 		<application name="Ants with Environment">
 			<agents>
-				<agent type="Ant" number="2" />
+				<agent type="Ant" number="1" />
 				<!--<agent name="EnvironmentLocal" type="Environment"/>-->
 			</agents>
 

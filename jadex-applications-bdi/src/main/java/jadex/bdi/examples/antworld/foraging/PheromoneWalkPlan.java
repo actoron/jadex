@@ -63,7 +63,7 @@ public class PheromoneWalkPlan extends Plan {
 			Collection pheromonesCol = grid.getNearObjects((IVector2) myself
 					.getProperty(Space2D.PROPERTY_POSITION), new Vector1Int(5),
 					"pheromone");
-			// List tmpList = Arrays.asList(pheromonesCol.toArray());
+			// Select strongest pheromone!
 			ISpaceObject selectedPheromone = selectStrongestPheromone(Arrays
 					.asList(pheromonesCol.toArray()), myself);
 			if (selectedPheromone == null) {
@@ -213,7 +213,6 @@ public class PheromoneWalkPlan extends Plan {
 
 	/**
 	 * Computes the strongest pheromone which determines the next destination of
-	 * the ant. Don't take pheromoes into account that are on the position of
 	 * the ant.
 	 * 
 	 * @param pheromonesCol
@@ -223,8 +222,6 @@ public class PheromoneWalkPlan extends Plan {
 	private ISpaceObject selectStrongestPheromone(List initialPheromonesList,
 			ISpaceObject myself) {
 
-		ArrayList target = new ArrayList();
-
 		System.out.println("#PheromoneWalkPlan# Before ordering list");
 		for (int i = 0; i < initialPheromonesList.size(); i++) {
 			System.out.println("#PheromoneWalkPlan#" + i + ": "
@@ -233,56 +230,233 @@ public class PheromoneWalkPlan extends Plan {
 
 		// ascending ordered.
 		Collections.sort(initialPheromonesList, new PheromoneComparator());
-		ArrayList strongestPheromones = new ArrayList();
+		ArrayList strongestPheromonesAsBuckets = new ArrayList();
 
-		// Hack: Remove pheromon o current pos of ant from list
+		// Hack: Remove pheromone of current pos of ant from list
 		// TODO: Leave current pheromone in list but do randomChoice over
 		// all pheromones according to their strength.
 
-		for (int i = 0; i < initialPheromonesList.size(); i++) {
-			if (((IVector2) (((ISpaceObject) initialPheromonesList.get(i))
-					.getProperty(Space2D.PROPERTY_POSITION)))
-					.equals((IVector2) myself
-							.getProperty(Space2D.PROPERTY_POSITION))) {
-				// nothing
-			} else {
-				target.add(initialPheromonesList.get(i));
-			}
-
-		}
+		// for (int i = 0; i < initialPheromonesList.size(); i++) {
+		// if (((IVector2) (((ISpaceObject) initialPheromonesList.get(i))
+		// .getProperty(Space2D.PROPERTY_POSITION)))
+		// .equals((IVector2) myself
+		// .getProperty(Space2D.PROPERTY_POSITION))) {
+		// // nothing
+		// } else {
+		// target.add(initialPheromonesList.get(i));
+		// }
+		//
+		// }
 
 		System.out.println("#PheromoneWalkPlan# Ordered list and size: "
-				+ target.size());
-		for (int i = 0; i < target.size(); i++) {
+				+ initialPheromonesList.size());
+		for (int i = 0; i < initialPheromonesList.size(); i++) {
 			System.out.println("#PheromoneWalkPlan#" + i + ": "
-					+ ((ISpaceObject) target.get(i)).toString());
+					+ ((ISpaceObject) initialPheromonesList.get(i)).toString());
+		}
+		// Returns a list of the pheromones as buckets.
+		strongestPheromonesAsBuckets = getBuckets(initialPheromonesList);
+
+		// // Get all pheromoes that have the maximum value for their strength.
+		// for (int i = target.size() - 1; i >= 0; i--) {
+		// ISpaceObject pheromone = (ISpaceObject) target
+		// .get(i);
+		// if (i == target.size() - 1) {
+		// strongestPheromones.add(pheromone);
+		// } else if (new Integer(((ISpaceObject) strongestPheromones.get(0))
+		// .getProperty("strength").toString()).intValue() == new Integer(
+		// (pheromone.getProperty("strength").toString())).intValue()) {
+		// strongestPheromones.add(pheromone);
+		// } else {
+		// break;
+		// }
+		// }
+		//		
+		// System.out
+		// .println("#PheromoneWalkPlan# Strongest Pheromones without current Position!");
+		// for (int i = 0; i < strongestPheromones.size(); i++) {
+		// System.out.println("#PheromoneWalkPlan#" + i + ": "
+		// + ((ISpaceObject) strongestPheromones.get(i)).toString());
+		// }
+
+		return getStrongestPheromoneRandomly(strongestPheromonesAsBuckets);
+//		return strongestPheromones.size() == 0 ? null
+//				: (ISpaceObject) strongestPheromones
+//						.get(getRandomNumber(strongestPheromones.size() + 1));
+
+		// OLD VERSION WITH DETERMINISTIC CHOICE --> the strongest pheromone is
+		// always selected
+		// ArrayList target = new ArrayList();
+		//
+		// System.out.println("#PheromoneWalkPlan# Before ordering list");
+		// for (int i = 0; i < initialPheromonesList.size(); i++) {
+		// System.out.println("#PheromoneWalkPlan#" + i + ": "
+		// + ((ISpaceObject) initialPheromonesList.get(i)).toString());
+		// }
+		//
+		// // ascending ordered.
+		// Collections.sort(initialPheromonesList, new PheromoneComparator());
+		// ArrayList strongestPheromones = new ArrayList();
+		//
+		// // Hack: Remove pheromone of current pos of ant from list
+		// // TODO: Leave current pheromone in list but do randomChoice over
+		// // all pheromones according to their strength.
+		//
+		// for (int i = 0; i < initialPheromonesList.size(); i++) {
+		// if (((IVector2) (((ISpaceObject) initialPheromonesList.get(i))
+		// .getProperty(Space2D.PROPERTY_POSITION)))
+		// .equals((IVector2) myself
+		// .getProperty(Space2D.PROPERTY_POSITION))) {
+		// // nothing
+		// } else {
+		// target.add(initialPheromonesList.get(i));
+		// }
+		//
+		// }
+		//
+		// System.out.println("#PheromoneWalkPlan# Ordered list and size: "
+		// + target.size());
+		// for (int i = 0; i < target.size(); i++) {
+		// System.out.println("#PheromoneWalkPlan#" + i + ": "
+		// + ((ISpaceObject) target.get(i)).toString());
+		// }
+		//
+		// // Get all pheromoes that have the maximum value for their strength.
+		// for (int i = target.size() - 1; i >= 0; i--) {
+		// ISpaceObject pheromone = (ISpaceObject) target
+		// .get(i);
+		// if (i == target.size() - 1) {
+		// strongestPheromones.add(pheromone);
+		// } else if (new Integer(((ISpaceObject) strongestPheromones.get(0))
+		// .getProperty("strength").toString()).intValue() == new Integer(
+		// (pheromone.getProperty("strength").toString())).intValue()) {
+		// strongestPheromones.add(pheromone);
+		// } else {
+		// break;
+		// }
+		// }
+		//
+		// System.out
+		// .println("#PheromoneWalkPlan# Strongest Pheromones without current Position!");
+		// for (int i = 0; i < strongestPheromones.size(); i++) {
+		// System.out.println("#PheromoneWalkPlan#" + i + ": "
+		// + ((ISpaceObject) strongestPheromones.get(i)).toString());
+		// }
+		// return strongestPheromones.size() == 0 ? null
+		// : (ISpaceObject) strongestPheromones
+		// .get(getRandomNumber(strongestPheromones.size() + 1));
+
+	}
+
+	/**
+	 * This method takes a list of (ascending) sorted items. Those items are
+	 * taken to get buckets, e.g. every element in a bucket has the same value.
+	 * HACK: Only one item per bucket. Todo: all items with the same value in
+	 * the same bucket not only one right now.
+	 * 
+	 * @param sortedList
+	 * @return
+	 */
+	private ArrayList getBuckets(List sortedList) {
+		// List that contains buckets
+		ArrayList buckets = new ArrayList();
+		double sum = 0;
+
+		for (int i = 0; i < sortedList.size(); i++) {
+			if (i == 0) {
+				buckets.add(sortedList.get(i));
+				sum = new Integer(((ISpaceObject) sortedList.get(i))
+						.getProperty("strength").toString()).intValue();
+			} else {
+				int maxVal = new Integer(((ISpaceObject) buckets.get(buckets
+						.size() - 1)).getProperty("strength").toString())
+						.intValue();
+				int currentVal = new Integer(((ISpaceObject) sortedList.get(i))
+						.getProperty("strength").toString()).intValue();
+
+				if (maxVal < currentVal) {
+					buckets.add(sortedList.get(i));
+					sum = sum
+							+ new Integer(((ISpaceObject) sortedList.get(i))
+									.getProperty("strength").toString())
+									.intValue();
+				}
+			}
 		}
 
-		// Get all pheromoes that have the maximum value for their strength.
-		for (int i = target.size() - 1; i >= 0; i--) {
-			ISpaceObject pheromone = (ISpaceObject) target
-					.get(i);
-			if (i == target.size() - 1) {
-				strongestPheromones.add(pheromone);
-			} else if (new Integer(((ISpaceObject) strongestPheromones.get(0))
-					.getProperty("strength").toString()).intValue() == new Integer(
-					(pheromone.getProperty("strength").toString())).intValue()) {
-				strongestPheromones.add(pheromone);
+		System.out.println("Sorted and indentified buckets. Sum is: " + sum);
+		for (int j = 0; j < buckets.size(); j++) {
+			int bucketVal = new Integer(((ISpaceObject) buckets.get(j))
+					.getProperty("strength").toString()).intValue();
+			System.out.println("Bucket No " + j + " : " + bucketVal);
+		}
+
+		return getProbabiltiyBorders(buckets, sum);
+	}
+
+	/**
+	 * Takes a list of buckets with their sum. Computes the probability borders
+	 * between the buckets.
+	 * 
+	 * @param buckets
+	 * @param sum
+	 * @return
+	 */
+	private ArrayList getProbabiltiyBorders(ArrayList buckets, double sum) {
+		for (int i = 0; i < buckets.size(); i++) {
+			if (i == 0) {				
+				double bucketVal = new Double(((ISpaceObject) buckets.get(i))
+						.getProperty("strength").toString()).doubleValue() 	/ sum;
+				((ISpaceObject) buckets.get(i)).setProperty("tmpBucketBorder", new Double(bucketVal));
+//				((ISpaceObject) buckets.get(i)).setProperty("strength", new Double(bucketVal));
+//				buckets.set(i, new Double(bucketVal));				
+				
 			} else {
-				break;
+				double bucketValSum = 
+					new Double(((ISpaceObject) buckets.get(i-1))
+							.getProperty("tmpBucketBorder").toString()).doubleValue();
+						
+				double bucketVal = new Double(((ISpaceObject) buckets.get(i))
+						.getProperty("strength").toString()).doubleValue() / sum; 
+//				((ISpaceObject) buckets.get(i)).setProperty("strength", new Double(bucketVal + bucketValSum));
+				((ISpaceObject) buckets.get(i)).setProperty("tmpBucketBorder", new Double(bucketVal + bucketValSum));
+
 			}
 		}
 
 		System.out
-				.println("#PheromoneWalkPlan# Strongest Pheromones without current Position!");
-		for (int i = 0; i < strongestPheromones.size(); i++) {
-			System.out.println("#PheromoneWalkPlan#" + i + ": "
-					+ ((ISpaceObject) strongestPheromones.get(i)).toString());
+				.println("Sorted and indentified buckets with probablitiy borders.");
+		for (int j = 0; j < buckets.size(); j++) {
+			double bucketVal = new Double(((ISpaceObject) buckets.get(j))
+					.getProperty("tmpBucketBorder").toString()).doubleValue();
+			System.out.println("Bucket No/Prob " + j + " : " + bucketVal);
 		}
-		return strongestPheromones.size() == 0 ? null
-				: (ISpaceObject) strongestPheromones
-						.get(getRandomNumber(strongestPheromones.size() + 1));
+		return buckets;
+	}
 
+	/**
+	 * Takes a list of buckets with pheromones. The border determines which pheromone is taken.s 
+	 */
+	private ISpaceObject getStrongestPheromoneRandomly(ArrayList buckets) {
+		
+		double currentRand = getRandomNumber();
+		System.out.println("Random number that determines selected phermone: " + currentRand);
+		
+		for (int j = 0; j < buckets.size(); j++) {
+			double bucketVal = new Double(((ISpaceObject) buckets.get(j))
+					.getProperty("tmpBucketBorder").toString()).doubleValue();
+			
+			if (buckets.size() == 1) {
+				System.out.println("Choosen value: " + bucketVal);
+				return (ISpaceObject) buckets.get(j);
+				
+			}
+			if (currentRand <= bucketVal || j + 1 == buckets.size()) {
+				System.out.println("Choosen value: " + bucketVal);
+				return (ISpaceObject) buckets.get(j);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -302,5 +476,19 @@ public class PheromoneWalkPlan extends Plan {
 		// int yvalue = rand.nextInt(size.getYAsInteger());
 		// return new Vector2Int(xvalue, yvalue);
 	}
+	
+	/**
+	 * Compute a random number.
+	 */
+	private double getRandomNumber() {
+		try {
+			return SecureRandom.getInstance("SHA1PRNG").nextDouble();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return 0.0;
+		}
+	}
+	
 
 }
