@@ -15,9 +15,17 @@
 		<!-- Plan which prints out a message and kills the agent. -->
 		<plan name="hello">
 			<!-- <body type="bpmn" impl="jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn"/> -->
-			<body type="bpmn" impl="jadex/bpmn/examples/helloworld/SubProcess.bpmn"/>
+			<body type="bpmn" impl="jadex/bpmn/examples/helloworld/MessageReceival.bpmn"/>
 		</plan>
 	</plans>
+	
+	<events>
+		<messageevent name="test_message" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+	</events>
 	
 	<properties>
 	 	<property name="debugging">false</property>

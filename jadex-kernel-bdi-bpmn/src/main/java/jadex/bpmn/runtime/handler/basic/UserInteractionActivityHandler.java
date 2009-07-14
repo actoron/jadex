@@ -31,7 +31,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread, final ThreadContext context)
 	{
-		thread.setWaiting(true);
+		thread.setWaiting(ProcessThread.WAITING_FOR_TASK);
 		
 		final JFrame frame = new JFrame();
 		JPanel panel = new JPanel(new BorderLayout());

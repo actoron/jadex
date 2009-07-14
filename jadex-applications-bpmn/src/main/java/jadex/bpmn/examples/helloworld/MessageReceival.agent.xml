@@ -11,6 +11,10 @@
 	name="MessagReceival"
 	package="jadex.bpmn.examples.helloworld">
 	
+	<imports>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+	
 	<plans>
 		<!-- Plan which waits for a message. -->
 		<plan name="message_receival">

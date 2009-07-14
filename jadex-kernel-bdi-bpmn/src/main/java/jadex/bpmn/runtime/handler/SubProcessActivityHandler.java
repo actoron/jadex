@@ -23,7 +23,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
 		MSubProcess	proc	= (MSubProcess) activity;
-		thread.setWaiting(true);
+		thread.setWaiting(ProcessThread.WAITING_FOR_SUBPROCESS);
 		ThreadContext	subcontext	= new ThreadContext(proc, thread, context);
 		context.addSubcontext(subcontext);
 		

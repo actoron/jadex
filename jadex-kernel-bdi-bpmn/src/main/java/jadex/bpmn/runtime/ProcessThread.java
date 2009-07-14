@@ -2,6 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 
 import java.util.HashMap;
@@ -13,6 +14,26 @@ import java.util.Map;
  */
 public class ProcessThread	implements ITaskContext
 {
+	//-------- constants --------
+	
+	/** Waiting constant for time. */
+	public static String WAITING_FOR_TIME = "waiting_for_time";
+	
+	/** Waiting constant for message. */
+	public static String WAITING_FOR_MESSAGE = "waiting_for_message";
+	
+	/** Waiting constant for condition. */
+	public static String WAITING_FOR_CONDITION = "waiting_for_condition";
+	
+	/** Waiting constant for join. */
+	public static String WAITING_FOR_JOIN = "waiting_for_join";
+
+	/** Waiting constant for task. */
+	public static String WAITING_FOR_TASK = "waiting_for_task";
+
+	/** Waiting constant for subprocess. */
+	public static String WAITING_FOR_SUBPROCESS = "waiting_for_subprocess";
+	
 	//-------- attributes --------
 	
 	/** The next activity. */
@@ -20,10 +41,7 @@ public class ProcessThread	implements ITaskContext
 	
 	/** The last edge (if any). */
 	protected MSequenceEdge	edge;
-	
-	/** Is the process in a waiting state. */
-	protected boolean	waiting;
-	
+		
 	/** The contexts (data) of previous activities (task name ->). */
 	protected Map	contexts;
 	
@@ -32,6 +50,15 @@ public class ProcessThread	implements ITaskContext
 	
 	/** The exception that has just occurred in the process (if any). */
 	protected Exception	exception;
+	
+	/** Is the process in a waiting state. */
+	protected String	waiting;
+
+	/** The wait info. */
+	protected Object waitinfo;
+	
+	/** The wait filter. */
+	protected IFilter waitfilter;
 	
 	//-------- constructors --------
 
@@ -110,6 +137,15 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean	isWaiting()
 	{
+		return this.waiting!=null;
+	}
+	
+	/**
+	 *  Get the waiting type. 
+	 *  @return The waiting type.
+	 */
+	public String getWaiting()
+	{
 		return this.waiting;
 	}
 
@@ -117,11 +153,47 @@ public class ProcessThread	implements ITaskContext
 	 *  Set the process waiting state (i.e. blocked). 
 	 *  @param waiting	The waiting flag.
 	 */
-	public void setWaiting(boolean waiting)
+	public void setWaiting(String waiting)
 	{
-		this.waiting	= waiting;
+		this.waiting = waiting;
 	}
 	
+	/**
+	 *  Set the process waiting info. 
+	 *  @param waiting	The waiting info.
+	 */
+	public void setWaitInfo(Object waitinfo)
+	{
+		this.waitinfo = waitinfo;
+	}
+	
+	/**
+	 *  Get the waitinfo.
+	 *  @return The waitinfo.
+	 */
+	public Object getWaitInfo()
+	{
+		return this.waitinfo;
+	}
+	
+	/**
+	 *  Get the wait filter.
+	 *  @return The waitfilter.
+	 */
+	public IFilter getWaitFilter()
+	{
+		return this.waitfilter;
+	}
+
+	/**
+	 *  Set the wait filter.
+	 *  @param waitfilter The waitfilter to set.
+	 */
+	public void setWaitFilter(IFilter waitfilter)
+	{
+		this.waitfilter = waitfilter;
+	}
+
 	/**
 	 *  Create a copy of this thread (e.g. for a parallel split).
 	 */

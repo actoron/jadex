@@ -74,7 +74,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			}
 			else
 			{
-				thread.setWaiting(true);
+				thread.setWaiting(ProcessThread.WAITING_FOR_JOIN);
 			}
 		}
 		

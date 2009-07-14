@@ -78,7 +78,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			throw new RuntimeException("Plan body could not be created: "+impl);
 
 		// Create the body data structure and update state
-		BpmnPlanBodyInstance bodyinstance = new BpmnPlanBodyInstance(bodymodel, interpreter); 
+		BpmnPlanBodyInstance bodyinstance = new BpmnPlanBodyInstance(bodymodel, interpreter, rcapability, rplan); 
 		
 		return bodyinstance;
 	}
@@ -102,6 +102,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		else
 		{
 			bodyinstance.updateTimers();
+			bodyinstance.updateWaitingThreads();
 		}
 		
 		Throwable throwable = null;
@@ -137,7 +138,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		if(throwable==null && !bodyinstance.isFinished())
 		{
 			long	timeout	= bodyinstance.getTimeout();
-			Object	wa	= null; // bodyinstance.getWaitAbstraction();
+			Object	wa	= bodyinstance.getWaitAbstraction();
 
 			if(bodyinstance.isReady())
 			{
@@ -149,8 +150,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			}
 			else if(timeout!=-1 || wa!=null)
 			{
-				Object[]	to	= PlanRules.initializeWait(wa, timeout, interpreter.getState(), rcapa, rplan);
-				// Set processing state to "ready"
+				Object[] to	= PlanRules.initializeWait(wa, timeout, interpreter.getState(), rcapa, rplan);
+				
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);
 			}
 			else

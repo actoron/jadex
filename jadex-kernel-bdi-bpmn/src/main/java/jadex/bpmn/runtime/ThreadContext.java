@@ -131,13 +131,16 @@ public class ThreadContext
 	public Set getAllThreads()
 	{
 		Set ret = new HashSet();
-		for(Iterator it=threads.keySet().iterator(); it.hasNext(); )
+		if(threads!=null)
 		{
-			ProcessThread pc = (ProcessThread)it.next();
-			ret.add(pc);
-			ThreadContext tc = (ThreadContext)threads.get(pc);
-			if(tc!=null)
-				ret.addAll(tc.getAllThreads());
+			for(Iterator it=threads.keySet().iterator(); it.hasNext(); )
+			{
+				ProcessThread pc = (ProcessThread)it.next();
+				ret.add(pc);
+				ThreadContext tc = (ThreadContext)threads.get(pc);
+				if(tc!=null)
+					ret.addAll(tc.getAllThreads());
+			}
 		}
 		return ret;
 	}	
