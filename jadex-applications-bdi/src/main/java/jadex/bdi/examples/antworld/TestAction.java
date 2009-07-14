@@ -20,11 +20,11 @@ public class TestAction extends SimplePropertyObject implements ISpaceAction {
 		IVector2 position2 = new Vector2Int(8, 5);
 		Map props1 = new HashMap();
 		props1.put(Space2D.PROPERTY_POSITION, position1);
-		props1.put(ProducePheromoneAction.ROUND, new Integer(1));
+		props1.put(ProducePheromoneAction.STRENGTH, new Integer(10));
 
 		Map props2 = new HashMap();
 		props2.put(Space2D.PROPERTY_POSITION, position1);
-		props2.put(ProducePheromoneAction.ROUND, new Integer(1));
+		props2.put(ProducePheromoneAction.STRENGTH, new Integer(10));
 		// props.put("creation_age", new Double(clock.getTick()));
 		// props.put("clock", clock);
 
