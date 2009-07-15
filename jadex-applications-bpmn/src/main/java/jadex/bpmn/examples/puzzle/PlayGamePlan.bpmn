@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_NElFAXFGEd63xqPyP8ks8A" iD="_NElFAHFGEd63xqPyP8ks8A">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="__VnvwXFHEd63xqPyP8ks8A" iD="__VnvwHFHEd63xqPyP8ks8A" name="package jadex.bpmn.examples.puzzle;&#xD;&#xA;import jadex.bpmn.examples.helloworld.*;">
+    <associations xmi:type="bpmn:Association" xmi:id="__VnvyXFHEd63xqPyP8ks8A"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_NFK64XFGEd63xqPyP8ks8A" iD="_NFK64HFGEd63xqPyP8ks8A" associations="__VnvyXFHEd63xqPyP8ks8A" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_NFK643FGEd63xqPyP8ks8A" iD="_NFK64nFGEd63xqPyP8ks8A" outgoingEdges="_fRs8wXFGEd63xqPyP8ks8A" name="Start&#xD;&#xA;class = PrintTask.class&#xD;&#xA;in String text = &quot;Now puzzling:&quot;&#xD;&#xA;out long start = $scope.getTime()" activityType="Task"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_fRjLwXFGEd63xqPyP8ks8A" iD="_fRjLwHFGEd63xqPyP8ks8A" outgoingEdges="_9KkC6nFGEd63xqPyP8ks8A" incomingEdges="_fRs8wXFGEd63xqPyP8ks8A" activityType="SubProcess">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_fRjLw3FGEd63xqPyP8ks8A" iD="_fRjLwnFGEd63xqPyP8ks8A" name="Play&#xD;&#xA;class = SubgoalTask.class&#xD;&#xA;type = &quot;makemove&quot;&#xD;&#xA;in int depth = 0"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_te0iynFGEd63xqPyP8ks8A" iD="_te0iyXFGEd63xqPyP8ks8A"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_sy20oXFGEd63xqPyP8ks8A" iD="_sy20oHFGEd63xqPyP8ks8A" outgoingEdges="_te0iynFGEd63xqPyP8ks8A" activityType="EventIntermediateError"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_te0iwXFGEd63xqPyP8ks8A" iD="_te0iwHFGEd63xqPyP8ks8A" outgoingEdges="_ByyyQXFHEd63xqPyP8ks8A" incomingEdges="_te0iynFGEd63xqPyP8ks8A" name="No Solution&#xD;&#xA;class = PrintTask.class&#xD;&#xA;in String text = &quot;No solution found :-( &quot;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_9KkC4XFGEd63xqPyP8ks8A" iD="_9KkC4HFGEd63xqPyP8ks8A" outgoingEdges="_igQuCnFHEd63xqPyP8ks8A" incomingEdges="_9KkC6nFGEd63xqPyP8ks8A _ByyyQXFHEd63xqPyP8ks8A" name="End&#xD;&#xA;class = PrintTask.class&#xD;&#xA;in long end = $scope.getTime()&#xD;&#xA;in String text = &quot;Needed: &quot;+(end-Start.start)+&quot; millis.&quot;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_igQuAXFHEd63xqPyP8ks8A" iD="_igQuAHFHEd63xqPyP8ks8A" incomingEdges="_igQuCnFHEd63xqPyP8ks8A" name="Kill&#xD;&#xA;class = KillAgentTask.class" activityType="Task"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fRs8wXFGEd63xqPyP8ks8A" iD="_fRs8wHFGEd63xqPyP8ks8A"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_9KkC6nFGEd63xqPyP8ks8A" iD="_9KkC6XFGEd63xqPyP8ks8A"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ByyyQXFHEd63xqPyP8ks8A" iD="_ByyyQHFHEd63xqPyP8ks8A"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_igQuCnFHEd63xqPyP8ks8A" iD="_igQuCXFHEd63xqPyP8ks8A"/>
+  </pools>
+</bpmn:BpmnDiagram>

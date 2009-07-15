@@ -11,7 +11,8 @@ public interface ITask
 	/**
 	 *  Execute the task.
 	 *  @param context	The accessible values.
-	 *  @listener	To be notified, when the task has completed.
+	 *  @param process	The process instance executing the task.
+	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public void	execute(ITaskContext context, IResultListener listener);
+	public void	execute(ITaskContext context, IProcessInstance process, IResultListener listener);
 }

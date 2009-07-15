@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
@@ -12,13 +13,14 @@ public abstract class AbstractTask implements ITask
 	/**
 	 *  Execute the task.
 	 *  @param context	The accessible values.
-	 *  @listener	To be notified, when the task has completed.
+	 *  @param instance	The process instance executing the task.
+	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public void	execute(ITaskContext context, IResultListener listener)
+	public void	execute(ITaskContext context, IProcessInstance instance, IResultListener listener)
 	{
 		try
 		{
-			Object	result	= doExecute(context);
+			Object	result	= doExecute(context, instance);
 			listener.resultAvailable(result);
 		}
 		catch(Exception e)
@@ -32,8 +34,9 @@ public abstract class AbstractTask implements ITask
 	 *  Implement this method for synchroneous tasks, which are
 	 *  finished, when the method returns.
 	 *  @param context	The accessible values.
+	 *  @param instance	The process instance executing the task.
 	 *  @return	The result, if any.
 	 *  @throws	Exception When task execution fails.
 	 */
-	public abstract Object	doExecute(ITaskContext context)	throws Exception;
+	public abstract Object	doExecute(ITaskContext context, IProcessInstance instance)	throws Exception;
 }

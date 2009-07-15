@@ -242,7 +242,7 @@ public class ProcessThread	implements ITaskContext
 		assert activity!=null;
 		return data!=null && data.containsKey(activity.getName())? ((Map)data.get(activity.getName())).containsKey(name): false;
 	}
-	
+
 	/**
 	 *  Get the model element.
 	 *  @return	The model of the task.

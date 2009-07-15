@@ -1,5 +1,6 @@
 package jadex.bpmn.examples.helloworld;
 
+import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 
@@ -8,7 +9,7 @@ import jadex.bpmn.runtime.task.AbstractTask;
  */
 public class SayHelloTask	extends AbstractTask
 {
-	public Object doExecute(ITaskContext context)
+	public Object doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		System.out.println("Hello BPMN world!");
 		int	x	= ((Number)context.getParameterValue("x")).intValue();

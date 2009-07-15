@@ -32,7 +32,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 		if(incoming!=null && incoming.size()==1 && outgoing!=null && outgoing.size()>1)
 		{
 			MSequenceEdge def = null;
-			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
+			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, instance.getValueFetcher());
 			for(int i=0; i<outgoing.size(); i++)
 			{
 				// Take first out edge that is satisfied and not the default edge (without condition)

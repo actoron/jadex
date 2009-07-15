@@ -1,21 +1,21 @@
-package jadex.bpmn.examples.helloworld;
+package jadex.bpmn.examples.puzzle;
 
+import jadex.bdi.bpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 
 /**
- *  Print out some text stored in variable test.
+ *  Task to kill the agent.
  */
-public class PrintTask extends AbstractTask
+public class KillAgentTask extends AbstractTask
 {
 	/**
-	 * 
+	 *  Execute the task.
 	 */
 	public Object doExecute(ITaskContext context, IProcessInstance instance)
 	{
-		String text = (String)context.getParameterValue("text");
-		System.out.println(text);
+		((BpmnPlanBodyInstance)instance).killAgent();
 		return null;
 	}
 }

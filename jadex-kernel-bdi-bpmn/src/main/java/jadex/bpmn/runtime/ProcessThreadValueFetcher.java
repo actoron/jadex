@@ -13,15 +13,26 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	
 	/** The process thread. */
 	protected ProcessThread thread;
+
+	/** The activity selection flag. */
+	protected boolean flag;
+	
+	/** The fall back value fetcher (if any). */
+	protected IValueFetcher fetcher;
 	
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a value fetcher for a given process.
+	 *  @param thread	The process thread.
+	 *  @param flag	Flag to indicate that values should be fetched from the next activity (otherwise previous activity is used).
+	 *  @param fetcher	The fall back fetcher, if any. 
 	 */
-	public ProcessThreadValueFetcher(ProcessThread thread)
+	public ProcessThreadValueFetcher(ProcessThread thread, boolean flag, IValueFetcher fetcher)
 	{
-		this.thread = thread;;
+		this.thread = thread;
+		this.flag	= flag;
+		this.fetcher	 = fetcher;
 	}
 	
 	//-------- methods --------
@@ -34,8 +45,10 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	 */
 	public Object fetchValue(String name, Object object)
 	{
-		if(object instanceof Map)
+		if(object instanceof Map && ((Map)object).containsKey(name))
 			return ((Map)object).get(name);
+		else if(fetcher!=null)
+			return fetcher.fetchValue(name, object);
 		else
 			throw new UnsupportedOperationException();
 	}
@@ -47,12 +60,16 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	 */
 	public Object fetchValue(String name)
 	{
-		Map	oldvalues = thread.getLastEdge()!=null ? thread.getData(thread.getLastEdge().getSource().getName()) : null;
-		Object	value	= oldvalues!=null ? oldvalues.get(name) : null;
-		if(value==null)
-		{
+		Object	value;
+		Map	oldvalues = thread.getLastEdge()!=null ? thread.getData(flag ? thread.getLastEdge().getTarget().getName() : thread.getLastEdge().getSource().getName()) : null;
+		if(oldvalues!=null && oldvalues.containsKey(name))
+			value	= oldvalues!=null ? oldvalues.get(name) : null;
+		else
 			value	= thread.getData(name);
-		}
+		
+		if(value==null && fetcher!=null)
+			value	= fetcher.fetchValue(name);
+		
 		return value;
 	}
 }

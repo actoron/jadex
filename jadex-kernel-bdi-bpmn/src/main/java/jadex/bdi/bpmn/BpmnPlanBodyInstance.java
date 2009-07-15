@@ -5,6 +5,7 @@ import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.GoalLifecycleRules;
 import jadex.bdi.interpreter.InternalEventRules;
 import jadex.bdi.interpreter.MessageEventRules;
+import jadex.bdi.interpreter.OAVBDIFetcher;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IBeliefbase;
@@ -109,7 +110,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 */
 	public BpmnPlanBodyInstance(MBpmnModel model, BDIInterpreter interpreter, Object rcapa, Object rplan)
 	{
-		super(model, DEFAULT_HANDLERS);
+		super(model, DEFAULT_HANDLERS, new OAVBDIFetcher(interpreter.getState(), rcapa));
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;

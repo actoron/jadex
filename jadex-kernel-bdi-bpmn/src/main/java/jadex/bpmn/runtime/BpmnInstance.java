@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  *  Representation of a running BPMN process.
  */
-public class BpmnInstance
+public class BpmnInstance	implements IProcessInstance
 {
 	//-------- static part --------
 	
@@ -53,6 +53,9 @@ public class BpmnInstance
 	/** The activity handlers. */
 	protected Map	handlers;
 
+	/** The global value fetcher. */
+	protected IValueFetcher	fetcher;
+
 	/** The thread context. */
 	protected ThreadContext	context;
 	
@@ -67,7 +70,7 @@ public class BpmnInstance
 	 */
 	public BpmnInstance(MBpmnModel model)
 	{
-		this(model, DEFAULT_HANDLERS);
+		this(model, DEFAULT_HANDLERS, null);
 	}
 
 	/**
@@ -75,9 +78,10 @@ public class BpmnInstance
 	 *  @param model	The BMPN process model.
 	 *  @param handlers	The activity handlers.
 	 */
-	public BpmnInstance(MBpmnModel model, Map handlers)
+	public BpmnInstance(MBpmnModel model, Map handlers, IValueFetcher fetcher)
 	{
 		this.handlers	= handlers;
+		this.fetcher	= fetcher;
 		this.context	= new ThreadContext(model);
 		
 		// Create initial thread(s). 
@@ -94,7 +98,7 @@ public class BpmnInstance
 	 *  Get the model of the BPMN process instance.
 	 *  @return The model.
 	 */
-	public MBpmnModel	getModel()
+	public MBpmnModel	getModelElement()
 	{
 		return (MBpmnModel)context.getModelElement();
 	}
@@ -137,7 +141,7 @@ public class BpmnInstance
 			Map mappings = thread.getLastEdge().getParameterMappings();
 			if(mappings!=null)
 			{
-				IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
+				IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, this.fetcher);
 				for(Iterator it2=mappings.keySet().iterator(); it2.hasNext(); )
 				{
 					String name = (String)it2.next();
@@ -155,7 +159,7 @@ public class BpmnInstance
 		List params = thread.getActivity().getParameters();
 		if(params!=null)
 		{	
-			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
+			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, true, this.fetcher);
 			for(int i=0; i<params.size(); i++)
 			{
 				MParameter param = (MParameter)params.get(i);
@@ -232,7 +236,7 @@ public class BpmnInstance
 	 */
 	public IActivityHandler getActivityHandler(MActivity activity)
 	{
-		return (IActivityHandler)handlers.get(activity.getName());
+		return (IActivityHandler)handlers.get(activity.getActivityType());
 	}
 
 	/**
@@ -244,10 +248,19 @@ public class BpmnInstance
 		StringBuffer buf = new StringBuffer();
 		buf.append(SReflect.getInnerClassName(this.getClass()));
 		buf.append("(name=");
-		buf.append(getModel().getName());
+		buf.append(getModelElement().getName());
 		buf.append(", context=");
 		buf.append(context);
 		buf.append(")");
 		return buf.toString();
+	}
+
+	/**
+	 *  Get the global value fetcher.
+	 *  @return The value fetcher (if any).
+	 */
+	public IValueFetcher getValueFetcher()
+	{
+		return this.fetcher;
 	}
 }
