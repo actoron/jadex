@@ -72,9 +72,13 @@ public class GoAction extends SimplePropertyObject implements ISpaceAction
 		}
 		
 //		System.out.println("NextDesired position: " + pos.toString());
-		checkPositionForGravitation(pos, space, obj);
+//		checkPositionForGravitation(pos, space, obj);
 		
 		((Space2D)space).setPosition(oid, pos);
+		
+		// Support evaluation.		
+		int walkedSteps = ((Integer)obj.getProperty("eval:walkedSteps")).intValue();
+		obj.setProperty("eval:walkedSteps", new Integer(walkedSteps+1));
 		
 //		System.out.println("Go action: "+obj.getProperty(IAgentAction.ACTOR_ID)+" "+pos);
 		

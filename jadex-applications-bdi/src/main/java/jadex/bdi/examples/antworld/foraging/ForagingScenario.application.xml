@@ -31,11 +31,13 @@
 			<env:objecttypes>
 				<env:objecttype name="ant">
 					<env:property name="vision_range">5</env:property>
-					<env:property name="position">new Vector2Double(5, 5)
-					</env:property>
+					<!--  <env:property name="position">new Vector2Int(5, 5)
+					</env:property>-->										
 					<env:property name="food">null</env:property>
 					<env:property name="id" dynamic="true">$object.getId()
 						</env:property>
+						<env:property name="eval:walkedSteps">0</env:property>
+						<env:property name="eval:carriedFood">0</env:property>
 				</env:objecttype>
 				<env:objecttype name="destinationSign">
 					<env:property name="antId" dynamic="true">
@@ -249,22 +251,22 @@
 	</agenttypes>
 
 	<applications>
-		<application name="Ants with Environment">
+		<application name="Ants -  Small environment">
 			<agents>
-				<agent type="Ant" number="5" />
+				<agent type="Ant" number="2" />
 				<!--<agent name="EnvironmentLocal" type="Environment"/>-->
 			</agents>
 
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:objects>
+				<env:objects>							
 					<env:object type="nest">
 						<env:property name="position">new Vector2Int(8,1)</env:property>
-					</env:object>
+					</env:object>					
 					<env:object type="foodSource">
-						<env:property name="position">new Vector2Int(3,8)</env:property>
+						<env:property name="position">new Vector2Int(3,3)</env:property>
 					</env:object>
 					<env:object type="food" number="2">
-						<env:property name="position">new Vector2Int(3,8)</env:property>
+						<env:property name="position">new Vector2Int(3,3)</env:property>
 					</env:object>
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(3,6)</env:property>
@@ -335,6 +337,47 @@
 				</env:observers>
 			</env:envspace>
 		</application>
-	</applications>
+	
+		<application name="Ants -  Huge environment">
+			<agents>
+				<agent type="Ant" number="5" />
+				<!--<agent name="EnvironmentLocal" type="Environment"/>-->
+			</agents>
 
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="20" height="20">
+				<env:objects>							
+					<env:object type="nest">
+						<env:property name="position">new Vector2Int(17,2)</env:property>
+					</env:object>					
+					<env:object type="foodSource">
+					<env:property name="stock">25</env:property>
+					<env:property name="capacity">25</env:property>
+						<env:property name="position">new Vector2Int(4,16)</env:property>
+					</env:object>
+					<env:object type="food" number="25">
+						<env:property name="position">new Vector2Int(4,16)</env:property>
+					</env:object>					
+				</env:objects>
+
+				<env:processes>
+					<env:process type="managePheromones">
+						<env:property name="rate">4</env:property>
+					</env:process>
+
+					<env:process type="manageFoodSources">
+						<env:property name="rate">1</env:property>
+					</env:process>
+				</env:processes>
+
+				<env:observers>
+					<env:observer name="world" view="view_all"
+						perspective="abstract">
+						<env:plugins>
+						</env:plugins>
+					</env:observer>
+				</env:observers>
+			</env:envspace>
+		</application>
+	</applications>
+	
 </applicationtype>

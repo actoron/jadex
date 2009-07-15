@@ -62,6 +62,8 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 		}
 		//update old pheromone
 		else{
+//			int oldStrength = ((Integer)pheromone.getProperty(STRENGTH)).intValue();
+//			pheromone.setProperty(STRENGTH, new Integer(10 + oldStrength));
 			pheromone.setProperty(ANT_ID, so.getId());
 			pheromone.setProperty(STRENGTH, new Integer(10));
 		}

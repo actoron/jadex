@@ -38,7 +38,7 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 		Collection food = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "food");
 		ISpaceObject pickedFood = (ISpaceObject)(food!=null? food.iterator().next(): null);		
 		
-		System.out.println("pickup food action: "+so+" "+so.getProperty(Grid2D.PROPERTY_POSITION)+" "+pickedFood);
+		System.out.println("#"+ so.getId() + "#pickup food action: "+so+" "+so.getProperty(Grid2D.PROPERTY_POSITION)+" "+pickedFood);
 		if(food!=null)
 		{
 //			if(Math.random()>0.88)
@@ -52,6 +52,10 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 //				System.out.println("pickup: "+waste);
 				so.setProperty("food", pickedFood);
 				
+				//Support evaluation
+				int carriedFood = ((Integer)so.getProperty("eval:carriedFood")).intValue();
+				so.setProperty("eval:carriedFood", new Integer(carriedFood+1));				
+				
 				grid.setPosition(pickedFood.getId(), null);
 				ret = true;
 				//pcs.firePropertyChange("worldObjects", garb, null);
@@ -64,7 +68,7 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 		}
 		else
 		{
-			System.out.println("#PickupFoodAction#Agent picked up failed.");
+			System.out.println("#"+ so.getId() +  " - PickupFoodAction#Agent picked up failed.");
 		}
 
 //		System.out.println("pickup food action "+parameters + "completed.");
