@@ -15,7 +15,10 @@ public class InitPlan extends Plan
 	public void body()
 	{	
 		//add property change listener
+		
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+//		myself.setProperty("id", myself.getId());
+		System.out.println("#InitPlan# Called: for ant: " + myself.getId());
 //		myself.addPropertyChangeListener(new GravitationListener());
 //		System.out.println("Moved to: "+newpos);
 	}

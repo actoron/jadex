@@ -30,8 +30,9 @@ public class GoPlanEnv extends Plan {
 
 		System.out.println("#GoPlanEnv# Plan started to walk from "
 				+ myself.getProperty(Space2D.PROPERTY_POSITION) + " to "
-				+ target);
+				+ target + " for ant: " + myself.getId());
 
+		
 		// Update destination and gravitationSensor of ant on space
 		Map params = new HashMap();
 		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier())

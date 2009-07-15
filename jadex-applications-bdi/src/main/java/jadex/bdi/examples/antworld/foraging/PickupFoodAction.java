@@ -31,9 +31,7 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject so = grid.getAvatar(owner);
 
-//		if(so.getProperty("garbage")!=null)
-//			System.out.println("pickup failed: "+so);
-		
+	
 		assert so.getProperty("food")==null: so;
 		
 		//TODO: atomic action?
@@ -43,8 +41,8 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 		System.out.println("pickup food action: "+so+" "+so.getProperty(Grid2D.PROPERTY_POSITION)+" "+pickedFood);
 		if(food!=null)
 		{
-//			if(Math.random()>0.5)
-			{
+//			if(Math.random()>0.88)
+//			{
 				Collection foodSources = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "foodSource");
 				ISpaceObject foodSource = (ISpaceObject) foodSources.iterator().next();
 				int stock = ((Integer)foodSource.getProperty("stock")).intValue();
@@ -58,15 +56,15 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 				ret = true;
 				//pcs.firePropertyChange("worldObjects", garb, null);
 //				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
-			}
+//			}
 //			else
 //			{
-				System.out.println("Agent picked up successfully");
+//				System.out.println("#PickUpFoodAction#Agent Pick UP failed randomly.");
 //			}
 		}
 		else
 		{
-			System.out.println("Agent picked up failed: ");
+			System.out.println("#PickupFoodAction#Agent picked up failed.");
 		}
 
 //		System.out.println("pickup food action "+parameters + "completed.");

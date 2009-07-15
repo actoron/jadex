@@ -1,16 +1,13 @@
-<!--
-  <H3>Ant agent.</H3>
 
-  Runs randomly on the grid. If it finds food it brings it back to the nest.
+	<!--
+		<H3>Ant agent.</H3> Runs randomly on the grid. If it finds food it
+		brings it back to the nest.
+	-->
 
--->
-
-<agent xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<agent xmlns="http://jadex.sourceforge.net/jadex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
-	name="ForagingAnt"
-	package="jadex.bdi.examples.antworld.foraging">
+	name="ForagingAnt" package="jadex.bdi.examples.antworld.foraging">
 
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>
@@ -18,158 +15,174 @@
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
-		<import>java.util.*</import>		
+		<import>java.util.*</import>
 	</imports>
 
 	<beliefs>
-		
+
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
 			<fact>
-				(Grid2D)$scope.getApplicationContext().getSpace("mygc2dspace")</fact>
+				(Grid2D)$scope.getApplicationContext().getSpace("mygc2dspace")
+			</fact>
 		</belief>
-		
+
 		<!-- Myself. -->
 		<belief name="myself" class="ISpaceObject">
 			<fact>$beliefbase.env.getAvatar($scope.getAgentIdentifier())</fact>
 		</belief>
-		
+
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl"> $beliefbase.myself.position </fact>
 		</belief>
-		
+
 		<!-- The next destination of the ant. -->
-		<!--  <belief name="destination" class="IVector2" evaluationmode="push">
+		<!--
+			<belief name="destination" class="IVector2" evaluationmode="push">
 			<fact language="jcl"> $beliefbase.myself.destination </fact>
-		</belief>-->
-		
+			</belief>
+		-->
+
 		<!-- Piece of food carried at that moment. -->
 		<belief name="carriedFood" class="ISpaceObject" evaluationmode="push">
 			<fact language="jcl"> $beliefbase.myself.food </fact>
 		</belief>
-		
+
 		<!-- Food sources at the current position. -->
-		<beliefset name="foodSources" class="ISpaceObject"/>
-		
+		<beliefset name="foodSources" class="ISpaceObject" />
+
 		<!-- Known nests. -->
-		<beliefset name="nests" class="ISpaceObject"/>
+		<beliefset name="nests" class="ISpaceObject" />
 
 		<!-- Smelled pheromones. -->
-		<beliefset name="pheromones" class="ISpaceObject"/>
-		
-		<!--<belief name="wastes" class="ISpaceObject"/>-->		
-		<belief name="hasGravitation" class="boolean"> 
+		<beliefset name="pheromones" class="ISpaceObject" />
+
+		<!--<belief name="wastes" class="ISpaceObject"/>-->
+		<belief name="hasGravitation" class="boolean">
 			<fact>false</fact>
 		</belief>
-		
-		
+
+
 	</beliefs>
-	
+
 
 	<goals>
 
 
 		<!-- Goal for going to a specified position. -->
 		<achievegoal name="go">
-			<parameter name="pos" class="IVector2"/>
+			<parameter name="pos" class="IVector2" />
 		</achievegoal>
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
-		<!--<achievegoal name="pick" exclude="never" retrydelay="100">
- 			<dropcondition>
- 				// !$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
-				
-				?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				?mbelief = (mbelief (melement_has_name "is_dirty"))
-				?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))
-				?mbelief2 = (mbelief (melement_has_name "has_garbage"))
- 			</dropcondition>
-		</achievegoal>-->
-		<performgoal name="check" exclude="never"/>
-				
-	
-	<!-- This goal is used to mine food.-->
-		<achievegoal name="food_mining" exclude="never" retry="false">		
-			<unique/>									
-			<creationcondition language="jcl"> Arrays.asList($beliefbase.foodSources).size() &gt; 0</creationcondition>			
- 			<deliberation>
-				<inhibits ref="pheromone_follow"/> 
+		<!--
+			<achievegoal name="pick" exclude="never" retrydelay="100">
+			<dropcondition> // !$beliefbase.is_dirty &amp;&amp;
+			!$beliefbase.has_garbage ?rbelief = (belief (element_has_model
+			?mbelief) (belief_has_fact false)) ?mbelief = (mbelief
+			(melement_has_name "is_dirty")) ?rbelief2 = (belief
+			(element_has_model ?mbelief2) (belief_has_fact false)) ?mbelief2 =
+			(mbelief (melement_has_name "has_garbage")) </dropcondition>
+			</achievegoal>
+		-->
+		<performgoal name="check" exclude="never" />
+
+
+		<!-- This goal is used to mine food.-->
+		<achievegoal name="food_mining" exclude="never" retry="false">
+			<unique />
+			<creationcondition language="jcl">
+				Arrays.asList($beliefbase.foodSources).size() &gt; 0
+			</creationcondition>
+			<deliberation>
+				<inhibits ref="pheromone_follow" />
 			</deliberation>
 		</achievegoal>
-		
-		<!-- This goal is used to follow pheromones in order to find a food source.-->
-  		<achievegoal name="pheromone_follow" exclude="never" retry="false">		
-			<unique/>			
-			<creationcondition language="jcl"> Arrays.asList($beliefbase.pheromones).size() &gt; 0</creationcondition>			
-<!-- 			<deliberation>
-				<inhibits ref="go"/> 
-				 <inhibits ref="check"/>
-			</deliberation>-->
- 	  	</achievegoal>
-		
+
+		<!--
+			This goal is used to follow pheromones in order to find a food
+			source.
+		-->
+		<achievegoal name="pheromone_follow" exclude="never"
+			retry="false">
+			<unique />
+			<creationcondition language="jcl">
+				Arrays.asList($beliefbase.pheromones).size() &gt; 0
+			</creationcondition>
+			<!--
+				<deliberation> <inhibits ref="go"/> <inhibits ref="check"/>
+				</deliberation>
+			-->
+		</achievegoal>
+
 	</goals>
 
-	<plans>		
+	<plans>
 
-	<!-- Plan for moving to a food source and bringing a piece of food back to a nest. -->
+		<!--
+			Plan for moving to a food source and bringing a piece of food back to
+			a nest.
+		-->
 		<plan name="foodMining">
-			<body class="FoodMiningPlan"/>
+			<body class="FoodMiningPlan" />
 			<trigger>
-				<goal ref="food_mining"/>
-			</trigger>
-		</plan>						
-
-	<!-- Plan for moving to a food source with the help of pheromones.--> 
-		<plan name="pheromoneWalk">
-			<body class="PheromoneWalkPlan"/>
-			<trigger>
-				<goal ref="pheromone_follow"/>
+				<goal ref="food_mining" />
 			</trigger>
 		</plan>
-		
+
+		<!-- Plan for moving to a food source with the help of pheromones.-->
+		<plan name="pheromoneWalk">
+			<body class="PheromoneWalkPlan" />
+			<trigger>
+				<goal ref="pheromone_follow" />
+			</trigger>
+		</plan>
+
 		<!-- Plan for running on a predefined route and searching waste. -->
 		<plan name="checking_plan">
-			<body class="CheckingPlanEnv"/>
+			<body class="CheckingPlanEnv" />
 			<trigger>
-				<goal ref="check"/>
+				<goal ref="check" />
 			</trigger>
 		</plan>
-		
+
 		<!-- Plan for going to a target position. -->
 		<plan name="go_plan">
 			<parameter name="pos" class="IVector2">
- 				<goalmapping ref="go.pos"/>
+				<goalmapping ref="go.pos" />
 			</parameter>
-			<body class="GoPlanEnv"/>
+			<body class="GoPlanEnv" />
 			<trigger>
-				<goal ref="go"/>
+				<goal ref="go" />
 			</trigger>
-		</plan>			
-		
+		</plan>
+
 		<!-- Plan to init the agent.-->
 		<plan name="init_plan">
-			<body class="InitPlan"/>		
+			<body class="InitPlan" />
 		</plan>
-				
+
 	</plans>
 
 	<properties>
-		<!-- The environment may throw exceptions when executing property listeners
-			and these listeners are not valid any longer. This leads to normal plan
-			failure and can therefore be ignored. -->
+		<!--
+			The environment may throw exceptions when executing property
+			listeners and these listeners are not valid any longer. This leads to
+			normal plan failure and can therefore be ignored.
+		-->
 		<property name="logging.level">java.util.logging.Level.WARNING</property>
 		<property name="debugging">false</property>
-    </properties>
+	</properties>
 
 	<configurations>
 		<configuration name="default">
 			<goals>
 				<!-- Initial goal for searching for garbage. -->
-				<initialgoal ref="check"/>			
+				<initialgoal ref="check" />
 			</goals>
 			<plans>
-<!--				<initialplan ref="init_plan"/>-->
+				<!-- <initialplan ref="init_plan" /> -->
 			</plans>
 		</configuration>
 	</configurations>
