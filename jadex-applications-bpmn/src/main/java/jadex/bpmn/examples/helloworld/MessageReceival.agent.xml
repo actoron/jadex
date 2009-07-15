@@ -18,7 +18,7 @@
 	<plans>
 		<!-- Plan which waits for a message. -->
 		<plan name="message_receival">
-			<body type="bpmn" impl="jadex/bpmn/examples/helloworld/MessageReceival.bpmn"/>
+			<body type="bpmn" impl="jadex/bpmn/examples/helloworld/MessageReceival3.bpmn"/>
 		</plan>
 	</plans>
 	

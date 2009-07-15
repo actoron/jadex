@@ -72,7 +72,7 @@ public class BpmnExecutor //implements ISteppable
 						for(Iterator it = threads.iterator(); it.hasNext(); )
 						{
 							ProcessThread pc = (ProcessThread)it.next();
-							if(breakpoints.contains(pc.getNextActivity()))
+							if(breakpoints.contains(pc.getActivity()))
 							{
 								setStepmode(true);
 								

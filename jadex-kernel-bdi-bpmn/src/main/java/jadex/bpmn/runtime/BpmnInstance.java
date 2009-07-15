@@ -153,7 +153,7 @@ public class BpmnInstance
 		
 		// todo: parameter direction / class
 		
-		List params = thread.getNextActivity().getParameters();
+		List params = thread.getActivity().getParameters();
 		if(params!=null)
 		{	
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread);
@@ -167,10 +167,10 @@ public class BpmnInstance
 		
 		
 		// Find handler and execute activity.
-		IActivityHandler handler = (IActivityHandler)handlers.get(thread.getNextActivity().getActivityType());
+		IActivityHandler handler = (IActivityHandler)handlers.get(thread.getActivity().getActivityType());
 		if(handler==null)
 			throw new UnsupportedOperationException("No handler for activity: "+thread);
-		handler.execute(thread.getNextActivity(), this, thread, ec);
+		handler.execute(thread.getActivity(), this, thread, ec);
 	}
 	
 	/**
@@ -225,19 +225,16 @@ public class BpmnInstance
 			}
 		}
 	}
-
-	/**
-	 *  Get the dispatched element, i.e. the element that caused
-	 *  the current plan step being executed.
-	 *  @return The dispatched element.
-	 * /
-	public IElement getDispatchedElement(); */
 	
 	/**
-	 *  Get the waitqueue.
-	 *  @return The waitqueue.
-	 * /
-	public IWaitqueue getWaitqueue(); */
+	 *  Get the activity handler for an activity.
+	 *  @param actvity The activity.
+	 *  @return The activity handler.
+	 */
+	public IActivityHandler getActivityHandler(MActivity activity)
+	{
+		return (IActivityHandler)handlers.get(activity.getName());
+	}
 
 	/**
 	 *  Get the string representation.
@@ -254,46 +251,4 @@ public class BpmnInstance
 		buf.append(")");
 		return buf.toString();
 	}
-
-	//-------- parameter handling --------
-
-	/**
-	 *  Get all parameters.
-	 *  @return All parameters.
-	 * /
-	public IParameter[]	getParameters(); */
-
-	/**
-	 *  Get all parameter sets.
-	 *  @return All parameter sets.
-	 * /
-	public IParameterSet[]	getParameterSets(); */
-
-	/**
-	 *  Get a parameter.
-	 *  @param name The name.
-	 *  @return The parameter.
-	 * /
-	public IParameter getParameter(String name); */
-
-	/**
-	 *  Get a parameter.
-	 *  @param name The name.
-	 *  @return The parameter set.
-	 * /
-	public IParameterSet getParameterSet(String name); */
-
-	/**
-	 *  Has the element a parameter element.
-	 *  @param name The name.
-	 *  @return True, if it has the parameter.
-	 * /
-	public boolean hasParameter(String name); */
-
-	/**
-	 *  Has the element a parameter set element.
-	 *  @param name The name.
-	 *  @return True, if it has the parameter set.
-	 * /
-	public boolean hasParameterSet(String name); */
 }

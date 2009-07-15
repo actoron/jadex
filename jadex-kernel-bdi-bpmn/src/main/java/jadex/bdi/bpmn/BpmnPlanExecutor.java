@@ -139,13 +139,12 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		{
 			long	timeout	= bodyinstance.getTimeout();
 			Object	wa	= bodyinstance.getWaitAbstraction();
-
+			
+			// Set waitqueue of plan.
+			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, wa);
+			
 			if(bodyinstance.isReady())
 			{
-//				if(timeout!=-1 || wa!=null)
-//					throw new UnsupportedOperationException("No combination of wait/execution supported: "+bodyinstance);
-				
-				// Set processing state to "ready"
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 			}
 			else if(timeout!=-1 || wa!=null)

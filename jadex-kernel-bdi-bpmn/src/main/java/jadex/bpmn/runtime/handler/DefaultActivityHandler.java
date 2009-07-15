@@ -113,7 +113,7 @@ public class DefaultActivityHandler implements IActivityHandler
 		if(remove!=null)
 		{
 			thread	= remove.getInitiator();
-			thread.setWaiting(null);
+			thread.setNonWaiting();
 			// Todo: Callbacks for aborted threads (to abort external activities)
 			context.removeSubcontext(remove);
 		}
@@ -158,7 +158,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 */
 	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
 	{
-		thread.setWaiting(null);
+		thread.setNonWaiting();
 		step(activity, instance, thread, context);
 		instance.wakeUp();
 	}

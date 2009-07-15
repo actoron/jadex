@@ -92,10 +92,10 @@ public class ProcessThread	implements ITaskContext
 	}
 
 	/**
-	 *  Get the next activity.
+	 *  Get the activity.
 	 *  @return The activity.
 	 */
-	public MActivity getNextActivity()
+	public MActivity getActivity()
 	{
 		return this.activity;
 	}
@@ -141,10 +141,19 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 *  Set to non waiting.
+	 *  @return The waiting flag.
+	 */
+	public void	setNonWaiting()
+	{
+		this.waiting = null;
+	}
+	
+	/**
 	 *  Get the waiting type. 
 	 *  @return The waiting type.
 	 */
-	public String getWaiting()
+	public String getWaitingState()
 	{
 		return this.waiting;
 	}
@@ -153,7 +162,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Set the process waiting state (i.e. blocked). 
 	 *  @param waiting	The waiting flag.
 	 */
-	public void setWaiting(String waiting)
+	public void setWaitingState(String waiting)
 	{
 		this.waiting = waiting;
 	}

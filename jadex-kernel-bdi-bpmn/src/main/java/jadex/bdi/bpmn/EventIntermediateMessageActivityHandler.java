@@ -26,7 +26,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	{
 		// Just set thread to waiting.
 		System.out.println("Waiting for message");
-		thread.setWaiting(ProcessThread.WAITING_FOR_MESSAGE);
+		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
 		thread.setWaitInfo(activity.getPropertyValue("type"));
 		
 		// Does currently only match message type name.

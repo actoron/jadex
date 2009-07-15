@@ -48,6 +48,7 @@ import jadex.bdi.runtime.impl.WaitqueueFlyweight;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.commons.SReflect;
@@ -167,9 +168,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				{
 					it.remove();
 					assert thread.isWaiting();
-					
-					// Hack!!! How to call handler!?
-					new EventIntermediateTimerActivityHandler().notify(thread.getModelElement(), this, thread, context.getThreadContext(thread));
+					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, context.getThreadContext(thread));
 				}
 			}
 		}
@@ -188,11 +187,10 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 			{
 				ProcessThread thread = (ProcessThread)it.next();
-				if(ProcessThread.WAITING_FOR_MESSAGE.equals(thread.getWaiting())
+				if(ProcessThread.WAITING_FOR_MESSAGE.equals(thread.getWaitingState())
 					&& thread.getWaitFilter().filter(dispelem))
 				{
-					// Hack!!! How to call handler!?
-					new EventIntermediateMessageActivityHandler().notify(thread.getModelElement(), this, thread, context.getThreadContext(thread));
+					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, context.getThreadContext(thread));
 				}
 			}
 		}
@@ -229,7 +227,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 		{
 			ProcessThread pt = (ProcessThread)it.next();
-			if(ProcessThread.WAITING_FOR_MESSAGE.equals(pt.getWaiting()))
+			if(ProcessThread.WAITING_FOR_MESSAGE.equals(pt.getWaitingState()))
 			{
 				String type = (String)pt.getWaitInfo();
 				if(type==null)
