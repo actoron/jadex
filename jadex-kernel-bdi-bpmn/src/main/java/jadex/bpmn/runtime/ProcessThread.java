@@ -34,6 +34,9 @@ public class ProcessThread	implements ITaskContext
 	/** Waiting constant for subprocess. */
 	public static String WAITING_FOR_SUBPROCESS = "waiting_for_subprocess";
 	
+	/** Waiting constant for multi. */
+	public static String WAITING_FOR_MULTI = "waiting_for_multi";
+	
 	//-------- attributes --------
 	
 	/** The next activity. */
