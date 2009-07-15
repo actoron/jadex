@@ -45,11 +45,11 @@ public class ProcessThread	implements ITaskContext
 	/** The last edge (if any). */
 	protected MSequenceEdge	edge;
 		
-	/** The contexts (data) of previous activities (task name ->). */
-	protected Map	contexts;
+	/** The data of previous activities (task name -> Map). */
+	protected Map	data;
 	
-	/** The contexts (data) of previous activities. */
-	protected Map	values;
+	/** The thread context. */
+	protected ThreadContext	context;
 	
 	/** The exception that has just occurred in the process (if any). */
 	protected Exception	exception;
@@ -69,9 +69,10 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(MActivity activity)
+	public ProcessThread(MActivity activity, ThreadContext context)
 	{
 		this.activity	= activity;
+		this.context	= context;
 	}
 	
 	//-------- methods --------
@@ -86,8 +87,8 @@ public class ProcessThread	implements ITaskContext
 		buf.append(SReflect.getInnerClassName(this.getClass()));
 		buf.append("(activity=");
 		buf.append(activity);
-		buf.append(", contexts=");
-		buf.append(contexts);
+		buf.append(", data=");
+		buf.append(data);
 		buf.append(", waiting=");
 		buf.append(waiting);
 		buf.append(")");
@@ -110,8 +111,12 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setNextActivity(MActivity activity)
 	{
-		setLastEdge(null);
+		this.edge	= null;
 		this.activity	= activity;
+		
+		// Remove old data, if activity was executed before.
+		if(activity!=null && data!=null)
+			data.remove(activity.getName());
 	}
 	
 	/**
@@ -129,9 +134,8 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void setLastEdge(MSequenceEdge edge)
 	{
+		setNextActivity(edge!=null ? (MActivity)edge.getTarget() : null);
 		this.edge	= edge;
-		this.activity	= edge!=null ? (MActivity) edge.getTarget() : null;
-		this.values	= null;	// Clean context for next activity;
 	}
 	
 	/**
@@ -205,16 +209,24 @@ public class ProcessThread	implements ITaskContext
 	{
 		this.waitfilter = waitfilter;
 	}
+	
+	/**
+	 *  Get the thread context
+	 *  @return	The thread context.
+	 */
+	public ThreadContext	getThreadContext()
+	{
+		return context;
+	}
 
 	/**
 	 *  Create a copy of this thread (e.g. for a parallel split).
 	 */
 	public ProcessThread	createCopy()
 	{
-		ProcessThread	ret	= new ProcessThread(activity);
+		ProcessThread	ret	= new ProcessThread(activity, context);
 		ret.edge	= edge;
-		ret.contexts	= contexts;
-		ret.values	= null;
+		ret.data	= data;
 		return ret;
 	}
 	
@@ -227,7 +239,8 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean hasParameterValue(String name)
 	{
-		return values!=null? values.containsKey(name): false;
+		assert activity!=null;
+		return data!=null && data.containsKey(activity.getName())? ((Map)data.get(activity.getName())).containsKey(name): false;
 	}
 	
 	/**
@@ -246,7 +259,8 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public Object getParameterValue(String name)
 	{
-		return values!=null ? values.get(name) : null;
+		assert activity!=null;
+		return data!=null && data.containsKey(activity.getName())? ((Map)data.get(activity.getName())).get(name): null;
 	}
 
 	/**
@@ -256,19 +270,16 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setParameterValue(String name, Object value)
 	{
-		if(values==null)
+		assert activity!=null;
+		if(data==null)
+			data	= new HashMap();
+			
+		if(!data.containsKey(activity.getName()))
 		{
-			values	= new HashMap();
-			
-			if(contexts==null)
-			{
-				contexts	= new HashMap();
-			}
-			
-			contexts.put(activity.getName(), values);
+			data.put(activity.getName(), new HashMap());
 		}
-		
-		values.put(name, value);
+			
+		((Map)data.get(activity.getName())).put(name, value);
 	}
 
 	/**
@@ -276,9 +287,9 @@ public class ProcessThread	implements ITaskContext
 	 *  @param name	The name of the task.
 	 *  @return	The context (if any).
 	 */
-	public Map getContext(String name)
+	public Map getData(String name)
 	{
-		return contexts!=null ? (Map)contexts.get(name) : null;
+		return data!=null ? (Map)data.get(name) : null;
 	}
 
 	/**

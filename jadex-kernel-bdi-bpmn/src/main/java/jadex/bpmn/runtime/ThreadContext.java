@@ -27,9 +27,6 @@ public class ThreadContext
 	/** The initiating thread (if any). */
 	protected ProcessThread	initiator;
 	
-	/** The parent context (if any). */
-	protected ThreadContext	parent;
-	
 	/** The currently running threads (thread -> context or null, if leaf thread). */
 	protected Map	threads;
 	
@@ -43,7 +40,6 @@ public class ThreadContext
 	{
 		this.model	= model;
 		this.initiator	= null;
-		this.parent	= null;
 	}
 	
 	/**
@@ -51,13 +47,11 @@ public class ThreadContext
 	 *  Should not be invoked from the outside
 	 *  @param model	The sub process model element.
 	 *  @param initiator	The initiating thread.
-	 *  @param parent	The parent context.
 	 */
-	public ThreadContext(MSubProcess model, ProcessThread initiator, ThreadContext parent)
+	public ThreadContext(MSubProcess model, ProcessThread initiator)
 	{
 		this.model	= model;
 		this.initiator	= initiator;
-		this.parent	= parent;
 	}
 
 	//-------- methods --------
@@ -77,7 +71,7 @@ public class ThreadContext
 	 */
 	public ThreadContext	getParent()
 	{
-		return parent;
+		return initiator!=null ? initiator.getThreadContext() : null;
 	}
 	
 	/**
@@ -207,36 +201,10 @@ public class ThreadContext
 	{
 		return threads==null || threads.isEmpty();
 	}
-	
-	/**
-	 *  Get a subcontext (or the context itself) that directly contains an executable thread.
-	 *  @return	A context with an executable thread (if any).
-	 */
-	public ThreadContext getExecutableContext()
-	{
-		ThreadContext	ret	= null;
-		if(threads!=null)
-		{
-			for(Iterator it=threads.keySet().iterator(); ret==null && it.hasNext(); )
-			{
-				ProcessThread	thread	= (ProcessThread) it.next();
-				if(threads.get(thread)!=null)
-				{
-					ThreadContext	context	= (ThreadContext) threads.get(thread);
-					ret	= context.getExecutableContext();
-				}
-				else if(!thread.isWaiting())
-				{
-					ret	= this;
-				}
-			}
-		}
-		return ret;
-	}
 
 	/**
-	 *  Get an executable thread that is contained directly in this context.
-	 *  @return	An executable thread of this context (if any).
+	 *  Get an executable thread that in the context or its sub contexts.
+	 *  @return	An executable thread (if any).
 	 */
 	public ProcessThread	getExecutableThread()
 	{
@@ -246,7 +214,12 @@ public class ThreadContext
 			for(Iterator it=threads.keySet().iterator(); ret==null && it.hasNext(); )
 			{
 				ProcessThread	thread	= (ProcessThread) it.next();
-				if(threads.get(thread)==null && !thread.isWaiting())
+				if(threads.get(thread)!=null)
+				{
+					ThreadContext	context	= (ThreadContext) threads.get(thread);
+					ret	= context.getExecutableThread();
+				}
+				else if(!thread.isWaiting())
 				{
 					ret	= thread;
 				}

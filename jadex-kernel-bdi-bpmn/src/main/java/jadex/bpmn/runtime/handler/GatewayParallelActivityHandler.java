@@ -5,7 +5,6 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ThreadContext;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,9 +22,8 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		List	incoming	= activity.getIncomingSequenceEdges();
 		List	outgoing	= activity.getOutgoingSequenceEdges();
@@ -43,7 +41,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 				{
 					ProcessThread	newthread	= thread.createCopy();
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
-					context.addThread(newthread);
+					thread.getThreadContext().addThread(newthread);
 				}
 			}
 		}
@@ -56,7 +54,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			Set	threads	= new HashSet();	// Threads to be deleted.
 			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
 			
-			for(Iterator it=context.getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
+			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
 			{
 				ProcessThread	oldthread	= (ProcessThread) it.next();
 				if(edges.contains(oldthread.getLastEdge()))
@@ -70,7 +68,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			{
 				thread.setLastEdge((MSequenceEdge) outgoing.get(0));
 				for(Iterator it=threads.iterator(); it.hasNext(); )
-					context.removeThread((ProcessThread) it.next());
+					thread.getThreadContext().removeThread((ProcessThread) it.next());
 			}
 			else
 			{

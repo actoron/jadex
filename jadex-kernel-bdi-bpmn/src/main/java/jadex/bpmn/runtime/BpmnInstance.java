@@ -84,7 +84,7 @@ public class BpmnInstance
 		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			context.addThread(new ProcessThread((MActivity)startevents.get(i)));
+			context.addThread(new ProcessThread((MActivity)startevents.get(i), context));
 		}
 	}
 	
@@ -129,8 +129,7 @@ public class BpmnInstance
 		if(!isReady())
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
 		
-		ThreadContext	ec	= context.getExecutableContext();
-		ProcessThread	thread	= ec.getExecutableThread();
+		ProcessThread	thread	= context.getExecutableThread();
 		
 		// Handle parameter passing in edge inscriptions.
 		if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
@@ -170,7 +169,7 @@ public class BpmnInstance
 		IActivityHandler handler = (IActivityHandler)handlers.get(thread.getActivity().getActivityType());
 		if(handler==null)
 			throw new UnsupportedOperationException("No handler for activity: "+thread);
-		handler.execute(thread.getActivity(), this, thread, ec);
+		handler.execute(thread.getActivity(), this, thread);
 	}
 	
 	/**
@@ -178,7 +177,7 @@ public class BpmnInstance
 	 */
 	public boolean	isReady()
 	{
-		return context.getExecutableContext()!=null;
+		return context.getExecutableThread()!=null;
 	}
 	
 	//-------- listener handling --------

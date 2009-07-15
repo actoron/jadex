@@ -47,11 +47,11 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	 */
 	public Object fetchValue(String name)
 	{
-		Map	oldvalues = thread.getLastEdge()!=null ? thread.getContext(thread.getLastEdge().getSource().getName()) : null;
+		Map	oldvalues = thread.getLastEdge()!=null ? thread.getData(thread.getLastEdge().getSource().getName()) : null;
 		Object	value	= oldvalues!=null ? oldvalues.get(name) : null;
 		if(value==null)
 		{
-			value	= thread.getContext(name);
+			value	= thread.getData(name);
 		}
 		return value;
 	}

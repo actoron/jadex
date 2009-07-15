@@ -1,5 +1,11 @@
 package jadex.bpmn.runtime.handler.basic;
 
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.commons.SGUI;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,13 +15,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInstance;
-import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ThreadContext;
-import jadex.bpmn.runtime.handler.DefaultActivityHandler;
-import jadex.commons.SGUI;
 
 /**
  *  Handler that opens a window and waits for the user to click a button.
@@ -27,9 +26,8 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread, final ThreadContext context)
+	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
 	{
 		thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);
 		
@@ -40,7 +38,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				UserInteractionActivityHandler.this.notify(activity, instance, thread, context);
+				UserInteractionActivityHandler.this.notify(activity, instance, thread);
 				frame.dispose();
 			}
 		});
@@ -51,7 +49,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				UserInteractionActivityHandler.this.notify(activity, instance, thread, context);
+				UserInteractionActivityHandler.this.notify(activity, instance, thread);
 				System.exit(0);
 			}
 		});

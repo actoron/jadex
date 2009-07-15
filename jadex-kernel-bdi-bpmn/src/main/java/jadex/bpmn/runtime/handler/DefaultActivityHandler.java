@@ -22,12 +22,11 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
-		doExecute(activity, instance, thread, context);
-		step(activity, instance, thread, context);
+		doExecute(activity, instance, thread);
+		step(activity, instance, thread);
 	}
 	
 	/**
@@ -35,9 +34,8 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		System.out.println("Executed: "+activity+", "+instance);
 	}
@@ -47,9 +45,8 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		MNamedIdElement	next	= null;
 		Exception	ex	= thread.getException();
@@ -89,7 +86,8 @@ public class DefaultActivityHandler implements IActivityHandler
 					}
 				}
 			}
-				
+			
+			ThreadContext	context	= thread.getThreadContext();
 			outside	= context.getParent()==null;
 			if(next==null && !outside)
 			{
@@ -115,7 +113,7 @@ public class DefaultActivityHandler implements IActivityHandler
 			thread	= remove.getInitiator();
 			thread.setNonWaiting();
 			// Todo: Callbacks for aborted threads (to abort external activities)
-			context.removeSubcontext(remove);
+			thread.getThreadContext().removeSubcontext(remove);
 		}
 
 		if(next!=null)
@@ -141,7 +139,7 @@ public class DefaultActivityHandler implements IActivityHandler
 		}
 		else if(next==null)
 		{
-			context.removeThread(thread);
+			thread.getThreadContext().removeThread(thread);
 		} 
 		else
 		{
@@ -154,12 +152,11 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param activity	The timing event activity.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		thread.setNonWaiting();
-		step(activity, instance, thread, context);
+		step(activity, instance, thread);
 		instance.wakeUp();
 	}
 }

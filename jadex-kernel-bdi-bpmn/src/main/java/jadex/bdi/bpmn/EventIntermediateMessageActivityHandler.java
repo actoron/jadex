@@ -5,7 +5,6 @@ import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ThreadContext;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.commons.IFilter;
 import jadex.rules.state.IOAVState;
@@ -20,9 +19,8 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	public void execute(final MActivity activity, final BpmnInstance instance, ProcessThread thread)
 	{
 		// Just set thread to waiting.
 		System.out.println("Waiting for message");

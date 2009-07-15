@@ -6,7 +6,6 @@ import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
-import jadex.bpmn.runtime.ThreadContext;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 
@@ -23,9 +22,8 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		List	incoming	= activity.getIncomingSequenceEdges();
 		List	outgoing	= activity.getOutgoingSequenceEdges();

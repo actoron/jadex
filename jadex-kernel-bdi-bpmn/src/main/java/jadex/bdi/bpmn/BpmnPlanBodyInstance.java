@@ -24,7 +24,6 @@ import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
-import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
@@ -168,7 +167,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				{
 					it.remove();
 					assert thread.isWaiting();
-					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, context.getThreadContext(thread));
+					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread);
 				}
 			}
 		}
@@ -190,7 +189,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				if(ProcessThread.WAITING_FOR_MESSAGE.equals(thread.getWaitingState())
 					&& thread.getWaitFilter().filter(dispelem))
 				{
-					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, context.getThreadContext(thread));
+					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread);
 				}
 			}
 		}

@@ -21,9 +21,8 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
-	 *  @param context	The thread context.
 	 */
-	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		System.out.println("Executed: "+activity+", "+instance);
 		
@@ -38,7 +37,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		{
 			MSequenceEdge next	= (MSequenceEdge)outgoing.get(0);
 			MActivity act = next.getTarget();
-			instance.getActivityHandler(act).execute(act, instance, thread, context);
+			instance.getActivityHandler(act).execute(act, instance, thread);
 			filters[i] = thread.getWaitFilter();
 		}
 		
