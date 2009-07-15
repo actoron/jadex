@@ -115,6 +115,8 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;
 		this.rplan = rplan;
+		
+		((OAVBDIFetcher)getValueFetcher()).setRPlan(rplan);
 	}
 	
 	//-------- methods --------
@@ -241,6 +243,31 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		}
 		
 		return wa;
+	}
+	
+	/**
+	 *  Wake up the instance.
+	 *  Called from activity handlers when external events re-activate waiting process threads.
+	 *  Propagated to change listeners.
+	 */
+	public void	wakeUp()
+	{
+		if(interpreter.isExternalThread() && isReady())
+		{
+			interpreter.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+			});
+		}
+		else if(isReady())
+		{
+			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+		}
+		
+		super.wakeUp();
 	}
 	
 	//-------- bdi plan methods --------

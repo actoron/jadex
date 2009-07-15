@@ -15,6 +15,13 @@ public interface ITaskContext
 	public MActivity	getModelElement();
 
 	/**
+	 *  Check if the value of a parameter is set.
+	 *  @param name	The parameter name. 
+	 *  @return	True, if the parameter is set to some value. 
+	 */
+	public boolean	hasParameterValue(String name);
+
+	/**
 	 *  Get the value of a parameter.
 	 *  @param name	The parameter name. 
 	 *  @return	The parameter value. 

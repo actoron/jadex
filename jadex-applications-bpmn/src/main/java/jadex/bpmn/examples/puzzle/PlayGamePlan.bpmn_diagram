@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_NFK683FGEd63xqPyP8ks8A"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_NFK69HFGEd63xqPyP8ks8A" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="PlayGamePlan.bpmn#_NFK643FGEd63xqPyP8ks8A"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NFUr4XFGEd63xqPyP8ks8A" y="55" width="193" height="77"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NFUr4XFGEd63xqPyP8ks8A" y="55" width="193" height="83"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_fRjLxHFGEd63xqPyP8ks8A" type="2002">
         <children xmi:type="notation:Node" xmi:id="_fRjLynFGEd63xqPyP8ks8A" type="4006"/>
@@ -100,7 +100,7 @@
   <styles xmi:type="notation:DescriptionStyle" xmi:id="_NEuO83FGEd63xqPyP8ks8A"/>
   <element xmi:type="bpmn:BpmnDiagram" href="PlayGamePlan.bpmn#_NElFAXFGEd63xqPyP8ks8A"/>
   <edges xmi:type="notation:Edge" xmi:id="_fRs8wnFGEd63xqPyP8ks8A" type="3001" source="_NFK68HFGEd63xqPyP8ks8A" target="_fRjLxHFGEd63xqPyP8ks8A">
-    <children xmi:type="notation:Node" xmi:id="_fRs8x3FGEd63xqPyP8ks8A" type="4012">
+    <children xmi:type="notation:Node" xmi:id="_fRs8x3FGEd63xqPyP8ks8A" visible="false" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_fRs8yHFGEd63xqPyP8ks8A" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_fRs8yXFGEd63xqPyP8ks8A" lineColor="16776959"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_fRs8ynFGEd63xqPyP8ks8A" y="-10"/>
@@ -112,7 +112,7 @@
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fRs8xnFGEd63xqPyP8ks8A" points="[-28, -28, 70, 71]$[-96, -97, 2, 2]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_te0iy3FGEd63xqPyP8ks8A" type="3001" source="_sy20onFGEd63xqPyP8ks8A" target="_te0iwnFGEd63xqPyP8ks8A">
-    <children xmi:type="notation:Node" xmi:id="_te0i0HFGEd63xqPyP8ks8A" type="4012">
+    <children xmi:type="notation:Node" xmi:id="_te0i0HFGEd63xqPyP8ks8A" visible="false" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_te0i0XFGEd63xqPyP8ks8A" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_te0i0nFGEd63xqPyP8ks8A" lineColor="16776959"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_te0i03FGEd63xqPyP8ks8A" y="-10"/>
@@ -124,7 +124,7 @@
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_te0iz3FGEd63xqPyP8ks8A" points="[-15, -8, 280, 131]$[-293, -139, 2, 0]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_9KkC63FGEd63xqPyP8ks8A" type="3001" source="_fRjLxHFGEd63xqPyP8ks8A" target="_9KkC4nFGEd63xqPyP8ks8A">
-    <children xmi:type="notation:Node" xmi:id="_9KkC8HFGEd63xqPyP8ks8A" type="4012">
+    <children xmi:type="notation:Node" xmi:id="_9KkC8HFGEd63xqPyP8ks8A" visible="false" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_9KkC8XFGEd63xqPyP8ks8A" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_9KkC8nFGEd63xqPyP8ks8A" lineColor="16776959"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_9KkC83FGEd63xqPyP8ks8A" y="-10"/>
@@ -136,7 +136,7 @@
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_9KkC73FGEd63xqPyP8ks8A" points="[-81, -26, 214, 68]$[-293, -94, 2, 0]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_ByyyQnFHEd63xqPyP8ks8A" type="3001" source="_te0iwnFGEd63xqPyP8ks8A" target="_9KkC4nFGEd63xqPyP8ks8A">
-    <children xmi:type="notation:Node" xmi:id="_ByyyR3FHEd63xqPyP8ks8A" type="4012">
+    <children xmi:type="notation:Node" xmi:id="_ByyyR3FHEd63xqPyP8ks8A" visible="false" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_ByyySHFHEd63xqPyP8ks8A" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_ByyySXFHEd63xqPyP8ks8A" lineColor="16776959"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_ByyySnFHEd63xqPyP8ks8A" y="-10"/>
@@ -148,7 +148,7 @@
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ByyyRnFHEd63xqPyP8ks8A" points="[77, -14, 20, 105]$[52, -90, -5, 29]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_igQuC3FHEd63xqPyP8ks8A" type="3001" source="_9KkC4nFGEd63xqPyP8ks8A" target="_igQuAnFHEd63xqPyP8ks8A">
-    <children xmi:type="notation:Node" xmi:id="_igQuEHFHEd63xqPyP8ks8A" type="4012">
+    <children xmi:type="notation:Node" xmi:id="_igQuEHFHEd63xqPyP8ks8A" visible="false" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_igQuEXFHEd63xqPyP8ks8A" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_igQuEnFHEd63xqPyP8ks8A" lineColor="16776959"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_igQuE3FHEd63xqPyP8ks8A" y="-10"/>

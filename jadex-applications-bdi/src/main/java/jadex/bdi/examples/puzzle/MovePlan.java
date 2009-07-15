@@ -14,7 +14,7 @@ public class MovePlan extends Plan
 	/** The move to try. */
 	protected Move move;
 
-	/** The recusion depth. */
+	/** The recursion depth. */
 	protected int depth;
 
 	/** The move delay. */
