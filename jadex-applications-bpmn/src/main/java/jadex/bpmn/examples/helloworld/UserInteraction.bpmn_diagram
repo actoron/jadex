@@ -100,7 +100,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_HkAhFW1kEd6B3oAuT8wltw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_HkAhFm1kEd6B3oAuT8wltw" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="UserInteraction.bpmn#_HkAhEW1kEd6B3oAuT8wltw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HkAhF21kEd6B3oAuT8wltw" x="911" y="115" width="199"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HkAhF21kEd6B3oAuT8wltw" x="871" y="115" width="199"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_N5eOUm1kEd6B3oAuT8wltw" type="2001">
         <children xmi:type="notation:Node" xmi:id="_N5eOWG1kEd6B3oAuT8wltw" type="4001"/>
@@ -109,7 +109,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_N5eOVW1kEd6B3oAuT8wltw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_N5eOVm1kEd6B3oAuT8wltw" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="UserInteraction.bpmn#_N5eOUW1kEd6B3oAuT8wltw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N5eOV21kEd6B3oAuT8wltw" x="1137" y="129"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N5eOV21kEd6B3oAuT8wltw" x="1097" y="129"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_Ghqv0m1jEd6B3oAuT8wltw"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_Ghqv021jEd6B3oAuT8wltw"/>

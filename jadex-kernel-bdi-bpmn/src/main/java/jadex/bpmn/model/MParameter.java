@@ -10,13 +10,13 @@ public class MParameter
 	//-------- constants --------
 	
 	/** The constant for direction in. */
-	public static String DIRECTION_IN = "dir_in";
+	public static String DIRECTION_IN = "in";
 	
 	/** The constant for direction out. */
-	public static String DIRECTION_OUT = "dir_out";
+	public static String DIRECTION_OUT = "out";
 
 	/** The constant for direction inout. */
-	public static String DIRECTION_INOUT = "dir_inout";
+	public static String DIRECTION_INOUT = "inout";
 
 	//-------- attributes --------
 	

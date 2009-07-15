@@ -11,9 +11,9 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_kXjaYW1jEd6B3oAuT8wltw" iD="_kXjaYG1jEd6B3oAuT8wltw" name="Activity B&#xD;&#xA;class = UserInteractionTask.class"/>
     </vertices>
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_mj6kQW1jEd6B3oAuT8wltw" iD="_mj6kQG1jEd6B3oAuT8wltw" outgoingEdges="_HkAhGm1kEd6B3oAuT8wltw" incomingEdges="_mkEVSG1jEd6B3oAuT8wltw" activityType="SubProcess">
-      <vertices xmi:type="bpmn:Activity" xmi:id="_mj6kQ21jEd6B3oAuT8wltw" iD="_mj6kQm1jEd6B3oAuT8wltw" outgoingEdges="_sgDLgW1jEd6B3oAuT8wltw" name="Activity A&#xD;&#xA;class = UserInteractionTask.class"/>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_sf5agW1jEd6B3oAuT8wltw" iD="_sf5agG1jEd6B3oAuT8wltw" incomingEdges="_sgDLgW1jEd6B3oAuT8wltw" name="Activity B&#xD;&#xA;class = UserInteractionTask.class" activityType="Task"/>
-      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_sgDLgW1jEd6B3oAuT8wltw" iD="_sgDLgG1jEd6B3oAuT8wltw"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_mj6kQ21jEd6B3oAuT8wltw" iD="_mj6kQm1jEd6B3oAuT8wltw" outgoingEdges="_sgDLgW1jEd6B3oAuT8wltw" name="Activity A&#xD;&#xA;class = UserInteractionTask.class&#xD;&#xA;out int x = 42"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_sf5agW1jEd6B3oAuT8wltw" iD="_sf5agG1jEd6B3oAuT8wltw" incomingEdges="_sgDLgW1jEd6B3oAuT8wltw" name="Activity B&#xD;&#xA;class = UserInteractionTask.class&#xD;&#xA;in int y" activityType="Task"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_sgDLgW1jEd6B3oAuT8wltw" iD="_sgDLgG1jEd6B3oAuT8wltw" name="y = x"/>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_HkAhEW1kEd6B3oAuT8wltw" iD="_HkAhEG1kEd6B3oAuT8wltw" outgoingEdges="_N5nYQW1kEd6B3oAuT8wltw" incomingEdges="_HkAhGm1kEd6B3oAuT8wltw _JSk7sW1kEd6B3oAuT8wltw" name="Final Activity&#xD;&#xA;class = UserInteractionTask.class" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_N5eOUW1kEd6B3oAuT8wltw" iD="_N5eOUG1kEd6B3oAuT8wltw" incomingEdges="_N5nYQW1kEd6B3oAuT8wltw" activityType="EventEndEmpty"/>
