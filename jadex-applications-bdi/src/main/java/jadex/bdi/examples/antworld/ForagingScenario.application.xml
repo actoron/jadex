@@ -1,8 +1,9 @@
 
 	<!--
 		<H3>The Foraging application descriptor</H3> It can be started to
-		launch an foraging scenario. Ant are looking for food and bringing it
-		back to their nest.
+		launch an foraging scenario. Ants are looking for food and bringing it
+		back to their nest. Furthermore, ants leave pheromones to guide other
+		ants to a food source.
 	-->
 
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
@@ -31,20 +32,21 @@
 			<env:objecttypes>
 				<env:objecttype name="ant">
 					<env:property name="vision_range">5</env:property>
-					<!--  <env:property name="position">new Vector2Int(5, 5)
-					</env:property>-->										
+					<!--
+						<env:property name="position">new Vector2Int(5, 5) </env:property>
+					-->
 					<env:property name="food">null</env:property>
 					<env:property name="id" dynamic="true">$object.getId()
-						</env:property>
-						<env:property name="eval:walkedSteps">0</env:property>
-						<env:property name="eval:carriedFood">0</env:property>
+					</env:property>
+					<env:property name="eval:walkedSteps">0</env:property>
+					<env:property name="eval:carriedFood">0</env:property>
 				</env:objecttype>
 				<env:objecttype name="destinationSign">
 					<env:property name="antId" dynamic="true">
 						$object.getProperty("antID")
 						</env:property>
 				</env:objecttype>
-				
+
 				<!-- The size of the objects decreases as time goes by.-->
 				<env:objecttype name="pheromone">
 					<env:property name="size" dynamic="true">
@@ -76,7 +78,7 @@
 
 				<env:objecttype name="nest">
 					<env:property name="stock">0</env:property>
-					<env:property name="capacity">50</env:property>
+					<env:property name="capacity">150</env:property>
 					<!--
 						<env:property name="full" dynamic="true">$object.stock ==
 						capacity</env:property>
@@ -100,7 +102,7 @@
 				<env:actiontype name="go" class="GoAction" />
 				<env:actiontype name="updateDestination" class="UpdateDestinationAction" />
 				<env:actiontype name="producePheromone" class="ProducePheromoneAction" />
-				</env:actiontypes>
+			</env:actiontypes>
 
 			<env:processtypes>
 				<env:processtype name="managePheromones" class="ManagePheromonesProcess">
@@ -108,7 +110,7 @@
 				</env:processtype>
 				<env:processtype name="manageFoodSources" class="ManageFoodSourcesProcess">
 					<env:property name="rate">1</env:property>
-				</env:processtype>		
+				</env:processtype>
 			</env:processtypes>
 
 			<!-- The percepttypes, generators and processors. -->
@@ -118,7 +120,7 @@
 				<!--
 					Percepttypes that the environment produces and agents can consume.
 				-->
-				<!-- TODO: disappear, etc..-->				
+				<!-- TODO: disappear, etc..-->
 				<env:percepttype name="foodSource_appeared"
 					objecttype="foodSource" agenttype="Ant" />
 				<env:percepttype name="foodSource_disappeared"
@@ -142,7 +144,7 @@
 					<!--
 						percept types are declared with associated action types:
 						percepttype, actiontype1, actiontype2, ...
-					-->				
+					-->
 					<env:property name="percepttypes"> new Object[] { new
 						String[]{"foodSource_appeared", "appeared", "created"}, new
 						String[]{"foodSource_disappeared", "disappeared", "destroyed"},new
@@ -156,7 +158,7 @@
 					Percept processors consume percepts and push them into the agents.
 				-->
 				<env:perceptprocessor agenttype="Ant"
-					class="DefaultBDIVisionProcessor">					
+					class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes"> new Object[] { new
 						String[]{"foodSource_appeared", "add", "foodSources"}, new
 						String[]{"foodSource_disappeared", "remove", "foodSources"},
@@ -183,23 +185,27 @@
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D"
 					opengl="false" objectshiftx="0.5" objectshifty="0.5">
-					
+
 					<env:drawable objecttype="ant" width="1.0" height="1.0">
 						<env:property name="vision_size" dynamic="true">new
 							Vector2Double($object.vision_range*2+1)</env:property>
-						<env:texturedrectangle layer="2" x="-0.1" y="+0.1" width="0.7" height="0.7"
+						<env:texturedrectangle layer="2" x="-0.1" y="+0.1"
+							width="0.7" height="0.7"
 							imagepath="jadex/bdi/examples/antworld/images/ameise.jpg" />
-						<env:text layer="2" basesize="11" text="$id$" x="0" y="-0.25" color="black" />
-						<env:texturedrectangle layer="3" x="0.3" y="+0.4" width="0.4" height="0.4" imagepath="jadex/bdi/examples/antworld/images/food.jpg">
+						<env:text layer="2" basesize="11" text="$id$" x="0" y="-0.25"
+							color="black" />
+						<env:texturedrectangle layer="3" x="0.3" y="+0.4"
+							width="0.4" height="0.4" imagepath="jadex/bdi/examples/antworld/images/food.jpg">
 							<env:drawcondition>$object.food!=null</env:drawcondition>
 						</env:texturedrectangle>
 					</env:drawable>
-					
+
 					<env:drawable objecttype="destinationSign" width="0.6"
 						height="0.6">
 						<env:texturedrectangle layer="1"
 							imagepath="jadex/bdi/examples/antworld/images/destination.png" />
-							 	<env:text layer="1" basesize="11" text="$antId$" x="-0.3" y="+0.1" color="black" /> 
+						<env:text layer="1" basesize="11" text="$antId$" x="-0.3"
+							y="+0.1" color="black" />
 					</env:drawable>
 
 					<env:drawable objecttype="pheromone" width="1.0"
@@ -211,8 +217,9 @@
 					<env:drawable objecttype="foodSource" width="0.8"
 						height="0.8">
 						<env:texturedrectangle layer="1"
-							imagepath="jadex/bdi/examples/antworld/images/foodSource.png" />						
-						<env:text layer="2" basesize="11" text="$text$" x="+0.2" y="-0.15" color="black" />
+							imagepath="jadex/bdi/examples/antworld/images/foodSource.png" />
+						<env:text layer="2" basesize="11" text="$text$" x="+0.2"
+							y="-0.15" color="black" />
 					</env:drawable>
 
 					<env:drawable objecttype="food" width="0.8" height="0.8">
@@ -223,7 +230,8 @@
 					<env:drawable objecttype="nest" width="0.8" height="0.8">
 						<env:texturedrectangle layer="1"
 							imagepath="jadex/bdi/examples/antworld/images/nest.jpg" />
-					<env:text layer="2" basesize="12" text="$text$" x="-0.15" y="-0.2" color="black" />
+						<env:text layer="2" basesize="12" text="$text$" x="-0.15"
+							y="-0.2" color="black" />
 					</env:drawable>
 
 					<env:prelayers>
@@ -254,14 +262,14 @@
 		<application name="Ants -  Small environment">
 			<agents>
 				<agent type="Ant" number="2" />
-				<!--<agent name="EnvironmentLocal" type="Environment"/>-->
+				<agent type="Environment" />
 			</agents>
 
 			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:objects>							
+				<env:objects>
 					<env:object type="nest">
 						<env:property name="position">new Vector2Int(8,1)</env:property>
-					</env:object>					
+					</env:object>
 					<env:object type="foodSource">
 						<env:property name="position">new Vector2Int(3,3)</env:property>
 					</env:object>
@@ -337,26 +345,30 @@
 				</env:observers>
 			</env:envspace>
 		</application>
-	
+
 		<application name="Ants -  Huge environment">
 			<agents>
 				<agent type="Ant" number="5" />
-				<!--<agent name="EnvironmentLocal" type="Environment"/>-->
+				<agent type="Environment" />
 			</agents>
 
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="20" height="20">
-				<env:objects>							
+			<env:envspace name="mygc2dspace" type="gc2dspace" width="20"
+				height="20">
+				<env:objects>
 					<env:object type="nest">
-						<env:property name="position">new Vector2Int(17,2)</env:property>
-					</env:object>					
+						<env:property name="position">new Vector2Int(17,2)
+						</env:property>
+					</env:object>
 					<env:object type="foodSource">
-					<env:property name="stock">25</env:property>
-					<env:property name="capacity">25</env:property>
-						<env:property name="position">new Vector2Int(4,16)</env:property>
+						<env:property name="stock">25</env:property>
+						<env:property name="capacity">25</env:property>
+						<env:property name="position">new Vector2Int(4,16)
+						</env:property>
 					</env:object>
 					<env:object type="food" number="25">
-						<env:property name="position">new Vector2Int(4,16)</env:property>
-					</env:object>					
+						<env:property name="position">new Vector2Int(4,16)
+						</env:property>
+					</env:object>
 				</env:objects>
 
 				<env:processes>
@@ -379,5 +391,5 @@
 			</env:envspace>
 		</application>
 	</applications>
-	
+
 </applicationtype>

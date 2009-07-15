@@ -1,7 +1,7 @@
 <!--
-  <H3>Ant agent.</H3>
+  <H3>Enviroment Agent</H3>
 
-  Runs randomly on the grid. If it feels gravitaton, it is absorbed by the gravitation center.
+  Used to maintain the Gui.
 
 -->
 
@@ -9,7 +9,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
-	name="Ant"
+	name="Enviroment"
 	package="jadex.bdi.examples.antworld.environment">
 
 	<imports>
@@ -20,12 +20,6 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>		
 	</imports>
 
-		<capabilities>
-		<!-- Include the StartAgents capability as startcap for starting agents. -->
-		<capability name="startercap" file="jadex.bdi.planlib.starter.StartAgents"/>
-		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
-	</capabilities>
-	
 	<beliefs>
 		
  		<!-- Environment. -->
@@ -33,30 +27,13 @@
  			<fact>(Grid2D)$scope.getApplicationContext().getSpace("mygc2dspace")</fact>			
  		</belief>
  		
- 		<!-- Myself. -->
- 		<belief name="myself" class="ISpaceObject">
-			 <fact>$beliefbase.env.getAvatar($scope.getAgentIdentifier())</fact>			 
- 		</belief>
-
-		<!-- The actual position on the grid world. -->
-		<belief name="pos" class="IVector2" evaluationmode="push">
-			<fact language="jcl">
-				$beliefbase.myself.position 
-				
-				// $beliefbase.myself.getProperty("position")
-				
-				// ((Environment)$beliefbase.getBelief("env").getFact()).getPosition($scope.getAgentName())
-				// ?agent = (agent (agent_has_localname ?agentname))
-				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				// ?mbel_env = (mbelief (melement_has_name "env"))
-				// ?env = (Environment (getPosition (?agentname) ?ret))
-			</fact>
- 		</belief>
 	</beliefs>
 
 	<goals>
-		<!-- Update the Environment.-->		
-		<performgoal name="updateEnv" exclude="never"/>	
+		<!-- Update the EnvironmentGUI.-->		
+		<achievegoal name="updateEnv" exclude="never" >
+		<unique/>
+		</achievegoal>	
 	</goals>
 
 	<plans>		
