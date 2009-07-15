@@ -8,6 +8,7 @@ import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
+import jadex.bpmn.runtime.handler.basic.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.basic.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
 import jadex.commons.ChangeEvent;
@@ -45,6 +46,7 @@ public class BpmnInstance	implements IProcessInstance
 		defhandlers.put("GatewayDataBasedExclusive", new GatewayXORActivityHandler());
 		defhandlers.put("EventIntermediateRule", new UserInteractionActivityHandler());
 		defhandlers.put("EventIntermediateTimer", new EventIntermediateTimerActivityHandler());
+		defhandlers.put("EventIntermediateMultiple", new EventIntermediateMultipleActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	

@@ -1,18 +1,16 @@
 package jadex.bpmn.runtime.handler.basic;
 
-import java.util.List;
-
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ThreadContext;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.commons.IFilter;
 
+import java.util.List;
+
 /**
- * 
+ *  Event intermediate multi handler.
  */
 public class EventIntermediateMultipleActivityHandler extends DefaultActivityHandler
 {
@@ -22,7 +20,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		System.out.println("Executed: "+activity+", "+instance);
 		
@@ -33,28 +31,20 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		
 		// Execute all connected activities.
 		final IFilter[] filters = new IFilter[outgoing.size()];
+		Object[] waitinfos = new Object[outgoing.size()];
 		for(int i=0; i<outgoing.size(); i++)
 		{
-			MSequenceEdge next	= (MSequenceEdge)outgoing.get(0);
+			MSequenceEdge next	= (MSequenceEdge)outgoing.get(i);
 			MActivity act = next.getTarget();
 			instance.getActivityHandler(act).execute(act, instance, thread);
 			filters[i] = thread.getWaitFilter();
+			waitinfos[i] = thread.getWaitInfo();
 		}
 		
 		// Set waiting state and filter.
 		thread.setWaitingState(ProcessThread.WAITING_FOR_MULTI);
-		thread.setWaitFilter(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-				boolean ret = false;
-				for(int i=0; !ret && i<filters.length; i++)
-				{
-					ret = filters[i].filter(obj);
-				}
-				return ret;
-			}	
-		});
+		thread.setWaitFilter(new OrFilter(filters));
+		thread.setWaitInfo(waitinfos);
 	}
 	
 	/**
@@ -64,103 +54,73 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param thread	The process thread.
 	 *  @param context	The thread context.
 	 */
-	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, ThreadContext context)
+	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, Object event)
 	{
-		MNamedIdElement	next	= null;
-		Exception	ex	= thread.getException();
+		MSequenceEdge next	= null;
 		
-		// Find next element and context(s) to be removed.
-		boolean	outside	= false;
-		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
-		while(next==null && !outside)
+		List outgoing = activity.getOutgoingSequenceEdges();
+		OrFilter filter = (OrFilter)thread.getWaitFilter();
+		IFilter[] filters = filter.getFilters();
+		
+		for(int i=0; i<outgoing.size() && next==null; i++)
 		{
-			// Normal flow
-			if(ex==null)
+			// Timeout edge has event null.
+			if((event==null && filters[i]==null) || filters[i].filter(event))
 			{
-				List	outgoing	= activity.getOutgoingSequenceEdges();
-				if(outgoing!=null && outgoing.size()==1)
-				{
-					next	= (MSequenceEdge)outgoing.get(0);
-				}
-				else if(outgoing!=null && outgoing.size()>1)
-				{
-					throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge step() for disambiguation: "+activity);
-				}
-				// else no outgoing edge -> check parent context, if any.
-			}
-		
-			// Exception flow.
-			else
-			{
-				List	handlers	= activity.getEventHandlers();
-				for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
-				{
-					MActivity	handler	= (MActivity) handlers.get(i);
-					if(handler.getActivityType().equals("EventIntermediateError"))
-					{
-						// Todo: match exception types.
-//						Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
-						next	= handler;
-					}
-				}
-			}
-				
-			outside	= context.getParent()==null;
-			if(next==null && !outside)
-			{
-				// When last thread or exception, mark current context for removal.
-				if(context.getThreads().size()==1 || ex!=null)
-				{
-					activity	= (MActivity)context.getModelElement();
-					remove	= context;
-					context	= context.getParent();
-				}
-				
-				// If more threads are available in current context just exit loop.
-				else if(context.getThreads().size()>1)
-				{
-					outside	= true;
-				}
+				next = (MSequenceEdge)outgoing.get(i);
 			}
 		}
-
-		// Remove inner context(s), if any.
-		if(remove!=null)
-		{
-			thread	= remove.getInitiator();
-			thread.setNonWaiting();
-			// Todo: Callbacks for aborted threads (to abort external activities)
-			context.removeSubcontext(remove);
-		}
-
-		if(next!=null)
-		{
-
-			// Todo: store exception as parameter!?
-			if(ex!=null)
-				thread.setException(null);
-		}
-		else if(ex!=null)
-		{
-			throw new RuntimeException("Unhandled exception in process: "+activity, ex);
-		}
 		
-		// Perform step settings, i.e. set next edge/activity or remove thread.
-		if(next instanceof MSequenceEdge)
+		if(next==null)
+			throw new RuntimeException("Could not determine next edge: "+this);
+		
+		super.step(next.getTarget(), instance, thread, event);
+	}
+}
+
+/**
+ *  Or filter implementation.
+ */
+class OrFilter implements IFilter
+{
+	//-------- attributes ---------
+	
+	/** The filters. */
+	protected IFilter[] filters;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new or filter.
+	 */
+	public OrFilter(IFilter[] filters) 
+	{
+		this.filters = filters;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Test if an object passes the filter.
+	 *  @return True, if passes the filter.
+	 */
+	public boolean filter(Object obj)
+	{
+		boolean ret = false;
+		for(int i=0; !ret && i<filters.length; i++)
 		{
-			thread.setLastEdge((MSequenceEdge) next);
+			if(filters[i]!=null)
+				ret = filters[i].filter(obj);
 		}
-		else if(next instanceof MActivity)
-		{
-			thread.setNextActivity((MActivity) next);
-		}
-		else if(next==null)
-		{
-			context.removeThread(thread);
-		} 
-		else
-		{
-			throw new UnsupportedOperationException("Unknown outgoing element type: "+next);
-		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the filters.
+	 *  @return The filters.
+	 */
+	public IFilter[] getFilters()
+	{
+		return filters;
 	}
 }

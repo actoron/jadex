@@ -101,7 +101,6 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		}
 		else
 		{
-			bodyinstance.updateTimers();
 			bodyinstance.updateWaitingThreads();
 		}
 		

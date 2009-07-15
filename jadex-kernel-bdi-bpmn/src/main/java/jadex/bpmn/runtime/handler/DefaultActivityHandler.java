@@ -26,7 +26,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
 		doExecute(activity, instance, thread);
-		step(activity, instance, thread);
+		step(activity, instance, thread, null);
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, Object event)
 	{
 		MNamedIdElement	next	= null;
 		Exception	ex	= thread.getException();
@@ -131,11 +131,11 @@ public class DefaultActivityHandler implements IActivityHandler
 		// Perform step settings, i.e. set next edge/activity or remove thread.
 		if(next instanceof MSequenceEdge)
 		{
-			thread.setLastEdge((MSequenceEdge) next);
+			thread.setLastEdge((MSequenceEdge)next);
 		}
 		else if(next instanceof MActivity)
 		{
-			thread.setNextActivity((MActivity) next);
+			thread.setNextActivity((MActivity)next);
 		}
 		else if(next==null)
 		{
@@ -153,10 +153,10 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread, Object event)
 	{
+		step(activity, instance, thread, event);
 		thread.setNonWaiting();
-		step(activity, instance, thread);
 		instance.wakeUp();
 	}
 }

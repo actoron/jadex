@@ -93,6 +93,8 @@ public class ThreadContext
 			threads	= new LinkedHashMap();
 		
 		threads.put(thread, null);
+		
+//		System.out.println("add: "+thread);
 	}
 	
 	/**
@@ -108,6 +110,8 @@ public class ThreadContext
 			if(threads.isEmpty())
 				threads	= null;
 		}
+		
+//		System.out.println("remove: "+thread);
 	}
 	
 	/**
@@ -213,10 +217,10 @@ public class ThreadContext
 		{
 			for(Iterator it=threads.keySet().iterator(); ret==null && it.hasNext(); )
 			{
-				ProcessThread	thread	= (ProcessThread) it.next();
+				ProcessThread	thread	= (ProcessThread)it.next();
 				if(threads.get(thread)!=null)
 				{
-					ThreadContext	context	= (ThreadContext) threads.get(thread);
+					ThreadContext	context	= (ThreadContext)threads.get(thread);
 					ret	= context.getExecutableThread();
 				}
 				else if(!thread.isWaiting())

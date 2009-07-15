@@ -29,7 +29,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 			public void run()
 			{
 				timer.cancel();
-				EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread);
+				EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread, null);
 			}
 		}, duration);
 	}

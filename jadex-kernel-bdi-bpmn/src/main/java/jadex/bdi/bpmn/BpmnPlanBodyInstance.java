@@ -46,6 +46,7 @@ import jadex.bdi.runtime.impl.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
@@ -61,6 +62,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -155,9 +157,9 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	}
 	
 	/**
-	 *  Update all timers that have become due.
+	 *  Update the waiting threads according to the wakeup reason (dispatched element).
 	 */
-	public void	updateTimers()
+	public void updateWaitingThreads()
 	{
 		if(waittimes!=null)
 		{
@@ -170,17 +172,11 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				{
 					it.remove();
 					assert thread.isWaiting();
-					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread);
+					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, null);
 				}
 			}
 		}
-	}
-	
-	/**
-	 *  Update the waiting threads according to the wakeup reason (dispatched element).
-	 */
-	public void updateWaitingThreads()
-	{
+		
 		Object dispelem = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement);
 //		System.out.println("dispatched: "+dispelem);
 		
@@ -192,7 +188,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				if(ProcessThread.WAITING_FOR_MESSAGE.equals(thread.getWaitingState())
 					&& thread.getWaitFilter().filter(dispelem))
 				{
-					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread);
+					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, dispelem);
 				}
 			}
 		}
@@ -235,6 +231,18 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				if(type==null)
 					throw new RuntimeException("Message type not specified: "+type);
 				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
+			}
+			else if(ProcessThread.WAITING_FOR_MULTI.equals(pt.getWaitingState()))
+			{
+				List edges = pt.getActivity().getOutgoingSequenceEdges();
+//				Object[] was = (Object[])pt.getWaitInfo();
+//
+//				for(int i=0; i<edges.size(); i++)
+//				{
+//					MSequenceEdge edge = (MSequenceEdge)edges.get(i);
+//					edge.getTarget()
+//				}
+//				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
 			}
 			
 			// todo: condition wait

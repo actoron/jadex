@@ -154,6 +154,9 @@ public class ProcessThread	implements ITaskContext
 	public void	setNonWaiting()
 	{
 		this.waiting = null;
+		this.waitinfo = null;
+		this.waitfilter = null;
+//		System.out.println("Thread: "+this+" "+waiting);
 	}
 	
 	/**
@@ -172,6 +175,7 @@ public class ProcessThread	implements ITaskContext
 	public void setWaitingState(String waiting)
 	{
 		this.waiting = waiting;
+//		System.out.println("Thread: "+this+" "+waiting);
 	}
 	
 	/**
