@@ -182,7 +182,7 @@
 				<initialgoal ref="check" />
 			</goals>
 			<plans>
-				<!-- <initialplan ref="init_plan" /> -->
+				<initialplan ref="init_plan" />
 			</plans>
 		</configuration>
 	</configurations>
