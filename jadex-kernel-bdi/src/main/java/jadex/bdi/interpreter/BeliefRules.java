@@ -295,16 +295,23 @@ public class BeliefRules
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
+			Object mcond = assignments.getVariableValue("?mcondition");
 			Object rcapa = assignments.getVariableValue("?rcapa");
 			Object rplan = assignments.getVariableValue("?rplan");
 
-//			System.out.println("WFC: Setting plan to ready: "+rplan);
-			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
-				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-
-			PlanRules.cleanupPlanWait(state, rcapa, rplan, false);
-			// todo: provide activation resp. variable bindings
-			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
+			System.out.println("WFC: Setting plan to ready: "+rplan);
+			
+			// todo: Should be a rule triggered event with variable values
+			
+			EventProcessingRules.schedulePlanInstanceCandidate(state, mcond, rplan, rcapa);
+//			
+//			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+//				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//
+//			PlanRules.cleanupPlanWait(state, rcapa, rplan, false);
+//			// todo: provide activation resp. variable bindings
+//			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
+			
 			BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
 		}
 	};

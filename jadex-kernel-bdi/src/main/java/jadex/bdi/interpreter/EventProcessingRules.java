@@ -28,12 +28,9 @@ import jadex.rules.state.OAVJavaType;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Static helper class for event processing rules and actions.
@@ -1519,6 +1516,7 @@ public class EventProcessingRules
 			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rpe);
 			PlanRules.cleanupPlanWait(state, rcapa, rplan, false);
 			state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
+			
 //			System.out.println("DISPATCH_WAITQUEUE_ELEMENT_ACTION: schedulePlanInstance: "
 //				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
 //				+", "+rplan+", "+rpe);
@@ -2005,12 +2003,14 @@ public class EventProcessingRules
 		}
 		else //if(state.getType(cand).equals(OAVBDIRuntimeModel.plancandidate_type))
 		{
-			schedulePlanInstanceCandidate(state, rpe, cand);
+			Object rplan = state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
+			Object rcapa = state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_rcapa);
+			schedulePlanInstanceCandidate(state, rpe, rplan, rcapa);
 			
 			// Save candidate in plan for later apl removal and exclude list management.
 			if(state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type))
 			{
-				Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
+//				Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_planinstancecandidate, cand);
 			}
 		}
@@ -2036,23 +2036,25 @@ public class EventProcessingRules
 	/**
 	 *  Schedule a plan instance candidate.
 	 */
-	protected static void schedulePlanInstanceCandidate(IOAVState state, Object rpe, Object cand)
+	public static void schedulePlanInstanceCandidate(IOAVState state, Object dispelem, Object rplan, Object rcapa)//Object cand)
 	{
 //		System.out.println("schedulePlanInstanceCandidate: Setting plan to ready: "
 //			+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
-//			+", "+cand);
-		Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
-		Object	rcapa	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_rcapa);
+//			+", "+rplan);
+		
+//		Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);
+//		Object	rcapa	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_rcapa);
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rpe);
+		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, dispelem);
 		PlanRules.cleanupPlanWait(state, rcapa, rplan, false);
 		
-		state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, 
-			OAVBDIRuntimeModel.PROCESSABLEELEMENT_CANDIDATESSELECTED);
+		if(dispelem!=null && state.getType(dispelem).isSubtype(OAVBDIRuntimeModel.processableelement_type))
+		{
+			state.setAttributeValue(dispelem, OAVBDIRuntimeModel.processableelement_has_state, 
+				OAVBDIRuntimeModel.PROCESSABLEELEMENT_CANDIDATESSELECTED);
+		}
 	}
-	
-	protected static Set	susiciousplans	= Collections.synchronizedSet(new HashSet());
 	
 	/**
 	 *  Schedule a waitqueue candidate.
@@ -2063,7 +2065,7 @@ public class EventProcessingRules
 	}
 	
 	/**
-	 *  Test if two plan candiates are equal.
+	 *  Test if two plan candidates are equal.
 	 *  @param state The state.
 	 *  @param mplancand1 The first candidate.
 	 *  @param mplancand2 The second candidate.

@@ -22,7 +22,8 @@ public class TaskActivityHandler extends DefaultActivityHandler
 		Class taskimpl = (Class)activity.getPropertyValue("class");
 		if(taskimpl!=null)
 		{
-			thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);
+//			thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);
+			thread.setWaiting(true);
 			try
 			{
 				ITask task = (ITask)taskimpl.newInstance();

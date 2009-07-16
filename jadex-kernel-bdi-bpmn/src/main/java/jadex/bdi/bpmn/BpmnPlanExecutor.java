@@ -1,6 +1,7 @@
 package jadex.bdi.bpmn;
 
 import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.interpreter.EventProcessingRules;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
@@ -144,7 +145,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			
 			if(bodyinstance.isReady())
 			{
-				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				// Bpmn plan is ready and can directly be executed (no event).
+				EventProcessingRules.schedulePlanInstanceCandidate(interpreter.getState(), null, rplan, rcapa);
 			}
 			else if(timeout!=-1 || wa!=null)
 			{

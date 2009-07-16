@@ -16,26 +16,26 @@ public class ProcessThread	implements ITaskContext
 {
 	//-------- constants --------
 	
-	/** Waiting constant for time. */
-	public static String WAITING_FOR_TIME = "waiting_for_time";
-	
-	/** Waiting constant for message. */
-	public static String WAITING_FOR_MESSAGE = "waiting_for_message";
-	
-	/** Waiting constant for condition. */
-	public static String WAITING_FOR_CONDITION = "waiting_for_condition";
-	
-	/** Waiting constant for join. */
-	public static String WAITING_FOR_JOIN = "waiting_for_join";
-
-	/** Waiting constant for task. */
-	public static String WAITING_FOR_TASK = "waiting_for_task";
-
-	/** Waiting constant for subprocess. */
-	public static String WAITING_FOR_SUBPROCESS = "waiting_for_subprocess";
-	
-	/** Waiting constant for multi. */
-	public static String WAITING_FOR_MULTI = "waiting_for_multi";
+//	/** Waiting constant for time. */
+//	public static String WAITING_FOR_TIME = "waiting_for_time";
+//	
+//	/** Waiting constant for message. */
+//	public static String WAITING_FOR_MESSAGE = "waiting_for_message";
+//	
+//	/** Waiting constant for condition. */
+//	public static String WAITING_FOR_CONDITION = "waiting_for_condition";
+//	
+//	/** Waiting constant for join. */
+//	public static String WAITING_FOR_JOIN = "waiting_for_join";
+//
+//	/** Waiting constant for task. */
+//	public static String WAITING_FOR_TASK = "waiting_for_task";
+//
+//	/** Waiting constant for subprocess. */
+//	public static String WAITING_FOR_SUBPROCESS = "waiting_for_subprocess";
+//	
+//	/** Waiting constant for multi. */
+//	public static String WAITING_FOR_MULTI = "waiting_for_multi";
 	
 	//-------- attributes --------
 	
@@ -55,8 +55,9 @@ public class ProcessThread	implements ITaskContext
 	protected Exception	exception;
 	
 	/** Is the process in a waiting state. */
-	protected String	waiting;
-
+//	protected String	waiting;
+	protected boolean waiting;
+	
 	/** The wait info. */
 	protected Object waitinfo;
 	
@@ -109,7 +110,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Should only be used, when no edge available (e.g. start events or event handlers of subprocesses).
 	 *  @return The activity.
 	 */
-	public void	setNextActivity(MActivity activity)
+	public void	setActivity(MActivity activity)
 	{
 		this.edge	= null;
 		this.activity	= activity;
@@ -134,7 +135,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void setLastEdge(MSequenceEdge edge)
 	{
-		setNextActivity(edge!=null ? (MActivity)edge.getTarget() : null);
+		setActivity(edge!=null ? (MActivity)edge.getTarget() : null);
 		this.edge	= edge;
 	}
 	
@@ -144,7 +145,16 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean	isWaiting()
 	{
-		return this.waiting!=null;
+//		return this.waiting!=null;
+		return waiting;
+	}
+	
+	/**
+	 *  Set the waiting state.
+	 */
+	public void setWaiting(boolean waiting)
+	{
+		this.waiting = waiting;
 	}
 	
 	/**
@@ -153,7 +163,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setNonWaiting()
 	{
-		this.waiting = null;
+		this.waiting = false;
 		this.waitinfo = null;
 		this.waitfilter = null;
 //		System.out.println("Thread: "+this+" "+waiting);
@@ -162,21 +172,21 @@ public class ProcessThread	implements ITaskContext
 	/**
 	 *  Get the waiting type. 
 	 *  @return The waiting type.
-	 */
+	 * /
 	public String getWaitingState()
 	{
 		return this.waiting;
-	}
+	}*/
 
 	/**
 	 *  Set the process waiting state (i.e. blocked). 
 	 *  @param waiting	The waiting flag.
-	 */
+	 * /
 	public void setWaitingState(String waiting)
 	{
 		this.waiting = waiting;
 //		System.out.println("Thread: "+this+" "+waiting);
-	}
+	}*/
 	
 	/**
 	 *  Set the process waiting info. 

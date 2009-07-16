@@ -1,10 +1,9 @@
-package jadex.bpmn.runtime.handler.basic;
+package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.commons.IFilter;
 
 import java.util.List;
@@ -39,10 +38,13 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 			instance.getActivityHandler(act).execute(act, instance, thread);
 			filters[i] = thread.getWaitFilter();
 			waitinfos[i] = thread.getWaitInfo();
+			thread.setWaitFilter(null);
+			thread.setWaitInfo(null);
 		}
 		
 		// Set waiting state and filter.
-		thread.setWaitingState(ProcessThread.WAITING_FOR_MULTI);
+//		thread.setWaitingState(ProcessThread.WAITING_FOR_MULTI);
+		thread.setWaiting(true);
 		thread.setWaitFilter(new OrFilter(filters));
 		thread.setWaitInfo(waitinfos);
 	}
@@ -65,7 +67,12 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		for(int i=0; i<outgoing.size() && next==null; i++)
 		{
 			// Timeout edge has event null.
-			if((event==null && filters[i]==null) || filters[i].filter(event))
+			if((event==null && filters[i]==null))
+			{
+				// todo: cancel timer?!
+			}
+			
+			if((event==null && filters[i]==null) || (filters[i]!=null && filters[i].filter(event)))
 			{
 				next = (MSequenceEdge)outgoing.get(i);
 			}
@@ -110,7 +117,16 @@ class OrFilter implements IFilter
 		for(int i=0; !ret && i<filters.length; i++)
 		{
 			if(filters[i]!=null)
-				ret = filters[i].filter(obj);
+			{
+				try
+				{
+					ret = filters[i].filter(obj);
+				}
+				catch(Exception e)
+				{
+					// just catch.
+				}
+			}
 		}
 		return ret;
 	}

@@ -26,6 +26,20 @@ public class MBpmnModel extends MIdElement
 {
 	//-------- constants --------
 	
+	/** Constant for task. */
+	public static final String TASK = "Task";
+
+	/** Constant for sub process. */
+	public static final String SUBPROCESS = "SubProcess";
+
+	
+	/** Constant for gateway parallel. */
+	public static final String GATEWAY_PARALLEL = "GatewayParallel";
+
+	/** Constant for gateway data based exclusive. */
+	public static final String GATEWAY_DATABASED_EXCLUSIVE = "GatewayDataBasedExclusive";
+
+	
 	/** Constant for event start empty. */
 	public static final String EVENT_START_EMPTY = "EventStartEmpty";
 	
@@ -35,21 +49,12 @@ public class MBpmnModel extends MIdElement
 	/** Constant for event intermediate error. */
 	public static final String EVENT_INTERMEDIATE_ERROR = "EventIntermediateError";
 	
-	/** Constant for task. */
-	public static final String TASK = "Task";
-
-	/** Constant for sub process. */
-	public static final String SUBPROCESS = "SubProcess";
-	
-	/** Constant for gateway parallel. */
-	public static final String GATEWAY_PARALLEL = "GatewayParallel";
-
-	/** Constant for gateway data based exclusive. */
-	public static final String GATEWAY_DATABASED_EXCLUSIVE = "GatewayDataBasedExclusive";
-
 	/** Constant for event intermediate rule. */
 	public static final String EVENT_INTERMEDIATE_RULE = "EventIntermediateRule";
 
+	/** Constant for event intermediate message. */
+	public static final String EVENT_INTERMEDIATE_MESSAGE = "EventIntermediateMessage";
+	
 	/** Constant for event intermediate timer. */
 	public static final String EVENT_INTERMEDIATE_TIMER = "EventIntermediateTimer";
 

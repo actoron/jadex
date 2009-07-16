@@ -135,7 +135,7 @@ public class DefaultActivityHandler implements IActivityHandler
 		}
 		else if(next instanceof MActivity)
 		{
-			thread.setNextActivity((MActivity)next);
+			thread.setActivity((MActivity)next);
 		}
 		else if(next==null)
 		{

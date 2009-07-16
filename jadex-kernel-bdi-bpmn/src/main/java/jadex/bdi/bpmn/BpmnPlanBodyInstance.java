@@ -2,6 +2,7 @@ package jadex.bdi.bpmn;
 
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.interpreter.EventProcessingRules;
 import jadex.bdi.interpreter.GoalLifecycleRules;
 import jadex.bdi.interpreter.InternalEventRules;
 import jadex.bdi.interpreter.MessageEventRules;
@@ -80,8 +81,9 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	static
 	{
 		Map	defhandlers	= new HashMap(BpmnInstance.DEFAULT_HANDLERS);
-		defhandlers.put("EventIntermediateTimer", new EventIntermediateTimerActivityHandler());
-		defhandlers.put("EventIntermediateMessage", new EventIntermediateMessageActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleActicityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	
@@ -186,10 +188,16 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 			{
 				ProcessThread thread = (ProcessThread)it.next();
-				if(ProcessThread.WAITING_FOR_MESSAGE.equals(thread.getWaitingState())
-					&& thread.getWaitFilter().filter(dispelem))
+				try
 				{
-					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, dispelem);
+					if(thread.isWaiting() && thread.getWaitFilter().filter(dispelem))
+					{
+						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, dispelem);
+					}
+				}
+				catch(Exception e)
+				{
+					// just catch filter exceptions.
 				}
 			}
 		}
@@ -221,38 +229,82 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 */
 	public Object  getWaitAbstraction()
 	{
-		Object wa = getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
+		Object ret = getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
+		boolean empty = true;
 		
 		for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 		{
 			ProcessThread pt = (ProcessThread)it.next();
-			if(ProcessThread.WAITING_FOR_MESSAGE.equals(pt.getWaitingState()))
+			MActivity act = pt.getActivity();
+			
+			if(pt.isWaiting())
 			{
-				String type = (String)pt.getWaitInfo();
-				if(type==null)
-					throw new RuntimeException("Message type not specified: "+type);
-				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
-			}
-			else if(ProcessThread.WAITING_FOR_MULTI.equals(pt.getWaitingState()))
-			{
-				List edges = pt.getActivity().getOutgoingSequenceEdges();
-				Object[] was = (Object[])pt.getWaitInfo();
-
-				for(int i=0; i<edges.size(); i++)
+				if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(act.getActivityType()))
 				{
-					MSequenceEdge edge = (MSequenceEdge)edges.get(i);
-					MActivity act = edge.getTarget();
-//					if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(act.getActivityType())
+					String type = (String)pt.getWaitInfo();
+					if(type==null)
+						throw new RuntimeException("Message type not specified: "+type);
+					WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
+					empty = false;
 				}
-//				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
+				else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(act.getActivityType()))
+				{
+					String type = (String)pt.getWaitInfo();
+					if(type==null)
+						throw new RuntimeException("Rule type not specified: "+type);
+					WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
+					empty = false;
+				}
+				else if(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(act.getActivityType()))
+				{
+					List edges = pt.getActivity().getOutgoingSequenceEdges();
+					Object[] was = (Object[])pt.getWaitInfo();
+	
+					for(int i=0; i<edges.size(); i++)
+					{
+						MSequenceEdge edge = (MSequenceEdge)edges.get(i);
+						MActivity nextact = edge.getTarget();
+						if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(nextact.getActivityType()))
+						{
+							String type = (String)was[i];
+							if(type==null)
+								throw new RuntimeException("Message type not specified: "+type);
+							WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
+							empty = false;
+						}
+						else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(nextact.getActivityType()))
+						{
+							String type = (String)was[i];
+							if(type==null)
+								throw new RuntimeException("Rule type not specified: "+type);
+							WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
+							empty = false;
+						}
+						else if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(nextact.getActivityType()))
+						{
+							// nothing to do with waitqueue.
+						}
+						else
+						{
+							throw new RuntimeException("Unknown event: "+nextact);
+						}
+					}
+	//				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
+				}
+				
+				// todo: condition wait
+				
+				// todo: time wait?!
 			}
-			
-			// todo: condition wait
-			
-			// todo: time wait?!
 		}
 		
-		return wa;
+		if(empty)
+		{
+			state.dropObject(ret);
+			ret = null;
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -268,13 +320,17 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			{
 				public void run()
 				{
-					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+					// todo: event?!
+					EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+//					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 				}
 			});
 		}
 		else if(isReady())
 		{
-			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+			// todo: event?!
+			EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+//			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 		}
 		
 		super.wakeUp();

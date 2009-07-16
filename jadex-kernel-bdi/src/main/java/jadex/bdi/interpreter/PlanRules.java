@@ -1049,9 +1049,12 @@ public class PlanRules
 //				System.out.println("createPlanInstanceMaintainGoalFinishedRule: Setting plan to ready: "
 //						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
 //						+", "+rplan);
-				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
-				cleanupPlanWait(state, rcapa, rplan, false);
+//				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
+//				cleanupPlanWait(state, rcapa, rplan, false);
+//				
+				EventProcessingRules.schedulePlanInstanceCandidate(state, rgoal, rplan, rcapa);
+				
 //				System.out.println("Maintaingoal finished: "+rplan+" "+state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model)+" "+
 //					state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 			}
@@ -1952,10 +1955,13 @@ public class PlanRules
 			Object	rcapa	= assignments.getVariableValue("?rcapa");
 			Object	change	= assignments.getVariableValue("?change");
 			
-			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, change);
-			cleanupPlanWait(state, rcapa, rplan, false);
-			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
-				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, change);
+//			cleanupPlanWait(state, rcapa, rplan, false);
+//			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+//				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+			
+			EventProcessingRules.schedulePlanInstanceCandidate(state, change, rplan, rcapa);
+			
 //			System.out.println("PLAN_CHANGEWAIT: Setting plan to ready: "
 //					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
 //					+", "+rplan);
@@ -2101,13 +2107,17 @@ public class PlanRules
 //						System.out.println("Timer occurred: "+start);
 
 						to[0] = true;
-						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
-							OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+						
+//						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
+//							OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 //						System.out.println("initializeWait: Setting plan to ready: "
 //								+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
 //								+", "+rplan);
-						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
-						cleanupPlanWait(state, rcapa, rplan, false);
+//						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
+//						cleanupPlanWait(state, rcapa, rplan, false);
+						
+						EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+						
 						BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
 					}
 				}));
@@ -2195,7 +2205,7 @@ public class PlanRules
 	 *  @param rplan	The plan to clean up.
 	 *  @param cleanwq	Flag indicating if waitqueue should be cleaned.
 	 */
-	protected static void	cleanupPlanWait(IOAVState state, Object rcapa, Object rplan, boolean cleanwq)
+	public static void	cleanupPlanWait(IOAVState state, Object rcapa, Object rplan, boolean cleanwq)
 	{
 		Object	wa	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction);
 		if(wa!=null)

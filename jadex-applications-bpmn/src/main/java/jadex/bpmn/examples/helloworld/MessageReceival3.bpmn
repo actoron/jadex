@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_seRskXEWEd6dTLJP0bYxrQ" iD="_seRskHEWEd6dTLJP0bYxrQ">
-  <pools xmi:type="bpmn:Pool" xmi:id="_seRsl3EWEd6dTLJP0bYxrQ" iD="_seRslnEWEd6dTLJP0bYxrQ" name="Pool">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_JeIQkXHnEd6dTLJP0bYxrQ" iD="_JeIQkHHnEd6dTLJP0bYxrQ" name="package jadex.bpmn.examples.helloworld;&#xD;&#xA;import jadex.bpmn.runtime.task.UserInteractionTask;">
+    <associations xmi:type="bpmn:Association" xmi:id="_JeSBkXHnEd6dTLJP0bYxrQ"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_seRsl3EWEd6dTLJP0bYxrQ" iD="_seRslnEWEd6dTLJP0bYxrQ" associations="_JeSBkXHnEd6dTLJP0bYxrQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_seRsmXEWEd6dTLJP0bYxrQ" iD="_seRsmHEWEd6dTLJP0bYxrQ" outgoingEdges="_CKLi4XEYEd6dTLJP0bYxrQ" name="Pre Wait" activityType="Task"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_CJ4n8XEYEd6dTLJP0bYxrQ" iD="_CJ4n8HEYEd6dTLJP0bYxrQ" outgoingEdges="_EEn2UXEYEd6dTLJP0bYxrQ _vJd1kXEYEd6dTLJP0bYxrQ" incomingEdges="_CKLi4XEYEd6dTLJP0bYxrQ" activityType="EventIntermediateMultiple"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_CJ4n8XEYEd6dTLJP0bYxrQ" iD="_CJ4n8HEYEd6dTLJP0bYxrQ" outgoingEdges="_EEn2UXEYEd6dTLJP0bYxrQ _vJd1kXEYEd6dTLJP0bYxrQ _DJliqHHiEd6dTLJP0bYxrQ _iPBJkXHiEd6dTLJP0bYxrQ" incomingEdges="_CKLi4XEYEd6dTLJP0bYxrQ" activityType="EventIntermediateMultiple"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_EEeFUXEYEd6dTLJP0bYxrQ" iD="_EEeFUHEYEd6dTLJP0bYxrQ" outgoingEdges="_05_CsXEYEd6dTLJP0bYxrQ" incomingEdges="_EEn2UXEYEd6dTLJP0bYxrQ" name="duration = 200000" activityType="EventIntermediateTimer"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_vJUroXEYEd6dTLJP0bYxrQ" iD="_vJUroHEYEd6dTLJP0bYxrQ" outgoingEdges="_3P-psXEYEd6dTLJP0bYxrQ" incomingEdges="_vJd1kXEYEd6dTLJP0bYxrQ" name="Wait for Message&#xD;&#xA;type = &quot;test_message&quot;" activityType="EventIntermediateMessage"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_051RsXEYEd6dTLJP0bYxrQ" iD="_051RsHEYEd6dTLJP0bYxrQ" incomingEdges="_05_CsXEYEd6dTLJP0bYxrQ" name="Timeout Occurred" activityType="Task"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_3P04sXEYEd6dTLJP0bYxrQ" iD="_3P04sHEYEd6dTLJP0bYxrQ" incomingEdges="_3P-psXEYEd6dTLJP0bYxrQ" name="Message Received" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_3P04sXEYEd6dTLJP0bYxrQ" iD="_3P04sHEYEd6dTLJP0bYxrQ" incomingEdges="_3P-psXEYEd6dTLJP0bYxrQ" name="Test Message Received" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_DJbxoXHiEd6dTLJP0bYxrQ" iD="_DJbxoHHiEd6dTLJP0bYxrQ" outgoingEdges="_H_Yz-HHiEd6dTLJP0bYxrQ" incomingEdges="_DJliqHHiEd6dTLJP0bYxrQ" name="Wait for Message&#xD;&#xA;type = &quot;other_message&quot;" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_H_PC8XHiEd6dTLJP0bYxrQ" iD="_H_PC8HHiEd6dTLJP0bYxrQ" incomingEdges="_H_Yz-HHiEd6dTLJP0bYxrQ" name="Other Message Received" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_iO3_oXHiEd6dTLJP0bYxrQ" iD="_iO3_oHHiEd6dTLJP0bYxrQ" outgoingEdges="_nq904XHiEd6dTLJP0bYxrQ" incomingEdges="_iPBJkXHiEd6dTLJP0bYxrQ" name="Wait For Rule&#xD;&#xA;type = &quot;test_rule&quot;" activityType="EventIntermediateRule"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_nq0q8XHiEd6dTLJP0bYxrQ" iD="_nq0q8HHiEd6dTLJP0bYxrQ" incomingEdges="_nq904XHiEd6dTLJP0bYxrQ" name="Rule Triggered" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_oqKEMXHmEd6dTLJP0bYxrQ" iD="_oqKEMHHmEd6dTLJP0bYxrQ" outgoingEdges="_3xnykXHmEd6dTLJP0bYxrQ" name="class =  UserInteractionTask.class&#xD;&#xA;out String text = &quot;test&quot;"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_3xeooXHmEd6dTLJP0bYxrQ" iD="_3xeooHHmEd6dTLJP0bYxrQ" incomingEdges="_3xnykXHmEd6dTLJP0bYxrQ" name="Write Belief&#xD;&#xA;class = WriteBeliefTask.class&#xD;&#xA;in String value&#xD;&#xA;in String beliefname = &quot;test_belief&quot;" activityType="Task"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_CKLi4XEYEd6dTLJP0bYxrQ" iD="_CKLi4HEYEd6dTLJP0bYxrQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_EEn2UXEYEd6dTLJP0bYxrQ" iD="_EEn2UHEYEd6dTLJP0bYxrQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vJd1kXEYEd6dTLJP0bYxrQ" iD="_vJd1kHEYEd6dTLJP0bYxrQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_05_CsXEYEd6dTLJP0bYxrQ" iD="_05_CsHEYEd6dTLJP0bYxrQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_3P-psXEYEd6dTLJP0bYxrQ" iD="_3P-psHEYEd6dTLJP0bYxrQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_DJliqHHiEd6dTLJP0bYxrQ" iD="_DJlip3HiEd6dTLJP0bYxrQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_H_Yz-HHiEd6dTLJP0bYxrQ" iD="_H_Yz93HiEd6dTLJP0bYxrQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_iPBJkXHiEd6dTLJP0bYxrQ" iD="_iPBJkHHiEd6dTLJP0bYxrQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_nq904XHiEd6dTLJP0bYxrQ" iD="_nq904HHiEd6dTLJP0bYxrQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_3xnykXHmEd6dTLJP0bYxrQ" iD="_3xnykHHmEd6dTLJP0bYxrQ" name="value = text"/>
   </pools>
 </bpmn:BpmnDiagram>
