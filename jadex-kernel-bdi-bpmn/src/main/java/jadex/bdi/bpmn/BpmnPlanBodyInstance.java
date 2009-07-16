@@ -45,6 +45,7 @@ import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
@@ -235,13 +236,14 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			else if(ProcessThread.WAITING_FOR_MULTI.equals(pt.getWaitingState()))
 			{
 				List edges = pt.getActivity().getOutgoingSequenceEdges();
-//				Object[] was = (Object[])pt.getWaitInfo();
-//
-//				for(int i=0; i<edges.size(); i++)
-//				{
-//					MSequenceEdge edge = (MSequenceEdge)edges.get(i);
-//					edge.getTarget()
-//				}
+				Object[] was = (Object[])pt.getWaitInfo();
+
+				for(int i=0; i<edges.size(); i++)
+				{
+					MSequenceEdge edge = (MSequenceEdge)edges.get(i);
+					MActivity act = edge.getTarget();
+//					if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(act.getActivityType())
+				}
 //				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
 			}
 			
