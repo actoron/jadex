@@ -29,7 +29,7 @@
 	<events>
 		<messageevent name="test_message" type="fipa" direction="receive">
 			<parameter name="performative" direction="fixed" class="String">
-				<value>SFipa.REQUEST</value>
+				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="content" direction="fixed" class="String">
 				<value>"test"</value>

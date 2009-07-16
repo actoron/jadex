@@ -50,11 +50,11 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.IBpmnExecutor;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
-import jadex.commons.SReflect;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -113,13 +113,41 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 *  Create a new BPMN process instance using default handler.
 	 *  @param model	The BMPN process model.
 	 */
-	public BpmnPlanBodyInstance(MBpmnModel model, BDIInterpreter interpreter, Object rcapa, Object rplan)
+	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, final Object rcapa, final Object rplan)
 	{
 		super(model, DEFAULT_HANDLERS, new OAVBDIFetcher(interpreter.getState(), rcapa));
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;
 		this.rplan = rplan;
+		
+		this.setExecutor(new IBpmnExecutor()
+		{
+			public void wakeUp()
+			{
+				if(interpreter.isExternalThread())
+				{
+					interpreter.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							if(isReady(null, null))
+							{
+								// todo: event?!
+								EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+//								state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+							}
+						}
+					});
+				}
+				else if(isReady(null, null))
+				{
+					// todo: event?!
+					EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+//					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+			}
+		});
 		
 		((OAVBDIFetcher)getValueFetcher()).setRPlan(rplan);
 	}
@@ -305,35 +333,6 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Wake up the instance.
-	 *  Called from activity handlers when external events re-activate waiting process threads.
-	 *  Propagated to change listeners.
-	 */
-	public void	wakeUp()
-	{
-		if(interpreter.isExternalThread() && isReady())
-		{
-			interpreter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					// todo: event?!
-					EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-//					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-				}
-			});
-		}
-		else if(isReady())
-		{
-			// todo: event?!
-			EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-//			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-		}
-		
-		super.wakeUp();
 	}
 	
 	//-------- bdi plan methods --------
@@ -564,21 +563,6 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	{
 		rplan.getScope().getAgent().invokeAndWait(code);
 	}*/
-
-
-	/**
-	 *  Get the string representation.
-	 *  @return The string representation.
-	 */
-	public String toString()
-	{
-		StringBuffer buf = new StringBuffer();
-		buf.append(SReflect.getInnerClassName(this.getClass()));
-//		buf.append("(name=");
-//		buf.append(getName());
-//		buf.append(")");
-		return buf.toString();
-	}
 
 	/**
 	 *  Get the agent name.

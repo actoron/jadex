@@ -1,9 +1,11 @@
-#Wed Jul 15 17:57:12 CEST 2009
+#Thu Jul 16 17:23:02 CEST 2009
 eclipse.preferences.version=1
 encoding//src/main/java/jadex/bpmn/examples/helloworld/Exception.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/Exception.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/MessageReceival.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/MessageReceival.bpmn_diagram=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/helloworld/MultiLanes.bpmn=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/helloworld/MultiLanes.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/SubProcess.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/SubProcess.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/UserInteraction.bpmn=UTF-8

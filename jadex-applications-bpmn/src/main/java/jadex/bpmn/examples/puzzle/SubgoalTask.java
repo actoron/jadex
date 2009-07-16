@@ -10,6 +10,7 @@ import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IParsedExpression;
 
 import java.util.List;
 
@@ -26,8 +27,12 @@ public class SubgoalTask	implements ITask
 		try
 		{
 			BpmnPlanBodyInstance	plan	= (BpmnPlanBodyInstance)instance;
-			String type	= (String)context.getModelElement().getPropertyValue("type");
-			final IGoal	subgoal	= plan.createGoal(type);
+			Object type	= context.getModelElement().getPropertyValue("type");	// Hack!!! Use parameter!?
+			if(type instanceof IParsedExpression)
+			{
+				type	= ((IParsedExpression)type).getValue(null);
+			}
+			final IGoal	subgoal	= plan.createGoal((String)type);
 			List	params	= context.getModelElement().getParameters();
 			for(int i=0; params!=null && i<params.size(); i++)
 			{

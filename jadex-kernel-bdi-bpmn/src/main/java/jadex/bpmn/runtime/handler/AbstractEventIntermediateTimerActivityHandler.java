@@ -18,7 +18,7 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 */
 	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
 	{
-		Number dur = (Number)activity.getPropertyValue("duration");
+		Number dur = (Number)getPropertyValue(activity, instance, thread, "duration");
 		long duration = dur==null? -1: dur.longValue(); 
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_TIME);
 		thread.setWaiting(true);

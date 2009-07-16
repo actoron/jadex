@@ -20,13 +20,14 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
 	{
 		// Just set thread to waiting.
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
+		final String	type	= (String)getPropertyValue(activity, instance, thread, "type");
 		thread.setWaiting(true);
-		thread.setWaitInfo(activity.getPropertyValue("type"));
-		System.out.println("Waiting for message: "+activity.getPropertyValue("type"));
+		thread.setWaitInfo(type);
+		System.out.println("Waiting for message: "+type);
 		
 		// Does currently only match message type name.
 		thread.setWaitFilter(new IFilter()
@@ -40,7 +41,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 				{
 					Object mmsg = state.getAttributeValue(event, OAVBDIRuntimeModel.element_has_model);
 					String msgtype = (String)state.getAttributeValue(mmsg, OAVBDIMetaModel.modelelement_has_name);
-					ret = activity.getPropertyValue("type").equals(msgtype);
+					ret = type.equals(msgtype);
 				}
 				return ret; 
 			}

@@ -11,8 +11,6 @@ import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.handler.basic.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -59,14 +57,17 @@ public class BpmnInstance	implements IProcessInstance
 	/** The activity handlers. */
 	protected Map	handlers;
 
+	/** The executor. */
+	protected IBpmnExecutor	executor;
+
 	/** The global value fetcher. */
 	protected IValueFetcher	fetcher;
 
 	/** The thread context. */
 	protected ThreadContext	context;
 	
-	/** The change listeners. */
-	protected List	listeners;
+	/** The external entries (i.e. runnables to execute external notifications during executeStep). */
+	protected List	extentries;
 	
 	//-------- constructors --------
 	
@@ -89,6 +90,7 @@ public class BpmnInstance	implements IProcessInstance
 		this.handlers	= handlers;
 		this.fetcher	= fetcher;
 		this.context	= new ThreadContext(model);
+		this.extentries	= new ArrayList();
 		
 		// Create initial thread(s). 
 		List	startevents	= model.getStartActivities();
@@ -99,6 +101,16 @@ public class BpmnInstance	implements IProcessInstance
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Set the executor.
+	 *  The executor will receive call backs, e.g. when the instance becomes ready again after waiting for an event.
+	 *  @param executor	The executor.
+	 */
+	public void	setExecutor(IBpmnExecutor executor)
+	{
+		this.executor	= executor;
+	}
 	
 	/**
 	 *  Get the model of the BPMN process instance.
@@ -129,110 +141,110 @@ public class BpmnInstance	implements IProcessInstance
 
 	/**
 	 *  Execute one step of the process.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param pool	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 */
-	// Todo: What about diagrams with multiple pools/lanes etc?
-	public void executeStep()
+	public void executeStep(String pool, String lane)
 	{
 		if(isFinished())
 			throw new UnsupportedOperationException("Cannot execute a finished process: "+this);
 		
-		if(!isReady())
+		if(!isReady(pool, lane))
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
+		
+		// Todo: execute only external entries belonging to pool/lane
+		Runnable[]	exta	= null;
+		synchronized(extentries)
+		{
+			if(!extentries.isEmpty())
+			{
+				exta	= (Runnable[])extentries.toArray(new Runnable[extentries.size()]);
+				extentries.clear();
+			}
+		}
+		if(exta!=null)
+		{
+			for(int i=0; i<exta.length; i++)
+				exta[i].run();
+		}
 		
 		ProcessThread	thread	= context.getExecutableThread();
 		
-		// Handle parameter passing in edge inscriptions.
-		if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
+		// Thread may be null when external entry has not changed waiting state of any active plan. 
+		if(thread!=null)
 		{
-			Map mappings = thread.getLastEdge().getParameterMappings();
-			if(mappings!=null)
+			// Handle parameter passing in edge inscriptions.
+			if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
 			{
-				IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, this.fetcher);
-				for(Iterator it2=mappings.keySet().iterator(); it2.hasNext(); )
+				Map mappings = thread.getLastEdge().getParameterMappings();
+				if(mappings!=null)
 				{
-					String name = (String)it2.next();
-					IParsedExpression exp = (IParsedExpression)mappings.get(name);
-					Object value = exp.getValue(fetcher);
-					thread.setParameterValue(name, value);
+					IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, this.fetcher);
+					for(Iterator it2=mappings.keySet().iterator(); it2.hasNext(); )
+					{
+						String name = (String)it2.next();
+						IParsedExpression exp = (IParsedExpression)mappings.get(name);
+						Object value = exp.getValue(fetcher);
+						thread.setParameterValue(name, value);
+					}
 				}
 			}
-		}
-		
-		// Handle declared parameters with initial values.
-		
-		// todo: parameter direction / class
-		
-		List params = thread.getActivity().getParameters();
-		if(params!=null)
-		{	
-			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, true, this.fetcher);
-			for(int i=0; i<params.size(); i++)
-			{
-				MParameter param = (MParameter)params.get(i);
-				if(!thread.hasParameterValue(param.getName()))
-					thread.setParameterValue(param.getName(), param.getInitialval()==null? null: param.getInitialval().getValue(fetcher));
+			
+			// Handle declared parameters with initial values.
+			
+			// todo: parameter direction / class
+			
+			List params = thread.getActivity().getParameters();
+			if(params!=null)
+			{	
+				IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, true, this.fetcher);
+				for(int i=0; i<params.size(); i++)
+				{
+					MParameter param = (MParameter)params.get(i);
+					if(!thread.hasParameterValue(param.getName()))
+						thread.setParameterValue(param.getName(), param.getInitialval()==null? null: param.getInitialval().getValue(fetcher));
+				}
 			}
+			
+			
+			// Find handler and execute activity.
+			IActivityHandler handler = (IActivityHandler)handlers.get(thread.getActivity().getActivityType());
+			if(handler==null)
+				throw new UnsupportedOperationException("No handler for activity: "+thread);
+			handler.execute(thread.getActivity(), this, thread);
 		}
-		
-		
-		// Find handler and execute activity.
-		IActivityHandler handler = (IActivityHandler)handlers.get(thread.getActivity().getActivityType());
-		if(handler==null)
-			throw new UnsupportedOperationException("No handler for activity: "+thread);
-		handler.execute(thread.getActivity(), this, thread);
 	}
 	
 	/**
 	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param pool	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 */
-	public boolean	isReady()
+	public boolean	isReady(String pool, String lane)
 	{
-		return context.getExecutableThread()!=null;
-	}
-	
-	//-------- listener handling --------
-	
-	/**
-	 *  Add a change listener.
-	 *  The listener is informed, whenever the ready state of the process becomes true.
-	 */
-	public void	addChangeListener(IChangeListener listener)
-	{
-		if(listeners==null)
-			listeners	= new ArrayList();
-		
-		listeners.add(listener);
-	}
-
-	
-	/**
-	 *  Remove a change listener.
-	 */
-	public void	removeChangeListener(IChangeListener listener)
-	{
-		if(listeners!=null)
+		boolean	ready;
+		// Todo: consider only external entries belonging to pool/lane
+		synchronized(extentries)
 		{
-			listeners.remove(listener);
-			if(listeners.isEmpty())
-				listeners	= null;
+			ready	= !extentries.isEmpty();
 		}
+		ready	= ready || context.getExecutableThread()!=null;
+		return ready;
 	}
 	
 	/**
-	 *  Wake up the instance.
-	 *  Called from activity handlers when external events re-activate waiting process threads.
-	 *  Propagated to change listeners.
+	 *  Add an external entry to be invoked during the next executeStep.
+	 *  This method may be called from external threads.
+	 *  @param code	The external code. 
 	 */
-	public void	wakeUp()
+	public void	invokeLater(Runnable code)
 	{
-		if(listeners!=null)
+		synchronized(extentries)
 		{
-			ChangeEvent	ce	= new ChangeEvent(this, "ready");	
-			for(int i=0; i<listeners.size(); i++)
-			{
-				((IChangeListener)listeners.get(i)).changeOccurred(ce);
-			}
+			extentries.add(code);
 		}
+		if(executor!=null)
+			executor.wakeUp();
 	}
 	
 	/**

@@ -2,10 +2,9 @@ package jadex.bpmn;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.IBpmnExecutor;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -19,7 +18,7 @@ import java.util.Set;
 /**
  *  A rule system executor can execute rule systems on a separate thread.
  */
-public class BpmnExecutor //implements ISteppable
+public class BpmnExecutor	implements IBpmnExecutor	//, ISteppable
 {
 	//-------- attributes --------
 
@@ -89,7 +88,7 @@ public class BpmnExecutor //implements ISteppable
 						}
 					}
 					
-					if(instance.isReady())
+					if(instance.isReady(null, null))
 					{						
 						System.out.println("Executing step: "+instance);
 						
@@ -97,7 +96,7 @@ public class BpmnExecutor //implements ISteppable
 						{
 							BpmnExecutor.this.dostep = false;
 							{
-								instance.executeStep();
+								instance.executeStep(null, null);
 							}
 						}
 					}
@@ -109,20 +108,24 @@ public class BpmnExecutor //implements ISteppable
 						pool.dispose();
 					}
 						
-					return instance.isReady() && !isStepmode();
+					return instance.isReady(null, null) && !isStepmode();
 				}
 			}
 		);
 		
-		instance.addChangeListener(new IChangeListener()
-		{				
-			public void changeOccurred(ChangeEvent event)
-			{
-				executor.execute();
-			}
-		});
-		
+		instance.setExecutor(this);
+				
 		setStepmode(stepmode);
+	}
+	
+	//-------- IBpmnExecutor interface --------
+	
+	/**
+	 *  Called, when the instance might have changed its ready state. 
+	 */
+	public void wakeUp()
+	{
+		executor.execute();
 	}
 	
 	//-------- steppable interface --------

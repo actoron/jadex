@@ -8,10 +8,11 @@ import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.xml.Reader;
 
-import java.io.InputStream;
+import java.io.File;
 import java.io.Serializable;
 
 /**
@@ -61,9 +62,13 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			try
 			{
 				// Read the file and parse the state machine
-				InputStream isplan = SUtil.getResource(impl, interpreter.getState().getTypeModel().getClassLoader());
+				ResourceInfo rinfo = SUtil.getResourceInfo0(impl, interpreter.getState().getTypeModel().getClassLoader());
 				Reader reader = BpmnXMLReader.getReader(); 
-				bodymodel = (MBpmnModel)reader.read(isplan, interpreter.getState().getTypeModel().getClassLoader(), null);
+				bodymodel = (MBpmnModel)reader.read(rinfo.getInputStream(), interpreter.getState().getTypeModel().getClassLoader(), null);
+				String name = new File(rinfo.getFilename()).getName();
+				name = name.substring(0, name.length()-5);
+				bodymodel.setName(name);
+				rinfo.getInputStream().close();
 
 				// HACK! Cache parsed body models
 //				planmodelcache.put(mbody, planmodel);
@@ -116,11 +121,11 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			}
 			
 			// execute a step
-			if(bodyinstance.isReady())
+			if(bodyinstance.isReady(null, null))
 			{
 				// Set processing state to "running"
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
-				bodyinstance.executeStep();
+				bodyinstance.executeStep(null, null);
 				bodyinstance.setLastState(steptype);
 			}
 			else if(steptype.equals(bodyinstance.getLastState()) || !bodyinstance.isFinished())
@@ -143,7 +148,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			// Set waitqueue of plan.
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, wa);
 			
-			if(bodyinstance.isReady())
+			if(bodyinstance.isReady(null, null))
 			{
 				// Bpmn plan is ready and can directly be executed (no event).
 				EventProcessingRules.schedulePlanInstanceCandidate(interpreter.getState(), null, rplan, rcapa);

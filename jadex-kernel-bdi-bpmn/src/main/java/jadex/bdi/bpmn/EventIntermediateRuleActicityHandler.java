@@ -1,7 +1,6 @@
 package jadex.bdi.bpmn;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
@@ -20,13 +19,14 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
 	{
 		// Just set thread to waiting.
+		String type	= (String)getPropertyValue(activity, instance, thread, "type");
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_RULE);
 		thread.setWaiting(true);
-		thread.setWaitInfo(activity.getPropertyValue("type"));
-		System.out.println("Waiting for rule: "+activity.getPropertyValue("type"));
+		thread.setWaitInfo(type);
+		System.out.println("Waiting for rule: "+type);
 		
 		// Does currently only match message type name.
 		thread.setWaitFilter(new IFilter()
@@ -39,7 +39,7 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 				if(OAVBDIMetaModel.condition_type.equals(state.getType(event)))
 				{
 					String type = (String)state.getAttributeValue(event, OAVBDIMetaModel.modelelement_has_name);
-					ret = activity.getPropertyValue("type").equals(type);
+					ret = type.equals(type);
 				}
 				
 				return ret;

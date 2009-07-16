@@ -835,7 +835,7 @@ public class MBpmnModel extends MIdElement
 						// property
 						String propname = prop.substring(0, idx).trim();
 						String proptext = prop.substring(idx+1).trim();
-						Object propval = parser.parseExpression(proptext, dia.getAllImports(), null, classloader).getValue(null);
+						IParsedExpression propval = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
 						act.setPropertyValue(propname, propval);
 					}
 					else

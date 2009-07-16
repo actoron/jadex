@@ -93,8 +93,7 @@
 			<parameter name="depth" class="int">
 				<goalmapping ref="makemove.depth"/>
 			</parameter>
-			<body class="MovePlan" />
-			<!-- <body type="bpmn" impl="jadex/bpmn/examples/puzzle/MovePlan.bpmn"/> -->
+			<body type="bpmn" impl="jadex/bpmn/examples/puzzle/MovePlan.bpmn"/>
 			<trigger>
 				<goal ref="makemove"/>
 			</trigger>

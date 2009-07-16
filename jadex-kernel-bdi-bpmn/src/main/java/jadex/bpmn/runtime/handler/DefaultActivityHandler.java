@@ -6,7 +6,9 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
+import jadex.javaparser.IParsedExpression;
 
 import java.util.List;
 
@@ -125,7 +127,10 @@ public class DefaultActivityHandler implements IActivityHandler
 		}
 		else if(ex!=null)
 		{
-			throw new RuntimeException("Unhandled exception in process: "+activity, ex);
+			if(ex instanceof RuntimeException)
+				throw (RuntimeException)ex;
+			else
+				throw new RuntimeException("Unhandled exception in process: "+activity, ex);
 		}
 		
 		// Perform step settings, i.e. set next edge/activity or remove thread.
@@ -149,14 +154,35 @@ public class DefaultActivityHandler implements IActivityHandler
 	
 	/**
 	 *  Method that should be called, when an activity is finished and the following activity should be scheduled.
+	 *  Can safely be called from external threads.
 	 *  @param activity	The timing event activity.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
+	 *  @param event	The event that has occurred, if any.
 	 */
-	public void	notify(MActivity activity, BpmnInstance instance, ProcessThread thread, Object event)
+	public void	notify(final MActivity activity, final BpmnInstance instance, final ProcessThread thread, final Object event)
 	{
-		step(activity, instance, thread, event);
-		thread.setNonWaiting();
-		instance.wakeUp();
+		instance.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				step(activity, instance, thread, event);
+				thread.setNonWaiting();
+			}
+		});
+	}
+
+	/**
+	 *  Get a property of an activity.
+	 *  Evaluates the property expression, if any.
+	 */
+	public Object	getPropertyValue(MActivity activity, BpmnInstance instance, ProcessThread thread, String prop)
+	{
+		Object	ret	= activity.getPropertyValue(prop);
+		if(ret instanceof IParsedExpression)
+		{
+			ret	= ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(thread, true, instance.getValueFetcher()));
+		}
+		return ret;
 	}
 }
