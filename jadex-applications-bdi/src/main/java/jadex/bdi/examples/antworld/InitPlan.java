@@ -5,7 +5,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.bdi.runtime.Plan;
 
 /**
- *  Init the ant agent.
+ *  Init the ant agent. Should an ant know its nest on start-up?
  */
 public class InitPlan extends Plan
 {

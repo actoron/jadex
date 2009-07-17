@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This action is responsible for updating the trace route of the ant.
+ * This action is responsible for updating the trace route of the ant, i.e. put a pheromone on the place that an ant has visited.
  */
 public class ProducePheromoneAction extends SimplePropertyObject implements ISpaceAction {
 	// -------- constants --------
@@ -46,7 +46,7 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject so = grid.getAvatar(owner);
 		Integer strength = (Integer) parameters.get(STRENGTH);
-		
+	
 		Collection pheromones = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "pheromone");
 //		ISpaceObject pickedFood = (ISpaceObject)(pheromones!=null? pheromones.iterator().next(): null);
 		ISpaceObject pheromone = (ISpaceObject)(pheromones==null? null : pheromones.iterator().next());
@@ -57,116 +57,20 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 			props.put(Space2D.PROPERTY_POSITION, position);
 //			props.put(ANT_ID, so.getProperty(ACTOR_ID));
 			props.put(ANT_ID, so.getId());
-			props.put(STRENGTH, new Integer(10));		
+			props.put(STRENGTH, new Integer(20));		
 			space.createSpaceObject("pheromone", props, null);
 		}
 		//update old pheromone
 		else{
-//			int oldStrength = ((Integer)pheromone.getProperty(STRENGTH)).intValue();
-//			pheromone.setProperty(STRENGTH, new Integer(10 + oldStrength));
+			int oldStrength = ((Integer)pheromone.getProperty(STRENGTH)).intValue();
+			pheromone.setProperty(STRENGTH, new Integer(20 + oldStrength));
 			pheromone.setProperty(ANT_ID, so.getId());
-			pheromone.setProperty(STRENGTH, new Integer(10));
+//			pheromone.setProperty(STRENGTH, new Integer(10));
 		}
 		
-//		Collection foodSources = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "foodSource");
-//		ISpaceObject foodSource = (ISpaceObject) foodSources.iterator().next();
-//		int stock = ((Integer)foodSource.getProperty("stock")).intValue();
-//		foodSource.setProperty("stock", new Integer(stock-1));
-//
-//		// add this position to trace route
-//		Map props = new HashMap();
-//		props.put(Space2D.PROPERTY_POSITION, position);
-//		props.put(ANT_ID, ownerAgentId.toString());
-//		props.put(ROUND, new Integer(0));		
-////		props.put("creation_age", new Double(clock.getTick()));
-////		props.put("clock", clock);
-//		space.createSpaceObject("pheromone", props, null);
-//
-//
-//		// check whether there is already a traceRoute on this position
-//		// yes: update "round" and "owner" value of old trace route
-//		// no: create new trace route object
-//		ISpaceObject objects[] = space.getSpaceObjectsByType("pheromone");
-//		ISpaceObject oldTraceRoute = null;
 
-//		for (int i = 0; i < objects.length; i++) {
-//			IVector2 pos = (IVector2) objects[i].getProperty(POSITION);
-//			if (pos.equals(position)) {
-//				oldTraceRoute = objects[i];
-//				break;
-//			}
-//		}
-//
-//		
-//		
-//		if (oldTraceRoute == null) {
-//			// add this position to trace route
-//			props = new HashMap();
-//			props.put(Space2D.PROPERTY_POSITION, position);
-//			props.put(ANT_ID, ownerAgentId.toString());
-//			props.put(ROUND, new Integer(0));
-//			// props.put("creation_age", new Double(clock.getTick()));
-//			// props.put("clock", clock);
-//			space.createSpaceObject("pheromone", props, null);
-//		} else {
-//			oldTraceRoute.setProperty(ANT_ID, ownerAgentId.toString());
-//			oldTraceRoute.setProperty(ROUND, new Integer(0));
-//		}
-		// ((Space2D)space).setPosition(destinationSign, destination);
-
-		// System.out.println("Go action: "+obj.getProperty(IAgentAction.ACTOR_ID)+" "+pos);
-
-		// obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));
 
 		return null;
-		
-		
-//		// add this position to trace route
-//		Map props = new HashMap();
-//		props.put(Space2D.PROPERTY_POSITION, position);
-//		props.put(ANT_ID, ownerAgentId.toString());
-//		props.put(ROUND, new Integer(0));		
-////		props.put("creation_age", new Double(clock.getTick()));
-////		props.put("clock", clock);
-//		space.createSpaceObject("pheromone", props, null);
-//
-//
-//		// check whether there is already a traceRoute on this position
-//		// yes: update "round" and "owner" value of old trace route
-//		// no: create new trace route object
-//		ISpaceObject objects[] = space.getSpaceObjectsByType("pheromone");
-//		ISpaceObject oldTraceRoute = null;
-//
-//		for (int i = 0; i < objects.length; i++) {
-//			IVector2 pos = (IVector2) objects[i].getProperty(POSITION);
-//			if (pos.equals(position)) {
-//				oldTraceRoute = objects[i];
-//				break;
-//			}
-//		}
-//
-//		
-//		
-//		if (oldTraceRoute == null) {
-//			// add this position to trace route
-//			props = new HashMap();
-//			props.put(Space2D.PROPERTY_POSITION, position);
-//			props.put(ANT_ID, ownerAgentId.toString());
-//			props.put(ROUND, new Integer(0));
-//			// props.put("creation_age", new Double(clock.getTick()));
-//			// props.put("clock", clock);
-//			space.createSpaceObject("pheromone", props, null);
-//		} else {
-//			oldTraceRoute.setProperty(ANT_ID, ownerAgentId.toString());
-//			oldTraceRoute.setProperty(ROUND, new Integer(0));
-//		}
-//		// ((Space2D)space).setPosition(destinationSign, destination);
-//
-//		// System.out.println("Go action: "+obj.getProperty(IAgentAction.ACTOR_ID)+" "+pos);
-//
-//		// obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));
-//
-//		return null;
 	}
 
 	/**

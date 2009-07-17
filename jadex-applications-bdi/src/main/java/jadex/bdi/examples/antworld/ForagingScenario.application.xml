@@ -348,7 +348,7 @@
 
 		<application name="Ants -  Huge environment">
 			<agents>
-				<agent type="Ant" number="5" />
+				<agent type="Ant" number="9" />
 				<agent type="Environment" />
 			</agents>
 
@@ -373,7 +373,7 @@
 
 				<env:processes>
 					<env:process type="managePheromones">
-						<env:property name="rate">4</env:property>
+						<env:property name="rate">3</env:property>
 					</env:process>
 
 					<env:process type="manageFoodSources">

@@ -15,7 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Go to a specified position.
+ * Plan is called if Ant detects food. Outflow:
+ * 1: Walk to food source
+ * 2: Pickup food
+ * 3: Search a nest
+ * 4: Walk to nest
+ * 5: Drop food
+ * 6. Walk randomly on grid
  */
 public class FoodMiningPlan extends Plan
 {
@@ -24,22 +30,19 @@ public class FoodMiningPlan extends Plan
 	 */
 	public void body()
 	{	
-		System.out.println("Called Food Mining Plan!!!!!!!!!");
+//		System.out.println("Called Food Mining Plan!!!!!!!!!");
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("env").getFact();
 		ISpaceObject[] foodSources = (ISpaceObject[]) getBeliefbase().getBeliefSet("foodSources").getFacts();
 		IVector2 sourcePos = (IVector2)foodSources[0].getProperty(Space2D.PROPERTY_POSITION);
-		System.out.println("#FoodMiningPlan# Destination of next point (foodSource): " + sourcePos.toString());
+//		System.out.println("#FoodMiningPlan# Destination of next point (foodSource): " + sourcePos.toString());
 		
-		//change belief "destination"
-//		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-//		myself.setProperty(CheckingPlanEnv.DESTINATION, sourcePos);
-		
+	
 		IGoal[] goals = getGoalbase().getGoals();
-		System.out.println("#GoalBase before drop...");
-		for(int i=0; i<goals.length; i++){
-			System.out.println(goals[i].getType() + " , " + goals[i].getLifecycleState() + ", " + goals[i].toString());			
-		}
-		System.out.println("***\n");
+//		System.out.println("#GoalBase before drop...");
+//		for(int i=0; i<goals.length; i++){
+//			System.out.println(goals[i].getType() + " , " + goals[i].getLifecycleState() + ", " + goals[i].toString());			
+//		}
+//		System.out.println("***\n");
 				
 		goals = getGoalbase().getGoals("check");		
 		for(int i=0; i<goals.length; i++){
@@ -51,14 +54,14 @@ public class FoodMiningPlan extends Plan
 			goals[i].drop();			
 		}
 				
-		goals = getGoalbase().getGoals();
-		System.out.println("#GoalBase after drop...");
-		for(int i=0; i<goals.length; i++){
-			System.out.println(goals[i].getType() + " , " + goals[i].getLifecycleState() + ", " + goals[i].toString());			
-		}
+//		goals = getGoalbase().getGoals();
+//		System.out.println("#GoalBase after drop...");
+//		for(int i=0; i<goals.length; i++){
+//			System.out.println(goals[i].getType() + " , " + goals[i].getLifecycleState() + ", " + goals[i].toString());			
+//		}
 		
 		//Move to the food source.
-		System.out.println("#FoodMiningPlan# walking to food source: " + sourcePos.toString());
+//		System.out.println("#FoodMiningPlan# walking to food source: " + sourcePos.toString());
 		IGoal go = createGoal("go");
 		go.getParameter("pos").setValue(sourcePos);
 		dispatchSubgoalAndWait(go);
@@ -68,19 +71,19 @@ public class FoodMiningPlan extends Plan
 		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
 		env.performSpaceAction("pickup", params, srl);
-		System.out.println("#FoodMiningPlan# trying ot pick up food.");
+//		System.out.println("#FoodMiningPlan# trying ot pick up food.");
 //		srl.waitForResult();
 		//TODO: Model failed situation!
 		if(!((Boolean)srl.waitForResult()).booleanValue()) 
 			fail();
-		System.out.println("#FoodMiningPlan# successfully picked up food.");
+//		System.out.println("#FoodMiningPlan# successfully picked up food.");
 		
 		//Move to the food source.
 		ISpaceObject[] nests = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests").getFacts();
 		if(nests.length == 0){
 			do{
 				//walk randomly on grid.
-				System.out.println("#FoodMiningPlan# walking randomly on the grid since no nest is known.");
+//				System.out.println("#FoodMiningPlan# walking randomly on the grid since no nest is known.");
 //				IGoal checkGoal = createGoal("check");
 //			    dispatchSubgoalAndWait(checkGoal);
 			    IGoal walkRandomly = createGoal("go");
@@ -90,11 +93,11 @@ public class FoodMiningPlan extends Plan
 			}while(nests.length == 0);
 		}		
 		IVector2 nestPos = (IVector2)nests[0].getProperty(Space2D.PROPERTY_POSITION);
-		System.out.println("#FoodMiningPlan# walking to nest: " + nestPos.toString());
+//		System.out.println("#FoodMiningPlan# walking to nest: " + nestPos.toString());
 		IGoal goToNest = createGoal("go");
 		goToNest.getParameter("pos").setValue(nestPos);
 		dispatchSubgoalAndWait(goToNest);
-		System.out.println("#FoodMiningPlan# Reached nest. Drop food and walk randomly on grid.");
+//		System.out.println("#FoodMiningPlan# Reached nest. Drop food and walk randomly on grid.");
 		
 		
 		//TODO:
@@ -108,17 +111,17 @@ public class FoodMiningPlan extends Plan
 		//TODO: Model failed situation!
 //		if(!((Boolean)srl.waitForResult()).booleanValue()) 
 //			fail();
-		System.out.println("#FoodMiningPlan# successfully dropped food.");
+//		System.out.println("#FoodMiningPlan# successfully dropped food.");
 		
 		//walk randomly on the grid.
 		IGoal randomWalk = createGoal("check");
 	    dispatchTopLevelGoal(randomWalk);		
 	    
-	    goals = getGoalbase().getGoals();
-		System.out.println("#GoalBase after creating new check goal...");
-		for(int i=0; i<goals.length; i++){
-			System.out.println(goals[i].getType() + " , " + goals[i].getLifecycleState() + ", " + goals[i].toString());			
-		}
+//	    goals = getGoalbase().getGoals();
+//		System.out.println("#GoalBase after creating new check goal...");
+//		for(int i=0; i<goals.length; i++){
+//			System.out.println(goals[i].getType() + " , " + goals[i].getLifecycleState() + ", " + goals[i].toString());			
+//		}
 	}
 	
 	/**

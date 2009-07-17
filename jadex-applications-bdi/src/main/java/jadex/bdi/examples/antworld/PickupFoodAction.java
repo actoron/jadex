@@ -38,7 +38,7 @@ public class PickupFoodAction extends SimplePropertyObject implements ISpaceActi
 		Collection food = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "food");
 		ISpaceObject pickedFood = (ISpaceObject)(food!=null? food.iterator().next(): null);		
 		
-		System.out.println("#"+ so.getId() + "#pickup food action: "+so+" "+so.getProperty(Grid2D.PROPERTY_POSITION)+" "+pickedFood);
+//		System.out.println("#"+ so.getId() + "#pickup food action: "+so+" "+so.getProperty(Grid2D.PROPERTY_POSITION)+" "+pickedFood);
 		if(food!=null)
 		{
 //			if(Math.random()>0.88)

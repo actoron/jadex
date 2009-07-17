@@ -10,7 +10,8 @@ import jadex.bdi.runtime.Plan;
 import java.security.SecureRandom;
 
 /**
- *  Walk randomly on the grid.
+ *  Ant walks randomly on the grid. When it reaches the destination it walk randomly to the next destination.
+ *  Plan can be interrupted if Ant finds a food source or if it detects pheromones.
  */
 public class CheckingPlanEnv extends Plan
 {
@@ -29,7 +30,7 @@ public class CheckingPlanEnv extends Plan
 		
 		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		myself.setProperty(DESTINATION, newpos);
-		System.out.println("#CheckPlanEnv# Plan started with following params: from " + mypos + " to " + newpos);
+//		System.out.println("#CheckPlanEnv# Plan started with following params: from " + mypos + " to " + newpos);
 		
 //		System.out.println("Moving from "+mypos+" to: "+newpos);
 		IGoal go = createGoal("go");

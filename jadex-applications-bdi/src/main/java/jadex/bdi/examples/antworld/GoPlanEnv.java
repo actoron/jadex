@@ -12,41 +12,31 @@ import java.util.Map;
 
 /**
  * Go to a specified position.
- */
-public class GoPlanEnv extends Plan {
+ */public class GoPlanEnv extends Plan {
 	/**
 	 * The plan body.
 	 */
 	public void body() {
 		Space2D env = (Space2D) getBeliefbase().getBelief("env").getFact();
-		Boolean hasGravitation = (Boolean) getBeliefbase().getBelief(
-				"hasGravitation").getFact();
+//		Boolean hasGravitation = (Boolean) getBeliefbase().getBelief("hasGravitation").getFact();
 		IVector2 size = env.getAreaSize();
 		IVector2 target = (IVector2) getParameter("pos").getValue();
-		ISpaceObject myself = (ISpaceObject) getBeliefbase()
-				.getBelief("myself").getFact();
-		myself.setProperty(GravitationListener.FEELS_GRAVITATION,
-				hasGravitation);
+		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
+//		myself.setProperty(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 
-		System.out.println("#GoPlanEnv# Plan started to walk from "
-				+ myself.getProperty(Space2D.PROPERTY_POSITION) + " to "
-				+ target + " for ant: " + myself.getId());
-
-		
+		//		System.out.println("#GoPlanEnv# Plan started to walk from " + myself.getProperty(Space2D.PROPERTY_POSITION) + " to " + target + " for ant: " + myself.getId());		
 		// Update destination and gravitationSensor of ant on space
 		Map params = new HashMap();
-		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier())
-				.getId());
+		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier()).getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);
-		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
-//		params.put("owner", myself.getId());
+//		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
+		// params.put("owner", myself.getId());
 		SyncResultListener srl = new SyncResultListener();
 		env.performSpaceAction("updateDestination", params, srl);
 		srl.waitForResult();
 
 		while (!target.equals(myself.getProperty(Space2D.PROPERTY_POSITION))) {
-			IVector2 mypos = (IVector2) myself
-					.getProperty(Space2D.PROPERTY_POSITION);
+			IVector2 mypos = (IVector2) myself.getProperty(Space2D.PROPERTY_POSITION);
 			String dir = null;
 			int mx = mypos.getXAsInteger();
 			int tx = target.getXAsInteger();
@@ -76,34 +66,30 @@ public class GoPlanEnv extends Plan {
 				env.performSpaceAction("producePheromone", params, srl);
 				srl.waitForResult();
 			}
-
+			
 			// go to next position
 			params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceAction.OBJECT_ID, env
-					.getAvatars(getAgentIdentifier())[0].getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatars(getAgentIdentifier())[0].getId());
 			srl = new SyncResultListener();
 			env.performSpaceAction("go", params, srl);
 			srl.waitForResult();
 
 			ISpaceObject[] objects = null;
-			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet(
-					"pheromones").getFacts();
-			System.out.println("#GoPlanEnv# Number of pheromones."
-					+ objects.length);
+			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet("pheromones").getFacts();
+//			System.out.println("#GoPlanEnv# Number of pheromones." + objects.length);
 
-			for (int i = 0; i < objects.length; i++) {
-				// System.out.println(objects[i].toString());
-			}
+//			for (int i = 0; i < objects.length; i++) {
+//				 System.out.println(objects[i].toString());
+//			}
 
-			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests")
-					.getFacts();
+			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests").getFacts();
 			// System.out.println("#GoPlanEnv# Number of nests."
 			// + objects.length);
 
-			for (int i = 0; i < objects.length; i++) {
-				// System.out.println(objects[i].toString());
-			}
+//			for (int i = 0; i < objects.length; i++) {
+//				 System.out.println(objects[i].toString());
+//			}
 		}
 	}
 
@@ -114,8 +100,7 @@ public class GoPlanEnv extends Plan {
 	 * @return
 	 */
 	private IVector2 checkDestination(IVector2 target, Space2D env) {
-		IVector2 newDestination = (IVector2) getBeliefbase().getBelief(
-				"destination").getFact();
+		IVector2 newDestination = (IVector2) getBeliefbase().getBelief("destination").getFact();
 
 		if (!newDestination.equals(target)) {
 			target = newDestination.copy();
