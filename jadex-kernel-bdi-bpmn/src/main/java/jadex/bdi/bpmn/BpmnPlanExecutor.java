@@ -10,13 +10,16 @@ import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
+import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.xml.Reader;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  *  A plan executor for plans modeled in BPMN. These plan steps 
@@ -143,13 +146,26 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			bodyinstance.updateWaitingThreads();
 		}
 		
-		String lane = bodyinstance.getLane();
+		String lane = bodyinstance.getLane(steptype);
 		Throwable throwable = null;
 		try
 		{
-			if(!steptype.equals(bodyinstance.getLastState()))
+			// Abort threads from the previous lane (i.e. body), when the lifecyclestate has changed.
+			if(bodyinstance.getLastState()!=null && !bodyinstance.getLastState().equals(steptype))
 			{
-				// Todo: abort BPMN process threads, if any				
+				String	abortlane	= bodyinstance.getLane(bodyinstance.getLastState());
+				Set	threads	= bodyinstance.getThreadContext().getAllThreads();
+				if(threads!=null && !threads.isEmpty())
+				{
+					for(Iterator it=threads.iterator(); it.hasNext(); )
+					{
+						ProcessThread	thread	= (ProcessThread)it.next();
+						if(thread.belongsTo(null, abortlane))
+						{
+							thread.getThreadContext().removeThread(thread);
+						}
+					}
+				}
 			}
 			
 			// Find lane to execute.

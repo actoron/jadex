@@ -5,11 +5,9 @@ import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MSubProcess;
 import jadex.commons.SReflect;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -147,7 +145,7 @@ public class ThreadContext
 	 *  Get the sub context corresponding to a given thread.
 	 *  @param thread	 The thread.
 	 *  @return The corresponding thread context.
-	 */
+	 * /
 	public ThreadContext	getThreadContext(ProcessThread thread)
 	{
 		List	contexts	= new ArrayList();
@@ -171,7 +169,7 @@ public class ThreadContext
 			}
 		}
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Add a sub context.

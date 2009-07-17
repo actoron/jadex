@@ -133,7 +133,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 					{
 						public void run()
 						{
-							if(isReady(null, getLane()))
+							if(isReady(null, getLane(getLastState())))
 							{
 								// todo: event?!
 								EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
@@ -142,7 +142,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 						}
 					});
 				}
-				else if(isReady(null, getLane()))
+				else if(isReady(null, getLane(getLastState())))
 				{
 					// todo: event?!
 					EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
@@ -247,7 +247,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
 				ProcessThread	thread	= (ProcessThread) it.next();
-				if(thread.belongsTo(null, getLane()))
+				if(thread.belongsTo(null, getLane(getLastState())))
 				{
 					long	time	= Math.max(((Number)waittimes.get(thread)).longValue()-clock.getTime(), 0);
 					mindur	= mindur==-1 ? time : time<mindur ? time : mindur;
@@ -269,7 +269,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 		{
 			ProcessThread pt = (ProcessThread)it.next();
-			if(pt.isWaiting() && pt.belongsTo(null, getLane()))
+			if(pt.isWaiting() && pt.belongsTo(null, getLane(getLastState())))
 			{
 				MActivity act = pt.getActivity();				
 				if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(act.getActivityType()))
@@ -1112,11 +1112,11 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 
 	/**
 	 *  Get the lane corresponding to the current plan lifecycle state.
+	 *  @param steptype	The step type.
 	 *  @return	The corresponding lane.
 	 */
-	protected String getLane()
+	protected String getLane(String steptype)
 	{
-		String	steptype	= (String)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate);
 		String	lane	= null;
 		List	pools	= getModelElement().getPools();
 		List	lanes	= ((MPool)pools.get(0)).getLanes();
