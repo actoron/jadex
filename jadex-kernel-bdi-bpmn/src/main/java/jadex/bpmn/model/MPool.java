@@ -44,7 +44,7 @@ public class MPool extends MAssociationTarget
 	{
 		if(activities==null)
 			activities = new ArrayList();
-		activities.add(activity);
+		activities.add(activity);		
 	}
 	
 	/**

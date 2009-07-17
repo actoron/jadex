@@ -52,6 +52,11 @@ public class MActivity extends MAssociationTarget
 	/** The event handlers. */
 	protected List eventhandlers;
 	
+	/** The pool. */
+	protected MPool pool;
+		
+	/** The lane (if any). */
+	protected MLane lane;
 		
 	//-------- added --------
 	
@@ -486,5 +491,41 @@ public class MActivity extends MAssociationTarget
 		buf.append(getActivityType());
 		buf.append(")");
 		return buf.toString();
+	}
+
+	/**
+	 *  Get the pool of the activity.
+	 *  @return The pool of the activity.
+	 */
+	public MPool getPool()
+	{
+		return pool;
+	}
+
+	/**
+	 *  Set the pool of the activity.
+	 *  @param pool The pool of the activity.
+	 */
+	public void setPool(MPool pool)
+	{
+		this.pool	= pool;
+	}
+
+	/**
+	 *  Get the lane of the activity.
+	 *  @return The lane of the activity.
+	 */
+	public MLane getLane()
+	{
+		return lane;
+	}
+
+	/**
+	 *  Set the lane of the activity.
+	 *  @param lane The lane of the activity.
+	 */
+	public void setLane(MLane lane)
+	{
+		this.lane	= lane;
 	}
 }

@@ -21,6 +21,9 @@ public class MLane extends MAssociationTarget
 	/** The type. */
 	protected String type;
 	
+	/** The parent lane (if any). */
+	protected MLane lane;
+		
 	//-------- methods --------
 	
 	/**
@@ -59,6 +62,9 @@ public class MLane extends MAssociationTarget
 		if(activities==null)
 			activities = new ArrayList();
 		activities.add(activity);
+
+		// Todo: Use post processor!?
+		activity.setLane(this);
 	}
 	
 	/**
@@ -96,5 +102,23 @@ public class MLane extends MAssociationTarget
 	public List getAssociations()
 	{
 		return associations;
+	}
+
+	/**
+	 *  Get the parent lane of the lane (if any).
+	 *  @return The parent lane of the lane.
+	 */
+	public MLane getLane()
+	{
+		return lane;
+	}
+
+	/**
+	 *  Set the parent lane of the lane.
+	 *  @param lane The parent lane of the lane.
+	 */
+	public void setLane(MLane lane)
+	{
+		this.lane	= lane;
 	}
 }

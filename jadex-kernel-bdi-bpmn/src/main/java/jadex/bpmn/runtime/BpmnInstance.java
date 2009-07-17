@@ -142,7 +142,7 @@ public class BpmnInstance	implements IProcessInstance
 	/**
 	 *  Execute one step of the process.
 	 *  @param pool	The pool to be executed or null for any.
-	 *  @param pool	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 */
 	public void executeStep(String pool, String lane)
 	{
@@ -168,7 +168,7 @@ public class BpmnInstance	implements IProcessInstance
 				exta[i].run();
 		}
 		
-		ProcessThread	thread	= context.getExecutableThread();
+		ProcessThread	thread	= context.getExecutableThread(pool, lane);
 		
 		// Thread may be null when external entry has not changed waiting state of any active plan. 
 		if(thread!=null)
@@ -218,7 +218,7 @@ public class BpmnInstance	implements IProcessInstance
 	/**
 	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
 	 *  @param pool	The pool to be executed or null for any.
-	 *  @param pool	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 */
 	public boolean	isReady(String pool, String lane)
 	{
@@ -228,7 +228,7 @@ public class BpmnInstance	implements IProcessInstance
 		{
 			ready	= !extentries.isEmpty();
 		}
-		ready	= ready || context.getExecutableThread()!=null;
+		ready	= ready || context.getExecutableThread(pool, lane)!=null;
 		return ready;
 	}
 	

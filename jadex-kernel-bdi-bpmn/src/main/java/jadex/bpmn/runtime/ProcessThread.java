@@ -1,12 +1,16 @@
 package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  *  Representation of a single control flow in a BPMN process instance,
@@ -322,5 +326,37 @@ public class ProcessThread	implements ITaskContext
 	public void	setException(Exception exception)
 	{
 		this.exception	= exception;
+	}
+	
+	/**
+	 *  Test if the thread belongs to the given pool and/or lane.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the thread belongs to the given pool and/or lane. Also returns true when both pool and lane are null.
+	 */
+	public boolean belongsTo(String pool, String lane)
+	{
+		// Test pool.
+		boolean	ret	= pool==null || pool.equals(getActivity().getPool().getName());
+		
+		// Test lane
+		if(ret && lane!=null)
+		{
+			List	lanes	= new ArrayList();
+			MLane	mlane	= getActivity().getLane();
+			while(mlane!=null)
+			{
+				lanes.add(mlane);
+				mlane	= mlane.getLane();
+			}
+			
+			StringTokenizer	stok	= new StringTokenizer(lane, ".");
+			while(ret && stok.hasMoreTokens())
+			{
+				ret	= !lanes.isEmpty() && ((MLane)lanes.remove(lanes.size()-1)).getName().equals(stok.nextToken());
+			}
+		}
+		
+		return ret;
 	}
 }

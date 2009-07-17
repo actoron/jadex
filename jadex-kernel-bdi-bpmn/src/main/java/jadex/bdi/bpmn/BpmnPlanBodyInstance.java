@@ -48,6 +48,8 @@ import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IBpmnExecutor;
@@ -131,7 +133,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 					{
 						public void run()
 						{
-							if(isReady(null, null))
+							if(isReady(null, getLane()))
 							{
 								// todo: event?!
 								EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
@@ -140,7 +142,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 						}
 					});
 				}
-				else if(isReady(null, null))
+				else if(isReady(null, getLane()))
 				{
 					// todo: event?!
 					EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
@@ -242,10 +244,14 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		if(waittimes!=null)
 		{
 			IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
-			for(Iterator it=waittimes.values().iterator(); it.hasNext(); )
+			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
-				long	time	= Math.max(((Number)it.next()).longValue()-clock.getTime(), 0);
-				mindur	= mindur==-1 ? time : time<mindur ? time : mindur; 
+				ProcessThread	thread	= (ProcessThread) it.next();
+				if(thread.belongsTo(null, getLane()))
+				{
+					long	time	= Math.max(((Number)waittimes.get(thread)).longValue()-clock.getTime(), 0);
+					mindur	= mindur==-1 ? time : time<mindur ? time : mindur;
+				}
 			}
 		}
 		return mindur;
@@ -263,10 +269,9 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 		{
 			ProcessThread pt = (ProcessThread)it.next();
-			MActivity act = pt.getActivity();
-			
-			if(pt.isWaiting())
+			if(pt.isWaiting() && pt.belongsTo(null, getLane()))
 			{
+				MActivity act = pt.getActivity();				
 				if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(act.getActivityType()))
 				{
 					String type = (String)pt.getWaitInfo();
@@ -1103,5 +1108,27 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 //		getInterpreter().getEventDispatcher().removePlanListener(getRPlan(), listener);
 		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
 		plan.removePlanListener(listener);
+	}
+
+	/**
+	 *  Get the lane corresponding to the current plan lifecycle state.
+	 *  @return	The corresponding lane.
+	 */
+	protected String getLane()
+	{
+		String	steptype	= (String)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate);
+		String	lane	= null;
+		List	pools	= getModelElement().getPools();
+		List	lanes	= ((MPool)pools.get(0)).getLanes();
+		if(lanes!=null && !lanes.isEmpty())
+		{
+			for(int i=0; lane==null && i<lanes.size(); i++)
+			{
+				String name	= ((MLane)lanes.get(i)).getName();
+				if(name.trim().toLowerCase().equals(steptype))
+					lane	= name;
+			}
+		}
+		return lane;
 	}
 }

@@ -207,10 +207,12 @@ public class ThreadContext
 	}
 
 	/**
-	 *  Get an executable thread that in the context or its sub contexts.
+	 *  Get an executable thread in the context or its sub contexts.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 *  @return	An executable thread (if any).
 	 */
-	public ProcessThread	getExecutableThread()
+	public ProcessThread	getExecutableThread(String pool, String lane)
 	{
 		ProcessThread	ret	= null;
 		if(threads!=null)
@@ -221,9 +223,9 @@ public class ThreadContext
 				if(threads.get(thread)!=null)
 				{
 					ThreadContext	context	= (ThreadContext)threads.get(thread);
-					ret	= context.getExecutableThread();
+					ret	= context.getExecutableThread(pool, lane);
 				}
-				else if(!thread.isWaiting())
+				else if(!thread.isWaiting() && thread.belongsTo(pool, lane))
 				{
 					ret	= thread;
 				}

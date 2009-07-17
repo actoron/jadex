@@ -8,12 +8,15 @@ import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MPool;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.xml.Reader;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *  A plan executor for plans modeled in BPMN. These plan steps 
@@ -81,7 +84,37 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		}
 
 		if(bodymodel==null)
+		{
 			throw new RuntimeException("Plan body could not be created: "+impl);
+		}
+		
+		// Check names of lanes, if any.
+		else
+		{
+			List	pools	= bodymodel.getPools();
+			if(pools==null || pools.size()!=1)
+				throw new RuntimeException("Only one pool supported for BPMN plans: "+bodymodel);
+			List	lanes	= ((MPool)pools.get(0)).getLanes();
+			if(lanes!=null && !lanes.isEmpty())
+			{
+				for(int i=0; i<lanes.size(); i++)
+				{
+					String name	= ((MLane)lanes.get(i)).getName();
+					if(name==null)
+					{
+						throw new RuntimeException("Lanes require a name (e.g. 'Body' or 'Aborted'): "+bodymodel);
+					}
+					name	= name.trim().toLowerCase();
+					if(!OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY.equals(name)
+							&& !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED.equals(name)
+						&& !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED.equals(name)
+						&& !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED.equals(name))
+					{
+						throw new RuntimeException("Unsupported name of lane. Use one of 'Body', 'Passed', 'Failed', 'Aborted': "+name);
+					}
+				}
+			}
+		}
 
 		// Create the body data structure and update state
 		BpmnPlanBodyInstance bodyinstance = new BpmnPlanBodyInstance(bodymodel, interpreter, rcapability, rplan); 
@@ -110,22 +143,24 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			bodyinstance.updateWaitingThreads();
 		}
 		
+		String lane = bodyinstance.getLane();
 		Throwable throwable = null;
 		try
 		{
 			if(!steptype.equals(bodyinstance.getLastState()))
 			{
-				// Todo: abort BPMN process threads, if any
-				
-				// Todo: initialize lane corresponding to steptype.
+				// Todo: abort BPMN process threads, if any				
 			}
 			
-			// execute a step
-			if(bodyinstance.isReady(null, null))
+			// Find lane to execute.
+			System.out.println("Executing plan step: "+rplan+", "+lane+", "+bodyinstance);
+			
+			// Execute a step.
+			if(bodyinstance.isReady(null, lane))
 			{
 				// Set processing state to "running"
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
-				bodyinstance.executeStep(null, null);
+				bodyinstance.executeStep(null, lane);
 				bodyinstance.setLastState(steptype);
 			}
 			else if(steptype.equals(bodyinstance.getLastState()) || !bodyinstance.isFinished())
@@ -148,22 +183,22 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			// Set waitqueue of plan.
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, wa);
 			
-			if(bodyinstance.isReady(null, null))
+			if(bodyinstance.isReady(null, lane))
 			{
 				// Bpmn plan is ready and can directly be executed (no event).
 				EventProcessingRules.schedulePlanInstanceCandidate(interpreter.getState(), null, rplan, rcapa);
 			}
 			else if(timeout!=-1 || wa!=null)
 			{
-				Object[] to	= PlanRules.initializeWait(wa, timeout, interpreter.getState(), rcapa, rplan);
-				
+				PlanRules.initializeWait(wa, timeout, interpreter.getState(), rcapa, rplan);
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);
 			}
-			else
-			{
-				throw new RuntimeException("Plan not finished, not ready and not waiting !?: "+bodyinstance);
-			}
 			
+			// Plan may be waiting for subgoal (todo: put in wa?) 
+//			else
+//			{
+//				throw new RuntimeException("Plan not finished, not ready and not waiting !?: "+bodyinstance);
+//			}
 		}
 		else
 		{
@@ -201,7 +236,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
     	return false;
     	
 	}
-	
+
 	/**
 	 *  Execute a step of a plan.
 	 *  Executing a step should cause the latest event to be handled.

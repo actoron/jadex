@@ -80,6 +80,9 @@ public class MBpmnModel extends MIdElement
 	/** The cached edges of the model. */
 	protected Map alledges;
 
+	/** The cached activities of the model. */
+	protected Map allactivities;
+
 	/** The association sources. */
 	protected Map associationsources;
 	
@@ -250,6 +253,37 @@ public class MBpmnModel extends MIdElement
 		}
 		
 		return alledges;
+	}
+	
+	/**
+	 *  Get all activities.
+	 *  @return The activities (id -> activity).
+	 */
+	public Map getAllActivities()
+	{
+		if(this.allactivities==null)
+		{
+			this.allactivities = new HashMap();
+			
+			List pools = getPools();
+			if(pools!=null)
+			{
+				for(int i=0; i<pools.size(); i++)
+				{
+					MPool tmp = (MPool)pools.get(i);
+					List acts = tmp.getActivities();
+					if(acts!=null)
+					{
+						for(int j=0; j<acts.size(); j++)
+						{
+							allactivities.put(((MActivity)acts.get(j)).getId(), acts.get(j));
+						}
+					}
+				}
+			}
+		}
+		
+		return allactivities;
 	}
 	
 	/**
@@ -611,7 +645,7 @@ public class MBpmnModel extends MIdElement
 		types.add(new TypeInfo("pools", MPool.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "associations"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("description"),
-			new BeanAttributeInfo("associationsDescription")}), new NamePropertyPostProcessor()));
+			new BeanAttributeInfo("associationsDescription")}), new PoolPostProcessor()));
 		
 		types.add(new TypeInfo("artifacts", MArtifact.class, null, null,
 			SUtil.createHashMap(new String[]{"name"}, 
@@ -623,7 +657,7 @@ public class MBpmnModel extends MIdElement
 		types.add(new TypeInfo("lanes", MLane.class, null, null,
 			SUtil.createHashMap(new String[]{"name", "activities"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("description"),
-			new BeanAttributeInfo("activitiesDescription")}), new NamePropertyPostProcessor()));
+			new BeanAttributeInfo("activitiesDescription")}), new LanePostProcessor()));
 		
 		types.add(new TypeInfo("eventHandlers", MActivity.class, null, null,
 			SUtil.createHashMap(new String[]{"outgoingEdges", "incomingEdges"}, 
@@ -858,6 +892,67 @@ public class MBpmnModel extends MIdElement
 	}
 	
 	/**
+	 *  Pool post processor.
+	 */
+	static class PoolPostProcessor	extends NamePropertyPostProcessor
+	{
+		//-------- IPostProcessor interface --------
+		
+		/**
+		 *  Establish element connections.
+		 */
+		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		{
+			super.postProcess(context, object, root, classloader);
+			
+			// Set pool of activities.
+			MPool	pool	= (MPool)object;
+			List	activities	= pool.getActivities();
+			if(activities!=null && !activities.isEmpty())
+			{
+				for(int i=0; i< activities.size(); i++)
+				{
+					((MActivity)activities.get(i)).setPool(pool);
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 *  Lane post processor.
+	 */
+	static class LanePostProcessor	extends NamePropertyPostProcessor
+	{
+		//-------- IPostProcessor interface --------
+		
+		/**
+		 *  Establish element connections.
+		 */
+		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		{
+			super.postProcess(context, object, root, classloader);
+			
+			// Resolve activities
+			MLane	lane	= (MLane)object;
+			String	actdesc	= lane.getActivitiesDescription();
+			if(actdesc!=null)
+			{
+				MBpmnModel dia = (MBpmnModel)root;
+				Map	activities	= dia.getAllActivities();
+				StringTokenizer stok = new StringTokenizer(actdesc);
+				while(stok.hasMoreElements())
+				{
+					String actid = stok.nextToken(); 
+					MActivity activity = (MActivity)activities.get(actid);
+					lane.addActivity(activity);
+					activity.setLane(lane);
+				}
+			}
+		}
+	}
+	
+	/**
 	 *  Association post processor.
 	 */
 	static class AssociationPostProcessor implements IPostProcessor
@@ -991,7 +1086,6 @@ public class MBpmnModel extends MIdElement
 				// lines with = in it: properties
 				
 				StringTokenizer	stok = new StringTokenizer(namedelem.getDescription(), "\r\n");
-				String name = null;
 				while(stok.hasMoreTokens())
 				{
 					String prop = stok.nextToken();
@@ -1006,7 +1100,7 @@ public class MBpmnModel extends MIdElement
 					else
 					{
 						// line without "=" is name
-						namedelem.setName(name);
+						namedelem.setName(prop);
 					}
 				}
 			}
