@@ -64,7 +64,7 @@ public class Test
 						instance.executeStep(null, null);
 					}
 					
-					if(instance.isFinished())
+					if(instance.isFinished(null, null))
 					{
 						System.out.println("Finished: "+instance);
 						exe.shutdown(null);

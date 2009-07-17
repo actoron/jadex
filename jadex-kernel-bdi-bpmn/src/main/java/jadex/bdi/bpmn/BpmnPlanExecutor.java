@@ -146,7 +146,9 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			bodyinstance.updateWaitingThreads();
 		}
 		
+		// Find lane to execute.
 		String lane = bodyinstance.getLane(steptype);
+//		System.out.println("Executing plan step: "+rplan+", "+lane+", "+bodyinstance);
 		Throwable throwable = null;
 		try
 		{
@@ -154,34 +156,37 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			if(bodyinstance.getLastState()!=null && !bodyinstance.getLastState().equals(steptype))
 			{
 				String	abortlane	= bodyinstance.getLane(bodyinstance.getLastState());
-				Set	threads	= bodyinstance.getThreadContext().getAllThreads();
-				if(threads!=null && !threads.isEmpty())
+				if(!BpmnPlanBodyInstance.LANE_UNDEFINED.equals(abortlane))
 				{
-					for(Iterator it=threads.iterator(); it.hasNext(); )
+					Set	threads	= bodyinstance.getThreadContext().getAllThreads();
+					if(threads!=null && !threads.isEmpty())
 					{
-						ProcessThread	thread	= (ProcessThread)it.next();
-						if(thread.belongsTo(null, abortlane))
+						for(Iterator it=threads.iterator(); it.hasNext(); )
 						{
-							thread.getThreadContext().removeThread(thread);
+							ProcessThread	thread	= (ProcessThread)it.next();
+							if(thread.belongsTo(null, abortlane))
+							{
+								thread.getThreadContext().removeThread(thread);
+							}
 						}
 					}
 				}
 			}
 			
-			// Find lane to execute.
-			System.out.println("Executing plan step: "+rplan+", "+lane+", "+bodyinstance);
-			
 			// Execute a step.
-			if(bodyinstance.isReady(null, lane))
+			if(!BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane))
 			{
-				// Set processing state to "running"
-				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
-				bodyinstance.executeStep(null, lane);
-				bodyinstance.setLastState(steptype);
-			}
-			else if(steptype.equals(bodyinstance.getLastState()) || !bodyinstance.isFinished())
-			{
-				throw new RuntimeException("Invalid plan step: BPMN process instance is not ready: "+bodyinstance);
+				if(bodyinstance.isReady(null, lane))
+				{
+					// Set processing state to "running"
+					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
+					bodyinstance.setLastState(steptype);
+					bodyinstance.executeStep(null, lane);
+				}
+				else if(/*steptype.equals(bodyinstance.getLastState()) ||*/ !bodyinstance.isFinished(null, lane))
+				{
+					throw new RuntimeException("Invalid plan step: BPMN process instance is not ready: "+bodyinstance);
+				}
 			}
 		}
 		catch(Throwable t)
@@ -191,7 +196,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		}
 		
 		// check for errors / exception / final state
-		if(throwable==null && !bodyinstance.isFinished())
+		if(throwable==null && !BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane) && !bodyinstance.isFinished(null, lane))
 		{
 			long	timeout	= bodyinstance.getTimeout();
 			Object	wa	= bodyinstance.getWaitAbstraction();
@@ -223,13 +228,13 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			
 			if(steptype.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY))
 			{
-				// Set plan processing state.
-				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-				
 				// Hack!!! Should not change state?
 				// set plan lifecycle state
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
 					throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);	
+
+				// Bpmn plan is ready and can directly be executed (no event).
+				EventProcessingRules.schedulePlanInstanceCandidate(interpreter.getState(), null, rplan, rcapa);				
 			}
 			else
 			{

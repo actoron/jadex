@@ -101,7 +101,7 @@ public class BpmnExecutor	implements IBpmnExecutor	//, ISteppable
 						}
 					}
 						
-					if(instance.isFinished())
+					if(instance.isFinished(null, null))
 					{
 						System.out.println("Finished: "+instance);
 						executor.shutdown(null);

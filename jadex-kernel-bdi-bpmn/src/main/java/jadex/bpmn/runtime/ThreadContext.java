@@ -197,11 +197,21 @@ public class ThreadContext
 	
 	/**
 	 *  The context is finished, when there are no (more) threads to execute.
-	 *  @return True, if the context is finished.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
 	 */
-	public boolean	isFinished()
+	public boolean	isFinished(String pool, String lane)
 	{
-		return threads==null || threads.isEmpty();
+		boolean	finished	= true;
+		if(threads!=null && !threads.isEmpty())
+		{
+			for(Iterator it=threads.keySet().iterator(); finished && it.hasNext(); )
+			{
+				finished	= !((ProcessThread)it.next()).belongsTo(pool, lane);
+			}
+		}
+		return finished;
 	}
 
 	/**

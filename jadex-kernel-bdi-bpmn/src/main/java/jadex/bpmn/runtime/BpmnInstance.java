@@ -132,11 +132,13 @@ public class BpmnInstance	implements IProcessInstance
 	
 	/**
 	 *  Check, if the process has terminated.
-	 *  @return True, when the process instance is finished.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
 	 */
-	public boolean isFinished()
+	public boolean isFinished(String pool, String lane)
 	{
-		return context.isFinished();
+		return context.isFinished(pool, lane);
 	}
 
 	/**
@@ -146,7 +148,7 @@ public class BpmnInstance	implements IProcessInstance
 	 */
 	public void executeStep(String pool, String lane)
 	{
-		if(isFinished())
+		if(isFinished(pool, lane))
 			throw new UnsupportedOperationException("Cannot execute a finished process: "+this);
 		
 		if(!isReady(pool, lane))

@@ -77,6 +77,9 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 {
 	//-------- static part --------
 	
+	/** Identifier for an undefined lane (e.g. when no 'aborted' lane is specified). */
+	protected static String	LANE_UNDEFINED	= "undefined-lane";
+	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map	DEFAULT_HANDLERS;
 	
@@ -133,7 +136,8 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 					{
 						public void run()
 						{
-							if(isReady(null, getLane(getLastState())))
+							String lane	= getLane(getLastState());
+							if(!LANE_UNDEFINED.equals(lane) && isReady(null, lane))
 							{
 								// todo: event?!
 								EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
@@ -142,11 +146,15 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 						}
 					});
 				}
-				else if(isReady(null, getLane(getLastState())))
+				else
 				{
-					// todo: event?!
-					EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-//					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+					String lane	= getLane(getLastState());
+					if(!LANE_UNDEFINED.equals(lane) && isReady(null, lane))
+					{
+						// todo: event?!
+						EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+//						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+					}
 				}
 			}
 		});
@@ -181,7 +189,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 */
 	public void	addTimer(ProcessThread thread, long duration)
 	{
-		assert duration>0;
+		assert duration>=0;
 		if(waittimes==null)
 			waittimes	= new HashMap();
 
@@ -243,14 +251,18 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		long	mindur	= -1;
 		if(waittimes!=null)
 		{
-			IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
-			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
+			String lane	= getLane(getLastState());
+			if(!LANE_UNDEFINED.equals(lane))
 			{
-				ProcessThread	thread	= (ProcessThread) it.next();
-				if(thread.belongsTo(null, getLane(getLastState())))
+				IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
+				for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 				{
-					long	time	= Math.max(((Number)waittimes.get(thread)).longValue()-clock.getTime(), 0);
-					mindur	= mindur==-1 ? time : time<mindur ? time : mindur;
+					ProcessThread	thread	= (ProcessThread) it.next();
+					if(thread.belongsTo(null, lane))
+					{
+						long	time	= Math.max(((Number)waittimes.get(thread)).longValue()-clock.getTime(), 0);
+						mindur	= mindur==-1 ? time : time<mindur ? time : mindur;
+					}
 				}
 			}
 		}
@@ -263,78 +275,83 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 */
 	public Object  getWaitAbstraction()
 	{
-		Object ret = getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		boolean empty = true;
-		
-		for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
+		Object ret	= null;
+		String lane	= getLane(getLastState());
+		if(!LANE_UNDEFINED.equals(lane))
 		{
-			ProcessThread pt = (ProcessThread)it.next();
-			if(pt.isWaiting() && pt.belongsTo(null, getLane(getLastState())))
+			ret = getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
+			boolean empty = true;
+			
+			for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 			{
-				MActivity act = pt.getActivity();				
-				if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(act.getActivityType()))
+				ProcessThread pt = (ProcessThread)it.next();
+				if(pt.isWaiting() && pt.belongsTo(null, lane))
 				{
-					String type = (String)pt.getWaitInfo();
-					if(type==null)
-						throw new RuntimeException("Message type not specified: "+type);
-					WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
-					empty = false;
-				}
-				else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(act.getActivityType()))
-				{
-					String type = (String)pt.getWaitInfo();
-					if(type==null)
-						throw new RuntimeException("Rule type not specified: "+type);
-					WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
-					empty = false;
-				}
-				else if(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(act.getActivityType()))
-				{
-					List edges = pt.getActivity().getOutgoingSequenceEdges();
-					Object[] was = (Object[])pt.getWaitInfo();
-	
-					for(int i=0; i<edges.size(); i++)
+					MActivity act = pt.getActivity();				
+					if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(act.getActivityType()))
 					{
-						MSequenceEdge edge = (MSequenceEdge)edges.get(i);
-						MActivity nextact = edge.getTarget();
-						if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(nextact.getActivityType()))
-						{
-							String type = (String)was[i];
-							if(type==null)
-								throw new RuntimeException("Message type not specified: "+type);
-							WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
-							empty = false;
-						}
-						else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(nextact.getActivityType()))
-						{
-							String type = (String)was[i];
-							if(type==null)
-								throw new RuntimeException("Rule type not specified: "+type);
-							WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
-							empty = false;
-						}
-						else if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(nextact.getActivityType()))
-						{
-							// nothing to do with waitqueue.
-						}
-						else
-						{
-							throw new RuntimeException("Unknown event: "+nextact);
-						}
+						String type = (String)pt.getWaitInfo();
+						if(type==null)
+							throw new RuntimeException("Message type not specified: "+type);
+						WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
+						empty = false;
 					}
-	//				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
-				}
-				
-				// todo: condition wait
-				
-				// todo: time wait?!
-			}
-		}
+					else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(act.getActivityType()))
+					{
+						String type = (String)pt.getWaitInfo();
+						if(type==null)
+							throw new RuntimeException("Rule type not specified: "+type);
+						WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
+						empty = false;
+					}
+					else if(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(act.getActivityType()))
+					{
+						List edges = pt.getActivity().getOutgoingSequenceEdges();
+						Object[] was = (Object[])pt.getWaitInfo();
 		
-		if(empty)
-		{
-			state.dropObject(ret);
-			ret = null;
+						for(int i=0; i<edges.size(); i++)
+						{
+							MSequenceEdge edge = (MSequenceEdge)edges.get(i);
+							MActivity nextact = edge.getTarget();
+							if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(nextact.getActivityType()))
+							{
+								String type = (String)was[i];
+								if(type==null)
+									throw new RuntimeException("Message type not specified: "+type);
+								WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
+								empty = false;
+							}
+							else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(nextact.getActivityType()))
+							{
+								String type = (String)was[i];
+								if(type==null)
+									throw new RuntimeException("Rule type not specified: "+type);
+								WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
+								empty = false;
+							}
+							else if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(nextact.getActivityType()))
+							{
+								// nothing to do with waitqueue.
+							}
+							else
+							{
+								throw new RuntimeException("Unknown event: "+nextact);
+							}
+						}
+		//				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
+					}
+					
+					// todo: condition wait
+					
+					// todo: time wait?!
+				}
+			}
+			
+			if(empty)
+			{
+				state.dropObject(ret);
+				ret = null;
+			}
 		}
 		
 		return ret;
@@ -1128,7 +1145,14 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				if(name.trim().toLowerCase().equals(steptype))
 					lane	= name;
 			}
+			
+			if(lane==null)
+				lane	= LANE_UNDEFINED;
 		}
+		
+		if(lane==null && !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY.equals(steptype))
+			lane	= LANE_UNDEFINED;
+
 		return lane;
 	}
 }

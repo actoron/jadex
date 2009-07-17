@@ -15,7 +15,7 @@ public class WriteBeliefTask extends AbstractTask
 		BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
 		
 		String belname = (String)context.getParameterValue("beliefname");
-		String value = (String)context.getParameterValue("value");
+		Object value = context.getParameterValue("value");
 		
 		System.out.println("Setting belief value: "+belname+" "+value);
 		
