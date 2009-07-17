@@ -19,7 +19,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_of7-EXLfEd6dTLJP0bYxrQ" iD="_of7-EHLfEd6dTLJP0bYxrQ" outgoingEdges="_sxCm6HLfEd6dTLJP0bYxrQ" incomingEdges="_ogPgEXLfEd6dTLJP0bYxrQ" name="Wait for Internal Event&#xD;&#xA;type = &quot;test_internal_event&quot;" activityType="EventIntermediateSignal"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_sw414XLfEd6dTLJP0bYxrQ" iD="_sw414HLfEd6dTLJP0bYxrQ" incomingEdges="_sxCm6HLfEd6dTLJP0bYxrQ" name="Internal Event Occurred" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_8xCfyHLfEd6dTLJP0bYxrQ" iD="_8xCfwHLfEd6dTLJP0bYxrQ" outgoingEdges="_fPHdgXLgEd6dTLJP0bYxrQ" name="Trigger Internal Event Dialog&#xD;&#xA;class =  UserInteractionTask.class"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_fO9sgXLgEd6dTLJP0bYxrQ" iD="_fO9sgHLgEd6dTLJP0bYxrQ" incomingEdges="_fPHdgXLgEd6dTLJP0bYxrQ" name="Dispatch Internal Event&#xD;&#xA;class = DispatchInternalEventTask.class&#xD;&#xA;type = &quot;test_internal_event&quot;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_fO9sgXLgEd6dTLJP0bYxrQ" iD="_fO9sgHLgEd6dTLJP0bYxrQ" incomingEdges="_fPHdgXLgEd6dTLJP0bYxrQ" name="Dispatch Internal Event&#xD;&#xA;class = InternalEventTask.class&#xD;&#xA;type = &quot;test_internal_event&quot;" activityType="Task"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_CKLi4XEYEd6dTLJP0bYxrQ" iD="_CKLi4HEYEd6dTLJP0bYxrQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_EEn2UXEYEd6dTLJP0bYxrQ" iD="_EEn2UHEYEd6dTLJP0bYxrQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vJd1kXEYEd6dTLJP0bYxrQ" iD="_vJd1kHEYEd6dTLJP0bYxrQ"/>

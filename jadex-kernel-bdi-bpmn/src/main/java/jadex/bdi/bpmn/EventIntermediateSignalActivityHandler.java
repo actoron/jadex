@@ -24,7 +24,7 @@ public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandl
 	{
 		// Just set thread to waiting.
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
-		final String type = (String)thread.getPropertyValue("type");
+		final String type = (String)thread.getPropertyValue("type", activity);
 		thread.setWaiting(true);
 		thread.setWaitInfo(type);
 		System.out.println("Waiting for internal event: "+type);

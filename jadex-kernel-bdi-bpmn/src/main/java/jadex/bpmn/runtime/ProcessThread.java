@@ -312,6 +312,18 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public Object	getPropertyValue(String name)
 	{
+		return getPropertyValue(name, activity);
+	}
+	
+	/**
+	 *  Hack: method is necessary because thread.activity is not always 
+	 *  the activity to execute in case of multiple event.
+	 *  Get the value of a property.
+	 *  @param name	The property name. 
+	 *  @return	The property value. 
+	 */
+	public Object	getPropertyValue(String name, MActivity activity)
+	{
 		assert activity!=null;
 		Object ret	= activity.getPropertyValue(name);
 		if(ret instanceof IParsedExpression)
@@ -320,7 +332,7 @@ public class ProcessThread	implements ITaskContext
 		}
 		return ret;
 	}
-
+	
 	/**
 	 *  Get the context of a previously executed task.
 	 *  @param name	The name of the task.
