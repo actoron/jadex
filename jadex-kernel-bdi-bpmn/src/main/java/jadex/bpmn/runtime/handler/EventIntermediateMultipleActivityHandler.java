@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime.handler;
 
+import jadex.bdi.bpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
@@ -64,14 +65,12 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		OrFilter filter = (OrFilter)thread.getWaitFilter();
 		IFilter[] filters = filter.getFilters();
 		
+		// Remove the timer entry.
+		((BpmnPlanBodyInstance)instance).removeTimer(thread);
+		
 		for(int i=0; i<outgoing.size() && next==null; i++)
 		{
-			// Timeout edge has event null.
-			if((event==null && filters[i]==null))
-			{
-				// todo: cancel timer?!
-			}
-			
+			// Timeout edge has event=null and filter=null.
 			if((event==null && filters[i]==null) || (filters[i]!=null && filters[i].filter(event)))
 			{
 				next = (MSequenceEdge)outgoing.get(i);

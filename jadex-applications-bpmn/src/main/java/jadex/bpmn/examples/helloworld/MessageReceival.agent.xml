@@ -37,6 +37,8 @@
 		</messageevent>
 		<messageevent name="other_message" type="fipa" direction="receive">
 		</messageevent>
+		
+		<internalevent name="test_internal_event" />
 	</events>
 	
 	<expressions>

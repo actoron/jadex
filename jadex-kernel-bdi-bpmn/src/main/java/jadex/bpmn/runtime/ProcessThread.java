@@ -5,6 +5,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +56,9 @@ public class ProcessThread	implements ITaskContext
 	/** The thread context. */
 	protected ThreadContext	context;
 	
+	/** The Bpmn instance. */
+	protected BpmnInstance instance;
+	
 	/** The exception that has just occurred in the process (if any). */
 	protected Exception	exception;
 	
@@ -74,10 +78,11 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(MActivity activity, ThreadContext context)
+	public ProcessThread(MActivity activity, ThreadContext context, BpmnInstance instance)
 	{
 		this.activity	= activity;
 		this.context	= context;
+		this.instance = instance;
 	}
 	
 	//-------- methods --------
@@ -242,7 +247,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public ProcessThread	createCopy()
 	{
-		ProcessThread	ret	= new ProcessThread(activity, context);
+		ProcessThread	ret	= new ProcessThread(activity, context, instance);
 		ret.edge	= edge;
 		ret.data	= data;
 		return ret;
@@ -298,6 +303,22 @@ public class ProcessThread	implements ITaskContext
 		}
 			
 		((Map)data.get(activity.getName())).put(name, value);
+	}
+	
+	/**
+	 *  Get the value of a property.
+	 *  @param name	The property name. 
+	 *  @return	The property value. 
+	 */
+	public Object	getPropertyValue(String name)
+	{
+		assert activity!=null;
+		Object ret	= activity.getPropertyValue(name);
+		if(ret instanceof IParsedExpression)
+		{
+			ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getValueFetcher()));
+		}
+		return ret;
 	}
 
 	/**

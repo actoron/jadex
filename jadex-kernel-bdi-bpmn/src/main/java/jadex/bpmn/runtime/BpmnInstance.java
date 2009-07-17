@@ -96,7 +96,7 @@ public class BpmnInstance	implements IProcessInstance
 		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			context.addThread(new ProcessThread((MActivity)startevents.get(i), context));
+			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, this));
 		}
 	}
 	

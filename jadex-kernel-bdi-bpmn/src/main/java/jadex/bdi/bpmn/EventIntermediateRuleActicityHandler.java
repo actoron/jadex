@@ -22,7 +22,7 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
 	{
 		// Just set thread to waiting.
-		String type	= (String)getPropertyValue(activity, instance, thread, "type");
+		String type	= (String)thread.getPropertyValue("type");
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_RULE);
 		thread.setWaiting(true);
 		thread.setWaitInfo(type);

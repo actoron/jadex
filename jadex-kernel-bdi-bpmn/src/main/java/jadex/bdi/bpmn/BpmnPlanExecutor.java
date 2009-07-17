@@ -173,6 +173,9 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 				}
 			}
 			
+			// Find lane to execute.
+//			System.out.println("Executing plan step: "+rplan+", "+lane+", "+bodyinstance);
+			
 			// Execute a step.
 			if(!BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane))
 			{

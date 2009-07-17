@@ -52,6 +52,9 @@ public class MBpmnModel extends MIdElement
 	/** Constant for event intermediate rule. */
 	public static final String EVENT_INTERMEDIATE_RULE = "EventIntermediateRule";
 
+	/** Constant for event intermediate signal. */
+	public static final String EVENT_INTERMEDIATE_SIGNAL = "EventIntermediateSignal";
+	
 	/** Constant for event intermediate message. */
 	public static final String EVENT_INTERMEDIATE_MESSAGE = "EventIntermediateMessage";
 	

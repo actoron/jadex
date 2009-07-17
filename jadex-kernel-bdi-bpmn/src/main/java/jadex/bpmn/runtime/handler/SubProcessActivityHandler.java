@@ -30,7 +30,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		List	start	= proc.getStartActivities();
 		for(int i=0; i<start.size(); i++)
 		{
-			ProcessThread	newthread	= new ProcessThread((MActivity)start.get(i), subcontext);
+			ProcessThread	newthread	= new ProcessThread((MActivity)start.get(i), subcontext, instance);
 			subcontext.addThread(newthread);
 		}
 	}

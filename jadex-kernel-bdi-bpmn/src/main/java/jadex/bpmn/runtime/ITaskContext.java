@@ -34,4 +34,11 @@ public interface ITaskContext
 	 *  @param value	The parameter value. 
 	 */
 	public void	setParameterValue(String name, Object value);
+	
+	/**
+	 *  Get the value of a property.
+	 *  @param name	The property name. 
+	 *  @return	The property value. 
+	 */
+	public Object	getPropertyValue(String name);
 }

@@ -6,9 +6,7 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
-import jadex.javaparser.IParsedExpression;
 
 import java.util.List;
 
@@ -166,8 +164,15 @@ public class DefaultActivityHandler implements IActivityHandler
 		{
 			public void run()
 			{
-				step(activity, instance, thread, event);
-				thread.setNonWaiting();
+				if(thread.getActivity().equals(activity))
+				{
+					step(activity, instance, thread, event);
+					thread.setNonWaiting();
+				}
+				else
+				{
+					System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
+				}
 			}
 		});
 	}
@@ -175,7 +180,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	/**
 	 *  Get a property of an activity.
 	 *  Evaluates the property expression, if any.
-	 */
+	 * /
 	public Object	getPropertyValue(MActivity activity, BpmnInstance instance, ProcessThread thread, String prop)
 	{
 		Object	ret	= activity.getPropertyValue(prop);
@@ -184,5 +189,5 @@ public class DefaultActivityHandler implements IActivityHandler
 			ret	= ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(thread, true, instance.getValueFetcher()));
 		}
 		return ret;
-	}
+	}*/
 }

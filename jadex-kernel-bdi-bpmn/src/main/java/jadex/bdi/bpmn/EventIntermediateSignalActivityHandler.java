@@ -10,9 +10,9 @@ import jadex.commons.IFilter;
 import jadex.rules.state.IOAVState;
 
 /**
- *  Handler for message events.
+ *  Handler for internal events.
  */
-public class EventIntermediateMessageActivityHandler	extends DefaultActivityHandler
+public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandler
 {
 	/**
 	 *  Execute an activity.
@@ -24,10 +24,10 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	{
 		// Just set thread to waiting.
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
-		final String	type	= (String)thread.getPropertyValue("type");
+		final String type = (String)thread.getPropertyValue("type");
 		thread.setWaiting(true);
 		thread.setWaitInfo(type);
-		System.out.println("Waiting for message: "+type);
+		System.out.println("Waiting for internal event: "+type);
 		
 		// Does currently only match message type name.
 		thread.setWaitFilter(new IFilter()
@@ -37,11 +37,11 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 				boolean ret = false;
 				BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
 				IOAVState state = inst.getState();
-				if(OAVBDIRuntimeModel.messageevent_type.equals(state.getType(event)))
+				if(OAVBDIRuntimeModel.internalevent_type.equals(state.getType(event)))
 				{
 					Object mmsg = state.getAttributeValue(event, OAVBDIRuntimeModel.element_has_model);
-					String msgtype = (String)state.getAttributeValue(mmsg, OAVBDIMetaModel.modelelement_has_name);
-					ret = type.equals(msgtype);
+					String eventtype = (String)state.getAttributeValue(mmsg, OAVBDIMetaModel.modelelement_has_name);
+					ret = type.equals(eventtype);
 				}
 				return ret; 
 			}

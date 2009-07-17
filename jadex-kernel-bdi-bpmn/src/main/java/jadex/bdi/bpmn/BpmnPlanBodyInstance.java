@@ -89,6 +89,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleActicityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL, new EventIntermediateSignalActivityHandler());
 		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	
@@ -189,12 +190,25 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 */
 	public void	addTimer(ProcessThread thread, long duration)
 	{
+		if(duration<0)
+			System.out.println("here");
 		assert duration>=0;
 		if(waittimes==null)
 			waittimes	= new HashMap();
 
 		IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
 		waittimes.put(thread, new Long(clock.getTime()+duration));
+	}
+	
+	/**
+	 *  Remove a timer for a thread.
+	 *  @param thread	The process thread that should wait.
+	 *  @param duration	The duration to wait for.
+	 */
+	public void	removeTimer(ProcessThread thread)
+	{
+		if(waittimes!=null)
+			waittimes.remove(thread);
 	}
 	
 	/**
@@ -296,6 +310,14 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 						WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
 						empty = false;
 					}
+					else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(act.getActivityType()))
+					{
+						String type = (String)pt.getWaitInfo();
+						if(type==null)
+							throw new RuntimeException("Internal event type not specified: "+type);
+						WaitAbstractionFlyweight.addInternalEvent(ret, type, state, rcapa);
+						empty = false;
+					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(act.getActivityType()))
 					{
 						String type = (String)pt.getWaitInfo();
@@ -321,6 +343,14 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 								WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
 								empty = false;
 							}
+							else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(nextact.getActivityType()))
+							{
+								String type = (String)was[i];
+								if(type==null)
+									throw new RuntimeException("Internal event type not specified: "+type);
+								WaitAbstractionFlyweight.addInternalEvent(ret, type, state, rcapa);
+								empty = false;
+							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(nextact.getActivityType()))
 							{
 								String type = (String)was[i];
@@ -338,7 +368,6 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 								throw new RuntimeException("Unknown event: "+nextact);
 							}
 						}
-		//				WaitAbstractionFlyweight.addMessageEvent(wa, type, state, rcapa);
 					}
 					
 					// todo: condition wait

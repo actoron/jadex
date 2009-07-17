@@ -1,6 +1,5 @@
-package jadex.bpmn.examples.puzzle;
+package jadex.bdi.bpmn;
 
-import jadex.bdi.bpmn.BpmnPlanBodyInstance;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
@@ -10,7 +9,6 @@ import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
-import jadex.javaparser.IParsedExpression;
 
 import java.util.List;
 
@@ -27,12 +25,11 @@ public class SubgoalTask	implements ITask
 		try
 		{
 			BpmnPlanBodyInstance	plan	= (BpmnPlanBodyInstance)instance;
-			Object type	= context.getModelElement().getPropertyValue("type");	// Hack!!! Use parameter!?
-			if(type instanceof IParsedExpression)
-			{
-				type	= ((IParsedExpression)type).getValue(null);
-			}
-			final IGoal	subgoal	= plan.createGoal((String)type);
+			String type = (String)context.getPropertyValue("type");
+			if(type==null)
+				throw new RuntimeException("Type property for internal event not specified: "+this);
+
+			final IGoal	subgoal	= plan.createGoal(type);
 			List	params	= context.getModelElement().getParameters();
 			for(int i=0; params!=null && i<params.size(); i++)
 			{
