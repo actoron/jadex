@@ -1,8 +1,10 @@
 package jadex.bdi.examples.antworld.environment;
 
+import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IPlatform;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -15,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * This Plan is used to update the environment.
+ * This Plan is used to update the environment. Right now it is used as an observer to show observed values of agents / the application. 
  * 
  * 
  */
@@ -28,23 +30,19 @@ public class UpdateEnvironmentPlan extends Plan {
 
 	private JLabel headlineLbl = new JLabel("Application Settings and Measured Values");
 	private JLabel tmpLbl = new JLabel("  ");
-
-	private JLabel counterLabel = new JLabel();
-	private JTextField antCounter = new JTextField();
 	private Space2D env = null;
-	private int counter = 0;
 	boolean targetCondition = false;
 	private Calendar cal = Calendar.getInstance();
 
 	public UpdateEnvironmentPlan() {
-		System.out.println("\n\n\n\n\n\n\n\n Created: " + this);
+//		System.out.println("\n\n\n\n\n\n\n\n Created: " + this);
 		init();
 	}
 
 	public void body() {
 
 		while (!targetCondition) {
-			System.out.println("\n\n\n\n\n\n\n\n Executing Udpate Environment Plan.");
+//			System.out.println("\n\n\n\n\n\n\n\n Executing Udpate Environment Plan.");
 			updateDynamicSettingsPnl();
 			dynamicSettingsPanel.repaint();
 			waitFor(2000);
@@ -81,6 +79,11 @@ public class UpdateEnvironmentPlan extends Plan {
 		if (targetCondition) {
 			dynamicSettingsPanel.remove(1);
 			dynamicSettingsPanel.add(new JLabel("Simulation End Time: " + String.valueOf(longToDateString(System.currentTimeMillis()))), 1);
+			
+			//Stop Siumlation when target condition true.
+			IPlatform platform = getExternalAccess().getPlatform();
+			ISimulationService simServ = (ISimulationService)platform.getService(ISimulationService.class);
+			simServ.pause();
 		}
 
 		dynamicSettingsPanel.remove(2);
