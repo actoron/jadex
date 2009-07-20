@@ -1,6 +1,5 @@
-package jadex.bpmn.examples.helloworld;
+package jadex.bdi.bpmn;
 
-import jadex.bdi.bpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
@@ -17,7 +16,7 @@ public class WriteBeliefTask extends AbstractTask
 		String belname = (String)context.getParameterValue("beliefname");
 		Object value = context.getParameterValue("value");
 		
-		System.out.println("Setting belief value: "+belname+" "+value);
+//		System.out.println("Setting belief value: "+belname+" "+value);
 		
 		inst.getBeliefbase().getBelief(belname).setFact(value);
 		

@@ -13,12 +13,14 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
+import jadex.commons.collection.SCollection;
 import jadex.commons.xml.Reader;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,7 +32,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	//-------- attributes --------
 	
 	/** Hack! Map for the parsed plan body objects (mplan -> bodyImpl) */
-//	protected Map planmodelcache;
+	protected Map planmodelcache;
 
 	//-------- constructor --------
 
@@ -39,7 +41,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	 */
 	public BpmnPlanExecutor()
 	{
-//		this.planmodelcache = SCollection.createHashMap();
+		this.planmodelcache = SCollection.createHashMap();
 	}
 
 	//-------- IPlanExecutor interface --------
@@ -59,9 +61,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		
 		// HACK!
 		// check the model cache for already parsed plan
-//		MBpmnModel planmodel = (MBpmnModel)planmodelcache.get(mbody);
+		MBpmnModel bodymodel = (MBpmnModel)planmodelcache.get(mbody);
 		
-		MBpmnModel bodymodel = null;
 		
 		if(bodymodel == null && impl!=null)
 		{
@@ -77,7 +78,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 				rinfo.getInputStream().close();
 
 				// HACK! Cache parsed body models
-//				planmodelcache.put(mbody, planmodel);
+				planmodelcache.put(mbody, bodymodel);
 			}
 			catch(Exception e)
 			{

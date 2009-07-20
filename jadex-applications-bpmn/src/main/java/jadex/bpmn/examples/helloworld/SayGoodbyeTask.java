@@ -16,8 +16,8 @@ public class SayGoodbyeTask	extends AbstractTask
 		int	y = ((Number)context.getParameterValue("y")).intValue();
 		System.out.println("Parameter y: "+y);
 		
-		if(instance instanceof BpmnPlanBodyInstance)
-			((BpmnPlanBodyInstance)instance).killAgent();
+//		if(instance instanceof BpmnPlanBodyInstance)
+//			((BpmnPlanBodyInstance)instance).killAgent();
 		return null;
 	}
 }

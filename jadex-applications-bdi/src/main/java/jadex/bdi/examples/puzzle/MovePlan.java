@@ -97,6 +97,8 @@ public class MovePlan extends Plan
 			}
 		}
 		
+//		waitFor(300000);
+		
 		print("Aborted "+move, depth);
 //		print("Aborted "+(isAbortedOnSuccess()?
 //			"on success: ": "on failure: ")+move, depth);

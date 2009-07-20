@@ -43,6 +43,7 @@ public class SubgoalTask	implements ITask
 			{
 				public void goalFinished(AgentEvent ae)
 				{
+					subgoal.removeGoalListener(this);
 					if(subgoal.isSucceeded())
 					{
 						List	params	= context.getModelElement().getParameters();

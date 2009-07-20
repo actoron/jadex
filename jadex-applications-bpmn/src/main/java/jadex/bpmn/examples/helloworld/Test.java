@@ -25,12 +25,12 @@ public class Test
 		{
 			// Load model.
 			Reader reader = BpmnXMLReader.getReader();
-			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
+//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test_parallel.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test2.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/all_activities.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/XOR.bpmn", null);
-//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/Exception.bpmn", null);
+			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/Exception.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test_rule.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/SubProcess.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/UserInteraction.bpmn", null);
