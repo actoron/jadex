@@ -11,6 +11,8 @@ import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.handler.basic.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -68,6 +70,12 @@ public class BpmnInstance	implements IProcessInstance
 	
 	/** The external entries (i.e. runnables to execute external notifications during executeStep). */
 	protected List	extentries;
+	
+	/** The execution history. */
+	protected List history;
+	
+	/** The change listeners. */
+	protected List listeners;
 	
 	//-------- constructors --------
 	
@@ -192,8 +200,6 @@ public class BpmnInstance	implements IProcessInstance
 				}
 			}
 			
-			// Handle declared parameters with initial values.
-			
 			// todo: parameter direction / class
 			
 			List params = thread.getActivity().getParameters();
@@ -214,6 +220,10 @@ public class BpmnInstance	implements IProcessInstance
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			handler.execute(thread.getActivity(), this, thread);
+			if(history!=null)
+				history.add(new HistoryEntry(thread.getActivity(), thread));
+			
+			notifyListeners(new ChangeEvent(this, "step_executed"));
 		}
 	}
 	
@@ -260,6 +270,79 @@ public class BpmnInstance	implements IProcessInstance
 	}
 
 	/**
+	 *  Get the global value fetcher.
+	 *  @return The value fetcher (if any).
+	 */
+	public IValueFetcher getValueFetcher()
+	{
+		return this.fetcher;
+	}
+	
+	/**
+	 *  Get the history mode.
+	 */
+	public boolean isHistoryEnabled()
+	{
+		return history!=null;
+	}
+	
+	/**
+	 *  Get the history.
+	 *  @return The history.
+	 */
+	public List getHistory()
+	{
+		return this.history;
+	}
+
+	/**
+	 *  Set the history mode.
+	 */
+	public void	setHistoryEnabled(boolean enabled)
+	{
+		// Hack!!! synchronized because of ProcessViewPanel.
+		if(enabled && history==null)
+			history	= Collections.synchronizedList(new ArrayList());
+		else if(!enabled && history!=null)
+			history	= null;
+	}
+	
+	/**
+	 *  Add a change listener.
+	 *  @param listener The listener.
+	 */
+	public void addChangeListener(IChangeListener listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList();
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Remove a change listener.
+	 *  @param listener The listener.
+	 */
+	public void removeChangeListener(IChangeListener listener)
+	{
+		if(listeners!=null)
+			listeners.remove(listener);
+	}
+	
+	/**
+	 *  Notify the change listeners.
+	 */
+	public void notifyListeners(ChangeEvent event)
+	{
+		if(listeners!=null)
+		{
+			for(int i=0; i<listeners.size(); i++)
+			{
+				((IChangeListener)listeners.get(i)).changeOccurred(event);
+			}
+		}
+	}
+	
+	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
 	 */
@@ -274,13 +357,67 @@ public class BpmnInstance	implements IProcessInstance
 		buf.append(")");
 		return buf.toString();
 	}
+}
+
+/**
+ *  History entry for saving the process execution history. 
+ */
+class HistoryEntry
+{
+	//-------- attributes --------
+	
+	/** The model element of the activity. */
+	protected MActivity activity;
+	
+	/** The thread that executed this activity. */
+	protected ProcessThread thread;
+
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new entry.
+	 */
+	public HistoryEntry(MActivity activity, ProcessThread thread)
+	{
+		this.activity = activity;
+		this.thread = thread;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get the activity.
+	 *  @return The activity.
+	 */
+	public MActivity getActivity()
+	{
+		return this.activity;
+	}
 
 	/**
-	 *  Get the global value fetcher.
-	 *  @return The value fetcher (if any).
+	 *  Set the activity.
+	 *  @param activity The activity to set.
 	 */
-	public IValueFetcher getValueFetcher()
+	public void setActivity(MActivity activity)
 	{
-		return this.fetcher;
+		this.activity = activity;
+	}
+
+	/**
+	 *  Get the thread.
+	 *  @return The thread.
+	 */
+	public ProcessThread getThread()
+	{
+		return this.thread;
+	}
+
+	/**
+	 *  Set the thread.
+	 *  @param thread The thread to set.
+	 */
+	public void setThread(ProcessThread thread)
+	{
+		this.thread = thread;
 	}
 }

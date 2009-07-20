@@ -1,10 +1,13 @@
 package jadex.bpmn.examples.helloworld;
 
+import jadex.bpmn.BpmnExecutor;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IBpmnExecutor;
+import jadex.bpmn.tools.ProcessViewPanel;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -12,7 +15,10 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.commons.xml.Reader;
 
+import java.awt.BorderLayout;
 import java.io.File;
+
+import javax.swing.JFrame;
 
 public class Test
 {
@@ -43,39 +49,49 @@ public class Test
 			System.out.println("Loaded model: "+model);
 			
 			// Create and execute instance.
-			final IThreadPool	pool	= ThreadPoolFactory.createThreadPool();
-			final Executor	exe	= new Executor(pool);
-			final BpmnInstance	instance	= new BpmnInstance(model);
-			instance.setExecutor(new IBpmnExecutor()
-			{
-				public void wakeUp()
-				{
-					exe.execute();
-				}
-			});
 			
-			exe.setExecutable(new IExecutable()
-			{	
-				public boolean execute()
-				{
-					if(instance.isReady(null, null))
-					{						
-						System.out.println("Executing step: "+instance);
-						instance.executeStep(null, null);
-					}
-					
-					if(instance.isFinished(null, null))
-					{
-						System.out.println("Finished: "+instance);
-						exe.shutdown(null);
-						pool.dispose();
-					}
-					
-					return instance.isReady(null, null);
-				}
-			});
+			BpmnInstance instance = new BpmnInstance(model);
+			ProcessViewPanel pvp = new ProcessViewPanel(instance);
+			BpmnExecutor exe = new BpmnExecutor(instance, false);
 			
-			exe.execute();
+			JFrame f = new JFrame();
+			f.add(pvp, BorderLayout.CENTER);
+			f.pack();
+			f.setVisible(true);
+			
+//			final IThreadPool	pool	= ThreadPoolFactory.createThreadPool();
+//			final Executor	exe	= new Executor(pool);
+//			final BpmnInstance	instance	= new BpmnInstance(model);
+//			instance.setExecutor(new IBpmnExecutor()
+//			{
+//				public void wakeUp()
+//				{
+//					exe.execute();
+//				}
+//			});
+//			
+//			exe.setExecutable(new IExecutable()
+//			{	
+//				public boolean execute()
+//				{
+//					if(instance.isReady(null, null))
+//					{						
+//						System.out.println("Executing step: "+instance);
+//						instance.executeStep(null, null);
+//					}
+//					
+//					if(instance.isFinished(null, null))
+//					{
+//						System.out.println("Finished: "+instance);
+//						exe.shutdown(null);
+//						pool.dispose();
+//					}
+//					
+//					return instance.isReady(null, null);
+//				}
+//			});
+//			
+//			exe.execute();
 		}
 		catch(Exception e)
 		{
