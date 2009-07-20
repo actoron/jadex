@@ -1055,6 +1055,7 @@ public class TestCenterPanel extends JSplitPane
 		 */
 		public void goalFinished(final AgentEvent ae)
 		{			
+			((IGoal)ae.getSource()).removeGoalListener(this);
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
@@ -1065,7 +1066,6 @@ public class TestCenterPanel extends JSplitPane
 					// Ignore if goal is leftover from aborted execution.
 					if(goals.remove(goal))
 					{
-						goal.removeGoalListener(TestSuite.this);
 						if(!goal.isSucceeded() && !aborted)
 						{
 							String text = SUtil.wrapText("Testcase error: "+goal.getException().getMessage());

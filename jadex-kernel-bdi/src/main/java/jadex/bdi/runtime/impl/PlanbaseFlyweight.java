@@ -239,7 +239,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 					if(mplan==null)
 						throw new RuntimeException("Plan not found: "+type);
 					
-					removeEventListener(listener, mplan);
+					removeEventListener(listener, mplan, false);
 				}
 			};
 		}
@@ -250,7 +250,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 			if(mplan==null)
 				throw new RuntimeException("Plan not found: "+type);
 			
-			removeEventListener(listener, mplan);
+			removeEventListener(listener, mplan, false);
 		}
 	}
 	

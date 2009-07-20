@@ -2190,6 +2190,11 @@ public class PlanRules
 				// Todo: Hack!!! wrong scope
 				ret = new ChangeEventFlyweight(state, rcapa, de);
 			}
+			else if(OAVBDIMetaModel.condition_type.equals(type))
+			{
+				// Todo: change event for triggered condition. 
+				ret = state.getAttributeValue(de, OAVBDIMetaModel.modelelement_has_name);
+			}
 			else
 			{
 				throw new RuntimeException("Unsupported return element: "+de+" "+type);

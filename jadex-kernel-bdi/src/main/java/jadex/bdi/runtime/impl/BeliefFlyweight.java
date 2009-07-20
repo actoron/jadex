@@ -192,13 +192,13 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 			{
 				public void run()
 				{
-					removeEventListener(listener, getHandle());
+					removeEventListener(listener, getHandle(), false);
 				}
 			};
 		}
 		else
 		{
-			removeEventListener(listener, getHandle());
+			removeEventListener(listener, getHandle(), false);
 		}
 	}
 	

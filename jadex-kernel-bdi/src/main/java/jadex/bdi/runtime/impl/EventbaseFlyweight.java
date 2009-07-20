@@ -283,7 +283,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 					if(mevent==null)
 						throw new RuntimeException("Unknown event type: "+args[0]);
 				
-					removeEventListener(args[1], mevent);
+					removeEventListener(args[1], mevent, false);
 				}
 			};
 		}
@@ -294,7 +294,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 			if(mevent==null)
 				throw new RuntimeException("Unknown event type: "+type);
 			
-			removeEventListener(listener, mevent);
+			removeEventListener(listener, mevent, false);
 		}
 	}
 	
@@ -402,7 +402,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 					if(mevent==null)
 						throw new RuntimeException("Event not found: "+args[0]);
 					
-					removeEventListener(args[1], mevent);
+					removeEventListener(args[1], mevent, false);
 				}
 			};
 		}
@@ -413,7 +413,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 			if(mevent==null)
 				throw new RuntimeException("Event not found: "+type);
 			
-			removeEventListener(listener, mevent);
+			removeEventListener(listener, mevent, false);
 		}
 	}
 	

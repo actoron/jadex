@@ -163,13 +163,13 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 			{
 				public void run()
 				{
-					removeEventListener(listener, getHandle());
+					removeEventListener(listener, getHandle(), false);
 				}
 			};
 		}
 		else
 		{
-			removeEventListener(listener, getHandle());
+			removeEventListener(listener, getHandle(), false);
 		}
 	}
 	

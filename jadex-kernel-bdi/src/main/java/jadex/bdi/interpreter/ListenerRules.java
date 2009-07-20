@@ -1,5 +1,7 @@
 package jadex.bdi.interpreter;
 
+import java.util.Collection;
+
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBeliefListener;
@@ -454,7 +456,6 @@ public class ListenerRules
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
-//				Object rcapa = assignments.getVariableValue("?rcapa");
 				Object rgoal = assignments.getVariableValue("?rgoal");
 				Object le	= assignments.getVariableValue("?listenerentry");
 				Object ce = assignments.getVariableValue("?ce");
@@ -468,9 +469,28 @@ public class ListenerRules
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(cetype))
+				{
 					lis.goalAdded(ae);
+				}
 				else
+				{
 					lis.goalFinished(ae);
+					// Remove goal listener if not yet removed, to avoid memory leaks
+					if(state.containsObject(le))
+					{
+						Collection coll = state.getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+						if(coll!=null && coll.contains(rgoal))
+						{
+							state.removeAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, rgoal);
+							coll = state.getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+							if(coll==null || coll.isEmpty())
+							{
+								state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_listeners, lis);
+							}
+							BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rgoal);
+						}
+					}					
+				}
 				
 //				System.err.println("listener_goal rule: "+rgoal+", "+lis+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier());
 			}
@@ -536,9 +556,28 @@ public class ListenerRules
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(cetype))
+				{
 					lis.planAdded(ae);
+				}
 				else
+				{
 					lis.planFinished(ae);
+					// Remove plan listener if not yet removed, to avoid memory leaks
+					if(state.containsObject(le))
+					{
+						Collection coll = state.getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+						if(coll!=null && coll.contains(rplan))
+						{
+							state.removeAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, rplan);
+							coll = state.getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+							if(coll==null || coll.isEmpty())
+							{
+								state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_listeners, lis);
+							}
+							BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rplan);
+						}
+					}
+				}
 			}
 		};
 		

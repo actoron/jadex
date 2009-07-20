@@ -363,7 +363,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 					if(mgoal==null)
 						throw new RuntimeException("Goal not found: "+type);
 
-					removeEventListener(listener, mgoal);
+					removeEventListener(listener, mgoal, false);
 				}
 			};
 		}
@@ -374,7 +374,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			if(mgoal==null)
 				throw new RuntimeException("Goal not found: "+type);
 			
-			removeEventListener(listener, mgoal);
+			removeEventListener(listener, mgoal, false);
 		}
 	}
 

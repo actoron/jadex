@@ -480,13 +480,15 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 			{
 				public void run()
 				{
-					removeEventListener(listener, getHandle());
+					// If goal is already finished, do safe removal, because listener may have been automatically removed.
+					removeEventListener(listener, getHandle(), isFinished());
 				}
 			};
 		}
 		else
 		{
-			removeEventListener(listener, getHandle());
+			// If goal is already finished, do safe removal, because listener may have been automatically removed.
+			removeEventListener(listener, getHandle(), isFinished());
 		}
 	}
 	

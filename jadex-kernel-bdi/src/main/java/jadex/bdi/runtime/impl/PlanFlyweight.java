@@ -123,19 +123,21 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public void removePlanListener(final IPlanListener listener)
 	{
+		// Todo: safe removal when plan is already finished.
+		
 		if(getInterpreter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
 				public void run()
 				{
-					removeEventListener(listener, getHandle());
+					removeEventListener(listener, getHandle(), false);
 				}
 			};
 		}
 		else
 		{
-			removeEventListener(listener, getHandle());
+			removeEventListener(listener, getHandle(), false);
 		}
 	}
 	

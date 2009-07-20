@@ -299,7 +299,7 @@ public class BeliefRules
 			Object rcapa = assignments.getVariableValue("?rcapa");
 			Object rplan = assignments.getVariableValue("?rplan");
 
-			System.out.println("WFC: Setting plan to ready: "+rplan);
+//			System.out.println("WFC: Setting plan to ready: "+rplan);
 			
 			// todo: Should be a rule triggered event with variable values
 			

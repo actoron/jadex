@@ -298,25 +298,36 @@ public abstract class ElementFlyweight implements IElement
 	/**
 	 *  Remove an event listener.
 	 *  @param listener The listener.
-	 *  @param handle The handle.
+	 * @param handle The handle.
+	 * @param failsafe Don't throw exception, when listener could not be removed (e.g. for finished goals).
 	 */
-	protected void removeEventListener(Object listener, Object handle)
+	protected void removeEventListener(Object listener, Object handle, boolean failsafe)
 	{
 		assert handle!=null;
 		
 //		System.out.println("remLis: "+getScope()+" "+listener+" "+getState().getAttributeValues(getScope(), OAVBDIRuntimeModel.capability_has_listeners));
 
 		Object le = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, listener);
-		if(le==null)
+		if(le==null && !failsafe)
+		{
 			throw new RuntimeException("Listener not found: "+listener);
-		Collection coll = getState().getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
-		if(!coll.contains(handle))
-			throw new RuntimeException("Listener could not be removed properly: "+listener);
-		getState().removeAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);
-		coll = getState().getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
-		if(coll==null || coll.isEmpty())
-			getState().removeAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, listener);
-		getInterpreter().getEventReificator().removeObservedElement(handle);
+		}
+		else if(le!=null)
+		{
+			Collection coll = getState().getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+			if(!coll.contains(handle) && !failsafe)
+			{
+				throw new RuntimeException("Listener could not be removed properly: "+listener);
+			}
+			else if(coll.contains(handle))
+			{
+				getState().removeAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);
+				coll = getState().getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+				if(coll==null || coll.isEmpty())
+					getState().removeAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, listener);
+				getInterpreter().getEventReificator().removeObservedElement(handle);
+			}
+		}
 	}
 	
 	//-------- inner classes --------
