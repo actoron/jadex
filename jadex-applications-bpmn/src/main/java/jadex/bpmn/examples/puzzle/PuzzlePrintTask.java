@@ -12,7 +12,7 @@ public class PuzzlePrintTask extends AbstractTask
 	/**
 	 * 
 	 */
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		int	indent	= ((Number)context.getParameterValue("indent")).intValue();
         for(int x=0; x<indent; x++)
@@ -20,6 +20,5 @@ public class PuzzlePrintTask extends AbstractTask
 
 		String text = (String)context.getParameterValue("text");
 		System.out.println(text);
-		return null;
 	}
 }

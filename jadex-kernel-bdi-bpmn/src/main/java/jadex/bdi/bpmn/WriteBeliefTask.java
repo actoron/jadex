@@ -5,21 +5,39 @@ import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 
 /**
- *  Write a belief value task.
+ *  Write a belief (set) value.
+ *  The belief(set) is specified by the 'belief(set)name' belief.
+ *  The value is specified by the 'value' belief.
+ *  For belief sets a boolean 'add' belief can be specified to distinguish
+ *  between value addition (default) and removal.
  */
 public class WriteBeliefTask extends AbstractTask
 {
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
-		
-		String belname = (String)context.getParameterValue("beliefname");
 		Object value = context.getParameterValue("value");
 		
-//		System.out.println("Setting belief value: "+belname+" "+value);
-		
-		inst.getBeliefbase().getBelief(belname).setFact(value);
-		
-		return null;
+		if(context.hasParameterValue("beliefname"))
+		{
+			String name = (String)context.getParameterValue("beliefname");
+			inst.getBeliefbase().getBelief(name).setFact(value);
+		}
+		else if(context.hasParameterValue("beliefsetname"))
+		{
+			String name = (String)context.getParameterValue("beliefname");
+			if(!context.hasParameterValue("add") || ((Boolean)context.getParameterValue("add")).booleanValue())
+			{
+				inst.getBeliefbase().getBeliefSet(name).addFact(value);
+			}
+			else
+			{
+				inst.getBeliefbase().getBeliefSet(name).removeFact(value);
+			}
+		}
+		else
+		{
+			throw new RuntimeException("Belief(set)name no specified: "+context);
+		}
 	}
 }

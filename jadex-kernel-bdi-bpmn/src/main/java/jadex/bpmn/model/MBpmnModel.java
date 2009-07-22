@@ -856,7 +856,9 @@ public class MBpmnModel extends MIdElement
 						StringTokenizer stok2 = new StringTokenizer(prop, " =");
 						String paramdir = stok2.nextToken();
 						String paramclazzname = stok2.nextToken();
-						Class paramclazz = paramclazzname==null? null: SReflect.findClass0(paramclazzname, dia.getAllImports(), classloader);
+						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getAllImports(), classloader);
+						if(paramclazz==null)
+							throw new RuntimeException("Parameter class not found in imports: "+dia+", "+act+", "+paramclazzname+", "+SUtil.arrayToString(dia.getAllImports()));
 						String paramname = stok2.nextToken();
 						IParsedExpression paramexp = null;
 						if(stok2.hasMoreTokens())

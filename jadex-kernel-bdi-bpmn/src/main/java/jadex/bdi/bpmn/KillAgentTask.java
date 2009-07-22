@@ -12,9 +12,8 @@ public class KillAgentTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		((BpmnPlanBodyInstance)instance).killAgent();
-		return null;
 	}
 }

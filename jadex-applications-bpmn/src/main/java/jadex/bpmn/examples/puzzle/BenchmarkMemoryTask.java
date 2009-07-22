@@ -14,7 +14,7 @@ public class BenchmarkMemoryTask extends AbstractTask
 	/**
 	 * 	Execute the task.
 	 */
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		BpmnPlanBodyInstance	inst	= (BpmnPlanBodyInstance)instance;
 		if(inst.getBeliefbase().containsBelief("endmem"))
@@ -33,7 +33,5 @@ public class BenchmarkMemoryTask extends AbstractTask
 				inst.getBeliefbase().getBelief("endmem").setFact(endmem);
 			}
 		}
-		
-		return null;
 	}
 }

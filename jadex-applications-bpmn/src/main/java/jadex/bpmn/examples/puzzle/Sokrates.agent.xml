@@ -107,7 +107,7 @@
 			<parameterset name="result" class="ICandidateInfo" direction="out">
 				<goalmapping ref="choosemove.result"/>
 			</parameterset>
-			<body class="ChooseMovePlan"/>
+			<body type="bpmn" impl="jadex/bpmn/examples/puzzle/ChooseMovePlan.bpmn"/>
 			<trigger>
 				<goal ref="choosemove"/>
 			</trigger>

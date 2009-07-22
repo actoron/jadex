@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_KQZA8XFYEd63xqPyP8ks8A" iD="_KQZA8HFYEd63xqPyP8ks8A">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_LwpSwXFYEd63xqPyP8ks8A" iD="_LwpSwHFYEd63xqPyP8ks8A" name="package jadex.bpmn.examples.puzzle;&#xD;&#xA;import jadex.bpmn.runtime.task.*;&#xD;&#xA;import jadex.bdi.bpmn.*;">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_LwpSwXFYEd63xqPyP8ks8A" iD="_LwpSwHFYEd63xqPyP8ks8A" name="package jadex.bpmn.examples.puzzle;&#xD;&#xA;import jadex.bpmn.runtime.task.*;&#xD;&#xA;import jadex.bdi.bpmn.*;&#xD;&#xA;import jadex.bdi.examples.puzzle.*;">
     <associations xmi:type="bpmn:Association" xmi:id="_LwzDx3FYEd63xqPyP8ks8A"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_KQZA93FYEd63xqPyP8ks8A" iD="_KQZA9nFYEd63xqPyP8ks8A" associations="_LwzDx3FYEd63xqPyP8ks8A" name="Pool">

@@ -10,14 +10,13 @@ import jadex.bpmn.runtime.task.AbstractTask;
  */
 public class SayGoodbyeTask	extends AbstractTask
 {
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		System.out.println("Goodbye BPMN world!");
 		int	y = ((Number)context.getParameterValue("y")).intValue();
 		System.out.println("Parameter y: "+y);
 		
-//		if(instance instanceof BpmnPlanBodyInstance)
-//			((BpmnPlanBodyInstance)instance).killAgent();
-		return null;
+		if(instance instanceof BpmnPlanBodyInstance)
+			((BpmnPlanBodyInstance)instance).killAgent();
 	}
 }

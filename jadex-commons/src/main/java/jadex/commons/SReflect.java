@@ -544,6 +544,14 @@ public class SReflect
 			// Try to find in imports.
 			if(clazz==null && imports!=null)
 			{
+				String	clwoa	=	clname;
+				String	brackets	= "";
+				while(clwoa.endsWith("[]"))
+				{
+					clwoa	= clwoa.substring(0, clwoa.length()-2);
+					brackets	+= "[]";
+				} 
+
 				for(int i=0; clazz==null && i<imports.length; i++)
 				{
 					// Package import
@@ -554,9 +562,9 @@ public class SReflect
 	//					System.out.println("+++cFN1: "+imp.substring(0, imp.length()-1) + clname+", "+clazz);
 					}
 					// Class import
-					else if(imports[i].endsWith(clname))
+					else if(imports[i].endsWith(clwoa))
 					{
-						clazz	= classForName0(imports[i], classloader);
+						clazz	= classForName0(imports[i]+brackets, classloader);
 	//					System.out.println("+++cFN2: "+imp+", "+clazz);
 					}
 					cache.put(new Tuple(clname, imports[i]), clazz);

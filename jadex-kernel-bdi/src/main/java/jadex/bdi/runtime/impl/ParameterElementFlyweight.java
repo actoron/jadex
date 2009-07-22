@@ -237,7 +237,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 				public void run()
 				{
 					bool = getState().containsKey(getHandle(), 
-						OAVBDIRuntimeModel.parameterelement_has_parameters, name);
+						OAVBDIRuntimeModel.parameterelement_has_parametersets, name);
 				}
 			};
 			return invoc.bool;
@@ -245,7 +245,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 		else
 		{
 			return getState().containsKey(getHandle(), 
-				OAVBDIRuntimeModel.parameterelement_has_parameters, name);
+				OAVBDIRuntimeModel.parameterelement_has_parametersets, name);
 		}
 	}
 

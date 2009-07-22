@@ -9,7 +9,7 @@ import jadex.bpmn.runtime.task.AbstractTask;
  */
 public class ExceptionTask extends AbstractTask
 {
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		throw new RuntimeException("Exception occurred.");
 	}

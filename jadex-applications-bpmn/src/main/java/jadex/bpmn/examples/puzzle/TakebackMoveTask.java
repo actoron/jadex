@@ -13,10 +13,9 @@ public class TakebackMoveTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		IBoard	board	= (IBoard)context.getParameterValue("board");
 		board.takeback();
-		return null;
 	}
 }

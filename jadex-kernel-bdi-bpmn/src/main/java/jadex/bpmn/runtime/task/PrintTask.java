@@ -11,10 +11,9 @@ public class PrintTask extends AbstractTask
 	/**
 	 * 
 	 */
-	public Object doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		String text = (String)context.getParameterValue("text");
 		System.out.println(text);
-		return null;
 	}
 }

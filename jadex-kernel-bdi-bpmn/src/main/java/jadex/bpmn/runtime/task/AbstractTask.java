@@ -20,8 +20,8 @@ public abstract class AbstractTask implements ITask
 	{
 		try
 		{
-			Object	result	= doExecute(context, instance);
-			listener.resultAvailable(result);
+			doExecute(context, instance);
+			listener.resultAvailable(null);
 		}
 		catch(Exception e)
 		{
@@ -35,8 +35,7 @@ public abstract class AbstractTask implements ITask
 	 *  finished, when the method returns.
 	 *  @param context	The accessible values.
 	 *  @param instance	The process instance executing the task.
-	 *  @return	The result, if any.
 	 *  @throws	Exception When task execution fails.
 	 */
-	public abstract Object	doExecute(ITaskContext context, IProcessInstance instance)	throws Exception;
+	public abstract void	doExecute(ITaskContext context, IProcessInstance instance)	throws Exception;
 }
