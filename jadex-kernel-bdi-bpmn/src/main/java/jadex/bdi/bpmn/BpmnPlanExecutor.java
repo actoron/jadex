@@ -69,13 +69,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			try
 			{
 				// Read the file and parse the state machine
-				ResourceInfo rinfo = SUtil.getResourceInfo0(impl, interpreter.getState().getTypeModel().getClassLoader());
-				Reader reader = BpmnXMLReader.getReader(); 
-				bodymodel = (MBpmnModel)reader.read(rinfo.getInputStream(), interpreter.getState().getTypeModel().getClassLoader(), null);
-				String name = new File(rinfo.getFilename()).getName();
-				name = name.substring(0, name.length()-5);
-				bodymodel.setName(name);
-				rinfo.getInputStream().close();
+				bodymodel = (MBpmnModel)BpmnXMLReader.read(impl, interpreter.getState().getTypeModel().getClassLoader(), null);
 
 				// HACK! Cache parsed body models
 				planmodelcache.put(mbody, bodymodel);

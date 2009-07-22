@@ -3,13 +3,13 @@ package jadex.tools.comanalyzer.table;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.jtable.ResizeableTableHeader;
+import jadex.commons.jtable.TableSorter;
 import jadex.commons.jtable.VisibilityTableColumnModel;
 import jadex.tools.comanalyzer.Agent;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.MessageFilterMenu;
 import jadex.tools.comanalyzer.ToolCanvas;
 import jadex.tools.comanalyzer.ToolTab;
-import jadex.tools.common.TableSorter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

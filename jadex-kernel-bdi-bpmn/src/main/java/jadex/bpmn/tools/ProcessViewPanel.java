@@ -1,12 +1,16 @@
 package jadex.bpmn.tools;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.HistoryEntry;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.jtable.ResizeableTableHeader;
+import jadex.commons.jtable.TableSorter;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -17,23 +21,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 
 /**
  *  Panel for showing / manipulating the Rete agenda.
  */
-public class ProcessViewPanel extends JSplitPane
+public class ProcessViewPanel extends JPanel
 {
 	//------- attributes --------
 	
@@ -59,10 +61,10 @@ public class ProcessViewPanel extends JSplitPane
 	protected HistoryModel	hmodel;
 	
 	/** The list for the activations. */
-	protected JList threads;
+	protected JTable threads;
 	
 	/** The list for the history. */
-	protected JList	history;
+	protected JTable history;
 
 	//------- constructors --------
 	
@@ -71,49 +73,40 @@ public class ProcessViewPanel extends JSplitPane
 	 */
 	public ProcessViewPanel(final BpmnInstance instance)
 	{
-		super(VERTICAL_SPLIT);
 		this.instance = instance;
-		this.setOneTouchExpandable(true);
-		
 		this.ptmodel = new ProcessThreadModel();
 		this.hmodel	= new HistoryModel();
 
-		this.threads = new JList(ptmodel);
-		threads.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		threads.addListSelectionListener(new ListSelectionListener()
-		{
-			public void valueChanged(ListSelectionEvent e)
-			{
-				if(!e.getValueIsAdjusting())
-				{
-					int i	= -1;
-					if(next!=null)
-					{
-						for(i=0;i<ptmodel.getSize(); i++)
-						{
-							if(next.equals(ptmodel.getElementAt(i)))
-								break;
-						}
-					}
-					
-					// Hack!!! Should use agent.invokeLater
-//					if(threads.getSelectedIndex()!=-1 && threads.getSelectedIndex()!=i && threads.getSelectedIndex()<agenda.getActivations().size())
-//						threads.setNextActivation((Activation)ptmodel.getElementAt(threads.getSelectedIndex()));
-				}
-			}
-		});
-		this.history	= new JList(hmodel);
-		
 		// todo: problem should be called on process execution thread!
 		instance.setHistoryEnabled(true);	// Todo: Disable history on close?
+		
 		threads_clone = getThreadInfos().toArray();
 		history_clone = instance.getHistory().toArray();
-//		next	= agenda.getNextActivation();
 		
+		TableSorter sorter = new TableSorter(ptmodel);
+		this.threads = new JTable(sorter);
+		ResizeableTableHeader header = new ResizeableTableHeader(threads.getColumnModel());
+		header.setIncludeHeaderWidth(true);
+//		threads.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		threads.setTableHeader(header);
+		threads.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		sorter.setTableHeader(header);
+		threads.getColumnModel().setColumnMargin(10);
+
+		sorter = new TableSorter(hmodel);
+		this.history = new JTable(sorter);
+		header = new ResizeableTableHeader(history.getColumnModel());
+		header.setIncludeHeaderWidth(true);
+//		history.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		history.setTableHeader(header);
+		history.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		sorter.setTableHeader(header);
+		history.getColumnModel().setColumnMargin(10);
+			
 		this.listener	= new IChangeListener()
 		{
-			Object[]	activations_clone;
-			Object[]	history_clone;
+			Object[] threads_clone;
+			Object[] history_clone;
 			Object	next;
 			boolean	invoked;
 
@@ -197,8 +190,13 @@ public class ProcessViewPanel extends JSplitPane
 		buts.add(clear);
 		historyp.add(buts, BorderLayout.SOUTH);
 		
-		this.add(procp);
-		this.add(historyp);
+		JSplitPane tmp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		tmp.add(procp);
+		tmp.add(historyp);
+		tmp.setDividerLocation(200); // Hack?!
+		
+		setLayout(new BorderLayout());
+		add(tmp, BorderLayout.CENTER);
 	}
 	
 	//-------- methods --------
@@ -218,23 +216,12 @@ public class ProcessViewPanel extends JSplitPane
 	 */
 	protected void	updateList()
 	{
-		ptmodel.fireAgendaChanged();
-		hmodel.fireAgendaChanged();
-
-		if(next!=null)
-		{
-			int i	= 0;
-			for(;i<ptmodel.getSize(); i++)
-			{
-				if(next.equals(ptmodel.getElementAt(i)))
-					break;
-			}
-			if(threads.getSelectedIndex()!=i)
-			{
-				threads.setSelectedIndex(-1);
-				threads.setSelectedIndex(i);
-			}
-		}
+		ptmodel.fireTableDataChanged();
+		hmodel.fireTableDataChanged();
+//		if(ptmodel.getRowCount()>0)
+//			((ResizeableTableHeader)threads.getTableHeader()).resizeAllColumns();
+//		if(hmodel.getRowCount()>0)
+//			((ResizeableTableHeader)history.getTableHeader()).resizeAllColumns();
 		threads.repaint();
 		history.repaint();
 	}
@@ -254,7 +241,8 @@ public class ProcessViewPanel extends JSplitPane
 			for(Iterator it=threads.iterator(); it.hasNext(); )
 			{
 				ProcessThread pt = (ProcessThread)it.next();
-				ret.add(new ProcessThreadInfo(pt.getActivity(), pt.getLastEdge(), pt.getException(), pt.isWaiting()));
+				ret.add(new ProcessThreadInfo(pt.getId(), pt.getActivity(), //pt.getLastEdge(), 
+					pt.getException(), pt.isWaiting()));
 			}
 		}
 		return ret;
@@ -265,42 +253,113 @@ public class ProcessViewPanel extends JSplitPane
 	/**
 	 *  List model for activations.
 	 */
-	protected class ProcessThreadModel extends AbstractListModel
+	protected class ProcessThreadModel extends AbstractTableModel
 	{
-		public Object getElementAt(int index)
+		protected String[] colnames = new String[]{"Process-Id", "Activity", "Pool", "Lane", "Exception", "Status"};
+		
+		public String getColumnName(int column)
 		{
-			return threads_clone[index];
+			return colnames[column];
 		}
 
-		public int getSize()
+		public int getColumnCount()
+		{
+			return 6;
+		}
+		
+		public int getRowCount()
 		{
 			return threads_clone.length;
 		}
 		
-		public void	fireAgendaChanged()
+		public Object getValueAt(int row, int column)
 		{
-			fireContentsChanged(this, 0, threads_clone.length);
+			Object ret = null;
+			ProcessThreadInfo pti = (ProcessThreadInfo)threads_clone[row];
+			if(column==0)
+			{
+				ret = pti.getId();
+			}
+			else if(column==1)
+			{
+				ret = pti.getActivity().getName();
+			}
+			else if(column==2)
+			{
+				MPool pool = pti.getActivity().getPool(); 
+				if(pool!=null)
+					ret = pool.getName();
+			}
+			else if(column==3)
+			{
+				MLane lane = pti.getActivity().getLane(); 
+				if(lane!=null)
+					ret = lane.getName();
+			}
+			else if(column==4)
+			{
+				ret = pti.getException();
+			}
+			else if(column==5)
+			{
+				ret = pti.isWaiting()? "waiting": "ready";
+			}
+			return ret;
 		}
 	}
 	
 	/**
 	 *  List model for history.
 	 */
-	protected class HistoryModel extends AbstractListModel
+	protected class HistoryModel extends AbstractTableModel
 	{
-		public Object getElementAt(int index)
+		protected String[] colnames = new String[]{"Step", "Process-Id", "Activity", "Pool", "Lane"};
+		
+		public String getColumnName(int column)
 		{
-			return history_clone[index];
+			return colnames[column];
 		}
 
-		public int getSize()
+		public int getColumnCount()
+		{
+			return 5;
+		}
+		
+		public int getRowCount()
 		{
 			return history_clone.length;
 		}
 		
-		public void	fireAgendaChanged()
+		public Object getValueAt(int row, int column)
 		{
-			fireContentsChanged(this, 0, history_clone.length);
+			Object ret = null;
+			HistoryEntry he = (HistoryEntry)history_clone[row];
+			if(column==0)
+			{
+				ret = ""+he.getStepNumber();
+			}
+			else if(column==1)
+			{
+				ret = he.getThreadId();
+			}
+			else if(column==2)
+			{
+				ret = he.getActivity().getName();
+			}
+			else if(column==3)
+			{
+				MPool pool = he.getActivity().getPool(); 
+				if(pool!=null)
+					ret = pool.getName();
+			}
+			else if(column==4)
+			{
+				MLane lane = he.getActivity().getLane(); 
+				if(lane!=null)
+					ret = lane.getName();
+			}
+
+			return ret;
 		}
 	}
 	
@@ -313,12 +372,12 @@ class ProcessThreadInfo
 {
 	//-------- attributes --------
 	
+	/** The id. */
+	protected String id;
+	
 	/** The next activity. */
 	protected MActivity	activity;
 	
-	/** The last edge (if any). */
-	protected MSequenceEdge	edge;
-		
 	/** The exception that has just occurred in the process (if any). */
 	protected Exception	exception;
 	
@@ -330,16 +389,34 @@ class ProcessThreadInfo
 	/**
 	 *  Create a new info.
 	 */
-	public ProcessThreadInfo(MActivity activity, MSequenceEdge edge,
+	public ProcessThreadInfo(String id, MActivity activity,
 		Exception exception, boolean waiting)
 	{
+		this.id = id;
 		this.activity = activity;
-		this.edge = edge;
 		this.exception = exception;
 		this.waiting = waiting;
 	}
 
 	//-------- methods --------
+
+	/**
+	 *  Get the id.
+	 *  @return The id.
+	 */
+	public String getId()
+	{
+		return this.id;
+	}
+
+	/**
+	 *  Set the id.
+	 *  @param id The id to set.
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
+	}
 	
 	/**
 	 *  Get the activity.
@@ -357,24 +434,6 @@ class ProcessThreadInfo
 	public void setActivity(MActivity activity)
 	{
 		this.activity = activity;
-	}
-
-	/**
-	 *  Get the edge.
-	 *  @return The edge.
-	 */
-	public MSequenceEdge getEdge()
-	{
-		return this.edge;
-	}
-
-	/**
-	 *  Set the edge.
-	 *  @param edge The edge to set.
-	 */
-	public void setEdge(MSequenceEdge edge)
-	{
-		this.edge = edge;
 	}
 
 	/**
@@ -418,8 +477,8 @@ class ProcessThreadInfo
 	 */
 	public String toString()
 	{
-		return "ProcessThreadInfo(activity=" + this.activity + ", edge="
-			+ this.edge + ", exception=" + this.exception + ", waiting="
+		return "ProcessThreadInfo(activity=" + this.activity + 
+			", exception=" + this.exception + ", waiting="
 			+ this.waiting + ")";
 	}
 	

@@ -1,0 +1,111 @@
+package jadex.bpmn.tools;
+
+import jadex.bpmn.runtime.BpmnInstance;
+import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
+
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+/**
+ * 
+ */
+public class ExecutionControlPanel extends JPanel
+{
+	//-------- attributes --------
+	
+
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new control panel.
+	 */
+	public ExecutionControlPanel(final ISteppable steppable)
+	{
+		// The step action
+		setLayout(new GridBagLayout());
+		final JButton step = new JButton("Step");
+		step.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				steppable.doStep();
+			}
+		});
+		step.setEnabled(steppable.isStepmode());		
+		
+		final JCheckBox	stepmode = new JCheckBox("Step Mode", steppable.isStepmode());
+		stepmode.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				steppable.setStepmode(stepmode.isSelected());
+				step.setEnabled(steppable.isStepmode());		
+			}
+		});
+		
+		steppable.addBreakpointCommand(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						stepmode.setSelected(steppable.isStepmode());
+						step.setEnabled(steppable.isStepmode());		
+					}
+				});
+			}
+		});
+		
+		int row	= 0;
+		int	col	= 0;
+		add(stepmode, new GridBagConstraints(col++, row, 1, 1,
+			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
+			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		
+	}
+	
+	/**
+	 *  Dispose the panel and remove any listeners.
+	 */
+	public void	dispose()
+	{
+//		ap.dispose();
+//		rulebasepanel.dispose();
+//		system.getAgenda().removeAgendaListener(agendalistener);
+	}
+	
+	/**
+	 *  Create a frame for a rete structure.
+	 *  @param title	The title for the frame.
+	 *  @param rs	The rule system.
+	 *  @return	The frame.
+	 */
+	public static JFrame createBpmnFrame(String title, BpmnInstance instance, ISteppable steppable)
+	{
+		JFrame f = new JFrame(title);
+		f.getContentPane().setLayout(new BorderLayout());
+		ProcessViewPanel vp = new ProcessViewPanel(instance);
+		ExecutionControlPanel ep = new ExecutionControlPanel(steppable);
+		f.add("Center", vp);
+		f.add("South", ep);
+//		f.pack();
+        f.setSize(600, 400);
+		f.setVisible(true);
+		
+		return f;
+	}
+}

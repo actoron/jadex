@@ -77,6 +77,9 @@ public class BpmnInstance	implements IProcessInstance
 	/** The change listeners. */
 	protected List listeners;
 	
+	/** The step number. */
+	protected int stepnumber;
+	
 	/** The context variables. */
 	protected Map	variables;
 	
@@ -211,7 +214,7 @@ public class BpmnInstance	implements IProcessInstance
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			handler.execute(thread.getActivity(), this, thread);
 			if(history!=null)
-				history.add(new HistoryEntry(thread.getActivity(), thread));
+				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
 			
 			notifyListeners(new ChangeEvent(this, "step_executed"));
 		}
@@ -393,65 +396,3 @@ public class BpmnInstance	implements IProcessInstance
 	}
 }
 
-/**
- *  History entry for saving the process execution history. 
- */
-class HistoryEntry
-{
-	//-------- attributes --------
-	
-	/** The model element of the activity. */
-	protected MActivity activity;
-	
-	/** The thread that executed this activity. */
-	protected ProcessThread thread;
-
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new entry.
-	 */
-	public HistoryEntry(MActivity activity, ProcessThread thread)
-	{
-		this.activity = activity;
-		this.thread = thread;
-	}
-	
-	//-------- methods --------
-	
-	/**
-	 *  Get the activity.
-	 *  @return The activity.
-	 */
-	public MActivity getActivity()
-	{
-		return this.activity;
-	}
-
-	/**
-	 *  Set the activity.
-	 *  @param activity The activity to set.
-	 */
-	public void setActivity(MActivity activity)
-	{
-		this.activity = activity;
-	}
-
-	/**
-	 *  Get the thread.
-	 *  @return The thread.
-	 */
-	public ProcessThread getThread()
-	{
-		return this.thread;
-	}
-
-	/**
-	 *  Set the thread.
-	 *  @param thread The thread to set.
-	 */
-	public void setThread(ProcessThread thread)
-	{
-		this.thread = thread;
-	}
-}

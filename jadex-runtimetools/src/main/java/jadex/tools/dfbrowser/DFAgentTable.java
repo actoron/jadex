@@ -6,7 +6,7 @@ import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
 import jadex.commons.SGUI;
-import jadex.tools.common.TableSorter;
+import jadex.commons.jtable.TableSorter;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

@@ -1,9 +1,12 @@
 package jadex.bpmn;
 
 import jadex.bpmn.model.MBpmnModel;
+import jadex.commons.ResourceInfo;
+import jadex.commons.SUtil;
 import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.Reader;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,9 +34,31 @@ public class BpmnXMLReader
 	
 	/**
 	 *  Get the reader instance.
-	 */
+	 * /
 	public static Reader	getReader()
 	{
 		return reader;
+	}*/
+	
+	/**
+	 *  Read properties from xml.
+	 *  @param input The input stream.
+	 *  @param classloader The classloader.
+	 * 	@param context The context.
+ 	 */
+	public static MBpmnModel read(String filename, final ClassLoader classloader, final Object context) throws Exception
+	{
+		ResourceInfo rinfo = SUtil.getResourceInfo0(filename, classloader);
+		if(rinfo==null)
+			throw new RuntimeException("Could not find resource: "+filename);
+		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, context);
+		String name = new File(rinfo.getFilename()).getName();
+		name = name.substring(0, name.length()-5);
+		ret.setName(name);
+		rinfo.getInputStream().close();
+		System.out.println("Loaded model: "+ret);
+		return ret;
 	}
+	
+
 }

@@ -1,7 +1,7 @@
 package jadex.rules.tools.reteviewer;
 
+import jadex.commons.ISteppable;
 import jadex.commons.SGUI;
-import jadex.rules.rulesystem.ISteppable;
 import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.rulesystem.RuleSystemExecutor;
 import jadex.rules.tools.stateviewer.OAVPanel;

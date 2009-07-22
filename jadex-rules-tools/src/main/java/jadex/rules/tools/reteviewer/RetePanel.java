@@ -1,10 +1,10 @@
 package jadex.rules.tools.reteviewer;
 
 import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IAgendaListener;
 import jadex.rules.rulesystem.IRule;
-import jadex.rules.rulesystem.ISteppable;
 import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rete.RetePatternMatcherState;

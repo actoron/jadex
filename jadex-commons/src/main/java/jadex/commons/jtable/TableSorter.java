@@ -1,4 +1,4 @@
-package jadex.tools.common;
+package jadex.commons.jtable;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -251,7 +251,15 @@ public class TableSorter extends AbstractTableModel {
     }
 
     public int modelIndex(int viewIndex) {
-        return getViewToModel()[viewIndex].modelIndex;
+    	try
+    	{
+    		return getViewToModel()[viewIndex].modelIndex;
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    		throw new RuntimeException();
+    	}
     }
 
     private int[] getModelToView() {

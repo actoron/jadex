@@ -1,10 +1,10 @@
 package jadex.rules.tools.reteviewer;
 
+import jadex.commons.ISteppable;
 import jadex.commons.SGUI;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
 import jadex.rules.rulesystem.IRulebaseListener;
-import jadex.rules.rulesystem.ISteppable;
 import jadex.rules.tools.common.TableSorter;
 
 import java.awt.BorderLayout;
@@ -249,7 +249,7 @@ public class RulebasePanel extends JPanel
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, final int rowIndex, int column)
 		{
 			final TableSorter sorter = (TableSorter)list.getModel();
-			boolean	selected	= steppable.isBreakpoint((IRule) rules.get(sorter.modelIndex(rowIndex)));
+			boolean	selected	= steppable.isBreakpoint((IRule)rules.get(sorter.modelIndex(rowIndex)));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			final JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);

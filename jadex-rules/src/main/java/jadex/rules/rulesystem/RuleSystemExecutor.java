@@ -1,6 +1,7 @@
 package jadex.rules.rulesystem;
 
 import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
@@ -136,7 +137,7 @@ public class RuleSystemExecutor implements ISteppable
 	/**
 	 *  Add a breakpoint to the interpreter.
 	 */
-	public void	addBreakpoint(IRule rule)
+	public void	addBreakpoint(Object rule)
 	{
 		if(breakpoints==null)
 			breakpoints	= new HashSet();
@@ -146,7 +147,7 @@ public class RuleSystemExecutor implements ISteppable
 	/**
 	 *  Remove a breakpoint from the interpreter.
 	 */
-	public void	removeBreakpoint(IRule rule)
+	public void	removeBreakpoint(Object rule)
 	{
 		if(breakpoints.remove(rule) && breakpoints.isEmpty())
 			breakpoints	= null;
@@ -155,7 +156,7 @@ public class RuleSystemExecutor implements ISteppable
 	/**
 	 *  Check if a rule is a breakpoint for the interpreter.
 	 */
-	public boolean	isBreakpoint(IRule rule)
+	public boolean	isBreakpoint(Object rule)
 	{
 		return breakpoints!=null && breakpoints.contains(rule);
 	}

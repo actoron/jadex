@@ -37,13 +37,13 @@ public class AgendaPanel extends JSplitPane
 	protected IAgendaListener	listener;
 	
 	/** Local copy of activations. */
-	Object[]	activations_clone;
+	protected Object[]	activations_clone;
 	
 	/** Local copy of agenda history. */
-	Object[]	history_clone;
+	protected Object[]	history_clone;
 	
 	/** Local copy of next agenda action. */
-	Object	next;
+	protected Object	next;
 	
 	/** The list model for the activations. */
 	protected ActivationsModel	amodel;

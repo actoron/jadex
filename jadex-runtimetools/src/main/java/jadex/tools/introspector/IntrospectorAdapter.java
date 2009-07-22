@@ -9,9 +9,9 @@ import jadex.bridge.IKernelAgent;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
 import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
-import jadex.rules.rulesystem.ISteppable;
 import jadex.rules.state.IOAVState;
 
 import java.util.HashSet;
@@ -97,7 +97,7 @@ public class IntrospectorAdapter implements IToolAdapter, ISteppable
 	/**
 	 *  Add a breakpoint to the interpreter.
 	 */
-	public void	addBreakpoint(IRule rule)
+	public void	addBreakpoint(Object rule)
 	{
 		if(breakpoints==null)
 			breakpoints	= new HashSet();
@@ -107,7 +107,7 @@ public class IntrospectorAdapter implements IToolAdapter, ISteppable
 	/**
 	 *  Remove a breakpoint from the interpreter.
 	 */
-	public void	removeBreakpoint(IRule rule)
+	public void	removeBreakpoint(Object rule)
 	{
 		if(breakpoints.remove(rule) && breakpoints.isEmpty())
 			breakpoints	= null;
@@ -116,7 +116,7 @@ public class IntrospectorAdapter implements IToolAdapter, ISteppable
 	/**
 	 *  Check if a rule is a breakpoint for the interpreter.
 	 */
-	public boolean	isBreakpoint(IRule rule)
+	public boolean	isBreakpoint(Object rule)
 	{
 		return breakpoints!=null && breakpoints.contains(rule);
 	}

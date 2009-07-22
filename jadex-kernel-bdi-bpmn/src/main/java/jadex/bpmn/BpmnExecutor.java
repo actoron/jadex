@@ -1,11 +1,11 @@
 package jadex.bpmn;
 
-import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IBpmnExecutor;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  *  A rule system executor can execute rule systems on a separate thread.
  */
-public class BpmnExecutor	implements IBpmnExecutor	//, ISteppable
+public class BpmnExecutor	implements IBpmnExecutor, ISteppable
 {
 	//-------- attributes --------
 
@@ -163,28 +163,28 @@ public class BpmnExecutor	implements IBpmnExecutor	//, ISteppable
 	/**
 	 *  Add a breakpoint to the interpreter.
 	 */
-	public void	addBreakpoint(MActivity activity)
+	public void	addBreakpoint(Object markerobj)
 	{
 		if(breakpoints==null)
 			breakpoints	= new HashSet();
-		breakpoints.add(activity);
+		breakpoints.add(markerobj);
 	}
 	
 	/**
 	 *  Remove a breakpoint from the interpreter.
 	 */
-	public void	removeBreakpoint(MActivity rule)
+	public void	removeBreakpoint(Object markerobj)
 	{
-		if(breakpoints.remove(rule) && breakpoints.isEmpty())
+		if(breakpoints.remove(markerobj) && breakpoints.isEmpty())
 			breakpoints	= null;
 	}
 	
 	/**
 	 *  Check if a rule is a breakpoint for the interpreter.
 	 */
-	public boolean	isBreakpoint(MActivity rule)
+	public boolean	isBreakpoint(Object markerobj)
 	{
-		return breakpoints!=null && breakpoints.contains(rule);
+		return breakpoints!=null && breakpoints.contains(markerobj);
 	}
 	
 	/**

@@ -47,6 +47,9 @@ public class ProcessThread	implements ITaskContext
 	
 	//-------- attributes --------
 	
+	/** The thread id. */
+	protected String id;
+	
 	/** The next activity. */
 	protected MActivity	activity;
 	
@@ -75,6 +78,9 @@ public class ProcessThread	implements ITaskContext
 	/** The wait filter. */
 	protected IFilter waitfilter;
 	
+	/** The static id counter. */
+	protected static int idcnt;
+	
 	//-------- constructors --------
 
 	/**
@@ -83,6 +89,10 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public ProcessThread(MActivity activity, ThreadContext context, BpmnInstance instance)
 	{
+		synchronized(ProcessThread.class)
+		{
+			this.id = "ProcessThread_"+idcnt++;
+		}
 		this.activity	= activity;
 		this.context	= context;
 		this.instance = instance;
@@ -91,23 +101,14 @@ public class ProcessThread	implements ITaskContext
 	//-------- methods --------
 	
 	/**
-	 *  Create a string representation of this process thread.
-	 *  @return A string representation of this process thread.
+	 *  Get the id.
+	 *  @return The id.
 	 */
-	public String	toString()
+	public String getId()
 	{
-		StringBuffer buf = new StringBuffer();
-		buf.append(SReflect.getInnerClassName(this.getClass()));
-		buf.append("(activity=");
-		buf.append(activity);
-		buf.append(", data=");
-		buf.append(data);
-		buf.append(", waiting=");
-		buf.append(waiting);
-		buf.append(")");
-		return buf.toString();
-	}
-
+		return this.id;
+	}	
+	
 	/**
 	 *  Get the activity.
 	 *  @return The activity.
@@ -446,5 +447,25 @@ public class ProcessThread	implements ITaskContext
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Create a string representation of this process thread.
+	 *  @return A string representation of this process thread.
+	 */
+	public String	toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append(SReflect.getInnerClassName(this.getClass()));
+		buf.append("(id=");
+		buf.append(id);
+		buf.append("(activity=");
+		buf.append(activity);
+		buf.append(", data=");
+		buf.append(data);
+		buf.append(", waiting=");
+		buf.append(waiting);
+		buf.append(")");
+		return buf.toString();
 	}
 }
