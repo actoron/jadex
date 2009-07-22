@@ -1,11 +1,14 @@
 package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +53,7 @@ public class ProcessThread	implements ITaskContext
 	/** The last edge (if any). */
 	protected MSequenceEdge	edge;
 		
-	/** The data of previous activities (task name -> Map). */
+	/** The data of the current or last activity. */
 	protected Map	data;
 	
 	/** The thread context. */
@@ -123,10 +126,6 @@ public class ProcessThread	implements ITaskContext
 	{
 		this.edge	= null;
 		this.activity	= activity;
-		
-		// Remove old data, if activity was executed before.
-		if(activity!=null && data!=null)
-			data.remove(activity.getName());
 	}
 	
 	/**
@@ -262,8 +261,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean hasParameterValue(String name)
 	{
-		assert activity!=null;
-		return data!=null && data.containsKey(activity.getName())? ((Map)data.get(activity.getName())).containsKey(name): false;
+		return data!=null && data.containsKey(name);
 	}
 
 	/**
@@ -282,8 +280,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public Object getParameterValue(String name)
 	{
-		assert activity!=null;
-		return data!=null && data.containsKey(activity.getName())? ((Map)data.get(activity.getName())).get(name): null;
+		return data!=null ? data.get(name): null;
 	}
 
 	/**
@@ -293,16 +290,23 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setParameterValue(String name, Object value)
 	{
-		assert activity!=null;
 		if(data==null)
 			data	= new HashMap();
 			
-		if(!data.containsKey(activity.getName()))
+		data.put(name, value);
+	}
+
+	/**
+	 *  Remove the value of a parameter.
+	 *  @param name	The parameter name. 
+	 */
+	public void	removeParameterValue(String name)
+	{
+		assert activity!=null;
+		if(data!=null)
 		{
-			data.put(activity.getName(), new HashMap());
+			data.remove(name);
 		}
-			
-		((Map)data.get(activity.getName())).put(name, value);
 	}
 	
 	/**
@@ -331,16 +335,6 @@ public class ProcessThread	implements ITaskContext
 			ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getValueFetcher()));
 		}
 		return ret;
-	}
-	
-	/**
-	 *  Get the context of a previously executed task.
-	 *  @param name	The name of the task.
-	 *  @return	The context (if any).
-	 */
-	public Map getData(String name)
-	{
-		return data!=null ? (Map)data.get(name) : null;
 	}
 
 	/**
@@ -391,5 +385,66 @@ public class ProcessThread	implements ITaskContext
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Update parameters based on edge inscriptions and initial values.
+	 *  @param instance	The calling BPMN instance.
+	 */
+	protected  void updateParameters(BpmnInstance instance)
+	{
+		if(getActivity().getActivityType().equals(MBpmnModel.TASK)
+			|| getActivity().getActivityType().equals(MBpmnModel.SUBPROCESS))
+		{
+			// Handle parameter passing in edge inscriptions.
+			Map	passedparams	= null;
+			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
+			{
+				List params = getActivity().getParameters();
+				if(params!=null)
+				{	
+					Map mappings = getLastEdge().getParameterMappings();
+					if(mappings!=null)
+					{
+						IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getValueFetcher());
+						for(int i=0; i<params.size(); i++)
+						{
+							MParameter param = (MParameter)params.get(i);
+							if(mappings.containsKey(param.getName()))
+							{
+								IParsedExpression exp = (IParsedExpression)mappings.get(param.getName());
+								Object value = exp.getValue(fetcher);
+								if(passedparams==null)
+									passedparams	= new HashMap();
+								passedparams.put(param.getName(), value);
+							}
+						}
+					}
+				}
+			}
+			
+			// Remove old data.
+			this.data	= null;
+			
+			// todo: parameter direction / class
+			
+			List params = getActivity().getParameters();
+			if(params!=null)
+			{	
+				IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getValueFetcher());
+				for(int i=0; i<params.size(); i++)
+				{
+					MParameter param = (MParameter)params.get(i);
+					if(passedparams!=null && passedparams.containsKey(param.getName()))
+					{
+						setParameterValue(param.getName(), passedparams.get(param.getName()));
+					}
+					else
+					{
+						setParameterValue(param.getName(), param.getInitialval()==null? null: param.getInitialval().getValue(fetcher));
+					}
+				}
+			}
+		}
 	}
 }

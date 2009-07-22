@@ -12,7 +12,7 @@
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_U7ftkWV3Ed6rasIGpuxRsw" iD="_U7ftkGV3Ed6rasIGpuxRsw" name=""/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fJ-60WV3Ed6rasIGpuxRsw" iD="_fJ-60GV3Ed6rasIGpuxRsw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_SkSD8WWKEd66n90-5WZehg" iD="_SkSD8GWKEd66n90-5WZehg"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Vrg6oWWKEd66n90-5WZehg" iD="_Vrg6oGWKEd66n90-5WZehg" name="y = SayHello.x + 1"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Vrg6oWWKEd66n90-5WZehg" iD="_Vrg6oGWKEd66n90-5WZehg" name="y = x + 1"/>
     <lanes xmi:type="bpmn:Lane" xmi:id="_z5xT4WWIEd66n90-5WZehg" iD="_z5xT4GWIEd66n90-5WZehg" name="Body" activities="_U7V8kWV3Ed6rasIGpuxRsw _TsXA8WV3Ed6rasIGpuxRsw _eQwz0WV3Ed6rasIGpuxRsw _XiioUWV3Ed6rasIGpuxRsw _SkIS8WWKEd66n90-5WZehg"/>
     <lanes xmi:type="bpmn:Lane" xmi:id="_1fPc4WWIEd66n90-5WZehg" iD="_1fPc4GWIEd66n90-5WZehg" name="Passed"/>
     <lanes xmi:type="bpmn:Lane" xmi:id="_2XbCEWWIEd66n90-5WZehg" iD="_2XbCEGWIEd66n90-5WZehg" name="Failed"/>

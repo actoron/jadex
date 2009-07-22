@@ -2,7 +2,6 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
@@ -14,13 +13,11 @@ import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
-import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -183,37 +180,8 @@ public class BpmnInstance	implements IProcessInstance
 		// Thread may be null when external entry has not changed waiting state of any active plan. 
 		if(thread!=null)
 		{
-			// Handle parameter passing in edge inscriptions.
-			if(thread.getLastEdge()!=null && thread.getLastEdge().getParameterMappings()!=null)
-			{
-				Map mappings = thread.getLastEdge().getParameterMappings();
-				if(mappings!=null)
-				{
-					IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, this.fetcher);
-					for(Iterator it2=mappings.keySet().iterator(); it2.hasNext(); )
-					{
-						String name = (String)it2.next();
-						IParsedExpression exp = (IParsedExpression)mappings.get(name);
-						Object value = exp.getValue(fetcher);
-						thread.setParameterValue(name, value);
-					}
-				}
-			}
-			
-			// todo: parameter direction / class
-			
-			List params = thread.getActivity().getParameters();
-			if(params!=null)
-			{	
-				IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, true, this.fetcher);
-				for(int i=0; i<params.size(); i++)
-				{
-					MParameter param = (MParameter)params.get(i);
-					if(!thread.hasParameterValue(param.getName()))
-						thread.setParameterValue(param.getName(), param.getInitialval()==null? null: param.getInitialval().getValue(fetcher));
-				}
-			}
-			
+			// Update parameters based on edge inscriptions and initial values.
+			thread.updateParameters(this);
 			
 			// Find handler and execute activity.
 			IActivityHandler handler = (IActivityHandler)handlers.get(thread.getActivity().getActivityType());
@@ -226,7 +194,7 @@ public class BpmnInstance	implements IProcessInstance
 			notifyListeners(new ChangeEvent(this, "step_executed"));
 		}
 	}
-	
+
 	/**
 	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
 	 *  @param pool	The pool to be executed or null for any.

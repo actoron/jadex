@@ -36,10 +36,11 @@ public class Test
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test2.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/all_activities.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/XOR.bpmn", null);
-			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/Exception.bpmn", null);
+//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/Exception.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/test_rule.bpmn", null);
 //			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/SubProcess.bpmn", null);
-//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/UserInteraction.bpmn", null);
+			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/UserInteraction.bpmn", null);
+//			ResourceInfo rinfo = SUtil.getResourceInfo0("jadex/bpmn/examples/helloworld/ChooseMovePlan.bpmn", null);
 
 			MBpmnModel model = (MBpmnModel)reader.read(rinfo.getInputStream(), null, null);
 			String name = new File(rinfo.getFilename()).getName();
