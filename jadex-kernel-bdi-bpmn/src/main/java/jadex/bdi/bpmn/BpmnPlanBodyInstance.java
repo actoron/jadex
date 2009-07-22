@@ -52,6 +52,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInstanceFetcher;
 import jadex.bpmn.runtime.IBpmnExecutor;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
@@ -160,7 +161,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			}
 		});
 		
-		((OAVBDIFetcher)getValueFetcher()).setRPlan(rplan);
+		((OAVBDIFetcher)((BpmnInstanceFetcher)getValueFetcher()).getValueFetcher()).setRPlan(rplan);
 	}
 	
 	//-------- methods --------

@@ -13,13 +13,16 @@ import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Representation of a running BPMN process.
@@ -74,6 +77,9 @@ public class BpmnInstance	implements IProcessInstance
 	/** The change listeners. */
 	protected List listeners;
 	
+	/** The context variables. */
+	protected Map	variables;
+	
 	//-------- constructors --------
 	
 	/**
@@ -93,9 +99,25 @@ public class BpmnInstance	implements IProcessInstance
 	public BpmnInstance(MBpmnModel model, Map handlers, IValueFetcher fetcher)
 	{
 		this.handlers	= handlers;
-		this.fetcher	= fetcher;
+		this.fetcher	= new BpmnInstanceFetcher(this, fetcher);
 		this.context	= new ThreadContext(model);
 		this.extentries	= new ArrayList();
+		
+		// Initialize context variables.
+		Set	vars	= model.getContextVariables();
+		for(Iterator it=vars.iterator(); it.hasNext(); )
+		{
+			String	name	= (String)it.next();
+			Object	value	= null;
+			IParsedExpression	exp	= model.getContextVariableExpression(name);
+			if(exp!=null)
+			{
+				value	= exp.getValue(fetcher);
+			}
+			if(variables==null)
+				variables	= new HashMap();
+			variables.put(name, value);
+		}
 		
 		// Create initial thread(s). 
 		List	startevents	= model.getStartActivities();
@@ -324,6 +346,50 @@ public class BpmnInstance	implements IProcessInstance
 		buf.append(context);
 		buf.append(")");
 		return buf.toString();
+	}
+
+	/**
+	 *  Test if the given context variable is declared.
+	 *  @param name	The variable name.
+	 *  @return True, if the variable is declared.
+	 */
+	public boolean hasContextVariable(String name)
+	{
+		return variables!=null && variables.containsKey(name);
+	}
+	
+	/**
+	 *  Get the value of the given context variable.
+	 *  @param name	The variable name.
+	 *  @return The variable value.
+	 */
+	public Object getContextVariable(String name)
+	{
+		if(variables!=null && variables.containsKey(name))
+		{
+			return variables.get(name);			
+		}
+		else
+		{
+			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
+		}
+	}
+	
+	/**
+	 *  Set the value of the given context variable.
+	 *  @param name	The variable name.
+	 *  @param value	The variable value.
+	 */
+	public void setContextVariable(String name, Object value)
+	{
+		if(variables!=null && variables.containsKey(name))
+		{
+			variables.put(name, value);			
+		}
+		else
+		{
+			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
+		}
 	}
 }
 

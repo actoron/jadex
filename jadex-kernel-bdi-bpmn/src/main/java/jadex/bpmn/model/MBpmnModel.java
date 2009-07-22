@@ -11,6 +11,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -102,6 +103,9 @@ public class MBpmnModel extends MIdElement
 	
 	/** The imports. */
 	protected String[] imports;
+	
+	/** The context variables (name -> [class, initexpression]). */
+	protected Map	variables;
 	
 	//-------- methods --------
 
@@ -853,7 +857,7 @@ public class MBpmnModel extends MIdElement
 					if(prop.startsWith("in") || prop.startsWith("out"))
 					{
 						// parameter
-						StringTokenizer stok2 = new StringTokenizer(prop, " =");
+						StringTokenizer stok2 = new StringTokenizer(prop, " \t=");
 						String paramdir = stok2.nextToken();
 						String paramclazzname = stok2.nextToken();
 						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getAllImports(), classloader);
@@ -1134,6 +1138,7 @@ public class MBpmnModel extends MIdElement
 		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnModel model = (MBpmnModel)root;
+			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
 			List arts = model.getArtifacts();
 			if(arts!=null)
@@ -1147,19 +1152,47 @@ public class MBpmnModel extends MIdElement
 				while(stok.hasMoreTokens())
 				{
 					String	prop	= stok.nextToken().trim();
+					if(prop.endsWith(";"))
+						prop = prop.substring(0, prop.length()-1);
+					
 					if(prop.startsWith("package"))
 					{
 						String packagename = prop.substring(prop.indexOf("package")+8).trim();
-						if(packagename.endsWith(";"))
-							packagename = packagename.substring(0, packagename.length()-1);
 						model.setPackage(packagename);
 					}
 					else if(prop.startsWith("import"))
 					{
 						String imp = prop.substring(prop.indexOf("imports")+7).trim();
-						if(imp.endsWith(";"))
-							imp = imp.substring(0, imp.length()-1);
 						imports.add(imp);
+					}
+					else
+					{
+						// context variable
+						String	init	= null;
+						int	idx	= prop.indexOf("=");
+						if(idx!=-1)
+						{
+							init	= prop.substring(idx+1);
+							prop	= prop.substring(0, idx);
+						}
+						StringTokenizer stok2 = new StringTokenizer(prop, " \t");
+						if(stok2.countTokens()==2)
+						{
+							String clazzname = stok2.nextToken();
+							String[]	imps	= (String[])imports.toArray(new String[imports.size()]);
+							Class clazz = SReflect.findClass0(clazzname, imps, classloader);
+							if(clazz!=null)
+							{
+								String name = stok2.nextToken();
+								IParsedExpression exp = null;
+								if(init!=null)
+								{
+									exp = parser.parseExpression(init, imps, null, classloader);
+								}
+								
+								model.addContextVariable(name, clazz, exp);
+							}
+						}
 					}
 				}
 				if(model.getPackage()!=null)
@@ -1176,5 +1209,65 @@ public class MBpmnModel extends MIdElement
 		{
 			return 2;
 		}
+	}
+
+	/**
+	 *  Add a context variable declaration.
+	 *  @param name	The variable name.
+	 *  @param clazz	The type of the variable
+	 *  @param exp	An initialization expression (if any).
+	 */
+	public void addContextVariable(String name, Class clazz, IParsedExpression exp)
+	{
+		if(variables==null)
+			variables	= new HashMap();
+		
+		variables.put(name, new Object[]{clazz, exp});
+	}
+
+	/**
+	 *  Remove a context variable declaration.
+	 *  @param name	The variable name.
+	 */
+	public void removeContextVariable(String name)
+	{
+		if(variables!=null)
+		{
+			variables.remove(name);
+			
+			if(variables.isEmpty())
+			{
+				variables	= null;
+			}
+		}
+	}
+
+	/**
+	 *  Get the declared context variables.
+	 *  @return A set of variable names.
+	 */
+	public Set getContextVariables()
+	{
+		return variables!=null ? variables.keySet() : Collections.EMPTY_SET;
+	}
+
+	/**
+	 *  Get the class of a declared context variable.
+	 *  @param name	The variable name.
+	 *  @return The class of the variable.
+	 */
+	public Class	getContextVariableClass(String name)
+	{
+		return (Class)((Object[])variables.get(name))[0];
+	}
+
+	/**
+	 *  Get the initialization expression of a declared context variable.
+	 *  @param name	The variable name.
+	 *  @return The initialization expression (if any).
+	 */
+	public IParsedExpression	getContextVariableExpression(String name)
+	{
+		return (IParsedExpression)((Object[])variables.get(name))[1];
 	}
 }
