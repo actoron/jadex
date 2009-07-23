@@ -95,7 +95,7 @@ public class GpmnXMLReader
 		types.add(new TypeInfo("associations", MAssociation.class));
 		
 		types.add(new TypeInfo("vertices", MAchieveGoal.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"}, 
+			SUtil.createHashMap(new String[]{"ID"},
 			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
 			new ProcessElementPostProcessor(),
 			new IFilter()
@@ -108,7 +108,7 @@ public class GpmnXMLReader
 			}));
 		
 		types.add(new TypeInfo("vertices", MMaintainGoal.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"}, 
+			SUtil.createHashMap(new String[]{"ID"},
 			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
 			new ProcessElementPostProcessor(),
 			new IFilter()
@@ -151,6 +151,17 @@ public class GpmnXMLReader
 		// gpmn model
 		linkinfos.add(new LinkInfo("processes", new BeanAttributeInfo("process")));
 
+		// goals
+		linkinfos.add(new LinkInfo("creationcondition", new BeanAttributeInfo("creationCondition")));
+		linkinfos.add(new LinkInfo("contextcondition", new BeanAttributeInfo("contextCondition")));
+		linkinfos.add(new LinkInfo("dropcondition", new BeanAttributeInfo("dropCondition")));
+		
+		// achieve goal
+		linkinfos.add(new LinkInfo("targetcondition", new BeanAttributeInfo("targetCondition")));
+
+		// maintain goal
+		linkinfos.add(new LinkInfo("maintaincondition", new BeanAttributeInfo("maintainCondition")));
+		
 		// process
 		linkinfos.add(new LinkInfo("outgoingEdges", new BeanAttributeInfo("outgoingSequenceEdgesDescription")));
 		linkinfos.add(new LinkInfo("incomingEdges", new BeanAttributeInfo("incomingSequenceEdgesDescription")));

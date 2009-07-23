@@ -16,7 +16,7 @@ public class MMaintainGoal extends MGoal
 	 *  Get the maintaincondition.
 	 *  @return The maintaincondition.
 	 */
-	public String getMaintaincondition()
+	public String getMaintainCondition()
 	{
 		return this.maintaincondition;
 	}
@@ -25,7 +25,7 @@ public class MMaintainGoal extends MGoal
 	 *  Set the maintaincondition.
 	 *  @param maintaincondition The maintaincondition to set.
 	 */
-	public void setMaintaincondition(String maintaincondition)
+	public void setMaintainCondition(String maintaincondition)
 	{
 		this.maintaincondition = maintaincondition;
 	}

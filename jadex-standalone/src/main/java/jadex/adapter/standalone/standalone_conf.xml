@@ -10,7 +10,7 @@
 	<properties type="platform_standalone" name="lars">
 		<property type="platformname">lars</property>
 		<property type="platform_shutdown_time">1000</property>
-		<property type="welcome">false</property>
+		<property type="welcome">true</property>
 		<property type="autoshutdown">true</property>
 		
 		<property type="application_factory">
