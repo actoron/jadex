@@ -2,12 +2,13 @@
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" name="DiPP1_Logistik" ID="_ajVBQHdpEd6QBt5Nz_tZNA">
   <processes name="xcDiPP1_Logistik.net" ID="_cLfR4HdpEd6QBt5Nz_tZNA">
     <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert_seq">
-      <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
       <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
+      <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_mAdy8HdpEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgeglichen">
       <outgoingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</outgoingEdges>
       <incomingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</incomingEdges>
+      <targetcondition>$beliefbase.produktmodell &amp;&amp; $beliefbase.vertriebsprognosen &amp;&amp; $beliefbase.gs_konzept &amp;&amp; $beliefbase.molog_praemissen</targetcondition>
     </vertices>
     <vertices xsi:type="gpmn:Plan" ID="_XA3KoHdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgleichen" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn">
       <incomingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</incomingEdges>
@@ -27,9 +28,9 @@
       <incomingEdges>_y12UgHdqEd6QBt5Nz_tZNA</incomingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_45Qq0HeeEd6InfwtmHfU3w" name="Dipp1_Logistik_abgesichert_par">
-      <outgoingEdges>_E2IsgHefEd6InfwtmHfU3w</outgoingEdges>
-      <outgoingEdges>_dwtTsHefEd6Ozo0E4CWLCw</outgoingEdges>
       <outgoingEdges>_eHW5IHefEd6Ozo0E4CWLCw</outgoingEdges>
+      <outgoingEdges>_dwtTsHefEd6Ozo0E4CWLCw</outgoingEdges>
+      <outgoingEdges>_E2IsgHefEd6InfwtmHfU3w</outgoingEdges>
       <incomingEdges>_5yVA0HeeEd6InfwtmHfU3w</incomingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_bLdIsHefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Prozessplanung_durchgeführt">
