@@ -8,31 +8,57 @@ import jadex.bpmn.runtime.task.AbstractTask;
  *  Write a belief (set) value.
  *  The belief(set) is specified by the 'belief(set)name' belief.
  *  The value is specified by the 'value' belief.
- *  For belief sets a boolean 'add' belief can be specified to distinguish
+ *  For belief sets a mode 'add', 'remove', or 'removeAll' can be specified to distinguish
  *  between value addition (default) and removal.
  */
 public class WriteBeliefTask extends AbstractTask
 {
+	//-------- constants --------
+	
+	/** The 'add' mode (default). */
+	public static final String	MODE_ADD	= "add";
+	
+	/** The 'remove' mode. */
+	public static final String	MODE_REMOVE	= "remove";
+	
+	/** The 'removeAll' mode. */
+	public static final String	MODE_REMOVE_ALL	= "removeAll";
+	
+	//-------- AbstractTask methods --------
+	
+	/**
+	 *  Execute the task.
+	 */
 	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{
 		BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
-		Object value = context.getParameterValue("value");
 		
 		if(context.hasParameterValue("beliefname"))
 		{
 			String name = (String)context.getParameterValue("beliefname");
+			Object value = context.getParameterValue("value");
 			inst.getBeliefbase().getBelief(name).setFact(value);
 		}
 		else if(context.hasParameterValue("beliefsetname"))
 		{
-			String name = (String)context.getParameterValue("beliefname");
-			if(!context.hasParameterValue("add") || ((Boolean)context.getParameterValue("add")).booleanValue())
+			String name = (String)context.getParameterValue("beliefsetname");
+			if(!context.hasParameterValue("mode") || MODE_ADD.equals(context.getParameterValue("mode")))
 			{
+				Object value = context.getParameterValue("value");
 				inst.getBeliefbase().getBeliefSet(name).addFact(value);
+			}
+			else if(MODE_REMOVE.equals(context.getParameterValue("mode")))
+			{
+				Object value = context.getParameterValue("value");
+				inst.getBeliefbase().getBeliefSet(name).removeFact(value);
+			}
+			else if(MODE_REMOVE_ALL.equals(context.getParameterValue("mode")))
+			{
+				inst.getBeliefbase().getBeliefSet(name).removeFacts();
 			}
 			else
 			{
-				inst.getBeliefbase().getBeliefSet(name).removeFact(value);
+				throw new RuntimeException("Unknown mode: "+context.getParameterValue("mode")+", "+context);
 			}
 		}
 		else

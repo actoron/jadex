@@ -44,7 +44,7 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_cLfR43dpEd6QBt5Nz_tZNA"/>
     <styles xmi:type="notation:FillStyle" xmi:id="_cLfR5HdpEd6QBt5Nz_tZNA"/>
     <element xmi:type="gpmn:Process" href="dipp.gpmn#_cLfR4HdpEd6QBt5Nz_tZNA"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cLfR5XdpEd6QBt5Nz_tZNA" x="150" y="85" width="631" height="460"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cLfR5XdpEd6QBt5Nz_tZNA" x="150" y="85" width="619" height="454"/>
   </children>
   <styles xmi:type="notation:DiagramStyle" xmi:id="_aj63IXdpEd6QBt5Nz_tZNA"/>
   <element xmi:type="gpmn:GpmnDiagram" href="dipp.gpmn#_ajVBQHdpEd6QBt5Nz_tZNA"/>

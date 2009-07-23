@@ -29,7 +29,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 		List	outgoing	= activity.getOutgoingSequenceEdges();
 		
 		// Split
-		if(incoming!=null && incoming.size()==1 && outgoing!=null && outgoing.size()>1)
+		if(incoming!=null /* && incoming.size()==1 */ && outgoing!=null && outgoing.size()>1)
 		{
 			MSequenceEdge def = null;
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, instance.getValueFetcher());
