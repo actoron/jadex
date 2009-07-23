@@ -1,9 +1,9 @@
 package jadex.bpmn.examples.helloworld;
 
-import jadex.bdi.bpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmnbdi.BpmnPlanBodyInstance;
 
 /**
  *  Print goodbye on the console and print parameter 'y'.

@@ -1,4 +1,4 @@
-package jadex.bdi.bpmn;
+package jadex.bpmnbdi;
 
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
@@ -56,6 +56,10 @@ import jadex.bpmn.runtime.BpmnInstanceFetcher;
 import jadex.bpmn.runtime.IBpmnExecutor;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bpmnbdi.handler.EventIntermediateMessageActivityHandler;
+import jadex.bpmnbdi.handler.EventIntermediateRuleActicityHandler;
+import jadex.bpmnbdi.handler.EventIntermediateSignalActivityHandler;
+import jadex.bpmnbdi.handler.EventIntermediateTimerActivityHandler;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IClockService;
 import jadex.javaparser.IExpressionParser;

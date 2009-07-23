@@ -1,4 +1,4 @@
-package jadex.bdi.bpmn;
+package jadex.bpmnbdi.task;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
@@ -8,6 +8,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmnbdi.BpmnPlanBodyInstance;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.List;

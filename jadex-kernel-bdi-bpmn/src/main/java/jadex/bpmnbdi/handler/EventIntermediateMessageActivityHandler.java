@@ -1,17 +1,19 @@
-package jadex.bdi.bpmn;
+package jadex.bpmnbdi.handler;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
+import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bpmnbdi.BpmnPlanBodyInstance;
 import jadex.commons.IFilter;
 import jadex.rules.state.IOAVState;
 
 /**
- *  Handler for rule events.
+ *  Handler for message events.
  */
-public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
+public class EventIntermediateMessageActivityHandler	extends DefaultActivityHandler
 {
 	/**
 	 *  Execute an activity.
@@ -22,11 +24,11 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
 	{
 		// Just set thread to waiting.
-		String type	= (String)thread.getPropertyValue("type", activity);
-//		thread.setWaitingState(ProcessThread.WAITING_FOR_RULE);
+//		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
+		final String	type	= (String)thread.getPropertyValue("type", activity);
 		thread.setWaiting(true);
 		thread.setWaitInfo(type);
-		System.out.println("Waiting for rule: "+type);
+		System.out.println("Waiting for message: "+type);
 		
 		// Does currently only match message type name.
 		thread.setWaitFilter(new IFilter()
@@ -36,13 +38,13 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 				boolean ret = false;
 				BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
 				IOAVState state = inst.getState();
-				if(OAVBDIMetaModel.condition_type.equals(state.getType(event)))
+				if(OAVBDIRuntimeModel.messageevent_type.equals(state.getType(event)))
 				{
-					String type = (String)state.getAttributeValue(event, OAVBDIMetaModel.modelelement_has_name);
-					ret = type.equals(type);
+					Object mmsg = state.getAttributeValue(event, OAVBDIRuntimeModel.element_has_model);
+					String msgtype = (String)state.getAttributeValue(mmsg, OAVBDIMetaModel.modelelement_has_name);
+					ret = type.equals(msgtype);
 				}
-				
-				return ret;
+				return ret; 
 			}
 		});
 	}

@@ -1,17 +1,18 @@
-package jadex.bdi.bpmn;
+package jadex.bpmnbdi.task;
 
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmnbdi.BpmnPlanBodyInstance;
 
 /**
- *  Write a belief (set) value.
- *  The belief(set) is specified by the 'belief(set)name' belief.
- *  The value is specified by the 'value' belief.
- *  For belief sets a mode 'add', 'remove', or 'removeAll' can be specified to distinguish
+ *  Write a parameter (set) value.
+ *  The parameter(set) is specified by the 'parameter(set)name' parameter.
+ *  The value is specified by the 'value' parameter.
+ *  For parameter sets a mode 'add', 'remove', or 'removeAll' can be specified to distinguish
  *  between value addition (default) and removal.
  */
-public class WriteBeliefTask extends AbstractTask
+public class WriteParameterTask extends AbstractTask
 {
 	//-------- constants --------
 	
@@ -33,28 +34,28 @@ public class WriteBeliefTask extends AbstractTask
 	{
 		BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
 		
-		if(context.hasParameterValue("beliefname"))
+		if(context.hasParameterValue("parametername"))
 		{
-			String name = (String)context.getParameterValue("beliefname");
+			String name = (String)context.getParameterValue("parametername");
 			Object value = context.getParameterValue("value");
-			inst.getBeliefbase().getBelief(name).setFact(value);
+			inst.getParameter(name).setValue(value);
 		}
-		else if(context.hasParameterValue("beliefsetname"))
+		else if(context.hasParameterValue("parametersetname"))
 		{
-			String name = (String)context.getParameterValue("beliefsetname");
+			String name = (String)context.getParameterValue("parametersetname");
 			if(!context.hasParameterValue("mode") || MODE_ADD.equals(context.getParameterValue("mode")))
 			{
 				Object value = context.getParameterValue("value");
-				inst.getBeliefbase().getBeliefSet(name).addFact(value);
+				inst.getParameterSet(name).addValue(value);
 			}
 			else if(MODE_REMOVE.equals(context.getParameterValue("mode")))
 			{
 				Object value = context.getParameterValue("value");
-				inst.getBeliefbase().getBeliefSet(name).removeFact(value);
+				inst.getParameterSet(name).removeValue(value);
 			}
 			else if(MODE_REMOVE_ALL.equals(context.getParameterValue("mode")))
 			{
-				inst.getBeliefbase().getBeliefSet(name).removeFacts();
+				inst.getParameterSet(name).removeValues();
 			}
 			else
 			{
@@ -63,7 +64,7 @@ public class WriteBeliefTask extends AbstractTask
 		}
 		else
 		{
-			throw new RuntimeException("Belief(set)name no specified: "+context);
+			throw new RuntimeException("Parameter(set)name no specified: "+context);
 		}
 	}
 }

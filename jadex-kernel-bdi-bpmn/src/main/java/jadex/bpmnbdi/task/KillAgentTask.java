@@ -1,8 +1,9 @@
-package jadex.bdi.bpmn;
+package jadex.bpmnbdi.task;
 
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmnbdi.BpmnPlanBodyInstance;
 
 /**
  *  Task to kill the agent.

@@ -1,4 +1,4 @@
-package jadex.bdi.bpmn;
+package jadex.bpmnbdi;
 
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.EventProcessingRules;

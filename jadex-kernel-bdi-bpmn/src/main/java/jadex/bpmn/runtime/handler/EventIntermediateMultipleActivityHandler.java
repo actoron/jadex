@@ -1,10 +1,10 @@
 package jadex.bpmn.runtime.handler;
 
-import jadex.bdi.bpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmnbdi.BpmnPlanBodyInstance;
 import jadex.commons.IFilter;
 
 import java.util.List;
