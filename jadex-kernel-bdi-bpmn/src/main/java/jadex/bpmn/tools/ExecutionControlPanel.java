@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -100,12 +101,17 @@ public class ExecutionControlPanel extends JPanel
 		f.getContentPane().setLayout(new BorderLayout());
 		ProcessViewPanel vp = new ProcessViewPanel(instance);
 		ExecutionControlPanel ep = new ExecutionControlPanel(steppable);
-		f.add("Center", vp);
-		f.add("South", ep);
+		ActivityPanel ap = new ActivityPanel(instance.getModelElement(), steppable);
+		JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		sp.add(ap);
+		sp.add(vp);
+		f.add(sp, BorderLayout.CENTER);
+		f.add(ep, BorderLayout.SOUTH);
 //		f.pack();
         f.setSize(600, 400);
-		f.setVisible(true);
-		
+        f.setVisible(true);
+        sp.setDividerLocation(0.3);
+        
 		return f;
 	}
 }
