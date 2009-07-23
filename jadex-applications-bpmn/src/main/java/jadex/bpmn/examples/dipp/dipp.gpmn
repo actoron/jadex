@@ -1,35 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" name="DiPP1_Logistik" ID="_ajVBQHdpEd6QBt5Nz_tZNA">
   <processes name="xcDiPP1_Logistik.net" ID="_cLfR4HdpEd6QBt5Nz_tZNA">
-    <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert">
+    <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert_seq">
+      <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
       <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
-      <outgoingEdges>_d9XCsHdqEd6QBt5Nz_tZNA</outgoingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_mAdy8HdpEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgeglichen">
       <outgoingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</outgoingEdges>
       <incomingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</incomingEdges>
     </vertices>
-    <vertices xsi:type="gpmn:Plan" ID="_XA3KoHdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgleichen">
+    <vertices xsi:type="gpmn:Plan" ID="_XA3KoHdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgleichen" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn">
       <incomingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</incomingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_cZFMgHdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Ladungsträger_abgesichert">
       <outgoingEdges>_jaDU4HdqEd6QBt5Nz_tZNA</outgoingEdges>
-      <incomingEdges>_d9XCsHdqEd6QBt5Nz_tZNA</incomingEdges>
+      <incomingEdges>_E2IsgHefEd6InfwtmHfU3w</incomingEdges>
     </vertices>
-    <vertices xsi:type="gpmn:Plan" ID="_h0Rp4HdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Ladungsträger_absichern">
+    <vertices xsi:type="gpmn:Plan" ID="_h0Rp4HdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Ladungsträger_absichern" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn">
       <incomingEdges>_jaDU4HdqEd6QBt5Nz_tZNA</incomingEdges>
     </vertices>
     <vertices xsi:type="gpmn:MaintainGoal" ID="_utNEIHdqEd6QBt5Nz_tZNA" name="Prämissen_ok">
       <outgoingEdges>_y12UgHdqEd6QBt5Nz_tZNA</outgoingEdges>
       <maintaincondition>$beliefbase.praemissen_ok</maintaincondition>
     </vertices>
-    <vertices xsi:type="gpmn:Plan" ID="_xVvMoHdqEd6QBt5Nz_tZNA" name="Info_Prämissen_fehlen">
+    <vertices xsi:type="gpmn:Plan" ID="_xVvMoHdqEd6QBt5Nz_tZNA" name="Info_Prämissen_fehlen" bpmnPlan="jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn">
       <incomingEdges>_y12UgHdqEd6QBt5Nz_tZNA</incomingEdges>
     </vertices>
-    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_SVpYsHdqEd6QBt5Nz_tZNA"/>
+    <vertices xsi:type="gpmn:AchieveGoal" ID="_45Qq0HeeEd6InfwtmHfU3w" name="Dipp1_Logistik_abgesichert_par">
+      <outgoingEdges>_E2IsgHefEd6InfwtmHfU3w</outgoingEdges>
+      <outgoingEdges>_dwtTsHefEd6Ozo0E4CWLCw</outgoingEdges>
+      <outgoingEdges>_eHW5IHefEd6Ozo0E4CWLCw</outgoingEdges>
+      <incomingEdges>_5yVA0HeeEd6InfwtmHfU3w</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:AchieveGoal" ID="_bLdIsHefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Prozessplanung_durchgeführt">
+      <outgoingEdges>_qutbMHefEd6Ozo0E4CWLCw</outgoingEdges>
+      <incomingEdges>_dwtTsHefEd6Ozo0E4CWLCw</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:AchieveGoal" ID="_bdVi4HefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Lieferantenstandort_geprüft">
+      <outgoingEdges>_2_srsHefEd6Ozo0E4CWLCw</outgoingEdges>
+      <incomingEdges>_eHW5IHefEd6Ozo0E4CWLCw</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:Plan" ID="_cUnwMHefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Prozessplanung_durchfuehren" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Prozessplanung_durchfuehren.bpmn">
+      <incomingEdges>_qutbMHefEd6Ozo0E4CWLCw</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:Plan" ID="_cfWZgHefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Lieferantenstandort_prüfen" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Lieferantenstandort_pruefen.bpmn">
+      <incomingEdges>_2_srsHefEd6Ozo0E4CWLCw</incomingEdges>
+    </vertices>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_SVpYsHdqEd6QBt5Nz_tZNA" description="" name=""/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_YtMJkHdqEd6QBt5Nz_tZNA"/>
-    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_d9XCsHdqEd6QBt5Nz_tZNA"/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_jaDU4HdqEd6QBt5Nz_tZNA"/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_y12UgHdqEd6QBt5Nz_tZNA"/>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_5yVA0HeeEd6InfwtmHfU3w"/>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_E2IsgHefEd6InfwtmHfU3w"/>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_dwtTsHefEd6Ozo0E4CWLCw"/>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_eHW5IHefEd6Ozo0E4CWLCw"/>
+    <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_qutbMHefEd6Ozo0E4CWLCw"/>
+    <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_2_srsHefEd6Ozo0E4CWLCw"/>
   </processes>
 </gpmn:GpmnDiagram>
