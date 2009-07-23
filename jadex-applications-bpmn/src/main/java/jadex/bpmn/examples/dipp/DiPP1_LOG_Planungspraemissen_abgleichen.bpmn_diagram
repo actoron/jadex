@@ -183,7 +183,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_GXkihXd9Ed6uv6EsxGS0Yg"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_GXkihnd9Ed6uv6EsxGS0Yg" lineColor="0"/>
     <element xmi:type="bpmn:TextAnnotation" href="DiPP1_LOG_Planungspraemissen_abgleichen.bpmn#_GXkigXd9Ed6uv6EsxGS0Yg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GXkih3d9Ed6uv6EsxGS0Yg" x="16" y="1084"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GXkih3d9Ed6uv6EsxGS0Yg" x="16" y="1188"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_c_1ss3d5Ed6uv6EsxGS0Yg"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_c_1stHd5Ed6uv6EsxGS0Yg"/>
