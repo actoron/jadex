@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" ID="_ajVBQHdpEd6QBt5Nz_tZNA">
+  <processes name="xcDiPP1_Logistik.net" ID="_cLfR4HdpEd6QBt5Nz_tZNA">
+    <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert">
+      <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
+      <outgoingEdges>_d9XCsHdqEd6QBt5Nz_tZNA</outgoingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:AchieveGoal" ID="_mAdy8HdpEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgeglichen">
+      <outgoingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</outgoingEdges>
+      <incomingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:Plan" ID="_XA3KoHdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgleichen">
+      <incomingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:AchieveGoal" ID="_cZFMgHdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Ladungsträger_abgesichert">
+      <outgoingEdges>_jaDU4HdqEd6QBt5Nz_tZNA</outgoingEdges>
+      <incomingEdges>_d9XCsHdqEd6QBt5Nz_tZNA</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:Plan" ID="_h0Rp4HdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Ladungsträger_absichern">
+      <incomingEdges>_jaDU4HdqEd6QBt5Nz_tZNA</incomingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:MaintainGoal" ID="_utNEIHdqEd6QBt5Nz_tZNA" name="Prämissen_ok">
+      <outgoingEdges>_y12UgHdqEd6QBt5Nz_tZNA</outgoingEdges>
+    </vertices>
+    <vertices xsi:type="gpmn:Plan" ID="_xVvMoHdqEd6QBt5Nz_tZNA" name="Info_Prämissen_fehlen">
+      <incomingEdges>_y12UgHdqEd6QBt5Nz_tZNA</incomingEdges>
+    </vertices>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_SVpYsHdqEd6QBt5Nz_tZNA"/>
+    <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_YtMJkHdqEd6QBt5Nz_tZNA"/>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_d9XCsHdqEd6QBt5Nz_tZNA"/>
+    <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_jaDU4HdqEd6QBt5Nz_tZNA"/>
+    <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_y12UgHdqEd6QBt5Nz_tZNA"/>
+  </processes>
+</gpmn:GpmnDiagram>

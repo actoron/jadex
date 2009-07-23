@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_aj63IHdpEd6QBt5Nz_tZNA" type="Gpmn" name="dipp.gpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_cLfR4XdpEd6QBt5Nz_tZNA" type="2004">
+    <children xmi:type="notation:DecorationNode" xmi:id="_cLob0HdpEd6QBt5Nz_tZNA" type="5004"/>
+    <children xmi:type="notation:BasicCompartment" xmi:id="_cLob0XdpEd6QBt5Nz_tZNA" type="7001">
+      <children xmi:type="notation:Shape" xmi:id="_jnRuAXdpEd6QBt5Nz_tZNA" type="3001">
+        <children xmi:type="notation:DecorationNode" xmi:id="_jnRuA3dpEd6QBt5Nz_tZNA" type="5005"/>
+        <element xmi:type="gpmn:AchieveGoal" href="dipp.gpmn#_jnRuAHdpEd6QBt5Nz_tZNA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_jnRuAndpEd6QBt5Nz_tZNA" x="140" y="54"/>
+      </children>
+      <children xmi:type="notation:Shape" xmi:id="_mAdy8XdpEd6QBt5Nz_tZNA" type="3001">
+        <children xmi:type="notation:DecorationNode" xmi:id="_mAdy83dpEd6QBt5Nz_tZNA" type="5005"/>
+        <element xmi:type="gpmn:AchieveGoal" href="dipp.gpmn#_mAdy8HdpEd6QBt5Nz_tZNA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mAdy8ndpEd6QBt5Nz_tZNA" x="15" y="169"/>
+      </children>
+      <children xmi:type="notation:Shape" xmi:id="_XA3KoXdqEd6QBt5Nz_tZNA" type="3002">
+        <children xmi:type="notation:DecorationNode" xmi:id="_XA3Ko3dqEd6QBt5Nz_tZNA" type="5006"/>
+        <element xmi:type="gpmn:Plan" href="dipp.gpmn#_XA3KoHdqEd6QBt5Nz_tZNA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XA3KondqEd6QBt5Nz_tZNA" x="20" y="309"/>
+      </children>
+      <children xmi:type="notation:Shape" xmi:id="_cZFMgXdqEd6QBt5Nz_tZNA" type="3001">
+        <children xmi:type="notation:DecorationNode" xmi:id="_cZFMg3dqEd6QBt5Nz_tZNA" type="5005"/>
+        <element xmi:type="gpmn:AchieveGoal" href="dipp.gpmn#_cZFMgHdqEd6QBt5Nz_tZNA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cZFMgndqEd6QBt5Nz_tZNA" x="300" y="214"/>
+      </children>
+      <children xmi:type="notation:Shape" xmi:id="_h0Rp4XdqEd6QBt5Nz_tZNA" type="3002">
+        <children xmi:type="notation:DecorationNode" xmi:id="_h0Rp43dqEd6QBt5Nz_tZNA" type="5006"/>
+        <element xmi:type="gpmn:Plan" href="dipp.gpmn#_h0Rp4HdqEd6QBt5Nz_tZNA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_h0Rp4ndqEd6QBt5Nz_tZNA" x="305" y="354"/>
+      </children>
+      <children xmi:type="notation:Shape" xmi:id="_utNEIXdqEd6QBt5Nz_tZNA" type="3005">
+        <children xmi:type="notation:DecorationNode" xmi:id="_utNEI3dqEd6QBt5Nz_tZNA" type="5009"/>
+        <element xmi:type="gpmn:MaintainGoal" href="dipp.gpmn#_utNEIHdqEd6QBt5Nz_tZNA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_utNEIndqEd6QBt5Nz_tZNA" x="480" y="44"/>
+      </children>
+      <children xmi:type="notation:Shape" xmi:id="_xVvMoXdqEd6QBt5Nz_tZNA" type="3002">
+        <children xmi:type="notation:DecorationNode" xmi:id="_xVvMo3dqEd6QBt5Nz_tZNA" type="5006"/>
+        <element xmi:type="gpmn:Plan" href="dipp.gpmn#_xVvMoHdqEd6QBt5Nz_tZNA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_xVvMondqEd6QBt5Nz_tZNA" x="455" y="144"/>
+      </children>
+    </children>
+    <children xmi:type="notation:DecorationNode" xmi:id="_cLob0ndpEd6QBt5Nz_tZNA" type="7002"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_cLfR4ndpEd6QBt5Nz_tZNA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_cLfR43dpEd6QBt5Nz_tZNA"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_cLfR5HdpEd6QBt5Nz_tZNA"/>
+    <element xmi:type="gpmn:Process" href="dipp.gpmn#_cLfR4HdpEd6QBt5Nz_tZNA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cLfR5XdpEd6QBt5Nz_tZNA" x="150" y="85" width="631" height="460"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_aj63IXdpEd6QBt5Nz_tZNA"/>
+  <element xmi:type="gpmn:GpmnDiagram" href="dipp.gpmn#_ajVBQHdpEd6QBt5Nz_tZNA"/>
+  <edges xmi:type="notation:Edge" xmi:id="_SVpYsXdqEd6QBt5Nz_tZNA" type="4001" source="_jnRuAXdpEd6QBt5Nz_tZNA" target="_mAdy8XdpEd6QBt5Nz_tZNA">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_SVpYsndqEd6QBt5Nz_tZNA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_SVpYs3dqEd6QBt5Nz_tZNA"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="dipp.gpmn#_SVpYsHdqEd6QBt5Nz_tZNA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_SVpYtHdqEd6QBt5Nz_tZNA" points="[-3, 20, 0, -80]$[-133, 101, -130, 1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_YtMJkXdqEd6QBt5Nz_tZNA" type="4003" source="_mAdy8XdpEd6QBt5Nz_tZNA" target="_XA3KoXdqEd6QBt5Nz_tZNA">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_YtMJkndqEd6QBt5Nz_tZNA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_YtMJk3dqEd6QBt5Nz_tZNA"/>
+    <element xmi:type="gpmn:PlanEdge" href="dipp.gpmn#_YtMJkHdqEd6QBt5Nz_tZNA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_YtMJlHdqEd6QBt5Nz_tZNA" points="[-5, 20, 19, -110]$[-25, 110, -1, -20]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_d9XCsXdqEd6QBt5Nz_tZNA" type="4001" source="_jnRuAXdpEd6QBt5Nz_tZNA" target="_cZFMgXdqEd6QBt5Nz_tZNA">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_d9XCsndqEd6QBt5Nz_tZNA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_d9XCs3dqEd6QBt5Nz_tZNA"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="dipp.gpmn#_d9XCsHdqEd6QBt5Nz_tZNA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_d9XCtHdqEd6QBt5Nz_tZNA" points="[3, 6, -124, -140]$[10, 131, -117, -15]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_d9XCtXdqEd6QBt5Nz_tZNA" id="(0.6626506024096386,0.85)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_jaDU4XdqEd6QBt5Nz_tZNA" type="4003" source="_cZFMgXdqEd6QBt5Nz_tZNA" target="_h0Rp4XdqEd6QBt5Nz_tZNA">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_jaDU4ndqEd6QBt5Nz_tZNA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_jaDU43dqEd6QBt5Nz_tZNA"/>
+    <element xmi:type="gpmn:PlanEdge" href="dipp.gpmn#_jaDU4HdqEd6QBt5Nz_tZNA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_jaDU5HdqEd6QBt5Nz_tZNA" points="[6, 20, -38, -120]$[46, 120, 2, -20]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_y12UgXdqEd6QBt5Nz_tZNA" type="4003" source="_utNEIXdqEd6QBt5Nz_tZNA" target="_xVvMoXdqEd6QBt5Nz_tZNA">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_y12UgndqEd6QBt5Nz_tZNA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_y12Ug3dqEd6QBt5Nz_tZNA"/>
+    <element xmi:type="gpmn:PlanEdge" href="dipp.gpmn#_y12UgHdqEd6QBt5Nz_tZNA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_y12UhHdqEd6QBt5Nz_tZNA" points="[1, 20, 1, -80]$[15, 120, 15, 20]"/>
+  </edges>
+</notation:Diagram>
