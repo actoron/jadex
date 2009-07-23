@@ -11,6 +11,10 @@
 	name="DiPP1"
 	package="jadex.bpmn.examples.dipp">
 	
+	<imports>
+		<import>jadex.gpmn.runtime.plan.*</import>
+	</imports>
+	
 	<beliefs>
 		<belief name="praemissen_ok" class="boolean">
 			<fact>true</fact>
@@ -36,6 +40,7 @@
 			<parameterset name="subgoals" class="String">
 				<value>"DiPP1_LOG_Planungspraemissen_abgeglichen"</value>
 				<value>"Dipp1_Logistik_abgesichert_2"</value>
+				<value>"all_done"</value>
 			</parameterset>
 		</achievegoal>
 		
@@ -50,17 +55,45 @@
 			</parameterset>
 		</achievegoal>
 		
-		<achievegoal name="DiPP1_LOG_Planungspraemissen_abgeglichen" />
+		<achievegoal name="DiPP1_LOG_Planungspraemissen_abgeglichen">
+			<targetcondition language="jcl">
+				$beliefbase.produktmodell &amp;&amp; $beliefbase.vertriebsprognosen
+				&amp;&amp; $beliefbase.gs_konzept &amp;&amp; $beliefbase.molog_praemissen
+			</targetcondition>
+		</achievegoal>
 		<achievegoal name="DiPP1_LOG_Ladungstraeger_abgesichert" />
 		<achievegoal name="DiPP1_LOG_Prozessplanung_durchgefuehrt" />
 		<achievegoal name="DiPP1_LOG_Lieferantenstandort_geprueft" />
+
+		<achievegoal name="all_done" />
 	</goals>
 	
 	<plans>
-		<plan name="Info_Praemissen_fehlen">
-			<body type="bpmn" impl="jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn"/>
+		<plan name="DiPP1_LOG_Planungspraemissen_abgleichen">
+			<body type="bpmn" impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn"/>
 			<trigger>
-				<goal ref="Praemissen_ok"/>
+				<goal ref="DiPP1_LOG_Planungspraemissen_abgeglichen"/>
+			</trigger>
+		</plan>
+
+		<plan name="DiPP1_LOG_Ladungstraeger_absichern">
+			<body type="bpmn" impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn"/>
+			<trigger>
+				<goal ref="DiPP1_LOG_Ladungstraeger_abgesichert"/>
+			</trigger>
+		</plan>
+
+		<plan name="DiPP1_LOG_Prozessplanung_durchfuehren">
+			<body type="bpmn" impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Prozessplanung_durchfuehren.bpmn"/>
+			<trigger>
+				<goal ref="DiPP1_LOG_Prozessplanung_durchgefuehrt"/>
+			</trigger>
+		</plan>
+
+		<plan name="DiPP1_LOG_Lieferantenstandort_pruefen">
+			<body type="bpmn" impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Lieferantenstandort_pruefen.bpmn"/>
+			<trigger>
+				<goal ref="DiPP1_LOG_Lieferantenstandort_geprueft"/>
 			</trigger>
 		</plan>
 
@@ -68,6 +101,13 @@
 			<body type="bpmn" impl="jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn"/>
 			<trigger>
 				<goal ref="Praemissen_ok"/>
+			</trigger>
+		</plan>
+
+		<plan name="AllDonePlan">
+			<body type="bpmn" impl="jadex/bpmn/examples/dipp/AllDonePlan.bpmn"/>
+			<trigger>
+				<goal ref="all_done"/>
 			</trigger>
 		</plan>
 

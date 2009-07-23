@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_quwl4XecEd6uv6EsxGS0Yg" iD="_quwl4HecEd6uv6EsxGS0Yg">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_xVXGcXecEd6uv6EsxGS0Yg" iD="_xVXGcHecEd6uv6EsxGS0Yg" name="import jadex.bpmn.runtime.task.*;">
+    <associations xmi:type="bpmn:Association" xmi:id="_xVgQYHecEd6uv6EsxGS0Yg"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_quwl53ecEd6uv6EsxGS0Yg" iD="_quwl5necEd6uv6EsxGS0Yg" associations="_xVgQYHecEd6uv6EsxGS0Yg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_quwl6XecEd6uv6EsxGS0Yg" iD="_quwl6HecEd6uv6EsxGS0Yg" name="No Open Tasks!&#xD;&#xA;class = UserInteractionTask.class" activityType="Task"/>
+  </pools>
+</bpmn:BpmnDiagram>

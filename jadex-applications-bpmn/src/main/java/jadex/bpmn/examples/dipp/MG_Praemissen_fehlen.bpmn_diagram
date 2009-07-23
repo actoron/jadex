@@ -37,7 +37,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_7W41lXd3Ed6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_7W41lnd3Ed6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MG_Praemissen_fehlen.bpmn#_7W41kXd3Ed6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7W41l3d3Ed6uv6EsxGS0Yg" x="1199" y="77"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7W41l3d3Ed6uv6EsxGS0Yg" x="1146" y="77"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_HzzpQnd4Ed6uv6EsxGS0Yg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_HzzpSHd4Ed6uv6EsxGS0Yg" type="4001"/>
