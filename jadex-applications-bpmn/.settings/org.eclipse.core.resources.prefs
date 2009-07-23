@@ -1,5 +1,9 @@
-#Wed Jul 22 11:47:24 CEST 2009
+#Thu Jul 23 13:10:38 CEST 2009
 eclipse.preferences.version=1
+encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn_diagram=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/Exception.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/Exception.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/MessageReceival.bpmn=UTF-8

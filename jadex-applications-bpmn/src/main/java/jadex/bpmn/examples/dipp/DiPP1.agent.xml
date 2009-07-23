@@ -1,0 +1,105 @@
+<!--
+	<H3>Digitales Produktionspackaging (DiPP)</H3>
+
+	Agent for starting the Daimler AG Agile Processes Demonstrator.
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	name="DiPP1"
+	package="jadex.bpmn.examples.dipp">
+	
+	<beliefs>
+		<belief name="praemissen_ok" class="boolean">
+			<fact>true</fact>
+		</belief>
+		<beliefset name="praemissen_fehlend" class="String"/>
+		<belief name="produktmodell" class="boolean"/>
+		<belief name="vertriebsprognosen" class="boolean"/>
+		<belief name="gs_konzept" class="boolean"/>
+		<belief name="molog_praemissen" class="boolean"/>
+	</beliefs>
+	
+	<goals>
+		<maintaingoal name="Praemissen_ok" exclude="never">
+			<maintaincondition language="jcl">
+				$beliefbase.praemissen_ok
+			</maintaincondition>
+		</maintaingoal>
+		
+		<achievegoal name="Dipp1_Logistik_abgesichert">
+			<parameter name="mode" class="String">
+				<value>"sequential"</value>
+			</parameter>
+			<parameterset name="subgoals" class="String">
+				<value>"DiPP1_LOG_Planungspraemissen_abgeglichen"</value>
+				<value>"Dipp1_Logistik_abgesichert_2"</value>
+			</parameterset>
+		</achievegoal>
+		
+		<achievegoal name="Dipp1_Logistik_abgesichert_2">
+			<parameter name="mode" class="String">
+				<value>"parallel"</value>
+			</parameter>
+			<parameterset name="subgoals" class="String">
+				<value>"DiPP1_LOG_Ladungstraeger_abgesichert"</value>
+				<value>"DiPP1_LOG_Prozessplanung_durchgefuehrt"</value>
+				<value>"DiPP1_LOG_Lieferantenstandort_geprueft"</value>
+			</parameterset>
+		</achievegoal>
+		
+		<achievegoal name="DiPP1_LOG_Planungspraemissen_abgeglichen" />
+		<achievegoal name="DiPP1_LOG_Ladungstraeger_abgesichert" />
+		<achievegoal name="DiPP1_LOG_Prozessplanung_durchgefuehrt" />
+		<achievegoal name="DiPP1_LOG_Lieferantenstandort_geprueft" />
+	</goals>
+	
+	<plans>
+		<plan name="Info_Praemissen_fehlen">
+			<body type="bpmn" impl="jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn"/>
+			<trigger>
+				<goal ref="Praemissen_ok"/>
+			</trigger>
+		</plan>
+
+		<plan name="Info_Praemissen_fehlen">
+			<body type="bpmn" impl="jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn"/>
+			<trigger>
+				<goal ref="Praemissen_ok"/>
+			</trigger>
+		</plan>
+
+		<plan name="goal_executor">
+			<parameter name="mode" class="String">
+				<goalmapping ref="Dipp1_Logistik_abgesichert.mode"/>
+				<goalmapping ref="Dipp1_Logistik_abgesichert_2.mode"/>
+			</parameter>
+			<parameterset name="subgoals" class="String">
+				<goalmapping ref="Dipp1_Logistik_abgesichert.subgoals"/>
+				<goalmapping ref="Dipp1_Logistik_abgesichert_2.subgoals"/>
+			</parameterset>
+			<body class="GoalHierarchyExecutionPlan"/>
+			<trigger>
+				<goal ref="Dipp1_Logistik_abgesichert"/>
+				<goal ref="Dipp1_Logistik_abgesichert_2"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<properties>
+	 	<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="Praemissen_ok"/>
+				<initialgoal ref="Dipp1_Logistik_abgesichert"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+
