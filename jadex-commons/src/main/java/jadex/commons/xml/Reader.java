@@ -247,7 +247,7 @@ public class Reader
 							pse = (StackElement)stack.get(i);
 						}
 						
-						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack), pse.getRawAttributes());
+						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
 						
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader, root);
 					}

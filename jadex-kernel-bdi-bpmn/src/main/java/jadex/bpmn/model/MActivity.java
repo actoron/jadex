@@ -84,24 +84,6 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
-	 *  Get the xml associations description.
-	 *  @return The associations description.
-	 */
-	public String getAssociationsDescription()
-	{
-		return this.associationsdescription;
-	}
-
-	/**
-	 *  Set the xml associations description.
-	 *  @param associationsdescription The associations description to set.
-	 */
-	public void setAssociationsDescription(String associationsdescription)
-	{
-		this.associationsdescription = associationsdescription;
-	}
-	
-	/**
 	 *  Get the xml outgoing sequence edges desription.
 	 *  @return The outgoing sequence edges description.
 	 */
