@@ -15,7 +15,6 @@ import java.awt.image.BufferedImage;
 
 import javax.media.opengl.GL;
 
-import org.codehaus.janino.Java.ThisReference;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 
