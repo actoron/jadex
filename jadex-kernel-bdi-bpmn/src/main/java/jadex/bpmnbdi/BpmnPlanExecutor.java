@@ -11,12 +11,8 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.commons.ResourceInfo;
-import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.xml.Reader;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;

@@ -5,7 +5,6 @@ import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
-import jadex.bdi.interpreter.OAVCapabilityModel;
 import jadex.bdi.interpreter.Report;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MGoal;
@@ -45,19 +44,20 @@ public class GpmnBDIConverter
 	/**
 	 * 
 	 */
-	public Object[] convertGpmnModelToBDIAgent(MGpmnModel model, ClassLoader classloader)
+	public OAVAgentModel[] convertGpmnModelToBDIAgents(MGpmnModel model, ClassLoader classloader)
 	{
-		Object[] ret = null;
+		OAVAgentModel[] ret = null;
 		
 		// todo: more than one process?!
 		List procs = model.getProcesses();
 		if(procs!=null)
 		{
+			ret	= new OAVAgentModel[procs.size()];
 			for(int i=0; i<procs.size(); i++)
 			{
 				MProcess proc = (MProcess)procs.get(i);
 				
-				ret = createBDIAgentForProcess(model, proc, classloader);
+				ret[i] = createBDIAgentForProcess(model, proc, classloader);
 			}
 		}
 		
@@ -67,7 +67,7 @@ public class GpmnBDIConverter
 	/**
 	 * 
 	 */
-	public Object[] createBDIAgentForProcess(MGpmnModel model, MProcess process, ClassLoader classloader)
+	public OAVAgentModel createBDIAgentForProcess(MGpmnModel model, MProcess process, ClassLoader classloader)
 	{
 		OAVAgentModel agentmodel = null;
 		
@@ -111,7 +111,7 @@ public class GpmnBDIConverter
 			throw new RuntimeException(e);
 		}
 		
-		return new Object[]{};
+		return agentmodel;
 	}
 	
 	/**

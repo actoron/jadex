@@ -137,6 +137,30 @@
 		<properties type="kernel" id="kernel_v2_micro">
 			<property type="agent_factory">new jadex.microkernel.MicroAgentFactory($platform)</property>
 		</properties> 
+	
+		<properties type="kernel" id="kernel_v2_gpmn">
+			<property type="agent_factory">new jadex.gpmn.GpmnAgentFactory(
+				jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"messagetype_fipa", 
+						"planexecutor_standard", 
+						"standard.timeout", 
+						"tooladapter.introspector",
+						"microplansteps",
+						"planexecutor_bpmn"
+					},
+					new Object[]
+					{
+						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
+						new java.lang.Long(10000),
+						jadex.tools.introspector.IntrospectorAdapter.class,
+						Boolean.TRUE,
+						new jadex.bpmnbdi.BpmnPlanExecutor()
+					}
+				), $platform)</property>
+		</properties> 
 	</properties>
 	
 </properties>

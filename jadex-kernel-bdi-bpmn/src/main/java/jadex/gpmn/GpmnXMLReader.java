@@ -12,7 +12,6 @@ import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.Reader;
 import jadex.commons.xml.TypeInfo;
 import jadex.gpmn.model.MAchieveGoal;
-import jadex.gpmn.model.MGoal;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.gpmn.model.MMaintainGoal;
 import jadex.gpmn.model.MPlan;

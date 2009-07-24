@@ -3,15 +3,15 @@
   <processes name="xcDiPP1_Logistik.net" ID="_cLfR4HdpEd6QBt5Nz_tZNA">
     <artifacts xsi:type="gpmn:Context" ID="_VW8BkHg9Ed6n6NlHaSOctw">
       <staticElements ID="_tLeNwHg9Ed6zhPNmTPYkVQ" initialValue="true" name="praemissen_ok" type="boolean"/>
-      <staticElements ID="_xpkwxHg9Ed6zhPNmTPYkVQ" name="praemissen_fehlend" restriction="set" type="String"/>
+      <staticElements ID="_xpkwxHg9Ed6zhPNmTPYkVQ" name="praemissen_fehlend" restriction="" set="true" type="String"/>
       <staticElements ID="_yGyRMHg9Ed6zhPNmTPYkVQ" name="produktmodell" type="boolean"/>
       <staticElements ID="_ynH-IHg9Ed6zhPNmTPYkVQ" name="vertriebsprognosen" type="boolean"/>
       <staticElements ID="_zEU3gHg9Ed6zhPNmTPYkVQ" name="gs_konzept" type="boolean"/>
       <staticElements ID="_zejVYHg9Ed6zhPNmTPYkVQ" name="molog_praemissen" type="boolean"/>
     </artifacts>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert_seq">
-      <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
       <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
+      <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_mAdy8HdpEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgeglichen">
       <outgoingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</outgoingEdges>
@@ -36,9 +36,9 @@
       <incomingEdges>_y12UgHdqEd6QBt5Nz_tZNA</incomingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_45Qq0HeeEd6InfwtmHfU3w" name="Dipp1_Logistik_abgesichert_par">
-      <outgoingEdges>_eHW5IHefEd6Ozo0E4CWLCw</outgoingEdges>
-      <outgoingEdges>_dwtTsHefEd6Ozo0E4CWLCw</outgoingEdges>
       <outgoingEdges>_E2IsgHefEd6InfwtmHfU3w</outgoingEdges>
+      <outgoingEdges>_dwtTsHefEd6Ozo0E4CWLCw</outgoingEdges>
+      <outgoingEdges>_eHW5IHefEd6Ozo0E4CWLCw</outgoingEdges>
       <incomingEdges>_5yVA0HeeEd6InfwtmHfU3w</incomingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_bLdIsHefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Prozessplanung_durchgeführt">
