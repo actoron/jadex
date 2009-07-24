@@ -63,6 +63,11 @@
         <element xmi:type="gpmn:Plan" href="dipp.gpmn#_cfWZgHefEd6Ozo0E4CWLCw"/>
         <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cfWZgnefEd6Ozo0E4CWLCw" x="685" y="489"/>
       </children>
+      <children xmi:type="notation:Shape" xmi:id="_VW8BkXg9Ed6n6NlHaSOctw" type="3010">
+        <children xmi:type="notation:DecorationNode" xmi:id="_VW8Bk3g9Ed6n6NlHaSOctw" type="5014"/>
+        <element xmi:type="gpmn:Context" href="dipp.gpmn#_VW8BkHg9Ed6n6NlHaSOctw"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_VW8Bkng9Ed6n6NlHaSOctw" x="25" y="79" width="100"/>
+      </children>
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_cLob0ndpEd6QBt5Nz_tZNA" type="7002"/>
     <styles xmi:type="notation:DescriptionStyle" xmi:id="_cLfR4ndpEd6QBt5Nz_tZNA"/>

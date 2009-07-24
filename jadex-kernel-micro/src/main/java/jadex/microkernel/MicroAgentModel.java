@@ -10,8 +10,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- *  The agent model contains the OAV agent model in a state and
- *  a type-specific compiled rulebase (matcher functionality).
+ *  The agent model contains a loaded micro agent model (class)
+ *  and provides meta-information (arguments, etc).
  */
 public class MicroAgentModel implements ILoadableElementModel
 {

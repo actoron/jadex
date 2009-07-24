@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" name="DiPP1_Logistik" ID="_ajVBQHdpEd6QBt5Nz_tZNA">
   <processes name="xcDiPP1_Logistik.net" ID="_cLfR4HdpEd6QBt5Nz_tZNA">
+    <artifacts xsi:type="gpmn:Context" ID="_VW8BkHg9Ed6n6NlHaSOctw">
+      <staticElements ID="_tLeNwHg9Ed6zhPNmTPYkVQ" initialValue="true" name="praemissen_ok" type="boolean"/>
+      <staticElements ID="_xpkwxHg9Ed6zhPNmTPYkVQ" name="praemissen_fehlend" restriction="set" type="String"/>
+      <staticElements ID="_yGyRMHg9Ed6zhPNmTPYkVQ" name="produktmodell" type="boolean"/>
+      <staticElements ID="_ynH-IHg9Ed6zhPNmTPYkVQ" name="vertriebsprognosen" type="boolean"/>
+      <staticElements ID="_zEU3gHg9Ed6zhPNmTPYkVQ" name="gs_konzept" type="boolean"/>
+      <staticElements ID="_zejVYHg9Ed6zhPNmTPYkVQ" name="molog_praemissen" type="boolean"/>
+    </artifacts>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert_seq">
       <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
       <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
