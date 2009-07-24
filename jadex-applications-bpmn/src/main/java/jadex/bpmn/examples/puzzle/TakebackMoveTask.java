@@ -17,5 +17,8 @@ public class TakebackMoveTask extends AbstractTask
 	{
 		IBoard	board	= (IBoard)context.getParameterValue("board");
 		board.takeback();
+
+//		BpmnExecutor exe = new BpmnExecutor((BpmnInstance) instance, true);
+//		ExecutionControlPanel.createBpmnFrame(instance.getModelElement().getName()+": "+context.getModelElement().getName(), (BpmnInstance) instance, exe);	
 	}
 }

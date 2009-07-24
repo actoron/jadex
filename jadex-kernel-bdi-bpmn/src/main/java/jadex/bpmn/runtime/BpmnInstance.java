@@ -106,6 +106,8 @@ public class BpmnInstance	implements IProcessInstance
 		this.context	= new ThreadContext(model);
 		this.extentries	= new ArrayList();
 		
+//		setHistoryEnabled(true);
+		
 		// Initialize context variables.
 		Set	vars	= model.getContextVariables();
 		for(Iterator it=vars.iterator(); it.hasNext(); )
