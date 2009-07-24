@@ -336,7 +336,7 @@ public class OAVBDIXMLReader
 	/**
 	 *  Load class.
 	 */
-	static class ClassPostProcessor	implements IPostProcessor
+	public static class ClassPostProcessor	implements IPostProcessor
 	{
 		//-------- attributes --------
 		

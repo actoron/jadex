@@ -10,8 +10,8 @@
       <staticElements ID="_zejVYHg9Ed6zhPNmTPYkVQ" name="molog_praemissen" type="boolean"/>
     </artifacts>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert_seq">
-      <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
       <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
+      <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_mAdy8HdpEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgeglichen">
       <outgoingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</outgoingEdges>
