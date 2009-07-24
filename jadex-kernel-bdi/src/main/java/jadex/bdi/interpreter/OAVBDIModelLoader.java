@@ -928,6 +928,11 @@ public class OAVBDIModelLoader
 		return ret;
 	}
 
+	/**
+	 * 
+	 * @param args
+	 * @throws IOException
+	 * /
 	public static void	main(String[] args) throws IOException
 	{
 		final File	file	= new File("../target/jadex-1.0-SNAPSHOT-dist.dir/lib/jadex-applications-bdi-1.0-SNAPSHOT.jar");
@@ -991,5 +996,5 @@ public class OAVBDIModelLoader
 				}
 			});
 		}
-	}
+	}*/
 }

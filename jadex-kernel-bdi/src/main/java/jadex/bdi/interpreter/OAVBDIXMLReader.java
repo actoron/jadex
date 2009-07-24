@@ -213,7 +213,7 @@ public class OAVBDIXMLReader
 	/**
 	 *  Parse expression text.
 	 */
-	static class ExpressionProcessor	implements IPostProcessor
+	public static class ExpressionProcessor	implements IPostProcessor
 	{
 		// Hack!!! Should be configurable.
 		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();

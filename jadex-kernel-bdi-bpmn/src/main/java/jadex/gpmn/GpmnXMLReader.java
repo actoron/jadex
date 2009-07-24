@@ -61,12 +61,12 @@ public class GpmnXMLReader
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public static Object read(String filename, final ClassLoader classloader, final Object context) throws Exception
+	public static MGpmnModel read(String filename, final ClassLoader classloader, final Object context) throws Exception
 	{
 		ResourceInfo rinfo = SUtil.getResourceInfo0(filename, classloader);
 		if(rinfo==null)
 			throw new RuntimeException("Could not find resource: "+filename);
-		Object ret = reader.read(rinfo.getInputStream(), classloader, context);
+		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, context);
 //		String name = new File(rinfo.getFilename()).getName();
 //		name = name.substring(0, name.length()-5);
 //		ret.setName(name);
