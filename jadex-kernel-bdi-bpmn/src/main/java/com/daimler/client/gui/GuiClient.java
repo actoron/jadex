@@ -137,6 +137,8 @@ public class GuiClient implements IRequestListener
 	
 	public void startedRequest(ClientRequest request)
 	{
+		//TODO: distinguish between requests
+		showText(request);
 	}
 	
 	private void initMainFrame()

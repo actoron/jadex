@@ -16,10 +16,16 @@ public abstract class AbstractTaskSelectAction extends AbstractAction
 
 	protected static final ImageIcon ICON_TASK = new ImageIcon(Toolkit
 			.getDefaultToolkit().createImage(
-					ClassLoader.getSystemResource("resources/text_file.gif")));
+					ClassLoader.getSystemResource(AbstractTaskSelectAction.class.getPackage().getName()
+							.replaceAll("event", "images.")
+							.replaceAll("\\.", "/")
+							+ "text_file.gif")));
 	protected static final ImageIcon ICON_INFO = new ImageIcon(Toolkit
 			.getDefaultToolkit().createImage(
-					ClassLoader.getSystemResource("resources/info.gif")));
+					ClassLoader.getSystemResource(AbstractTaskSelectAction.class.getPackage().getName()
+							.replaceAll("event", "images.")
+							.replaceAll("\\.", "/")
+							+ "info.gif")));
 
 	private Component theContent;
 

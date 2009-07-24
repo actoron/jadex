@@ -24,6 +24,8 @@ public class ShowClientInfoTask implements ITask
 		{
 			public void run()
 			{
+				if (context.getParameterValue("info_text") == null)
+					context.setParameterValue("info_text", "<html><center><h1>No Text</h1></center></html");
 				ClientConnector.getInstance().dispatchRequest(new ClientRequest(context, listener));
 			}
 		});
