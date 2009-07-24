@@ -1,7 +1,5 @@
 package jadex.gpmn.model;
 
-import jadex.bpmn.model.MNamedIdElement;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +18,9 @@ public class MProcess extends MNamedIdElement
 	
 	/** The sequence edges. */
 	protected List sequenceedges;
+	
+	/** The artifacs. */
+	protected List artifacts;
 	
 	//-------- methods --------
 	
@@ -111,5 +112,35 @@ public class MProcess extends MNamedIdElement
 	{
 		if(sequenceedges!=null)
 			sequenceedges.remove(edge);
+	}
+	
+	/**
+	 *  Get the artifacts.
+	 *  @return The artifacts.
+	 */
+	public List getArtifacts()
+	{
+		return artifacts;
+	}
+	
+	/**
+	 *  Add an artifact.
+	 *  @param artifact The artifact.
+	 */
+	public void addArtifact(MArtifact artifact)
+	{
+		if(artifacts==null)
+			artifacts = new ArrayList();
+		artifacts.add(artifact);
+	}
+	
+	/**
+	 *  Remove an artifact.
+	 *  @param artifact The artifact.
+	 */
+	public void removeArtifact(MArtifact artifact)
+	{
+		if(artifacts!=null)
+			artifacts.remove(artifact);
 	}
 }

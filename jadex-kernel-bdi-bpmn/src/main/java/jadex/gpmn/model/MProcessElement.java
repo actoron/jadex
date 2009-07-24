@@ -1,6 +1,5 @@
 package jadex.gpmn.model;
 
-import jadex.bpmn.model.MNamedIdElement;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;

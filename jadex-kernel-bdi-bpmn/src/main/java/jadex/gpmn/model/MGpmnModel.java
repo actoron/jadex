@@ -1,7 +1,5 @@
 package jadex.gpmn.model;
 
-import jadex.bpmn.model.MArtifact;
-import jadex.bpmn.model.MIdElement;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;

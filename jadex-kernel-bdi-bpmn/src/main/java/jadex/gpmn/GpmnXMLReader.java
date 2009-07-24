@@ -1,7 +1,5 @@
 package jadex.gpmn;
 
-import jadex.bpmn.model.MArtifact;
-import jadex.bpmn.model.MAssociation;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
@@ -12,8 +10,12 @@ import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.Reader;
 import jadex.commons.xml.TypeInfo;
 import jadex.gpmn.model.MAchieveGoal;
+import jadex.gpmn.model.MArtifact;
+import jadex.gpmn.model.MAssociation;
+import jadex.gpmn.model.MContext;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.gpmn.model.MMaintainGoal;
+import jadex.gpmn.model.MParameter;
 import jadex.gpmn.model.MPlan;
 import jadex.gpmn.model.MProcess;
 import jadex.gpmn.model.MProcessElement;
@@ -45,14 +47,6 @@ public class GpmnXMLReader
 		ignored.add("version");
 		reader = new Reader(new BeanObjectHandler(), getXMLMapping(), getXMLLinkInfos(), ignored);
 	}
-	
-	/**
-	 *  Get the reader instance.
-	 * /
-	public static Reader	getReader()
-	{
-		return reader;
-	}*/
 	
 	/**
 	 *  Read properties from xml.
@@ -89,8 +83,6 @@ public class GpmnXMLReader
 			SUtil.createHashMap(new String[]{"ID"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}), null));
 		
-		types.add(new TypeInfo("artifacts", MArtifact.class));
-
 		types.add(new TypeInfo("associations", MAssociation.class));
 		
 		types.add(new TypeInfo("vertices", MAchieveGoal.class, null, null,
@@ -136,6 +128,38 @@ public class GpmnXMLReader
 			SUtil.createHashMap(new String[]{"ID", "associations"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"),
 			new BeanAttributeInfo("associationsDescription")}), null));
+		
+		types.add(new TypeInfo("staticElements", MParameter.class, null, null,
+			SUtil.createHashMap(new String[]{"ID", "type", "initialValue"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"),
+			new BeanAttributeInfo("className"),
+			new BeanAttributeInfo("initialValueDescription")}), null));
+		
+		types.add(new TypeInfo("artifacts", MArtifact.class, null, null,
+			SUtil.createHashMap(new String[]{"ID"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
+			null,
+			new IFilter()
+			{
+				public boolean filter(Object obj)
+				{
+					String type = (String)((Map)obj).get("type");
+					return !type.endsWith("Context");
+				}
+			}));
+		
+		types.add(new TypeInfo("artifacts", MContext.class, null, null,
+			SUtil.createHashMap(new String[]{"ID"}, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
+			null,
+			new IFilter()
+			{
+				public boolean filter(Object obj)
+				{
+					String type = (String)((Map)obj).get("type");
+					return type.endsWith("Context");
+				}
+			}));
 		
 		return types;
 	}
@@ -185,6 +209,10 @@ public class GpmnXMLReader
 		
 		// artifacts
 		linkinfos.add(new LinkInfo("associations", new BeanAttributeInfo("association")));
+		
+		// context
+		linkinfos.add(new LinkInfo("staticElements", new BeanAttributeInfo("parameter")));
+
 		
 		return linkinfos;
 	}

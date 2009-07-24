@@ -3,7 +3,7 @@
   <processes name="xcDiPP1_Logistik.net" ID="_cLfR4HdpEd6QBt5Nz_tZNA">
     <artifacts xsi:type="gpmn:Context" ID="_VW8BkHg9Ed6n6NlHaSOctw">
       <staticElements ID="_tLeNwHg9Ed6zhPNmTPYkVQ" initialValue="true" name="praemissen_ok" type="boolean"/>
-      <staticElements ID="_xpkwxHg9Ed6zhPNmTPYkVQ" name="praemissen_fehlend" restriction="" set="true" type="String"/>
+      <staticElements ID="_xpkwxHg9Ed6zhPNmTPYkVQ" name="praemissen_fehlend" set="true" type="String"/>
       <staticElements ID="_yGyRMHg9Ed6zhPNmTPYkVQ" name="produktmodell" type="boolean"/>
       <staticElements ID="_ynH-IHg9Ed6zhPNmTPYkVQ" name="vertriebsprognosen" type="boolean"/>
       <staticElements ID="_zEU3gHg9Ed6zhPNmTPYkVQ" name="gs_konzept" type="boolean"/>

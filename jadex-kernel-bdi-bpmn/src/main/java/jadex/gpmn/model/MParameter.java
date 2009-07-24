@@ -1,4 +1,4 @@
-package jadex.bpmn.model;
+package jadex.gpmn.model;
 
 import jadex.javaparser.IParsedExpression;
 
@@ -20,6 +20,13 @@ public class MParameter extends MIdElement
 
 	//-------- attributes --------
 	
+	/** The class name. */
+	protected String classname;
+	
+	/** The initial values description. */
+	protected String initialvaluedescription;
+	
+	
 	/** The direction. */
 	protected String direction;
 	
@@ -31,6 +38,9 @@ public class MParameter extends MIdElement
 	
 	/** The initial value. */
 	protected IParsedExpression initialval;
+	
+	/** The set attribute. */
+	protected boolean set;
 
 	//-------- constructors --------
 	
@@ -55,6 +65,42 @@ public class MParameter extends MIdElement
 	
 	//-------- methods --------
 	
+	/**
+	 *  Get the classname.
+	 *  @return The classname.
+	 */
+	public String getClassName()
+	{
+		return this.classname;
+	}
+
+	/**
+	 *  Set the classname.
+	 *  @param classname The classname to set.
+	 */
+	public void setClassName(String classname)
+	{
+		this.classname = classname;
+	}
+	
+	/**
+	 *  Get the valuesdescription.
+	 *  @return The valuesdescription.
+	 */
+	public String getInitialValueDescription()
+	{
+		return this.initialvaluedescription;
+	}
+
+	/**
+	 *  Set the valuesdescription.
+	 *  @param valuesdescription The valuesdescription to set.
+	 */
+	public void setInitialValueDescription(String initialvaluesdescription)
+	{
+		this.initialvaluedescription = initialvaluesdescription;
+	}
+
 	/**
 	 *  Get the direction.
 	 *  @return The direction.
@@ -130,6 +176,23 @@ public class MParameter extends MIdElement
 	public void setInitialValue(IParsedExpression initialval)
 	{
 		this.initialval = initialval;
+	}
+
+	/**
+	 *  Get the set.
+	 *  @return The set.
+	 */
+	public boolean isSet()
+	{
+		return this.set;
+	}
+
+	/**
+	 *  Set the set.
+	 *  @param set The set to set.
+	 */
+	public void setSet(boolean set)
+	{
+		this.set = set;
 	}	
-	
 }

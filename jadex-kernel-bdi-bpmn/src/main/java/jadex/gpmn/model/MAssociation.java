@@ -1,64 +1,60 @@
 package jadex.gpmn.model;
 
-import java.util.List;
-
 /**
- *  A sequence edge is a control flow edge between activities.
+ *  An association is a connection between an 
+ *  artifact and some other thing.
  */
-public class MSequenceEdge extends MNamedIdElement//MAssociationTarget
+public class MAssociation extends MIdElement
 {
 	//-------- attributes --------
 	
-	/** The outgoing edges. */
-	protected MProcessElement source;
+	/** The source. */
+	protected MArtifact source;
 	
-	/** The incoming edges. */
-	protected MProcessElement target;
-	
+	/** The target. */
+	protected MAssociationTarget target;
+
 	/** The type. */
 	protected String type;
 	
-	/** The associations. */
-	protected List associations;
-	
 	//-------- methods --------
-
+	
 	/**
 	 *  Get the source.
 	 *  @return The source.
 	 */
-	public MProcessElement getSource()
+	public MArtifact getSource()
 	{
-		return source;
+		return this.source;
 	}
-	
+
 	/**
 	 *  Set the source.
-	 *  @return The source.
+	 *  @param source The source to set.
 	 */
-	public void setSource(MProcessElement source)
+	public void setSource(MArtifact source)
 	{
 		this.source = source;
 	}
-	
+
 	/**
 	 *  Get the target.
 	 *  @return The target.
 	 */
-	public MProcessElement getTarget()
+	public MAssociationTarget getTarget()
 	{
-		return target;
+		return this.target;
 	}
-	
+
 	/**
 	 *  Set the target.
-	 *  @param target The target.
+	 *  @param target The target to set.
 	 */
-	public void setTarget(MProcessElement target)
+	public void setTarget(MAssociationTarget target)
 	{
 		this.target = target;
 	}
-
+	
 	/**
 	 *  Get the type.
 	 *  @return The type.
@@ -76,5 +72,5 @@ public class MSequenceEdge extends MNamedIdElement//MAssociationTarget
 	{
 		this.type = type;
 	}
-
+	
 }

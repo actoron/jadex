@@ -442,7 +442,7 @@ public class ProcessThread	implements ITaskContext
 					}
 					else
 					{
-						setParameterValue(param.getName(), param.getInitialval()==null? null: param.getInitialval().getValue(fetcher));
+						setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
 					}
 				}
 			}
