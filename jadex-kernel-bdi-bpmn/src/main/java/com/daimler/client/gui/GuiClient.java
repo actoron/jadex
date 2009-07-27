@@ -17,22 +17,26 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
 
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTaskPane;
 
 import com.daimler.client.connector.ClientConnector;
-import com.daimler.client.connector.ClientRequest;
-import com.daimler.client.connector.IRequestListener;
+import com.daimler.client.connector.UserNotification;
+import com.daimler.client.connector.INotificationStateListener;
+import com.daimler.client.connector.UserNotificationStateChangeEvent;
 import com.daimler.client.gui.components.parts.GuiBackgroundPanel;
+import com.daimler.client.gui.components.parts.GuiHelpBrowser;
 import com.daimler.client.gui.event.AbstractTaskSelectAction;
+import com.daimler.client.gui.event.FetchDataTaskSelectAction;
 import com.daimler.client.gui.event.ShowInfoTaskSelectAction;
 import com.daimler.util.swing.autohidepanel.AutoHidePanel;
 import com.daimler.util.swing.autohidepanel.HideablePanelGlassPane;
 import com.daimler.util.swing.layout.EqualsLayout;
 
-public class GuiClient implements IRequestListener
+public class GuiClient
 {
 	private JXFrame mainFrame;
 
@@ -48,10 +52,16 @@ public class GuiClient implements IRequestListener
 	
 	private Map taskMapping;
 	
+	private UserNotification activeNotification;
+	
+	private GuiHelpBrowser helpBrowser;
+	
 	public GuiClient()
 	{
 		taskMapping = new HashMap();
+		helpBrowser = new GuiHelpBrowser();
 		initMainFrame();
+		ClientConnector.getInstance().addNotificationStateListener(new ConnectorController());
 	}
 	
 	public static void main(String[] args)
@@ -59,12 +69,34 @@ public class GuiClient implements IRequestListener
 		ClientConnector.getInstance();
 	}
 	
-	public void activateComponent(final Component comp)
+	public void activateComponent(Component comp)
+	{
+		activateComponent(comp, null);
+	}
+	
+	public void activateComponent(final Component comp, final UserNotification notification)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
+				if (notification != null)
+				{
+					if (notification.equals(activeNotification))
+						return;
+					ClientConnector c = ClientConnector.getInstance();
+					synchronized (c)
+					{
+						if (!c.isAvailable(notification))
+							return;
+						if (activeNotification != null)
+						{
+							c.releaseNotification(notification);
+						}
+						activeNotification = notification;
+						c.claimNotification(notification);
+					}
+				}
 				scrollPane.getViewport().setView(comp);
 				if (comp.equals(emptyLabel))
 				{
@@ -88,57 +120,23 @@ public class GuiClient implements IRequestListener
         return backgroundPanel;
     }
 	
-	public AbstractTaskSelectAction showText(ClientRequest request)
+	public GuiHelpBrowser getHelpBrowser()
 	{
-		ShowInfoTaskSelectAction sitsa = new ShowInfoTaskSelectAction(this, request);
-		addTaskSelectAction(request, sitsa);
+		return helpBrowser;
+	}
+	
+	public AbstractTaskSelectAction showText(UserNotification notification)
+	{
+		ShowInfoTaskSelectAction sitsa = new ShowInfoTaskSelectAction(this, notification);
+		addTaskSelectAction(notification, sitsa);
 		return sitsa;
 	}
 	
-	public void finishedRequest(ClientRequest request)
+	public AbstractTaskSelectAction fetchData(UserNotification notification)
 	{
-		AbstractTaskSelectAction action = (AbstractTaskSelectAction) taskMapping.get(request);
-		Component comp = action.getParent();
-        JXTaskPane tpgTemp;
-        for (int i = 0; i < taskPanel.getItemCount(); i++) {
-            if (taskPanel.getItem(i) instanceof JXTaskPane) {
-                tpgTemp = (JXTaskPane) taskPanel.getItem(i);
-                tpgTemp.remove(comp);
-                if (tpgTemp.getContentPane().getComponentCount() == 0) {
-                    taskPanel.removeItem(tpgTemp);
-                }
-            }
-        }
-        /*if (act.getTheFetchedData() != null) {
-            act.setOpen(false);
-        } else {
-            theTaskMapping.remove(ticket);
-        }*/
-        taskPanel.repaint();
-        taskPanel.updateUI();
-        if (taskPanel.getItemCount() == 0) {
-            activateComponent(emptyLabel);
-        }
-        else
-        {
-        	JXTaskPane tpg = (JXTaskPane) taskPanel.getItem(0);
-        	Iterator it = taskMapping.values().iterator();
-        	Component c = tpg.getContentPane().getComponent(0);
-        	while (it.hasNext())
-        	{
-        		action = (AbstractTaskSelectAction) it.next();
-        		if (action.getParent().equals(c))
-        		{
-        			action.actionPerformed(new ActionEvent(c, -1, ""));
-        		}
-        	}
-        }
-	}
-	
-	public void startedRequest(ClientRequest request)
-	{
-		//TODO: distinguish between requests
-		showText(request);
+		FetchDataTaskSelectAction fdtsa = new FetchDataTaskSelectAction(this, notification);
+		addTaskSelectAction(notification, fdtsa);
+		return fdtsa;
 	}
 	
 	private void initMainFrame()
@@ -173,7 +171,9 @@ public class GuiClient implements IRequestListener
 		scrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.getViewport().setBorder(null);
-		scrollPane.setViewportBorder(null);
+		//scrollPane.setViewportBorder(null);
+		
+		//scrollPane.setViewportBorder(new EmptyBorder(0, 200, 0, 0));
 		//scrollPane.getViewport().setBackground(Color.WHITE);
 		scrollPane.getViewport().setBackground(new Color(0.0f, 0.0f, 0.0f, 0.0f));
 		scrollPane.setBorder(null);
@@ -205,7 +205,7 @@ public class GuiClient implements IRequestListener
 		return lbTemp;
 	}
 
-	private void addTaskSelectAction(ClientRequest request, AbstractTaskSelectAction taskAction)
+	private void addTaskSelectAction(UserNotification notification, AbstractTaskSelectAction taskAction)
 	{
 		JXTaskPane tpg = null;
 		for (int i = 0; i < taskPanel.getItemCount(); i++)
@@ -223,15 +223,105 @@ public class GuiClient implements IRequestListener
 			taskPanel.addItem(tpg);
 		}
 		Component c = tpg.add(taskAction);
-		taskAction.setParent(c);
+		taskAction.setTaskListComponent(c);
 
-		taskMapping.put(request, taskAction);
+		taskMapping.put(notification, taskAction);
 		taskPanel.repaint();
 		taskPanel.updateUI();
 		if (emptyLabel.equals(scrollPane.getViewport().getView()))
 		{
 			ActionEvent a = new ActionEvent(this, 0, "");
 			taskAction.actionPerformed(a);
+		}
+	}
+	
+	private void removeNotification(UserNotification notification)
+	{
+		AbstractTaskSelectAction action = (AbstractTaskSelectAction) taskMapping.get(notification);
+		Component comp = action.getTaskListComponent();
+        JXTaskPane tpgTemp;
+        for (int i = 0; i < taskPanel.getItemCount(); ++i)
+        {
+            if (taskPanel.getItem(i) instanceof JXTaskPane)
+            {
+                tpgTemp = (JXTaskPane) taskPanel.getItem(i);
+                tpgTemp.remove(comp);
+                if (tpgTemp.getContentPane().getComponentCount() == 0) {
+                    taskPanel.removeItem(tpgTemp);
+                }
+            }
+        }
+        /*if (act.getTheFetchedData() != null) {
+            act.setOpen(false);
+        } else {
+            theTaskMapping.remove(ticket);
+        }*/
+        taskMapping.remove(notification);
+        taskPanel.repaint();
+        taskPanel.updateUI();
+        if (taskPanel.getItemCount() == 0) {
+            activateComponent(emptyLabel);
+        }
+        else
+        {
+        	JXTaskPane tpg = (JXTaskPane) taskPanel.getItem(0);
+        	Iterator it = taskMapping.values().iterator();
+        	Component c = tpg.getContentPane().getComponent(0);
+        	while (it.hasNext())
+        	{
+        		action = (AbstractTaskSelectAction) it.next();
+        		if (action.getTaskListComponent().equals(c))
+        		{
+        			action.actionPerformed(new ActionEvent(c, -1, ""));
+        		}
+        	}
+        }
+        
+        taskPanel.repaint();
+        taskPanel.updateUI();
+	}
+	
+	private class ConnectorController implements INotificationStateListener
+	{
+		public void notificationAdded(UserNotificationStateChangeEvent event)
+		{
+			int type = event.getNotification().getType();
+			switch (type)
+			{
+				case UserNotification.TEXT_INFO_NOTIFICATION_TYPE:
+					showText(event.getNotification());
+					break;
+					
+				case UserNotification.DATA_FETCH_NOTIFICATION_TYPE:
+					fetchData(event.getNotification());
+					break;
+					
+				default:
+					throw new RuntimeException("Unknown Notification type: " + String.valueOf(type));
+			}
+		}
+		
+		public void notificationRemoved(UserNotificationStateChangeEvent event)
+		{
+			if (event.getNotification().equals(activeNotification))
+			{
+				removeNotification(event.getNotification());
+				activeNotification = null;
+			}
+		}
+		
+		public void notificationClaimed(UserNotificationStateChangeEvent event)
+		{
+			if (!event.getNotification().equals(activeNotification))
+			{
+				removeNotification(event.getNotification());
+			}
+		}
+		
+		public void notificationReleased(UserNotificationStateChangeEvent event)
+		{
+			if (!taskMapping.containsKey(event.getNotification()))
+				notificationAdded(event);
 		}
 	}
 }

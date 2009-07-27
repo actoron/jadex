@@ -61,7 +61,7 @@ public class StringInputPanel extends AbstractInputPanel
 	public StringInputPanel(String name, String labelText, String toolTip,
 			String helpText, Color bgColor, boolean isRequired, Format format)
 	{
-		super(helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, isRequired);
 		this.labelText = labelText;
 		this.toolTip = toolTip;
 		this.format = format;

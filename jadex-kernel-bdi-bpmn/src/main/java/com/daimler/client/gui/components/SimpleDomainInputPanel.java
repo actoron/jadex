@@ -48,7 +48,7 @@ public class SimpleDomainInputPanel extends AbstractInputPanel
 			String toolTip, String helpText, Color bgColor, boolean isRequired,
 			IInputComponent inputField)
 	{
-		super(helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, isRequired);
 		this.labelText = text;
 		this.toolTip = toolTip;
 		this.inputField = inputField;

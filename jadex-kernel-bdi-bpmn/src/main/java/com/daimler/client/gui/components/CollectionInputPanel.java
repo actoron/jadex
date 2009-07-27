@@ -92,7 +92,7 @@ public class CollectionInputPanel extends AbstractInputPanel implements ActionLi
     
     public CollectionInputPanel(String name, String labelText, String helpText, Color bgColor, boolean isRequired, IInputComponent inputField, int type)
     {
-        super(helpText, bgColor, isRequired);
+        super(name, helpText, bgColor, isRequired);
         this.type = type;
         this.labelText = labelText;
         this.inputField = inputField;

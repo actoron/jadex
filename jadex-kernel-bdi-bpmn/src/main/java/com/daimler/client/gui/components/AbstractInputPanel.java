@@ -41,10 +41,11 @@ public abstract class AbstractInputPanel extends JPanel implements Comparable
 
 	private boolean isRequired = false;
 
-	public AbstractInputPanel(String helpText,
+	public AbstractInputPanel(String name, String helpText,
 			Color bgColor, boolean isRequired)
 	{
 		super();
+		setName(name);
 		this.isRequired = isRequired;
 		this.backgroundColor = bgColor;
 		this.helpText = helpText;

@@ -12,7 +12,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -119,6 +122,18 @@ public class GuiCategoryPanel extends JPanel
 	{
 		return theCategoryName;
 	}
+	
+	public Map getTheFetchedData()
+	{
+        Map ret = new HashMap(theInputFields.size());
+        Iterator it = theInputFields.iterator();
+        while (it.hasNext())
+        {
+        	AbstractInputPanel panel = (AbstractInputPanel) it.next();
+            ret.put(panel.getName(), panel.getCurrentValue());
+        }
+        return ret;
+    }
 
 	/**
 	 * Checks all TaskProperties in this category whether they have proper

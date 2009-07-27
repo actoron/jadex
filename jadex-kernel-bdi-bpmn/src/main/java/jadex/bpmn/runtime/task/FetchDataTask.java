@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities;
 import com.daimler.client.connector.ClientConnector;
 import com.daimler.client.connector.UserNotification;
 
-public class ShowClientInfoTask implements ITask
+public class FetchDataTask implements ITask
 {
 	/**
 	 *  Execute the task.
@@ -24,9 +24,7 @@ public class ShowClientInfoTask implements ITask
 		{
 			public void run()
 			{
-				if (context.getParameterValue("info_text") == null)
-					context.setParameterValue("info_text", "<html><center><h1>No Text</h1></center></html");
-				ClientConnector.getInstance().queueNotification(new UserNotification(UserNotification.TEXT_INFO_NOTIFICATION_TYPE, context, listener));
+				ClientConnector.getInstance().queueNotification(new UserNotification(UserNotification.DATA_FETCH_NOTIFICATION_TYPE, context, listener));
 			}
 		});
 	}

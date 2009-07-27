@@ -41,7 +41,7 @@ public class ComplexRenderPanel extends AbstractInputPanel
 	public ComplexRenderPanel(String name, String text, String toolTip,
 			String helpText, Color bgColor, boolean isRequired)
 	{
-		super(helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, isRequired);
 		this.labelText = name;
 		this.valueText = "<html>" + StringUtils.replace(text, "\n", "<br>")
 				+ "</html>";

@@ -1,20 +1,27 @@
 package com.daimler.client.connector;
 
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.runtime.ITaskContext;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import com.daimler.client.gui.GuiClient;
 
 public class ClientConnector
 {
-	private List requestQueue;
+	private Set availableNotifications;
 	
-	private Set requestListeners;
+	private Set claimedNotifications;
+	
+	private Set notificationListeners;
 	
 	private static ClientConnector instance;
 	
@@ -23,64 +30,138 @@ public class ClientConnector
 		if (instance == null)
 		{
 			instance = new ClientConnector();
-			GuiClient client = new GuiClient();
-			instance.addRequestListener(client);
+			new GuiClient();
+			//new GuiClient();
 		}
 		return instance;
 	}
 	
 	private ClientConnector()
 	{
-		requestQueue = new LinkedList();
-		requestListeners = new HashSet();
+		availableNotifications = new HashSet();
+		claimedNotifications = new HashSet();
+		notificationListeners = new HashSet();
 	}
 	
 	
-	public synchronized void dispatchRequest(ClientRequest request)
+	public synchronized void queueNotification(UserNotification notification)
 	{
-		requestQueue.add(request);
-		fireNewRequest(request);
+		availableNotifications.add(notification);
+		fireNotificationAddedEvent(notification);
 	}
 	
-	public synchronized void finishRequest(ClientRequest request)
+	public synchronized void commitNotification(UserNotification notification, Map commitData)
 	{
-		requestQueue.remove(request);
-		fireFinishedRequest(request);
-		request.getListener().resultAvailable(null);
-	}
-	
-	public synchronized List getRequests()
-	{
-		return new ArrayList(requestQueue);
-	}
-	
-	public synchronized void addRequestListener(IRequestListener listener)
-	{
-		requestListeners.add(listener);
-	}
-	
-	public synchronized void removeRequestListener(IRequestListener listener)
-	{
-		requestListeners.remove(listener);
-	}
-	
-	private synchronized void fireNewRequest(ClientRequest request)
-	{
-		for (Iterator it = requestListeners.iterator(); it.hasNext(); )
+		if (claimedNotifications.contains(notification))
 		{
-			IRequestListener listener = (IRequestListener) it.next();
-			listener.startedRequest(request);
+			claimedNotifications.remove(notification);
+			fireNotificationRemovedEvent(notification);
+			if (notification.getType() == UserNotification.DATA_FETCH_NOTIFICATION_TYPE)
+			{
+				ITaskContext context = notification.getContext();
+				for (Iterator it = commitData.entrySet().iterator(); it.hasNext(); )
+				{
+					Map.Entry parameter = (Map.Entry) it.next();
+					context.setParameterValue((String) parameter.getKey(), parameter.getValue());
+				}
+			}
+			notification.getListener().resultAvailable(null);
+		}
+		else
+		{
+			// TODO: Improve error handling
+			throw new RuntimeException("Attempted to commit unclaimed Notification: " + notification.getType());
 		}
 	}
 	
-	private synchronized void fireFinishedRequest(ClientRequest request)
+	public synchronized void claimNotification(UserNotification notification)
 	{
-		synchronized (requestListeners)
+		if (availableNotifications.contains(notification))
 		{
-			for (Iterator it = requestListeners.iterator(); it.hasNext(); )
+			availableNotifications.remove(notification);
+			claimedNotifications.add(notification);
+			fireNotificationClaimedEvent(notification);
+		}
+		else
+		{
+			// TODO: Improve error handling
+			throw new RuntimeException("Attempted to claim unavailable Notification: " + notification.getType());
+		}
+	}
+	
+	public synchronized void releaseNotification(UserNotification notification)
+	{
+		if (claimedNotifications.contains(notification))
+		{
+			claimedNotifications.remove(notification);
+			availableNotifications.add(notification);
+			fireNotificationReleasedEvent(notification);
+		}
+		else
+		{
+			// TODO: Improve error handling
+			throw new RuntimeException("Attempted to release unclaimed Notification: " + notification.getType());
+		}
+	}
+	
+	public synchronized boolean isAvailable(UserNotification notification)
+	{
+		return availableNotifications.contains(notification);
+	}
+	
+	public synchronized List getAvailableNotifications()
+	{
+		return new ArrayList(availableNotifications);
+	}
+	
+	public synchronized void addNotificationStateListener(INotificationStateListener listener)
+	{
+		notificationListeners.add(listener);
+	}
+	
+	public synchronized void removeNotificationStateListener(INotificationStateListener listener)
+	{
+		notificationListeners.remove(listener);
+	}
+	
+	private synchronized void fireNotificationAddedEvent(UserNotification notification)
+	{
+		for (Iterator it = notificationListeners.iterator(); it.hasNext(); )
+		{
+			INotificationStateListener listener = (INotificationStateListener) it.next();
+			listener.notificationAdded(new UserNotificationStateChangeEvent(notification));
+		}
+	}
+	
+	private synchronized void fireNotificationRemovedEvent(UserNotification notification)
+	{
+		synchronized (notificationListeners)
+		{
+			for (Iterator it = notificationListeners.iterator(); it.hasNext(); )
 			{
-				IRequestListener listener = (IRequestListener) it.next();
-				listener.finishedRequest(request);
+				INotificationStateListener listener = (INotificationStateListener) it.next();
+				listener.notificationRemoved(new UserNotificationStateChangeEvent(notification));
+			}
+		}
+	}
+	
+	private synchronized void fireNotificationClaimedEvent(UserNotification notification)
+	{
+		for (Iterator it = notificationListeners.iterator(); it.hasNext(); )
+		{
+			INotificationStateListener listener = (INotificationStateListener) it.next();
+			listener.notificationClaimed(new UserNotificationStateChangeEvent(notification));
+		}
+	}
+	
+	private synchronized void fireNotificationReleasedEvent(UserNotification notification)
+	{
+		synchronized (notificationListeners)
+		{
+			for (Iterator it = notificationListeners.iterator(); it.hasNext(); )
+			{
+				INotificationStateListener listener = (INotificationStateListener) it.next();
+				listener.notificationReleased(new UserNotificationStateChangeEvent(notification));
 			}
 		}
 	}

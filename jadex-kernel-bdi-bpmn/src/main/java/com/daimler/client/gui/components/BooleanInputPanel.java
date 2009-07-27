@@ -35,7 +35,7 @@ public class BooleanInputPanel extends AbstractInputPanel
 	public BooleanInputPanel(String name, String labelText, String toolTip,
 			String helpText, Color bgColor, boolean isRequired)
 	{
-		super(helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, isRequired);
 		this.labelText = labelText;
 		this.toolTip = toolTip;
 		initComponents();

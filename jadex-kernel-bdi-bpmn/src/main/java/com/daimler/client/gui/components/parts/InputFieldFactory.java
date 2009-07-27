@@ -23,6 +23,8 @@ public class InputFieldFactory
 {
 	public static AbstractInputPanel createInputPanel(String name, String labelText, String toolTip, String helpText, Color bgColor, boolean isRequired, Class clazz)
 	{
+		if (String.valueOf(clazz).equals("boolean"))
+			clazz = Boolean.class;
 		/*if (property instanceof List)
 		{((List) property).get(0)
 			return new CollectionInputPanel(name, labelText, helpText, bgColor, isRequired, null, 0);//taskProperty, bgColor);

@@ -12,23 +12,22 @@ import javax.swing.text.ChangedCharSetException;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.daimler.client.connector.ClientConnector;
-import com.daimler.client.connector.ClientRequest;
+import com.daimler.client.connector.UserNotification;
 import com.daimler.client.gui.GuiClient;
 
 public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
 
-	private ClientRequest request;
-	
-    public ShowInfoTaskSelectAction(GuiClient client, ClientRequest request)
+    public ShowInfoTaskSelectAction(GuiClient client, UserNotification notification)
     {
-    	super(client, request.getContext().getModelElement().getActivityType());
-    	this.request = request;
+    	super(client, notification.getContext().getModelElement().getActivityType(), notification);
         initAction();
-        initPanel((String) request.getContext().getParameterValue("info_text"));
+        initPanel((String) notification.getContext().getParameterValue("info_text"));
     }
     
-    private void initAction() {
-        String sTitle = this.getClass().getName() + " sTitle"; /*"<HTML>" + getThePlan().getTheModuleName() + "<BR>( "
+    private void initAction()
+    {
+    	//TODO: Different default name?
+        String sTitle = this.getClass().getName() + ""; /*"<HTML>" + getThePlan().getTheModuleName() + "<BR>( "
             + GuiEnvConnUtils.formatGoalName(getThePlan().getTheParentGoalName()) + " )</HTML>";*/
         putValue(Action.SMALL_ICON, ICON_INFO);
         putValue(Action.NAME, sTitle);
@@ -92,7 +91,7 @@ public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
     
     public void okButtonPressed()
     {
-        ClientConnector.getInstance().finishRequest(request);
+        ClientConnector.getInstance().commitNotification(getNotification(), null);
         dispose();
     }
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_c_1ssXd5Ed6uv6EsxGS0Yg" iD="_c_1ssHd5Ed6uv6EsxGS0Yg">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_GXkigXd9Ed6uv6EsxGS0Yg" iD="_GXkigHd9Ed6uv6EsxGS0Yg" name="packagecom.daimler.client.gui.test;&#xD;&#xA;import jadex.bpmn.runtime.task.*;&#xD;&#xA;import jadex.bpmnbdi.task.*;">
+    <associations xmi:type="bpmn:Association" xmi:id="_GXuTgHd9Ed6uv6EsxGS0Yg"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_c__dsXd5Ed6uv6EsxGS0Yg" iD="_c__dsHd5Ed6uv6EsxGS0Yg" associations="_GXuTgHd9Ed6uv6EsxGS0Yg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_lc5_oXd5Ed6uv6EsxGS0Yg" iD="_lc5_oHd5Ed6uv6EsxGS0Yg" outgoingEdges="_mHqz6nd5Ed6uv6EsxGS0Yg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_mHqz4Xd5Ed6uv6EsxGS0Yg" iD="_mHqz4Hd5Ed6uv6EsxGS0Yg" outgoingEdges="__taQMXq0Ed6DCtJyDWKHrQ" incomingEdges="_mHqz6nd5Ed6uv6EsxGS0Yg" name="DiPP1_LOG_Abgleichen_Planungspraemissen&#xD;&#xA;class = FetchDataTask.class&#xD;&#xA;inout boolean Digitales_Produktmodell_liegt_vor&#xD;&#xA;inout boolean Vertriebsprognosen_liegen_vor&#xD;&#xA;inout boolean Gebietsspeditionskonzept_liegt_vor&#xD;&#xA;inout boolean Praemissen_mit_Montage_abgeglichen" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_6FGEQXd8Ed6uv6EsxGS0Yg" iD="_6FGEQHd8Ed6uv6EsxGS0Yg" incomingEdges="__taQMXq0Ed6DCtJyDWKHrQ" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mHqz6nd5Ed6uv6EsxGS0Yg" iD="_mHqz6Xd5Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__taQMXq0Ed6DCtJyDWKHrQ" iD="__taQMHq0Ed6DCtJyDWKHrQ"/>
+  </pools>
+</bpmn:BpmnDiagram>
