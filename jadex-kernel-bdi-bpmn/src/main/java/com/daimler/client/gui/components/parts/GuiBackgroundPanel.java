@@ -57,16 +57,16 @@ public class GuiBackgroundPanel extends JXPanel
 
 	private void init()//Configuration conf)
 	{
-		main_top_X = 0;
-	    main_top_Y = 0;
-	    main_bottom_X = 0;
-	    main_bottom_Y = 0;
+		main_top_X = 50;
+	    main_top_Y = 160;
+	    main_bottom_X = 30;
+	    main_bottom_Y = 60;
 	    offset_tasks_top = 0;
 	    offset_tasks_bottom = 0;
-	    title_X = -1;
-	    title_Y = -1;
-	    category_X = -1;
-	    category_Y = -1;
+	    title_X = 60;
+	    title_Y = 140;
+	    category_X = 700;
+	    category_Y = 85;
         /*main_top_X = conf.getIntProperty("Top_Main_X", 0, "GUI_Options");
         main_top_Y = conf.getIntProperty("Top_Main_Y", 0, "GUI_Options");
         main_bottom_X = conf.getIntProperty("Bottom_Main_X", 0, "GUI_Options");

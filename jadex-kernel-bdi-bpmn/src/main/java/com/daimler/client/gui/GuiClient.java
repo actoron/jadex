@@ -178,6 +178,21 @@ public class GuiClient
 		scrollPane.getViewport().setBackground(new Color(0.0f, 0.0f, 0.0f, 0.0f));
 		scrollPane.setBorder(null);
 		mainPanel.add(scrollPane, BorderLayout.CENTER);
+		
+		/*JXPanel buffer = new JXPanel()
+		{
+			public Dimension getMinimumSize()
+			{
+				return new Dimension(2000, 1000);
+			}
+			
+			public Dimension getSize()
+			{
+				return new Dimension(2000, 1000);
+			}
+		};
+		buffer.setBackground(Color.WHITE);
+		mainPanel.add(buffer, BorderLayout.WEST);*/
 
 		okButton = new JButton("OK");
 		JPanel pSouth = new JPanel(new EqualsLayout(5));
