@@ -91,7 +91,7 @@ public class GuiClient
 							return;
 						if (activeNotification != null)
 						{
-							c.releaseNotification(notification);
+							c.releaseNotification(activeNotification);
 						}
 						activeNotification = notification;
 						c.claimNotification(notification);
