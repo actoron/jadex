@@ -27,8 +27,7 @@ public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
     private void initAction()
     {
     	//TODO: Different default name?
-        String sTitle = this.getClass().getName() + ""; /*"<HTML>" + getThePlan().getTheModuleName() + "<BR>( "
-            + GuiEnvConnUtils.formatGoalName(getThePlan().getTheParentGoalName()) + " )</HTML>";*/
+        String sTitle = "<HTML>" + "" + getTitle() + " </HTML>";
         putValue(Action.SMALL_ICON, ICON_INFO);
         putValue(Action.NAME, sTitle);
     }
