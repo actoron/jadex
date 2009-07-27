@@ -206,10 +206,12 @@ public class GoalLifecycleRules
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
 			Object	rgoal	= assignments.getVariableValue("?rgoal");
-			dropGoal(state, rgoal);
-//			if(((String)state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)).startsWith("purchase"))
+			
+//			if(((String)state.getAttributeValue(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)).startsWith("maintain"))
 //				System.out.println("Dropping goal: "+rgoal+" "+state.getAttributeValue(state.getAttributeValue(rgoal, 
-//						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+//				OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+
+			dropGoal(state, rgoal);
 		}
 	};
 	
@@ -414,7 +416,6 @@ public class GoalLifecycleRules
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
 
-		// Todo: Not MGoal.recur
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, mgoal));
@@ -424,7 +425,7 @@ public class GoalLifecycleRules
 		goalcon.addConstraint(new OrConstraint(
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_SUCCEEDED),
 			new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_FAILED)));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVAttributeType.OBJECTTYPE}, OAVBDIMetaModel.maintaingoal_type, IOperator.NOTEQUAL));
+//		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVAttributeType.OBJECTTYPE}, OAVBDIMetaModel.maintaingoal_type, IOperator.NOTEQUAL));
 
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));

@@ -900,16 +900,17 @@ public class GoalProcessingRules
 
 		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
 		goalcon.addConstraint(new BoundConstraint(null, rgoal));
-		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_apl, null, IOperator.EQUAL));
 		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.goal_has_finishedplans, rplan, IOperator.CONTAINS));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_processingstate, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_INPROCESS));
 		goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.maintaingoal_type, IOperator.INSTANCEOF));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_rebuild}, Boolean.FALSE));
-		goalcon.addConstraint(new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_retry}, Boolean.FALSE));
-		IConstraint reb = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_rebuild}, Boolean.FALSE);
-		IConstraint retry = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_retry}, Boolean.FALSE);
-		goalcon.addConstraint(new OrConstraint(new IConstraint[]{reb, retry}));
+		
+		// (!recur && (!retry || (rebuild=false && apl==null)))
+		IConstraint notrecur = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_recur}, Boolean.FALSE);
+		IConstraint notreb = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_rebuild}, Boolean.FALSE);
+		IConstraint aplnull = new LiteralConstraint(OAVBDIRuntimeModel.processableelement_has_apl, null, IOperator.EQUAL);
+		IConstraint notretry = new LiteralConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.element_has_model, OAVBDIMetaModel.goal_has_retry}, Boolean.FALSE);
+		goalcon.addConstraint(new AndConstraint(new IConstraint[]{notrecur, new OrConstraint(new IConstraint[]{notretry, new AndConstraint(new IConstraint[]{notreb, aplnull})})}));
 		
 		ObjectCondition	capcon	= new ObjectCondition(OAVBDIRuntimeModel.capability_type);
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rgoal, IOperator.CONTAINS));

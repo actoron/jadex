@@ -44,9 +44,9 @@ public class LoadBatteryPlan extends Plan
 			IGoal moveto = createGoal("achievemoveto");
 			IVector2 location = (IVector2)station.getProperty(Space2D.PROPERTY_POSITION);
 			moveto.getParameter("location").setValue(location);
-//			System.out.println("Created: "+location+" "+this);
+			System.out.println("Created: "+location+" "+this);
 			dispatchSubgoalAndWait(moveto);
-//			System.out.println("Reached: "+location+" "+this);
+			System.out.println("Reached: "+location+" "+this);
 
 			SyncResultListener	res	= new SyncResultListener();
 			Map props = new HashMap();
@@ -55,11 +55,13 @@ public class LoadBatteryPlan extends Plan
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			taskid = space.createObjectTask(LoadBatteryTask.PROPERTY_TYPENAME, props, myself.getId());
+			// Its important to wait for the task, as otherwise the plan is immediately finished and the maintaingoal is failed (one plan, no recur) 
+			waitForExternalCondition(res);
 //			load = new LoadBatteryTask(station, res);
 //			myself.addTask(load);
 		}
 
-//		getLogger().info("Loading finished.");
+		getLogger().info("Loading finished.");
 		//getBeliefbase().getBelief("is_loading").setFact(new Boolean(false));
 	}
 
