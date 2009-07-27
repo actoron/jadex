@@ -17,6 +17,7 @@ import jadex.gpmn.model.MPlan;
 import jadex.gpmn.model.MProcess;
 import jadex.gpmn.model.MProcessElement;
 import jadex.gpmn.model.MSequenceEdge;
+import jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -32,23 +33,29 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *  Class for converting a gpmn model description to an agent description.
  */
 public class GpmnBDIConverter
 {
+	//-------- attributes --------
+	
 	/** The loader. */
 	protected OAVBDIModelLoader loader;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new converter.
 	 */
 	public GpmnBDIConverter(OAVBDIModelLoader loader)
 	{
 		this.loader = loader;
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Convert a gpmn model to a bdi agent.
 	 */
 	public OAVAgentModel[] convertGpmnModelToBDIAgents(MGpmnModel model, ClassLoader classloader)
 	{
@@ -71,7 +78,7 @@ public class GpmnBDIConverter
 	}
 	
 	/**
-	 * 
+	 *  Create a bdi agent for one process.
 	 */
 	public OAVAgentModel createBDIAgentForProcess(MGpmnModel model, MProcess process, ClassLoader classloader)
 	{
@@ -121,7 +128,7 @@ public class GpmnBDIConverter
 	}
 	
 	/**
-	 * 
+	 *  Convert all aspects of a process.
 	 */
 	public Object doConvert(MProcess proc, ClassLoader classloader, IOAVState state)
 	{
@@ -247,17 +254,19 @@ public class GpmnBDIConverter
 				}
 				
 				// Create initial goal for goal with no incoming edges
-				if(goal.getIncomingSequenceEdges()==null)
-				{
-					Object inigoalhandle = state.createObject(OAVBDIMetaModel.configelement_type);
-					state.setAttributeValue(inigoalhandle, OAVBDIMetaModel.configelement_has_ref, goal.getName());
-					state.addAttributeValue(confighandle, OAVBDIMetaModel.configuration_has_initialgoals, inigoalhandle);
-				}
+//				if(goal.getIncomingSequenceEdges()==null)
+//				{
+//					Object inigoalhandle = state.createObject(OAVBDIMetaModel.configelement_type);
+//					state.setAttributeValue(inigoalhandle, OAVBDIMetaModel.configelement_has_ref, goal.getName());
+//					state.addAttributeValue(confighandle, OAVBDIMetaModel.configuration_has_initialgoals, inigoalhandle);
+//				}
 				
 				// Create implicit plans for creating/dispatching subgoals
 				List outedges = goal.getOutgoingSequenceEdges();
 				if(outedges!=null)
 				{
+					// todo: parameters
+					
 					List outgoals = new ArrayList();
 					for(int j=0; j<outedges.size(); j++)
 					{
@@ -357,8 +366,58 @@ public class GpmnBDIConverter
 			}
 		}
 		
+		// Create plan for starting/monitoring the process.
+		String planname = "startandmonitor_"+proc.getName().substring(0, proc.getName().indexOf("."));
+		Object planhandle = state.createObject(OAVBDIMetaModel.plan_type);
+		state.setAttributeValue(planhandle, OAVBDIMetaModel.modelelement_has_name, planname);
+		state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_plans, planhandle);
+		Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
+		state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
+		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_class, StartAndMonitorProcessPlan.class);
+		
+		// Create achieve_goals maintain_goals paramterset
+		Object aparamsethandle = state.createObject(OAVBDIMetaModel.planparameterset_type);
+		state.setAttributeValue(aparamsethandle, OAVBDIMetaModel.modelelement_has_name, "achieve_goals");
+		state.setAttributeValue(aparamsethandle, OAVBDIMetaModel.typedelement_has_class, String.class);
+		state.addAttributeValue(planhandle, OAVBDIMetaModel.parameterelement_has_parametersets, aparamsethandle);
+		Object mparamsethandle = state.createObject(OAVBDIMetaModel.planparameterset_type);
+		state.setAttributeValue(mparamsethandle, OAVBDIMetaModel.modelelement_has_name, "maintain_goals");
+		state.setAttributeValue(mparamsethandle, OAVBDIMetaModel.typedelement_has_class, String.class);
+		state.addAttributeValue(planhandle, OAVBDIMetaModel.parameterelement_has_parametersets, mparamsethandle);
+	
+		Collection goalhandles = state.getAttributeValues(agenthandle, OAVBDIMetaModel.capability_has_goals);
+		if(goals!=null)
+		{
+			for(int i=0; i<goals.size(); i++)
+			{
+				MGoal goal = (MGoal)goals.get(i);
+				if(goal.getIncomingSequenceEdges()==null)
+				{
+					Object goalhandle = state.getAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_goals, goal.getName());
+					Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
+					String goalname = (String)state.getAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name);
+					state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, "\""+goalname+"\"");
+	
+					if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.achievegoal_type))
+					{
+						state.addAttributeValue(aparamsethandle, OAVBDIMetaModel.parameterset_has_values, valhandle);
+					}
+					else if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.maintaingoal_type))
+					{
+						state.addAttributeValue(mparamsethandle, OAVBDIMetaModel.parameterset_has_values, valhandle);
+					}
+				}
+			}
+		}
+		
+		// Make this plan the initial plan
+		Object iniplanhandle = state.createObject(OAVBDIMetaModel.configelement_type);
+		state.setAttributeValue(iniplanhandle, OAVBDIMetaModel.configelement_has_ref, planname);
+		state.addAttributeValue(confighandle, OAVBDIMetaModel.configuration_has_initialplans, iniplanhandle);
+
 		
 		// Do second pass post-processing
+		
 		
 		OAVBDIXMLReader.ExpressionProcessor expost = new OAVBDIXMLReader.ExpressionProcessor();
 		OAVBDIXMLReader.ClassPostProcessor clpost = new OAVBDIXMLReader.ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class);
@@ -386,11 +445,19 @@ public class GpmnBDIConverter
 				clpost.postProcess(state, belsethandle, agenthandle, classloader);
 				if(exphandle!=null)
 					expost.postProcess(state, exphandle, agenthandle, classloader);
+				Collection expshandle = state.getAttributeValues(belsethandle, OAVBDIMetaModel.beliefset_has_facts);
+				if(expshandle!=null)
+				{
+					for(Iterator it2=expshandle.iterator(); it2.hasNext(); )
+					{
+						exphandle = it2.next();
+						expost.postProcess(state, exphandle, agenthandle, classloader);
+					}
+				}
 			}
 		}
 		
 		// Handle goal conditions
-		Collection goalhandles = state.getAttributeValues(agenthandle, OAVBDIMetaModel.capability_has_goals);
 		if(goalhandles!=null)
 		{
 			for(Iterator it = goalhandles.iterator(); it.hasNext(); )
@@ -418,6 +485,38 @@ public class GpmnBDIConverter
 					if(condhandle!=null)
 						expost.postProcess(state, condhandle, agenthandle, classloader);
 				}
+				
+				Collection paramhandles = state.getAttributeValues(goalhandle, OAVBDIMetaModel.parameterelement_has_parameters);
+				if(paramhandles!=null)
+				{
+					for(Iterator it2 = paramhandles.iterator(); it2.hasNext(); )
+					{
+						Object paramhandle = it2.next();
+						Object exphandle = state.getAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value);
+						if(exphandle!=null)
+							expost.postProcess(state, exphandle, agenthandle, classloader);
+					}
+				}
+				Collection paramsethandles = state.getAttributeValues(goalhandle, OAVBDIMetaModel.parameterelement_has_parametersets);
+				if(paramsethandles!=null)
+				{
+					for(Iterator it2 = paramsethandles.iterator(); it2.hasNext(); )
+					{
+						Object paramsethandle = it2.next();
+						Object exphandle = state.getAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression);
+						if(exphandle!=null)
+							expost.postProcess(state, exphandle, agenthandle, classloader);
+						Collection expshandle = state.getAttributeValues(paramsethandle, OAVBDIMetaModel.parameterset_has_values);
+						if(expshandle!=null)
+						{
+							for(Iterator it3=expshandle.iterator(); it3.hasNext(); )
+							{
+								exphandle = it3.next();
+								expost.postProcess(state, exphandle, agenthandle, classloader);
+							}
+						}
+					}
+				}
 			}
 		}
 		
@@ -427,7 +526,7 @@ public class GpmnBDIConverter
 		{
 			for(Iterator it = planhandles.iterator(); it.hasNext(); )
 			{
-				Object planhandle = it.next();
+				planhandle = it.next();
 				Collection paramhandles = state.getAttributeValues(planhandle, OAVBDIMetaModel.parameterelement_has_parameters);
 				if(paramhandles!=null)
 				{
@@ -448,6 +547,15 @@ public class GpmnBDIConverter
 						Object exphandle = state.getAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression);
 						if(exphandle!=null)
 							expost.postProcess(state, exphandle, agenthandle, classloader);
+						Collection expshandle = state.getAttributeValues(paramsethandle, OAVBDIMetaModel.parameterset_has_values);
+						if(expshandle!=null)
+						{
+							for(Iterator it3=expshandle.iterator(); it3.hasNext(); )
+							{
+								exphandle = it3.next();
+								expost.postProcess(state, exphandle, agenthandle, classloader);
+							}
+						}
 					}
 				}
 			}

@@ -138,6 +138,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			{
 				if(interpreter.isExternalThread())
 				{
+//					Thread.dumpStack();
 					interpreter.invokeLater(new Runnable()
 					{
 						public void run()

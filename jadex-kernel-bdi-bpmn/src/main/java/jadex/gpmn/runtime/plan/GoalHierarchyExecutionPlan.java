@@ -48,14 +48,14 @@ public class GoalHierarchyExecutionPlan extends Plan
 	
 	public void passed()
 	{
-		System.out.println("Passed: "+getParameter("mode").getValue()+SUtil.arrayToString(getParameterSet("subgoals").getValues()));
+		System.out.println("Passed: "+this+" "+getParameter("mode").getValue()+SUtil.arrayToString(getParameterSet("subgoals").getValues()));
 	}
 	public void failed()
 	{
-		System.out.println("Failed: "+getParameter("mode").getValue()+SUtil.arrayToString(getParameterSet("subgoals").getValues())+", "+getException());
+		System.out.println("Failed: "+this+" "+getParameter("mode").getValue()+SUtil.arrayToString(getParameterSet("subgoals").getValues())+", "+getException());
 	}
 	public void aborted()
 	{
-		System.out.println("Aborted: "+getParameter("mode").getValue()+SUtil.arrayToString(getParameterSet("subgoals").getValues()));
+		System.out.println("Aborted: "+this+" "+getParameter("mode").getValue()+SUtil.arrayToString(getParameterSet("subgoals").getValues()));
 	}
 }

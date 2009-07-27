@@ -320,7 +320,7 @@ public abstract class Plan extends AbstractPlan
 		{
 			// Todo: check thread access.
 			if(OAVBDIRuntimeModel.GOALPROCESSINGSTATE_FAILED.equals(
-					getState().getAttributeValue(((ElementFlyweight)goal).getHandle(), OAVBDIRuntimeModel.goal_has_processingstate)))
+				getState().getAttributeValue(((ElementFlyweight)goal).getHandle(), OAVBDIRuntimeModel.goal_has_processingstate)))
 			{
 				throw new GoalFailureException("Goal failed: "+goal);
 			}
