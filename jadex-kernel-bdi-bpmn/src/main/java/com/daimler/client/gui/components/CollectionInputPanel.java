@@ -90,9 +90,9 @@ public class CollectionInputPanel extends AbstractInputPanel implements ActionLi
     
     private int type;
     
-    public CollectionInputPanel(String name, String labelText, String helpText, Color bgColor, boolean isRequired, IInputComponent inputField, int type)
+    public CollectionInputPanel(String name, String labelText, String helpText, Color bgColor, Object initialValue, boolean isRequired, IInputComponent inputField, int type)
     {
-        super(name, helpText, bgColor, isRequired);
+        super(name, helpText, bgColor, initialValue, isRequired);
         this.type = type;
         this.labelText = labelText;
         this.inputField = inputField;
@@ -269,7 +269,12 @@ public class CollectionInputPanel extends AbstractInputPanel implements ActionLi
         }
         return null;
     }*/
-
+    
+    public void setEditable(boolean editable)
+    {
+    	//TODO: FIXME
+    }
+    
     public String getLabel() {
         return labelText;
     }

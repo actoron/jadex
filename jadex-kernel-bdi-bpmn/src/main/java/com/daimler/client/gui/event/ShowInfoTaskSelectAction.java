@@ -19,7 +19,7 @@ public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
 
     public ShowInfoTaskSelectAction(GuiClient client, UserNotification notification)
     {
-    	super(client, notification.getContext().getModelElement().getActivityType(), notification);
+    	super(client, notification.getContext().getModelElement().getName(), notification);
         initAction();
         initPanel((String) notification.getContext().getParameterValue("info_text"));
     }

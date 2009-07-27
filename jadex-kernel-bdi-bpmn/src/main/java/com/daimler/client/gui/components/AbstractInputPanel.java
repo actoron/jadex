@@ -42,7 +42,7 @@ public abstract class AbstractInputPanel extends JPanel implements Comparable
 	private boolean isRequired = false;
 
 	public AbstractInputPanel(String name, String helpText,
-			Color bgColor, boolean isRequired)
+			Color bgColor, Object initialValue, boolean isRequired)
 	{
 		super();
 		setName(name);
@@ -54,6 +54,8 @@ public abstract class AbstractInputPanel extends JPanel implements Comparable
 			this.helpText = null;
 		}
 		this.elementBorder = BorderFactory.createMatteBorder(5, 10, 5, 10, bgColor);
+		if (initialValue != null)
+			setCurrentValue(initialValue);
 	}
 
 	protected void init()
@@ -160,6 +162,7 @@ public abstract class AbstractInputPanel extends JPanel implements Comparable
 	// return theAccessible;
 	// }
 	
+	public abstract void setEditable(boolean editable);
 	
 	public int compareTo(Object arg0)
 	{

@@ -59,9 +59,9 @@ public class StringInputPanel extends AbstractInputPanel
 	private Format format;
 
 	public StringInputPanel(String name, String labelText, String toolTip,
-			String helpText, Color bgColor, boolean isRequired, Format format)
+			String helpText, Color bgColor, Object initialValue, boolean isRequired, Format format)
 	{
-		super(name, helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, initialValue, isRequired);
 		this.labelText = labelText;
 		this.toolTip = toolTip;
 		this.format = format;
@@ -116,7 +116,12 @@ public class StringInputPanel extends AbstractInputPanel
 	{
 		return labelText;
 	}
-
+	
+	public void setEditable(boolean editable)
+    {
+    	textField.setEditable(editable);
+    }
+	
 	public int getWeight()
 	{
 		return -100;

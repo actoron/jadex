@@ -18,14 +18,14 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
     private GuiDataScrollPanel theDataPanel;
     
     public FetchDataTaskSelectAction(GuiClient client, UserNotification notification) {
-    	super(client, notification.getContext().getModelElement().getActivityType(), notification);
+    	super(client, notification.getContext().getModelElement().getName(), notification);
         initAction();
         initPanel(notification.getContext().getModelElement().getParameters());
     }
     
     private void initAction() {
     	//TODO: Different default name?
-        String sTitle = "<HTML>" + "" + "<BR> Data Request" + " </HTML>";
+        String sTitle = "<HTML>" + "" + getTitle() + " </HTML>";
         putValue(Action.SMALL_ICON, ICON_TASK);
         putValue(Action.NAME, sTitle);
     }

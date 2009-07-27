@@ -45,10 +45,10 @@ public class SimpleDomainInputPanel extends AbstractInputPanel
 	private TitledBorder border;
 
 	public SimpleDomainInputPanel(String name, String text, String labelText,
-			String toolTip, String helpText, Color bgColor, boolean isRequired,
+			String toolTip, String helpText, Color bgColor, Object initialValue, boolean isRequired,
 			IInputComponent inputField)
 	{
-		super(name, helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, initialValue, isRequired);
 		this.labelText = text;
 		this.toolTip = toolTip;
 		this.inputField = inputField;
@@ -151,7 +151,12 @@ public class SimpleDomainInputPanel extends AbstractInputPanel
 		 * setTheCurrentValue(getTheAccessible().getTheValue()); }
 		 */
 	}
-
+	
+	public void setEditable(boolean editable)
+    {
+    	//TODO: FIXME
+    }
+	
 	public String getTheLabel()
 	{
 		return labelText;

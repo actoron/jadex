@@ -7,6 +7,7 @@
 package com.daimler.client.gui.components.parts;
 
 import jadex.bpmn.model.MParameter;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -71,9 +72,17 @@ public class GuiCategoryPanel extends JPanel
 			// System.out.println("Creating panel for: " +
 			// theCategoryProperties.get(i).getTheName());
 			MParameter parameter = (MParameter) categoryParameters.get(i);
-			theInputFields.add(InputFieldFactory.createInputPanel(parameter
+			Object initVal = null;
+			if (((parameter.getDirection().equals(MParameter.DIRECTION_INOUT)) ||
+				(parameter.getDirection().equals(MParameter.DIRECTION_IN))) &&
+				(parameter.getInitialValue() != null))
+				initVal = parameter.getInitialValue().getValue(new SimpleValueFetcher());
+			AbstractInputPanel inputField = InputFieldFactory.createInputPanel(parameter
 					.getName(), parameter.getName(), "", "",
-					theBackgroundColor, true, parameter.getClazz()));
+					theBackgroundColor, true, parameter.getClazz(), initVal);
+			if (parameter.getDirection().equals(MParameter.DIRECTION_IN))
+				inputField.setEditable(false);
+			theInputFields.add(inputField);
 		}
 		AbstractInputPanel[] fields = (AbstractInputPanel[]) theInputFields
 				.toArray(new AbstractInputPanel[0]);

@@ -49,6 +49,11 @@ public abstract class AbstractTaskSelectAction extends AbstractAction
 	{
 		return notification;
 	}
+	
+	public String getTitle()
+	{
+		return title;
+	}
 
 	public void actionPerformed(ActionEvent e)
 	{

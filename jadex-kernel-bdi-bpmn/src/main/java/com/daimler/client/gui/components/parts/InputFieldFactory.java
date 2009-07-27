@@ -21,7 +21,7 @@ import com.daimler.client.gui.components.TextInputPanel;
  */
 public class InputFieldFactory
 {
-	public static AbstractInputPanel createInputPanel(String name, String labelText, String toolTip, String helpText, Color bgColor, boolean isRequired, Class clazz)
+	public static AbstractInputPanel createInputPanel(String name, String labelText, String toolTip, String helpText, Color bgColor, boolean isRequired, Class clazz, Object initialValue)
 	{
 		if (String.valueOf(clazz).equals("boolean"))
 			clazz = Boolean.class;
@@ -39,19 +39,19 @@ public class InputFieldFactory
 		}*/
 		if (clazz.equals(Date.class))
 		{
-			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, isRequired, StringInputPanel.DATE_FORMAT);
+			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, initialValue, isRequired, StringInputPanel.DATE_FORMAT);
 		}
 		if (clazz.equals(Integer.class))
 		{
-			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, isRequired, StringInputPanel.INTEGER_FORMAT);
+			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, initialValue, isRequired, StringInputPanel.INTEGER_FORMAT);
 		}
 		if (clazz.equals(Double.class))
 		{
-			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, isRequired, StringInputPanel.DOUBLE_FORMAT);
+			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, initialValue, isRequired, StringInputPanel.DOUBLE_FORMAT);
 		}
 		if (clazz.equals(Long.class))
 		{
-			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, isRequired, StringInputPanel.INTEGER_FORMAT);
+			return new StringInputPanel(name, labelText, toolTip, helpText, bgColor, initialValue, isRequired, StringInputPanel.INTEGER_FORMAT);
 		}
 		/*if (clazz.equals(String.class))
 		{
@@ -59,11 +59,11 @@ public class InputFieldFactory
 		}*/
 		if (clazz.equals(String.class))
 		{
-			return new TextInputPanel(name, labelText, toolTip, helpText, bgColor, isRequired);
+			return new TextInputPanel(name, labelText, toolTip, helpText, bgColor, initialValue, isRequired);
 		}
 		if (clazz.equals(Boolean.class))
 		{
-			return new BooleanInputPanel(name, labelText, toolTip, helpText, bgColor, isRequired);
+			return new BooleanInputPanel(name, labelText, toolTip, helpText, bgColor, initialValue, isRequired);
 		}
 		//if (property instanceof ComplexContextVariableDomain)
 		//{

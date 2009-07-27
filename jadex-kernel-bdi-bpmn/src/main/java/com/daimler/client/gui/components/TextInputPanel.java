@@ -35,9 +35,9 @@ public class TextInputPanel extends AbstractInputPanel
 	private TitledBorder border;
 
 	public TextInputPanel(String name, String text, String toolTip,
-			String helpText, Color bgColor, boolean isRequired)
+			String helpText, Color bgColor, Object initialValue, boolean isRequired)
 	{
-		super(name, helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, initialValue, isRequired);
 		this.labelText = text;
 		this.toolTip = toolTip;
 		initComponents();
@@ -67,7 +67,12 @@ public class TextInputPanel extends AbstractInputPanel
 				BorderLayout.WEST);
 		mainPanel.setBorder(border);
 	}
-
+	
+	public void setEditable(boolean editable)
+    {
+    	textField.setEnabled(editable);
+    }
+	
 	public String getLabel()
 	{
 		return labelText;

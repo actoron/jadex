@@ -39,9 +39,9 @@ public class ComplexRenderPanel extends AbstractInputPanel
 	private JLabel label;
 
 	public ComplexRenderPanel(String name, String text, String toolTip,
-			String helpText, Color bgColor, boolean isRequired)
+			String helpText, Color bgColor, Object initialValue, boolean isRequired)
 	{
-		super(name, helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, initialValue, isRequired);
 		this.labelText = name;
 		this.valueText = "<html>" + StringUtils.replace(text, "\n", "<br>")
 				+ "</html>";
@@ -73,7 +73,12 @@ public class ComplexRenderPanel extends AbstractInputPanel
 				getBackgroundColor(), Component.LEFT_ALIGNMENT,
 				Component.CENTER_ALIGNMENT), BorderLayout.WEST);
 	}
-
+	
+	public void setEditable(boolean editable)
+    {
+    	//TODO: FIXME
+    }
+	
 	public String getTheLabel()
 	{
 		return labelText;

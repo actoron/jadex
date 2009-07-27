@@ -33,9 +33,9 @@ public class BooleanInputPanel extends AbstractInputPanel
 	private JCheckBox checkBox;
 
 	public BooleanInputPanel(String name, String labelText, String toolTip,
-			String helpText, Color bgColor, boolean isRequired)
+			String helpText, Color bgColor, Object initialValue, boolean isRequired)
 	{
-		super(name, helpText, bgColor, isRequired);
+		super(name, helpText, bgColor, initialValue, isRequired);
 		this.labelText = labelText;
 		this.toolTip = toolTip;
 		initComponents();
@@ -66,6 +66,11 @@ public class BooleanInputPanel extends AbstractInputPanel
 		 * setTheCurrentValue(new Boolean(false)); }
 		 */
 		// theCheckBox.addActionListener(this);
+	}
+	
+	public void setEditable(boolean editable)
+	{
+		checkBox.setEnabled(editable);
 	}
 
 	public String getLabel()
