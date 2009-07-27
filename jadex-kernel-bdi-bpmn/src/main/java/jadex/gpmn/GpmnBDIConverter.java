@@ -198,6 +198,8 @@ public class GpmnBDIConverter
 					goalhandle = state.createObject(OAVBDIMetaModel.achievegoal_type);
 					state.setAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name, goal.getName());
 					state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_goals, goalhandle);
+					if(((MAchieveGoal)goal).getExcludeMode()!=null)
+						state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_exclude, ((MAchieveGoal)goal).getExcludeMode());
 					if(((MAchieveGoal)goal).getTargetCondition()!=null)
 					{
 						Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
@@ -211,6 +213,8 @@ public class GpmnBDIConverter
 					goalhandle = state.createObject(OAVBDIMetaModel.maintaingoal_type);
 					state.setAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name, goal.getName());
 					state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_goals, goalhandle);
+					if(((MMaintainGoal)goal).getExcludeMode()!=null)
+						state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_exclude, ((MMaintainGoal)goal).getExcludeMode());
 					if(((MMaintainGoal)goal).getMaintainCondition()!=null)
 					{
 						Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);

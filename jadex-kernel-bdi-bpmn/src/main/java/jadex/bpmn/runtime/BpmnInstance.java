@@ -3,6 +3,7 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
@@ -46,6 +47,7 @@ public class BpmnInstance	implements IProcessInstance
 
 		defhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new DefaultActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());

@@ -33,18 +33,17 @@
 			</maintaincondition>
 		</maintaingoal>
 		
-		<achievegoal name="Dipp1_Logistik_abgesichert">
+		<achievegoal name="Dipp1_Logistik_abgesichert_seq">
 			<parameter name="mode" class="String">
 				<value>"sequential"</value>
 			</parameter>
 			<parameterset name="subgoals" class="String">
 				<value>"DiPP1_LOG_Planungspraemissen_abgeglichen"</value>
-				<value>"Dipp1_Logistik_abgesichert_2"</value>
-				<value>"all_done"</value>
+				<value>"Dipp1_Logistik_abgesichert_par"</value>
 			</parameterset>
 		</achievegoal>
 		
-		<achievegoal name="Dipp1_Logistik_abgesichert_2">
+		<achievegoal name="Dipp1_Logistik_abgesichert_par">
 			<parameter name="mode" class="String">
 				<value>"parallel"</value>
 			</parameter>
@@ -55,12 +54,7 @@
 			</parameterset>
 		</achievegoal>
 		
-		<achievegoal name="DiPP1_LOG_Planungspraemissen_abgeglichen">
-			<targetcondition language="jcl">
-				$beliefbase.produktmodell &amp;&amp; $beliefbase.vertriebsprognosen
-				&amp;&amp; $beliefbase.gs_konzept &amp;&amp; $beliefbase.molog_praemissen
-			</targetcondition>
-		</achievegoal>
+		<achievegoal name="DiPP1_LOG_Planungspraemissen_abgeglichen" />
 		<achievegoal name="DiPP1_LOG_Ladungstraeger_abgesichert" />
 		<achievegoal name="DiPP1_LOG_Prozessplanung_durchgefuehrt" />
 		<achievegoal name="DiPP1_LOG_Lieferantenstandort_geprueft" />
@@ -104,26 +98,19 @@
 			</trigger>
 		</plan>
 
-		<plan name="AllDonePlan">
-			<body type="bpmn" impl="jadex/bpmn/examples/dipp/AllDonePlan.bpmn"/>
-			<trigger>
-				<goal ref="all_done"/>
-			</trigger>
-		</plan>
-
 		<plan name="goal_executor">
 			<parameter name="mode" class="String">
-				<goalmapping ref="Dipp1_Logistik_abgesichert.mode"/>
-				<goalmapping ref="Dipp1_Logistik_abgesichert_2.mode"/>
+				<goalmapping ref="Dipp1_Logistik_abgesichert_seq.mode"/>
+				<goalmapping ref="Dipp1_Logistik_abgesichert_par.mode"/>
 			</parameter>
 			<parameterset name="subgoals" class="String">
-				<goalmapping ref="Dipp1_Logistik_abgesichert.subgoals"/>
-				<goalmapping ref="Dipp1_Logistik_abgesichert_2.subgoals"/>
+				<goalmapping ref="Dipp1_Logistik_abgesichert_seq.subgoals"/>
+				<goalmapping ref="Dipp1_Logistik_abgesichert_par.subgoals"/>
 			</parameterset>
 			<body class="GoalHierarchyExecutionPlan"/>
 			<trigger>
-				<goal ref="Dipp1_Logistik_abgesichert"/>
-				<goal ref="Dipp1_Logistik_abgesichert_2"/>
+				<goal ref="Dipp1_Logistik_abgesichert_seq"/>
+				<goal ref="Dipp1_Logistik_abgesichert_par"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -136,7 +123,7 @@
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="Praemissen_ok"/>
-				<initialgoal ref="Dipp1_Logistik_abgesichert"/>
+				<initialgoal ref="Dipp1_Logistik_abgesichert_seq"/>
 			</goals>
 		</configuration>
 	</configurations>

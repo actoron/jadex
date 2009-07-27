@@ -78,12 +78,6 @@
   </children>
   <styles xmi:type="notation:DiagramStyle" xmi:id="_aj63IXdpEd6QBt5Nz_tZNA"/>
   <element xmi:type="gpmn:GpmnDiagram" href="dipp.gpmn#_ajVBQHdpEd6QBt5Nz_tZNA"/>
-  <edges xmi:type="notation:Edge" xmi:id="_SVpYsXdqEd6QBt5Nz_tZNA" type="4001" source="_jnRuAXdpEd6QBt5Nz_tZNA" target="_mAdy8XdpEd6QBt5Nz_tZNA">
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_SVpYsndqEd6QBt5Nz_tZNA"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_SVpYs3dqEd6QBt5Nz_tZNA"/>
-    <element xmi:type="gpmn:SubGoalEdge" href="dipp.gpmn#_SVpYsHdqEd6QBt5Nz_tZNA"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_SVpYtHdqEd6QBt5Nz_tZNA" points="[-6, 20, 32, -125]$[-33, 125, 5, -20]"/>
-  </edges>
   <edges xmi:type="notation:Edge" xmi:id="_YtMJkXdqEd6QBt5Nz_tZNA" type="4003" source="_mAdy8XdpEd6QBt5Nz_tZNA" target="_XA3KoXdqEd6QBt5Nz_tZNA">
     <styles xmi:type="notation:RoutingStyle" xmi:id="_YtMJkndqEd6QBt5Nz_tZNA"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_YtMJk3dqEd6QBt5Nz_tZNA"/>
@@ -101,13 +95,6 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_y12Ug3dqEd6QBt5Nz_tZNA"/>
     <element xmi:type="gpmn:PlanEdge" href="dipp.gpmn#_y12UgHdqEd6QBt5Nz_tZNA"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_y12UhHdqEd6QBt5Nz_tZNA" points="[1, 20, 1, -80]$[15, 120, 15, 20]"/>
-  </edges>
-  <edges xmi:type="notation:Edge" xmi:id="_5yex0HeeEd6InfwtmHfU3w" type="4001" source="_jnRuAXdpEd6QBt5Nz_tZNA" target="_45Qq0XeeEd6InfwtmHfU3w">
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_5yex0XeeEd6InfwtmHfU3w"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_5yex0neeEd6InfwtmHfU3w"/>
-    <element xmi:type="gpmn:SubGoalEdge" href="dipp.gpmn#_5yVA0HeeEd6InfwtmHfU3w"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5yex03eeEd6InfwtmHfU3w" points="[24, 20, -89, -72]$[107, 94, -6, 2]"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_5yex1HeeEd6InfwtmHfU3w" id="(0.12244897959183673,0.675)"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_E2IsgXefEd6InfwtmHfU3w" type="4001" source="_45Qq0XeeEd6InfwtmHfU3w" target="_cZFMgXdqEd6QBt5Nz_tZNA">
     <styles xmi:type="notation:RoutingStyle" xmi:id="_E2IsgnefEd6InfwtmHfU3w"/>
@@ -138,5 +125,20 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_2_srs3efEd6Ozo0E4CWLCw"/>
     <element xmi:type="gpmn:PlanEdge" href="dipp.gpmn#_2_srsHefEd6Ozo0E4CWLCw"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_2_srtHefEd6Ozo0E4CWLCw" points="[1, 20, -22, -180]$[-99, 199, -122, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_kqXNsXrBEd6VULQxsz6luA" type="4001" source="_jnRuAXdpEd6QBt5Nz_tZNA" target="_mAdy8XdpEd6QBt5Nz_tZNA">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_kqXNsnrBEd6VULQxsz6luA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_kqXNs3rBEd6VULQxsz6luA"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="dipp.gpmn#_kqXNsHrBEd6VULQxsz6luA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_kqXNtHrBEd6VULQxsz6luA" points="[-2, 7, 22, -136]$[30, 152, 54, 9]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_kqXNtXrBEd6VULQxsz6luA" id="(0.6994818652849741,0.825)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_kqXNtnrBEd6VULQxsz6luA" id="(0.7538461538461538,0.775)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_lBTuEXrBEd6VULQxsz6luA" type="4001" source="_jnRuAXdpEd6QBt5Nz_tZNA" target="_45Qq0XeeEd6InfwtmHfU3w">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_lBTuEnrBEd6VULQxsz6luA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_lBTuE3rBEd6VULQxsz6luA"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="dipp.gpmn#_lBTuEHrBEd6VULQxsz6luA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_lBTuFHrBEd6VULQxsz6luA" points="[39, 10, -203, -53]$[147, 63, -95, 0]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_lBdfEHrBEd6VULQxsz6luA" id="(0.7979274611398963,0.675)"/>
   </edges>
 </notation:Diagram>

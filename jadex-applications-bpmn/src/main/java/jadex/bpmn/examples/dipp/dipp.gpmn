@@ -10,13 +10,13 @@
       <staticElements ID="_zejVYHg9Ed6zhPNmTPYkVQ" name="molog_praemissen" type="boolean"/>
     </artifacts>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_jnRuAHdpEd6QBt5Nz_tZNA" name="Dipp1_Logistik_abgesichert_seq">
-      <outgoingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</outgoingEdges>
-      <outgoingEdges>_5yVA0HeeEd6InfwtmHfU3w</outgoingEdges>
+      <outgoingEdges>_kqXNsHrBEd6VULQxsz6luA</outgoingEdges>
+      <outgoingEdges>_lBTuEHrBEd6VULQxsz6luA</outgoingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_mAdy8HdpEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgeglichen">
       <outgoingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</outgoingEdges>
-      <incomingEdges>_SVpYsHdqEd6QBt5Nz_tZNA</incomingEdges>
-      <targetcondition>$beliefbase.produktmodell &amp;&amp; $beliefbase.vertriebsprognosen &amp;&amp; $beliefbase.gs_konzept &amp;&amp; $beliefbase.molog_praemissen</targetcondition>
+      <incomingEdges>_kqXNsHrBEd6VULQxsz6luA</incomingEdges>
+      <targetcondition></targetcondition>
     </vertices>
     <vertices xsi:type="gpmn:Plan" ID="_XA3KoHdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Planungsprämissen_abgleichen" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn">
       <incomingEdges>_YtMJkHdqEd6QBt5Nz_tZNA</incomingEdges>
@@ -28,8 +28,9 @@
     <vertices xsi:type="gpmn:Plan" ID="_h0Rp4HdqEd6QBt5Nz_tZNA" name="DiPP1_LOG_Ladungsträger_absichern" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn">
       <incomingEdges>_jaDU4HdqEd6QBt5Nz_tZNA</incomingEdges>
     </vertices>
-    <vertices xsi:type="gpmn:MaintainGoal" ID="_utNEIHdqEd6QBt5Nz_tZNA" name="Prämissen_ok">
+    <vertices xsi:type="gpmn:MaintainGoal" ID="_utNEIHdqEd6QBt5Nz_tZNA" name="Prämissen_ok" exclude="never">
       <outgoingEdges>_y12UgHdqEd6QBt5Nz_tZNA</outgoingEdges>
+      <contextcondition></contextcondition>
       <maintaincondition>$beliefbase.praemissen_ok</maintaincondition>
     </vertices>
     <vertices xsi:type="gpmn:Plan" ID="_xVvMoHdqEd6QBt5Nz_tZNA" name="Info_Prämissen_fehlen" bpmnPlan="jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn">
@@ -39,7 +40,7 @@
       <outgoingEdges>_E2IsgHefEd6InfwtmHfU3w</outgoingEdges>
       <outgoingEdges>_dwtTsHefEd6Ozo0E4CWLCw</outgoingEdges>
       <outgoingEdges>_eHW5IHefEd6Ozo0E4CWLCw</outgoingEdges>
-      <incomingEdges>_5yVA0HeeEd6InfwtmHfU3w</incomingEdges>
+      <incomingEdges>_lBTuEHrBEd6VULQxsz6luA</incomingEdges>
     </vertices>
     <vertices xsi:type="gpmn:AchieveGoal" ID="_bLdIsHefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Prozessplanung_durchgeführt">
       <outgoingEdges>_qutbMHefEd6Ozo0E4CWLCw</outgoingEdges>
@@ -55,15 +56,15 @@
     <vertices xsi:type="gpmn:Plan" ID="_cfWZgHefEd6Ozo0E4CWLCw" name="DiPP1_LOG_Lieferantenstandort_prüfen" bpmnPlan="jadex/bpmn/examples/dipp/DiPP1_LOG_Lieferantenstandort_pruefen.bpmn">
       <incomingEdges>_2_srsHefEd6Ozo0E4CWLCw</incomingEdges>
     </vertices>
-    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_SVpYsHdqEd6QBt5Nz_tZNA" description="" name=""/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_YtMJkHdqEd6QBt5Nz_tZNA"/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_jaDU4HdqEd6QBt5Nz_tZNA"/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_y12UgHdqEd6QBt5Nz_tZNA"/>
-    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_5yVA0HeeEd6InfwtmHfU3w"/>
     <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_E2IsgHefEd6InfwtmHfU3w"/>
     <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_dwtTsHefEd6Ozo0E4CWLCw"/>
     <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_eHW5IHefEd6Ozo0E4CWLCw"/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_qutbMHefEd6Ozo0E4CWLCw"/>
     <sequenceEdges xsi:type="gpmn:PlanEdge" ID="_2_srsHefEd6Ozo0E4CWLCw"/>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_kqXNsHrBEd6VULQxsz6luA"/>
+    <sequenceEdges xsi:type="gpmn:SubGoalEdge" ID="_lBTuEHrBEd6VULQxsz6luA"/>
   </processes>
 </gpmn:GpmnDiagram>

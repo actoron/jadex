@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_2G7C4XeaEd6uv6EsxGS0Yg" iD="_2G7C4HeaEd6uv6EsxGS0Yg">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_itFq8XebEd6uv6EsxGS0Yg" iD="_itFq8HebEd6uv6EsxGS0Yg" name="import jadex.bpmn.runtime.task.*;">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_itFq8XebEd6uv6EsxGS0Yg" iD="_itFq8HebEd6uv6EsxGS0Yg" name="package jadex.bpmn.examples.dipp;&#xD;&#xA;&#xD;&#xA;import jadex.bpmn.runtime.task.*;&#xD;&#xA;import jadex.bpmnbdi.task.*;">
     <associations xmi:type="bpmn:Association" xmi:id="_itFq-XebEd6uv6EsxGS0Yg"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_2G7C53eaEd6uv6EsxGS0Yg" iD="_2G7C5neaEd6uv6EsxGS0Yg" associations="_itFq-XebEd6uv6EsxGS0Yg" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_2G7C6XeaEd6uv6EsxGS0Yg" iD="_2G7C6HeaEd6uv6EsxGS0Yg" outgoingEdges="_fXtDinebEd6uv6EsxGS0Yg" incomingEdges="_hYAHWnebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Prozessplanung_durchfuehren&#xD;&#xA;class = UserInteractionTask.class" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_2G7C6XeaEd6uv6EsxGS0Yg" iD="_2G7C6HeaEd6uv6EsxGS0Yg" outgoingEdges="_fXtDinebEd6uv6EsxGS0Yg" incomingEdges="_hYAHWnebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Prozessplanung_durchfuehren&#xD;&#xA;class = ShowClientInfoTask.class" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_fXtDgXebEd6uv6EsxGS0Yg" iD="_fXtDgHebEd6uv6EsxGS0Yg" incomingEdges="_fXtDinebEd6uv6EsxGS0Yg" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_hYAHUXebEd6uv6EsxGS0Yg" iD="_hYAHUHebEd6uv6EsxGS0Yg" outgoingEdges="_hYAHWnebEd6uv6EsxGS0Yg" activityType="EventStartEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fXtDinebEd6uv6EsxGS0Yg" iD="_fXtDiXebEd6uv6EsxGS0Yg"/>

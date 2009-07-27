@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_39BwFXdyEd6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_39BwFndyEd6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MG_Praemissen_fehlen.bpmn#_39BwEXdyEd6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_39BwF3dyEd6uv6EsxGS0Yg" x="95" y="63" width="386"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_39BwF3dyEd6uv6EsxGS0Yg" x="93" y="54" width="386"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_ysn7gnd0Ed6uv6EsxGS0Yg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_ysn7iHd0Ed6uv6EsxGS0Yg" type="4001"/>
@@ -28,7 +28,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_ysn7hXd0Ed6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_ysn7hnd0Ed6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MG_Praemissen_fehlen.bpmn#_ysn7gXd0Ed6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ysn7h3d0Ed6uv6EsxGS0Yg" x="825" y="63"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ysn7h3d0Ed6uv6EsxGS0Yg" x="826" y="54" height="79"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_7W41knd3Ed6uv6EsxGS0Yg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_7W41mHd3Ed6uv6EsxGS0Yg" type="4001"/>
@@ -37,7 +37,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_7W41lXd3Ed6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_7W41lnd3Ed6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MG_Praemissen_fehlen.bpmn#_7W41kXd3Ed6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7W41l3d3Ed6uv6EsxGS0Yg" x="1146" y="77"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7W41l3d3Ed6uv6EsxGS0Yg" x="1394" y="77"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_HzzpQnd4Ed6uv6EsxGS0Yg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_HzzpSHd4Ed6uv6EsxGS0Yg" type="4001"/>
@@ -46,7 +46,16 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_HzzpRXd4Ed6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_HzzpRnd4Ed6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MG_Praemissen_fehlen.bpmn#_HzzpQXd4Ed6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HzzpR3d4Ed6uv6EsxGS0Yg" x="516" y="62"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HzzpR3d4Ed6uv6EsxGS0Yg" x="516" y="54"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_IC3BwnrBEd6bIMHDkFj0cg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_IC3ByHrBEd6bIMHDkFj0cg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_IC3Bw3rBEd6bIMHDkFj0cg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_IC3BxHrBEd6bIMHDkFj0cg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_IC3BxXrBEd6bIMHDkFj0cg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_IC3BxnrBEd6bIMHDkFj0cg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="MG_Praemissen_fehlen.bpmn#_IC3BwXrBEd6bIMHDkFj0cg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IC3Bx3rBEd6bIMHDkFj0cg" x="1114" y="54"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_p1IBQndyEd6uv6EsxGS0Yg"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_p1IBQ3dyEd6uv6EsxGS0Yg"/>
@@ -57,7 +66,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_p0-QQ3dyEd6uv6EsxGS0Yg" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_p0-QRHdyEd6uv6EsxGS0Yg" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="MG_Praemissen_fehlen.bpmn#_p0YaYXdyEd6uv6EsxGS0Yg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_p1IBRXdyEd6uv6EsxGS0Yg" x="16" y="16" width="1595" height="200"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_p1IBRXdyEd6uv6EsxGS0Yg" x="16" y="16" width="1844" height="200"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_LwiLQnd9Ed6uv6EsxGS0Yg" type="1002">
     <children xmi:type="notation:Node" xmi:id="_LwiLSHd9Ed6uv6EsxGS0Yg" type="4009"/>
@@ -83,18 +92,6 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_39LhE3dyEd6uv6EsxGS0Yg" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="MG_Praemissen_fehlen.bpmn#_39BwGndyEd6uv6EsxGS0Yg"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_39LhFHdyEd6uv6EsxGS0Yg" points="[-7, -15, 35, 79]$[-42, -92, 0, 2]"/>
-  </edges>
-  <edges xmi:type="notation:Edge" xmi:id="_7W41m3d3Ed6uv6EsxGS0Yg" type="3001" source="_ysn7gnd0Ed6uv6EsxGS0Yg" target="_7W41knd3Ed6uv6EsxGS0Yg">
-    <children xmi:type="notation:Node" xmi:id="_7W41oHd3Ed6uv6EsxGS0Yg" type="4012">
-      <styles xmi:type="notation:FillStyle" xmi:id="_7W41oXd3Ed6uv6EsxGS0Yg" fillColor="16776959"/>
-      <styles xmi:type="notation:LineStyle" xmi:id="_7W41ond3Ed6uv6EsxGS0Yg" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_7W41o3d3Ed6uv6EsxGS0Yg" y="-10"/>
-    </children>
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_7W41nHd3Ed6uv6EsxGS0Yg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_7W41nXd3Ed6uv6EsxGS0Yg" fontName="Arial"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_7W41nnd3Ed6uv6EsxGS0Yg" lineColor="0"/>
-    <element xmi:type="bpmn:SequenceEdge" href="MG_Praemissen_fehlen.bpmn#_7W41mnd3Ed6uv6EsxGS0Yg"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7W41n3d3Ed6uv6EsxGS0Yg" points="[-180, -23, 540, 68]$[-718, -91, 2, 0]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_HzzpS3d4Ed6uv6EsxGS0Yg" type="3001" source="_39BwEndyEd6uv6EsxGS0Yg" target="_HzzpQnd4Ed6uv6EsxGS0Yg">
     <children xmi:type="notation:Node" xmi:id="_HzzpUHd4Ed6uv6EsxGS0Yg" type="4012">
@@ -126,5 +123,29 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_LwiLTXd9Ed6uv6EsxGS0Yg" lineColor="0"/>
     <element xmi:type="bpmn:Association" href="MG_Praemissen_fehlen.bpmn#_LwiLSXd9Ed6uv6EsxGS0Yg"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_LwiLTnd9Ed6uv6EsxGS0Yg" points="[0, 0, -813, -116]$[112, 16, -701, -100]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_IC3By3rBEd6bIMHDkFj0cg" type="3001" source="_ysn7gnd0Ed6uv6EsxGS0Yg" target="_IC3BwnrBEd6bIMHDkFj0cg">
+    <children xmi:type="notation:Node" xmi:id="_IC3B0HrBEd6bIMHDkFj0cg" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_IC3B0XrBEd6bIMHDkFj0cg" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_IC3B0nrBEd6bIMHDkFj0cg" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_IC3B03rBEd6bIMHDkFj0cg" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_IC3BzHrBEd6bIMHDkFj0cg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_IC3BzXrBEd6bIMHDkFj0cg" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_IC3BznrBEd6bIMHDkFj0cg" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="MG_Praemissen_fehlen.bpmn#_IC3BynrBEd6bIMHDkFj0cg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_IC3Bz3rBEd6bIMHDkFj0cg" points="[-113, -12, 827, 81]$[-938, -93, 2, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_JjtwgnrBEd6bIMHDkFj0cg" type="3001" source="_IC3BwnrBEd6bIMHDkFj0cg" target="_7W41knd3Ed6uv6EsxGS0Yg">
+    <children xmi:type="notation:Node" xmi:id="_Jjtwh3rBEd6bIMHDkFj0cg" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_JjtwiHrBEd6bIMHDkFj0cg" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_JjtwiXrBEd6bIMHDkFj0cg" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_JjtwinrBEd6bIMHDkFj0cg" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_Jjtwg3rBEd6bIMHDkFj0cg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_JjtwhHrBEd6bIMHDkFj0cg" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_JjtwhXrBEd6bIMHDkFj0cg" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="MG_Praemissen_fehlen.bpmn#_JjtwgXrBEd6bIMHDkFj0cg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_JjtwhnrBEd6bIMHDkFj0cg" points="[132, 2, -120, -5]$[237, -8, -15, -15]"/>
   </edges>
 </notation:Diagram>

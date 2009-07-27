@@ -6,11 +6,13 @@ import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.IPlanExecutor;
+import jadex.bdi.runtime.PlanFailureException;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
 import jadex.commons.collection.SCollection;
 
 import java.io.Serializable;
@@ -237,6 +239,10 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			}
 
 			// in case of an error / exception, throw it now
+			if(throwable instanceof EventEndErrorException)
+			{
+	    		throw new PlanFailureException(throwable.getMessage(), throwable);
+			}
 			if(throwable instanceof Exception)
 			{
 	    		throw (Exception) throwable;

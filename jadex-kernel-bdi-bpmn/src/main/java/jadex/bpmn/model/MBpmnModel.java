@@ -38,6 +38,9 @@ public class MBpmnModel extends MIdElement
 	
 	/** Constant for event end empty. */
 	public static final String EVENT_END_EMPTY = "EventEndEmpty";
+
+	/** Constant for event end error. */
+	public static final String EVENT_END_ERROR = "EventEndError";
 	
 	/** Constant for event intermediate error. */
 	public static final String EVENT_INTERMEDIATE_ERROR = "EventIntermediateError";

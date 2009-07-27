@@ -86,8 +86,8 @@ public class GpmnXMLReader
 		types.add(new TypeInfo("associations", MAssociation.class));
 		
 		types.add(new TypeInfo("vertices", MAchieveGoal.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"},
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
+			SUtil.createHashMap(new String[]{"ID", "exclude"},
+			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"), new BeanAttributeInfo("excludeMode")}),
 			new ProcessElementPostProcessor(),
 			new IFilter()
 			{
@@ -99,8 +99,8 @@ public class GpmnXMLReader
 			}));
 		
 		types.add(new TypeInfo("vertices", MMaintainGoal.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"},
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
+			SUtil.createHashMap(new String[]{"ID", "exclude"},
+			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"), new BeanAttributeInfo("excludeMode")}),
 			new ProcessElementPostProcessor(),
 			new IFilter()
 			{

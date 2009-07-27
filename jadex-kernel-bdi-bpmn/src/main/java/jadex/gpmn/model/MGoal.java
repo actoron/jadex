@@ -17,6 +17,9 @@ public class MGoal extends MProcessElement
 	/** The drop condition. */
 	protected String dropcondition;
 
+	/** The exclude mode. */
+	protected String excludemode;
+
 	//-------- methods --------
 	
 	/**
@@ -72,5 +75,22 @@ public class MGoal extends MProcessElement
 	{
 		this.dropcondition = dropcondition;
 	}	
-	
+
+	/**
+	 *  Get the exclude mode.
+	 *  @return The exclude mode.
+	 */
+	public String getExcludeMode()
+	{
+		return this.excludemode;
+	}
+
+	/**
+	 *  Set the exclude mode.
+	 *  @param excludemode The exclude mode to set.
+	 */
+	public void setExcludeMode(String excludemode)
+	{
+		this.excludemode = excludemode;
+	}		
 }
