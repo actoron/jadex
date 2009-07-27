@@ -1,8 +1,11 @@
 package com.daimler.client.gui.event;
 
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.ITaskContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +23,7 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
     public FetchDataTaskSelectAction(GuiClient client, UserNotification notification) {
     	super(client, notification.getContext().getModelElement().getName(), notification);
         initAction();
-        initPanel(notification.getContext().getModelElement().getParameters());
+        initPanel(notification.getContext());
     }
     
     private void initAction() {
@@ -30,9 +33,19 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
         putValue(Action.NAME, sTitle);
     }
     
-    private void initPanel(List parameters)
+    private void initPanel(ITaskContext context)
     {
-        theDataPanel = new GuiDataScrollPanel(parameters, this);
+    	Map initVals = new HashMap();
+		for (Iterator it = context.getModelElement().getParameters().iterator(); it.hasNext();)
+		{
+			MParameter param = (MParameter) it.next();
+			if ((param.getDirection().equals(MParameter.DIRECTION_INOUT)) ||
+				(param.getDirection().equals(MParameter.DIRECTION_IN)))
+			{
+				initVals.put(param.getName(), context.getParameterValue(param.getName()));
+			}				
+		}
+        theDataPanel = new GuiDataScrollPanel(initVals, context.getModelElement().getParameters(), this);
         setTheContent(theDataPanel);
     }
     

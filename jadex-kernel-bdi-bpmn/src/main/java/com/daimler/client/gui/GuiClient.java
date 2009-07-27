@@ -1,5 +1,6 @@
 package com.daimler.client.gui;
 
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.ITaskContext;
 
 import java.awt.BorderLayout;

@@ -48,20 +48,20 @@ public class GuiCategoryPanel extends JPanel
 
 	public GuiCategoryPanel(List parameters, String categoryName)
 	{
-		this(parameters, categoryName, (new JPanel()).getBackground());
+		this(new HashMap(), parameters, categoryName, (new JPanel()).getBackground());
 	}
 
-	public GuiCategoryPanel(List parameters, String categoryName, Color bgColor)
+	public GuiCategoryPanel(Map initVals, List parameters, String categoryName, Color bgColor)
 	{
 		super();
 		this.categoryParameters = parameters;
 		this.theCategoryName = categoryName;
 		this.theBackgroundColor = bgColor;
 		this.setBackground(Color.WHITE);
-		init();
+		init(initVals);
 	}
 
-	private void init()
+	private void init(Map initVals)
 	{
 		// create all input fields for every task in the list of taskproperties
 		// order them by their weight
@@ -72,11 +72,7 @@ public class GuiCategoryPanel extends JPanel
 			// System.out.println("Creating panel for: " +
 			// theCategoryProperties.get(i).getTheName());
 			MParameter parameter = (MParameter) categoryParameters.get(i);
-			Object initVal = null;
-			if (((parameter.getDirection().equals(MParameter.DIRECTION_INOUT)) ||
-				(parameter.getDirection().equals(MParameter.DIRECTION_IN))) &&
-				(parameter.getInitialValue() != null))
-				initVal = parameter.getInitialValue().getValue(new SimpleValueFetcher());
+			Object initVal = initVals.get(parameter.getName());
 			AbstractInputPanel inputField = InputFieldFactory.createInputPanel(parameter
 					.getName(), parameter.getName(), "", "",
 					theBackgroundColor, true, parameter.getClazz(), initVal);
