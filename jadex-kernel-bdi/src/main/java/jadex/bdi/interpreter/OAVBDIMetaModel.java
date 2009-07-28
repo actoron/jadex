@@ -569,10 +569,10 @@ public class OAVBDIMetaModel
 	public static OAVAttributeType body_has_type;
 
 	/** Body has class attribute. */
-	public static OAVAttributeType body_has_class;
+//	public static OAVAttributeType body_has_class;
 
 	/** Body has class name attribute. */
-	public static OAVAttributeType body_has_classname;
+//	public static OAVAttributeType body_has_classname;
 	
 	/** Body has class name attribute. */
 	public static OAVAttributeType body_has_impl;
@@ -1024,8 +1024,8 @@ public class OAVBDIMetaModel
 
 		// plan body
 		body_has_type = body_type.createAttributeType("mbody_has_type", OAVJavaType.java_string_type, OAVAttributeType.NONE,  "standard");
-		body_has_class = body_type.createAttributeType("mbody_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
-		body_has_classname = body_type.createAttributeType("mbody_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+//		body_has_class = body_type.createAttributeType("mbody_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
+//		body_has_classname = body_type.createAttributeType("mbody_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		body_has_impl = body_type.createAttributeType("mbody_has_impl", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 //		body_has_inline = body_type.createAttributeType("mbody_has_inline", OAVJavaType.java_boolean_type);
 //		body_has_passed	= body_type.createAttributeType("mbody_has_passed", OAVJavaType.java_string_type);	// Todo: should be expression?

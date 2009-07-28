@@ -3,9 +3,12 @@ package jadex.bdi.runtime;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bdi.interpreter.PlanRules;
+import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.rules.state.IOAVState;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -64,9 +67,16 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		String refname= ""+Thread.currentThread()+"_"+Thread.currentThread().hashCode();
 		AbstractPlan.planinit.put(refname, new Object[]{interpreter, rplan, rcapability});
 
-		Object	mplan	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
-		Object	mbody	= interpreter.getState().getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
-		Class	clazz	= (Class)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_class);
+		IOAVState state = interpreter.getState();
+		
+		Object	mplan	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
+		Object	mbody	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
+//		Class	clazz	= (Class)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_class);
+		String clname = (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
+		if(clname==null)
+			throw new RuntimeException("Classname must not be null: "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+		Class clazz = SReflect.findClass(clname, OAVBDIXMLReader.getImports(interpreter.getState(), interpreter.getState().getAttributeValue
+			(rcapability, OAVBDIRuntimeModel.element_has_model)), state.getTypeModel().getClassLoader());
 		
 		Object	body = null;
 		if(clazz!=null)

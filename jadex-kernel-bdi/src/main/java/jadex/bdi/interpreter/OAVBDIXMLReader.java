@@ -40,7 +40,7 @@ public class OAVBDIXMLReader
 		// Post processors.
 		IPostProcessor	expost	= new ExpressionProcessor();
 		IPostProcessor	tepost	= new ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class); 
-		IPostProcessor	bopost	= new ClassPostProcessor(OAVBDIMetaModel.body_has_classname, OAVBDIMetaModel.body_has_class); 
+//		IPostProcessor	bopost	= new ClassPostProcessor(OAVBDIMetaModel.body_has_classname, OAVBDIMetaModel.body_has_class); 
 		
 		Set typeinfos = new HashSet();
 
@@ -86,7 +86,7 @@ public class OAVBDIXMLReader
 		}));
 
 		typeinfos.add(new TypeInfo("plan", OAVBDIMetaModel.plan_type));
-		typeinfos.add(new TypeInfo("body", OAVBDIMetaModel.body_type, null, null, SUtil.createHashMap(new String[]{"class"}, new Object[]{OAVBDIMetaModel.body_has_classname}), bopost));
+		typeinfos.add(new TypeInfo("body", OAVBDIMetaModel.body_type, null, null, SUtil.createHashMap(new String[]{"class", "impl"}, new Object[]{OAVBDIMetaModel.body_has_impl, OAVBDIMetaModel.body_has_impl}),null));//, bopost));
 		typeinfos.add(new TypeInfo("precondition", OAVBDIMetaModel.expression_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new TypeInfo("contextcondition", OAVBDIMetaModel.condition_type, null, OAVBDIMetaModel.expression_has_content, null, expost));
 		typeinfos.add(new TypeInfo("trigger", OAVBDIMetaModel.plantrigger_type));
@@ -394,7 +394,7 @@ public class OAVBDIXMLReader
 	/**
 	 *  Extract imports from ADF.
 	 */
-	protected static String[] getImports(IOAVState state, Object root)
+	public static String[] getImports(IOAVState state, Object root)
 	{
 		Collection	coll	= state.getAttributeValues(root, OAVBDIMetaModel.capability_has_imports);
 		String[] imports	= coll!=null ? (String[])coll.toArray(new String[coll.size()]) : null;

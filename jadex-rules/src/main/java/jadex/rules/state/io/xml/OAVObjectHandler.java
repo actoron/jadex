@@ -71,6 +71,10 @@ public class OAVObjectHandler implements IObjectHandler
 	public void handleAttributeValue(Object object, String xmlattrname, List attrpath, String attrval, 
 		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
 	{
+		// If attrval==null only set if default value available.
+		if(attrval==null && !(attrinfo instanceof OAVAttributeInfo && ((OAVAttributeInfo)attrinfo).getDefaultValue()!=null))
+			return;
+		
 		IOAVState state = (IOAVState)context;
 
 		OAVAttributeType attrtype = null;
@@ -80,7 +84,7 @@ public class OAVObjectHandler implements IObjectHandler
 		{
 			OAVAttributeInfo info = (OAVAttributeInfo)attrinfo;
 			attrtype = info.getAttribute();
-			if(((OAVAttributeInfo)attrinfo).getDefaultValue()!=null)
+			if(val==null && ((OAVAttributeInfo)attrinfo).getDefaultValue()!=null)
 				val = ((OAVAttributeInfo)attrinfo).getDefaultValue();
 			ITypeConverter conv = info.getConverter();
 			if(conv!=null)

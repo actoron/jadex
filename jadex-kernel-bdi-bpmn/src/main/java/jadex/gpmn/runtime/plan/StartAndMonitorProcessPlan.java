@@ -1,16 +1,13 @@
 package jadex.gpmn.runtime.plan;
 
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.IResultListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Create a process and the corresponding parameters.

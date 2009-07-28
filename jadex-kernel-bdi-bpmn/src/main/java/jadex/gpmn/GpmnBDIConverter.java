@@ -286,7 +286,7 @@ public class GpmnBDIConverter
 						state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_plans, planhandle);
 						Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
 						state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
-						state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_class, jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan.class);
+						state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, "jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan.class");
 //						state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_classname, "jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan");
 //						state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_type, "bpmn");
 						
@@ -373,7 +373,7 @@ public class GpmnBDIConverter
 		state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_plans, planhandle);
 		Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
 		state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
-		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_class, StartAndMonitorProcessPlan.class);
+		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan.class");
 		
 		// Create achieve_goals maintain_goals paramterset
 		Object aparamsethandle = state.createObject(OAVBDIMetaModel.planparameterset_type);
@@ -563,4 +563,19 @@ public class GpmnBDIConverter
 		
 		return agenthandle;
 	}
+	
+	/**
+	 * 
+	 * /
+	protected Object createPlan(Object scopehandle, IOAVState state, String name)
+	{
+		Object planhandle = state.createObject(OAVBDIMetaModel.plan_type);
+		state.setAttributeValue(planhandle, OAVBDIMetaModel.modelelement_has_name, name);
+		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_plans, planhandle);
+		Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
+		state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
+		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, plan.getBpmnPlan());
+		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_type, "bpmn");
+	
+	}*/
 }
