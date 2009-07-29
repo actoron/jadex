@@ -40,8 +40,11 @@ public class GoalHierarchyExecutionPlan extends Plan
 			for(int i=0; i<subgoals.length; i++)
 			{
 				System.out.println("Creating Goal: "+subgoals[i]);
-				IGoal	subgoal	= createGoal(subgoals[i]);
-				dispatchSubgoalAndWait(subgoal);
+				if(subgoals[i]!=null)
+				{
+					IGoal	subgoal	= createGoal(subgoals[i]);
+					dispatchSubgoalAndWait(subgoal);
+				}
 			}
 		}
 	}

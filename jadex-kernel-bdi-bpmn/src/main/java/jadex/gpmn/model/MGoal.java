@@ -20,6 +20,27 @@ public class MGoal extends MProcessElement
 	/** The exclude mode. */
 	protected String excludemode;
 
+	/** The retry flag. */
+	protected Boolean retry;
+	
+	/** The retry delay. */
+	protected Long retrydelay;
+	
+	/** The recur flag. */
+	protected Boolean recur;
+	
+	/** The recur delay. */
+	protected Long recurdelay;
+	
+	/** The exclude mode. */
+	protected String exclude;
+	
+	/** The rebuild flag. */
+	protected Boolean rebuild;
+	
+	/** The unique flag. */
+	protected Boolean unique;
+	
 	//-------- methods --------
 	
 	/**
@@ -76,6 +97,8 @@ public class MGoal extends MProcessElement
 		this.dropcondition = dropcondition;
 	}	
 
+	//-------- flags --------
+	
 	/**
 	 *  Get the exclude mode.
 	 *  @return The exclude mode.
@@ -84,7 +107,7 @@ public class MGoal extends MProcessElement
 	{
 		return this.excludemode;
 	}
-
+	
 	/**
 	 *  Set the exclude mode.
 	 *  @param excludemode The exclude mode to set.
@@ -92,5 +115,113 @@ public class MGoal extends MProcessElement
 	public void setExcludeMode(String excludemode)
 	{
 		this.excludemode = excludemode;
-	}		
+	}
+
+	/**
+	 *  Get the retry.
+	 *  @return The retry.
+	 */
+	public Boolean getRetry()
+	{
+		return this.retry;
+	}
+
+	/**
+	 *  Set the retry.
+	 *  @param retry The retry to set.
+	 */
+	public void setRetry(Boolean retry)
+	{
+		this.retry = retry;
+	}
+
+	/**
+	 *  Get the retrydelay.
+	 *  @return The retrydelay.
+	 */
+	public Long getRetryDelay()
+	{
+		return this.retrydelay;
+	}
+
+	/**
+	 *  Set the retrydelay.
+	 *  @param retrydelay The retrydelay to set.
+	 */
+	public void setRetryDelay(Long retrydelay)
+	{
+		this.retrydelay = retrydelay;
+	}
+
+	/**
+	 *  Get the recur.
+	 *  @return The recur.
+	 */
+	public Boolean getRecur()
+	{
+		return this.recur;
+	}
+
+	/**
+	 *  Set the recur.
+	 *  @param recur The recur to set.
+	 */
+	public void setRecur(Boolean recur)
+	{
+		this.recur = recur;
+	}
+
+	/**
+	 *  Get the recurdelay.
+	 *  @return The recurdelay.
+	 */
+	public Long getRecurDelay()
+	{
+		return this.recurdelay;
+	}
+
+	/**
+	 *  Set the recurdelay.
+	 *  @param recurdelay The recurdelay to set.
+	 */
+	public void setRecurDelay(Long recurdelay)
+	{
+		this.recurdelay = recurdelay;
+	}
+
+	/**
+	 *  Get the rebuild.
+	 *  @return The rebuild.
+	 */
+	public Boolean getRebuild()
+	{
+		return this.rebuild;
+	}
+
+	/**
+	 *  Set the rebuild.
+	 *  @param rebuild The rebuild to set.
+	 */
+	public void setRebuild(Boolean rebuild)
+	{
+		this.rebuild = rebuild;
+	}
+
+	/**
+	 *  Get the unique.
+	 *  @return The unique.
+	 */
+	public Boolean getUnique()
+	{
+		return this.unique;
+	}
+
+	/**
+	 *  Set the unique.
+	 *  @param unique The unique to set.
+	 */
+	public void setUnique(Boolean unique)
+	{
+		this.unique = unique;
+	}
 }

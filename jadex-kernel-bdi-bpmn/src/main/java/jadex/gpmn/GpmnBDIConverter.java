@@ -6,6 +6,7 @@ import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bdi.interpreter.Report;
+import jadex.commons.xml.IPostProcessor;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MArtifact;
 import jadex.gpmn.model.MContext;
@@ -17,7 +18,6 @@ import jadex.gpmn.model.MPlan;
 import jadex.gpmn.model.MProcess;
 import jadex.gpmn.model.MProcessElement;
 import jadex.gpmn.model.MSequenceEdge;
-import jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -132,7 +132,7 @@ public class GpmnBDIConverter
 	 */
 	public Object doConvert(MProcess proc, ClassLoader classloader, IOAVState state)
 	{
-		Object agenthandle = state.createRootObject(OAVBDIMetaModel.agent_type);
+		Object scopehandle = state.createRootObject(OAVBDIMetaModel.agent_type);
 		
 		// Handle package and imports
 		// todo:
@@ -140,7 +140,7 @@ public class GpmnBDIConverter
 		// Create default configuration
 		Object confighandle = state.createObject(OAVBDIMetaModel.configuration_type);
 		state.setAttributeValue(confighandle, OAVBDIMetaModel.modelelement_has_name, "default");
-		state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_configurations, confighandle);
+		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_configurations, confighandle);
 		
 		// Handle beliefs
 		List artifacts = proc.getArtifacts();
@@ -161,29 +161,11 @@ public class GpmnBDIConverter
 							
 							if(!param.isSet())
 							{
-								Object belhandle = state.createObject(OAVBDIMetaModel.belief_type);
-								state.setAttributeValue(belhandle, OAVBDIMetaModel.modelelement_has_name, param.getName());
-								state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_beliefs, belhandle);
-								state.setAttributeValue(belhandle, OAVBDIMetaModel.typedelement_has_classname, param.getClassName());
-								if(param.getInitialValueDescription()!=null)
-								{
-									Object facthandle = state.createObject(OAVBDIMetaModel.expression_type);
-									state.setAttributeValue(facthandle, OAVBDIMetaModel.expression_has_content, param.getInitialValueDescription());
-									state.setAttributeValue(belhandle, OAVBDIMetaModel.belief_has_fact, facthandle);
-								}
+								createBelief(state, scopehandle, param.getName(), param.getClassName(), param.getInitialValueDescription());
 							}
 							else
 							{
-								Object belsethandle = state.createObject(OAVBDIMetaModel.beliefset_type);
-								state.setAttributeValue(belsethandle, OAVBDIMetaModel.modelelement_has_name, param.getName());
-								state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_beliefsets, belsethandle);
-								state.setAttributeValue(belsethandle, OAVBDIMetaModel.typedelement_has_classname, param.getClassName());
-								if(param.getInitialValueDescription()!=null)
-								{
-									Object factshandle = state.createObject(OAVBDIMetaModel.expression_type);
-									state.setAttributeValue(factshandle, OAVBDIMetaModel.expression_has_content, param.getInitialValueDescription());
-									state.setAttributeValue(belsethandle, OAVBDIMetaModel.beliefset_has_factsexpression, factshandle);
-								}
+								createBeliefSet(state, scopehandle, param.getName(), param.getClassName(), null, param.getInitialValueDescription());
 							}
 						}
 					}
@@ -198,58 +180,25 @@ public class GpmnBDIConverter
 			for(int i=0; i<goals.size(); i++)
 			{
 				MGoal goal = (MGoal)goals.get(i);
-				Object goalhandle = null;
+				OAVObjectType goaltype = goal instanceof MAchieveGoal? OAVBDIMetaModel.achievegoal_type: 
+					goal instanceof MMaintainGoal? OAVBDIMetaModel.maintaingoal_type: null;
+				Object goalhandle = createGoal(state, scopehandle, goal.getName(), goaltype, goal.getRetry(), 
+					goal.getRetryDelay(), goal.getRecur(), goal.getRecurDelay(), goal.getExcludeMode(), 
+					goal.getRetry(), goal.getUnique(), goal.getCreationCondition(), goal.getContextCondition(), 
+					goal.getDropCondition());
 				
-				if(goal instanceof MAchieveGoal)
+				if(goal instanceof MAchieveGoal && ((MAchieveGoal)goal).getTargetCondition()!=null)
 				{
-					goalhandle = state.createObject(OAVBDIMetaModel.achievegoal_type);
-					state.setAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name, goal.getName());
-					state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_goals, goalhandle);
-					if(((MAchieveGoal)goal).getExcludeMode()!=null)
-						state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_exclude, ((MAchieveGoal)goal).getExcludeMode());
-					if(((MAchieveGoal)goal).getTargetCondition()!=null)
-					{
-						Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
-						state.setAttributeValue(goalhandle, OAVBDIMetaModel.achievegoal_has_targetcondition, condhandle);
-						state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, ((MAchieveGoal)goal).getTargetCondition());
-						state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
-					}
+					Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
+					state.setAttributeValue(goalhandle, OAVBDIMetaModel.achievegoal_has_targetcondition, condhandle);
+					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, ((MAchieveGoal)goal).getTargetCondition());
+					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 				}	
-				else if(goal instanceof MMaintainGoal)
-				{
-					goalhandle = state.createObject(OAVBDIMetaModel.maintaingoal_type);
-					state.setAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name, goal.getName());
-					state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_goals, goalhandle);
-					if(((MMaintainGoal)goal).getExcludeMode()!=null)
-						state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_exclude, ((MMaintainGoal)goal).getExcludeMode());
-					if(((MMaintainGoal)goal).getMaintainCondition()!=null)
-					{
-						Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
-						state.setAttributeValue(goalhandle, OAVBDIMetaModel.maintaingoal_has_maintaincondition, condhandle);
-						state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, ((MMaintainGoal)goal).getMaintainCondition());
-						state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
-					}
-				}
-				
-				if(goal.getCreationCondition()!=null)
+				else if(goal instanceof MMaintainGoal && ((MMaintainGoal)goal).getMaintainCondition()!=null)
 				{
 					Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
-					state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_creationcondition, condhandle);
-					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, goal.getCreationCondition());
-					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
-				}
-				if(goal.getContextCondition()!=null)
-				{
-					Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
-					state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_contextcondition, condhandle);
-					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, goal.getContextCondition());
-					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
-				}
-				if(goal.getDropCondition()!=null)
-				{
-					Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
-					state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_dropcondition, condhandle);
-					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, goal.getDropCondition());
+					state.setAttributeValue(goalhandle, OAVBDIMetaModel.maintaingoal_has_maintaincondition, condhandle);
+					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, ((MMaintainGoal)goal).getMaintainCondition());
 					state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 				}
 				
@@ -281,50 +230,19 @@ public class GpmnBDIConverter
 					if(outgoals.size()>0)
 					{
 						// Create plan with body and name
-						Object planhandle = state.createObject(OAVBDIMetaModel.plan_type);
-						state.setAttributeValue(planhandle, OAVBDIMetaModel.modelelement_has_name, "implicit_"+goal.getName());
-						state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_plans, planhandle);
-						Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
-						state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
-						state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, "jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan.class");
-//						state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_classname, "jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan");
-//						state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_type, "bpmn");
+						Object planhandle = createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan", null);
 						
 						// Create trigger
-						Object triggerhandle = state.createObject(OAVBDIMetaModel.plantrigger_type);
-						state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_trigger, triggerhandle);
-						Object triggerrefhandle = state.createObject(OAVBDIMetaModel.triggerreference_type);
-						state.setAttributeValue(triggerrefhandle, OAVBDIMetaModel.triggerreference_has_ref, goal.getName());
-						state.addAttributeValue(triggerhandle, OAVBDIMetaModel.plantrigger_has_goals, triggerrefhandle);
+						Object triggerhandle = createPlanTrigger(planhandle, state, new String[]{goal.getName()}, null, null);
 				
 						// Create mode paramter
-						Object paramhandle = state.createObject(OAVBDIMetaModel.planparameter_type);
-						state.setAttributeValue(paramhandle, OAVBDIMetaModel.modelelement_has_name, "mode");
-						state.addAttributeValue(planhandle, OAVBDIMetaModel.parameterelement_has_parameters, paramhandle);
-						state.setAttributeValue(paramhandle, OAVBDIMetaModel.typedelement_has_class, String.class);
-						Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
-						state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, goal.getName().endsWith("par")? "\"parallel\"": "\"sequential\"");
-						state.setAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value, valhandle);
+						Object paramhandle = createParameter(planhandle, state, "mode", String.class, goal.getName().endsWith("par")? "\"parallel\"": "\"sequential\"", true);
 					
 						// Create subgoals paramterset
-						Object paramsethandle = state.createObject(OAVBDIMetaModel.planparameterset_type);
-						state.setAttributeValue(paramsethandle, OAVBDIMetaModel.modelelement_has_name, "subgoals");
-						state.addAttributeValue(planhandle, OAVBDIMetaModel.parameterelement_has_parametersets, paramsethandle);
-						
-						StringBuffer goalnames = new StringBuffer("new String[]{");
+						String[] goalnames = new String[outgoals.size()];
 						for(int j=0; j<outgoals.size(); j++)
-						{
-							if(j!=0)
-								goalnames.append(", ");
-							goalnames.append("\"").append(((MGoal)outgoals.get(j)).getName()).append("\"");
-						}	
-						goalnames.append("}");
-						
-						state.setAttributeValue(paramsethandle, OAVBDIMetaModel.typedelement_has_class, String.class);
-						Object valshandle = state.createObject(OAVBDIMetaModel.expression_type);
-						
-						state.setAttributeValue(valshandle, OAVBDIMetaModel.expression_has_content, goalnames.toString());
-						state.setAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression, valshandle);
+							goalnames[j] = "\""+((MGoal)outgoals.get(j)).getName()+"\"";
+						Object paramsethandle = createParameterSet(planhandle, state, "subgoals", String.class, goalnames, null, true);
 					}
 				}
 			}
@@ -338,28 +256,20 @@ public class GpmnBDIConverter
 			{
 				MPlan plan = (MPlan)plans.get(i);
 				
-				Object planhandle = state.createObject(OAVBDIMetaModel.plan_type);
-				state.setAttributeValue(planhandle, OAVBDIMetaModel.modelelement_has_name, plan.getName());
-				state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_plans, planhandle);
-				Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
-				state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
-				state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, plan.getBpmnPlan());
-				state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_type, "bpmn");
+				Object planhandle = createPlan(scopehandle, state, plan.getName(), plan.getBpmnPlan(), "bpmn");
 			
 				List inedges = plan.getIncomingSequenceEdges();
 				if(inedges!=null)
 				{
-					Object triggerhandle = state.createObject(OAVBDIMetaModel.plantrigger_type);
-					state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_trigger, triggerhandle);
-					
+					String[] goalnames = new String[inedges.size()]; 
 					for(int j=0; j<inedges.size(); j++)
 					{
 						MSequenceEdge inedge = (MSequenceEdge)inedges.get(j);
 						MGoal goal = (MGoal)inedge.getSource();
-						Object triggerrefhandle = state.createObject(OAVBDIMetaModel.triggerreference_type);
-						state.setAttributeValue(triggerrefhandle, OAVBDIMetaModel.triggerreference_has_ref, goal.getName());
-						state.addAttributeValue(triggerhandle, OAVBDIMetaModel.plantrigger_has_goals, triggerrefhandle);
+						goalnames[j] = goal.getName();
 					}
+					
+					createPlanTrigger(planhandle, state, goalnames, null, null);
 				}
 				
 				// todo: parameters
@@ -368,24 +278,12 @@ public class GpmnBDIConverter
 		
 		// Create plan for starting/monitoring the process.
 		String planname = "startandmonitor_"+proc.getName().substring(0, proc.getName().indexOf("."));
-		Object planhandle = state.createObject(OAVBDIMetaModel.plan_type);
-		state.setAttributeValue(planhandle, OAVBDIMetaModel.modelelement_has_name, planname);
-		state.addAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_plans, planhandle);
-		Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
-		state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
-		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan.class");
+		Object planhandle = createPlan(scopehandle, state, planname, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan", null);
 		
 		// Create achieve_goals maintain_goals paramterset
-		Object aparamsethandle = state.createObject(OAVBDIMetaModel.planparameterset_type);
-		state.setAttributeValue(aparamsethandle, OAVBDIMetaModel.modelelement_has_name, "achieve_goals");
-		state.setAttributeValue(aparamsethandle, OAVBDIMetaModel.typedelement_has_class, String.class);
-		state.addAttributeValue(planhandle, OAVBDIMetaModel.parameterelement_has_parametersets, aparamsethandle);
-		Object mparamsethandle = state.createObject(OAVBDIMetaModel.planparameterset_type);
-		state.setAttributeValue(mparamsethandle, OAVBDIMetaModel.modelelement_has_name, "maintain_goals");
-		state.setAttributeValue(mparamsethandle, OAVBDIMetaModel.typedelement_has_class, String.class);
-		state.addAttributeValue(planhandle, OAVBDIMetaModel.parameterelement_has_parametersets, mparamsethandle);
-	
-		Collection goalhandles = state.getAttributeValues(agenthandle, OAVBDIMetaModel.capability_has_goals);
+		List agoalnames = new ArrayList();
+		List mgoalnames = new ArrayList();
+		Collection goalhandles = state.getAttributeValues(scopehandle, OAVBDIMetaModel.capability_has_goals);
 		if(goals!=null)
 		{
 			for(int i=0; i<goals.size(); i++)
@@ -393,22 +291,24 @@ public class GpmnBDIConverter
 				MGoal goal = (MGoal)goals.get(i);
 				if(goal.getIncomingSequenceEdges()==null)
 				{
-					Object goalhandle = state.getAttributeValue(agenthandle, OAVBDIMetaModel.capability_has_goals, goal.getName());
-					Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
+					Object goalhandle = state.getAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_goals, goal.getName());
 					String goalname = (String)state.getAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name);
-					state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, "\""+goalname+"\"");
 	
 					if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.achievegoal_type))
 					{
-						state.addAttributeValue(aparamsethandle, OAVBDIMetaModel.parameterset_has_values, valhandle);
+						agoalnames.add("\""+goalname+"\"");
 					}
 					else if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.maintaingoal_type))
 					{
-						state.addAttributeValue(mparamsethandle, OAVBDIMetaModel.parameterset_has_values, valhandle);
+						mgoalnames.add("\""+goalname+"\"");
 					}
 				}
 			}
 		}
+		createParameterSet(planhandle, state, "achieve_goals", String.class, 
+			agoalnames.size()==0? null: (String[])agoalnames.toArray(new String[agoalnames.size()]), null, true);
+		createParameterSet(planhandle, state, "maintain_goals", String.class, 
+			mgoalnames.size()==0? null: (String[])mgoalnames.toArray(new String[mgoalnames.size()]), null, true);
 		
 		// Make this plan the initial plan
 		Object iniplanhandle = state.createObject(OAVBDIMetaModel.configelement_type);
@@ -423,159 +323,339 @@ public class GpmnBDIConverter
 		OAVBDIXMLReader.ClassPostProcessor clpost = new OAVBDIXMLReader.ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class);
 		
 		// Handle beliefs
-		Collection beliefhandles = state.getAttributeValues(agenthandle, OAVBDIMetaModel.capability_has_beliefs);
+		Collection beliefhandles = state.getAttributeValues(scopehandle, OAVBDIMetaModel.capability_has_beliefs);
 		if(beliefhandles!=null)
 		{
 			for(Iterator it = beliefhandles.iterator(); it.hasNext(); )
 			{
 				Object belhandle = it.next();
 				Object exphandle = state.getAttributeValue(belhandle, OAVBDIMetaModel.belief_has_fact);
-				clpost.postProcess(state, belhandle, agenthandle, classloader);
+				clpost.postProcess(state, belhandle, scopehandle, classloader);
 				if(exphandle!=null)
-					expost.postProcess(state, exphandle, agenthandle, classloader);
+					expost.postProcess(state, exphandle, scopehandle, classloader);
 			}
 		}
-		Collection beliefsethandles = state.getAttributeValues(agenthandle, OAVBDIMetaModel.capability_has_beliefsets);
+		Collection beliefsethandles = state.getAttributeValues(scopehandle, OAVBDIMetaModel.capability_has_beliefsets);
 		if(beliefsethandles!=null)
 		{
 			for(Iterator it = beliefsethandles.iterator(); it.hasNext(); )
 			{
 				Object belsethandle = it.next();
 				Object exphandle = state.getAttributeValue(belsethandle, OAVBDIMetaModel.beliefset_has_factsexpression);
-				clpost.postProcess(state, belsethandle, agenthandle, classloader);
+				clpost.postProcess(state, belsethandle, scopehandle, classloader);
 				if(exphandle!=null)
-					expost.postProcess(state, exphandle, agenthandle, classloader);
+					expost.postProcess(state, exphandle, scopehandle, classloader);
 				Collection expshandle = state.getAttributeValues(belsethandle, OAVBDIMetaModel.beliefset_has_facts);
 				if(expshandle!=null)
 				{
 					for(Iterator it2=expshandle.iterator(); it2.hasNext(); )
 					{
 						exphandle = it2.next();
-						expost.postProcess(state, exphandle, agenthandle, classloader);
+						expost.postProcess(state, exphandle, scopehandle, classloader);
 					}
 				}
 			}
 		}
 		
-		// Handle goal conditions
+		// Handle goals
 		if(goalhandles!=null)
 		{
 			for(Iterator it = goalhandles.iterator(); it.hasNext(); )
 			{
 				Object goalhandle = it.next();
+				postProcessParameterElement(state, scopehandle, goalhandle, expost, classloader);
+
 				Object condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_creationcondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, agenthandle, classloader);
+					expost.postProcess(state, condhandle, scopehandle, classloader);
 				condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_contextcondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, agenthandle, classloader);
+					expost.postProcess(state, condhandle, scopehandle, classloader);
 				condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_dropcondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, agenthandle, classloader);
+					expost.postProcess(state, condhandle, scopehandle, classloader);
 
 				if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.achievegoal_type))
 				{
 					condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.achievegoal_has_targetcondition);
 					if(condhandle!=null)
-						expost.postProcess(state, condhandle, agenthandle, classloader);
+						expost.postProcess(state, condhandle, scopehandle, classloader);
 				}
 				else if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.maintaingoal_type))
 				{
 					condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.maintaingoal_has_maintaincondition);
 					if(condhandle!=null)
-						expost.postProcess(state, condhandle, agenthandle, classloader);
-				}
-				
-				Collection paramhandles = state.getAttributeValues(goalhandle, OAVBDIMetaModel.parameterelement_has_parameters);
-				if(paramhandles!=null)
-				{
-					for(Iterator it2 = paramhandles.iterator(); it2.hasNext(); )
-					{
-						Object paramhandle = it2.next();
-						Object exphandle = state.getAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value);
-						if(exphandle!=null)
-							expost.postProcess(state, exphandle, agenthandle, classloader);
-					}
-				}
-				Collection paramsethandles = state.getAttributeValues(goalhandle, OAVBDIMetaModel.parameterelement_has_parametersets);
-				if(paramsethandles!=null)
-				{
-					for(Iterator it2 = paramsethandles.iterator(); it2.hasNext(); )
-					{
-						Object paramsethandle = it2.next();
-						Object exphandle = state.getAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression);
-						if(exphandle!=null)
-							expost.postProcess(state, exphandle, agenthandle, classloader);
-						Collection expshandle = state.getAttributeValues(paramsethandle, OAVBDIMetaModel.parameterset_has_values);
-						if(expshandle!=null)
-						{
-							for(Iterator it3=expshandle.iterator(); it3.hasNext(); )
-							{
-								exphandle = it3.next();
-								expost.postProcess(state, exphandle, agenthandle, classloader);
-							}
-						}
-					}
-				}
+						expost.postProcess(state, condhandle, scopehandle, classloader);
+				}				
 			}
 		}
 		
-		// Handle plan parameters
-		Collection planhandles = state.getAttributeValues(agenthandle, OAVBDIMetaModel.capability_has_plans);
+		// Handle plans
+		Collection planhandles = state.getAttributeValues(scopehandle, OAVBDIMetaModel.capability_has_plans);
 		if(planhandles!=null)
 		{
 			for(Iterator it = planhandles.iterator(); it.hasNext(); )
 			{
 				planhandle = it.next();
-				Collection paramhandles = state.getAttributeValues(planhandle, OAVBDIMetaModel.parameterelement_has_parameters);
-				if(paramhandles!=null)
-				{
-					for(Iterator it2 = paramhandles.iterator(); it2.hasNext(); )
-					{
-						Object paramhandle = it2.next();
-						Object exphandle = state.getAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value);
-						if(exphandle!=null)
-							expost.postProcess(state, exphandle, agenthandle, classloader);
-					}
-				}
-				Collection paramsethandles = state.getAttributeValues(planhandle, OAVBDIMetaModel.parameterelement_has_parametersets);
-				if(paramsethandles!=null)
-				{
-					for(Iterator it2 = paramsethandles.iterator(); it2.hasNext(); )
-					{
-						Object paramsethandle = it2.next();
-						Object exphandle = state.getAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression);
-						if(exphandle!=null)
-							expost.postProcess(state, exphandle, agenthandle, classloader);
-						Collection expshandle = state.getAttributeValues(paramsethandle, OAVBDIMetaModel.parameterset_has_values);
-						if(expshandle!=null)
-						{
-							for(Iterator it3=expshandle.iterator(); it3.hasNext(); )
-							{
-								exphandle = it3.next();
-								expost.postProcess(state, exphandle, agenthandle, classloader);
-							}
-						}
-					}
-				}
+				postProcessParameterElement(state, scopehandle, planhandle, expost, classloader);
 			}
 		}
 		
-		return agenthandle;
+		return scopehandle;
+	}
+	
+	//-------- helper creation methods --------
+	
+	/**
+	 *  Create a configuration.
+	 */
+	protected Object createConfiguration(IOAVState state, Object scopehandle, String name)
+	{
+		Object confighandle = state.createObject(OAVBDIMetaModel.configuration_type);
+		state.setAttributeValue(confighandle, OAVBDIMetaModel.modelelement_has_name, "default");
+		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_configurations, confighandle);
+		return confighandle;
 	}
 	
 	/**
-	 * 
-	 * /
-	protected Object createPlan(Object scopehandle, IOAVState state, String name)
+	 *  Create a belief.
+	 */
+	protected Object createBelief(IOAVState state, Object scopehandle, String name, String classname, String inival)
+	{
+		Object belhandle = state.createObject(OAVBDIMetaModel.belief_type);
+		state.setAttributeValue(belhandle, OAVBDIMetaModel.modelelement_has_name, name);
+		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_beliefs, belhandle);
+		state.setAttributeValue(belhandle, OAVBDIMetaModel.typedelement_has_classname, classname);
+		if(inival!=null)
+		{
+			Object facthandle = state.createObject(OAVBDIMetaModel.expression_type);
+			state.setAttributeValue(facthandle, OAVBDIMetaModel.expression_has_content, inival);
+			state.setAttributeValue(belhandle, OAVBDIMetaModel.belief_has_fact, facthandle);
+		}
+		return belhandle;
+	}
+	
+	/**
+	 *  Create a belief set.
+	 */
+	protected Object createBeliefSet(IOAVState state, Object scopehandle, String name, String classname, String[] values, String valuesexp)
+	{
+		Object belsethandle = state.createObject(OAVBDIMetaModel.beliefset_type);
+		state.setAttributeValue(belsethandle, OAVBDIMetaModel.modelelement_has_name, name);
+		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_beliefsets, belsethandle);
+		state.setAttributeValue(belsethandle, OAVBDIMetaModel.typedelement_has_classname, classname);
+		
+		if(values!=null)
+		{
+			for(int i=0; i<values.length; i++)
+			{
+				Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
+				state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, values[i]);
+				state.addAttributeValue(belsethandle, OAVBDIMetaModel.beliefset_has_facts, valhandle);
+			}
+		}
+		else if(valuesexp!=null)
+		{
+			Object valshandle = state.createObject(OAVBDIMetaModel.expression_type);
+			state.setAttributeValue(valshandle, OAVBDIMetaModel.expression_has_content, valuesexp);
+			state.setAttributeValue(belsethandle, OAVBDIMetaModel.beliefset_has_factsexpression, valshandle);
+		}
+		
+		return belsethandle;
+	}
+	
+	/**
+	 *  Create a goal.
+	 */
+	protected Object createGoal(IOAVState state, Object scopehandle, String name, OAVObjectType goaltype, 
+		Boolean retry, Long retrydelay, Boolean recur, Long recurdelay, String exclude, Boolean rebuild, Boolean unique,
+		String creationcond, String contextcond, String dropcond)
+	{
+		Object goalhandle = state.createObject(goaltype);
+		state.setAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name, name);
+		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_goals, goalhandle);
+		
+		if(retry!=null)
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_retry, retry);
+		if(retrydelay!=null)
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_retrydelay, retrydelay);
+		if(recur!=null)
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_recur, recur);
+		if(recurdelay!=null)
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_recurdelay, recurdelay);
+		if(exclude!=null)
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_exclude, exclude);
+		if(rebuild!=null)
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_rebuild, rebuild);
+		if(unique!=null)
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_unique, unique);
+	
+		if(creationcond!=null)
+		{
+			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_creationcondition, condhandle);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, creationcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
+		}
+		if(contextcond!=null)
+		{
+			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_contextcondition, condhandle);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, contextcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
+		}
+		if(dropcond!=null)
+		{
+			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
+			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_dropcondition, condhandle);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, dropcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
+		}
+		
+		return goalhandle;
+	}
+	
+	/**
+	 *  Create a plan.
+	 */
+	protected Object createPlan(Object scopehandle, IOAVState state, String name, String impl, String bodytype)
 	{
 		Object planhandle = state.createObject(OAVBDIMetaModel.plan_type);
 		state.setAttributeValue(planhandle, OAVBDIMetaModel.modelelement_has_name, name);
 		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_plans, planhandle);
 		Object bodyhandle = state.createObject(OAVBDIMetaModel.body_type);
 		state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_body, bodyhandle);
-		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, plan.getBpmnPlan());
-		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_type, "bpmn");
+		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, impl);
+		if(bodytype!=null)
+			state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_type, bodytype);
+		return planhandle;
+	}
 	
-	}*/
+	/**
+	 *  Create a parameter.
+	 */
+	protected Object createParameter(Object paramelemhandle, IOAVState state, String name, Class clazz, String value, boolean planparam)
+	{
+		Object paramhandle = planparam? state.createObject(OAVBDIMetaModel.planparameter_type): 
+			state.createObject(OAVBDIMetaModel.parameter_type); 
+		state.setAttributeValue(paramhandle, OAVBDIMetaModel.modelelement_has_name, name);
+		state.addAttributeValue(paramelemhandle, OAVBDIMetaModel.parameterelement_has_parameters, paramhandle);
+		state.setAttributeValue(paramhandle, OAVBDIMetaModel.typedelement_has_class, clazz);
+		Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
+		state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, value);
+		state.setAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value, valhandle);
+		return paramhandle;
+	}
+	
+	/**
+	 *  Create a parameter set.
+	 */
+	protected Object createParameterSet(Object paramelemhandle, IOAVState state, String name, Class clazz, String[] values, String valuesexp, boolean planparamset)
+	{
+		Object paramsethandle = planparamset? state.createObject(OAVBDIMetaModel.planparameterset_type): 
+			state.createObject(OAVBDIMetaModel.parameterset_type); 
+		state.setAttributeValue(paramsethandle, OAVBDIMetaModel.modelelement_has_name, name);
+		state.addAttributeValue(paramelemhandle, OAVBDIMetaModel.parameterelement_has_parametersets, paramsethandle);
+		state.setAttributeValue(paramsethandle, OAVBDIMetaModel.typedelement_has_class, clazz);
+
+		if(values!=null)
+		{
+			for(int i=0; i<values.length; i++)
+			{
+				Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
+				state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, values[i]);
+				state.addAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_values, valhandle);
+			}
+		}
+		else if(valuesexp!=null)
+		{
+			Object valshandle = state.createObject(OAVBDIMetaModel.expression_type);
+			state.setAttributeValue(valshandle, OAVBDIMetaModel.expression_has_content, valuesexp);
+			state.setAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression, valshandle);
+		}
+		
+		return paramsethandle;
+	}
+	
+	/**
+	 *  Create a plan trigger.
+	 */
+	protected Object createPlanTrigger(Object planhandle, IOAVState state, String[] goals, String[] ievents, String[] mevents)
+	{
+		Object triggerhandle = state.createObject(OAVBDIMetaModel.plantrigger_type);
+		state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_trigger, triggerhandle);
+		
+		if(goals!=null)
+		{
+			for(int i=0; i<goals.length; i++)
+			{
+				Object triggerrefhandle = state.createObject(OAVBDIMetaModel.triggerreference_type);
+				state.setAttributeValue(triggerrefhandle, OAVBDIMetaModel.triggerreference_has_ref, goals[i]);
+				state.addAttributeValue(triggerhandle, OAVBDIMetaModel.plantrigger_has_goals, triggerrefhandle);
+			}
+		}
+		
+		if(ievents!=null)
+		{
+			for(int i=0; i<ievents.length; i++)
+			{
+				Object triggerrefhandle = state.createObject(OAVBDIMetaModel.triggerreference_type);
+				state.setAttributeValue(triggerrefhandle, OAVBDIMetaModel.triggerreference_has_ref, ievents[i]);
+				state.addAttributeValue(triggerhandle, OAVBDIMetaModel.trigger_has_internalevents, triggerrefhandle);
+			}
+		}
+		
+		if(mevents!=null)
+		{
+			for(int i=0; i<mevents.length; i++)
+			{
+				Object triggerrefhandle = state.createObject(OAVBDIMetaModel.triggerreference_type);
+				state.setAttributeValue(triggerrefhandle, OAVBDIMetaModel.triggerreference_has_ref, mevents[i]);
+				state.addAttributeValue(triggerhandle, OAVBDIMetaModel.trigger_has_messageevents, triggerrefhandle);
+			}
+		}
+		
+		return triggerhandle;
+	}
+	
+	//-------- other helper methods --------
+	
+	/**
+	 *  Post process a parameter element.
+	 */
+	protected void postProcessParameterElement(IOAVState state, Object scopehandle, Object paramelem, 
+		IPostProcessor postproc, ClassLoader classloader)
+	{
+		Collection paramhandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parameters);
+		if(paramhandles!=null)
+		{
+			for(Iterator it2 = paramhandles.iterator(); it2.hasNext(); )
+			{
+				Object paramhandle = it2.next();
+				Object exphandle = state.getAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value);
+				if(exphandle!=null)
+					postproc.postProcess(state, exphandle, scopehandle, classloader);
+			}
+		}
+		Collection paramsethandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parametersets);
+		if(paramsethandles!=null)
+		{
+			for(Iterator it2 = paramsethandles.iterator(); it2.hasNext(); )
+			{
+				Object paramsethandle = it2.next();
+				Object exphandle = state.getAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression);
+				if(exphandle!=null)
+					postproc.postProcess(state, exphandle, scopehandle, classloader);
+				Collection expshandle = state.getAttributeValues(paramsethandle, OAVBDIMetaModel.parameterset_has_values);
+				if(expshandle!=null)
+				{
+					for(Iterator it3=expshandle.iterator(); it3.hasNext(); )
+					{
+						exphandle = it3.next();
+						postproc.postProcess(state, exphandle, scopehandle, classloader);
+					}
+				}
+			}
+		}
+	}
 }
