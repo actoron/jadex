@@ -112,6 +112,8 @@ public class GpmnBDIConverter
 		Report	report	= new Report();
 		state.addStateListener(listener, false);
 		Object handle = doConvert(process, classloader, state);
+		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, model.getName());
+		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, model.getDescription());
 		state.removeStateListener(listener);
 		// todo: filename, last modified
 		agentmodel =  new OAVAgentModel(state, handle, typemodel, types, null, 0, report);

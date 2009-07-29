@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" name="DiPP1_Logistik" ID="_ajVBQHdpEd6QBt5Nz_tZNA">
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" description="&lt;H3>Digitales Produktionspackaging (DiPP)&lt;/H3> Agent for starting the Daimler AG Agile Processes Demonstrator." name="DiPP1_Logistik" ID="_ajVBQHdpEd6QBt5Nz_tZNA">
   <processes name="xcDiPP1_Logistik.net" ID="_cLfR4HdpEd6QBt5Nz_tZNA">
     <artifacts xsi:type="gpmn:Context" ID="_VW8BkHg9Ed6n6NlHaSOctw">
       <staticElements ID="_tLeNwHg9Ed6zhPNmTPYkVQ" initialValue="true" name="praemissen_ok" type="boolean"/>

@@ -39,6 +39,9 @@ public class MGpmnModel extends MIdElement
 	
 	/** The name of the model. */
 	protected String name;
+
+	/** The description. */
+	protected String description;
 	
 	//-------- init structures --------
 	
@@ -133,6 +136,24 @@ public class MGpmnModel extends MIdElement
 	public void	setName(String name)
 	{
 		this.name	= name;
+	}
+	
+	/**
+	 *  Get the description of the model.
+	 *  @return The description of the model.
+	 */
+	public String	getDescription()
+	{
+		return description;
+	}
+	
+	/**
+	 *  Set the description of the model.
+	 *  @param description	The description to set.
+	 */
+	public void	setDescription(String description)
+	{
+		this.description	= description;
 	}
 	
 	/**
