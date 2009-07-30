@@ -2,6 +2,8 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
+import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -26,6 +28,9 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	
 	/** The object's tasks. */
 	protected Map tasks;
+
+	/** The task listeners. */
+	protected MultiCollection tasklisteners;
 
 	/** Event listeners. */
 	protected List listeners;
@@ -59,7 +64,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 			for(Iterator it = tasks.iterator(); it.hasNext(); )
 			{
 				IObjectTask task = (IObjectTask)it.next();
-				this.tasks.put(task.getId(), task);
+				this.tasks.put(task.getProperty(IObjectTask.PROPERTY_ID), task);
 			}
 		}
 		this.fetcher = new SimpleValueFetcher();
@@ -165,10 +170,10 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	{
 		synchronized(monitor)
 		{
-			if(tasks.containsKey(task.getId()))
+			if(tasks.containsKey(task.getProperty(IObjectTask.PROPERTY_ID)))
 				throw new RuntimeException("Task already exists: "+this+", "+task);
 			task.start(this);
-			tasks.put(task.getId(), task);
+			tasks.put(task.getProperty(IObjectTask.PROPERTY_ID), task);
 		}
 	}
 
@@ -180,10 +185,31 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	{
 		synchronized(monitor)
 		{
+			if(tasklisteners!=null && tasklisteners.containsKey(taskid))
+			{
+				Collection	listeners	= tasklisteners.getCollection(taskid);
+				for(Iterator it=listeners.iterator(); it.hasNext(); )
+				{
+					((IResultListener)it.next()).resultAvailable(taskid);
+				}
+				tasklisteners.remove(taskid);
+				
+				if(tasklisteners.isEmpty())
+					tasklisteners	= null;
+			}
+
 			IObjectTask task = getTask(taskid);
 			if(task!=null)
 			{
-				task.shutdown(this);
+				try
+				{
+					task.shutdown(this);
+				}
+				catch (Exception e)
+				{
+					// Todo: logger.
+					e.printStackTrace();
+				}
 				tasks.remove(taskid);
 			}
 		}
@@ -230,6 +256,46 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	}
 	
 	/**
+	 *  Add a result listener to a task.
+	 *  The result will be the task id.
+	 *  If the task is already finished, the listener will be notified.
+	 */
+	public void addTaskListener(Object taskid, IResultListener listener)
+	{
+		synchronized(monitor)
+		{
+			if(tasks.containsKey(taskid))
+			{				
+				if(tasklisteners==null)
+					tasklisteners	= new MultiCollection();
+				
+				tasklisteners.put(taskid, listener);
+			}
+			else
+			{
+				listener.resultAvailable(taskid);
+			}
+		}
+	}
+	
+	/**
+	 *  Remove a result listener from a task.
+	 */
+	public void removeTaskListener(Object taskid, IResultListener listener)
+	{
+		synchronized(monitor)
+		{
+			if(tasklisteners!=null)
+			{
+				tasklisteners.remove(taskid, listener);
+				
+				if(tasklisteners.isEmpty())
+					tasklisteners	= null;
+			}			
+		}
+	}
+
+	/**
 	 * Updates the object to the current time.
 	 * time the current time	
 	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
@@ -241,7 +307,30 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 			IObjectTask[] atasks = (IObjectTask[])tasks.values().toArray(new IObjectTask[tasks.size()]);
 			for(int i = 0; i < atasks.length; ++i)
 			{
-				atasks[i].execute(space, this, progress);
+				try
+				{
+					atasks[i].execute(space, this, progress);
+				}
+				catch(Exception e)
+				{
+					// Todo: logger.
+					e.printStackTrace();
+					
+					if(tasklisteners!=null && tasklisteners.containsKey(atasks[i].getProperty(IObjectTask.PROPERTY_ID)))
+					{
+						Collection	listeners	= tasklisteners.getCollection(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
+						for(Iterator it=listeners.iterator(); it.hasNext(); )
+						{
+							((IResultListener)it.next()).exceptionOccurred(e);
+						}
+						tasklisteners.remove(atasks[i].getProperty(IObjectTask.PROPERTY_ID));				
+						if(tasklisteners.isEmpty())
+							tasklisteners	= null;
+
+					}
+					
+					removeTask(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
+				}
 			}
 		}
 	}

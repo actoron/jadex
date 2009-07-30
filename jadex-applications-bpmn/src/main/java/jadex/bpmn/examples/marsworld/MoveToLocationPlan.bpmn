@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_JerAoXz_Ed6Ya8z0CnMcMA" iD="_JerAoHz_Ed6Ya8z0CnMcMA">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_jVa_YX0DEd6Ya8z0CnMcMA" iD="_jVa_YH0DEd6Ya8z0CnMcMA" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.tasks.*;&#xD;&#xA;import jadex.bdi.examples.marsworld.movement.*;&#xD;&#xA;&#xD;&#xA;Object _taskid;">
+    <associations xmi:type="bpmn:Association" xmi:id="_jVa_aX0DEd6Ya8z0CnMcMA"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_Je0xoXz_Ed6Ya8z0CnMcMA" iD="_Je0xoHz_Ed6Ya8z0CnMcMA" associations="_jVa_aX0DEd6Ya8z0CnMcMA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Je0xo3z_Ed6Ya8z0CnMcMA" iD="_Je0xonz_Ed6Ya8z0CnMcMA" outgoingEdges="_X-enOn0BEd6Ya8z0CnMcMA" name="Create Move Task&#xD;&#xA;&#xD;&#xA;class = CreateSpaceObjectTaskTask.class&#xD;&#xA;space = $beliefbase.environment&#xD;&#xA;type = MoveTask.PROPERTY_TYPENAME&#xD;&#xA;object_id = $beliefbase.myself.getId()&#xD;&#xA;out Object taskid" lanes="_3-IsoXz_Ed6Ya8z0CnMcMA" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_X-enMX0BEd6Ya8z0CnMcMA" iD="_X-enMH0BEd6Ya8z0CnMcMA" incomingEdges="_X-enOn0BEd6Ya8z0CnMcMA" name="Wait For Move Task" lanes="_3-IsoXz_Ed6Ya8z0CnMcMA" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_fwej4X0BEd6Ya8z0CnMcMA" iD="_fwej4H0BEd6Ya8z0CnMcMA" name="Remove  Move Task&#xD;&#xA;&#xD;&#xA;class = RemoveSpaceObjectTaskTask.class&#xD;&#xA;space = $beliefbase.environment&#xD;&#xA;taskid = _taskid&#xD;&#xA;object_id = $beliefbase.myself.getId()&#xD;&#xA;" lanes="_6P3esXz_Ed6Ya8z0CnMcMA" activityType="Task"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_X-enOn0BEd6Ya8z0CnMcMA" iD="_X-enOX0BEd6Ya8z0CnMcMA" name="_taskid = taskid"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_3-IsoXz_Ed6Ya8z0CnMcMA" iD="_3-IsoHz_Ed6Ya8z0CnMcMA" name="Body" activities="_Je0xo3z_Ed6Ya8z0CnMcMA _X-enMX0BEd6Ya8z0CnMcMA"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_6P3esXz_Ed6Ya8z0CnMcMA" iD="_6P3esHz_Ed6Ya8z0CnMcMA" name="Aborted" activities="_fwej4X0BEd6Ya8z0CnMcMA"/>
+  </pools>
+</bpmn:BpmnDiagram>

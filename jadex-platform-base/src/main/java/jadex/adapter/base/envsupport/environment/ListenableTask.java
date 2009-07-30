@@ -46,7 +46,7 @@ public abstract class ListenableTask extends SimplePropertyObject implements IOb
 	 */
 	public Object getId()
 	{
-		return getProperty(IObjectTask.ID);
+		return getProperty(IObjectTask.PROPERTY_ID);
 	}
 	
 	/**

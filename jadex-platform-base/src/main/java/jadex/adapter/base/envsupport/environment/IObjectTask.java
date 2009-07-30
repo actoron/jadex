@@ -8,13 +8,8 @@ import jadex.commons.IPropertyObject;
  */
 public interface IObjectTask extends IPropertyObject
 {
-	public static final String ID = "task_id";
-	
-	/**
-	 *  Get the objects id.
-	 *  @return The object id.
-	 */
-	public Object getId();
+	/** The property for holding the task id. */
+	public static final String PROPERTY_ID = "task_id";
 	
 	/**
 	 *  This method will be executed by the object before the task gets added to

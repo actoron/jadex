@@ -271,7 +271,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				IObjectTask task = (IObjectTask)((Class)taskinfo[0]).newInstance();
 				// todo: ensure uniqueness?!
 				Object id = taskidcounter.getNext();
-				task.setProperty(IObjectTask.ID, id);
+				task.setProperty(IObjectTask.PROPERTY_ID, id);
 				
 				properties	= mergeProperties((List) taskinfo[1], properties);
 				if(properties!=null)
@@ -307,6 +307,26 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			SpaceObject so = (SpaceObject)getSpaceObject(objectid);
 			so.removeTask(taskid);
 		}
+	}
+	
+	/**
+	 *  Add a result listener to an object task.
+	 *  The listener result will be the task id.
+	 *  If the task is already finished, the listener will be notified.
+	 */
+	public void addTaskListener(Object taskid, Object objectid, IResultListener listener)
+	{
+		SpaceObject so = (SpaceObject)getSpaceObject(objectid);
+		so.addTaskListener(taskid, listener);
+	}
+	
+	/**
+	 *  Remove a result listener from an object task.
+	 */
+	public void removeTaskListener(Object taskid, Object objectid, IResultListener listener)
+	{
+		SpaceObject so = (SpaceObject)getSpaceObject(objectid);
+		so.removeTaskListener(taskid, listener);
 	}
 	
 	/**

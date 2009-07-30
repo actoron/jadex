@@ -1,4 +1,4 @@
-#Thu Jul 30 11:08:27 CEST 2009
+#Thu Jul 30 13:50:16 CEST 2009
 eclipse.preferences.version=1
 encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn_diagram=UTF-8
@@ -29,6 +29,8 @@ encoding//src/main/java/jadex/bpmn/examples/helloworld/test2.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/test2.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/test_parallel.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/test_parallel.bpmn_diagram=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/marsworld/MoveToLocationPlan.bpmn=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/marsworld/MoveToLocationPlan.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/marsworld/RandomWalkPlan.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/marsworld/RandomWalkPlan.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/puzzle/ChooseMovePlan.bpmn=UTF-8

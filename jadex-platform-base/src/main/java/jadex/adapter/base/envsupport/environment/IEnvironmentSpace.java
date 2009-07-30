@@ -144,7 +144,19 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 *  @param properties The properties.
 	 */
 	public void removeObjectTask(Object taskid, Object objectid);
-			
+	
+	/**
+	 *  Add a result listener to an object task.
+	 *  The listener result will be the task id.
+	 *  If the task is already finished, the listener will be notified.
+	 */
+	public void addTaskListener(Object taskid, Object objectid, IResultListener listener);
+	
+	/**
+	 *  Remove a result listener from an object task.
+	 */
+	public void removeTaskListener(Object taskid, Object objectid, IResultListener listener);
+
 	/**
 	 * Adds an space action.
 	 * @param name the action ID

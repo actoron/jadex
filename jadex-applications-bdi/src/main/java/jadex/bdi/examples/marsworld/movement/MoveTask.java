@@ -1,11 +1,8 @@
 package jadex.bdi.examples.marsworld.movement;
 
-import java.util.Iterator;
-import java.util.Set;
-
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -13,10 +10,13 @@ import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
 
+import java.util.Iterator;
+import java.util.Set;
+
 /**
  *  Move an object towards a destination.
  */
-public class MoveTask extends ListenableTask
+public class MoveTask extends AbstractTask
 {
 	//-------- constants --------
 	
@@ -29,45 +29,22 @@ public class MoveTask extends ListenableTask
 	/** The scope property. */
 	public static final String	PROPERTY_SCOPE = "scope";
 
-	
 	/** The speed property (units per second). */
 	public static final String	PROPERTY_SPEED	= "speed";
 	
 	/** The vision property (radius in units). */
 	public static final String	PROPERTY_VISION	= "vision";
-	
-	//-------- attributes --------
-	
-	/** The destination. */
-//	protected IVector2	destination;
-	
-	/** The external access for notifying seen targets. */
-	// Todo: use vision generator / processors instead!?
-//	protected IExternalAccess	scope;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new move task.
-	 *  @param destination	The destination. 
-	 *  @param listsner	The result listener to be informed when the destination is reached. 
-	 * /
-	public MoveTask(IVector2 destination, IResultListener listener, IExternalAccess scope)
-	{
-		super(listener);
-		this.destination	= destination;
-		this.scope	= scope;
-	}*/
-	
-	//-------- ListenableTask methods --------
+		
+	//-------- IObjectTask methods --------
 	
 	/**
 	 *  Executes the task.
+	 *  Handles exceptions. Subclasses should implement doExecute() instead.
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
 		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
 		final IExternalAccess scope = (IExternalAccess)getProperty(PROPERTY_SCOPE);
@@ -105,6 +82,6 @@ public class MoveTask extends ListenableTask
 		}
 		
 		if(newloc==destination)
-			taskFinished(space, obj, null);
+			space.removeObjectTask(this.getProperty(PROPERTY_ID), obj.getId());
 	}
 }
