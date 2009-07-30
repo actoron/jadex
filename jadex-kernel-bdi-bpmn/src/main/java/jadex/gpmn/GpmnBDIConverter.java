@@ -111,12 +111,23 @@ public class GpmnBDIConverter
 		
 		Report	report	= new Report();
 		state.addStateListener(listener, false);
-		Object handle = doConvert(process, classloader, state);
+		
+		Object handle = state.createRootObject(OAVBDIMetaModel.agent_type); 
+		doConvert(process, classloader, state, handle);
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, model.getName());
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, model.getDescription());
+		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, model.getPackage());
+		String[] imports = model.getImports();
+		if(imports!=null)
+		{
+			for(int i=0; i<imports.length; i++)
+			{
+				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
+			}
+		}
+		
 		state.removeStateListener(listener);
-		// todo: filename, last modified
-		agentmodel =  new OAVAgentModel(state, handle, typemodel, types, null, 0, report);
+		agentmodel =  new OAVAgentModel(state, handle, typemodel, types, model.getFilename(), model.getLastModified(), report);
 		try
 		{
 			loader.createAgentModelEntry(agentmodel, report);
@@ -132,11 +143,9 @@ public class GpmnBDIConverter
 	/**
 	 *  Convert all aspects of a process.
 	 */
-	public Object doConvert(MProcess proc, ClassLoader classloader, IOAVState state)
-	{
-		Object scopehandle = state.createRootObject(OAVBDIMetaModel.agent_type);
-		
-		// Handle package and imports
+	public void doConvert(MProcess proc, ClassLoader classloader, IOAVState state, Object scopehandle)
+	{		
+		// Handle package and imports here?!
 		// todo:
 		
 		// Create default configuration
@@ -235,16 +244,16 @@ public class GpmnBDIConverter
 						Object planhandle = createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan", null);
 						
 						// Create trigger
-						Object triggerhandle = createPlanTrigger(planhandle, state, new String[]{goal.getName()}, null, null);
+						createPlanTrigger(planhandle, state, new String[]{goal.getName()}, null, null);
 				
 						// Create mode paramter
-						Object paramhandle = createParameter(planhandle, state, "mode", String.class, goal.getName().endsWith("par")? "\"parallel\"": "\"sequential\"", true);
+						createParameter(planhandle, state, "mode", String.class, goal.getName().endsWith("par")? "\"parallel\"": "\"sequential\"", true);
 					
 						// Create subgoals paramterset
 						String[] goalnames = new String[outgoals.size()];
 						for(int j=0; j<outgoals.size(); j++)
 							goalnames[j] = "\""+((MGoal)outgoals.get(j)).getName()+"\"";
-						Object paramsethandle = createParameterSet(planhandle, state, "subgoals", String.class, goalnames, null, true);
+						createParameterSet(planhandle, state, "subgoals", String.class, goalnames, null, true);
 					}
 				}
 			}
@@ -402,8 +411,6 @@ public class GpmnBDIConverter
 				postProcessParameterElement(state, scopehandle, planhandle, expost, classloader);
 			}
 		}
-		
-		return scopehandle;
 	}
 	
 	//-------- helper creation methods --------

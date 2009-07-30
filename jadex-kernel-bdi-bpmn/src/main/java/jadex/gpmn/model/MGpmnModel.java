@@ -12,23 +12,6 @@ import java.util.Map;
  */
 public class MGpmnModel extends MIdElement
 {
-	//-------- constants --------
-	
-//	/** Constant for maintain goal. */
-//	public static final String MAINTAIN_GOAL = "MaintainGoal";
-//
-//	/** Constant for achieve goal. */
-//	public static final String ACHIEVE_GOAL = "AchieveGoal";
-//
-//	/** Constant for query goal. */
-//	public static final String QUERY_GOAL = "QueryGoal";
-//
-//	/** Constant for perform goal. */
-//	public static final String PERFORM_GOAL = "PerformGoal";
-
-	/** Constant for plan. */
-	public static final String PLAN = "Plan";
-	
 	//-------- attributes --------
 	
 	/** The processes. */
@@ -42,6 +25,12 @@ public class MGpmnModel extends MIdElement
 
 	/** The description. */
 	protected String description;
+	
+	/** The filename. */
+	protected String filename;
+	
+	/** The last modified date. */
+	protected long lastmodified;
 	
 	//-------- init structures --------
 	
@@ -160,7 +149,7 @@ public class MGpmnModel extends MIdElement
 	 *  Get all imports.
 	 *  @return The imports.
 	 */
-	public String[] getAllImports()
+	public String[] getImports()
 	{
 		return imports;
 	}
@@ -174,6 +163,42 @@ public class MGpmnModel extends MIdElement
 		this.imports = imports;
 	}
 	
+	/**
+	 *  Get the filename.
+	 *  @return The filename.
+	 */
+	public String getFilename()
+	{
+		return this.filename;
+	}
+
+	/**
+	 *  Set the filename.
+	 *  @param filename The filename to set.
+	 */
+	public void setFilename(String filename)
+	{
+		this.filename = filename;
+	}
+
+	/**
+	 *  Get the lastmodified.
+	 *  @return The lastmodified.
+	 */
+	public long getLastModified()
+	{
+		return this.lastmodified;
+	}
+
+	/**
+	 *  Set the lastmodified.
+	 *  @param lastmodified The lastmodified to set.
+	 */
+	public void setLastModified(long lastmodified)
+	{
+		this.lastmodified = lastmodified;
+	}
+
 	/**
 	 *  Get the package name.
 	 *  @return The package name.
