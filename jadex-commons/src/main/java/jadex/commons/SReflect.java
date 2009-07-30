@@ -840,6 +840,20 @@ public class SReflect
 		}
 	}
 	
+	/**
+	 *  Test if object is some kind of collection.
+	 *  @param obj The object.
+	 *  @return True if is iterable.
+	 */
+	public static boolean isIterable(Object obj)
+	{
+		return obj instanceof Iterator 
+			|| obj instanceof Enumeration
+			|| obj instanceof Collection 
+			|| obj instanceof Map
+			|| obj!=null && obj.getClass().isArray();
+	}
+	
 	protected static Object[] EMPTY_ARRAY = new Object[0];
 	/**
 	 *  Get an array for an arbitrary collection object.

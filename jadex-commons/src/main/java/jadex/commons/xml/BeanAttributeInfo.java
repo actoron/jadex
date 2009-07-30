@@ -8,8 +8,16 @@ public class BeanAttributeInfo
 {
 	//-------- attributes --------
 	
+	// read + write
+	
 	/** The Java attribute name. */
 	protected String attributename;
+
+	// write
+	
+	protected String xmlattributename;
+	
+	// read
 	
 	/** The attribute value converter. */
 	protected ITypeConverter converter;
@@ -131,6 +139,25 @@ public class BeanAttributeInfo
 	public void setDefaultValue(Object defaultvalue)
 	{
 		this.defaultvalue = defaultvalue;
+	}
+	
+	
+	/**
+	 *  Get the attribut name.
+	 *  @return The attributename.
+	 */
+	public String getXMLAttributeName()
+	{
+		return this.xmlattributename;
+	}
+
+	/**
+	 *  Set the attribute name.
+	 *  @param xmlattributename the xmlattributename to set
+	 */
+	public void setXMLAttributeName(String xmlattributename)
+	{
+		this.xmlattributename = xmlattributename;
 	}
 
 }

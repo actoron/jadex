@@ -144,7 +144,7 @@ public class Reader
 					}
 					
 					// Handle attributes
-					Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getAttributeNames();
+					Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
 					for(int i=0; i<parser.getAttributeCount(); i++)
 					{
 						String attrname = parser.getAttributeLocalName(i);

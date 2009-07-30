@@ -2,9 +2,13 @@ package jadex.commons.xml;
 
 import jadex.commons.IFilter;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,7 +19,9 @@ public class TypeInfo	extends AbstractInfo
 {
 	//-------- attributes -------- 
 	
-	/** The type info. */
+	// read + write (if not Ibeancreator)
+	
+	/** The object type. */
 	protected Object typeinfo;
 	
 	/** The comment info. */
@@ -24,11 +30,18 @@ public class TypeInfo	extends AbstractInfo
 	/** The content info. */
 	protected Object contentinfo;
 	
-	/** The attributes info. */
+	// read
+	
+	/** The attributes info (xmlname -> attrinfo). */
 	protected Map attributesinfo;
 	
 	/** The post processor (if any). */
 	protected IPostProcessor postproc;
+	
+	// write
+	
+	/** The sub objects. */ // todo: unify with link infos?!
+	protected List subobjectsinfo;
 	
 	//-------- constructors --------
 	
@@ -168,12 +181,46 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
-	 *  Get the attribute names.
+	 *  Get the attribute info.
+	 *  @param name The name of the attribute.
+	 *  @return The attribute info.
+	 * /
+	public Object getAttributeInfo2(String name)
+	{
+		Object ret = null;
+		
+		// todo: use map
+		if(attributesinfo!=null)
+		{
+			for(Iterator it=attributesinfo.values().iterator(); it.hasNext(); )
+			{
+				BeanAttributeInfo attrinfo = (BeanAttributeInfo)it.next();
+				if(name.equals(attrinfo.getAttributeName()))
+				{
+					ret = attrinfo;
+					break;
+				}
+			}
+		}
+		return ret;
+	}*/
+	
+	/**
+	 *  Get the xml attribute names.
 	 *  @return The attribute names.
 	 */
-	public Set getAttributeNames()
+	public Set getXMLAttributeNames()
 	{
 		return attributesinfo==null? Collections.EMPTY_SET: new HashSet(attributesinfo.keySet());
+	}
+	
+	/**
+	 *  Get the attribute infos.
+	 *  @return The attribute infos.
+	 */
+	public Collection getAttributeInfos()
+	{
+		return attributesinfo.values();
 	}
 	
 	/**
@@ -192,5 +239,25 @@ public class TypeInfo	extends AbstractInfo
 	public void setPostProcessor(IPostProcessor pproc)
 	{
 		this.postproc = pproc;
+	}
+	
+	/**
+	 *  Add a subobjects info.
+	 *  @param info The subobjects info.
+	 */
+	public void addSubobjectInf(Object info)
+	{
+		if(subobjectsinfo==null)
+			subobjectsinfo = new ArrayList();
+		subobjectsinfo.add(info);
+	}
+	
+	/**
+	 *  Get the subobject infos. 
+	 *  @return The subobject infos.
+	 */
+	public List getSubobjectInfos()
+	{
+		return subobjectsinfo;
 	}
 }

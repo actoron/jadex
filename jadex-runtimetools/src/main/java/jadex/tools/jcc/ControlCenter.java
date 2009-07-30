@@ -17,6 +17,7 @@ import jadex.bridge.XMLPropertiesReader;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.xml.BeanObjectWriterHandler;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.RememberOptionMessage;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -460,6 +461,12 @@ public class ControlCenter implements IControlCenter
 				os.close();
 				setStatusText("Project saved successfully: "
 						+ project.getAbsolutePath());
+				
+				// for testing the writer
+//				os = new FileOutputStream("c:\\wurst.xml");
+//				jadex.commons.xml.Writer w = new jadex.commons.xml.Writer(new BeanObjectWriterHandler(), null, null);
+//				w.write(props, os, null);
+//				os.close();
 			}
 			catch(Exception e)
 			{
