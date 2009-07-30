@@ -16,11 +16,12 @@
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.bdi.examples.marsworld.*</import>
+		<import>jadex.bdi.examples.marsworld.movement.*</import>
 	</imports>
 
 	<capabilities>
 		<!-- Include the move capability as move for basic movement. -->
-		<capability name="move" file="jadex.bdi.examples.marsworld.movement.Movement" />
+		<capability name="move" file="Movement" />
 	</capabilities>
 
 	<beliefs>

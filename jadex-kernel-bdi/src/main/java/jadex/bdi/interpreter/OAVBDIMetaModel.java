@@ -1,7 +1,10 @@
 package jadex.bdi.interpreter;
 
+import java.util.Collection;
+
 import jadex.bridge.MessageType;
 import jadex.javaparser.IParsedExpression;
+import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
@@ -1110,6 +1113,32 @@ public class OAVBDIMetaModel
 		
 		// propertybase
 		properties_has_properties	= properties_type.createAttributeType("properties_has_properties", expression_type, OAVAttributeType.LIST);
+	}
+
+
+	/**
+	 *  Extract imports from ADF.
+	 */
+	public static String[] getImports(IOAVState state, Object root)
+	{
+		Collection	coll	= state.getAttributeValues(root, capability_has_imports);
+		String[] imports	= coll!=null ? (String[])coll.toArray(new String[coll.size()]) : null;
+		String	pkg	= (String)state.getAttributeValue(root, capability_has_package);
+		if(pkg!=null)
+		{
+			if(imports!=null)
+			{
+				String[]	newimports	= new String[imports.length+1];
+				System.arraycopy(imports, 0, newimports, 1, imports.length);
+				imports	= newimports;
+			}
+			else
+			{
+				imports	= new String[1];
+			}
+			imports[0]	= pkg+".*";
+		}
+		return imports;
 	}
 
 }

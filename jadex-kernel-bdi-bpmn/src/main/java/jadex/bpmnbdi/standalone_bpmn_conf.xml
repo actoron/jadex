@@ -128,7 +128,7 @@
 						new java.lang.Long(10000),
 						jadex.tools.introspector.IntrospectorAdapter.class,
 						Boolean.TRUE,
-						new jadex.bpmnbdi.BpmnPlanExecutor()
+						new jadex.bpmnbdi.BpmnPlanExecutor($platform)
 					}
 				), $platform)
 			</property>
@@ -157,7 +157,7 @@
 						new java.lang.Long(10000),
 						jadex.tools.introspector.IntrospectorAdapter.class,
 						Boolean.TRUE,
-						new jadex.bpmnbdi.BpmnPlanExecutor()
+						new jadex.bpmnbdi.BpmnPlanExecutor($platform)
 					}
 				), $platform)</property>
 		</properties> 

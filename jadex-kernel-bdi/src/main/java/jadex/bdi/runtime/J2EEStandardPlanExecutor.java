@@ -3,7 +3,6 @@ package jadex.bdi.runtime;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bdi.interpreter.PlanRules;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
@@ -98,7 +97,7 @@ public class J2EEStandardPlanExecutor	implements IPlanExecutor, Serializable
 		String clname = (String)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
 		if(clname==null)
 			throw new RuntimeException("Classname must not be null: "+interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model));
-		Class clazz = SReflect.findClass(clname, OAVBDIXMLReader.getImports(interpreter.getState(), interpreter.getState().getAttributeValue
+		Class clazz = SReflect.findClass(clname, OAVBDIMetaModel.getImports(interpreter.getState(), interpreter.getState().getAttributeValue
 			(rcapability, OAVBDIRuntimeModel.element_has_model)), interpreter.getState().getTypeModel().getClassLoader());
 	
 		Object	body = null;

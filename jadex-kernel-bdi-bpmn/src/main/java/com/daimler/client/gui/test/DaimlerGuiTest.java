@@ -1,6 +1,7 @@
 package com.daimler.client.gui.test;
 
 import jadex.bpmn.BpmnExecutor;
+import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
@@ -27,7 +28,7 @@ public class DaimlerGuiTest
 //			String filename = "jadex/bpmn/examples/helloworld/SubProcess.bpmn"
 //			String filename = "jadex/bpmn/examples/helloworld/UserInteraction.bpmn";
 			
-			MBpmnModel model = BpmnXMLReader.read(filename, null, null);
+			MBpmnModel model = new BpmnModelLoader().loadBpmnModel(filename, null);
 			BpmnInstance instance = new BpmnInstance(model);
 			BpmnExecutor exe = new BpmnExecutor(instance, true);
 			ExecutionControlPanel.createBpmnFrame("test", instance, exe);

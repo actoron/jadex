@@ -22,7 +22,7 @@ public class Test
 			String filename = "jadex/bpmn/examples/dipp/dipp.gpmn";
 			
 			MGpmnModel model = GpmnXMLReader.read(filename, null, null);
-			GpmnBDIConverter conv = new GpmnBDIConverter(new OAVBDIModelLoader(Collections.EMPTY_MAP));
+			GpmnBDIConverter conv = new GpmnBDIConverter(new OAVBDIModelLoader());
 			Object[] ret = conv.convertGpmnModelToBDIAgents(model, null);
 			System.out.println("Converted: "+SUtil.arrayToString(ret));
 		}

@@ -10,7 +10,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
 	name="Sentry"
-	package="jadex.bdi.examples.marsworld.sentry">
+	package="jadex.bpmn.examples.marsworld">
 
 	<imports>
 		<import>java.util.*</import>
@@ -18,7 +18,8 @@
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.math.*</import>
-		<import>jadex.bdi.examples.marsworld.movement.*</import>
+		<import>jadex.bdi.examples.marsworld.*</import>
+		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 	</imports>
 
 	<capabilities>

@@ -66,21 +66,14 @@ public class BpmnXMLReader
 	
 	/**
 	 *  Read properties from xml.
-	 *  @param input The input stream.
+	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
-	 * 	@param context The context.
  	 */
-	public static MBpmnModel read(String filename, final ClassLoader classloader, final Object context) throws Exception
+	protected static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
-		ResourceInfo rinfo = SUtil.getResourceInfo0(filename, classloader);
-		if(rinfo==null)
-			throw new RuntimeException("Could not find resource: "+filename);
-		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, context);
-		String name = new File(rinfo.getFilename()).getName();
-		name = name.substring(0, name.length()-5);
-		ret.setName(name);
-		rinfo.getInputStream().close();
-		System.out.println("Loaded model: "+ret);
+		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
+		ret.setFilename(rinfo.getFilename());
+		ret.setLastModified(rinfo.getLastModified());
 		return ret;
 	}
 	

@@ -65,7 +65,7 @@ public class BDIAgentFactory implements IAgentFactory
 	{
 //		this.kernelprops = kernelprops;
 		this.props = props;
-		this.loader	= new OAVBDIModelLoader(props);
+		this.loader	= new OAVBDIModelLoader();
 		this.platform = platform;
 	}
 	
@@ -129,10 +129,10 @@ public class BDIAgentFactory implements IAgentFactory
 		try
 		{
 //			System.out.println("loading: "+filename);
-			OAVCapabilityModel loaded = loader.loadModel(filename, null, null);
+			OAVCapabilityModel loaded = (OAVCapabilityModel) loader.loadModel(filename, null);
 			return loaded;
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
 			System.err.println(filename);
 			throw new RuntimeException(e);

@@ -1,5 +1,6 @@
 package jadex.bpmn.model;
 
+import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 
@@ -15,7 +16,7 @@ import java.util.StringTokenizer;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MBpmnModel extends MIdElement
+public class MBpmnModel extends MIdElement	implements ICacheableModel
 {
 	//-------- constants --------
 	
@@ -101,6 +102,17 @@ public class MBpmnModel extends MIdElement
 	
 	/** The context variables (name -> [class, initexpression]). */
 	protected Map	variables;
+	
+	//-------- model management --------
+	
+	/** The filename. */
+	protected String filename;
+	
+	/** The last modified date. */
+	protected long lastmodified;
+	
+	/** The last check date. */
+	protected long lastchecked;
 	
 	//-------- methods --------
 
@@ -692,5 +704,60 @@ public class MBpmnModel extends MIdElement
 	public IParsedExpression	getContextVariableExpression(String name)
 	{
 		return (IParsedExpression)((Object[])variables.get(name))[1];
+	}
+
+	
+	/**
+	 *  Get the filename.
+	 *  @return The filename.
+	 */
+	public String getFilename()
+	{
+		return this.filename;
+	}
+
+	/**
+	 *  Set the filename.
+	 *  @param filename The filename to set.
+	 */
+	public void setFilename(String filename)
+	{
+		this.filename = filename;
+	}
+
+	/**
+	 *  Get the lastmodified date.
+	 *  @return The lastmodified date.
+	 */
+	public long getLastModified()
+	{
+		return this.lastmodified;
+	}
+
+	/**
+	 *  Set the lastmodified date.
+	 *  @param lastmodified The lastmodified date to set.
+	 */
+	public void setLastModified(long lastmodified)
+	{
+		this.lastmodified = lastmodified;
+	}
+
+	/**
+	 *  Get the last checked date.
+	 *  @return The last checked date
+	 */
+	public long getLastChecked()
+	{
+		return this.lastchecked;
+	}
+
+	/**
+	 *  Set the last checked date.
+	 *  @param lastchecked The last checked date to set.
+	 */
+	public void setLastChecked(long lastchecked)
+	{
+		this.lastchecked = lastchecked;
 	}
 }

@@ -7,12 +7,15 @@ import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.PlanFailureException;
+import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
+import jadex.bridge.ILibraryService;
+import jadex.bridge.IPlatform;
 import jadex.commons.collection.SCollection;
 
 import java.io.Serializable;
@@ -29,17 +32,19 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 {
 	//-------- attributes --------
 	
-	/** Hack! Map for the parsed plan body objects (mplan -> bodyImpl) */
-	protected Map planmodelcache;
+	/** Model loader (todo: classpath issues?) */
+	protected BpmnModelLoader	loader;
 
 	//-------- constructor --------
 
 	/**
 	 *  Create a new BPMN plan executor.
 	 */
-	public BpmnPlanExecutor()
+	public BpmnPlanExecutor(IPlatform platform)
 	{
-		this.planmodelcache = SCollection.createHashMap();
+		this.loader = new BpmnModelLoader();
+		loader.setClassLoader(((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader());
+		// Todo: different agents may have different class loaders?
 	}
 
 	//-------- IPlanExecutor interface --------
@@ -56,28 +61,10 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		Object	mplan	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
 		Object	mbody	= interpreter.getState().getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
 		String	impl	= (String)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
+		Object	mcapa	= interpreter.getState().getAttributeValue(rcapability, OAVBDIRuntimeModel.element_has_model);
+		String[]	imports	= OAVBDIMetaModel.getImports(interpreter.getState(), mcapa);
 		
-		// HACK!
-		// check the model cache for already parsed plan
-		MBpmnModel bodymodel = (MBpmnModel)planmodelcache.get(mbody);
-		
-		
-		if(bodymodel == null && impl!=null)
-		{
-			try
-			{
-				// Read the file and parse the state machine
-				bodymodel = (MBpmnModel)BpmnXMLReader.read(impl, interpreter.getState().getTypeModel().getClassLoader(), null);
-
-				// HACK! Cache parsed body models
-				planmodelcache.put(mbody, bodymodel);
-			}
-			catch(Exception e)
-			{
-				// Use only RuntimeException from below
-				e.printStackTrace();
-			}
-		}
+		MBpmnModel bodymodel = loader.loadBpmnModel(impl, imports); 
 
 		if(bodymodel==null)
 		{

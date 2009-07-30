@@ -1,9 +1,8 @@
 package jadex.bdi.interpreter;
 
+import jadex.commons.AbstractModelLoader;
+import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple;
-import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.xml.Reader;
 import jadex.commons.xml.StackElement;
 import jadex.rules.parser.conditions.ParserHelper;
@@ -29,29 +28,18 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
-import javax.xml.parsers.SAXParserFactory;
 
 /**
  *  Loader for reading agent XMLs into OAV representation.
  */
-public class OAVBDIModelLoader
+public class OAVBDIModelLoader	extends AbstractModelLoader
 {
 	//-------- constants --------
 
@@ -75,281 +63,117 @@ public class OAVBDIModelLoader
 	/** The reader (cached for speed, todo: weak for memory). */
 	protected Reader	reader;
 	
-	/** The xmlmapping (cached for speed, todo: weak for memory). */
-//	protected IOAVXMLMapping	mapping;
-		
-	/** The model cache (filename -> oav capability model). */
-	protected Map modelcache;
-	
-	/** The classloader. */
-	protected ClassLoader classloader;
-	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an OAV BDI Model loader.
 	 */
-	public OAVBDIModelLoader(Map props)
+	public OAVBDIModelLoader()
 	{
+		super(new String[]{FILE_EXTENSION_AGENT, FILE_EXTENSION_CAPABILITY, FILE_EXTENSION_PROPERTIES});
 		this.reader	= OAVBDIXMLReader.getReader();
-//		this.mapping = OAVBDIMetaModel.getXMLMapping(props);
-		this.modelcache	= new HashMap();	
 	}
 
 	//-------- methods --------
 
 	/**
-	 *  Load an agent model into a state.
-	 *  @param name	The name or filename of the model to load.
-	 *  @param imports Optional imports, used to resolve the name to a filename, if necessary. 
-	 *  @return The reference to the loaded model in the state.
+	 *  Load an agent model.
+	 *  @param name	The filename or logical name (resolved via imports and extensions).
+	 *  @param imports	The imports, if any.
 	 */
-	// Todo: remove imports, support only fully qualified.
-	public OAVAgentModel loadAgentModel(String name, String[] imports) throws IOException
+	public OAVAgentModel	loadAgentModel(String name, String[] imports) throws Exception
 	{
 		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports);
 	}
-	
+
 	/**
-	 *  Load a capability model into a state.
-	 *  @param parent	The parent capability model.
-	 *  @param name	The name or filename of the model to load.
-	 *  @param imports Optional imports, used to resolve the name to a filename, if necessary. 
-	 *  @return The reference to the loaded model in the state.
+	 *  Load a capability model.
+	 *  @param name	The filename or logical name (resolved via imports and extensions).
+	 *  @param imports	The imports, if any.
 	 */
-	// Todo: remove imports, support only fully qualified.
-	public OAVCapabilityModel loadCapabilityModel(String name, String[] imports) throws IOException
+	public OAVCapabilityModel	loadCapabilityModel(String name, String[] imports) throws Exception
 	{
-		return loadModel(name, FILE_EXTENSION_CAPABILITY, imports);
+		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports);
 	}
 
-	/**
-	 *  Load a properties model into a state.
-	 *  @param state	The state to load the model into.
-	 *  @param name	The name or filename of the model to load.
-	 *  @param imports Optional imports, used to resolve the name to a filename, if necessary. 
-	 *  @return The reference to the loaded model in the state.
-	 * /
-	// Todo: remove imports, support only fully qualified.
-	public Object loadPropertyModel(IOAVState state, String name, String[] imports, OAVCapabilityModel parent) throws IOException
-	{
-		return loadModel(state, name, FILE_EXTENSION_PROPERTIES, imports, parent);
-	}*/
-	
-	/**
-	 *  Load an xml Jadex model.
-	 *  Creates file name when specified with or without package.
-	 *  Transforms the model via the Jadex default xslt when not null.
-	 *  Configures the model via setup() when configurable.
-	 *  @param xml The filename | fully qualified classname
-	 *  @return The loaded model.
-	 */
-	// Todo: fix directory stuff!???
-	public static ResourceInfo getResourceInfo(String xml, String suffix, String[] imports, ClassLoader classloader) throws IOException
-	{
-		if(xml==null)
-			throw new IllegalArgumentException("Required ADF name nulls.");
-		if(suffix==null && !xml.endsWith(FILE_EXTENSION_AGENT) && !xml.endsWith(FILE_EXTENSION_CAPABILITY))
-			throw new IllegalArgumentException("Required suffix nulls.");
-
-		if(suffix==null)
-			suffix="";
-		
-		// Try to find directly as absolute path.
-		String resstr = xml;
-		ResourceInfo ret = SUtil.getResourceInfo0(resstr, classloader);
-
-		if(ret==null || ret.getInputStream()==null)
-		{
-			// Fully qualified package name? Can also be full package name with empty package ;-)
-			//if(xml.indexOf(".")!=-1)
-			//{
-				resstr	= SUtil.replace(xml, ".", "/") + suffix;
-				//System.out.println("Trying: "+resstr);
-				ret	= SUtil.getResourceInfo0(resstr, classloader);
-			//}
-
-			// Try to find in imports.
-			for(int i=0; (ret==null || ret.getInputStream()==null) && imports!=null && i<imports.length; i++)
-			{
-				// Package import
-				if(imports[i].endsWith(".*"))
-				{
-					resstr = SUtil.replace(imports[i].substring(0,
-						imports[i].length()-1), ".", "/") + xml + suffix;
-					//System.out.println("Trying: "+resstr);
-					ret	= SUtil.getResourceInfo0(resstr, classloader);
-				}
-				// Direct import
-				else if(imports[i].endsWith(xml))
-				{
-					resstr = SUtil.replace(imports[i], ".", "/") + suffix;
-					//System.out.println("Trying: "+resstr);
-					ret	= SUtil.getResourceInfo0(resstr, classloader);
-				}
-			}
-		}
-
-		if(ret==null || ret.getInputStream()==null)
-			throw new IOException("File "+xml+" not found in imports: "+SUtil.arrayToString(imports));
-
-		return ret;
-	}
-	
-	// todo: synchronize modelcache!
-	
-	/**
-	 *  Set the class loader.
-	 *  @param classloader The class loader.
-	 */
-	public synchronized void setClassLoader(ClassLoader classloader)
-	{
-		this.classloader = classloader;
-		modelcache.clear();
-	}
-
-	//-------- helper methods --------
+	//-------- AbstractModelLoader methods --------
 
 	/**
 	 *  Load a model.
+	 *  @param name	The original name (i.e. not filename).
+	 *  @param info	The resource info.
 	 */
-	protected synchronized OAVCapabilityModel loadModel(String name, String extension, String[] imports) throws IOException
+	protected ICacheableModel	doLoadModel(String name, ResourceInfo info) throws Exception
 	{
-		if(extension==null)
-			extension = getFilenameExtension(name);
+		OAVCapabilityModel	ret;
+
+		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", classloader);
+		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
+		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+		IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
 		
-		// Lookup cache by name/extension/imports
-		OAVCapabilityModel cached = null;
-		Object[] keys	= imports!=null? new Object[imports.length+2]: new Object[2];
-		keys[0]	= name;
-		keys[1]	= extension;
-		if(imports!=null)
-			System.arraycopy(imports, 0, keys, 2, imports.length);
-		Tuple	keytuple	= new Tuple(keys);
-		
-		ResourceInfo	info	= null;
-		//		synchronized(modelcache)
-//		{
-			cached	= (OAVCapabilityModel)modelcache.get(keytuple);
-			// If model is in cache, check at most every second if file on disc is newer.
-			if(cached!=null && cached.getLastChecked()+1000<System.currentTimeMillis())
+		final Set	types	= new HashSet();
+		IOAVStateListener	listener	= new IOAVStateListener()
+		{
+			public void objectAdded(Object id, OAVObjectType type, boolean root)
 			{
-				info	= getResourceInfo(name, extension, imports, classloader);
-				if(cached.getLastModified()<info.getLastModified())
-				{
-					cached	= null;
-				}
-				else
-				{
-					cached.setLastChecked(System.currentTimeMillis());
-				}
+				// Add the type and its supertypes (if not already contained).
+				while(type!=null && types.add(type))
+					type	= type.getSupertype();
 			}
-//		}
-
-		if(cached==null && info==null)
-		{
-			// Lookup cache by resolved filename.
-//			synchronized(modelcache)
-//			{
-				info	= getResourceInfo(name, extension, imports, classloader);
-				cached	= (OAVCapabilityModel)modelcache.get(info.getFilename());
-				if(cached!=null)
-				{
-					if(cached.getLastModified()<info.getLastModified())
-					{
-						cached	= null;
-					}
-					else
-					{
-						cached.setLastChecked(System.currentTimeMillis());
-					}
-
-					// Associate cached model to new key (name/extension/imports).
-					modelcache.put(keytuple, cached);
-				}
-//			}
-		}
 			
-		// Not found: load from disc and store in cache.
-		if(cached==null)
-		{
-			OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", classloader);
-			// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
-			typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-			IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
-			
-			final Set	types	= new HashSet();
-			IOAVStateListener	listener	= new IOAVStateListener()
+			public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, Object newvalue)
 			{
-				public void objectAdded(Object id, OAVObjectType type, boolean root)
-				{
-					// Add the type and its supertypes (if not already contained).
-					while(type!=null && types.add(type))
-						type	= type.getSupertype();
-				}
-				
-				public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, Object newvalue)
-				{
-				}
-				
-				public void objectRemoved(Object id, OAVObjectType type)
-				{
-				}
-			};
+			}
 			
-			
-			Report	report	= new Report();
-			try
+			public void objectRemoved(Object id, OAVObjectType type)
 			{
-				state.addStateListener(listener, false);
-				Object handle = reader.read(info.getInputStream(), classloader, state);
+			}
+		};
+		
+		
+		Report	report	= new Report();
+		try
+		{
+			state.addStateListener(listener, false);
+			Object handle = reader.read(info.getInputStream(), classloader, state);
 //				Object handle = reader.read(info.getInputStream(), state, mapping, report.entries);
-				state.removeStateListener(listener);
+			state.removeStateListener(listener);
 
-				if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
-				{
-					cached	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
-				}
-				else
-				{
-					cached	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
-				}
-			}
-			catch(Exception e)
+			if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 			{
-//				e.printStackTrace();
-				if(e instanceof RuntimeException)
-					throw (RuntimeException)e;
-				else
-					throw new RuntimeException(e);
+				ret	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
 			}
-			finally
+			else
 			{
-				info.cleanup();
-			}				
-			
-			createAgentModelEntry(cached, report);
-
-			// Store by filename also, to avoid reloading with different imports.
-			modelcache.put(info.getFilename(), cached);
-			
-			// Associate cached model to new key (name/extension/imports).
-			modelcache.put(keytuple, cached);
+				ret	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
+			}
 		}
+		catch(Exception e)
+		{
+//				e.printStackTrace();
+			if(e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
+				throw new RuntimeException(e);
+		}
+		
+		createAgentModelEntry(ret, report);
 
-		return cached;
+
+		return ret;
 	}
 
 	/**
 	 *  Rules for agent elements have to be created and added to the generic
 	 *  BDI interpreter rules.
 	 */
-	public void	createAgentModelEntry(OAVCapabilityModel model, Report report)	throws IOException
+	public void	createAgentModelEntry(OAVCapabilityModel model, Report report)	throws Exception
 	{
 		IRulebase rb = model.getRulebase();
 		IOAVState	state	= model.getState();
 		Object	mcapa	= model.getHandle();
-		String[]	imports	= OAVBDIXMLReader.getImports(state, mcapa);
+		String[]	imports	= OAVBDIMetaModel.getImports(state, mcapa);
 		
 		// Load subcapabilities.
 		Collection mcaparefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
@@ -359,7 +183,7 @@ public class OAVBDIModelLoader
 			{
 				Object mcaparef = it.next();
 				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
-				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, null);
+				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports);
 				model.addSubcapabilityModel(cmodel);
 				if(!cmodel.getReport().isEmpty())
 				{
@@ -863,138 +687,4 @@ public class OAVBDIModelLoader
 			System.out.println("Using rule "+rule.getName());
 		return check;
 	}
-
-	/**
-	 *  Create a condition for a goal.
-	 *  @param goalname	The name of the goal type.
-	 *  @param usercond	The user part of the condition
-	 *  @return	The complete goal condition including variables ?rgoal and ?mgoal.
-	 * /
-	protected static ICondition createGoalCondition(String goalname, ICondition usercond)
-	{
-		return createGoalCondition(goalname, usercond, null);
-	}
-
-	/**
-	 *  Create a condition for a goal.
-	 *  @param goalname	The name of the goal type.
-	 *  @param usercond	The user part of the condition.
-	 *  @param lifecyclestate	A goal lifecycle state in which the condition should trigger.
-	 *  @return	The complete goal condition including variables ?rgoal and ?mgoal.
-	 * /
-	protected static ICondition createGoalCondition(String goalname, ICondition usercond, String lifecyclestate)
-	{
-		return createGoalCondition(goalname, usercond, lifecyclestate, true);
-	}
-
-	/**
-	 *  Create a condition for a goal.
-	 *  @param goalname	The name of the goal type.
-	 *  @param usercond	The user part of the condition.
-	 *  @param lifecyclestate	A goal lifecycle state in which the condition should trigger.
-	 *  @param islifecyclestate	If true, condition triggers only when goal is in the given lifecyclestate,
-	 *  	otherwise triggers when goal is NOT in lifecyclestate.
-	 *  @return	The complete goal condition including variables ?rgoal and ?mgoal.
-	 * /
-	protected static ICondition createGoalCondition(String goalname, ICondition usercond, String lifecyclestate, boolean islifecyclestate)
-	{
-		ObjectCondition	mgoalcon	= new ObjectCondition(OAVBDIMetaModel.goal_type);
-		mgoalcon.addConstraint(new BoundConstraint(null, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
-		mgoalcon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.modelelement_has_name, goalname));
-		ObjectCondition	goalcon	= new ObjectCondition(OAVBDIRuntimeModel.goal_type);
-		goalcon.addConstraint(new BoundConstraint(null, new Variable("?rgoal", OAVBDIRuntimeModel.goal_type)));
-		goalcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.element_has_model, new Variable("?mgoal", OAVBDIMetaModel.goal_type)));
-		if(lifecyclestate!=null)
-		{
-			goalcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.goal_has_lifecyclestate, lifecyclestate,
-				islifecyclestate ? IOperator.EQUAL : IOperator.NOTEQUAL));
-		}
-		ICondition	goalcond	= new AndCondition(new ICondition[]{mgoalcon, goalcon, usercond});
-		return goalcond;
-	}*/
-
-	/**
-	 * 
-	 */
-	public String getFilenameExtension(String filename)
-	{
-		String ret = null;
-		if(filename.endsWith(FILE_EXTENSION_AGENT))
-			ret = FILE_EXTENSION_AGENT;
-		else if(filename.endsWith(FILE_EXTENSION_CAPABILITY))
-			ret = FILE_EXTENSION_CAPABILITY;
-		if(ret==null)
-			throw new RuntimeException("Unknown extension: "+filename);
-		return ret;
-	}
-
-	/**
-	 * 
-	 * @param args
-	 * @throws IOException
-	 * /
-	public static void	main(String[] args) throws IOException
-	{
-		final File	file	= new File("../target/jadex-1.0-SNAPSHOT-dist.dir/lib/jadex-applications-bdi-1.0-SNAPSHOT.jar");
-		JarFile	jar	= new JarFile(file);
-		ClassLoader	cl	= new URLClassLoader(new URL[]{file.toURI().toURL()}, OAVBDIModelLoader.class.getClassLoader());
-
-		final OAVBDIModelLoader	loader	= new OAVBDIModelLoader(Collections.EMPTY_MAP);
-		loader.setClassLoader(cl);
-		final SAXParserFactory	factory	= SAXParserFactory.newInstance();
-		factory.setNamespaceAware(false);
-		ThreadPool	tp	= new ThreadPool();
-		Enumeration	entries	= jar.entries();
-		while(entries.hasMoreElements())
-		{
-			final Object	entry	= entries.nextElement();
-			tp.execute(new Runnable()
-			{
-				public void run()
-				{
-					final String	filename	= "jar:file:/"+file.getAbsolutePath()
-						+"!/"+((JarEntry) entry).getName();
-					if(filename.endsWith(FILE_EXTENSION_AGENT) || filename.endsWith(FILE_EXTENSION_CAPABILITY))
-					{
-//						ResourceInfo	rinfo	= null;
-						try
-						{
-							loader.loadModel(filename, null, null);
-
-//							rinfo = getResourceInfo(filename, loader.getFilenameExtension(filename), null, null);
-//							OAVTypeModel	typemodel	= new OAVTypeModel(filename+"_typemodel", null);
-//							typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-//							loader.reader.read(rinfo.getInputStream(), OAVStateFactory.createOAVState(typemodel), loader.mapping);
-
-//							XMLReader	xmlreader	= factory.newSAXParser().getXMLReader();
-//							xmlreader.setContentHandler(new DefaultHandler()
-//							{
-//								public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
-//								{
-//									if(Math.random()>0.9)
-//										throw new SAXException("kaputt");
-//								}
-//							});
-//							xmlreader.parse(new InputSource(rinfo.getInputStream()));
-
-//							InputStream	is	= rinfo.getInputStream();
-//							while(is.read()!=-1);
-						}
-						catch(NullPointerException e)
-						{
-							System.err.println("Error loading: "+filename);
-							e.printStackTrace();
-						}
-						catch(Exception e)
-						{
-							System.err.println("Error loading: "+filename+", "+e.getClass());
-						}
-						
-//						if(rinfo!=null)
-//							rinfo.cleanup();
-					}
-				}
-			});
-		}
-	}*/
 }

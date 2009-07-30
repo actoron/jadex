@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_iq2zsHzoEd6zCuIqBrMhmQ" iD="_iqtCsHzoEd6zCuIqBrMhmQ" name="RandomWalkPlan">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_8JfKMXzoEd6zCuIqBrMhmQ" iD="_8JfKMHzoEd6zCuIqBrMhmQ" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.adapter.base.envsupport.math.*;">
+    <associations xmi:type="bpmn:Association" xmi:id="_8JysMHzoEd6zCuIqBrMhmQ"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_isytYXzoEd6zCuIqBrMhmQ" iD="_isytYHzoEd6zCuIqBrMhmQ" associations="_8JysMHzoEd6zCuIqBrMhmQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_iuIxMXzoEd6zCuIqBrMhmQ" iD="_iuIxMHzoEd6zCuIqBrMhmQ" name="Move&#xD;&#xA;&#xD;&#xA;class = SubgoalTask.class&#xD;&#xA;type = &quot;move_dest&quot;&#xD;&#xA;in IVector2 destination = $beliefbase.environment.getRandomPosition(Vector2Int.ZERO)" activityType="Task"/>
+  </pools>
+</bpmn:BpmnDiagram>
