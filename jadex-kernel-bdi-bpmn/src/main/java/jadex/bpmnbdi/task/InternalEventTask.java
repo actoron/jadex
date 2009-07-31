@@ -1,14 +1,14 @@
 package jadex.bpmnbdi.task;
 
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  Dispatch an internal event task.
@@ -23,19 +23,20 @@ public class InternalEventTask	implements ITask
 		try
 		{
 			BpmnPlanBodyInstance	plan	= (BpmnPlanBodyInstance)instance;
-			String type = (String)context.getPropertyValue("type");
+			String type = (String)context.getParameterValue("type");
 			if(type==null)
-				throw new RuntimeException("Type property for internal event not specified: "+this);
+				throw new RuntimeException("Parameter 'type' for internal event not specified: "+instance);
 			
 			final IInternalEvent event	= plan.createInternalEvent((String)type);
 			
-			List params	= context.getModelElement().getParameters();
-			for(int i=0; params!=null && i<params.size(); i++)
+			Map params	= context.hasParameterValue("parameters")
+				? (Map) context.getParameterValue("parameters") : null;
+			if(params!=null)
 			{
-				MParameter	param	= (MParameter)params.get(i);
-				if(!param.getDirection().equals(MParameter.DIRECTION_OUT) && context.hasParameterValue(param.getName()))
+				for(Iterator it=params.keySet().iterator(); it.hasNext(); )
 				{
-					event.getParameter(param.getName()).setValue(context.getParameterValue(param.getName()));
+					String	param = (String)it.next();
+					event.getParameter(param).setValue(params.get(param));
 				}
 			}
 			

@@ -5,6 +5,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
@@ -12,6 +13,7 @@ import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -394,31 +396,37 @@ public class ProcessThread	implements ITaskContext
 	 */
 	protected  void updateParameters(BpmnInstance instance)
 	{
-		if(getActivity().getActivityType().equals(MBpmnModel.TASK)
-			|| getActivity().getActivityType().equals(MBpmnModel.SUBPROCESS))
+		if(MBpmnModel.TASK.equals(getActivity().getActivityType())
+			|| getActivity() instanceof MSubProcess)
 		{
 			// Handle parameter passing in edge inscriptions.
 			Map	passedparams	= null;
 			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
 			{
-				List params = getActivity().getParameters();
-				if(params!=null)
-				{	
-					Map mappings = getLastEdge().getParameterMappings();
-					if(mappings!=null)
+				Map mappings = getLastEdge().getParameterMappings();
+				if(mappings!=null)
+				{
+					IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getValueFetcher());
+					for(Iterator it=mappings.keySet().iterator(); it.hasNext(); )
 					{
-						IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getValueFetcher());
-						for(int i=0; i<params.size(); i++)
+						String	name	= (String)it.next();
+						if(getActivity().hasParameter(name))
 						{
-							MParameter param = (MParameter)params.get(i);
-							if(mappings.containsKey(param.getName()))
-							{
-								IParsedExpression exp = (IParsedExpression)mappings.get(param.getName());
-								Object value = exp.getValue(fetcher);
-								if(passedparams==null)
-									passedparams	= new HashMap();
-								passedparams.put(param.getName(), value);
-							}
+							IParsedExpression exp = (IParsedExpression)mappings.get(name);
+							Object value = exp.getValue(fetcher);
+							if(passedparams==null)
+								passedparams	= new HashMap();
+							passedparams.put(name, value);
+						}
+						else if(instance.hasContextVariable(name))
+						{
+							IParsedExpression exp = (IParsedExpression)mappings.get(name);
+							Object value = exp.getValue(fetcher);
+							instance.setContextVariable(name, value);
+						}
+						else
+						{
+							throw new RuntimeException("Unknown parameter or context variable: "+name+", "+this);
 						}
 					}
 				}
@@ -429,13 +437,13 @@ public class ProcessThread	implements ITaskContext
 			
 			// todo: parameter direction / class
 			
-			List params = getActivity().getParameters();
+			Map params = getActivity().getParameters();
 			if(params!=null)
 			{	
 				IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getValueFetcher());
-				for(int i=0; i<params.size(); i++)
+				for(Iterator it=params.values().iterator(); it.hasNext(); )
 				{
-					MParameter param = (MParameter)params.get(i);
+					MParameter param = (MParameter)it.next();
 					if(passedparams!=null && passedparams.containsKey(param.getName()))
 					{
 						setParameterValue(param.getName(), passedparams.get(param.getName()));

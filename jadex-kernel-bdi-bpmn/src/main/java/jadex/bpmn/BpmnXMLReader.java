@@ -116,7 +116,7 @@ public class BpmnXMLReader
 			new BeanAttributeInfo("incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("laneDescription"),
 			new BeanAttributeInfo("associationsDescription"),
-			new BeanAttributeInfo("activityType", null, null, "Task")}),
+			new BeanAttributeInfo("activityType", null, null, MBpmnModel.TASK)}),
 			new ActivityPostProcessor(),
 			new IFilter()
 			{
@@ -128,12 +128,14 @@ public class BpmnXMLReader
 			}));
 		
 		types.add(new TypeInfo("vertices", MSubProcess.class, null, null,
-			SUtil.createHashMap(new String[]{"name", "outgoingEdges", "incomingEdges", "lanes", "associations"}, 
+			SUtil.createHashMap(new String[]{"name", "outgoingEdges", "incomingEdges", "lanes", "associations", "activityType"}, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("description"),
 			new BeanAttributeInfo("outgoingSequenceEdgesDescription"),
 			new BeanAttributeInfo("incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("laneDescription"),
-			new BeanAttributeInfo("associationsDescription")}), new ActivityPostProcessor(),
+			new BeanAttributeInfo("associationsDescription"),
+			new BeanAttributeInfo("activityType", null, null, MBpmnModel.SUBPROCESS)}),
+			new ActivityPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)

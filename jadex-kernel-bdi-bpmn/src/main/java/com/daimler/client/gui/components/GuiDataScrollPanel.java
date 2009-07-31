@@ -2,28 +2,16 @@ package com.daimler.client.gui.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.ChangedCharSetException;
-import javax.swing.text.html.HTMLEditorKit;
 
 import com.daimler.client.gui.components.parts.GuiCategoryPanel;
 import com.daimler.client.gui.event.FetchDataTaskSelectAction;
@@ -44,7 +32,7 @@ public class GuiDataScrollPanel extends JScrollPane
 	
 	private FetchDataTaskSelectAction theFetchDataTaskSelection = null;
 	
-	public GuiDataScrollPanel(Map initVals, List parameters, FetchDataTaskSelectAction fdtsa)
+	public GuiDataScrollPanel(Map initVals, Collection parameters, FetchDataTaskSelectAction fdtsa)
 	{
 		setViewportBorder(null);
 		setBorder(null);

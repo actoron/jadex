@@ -11,7 +11,6 @@ import java.util.List;
 
 /**
  *  Create a process and the corresponding parameters.
- *	The 'subgoals' parameter set denotes the names of goals to create.
  */
 public class StartAndMonitorProcessPlan extends Plan
 {

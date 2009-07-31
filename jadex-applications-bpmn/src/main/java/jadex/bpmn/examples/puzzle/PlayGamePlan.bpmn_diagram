@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_NFK683FGEd63xqPyP8ks8A"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_NFK69HFGEd63xqPyP8ks8A" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="PlayGamePlan.bpmn#_NFK643FGEd63xqPyP8ks8A"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NFUr4XFGEd63xqPyP8ks8A" y="55" width="193" height="83"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NFUr4XFGEd63xqPyP8ks8A" y="68" width="193" height="83"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_fRjLxHFGEd63xqPyP8ks8A" type="2002">
         <children xmi:type="notation:Node" xmi:id="_fRjLynFGEd63xqPyP8ks8A" type="4006"/>
@@ -22,7 +22,7 @@
             <styles xmi:type="notation:FillStyle" xmi:id="_fRjL1XFGEd63xqPyP8ks8A"/>
             <styles xmi:type="notation:LineStyle" xmi:id="_fRjL1nFGEd63xqPyP8ks8A" lineColor="0"/>
             <element xmi:type="bpmn:Activity" href="PlayGamePlan.bpmn#_fRjLw3FGEd63xqPyP8ks8A"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fRjL13FGEd63xqPyP8ks8A" y="20" width="168"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fRjL13FGEd63xqPyP8ks8A" x="8" y="13" width="228"/>
           </children>
           <styles xmi:type="notation:DrawerStyle" xmi:id="_fRjLzHFGEd63xqPyP8ks8A"/>
           <styles xmi:type="notation:SortingStyle" xmi:id="_fRjLzXFGEd63xqPyP8ks8A"/>
@@ -46,7 +46,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_fRjLx3FGEd63xqPyP8ks8A"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_fRjLyHFGEd63xqPyP8ks8A" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="PlayGamePlan.bpmn#_fRjLwXFGEd63xqPyP8ks8A"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fRjLyXFGEd63xqPyP8ks8A" x="213" y="24" width="183" height="140"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fRjLyXFGEd63xqPyP8ks8A" x="215" y="34" width="250" height="151"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_te0iwnFGEd63xqPyP8ks8A" type="2001">
         <children xmi:type="notation:Node" xmi:id="_te0iyHFGEd63xqPyP8ks8A" type="4001"/>
@@ -55,7 +55,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_te0ixXFGEd63xqPyP8ks8A"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_te0ixnFGEd63xqPyP8ks8A" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="PlayGamePlan.bpmn#_te0iwXFGEd63xqPyP8ks8A"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_te0ix3FGEd63xqPyP8ks8A" x="335" y="183"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_te0ix3FGEd63xqPyP8ks8A" x="363" y="194"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_9KkC4nFGEd63xqPyP8ks8A" type="2001">
         <children xmi:type="notation:Node" xmi:id="_9KkC6HFGEd63xqPyP8ks8A" type="4001"/>
@@ -64,7 +64,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_9KkC5XFGEd63xqPyP8ks8A"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_9KkC5nFGEd63xqPyP8ks8A" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="PlayGamePlan.bpmn#_9KkC4XFGEd63xqPyP8ks8A"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9KkC53FGEd63xqPyP8ks8A" x="563" y="72" width="341" height="72"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9KkC53FGEd63xqPyP8ks8A" x="589" y="85" width="341" height="72"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_igQuAnFHEd63xqPyP8ks8A" type="2001">
         <children xmi:type="notation:Node" xmi:id="_igQuCHFHEd63xqPyP8ks8A" type="4001"/>
@@ -73,7 +73,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_igQuBXFHEd63xqPyP8ks8A"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_igQuBnFHEd63xqPyP8ks8A" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="PlayGamePlan.bpmn#_igQuAXFHEd63xqPyP8ks8A"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_igQuB3FHEd63xqPyP8ks8A" x="1223" y="77" width="160"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_igQuB3FHEd63xqPyP8ks8A" x="1223" y="90" width="160"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_XqhlUnU-Ed6U1PeYnSFQ0g" type="2001">
         <children xmi:type="notation:Node" xmi:id="_XqhlWHU-Ed6U1PeYnSFQ0g" type="4001"/>
@@ -82,7 +82,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_XqhlVXU-Ed6U1PeYnSFQ0g"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_XqhlVnU-Ed6U1PeYnSFQ0g" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="PlayGamePlan.bpmn#_XqhlUXU-Ed6U1PeYnSFQ0g"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XqhlV3U-Ed6U1PeYnSFQ0g" x="947" y="69" width="226" height="77"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XqhlV3U-Ed6U1PeYnSFQ0g" x="947" y="82" width="226" height="77"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_NFK67HFGEd63xqPyP8ks8A"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_NFK67XFGEd63xqPyP8ks8A"/>
@@ -93,7 +93,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_NFK653FGEd63xqPyP8ks8A" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_NFK66HFGEd63xqPyP8ks8A" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="PlayGamePlan.bpmn#_NFK64XFGEd63xqPyP8ks8A"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NFK673FGEd63xqPyP8ks8A" x="16" y="16" width="1771" height="257"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NFK673FGEd63xqPyP8ks8A" x="16" y="16" width="1771" height="267"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="__VnvwnFHEd63xqPyP8ks8A" type="1002">
     <children xmi:type="notation:Node" xmi:id="__VnvyHFHEd63xqPyP8ks8A" type="4009"/>

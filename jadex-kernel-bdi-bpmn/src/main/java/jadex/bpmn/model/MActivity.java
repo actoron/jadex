@@ -3,7 +3,10 @@ package jadex.bpmn.model;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Base class for all kinds of activities.
@@ -61,7 +64,7 @@ public class MActivity extends MAssociationTarget
 	//-------- added --------
 	
 	/** The parameters. */
-	protected List parameters;
+	protected Map	parameters;
 	
 	//-------- methods --------
 	
@@ -389,7 +392,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the parameters.
 	 *  @return The parameters.
 	 */
-	public List getParameters()
+	public Map	getParameters()
 	{
 		return parameters;
 	}
@@ -403,9 +406,9 @@ public class MActivity extends MAssociationTarget
 		List inparams = new ArrayList();
 		if(parameters!=null)
 		{
-			for(int i=0; i<parameters.size(); i++)
+			for(Iterator it=parameters.values().iterator(); it.hasNext(); )
 			{
-				MParameter param = (MParameter)parameters.get(i);
+				MParameter param = (MParameter)it.next();
 				if(MParameter.DIRECTION_IN.equals(param.getDirection())
 					|| MParameter.DIRECTION_INOUT.equals(param.getDirection()))
 				{
@@ -425,9 +428,9 @@ public class MActivity extends MAssociationTarget
 		List outparams = new ArrayList();
 		if(parameters!=null)
 		{
-			for(int i=0; i<parameters.size(); i++)
+			for(Iterator it=parameters.values().iterator(); it.hasNext(); )
 			{
-				MParameter param = (MParameter)parameters.get(i);
+				MParameter param = (MParameter)it.next();
 				if(MParameter.DIRECTION_OUT.equals(param.getDirection())
 					|| MParameter.DIRECTION_INOUT.equals(param.getDirection()))
 				{
@@ -439,14 +442,22 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Test if a parameter exists.
+	 */
+	public boolean hasParameter(String name)
+	{
+		return parameters!=null && parameters.containsKey(name);
+	}
+	
+	/**
 	 *  Add a parameter.
 	 *  @param param The parameter.
 	 */
 	public void addParameter(MParameter param)
 	{
 		if(parameters==null)
-			parameters = new ArrayList();
-		parameters.add(param);
+			parameters = new LinkedHashMap();
+		parameters.put(param.getName(), param);
 	}
 	
 	/**
@@ -456,7 +467,7 @@ public class MActivity extends MAssociationTarget
 	public void removeParameter(MParameter param)
 	{
 		if(parameters!=null)
-			parameters.remove(param);
+			parameters.remove(param.getName());
 	}
 	
 	/**
@@ -508,6 +519,11 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void setLane(MLane lane)
 	{
+		// eclipse STP has bugs regarding lanes.
+		// The following at least identifies some inconsistencies (activity in multiple lanes).
+		if(this.lane!=null && lane!=this.lane && lane!=null)
+			throw new RuntimeException("Cannot add activity to lane '"+lane.getName()+"'. Already contained in '"+this.lane.getName()+"'");
+		
 		this.lane	= lane;
 	}
 }

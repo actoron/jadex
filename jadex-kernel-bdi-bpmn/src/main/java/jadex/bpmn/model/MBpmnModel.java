@@ -25,7 +25,6 @@ public class MBpmnModel extends MIdElement	implements ICacheableModel
 
 	/** Constant for sub process. */
 	public static final String SUBPROCESS = "SubProcess";
-
 	
 	/** Constant for gateway parallel. */
 	public static final String GATEWAY_PARALLEL = "GatewayParallel";

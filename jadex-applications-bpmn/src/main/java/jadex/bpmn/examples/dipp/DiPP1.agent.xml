@@ -98,18 +98,24 @@
 			</trigger>
 		</plan>
 
+		<plan name="sequential_executor">
+			<parameterset name="subgoals" class="String">
+				<goalmapping ref="Dipp1_Logistik_abgesichert_seq.subgoals"/>
+			</parameterset>
+			<body type="bpmn" impl="SequentialGoalExecutionPlan"/>
+			<trigger>
+				<goal ref="Dipp1_Logistik_abgesichert_seq"/>
+			</trigger>
+		</plan>
 		<plan name="goal_executor">
 			<parameter name="mode" class="String">
-				<goalmapping ref="Dipp1_Logistik_abgesichert_seq.mode"/>
 				<goalmapping ref="Dipp1_Logistik_abgesichert_par.mode"/>
 			</parameter>
 			<parameterset name="subgoals" class="String">
-				<goalmapping ref="Dipp1_Logistik_abgesichert_seq.subgoals"/>
 				<goalmapping ref="Dipp1_Logistik_abgesichert_par.subgoals"/>
 			</parameterset>
 			<body class="GoalHierarchyExecutionPlan"/>
 			<trigger>
-				<goal ref="Dipp1_Logistik_abgesichert_seq"/>
 				<goal ref="Dipp1_Logistik_abgesichert_par"/>
 			</trigger>
 		</plan>

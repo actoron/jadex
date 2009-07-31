@@ -7,12 +7,12 @@
 package com.daimler.client.gui.components.parts;
 
 import jadex.bpmn.model.MParameter;
-import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +34,7 @@ import com.daimler.util.swing.SwingUtils;
 public class GuiCategoryPanel extends JPanel
 {
 
-	private List categoryParameters;
+	private Collection categoryParameters;
 
 	private String theCategoryName;
 
@@ -46,12 +46,12 @@ public class GuiCategoryPanel extends JPanel
 
 	private ArrayList theInputFields;
 
-	public GuiCategoryPanel(List parameters, String categoryName)
+	public GuiCategoryPanel(Collection parameters, String categoryName)
 	{
 		this(new HashMap(), parameters, categoryName, (new JPanel()).getBackground());
 	}
 
-	public GuiCategoryPanel(Map initVals, List parameters, String categoryName, Color bgColor)
+	public GuiCategoryPanel(Map initVals, Collection parameters, String categoryName, Color bgColor)
 	{
 		super();
 		this.categoryParameters = parameters;
@@ -67,11 +67,11 @@ public class GuiCategoryPanel extends JPanel
 		// order them by their weight
 		// add them to this panel
 		theInputFields = new ArrayList();
-		for (int i = 0; i < categoryParameters.size(); i++)
+		for(Iterator it=categoryParameters.iterator(); it.hasNext(); )
 		{
 			// System.out.println("Creating panel for: " +
 			// theCategoryProperties.get(i).getTheName());
-			MParameter parameter = (MParameter) categoryParameters.get(i);
+			MParameter parameter = (MParameter)it.next();
 			Object initVal = initVals.get(parameter.getName());
 			AbstractInputPanel inputField = InputFieldFactory.createInputPanel(parameter
 					.getName(), parameter.getName(), "", "",

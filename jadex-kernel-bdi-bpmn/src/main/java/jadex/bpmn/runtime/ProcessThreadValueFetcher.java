@@ -60,14 +60,26 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	 */
 	public Object fetchValue(String name)
 	{
-		Object	value;
-
-		if(thread.hasParameterValue(name))
-			value	= thread.getParameterValue(name);
-		else if(fetcher!=null)
+		boolean	found	= false;
+		Object	value	= null;
+		
+		for(ProcessThread t=thread; t!=null && !found; t=t.getThreadContext().getInitiator() )
+		{
+			if(t.hasParameterValue(name))
+			{
+				value	= t.getParameterValue(name);
+				found	= true;
+			}
+		}
+		
+		if(!found && fetcher!=null)
+		{
 			value	= fetcher.fetchValue(name);
-		else
+		}
+		else if(!found)
+		{
 			throw new RuntimeException("Parameter not found: "+name);
+		}
 		
 		return value;
 	}

@@ -36,7 +36,7 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
     private void initPanel(ITaskContext context)
     {
     	Map initVals = new HashMap();
-		for (Iterator it = context.getModelElement().getParameters().iterator(); it.hasNext();)
+		for (Iterator it = context.getModelElement().getParameters().values().iterator(); it.hasNext();)
 		{
 			MParameter param = (MParameter) it.next();
 			if ((param.getDirection().equals(MParameter.DIRECTION_INOUT)) ||
@@ -45,7 +45,7 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
 				initVals.put(param.getName(), context.getParameterValue(param.getName()));
 			}				
 		}
-        theDataPanel = new GuiDataScrollPanel(initVals, context.getModelElement().getParameters(), this);
+        theDataPanel = new GuiDataScrollPanel(initVals, context.getModelElement().getParameters().values(), this);
         setTheContent(theDataPanel);
     }
     

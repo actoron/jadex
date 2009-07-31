@@ -28,7 +28,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_ysn7hXd0Ed6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_ysn7hnd0Ed6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MG_Praemissen_fehlen.bpmn#_ysn7gXd0Ed6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ysn7h3d0Ed6uv6EsxGS0Yg" x="826" y="54" height="79"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ysn7h3d0Ed6uv6EsxGS0Yg" x="809" y="54" width="295" height="79"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_7W41knd3Ed6uv6EsxGS0Yg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_7W41mHd3Ed6uv6EsxGS0Yg" type="4001"/>

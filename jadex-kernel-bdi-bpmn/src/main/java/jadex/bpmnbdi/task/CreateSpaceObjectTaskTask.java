@@ -21,7 +21,7 @@ public class CreateSpaceObjectTaskTask	extends AbstractTask
 		IEnvironmentSpace	space	= (IEnvironmentSpace)context.getParameterValue("space");
 		Object	objectid	= context.getParameterValue("objectid");
 		Map	properties	= context.hasParameterValue("properties")
-			? (Map)context.getParameterValue("proeprties") : null;
+			? (Map)context.getParameterValue("properties") : null;
 		
 		Object	taskid	= space.createObjectTask(type, properties, objectid);
 		

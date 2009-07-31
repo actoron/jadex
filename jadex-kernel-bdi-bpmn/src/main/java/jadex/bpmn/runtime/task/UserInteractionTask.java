@@ -22,7 +22,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -54,7 +55,7 @@ public class UserInteractionTask implements ITask
 			{
 				JComponent	message;
 				MActivity	task	= context.getModelElement();
-				List	parameters	= task.getParameters();
+				Map	parameters	= task.getParameters();
 				
 				if(parameters!=null && !parameters.isEmpty())
 				{
@@ -63,9 +64,10 @@ public class UserInteractionTask implements ITask
 					message.add(new JLabel("Please enter values for task "+context.getModelElement().getName()),
 						new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 					
-					for(int i=0; i<parameters.size(); i++)
+					int i=0;
+					for(Iterator it=parameters.values().iterator(); it.hasNext(); i++)
 					{
-						final MParameter	param	= (MParameter) parameters.get(i);
+						final MParameter param = (MParameter)it.next();
 						Object	value	= context.getParameterValue(param.getName());
 						JComponent	comp;
 						if(SReflect.getWrappedType(param.getClazz()).equals(Boolean.class))

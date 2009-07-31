@@ -54,6 +54,7 @@ public class DefaultActivityHandler implements IActivityHandler
 		// Find next element and context(s) to be removed.
 		boolean	outside	= false;
 		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
+		ThreadContext	context	= thread.getThreadContext();
 		while(next==null && !outside)
 		{
 			// Normal flow
@@ -87,7 +88,6 @@ public class DefaultActivityHandler implements IActivityHandler
 				}
 			}
 			
-			ThreadContext	context	= thread.getThreadContext();
 			outside	= context.getParent()==null;
 			if(next==null && !outside)
 			{
