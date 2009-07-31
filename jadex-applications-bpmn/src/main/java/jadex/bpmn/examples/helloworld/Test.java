@@ -27,7 +27,8 @@ public class Test
 //			String filename = "jadex/bpmn/examples/helloworld/test_rule.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/SubProcess.bpmn"
 //			String filename = "jadex/bpmn/examples/helloworld/UserInteraction.bpmn";
-			String filename = "jadex/bpmn/examples/helloworld/ForLoop.bpmn";
+//			String filename = "jadex/bpmn/examples/helloworld/ForLoop.bpmn";
+			String filename = "jadex/bpmn/examples/helloworld/Scopes.bpmn";
 			
 			MBpmnModel model = new BpmnModelLoader().loadBpmnModel(filename, null);
 			BpmnInstance instance = new BpmnInstance(model);

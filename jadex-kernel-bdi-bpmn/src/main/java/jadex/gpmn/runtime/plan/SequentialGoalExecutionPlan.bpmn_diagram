@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_2YywU33MEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_2YywVH3MEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="SequentialGoalExecutionPlan.bpmn#_2Yo_UX3MEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2YywVX3MEd6VFdlpWzoevQ" x="139" y="11"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2YywVX3MEd6VFdlpWzoevQ" x="3" y="4"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_6q0mMn3MEd6VFdlpWzoevQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_6q0mOH3MEd6VFdlpWzoevQ" type="4001"/>
@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_6q0mNX3MEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_6q0mNn3MEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="SequentialGoalExecutionPlan.bpmn#_6q0mMX3MEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6q0mN33MEd6VFdlpWzoevQ" x="805" y="65"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6q0mN33MEd6VFdlpWzoevQ" x="479" y="58"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_HVAZ1H3NEd6VFdlpWzoevQ" type="2002">
         <children xmi:type="notation:Node" xmi:id="_HVAZ2n3NEd6VFdlpWzoevQ" type="4006"/>
@@ -31,7 +31,7 @@
             <styles xmi:type="notation:FillStyle" xmi:id="_HVces33NEd6VFdlpWzoevQ"/>
             <styles xmi:type="notation:LineStyle" xmi:id="_HVcetH3NEd6VFdlpWzoevQ" lineColor="0"/>
             <element xmi:type="bpmn:Activity" href="SequentialGoalExecutionPlan.bpmn#_HVAZ033NEd6VFdlpWzoevQ"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HVcetX3NEd6VFdlpWzoevQ" x="42" y="13" width="232" height="83"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HVcetX3NEd6VFdlpWzoevQ" x="23" y="15" width="232" height="83"/>
           </children>
           <styles xmi:type="notation:DrawerStyle" xmi:id="_HVAZ3H3NEd6VFdlpWzoevQ"/>
           <styles xmi:type="notation:SortingStyle" xmi:id="_HVAZ3X3NEd6VFdlpWzoevQ"/>
@@ -46,7 +46,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_HVAZ133NEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_HVAZ2H3NEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="SequentialGoalExecutionPlan.bpmn#_HVAZ0X3NEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HVAZ2X3NEd6VFdlpWzoevQ" x="229" y="27" width="483" height="130"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HVAZ2X3NEd6VFdlpWzoevQ" x="93" y="20" width="295" height="130"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_EG1iwn3PEd6VFdlpWzoevQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_EG-ssH3PEd6VFdlpWzoevQ" type="4001"/>
@@ -55,7 +55,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_EG1ixX3PEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_EG1ixn3PEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="SequentialGoalExecutionPlan.bpmn#_EG1iwX3PEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_EG1ix33PEd6VFdlpWzoevQ" x="749" y="123" width="14" height="14"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_EG1ix33PEd6VFdlpWzoevQ" x="423" y="116" width="14" height="14"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_xQhO-H3MEd6VFdlpWzoevQ"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_xQhO-X3MEd6VFdlpWzoevQ"/>
@@ -66,7 +66,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_xQhO833MEd6VFdlpWzoevQ" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_xQhO9H3MEd6VFdlpWzoevQ" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="SequentialGoalExecutionPlan.bpmn#_xQYFAX3MEd6VFdlpWzoevQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_xQhO-33MEd6VFdlpWzoevQ" x="16" y="16" width="1500" height="249"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_xQhO-33MEd6VFdlpWzoevQ" x="16" y="16" width="615" height="249"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_IzD2wn3OEd6VFdlpWzoevQ" type="1002">
     <children xmi:type="notation:Node" xmi:id="_IzD2yH3OEd6VFdlpWzoevQ" type="4009"/>
@@ -109,7 +109,7 @@
     <children xmi:type="notation:Node" xmi:id="_BpS-x33OEd6VFdlpWzoevQ" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_BpS-yH3OEd6VFdlpWzoevQ" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_BpS-yX3OEd6VFdlpWzoevQ" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_BpS-yn3OEd6VFdlpWzoevQ" x="1" y="-23"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_BpS-yn3OEd6VFdlpWzoevQ" x="14" y="-25"/>
     </children>
     <styles xmi:type="notation:RoutingStyle" xmi:id="_BpS-w33OEd6VFdlpWzoevQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_BpS-xH3OEd6VFdlpWzoevQ" fontName="Arial"/>

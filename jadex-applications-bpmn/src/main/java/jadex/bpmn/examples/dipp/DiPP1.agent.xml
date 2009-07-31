@@ -107,14 +107,11 @@
 				<goal ref="Dipp1_Logistik_abgesichert_seq"/>
 			</trigger>
 		</plan>
-		<plan name="goal_executor">
-			<parameter name="mode" class="String">
-				<goalmapping ref="Dipp1_Logistik_abgesichert_par.mode"/>
-			</parameter>
+		<plan name="parallel_executor">
 			<parameterset name="subgoals" class="String">
 				<goalmapping ref="Dipp1_Logistik_abgesichert_par.subgoals"/>
 			</parameterset>
-			<body class="GoalHierarchyExecutionPlan"/>
+			<body type="bpmn" impl="ParallelGoalExecutionPlan"/>
 			<trigger>
 				<goal ref="Dipp1_Logistik_abgesichert_par"/>
 			</trigger>

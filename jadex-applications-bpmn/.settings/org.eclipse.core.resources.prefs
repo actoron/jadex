@@ -1,4 +1,4 @@
-#Thu Jul 30 13:50:16 CEST 2009
+#Fri Jul 31 17:45:30 CEST 2009
 eclipse.preferences.version=1
 encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn_diagram=UTF-8
@@ -19,6 +19,8 @@ encoding//src/main/java/jadex/bpmn/examples/helloworld/MessageReceival.bpmn=UTF-
 encoding//src/main/java/jadex/bpmn/examples/helloworld/MessageReceival.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/MultiLanes.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/MultiLanes.bpmn_diagram=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/helloworld/Scopes.bpmn=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/helloworld/Scopes.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/SubProcess.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/SubProcess.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/UserInteraction.bpmn=UTF-8

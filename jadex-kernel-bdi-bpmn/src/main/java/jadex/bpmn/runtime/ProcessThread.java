@@ -409,22 +409,43 @@ public class ProcessThread	implements ITaskContext
 					IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getValueFetcher());
 					for(Iterator it=mappings.keySet().iterator(); it.hasNext(); )
 					{
+						boolean	found	= false;
 						String	name	= (String)it.next();
+						IParsedExpression exp = (IParsedExpression)mappings.get(name);
+						Object value = exp.getValue(fetcher);
+
+						int	idx	= -1;
+						if(name.endsWith("]") && name.indexOf("[")!=-1)
+						{
+							String	indexp	= name.substring(name.indexOf("[")+1, name.length()-1);
+							name	= name.substring(0, name.indexOf("["));
+						}
+						
 						if(getActivity().hasParameter(name))
 						{
-							IParsedExpression exp = (IParsedExpression)mappings.get(name);
-							Object value = exp.getValue(fetcher);
 							if(passedparams==null)
 								passedparams	= new HashMap();
 							passedparams.put(name, value);
+							found	= true;
 						}
-						else if(instance.hasContextVariable(name))
+						
+						if(!found)
 						{
-							IParsedExpression exp = (IParsedExpression)mappings.get(name);
-							Object value = exp.getValue(fetcher);
+							for(ProcessThread t=this.getThreadContext().getInitiator(); t!=null && !found; t=t.getThreadContext().getInitiator() )
+							{
+								if(t.getActivity().hasParameter(name))
+								{
+									t.setParameterValue(name, value);
+									found	= true;
+								}
+							}
+						}
+						
+						if(!found && instance.hasContextVariable(name))
+						{
 							instance.setContextVariable(name, value);
 						}
-						else
+						else if(!found)
 						{
 							throw new RuntimeException("Unknown parameter or context variable: "+name+", "+this);
 						}
