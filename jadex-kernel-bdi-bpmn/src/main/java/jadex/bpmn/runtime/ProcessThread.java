@@ -411,15 +411,12 @@ public class ProcessThread	implements ITaskContext
 					{
 						boolean	found	= false;
 						String	name	= (String)it.next();
-						IParsedExpression exp = (IParsedExpression)mappings.get(name);
+						IParsedExpression exp = (IParsedExpression)((Object[])mappings.get(name))[0];
+						IParsedExpression iexp = (IParsedExpression)((Object[])mappings.get(name))[1];
 						Object value = exp.getValue(fetcher);
-
-						int	idx	= -1;
-						if(name.endsWith("]") && name.indexOf("[")!=-1)
-						{
-							String	indexp	= name.substring(name.indexOf("[")+1, name.length()-1);
-							name	= name.substring(0, name.indexOf("["));
-						}
+						
+						if(iexp!=null)
+							throw new UnsupportedOperationException("todo: array parameters");
 						
 						if(getActivity().hasParameter(name))
 						{

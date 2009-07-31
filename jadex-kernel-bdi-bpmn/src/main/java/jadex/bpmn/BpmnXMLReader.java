@@ -476,7 +476,16 @@ public class BpmnXMLReader
 						String	propname = prop.substring(0, idx).trim();
 						String	proptext = prop.substring(idx+1).trim();
 						IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
-						edge.addParameterMapping(propname, exp);
+						IParsedExpression iexp	= null;
+
+						if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+						{
+							String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
+							propname	= propname.substring(0, propname.indexOf("["));
+							iexp	= parser.parseExpression(itext, dia.getAllImports(), null, classloader);
+						}
+
+						edge.addParameterMapping(propname, exp, iexp);
 					}
 					else
 					{

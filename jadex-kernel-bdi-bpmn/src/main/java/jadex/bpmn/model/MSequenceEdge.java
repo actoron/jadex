@@ -113,13 +113,14 @@ public class MSequenceEdge extends MAssociationTarget
 	 *  Add a parameter mapping.
 	 *  @param name The parameter name.
 	 *  @param exp The expression.
+	 *  @param iexp The index expression, when setting a entry of an array parameter.
 	 */
-	public void addParameterMapping(String name, IParsedExpression exp)
+	public void addParameterMapping(String name, IParsedExpression exp, IParsedExpression iexp)
 	{
 		if(parametermappings == null)
 			parametermappings = new HashMap();
 		
-		parametermappings.put(name, exp);
+		parametermappings.put(name, new Object[]{exp, iexp});
 	}
 	
 	/**
