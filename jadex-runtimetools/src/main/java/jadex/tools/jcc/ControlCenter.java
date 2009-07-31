@@ -13,12 +13,13 @@ import jadex.bridge.ILibraryService;
 import jadex.bridge.IVersionInfo;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
-import jadex.bridge.XMLPropertiesReader;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.BeanAttributeInfo;
+import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.BeanObjectWriterHandler;
+import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.tools.common.GuiProperties;
@@ -313,9 +314,11 @@ public class ControlCenter implements IControlCenter
 		try
 		{
 			FileInputStream fis = new FileInputStream(pd);
-			props = XMLPropertiesReader.readProperties(fis,
-					((ILibraryService)agent.getPlatform().getService(
-							ILibraryService.class)).getClassLoader());
+			props = (Properties)getPropertyReader().read(fis, ((ILibraryService)agent.getPlatform()
+				.getService(ILibraryService.class)).getClassLoader(), null);
+//			props = XMLPropertiesReader.readProperties(fis,
+//					((ILibraryService)agent.getPlatform().getService(
+//							ILibraryService.class)).getClassLoader());
 			fis.close();
 		}
 		catch(Exception e)
@@ -451,31 +454,23 @@ public class ControlCenter implements IControlCenter
 					plugprops = oldprops.getSubproperty(plugin.getName());
 
 				if(plugprops != null)
-					AbstractJCCPlugin.addSubproperties(props, plugin.getName(),
-							plugprops);
+					AbstractJCCPlugin.addSubproperties(props, plugin.getName(), plugprops);
 			}
 
 
 			try
 			{
 				// Todo: save project
-				FileOutputStream os = new FileOutputStream(project);
-				XMLPropertiesReader.writeProperties(props, os);
-				os.close();
-				setStatusText("Project saved successfully: "
-						+ project.getAbsolutePath());
+//				FileOutputStream os = new FileOutputStream(project);
+//				XMLPropertiesReader.writeProperties(props, os);
+//				os.close();
+//				setStatusText("Project saved successfully: "+ project.getAbsolutePath());
 				
 				// for testing the writer
-				
-//				Set typeinfos = new HashSet();				
-//				typeinfos.add(new TypeInfo("properties", Properties.class, null, null, null, null, null,
-//					new SubobjectInfo[]{new SubobjectInfo("properties", "property"), new SubobjectInfo("subproperties", "properties")}));
-//				typeinfos.add(new TypeInfo("property", Property.class, null, new BeanAttributeInfo("value", AbstractInfo.XML_CONTENT_ATTRIBUTE)));
-//				
-//				os = new FileOutputStream("c:\\wurst.xml");
-//				jadex.commons.xml.Writer w = new jadex.commons.xml.Writer(new BeanObjectWriterHandler(), typeinfos, null);
-//				w.write(props, os, null);
-//				os.close();
+				FileOutputStream os = new FileOutputStream(project);
+				getPropertyWriter().write(props, os, null);
+				os.close();
+				setStatusText("Project saved successfully: "+ project.getAbsolutePath());
 			}
 			catch(Exception e)
 			{
@@ -1154,6 +1149,45 @@ public class ControlCenter implements IControlCenter
 	public IControlCenterPlugin[] getPlugins()
 	{
 		return (IControlCenterPlugin[])plugins.keySet().toArray(
-				new IControlCenterPlugin[plugins.size()]);
+			new IControlCenterPlugin[plugins.size()]);
+	}
+
+	public static Set typeinfos;	
+	public static Set linkinfos;
+	static
+	{
+		typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo("properties", Properties.class, null, null, null, null, null,
+			new SubobjectInfo[]{new SubobjectInfo("properties", "property"), new SubobjectInfo("subproperties", "properties")}));
+			typeinfos.add(new TypeInfo("property", Property.class, null, new BeanAttributeInfo("value", AbstractInfo.XML_CONTENT_ATTRIBUTE)));
+		
+		linkinfos = new HashSet();
+		linkinfos.add(new LinkInfo("properties", new BeanAttributeInfo("subproperties")));
+	}
+	public static jadex.commons.xml.Writer writer;
+	public static jadex.commons.xml.Reader reader;
+	
+	/**
+	 *  Get the xml properties writer.
+	 */
+	public static jadex.commons.xml.Writer getPropertyWriter()
+	{
+		if(writer==null)
+		{
+			writer = new jadex.commons.xml.Writer(new BeanObjectWriterHandler(), typeinfos, null);
+		}
+		return writer;
+	}
+	
+	/**
+	 *  Get the xml properties reader.
+	 */
+	public static jadex.commons.xml.Reader getPropertyReader()
+	{
+		if(reader==null)
+		{
+			reader = new jadex.commons.xml.Reader(new BeanObjectHandler(), typeinfos, linkinfos, null);
+		}
+		return reader;
 	}
 }

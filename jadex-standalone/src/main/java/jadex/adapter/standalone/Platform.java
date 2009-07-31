@@ -10,11 +10,17 @@ import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatformService;
 import jadex.bridge.Properties;
 import jadex.bridge.Property;
-import jadex.bridge.XMLPropertiesReader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.xml.AbstractInfo;
+import jadex.commons.xml.BeanAttributeInfo;
+import jadex.commons.xml.BeanObjectHandler;
+import jadex.commons.xml.BeanObjectWriterHandler;
+import jadex.commons.xml.LinkInfo;
+import jadex.commons.xml.SubobjectInfo;
+import jadex.commons.xml.TypeInfo;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -22,10 +28,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -412,7 +420,8 @@ public class Platform extends AbstractPlatform
 		// Create an instance of the platform.
 		// Hack as long as no loader is present.
 		ClassLoader cl = Platform.class.getClassLoader();
-		Properties configuration = XMLPropertiesReader.readProperties(SUtil.getResource(conffile, cl), cl);
+//		Properties configuration = XMLPropertiesReader.readProperties(SUtil.getResource(conffile, cl), cl);
+		Properties configuration = (Properties)getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
 		platform = new Platform(configuration);
 		platform.start();
 		startAgents(args, platform);
@@ -476,5 +485,49 @@ public class Platform extends AbstractPlatform
 			System.arraycopy(args, i, ret, 0, ret.length);
 		return ret;
 	}*/
+	
+	// 
+	
+	public static Set typeinfos;	
+	public static Set linkinfos;
+	public static Set ignoredattrs;
+	static
+	{
+		ignoredattrs = new HashSet();
+		ignoredattrs.add("schemaLocation");
+		typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo("properties", Properties.class, null, null, null, null, null,
+			new SubobjectInfo[]{new SubobjectInfo("properties", "property"), new SubobjectInfo("subproperties", "properties")}));
+			typeinfos.add(new TypeInfo("property", Property.class, null, new BeanAttributeInfo("value", AbstractInfo.XML_CONTENT_ATTRIBUTE)));
+		
+		linkinfos = new HashSet();
+		linkinfos.add(new LinkInfo("properties", new BeanAttributeInfo("subproperties")));	
+	}
+	public static jadex.commons.xml.Writer writer;
+	public static jadex.commons.xml.Reader reader;
+	
+	/**
+	 *  Get the xml properties writer.
+	 */
+	public static jadex.commons.xml.Writer getPropertyWriter()
+	{
+		if(writer==null)
+		{
+			writer = new jadex.commons.xml.Writer(new BeanObjectWriterHandler(), typeinfos, null);
+		}
+		return writer;
+	}
+	
+	/**
+	 *  Get the xml properties reader.
+	 */
+	public static jadex.commons.xml.Reader getPropertyReader()
+	{
+		if(reader==null)
+		{
+			reader = new jadex.commons.xml.Reader(new BeanObjectHandler(), typeinfos, linkinfos, ignoredattrs);
+		}
+		return reader;
+	}
 }
 

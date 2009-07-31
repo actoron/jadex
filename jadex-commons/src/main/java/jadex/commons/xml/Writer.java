@@ -58,7 +58,7 @@ public class Writer
 		this.handler = handler;
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
 		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
-		this.genids = true;
+		this.genids = false;
 		this.gencontainertags = false;
 	}
 	
@@ -78,6 +78,7 @@ public class Writer
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out);
 		writer.writeStartDocument();
+		writer.writeCharacters(lf);
 		writeObject(writer, object, writtenobs, null, stack);
 		writer.writeEndDocument();
 		writer.close();
@@ -104,10 +105,16 @@ public class Writer
 		if(writtenobs.containsKey(object))
 		{
 			if(genids)
+			{
 				writer.writeAttribute("IDREF", (String)writtenobs.get(object));
+				writer.writeEndElement();
+				writer.writeCharacters(lf);
 //				writeIdref(writer, (String)writtenobs.get(object));
+			}
 			else
+			{
 				throw new RuntimeException("Object structure contains cycles: Enable 'genids' mode for serialization.");
+			}
 		}
 		else
 		{
@@ -135,6 +142,7 @@ public class Writer
 			if(content==null && (subobs==null || subobs.size()==0))
 			{
 				writer.writeEndElement();
+				writer.writeCharacters(lf);
 //				writeEndObjectSameLine(writer);
 			}
 			else
@@ -145,12 +153,16 @@ public class Writer
 				// write content (before subobjects).
 				if(content!=null)
 				{
-					writer.writeCharacters(content);
+					if(content.indexOf("<")!=-1 || content.indexOf(">")!=-1 || content.indexOf("&")!=-1)
+						writer.writeCData(content);
+					else
+						writer.writeCharacters(content);
 				}
 				
 				if(subobs==null || subobs.size()==0)
 				{
 					writer.writeEndElement();
+					writer.writeCharacters(lf);
 //					writeEndObject(writer, object, tagname);
 				}
 				else
@@ -182,12 +194,14 @@ public class Writer
 //									writeStartObject(writer, object, subtagname);
 //									writeStartTagClose(writer);
 									writer.writeEndElement();
+									writer.writeCharacters(lf);
 									while(it2.hasNext())
 									{
 										writeObject(writer, it2.next(), writtenobs, subtagname, stack);
 									}
 									writeIdentation(writer, stack.size());
 									writer.writeEndElement();
+									writer.writeCharacters(lf);
 									//writeEndObject(writer, object, subtagname);
 								}
 								else
@@ -207,6 +221,7 @@ public class Writer
 					writeIdentation(writer, stack.size()-1);
 //					writeEndObject(writer, object, tagname);
 					writer.writeEndElement();
+					writer.writeCharacters(lf);
 				}
 			}
 		}
