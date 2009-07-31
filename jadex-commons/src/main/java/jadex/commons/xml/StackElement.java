@@ -26,6 +26,14 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
+	public StackElement(String tag, Object object)
+	{
+		this(tag, object, null);
+	}
+	
+	/**
+	 *  Create a new stack element.
+	 */
 	public StackElement(String tag, Object object, Map rawattrs)
 	{
 		this.tag = tag;

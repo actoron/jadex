@@ -21,16 +21,18 @@ public class ReflectionIntrospector implements IBeanIntrospector
 			Method[] ms = clazz.getMethods();
 			HashMap getters = new HashMap();
 			ArrayList setters = new ArrayList();
-            for(int k=0; k<ms.length; k++) 
+            for(int i=0; i<ms.length; i++) 
             {
-            	String method_name=ms[k].getName();
+            	String method_name=ms[i].getName();
             	if(method_name.startsWith("is") || method_name.startsWith("get")) 
             	{
-            		getters.put(method_name, ms[k]);
+            		if(ms[i].getParameterTypes().length==0)
+            			getters.put(method_name, ms[i]);
             	}
             	else if(method_name.startsWith("set")) 
             	{
-            		setters.add(ms[k]);
+            		if(ms[i].getParameterTypes().length==1) 
+            			setters.add(ms[i]);
             	}
             }
             
@@ -45,16 +47,13 @@ public class ReflectionIntrospector implements IBeanIntrospector
 				Method getter = (Method)getters.get("get" + property_name);
 				if(getter==null)
 				{
-					getter=(Method)getters.get("is" + property_name);
+					getter = (Method)getters.get("is" + property_name);
 				}
 				if(getter!=null) 
 				{
 					Class[] setter_param_type = setter.getParameterTypes();
-					if(setter_param_type.length==1) 
-					{
-						String property_java_name = Character.toLowerCase(property_name.charAt(0))+property_name.substring(1);
-						props.put(property_java_name, new BeanProperty(property_java_name, getter.getReturnType(), getter, setter, setter_param_type[0]));
-					}
+					String property_java_name = Character.toLowerCase(property_name.charAt(0))+property_name.substring(1);
+					props.put(property_java_name, new BeanProperty(property_java_name, getter.getReturnType(), getter, setter, setter_param_type[0]));
 				}
 			}
 			

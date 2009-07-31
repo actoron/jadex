@@ -144,6 +144,15 @@ public class Properties
 	}
 	
 	/**
+	 *  Set the properties.
+	 *  @param properties The properties.
+	 */
+	public void setProperties(List properties)
+	{
+		this.properties = properties;
+	}
+
+	/**
 	 *  Get a properties by type.
 	 *  @param type The type name. 
 	 */
@@ -167,6 +176,15 @@ public class Properties
 		return (Properties[])subproperties.toArray(new Properties[subproperties.size()]);
 	}
 	
+	/**
+	 *  Set the subproperties.
+	 *  @param subproperties The subproperties to set.
+	 */
+	public void setSubproperties(List subproperties)
+	{
+		this.subproperties = subproperties;
+	}
+
 	/**
 	 *  Get subproperties by type. 
 	 *  @param type The type.

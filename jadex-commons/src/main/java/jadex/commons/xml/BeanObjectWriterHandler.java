@@ -1,31 +1,62 @@
 package jadex.commons.xml;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
  */
 public class BeanObjectWriterHandler implements IObjectWriterHandler
 {
+	//-------- attributes --------
+	
+	/** The bean introspector. */
 	protected IBeanIntrospector introspector = new ReflectionIntrospector();
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get attributes of an object as name value pairs.
 	 */
-	public Object[] getAttributesAndSubobjects(Object object, TypeInfo typeinfo)
+	public Object[] getAttributesContentAndSubobjects(Object object, TypeInfo typeinfo)
 	{
+		// todo: handle proper attribute -> string conversion
+		
 		Map attrs = new HashMap();
+		String content = null;
 		Map subobs = new HashMap();
+		Set doneprops = new HashSet();
 		
 		if(typeinfo!=null)
 		{
-			// Attributes can be found via attribute infos.
+			// Content
+			
+			BeanAttributeInfo cinfo = (BeanAttributeInfo)typeinfo.getContentInfo();
+			if(cinfo!=null)
+			{
+				try
+				{
+					String propname = cinfo.getAttributeName();
+					Method method = findGetMethod(object, propname, new String[]{"get", "is"});
+					Object value = method.invoke(object, new Object[0]);
+					if(value!=null)
+					{
+						content = ""+value;
+						doneprops.add(propname);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			// Attributes
 			
 			Collection attrinfos = typeinfo.getAttributeInfos();
 			if(attrinfos!=null)
@@ -36,21 +67,15 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 					{
 						BeanAttributeInfo attrinfo = (BeanAttributeInfo)it.next();
 						String propname = attrinfo.getAttributeName();
-						String methodname = "get"+propname;
-						Method method = object.getClass().getMethod(methodname, new Class[0]);
-						if(method==null)
-						{
-							methodname = "is"+propname;
-							method = object.getClass().getMethod(methodname, new Class[0]);
-						}
-						if(method==null)
-						{
-							throw new RuntimeException("No getter found for: "+propname);
-						}
-						Object value = method.invoke(object, new Object[0]);
+						Method method = findGetMethod(object, propname, new String[]{"get", "is"});
 						
-						String xmlattrname = attrinfo.getXMLAttributeName()!=null? attrinfo.getXMLAttributeName(): propname;
-						attrs.put(xmlattrname, ""+value);
+						Object value = method.invoke(object, new Object[0]);
+						if(value!=null)
+						{
+							String xmlattrname = attrinfo.getXMLAttributeName()!=null? attrinfo.getXMLAttributeName(): propname;
+							attrs.put(xmlattrname, ""+value);
+							doneprops.add(propname);
+						}
 					}
 					catch(Exception e)
 					{
@@ -61,25 +86,24 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 			
 			// Subobjects 
 			
-			Collection subobsinfos = typeinfo.getSubobjectInfos();
+			Map subobsinfos = typeinfo.getSubobjectInfos();
 			if(subobsinfos!=null)
 			{
-				for(Iterator it=subobsinfos.iterator(); it.hasNext(); )
+				for(Iterator it=subobsinfos.values().iterator(); it.hasNext(); )
 				{
 					try
 					{
-						BeanSubobjectInfo soinfo = (BeanSubobjectInfo)it.next();
-						String propname = soinfo.getAttributeName();
-						String methodname = "get"+propname;
-						Method method = object.getClass().getMethod(methodname, new Class[0]);
-						if(method==null)
-						{
-							throw new RuntimeException("No getter found for: "+propname);
-						}
-						Object value = method.invoke(object, new Object[0]);
+						SubobjectInfo soinfo = (SubobjectInfo)it.next();
+						String propname = (String)soinfo.getAttribute();
+						Method method = findGetMethod(object, propname, new String[]{"get"});
 						
-						String xmlattrname = soinfo.getXMLAttributeName()!=null? soinfo.getXMLAttributeName(): propname;
-						attrs.put(xmlattrname, value);
+						Object value = method.invoke(object, new Object[0]);
+						if(value!=null)
+						{
+							String xmlsoname = soinfo.getXMLAttributeName()!=null? soinfo.getXMLAttributeName(): propname;
+							subobs.put(xmlsoname, value);
+							doneprops.add(propname);
+						}
 					}
 					catch(Exception e)
 					{
@@ -88,26 +112,31 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 				}
 			}
 		}
-		else
-		{	
-			Map props = introspector.getBeanProperties(object.getClass());
-			if(props!=null)
+			
+		Map props = introspector.getBeanProperties(object.getClass());
+		if(props!=null)
+		{
+			for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 			{
-				for(Iterator it=props.keySet().iterator(); it.hasNext(); )
+				String propname = (String)it.next();
+				
+				if(!doneprops.contains(propname))
 				{
-					String propname = (String)it.next();
 					BeanProperty bp = (BeanProperty)props.get(propname);
 					try
 					{
 						Object value = bp.getGetter().invoke(object, new Object[0]);
 		
-						if(BasicTypeConverter.isBuiltInType(bp.getType()))
+						if(value!=null)
 						{
-							attrs.put(propname, ""+value);
-						}
-						else
-						{
-							subobs.put(propname, value);
+							if(BasicTypeConverter.isBuiltInType(bp.getType()))
+							{
+								attrs.put(propname, ""+value);
+							}
+							else
+							{
+								subobs.put(propname, value);
+							}
 						}
 					}
 					catch(Exception e)
@@ -118,15 +147,30 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 			}
 		}
 		
-		return new Object[]{attrs, subobs};
+		return new Object[]{attrs, content, subobs};
 	}
 	
 	/**
-	 *  Get the tag for an object.
+	 * 
 	 */
-	public String getTag(Object object, TypeInfo typeinfo)
+	protected Method findGetMethod(Object object, String name, String[] prefixes)
 	{
-		// Hack! use typeinfo
-		return SReflect.getInnerClassName(object.getClass());
+		Method method = null;
+		for(int i=0; i<prefixes.length && method==null; i++)
+		{
+			String methodname = prefixes[i]+name.substring(0, 1).toUpperCase()+name.substring(1);
+			try
+			{
+				method = object.getClass().getMethod(methodname, new Class[0]);
+			}
+			catch(Exception e)
+			{
+				// nop
+			}
+		}
+		if(method==null)
+			throw new RuntimeException("No getter found for: "+name);
+		
+		return method;
 	}
 }

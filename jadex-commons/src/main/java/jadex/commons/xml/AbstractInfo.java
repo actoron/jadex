@@ -12,6 +12,11 @@ import java.util.Comparator;
  */
 public class AbstractInfo
 {
+	//-------- constants --------
+	
+	/** The content xml attribute constant. */
+	public static String XML_CONTENT_ATTRIBUTE = "__XML_CONTENT";
+	
 	//-------- attributes --------
 	
 	/** The xml tag/path. */
@@ -58,6 +63,14 @@ public class AbstractInfo
 	}
 	
 	/**
+	 *  Set the xmlpath.
+	 */
+	public void setXMLPath(String xmlpath)
+	{
+		this.xmlpath = xmlpath;
+	}
+	
+	/**
 	 *  Get the xml tag
 	 */
 	public String getXMLTag()
@@ -75,11 +88,16 @@ public class AbstractInfo
 	}
 	
 	/**
-	 *  Set the xmlpath.
+	 *  Get the xml path without element.
 	 */
-	public void setXMLPath(String xmlpath)
+	public String getXMLPathWithoutElement()
 	{
-		this.xmlpath = xmlpath;
+		String ret = "";
+		String xmlpath = getXMLPath();
+		int idx = xmlpath.lastIndexOf("/");
+		if(idx!=-1)
+			ret = xmlpath.substring(0, idx-1);
+		return ret;
 	}
 	
 	/**

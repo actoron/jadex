@@ -3,14 +3,14 @@ package jadex.commons.xml;
 /**
  * 
  */
-public class BeanSubobjectInfo
+public class SubobjectInfo
 {
 //-------- attributes --------
 	
 	// read + write
 	
-	/** The Java attribute name. */
-	protected String attributename;
+	/** The non xml attribute. */
+	protected Object attribute;
 
 	// write
 	
@@ -24,30 +24,30 @@ public class BeanSubobjectInfo
 	/**
 	 *  Create a new bean attribute info. 
 	 */
-	public BeanSubobjectInfo(String attributename, String xmlattributename)
+	public SubobjectInfo(Object attribute, String xmlattributename)
 	{
-		this.attributename = attributename;
+		this.attribute = attribute;
 		this.xmlattributename = xmlattributename;
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 *  Get the attribut name.
-	 *  @return The attributename.
+	 *  Get the non xml attribut.
+	 *  @return The attribute.
 	 */
-	public String getAttributeName()
+	public Object getAttribute()
 	{
-		return this.attributename;
+		return this.attribute;
 	}
 
 	/**
-	 *  Set the attribute name.
-	 *  @param attributename the attributename to set
+	 *  Set the attribute.
+	 *  @param attributename the attribute to set
 	 */
-	public void setAttributeName(String attributename)
+	public void setAttribute(String attribute)
 	{
-		this.attributename = attributename;
+		this.attribute = attribute;
 	}
 
 	/**

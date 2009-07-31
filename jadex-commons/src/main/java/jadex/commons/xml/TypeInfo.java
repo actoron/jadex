@@ -2,12 +2,10 @@ package jadex.commons.xml;
 
 import jadex.commons.IFilter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +38,8 @@ public class TypeInfo	extends AbstractInfo
 	
 	// write
 	
-	/** The sub objects. */ // todo: unify with link infos?!
-	protected List subobjectsinfo;
+	/** The sub objects (non-xml name -> subobject info). */ // todo: unify with link infos?!
+	protected Map subobjectsinfo;
 	
 	//-------- constructors --------
 	
@@ -52,7 +50,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(String xmlpath, Object typeinfo)
 	{
-		this(xmlpath, typeinfo, null, null, null, null, null);
+		this(xmlpath, typeinfo, null, null);
 	}
 	
 	/**
@@ -64,7 +62,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo)
 	{
-		this(xmlpath, typeinfo, commentinfo, contentinfo, null, null, null);
+		this(xmlpath, typeinfo, commentinfo, contentinfo, null, null);
 	}
 	
 	/**
@@ -94,12 +92,37 @@ public class TypeInfo	extends AbstractInfo
 	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
 		Map attributesinfo, IPostProcessor postproc, IFilter filter)
 	{
+		this(xmlpath, typeinfo, commentinfo, contentinfo, attributesinfo, postproc, null, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param typeinfo The type of object to create.
+	 *  @param commentinfo The commnent.
+	 *  @param contentinfo The content.
+	 *  @param attributesinfo The attributes map.
+	 *  @param postproc The post processor. 
+	 */
+	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
+		Map attributesinfo, IPostProcessor postproc, IFilter filter, SubobjectInfo[] subobjectsinfo)
+	{
 		super(xmlpath, filter);
 		this.typeinfo = typeinfo;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.attributesinfo = attributesinfo;
 		this.postproc = postproc;
+		
+		if(subobjectsinfo!=null)
+		{
+			this.subobjectsinfo = new HashMap();
+			for(int i=0; i<subobjectsinfo.length; i++)
+			{
+				this.subobjectsinfo.put(subobjectsinfo[i].getAttribute(), subobjectsinfo[i]);
+			}
+		}
+		
 	}
 	
 	//-------- methods --------
@@ -181,31 +204,6 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
-	 *  Get the attribute info.
-	 *  @param name The name of the attribute.
-	 *  @return The attribute info.
-	 * /
-	public Object getAttributeInfo2(String name)
-	{
-		Object ret = null;
-		
-		// todo: use map
-		if(attributesinfo!=null)
-		{
-			for(Iterator it=attributesinfo.values().iterator(); it.hasNext(); )
-			{
-				BeanAttributeInfo attrinfo = (BeanAttributeInfo)it.next();
-				if(name.equals(attrinfo.getAttributeName()))
-				{
-					ret = attrinfo;
-					break;
-				}
-			}
-		}
-		return ret;
-	}*/
-	
-	/**
 	 *  Get the xml attribute names.
 	 *  @return The attribute names.
 	 */
@@ -220,7 +218,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public Collection getAttributeInfos()
 	{
-		return attributesinfo.values();
+		return attributesinfo==null? null: attributesinfo.values();
 	}
 	
 	/**
@@ -245,19 +243,28 @@ public class TypeInfo	extends AbstractInfo
 	 *  Add a subobjects info.
 	 *  @param info The subobjects info.
 	 */
-	public void addSubobjectInf(Object info)
+	public void addSubobjectInfo(Object nonxmlname, SubobjectInfo info)
 	{
 		if(subobjectsinfo==null)
-			subobjectsinfo = new ArrayList();
-		subobjectsinfo.add(info);
+			subobjectsinfo = new HashMap();
+		subobjectsinfo.put(nonxmlname, info);
 	}
 	
 	/**
 	 *  Get the subobject infos. 
 	 *  @return The subobject infos.
 	 */
-	public List getSubobjectInfos()
+	public Map getSubobjectInfos()
 	{
 		return subobjectsinfo;
+	}
+	
+	/**
+	 *  Get the subobject infos. 
+	 *  @return The subobject info.
+	 */
+	public SubobjectInfo getSubobjectInfo(Object attr)
+	{
+		return (SubobjectInfo)subobjectsinfo.get(attr);
 	}
 }

@@ -5,7 +5,7 @@ package jadex.commons.xml;
  *  Java bean attribute meta information.
  */
 public class BeanAttributeInfo
-{
+{	
 	//-------- attributes --------
 	
 	// read + write
@@ -35,7 +35,15 @@ public class BeanAttributeInfo
 	 */
 	public BeanAttributeInfo(String attributename)
 	{
-		this(attributename, null);
+		this(attributename, (String)null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String attributename, String xmlattributename)
+	{
+		this(attributename, null, null, null, xmlattributename);
 	}
 	
 	/**
@@ -59,10 +67,19 @@ public class BeanAttributeInfo
 	 */
 	public BeanAttributeInfo(String attributename, ITypeConverter converter, String mapname, Object defaultvalue)
 	{
+		this(attributename, converter, mapname, defaultvalue, null);
+	}
+		
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String attributename, ITypeConverter converter, String mapname, Object defaultvalue, String xmlattributename)
+	{
 		this.attributename = attributename;
 		this.converter = converter;
 		this.mapname = mapname;
 		this.defaultvalue = defaultvalue;
+		this.xmlattributename = xmlattributename;
 	}
 
 	//-------- methods --------
