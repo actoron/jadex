@@ -29,10 +29,10 @@ public class MoveTask extends AbstractTask
 	/** The scope property. */
 	public static final String	PROPERTY_SCOPE = "scope";
 
-	/** The speed property (units per second). */
+	/** The speed property of the moving object (units per second). */
 	public static final String	PROPERTY_SPEED	= "speed";
 	
-	/** The vision property (radius in units). */
+	/** The vision property of the moving object (radius in units). */
 	public static final String	PROPERTY_VISION	= "vision";
 		
 	//-------- IObjectTask methods --------

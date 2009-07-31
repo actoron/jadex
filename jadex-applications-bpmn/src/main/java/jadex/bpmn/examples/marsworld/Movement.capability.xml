@@ -86,7 +86,7 @@
  				<goalmapping ref="move_dest.destination"/>
   				<goalmapping ref="missionend.destination"/>
 			</parameter>
-			<body class="MoveToLocationPlan"/>
+			<body type="bpmn" impl="MoveToLocationPlan"/>
 			<trigger>
 				<goal ref="move_dest"/>
  				<goal ref="missionend"/>

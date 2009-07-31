@@ -5,12 +5,12 @@
     <children xmi:type="notation:Node" xmi:id="_Je0xq3z_Ed6Ya8z0CnMcMA" type="5001">
       <children xmi:type="notation:Node" xmi:id="_Je97k3z_Ed6Ya8z0CnMcMA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_Je97mXz_Ed6Ya8z0CnMcMA" type="4001"/>
-        <styles xmi:type="notation:FontStyle" xmi:id="_Je97lHz_Ed6Ya8z0CnMcMA" fontName="Arial"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_Je97lHz_Ed6Ya8z0CnMcMA" fontName="Arial" fontHeight="8"/>
         <styles xmi:type="notation:DescriptionStyle" xmi:id="_Je97lXz_Ed6Ya8z0CnMcMA"/>
         <styles xmi:type="notation:FillStyle" xmi:id="_Je97lnz_Ed6Ya8z0CnMcMA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_Je97l3z_Ed6Ya8z0CnMcMA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MoveToLocationPlan.bpmn#_Je0xo3z_Ed6Ya8z0CnMcMA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Je97mnz_Ed6Ya8z0CnMcMA" x="77" y="22" width="336" height="128"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Je97mnz_Ed6Ya8z0CnMcMA" x="31" y="18" width="544" height="135"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_3-Isonz_Ed6Ya8z0CnMcMA" type="2007">
         <children xmi:type="notation:Node" xmi:id="_3-IsqHz_Ed6Ya8z0CnMcMA" type="4007"/>
@@ -28,7 +28,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_6P3etXz_Ed6Ya8z0CnMcMA" fillColor="16771304"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_6P3etnz_Ed6Ya8z0CnMcMA" lineColor="0"/>
         <element xmi:type="bpmn:Lane" href="MoveToLocationPlan.bpmn#_6P3esXz_Ed6Ya8z0CnMcMA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6P3et3z_Ed6Ya8z0CnMcMA" y="176" height="169"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6P3et3z_Ed6Ya8z0CnMcMA" y="176" height="165"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_X-enMn0BEd6Ya8z0CnMcMA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_X-enOH0BEd6Ya8z0CnMcMA" type="4001"/>
@@ -37,7 +37,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_X-enNX0BEd6Ya8z0CnMcMA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_X-enNn0BEd6Ya8z0CnMcMA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MoveToLocationPlan.bpmn#_X-enMX0BEd6Ya8z0CnMcMA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_X-enN30BEd6Ya8z0CnMcMA" x="508" y="22" width="188" height="128"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_X-enN30BEd6Ya8z0CnMcMA" x="678" y="22" width="429" height="131"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_fwej4n0BEd6Ya8z0CnMcMA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_fwej6H0BEd6Ya8z0CnMcMA" type="4001"/>
@@ -46,7 +46,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_fwej5X0BEd6Ya8z0CnMcMA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_fwej5n0BEd6Ya8z0CnMcMA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MoveToLocationPlan.bpmn#_fwej4X0BEd6Ya8z0CnMcMA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fwej530BEd6Ya8z0CnMcMA" x="77" y="193" width="336" height="147"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fwej530BEd6Ya8z0CnMcMA" x="57" y="187" width="336" height="147"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_Je0xrHz_Ed6Ya8z0CnMcMA"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_Je97kHz_Ed6Ya8z0CnMcMA"/>
@@ -57,7 +57,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_Je0xp3z_Ed6Ya8z0CnMcMA" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_Je0xqHz_Ed6Ya8z0CnMcMA" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="MoveToLocationPlan.bpmn#_Je0xoXz_Ed6Ya8z0CnMcMA"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Je97knz_Ed6Ya8z0CnMcMA" x="16" y="16" width="1034" height="361"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Je97knz_Ed6Ya8z0CnMcMA" x="16" y="16" width="1445" height="357"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_jVa_Yn0DEd6Ya8z0CnMcMA" type="1002">
     <children xmi:type="notation:Node" xmi:id="_jVa_aH0DEd6Ya8z0CnMcMA" type="4009"/>
