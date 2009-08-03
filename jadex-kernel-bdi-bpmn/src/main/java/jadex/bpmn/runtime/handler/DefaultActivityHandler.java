@@ -51,6 +51,10 @@ public class DefaultActivityHandler implements IActivityHandler
 		MNamedIdElement	next	= null;
 		Exception	ex	= thread.getException();
 		
+		// Store event (if any).
+		if(event!=null)
+			thread.setParameterValue("$event", event);
+		
 		// Find next element and context(s) to be removed.
 		boolean	outside	= false;
 		ThreadContext	remove	= null;	// Context that needs to be removed (if any).

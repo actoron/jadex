@@ -30,6 +30,10 @@
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>
+		<!-- Environment belief is used CarryPlan. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
 	</beliefs>
 
   	<goals>
@@ -49,7 +53,7 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="carry_plan">
-			<body class="CarryPlan"/>
+			<body type="bpmn" impl="CarryPlan"/>
 			<waitqueue>
 				<messageevent ref="request_carry"/>
 			</waitqueue>

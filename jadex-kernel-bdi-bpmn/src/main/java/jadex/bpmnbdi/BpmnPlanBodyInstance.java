@@ -250,7 +250,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 				{
 					if(thread.isWaiting() && thread.getWaitFilter().filter(dispelem))
 					{
-						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, dispelem);
+						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, getFlyweight(dispelem));
 					}
 				}
 				catch(Exception e)
