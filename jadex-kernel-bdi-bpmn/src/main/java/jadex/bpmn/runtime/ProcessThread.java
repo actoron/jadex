@@ -11,11 +11,14 @@ import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -401,6 +404,7 @@ public class ProcessThread	implements ITaskContext
 		{
 			// Handle parameter passing in edge inscriptions.
 			Map	passedparams	= null;
+			Set	indexparams	= null;
 			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
 			{
 				Map mappings = getLastEdge().getParameterMappings();
@@ -414,15 +418,29 @@ public class ProcessThread	implements ITaskContext
 						IParsedExpression exp = (IParsedExpression)((Object[])mappings.get(name))[0];
 						IParsedExpression iexp = (IParsedExpression)((Object[])mappings.get(name))[1];
 						Object value = exp.getValue(fetcher);
-						
-						if(iexp!=null)
-							throw new UnsupportedOperationException("todo: array parameters");
-						
+						Object index	= iexp!=null ? iexp.getValue(fetcher) : null;
+												
 						if(getActivity().hasParameter(name))
 						{
 							if(passedparams==null)
 								passedparams	= new HashMap();
-							passedparams.put(name, value);
+							
+							if(iexp!=null)
+							{
+								if(!passedparams.containsKey(name))
+								{
+									passedparams.put(name, new ArrayList());
+									if(indexparams==null)
+										indexparams	= new HashSet();
+									
+									indexparams.add(name);
+								}
+								((List)passedparams.get(name)).add(new Object[]{index, value});
+							}
+							else
+							{
+								passedparams.put(name, value);
+							}
 							found	= true;
 						}
 						
@@ -432,7 +450,15 @@ public class ProcessThread	implements ITaskContext
 							{
 								if(t.getActivity().hasParameter(name))
 								{
-									t.setParameterValue(name, value);
+									if(iexp!=null)
+									{
+										Object	array	= t.getParameterValue(name);
+										Array.set(array, ((Number)index).intValue(), value);
+									}
+									else
+									{
+										t.setParameterValue(name, value);
+									}
 									found	= true;
 								}
 							}
@@ -440,7 +466,16 @@ public class ProcessThread	implements ITaskContext
 						
 						if(!found && instance.hasContextVariable(name))
 						{
-							instance.setContextVariable(name, value);
+							if(iexp!=null)
+							{
+								Object	array	= instance.getContextVariable(name);
+								Array.set(array, ((Number)index).intValue(), value);
+							}
+							else
+							{
+								instance.setContextVariable(name, value);
+							}
+							found	= true;
 						}
 						else if(!found)
 						{
@@ -464,7 +499,20 @@ public class ProcessThread	implements ITaskContext
 					MParameter param = (MParameter)it.next();
 					if(passedparams!=null && passedparams.containsKey(param.getName()))
 					{
-						setParameterValue(param.getName(), passedparams.get(param.getName()));
+						if(indexparams!=null && indexparams.contains(param.getName()))
+						{
+							Object	array	= getParameterValue(param.getName());
+							List	values	= (List)passedparams.get(param.getName());
+							for(int i=0; i<values.size(); i++)
+							{
+								Object[]	entry	= (Object[])values.get(i);
+								Array.set(array, ((Number)entry[0]).intValue(), entry[1]);
+							}
+						}
+						else
+						{
+							setParameterValue(param.getName(), passedparams.get(param.getName()));
+						}
 					}
 					else
 					{

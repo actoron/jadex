@@ -18,10 +18,10 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_KdGUsX3kEd6VFdlpWzoevQ" iD="_KdGUsH3kEd6VFdlpWzoevQ" incomingEdges="_KdGUun3kEd6VFdlpWzoevQ" activityType="EventEndEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Mdk2IX3NEd6VFdlpWzoevQ" iD="_Mdk2IH3NEd6VFdlpWzoevQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NNZwkX3NEd6VFdlpWzoevQ" iD="_NNZwkH3NEd6VFdlpWzoevQ" name=""/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BpS-wX3OEd6VFdlpWzoevQ" iD="_BpS-wH3OEd6VFdlpWzoevQ" name="i+1 &lt; $plan.subgoals.length&#xD;&#xA;i=i+1"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BpS-wX3OEd6VFdlpWzoevQ" iD="_BpS-wH3OEd6VFdlpWzoevQ" name="i+1 &lt; $plan.subgoals.length&#xD;&#xA;i=i+1&#xD;&#xA;goals = goals"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_AEp6MX3kEd6VFdlpWzoevQ" iD="_AEp6MH3kEd6VFdlpWzoevQ" name="goals = goals"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Jdw-qn3kEd6VFdlpWzoevQ" iD="_Jdw-qX3kEd6VFdlpWzoevQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KdGUun3kEd6VFdlpWzoevQ" iD="_KdGUuX3kEd6VFdlpWzoevQ"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LIwg0X3kEd6VFdlpWzoevQ" iD="_LIwg0H3kEd6VFdlpWzoevQ" name="i+1 &lt; goals.length&#xD;&#xA;i=i+1"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LIwg0X3kEd6VFdlpWzoevQ" iD="_LIwg0H3kEd6VFdlpWzoevQ" name="i+1 &lt; goals.length&#xD;&#xA;i=i+1&#xD;&#xA;goals = goals"/>
   </pools>
 </bpmn:BpmnDiagram>

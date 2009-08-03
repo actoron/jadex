@@ -241,15 +241,14 @@ public class GpmnBDIConverter
 					if(outgoals.size()>0)
 					{
 						// Create plan with body and name
-						Object planhandle = createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.GoalHierarchyExecutionPlan", null);
+						Object planhandle = goal.getName().endsWith("par")
+							? createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.ParallelGoalExecutionPlan", "bpmn")
+							: createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.SequentialGoalExecutionPlan", "bpmn");
 						
 						// Create trigger
 						createPlanTrigger(planhandle, state, new String[]{goal.getName()}, null, null);
 				
-						// Create mode paramter
-						createParameter(planhandle, state, "mode", String.class, goal.getName().endsWith("par")? "\"parallel\"": "\"sequential\"", true);
-					
-						// Create subgoals paramterset
+						// Create subgoals parameter set
 						String[] goalnames = new String[outgoals.size()];
 						for(int j=0; j<outgoals.size(); j++)
 							goalnames[j] = "\""+((MGoal)outgoals.get(j)).getName()+"\"";

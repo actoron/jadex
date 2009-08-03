@@ -92,7 +92,7 @@ public class TypeInfo	extends AbstractInfo
 	public TypeInfo(String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
 		Map attributesinfo, IPostProcessor postproc, IFilter filter)
 	{
-		this(xmlpath, typeinfo, commentinfo, contentinfo, attributesinfo, postproc, null, null);
+		this(xmlpath, typeinfo, commentinfo, contentinfo, attributesinfo, postproc, filter, null);
 	}
 	
 	/**
