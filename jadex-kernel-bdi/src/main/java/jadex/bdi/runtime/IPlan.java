@@ -19,11 +19,12 @@ public interface IPlan	extends IParameterElement
 	 *  @return The body.
 	 */
 	public Object getBody();
-
+	
 	/**
-	 *  Create the body.
-	 * /
-	public Object createBody() throws Exception;*/
+	 *  Get the reason (i.e. initial event).
+	 *  @return The reason.
+	 */
+	public Object getReason();
 	
 	//-------- listeners --------
 	

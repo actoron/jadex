@@ -67,7 +67,7 @@
 
 		<!-- Inform sentries about new targets. -->
 		<plan name="informer">
-			<body class="InformNewTargetPlan"/>
+			<body type="bpmn" impl="InformNewTargetPlan"/>
 			<!-- Inform whenever a new fact is added to the belief set my_targets. -->
 			<trigger>
 				<factadded ref="move.my_targets"/>

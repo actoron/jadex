@@ -919,7 +919,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		// Hack!!! Should be configurable.
 		IExpressionParser	exp_parser	= new JavaCCExpressionParser();
 		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		Collection coll = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_imports);
+		String[]	imports	= OAVBDIMetaModel.getImports(state, mcapa);
 		
 		Map	params	= null;
 		if(paramnames!=null)
@@ -931,8 +931,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			}
 		}
 		
-		IParsedExpression pex = exp_parser.parseExpression(expression, coll==null? 
-			null: (String[])coll.toArray(new String[coll.size()]), params, Thread.currentThread().getContextClassLoader());
+		IParsedExpression pex = exp_parser.parseExpression(expression, imports, params, Thread.currentThread().getContextClassLoader());
 		return new ExpressionNoModel(state, rcapa, pex);
 	}
 

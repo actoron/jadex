@@ -2,6 +2,7 @@ package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IWaitqueue;
@@ -66,6 +67,41 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	}
 
 	/**
+	 *  Get the reason (i.e. initial event).
+	 *  @return The reason.
+	 */
+	public Object getReason()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	elem	= getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.plan_has_reason);
+					if(elem!=null)
+					{
+						// todo: wrong scope
+						object	= WaitqueueFlyweight.getFlyweight(getState(), getScope(), elem);
+					}
+				}
+			};
+			return invoc.object;
+		}
+		else
+		{
+			Object	elem	= getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.plan_has_reason);
+			IElement ret = null;
+			if(elem!=null)
+			{
+				// todo: wrong scope
+				ret = WaitqueueFlyweight.getFlyweight(getState(), getScope(), elem);
+			}
+			return ret;
+		}
+	}
+
+	/**
 	 *  Get the body.
 	 *  @return The body.
 	 */
@@ -87,11 +123,6 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 			return getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.plan_has_body);
 		}
 	}
-
-	/**
-	 *  Create the body.
-	 * /
-	public Object createBody() throws Exception;*/
 	
 	//-------- listeners --------
 	

@@ -79,4 +79,14 @@ public class MNamedIdElement extends MIdElement
 			ret = properties.get(name);
 		return ret;
 	}
+	
+	/**
+	 *  Test, if a property is declared.
+	 *  @param name	The property name.
+	 *  @return True, if the property is declared.
+	 */
+	public boolean	hasPropertyValue(String name)
+	{
+		return properties!=null && properties.containsKey(name);
+	}
 }

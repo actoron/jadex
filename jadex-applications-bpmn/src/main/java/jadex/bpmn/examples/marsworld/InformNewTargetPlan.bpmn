@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="__dlOkYAREd6N8dR31QwQkg" iD="__dlOkIAREd6N8dR31QwQkg">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_em8d0YATEd6N8dR31QwQkg" iD="_em8d0IATEd6N8dR31QwQkg" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bridge.IAgentIdentifier;&#xD;&#xA;import jadex.adapter.base.agr.AGRSpace;">
+    <associations xmi:type="bpmn:Association" xmi:id="_em8d2YATEd6N8dR31QwQkg"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="__d4JgYAREd6N8dR31QwQkg" iD="__d4JgIAREd6N8dR31QwQkg" associations="_em8d2YATEd6N8dR31QwQkg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="__d4Jg4AREd6N8dR31QwQkg" iD="__d4JgoAREd6N8dR31QwQkg" outgoingEdges="_Z_RkmoASEd6N8dR31QwQkg" name="Find Sentries&#xD;&#xA;&#xD;&#xA;in AGRSpace agrs = $scope.getApplicationContext().getSpace(&quot;myagrspace&quot;)&#xD;&#xA;out IAgentIdentifier[] sentries = agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;sentry&quot;)" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Z_RkkYASEd6N8dR31QwQkg" iD="_Z_RkkIASEd6N8dR31QwQkg" outgoingEdges="_vmPtAYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" incomingEdges="_Z_RkmoASEd6N8dR31QwQkg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_raeQIYASEd6N8dR31QwQkg" iD="_raeQIIASEd6N8dR31QwQkg" outgoingEdges="_v5n8AYASEd6N8dR31QwQkg" incomingEdges="_vmPtAYASEd6N8dR31QwQkg" name="mode = &quot;send&quot;&#xD;&#xA;type = &quot;inform_target&quot;&#xD;&#xA;receivers = sentries&#xD;&#xA;content = $plan.getReason().getValue()" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_u93eYYASEd6N8dR31QwQkg" iD="_u93eYIASEd6N8dR31QwQkg" incomingEdges="_v5n8AYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Z_RkmoASEd6N8dR31QwQkg" iD="_Z_RkmYASEd6N8dR31QwQkg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vmPtAYASEd6N8dR31QwQkg" iD="_vmPtAIASEd6N8dR31QwQkg" name="sentries!=null"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_v5n8AYASEd6N8dR31QwQkg" iD="_v5n8AIASEd6N8dR31QwQkg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_x02SkYASEd6N8dR31QwQkg" iD="_x02SkIASEd6N8dR31QwQkg"/>
+  </pools>
+</bpmn:BpmnDiagram>

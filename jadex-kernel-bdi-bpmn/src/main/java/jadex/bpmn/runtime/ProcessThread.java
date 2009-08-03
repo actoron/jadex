@@ -342,6 +342,16 @@ public class ProcessThread	implements ITaskContext
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Test, if a property is declared.
+	 *  @param name	The property name.
+	 *  @return True, if the property is declared.
+	 */
+	public boolean	hasPropertyValue(String name)
+	{
+		return activity.hasPropertyValue(name);
+	}
 
 	/**
 	 *  Get the exception (if any).

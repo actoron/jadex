@@ -1129,14 +1129,15 @@ public class OAVBDIMetaModel
 			if(imports!=null)
 			{
 				String[]	newimports	= new String[imports.length+1];
-				System.arraycopy(imports, 0, newimports, 1, imports.length);
+				for(int i=0; i<imports.length; i++)
+					newimports[i+1]	= imports[i]!=null ? imports[i].trim() : null;
 				imports	= newimports;
 			}
 			else
 			{
 				imports	= new String[1];
 			}
-			imports[0]	= pkg+".*";
+			imports[0]	= pkg.trim()+".*";
 		}
 		return imports;
 	}
