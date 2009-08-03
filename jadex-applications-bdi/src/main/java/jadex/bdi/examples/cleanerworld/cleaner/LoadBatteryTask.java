@@ -1,8 +1,8 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -10,7 +10,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 /**
  *  Move an object towards a destination.
  */
-public class LoadBatteryTask extends ListenableTask
+public class LoadBatteryTask extends AbstractTask
 {
 	//-------- constants --------
 	
@@ -32,15 +32,16 @@ public class LoadBatteryTask extends ListenableTask
 	/** The remaining time. */
 	protected int	time;
 	
-	//-------- ListenableTask methods --------
+	//-------- AbstractTask methods --------
 	
 	/**
 	 *  Executes the task.
+	 *  Handles exceptions. Subclasses should implement doExecute() instead.
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
 		ISpaceObject target	= (ISpaceObject)getProperty(PROPERTY_TARGET);
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
@@ -60,6 +61,6 @@ public class LoadBatteryTask extends ListenableTask
 //		System.out.println("Increased chargestate to: "+chargestate);
 		
 		if(chargestate==1.0)
-			taskFinished(space, obj, null);
+			setFinished(space, obj, true);
 	}
 }

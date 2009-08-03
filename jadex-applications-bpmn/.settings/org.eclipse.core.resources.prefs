@@ -1,4 +1,4 @@
-#Mon Aug 03 13:59:30 CEST 2009
+#Mon Aug 03 15:25:31 CEST 2009
 eclipse.preferences.version=1
 encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn_diagram=UTF-8
@@ -31,6 +31,8 @@ encoding//src/main/java/jadex/bpmn/examples/helloworld/test2.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/test2.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/test_parallel.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/helloworld/test_parallel.bpmn_diagram=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/marsworld/CarryOrePlan.bpmn=UTF-8
+encoding//src/main/java/jadex/bpmn/examples/marsworld/CarryOrePlan.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/marsworld/CarryPlan.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/marsworld/CarryPlan.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/marsworld/InformNewTargetPlan.bpmn=UTF-8

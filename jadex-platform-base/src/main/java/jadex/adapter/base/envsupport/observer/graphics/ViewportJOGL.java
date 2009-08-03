@@ -138,7 +138,9 @@ public class ViewportJOGL extends AbstractViewport
 		{
 			public void run()
 			{
+				System.out.println("repaint");
 				((GLCanvas)ViewportJOGL.this.canvas_).display();
+				System.out.println("repaint done");
 				rendering	= false;
 			}
 		};

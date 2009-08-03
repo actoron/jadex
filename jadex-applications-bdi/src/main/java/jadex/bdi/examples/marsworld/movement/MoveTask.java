@@ -82,6 +82,6 @@ public class MoveTask extends AbstractTask
 		}
 		
 		if(newloc==destination)
-			space.removeObjectTask(this.getProperty(PROPERTY_ID), obj.getId());
+			setFinished(space, obj, true);
 	}
 }

@@ -67,18 +67,6 @@ public class MicroAgentInterpreter implements IKernelAgent
 		this.arguments = arguments;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		
-		try
-		{
-			this.microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
-			this.microagent.init(this);
-			this.microagent.agentCreated();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
 		for(int i=0; i<args.length; i++)
@@ -94,6 +82,18 @@ public class MicroAgentInterpreter implements IKernelAgent
 				}
 			}
 		}
+
+		try
+		{
+			this.microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
+			this.microagent.init(this);
+			this.microagent.agentCreated();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}		
 	}
 	
 	//-------- IKernelAgent interface --------

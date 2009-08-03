@@ -42,4 +42,18 @@ public abstract class AbstractTask extends SimplePropertyObject implements IObje
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
 	}
+
+	//-------- helper methods --------
+	
+	/**
+	 *  Indicate that the task is finished and should be removed.
+	 *  @param space	The environment in which the task is executing.
+	 *  @param obj	The object that is executing the task.
+	 *  @param finished	The finished flag.
+	 */
+	public void	setFinished(IEnvironmentSpace space, ISpaceObject obj, boolean finished)
+	{
+		if(finished)
+			space.removeObjectTask(this.getProperty(PROPERTY_ID), obj.getId());
+	}
 }

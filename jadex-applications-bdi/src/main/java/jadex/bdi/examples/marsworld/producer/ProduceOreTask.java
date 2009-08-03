@@ -1,8 +1,8 @@
 package jadex.bdi.examples.marsworld.producer;
 
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -11,7 +11,7 @@ import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
 /**
  *  Move an object towards a destination.
  */
-public class ProduceOreTask extends ListenableTask
+public class ProduceOreTask extends AbstractTask
 {
 	//-------- constants --------
 	
@@ -49,15 +49,16 @@ public class ProduceOreTask extends ListenableTask
 		this.target	= target;
 	}*/
 	
-	//-------- ListenableTask methods --------
+	//-------- AbstractTask methods --------
 	
 	/**
 	 *  Executes the task.
+	 *  Handles exceptions. Subclasses should implement doExecute() instead.
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
 		ISpaceObject target = (ISpaceObject)getProperty(PROPERTY_TARGET);
 		
@@ -76,7 +77,7 @@ public class ProduceOreTask extends ListenableTask
 		
 		if(ore==0)
 		{
-			taskFinished(space, obj, target.getProperty(PROPERTY_CAPACITY));
+			setFinished(space, obj, true);
 		}
 	}
 }

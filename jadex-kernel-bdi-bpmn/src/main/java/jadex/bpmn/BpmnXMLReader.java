@@ -470,7 +470,7 @@ public class BpmnXMLReader
 					
 					String prop = stok.nextToken();
 					int	idx	= prop.indexOf("=");
-					boolean	comp	= idx>0 && (prop.charAt(idx-1)=='!') || (prop.charAt(idx-1)=='<') || (prop.charAt(idx-1)=='>');
+					boolean	comp	= idx>0 && (prop.charAt(idx-1)=='!' || prop.charAt(idx-1)=='<' || prop.charAt(idx-1)=='>');
 					boolean	eq	= idx!=-1 && idx<prop.length()-1 && prop.charAt(idx+1)=='=';
 					boolean	assignment	= idx!=-1 && !comp && !eq;
 					if(assignment)

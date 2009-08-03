@@ -1,8 +1,8 @@
 package jadex.bdi.examples.marsworld.carry;
 
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ListenableTask;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -12,7 +12,7 @@ import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
 /**
  *  Move an object towards a destination.
  */
-public class LoadOreTask extends ListenableTask
+public class LoadOreTask extends AbstractTask
 {
 	//-------- constants --------
 	
@@ -54,15 +54,16 @@ public class LoadOreTask extends ListenableTask
 		this.load	= load;
 	}*/
 	
-	//-------- ListenableTask methods --------
+	//-------- AbstractTask methods --------
 	
 	/**
 	 *  Executes the task.
+	 *  Handles exceptions. Subclasses should implement doExecute() instead.
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void	doExecute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
 	{
 		ISpaceObject target = (ISpaceObject)getProperty(PROPERTY_TARGET);
 		boolean load = ((Boolean)getProperty(PROPERTY_LOAD)).booleanValue();
@@ -99,7 +100,7 @@ public class LoadOreTask extends ListenableTask
 		
 		if(finished)
 		{
-			taskFinished(space, obj, load? obj.getProperty(AnalyzeTargetTask.PROPERTY_ORE): null); // Todo amount of unloaded ore?
+			setFinished(space, obj, true); // Todo amount of unloaded ore?
 		}
 	}
 }

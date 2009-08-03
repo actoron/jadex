@@ -51,12 +51,12 @@ public class LoadBatteryPlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			Map props = new HashMap();
 			props.put(LoadBatteryTask.PROPERTY_TARGET, station);
-			props.put(LoadBatteryTask.PROPERTY_LISTENER, res);
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			taskid = space.createObjectTask(LoadBatteryTask.PROPERTY_TYPENAME, props, myself.getId());
+			space.addTaskListener(taskid, myself.getId(), res);
 			// Its important to wait for the task, as otherwise the plan is immediately finished and the maintaingoal is failed (one plan, no recur) 
-			waitForExternalCondition(res);
+			res.waitForResult();
 //			load = new LoadBatteryTask(station, res);
 //			myself.addTask(load);
 		}

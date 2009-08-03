@@ -45,12 +45,10 @@ public class ProduceOrePlan extends Plan
 		SyncResultListener	res	= new SyncResultListener();
 		Map props = new HashMap();
 		props.put(LoadBatteryTask.PROPERTY_TARGET, target);
-		props.put(LoadBatteryTask.PROPERTY_LISTENER, res);
 		IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-		space.createObjectTask(ProduceOreTask.PROPERTY_TYPENAME, props, myself.getId());
-//		myself.addTask(new ProduceOreTask(target, res));
+		Object	taskid	= space.createObjectTask(ProduceOreTask.PROPERTY_TYPENAME, props, myself.getId());
+		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
-//		Number	ore	= (Number)res.waitForResult();
 //		System.out.println("Produced ore at target: "+getAgentName()+", "+ore+" ore produced.");
 	}
 }

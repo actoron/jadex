@@ -8,7 +8,6 @@ import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bpmn.BpmnModelLoader;
-import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
@@ -16,12 +15,10 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
 import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
-import jadex.commons.collection.SCollection;
 
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**

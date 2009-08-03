@@ -174,6 +174,7 @@ public final class Text implements IDrawable
 			g.setColor(color);
 			for (int i = 0; i < lines.length; ++i)
 			{
+				System.out.println("hier1");
 				TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
 				
 				if (i != 0)
@@ -239,17 +240,26 @@ public final class Text implements IDrawable
 			
 			for (int i = 0; i < lines.length; ++i)
 			{
-				
+				System.out.println("hier2");
 				TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
+				System.out.println("hier2.1");
 				
 				if (i != 0)
+				{
+					System.out.println("hier2.2");
 					yPos -= tl.getAscent();
+				}
 
+				System.out.println("hier2.3");
 				tr.beginRendering(canvasSize.getXAsInteger(), canvasSize.getYAsInteger());
+				System.out.println("hier2.4");
 				tr.draw(lines[i], (int) (xPos + getAlignment(tl)), (int) yPos);
+				System.out.println("hier2.5");
 				tr.endRendering();
 				
+				System.out.println("hier2.6");
 				yPos -= (tl.getDescent() + tl.getLeading());
+				System.out.println("hier2.0");
 			}
 		}
 	}
@@ -292,6 +302,7 @@ public final class Text implements IDrawable
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < tokens.length; ++i)
 		{
+			System.out.println("hier3");
 			if ((i & 1) == 0)
 			{
 				sb.append(tokens[i]);

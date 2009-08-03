@@ -52,14 +52,13 @@ public class AnalyzeTargetPlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			Map props = new HashMap();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
-			props.put(AnalyzeTargetTask.PROPERTY_LISTENER, res);
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-			space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
+			Object	taskid	= space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
+			space.addTaskListener(taskid, myself.getId(), res);
 
-//			myself.addTask(new AnalyzeTargetTask(target, res));
-			Number	ore	= (Number)res.waitForResult();
+			res.waitForResult();
 //			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
-			if(ore.intValue()>0)
+			if(((Number)target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue()>0)
 				callProducerAgent(target);
 	
 			// Hack??? Should be done in task, but aborts plan before producers are called.

@@ -34,6 +34,10 @@
 		<beliefref name="environment">
 			<concrete ref="move.environment"/>
 		</beliefref>
+		<!-- Self belief is used CarryOrePlan. -->
+		<beliefref name="myself">
+			<concrete ref="move.myself"/>
+		</beliefref>
 	</beliefs>
 
   	<goals>
@@ -64,7 +68,7 @@
 			<parameter name="target" class="ISpaceObject">
 				<goalmapping ref="carry_ore.target"/>
 			</parameter>
-			<body class="CarryOrePlan"/>
+			<body type="bpmn" impl="CarryOrePlan"/>
 			<trigger>
 				<goal ref="carry_ore"/>
 			</trigger>

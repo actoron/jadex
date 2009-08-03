@@ -7,6 +7,7 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.bdi.examples.marsworld.producer.ProduceOreTask;
+import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -52,14 +53,14 @@ public class CarryOrePlan extends Plan
 			Map props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, target);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.TRUE);
-			props.put(LoadOreTask.PROPERTY_LISTENER, res);
-			env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
+			Object	taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
+			env.addTaskListener(taskid, myself.getId(), res);
 			
-			Number	ore	= (Number)res.waitForResult();
+			res.waitForResult();
 //			System.out.println("Loaded ore at target: "+getAgentName()+", "+ore+" ore loaded.");
 			// Todo: use return value to determine finished state?
 			finished	= ((Number)target.getProperty(ProduceOreTask.PROPERTY_CAPACITY)).intValue()==0;
-			if(ore.intValue()==0)
+			if(((Number)myself.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue()==0)
 				break;
 	
 			// Move to the homebase.
@@ -73,8 +74,8 @@ public class CarryOrePlan extends Plan
 			props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, homebase);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.FALSE);
-			props.put(LoadOreTask.PROPERTY_LISTENER, res);
-			env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
+			taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
+			env.addTaskListener(taskid, myself.getId(), res);
 //			myself.addTask(new LoadOreTask(homebase, false, res));
 			res.waitForResult();
 //			System.out.println("Unloaded ore at homebase: "+getAgentName()+", "+ore+" ore unloaded.");
