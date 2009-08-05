@@ -1,6 +1,12 @@
-package jadex.commons.xml;
+package jadex.commons.xml.reader;
 
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.xml.AbstractInfo;
+import jadex.commons.xml.IPostProcessor;
+import jadex.commons.xml.StackElement;
+import jadex.commons.xml.SubobjectInfo;
+import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.AbstractInfo.SpecificityComparator;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,13 +34,13 @@ public class Reader
 	//-------- attributes --------
 	
 	/** The object creator. */
-	protected IObjectHandler handler;
+	protected IObjectReaderHandler handler;
 	
 	/** The type mappings. */
 	protected Map typeinfos;
 	
 	/** The link object infos. */
-	protected Map linkinfos;
+//	protected Map linkinfos;
 	
 	/** The ignored attribute types. */
 	protected Set ignoredattrs;
@@ -44,12 +50,24 @@ public class Reader
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
-	 */
-	public Reader(IObjectHandler handler, Set typeinfos, Set linkinfos, Set ignoredattrs)
+	 * /
+	public Reader(IObjectReaderHandler handler, Set typeinfos, Set linkinfos, Set ignoredattrs)
 	{
 		this.handler = handler;
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
 		this.linkinfos = linkinfos!=null? createLinkInfos(linkinfos): Collections.EMPTY_MAP;
+		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
+	}*/
+	
+	/**
+	 *  Create a new reader.
+	 *  @param handler The handler.
+	 */
+	public Reader(IObjectReaderHandler handler, Set typeinfos, Set ignoredattrs)
+	{
+		this.handler = handler;
+		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
+//		this.linkinfos = linkinfos!=null? createLinkInfos(linkinfos): Collections.EMPTY_MAP;
 		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 	}
 	
@@ -116,7 +134,7 @@ public class Reader
 					if(DEBUG)
 						System.out.println("No mapping found: "+parser.getLocalName());
 				}
-				topse	= new StackElement(parser.getLocalName(), object, rawattrs);
+				topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
 				stack.add(topse);
 				if(stack.size()==1)
 				{
@@ -247,7 +265,9 @@ public class Reader
 							pse = (StackElement)stack.get(i);
 						}
 						
-						LinkInfo linkinfo = getLinkInfo(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
+						TypeInfo patypeinfo = pse.getTypeInfo();
+//						System.out.println("here: "+parser.getLocalName()+" "+getXMLPath(stack)+" "+topse.getRawAttributes());
+						SubobjectInfo linkinfo = patypeinfo.getSubobjectInfoRead(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
 						
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader, root);
 					}
@@ -300,27 +320,27 @@ public class Reader
 		return ret;
 	}
 	
-	/**
-	 *  Get the most specific link info.
-	 *  @param tag The tag.
-	 *  @param fullpath The full path.
-	 *  @return The most specific link info.
-	 */
-	protected LinkInfo getLinkInfo(String tag, String fullpath, Map rawattributes)
-	{
-		LinkInfo ret = null;
-		Set links = (Set)linkinfos.get(tag);
-		if(links!=null)
-		{
-			for(Iterator it=links.iterator(); ret==null && it.hasNext(); )
-			{
-				LinkInfo tmp = (LinkInfo)it.next();
-				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-					ret = tmp;
-			}
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get the most specific link info.
+//	 *  @param tag The tag.
+//	 *  @param fullpath The full path.
+//	 *  @return The most specific link info.
+//	 */
+//	protected LinkInfo getLinkInfo(String tag, String fullpath, Map rawattributes)
+//	{
+//		LinkInfo ret = null;
+//		Set links = (Set)linkinfos.get(tag);
+//		if(links!=null)
+//		{
+//			for(Iterator it=links.iterator(); ret==null && it.hasNext(); )
+//			{
+//				LinkInfo tmp = (LinkInfo)it.next();
+//				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
+//					ret = tmp;
+//			}
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the xml path for a stack.
@@ -367,7 +387,7 @@ public class Reader
 	 *  Create link infos for each tag sorted by specificity.
 	 *  @param linkinfos The link infos.
 	 *  @return Map of link infos.
-	 */
+	 * /
 	protected Map createLinkInfos(Set linkinfos)
 	{
 		Map ret = new HashMap();
@@ -385,5 +405,5 @@ public class Reader
 		}
 		
 		return ret;
-	}
+	}*/
 }

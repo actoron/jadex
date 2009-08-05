@@ -2,7 +2,7 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
-import jadex.commons.xml.Reader;
+import jadex.commons.xml.reader.Reader;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 

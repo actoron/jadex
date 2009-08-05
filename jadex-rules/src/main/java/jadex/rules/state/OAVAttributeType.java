@@ -128,7 +128,7 @@ public class OAVAttributeType
 	//-------- methods --------
 	
 	/**
-	 *  Get the object type.
+	 *  Get the object type (the type of the object holding this attribute).
 	 *  @return The objecttype.
 	 */
 	public OAVObjectType getObjectType()
@@ -155,7 +155,7 @@ public class OAVAttributeType
 	}
 
 	/**
-	 *  Get the attribute type.
+	 *  Get the attribute type (the type of the value stored via this attribute).
 	 *  @return The type.
 	 */
 	public OAVObjectType getType()

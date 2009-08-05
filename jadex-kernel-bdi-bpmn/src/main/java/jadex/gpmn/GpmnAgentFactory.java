@@ -2,11 +2,14 @@ package jadex.gpmn;
 
 import jadex.bdi.interpreter.BDIAgentFactory;
 import jadex.bdi.interpreter.OAVAgentModel;
+import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
+import jadex.commons.xml.writer.Writer;
 import jadex.gpmn.model.MGpmnModel;
 
+import java.io.FileOutputStream;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -62,10 +65,15 @@ public class GpmnAgentFactory extends BDIAgentFactory
 		{
 			MGpmnModel gpmn = GpmnXMLReader.read(model, libservice.getClassLoader(), null);
 			OAVAgentModel[]	agents	= converter.convertGpmnModelToBDIAgents(gpmn, libservice.getClassLoader());
-			if(agents.length!=1)
+			if(agents==null || agents.length!=1)
 			{
 				throw new RuntimeException("Model must contain a single process: "+model);
 			}
+			
+			FileOutputStream os = new FileOutputStream("wurst.xml");
+			Writer writer = OAVBDIXMLReader.getWriter();
+			writer.write(agents[0].getState().getRootObjects().next(), os, agents[0].getState());
+			os.close();
 			return agents[0];
 		}
 		catch(Exception e)

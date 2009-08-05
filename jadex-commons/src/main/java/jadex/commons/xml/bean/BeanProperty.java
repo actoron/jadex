@@ -8,7 +8,7 @@
  * Last revision $Revision: 4401 $ by:
  * $Author: walczak $ on $Date: 2006-06-29 19:27:25 +0200 (Do, 29 Jun 2006) $.
  */
-package jadex.commons.xml;
+package jadex.commons.xml.bean;
 
 import java.lang.reflect.Method;
 

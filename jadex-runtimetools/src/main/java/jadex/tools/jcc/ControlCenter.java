@@ -16,12 +16,11 @@ import jadex.bridge.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.xml.AbstractInfo;
-import jadex.commons.xml.BeanAttributeInfo;
-import jadex.commons.xml.BeanObjectHandler;
-import jadex.commons.xml.BeanObjectWriterHandler;
-import jadex.commons.xml.LinkInfo;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.bean.BeanAttributeInfo;
+import jadex.commons.xml.bean.BeanObjectReaderHandler;
+import jadex.commons.xml.bean.BeanObjectWriterHandler;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.RememberOptionMessage;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -323,6 +322,8 @@ public class ControlCenter implements IControlCenter
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
+			
 			final String failed = SUtil.wrapText("Could not open project\n\n"
 				+ e.getMessage());
 			SwingUtilities.invokeLater(new Runnable()
@@ -1153,28 +1154,37 @@ public class ControlCenter implements IControlCenter
 	}
 
 	public static Set typeinfos;	
-	public static Set linkinfos;
+//	public static Set linkinfos;
+	public static Set ignoredattrs;
 	static
 	{
+		ignoredattrs = new HashSet();
+		ignoredattrs.add("schemaLocation");
 		typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo("properties", Properties.class, null, null, null, null, null,
-			new SubobjectInfo[]{new SubobjectInfo("properties", "property"), new SubobjectInfo("subproperties", "properties")}));
-			typeinfos.add(new TypeInfo("property", Property.class, null, new BeanAttributeInfo("value", AbstractInfo.XML_CONTENT_ATTRIBUTE)));
+		typeinfos.add(new TypeInfo(null, "properties", Properties.class, null, null, null, null, null,
+			new SubobjectInfo[]
+			{
+				new SubobjectInfo(new BeanAttributeInfo("property", "properties")), 
+				new SubobjectInfo(new BeanAttributeInfo("properties", "subproperties"))
+			}
+		));
 		
-		linkinfos = new HashSet();
-		linkinfos.add(new LinkInfo("properties", new BeanAttributeInfo("subproperties")));
+		typeinfos.add(new TypeInfo(null, "property", Property.class, null, new BeanAttributeInfo(null, "value")));
+		
+//		linkinfos = new HashSet();
+//		linkinfos.add(new LinkInfo("properties", new BeanAttributeInfo("subproperties")));	
 	}
-	public static jadex.commons.xml.Writer writer;
-	public static jadex.commons.xml.Reader reader;
+	public static jadex.commons.xml.writer.Writer writer;
+	public static jadex.commons.xml.reader.Reader reader;
 	
 	/**
 	 *  Get the xml properties writer.
 	 */
-	public static jadex.commons.xml.Writer getPropertyWriter()
+	public static jadex.commons.xml.writer.Writer getPropertyWriter()
 	{
 		if(writer==null)
 		{
-			writer = new jadex.commons.xml.Writer(new BeanObjectWriterHandler(), typeinfos, null);
+			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(), typeinfos);
 		}
 		return writer;
 	}
@@ -1182,11 +1192,12 @@ public class ControlCenter implements IControlCenter
 	/**
 	 *  Get the xml properties reader.
 	 */
-	public static jadex.commons.xml.Reader getPropertyReader()
+	public static jadex.commons.xml.reader.Reader getPropertyReader()
 	{
 		if(reader==null)
 		{
-			reader = new jadex.commons.xml.Reader(new BeanObjectHandler(), typeinfos, linkinfos, null);
+//			reader = new jadex.commons.xml.Reader(new BeanObjectReaderHandler(), typeinfos, linkinfos, ignoredattrs);
+			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(), typeinfos, ignoredattrs);
 		}
 		return reader;
 	}

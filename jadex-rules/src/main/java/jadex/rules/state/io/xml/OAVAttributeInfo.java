@@ -1,17 +1,15 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
 import jadex.rules.state.OAVAttributeType;
 
 /**
  *  OAV attribute meta information.
  */
-public class OAVAttributeInfo
+public class OAVAttributeInfo extends AttributeInfo
 {
 	//-------- attributes --------
-	
-	/** The oav attribute. */
-	protected OAVAttributeType attribute;
 	
 	/** The attribute value converter. */
 	protected ITypeConverter converter;
@@ -24,25 +22,25 @@ public class OAVAttributeInfo
 	/**
 	 *  Create a new oav attribute info. 
 	 */
-	public OAVAttributeInfo(OAVAttributeType attribute)
+	public OAVAttributeInfo(String xmlattributename, OAVAttributeType attribute)
 	{
-		this(attribute, null);
+		this(xmlattributename, attribute, null);
 	}
 	
 	/**
 	 *  Create a new oav attribute info. 
 	 */
-	public OAVAttributeInfo(OAVAttributeType attribute, ITypeConverter converter)
+	public OAVAttributeInfo(String xmlattributename, OAVAttributeType attribute, ITypeConverter converter)
 	{
-		this(attribute, converter, null);
+		this(xmlattributename, attribute, converter, null);
 	}
 	
 	/**
 	 *  Create a new oav attribute info. 
 	 */
-	public OAVAttributeInfo(OAVAttributeType attribute, ITypeConverter converter, Object defaultvalue)
+	public OAVAttributeInfo(String xmlattributename, OAVAttributeType attribute, ITypeConverter converter, Object defaultvalue)
 	{
-		this.attribute = attribute;
+		super(xmlattributename, attribute);
 		this.converter = converter;
 		this.defaultvalue = defaultvalue;
 	}
@@ -55,16 +53,16 @@ public class OAVAttributeInfo
 	 */
 	public OAVAttributeType getAttribute()
 	{
-		return this.attribute;
+		return (OAVAttributeType)getAttributeIdentifier();
 	}
 
 	/**
 	 *  Set the attribute.
 	 *  @param attribute The attribute to set.
 	 */
-	public void setAttribute(String attributename)
+	public void setAttribute(OAVAttributeType attribute)
 	{
-		this.attribute = attribute;
+		setAttributeIdentifier(attribute);
 	}
 
 	/**

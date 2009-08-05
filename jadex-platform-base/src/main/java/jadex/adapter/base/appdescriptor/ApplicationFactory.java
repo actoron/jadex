@@ -11,9 +11,10 @@ import jadex.bridge.ISpace;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.xml.BeanObjectHandler;
-import jadex.commons.xml.Reader;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.bean.BeanAttributeInfo;
+import jadex.commons.xml.bean.BeanObjectReaderHandler;
+import jadex.commons.xml.reader.Reader;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -61,40 +62,39 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings (if any).
 	 */
-	public ApplicationFactory(IPlatform platform, Set[] mappings, Set[] linkinfos)
+	public ApplicationFactory(IPlatform platform, Set[] mappings)// Set[] linkinfos)
 	{
 		this.platform = platform;
 		
 		Set types = new HashSet();
-		Map attrs = new HashMap();
-		attrs.put("type", "typeName");
-		types.add(new TypeInfo("applicationtype", MApplicationType.class, "description", null));
-		types.add(new TypeInfo("spacetype", MSpaceType.class));
-		types.add(new TypeInfo("agenttype", MAgentType.class));
-		types.add(new TypeInfo("application", MApplicationInstance.class, null, null, attrs, null));
-		types.add(new TypeInfo("space", MSpaceInstance.class));
-		types.add(new TypeInfo("agent", MAgentInstance.class, null, null, attrs, null));
-		types.add(new TypeInfo("parameter", MArgument.class));
-		types.add(new TypeInfo("parameterset", MArgumentSet.class));
-		types.add(new TypeInfo("value", String.class));
-		types.add(new TypeInfo("import", String.class));
-		types.add(new TypeInfo("property", String.class));
+		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null));
+		types.add(new TypeInfo(null, "spacetype", MSpaceType.class));
+		types.add(new TypeInfo(null, "agenttype", MAgentType.class));
+		types.add(new TypeInfo(null, "application", MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
+		types.add(new TypeInfo(null, "space", MSpaceInstance.class));
+		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
+		types.add(new TypeInfo(null, "parameter", MArgument.class));
+		types.add(new TypeInfo(null, "parameterset", MArgumentSet.class));
+		types.add(new TypeInfo(null, "value", String.class));
+		types.add(new TypeInfo(null, "import", String.class));
+		types.add(new TypeInfo(null, "property", String.class));
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
 			types.addAll(mappings[i]);
 		}
 		
-		Set links = new HashSet();
-		for(int i=0; linkinfos!=null && i<linkinfos.length; i++)
-		{
-			links.addAll(linkinfos[i]);
-		}
+//		Set links = new HashSet();
+//		for(int i=0; linkinfos!=null && i<linkinfos.length; i++)
+//		{
+//			links.addAll(linkinfos[i]);
+//		}
 		
 		Set ignored = new HashSet();
 		ignored.add("schemaLocation");
 		
-		this.reader = new Reader(new BeanObjectHandler(), types, links, ignored);
+//		this.reader = new Reader(new BeanObjectReaderHandler(), types, links, ignored);
+		this.reader = new Reader(new BeanObjectReaderHandler(), types, ignored);
 	}
 	
 	//-------- IAgentFactory interface --------

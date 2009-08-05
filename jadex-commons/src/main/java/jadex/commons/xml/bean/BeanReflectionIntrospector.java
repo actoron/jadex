@@ -1,4 +1,5 @@
-package jadex.commons.xml;
+package jadex.commons.xml.bean;
+
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  *
  */
-public class ReflectionIntrospector implements IBeanIntrospector
+public class BeanReflectionIntrospector implements IBeanIntrospector
 {
 	/**
 	 * 

@@ -1,6 +1,10 @@
-package jadex.commons.xml;
+package jadex.commons.xml.writer;
 
 import jadex.commons.SReflect;
+import jadex.commons.xml.AbstractInfo;
+import jadex.commons.xml.StackElement;
+import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.bean.BeanObjectWriterHandler;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -11,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -53,13 +58,13 @@ public class Writer
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Writer(IObjectWriterHandler handler, Set typeinfos, Set ignoredattrs)
+	public Writer(IObjectWriterHandler handler, Set typeinfos)//, Set ignoredattrs)
 	{
 		this.handler = handler;
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
-		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
+//		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 		this.genids = false;
-		this.gencontainertags = false;
+		this.gencontainertags = true;
 	}
 	
 	//-------- methods --------
@@ -79,7 +84,7 @@ public class Writer
 		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out);
 		writer.writeStartDocument();
 		writer.writeCharacters(lf);
-		writeObject(writer, object, writtenobs, null, stack);
+		writeObject(writer, object, writtenobs, null, stack, context);
 		writer.writeEndDocument();
 		writer.close();
 	}
@@ -87,48 +92,60 @@ public class Writer
 	/**
 	 *  Write an object to xml.
 	 */
-	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, List stack) throws Exception
+	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, List stack, Object context) throws Exception
 	{
-		TypeInfo typeinfo = getTypeInfo(object, getXMLPath(stack)); 
+		TypeInfo typeinfo = tagname!=null? getTypeInfo(object, getXMLPath(stack)+"/"+tagname, context, true):
+			getTypeInfo(object, getXMLPath(stack), context, false); 
 		if(typeinfo!=null)
 			tagname = typeinfo.getXMLTag();
-		if(tagname==null)
+		else if(tagname.indexOf("/")!=-1)
+			tagname = tagname.substring(tagname.lastIndexOf("/")+1);
+		else if(tagname==null)
 			tagname = object.getClass().getName();
 		
-		writeIdentation(writer, stack.size());
-//		writeStartObject(writer, object, tagname);
-		writer.writeStartElement(tagname);
-		
-		StackElement topse = new StackElement(tagname, object);
-		stack.add(topse);
-		
-		if(writtenobs.containsKey(object))
+		if(genids && writtenobs.containsKey(object))
 		{
-			if(genids)
-			{
-				writer.writeAttribute("IDREF", (String)writtenobs.get(object));
-				writer.writeEndElement();
-				writer.writeCharacters(lf);
-//				writeIdref(writer, (String)writtenobs.get(object));
-			}
-			else
-			{
-				throw new RuntimeException("Object structure contains cycles: Enable 'genids' mode for serialization.");
-			}
+			writeStartObject(writer, tagname, stack.size());
+			writer.writeAttribute("IDREF", (String)writtenobs.get(object));
+			writeEndObject(writer, 0);
 		}
 		else
 		{
+			// Check for cycle structures, which are not mappable without ids.
+			if(writtenobs.containsKey(object))
+			{
+				boolean rec = false;
+				for(int i=0; i<stack.size() && !rec; i++)
+				{
+					if(object.equals(((StackElement)stack.get(i)).getObject()))
+						throw new RuntimeException("Object structure contains cycles: Enable 'genids' mode for serialization.");
+				}
+			}
+			
+			WriteObjectInfo wi = handler.getObjectWriteInfo(object, typeinfo, context);
+
+			// Comment
+			
+			String comment = wi.getComment();
+			if(comment!=null)
+			{
+				writeIdentation(writer, stack.size());
+				writer.writeComment(comment);
+				writer.writeCharacters(lf);
+			}
+			
+			writeStartObject(writer, tagname, stack.size());
+			
+			StackElement topse = new StackElement(tagname, object);
+			stack.add(topse);
 			writtenobs.put(object, ""+id);
 			if(genids)
 				writer.writeAttribute("ID", ""+id);
-//				writeId(writer, ""+id);
 			id++;
 			
-			Object[] tmp = handler.getAttributesContentAndSubobjects(object, typeinfo);
-			Map attrs = (Map)tmp[0];
-			String content = (String)tmp[1];
-			Map subobs = (Map)tmp[2]; 
+			// Attributes
 			
+			Map attrs = wi.getAttributes();
 			if(attrs!=null)
 			{
 				for(Iterator it=attrs.keySet().iterator(); it.hasNext(); )
@@ -139,18 +156,15 @@ public class Writer
 				}
 			}
 			
-			if(content==null && (subobs==null || subobs.size()==0))
+			if(wi.getContent()==null && (wi.getSubobjects()==null || wi.getSubobjects().size()==0))
 			{
-				writer.writeEndElement();
-				writer.writeCharacters(lf);
-//				writeEndObjectSameLine(writer);
+				writeEndObject(writer, 0);
 			}
 			else
 			{
-//				writer.writeEndElement();
-//				writeStartTagClose(writer);
+				// Content
 				
-				// write content (before subobjects).
+				String content = wi.getContent();
 				if(content!=null)
 				{
 					if(content.indexOf("<")!=-1 || content.indexOf(">")!=-1 || content.indexOf("&")!=-1)
@@ -159,74 +173,70 @@ public class Writer
 						writer.writeCharacters(content);
 				}
 				
+				// Subobjects
+				
+				Map subobs = wi.getSubobjects();
 				if(subobs==null || subobs.size()==0)
 				{
-					writer.writeEndElement();
-					writer.writeCharacters(lf);
-//					writeEndObject(writer, object, tagname);
+					writeEndObject(writer, 0);
 				}
 				else
 				{
 					writer.writeCharacters(lf);
-//					writeLF(writer);
 					
 					for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
 					{
-						Object subref = (String)it.next();
-						Object obj =  subobs.get(subref);
+						String subpathname = (String)it.next();
+						String subtagname = subpathname.indexOf("/")!=-1? subpathname.substring(subpathname.indexOf("/")): subpathname;
+						Object obj =  subobs.get(subpathname);
 						
-						SubobjectInfo subinfo = null;
-						if(typeinfo!=null)
-							subinfo = typeinfo.getSubobjectInfo(subref);
-						String subtagname = subinfo!=null? subinfo.getXMLAttributeName(): ""+subref; 
+						StringTokenizer stok = new StringTokenizer(subpathname, "/");
+						String[] subtags = new String[stok.countTokens()-1];
+						for(int i=0; i<subtags.length; i++)
+							subtags[i] = stok.nextToken();
 						
+						if(gencontainertags)
+						{
+							for(int i=0; i<subtags.length; i++)
+							{
+								writeStartObject(writer, subtags[i], stack.size());
+								writer.writeCharacters(lf);
+								stack.add(new StackElement(subtags[i], null));
+							}
+						}
+							
 						if(SReflect.isIterable(obj))
 						{
 							// todo: container tags?!
 							Iterator it2 = SReflect.getIterator(obj);
 							if(it2.hasNext())
 							{
-								if(gencontainertags)
+								while(it2.hasNext())
 								{
-									// todo: container tags in subobjectinfo
-									writeIdentation(writer, stack.size());
-									writer.writeStartElement(subtagname);
-//									writeStartObject(writer, object, subtagname);
-//									writeStartTagClose(writer);
-									writer.writeEndElement();
-									writer.writeCharacters(lf);
-									while(it2.hasNext())
-									{
-										writeObject(writer, it2.next(), writtenobs, subtagname, stack);
-									}
-									writeIdentation(writer, stack.size());
-									writer.writeEndElement();
-									writer.writeCharacters(lf);
-									//writeEndObject(writer, object, subtagname);
-								}
-								else
-								{
-									while(it2.hasNext())
-									{
-										writeObject(writer, it2.next(), writtenobs, subtagname, stack);
-									}
+									writeObject(writer, it2.next(), writtenobs, subpathname, stack, context);
 								}
 							}
 						}
 						else
 						{
-							writeObject(writer, obj, writtenobs, subtagname, stack);
+							writeObject(writer, obj, writtenobs, subpathname, stack, context);
+						}
+						
+						if(gencontainertags)
+						{
+							for(int i=0; i<subtags.length; i++)
+							{
+								stack.remove(stack.size()-1);
+								writeEndObject(writer, stack.size());
+							}
 						}
 					}
-					writeIdentation(writer, stack.size()-1);
-//					writeEndObject(writer, object, tagname);
-					writer.writeEndElement();
-					writer.writeCharacters(lf);
+					writeEndObject(writer, stack.size()-1);
 				}
 			}
+			
+			stack.remove(stack.size()-1);
 		}
-		
-		stack.remove(stack.size()-1);
 	}
 	
 	/**
@@ -235,16 +245,17 @@ public class Writer
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	protected TypeInfo getTypeInfo(Object object, String fullpath)//, Map rawattributes)
+	protected TypeInfo getTypeInfo(Object object, String fullpath, Object context, boolean full)//, Map rawattributes)
 	{
 		TypeInfo ret = null;
-		Set maps = (Set)typeinfos.get(object.getClass());
+		Set maps = (Set)typeinfos.get(handler.getObjectType(object, context));
 		if(maps!=null)
 		{
 			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
 			{
 				TypeInfo tmp = (TypeInfo)it.next();
-				if(fullpath.endsWith(tmp.getXMLPathWithoutElement()))// && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
+				if(!full && fullpath.endsWith(tmp.getXMLPathWithoutElement()) ||
+					(full && fullpath.endsWith(tmp.getXMLPath())))// && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
 					ret = tmp;
 			}
 		}
@@ -276,95 +287,30 @@ public class Writer
 	}
 	
 	/**
-	 *  Writer the xml header info.
-	 * /
-	public void writeHeader(PrintWriter writer)
-	{
-		// todo: namespaces etc
-		writer.write("<?xml version=\"1.0\"?>");
-		writer.write(lf);
-	}*/
-	
-	/**
-	 *  Write the id of an object.
-	 * /
-	public void writeId(XMLStreamWriter writer, String id) throws Exception
-	{
-		// todo: namespaces etc
-		writer.writeAttribute("ID", ""+id);
-	}*/
-	
-	/**
-	 *  Write the idref of an object.
+	 *  Write the start of an object.
 	 */
-	public void writeIdref(XMLStreamWriter writer, String idref) throws Exception
+	public void writeStartObject(XMLStreamWriter writer, String name, int level) throws Exception
 	{
-		writer.writeAttribute("IDREF", idref);
-		// todo: namespaces etc
-		//writer.write(" IDREF=\""+idref+"\""+"/>");
-		//writer.write(lf);
+		writeIdentation(writer, level);
+		writer.writeStartElement(name);
 	}
 	
 	/**
-	 *  Write a closing brace.
-	 * /
-	public void writeStartTagClose(XMLStreamWriter writer) throws Exception
-	{
-		writer.writeCharacters(">");
-	}*/
-	
-	/**
-	 *  Write a line feed.
-	 * /
-	public void writeLF(PrintWriter writer)
-	{
-		writer.write(lf);
-	}*/
-	
-	/**
-	 *  Write the start of an object.
-	 * /
-	public void writeStartObject(XMLStreamWriter writer, Object object, String name) throws Exception
-	{
-		writer.writeStartElement(name);
-//		writer.write("<"+handler.getTag(object, null)); // todo: typeinfo
-//		writer.write("<"+name); // todo: typeinfo
-	}*/
-	
-	/**
 	 *  Write the end of an object.
-	 * /
-	public void writeEndObject(PrintWriter writer, Object object, String name)
+	 */
+	public void writeEndObject(XMLStreamWriter writer, int level) throws Exception
 	{
-//		writer.write("<"+handler.getTag(object, null)); // todo: typeinfo
-		writer.write("</"+name+">"); // todo: typeinfo
-		writer.write(lf);
-	}*/
-	
-	/**
-	 *  Write a closing brace.
-	 * /
-	public void writeEndObjectSameLine(XMLStreamWriter writer) throws Exception
-	{
-		writer.writeCharacters("/>");
+		writeIdentation(writer, level);
+		writer.writeEndElement();
 		writer.writeCharacters(lf);
-	}*/
-	
-	/**
-	 *  Write an attribute value.
-	 * /
-	public void writeAttribute(PrintWriter writer, String name, String value)
-	{
-		writer.write(" "+name+"=\""+value+"\"");
-	}*/
-	
+	}
+		
 	/**
 	 *  Write content.
 	 */
 	public void writeContent(PrintWriter writer, String value)
 	{
 		writer.write(value);
-//		writer.write(lf);
 	}
 	
 	/**
@@ -409,7 +355,7 @@ public class Writer
 	//		TypeInfo tia = new TypeInfo("a", A.class);
 	//		TypeInfo tib = new TypeInfo("b", B.class);
 			
-			Writer w = new Writer(new BeanObjectWriterHandler(), null, null);
+			Writer w = new Writer(new BeanObjectWriterHandler(), null);
 			
 			w.write(a, System.out, null);
 		}

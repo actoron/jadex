@@ -318,8 +318,16 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			Class	clazz	= (Class)getState().getAttributeValue(mbelset, OAVBDIMetaModel.typedelement_has_class);
 			ret	= (Object[])Array.newInstance(SReflect.getWrappedType(clazz), facts!=null ? facts.size() : 0);
 			if(facts!=null)
+			{
+			try
+			{
 				ret = facts.toArray(ret);
-			
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			}
 			return ret;
 		}
 	}

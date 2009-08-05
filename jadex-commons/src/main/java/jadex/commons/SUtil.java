@@ -1441,6 +1441,22 @@ public class SUtil
 		return ret;
 	}
 	
+	/**
+	 *  Create a hash map from keys and values.
+	 *  @param keys The keys.
+	 *  @param values The values.
+	 *  @return The map.
+	 */
+	public static Set createHashSet(Object[] values)
+	{
+		Set ret = new HashSet();
+		for(int i=0; i<values.length; i++)
+		{
+			ret.add(values[i]);
+		}
+		return ret;
+	}
+	
 	/** The counter for conversation ids. */
 	protected static int	convidcnt;
 

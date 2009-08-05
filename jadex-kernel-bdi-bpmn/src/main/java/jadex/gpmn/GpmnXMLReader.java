@@ -3,12 +3,12 @@ package jadex.gpmn;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
-import jadex.commons.xml.BeanAttributeInfo;
-import jadex.commons.xml.BeanObjectHandler;
 import jadex.commons.xml.IPostProcessor;
-import jadex.commons.xml.LinkInfo;
-import jadex.commons.xml.Reader;
+import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.bean.BeanAttributeInfo;
+import jadex.commons.xml.bean.BeanObjectReaderHandler;
+import jadex.commons.xml.reader.Reader;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MArtifact;
 import jadex.gpmn.model.MAssociation;
@@ -46,7 +46,7 @@ public class GpmnXMLReader
 		ignored.add("xmi");
 		ignored.add("iD");
 		ignored.add("version");
-		reader = new Reader(new BeanObjectHandler(), getXMLMapping(), getXMLLinkInfos(), ignored);
+		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping(), ignored);
 	}
 	
 	/**
@@ -82,19 +82,42 @@ public class GpmnXMLReader
 	{
 		Set types = new HashSet();
 		
-		types.add(new TypeInfo("GpmnDiagram", MGpmnModel.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}), null));
+		types.add(new TypeInfo(null, "GpmnDiagram", MGpmnModel.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo("processes", "process"))
+		}));
 		
-		types.add(new TypeInfo("processes", MProcess.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}), null));
+		types.add(new TypeInfo(null, "processes", MProcess.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
+			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new SubobjectInfo(new BeanAttributeInfo("artifacts", "artifact")),
+			new SubobjectInfo(new BeanAttributeInfo("vertices", "goal"), new IFilter()
+			{
+				public boolean filter(Object obj)
+				{
+					String type = (String)((Map)obj).get("type");
+					return type.endsWith("Goal");
+				}
+			}),
+			new SubobjectInfo(new BeanAttributeInfo("vertices", "plan"),
+			new IFilter()
+			{
+				public boolean filter(Object obj)
+				{
+					String type = (String)((Map)obj).get("type");
+					return type.endsWith("Plan");
+				}
+			})
+		}));	
 		
-		types.add(new TypeInfo("associations", MAssociation.class));
+		types.add(new TypeInfo(null, "associations", MAssociation.class));
 		
-		types.add(new TypeInfo("vertices", MAchieveGoal.class, null, null,
-			SUtil.createHashMap(new String[]{"ID", "exclude"},
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"), new BeanAttributeInfo("excludeMode")}),
+		types.add(new TypeInfo(null, "vertices", MAchieveGoal.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
 			new ProcessElementPostProcessor(),
 			new IFilter()
 			{
@@ -103,11 +126,21 @@ public class GpmnXMLReader
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("AchieveGoal");
 				}
-			}));
+			}, 
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
+			new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
+			new SubobjectInfo(new BeanAttributeInfo("dropcondition", "dropCondition")),
+			new SubobjectInfo(new BeanAttributeInfo("targetcondition", "targetCondition")),
+//			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
+			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+
+		}));
 		
-		types.add(new TypeInfo("vertices", MMaintainGoal.class, null, null,
-			SUtil.createHashMap(new String[]{"ID", "exclude"},
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"), new BeanAttributeInfo("excludeMode")}),
+		
+		types.add(new TypeInfo(null, "vertices", MMaintainGoal.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
 			new ProcessElementPostProcessor(),
 			new IFilter()
 			{
@@ -116,11 +149,19 @@ public class GpmnXMLReader
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("MaintainGoal");
 				}
+			}, 
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
+			new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
+			new SubobjectInfo(new BeanAttributeInfo("dropcondition", "dropCondition")),
+			new SubobjectInfo(new BeanAttributeInfo("maintaincondition", "maintainCondition")),
+//			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
+			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 			}));
 		
-		types.add(new TypeInfo("vertices", MPlan.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
+		types.add(new TypeInfo(null, "vertices", MPlan.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			new ProcessElementPostProcessor(),
 			new IFilter()
 			{
@@ -129,22 +170,24 @@ public class GpmnXMLReader
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("Plan");
 				}
-			}));
+			},
+			new SubobjectInfo[]{
+//			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
+			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			}));	
 		
-		types.add(new TypeInfo("sequenceEdges", MSequenceEdge.class, null, null,
-			SUtil.createHashMap(new String[]{"ID", "associations"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"),
-			new BeanAttributeInfo("associationsDescription")}), null));
+		types.add(new TypeInfo(null, "sequenceEdges", MSequenceEdge.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
+			new BeanAttributeInfo("associations", "associationsDescription")}, null));
 		
-		types.add(new TypeInfo("staticElements", MParameter.class, null, null,
-			SUtil.createHashMap(new String[]{"ID", "type", "initialValue"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id"),
-			new BeanAttributeInfo("className"),
-			new BeanAttributeInfo("initialValueDescription")}), null));
+		types.add(new TypeInfo(null, "staticElements", MParameter.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
+			new BeanAttributeInfo("type", "className"),
+			new BeanAttributeInfo("initialValue", "initialValueDescription")}, null));
 		
-		types.add(new TypeInfo("artifacts", MArtifact.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
+		types.add(new TypeInfo(null, "artifacts", MArtifact.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			null,
 			new IFilter()
 			{
@@ -153,11 +196,14 @@ public class GpmnXMLReader
 					String type = (String)((Map)obj).get("type");
 					return !type.endsWith("Context");
 				}
-			}));
+			},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo("associations", "association"))
+			}	
+		));
 		
-		types.add(new TypeInfo("artifacts", MContext.class, null, null,
-			SUtil.createHashMap(new String[]{"ID"}, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("Id")}),
+		types.add(new TypeInfo(null, "artifacts", MContext.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			null,
 			new IFilter()
 			{
@@ -166,14 +212,18 @@ public class GpmnXMLReader
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("Context");
 				}
-			}));
+			},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo("staticElements", "parameter"))
+			}
+		));
 		
 		return types;
 	}
 	
 	/**
 	 *  Get the XML link infos.
-	 */
+	 * /
 	public static Set getXMLLinkInfos()
 	{
 		Set linkinfos = new HashSet();
@@ -212,6 +262,7 @@ public class GpmnXMLReader
 				return type.endsWith("Plan");
 			}
 		}));
+		
 		linkinfos.add(new LinkInfo("sequenceEdges", new BeanAttributeInfo("sequenceEdge")));
 		
 		// artifacts
@@ -222,7 +273,7 @@ public class GpmnXMLReader
 
 		
 		return linkinfos;
-	}
+	}*/
 	
 	/**
 	 *  Process element post processor.

@@ -2,9 +2,11 @@ package jadex.commons.xml;
 
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 
 /**
@@ -12,11 +14,6 @@ import java.util.Comparator;
  */
 public class AbstractInfo
 {
-	//-------- constants --------
-	
-	/** The content xml attribute constant. */
-	public static String XML_CONTENT_ATTRIBUTE = "__XML_CONTENT";
-	
 	//-------- attributes --------
 	
 	/** The xml tag/path. */
@@ -63,14 +60,6 @@ public class AbstractInfo
 	}
 	
 	/**
-	 *  Set the xmlpath.
-	 */
-	public void setXMLPath(String xmlpath)
-	{
-		this.xmlpath = xmlpath;
-	}
-	
-	/**
 	 *  Get the xml tag
 	 */
 	public String getXMLTag()
@@ -85,6 +74,19 @@ public class AbstractInfo
 		}
 		
 		return xmltag;
+	}
+	
+	/**
+	 *  Get the xmlpath as string array.
+	 *  @return The xmlpath.
+	 */
+	public String[] getXMLPathElements()
+	{
+		List ret = new ArrayList();
+		StringTokenizer stok = new StringTokenizer("/");
+		while(stok.hasMoreElements())
+			ret.add(stok.nextToken());
+		return (String[])ret.toArray(new String[ret.size()]);
 	}
 	
 	/**
@@ -128,15 +130,6 @@ public class AbstractInfo
 	}
 
 	/**
-	 *  Set the filter.
-	 *  @param filter The filter to set.
-	 */
-	public void setFilter(IFilter filter)
-	{
-		this.filter = filter;
-	}
-	
-	/**
 	 *  Get the id.
 	 *  @return The id.
 	 */
@@ -164,7 +157,7 @@ public class AbstractInfo
 	/**
 	 *  Compare infos by specificity of the XML path.
 	 */
-	static final class SpecificityComparator implements Comparator
+	public static final class SpecificityComparator implements Comparator
 	{
 		public int compare(Object arg0, Object arg1)
 		{

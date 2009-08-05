@@ -1,4 +1,5 @@
-package jadex.commons.xml;
+package jadex.commons.xml.bean;
+
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;

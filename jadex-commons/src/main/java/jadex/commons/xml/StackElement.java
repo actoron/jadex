@@ -10,16 +10,21 @@ public class StackElement
 	//-------- attributes --------
 	
 	/** The xml tag. */
-	public String tag;
+	protected String tag;
 	
 	/** The created object. */
-	public Object object;
+	protected Object object;
 	
 	/** The collected content. */
-	public String content;
+	protected String content;
+	
+	// todo: remove rest somehow
 	
 	/** The raw attributes. */
-	public Map rawattrs;
+	protected Map rawattrs;
+	
+	/** The type info. */
+	protected TypeInfo typeinfo;
 	
 	//-------- constructors --------
 	
@@ -39,6 +44,17 @@ public class StackElement
 		this.tag = tag;
 		this.object = object;
 		this.rawattrs = rawattrs;
+	}
+	
+	/**
+	 *  Create a new stack element.
+	 */
+	public StackElement(String tag, Object object, Map rawattrs, TypeInfo typeinfo)
+	{
+		this.tag = tag;
+		this.object = object;
+		this.rawattrs = rawattrs;
+		this.typeinfo = typeinfo;
 	}
 	
 	//-------- methods --------
@@ -77,6 +93,15 @@ public class StackElement
 	public Map getRawAttributes()
 	{
 		return this.rawattrs;
+	}
+
+	/**
+	 *  Get the typeinfo.
+	 *  @return The typeinfo.
+	 */
+	public TypeInfo getTypeInfo()
+	{
+		return this.typeinfo;
 	}
 
 	/**

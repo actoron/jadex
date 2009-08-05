@@ -1,52 +1,87 @@
-package jadex.commons.xml;
+package jadex.commons.xml.bean;
+
+import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.SubobjectInfo;
+import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.writer.IObjectWriterHandler;
+import jadex.commons.xml.writer.WriteObjectInfo;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * 
+ *  Java bean version for fetching write info for an object. 
  */
 public class BeanObjectWriterHandler implements IObjectWriterHandler
 {
 	//-------- attributes --------
 	
 	/** The bean introspector. */
-	protected IBeanIntrospector introspector = new ReflectionIntrospector();
+	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
 	
 	//-------- methods --------
 	
 	/**
-	 *  Get attributes of an object as name value pairs.
+	 *  Get the object type
+	 *  @param object The object.
+	 *  @return The object type.
 	 */
-	public Object[] getAttributesContentAndSubobjects(Object object, TypeInfo typeinfo)
+	public Object getObjectType(Object object, Object context)
+	{
+		return object.getClass();
+	}
+	
+	/**
+	 *  Get write info for an object.
+	 */
+	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, Object context)
 	{
 		// todo: handle proper attribute -> string conversion
 		
-		Map attrs = new HashMap();
-		String content = null;
-		Map subobs = new HashMap();
-		Set doneprops = new HashSet();
+		WriteObjectInfo wi = new WriteObjectInfo();
+		HashSet doneprops = new HashSet();
 		
 		if(typeinfo!=null)
 		{
-			// Content
+			// Comment
 			
-			BeanAttributeInfo cinfo = (BeanAttributeInfo)typeinfo.getContentInfo();
-			if(cinfo!=null)
+			Object cominfo = typeinfo.getCommentInfo();
+			if(cominfo!=null)
 			{
+				String propname = getPropertyName(cominfo);
 				try
 				{
-					String propname = cinfo.getAttributeName();
 					Method method = findGetMethod(object, propname, new String[]{"get", "is"});
 					Object value = method.invoke(object, new Object[0]);
 					if(value!=null)
 					{
-						content = ""+value;
+						wi.setComment(""+value);
+						doneprops.add(propname);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			// Content
+			
+			Object cinfo = typeinfo.getContentInfo();
+			if(cinfo!=null)
+			{
+				String propname = getPropertyName(cinfo);
+				try
+				{
+					Method method = findGetMethod(object, propname, new String[]{"get", "is"});
+					Object value = method.invoke(object, new Object[0]);
+					if(value!=null)
+					{
+						wi.setContent(""+value);
 						doneprops.add(propname);
 					}
 				}
@@ -63,17 +98,21 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 			{
 				for(Iterator it=attrinfos.iterator(); it.hasNext(); )
 				{
+					Object info = it.next();
+					String propname = getPropertyName(info);
 					try
 					{
-						BeanAttributeInfo attrinfo = (BeanAttributeInfo)it.next();
-						String propname = attrinfo.getAttributeName();
 						Method method = findGetMethod(object, propname, new String[]{"get", "is"});
 						
 						Object value = method.invoke(object, new Object[0]);
 						if(value!=null)
 						{
-							String xmlattrname = attrinfo.getXMLAttributeName()!=null? attrinfo.getXMLAttributeName(): propname;
-							attrs.put(xmlattrname, ""+value);
+							String xmlattrname = null;
+							if(info instanceof AttributeInfo)
+								xmlattrname = ((AttributeInfo)info).getXMLAttributeName();
+							if(xmlattrname==null)
+								xmlattrname = propname;
+							wi.addAttribute(xmlattrname, ""+value);
 							doneprops.add(propname);
 						}
 					}
@@ -86,22 +125,22 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 			
 			// Subobjects 
 			
-			Map subobsinfos = typeinfo.getSubobjectInfos();
+			Collection subobsinfos = typeinfo.getSubobjectInfos();
 			if(subobsinfos!=null)
 			{
-				for(Iterator it=subobsinfos.values().iterator(); it.hasNext(); )
+				for(Iterator it=subobsinfos.iterator(); it.hasNext(); )
 				{
 					try
 					{
 						SubobjectInfo soinfo = (SubobjectInfo)it.next();
-						String propname = (String)soinfo.getAttribute();
+						String propname = (String)soinfo.getLinkInfo().getAttributeIdentifier();
 						Method method = findGetMethod(object, propname, new String[]{"get"});
 						
 						Object value = method.invoke(object, new Object[0]);
 						if(value!=null)
 						{
-							String xmlsoname = soinfo.getXMLAttributeName()!=null? soinfo.getXMLAttributeName(): propname;
-							subobs.put(xmlsoname, value);
+							String xmlsoname = soinfo.getXMLTag()!=null? soinfo.getXMLTag(): propname;
+							wi.addSubobject(xmlsoname, value);
 							doneprops.add(propname);
 						}
 					}
@@ -131,11 +170,11 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 						{
 							if(BasicTypeConverter.isBuiltInType(bp.getType()))
 							{
-								attrs.put(propname, ""+value);
+								wi.addAttribute(propname, ""+value);
 							}
 							else
 							{
-								subobs.put(propname, value);
+								wi.addSubobject(propname, value);
 							}
 						}
 					}
@@ -147,11 +186,37 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 			}
 		}
 		
-		return new Object[]{attrs, content, subobs};
+		return wi;
 	}
 	
 	/**
-	 * 
+	 *  Get the property name.
+	 *  @param info The info.
+	 *  @return The property name.
+	 */
+	protected String getPropertyName(Object info)
+	{
+		String ret;
+		if(info instanceof AttributeInfo)
+		{
+			ret = (String)((AttributeInfo)info).getAttributeIdentifier();
+		}
+		else if(info instanceof String)
+		{
+			ret = (String)info;
+		}
+		else
+		{
+			throw new RuntimeException("Unknown info type: "+info);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Find a get method with some prefix.
+	 *  @param object The object.
+	 *  @param name The name.
+	 *  @param prefixes The prefixes to test.
 	 */
 	protected Method findGetMethod(Object object, String name, String[] prefixes)
 	{
@@ -174,3 +239,4 @@ public class BeanObjectWriterHandler implements IObjectWriterHandler
 		return method;
 	}
 }
+

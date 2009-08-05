@@ -1,6 +1,11 @@
-package jadex.commons.xml;
+package jadex.commons.xml.bean;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.reader.IObjectReaderHandler;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
@@ -10,7 +15,7 @@ import java.util.Map;
 /**
  *  Handler for reading XML into Java beans.
  */
-public class BeanObjectHandler implements IObjectHandler
+public class BeanObjectReaderHandler implements IObjectReaderHandler
 {
 	//-------- methods --------
 
@@ -134,13 +139,14 @@ public class BeanObjectHandler implements IObjectHandler
 	{
 		boolean set = false;
 		
-		if(attrinfo instanceof BeanAttributeInfo)
+		if(attrinfo instanceof AttributeInfo)
 		{
-			BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
+			AttributeInfo ai = (AttributeInfo)attrinfo;
 			
 			// Write to a map.
-			if(bai.getMapName()!=null)
+			if(ai instanceof BeanAttributeInfo && ((BeanAttributeInfo)ai).getMapName()!=null)
 			{	
+				BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
 				String mapname = bai.getMapName().length()==0? bai.getMapName(): bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
 				
 				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
@@ -154,7 +160,7 @@ public class BeanObjectHandler implements IObjectHandler
 						Class[] ps = ms[j].getParameterTypes();
 						if(ps.length==2)
 						{
-							Object arg = convertAttributeValue(attrval, ps[1], bai.getConverter(), root, classloader);
+							Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader);
 							
 							try
 							{
@@ -170,10 +176,23 @@ public class BeanObjectHandler implements IObjectHandler
 			}
 			else
 			{
-				String postfix = bai.getAttributeName()!=null? bai.getAttributeName().substring(0,1).toUpperCase()+bai.getAttributeName().substring(1)
+				String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
+					.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
 					: xmlattrname.substring(0,1).toUpperCase()+xmlattrname.substring(1);
-				
-				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, bai.getConverter());
+					
+				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
+					ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
+			
+				if(!set)
+				{
+					String oldpostfix = postfix;
+					postfix = SUtil.getSingular(postfix);
+					if(!postfix.equals(oldpostfix))
+					{
+						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
+							ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
+					}
+				}
 			}
 		}
 		else
@@ -184,6 +203,16 @@ public class BeanObjectHandler implements IObjectHandler
 				: xmlattrname.substring(0,1).toUpperCase()+xmlattrname.substring(1);
 			
 			set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
+		
+			if(!set)
+			{
+				String oldpostfix = postfix;
+				postfix = SUtil.getSingular(postfix);
+				if(!postfix.equals(oldpostfix))
+				{
+					set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
+				}
+			}
 		}
 		
 		if(!set)

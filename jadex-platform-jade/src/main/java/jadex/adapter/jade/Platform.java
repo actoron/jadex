@@ -97,11 +97,12 @@ public class Platform implements IPlatform
   			{
   				MAGRSpaceType.getXMLMapping(),
   				MEnvSpaceType.getXMLMapping()
-  			}, 
-  			new Set[]
-  			{
-  				MEnvSpaceType.getXMLLinkInfos()
   			}
+//			, 
+//  			new Set[]
+//  			{
+//  				MEnvSpaceType.getXMLLinkInfos()
+//  			}
 		);
 		
 		services.put(ILibraryService.class, new LibraryService());

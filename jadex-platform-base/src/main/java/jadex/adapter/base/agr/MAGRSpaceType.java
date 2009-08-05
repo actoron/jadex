@@ -3,8 +3,9 @@ package jadex.adapter.base.agr;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.xml.BeanAttributeInfo;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.bean.BeanAttributeInfo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -102,16 +103,16 @@ public class MAGRSpaceType	extends MSpaceType
 	public static Set getXMLMapping()
 	{
 		Set types = new HashSet();
-		types.add(new TypeInfo("agrspacetype", MAGRSpaceType.class));
-		types.add(new TypeInfo("grouptype", MGroupType.class));
-		types.add(new TypeInfo("role", MRoleType.class));
-		types.add(new TypeInfo("agrspace", MAGRSpaceInstance.class, null, null,
-			SUtil.createHashMap(new String[]{"type"}, new String[]{"typeName"}), null));
-		types.add(new TypeInfo("group", MGroupInstance.class, null, null,
-			SUtil.createHashMap(new String[]{"type"}, new String[]{"typeName"}), null));
-		types.add(new TypeInfo("position", MPosition.class, null, null,
-			SUtil.createHashMap(new String[]{"agenttype", "role"}, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("agentType"), new BeanAttributeInfo("roleType")}), null));
+		types.add(new TypeInfo(null, "agrspacetype", MAGRSpaceType.class));
+		types.add(new TypeInfo(null, "grouptype", MGroupType.class));
+		types.add(new TypeInfo(null, "role", MRoleType.class));
+		types.add(new TypeInfo(null, "agrspace", MAGRSpaceInstance.class, null, null,
+			new AttributeInfo[]{new AttributeInfo("type", "typeName")}, null));	
+		types.add(new TypeInfo(null, "group", MGroupInstance.class, null, null,
+			new AttributeInfo[]{new AttributeInfo("type", "typeName")}, null));
+		types.add(new TypeInfo(null, "position", MPosition.class, null, null,
+			new AttributeInfo[]{new AttributeInfo("agenttype", "agentType"), 
+			new AttributeInfo("role", "roleType")}, null));
 		return types;
 	}
 }

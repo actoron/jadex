@@ -1,14 +1,14 @@
-package jadex.commons.xml;
+package jadex.commons.xml.reader;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- *  Interface for object handler.
+ *  Interface for object reader handler.
  *  Is called when a tag start is found and an object could be created.
  *  Is called when an end tag is found and an object could be linked to its parent.
  */
-public interface IObjectHandler
+public interface IObjectReaderHandler
 {
 	/**
 	 *  Create an object for the current tag.

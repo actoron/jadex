@@ -1,10 +1,10 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
-import jadex.commons.xml.BeanAttributeInfo;
-import jadex.commons.xml.IBeanObjectCreator;
-import jadex.commons.xml.IObjectHandler;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.bean.IBeanObjectCreator;
+import jadex.commons.xml.reader.IObjectReaderHandler;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  *  Handler for reading XML into OAV objects.
  */
-public class OAVObjectHandler implements IObjectHandler
+public class OAVObjectReaderHandler implements IObjectReaderHandler
 {
 	//-------- methods --------
 	
@@ -80,19 +80,27 @@ public class OAVObjectHandler implements IObjectHandler
 		OAVAttributeType attrtype = null;
 		Object val = attrval;
 		
-		if(attrinfo instanceof OAVAttributeInfo)
+		if(attrinfo instanceof AttributeInfo)
 		{
-			OAVAttributeInfo info = (OAVAttributeInfo)attrinfo;
-			attrtype = info.getAttribute();
+			AttributeInfo info = (AttributeInfo)attrinfo;
+			attrtype = (OAVAttributeType)info.getAttributeIdentifier();
 			if(val==null && ((OAVAttributeInfo)attrinfo).getDefaultValue()!=null)
 				val = ((OAVAttributeInfo)attrinfo).getDefaultValue();
-			ITypeConverter conv = info.getConverter();
-			if(conv!=null)
-				val = conv.convertObject(attrval, root, classloader);
+			
+			if(info instanceof OAVAttributeInfo)
+			{
+				ITypeConverter conv = ((OAVAttributeInfo)info).getConverter();
+				if(conv!=null)
+					val = conv.convertObject(attrval, root, classloader);
+			}
 		}
 		else if(attrinfo instanceof OAVAttributeType)
 		{
 			attrtype = (OAVAttributeType)attrinfo;
+		}
+		else if(attrinfo!=null)
+		{
+			throw new RuntimeException("Unknown attribute info: "+attrinfo);
 		}
 		
 		// Search attribute in type and supertypes.

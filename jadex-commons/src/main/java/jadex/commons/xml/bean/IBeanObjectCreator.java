@@ -1,4 +1,4 @@
-package jadex.commons.xml;
+package jadex.commons.xml.bean;
 
 import java.util.Map;
 

@@ -261,7 +261,7 @@ public class AgentRules
 			for(Iterator it=plans.iterator(); it.hasNext(); )
 			{
 				Object rplan = it.next();
-				IPlanExecutor	executor	= BDIInterpreter.getInterpreter(state).getPlanExecutor(rplan);
+				IPlanExecutor executor = BDIInterpreter.getInterpreter(state).getPlanExecutor(rplan);
 				if(executor!=null)
 					executor.cleanup(rplan);
 				PlanRules.cleanupPlanWait(state, rcapa, rplan, true);
@@ -1557,6 +1557,7 @@ public class AgentRules
 							{
 								Object	fact = state.getAttributeValue(minibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
 								Collection	facts = state.getAttributeValues(minibelset, OAVBDIMetaModel.beliefset_has_facts);
+//								System.out.println("fact:"+fact+" facts: "+facts);
 								if(fact!=null)
 								{
 									ret = evaluateExpression(state, fact, fetcher);

@@ -19,11 +19,11 @@
 				{
 					jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
 					jadex.adapter.base.envsupport.MEnvSpaceType.getXMLMapping()
-				}, 
+				}/*, 
 				new java.util.Set[]
 				{
 					jadex.adapter.base.envsupport.MEnvSpaceType.getXMLLinkInfos()
-				}
+				}*/
 			)		
 		</property>
 		
