@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_Gdz1cYAlEd6N8dR31QwQkg" iD="_Gdz1cIAlEd6N8dR31QwQkg">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_-RpaYYAmEd6N8dR31QwQkg" iD="_-RpaYIAmEd6N8dR31QwQkg" name="package jadex.bpmn.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bdi.examples.marsworld.*;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import java.util.Map;&#xD;&#xA;&#xD;&#xA;import jadex.bridge.IAgentIdentifier;&#xD;&#xA;import jadex.adapter.base.agr.AGRSpace;&#xD;&#xA;&#xD;&#xA;Object target;">
+    <associations xmi:type="bpmn:Association" xmi:id="_-RpaaYAmEd6N8dR31QwQkg"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_Gdz1d4AlEd6N8dR31QwQkg" iD="_Gdz1doAlEd6N8dR31QwQkg" associations="_-RpaaYAmEd6N8dR31QwQkg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Gdz1eYAlEd6N8dR31QwQkg" iD="_Gdz1eIAlEd6N8dR31QwQkg" outgoingEdges="_-qM_CoHAEd6iKJCjTAMfBQ" incomingEdges="_Jgj0wYAlEd6N8dR31QwQkg" name="Produce Ore&#xD;&#xA;&#xD;&#xA;class = DispatchGoalTask.class&#xD;&#xA;in String type = &quot;produce_ore&quot;&#xD;&#xA;in Map parameters = SUtil.createHashMap(new String[]{&quot;target&quot;}, new Object[]{target})" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_HtFE8YAlEd6N8dR31QwQkg" iD="_HtFE8IAlEd6N8dR31QwQkg" outgoingEdges="_I3SOQYAlEd6N8dR31QwQkg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_I3JEUYAlEd6N8dR31QwQkg" iD="_I3JEUIAlEd6N8dR31QwQkg" outgoingEdges="_Jgj0wYAlEd6N8dR31QwQkg" incomingEdges="_I3SOQYAlEd6N8dR31QwQkg _SzwHMYHBEd6iKJCjTAMfBQ _f4JxoYHBEd6iKJCjTAMfBQ" name="type = &quot;request_production&quot;" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_-qM_AYHAEd6iKJCjTAMfBQ" iD="_-qM_AIHAEd6iKJCjTAMfBQ" outgoingEdges="_LpF3UYHBEd6iKJCjTAMfBQ" incomingEdges="_-qM_CoHAEd6iKJCjTAMfBQ" name="Find Carries&#xD;&#xA;&#xD;&#xA;in AGRSpace agrs = $scope.getApplicationContext().getSpace(&quot;myagrspace&quot;)&#xD;&#xA;out IAgentIdentifier[] carries = agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;carrier&quot;)" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Lo8tYYHBEd6iKJCjTAMfBQ" iD="_Lo8tYIHBEd6iKJCjTAMfBQ" outgoingEdges="_MpBDQYHBEd6iKJCjTAMfBQ _f4JxoYHBEd6iKJCjTAMfBQ" incomingEdges="_LpF3UYHBEd6iKJCjTAMfBQ" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Mo35UYHBEd6iKJCjTAMfBQ" iD="_Mo35UIHBEd6iKJCjTAMfBQ" outgoingEdges="_SzwHMYHBEd6iKJCjTAMfBQ" incomingEdges="_MpBDQYHBEd6iKJCjTAMfBQ" name="mode = &quot;send&quot;&#xD;&#xA;type = &quot;request_carries&quot;&#xD;&#xA;receivers = carries&#xD;&#xA;content = new RequestCarry(target)" activityType="EventIntermediateMessage"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_I3SOQYAlEd6N8dR31QwQkg" iD="_I3SOQIAlEd6N8dR31QwQkg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Jgj0wYAlEd6N8dR31QwQkg" iD="_Jgj0wIAlEd6N8dR31QwQkg" name="target = $beliefbase.environment.getSpaceObject($event.content.getTarget().getId())"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_-qM_CoHAEd6iKJCjTAMfBQ" iD="_-qM_CYHAEd6iKJCjTAMfBQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LpF3UYHBEd6iKJCjTAMfBQ" iD="_LpF3UIHBEd6iKJCjTAMfBQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_MpBDQYHBEd6iKJCjTAMfBQ" iD="_MpBDQIHBEd6iKJCjTAMfBQ" name="carries!=null"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_SzwHMYHBEd6iKJCjTAMfBQ" iD="_SzwHMIHBEd6iKJCjTAMfBQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_f4JxoYHBEd6iKJCjTAMfBQ" iD="_f4JxoIHBEd6iKJCjTAMfBQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

@@ -24,6 +24,16 @@ public class RequestCarry implements IAgentAction
 	{
 	}
 
+	/**
+	 *  Default Constructor.
+	 *  Create a new RequestCarry.
+	 */
+	public RequestCarry(ISpaceObject target)
+	{
+		this();
+		setTarget(target);
+	}
+
 	//-------- accessor methods --------
 
 	/**

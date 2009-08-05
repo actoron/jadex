@@ -29,6 +29,14 @@
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>
+		<!-- Environment belief is used ProducerPlan. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		<!-- Self belief is used ProduceOrePlan. -->
+		<beliefref name="myself">
+			<concrete ref="move.myself"/>
+		</beliefref>
 	</beliefs>
 
   	<goals>
@@ -48,7 +56,7 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="producer_plan">
-			<body class="ProducerPlan"/>
+			<body type="bpmn" impl="ProducerPlan"/>
 			<waitqueue>
 				<messageevent ref="request_production"/>
 			</waitqueue>
@@ -59,7 +67,7 @@
 			<parameter name="target" class="ISpaceObject">
 				<goalmapping ref="produce_ore.target"/>
 			</parameter>
-			<body class="ProduceOrePlan"/>
+			<body type="bpmn" impl="ProduceOrePlan"/>
 			<trigger>
 				<goal ref="produce_ore"/>
 			</trigger>

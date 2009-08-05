@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_Je97lnz_Ed6Ya8z0CnMcMA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_Je97l3z_Ed6Ya8z0CnMcMA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MoveToLocationPlan.bpmn#_Je0xo3z_Ed6Ya8z0CnMcMA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Je97mnz_Ed6Ya8z0CnMcMA" x="31" y="18" width="544" height="135"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Je97mnz_Ed6Ya8z0CnMcMA" x="31" y="5" width="544" height="163"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_3-Isonz_Ed6Ya8z0CnMcMA" type="2007">
         <children xmi:type="notation:Node" xmi:id="_3-IsqHz_Ed6Ya8z0CnMcMA" type="4007"/>

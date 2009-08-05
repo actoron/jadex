@@ -1,6 +1,7 @@
 package jadex.bpmnbdi.task;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
@@ -30,6 +31,9 @@ public class CreateSpaceObjectTaskTask	implements	ITask
 			
 			if(context.hasParameterValue("taskid"))
 				context.setParameterValue("taskid", taskid);
+			
+			if(context.hasParameterValue("contextvar"))
+				((BpmnInstance)instance).setContextVariable((String)context.getParameterValue("contextvar"), taskid);
 
 			boolean	wait	= context.hasParameterValue("wait")
 				? ((Boolean)context.getParameterValue("wait")).booleanValue() : true;
