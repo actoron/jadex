@@ -181,16 +181,19 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			long	timeout	= bodyinstance.getTimeout();
 			Object	wa	= bodyinstance.getWaitAbstraction();
 			
-			// Set waitqueue of plan.
-			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, wa);
-			
 			if(bodyinstance.isReady(null, lane))
 			{
+				// Set waitqueue of plan.
+				bodyinstance.updateWaitqueue(wa);
+
 				// Bpmn plan is ready and can directly be executed (no event).
 				EventProcessingRules.schedulePlanInstanceCandidate(interpreter.getState(), null, rplan, rcapa);
 			}
 			else if(timeout!=-1 || wa!=null)
 			{
+				// Reset waitqueue of plan.
+				bodyinstance.updateWaitqueue(null);
+
 				PlanRules.initializeWait(wa, timeout, interpreter.getState(), rcapa, rplan);
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);
 			}

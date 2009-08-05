@@ -268,7 +268,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		for(Iterator it = drawList.iterator(); it.hasNext();)
 		{
 			IDrawable d = (IDrawable)it.next();
-			System.out.println("draw: "+d);
+//			System.out.println("draw: "+d);
 			d.draw(this, obj, vp);
 		}
 	}

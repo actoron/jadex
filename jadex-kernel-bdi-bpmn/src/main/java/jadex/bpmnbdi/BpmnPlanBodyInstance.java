@@ -70,6 +70,7 @@ import jadex.rules.state.IOAVState;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1188,5 +1189,128 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			lane	= LANE_UNDEFINED;
 
 		return lane;
+	}
+
+	Collection	cts;
+	Collection	ecs;
+	Collection	fas;
+	Collection	fcs;
+	Collection	frs;
+	Collection	gfs;
+	Collection	gls;
+	Collection	its;
+	Collection	mes;
+	Collection	mts;
+
+	/**
+	 *  Update the waitqueue wait abstraction, but keep user entries, if any.
+	 *  @param wa	The new wait abstraction.
+	 */
+	protected void updateWaitqueue(Object wa)
+	{
+		// Retain old user settings.
+		Collection	oldcts	= Collections.EMPTY_SET;
+		Collection	oldecs	= Collections.EMPTY_SET;
+		Collection	oldfas	= Collections.EMPTY_SET;
+		Collection	oldfcs	= Collections.EMPTY_SET;
+		Collection	oldfrs	= Collections.EMPTY_SET;
+		Collection	oldgfs	= Collections.EMPTY_SET;
+		Collection	oldgls	= Collections.EMPTY_SET;
+		Collection	oldits	= Collections.EMPTY_SET;
+		Collection	oldmes	= Collections.EMPTY_SET;
+		Collection	oldmts	= Collections.EMPTY_SET;
+		Object	oldwa	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa);
+		if(oldwa!=null)
+		{
+			oldcts	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_conditiontypes);
+			oldecs	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_externalconditions);
+			oldfas	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds);
+			oldfcs	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds);
+			oldfrs	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds);
+			oldgfs	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds);
+			oldgls	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_goals);
+			oldits	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes);
+			oldmes	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_messageevents);
+			oldmts	= state.getAttributeValues(oldwa, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes);
+			
+			oldcts	= oldcts!=null ? new HashSet(oldcts) : Collections.EMPTY_SET; 
+			oldecs	= oldecs!=null ? new HashSet(oldecs) : Collections.EMPTY_SET; 
+			oldfas	= oldfas!=null ? new HashSet(oldfas) : Collections.EMPTY_SET; 
+			oldfcs	= oldfcs!=null ? new HashSet(oldfcs) : Collections.EMPTY_SET; 
+			oldfrs	= oldfrs!=null ? new HashSet(oldfrs) : Collections.EMPTY_SET; 
+			oldgfs	= oldgfs!=null ? new HashSet(oldgfs) : Collections.EMPTY_SET; 
+			oldgls	= oldgls!=null ? new HashSet(oldgls) : Collections.EMPTY_SET; 
+			oldits	= oldits!=null ? new HashSet(oldits) : Collections.EMPTY_SET; 
+			oldmes	= oldmes!=null ? new HashSet(oldmes) : Collections.EMPTY_SET; 
+			oldmts	= oldmts!=null ? new HashSet(oldmts) : Collections.EMPTY_SET;
+			
+			if(cts!=null) oldcts.removeAll(cts);
+			if(ecs!=null) oldecs.removeAll(ecs);
+			if(fas!=null) oldfas.removeAll(fas);
+			if(fcs!=null) oldfcs.removeAll(fcs);
+			if(frs!=null) oldfrs.removeAll(frs);
+			if(gfs!=null) oldgfs.removeAll(gfs);
+			if(gls!=null) oldgls.removeAll(gls);
+			if(its!=null) oldits.removeAll(its);
+			if(mes!=null) oldmes.removeAll(mes);
+			if(mts!=null) oldmts.removeAll(mts);
+		}
+		
+		// Remember new non-user settings (for finding out user settings later). 
+		if(wa!=null)
+		{
+			cts	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_conditiontypes);
+			ecs	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_externalconditions);
+			fas	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds);
+			fcs	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds);
+			frs	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds);
+			gfs	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds);
+			gls	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goals);
+			its	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes);
+			mes	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_messageevents);
+			mts	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes);
+			
+			cts	= cts!=null ? new HashSet(cts) : Collections.EMPTY_SET; 
+			ecs	= ecs!=null ? new HashSet(ecs) : Collections.EMPTY_SET; 
+			fas	= fas!=null ? new HashSet(fas) : Collections.EMPTY_SET; 
+			fcs	= fcs!=null ? new HashSet(fcs) : Collections.EMPTY_SET; 
+			frs	= frs!=null ? new HashSet(frs) : Collections.EMPTY_SET; 
+			gfs	= gfs!=null ? new HashSet(gfs) : Collections.EMPTY_SET; 
+			gls	= gls!=null ? new HashSet(gls) : Collections.EMPTY_SET; 
+			its	= its!=null ? new HashSet(its) : Collections.EMPTY_SET; 
+			mes	= mes!=null ? new HashSet(mes) : Collections.EMPTY_SET; 
+			mts	= mts!=null ? new HashSet(mts) : Collections.EMPTY_SET; 
+		}
+		
+		// Re-add user settings
+		if(!oldcts.isEmpty() || !oldecs.isEmpty() || !oldfas.isEmpty() || !oldfcs.isEmpty() || !oldfrs.isEmpty()
+			|| !oldgfs.isEmpty() || !oldgls.isEmpty() || !oldits.isEmpty() || !oldmes.isEmpty() || !oldmts.isEmpty())
+		{
+			if(wa==null)
+				wa	= state.createObject(OAVBDIRuntimeModel.waitabstraction_type);
+			
+			for(Iterator it=oldcts.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_conditiontypes, it.next());
+			for(Iterator it=oldecs.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_externalconditions, it.next());
+			for(Iterator it=oldfas.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds, it.next());
+			for(Iterator it=oldfcs.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds, it.next());
+			for(Iterator it=oldfrs.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, it.next());
+			for(Iterator it=oldgfs.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, it.next());
+			for(Iterator it=oldgls.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_goals, it.next());
+			for(Iterator it=oldits.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes, it.next());
+			for(Iterator it=oldmes.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_messageevents, it.next());
+			for(Iterator it=oldmts.iterator(); it.hasNext(); )
+				state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes, it.next());
+		}
+
+		interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, wa);
 	}
 }
