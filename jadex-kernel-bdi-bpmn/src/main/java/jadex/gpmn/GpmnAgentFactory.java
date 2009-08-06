@@ -72,7 +72,7 @@ public class GpmnAgentFactory extends BDIAgentFactory
 			
 			FileOutputStream os = new FileOutputStream("wurst.xml");
 			Writer writer = OAVBDIXMLReader.getWriter();
-			writer.write(agents[0].getState().getRootObjects().next(), os, agents[0].getState());
+			writer.write(agents[0].getState().getRootObjects().next(), os, libservice.getClassLoader(), agents[0].getState());
 			os.close();
 			return agents[0];
 		}

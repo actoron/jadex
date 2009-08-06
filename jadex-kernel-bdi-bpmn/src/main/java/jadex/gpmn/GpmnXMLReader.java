@@ -3,6 +3,7 @@ package jadex.gpmn;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
@@ -42,11 +43,11 @@ public class GpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		Set ignored = new HashSet();
-		ignored.add("xmi");
-		ignored.add("iD");
-		ignored.add("version");
-		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping(), ignored);
+//		Set ignored = new HashSet();
+//		ignored.add("xmi");
+//		ignored.add("iD");
+//		ignored.add("version");
+		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping());
 	}
 	
 	/**
@@ -83,7 +84,12 @@ public class GpmnXMLReader
 		Set types = new HashSet();
 		
 		types.add(new TypeInfo(null, "GpmnDiagram", MGpmnModel.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")}, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("ID", "Id"),
+			new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, null, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("processes", "process"))
 		}));

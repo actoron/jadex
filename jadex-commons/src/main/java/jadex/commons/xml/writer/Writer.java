@@ -6,6 +6,7 @@ import jadex.commons.xml.StackElement;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanObjectWriterHandler;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ public class Writer
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public void write(Object object, OutputStream out, final Object context) throws Exception
+	public void write(Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
 		Map writtenobs = new HashMap();
 		List stack = new ArrayList();
@@ -84,7 +85,7 @@ public class Writer
 		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out);
 		writer.writeStartDocument();
 		writer.writeCharacters(lf);
-		writeObject(writer, object, writtenobs, null, stack, context);
+		writeObject(writer, object, writtenobs, null, stack, context, classloader);
 		writer.writeEndDocument();
 		writer.close();
 	}
@@ -92,7 +93,7 @@ public class Writer
 	/**
 	 *  Write an object to xml.
 	 */
-	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, List stack, Object context) throws Exception
+	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, List stack, Object context, ClassLoader classloader) throws Exception
 	{
 		TypeInfo typeinfo = tagname!=null? getTypeInfo(object, getXMLPath(stack)+"/"+tagname, context, true):
 			getTypeInfo(object, getXMLPath(stack), context, false); 
@@ -122,7 +123,7 @@ public class Writer
 				}
 			}
 			
-			WriteObjectInfo wi = handler.getObjectWriteInfo(object, typeinfo, context);
+			WriteObjectInfo wi = handler.getObjectWriteInfo(object, typeinfo, context, classloader);
 
 			// Comment
 			
@@ -213,13 +214,13 @@ public class Writer
 							{
 								while(it2.hasNext())
 								{
-									writeObject(writer, it2.next(), writtenobs, subpathname, stack, context);
+									writeObject(writer, it2.next(), writtenobs, subpathname, stack, context, classloader);
 								}
 							}
 						}
 						else
 						{
-							writeObject(writer, obj, writtenobs, subpathname, stack, context);
+							writeObject(writer, obj, writtenobs, subpathname, stack, context, classloader);
 						}
 						
 						if(gencontainertags)
@@ -357,7 +358,7 @@ public class Writer
 			
 			Writer w = new Writer(new BeanObjectWriterHandler(), null);
 			
-			w.write(a, System.out, null);
+			w.write(a, System.out, null, null);
 		}
 		catch(Exception e)
 		{

@@ -233,13 +233,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 
 		if(converter!=null && converter.acceptsInputType(attrval.getClass()))
 		{
-			ret = converter.convertObject(attrval, root, classloader);
+			ret = converter.convertObject(attrval, root, classloader, null);
 		}
 		else if(!String.class.isAssignableFrom(targetclass))
 		{
 			ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
 			if(conv!=null && conv.acceptsInputType(attrval.getClass()))
-				ret = conv.convertObject(attrval, root, classloader);
+				ret = conv.convertObject(attrval, root, classloader, null);
 		}
 	
 		return ret;
@@ -322,7 +322,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						try
 						{
-							object = converter.convertObject((String)object, root, classloader);
+							object = converter.convertObject((String)object, root, classloader, null);
 							ms[i].invoke(parent, new Object[]{object});
 							ret	= true;
 						}

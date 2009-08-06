@@ -16,6 +16,7 @@ import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
@@ -48,12 +49,12 @@ public class BpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		Set ignored = new HashSet();
-		ignored.add("xmi");
-		ignored.add("iD");
-		ignored.add("version");
+//		Set ignored = new HashSet();
+//		ignored.add("xmi");
+//		ignored.add("iD");
+//		ignored.add("version");
 //		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping(), getXMLLinkInfos(), ignored);
-		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping(), ignored);
+		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping());
 	}
 	
 	/**
@@ -85,7 +86,11 @@ public class BpmnXMLReader
 		Set types = new HashSet();
 		
 		types.add(new TypeInfo(null, "BpmnDiagram", MBpmnModel.class, null, null, 
-			null, new BpmnModelPostProcessor(), null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, new BpmnModelPostProcessor(), null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("pools", "pool")),
 			new SubobjectInfo(new BeanAttributeInfo("artifacts", "artifact")),
@@ -93,9 +98,11 @@ public class BpmnXMLReader
 			}));
 			
 		types.add(new TypeInfo(null, "pools", MPool.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"),
-			new BeanAttributeInfo("associations", "associationsDescription")}, 
-			new PoolPostProcessor(), null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", "description"),
+			new BeanAttributeInfo("associations", "associationsDescription"),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, new PoolPostProcessor(), null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("vertices", "activity")),
 			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
@@ -103,21 +110,30 @@ public class BpmnXMLReader
 			}));
 		
 		types.add(new TypeInfo(null, "artifacts", MArtifact.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description")}, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", "description"),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, null, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("associations", "association"))
 			}));
 		
 		types.add(new TypeInfo(null, "associations", MAssociation.class, null, null, 
-			null, new AssociationPostProcessor()));
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, new AssociationPostProcessor()));
 		
 		types.add(new TypeInfo(null, "lanes", MLane.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"),
-			new BeanAttributeInfo("activities", "activitiesDescription")}, new LanePostProcessor()));
+			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"), 
+			new BeanAttributeInfo("activities", "activitiesDescription"),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)}, new LanePostProcessor()));
 		
 		types.add(new TypeInfo(null, "eventHandlers", MActivity.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
-			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")}, new ActivityPostProcessor()));
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
+			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			}, new ActivityPostProcessor()));
 		
 		types.add(new TypeInfo(null, "vertices", MActivity.class, null, null,
 			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"),
@@ -125,8 +141,9 @@ public class BpmnXMLReader
 			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("lanes", "laneDescription"),
 			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("activityType", "activityType", null, null, MBpmnModel.TASK)},
-			new ActivityPostProcessor(),
+			new BeanAttributeInfo("activityType", "activityType", null, null, null, MBpmnModel.TASK),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, new ActivityPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)
@@ -146,8 +163,9 @@ public class BpmnXMLReader
 			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("lanes", "laneDescription"),
 			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("activityType", "activityType", null, null, MBpmnModel.SUBPROCESS)},
-			new ActivityPostProcessor(),
+			new BeanAttributeInfo("activityType", "activityType", null, null, null, MBpmnModel.SUBPROCESS),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)	
+			}, new ActivityPostProcessor(),
 			new IFilter()
 			{
 				public boolean filter(Object obj)
@@ -165,24 +183,39 @@ public class BpmnXMLReader
 			}));
 		
 		types.add(new TypeInfo(null, "sequenceEdges", MSequenceEdge.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"), 
-			new BeanAttributeInfo("associations", "associationsDescription")}, new SequenceEdgePostProcessor()));
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", "description"), 
+			new BeanAttributeInfo("associations", "associationsDescription"),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, new SequenceEdgePostProcessor()));
 		
 		types.add(new TypeInfo(null, "messagingEdges", MMessagingEdge.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"), 
-			new BeanAttributeInfo("associations", "associationsDescription")}, null));
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", "description"), 
+			new BeanAttributeInfo("associations", "associationsDescription"),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			}, null));
 		
 		types.add(new TypeInfo(null, "incomingMessages", HashMap.class, null, null, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("type", null, null, ""),
-			new BeanAttributeInfo("href", null, null, "")}, null));
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("type", null, null, null, null, ""),
+			new BeanAttributeInfo("href", null, null, null, null, ""),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			}, null));
 
 		types.add(new TypeInfo(null, "outgoingMessages", HashMap.class, null, null, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("type", null, null, ""),
-			new BeanAttributeInfo("href", null, null, "")}, null));
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("type", null, null, null, null, ""),
+			new BeanAttributeInfo("href", null, null, null, null, ""),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			}, null));
 		
 		types.add(new TypeInfo(null, "messages", MMessagingEdge.class, null, null, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo("source", "sourceDescription"),
-			new BeanAttributeInfo("target", "targetDescription")}, null));
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("source", "sourceDescription"),
+			new BeanAttributeInfo("target", "targetDescription"),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			}, null));
 		
 		return types;
 	}

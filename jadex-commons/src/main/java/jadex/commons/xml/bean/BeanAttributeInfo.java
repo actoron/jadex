@@ -11,16 +11,23 @@ public class BeanAttributeInfo extends AttributeInfo
 {	
 	//-------- attributes --------
 	
+	// read + write
+	
+	/** The default value. */
+	protected Object defaultvalue;
+	
+	/** The map name (if it should be put in map). */
+	protected String mapname; // todo: exploit also for writing?!
+
 	// read
 	
 	/** The attribute value converter for reading. */
 	protected ITypeConverter converterread;
 	
-	/** The map name (if it should be put in map). */
-	protected String mapname;
+	// write
 	
-	/** The default value. */
-	protected Object defaultvalue;
+	/** The attribute value converter for write. */
+	protected ITypeConverter converterwrite;
 	
 	//-------- constructors --------
 	
@@ -29,25 +36,34 @@ public class BeanAttributeInfo extends AttributeInfo
 	 */
 	public BeanAttributeInfo(String xmlattributename, String attributename)
 	{
-		this(xmlattributename, attributename, null, null, null);
+		this(xmlattributename, attributename, null, null, null, null);
 	}
 	
 	/**
 	 *  Create a new bean attribute info. 
 	 */
-	public BeanAttributeInfo(String xmlattributename, String attributename, ITypeConverter converter, String mapname)
+	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore)
 	{
-		this(xmlattributename, attributename, converter, mapname, null);
+		this(xmlattributename, attributename, ignore, null, null, null);
 	}
 	
 	/**
 	 *  Create a new bean attribute info. 
 	 */
-	public BeanAttributeInfo(String xmlattributename, String attributename, ITypeConverter converter, String mapname, Object defaultvalue)
+	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname)
 	{
-		super(xmlattributename, attributename!=null? attributename: xmlattributename);
+		this(xmlattributename, attributename, ignore, converterread, null, mapname, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname, Object defaultvalue)
+	{
+		super(xmlattributename, attributename!=null? attributename: xmlattributename, ignore);
 		
-		this.converterread = converter;
+		this.converterread = converterread;
+		this.converterwrite = converterwrite;
 		this.mapname = mapname;
 		this.defaultvalue = defaultvalue;
 	}
@@ -70,6 +86,15 @@ public class BeanAttributeInfo extends AttributeInfo
 	public ITypeConverter getConverterRead()
 	{
 		return this.converterread;
+	}
+
+	/**
+	 *  Get the attribute converter for writing.
+	 *  @return The converter.
+	 */
+	public ITypeConverter getConverterWrite()
+	{
+		return this.converterwrite;
 	}
 
 	/**

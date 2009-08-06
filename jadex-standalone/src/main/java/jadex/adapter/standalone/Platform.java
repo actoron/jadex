@@ -15,6 +15,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.xml.AbstractInfo;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
@@ -485,17 +486,12 @@ public class Platform extends AbstractPlatform
 		return ret;
 	}*/
 	
-	// 
-	
 	public static Set typeinfos;	
-//	public static Set linkinfos;
-	public static Set ignoredattrs;
 	static
 	{
-		ignoredattrs = new HashSet();
-		ignoredattrs.add("schemaLocation");
 		typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "properties", Properties.class, null, null, null, null, null,
+		typeinfos.add(new TypeInfo(null, "properties", Properties.class, null, null, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null, null,
 			new SubobjectInfo[]
 			{
 				new SubobjectInfo(new BeanAttributeInfo("property", "properties")), 
@@ -504,9 +500,6 @@ public class Platform extends AbstractPlatform
 		));
 		
 		typeinfos.add(new TypeInfo(null, "property", Property.class, null, new BeanAttributeInfo(null, "value")));
-		
-//		linkinfos = new HashSet();
-//		linkinfos.add(new LinkInfo("properties", new BeanAttributeInfo("subproperties")));	
 	}
 	public static jadex.commons.xml.writer.Writer writer;
 	public static jadex.commons.xml.reader.Reader reader;
@@ -530,8 +523,7 @@ public class Platform extends AbstractPlatform
 	{
 		if(reader==null)
 		{
-//			reader = new jadex.commons.xml.Reader(new BeanObjectReaderHandler(), typeinfos, linkinfos, ignoredattrs);
-			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(), typeinfos, ignoredattrs);
+			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(), typeinfos);
 		}
 		return reader;
 	}

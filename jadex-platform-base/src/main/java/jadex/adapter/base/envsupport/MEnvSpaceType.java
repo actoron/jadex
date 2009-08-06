@@ -131,114 +131,114 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		TypeInfo ti_po = new TypeInfo(null, "abstract_propertyobject", MultiCollection.class, null, null, null, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, ""))
+			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, null, null, ""))
 			}
 		);
 		
 		types.add(new TypeInfo(ti_po, "objecttype", MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "name", null, "")}, null));
+			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "name", null, null, null, "")}, null));
 		
 		types.add(new TypeInfo(null, "envspacetype", MEnvSpaceType.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, "property"),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-			new BeanAttributeInfo("depth", null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-			new BeanAttributeInfo("border", null, null, "property"),
-			new BeanAttributeInfo("neighborhood", null, null, "property")
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, "property"),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("depth", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("border", null, null, null, null, "property"),
+			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("objecttype", "objecttypes", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("avatarmapping", "avatarmappings", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("actiontype", "actiontypes", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("processtype", "processtypes", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("tasktype", "tasktypes", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("perceptgenerator", "perceptgenerators", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("perceptprocessor", "perceptprocessors", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("view", "views", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("spaceexecutor", null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("perspective", "perspectives", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("percepttype", "percepttypes", null, "property"))
+			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("objecttype", "objecttypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("avatarmapping", "avatarmappings", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("actiontype", "actiontypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("processtype", "processtypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("tasktype", "tasktypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("perceptgenerator", "perceptgenerators", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("perceptprocessor", "perceptprocessors", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("view", "views", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("spaceexecutor", null, null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("perspective", "perspectives", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("percepttype", "percepttypes", null, null, null, "property"))
 		}));
 		
 		types.add(new TypeInfo(null, "avatarmapping", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("agenttype", null, null, ""),
-			new BeanAttributeInfo("objecttype", null, null, ""),
-			new BeanAttributeInfo("createavatar", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("createagent", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("killavatar", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("killagent", null, BasicTypeConverter.BOOLEAN_CONVERTER, "")
+			new BeanAttributeInfo("agenttype", null, null, null, null, ""),
+			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
+			new BeanAttributeInfo("createavatar", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("createagent", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("killavatar", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("killagent", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "")
 			}, null));
 		
 		types.add(new TypeInfo(null, "percepttype", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("objecttype", "objecttypes", null, ""),
-			new BeanAttributeInfo("agenttype", "agenttypes", null, "")
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("objecttype", "objecttypes", null, null, null, ""),
+			new BeanAttributeInfo("agenttype", "agenttypes", null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
 //			new SubobjectInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttype", "objecttypes", null, "")),
 //			new SubobjectInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("percepttype", "agenttypes", new ITypeConverter()
-			new SubobjectInfo(new BeanAttributeInfo("objecttypes/objecttype", "objecttypes", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("agenttypes/agenttype", "agenttypes", new ITypeConverter()
+			new SubobjectInfo(new BeanAttributeInfo("objecttypes/objecttype", "objecttypes", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("agenttypes/agenttype", "agenttypes", null, new ITypeConverter()
 			{
 				public boolean acceptsInputType(Class inputtype)
 				{
 					return true;
 				}
-				public Object convertObject(Object val, Object root, ClassLoader classloader)
+				public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 				{
 					return ((Map)val).get("name");
 				}
-			}, ""))
+			}, null, ""))
 			}));
 		
 		types.add(new TypeInfo(ti_po, "actiontype", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("name", null, null, "")
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
 		types.add(new TypeInfo(ti_po, "processtype", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("name", null, null, "")
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
 		types.add(new TypeInfo(ti_po, "tasktype", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("name", null, null, "")
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
 		types.add(new TypeInfo(ti_po, "perceptgenerator", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("name", null, null, "")
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 
 		types.add(new TypeInfo(ti_po, "perceptprocessor", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{	
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("agenttype", null, null, "")
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("agenttype", null, null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("percepttype", "percepttypes", nameconv, "")),
+			new SubobjectInfo(new BeanAttributeInfo("percepttype", "percepttypes", null, nameconv, null, "")),
 			}));
 		
 		types.add(new TypeInfo(null, "perceptprocessor/percepttype", HashMap.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, "")
+			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
 		types.add(new TypeInfo(ti_po, "view", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("objecttype", null, null, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -263,16 +263,16 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo(ti_po, "perspective", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),		
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("opengl", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("invertxaxis", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE),
-			new BeanAttributeInfo("invertyaxis", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.TRUE),
-			new BeanAttributeInfo("objectshiftx", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("objectshifty", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("zoomlimit", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("bgcolor", null, colorconv, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),		
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("opengl", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("invertxaxis", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE),
+			new BeanAttributeInfo("invertyaxis", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.TRUE),
+			new BeanAttributeInfo("objectshiftx", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("objectshifty", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("zoomlimit", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("bgcolor", null, null, colorconv, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -354,29 +354,29 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawable", "drawables", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("prelayers/gridlayer", "prelayers", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("prelayers/tiledlayer", "prelayers", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("prelayers/colorlayer", "prelayers", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("postlayers/gridlayer", "postlayers", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("postlayers/tiledlayer", "postlayers", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("postlayers/colorlayer", "postlayers", null, ""))
+			new SubobjectInfo(new BeanAttributeInfo("drawable", "drawables", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("prelayers/gridlayer", "prelayers", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("prelayers/tiledlayer", "prelayers", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("prelayers/colorlayer", "prelayers", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("postlayers/gridlayer", "postlayers", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("postlayers/tiledlayer", "postlayers", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("postlayers/colorlayer", "postlayers", null, null, null, ""))
 			}));
 		
 		types.add(new TypeInfo(ti_po, "drawable", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("objecttype", null, null, ""),
-			new BeanAttributeInfo("x", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("y", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatex", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatey", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatez", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("position", null, null, ""),
-			new BeanAttributeInfo("rotation", null, null, ""),
-			new BeanAttributeInfo("size", null, null, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
+			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatey", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatez", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("position", null, null, null, null, ""),
+			new BeanAttributeInfo("rotation", null, null, null, null, ""),
+			new BeanAttributeInfo("size", null, null, null, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -423,34 +423,34 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("texturedrectangle", "parts", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("triangle", "parts", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("rectangle", "parts", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("regularpolygon", "parts", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("ellipse", "parts", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("text", "parts", null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, expconv, ""))
+			new SubobjectInfo(new BeanAttributeInfo("texturedrectangle", "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("triangle", "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("rectangle", "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("regularpolygon", "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("ellipse", "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("text", "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
 			}));
 
 		types.add(new TypeInfo(null, "texturedrectangle", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("x", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("y", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatex", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatey", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatez", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("position", null, null, ""),
-			new BeanAttributeInfo("rotation", null, null, ""),
-			new BeanAttributeInfo("size", null, null, ""),
-			new BeanAttributeInfo("abspos", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("abssize", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("absrot", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("imagepath", null, null, ""),
-			new BeanAttributeInfo("layer", null, tintconv, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatey", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatez", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("position", null, null, null, null, ""),
+			new BeanAttributeInfo("rotation", null, null, null, null, ""),
+			new BeanAttributeInfo("size", null, null, null, null, ""),
+			new BeanAttributeInfo("abspos", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("abssize", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("absrot", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("imagepath", null, null, null, null, ""),
+			new BeanAttributeInfo("layer", null, null, tintconv, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -484,27 +484,27 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, expconv, ""))
+			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
 			}));
 		
 		types.add(new TypeInfo(null, "triangle", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("x", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("y", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatex", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatey", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatez", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("position", null, null, ""),
-			new BeanAttributeInfo("rotation", null, null, ""),
-			new BeanAttributeInfo("size", null, null, ""),
-			new BeanAttributeInfo("abspos", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("abssize", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("absrot", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("layer", null, tintconv, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatey", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatez", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("position", null, null, null, null, ""),
+			new BeanAttributeInfo("rotation", null, null, null, null, ""),
+			new BeanAttributeInfo("size", null, null, null, null, ""),
+			new BeanAttributeInfo("abspos", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("abssize", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("absrot", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("layer", null, null, tintconv, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -539,27 +539,27 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, expconv, ""))
+			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
 			}));
 		
 		types.add(new TypeInfo(null, "rectangle", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("x", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("y", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatex", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatey", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatez", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("position", null, null, ""),
-			new BeanAttributeInfo("rotation", null, null, ""),
-			new BeanAttributeInfo("size", null, null, ""),
-			new BeanAttributeInfo("abspos", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("abssize", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("absrot", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("layer", null, tintconv, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatey", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatez", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("position", null, null, null, null, ""),
+			new BeanAttributeInfo("rotation", null, null, null, null, ""),
+			new BeanAttributeInfo("size", null, null, null, null, ""),
+			new BeanAttributeInfo("abspos", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("abssize", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("absrot", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("layer", null, null, tintconv, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -593,28 +593,28 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, expconv, ""))
+			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
 			}));
 		
 		types.add(new TypeInfo(null, "regularpolygon", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("x", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("y", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatex", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatey", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatez", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("position", null, null, ""),
-			new BeanAttributeInfo("rotation", null, null, ""),
-			new BeanAttributeInfo("size", null, null, ""),
-			new BeanAttributeInfo("abspos", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("abssize", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("absrot", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("vertices", null, BasicTypeConverter.INTEGER_CONVERTER, "", new Integer(3)),
-			new BeanAttributeInfo("layer", null, tintconv, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatey", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatez", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("position", null, null, null, null, ""),
+			new BeanAttributeInfo("rotation", null, null, null, null, ""),
+			new BeanAttributeInfo("size", null, null, null, null, ""),
+			new BeanAttributeInfo("abspos", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("abssize", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("absrot", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("vertices", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, "", new Integer(3)),
+			new BeanAttributeInfo("layer", null, null, tintconv, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -652,27 +652,27 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, expconv, ""))
+			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
 			}));
 	
 		types.add(new TypeInfo(null, "ellipse", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("x", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("y", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatex", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatey", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("rotatez", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("position", null, null, ""),
-			new BeanAttributeInfo("rotation", null, null, ""),
-			new BeanAttributeInfo("size", null, null, ""),
-			new BeanAttributeInfo("abspos", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("abssize", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("absrot", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("layer", null, tintconv, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatey", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("rotatez", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("position", null, null, null, null, ""),
+			new BeanAttributeInfo("rotation", null, null, null, null, ""),
+			new BeanAttributeInfo("size", null, null, null, null, ""),
+			new BeanAttributeInfo("abspos", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("abssize", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("absrot", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("layer", null, null, tintconv, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -707,24 +707,24 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, expconv, ""))
+			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
 			}));
 		
 		types.add(new TypeInfo(null, "text", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("x", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("y", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("position", null, null, ""),
-			new BeanAttributeInfo("font", null, BasicTypeConverter.STRING_CONVERTER, ""),
-			new BeanAttributeInfo("style", null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-			new BeanAttributeInfo("basesize", null, BasicTypeConverter.INTEGER_CONVERTER, ""),
-			new BeanAttributeInfo("abspos", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("abssize", null, BasicTypeConverter.BOOLEAN_CONVERTER, ""),
-			new BeanAttributeInfo("color", null, colorconv, ""),
-			new BeanAttributeInfo("layer", null, tintconv, ""),
-			new BeanAttributeInfo("text", null, BasicTypeConverter.STRING_CONVERTER, ""),
-			new BeanAttributeInfo("align", null, BasicTypeConverter.STRING_CONVERTER, ""),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("position", null, null, null, null, ""),
+			new BeanAttributeInfo("font", null, null, BasicTypeConverter.STRING_CONVERTER, null, ""),
+			new BeanAttributeInfo("style", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
+			new BeanAttributeInfo("basesize", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
+			new BeanAttributeInfo("abspos", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("abssize", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
+			new BeanAttributeInfo("color", null, null, colorconv, null, ""),
+			new BeanAttributeInfo("layer", null, null, tintconv, null, ""),
+			new BeanAttributeInfo("text", null, null, BasicTypeConverter.STRING_CONVERTER, null, ""),
+			new BeanAttributeInfo("align", null, null, BasicTypeConverter.STRING_CONVERTER, null, ""),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -775,16 +775,16 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, expconv, ""))
+			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
 			}));
 		
 		types.add(new TypeInfo(null, "gridlayer", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("type", null, null, "", "gridlayer"),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("type", null, null, null, null, "", "gridlayer"),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -797,12 +797,12 @@ public class MEnvSpaceType	extends MSpaceType
 
 		types.add(new TypeInfo(null, "tiledlayer", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("imagepath", null, null, ""),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, ""),
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("type", null, null, "", "tiledlayer"),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("imagepath", null, null, null, null, ""),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("type", null, null, null, null, "", "tiledlayer"),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -815,9 +815,9 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo(null, "colorlayer", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("color", null, tcolorconv, ""),
-			new BeanAttributeInfo("type", null, null, "", "colorlayer"),
-			new BeanAttributeInfo("creator", null, null, "", new IObjectCreator()
+			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
+			new BeanAttributeInfo("type", null, null, null, null, "", "colorlayer"),
+			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
@@ -827,164 +827,164 @@ public class MEnvSpaceType	extends MSpaceType
 			}, null));
 		
 		types.add(new TypeInfo(ti_po, "spaceexecutor", MultiCollection.class, null, 
-			new BeanAttributeInfo("expression", null, expconv, ""),
+			new BeanAttributeInfo("expression", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("class", "clazz", typeconv, "")
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(null, "envspacetype/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "envspacetype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)
 			}, null));
 		
-		types.add(new TypeInfo(null, "envspace/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "envspace/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "processtype/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "processtype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "tasktype/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "tasktype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "actiontype/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "actiontype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
 		types.add(new TypeInfo(null, "percepttype/agenttypes/agenttype", HashMap.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, "")}, null));
+			new BeanAttributeInfo("name", null, null, null, null, "")}, null));
 		
-		types.add(new TypeInfo(null, "perceptgenerator/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "perceptgenerator/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "perceptprocessor/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "perceptprocessor/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "view/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "view/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""), 
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""), 
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "perspective/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "perspective/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "object/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "object/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "avatar/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "avatar/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),			
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),			
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "process/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "process/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "objecttype/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "objecttype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "drawable/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "drawable/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "spaceexecutor/property", HashMap.class, null, new BeanAttributeInfo("value", null, expconv, ""),
+		types.add(new TypeInfo(null, "spaceexecutor/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("class", "clazz", typeconv, ""),
-			new BeanAttributeInfo("dynamic", null, BasicTypeConverter.BOOLEAN_CONVERTER, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
 		// type instance declarations.
 		
 		types.add(new TypeInfo(null, "envspace", MEnvSpaceInstance.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("type", "typeName"),
-			new BeanAttributeInfo("width", null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-			new BeanAttributeInfo("height", null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-			new BeanAttributeInfo("depth", null, BasicTypeConverter.DOUBLE_CONVERTER, "property"),
-			new BeanAttributeInfo("border", null, null, "property"),
-			new BeanAttributeInfo("neighborhood", null, null, "property")
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("depth", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("border", null, null, null, null, "property"),
+			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("object", "objects", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("avatar", "avatars", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("process", "processes", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("spaceaction", "spaceactions", null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("observer", "observers", null, "property"))
+			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("object", "objects", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("avatar", "avatars", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("process", "processes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("spaceaction", "spaceactions", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo("observer", "observers", null, null, null, "property"))
 			}));
 		
 		types.add(new TypeInfo(ti_po, "object", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("type", null, null, ""),
-			new BeanAttributeInfo("number", null, BasicTypeConverter.INTEGER_CONVERTER, "")
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("type", null, null, null, null, ""),
+			new BeanAttributeInfo("number", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, "")
 			}, null));
 			
 		types.add(new TypeInfo(ti_po, "avatar", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("type", null, null, ""),
-			new BeanAttributeInfo("owner", null, null, "")
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("type", null, null, null, null, ""),
+			new BeanAttributeInfo("owner", null, null, null, null, "")
 			}, null));
 			
 		types.add(new TypeInfo(ti_po, "process", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("type", null, null, ""),
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("type", null, null, null, null, ""),
 			}, null));
 		
 		types.add(new TypeInfo(null, "spaceaction", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("type", null, null, "")
+			new BeanAttributeInfo("type", null, null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("parameter", "parameters", null, ""))
+			new SubobjectInfo(new BeanAttributeInfo("parameter", "parameters", null, null, null, ""))
 			}));
 		
 		types.add(new TypeInfo(null, "spaceaction/parameter", HashMap.class, null,
-			new BeanAttributeInfo("value", null, expconv, ""),
+			new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, "")}, null));
+			new BeanAttributeInfo("name", null, null, null, null, "")}, null));
 
 		types.add(new TypeInfo(null, "observer", MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, ""),
-			new BeanAttributeInfo("view", null, null, ""),
-			new BeanAttributeInfo("perspective", null, null, ""),
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("view", null, null, null, null, ""),
+			new BeanAttributeInfo("perspective", null, null, null, null, ""),
 			}, null));
 		
 		return types;
@@ -1098,7 +1098,7 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
 			if(!(val instanceof String))
 				throw new RuntimeException("Source value must be string: "+val);
@@ -1138,7 +1138,7 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
 			if(!(val instanceof String))
 				throw new RuntimeException("Source value must be string: "+val);
@@ -1170,7 +1170,7 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
 			if(!(val instanceof String))
 				throw new RuntimeException("Source value must be string: "+val);
@@ -1214,7 +1214,7 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Convert a string value to another type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
 			if(!(val instanceof String))
 				throw new RuntimeException("Source value must be string: "+val);
@@ -1245,7 +1245,7 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Convert a string value to another type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
 			if(!(val instanceof String))
 				throw new RuntimeException("Source value must be string: "+val);
@@ -1276,12 +1276,12 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Convert a string value to another type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
 			if(!(val instanceof String))
 				throw new RuntimeException("Source value must be string: "+val);
 			
-			Object ret = (new ColorConverter()).convertObject(val, root, classloader);
+			Object ret = (new ColorConverter()).convertObject(val, root, classloader, null);
 			if (ret == null)
 				ret = val;
 			
@@ -1315,10 +1315,10 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		/**
 		 *  Test if a converter accepts a specific input type.
-		 *  @param inputtype The input type.
+		 * @param inputtype The input type.
 		 *  @return True, if accepted.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader)
+		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
 			return (String)((Map)val).get("name");
 		}

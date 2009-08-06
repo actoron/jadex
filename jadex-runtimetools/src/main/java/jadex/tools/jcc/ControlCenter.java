@@ -16,6 +16,7 @@ import jadex.bridge.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.xml.AbstractInfo;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
@@ -469,7 +470,8 @@ public class ControlCenter implements IControlCenter
 				
 				// for testing the writer
 				FileOutputStream os = new FileOutputStream(project);
-				getPropertyWriter().write(props, os, null);
+				getPropertyWriter().write(props, os, ((ILibraryService)agent.getPlatform()
+					.getService(ILibraryService.class)).getClassLoader(), null);
 				os.close();
 				setStatusText("Project saved successfully: "+ project.getAbsolutePath());
 			}
@@ -1154,14 +1156,11 @@ public class ControlCenter implements IControlCenter
 	}
 
 	public static Set typeinfos;	
-//	public static Set linkinfos;
-	public static Set ignoredattrs;
 	static
 	{
-		ignoredattrs = new HashSet();
-		ignoredattrs.add("schemaLocation");
 		typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "properties", Properties.class, null, null, null, null, null,
+		typeinfos.add(new TypeInfo(null, "properties", Properties.class, null, null, 
+			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null, null,
 			new SubobjectInfo[]
 			{
 				new SubobjectInfo(new BeanAttributeInfo("property", "properties")), 
@@ -1170,9 +1169,6 @@ public class ControlCenter implements IControlCenter
 		));
 		
 		typeinfos.add(new TypeInfo(null, "property", Property.class, null, new BeanAttributeInfo(null, "value")));
-		
-//		linkinfos = new HashSet();
-//		linkinfos.add(new LinkInfo("properties", new BeanAttributeInfo("subproperties")));	
 	}
 	public static jadex.commons.xml.writer.Writer writer;
 	public static jadex.commons.xml.reader.Reader reader;
@@ -1196,8 +1192,7 @@ public class ControlCenter implements IControlCenter
 	{
 		if(reader==null)
 		{
-//			reader = new jadex.commons.xml.Reader(new BeanObjectReaderHandler(), typeinfos, linkinfos, ignoredattrs);
-			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(), typeinfos, ignoredattrs);
+			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(), typeinfos);
 		}
 		return reader;
 	}

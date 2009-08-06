@@ -94,7 +94,7 @@ class StringTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		return val;
 	}
@@ -119,7 +119,7 @@ class IntegerTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);
@@ -146,7 +146,7 @@ class LongTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);
@@ -173,7 +173,7 @@ class FloatTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);
@@ -200,7 +200,7 @@ class DoubleTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);
@@ -227,7 +227,7 @@ class BooleanTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);
@@ -254,7 +254,7 @@ class ShortTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);
@@ -281,7 +281,7 @@ class ByteTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);
@@ -308,7 +308,7 @@ class CharacterTypeConverter implements ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertObject(Object val, Object root, ClassLoader classloader)
+	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
 		if(!(val instanceof String))
 			throw new RuntimeException("Source value must be string: "+val);

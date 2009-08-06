@@ -11,6 +11,7 @@ import jadex.bridge.ISpace;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
 import jadex.commons.xml.bean.BeanObjectReaderHandler;
@@ -67,7 +68,8 @@ public class ApplicationFactory implements IApplicationFactory
 		this.platform = platform;
 		
 		Set types = new HashSet();
-		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null));
+		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null));
 		types.add(new TypeInfo(null, "spacetype", MSpaceType.class));
 		types.add(new TypeInfo(null, "agenttype", MAgentType.class));
 		types.add(new TypeInfo(null, "application", MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
@@ -90,11 +92,11 @@ public class ApplicationFactory implements IApplicationFactory
 //			links.addAll(linkinfos[i]);
 //		}
 		
-		Set ignored = new HashSet();
-		ignored.add("schemaLocation");
+//		Set ignored = new HashSet();
+//		ignored.add("schemaLocation");
 		
 //		this.reader = new Reader(new BeanObjectReaderHandler(), types, links, ignored);
-		this.reader = new Reader(new BeanObjectReaderHandler(), types, ignored);
+		this.reader = new Reader(new BeanObjectReaderHandler(), types);
 	}
 	
 	//-------- IAgentFactory interface --------

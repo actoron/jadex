@@ -41,6 +41,8 @@ public class TypeInfo	extends AbstractInfo
 	/** The post processor (if any). */
 	protected IPostProcessor postproc;
 	
+	// todo: IPreWriter for doing sth with the object before writing?
+	
 	// write
 	
 	/** The sub objects (non-xml name -> subobject info). */

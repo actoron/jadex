@@ -1,7 +1,5 @@
 package wfms;
 
-import jadex.bridge.IPlatformService;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +22,7 @@ public class BasicWfms implements IWfms
 	 *  @param type type of service
 	 *  @param service The service.
 	 */
-	public synchronized void addService(Class type, IPlatformService service)
+	public synchronized void addService(Class type, Object service)
 	{
 		services.put(type, service);
 	}

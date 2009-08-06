@@ -2,11 +2,11 @@ package jadex.commons.xml.reader;
 
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.xml.AbstractInfo;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.AbstractInfo.SpecificityComparator;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,36 +39,16 @@ public class Reader
 	/** The type mappings. */
 	protected Map typeinfos;
 	
-	/** The link object infos. */
-//	protected Map linkinfos;
-	
-	/** The ignored attribute types. */
-	protected Set ignoredattrs;
-	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
-	 * /
-	public Reader(IObjectReaderHandler handler, Set typeinfos, Set linkinfos, Set ignoredattrs)
-	{
-		this.handler = handler;
-		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
-		this.linkinfos = linkinfos!=null? createLinkInfos(linkinfos): Collections.EMPTY_MAP;
-		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
-	}*/
-	
-	/**
-	 *  Create a new reader.
-	 *  @param handler The handler.
 	 */
-	public Reader(IObjectReaderHandler handler, Set typeinfos, Set ignoredattrs)
+	public Reader(IObjectReaderHandler handler, Set typeinfos)
 	{
 		this.handler = handler;
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
-//		this.linkinfos = linkinfos!=null? createLinkInfos(linkinfos): Collections.EMPTY_MAP;
-		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 	}
 	
 	//-------- methods --------
@@ -169,9 +149,9 @@ public class Reader
 						String attrval = parser.getAttributeValue(i);
 						attrs.remove(attrname);
 						
-						if(!ignoredattrs.contains(attrname))
+						Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
+						if(!(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).isIgnoreRead()))
 						{
-							Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
 //							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
 //							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
 							handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context, classloader, root);

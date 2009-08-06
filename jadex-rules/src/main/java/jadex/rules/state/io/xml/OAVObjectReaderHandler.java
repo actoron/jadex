@@ -72,7 +72,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		// If attrval==null only set if default value available.
-		if(attrval==null && !(attrinfo instanceof OAVAttributeInfo && ((OAVAttributeInfo)attrinfo).getDefaultValue()!=null))
+		if(attrval==null && !(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).getDefaultValue()!=null))
 			return;
 		
 		IOAVState state = (IOAVState)context;
@@ -84,14 +84,14 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		{
 			AttributeInfo info = (AttributeInfo)attrinfo;
 			attrtype = (OAVAttributeType)info.getAttributeIdentifier();
-			if(val==null && ((OAVAttributeInfo)attrinfo).getDefaultValue()!=null)
-				val = ((OAVAttributeInfo)attrinfo).getDefaultValue();
+			if(val==null && ((AttributeInfo)attrinfo).getDefaultValue()!=null)
+				val = ((AttributeInfo)attrinfo).getDefaultValue();
 			
-			if(info instanceof OAVAttributeInfo)
+			if(info instanceof AttributeInfo)
 			{
-				ITypeConverter conv = ((OAVAttributeInfo)info).getConverter();
+				ITypeConverter conv = ((AttributeInfo)info).getConverterRead();
 				if(conv!=null)
-					val = conv.convertObject(attrval, root, classloader);
+					val = conv.convertObject(attrval, root, classloader, null);
 			}
 		}
 		else if(attrinfo instanceof OAVAttributeType)
@@ -140,7 +140,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		{
 			Object arg = val instanceof String && attrtype.getType() instanceof OAVJavaType 
 				&& BasicTypeConverter.isBuiltInType(((OAVJavaType)attrtype.getType()).getClazz())?
-				BasicTypeConverter.getBasicConverter((((OAVJavaType)attrtype.getType()).getClazz())).convertObject(attrval, root, classloader):
+				BasicTypeConverter.getBasicConverter((((OAVJavaType)attrtype.getType()).getClazz())).convertObject(attrval, root, classloader, null):
 					val;
 	
 			setAttributeValue(state, object, attrtype, arg);
@@ -171,13 +171,13 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		
 		OAVAttributeType attrtype = null;
 
-		if(linkinfo instanceof OAVAttributeInfo)
+		if(linkinfo instanceof AttributeInfo)
 		{
-			OAVAttributeInfo info = (OAVAttributeInfo)linkinfo;
-			attrtype = info.getAttribute();
-			ITypeConverter conv = info.getConverter();
+			AttributeInfo info = (AttributeInfo)linkinfo;
+			attrtype = (OAVAttributeType)info.getAttributeIdentifier();
+			ITypeConverter conv = info.getConverterRead();
 			if(conv!=null)
-				elem = conv.convertObject(elem, root, classloader);
+				elem = conv.convertObject(elem, root, classloader, null);
 		}
 		else if(linkinfo instanceof OAVAttributeType)
 		{

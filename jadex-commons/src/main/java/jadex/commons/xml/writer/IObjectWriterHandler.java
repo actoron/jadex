@@ -20,6 +20,6 @@ public interface IObjectWriterHandler
 	 *  @param object The object.
 	 *  @param typeinfo The Typeinfo.
 	 */
-	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, Object context);
+	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, Object context, ClassLoader classloader);
 
 }
