@@ -2,11 +2,13 @@ package jadex.bdi.examples.marsworld.sentry;
 
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld.RequestProduction;
+import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
@@ -21,18 +23,6 @@ import java.util.Map;
  */
 public class AnalyzeTargetPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public AnalyzeTargetPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
-	//-------- methods --------
-
 	/**
 	 *  The plan body.
 	 */
@@ -48,10 +38,11 @@ public class AnalyzeTargetPlan extends Plan
 		// Analyse the target.
 		try
 		{
-			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
+			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			SyncResultListener	res	= new SyncResultListener();
 			Map props = new HashMap();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
+			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
 			Object	taskid	= space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
 			space.addTaskListener(taskid, myself.getId(), res);
@@ -60,9 +51,6 @@ public class AnalyzeTargetPlan extends Plan
 //			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
 			if(((Number)target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue()>0)
 				callProducerAgent(target);
-	
-			// Hack??? Should be done in task, but aborts plan before producers are called.
-			target.setProperty(AnalyzeTargetTask.PROPERTY_STATE, AnalyzeTargetTask.STATE_ANALYZED);
 		}
 		catch(Exception e)
 		{
@@ -89,8 +77,7 @@ public class AnalyzeTargetPlan extends Plan
 			int sel = (int)(Math.random()*producers.length); // todo: Select not randomly
 //			System.out.println("Found agents: "+producers.length+" selected: "+sel);
 
-			RequestProduction rp = new RequestProduction();
-			rp.setTarget(target);
+			RequestProduction rp = new RequestProduction(target);
 			//Action action = new Action();
 			//action.setAction(rp);
 			//action.setActor(SJade.convertAIDtoJade(producers[sel].getName()));

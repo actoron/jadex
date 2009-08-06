@@ -147,7 +147,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="rp_filter">
-					<fact>jadex.bdi.runtime.IFilter.ALWAYS</fact>
+					<fact>jadex.commons.IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>
 			<goals>

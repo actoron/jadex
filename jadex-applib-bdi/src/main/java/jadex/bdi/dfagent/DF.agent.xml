@@ -16,7 +16,7 @@
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.adapter.standalone.*</import>
-		<import>jadex.bdi.runtime.IFilter</import>
+		<import>jadex.commons.IFilter</import>
 	</imports>
 
 	<capabilities>

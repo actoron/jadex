@@ -14,6 +14,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.commons.IFilter</import>
 	</imports>
 
 	<capabilities>

@@ -3,11 +3,13 @@ package jadex.bdi.examples.marsworld.carry;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.bdi.examples.marsworld.producer.ProduceOreTask;
 import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
+import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -17,18 +19,6 @@ import jadex.bdi.runtime.Plan;
  */
 public class CarryOrePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public CarryOrePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
-	//-------- methods --------
-
 	/**
 	 *  The plan body.
 	 */
@@ -53,6 +43,7 @@ public class CarryOrePlan extends Plan
 			Map props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, target);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.TRUE);
+			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
 			Object	taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
 			env.addTaskListener(taskid, myself.getId(), res);
 			
@@ -74,6 +65,7 @@ public class CarryOrePlan extends Plan
 			props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, homebase);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.FALSE);
+			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
 			taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
 			env.addTaskListener(taskid, myself.getId(), res);
 //			myself.addTask(new LoadOreTask(homebase, false, res));

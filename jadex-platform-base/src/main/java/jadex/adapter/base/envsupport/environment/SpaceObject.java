@@ -309,7 +309,14 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 			{
 				try
 				{
-					atasks[i].execute(space, this, progress);
+					if(!atasks[i].isFinished(space, this))
+					{
+						atasks[i].execute(space, this, progress);
+					}
+					else
+					{
+						removeTask(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
+					}
 				}
 				catch(Exception e)
 				{

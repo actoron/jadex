@@ -10,7 +10,7 @@
 
 	<imports>
 		<import>jadex.bdi.examples.hunterprey_classic.*</import>
-		<import>jadex.bdi.runtime.IFilter</import>
+		<import>jadex.commons.IFilter</import>
 		<import>jadex.adapter.base.fipa.*</import>
 	</imports>
 

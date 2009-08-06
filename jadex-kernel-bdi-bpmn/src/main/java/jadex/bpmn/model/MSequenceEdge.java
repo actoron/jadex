@@ -3,7 +3,6 @@ package jadex.bpmn.model;
 import jadex.javaparser.IParsedExpression;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,9 +20,6 @@ public class MSequenceEdge extends MAssociationTarget
 	
 	/** The type. */
 	protected String type;
-	
-	/** The associations. */
-	protected List associations;
 	
 	//-------- additions --------
 	

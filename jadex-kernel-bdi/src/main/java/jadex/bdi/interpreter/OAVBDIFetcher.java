@@ -61,6 +61,25 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 		this.rcapa = rcapa;
 	}
 	
+	/**
+	 *  Create a new fetcher.
+	 */
+	public OAVBDIFetcher(IOAVState state, Object rcapa, Object relem)
+	{
+		this(state, rcapa);
+		
+		if(state.getType(relem).equals(OAVBDIRuntimeModel.goal_type))
+			setRGoal(relem);
+		else if(state.getType(relem).equals(OAVBDIRuntimeModel.plan_type))
+			setRPlan(relem);
+		else if(state.getType(relem).equals(OAVBDIRuntimeModel.messageevent_type))
+			setRMessageEvent(relem);
+		else if(state.getType(relem).equals(OAVBDIRuntimeModel.internalevent_type))
+			setRInternalEvent(relem);
+		else
+			throw new IllegalArgumentException("Unsoppurted object: "+relem);
+	}
+	
 	//-------- IValueFetcher methods --------
 	
 	/**

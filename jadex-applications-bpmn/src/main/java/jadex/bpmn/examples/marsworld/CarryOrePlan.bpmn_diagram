@@ -28,7 +28,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_OCBXVYAxEd6N8dR31QwQkg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_OCBXVoAxEd6N8dR31QwQkg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="CarryOrePlan.bpmn#_OCBXUYAxEd6N8dR31QwQkg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OCBXV4AxEd6N8dR31QwQkg" x="437" width="331" height="147"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OCBXV4AxEd6N8dR31QwQkg" x="437" width="357" height="147"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_Q-E4woAxEd6N8dR31QwQkg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_Q-E4yIAxEd6N8dR31QwQkg" type="4001"/>
@@ -46,7 +46,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_SYrOhYAxEd6N8dR31QwQkg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_SYrOhoAxEd6N8dR31QwQkg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="CarryOrePlan.bpmn#_SYrOgYAxEd6N8dR31QwQkg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_SYrOh4AxEd6N8dR31QwQkg" x="470" y="188" width="319" height="146"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_SYrOh4AxEd6N8dR31QwQkg" x="454" y="188" width="352" height="146"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_Wado8IAxEd6N8dR31QwQkg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_Wado9oAxEd6N8dR31QwQkg" type="4001"/>

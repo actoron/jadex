@@ -11,6 +11,7 @@
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.bdi.planlib.ping.*</import>
 		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.commons.IFilter</import>
 	</imports>
 
 	<capabilities>

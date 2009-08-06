@@ -1,12 +1,37 @@
 package jadex.bdi.runtime;
 
+import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+
 
 /**
  *  A currently instantiated plan of the agent (=intention).
  */
 public interface IPlan	extends IParameterElement
 {
-	// Todo: add some methods (e.g. isAlive)?
+	//-------- constants --------
+	
+	/** The lifecycle state "new" (just created). */
+	public static final String	PLANLIFECYCLESTATE_NEW	= OAVBDIRuntimeModel.PLANLIFECYCLESTATE_NEW;
+	
+	/** The state, indicating the execution of the plan body. */
+	public static final String	PLANLIFECYCLESTATE_BODY	= OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY;
+	
+	/** The state, indicating the execution of the passed code. */
+	public static final String	PLANLIFECYCLESTATE_PASSED	= OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED;
+	
+	/** The state, indicating the execution of the failed code. */
+	public static final String	PLANLIFECYCLESTATE_FAILED	= OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED;
+	
+	/** The state, indicating the execution of the aborted. */
+	public static final String	PLANLIFECYCLESTATE_ABORTED	= OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED;
+
+	//-------- methods --------
+	
+	/**
+	 *  Get the lifecycle state of the plan (e.g. body or aborted).
+	 *  @return The lifecycle state.
+	 */
+	public String	getLifecycleState();
 
 	/**
 	 *  Get the waitqueue.
@@ -24,7 +49,7 @@ public interface IPlan	extends IParameterElement
 	 *  Get the reason (i.e. initial event).
 	 *  @return The reason.
 	 */
-	public Object getReason();
+	public IElement getReason();
 	
 	//-------- listeners --------
 	

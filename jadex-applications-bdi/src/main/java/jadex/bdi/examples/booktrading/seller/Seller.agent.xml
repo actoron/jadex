@@ -174,7 +174,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="cnp_filter">
-					<fact>jadex.bdi.runtime.IFilter.ALWAYS</fact>
+					<fact>jadex.commons.IFilter.ALWAYS</fact>
 				</initialbelief>
 				<initialbelief ref="gui">
 					<fact>new jadex.bdi.planlib.GuiCreator(Gui.class, new Class[]{jadex.bdi.runtime.IExternalAccess.class, boolean.class}, 

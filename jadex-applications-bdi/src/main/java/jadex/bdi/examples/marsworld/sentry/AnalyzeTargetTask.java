@@ -102,6 +102,7 @@ public class AnalyzeTargetTask extends AbstractTask
 		
 		if(time<=0)
 		{
+			target.setProperty(AnalyzeTargetTask.PROPERTY_STATE, AnalyzeTargetTask.STATE_ANALYZED);
 			setFinished(space, obj, true);
 		}
 	}

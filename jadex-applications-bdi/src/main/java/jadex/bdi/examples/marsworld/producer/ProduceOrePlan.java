@@ -1,8 +1,10 @@
 package jadex.bdi.examples.marsworld.producer;
 
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -15,23 +17,6 @@ import java.util.Map;
  */
 public class ProduceOrePlan extends Plan
 {
-	//-------- attributes --------
-	
-	/** The id of the produce ore task (if any). */
-	protected Object	taskid;
-	
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ProduceOrePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
-	//-------- methods --------
-
 	/**
 	 *  The plan body.
 	 */
@@ -49,23 +34,11 @@ public class ProduceOrePlan extends Plan
 		SyncResultListener	res	= new SyncResultListener();
 		Map props = new HashMap();
 		props.put(ProduceOreTask.PROPERTY_TARGET, target);
+		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
 		IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-		taskid	= space.createObjectTask(ProduceOreTask.PROPERTY_TYPENAME, props, myself.getId());
+		Object taskid	= space.createObjectTask(ProduceOreTask.PROPERTY_TYPENAME, props, myself.getId());
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
 //		System.out.println("Produced ore at target: "+getAgentName()+", "+ore+" ore produced.");
-	}
-	
-	/**
-	 *  Called, when the plan is aborted.
-	 */
-	public void aborted()
-	{
-		if(taskid!=null)
-		{
-			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
-			space.removeObjectTask(taskid, myself.getId());
-		}
 	}
 }

@@ -8,14 +8,14 @@ public interface ICondition	extends IExpression
 {
 	//-------- constants --------
 
-	/** Do not trace this condition (the default). */
+	/** Do not trace this condition (the default). * /
 	public static final String	TRACE_NEVER	= "never";
 	
-	/** Always trace this condition (generate event whenever satisfied). */
+	/** Always trace this condition (generate event whenever satisfied). * /
 	public static final String	TRACE_ALWAYS	= "always";
 	
-	/** Trace this condition once (until satisfied). */
-	public static final String	TRACE_ONCE	= "once";
+	/** Trace this condition once (until satisfied). * /
+	public static final String	TRACE_ONCE	= "once";*/
 
 	//-------- attribute accessors --------
 	

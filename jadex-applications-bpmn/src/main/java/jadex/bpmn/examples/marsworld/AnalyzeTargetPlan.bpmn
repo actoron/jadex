@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_tI-10YKCEd6rVea0-FiZ3Q" iD="_tI-10IKCEd6rVea0-FiZ3Q">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_Wh9wMYKDEd6rVea0-FiZ3Q" iD="_Wh9wMIKDEd6rVea0-FiZ3Q" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;&#xD;&#xA;import jadex.bdi.examples.marsworld.RequestProduction;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.adapter.base.envsupport.environment.space2d.*;&#xD;&#xA;import jadex.adapter.base.envsupport.environment.*;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import java.util.Map;&#xD;&#xA;import jadex.bdi.planlib.*;&#xD;&#xA;import jadex.bridge.IAgentIdentifier;&#xD;&#xA;import jadex.adapter.base.agr.AGRSpace;">
+    <associations xmi:type="bpmn:Association" xmi:id="_Wh9wOYKDEd6rVea0-FiZ3Q"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_tI-114KCEd6rVea0-FiZ3Q" iD="_tI-11oKCEd6rVea0-FiZ3Q" associations="_Wh9wOYKDEd6rVea0-FiZ3Q" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_tI-12YKCEd6rVea0-FiZ3Q" iD="_tI-12IKCEd6rVea0-FiZ3Q" outgoingEdges="_k_e-IYKNEd6rVea0-FiZ3Q" name="Move to Target&#xD;&#xA;&#xD;&#xA;class = DispatchGoalTask.class&#xD;&#xA;in String type = &quot;move.move_dest&quot;&#xD;&#xA;in Map parameters = SUtil.createHashMap(new String[]{&quot;destination&quot;}, new Object[]{$plan.target.getProperty(Space2D.PROPERTY_POSITION)})" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_mVvyAYKDEd6rVea0-FiZ3Q" iD="_mVvyAIKDEd6rVea0-FiZ3Q" outgoingEdges="_nxPfqoKDEd6rVea0-FiZ3Q _Po8_EYKFEd6rVea0-FiZ3Q" incomingEdges="_lYEdQYKNEd6rVea0-FiZ3Q" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_nxPfoYKDEd6rVea0-FiZ3Q" iD="_nxPfoIKDEd6rVea0-FiZ3Q" outgoingEdges="_SiLO8YKFEd6rVea0-FiZ3Q" incomingEdges="_jX8HoYKEEd6rVea0-FiZ3Q" name="mode = &quot;send&quot;&#xD;&#xA;type = &quot;request_producer&quot;&#xD;&#xA;receivers = new IAgentIdentifier[]{producers[Math.random()*producers.length]}&#xD;&#xA;content = new RequestProduction($plan.target)" activityType="EventIntermediateMessage" looping="false"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_RRrF0YKEEd6rVea0-FiZ3Q" iD="_RRrF0IKEEd6rVea0-FiZ3Q" outgoingEdges="_ieRUuoKEEd6rVea0-FiZ3Q" incomingEdges="_nxPfqoKDEd6rVea0-FiZ3Q" name="Find Producer&#xD;&#xA;&#xD;&#xA;in AGRSpace agrs = $scope.getApplicationContext().getSpace(&quot;myagrspace&quot;)&#xD;&#xA;out IAgentIdentifier[] producers = agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;producer&quot;)"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ieRUsYKEEd6rVea0-FiZ3Q" iD="_ieRUsIKEEd6rVea0-FiZ3Q" outgoingEdges="_jX8HoYKEEd6rVea0-FiZ3Q _6o3QeoKEEd6rVea0-FiZ3Q" incomingEdges="_ieRUuoKEEd6rVea0-FiZ3Q" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_6o3QcYKEEd6rVea0-FiZ3Q" iD="_6o3QcIKEEd6rVea0-FiZ3Q" incomingEdges="_6o3QeoKEEd6rVea0-FiZ3Q _Po8_EYKFEd6rVea0-FiZ3Q _SiLO8YKFEd6rVea0-FiZ3Q _tWJHEYKNEd6rVea0-FiZ3Q" name="" activityType="EventEndEmpty" looping="false"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_XYqjIYKNEd6rVea0-FiZ3Q" iD="_XYqjIIKNEd6rVea0-FiZ3Q" outgoingEdges="_lYEdQYKNEd6rVea0-FiZ3Q" incomingEdges="_k_e-IYKNEd6rVea0-FiZ3Q">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_eHdWYYKNEd6rVea0-FiZ3Q" iD="_eHdWYIKNEd6rVea0-FiZ3Q" name="Analyze Target&#xD;&#xA;&#xD;&#xA;class = CreateSpaceObjectTaskTask.class&#xD;&#xA;in IEnvironmentSpace space = $beliefbase.environment&#xD;&#xA;in Object objectid = $beliefbase.myself.getId()&#xD;&#xA;in String type = AnalyzeTargetTask.PROPERTY_TYPENAME&#xD;&#xA;in Map properties = SUtil.createHashMap(new String[]{&quot;target&quot;, AnalyzeTargetTask.PROPERTY_CONDITION}, new Object[]{$plan.target, new PlanFinishedTaskCondition($plan)})"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_tWJHEYKNEd6rVea0-FiZ3Q" iD="_tWJHEIKNEd6rVea0-FiZ3Q"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_sIDjUYKNEd6rVea0-FiZ3Q" iD="_sIDjUIKNEd6rVea0-FiZ3Q" outgoingEdges="_tWJHEYKNEd6rVea0-FiZ3Q" activityType="EventIntermediateError"/>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_nxPfqoKDEd6rVea0-FiZ3Q" iD="_nxPfqYKDEd6rVea0-FiZ3Q" name="$plan.target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)>0"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ieRUuoKEEd6rVea0-FiZ3Q" iD="_ieRUuYKEEd6rVea0-FiZ3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jX8HoYKEEd6rVea0-FiZ3Q" iD="_jX8HoIKEEd6rVea0-FiZ3Q" name="producers!=null"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6o3QeoKEEd6rVea0-FiZ3Q" iD="_6o3QeYKEEd6rVea0-FiZ3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Po8_EYKFEd6rVea0-FiZ3Q" iD="_Po8_EIKFEd6rVea0-FiZ3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_SiLO8YKFEd6rVea0-FiZ3Q" iD="_SiLO8IKFEd6rVea0-FiZ3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_k_e-IYKNEd6rVea0-FiZ3Q" iD="_k_e-IIKNEd6rVea0-FiZ3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_lYEdQYKNEd6rVea0-FiZ3Q" iD="_lYEdQIKNEd6rVea0-FiZ3Q"/>
+  </pools>
+</bpmn:BpmnDiagram>

@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bdi.runtime.IFilter;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 
@@ -93,7 +93,7 @@ public class ParameterElementFilter implements IFilter, Serializable
 	 * @return True, if the filter matches.
 	 * @throws Exception
 	 */
-	public boolean filter(Object object) throws Exception
+	public boolean filter(Object object)
 	{
 
 		boolean ret = false;

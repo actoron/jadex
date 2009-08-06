@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bdi.runtime.IFilter;
 import jadex.bridge.IAgentIdentifier;
+import jadex.commons.IFilter;
 
 import java.util.ArrayList;
 import java.util.List;

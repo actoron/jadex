@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  *  The abstract plan is the abstract superclass
  *  for standard plans and mobile plans.
  */
-public abstract class AbstractPlan implements java.io.Serializable
+public abstract class AbstractPlan implements java.io.Serializable, IPlan
 {
 	//-------- attributes --------
 
@@ -90,6 +90,76 @@ public abstract class AbstractPlan implements java.io.Serializable
 		System.out.println("Finalized: "+this+" "+rplan);
 	}*/
 	
+	//-------- IPlan interface --------
+	
+	/**
+	 *  Get the lifecycle state of the plan (e.g. body or aborted).
+	 *  @return The lifecycle state.
+	 */
+	public String	getLifecycleState()
+	{
+		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
+		return plan.getLifecycleState();		
+	}
+
+	/**
+	 *  Get the waitqueue.
+	 *  @return The waitqueue.
+	 */
+	public IWaitqueue getWaitqueue()
+	{
+		return WaitqueueFlyweight.getWaitqueueFlyweight(getState(), getRCapability(), getRPlan());
+	}
+
+	/**
+	 *  Get the body.
+	 *  @return The body.
+	 */
+	public Object getBody()
+	{
+		return this;
+	}
+	
+	/**
+	 *  Get the reason (i.e. initial event).
+	 *  @return The reason.
+	 */
+	public IElement getReason()
+	{
+		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
+		return plan.getReason();		
+	}
+	
+	/**
+	 *  Add a goal listener.
+	 *  @param listener The goal listener.
+	 */
+	public void addPlanListener(IPlanListener listener)
+	{
+		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
+		plan.addPlanListener(listener);		
+	}
+	
+	/**
+	 *  Remove a goal listener.
+	 *  @param listener The goal listener.
+	 */
+	public void removePlanListener(IPlanListener listener)
+	{
+		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
+		plan.removePlanListener(listener);		
+	}
+	
+	/**
+	 *  Get the element type (i.e. the name declared in the ADF).
+	 *  @return The element type.
+	 */
+	public String	getType()
+	{
+		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
+		return plan.getType();		
+	}
+
 	//-------- methods --------
 
 	/**
@@ -126,15 +196,6 @@ public abstract class AbstractPlan implements java.io.Serializable
 	public ICapability getScope()
 	{
 		return new CapabilityFlyweight(state, rcapa);
-	}
-
-	/**
-	 *  Get the reason, why the plan gets executed.
-	 */
-	public IElement getReason()
-	{
-		Object elem = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason);
-		return getFlyweight(elem);
 	}
 	
 	/**
@@ -285,16 +346,7 @@ public abstract class AbstractPlan implements java.io.Serializable
 			rootgoal = new ProcessGoalWrapper(rplan.getRootGoal());
 		return rootgoal;
 	}*/
-
-	/**
-	 *  Get the waitqueue.
-	 *  @return The waitqueue.
-	 */
-	public IWaitqueue getWaitqueue()
-	{
-		return WaitqueueFlyweight.getWaitqueueFlyweight(getState(), getRCapability(), getRPlan());
-	}
-
+	
 	/**
 	 *  Add some code to the agent's agenda,
 	 *  that will be executed on the agent's thread.
@@ -849,30 +901,6 @@ public abstract class AbstractPlan implements java.io.Serializable
 	{
 		return capability;
 	}*/
-	
-	//-------- listeners --------
-	
-	/**
-	 *  Add a plan listener.
-	 *  @param listener The plan listener.
-	 */
-	public void addPlanListener(IPlanListener listener)
-	{
-//		getInterpreter().getEventDispatcher().addPlanListener(getRPlan(), listener);
-		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
-		plan.addPlanListener(listener);
-	}
-	
-	/**
-	 *  Remove a plan listener.
-	 *  @param listener The plan listener.
-	 */
-	public void removePlanListener(final IPlanListener listener)
-	{
-//		getInterpreter().getEventDispatcher().removePlanListener(getRPlan(), listener);
-		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
-		plan.removePlanListener(listener);
-	}
 
 	//-------- static part -------
 

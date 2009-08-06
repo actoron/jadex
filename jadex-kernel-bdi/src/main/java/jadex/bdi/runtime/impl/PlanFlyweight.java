@@ -41,7 +41,28 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	
 	//-------- plan interface --------
 	
-	// Todo: add some methods (e.g. isAlive)?
+	/**
+	 *  Get the lifecycle state of the plan (e.g. body or aborted).
+	 *  @return The lifecycle state.
+	 */
+	public String	getLifecycleState()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					string = (String)getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.plan_has_lifecyclestate);
+				}
+			};
+			return invoc.string;
+		}
+		else
+		{
+			return (String)getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.plan_has_lifecyclestate);
+		}
+	}
 
 	/**
 	 *  Get the waitqueue.
@@ -70,7 +91,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 *  Get the reason (i.e. initial event).
 	 *  @return The reason.
 	 */
-	public Object getReason()
+	public IElement getReason()
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -86,7 +107,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 					}
 				}
 			};
-			return invoc.object;
+			return (IElement) invoc.object;
 		}
 		else
 		{

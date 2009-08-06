@@ -28,6 +28,15 @@ public class RequestProduction implements IAgentAction
 	{
 	}
 
+	/**
+	 *  Create a new RequestProduction.
+	 */
+	public RequestProduction(ISpaceObject target)
+	{
+		this();
+		setTarget(target);
+	}
+
 	//-------- accessor methods --------
 
 	/**

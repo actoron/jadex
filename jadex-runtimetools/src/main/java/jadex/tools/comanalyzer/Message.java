@@ -1,10 +1,10 @@
 package jadex.tools.comanalyzer;
 
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.runtime.IFilter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
+import jadex.commons.IFilter;
 import jadex.commons.collection.SCollection;
 
 import java.util.ArrayList;

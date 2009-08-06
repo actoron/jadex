@@ -1,6 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.math.IVector1;
+import jadex.commons.IBooleanCondition;
 import jadex.commons.SimplePropertyObject;
 
 /**
@@ -8,6 +9,19 @@ import jadex.commons.SimplePropertyObject;
  */
 public abstract class AbstractTask extends SimplePropertyObject implements IObjectTask
 {
+	//-------- constants --------
+	
+	/** The task condition property. */
+	public static final String	PROPERTY_CONDITION	= "condition";
+	
+	//-------- attributes --------
+	
+	/** The finished flag. */
+	protected boolean	finished;
+	
+	/** The task condition (optional). Task is executed as long as the condition is true. */
+	protected IBooleanCondition	condition;
+	
 	//-------- IObjectTask interface --------
 	
 	/**
@@ -19,6 +33,7 @@ public abstract class AbstractTask extends SimplePropertyObject implements IObje
 	 */
 	public void start(/*IEnvironmentSpace space,*/ ISpaceObject obj)
 	{
+		this.condition	= (IBooleanCondition)getProperty(PROPERTY_CONDITION);
 	}
 	
 	/**
@@ -43,6 +58,16 @@ public abstract class AbstractTask extends SimplePropertyObject implements IObje
 	{
 	}
 
+	/**
+	 *  Check if a task is finished and should be removed.
+	 *  Finished tasks will no longer be executed.
+	 *  @return	True, if the task is finished.
+	 */
+	public boolean isFinished(IEnvironmentSpace space, ISpaceObject obj)
+	{
+		return finished || condition!=null && !condition.isValid();
+	}
+
 	//-------- helper methods --------
 	
 	/**
@@ -53,6 +78,9 @@ public abstract class AbstractTask extends SimplePropertyObject implements IObje
 	 */
 	public void	setFinished(IEnvironmentSpace space, ISpaceObject obj, boolean finished)
 	{
+		this.finished	= finished;
+		
+		// remove task immediately (otherwise will only be removed in next step).
 		if(finished)
 			space.removeObjectTask(this.getProperty(PROPERTY_ID), obj.getId());
 	}

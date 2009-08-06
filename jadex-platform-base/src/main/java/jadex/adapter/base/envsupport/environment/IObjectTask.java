@@ -34,4 +34,11 @@ public interface IObjectTask extends IPropertyObject
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress);
+
+	/**
+	 *  Check if a task is finished and should be removed.
+	 *  Finished tasks will no longer be executed.
+	 *  @return	True, if the task is finished.
+	 */
+	public boolean isFinished(IEnvironmentSpace space, ISpaceObject obj);
 }

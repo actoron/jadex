@@ -12,6 +12,7 @@
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.commons.IFilter</import>
 	</imports>
 
 	<capabilities>

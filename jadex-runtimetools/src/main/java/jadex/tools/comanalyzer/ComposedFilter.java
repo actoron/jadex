@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bdi.runtime.IFilter;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
@@ -56,7 +56,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 *  @return True, if the filter matches.
 	 * @throws Exception
 	 */
-	public boolean filter(Object object) throws Exception
+	public boolean filter(Object object)
 	{
 		boolean ret	= false;
 		if(operator==AND)
@@ -70,14 +70,14 @@ public class ComposedFilter implements IFilter,	Serializable
 		else if(operator==OR)
 		{
 			// When exception occurs: remember.
-			Exception	exception	= null;
+			RuntimeException	exception	= null;
 			for(int i=0; i<filters.length && !ret; i++)
 			{
 				try
 				{
 					ret	= ret || filters[i].filter(object);
 				}
-				catch(Exception e)
+				catch(RuntimeException e)
 				{
 					exception	= exception!=null ? exception : e;
 				}

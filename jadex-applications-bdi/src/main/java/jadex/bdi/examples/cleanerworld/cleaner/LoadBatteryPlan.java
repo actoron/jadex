@@ -1,9 +1,11 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
+import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -16,13 +18,6 @@ import java.util.Map;
  */
 public class LoadBatteryPlan extends Plan
 {
-	//-------- attributes --------
-
-	/** The load task. */
-	protected Object taskid;
-
-	//-------- methods --------
-
 	/**
 	 *  The plan body.
 	 */
@@ -51,9 +46,10 @@ public class LoadBatteryPlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			Map props = new HashMap();
 			props.put(LoadBatteryTask.PROPERTY_TARGET, station);
+			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			taskid = space.createObjectTask(LoadBatteryTask.PROPERTY_TYPENAME, props, myself.getId());
+			Object taskid = space.createObjectTask(LoadBatteryTask.PROPERTY_TYPENAME, props, myself.getId());
 			space.addTaskListener(taskid, myself.getId(), res);
 			// Its important to wait for the task, as otherwise the plan is immediately finished and the maintaingoal is failed (one plan, no recur) 
 			res.waitForResult();
@@ -63,31 +59,5 @@ public class LoadBatteryPlan extends Plan
 
 		getLogger().info("Loading finished.");
 		//getBeliefbase().getBelief("is_loading").setFact(new Boolean(false));
-	}
-
-	/**
-	 *  Remove the task, when the plan is aborted. 
-	 */
-	public void aborted()
-	{
-		if(taskid!=null)
-		{
-			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
-			space.removeObjectTask(taskid, myself.getId());
-		}
-	}
-	
-	/**
-	 *  Remove the task, when the plan is aborted. 
-	 */
-	public void failed()
-	{
-		if(taskid!=null)
-		{
-			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
-			space.removeObjectTask(taskid, myself.getId());
-		}
 	}
 }

@@ -102,9 +102,9 @@
 			<deliberation cardinality="1">
 				<inhibits ref="move.walk_around"/>
 			</deliberation>
-			<!-- The goal is reached when the target is analysed. -->
+			<!-- The goal is reached when the target is analysed. - ->
+			<!- - Target condition prevents producers from being called by sentry, because plan is aborted. - ->  
 			<targetcondition language="jcl">
-				// $beliefbase.getBeliefSet("analysed_targets").containsFact($goal.target)
 				$goal.target.state==AnalyzeTargetTask.STATE_ANALYZED
 				
 				// ?rgoal	= (goal (parameterelement_has_parameters ?param_target))
@@ -114,7 +114,7 @@
  
 				// ?rgoal	= (goal (parameterelement_has_parameters["target"].parameter_has_value ?target))
 				// (beliefset (element_has_model.melement_has_name "analysed_targets") (beliefset_has_facts contains ?target))
- 			</targetcondition>
+ 			</targetcondition> -->
 		</achievegoal>
 	</goals>
 
