@@ -39,9 +39,9 @@ public class LoadBatteryPlan extends Plan
 			IGoal moveto = createGoal("achievemoveto");
 			IVector2 location = (IVector2)station.getProperty(Space2D.PROPERTY_POSITION);
 			moveto.getParameter("location").setValue(location);
-			System.out.println("Created: "+location+" "+this);
+//			System.out.println("Created: "+location+" "+this);
 			dispatchSubgoalAndWait(moveto);
-			System.out.println("Reached: "+location+" "+this);
+//			System.out.println("Reached: "+location+" "+this);
 
 			SyncResultListener	res	= new SyncResultListener();
 			Map props = new HashMap();

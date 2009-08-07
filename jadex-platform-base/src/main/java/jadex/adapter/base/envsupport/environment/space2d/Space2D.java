@@ -40,9 +40,6 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	/** Area size. */
 	protected IVector2 areasize;
 	
-	/** The behavior of the world */
-	public String bordermode;
-	
 	//-------- constructors --------
 	
 	/**
@@ -51,12 +48,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	protected Space2D(IVector2 areasize, String bordermode)
+	protected Space2D(IVector2 areasize)
 	{		
 		this.areasize = areasize;
-		setBorderMode(bordermode!=null ? bordermode
-			: getPropertyNames().contains(PROPERTY_BORDER)
-			? (String)getProperty(PROPERTY_BORDER) : BORDER_TORUS);
 	}
 	
 	//-------- methods --------
@@ -91,19 +85,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public String getBorderMode()
 	{
-		return this.bordermode;
-	}
-
-	/**
-	 *  Set the border mode.
-	 *  @param border_mode The border mode to set.
-	 */
-	public void setBorderMode(String bordermode)
-	{
-//		System.out.println("bordemode: "+bordermode);
-		if(!BORDER_STRICT.equals(bordermode) && !BORDER_TORUS.equals(bordermode))
-			throw new RuntimeException("Unknown border mode: "+bordermode);
-		this.bordermode = bordermode;
+		return getPropertyNames().contains(PROPERTY_BORDER)
+		? (String)getProperty(PROPERTY_BORDER)
+		: BORDER_TORUS;
 	}
 
 	/** 
@@ -269,7 +253,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			}
 			else
 			{
-				throw new RuntimeException("Unknown bordermode: "+bordermode);
+				throw new RuntimeException("Unknown bordermode: "+getBorderMode());
 			}
 		}
 		

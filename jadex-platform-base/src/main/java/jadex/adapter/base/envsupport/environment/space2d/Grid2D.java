@@ -39,9 +39,6 @@ public class Grid2D extends Space2D
 	/** All simobject id's accessible per position. */
 	protected MultiCollection objectsygridpos;
 	
-	/** The neighborhhod. */
-	protected String neighborhood;
-	
 	/** Standard vector for left movement. */
 //	public static final IVector2	LEFT	= new Vector2Int(-1, 0);
 	
@@ -65,7 +62,7 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D()
 	{
-		this(null, null, null, null);
+		this(null);
 	}
 	
 	/**
@@ -74,9 +71,9 @@ public class Grid2D extends Space2D
 	 * @param actionexecutor executor for agent actions
 	 * @param areasize the size of the 2D area
 	 */
-	public Grid2D(IVector2 areasize, String neighborhood)
+	public Grid2D(IVector2 areasize)
 	{
-		this(DEFAULT_NAME, areasize, null, neighborhood);
+		this(DEFAULT_NAME, areasize);
 	}
 	
 	/**
@@ -85,13 +82,10 @@ public class Grid2D extends Space2D
 	 * @param areasize the size of the 2D area
 	 * @param actionexecutor executor for agent actions
 	 */
-	public Grid2D(Object name, IVector2 areasize, String bordermode, String neighborhood)
+	public Grid2D(Object name, IVector2 areasize)
 	{
-		super(areasize==null? null: new Vector2Int(areasize.getXAsInteger(), areasize.getYAsInteger()), bordermode);
+		super(areasize==null? null: new Vector2Int(areasize.getXAsInteger(), areasize.getYAsInteger()));
 		this.setProperty("name", name);	
-		setNeighborhood(neighborhood==null
-			? getPropertyNames().contains(PROPERTY_NEIGHBORHOOD) ? (String)getProperty(PROPERTY_NEIGHBORHOOD) : NEIGHBORHOOD_VON_NEUMANN
-			: neighborhood);
 		this.objectsygridpos = new MultiCollection();
 	}
 	
@@ -115,21 +109,9 @@ public class Grid2D extends Space2D
 	 */
 	public String getNeighborhood()
 	{
-		return this.neighborhood;
-	}
-
-	/**
-	 *  Set the neighborhood.
-	 *  @param neighborhood the neighborhood to set.
-	 */
-	public void setNeighborhood(String neighborhood)
-	{
-		if(!NEIGHBORHOOD_MOORE.equals(neighborhood)
-			&& !NEIGHBORHOOD_VON_NEUMANN.equals(neighborhood))
-		{
-			throw new RuntimeException("Unknown neighborhood: "+neighborhood);
-		}
-		this.neighborhood = neighborhood;
+		return getPropertyNames().contains(PROPERTY_NEIGHBORHOOD)
+			? (String)getProperty(PROPERTY_NEIGHBORHOOD)
+			: NEIGHBORHOOD_VON_NEUMANN;
 	}
 
 	/**

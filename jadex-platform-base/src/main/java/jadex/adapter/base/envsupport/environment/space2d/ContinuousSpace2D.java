@@ -19,7 +19,7 @@ public class ContinuousSpace2D extends Space2D
 	 */
 	public ContinuousSpace2D()
 	{
-		this(null, null, null);
+		this(null);
 	}
 	
 	/**
@@ -30,7 +30,7 @@ public class ContinuousSpace2D extends Space2D
 	 */
 	public ContinuousSpace2D(IVector2 areasize)
 	{
-		this(DEFAULT_NAME, areasize, null);
+		this(DEFAULT_NAME, areasize);
 	}
 	
 	/**
@@ -39,9 +39,9 @@ public class ContinuousSpace2D extends Space2D
 	 * @param areasize the size of the 2D area
 	 * @param actionexecutor executor for agent actions
 	 */
-	public ContinuousSpace2D(Object name, IVector2 areasize, String bordermode)
+	public ContinuousSpace2D(Object name, IVector2 areasize)
 	{
-		super(areasize, bordermode);
+		super(areasize);
 		setProperty("name", name);
 	}
 }
