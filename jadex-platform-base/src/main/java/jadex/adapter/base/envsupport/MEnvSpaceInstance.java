@@ -11,7 +11,6 @@ import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.PerceptType;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
@@ -111,17 +110,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			Double width = getProperty(properties, "width")!=null? (Double)getProperty(properties, "width"): (Double)getProperty(mspacetype.getProperties(), "width");
 			Double height = getProperty(properties, "height")!=null? (Double)getProperty(properties, "height"): (Double)getProperty(mspacetype.getProperties(), "height");
 			((Space2D)ret).setAreaSize(Vector2Double.getVector2(width, height));
-			
-			String bordermode = (String)getProperty(properties, "border")!=null? (String)getProperty(properties, "border"): (String)getProperty(mspacetype.getProperties(), "border");
-			if(bordermode!=null)
-				((Space2D)ret).setBorderMode(bordermode);
-			
-			if(ret instanceof Grid2D)
-			{
-				String neighborhood = (String)getProperty(properties, "neighborhood")!=null? (String)getProperty(properties, "neighborhood"): (String)getProperty(mspacetype.getProperties(), "neighborhood");
-				if(neighborhood!=null)
-					((Grid2D)ret).setNeighborhood(neighborhood);
-			}
 //			System.out.println("areasize: "+width+" "+height);
 		}
 		
@@ -422,13 +410,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					});
 				}
 				
-				// Hack! Is configuation the presentation?
-				// Yes! No, now it's, together with the Theme, the Perspective.
-				//Perspective2D perspective = new Perspective2D();
-				//perspective.setInvertYAxis(true);
-				//perspective.setObjectShift(new Vector2Double(0.5));
-				//oc.addPerspective("Simple 2D Space", perspective);
-				
 				List perspectives = mspacetype.getPropertyList("perspectives");
 				for(int j=0; j<perspectives.size(); j++)
 				{
@@ -441,11 +422,6 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					List props = (List)sourcepers.get("properties");
 					setProperties(persp, props, fetcher);
 					
-//					if(ret.getClass().getName().indexOf("2D")!=-1)
-//						((Perspective2D)persp).setInvertYAxis(true);
-//					if(ret.getClass().getName().indexOf("Grid")!=-1)
-//						((Perspective2D)persp).setObjectShift(new Vector2Double(0.5));
-
 					oc.addPerspective((String)getProperty(sourcepers, "name"), persp);
 				}
 			}

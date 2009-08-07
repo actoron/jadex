@@ -36,7 +36,7 @@ public class BeanAttributeInfo extends AttributeInfo
 	 */
 	public BeanAttributeInfo(String xmlattributename, String attributename)
 	{
-		this(xmlattributename, attributename, null, null, null, null);
+		this(xmlattributename, attributename, null);
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class BeanAttributeInfo extends AttributeInfo
 	 */
 	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname)
 	{
-		this(xmlattributename, attributename, ignore, converterread, null, mapname, null);
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, null);
 	}
 	
 	/**

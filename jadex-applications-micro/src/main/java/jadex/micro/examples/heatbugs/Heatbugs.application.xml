@@ -4,7 +4,7 @@
 	It can be started to launch a heatbugs scenario.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
 	xmlns:env="http://jadex.sourceforge.net/jadex-env"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
@@ -21,7 +21,8 @@
 	</imports>
 	
 	<spacetypes>
-		<env:envspacetype name="gc2dspace" width="20" height="20" neighborhood="moore" class="Grid2D">
+		<env:envspacetype name="gc2dspace" width="20" height="20" class="Grid2D">
+			<env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property>
 			<env:property name="min_ideal_temp">50.0</env:property>
 			<env:property name="max_ideal_temp">100.0</env:property>
 			<!-- <env:property name="min_ideal_temp">0</env:property>-->
@@ -66,7 +67,7 @@
 			</env:views>
 			
 			<env:perspectives>
-				<env:perspective name="main" class="Perspective2D" opengl="true" objectshiftx="0.5" objectshifty="0.5">
+				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
 					
 					<env:drawable objecttype="patch" width="1.0" height="1.0">
 						<env:property name="color" dynamic="true">new java.awt.Color((int)(Math.min(255, $object.heat)),0,0)</env:property>
@@ -82,7 +83,7 @@
 			</env:perspectives>
 			
 			<env:spaceexecutor class="RoundBasedExecutor">
-				<property name="space">$space</property>
+				<env:property name="space">$space</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
@@ -93,35 +94,39 @@
 	
 	<applications>
 		<application name="30x30">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
+					<env:processes>
+						<env:process type="diffuse"/>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="main"/>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
 			<agents>
 				<agent type="Heatbug" number="40"/>
 			</agents>
-			
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
-				<env:processes>
-					<env:process type="diffuse"/>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="world" view="view_all" perspective="main"/>
-				</env:observers>
-			</env:envspace>
 		</application>
 		
 		<application name="50x50">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
+					<env:processes>
+						<env:process type="diffuse"/>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="main"/>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
 			<agents>
 				<agent type="Heatbug" number="100"/>
 			</agents>
-			
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
-				<env:processes>
-					<env:process type="diffuse"/>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="world" view="view_all" perspective="main"/>
-				</env:observers>
-			</env:envspace>
 		</application>
 	</applications>
 

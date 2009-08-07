@@ -60,7 +60,7 @@
 		</plan>
 		
 		<plan name="increment">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"count"</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>

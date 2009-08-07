@@ -23,7 +23,6 @@ import jadex.adapter.base.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
@@ -48,10 +47,18 @@ import java.util.Set;
 import javax.swing.text.html.StyleSheet;
 
 /**
- *  Java representation of environemnt space type for xml description.
+ *  Java representation of environment space type for xml description.
  */
 public class MEnvSpaceType	extends MSpaceType
 {
+	//-------- constants --------
+	
+	/** The border object placement. */
+	public static final String	OBJECTPLACEMENT_BORDER	= "border";
+	
+	/** The center object placement. */
+	public static final String	OBJECTPLACEMENT_CENTER	= "center";
+	
 	//-------- attributes --------
 	
 	/** The properties. */
@@ -268,8 +275,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("opengl", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
 			new BeanAttributeInfo("invertxaxis", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE),
 			new BeanAttributeInfo("invertyaxis", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.TRUE),
-			new BeanAttributeInfo("objectshiftx", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
-			new BeanAttributeInfo("objectshifty", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
+			new BeanAttributeInfo("objectplacement", null, null, BasicTypeConverter.STRING_CONVERTER, null, "", OBJECTPLACEMENT_BORDER),
 			new BeanAttributeInfo("zoomlimit", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("bgcolor", null, null, colorconv, null, ""),
 			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
@@ -283,7 +289,7 @@ public class MEnvSpaceType	extends MSpaceType
 					boolean opengl = MEnvSpaceInstance.getProperty(args, "opengl")!=null? 
 						((Boolean)MEnvSpaceInstance.getProperty(args, "opengl")).booleanValue(): true;
 					ret.setOpenGl(opengl);
-					String name = (String)MEnvSpaceInstance.getProperty(args, "name");
+//					String name = (String)MEnvSpaceInstance.getProperty(args, "name");
 //					System.out.println("Perspective: "+name+" using opengl="+opengl);
 					
 					// Hack!!!
@@ -297,12 +303,9 @@ public class MEnvSpaceType	extends MSpaceType
 						
 						pers.setBackground((Color)MEnvSpaceInstance.getProperty(args, "bgcolor"));
 						
-						Double xshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshiftx");
-						Double yshift = (Double)MEnvSpaceInstance.getProperty(args, "objectshifty");
-						if(xshift!=null && yshift!=null)
-							pers.setObjectShift(Vector2Double.getVector2(xshift, yshift));
-//						else if(ret instanceof Grid2D)
-//							pers.setObjectShift(new Vector2Double(0.5));
+						String	placement	= (String)MEnvSpaceInstance.getProperty(args, "objectplacement");
+						if(OBJECTPLACEMENT_CENTER.equals(placement))
+							pers.setObjectShift(new Vector2Double(0.5));
 						
 						Double zoomlimit = (Double)MEnvSpaceInstance.getProperty(args, "zoomlimit");
 						if(zoomlimit != null)
@@ -717,7 +720,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("position", null, null, null, null, ""),
 			new BeanAttributeInfo("font", null, null, BasicTypeConverter.STRING_CONVERTER, null, ""),
 			new BeanAttributeInfo("style", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
-			new BeanAttributeInfo("basesize", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
+			new BeanAttributeInfo("size", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
 			new BeanAttributeInfo("abspos", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
 			new BeanAttributeInfo("abssize", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
 			new BeanAttributeInfo("color", null, null, colorconv, null, ""),
@@ -745,7 +748,7 @@ public class MEnvSpaceType	extends MSpaceType
 					{
 						fontstyle = new Integer(Font.PLAIN);
 					}
-					Integer fontsize = (Integer) MEnvSpaceInstance.getProperty(args, "basesize");
+					Integer fontsize = (Integer) MEnvSpaceInstance.getProperty(args, "size");
 					if (fontsize==null)
 					{
 						fontsize = new Integer(12);

@@ -69,13 +69,13 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<goal ref="testgoal"/>
 				<condition language="jcl">
 					$beliefbase.trigger
 					
 					// ?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
 					// ?mbel_trigger	= (mbelief (melement_has_name "trigger"))
 				</condition>
+				<goal ref="testgoal"/>
 			</trigger>
 		</plan>
 		<plan name="endstateworkertest_plan">
@@ -90,10 +90,10 @@
 			<body class="EndStateWorkerTestPlan"/>
 			<trigger>
 				<internalevent ref="endevent"/>
-				<messageevent ref="endmsg"/>
-				<goal ref="endgoal"/>
  				<internalevent ref="endcap.endevent"/>
+				<messageevent ref="endmsg"/>
 				<messageevent ref="endcap.endmsg"/>
+				<goal ref="endgoal"/>
 				<goal ref="endcap.endgoal"/>
 		</trigger>
 		</plan>

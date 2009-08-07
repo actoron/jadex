@@ -2,14 +2,14 @@
 	<!--
 		<H3>Test applikation for V2 and Deco4MAS</H3> Work in progress...
 		can be removed!
-	-->
+	- ->
 
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-env" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="EasyMechanism" package="jadex.bdi.examples.antworld.depricated">
-
+	name="EasyMechanism" package="jadex.bdi.examples.antworld.depricated">-->
+<applicationtype>
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor

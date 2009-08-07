@@ -55,14 +55,14 @@
 
 	<configurations>
 		<configuration name="default">
-			<plans>
-				<initialplan ref="dumbmove"/>
- 			</plans>
 			<beliefs>
 				<initialbelief ref="my_self">
 					<fact>new Hunter($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(10,10))</fact>
 				</initialbelief>
 			</beliefs>
+			<plans>
+				<initialplan ref="dumbmove"/>
+ 			</plans>
 		</configuration>
 	</configurations>
 

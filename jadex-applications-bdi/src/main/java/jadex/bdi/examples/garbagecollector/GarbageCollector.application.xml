@@ -6,7 +6,7 @@
 	of the Jason BDI agent engine.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
 	xmlns:env="http://jadex.sourceforge.net/jadex-env"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
@@ -133,7 +133,7 @@
 			
 			<!-- Perspectives define the user-interface appearance. -->
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="false" objectshiftx="0.5" objectshifty="0.5">
+				<env:perspective name="icons" class="Perspective2D" opengl="false" objectplacement="center">
 					<env:drawable objecttype="collector" width="1.0" height="1.0" rotation="rotation">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
 						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector/images/collector.png" />
@@ -161,7 +161,7 @@
 					</env:prelayers>
 				</env:perspective>
 					
-				<env:perspective name="abstract" class="Perspective2D" opengl="false" objectshiftx="0.5" objectshifty="0.5">
+				<env:perspective name="abstract" class="Perspective2D" opengl="false" objectplacement="center">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
 						<env:triangle layer="2" color="red" />
@@ -188,7 +188,7 @@
 			
 			<!-- A space executor defines the space execution policy (e.g. roundbased vs. continuous). -->
 			<env:spaceexecutor class="RoundBasedExecutor">
-				<property name="space">$space</property>
+				<env:property name="space">$space</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
@@ -203,28 +203,41 @@
 	<applications>
 	
 		<application name="One Burner / One Collector">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">15</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="abstract"/>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
 			<agents>
 				<agent type="Collector"/>
 				<agent type="Burner"/>
-			</agents>
-			
-			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:processes>
-					<env:process type="create">
-						<env:property name="tickrate">15</env:property>
-					</env:process>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="world" view="view_all" perspective="abstract">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
-				</env:observers>
-			</env:envspace>
+			</agents>			
 		</application>
 		
 		<application name="One Burner / Two Collectors">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">8</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="abstract"/>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+			
 			<agents>
 				<!-- Using names for agents is problemat -->
 				<!-- <agent name="Collector2" type="Collector"/>
@@ -233,59 +246,48 @@
 				<agent type="Collector" number="2"/>
 				<agent type="Burner" number="1"/>
 			</agents>
-			
-			<env:envspace name="mygc2dspace" type="gc2dspace">
-				<env:processes>
-					<env:process type="create">
-						<env:property name="tickrate">8</env:property>
-					</env:process>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="world" view="view_all" perspective="abstract">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
-				</env:observers>
-			</env:envspace>
 		</application>
 		
 		<application name="Two Burners / Three Collectors">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="14" height="14">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">5</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="abstract" />
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
 			<agents>
 				<agent type="Collector" number="3"/>
 				<agent type="Burner" number="2"/>
 			</agents>
-			
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="14" height="14">
-				<env:processes>
-					<env:process type="create">
-						<env:property name="tickrate">5</env:property>
-					</env:process>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="world" view="view_all" perspective="abstract" />
-				</env:observers>
-			</env:envspace>
 		</application>
 		
 		<application name="Many Burners / Too Many Collectors">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">2</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="abstract" />
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
 			<agents>
 				<agent type="Collector" number="30"/>
 				<agent type="Burner" number="5"/>
 			</agents>
-			
-			<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
-				<env:processes>
-					<env:process type="create">
-						<env:property name="tickrate">2</env:property>
-					</env:process>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="world" view="view_all" perspective="abstract" />
-				</env:observers>
-			</env:envspace>
 		</application>
 	</applications>
 

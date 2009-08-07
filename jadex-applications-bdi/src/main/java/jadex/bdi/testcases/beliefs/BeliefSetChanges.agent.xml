@@ -74,7 +74,7 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 		</plan>
 
 		<plan name="a_added">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"result"</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
@@ -83,10 +83,10 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 			</trigger>
 		</plan>
 		<plan name="a_removed">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"result"</value>
 			</parameter>
-			<parameter name="value">
+			<parameter name="value" class="int">
 				<value>-1</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
@@ -96,7 +96,7 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 		</plan>
 
 		<plan name="belset_added">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"result"</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>

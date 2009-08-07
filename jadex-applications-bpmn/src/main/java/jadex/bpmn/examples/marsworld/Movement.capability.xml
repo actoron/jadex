@@ -28,8 +28,8 @@
  		</belief>
 
 		<!-- Is the mission finished? -->
-		<belief name="missionend" class="boolean" updaterate="1000" exported="true">
-			<fact evaluationmode="pull">
+		<belief name="missionend" class="boolean" updaterate="1000" evaluationmode="pull" exported="true">
+			<fact>
  				$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("missiontime")&lt;=$scope.getTime()
  			</fact>
 		</belief>

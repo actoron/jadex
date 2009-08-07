@@ -28,11 +28,11 @@
 
 	<xs:complexType name="grouptype">
 		<xs:sequence>
-			<xs:element name="roles">
+			<xs:element name="roles" minOccurs="0" maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="role"
-							type="role">
+							type="role" minOccurs="1" maxOccurs="unbounded">
 						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
@@ -47,11 +47,32 @@
 		<xs:attribute name="max" type="xs:int"></xs:attribute>
 	</xs:complexType>
 
-	<xs:element name="agrspacetype">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="agrspacetype" />
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
+
+    <xs:element name="agrspace" type="agrspace"></xs:element>
+
+    <xs:complexType name="agrspace">
+    	<xs:sequence>
+    		<xs:element name="group" type="group" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="type" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:element name="agrspacetype" type="agrspacetype"></xs:element>
+
+    <xs:complexType name="group">
+    	<xs:sequence>
+    		<xs:element name="position" minOccurs="0" maxOccurs="unbounded">
+    			<xs:complexType>
+    				<xs:attribute name="role" type="xs:string"
+    					use="required">
+    				</xs:attribute>
+    				<xs:attribute name="agenttype"
+    					type="xs:string" use="required">
+    				</xs:attribute>
+    			</xs:complexType></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="type" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
 </xs:schema>

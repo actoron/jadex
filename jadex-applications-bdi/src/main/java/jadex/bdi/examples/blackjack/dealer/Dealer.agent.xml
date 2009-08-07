@@ -170,10 +170,10 @@
 		<plan name="propagate_game_state_plan">
 			<body class="PropagateGameStatePlan" />
 			<trigger>
-				<factchanged ref="myself"/>
 				<factadded ref="players"/>
 				<factremoved ref="players"/>
 				<factchanged ref="players"/>
+				<factchanged ref="myself"/>
 			</trigger>
 			<!-- not possible because game must always be updated. -->
 			<!--<precondition>$beliefbase.players.length>0</precondition>-->

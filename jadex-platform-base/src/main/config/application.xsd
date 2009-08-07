@@ -22,34 +22,39 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:complexType name="applicationtype">
-		<xs:complexContent>
-			<xs:extension base="contexttype">
 				<xs:sequence>
-					<xs:element name="imports">
+					<xs:element name="imports" minOccurs="0">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element name="import" type="import" minOccurs="0" maxOccurs="unbounded"/>
+								<xs:element name="import" type="import" minOccurs="0" maxOccurs="unbounded" />
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="agenttypes">
+                    <xs:element name="spacetypes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<!-- <xs:element name="spacetype" type="spacetype" minOccurs="0" maxOccurs="unbounded"/> -->
+						<xs:any minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+                    <xs:element name="agenttypes" minOccurs="0">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element name="agenttype" type="agenttype" minOccurs="0" maxOccurs="unbounded"/>
+								<xs:element name="agenttype" type="agenttype" minOccurs="0" maxOccurs="unbounded" />
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="applications">
+					<xs:element name="applications" minOccurs="0">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element name="application" type="application" minOccurs="0" maxOccurs="unbounded"/>
+								<xs:element name="application" type="application" minOccurs="0" maxOccurs="unbounded" />
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
 				</xs:sequence>
-				<xs:attribute name="package" type="xs:string"/>
-			</xs:extension>
-		</xs:complexContent>
+                <xs:attribute name="name" type="xs:string" />
+                <xs:attribute name="package" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="agenttype">
 		<xs:annotation>
@@ -63,14 +68,14 @@
 			<xs:element name="spaces" maxOccurs="1" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="space"/>
+						<xs:any maxOccurs="unbounded" minOccurs="0"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
             <xs:element name="agents" maxOccurs="1" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="agent" type="agent" />
+						<xs:element name="agent" type="agent" maxOccurs="unbounded" minOccurs="0"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -79,7 +84,7 @@
 	</xs:complexType>
 	<xs:complexType name="agent">
 		<xs:sequence>
-			<xs:element name="parameters">
+			<xs:element name="parameters" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence minOccurs="0">
 						<xs:element name="parameter" type="parameter" minOccurs="0" maxOccurs="unbounded"/>
@@ -100,26 +105,12 @@
 	</xs:complexType>
 	<xs:complexType name="parameterset">
 		<xs:sequence>
-			<xs:element name="value" maxOccurs="unbounded">
+			<xs:element name="value" maxOccurs="unbounded" minOccurs="0">
 				<xs:complexType mixed="true"/>
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
-	</xs:complexType>
-	<xs:complexType name="contexttype">
-		<xs:sequence>
-			<xs:element name="spacetypes">
-				<xs:complexType>
-					<xs:sequence>
-						<!-- <xs:element name="spacetype" type="spacetype" minOccurs="0" maxOccurs="unbounded"/> -->
-						<xs:any minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="class" type="xs:string"/>
-	</xs:complexType>
+	</xs:complexType>
 	<xs:complexType name="spacetype">
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded">

@@ -19,7 +19,7 @@ public class ContinuousSpace2D extends Space2D
 	 */
 	public ContinuousSpace2D()
 	{
-		this(null, null, BORDER_TORUS);
+		this(null, null, null);
 	}
 	
 	/**
@@ -30,7 +30,7 @@ public class ContinuousSpace2D extends Space2D
 	 */
 	public ContinuousSpace2D(IVector2 areasize)
 	{
-		this(DEFAULT_NAME, areasize, BORDER_TORUS);
+		this(DEFAULT_NAME, areasize, null);
 	}
 	
 	/**

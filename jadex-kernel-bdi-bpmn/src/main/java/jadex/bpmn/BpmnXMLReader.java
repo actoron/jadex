@@ -141,7 +141,7 @@ public class BpmnXMLReader
 			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("lanes", "laneDescription"),
 			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("activityType", "activityType", null, null, null, MBpmnModel.TASK),
+			new BeanAttributeInfo("activityType", "activityType", null, null, null, null, MBpmnModel.TASK),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
 			}, new ActivityPostProcessor(),
 			new IFilter()
@@ -163,7 +163,7 @@ public class BpmnXMLReader
 			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("lanes", "laneDescription"),
 			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("activityType", "activityType", null, null, null, MBpmnModel.SUBPROCESS),
+			new BeanAttributeInfo("activityType", "activityType", null, null, null, null, MBpmnModel.SUBPROCESS),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)	
 			}, new ActivityPostProcessor(),
 			new IFilter()

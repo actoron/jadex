@@ -49,8 +49,8 @@
 
 	<goals>
 		<achievegoal name="testgoal">
-			<parameter name="param1" class="String" updaterate="1000">
-				<value evaluationmode="pull">""+$scope.getTime()</value>
+			<parameter name="param1" class="String" updaterate="1000" evaluationmode="pull">
+				<value>""+$scope.getTime()</value>
 			</parameter>
 		</achievegoal>
 	</goals>
@@ -67,8 +67,8 @@
 
 	<events>
 		<internalevent name="testevent">
-			<parameter name="param1" class="String" updaterate="1000">
-				<value evaluationmode="pull">""+$scope.getTime()</value>
+			<parameter name="param1" class="String" updaterate="1000" evaluationmode="pull">
+				<value>""+$scope.getTime()</value>
 			</parameter>
 		</internalevent>
 		<messageevent name="testmsg" type="fipa">

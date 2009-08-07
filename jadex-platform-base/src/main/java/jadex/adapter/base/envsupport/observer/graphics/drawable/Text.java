@@ -1,35 +1,22 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
-import java.awt.font.TextLayout;
-import java.awt.font.TextMeasurer;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-
-import javax.media.opengl.GL;
-
-
-import com.sun.opengl.util.j2d.TextRenderer;
-
-
-import jadex.adapter.base.envsupport.environment.space2d.action.GetPosition;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport;
-import jadex.adapter.base.envsupport.observer.graphics.IViewport;
-import jadex.adapter.base.envsupport.observer.graphics.TextInfo;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+
+import com.sun.opengl.util.j2d.TextRenderer;
 
 /**
  * Drawable component for displaying text.

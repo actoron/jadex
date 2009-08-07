@@ -51,10 +51,10 @@
 
 	<plans>
         <plan name="increment">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"count"</value>
 			</parameter>
-			<parameter name="value">
+			<parameter name="value" class="int">
 				<value>3</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
@@ -64,13 +64,13 @@
 		</plan>
 		
 		 <plan name="decrement">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"count"</value>
 			</parameter>
-			<parameter name="value">
+			<parameter name="value" class="int">
 				<value>-1</value>
 			</parameter>
-			<parameter name="rate">
+			<parameter name="rate" class="int">
 				<value>100</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>

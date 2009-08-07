@@ -307,14 +307,14 @@ public class OAVBDIMetaModel
 	/** Expression has class attribute. */
 //	public static OAVAttributeType expression_has_class;
 	
-	/** Expression has parameters attribute. */
-	public static OAVAttributeType expression_has_parameters;
+//	/** Expression has parameters attribute. */
+//	public static OAVAttributeType expression_has_parameters;
 	
-	/** Expression has relevants attribute. */
-	public static OAVAttributeType expression_has_relevants;
+//	/** Expression has relevants attribute. */
+//	public static OAVAttributeType expression_has_relevants;
 
-	/** Expression has evaluationmode attribute. */
-	public static OAVAttributeType expression_has_evaluationmode;
+//	/** Expression has evaluationmode attribute. */
+//	public static OAVAttributeType expression_has_evaluationmode;
 
 	//-------- expression parameter --------
 
@@ -907,7 +907,7 @@ public class OAVBDIMetaModel
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
 //		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
 //		expression_has_relevants = expression_type.createAttributeType("mexpression_has_relevants",  expressionrelevant_type, OAVAttributeType.LIST);
-		expression_has_evaluationmode = expression_type.createAttributeType("mexpression_has_evaluationmode", OAVJavaType.java_string_type);
+//		expression_has_evaluationmode = expression_type.createAttributeType("mexpression_has_evaluationmode", OAVJavaType.java_string_type);
 				
 		// condition
 		// todo: separate conditions from expressions

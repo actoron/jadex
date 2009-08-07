@@ -39,8 +39,8 @@
 		<belief name="my_vision" class="double" exported="true"/>
 
 		<!-- Is the mission finished? -->
-		<belief name="missionend" class="boolean" updaterate="1000" exported="true">
-			<fact evaluationmode="pull">
+		<belief name="missionend" class="boolean" updaterate="1000" evaluationmode="pull" exported="true">
+			<fact>
  				$beliefbase.environment.getHomebase().getRemainingMissionTime()==0
  			</fact>
 		</belief>

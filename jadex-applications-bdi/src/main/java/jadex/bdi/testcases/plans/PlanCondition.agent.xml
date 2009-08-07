@@ -41,7 +41,7 @@
 
 	<plans>
         <plan name="plan_a">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"a"</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>

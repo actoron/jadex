@@ -32,6 +32,9 @@ public class Grid2D extends Space2D
 	
 	/** The von neumann neighborhood. */
 	public static final String NEIGHBORHOOD_VON_NEUMANN = "von_neumann";
+
+	/** The neighborhood property. */
+	public static final String PROPERTY_NEIGHBORHOOD = "neighborhood";
 	
 	/** All simobject id's accessible per position. */
 	protected MultiCollection objectsygridpos;
@@ -62,7 +65,7 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D()
 	{
-		this(null, null, BORDER_TORUS, null);
+		this(null, null, null, null);
 	}
 	
 	/**
@@ -73,7 +76,7 @@ public class Grid2D extends Space2D
 	 */
 	public Grid2D(IVector2 areasize, String neighborhood)
 	{
-		this(DEFAULT_NAME, areasize, BORDER_TORUS, neighborhood);
+		this(DEFAULT_NAME, areasize, null, neighborhood);
 	}
 	
 	/**
@@ -86,7 +89,9 @@ public class Grid2D extends Space2D
 	{
 		super(areasize==null? null: new Vector2Int(areasize.getXAsInteger(), areasize.getYAsInteger()), bordermode);
 		this.setProperty("name", name);	
-		setNeighborhood(neighborhood==null? NEIGHBORHOOD_VON_NEUMANN: neighborhood);
+		setNeighborhood(neighborhood==null
+			? getPropertyNames().contains(PROPERTY_NEIGHBORHOOD) ? (String)getProperty(PROPERTY_NEIGHBORHOOD) : NEIGHBORHOOD_VON_NEUMANN
+			: neighborhood);
 		this.objectsygridpos = new MultiCollection();
 	}
 	

@@ -66,11 +66,6 @@
 		</plan>
 	</plans>
 
-	<properties>
-		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
-		<!--<property name="debugging">true</property>-->
-	</properties>
-	
 	<expressions>
 		<condition name="plan_context" language="jcl">
 			!$beliefbase.context
@@ -80,6 +75,11 @@
 		</condition>
 	</expressions>
 
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<!--<property name="debugging">true</property>-->
+	</properties>
+	
 	<configurations>
 		<configuration name="default">
 			<plans>

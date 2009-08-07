@@ -50,22 +50,22 @@
 			</trigger>
 		</plan>
 		<plan name="adder">
-			<body class="BeliefSetAddPlan"/>
 			<parameter name="beliefsetname" class="String">
 				<value>"belset"</value>
 			</parameter>
 			<parameter name="time" class="long">
 				<value>1000L</value>
 			</parameter>
+			<body class="BeliefSetAddPlan"/>
 		</plan>
 		<plan name="remover">
-			<body class="BeliefSetRemovePlan"/>
 			<parameter name="beliefsetname" class="String">
 				<value>"belset"</value>
 			</parameter>
 			<parameter name="time" class="long">
 				<value>1300L</value>
 			</parameter>
+			<body class="BeliefSetRemovePlan"/>
 		</plan>
 		
 		<!-- This plan sends back an alive on a ping request. -->

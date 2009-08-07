@@ -4,7 +4,7 @@
 	It can be started to launch a cleaner world scenario.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
 	xmlns:env="http://jadex.sourceforge.net/jadex-env"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
@@ -23,7 +23,8 @@
 	</imports>
 	
 	<spacetypes>
-		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1" border="strict">
+		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
+			<env:property name="border">Space2D.BORDER_STRICT</env:property>
 			<env:property name="time" dynamic="true">$platform.getService(IClockService.class).getTime()</env:property>
 			<env:property name="timeofday" dynamic="true">(int)($space.time %86400)</env:property>
 			<env:property name="daytime" dynamic="true">$space.timeofday &lt; 43200</env:property>
@@ -140,7 +141,7 @@
 					<env:drawable objecttype="cleaner" width="0.1" height="0.1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*20)</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld/images/cleaner.png" />
-						<env:text layer="4" align="center" y="-0.6" color="black" text="$owner$" basesize="8"/>
+						<env:text layer="4" align="center" y="-0.6" color="black" text="$owner$" size="8"/>
 						<env:ellipse layer="-1" size="vision_size" color="#ffff007f" />
 						<env:texturedrectangle layer="0" x="0.3" y="0.4" width="0.3" height="0.3" imagepath="jadex/bdi/examples/cleanerworld/images/waste.png">
 							<env:drawcondition>$object.waste!=null</env:drawcondition>
@@ -149,7 +150,7 @@
 					
 					<env:drawable objecttype="truck" width="0.2" height="0.15">
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld/images/truck.png" />
-						<env:text layer="4" align="center" y="-0.5" color="black" text="$owner$" basesize="8"/>
+						<env:text layer="4" align="center" y="-0.5" color="black" text="$owner$" size="8"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="waste" width="0.03" height="0.03">
@@ -194,101 +195,104 @@
 	
 	<applications>
 		<application name="One cleaner">
+			<spaces>
+				<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
+					<!-- <env:property name="daytime">true</env:property> -->
+					
+					<env:objects>
+						<env:object type="chargingstation">
+							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
+						</env:object>
+						<env:object type="chargingstation">
+							<env:property name="position">new Vector2Double(0.2, 0.4)</env:property>
+						</env:object>
+						<env:object type="wastebin">
+							<env:property name="position">new Vector2Double(0.2, 0.2)</env:property>
+						</env:object>
+						<env:object type="wastebin">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.1, 0.5)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.2, 0.5)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.3, 0.5)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.9, 0.9)</env:property>
+						</env:object>
+					</env:objects>
+					
+					<env:processes>
+						<env:process type="create">
+							<env:property name="timerate">15000</env:property>
+						</env:process>
+						<env:process type="empty">
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="Observer" view="view_all" perspective="abstract" />
+					</env:observers>
+				</env:envspace>
+			</spaces>
 			<agents>
 				<agent type="Cleaner"/>
 			</agents>
-			
-			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
-				<!-- <env:property name="daytime">true</env:property> -->
-				
-				<env:objects>
-					<env:object type="chargingstation">
-						<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
-					</env:object>
-					<env:object type="chargingstation">
-						<env:property name="position">new Vector2Double(0.2, 0.4)</env:property>
-					</env:object>
-					<env:object type="wastebin">
-						<env:property name="position">new Vector2Double(0.2, 0.2)</env:property>
-					</env:object>
-					<env:object type="wastebin">
-						<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.1, 0.5)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.2, 0.5)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.3, 0.5)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.9, 0.9)</env:property>
-					</env:object>
-				</env:objects>
-				
-				<env:processes>
-					<env:process type="create">
-						<env:property name="timerate">15000</env:property>
-					</env:process>
-					<env:process type="empty">
-					</env:process>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="Observer" view="view_all" perspective="abstract" />
-				</env:observers>
-			</env:envspace>
 		</application>
 		
 		<application name="Two cleaners">
+			<spaces>
+				<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
+					<!-- <env:property name="daytime">true</env:property> -->
+					
+					<env:objects>
+						<env:object type="chargingstation">
+							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
+						</env:object>
+						<env:object type="chargingstation">
+							<env:property name="position">new Vector2Double(0.2, 0.4)</env:property>
+						</env:object>
+						<env:object type="wastebin">
+							<env:property name="position">new Vector2Double(0.2, 0.2)</env:property>
+						</env:object>
+						<env:object type="wastebin">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.1, 0.5)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.2, 0.5)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.3, 0.5)</env:property>
+						</env:object>
+						<env:object type="waste">
+							<env:property name="position">new Vector2Double(0.9, 0.9)</env:property>
+						</env:object>
+					</env:objects>
+					
+					<env:processes>
+						<env:process type="create">
+							<env:property name="timerate">7000</env:property>
+						</env:process>
+						<env:process type="empty">
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="Observer" view="view_all" perspective="abstract" />
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
 			<agents>
 				<agent type="Cleaner" number="2"/>
 			</agents>
-			
-			<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
-				<!-- <env:property name="daytime">true</env:property> -->
-				
-				<env:objects>
-					<env:object type="chargingstation">
-						<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
-					</env:object>
-					<env:object type="chargingstation">
-						<env:property name="position">new Vector2Double(0.2, 0.4)</env:property>
-					</env:object>
-					<env:object type="wastebin">
-						<env:property name="position">new Vector2Double(0.2, 0.2)</env:property>
-					</env:object>
-					<env:object type="wastebin">
-						<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.1, 0.5)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.2, 0.5)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.3, 0.5)</env:property>
-					</env:object>
-					<env:object type="waste">
-						<env:property name="position">new Vector2Double(0.9, 0.9)</env:property>
-					</env:object>
-				</env:objects>
-				
-				<env:processes>
-					<env:process type="create">
-						<env:property name="timerate">7000</env:property>
-					</env:process>
-					<env:process type="empty">
-					</env:process>
-				</env:processes>
-				
-				<env:observers>
-					<env:observer name="Observer" view="view_all" perspective="abstract" />
-				</env:observers>
-			</env:envspace>
 		</application>
 	</applications>
 

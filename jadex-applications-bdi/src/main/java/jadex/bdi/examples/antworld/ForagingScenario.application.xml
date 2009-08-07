@@ -4,14 +4,14 @@
 		launch an foraging scenario. Ants are looking for food and bringing it
 		back to their nest. Furthermore, ants leave pheromones to guide other
 		ants to a food source.
-	-->
+	- ->
 
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-env" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="ForagingScenario" package="jadex.bdi.examples.antworld">
-
+	name="ForagingScenario" package="jadex.bdi.examples.antworld">-->
+<applicationtype name="ForagingScenario" package="jadex.bdi.examples.antworld">
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor

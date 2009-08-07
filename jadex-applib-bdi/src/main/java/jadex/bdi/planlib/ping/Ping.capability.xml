@@ -53,11 +53,6 @@
 			<parameter name="missed_max" class="int">
 				<value>3</value>
 			</parameter>
-			<targetcondition language="jcl">
-				false // (i.e. never finished)
-				
-				// (test (jadex.rules.rulesystem.rules.functions.Identity false))
-			</targetcondition>
 			<dropcondition language="jcl">
 				// Finished if pinged agent misses max pings.
 				$goal.missed_cnt > $goal.missed_max
@@ -66,6 +61,11 @@
 				// ?rparamcnt = (parameter (parameter_has_name "missed_cnt") (parameter_has_value > ?max))
 				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparammax) (parameterelement_has_parameters contains ?rparamcnt))
 			</dropcondition>
+			<targetcondition language="jcl">
+				false // (i.e. never finished)
+				
+				// (test (jadex.rules.rulesystem.rules.functions.Identity false))
+			</targetcondition>
 		</achievegoal>
 	
 		<achievegoal name="ping" exported="true">

@@ -37,10 +37,10 @@
 		</plan>
 		<!-- This plan sends 5 answers, each delayed 0.1 secs -->
 		<plan name="answer">
-			<parameter name="number">
+			<parameter name="number" class="int">
 				<value>5</value>
 			</parameter>
-			<parameter name="delay">
+			<parameter name="delay" class="int">
 				<value>100</value>
 			</parameter>
 			<body class="AnswerPlan"/>

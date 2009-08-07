@@ -17,7 +17,7 @@
 	xmlns:agr="http://jadex.sourceforge.net/jadex-agr"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
-	                    http://jadex.sourceforge.net/application.xsd"
+	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
 	name="MarsWorldAGR" package="jadex.bdi.examples.marsworld_classic">
 	
 	<spacetypes>
@@ -42,29 +42,21 @@
 	
 	<applications>
 		<application name="1 Sentry / 2 Producers / 3 Carriers">
+			<spaces>
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" agenttype="Sentry" />
+						<agr:position role="producer" agenttype="Producer" />
+						<agr:position role="carrier" agenttype="Carrier" />
+					</agr:group>
+				</agr:agrspace>
+			</spaces>
 			<agents>
 				<agent type="Environment"/>
 				<agent type="Sentry"/>
 				<agent type="Producer" number="2"/>
 				<agent type="Carrier" number="3"/>
 			</agents>
-			
-			<agr:agrspace name="myagrspace" type="marsagrspace">
-				<agr:group name="mymarsteam" type="marsteam">
-					<agr:position role="sentry" agenttype="Sentry" />
-					<agr:position role="producer" agenttype="Producer" />
-					<agr:position role="carrier" agenttype="Carrier" />
-				</agr:group>
-			</agr:agrspace>
-			
-			<!--  <twod:space type="mars2dspace">
-				<twod:position agenttype="Sentry" x="1" y="1"/>
-				<twod:position agenttype="Producer" x="2" y="2" number="0"/>
-				<twod:position agenttype="Producer" x="3" y="3" number="1"/>
-				<twod:position agenttype="Carrier" x="4" y="4" number="0"/>
-				<twod:position agenttype="Carrier" x="5" y="5" number="1"/>
-				<twod:position agenttype="Carrier" x="6" y="6" number="2"/>
-			</twod:space>-->
 		</application>
 	</applications>	
 

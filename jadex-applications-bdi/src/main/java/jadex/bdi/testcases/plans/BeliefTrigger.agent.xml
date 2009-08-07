@@ -37,14 +37,14 @@
 
 	<plans>
 		<plan name="triggertest">
-			<parameter name="beliefname">
+			<parameter name="beliefname" class="String">
 				<value>"result"</value>
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<factchanged ref="bel"/>
 				<factadded ref="belset"/>
 				<factremoved ref="belset"/>
+				<factchanged ref="bel"/>
 			</trigger>
 		</plan>
 

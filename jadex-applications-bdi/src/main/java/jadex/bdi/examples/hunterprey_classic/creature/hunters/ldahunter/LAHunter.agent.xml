@@ -117,14 +117,14 @@
 
 	<configurations>
 		<configuration name="default">
-			<goals>
-				<initialgoal ref="hunt"/>
-			</goals>
 			<beliefs>
 				<initialbelief ref="my_self">
 					<fact>new Hunter($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(10,10))</fact>
 				</initialbelief>
 			</beliefs>
+			<goals>
+				<initialgoal ref="hunt"/>
+			</goals>
 		</configuration>
 	</configurations>
 

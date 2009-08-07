@@ -3,15 +3,15 @@
 
 	It can be started to launch an ant world scenario.
 	This scenario will be used to apply and analyze different coordination strategies.
--->
+- ->
 
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-env"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
 	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
-	name="AntCoordinationSpace" package="jadex.bdi.examples.antworld">
-	
+	name="AntCoordinationSpace" package="jadex.bdi.examples.antworld"> -->
+<applicationtype name="AntCoordinationSpace" package="jadex.bdi.examples.antworld">
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>

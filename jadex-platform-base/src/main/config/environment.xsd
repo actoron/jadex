@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-env" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-env">
+
+    <xs:complexType name="envspacetype">
+    	<xs:sequence>
+            <xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            <xs:element name="objecttypes" minOccurs="0">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="objecttype" type="objecttype"
+    						minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="avatarmappings" minOccurs="0"
+    			maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="avatarmapping"
+    						type="avatarmapping" minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="actiontypes" minOccurs="0"
+    			maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="actiontype" type="actiontype"
+    						minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="tasktypes" minOccurs="0" maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="tasktype" type="tasktype"
+    						minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="processtypes" minOccurs="0"
+    			maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="processtype"
+    						type="processtype" minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="percepttypes" minOccurs="0"
+    			maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="percepttype"
+    						type="percepttype" minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    					<xs:element name="perceptgenerator"
+    						type="perceptgenerator" minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    					<xs:element name="perceptprocessor"
+    						type="perceptprocessor" minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="views" minOccurs="0" maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="view" type="view"
+    						minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="perspectives" minOccurs="0"
+    			maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="perspective"
+    						type="perspective" minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    		<xs:element name="spaceexecutor" type="spaceexecutor"
+    			minOccurs="0" maxOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string"></xs:attribute>
+    	<xs:attribute name="width" type="xs:double"></xs:attribute>
+    	<xs:attribute name="height" type="xs:double"></xs:attribute>
+    	<xs:attribute name="depth" type="xs:double"></xs:attribute>
+    </xs:complexType>
+
+    <xs:element name="envspacetype" type="envspacetype"></xs:element>
+
+    <xs:complexType name="envspace">
+    	<xs:sequence>
+    		<xs:element name="objects" minOccurs="0" maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="object" type="object"
+    						minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+            <xs:element name="processes" maxOccurs="1" minOccurs="0">
+            	<xs:complexType>
+            		<xs:sequence>
+            			<xs:element name="process"
+            				type="process" minOccurs="0" maxOccurs="unbounded">
+            			</xs:element>
+            		</xs:sequence>
+            	</xs:complexType></xs:element>
+            <xs:element name="observers" minOccurs="0" maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="observer" type="observer"
+    						minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="type" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="width" type="xs:double"></xs:attribute>
+    	<xs:attribute name="height" type="xs:double"></xs:attribute>
+    	<xs:attribute name="depth" type="xs:double"></xs:attribute>
+    </xs:complexType>
+
+    <xs:element name="envspace" type="envspace"></xs:element>
+
+    <xs:complexType name="objecttype">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="property" mixed="true">
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="dynamic" type="xs:boolean" default="false"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="avatarmapping">
+    	<xs:attribute name="agenttype" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="objecttype" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="spaceexecutor">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="tasktype">
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="view">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="objecttype" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="perspective">
+    	<xs:sequence>
+            <xs:element name="property" type="property" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="drawable" type="drawable" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</xs:element>
+    		<xs:element name="prelayers" type="layers" minOccurs="0"
+    			maxOccurs="1">
+    		</xs:element>
+    		<xs:element name="postlayers" type="layers" minOccurs="0"
+    			maxOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="opengl" type="xs:boolean" default="true"></xs:attribute>
+    	<xs:attribute name="objectplacement" default="border">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:string">
+    				<xs:enumeration value="border"></xs:enumeration>
+    				<xs:enumeration value="center"></xs:enumeration>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
+    	<xs:attribute name="invertxaxis" type="xs:boolean"></xs:attribute>
+    	<xs:attribute name="invertyaxis" type="xs:boolean"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="drawable">
+    	<xs:choice minOccurs="0" maxOccurs="unbounded">
+    		<xs:element name="property" type="property"></xs:element>
+    		<xs:element name="triangle" type="drawableelement"></xs:element>
+    		<xs:element name="rectangle" type="drawableelement"></xs:element>
+    		<xs:element name="ellipse" type="drawableelement"></xs:element>
+    		<xs:element name="regularpolygon" type="regularpolygon"></xs:element>
+    		<xs:element name="texturedrectangle"
+    			type="texturedrectangle">
+    		</xs:element>
+    		<xs:element name="text" type="text"></xs:element>
+    	</xs:choice>
+    	<xs:attribute name="objecttype" type="xs:string"
+    		use="required">
+    	</xs:attribute>
+    	<xs:attribute name="width" type="xs:double" use="required"></xs:attribute>
+    	<xs:attribute name="height" type="xs:double" use="required"></xs:attribute>
+    	<xs:attribute name="rotation" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="drawableelement">
+    	<xs:sequence>
+    		<xs:element name="drawcondition" type="xs:string" minOccurs="0" maxOccurs="1"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="layer" type="xs:int" default="0"></xs:attribute>
+    	<xs:attribute name="x" type="xs:string"></xs:attribute>
+    	<xs:attribute name="y" type="xs:string"></xs:attribute>
+    	<xs:attribute name="width" type="xs:double"></xs:attribute>
+    	<xs:attribute name="height" type="xs:string"></xs:attribute>
+    	<xs:attribute name="rotatex" type="xs:string"></xs:attribute>
+    	<xs:attribute name="rotatey" type="xs:string"></xs:attribute>
+    	<xs:attribute name="rotatez" type="xs:string"></xs:attribute>
+    	<xs:attribute name="position" type="xs:string"></xs:attribute>
+    	<xs:attribute name="rotation" type="xs:string"></xs:attribute>
+    	<xs:attribute name="size" type="xs:string"></xs:attribute>
+    	<xs:attribute name="abspos" type="xs:string"></xs:attribute>
+    	<xs:attribute name="abssize" type="xs:string"></xs:attribute>
+    	<xs:attribute name="absrot" type="xs:string"></xs:attribute>
+    	<xs:attribute name="color" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="texturedrectangle">
+    	<xs:complexContent>
+    		<xs:extension base="drawableelement">
+    			<xs:attribute name="imagepath" type="xs:string" use="required"></xs:attribute>
+    		</xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="regularpolygon">
+    	<xs:complexContent>
+    		<xs:extension base="drawableelement">
+    			<xs:attribute name="vertices" type="xs:int" use="required"></xs:attribute>
+    		</xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="text">
+    	<xs:complexContent>
+    		<xs:extension base="drawableelement">
+    			<xs:attribute name="font" type="xs:string"></xs:attribute>
+    			<xs:attribute name="style" type="xs:string"></xs:attribute>
+    			<xs:attribute name="text" type="xs:string" use="required"></xs:attribute>
+    			<xs:attribute name="align" default="left">
+    				<xs:simpleType>
+    					<xs:restriction base="xs:string">
+    						<xs:enumeration value="left"></xs:enumeration>
+    						<xs:enumeration value="right"></xs:enumeration>
+    						<xs:enumeration value="center"></xs:enumeration>
+    					</xs:restriction>
+    				</xs:simpleType>
+    			</xs:attribute>
+    		</xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="layers">
+    	<xs:choice minOccurs="0" maxOccurs="unbounded">
+    		<xs:element name="gridlayer" type="gridlayer"></xs:element>
+    		<xs:element name="tiledlayer" type="tiledlayer"></xs:element>
+    		<xs:element name="colorlayer" type="colorlayer"></xs:element>
+    	</xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="gridlayer">
+    	<xs:attribute name="color" type="xs:string"></xs:attribute>
+    	<xs:attribute name="width" type="xs:string"></xs:attribute>
+    	<xs:attribute name="height" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="tiledlayer">
+    	<xs:attribute name="color" type="xs:string"></xs:attribute>
+    	<xs:attribute name="width" type="xs:string"></xs:attribute>
+    	<xs:attribute name="height" type="xs:string"></xs:attribute>
+    	<xs:attribute name="imagepath" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="colorlayer">
+    	<xs:attribute name="color" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="observer">
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="view" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="perspective" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="object">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="type" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="number" type="xs:int" default="1"></xs:attribute>
+    </xs:complexType>
+
+    <xs:attribute name="NewAttribute" type="xs:string"></xs:attribute>
+
+
+    <xs:complexType name="actiontype">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="processtype">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="percepttype">
+    	<xs:sequence>
+    		<xs:element name="agenttypes" minOccurs="0" maxOccurs="1">
+    			<xs:complexType>
+    				<xs:sequence>
+    					<xs:element name="agenttype" type="agenttype"
+    						minOccurs="0" maxOccurs="unbounded">
+    					</xs:element>
+    				</xs:sequence>
+    			</xs:complexType>
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="objecttype" type="xs:string"
+    		use="required">
+    	</xs:attribute>
+    	<xs:attribute name="agenttype" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="perceptgenerator">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="perceptprocessor">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="agenttype" type="xs:string"
+    		use="required">
+    	</xs:attribute>
+    	<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="agenttype">
+    	<xs:attribute name="name" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="process">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="type" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+</xs:schema>

@@ -9,7 +9,6 @@ import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector2Int;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +25,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	
 	/** The constant for the position property. */
 	public static final String PROPERTY_POSITION = "position";
+	
+	/** The constant for the border property. */
+	public static final String PROPERTY_BORDER = "border";
 	
 	/** Border strict mode. */
 	public static final String BORDER_STRICT = "strict";
@@ -52,7 +54,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	protected Space2D(IVector2 areasize, String bordermode)
 	{		
 		this.areasize = areasize;
-		setBorderMode(bordermode);
+		setBorderMode(bordermode!=null ? bordermode
+			: getPropertyNames().contains(PROPERTY_BORDER)
+			? (String)getProperty(PROPERTY_BORDER) : BORDER_TORUS);
 	}
 	
 	//-------- methods --------
