@@ -989,22 +989,7 @@
 			<xs:documentation>An expression that is monitored.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MExpression">
-				<xs:attribute name="trigger" use="optional">
-					<xs:annotation>
-						<xs:documentation>The trigger specifies the circumstances under which a condition triggers. Possible settings are changes_to_true, changes_to_false, is_true, is_false, changes and always.</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="changes_to_true"/>
-							<xs:enumeration value="changes_to_false"/>
-							<xs:enumeration value="is_true"/>
-							<xs:enumeration value="is_false"/>
-							<xs:enumeration value="changes"/>
-							<xs:enumeration value="always"/>
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
+			<xs:extension base="MExpression">
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1013,40 +998,9 @@
 			<xs:documentation>For conditions that are not conatined in the expressionbase. Cannot be exported.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:restriction base="MCondition">
-				<xs:sequence>
-					<xs:sequence>
-						<xs:element name="relevantbelief" type="MRelevantElement" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Any number of beliefs that should cause a re-evaluation of this expression.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="relevantbeliefset" type="MRelevantElement" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Any number of belief sets that should cause a re-evaluation of this expression.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="relevantgoal" type="MRelevantElement" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Any number of goals that should cause a re-evaluation of this expression.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="relevantparameter" type="MRelevantElement" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Any number of parameters that should cause a re-evaluation of this expression.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="relevantparameterset" type="MRelevantElement" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Any number of parameter sets that should cause a re-evaluation of this expression.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:sequence>
-				<xs:attribute name="exported" use="prohibited"/>
-				<xs:attribute name="evaluationmode" use="prohibited"/>
-				<xs:attribute name="class" use="prohibited"/>
-				<xs:attribute name="trigger" use="prohibited"/>
+			<xs:restriction base="MCondition">
+				<xs:attribute name="exported" use="prohibited"/>
+				<xs:attribute name="class" use="prohibited"/>
 			</xs:restriction>
 		</xs:complexContent>
 	</xs:complexType>

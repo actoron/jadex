@@ -355,9 +355,6 @@ public class OAVBDIMetaModel
 	/** The condition type. */
 	public static OAVObjectType condition_type;
 	
-	/** Condition has trigger attribute. */
-	public static OAVAttributeType condition_has_trigger;
-	
 	//-------- agent --------
 	
 	/** The agent (model) type. */
@@ -911,7 +908,6 @@ public class OAVBDIMetaModel
 				
 		// condition
 		// todo: separate conditions from expressions
-		condition_has_trigger = condition_type.createAttributeType("mcondition_has_trigger", OAVJavaType.java_string_type);
 
 		// typed element
 		typedelement_has_classname = typedelement_type.createAttributeType("mtypedelement_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
