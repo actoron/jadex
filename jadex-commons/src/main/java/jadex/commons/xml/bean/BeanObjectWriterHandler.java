@@ -2,6 +2,7 @@ package jadex.commons.xml.bean;
 
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
 
 import java.lang.reflect.Method;
@@ -130,188 +131,17 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	}
 	
 	/**
-	 *  Get write info for an object.
-	 * /
-	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, Object context)
+	 *  Test if a value is compatible with the defined typeinfo.
+	 */
+	protected boolean isTypeCompatible(Object object, TypeInfo info, Object context)
 	{
-		// todo: handle proper attribute -> string conversion
-		
-		WriteObjectInfo wi = new WriteObjectInfo();
-		HashSet doneprops = new HashSet();
-		
-		if(typeinfo!=null)
+		boolean ret = true;
+		if(info!=null)
 		{
-			// Comment
-			
-			Object info = typeinfo.getCommentInfo();
-			String propname = getPropertyName(info);
-			doneprops.add(propname);
-			if(info!=null && !(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
-			{
-				try
-				{
-					Method method = findGetMethod(object, propname, new String[]{"get", "is"});
-					Object value = method.invoke(object, new Object[0]);
-					if(value!=null)
-					{
-						wi.setComment(""+value);
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			
-			// Content
-			
-			info = typeinfo.getContentInfo();
-			propname = getPropertyName(info);
-			doneprops.add(propname);
-			if(info!=null && !(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
-			{
-				try
-				{
-					Method method = findGetMethod(object, propname, new String[]{"get", "is"});
-					Object value = method.invoke(object, new Object[0]);
-					if(value!=null)
-					{
-						wi.setContent(""+value);
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			
-			// Attributes
-			
-			Collection attrinfos = typeinfo.getAttributeInfos();
-			if(attrinfos!=null)
-			{
-				for(Iterator it=attrinfos.iterator(); it.hasNext(); )
-				{
-					info = it.next();
-					propname = getPropertyName(info);
-					doneprops.add(propname);
-					if(info!=null && !(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
-					{
-						try
-						{
-							Method method = findGetMethod(object, propname, new String[]{"get", "is"});
-							
-							Object value = method.invoke(object, new Object[0]);
-							if(value!=null)
-							{
-								String xmlattrname = null;
-								if(info instanceof AttributeInfo)
-									xmlattrname = ((AttributeInfo)info).getXMLAttributeName();
-								if(xmlattrname==null)
-									xmlattrname = propname;
-								wi.addAttribute(xmlattrname, ""+value);
-							}
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-			
-			// Subobjects 
-			
-			Collection subobsinfos = typeinfo.getSubobjectInfos();
-			if(subobsinfos!=null)
-			{
-				for(Iterator it=subobsinfos.iterator(); it.hasNext(); )
-				{
-					try
-					{
-						SubobjectInfo soinfo = (SubobjectInfo)it.next();
-						info = soinfo.getLinkInfo();
-						propname = getPropertyName(info);
-						doneprops.add(propname);
-						if(info!=null && !(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
-						{
-							Method method = findGetMethod(object, propname, new String[]{"get"});
-						
-							Object value = method.invoke(object, new Object[0]);
-							if(value!=null)
-							{
-								String xmlsoname = soinfo.getXMLTag()!=null? soinfo.getXMLTag(): propname;
-								wi.addSubobject(xmlsoname, value);
-								doneprops.add(propname);
-							}
-						}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-			
-		Map props = introspector.getBeanProperties(object.getClass());
-		if(props!=null)
-		{
-			for(Iterator it=props.keySet().iterator(); it.hasNext(); )
-			{
-				String propname = (String)it.next();
-				
-				if(!doneprops.contains(propname))
-				{
-					BeanProperty bp = (BeanProperty)props.get(propname);
-					try
-					{
-						Object value = bp.getGetter().invoke(object, new Object[0]);
-		
-						if(value!=null)
-						{
-							if(BasicTypeConverter.isBuiltInType(bp.getType()))
-							{
-								wi.addAttribute(propname, ""+value);
-							}
-							else
-							{
-								wi.addSubobject(propname, value);
-							}
-						}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		
-		return wi;
-	}*/
-	
-	/**
-	 *  Get the property name.
-	 *  @param info The info.
-	 *  @return The property name.
-	 * /
-	protected String getPropertyName(Object info)
-	{
-		String ret;
-		if(info instanceof AttributeInfo)
-		{
-			ret = (String)((AttributeInfo)info).getAttributeIdentifier();
-		}
-		else if(info instanceof String)
-		{
-			ret = (String)info;
-		}
-		else
-		{
-			throw new RuntimeException("Unknown info type: "+info);
+			Class clazz = (Class)info.getTypeInfo();
+			ret = clazz.isAssignableFrom(object.getClass());
 		}
 		return ret;
-	}*/
+	}
 }
 

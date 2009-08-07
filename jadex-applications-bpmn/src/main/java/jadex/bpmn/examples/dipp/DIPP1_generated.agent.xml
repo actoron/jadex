@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!--<H3>Digitales Produktionspackaging (DiPP)</H3> Agent for starting the Daimler AG Agile Processes Demonstrator.-->
+<agent name="DIPP1_generated">
+	<beliefs>
+		<belief class="boolean" name="praemissen_ok">
+			<fact>true</fact>
+		</belief>
+		<belief class="boolean" name="produktmodell"></belief>
+		<belief class="boolean" name="vertriebsprognosen"></belief>
+		<belief class="boolean" name="gs_konzept"></belief>
+		<belief class="boolean" name="molog_praemissen"></belief>
+		<beliefset class="String" name="praemissen_fehlend"></beliefset>
+	</beliefs>
+	<goals>
+		<achievegoal name="Dipp1_Logistik_abgesichert_seq"></achievegoal>
+		<achievegoal name="DiPP1_LOG_Planungspr�missen_abgeglichen"></achievegoal>
+		<achievegoal name="DiPP1_LOG_Ladungstr�ger_abgesichert"></achievegoal>
+		<achievegoal name="Dipp1_Logistik_abgesichert_par"></achievegoal>
+		<achievegoal name="DiPP1_LOG_Prozessplanung_durchgef�hrt"></achievegoal>
+		<achievegoal name="DiPP1_LOG_Lieferantenstandort_gepr�ft"></achievegoal>
+		<maintaingoal exclude="never" name="Pr�missen_ok">
+			<maintaincondition language="jcl">$beliefbase.praemissen_ok</maintaincondition>
+		</maintaingoal>
+	</goals>
+	<plans>
+		<plan name="implicit_Dipp1_Logistik_abgesichert_seq">
+			<parameterset class="String" name="subgoals">
+				<value>"DiPP1_LOG_Planungspr�missen_abgeglichen"</value>
+				<value>"Dipp1_Logistik_abgesichert_par"</value>
+			</parameterset>
+			<body impl="jadex.gpmn.runtime.plan.SequentialGoalExecutionPlan" type="bpmn"></body>
+			<trigger>
+				<goal ref="Dipp1_Logistik_abgesichert_seq"></goal>
+			</trigger>
+		</plan>
+		<plan name="implicit_Dipp1_Logistik_abgesichert_par">
+			<parameterset class="String" name="subgoals">
+				<value>"DiPP1_LOG_Ladungstr�ger_abgesichert"</value>
+				<value>"DiPP1_LOG_Prozessplanung_durchgef�hrt"</value>
+				<value>"DiPP1_LOG_Lieferantenstandort_gepr�ft"</value>
+			</parameterset>
+			<body impl="jadex.gpmn.runtime.plan.ParallelGoalExecutionPlan" type="bpmn"></body>
+			<trigger>
+				<goal ref="Dipp1_Logistik_abgesichert_par"></goal>
+			</trigger>
+		</plan>
+		<plan name="DiPP1_LOG_Planungspr�missen_abgleichen">
+			<body impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn" type="bpmn"></body>
+			<trigger>
+				<goal ref="DiPP1_LOG_Planungspr�missen_abgeglichen"></goal>
+			</trigger>
+		</plan>
+		<plan name="DiPP1_LOG_Ladungstr�ger_absichern">
+			<body impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn" type="bpmn"></body>
+			<trigger>
+				<goal ref="DiPP1_LOG_Ladungstr�ger_abgesichert"></goal>
+			</trigger>
+		</plan>
+		<plan name="Info_Pr�missen_fehlen">
+			<body impl="jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn" type="bpmn"></body>
+			<trigger>
+				<goal ref="Pr�missen_ok"></goal>
+			</trigger>
+		</plan>
+		<plan name="DiPP1_LOG_Prozessplanung_durchfuehren">
+			<body impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Prozessplanung_durchfuehren.bpmn" type="bpmn"></body>
+			<trigger>
+				<goal ref="DiPP1_LOG_Prozessplanung_durchgef�hrt"></goal>
+			</trigger>
+		</plan>
+		<plan name="DiPP1_LOG_Lieferantenstandort_pr�fen">
+			<body impl="jadex/bpmn/examples/dipp/DiPP1_LOG_Lieferantenstandort_pruefen.bpmn" type="bpmn"></body>
+			<trigger>
+				<goal ref="DiPP1_LOG_Lieferantenstandort_gepr�ft"></goal>
+			</trigger>
+		</plan>
+		<plan name="startandmonitor_xcDiPP1_Logistik">
+			<parameterset class="String" name="achieve_goals">
+				<value>"Dipp1_Logistik_abgesichert_seq"</value>
+			</parameterset>
+			<parameterset class="String" name="maintain_goals">
+				<value>"Pr�missen_ok"</value>
+			</parameterset>
+			<body impl="jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan"></body>
+		</plan>
+	</plans>
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="startandmonitor_xcDiPP1_Logistik"></initialplan>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>

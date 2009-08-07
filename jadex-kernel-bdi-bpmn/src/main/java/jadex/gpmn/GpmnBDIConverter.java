@@ -252,7 +252,7 @@ public class GpmnBDIConverter
 						String[] goalnames = new String[outgoals.size()];
 						for(int j=0; j<outgoals.size(); j++)
 							goalnames[j] = "\""+((MGoal)outgoals.get(j)).getName()+"\"";
-						createParameterSet(planhandle, state, "subgoals", String.class, goalnames, null, true);
+						createParameterSet(planhandle, state, "subgoals", "String", goalnames, null, true);
 					}
 				}
 			}
@@ -315,9 +315,9 @@ public class GpmnBDIConverter
 				}
 			}
 		}
-		createParameterSet(planhandle, state, "achieve_goals", String.class, 
+		createParameterSet(planhandle, state, "achieve_goals", "String", 
 			agoalnames.size()==0? null: (String[])agoalnames.toArray(new String[agoalnames.size()]), null, true);
-		createParameterSet(planhandle, state, "maintain_goals", String.class, 
+		createParameterSet(planhandle, state, "maintain_goals", "String", 
 			mgoalnames.size()==0? null: (String[])mgoalnames.toArray(new String[mgoalnames.size()]), null, true);
 		
 		// Make this plan the initial plan
@@ -542,13 +542,13 @@ public class GpmnBDIConverter
 	/**
 	 *  Create a parameter.
 	 */
-	protected Object createParameter(Object paramelemhandle, IOAVState state, String name, Class clazz, String value, boolean planparam)
+	protected Object createParameter(Object paramelemhandle, IOAVState state, String name, String classname, String value, boolean planparam)
 	{
 		Object paramhandle = planparam? state.createObject(OAVBDIMetaModel.planparameter_type): 
 			state.createObject(OAVBDIMetaModel.parameter_type); 
 		state.setAttributeValue(paramhandle, OAVBDIMetaModel.modelelement_has_name, name);
 		state.addAttributeValue(paramelemhandle, OAVBDIMetaModel.parameterelement_has_parameters, paramhandle);
-		state.setAttributeValue(paramhandle, OAVBDIMetaModel.typedelement_has_class, clazz);
+		state.setAttributeValue(paramhandle, OAVBDIMetaModel.typedelement_has_classname, classname);
 		Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
 		state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, value);
 		state.setAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value, valhandle);
@@ -558,13 +558,13 @@ public class GpmnBDIConverter
 	/**
 	 *  Create a parameter set.
 	 */
-	protected Object createParameterSet(Object paramelemhandle, IOAVState state, String name, Class clazz, String[] values, String valuesexp, boolean planparamset)
+	protected Object createParameterSet(Object paramelemhandle, IOAVState state, String name, String classname, String[] values, String valuesexp, boolean planparamset)
 	{
 		Object paramsethandle = planparamset? state.createObject(OAVBDIMetaModel.planparameterset_type): 
 			state.createObject(OAVBDIMetaModel.parameterset_type); 
 		state.setAttributeValue(paramsethandle, OAVBDIMetaModel.modelelement_has_name, name);
 		state.addAttributeValue(paramelemhandle, OAVBDIMetaModel.parameterelement_has_parametersets, paramsethandle);
-		state.setAttributeValue(paramsethandle, OAVBDIMetaModel.typedelement_has_class, clazz);
+		state.setAttributeValue(paramsethandle, OAVBDIMetaModel.typedelement_has_classname, classname);
 
 		if(values!=null)
 		{

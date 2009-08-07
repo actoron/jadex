@@ -1186,7 +1186,7 @@ public class AgentRules
 			}
 	
 			// Create initial message events.
-			Collection	cmevents = state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialmessagevents);
+			Collection	cmevents = state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialmessageevents);
 			if(cmevents!=null)
 			{
 				for(Iterator it=cmevents.iterator(); it.hasNext(); )

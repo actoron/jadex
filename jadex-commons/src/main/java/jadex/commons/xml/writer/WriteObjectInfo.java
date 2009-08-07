@@ -1,8 +1,11 @@
 package jadex.commons.xml.writer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  *  Info for writing an object.
@@ -96,12 +99,43 @@ public class WriteObjectInfo
 	/**
 	 *  Add a subobject.
 	 */
-	public void addSubobject(String tagname, Object subobject)
+	public void addSubobject(String pathname, Object subobject)
 	{
+		System.out.println("added: "+pathname+" "+subobject);
 		if(subobjects==null)
 			subobjects = new LinkedHashMap();
-		else if(subobjects.containsKey(tagname))
-			throw new RuntimeException("Duplicate subobject: "+tagname);
-		subobjects.put(tagname, subobject);
+		
+		StringTokenizer stok = new StringTokenizer(pathname, "/");
+		String[] tags = new String[stok.countTokens()];
+		for(int i=0; stok.hasMoreTokens(); i++)
+			tags[i] = stok.nextToken();
+		
+		insertSubobject(subobjects, tags, subobject, 0);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void insertSubobject(Map tagmap, String[] tags, Object subob, int i)
+	{
+		if(i+1==tags.length)
+		{
+			List elems = (List)tagmap.get(tags[i]);
+			if(elems==null)
+				elems = new ArrayList();
+			tagmap.put(tags[i], elems);
+			elems.add(subob);
+		}
+		else
+		{
+			Map subtagmap = (Map)tagmap.get(tags[i]);
+			if(subtagmap==null)
+			{
+				subtagmap = new HashMap();
+				tagmap.put(tags[i], subtagmap);
+			}
+		
+			insertSubobject(subtagmap, tags, subob, i+1);
+		}
 	}
 }

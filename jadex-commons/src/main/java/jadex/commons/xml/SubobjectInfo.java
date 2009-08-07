@@ -2,9 +2,8 @@ package jadex.commons.xml;
 
 import jadex.commons.IFilter;
 
-
 /**
- * 
+ *  Info object for subobjects, i.e. objects that are contained in another object.
  */
 public class SubobjectInfo extends AbstractInfo
 {
@@ -14,6 +13,10 @@ public class SubobjectInfo extends AbstractInfo
 	
 	/** The link info. */
 	protected AttributeInfo linkinfo;
+	
+	/** The type info of the subobjects. */
+	// E.g. used for write check, i.e. is it the object of the right type
+	protected TypeInfo typeinfo;
 
 	//-------- constructors --------
 	
@@ -36,6 +39,18 @@ public class SubobjectInfo extends AbstractInfo
 	{
 		super(linkinfo.getXMLAttributeName(), filter);
 		this.linkinfo = linkinfo;
+	}
+	
+	/**
+	 *  Create a link info. 
+	 *  @param xmlpath The xmlpath.
+	 *  @param linkinfo The link info.
+	 */
+	public SubobjectInfo(AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo)
+	{
+		super(linkinfo.getXMLAttributeName(), filter);
+		this.linkinfo = linkinfo;
+		this.typeinfo = typeinfo;
 	}
 	
 	/**
@@ -68,5 +83,14 @@ public class SubobjectInfo extends AbstractInfo
 	public AttributeInfo getLinkInfo()
 	{
 		return this.linkinfo;
+	}
+
+	/**
+	 *  Get the typeinfo.
+	 *  @return The typeinfo.
+	 */
+	public TypeInfo getTypeInfo()
+	{
+		return this.typeinfo;
 	}
 }

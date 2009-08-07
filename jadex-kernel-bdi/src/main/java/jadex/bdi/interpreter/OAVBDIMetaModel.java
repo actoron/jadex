@@ -735,7 +735,7 @@ public class OAVBDIMetaModel
 	public static OAVAttributeType configuration_has_initialinternalevents;
 	
 	/** Configuration has initial message events attribute. */
-	public static OAVAttributeType configuration_has_initialmessagevents;
+	public static OAVAttributeType configuration_has_initialmessageevents;
 	
 	/** Configuration has end internal events attribute. */
 	public static OAVAttributeType configuration_has_endinternalevents;
@@ -1082,7 +1082,7 @@ public class OAVBDIMetaModel
 		configuration_has_initialplans = configuration_type.createAttributeType("mconfiguration_has_initialplans", configelement_type, OAVAttributeType.LIST);
 		configuration_has_endplans = configuration_type.createAttributeType("mconfiguration_has_endplans", configelement_type, OAVAttributeType.LIST);
 		configuration_has_initialinternalevents = configuration_type.createAttributeType("mconfiguration_has_initialinternalevents", configelement_type, OAVAttributeType.LIST);
-		configuration_has_initialmessagevents = configuration_type.createAttributeType("mconfiguration_has_initialmessageevents", configelement_type, OAVAttributeType.LIST);
+		configuration_has_initialmessageevents = configuration_type.createAttributeType("mconfiguration_has_initialmessageevents", configelement_type, OAVAttributeType.LIST);
 		configuration_has_endinternalevents = configuration_type.createAttributeType("mconfiguration_has_endinternalevents", configelement_type, OAVAttributeType.LIST);
 		configuration_has_endmessageevents = configuration_type.createAttributeType("mconfiguration_has_endmessageevents", configelement_type, OAVAttributeType.LIST);
 				

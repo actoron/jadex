@@ -182,61 +182,110 @@ public class Writer
 					writeEndObject(writer, 0);
 				}
 				else
-				{
+				{	
 					writer.writeCharacters(lf);
 					
-					for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
-					{
-						String subpathname = (String)it.next();
-						String subtagname = subpathname.indexOf("/")!=-1? subpathname.substring(subpathname.indexOf("/")): subpathname;
-						Object obj =  subobs.get(subpathname);
-						
-						StringTokenizer stok = new StringTokenizer(subpathname, "/");
-						String[] subtags = new String[stok.countTokens()-1];
-						for(int i=0; i<subtags.length; i++)
-							subtags[i] = stok.nextToken();
-						
-						if(gencontainertags)
-						{
-							for(int i=0; i<subtags.length; i++)
-							{
-								writeStartObject(writer, subtags[i], stack.size());
-								writer.writeCharacters(lf);
-								stack.add(new StackElement(subtags[i], null));
-							}
-						}
-							
-						if(SReflect.isIterable(obj))
-						{
-							// todo: container tags?!
-							Iterator it2 = SReflect.getIterator(obj);
-							if(it2.hasNext())
-							{
-								while(it2.hasNext())
-								{
-									writeObject(writer, it2.next(), writtenobs, subpathname, stack, context, classloader);
-								}
-							}
-						}
-						else
-						{
-							writeObject(writer, obj, writtenobs, subpathname, stack, context, classloader);
-						}
-						
-						if(gencontainertags)
-						{
-							for(int i=0; i<subtags.length; i++)
-							{
-								stack.remove(stack.size()-1);
-								writeEndObject(writer, stack.size());
-							}
-						}
-					}
+					writeSubobjects(writer, subobs, writtenobs, stack, context, classloader);
+					
 					writeEndObject(writer, stack.size()-1);
 				}
+					
+					
+//				{
+//					writer.writeCharacters(lf);
+//					
+//					for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
+//					{
+//						String subpathname = (String)it.next();
+//						String subtagname = subpathname.indexOf("/")!=-1? subpathname.substring(subpathname.indexOf("/")): subpathname;
+//						Object obj =  subobs.get(subpathname);
+//						
+//						StringTokenizer stok = new StringTokenizer(subpathname, "/");
+//						String[] subtags = new String[stok.countTokens()-1];
+//						for(int i=0; i<subtags.length; i++)
+//							subtags[i] = stok.nextToken();
+//						
+//						if(gencontainertags)
+//						{
+//							for(int i=0; i<subtags.length; i++)
+//							{
+//								writeStartObject(writer, subtags[i], stack.size());
+//								writer.writeCharacters(lf);
+//								stack.add(new StackElement(subtags[i], null));
+//							}
+//						}
+//							
+//						if(SReflect.isIterable(obj))
+//						{
+//							// todo: container tags?!
+//							Iterator it2 = SReflect.getIterator(obj);
+//							if(it2.hasNext())
+//							{
+//								while(it2.hasNext())
+//								{
+//									writeObject(writer, it2.next(), writtenobs, subpathname, stack, context, classloader);
+//								}
+//							}
+//						}
+//						else
+//						{
+//							writeObject(writer, obj, writtenobs, subpathname, stack, context, classloader);
+//						}
+//						
+//						if(gencontainertags)
+//						{
+//							for(int i=0; i<subtags.length; i++)
+//							{
+//								stack.remove(stack.size()-1);
+//								writeEndObject(writer, stack.size());
+//							}
+//						}
+//					}
+//					writeEndObject(writer, stack.size()-1);
+//				}
 			}
 			
 			stack.remove(stack.size()-1);
+		}
+	}
+	
+	
+	/**
+	 * 
+	 */
+	protected void writeSubobjects(XMLStreamWriter writer, Map subobs, Map writtenobs, 
+		List stack, Object context, ClassLoader classloader) throws Exception
+	{
+		for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
+		{
+			String subtag = (String)it.next();
+			Object subob = subobs.get(subtag);
+			if(subob instanceof Map)
+			{
+				writeStartObject(writer, subtag, stack.size());
+				writer.writeCharacters(lf);
+				stack.add(new StackElement(subtag, null));
+				
+				writeSubobjects(writer, (Map)subob, writtenobs, stack, context, classloader);
+				
+				stack.remove(stack.size()-1);
+				writeEndObject(writer, stack.size());
+			}
+			else if(SReflect.isIterable(subob))
+			{
+				Iterator it2 = SReflect.getIterator(subob);
+				if(it2.hasNext())
+				{
+					while(it2.hasNext())
+					{
+						writeObject(writer, it2.next(), writtenobs, subtag, stack, context, classloader);
+					}
+				}				
+			}	
+			else
+			{
+				writeObject(writer, subob, writtenobs, subtag, stack, context, classloader);
+			}
 		}
 	}
 	

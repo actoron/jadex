@@ -4,13 +4,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 
 /**
- * 
+ *  Abstract base class for an object writer handler. Is object type agnostic and
+ *  uses several abstract methods that have to be overridden by concrete handlers.
  */
 public abstract class AbstractObjectWriterHandler implements IObjectWriterHandler
 {
@@ -145,6 +147,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					{
 						SubobjectInfo soinfo = (SubobjectInfo)it.next();
 						info = soinfo.getLinkInfo();
+						TypeInfo sotypeinfo = soinfo.getTypeInfo();
 						Object property = getProperty(info);
 						if(property!=null)
 						{
@@ -155,7 +158,25 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								if(value!=null)
 								{
 									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
-									wi.addSubobject(xmlsoname, value);
+									
+									if(SReflect.isIterable(value))
+									{
+										Iterator it2 = SReflect.getIterator(value);
+										if(it2.hasNext())
+										{
+											while(it2.hasNext())
+											{
+												Object val = it2.next();
+												if(isTypeCompatible(val, sotypeinfo, context))
+													wi.addSubobject(xmlsoname, val);
+											}
+										}
+									}
+									else
+									{
+										if(isTypeCompatible(value, sotypeinfo, context))
+											wi.addSubobject(xmlsoname, value);
+									}
 								}
 							}
 						}
@@ -212,13 +233,13 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			wi.setContent(object.toString());
 		}
 		
-		System.out.println("wi: "+object+" "+wi.getContent()+" "+wi.getSubobjects());
+//		System.out.println("wi: "+object+" "+wi.getContent()+" "+wi.getSubobjects());
 		
 		return wi;
 	}
 	
 	/**
-	 * 
+	 *  Convert a value before writing.
 	 */
 	protected Object convertValue(Object info, Object value, ClassLoader classloader, Object context)
 	{
@@ -268,7 +289,12 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	protected abstract Collection getProperties(Object object, Object context);
 
 	/**
-	 * 
+	 *  Test is a value is a basic type (and can be mapped to an attribute).
 	 */
 	protected abstract boolean isBasicType(Object property, Object value);
+	
+	/**
+	 *  Test if a value is compatible with the defined typeinfo.
+	 */
+	protected abstract boolean isTypeCompatible(Object object, TypeInfo info, Object context);
 }
