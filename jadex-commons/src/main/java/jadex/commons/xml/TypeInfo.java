@@ -36,6 +36,9 @@ public class TypeInfo	extends AbstractInfo
 	/** The attributes info (xmlname -> attrinfo). */
 	protected Map attributeinfos;
 	
+	/** The namespace. */
+	protected Namespace namespace;
+	
 	// read
 	
 	/** The post processor (if any). */
@@ -118,13 +121,30 @@ public class TypeInfo	extends AbstractInfo
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
 		SubobjectInfo[] subobjectinfos)
 	{
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, 
+			postproc, filter, subobjectinfos, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 * @param xmlpath The path or tag.
+	 * @param typeinfo The type of object to create.
+	 * @param commentinfo The commnent.
+	 * @param contentinfo The content.
+	 * @param attributeinfos The attributes map.
+	 * @param postproc The post processor. 
+	 */
+	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
+		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
+		SubobjectInfo[] subobjectinfos, Namespace namespace)
+	{
 		super(xmlpath, filter);
 		this.supertype = supertype;
 		this.typeinfo = typeinfo;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.postproc = postproc;
-		
+		this.namespace = namespace;
 		
 		if(attributeinfos!=null)
 			this.attributeinfos = createAttributeInfos(attributeinfos);
@@ -146,30 +166,12 @@ public class TypeInfo	extends AbstractInfo
 	}
 
 	/**
-	 *  Set the type info.
-	 *  @param type The type to set.
-	 */
-	public void setTypeInfo(Object typeinfo)
-	{
-		this.typeinfo = typeinfo;
-	}
-
-	/**
 	 *  Get the comment info.
 	 *  @return The comment
 	 */
 	public Object getCommentInfo()
 	{
 		return this.commentinfo!=null? commentinfo: supertype!=null? supertype.getCommentInfo(): null;
-	}
-
-	/**
-	 *  Set the comment info.
-	 *  @param commentinfo The comment to set.
-	 */
-	public void setCommentInfo(Object commentinfo)
-	{
-		this.commentinfo = commentinfo;
 	}
 
 	/**
@@ -180,14 +182,14 @@ public class TypeInfo	extends AbstractInfo
 	{
 		return this.contentinfo!=null? contentinfo: supertype!=null? supertype.getContentInfo(): null;
 	}
-
+	
 	/**
-	 *  Set the content info.
-	 *  @param contentinfo The content info to set.
+	 *  Get the namespace.
+	 *  @return The namespace.
 	 */
-	public void setContentInfo(Object content)
+	public Namespace getNamespace()
 	{
-		this.contentinfo = contentinfo;
+		return namespace!=null? namespace: supertype!=null? supertype.getNamespace(): null;
 	}
 	
 	/**
@@ -201,7 +203,7 @@ public class TypeInfo	extends AbstractInfo
 			attributeinfos = new HashMap();
 		attributeinfos.put(xmlname, attrinfo);
 	}*/
-	
+
 	/**
 	 *  Get the attribute info.
 	 *  @param xmlname The xml name of the attribute.
@@ -248,14 +250,6 @@ public class TypeInfo	extends AbstractInfo
 		return this.postproc!=null? postproc: supertype!=null? supertype.getPostProcessor(): null;
 	}
 
-	/**
-	 *  Set the post-processor.
-	 *  @param pproc The post-processor.
-	 */
-	public void setPostProcessor(IPostProcessor pproc)
-	{
-		this.postproc = pproc;
-	}
 	
 	/**
 	 *  Add a subobjects info.

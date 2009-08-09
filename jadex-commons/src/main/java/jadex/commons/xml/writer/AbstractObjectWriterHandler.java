@@ -16,6 +16,11 @@ import jadex.commons.xml.TypeInfo;
  */
 public abstract class AbstractObjectWriterHandler implements IObjectWriterHandler
 {
+	//-------- attributes --------
+	
+	/** Control flag for generating container tags. */
+	protected boolean gencontainertags = true;
+	
 	//-------- methods --------
 	
 	/**
@@ -25,6 +30,11 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 */
 	public abstract Object getObjectType(Object object, Object context);
 		
+	/**
+	 *  Get the tag name for an object.
+	 */
+	public abstract String getTagName(Object object, Object context);
+	
 	/**
 	 *  Get write info for an object.
 	 */
@@ -213,7 +223,22 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							}
 							else
 							{
-								wi.addSubobject(propname, value);
+								if(SReflect.isIterable(value))
+								{
+									Iterator it2 = SReflect.getIterator(value);
+									if(it2.hasNext())
+									{
+										while(it2.hasNext())
+										{
+											Object val = it2.next();
+											wi.addSubobject(gencontainertags? propname+"/"+getTagName(val, context): propname, val);
+										}
+									}
+								}
+								else
+								{
+									wi.addSubobject(propname, value);
+								}
 							}
 						}
 					}

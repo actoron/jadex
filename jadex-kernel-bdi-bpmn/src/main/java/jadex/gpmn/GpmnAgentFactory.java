@@ -74,6 +74,7 @@ public class GpmnAgentFactory extends BDIAgentFactory
 			Writer writer = OAVBDIXMLReader.getWriter();
 			writer.write(agents[0].getState().getRootObjects().next(), os, libservice.getClassLoader(), agents[0].getState());
 			os.close();
+			
 			return agents[0];
 		}
 		catch(Exception e)

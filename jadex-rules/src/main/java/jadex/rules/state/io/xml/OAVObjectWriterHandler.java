@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.TypeInfo;
@@ -27,6 +28,14 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	public Object getObjectType(Object object, Object context)
 	{
 		return ((IOAVState)context).getType(object);
+	}
+	
+	/**
+	 *  Get the tag name for an object.
+	 */
+	public String getTagName(Object object, Object context)
+	{
+		return ((IOAVState)context).getType(object).getName();
 	}
 	
 	/**

@@ -2,11 +2,11 @@ package jadex.commons.xml.writer;
 
 import jadex.commons.SReflect;
 import jadex.commons.xml.AbstractInfo;
+import jadex.commons.xml.Namespace;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanObjectWriterHandler;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -47,11 +46,7 @@ public class Writer
 	protected int id;
 	
 	/** Control flag for generating ids. */
-	protected boolean genids;
-	
-	/** Control flag for generating container tags. */
-	protected boolean gencontainertags;
-	
+	protected boolean genids;	
 	
 	//-------- constructors --------
 
@@ -59,13 +54,11 @@ public class Writer
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Writer(IObjectWriterHandler handler, Set typeinfos)//, Set ignoredattrs)
+	public Writer(IObjectWriterHandler handler, Set typeinfos)
 	{
 		this.handler = handler;
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
-//		this.ignoredattrs = ignoredattrs!=null? ignoredattrs: Collections.EMPTY_SET;
 		this.genids = false;
-		this.gencontainertags = true;
 	}
 	
 	//-------- methods --------
@@ -82,8 +75,10 @@ public class Writer
 		List stack = new ArrayList();
 		
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+//		factory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
 		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out);
-		writer.writeStartDocument();
+		
+		writer.writeStartDocument();//"utf-8", "1.0");
 		writer.writeCharacters(lf);
 		writeObject(writer, object, writtenobs, null, stack, context, classloader);
 		writer.writeEndDocument();
@@ -99,14 +94,13 @@ public class Writer
 			getTypeInfo(object, getXMLPath(stack), context, false); 
 		if(typeinfo!=null)
 			tagname = typeinfo.getXMLTag();
-		else if(tagname.indexOf("/")!=-1)
-			tagname = tagname.substring(tagname.lastIndexOf("/")+1);
-		else if(tagname==null)
-			tagname = object.getClass().getName();
+		
+		if(tagname==null)
+			tagname = handler.getTagName(object, context);
 		
 		if(genids && writtenobs.containsKey(object))
 		{
-			writeStartObject(writer, tagname, stack.size());
+			writeStartObject(writer, tagname, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
 			writer.writeAttribute("IDREF", (String)writtenobs.get(object));
 			writeEndObject(writer, 0);
 		}
@@ -135,7 +129,7 @@ public class Writer
 				writer.writeCharacters(lf);
 			}
 			
-			writeStartObject(writer, tagname, stack.size());
+			writeStartObject(writer, tagname, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
 			
 			StackElement topse = new StackElement(tagname, object);
 			stack.add(topse);
@@ -185,76 +179,21 @@ public class Writer
 				{	
 					writer.writeCharacters(lf);
 					
-					writeSubobjects(writer, subobs, writtenobs, stack, context, classloader);
+					writeSubobjects(writer, subobs, writtenobs, stack, context, classloader, typeinfo);
 					
 					writeEndObject(writer, stack.size()-1);
 				}
-					
-					
-//				{
-//					writer.writeCharacters(lf);
-//					
-//					for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
-//					{
-//						String subpathname = (String)it.next();
-//						String subtagname = subpathname.indexOf("/")!=-1? subpathname.substring(subpathname.indexOf("/")): subpathname;
-//						Object obj =  subobs.get(subpathname);
-//						
-//						StringTokenizer stok = new StringTokenizer(subpathname, "/");
-//						String[] subtags = new String[stok.countTokens()-1];
-//						for(int i=0; i<subtags.length; i++)
-//							subtags[i] = stok.nextToken();
-//						
-//						if(gencontainertags)
-//						{
-//							for(int i=0; i<subtags.length; i++)
-//							{
-//								writeStartObject(writer, subtags[i], stack.size());
-//								writer.writeCharacters(lf);
-//								stack.add(new StackElement(subtags[i], null));
-//							}
-//						}
-//							
-//						if(SReflect.isIterable(obj))
-//						{
-//							// todo: container tags?!
-//							Iterator it2 = SReflect.getIterator(obj);
-//							if(it2.hasNext())
-//							{
-//								while(it2.hasNext())
-//								{
-//									writeObject(writer, it2.next(), writtenobs, subpathname, stack, context, classloader);
-//								}
-//							}
-//						}
-//						else
-//						{
-//							writeObject(writer, obj, writtenobs, subpathname, stack, context, classloader);
-//						}
-//						
-//						if(gencontainertags)
-//						{
-//							for(int i=0; i<subtags.length; i++)
-//							{
-//								stack.remove(stack.size()-1);
-//								writeEndObject(writer, stack.size());
-//							}
-//						}
-//					}
-//					writeEndObject(writer, stack.size()-1);
-//				}
 			}
-			
 			stack.remove(stack.size()-1);
 		}
 	}
 	
 	
 	/**
-	 * 
+	 *  Write the subobjects of an object.
 	 */
 	protected void writeSubobjects(XMLStreamWriter writer, Map subobs, Map writtenobs, 
-		List stack, Object context, ClassLoader classloader) throws Exception
+		List stack, Object context, ClassLoader classloader, TypeInfo typeinfo) throws Exception
 	{
 		for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
 		{
@@ -262,11 +201,11 @@ public class Writer
 			Object subob = subobs.get(subtag);
 			if(subob instanceof Map)
 			{
-				writeStartObject(writer, subtag, stack.size());
+				writeStartObject(writer, subtag, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
 				writer.writeCharacters(lf);
 				stack.add(new StackElement(subtag, null));
 				
-				writeSubobjects(writer, (Map)subob, writtenobs, stack, context, classloader);
+				writeSubobjects(writer, (Map)subob, writtenobs, stack, context, classloader, typeinfo);
 				
 				stack.remove(stack.size()-1);
 				writeEndObject(writer, stack.size());
@@ -339,10 +278,21 @@ public class Writer
 	/**
 	 *  Write the start of an object.
 	 */
-	public void writeStartObject(XMLStreamWriter writer, String name, int level) throws Exception
+	public void writeStartObject(XMLStreamWriter writer, String name, Namespace ns, int level) throws Exception
 	{
 		writeIdentation(writer, level);
+		
 		writer.writeStartElement(name);
+//		if(ns==null)
+//		{
+//			writer.writeStartElement(name);
+//		}
+//		else
+//		{
+////			System.out.println("huhu: "+ns.getPrefix()+" "+ns.getURI()+" "+name);
+//			writer.writeStartElement(ns.getPrefix(), name, ns.getURI());
+//			writer.writeNamespace(ns.getPrefix(), ns.getURI());
+//		}
 	}
 	
 	/**

@@ -9,6 +9,7 @@ public interface ITypeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The value to convert.
 	 */
+	// todo: remove root parameter
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context);
 	
 	/**
@@ -16,5 +17,6 @@ public interface ITypeConverter
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
 	 */
+	// todo: remove or change signature to Object (OAV)
 	public boolean acceptsInputType(Class inputtype);
 }

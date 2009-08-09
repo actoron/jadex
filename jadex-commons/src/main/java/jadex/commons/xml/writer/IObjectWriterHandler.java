@@ -9,6 +9,11 @@ import jadex.commons.xml.TypeInfo;
 public interface IObjectWriterHandler
 {
 	/**
+	 *  Get the tag name for an object.
+	 */
+	public String getTagName(Object object, Object context);
+	
+	/**
 	 *  Get the object type
 	 *  @param object The object.
 	 *  @return The object type.

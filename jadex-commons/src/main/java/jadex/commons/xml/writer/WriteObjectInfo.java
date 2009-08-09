@@ -101,7 +101,7 @@ public class WriteObjectInfo
 	 */
 	public void addSubobject(String pathname, Object subobject)
 	{
-		System.out.println("added: "+pathname+" "+subobject);
+//		System.out.println("added: "+pathname+" "+subobject);
 		if(subobjects==null)
 			subobjects = new LinkedHashMap();
 		

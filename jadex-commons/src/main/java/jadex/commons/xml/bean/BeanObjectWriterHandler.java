@@ -1,5 +1,6 @@
 package jadex.commons.xml.bean;
 
+import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.TypeInfo;
@@ -28,6 +29,14 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	public Object getObjectType(Object object, Object context)
 	{
 		return object.getClass();
+	}
+	
+	/**
+	 *  Get the tag name for an object.
+	 */
+	public String getTagName(Object object, Object context)
+	{
+		return SReflect.getInnerClassName(object.getClass());
 	}
 
 	/**
