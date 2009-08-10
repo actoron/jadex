@@ -74,6 +74,7 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 		}
 		catch(Exception e)
 		{
+			System.out.println("Decode error: "+val);
 			throw new RuntimeException(e);
 		}
 	}
