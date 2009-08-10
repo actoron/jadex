@@ -7,7 +7,7 @@ import jadex.commons.concurrent.IResultListener;
  * Authentication service that accepts anyone.
  *
  */
-public class NullAccountingService implements IAuthenticationService
+public class NullAuthenticationService implements IAuthenticationService
 {
 	public void start()
 	{

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import wfms.IWfms;
+
 /**
  *  Representation of a running BPMN process.
  */
@@ -75,6 +77,9 @@ public class BpmnInstance	implements IProcessInstance
 	
 	/** The execution history. */
 	protected List history;
+	
+	/** The WFMS. */
+	protected IWfms wfms;
 	
 	/** The change listeners. */
 	protected List listeners;
@@ -302,6 +307,24 @@ public class BpmnInstance	implements IProcessInstance
 			history	= Collections.synchronizedList(new ArrayList());
 		else if(!enabled && history!=null)
 			history	= null;
+	}
+	
+	/**
+	 *  Get the WFMS.
+	 *  @return The WFMS.
+	 */
+	public IWfms getWfms()
+	{
+		return this.wfms;
+	}
+	
+	/**
+	 *  Set the WFMS.
+	 *  @param wfms The WFMS.
+	 */
+	public void setWfms(IWfms wfms)
+	{
+		this.wfms = wfms;
 	}
 	
 	/**

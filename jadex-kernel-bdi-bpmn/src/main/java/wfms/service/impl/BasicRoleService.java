@@ -12,7 +12,7 @@ import wfms.service.IRoleService;
 /** A basic Role Service implementation.
  *
  */
-public class SimpleRoleService implements IRoleService
+public class BasicRoleService implements IRoleService
 {
 	private Map userRoles;
 	
@@ -24,7 +24,7 @@ public class SimpleRoleService implements IRoleService
 	{
 	}
 	
-	public SimpleRoleService()
+	public BasicRoleService()
 	{
 		userRoles = new HashMap();
 	}

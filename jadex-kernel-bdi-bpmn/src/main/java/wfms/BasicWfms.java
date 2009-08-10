@@ -1,13 +1,24 @@
 package wfms;
 
+import jadex.bpmn.BpmnExecutor;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.runtime.BpmnInstance;
+
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+
+import wfms.service.IModelRepositoryService;
 
 /**
  *  Basic Wfms implementation.
  */
 public class BasicWfms implements IWfms
 {
+	/** Running BPMN processes */
+	private List bpmnProcesses;
+	
 	/** Wfms services */
 	private Map services;
 	
@@ -15,6 +26,21 @@ public class BasicWfms implements IWfms
 	public BasicWfms()
 	{
 		services = new HashMap();
+		bpmnProcesses = new LinkedList();
+	}
+	
+	/**
+	 * Starts a BPMN process
+	 * @param name name of the BPMN model
+	 * @param stepmode if true, the process will start in step mode
+	 */
+	public synchronized void startBpmnProcess(String name, boolean stepmode)
+	{
+		IModelRepositoryService mr = (IModelRepositoryService) getService(IModelRepositoryService.class);
+		MBpmnModel model = mr.getBpmnModel(name);
+		BpmnInstance instance = new BpmnInstance(model);
+		new BpmnExecutor(instance, stepmode);
+		bpmnProcesses.add(instance);
 	}
 	
 	/**
@@ -36,6 +62,11 @@ public class BasicWfms implements IWfms
 		services.remove(type);
 	}
 	
+	/**
+	 *  Get a Wfms-service.
+	 *  @param type The service interface/type.
+	 *  @return The corresponding Wfms-service.
+	 */
 	public synchronized Object getService(Class type)
 	{
 		return services.get(type);
