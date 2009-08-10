@@ -39,6 +39,7 @@ public class BasicWfms implements IWfms
 		IModelRepositoryService mr = (IModelRepositoryService) getService(IModelRepositoryService.class);
 		MBpmnModel model = mr.getBpmnModel(name);
 		BpmnInstance instance = new BpmnInstance(model);
+		instance.setWfms(this);
 		new BpmnExecutor(instance, stepmode);
 		bpmnProcesses.add(instance);
 	}
