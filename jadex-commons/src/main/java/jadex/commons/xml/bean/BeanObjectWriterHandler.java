@@ -36,7 +36,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public String getTagName(Object object, Object context)
 	{
-		return SReflect.getInnerClassName(object.getClass());
+//		return SReflect.getInnerClassName(object.getClass());
+		return SReflect.getClassName(object.getClass());
 	}
 
 	/**

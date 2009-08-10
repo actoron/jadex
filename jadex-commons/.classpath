@@ -4,5 +4,8 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="lib" path="/jadex-launch/target/lib/jadex-nuggets-2.0-beta2.jar"/>
+	<classpathentry kind="lib" path="/jadex-launch/target/lib/xpp3-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="/jadex-launch/target/lib/janino-2.5.10.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

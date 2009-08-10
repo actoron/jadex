@@ -42,12 +42,14 @@ public class CodecFactory
 	 */
 	public CodecFactory()
 	{
-		default_id = NuggetsCodec.CODEC_ID;
+//		default_id = NuggetsCodec.CODEC_ID;
+		default_id = JadexXMLCodec.CODEC_ID;
 		codecclasses = SCollection.createHashMap();
 		codeccache = SCollection.createHashMap();
 		addCodec(SerialCodec.class);
 		addCodec(NuggetsCodec.class);
 		addCodec(XMLCodec.class);
+		addCodec(JadexXMLCodec.class);
 	}
 	
 	//-------- methods --------

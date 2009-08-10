@@ -3,6 +3,7 @@ package jadex.rules.state.io.xml;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.IBeanObjectCreator;
 import jadex.commons.xml.reader.IObjectReaderHandler;
 import jadex.rules.state.IOAVState;
@@ -32,6 +33,9 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		Object ret = null;
 		IOAVState state = (IOAVState)context;
 		
+		if(type instanceof TypeInfo)
+			type =  ((TypeInfo)type).getTypeInfo();
+		
 		if(type instanceof OAVObjectType)
 		{
 			if(root)
@@ -43,7 +47,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 				ret	= state.createObject((OAVObjectType)type);
 			}
 		}
-		if(type instanceof Class)
+		else if(type instanceof Class)
 		{
 			Class clazz = (Class)type;
 			if(!BasicTypeConverter.isBuiltInType(clazz))
@@ -159,9 +163,12 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object elem, Object parent, Object linkinfo, String tagname, Object context, ClassLoader classloader, Object root) throws Exception
+	public void linkObject(Object elem, Object parent, Object linkinfo, String pathname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
+	
+		int idx = pathname.lastIndexOf("/");
+		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
 		
 //		System.out.println("link: "+elem+" "+parent);
 		

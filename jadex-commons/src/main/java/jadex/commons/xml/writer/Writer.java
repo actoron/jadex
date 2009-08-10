@@ -5,7 +5,6 @@ import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.Namespace;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanObjectWriterHandler;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -58,7 +57,7 @@ public class Writer
 	{
 		this.handler = handler;
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
-		this.genids = false;
+		this.genids = true;
 	}
 	
 	//-------- methods --------
@@ -101,7 +100,8 @@ public class Writer
 		if(genids && writtenobs.containsKey(object))
 		{
 			writeStartObject(writer, tagname, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
-			writer.writeAttribute("IDREF", (String)writtenobs.get(object));
+//			writer.writeEntityRef("ü");
+			writer.writeAttribute("__IDREF", (String)writtenobs.get(object));
 			writeEndObject(writer, 0);
 		}
 		else
@@ -135,7 +135,7 @@ public class Writer
 			stack.add(topse);
 			writtenobs.put(object, ""+id);
 			if(genids)
-				writer.writeAttribute("ID", ""+id);
+				writer.writeAttribute("__ID", ""+id);
 			id++;
 			
 			// Attributes
@@ -339,108 +339,5 @@ public class Writer
 		return ret.toString();
 	}
 	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-		try
-		{
-			B b1 = new B("test b1");
-			B b2 = new B("test b2");
-			B b3 = new B("test b3");
-			B b4 = new B("test b4");
-			A a = new A(10, "test a", b1, new B[]{b1, b2, b3, b4});
-			
-	//		TypeInfo tia = new TypeInfo("a", A.class);
-	//		TypeInfo tib = new TypeInfo("b", B.class);
-			
-			Writer w = new Writer(new BeanObjectWriterHandler(), null);
-			
-			w.write(a, System.out, null, null);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public static class A
-	{
-		protected int i;
-		
-		protected String s;
-		
-		protected B b;
-		
-		protected B[] bs;
-		
-		public A(int i, String s, B b, B[] bs)
-		{
-			this.i = i;
-			this.s = s;
-			this.b = b;
-			this.bs = bs;
-		}
 
-		public int getI()
-		{
-			return this.i;
-		}
-
-		public void setI(int i)
-		{
-			this.i = i;
-		}
-
-		public String getS()
-		{
-			return this.s;
-		}
-
-		public void setS(String s)
-		{
-			this.s = s;
-		}
-
-		public B getB()
-		{
-			return this.b;
-		}
-
-		public void setB(B b)
-		{
-			this.b = b;
-		}
-
-		public B[] getBs()
-		{
-			return this.bs;
-		}
-
-		public void setBs(B[] bs)
-		{
-			this.bs = bs;
-		}
-	}
-	
-	public static class B
-	{
-		protected String str;
-
-		public B(String str)
-		{
-			this.str = str;
-		}
-		
-		public String getStr()
-		{
-			return this.str;
-		}
-
-		public void setStr(String str)
-		{
-			this.str = str;
-		}
-	}
 }

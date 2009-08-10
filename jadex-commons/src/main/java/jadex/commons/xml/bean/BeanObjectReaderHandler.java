@@ -5,12 +5,14 @@ import jadex.commons.SUtil;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.reader.IObjectReaderHandler;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  *  Handler for reading XML into Java beans.
@@ -29,6 +31,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	public Object createObject(Object type, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception
 	{
 		Object ret = null;
+		if(type instanceof TypeInfo)
+			type =  ((TypeInfo)type).getTypeInfo();
+			
 		if(type instanceof Class)
 		{
 			Class clazz = (Class)type;
@@ -41,6 +46,16 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		else if(type instanceof IBeanObjectCreator)
 		{
 			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
+		}
+		else if(type instanceof String)
+		{
+//			System.out.println("here: "+typeinfo);
+			Class clazz = SReflect.classForName0((String)type, classloader);
+			if(clazz!=null)
+			{
+				// Must have empty constructor.
+				ret = clazz.newInstance();
+			}
 		}
 		return ret;
 	}
@@ -72,8 +87,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, 
-		String tagname, Object context, ClassLoader classloader, Object root) throws Exception
+		String pathname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
+		int idx = pathname.lastIndexOf("/");
+		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
+//		pathname = idx!=-1? pathname.substring(0, idx-1): null;
+		
 		// Add object to its parent.
 		boolean	linked	= false;
 		List classes	= new LinkedList();
@@ -85,25 +104,47 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			linked = true;
 		}
 		
+		StringTokenizer stok = new StringTokenizer(pathname, "/");
+		String[] plunames = new String[stok.countTokens()];
+		String[] sinnames = new String[stok.countTokens()];
+		for(int i=0; stok.hasMoreTokens(); i++)
+		{
+			String tok = stok.nextToken();
+			String name = tok.substring(0, 1).toUpperCase()+tok.substring(1);
+			plunames[i] = name;
+			sinnames[i] = SUtil.getSingular(name);
+		}
+		
 		// Try name guessing via class/superclass/interface names of object to add
 		while(!linked && !classes.isEmpty())
 		{
 			Class clazz = (Class)classes.remove(0);
 			
-			if(!BasicTypeConverter.isBuiltInType(clazz))
+			for(int i=0; i<plunames.length && !linked; i++)
+			{
+				linked = internalLinkObjects(clazz, "set"+plunames[i], object, parent, root, classloader);
+				if(!linked)
+				{
+					linked = internalLinkObjects(clazz, "add"+sinnames[i], object, parent, root, classloader);
+					if(!linked && sinnames[i].equals(plunames[i]))
+						linked = internalLinkObjects(clazz, "add"+plunames[i], object, parent, root, classloader);
+				}
+			}
+			
+			if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
 			{
 				String name = SReflect.getInnerClassName(clazz);
 				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
 				if(!linked)
+				{
 					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
-			}
-			
-			if(!linked)
-			{
-				String name = tagname.substring(0, 1).toUpperCase()+tagname.substring(1);
-				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
-				if(!linked)
-					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
+					if(!linked)
+					{
+						String sinname = SUtil.getSingular(name);
+						if(!name.equals(sinname))
+							linked = internalLinkObjects(clazz, "add"+sinname, object, parent, root, classloader);
+					}
+				}
 			}
 			
 			if(!linked)
@@ -189,6 +230,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					postfix = SUtil.getSingular(postfix);
 					if(!postfix.equals(oldpostfix))
 					{
+						// First try add, as set might also be there and used for a non-multi attribute.
 						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
 							ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
 					}

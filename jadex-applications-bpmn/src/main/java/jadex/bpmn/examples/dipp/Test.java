@@ -1,7 +1,5 @@
 package jadex.bpmn.examples.dipp;
 
-import java.util.Collections;
-
 import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.commons.SUtil;
 import jadex.gpmn.GpmnBDIConverter;

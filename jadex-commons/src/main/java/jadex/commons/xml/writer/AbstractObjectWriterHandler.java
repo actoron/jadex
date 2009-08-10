@@ -237,7 +237,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								}
 								else
 								{
-									wi.addSubobject(propname, value);
+									wi.addSubobject(gencontainertags? propname+"/"+getTagName(value, context): propname, value);
 								}
 							}
 						}

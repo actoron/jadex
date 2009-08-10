@@ -44,6 +44,7 @@ public class MessageService implements IMessageService
 	protected static IContentCodec[]	DEFCODECS	= new IContentCodec[]
 	{
 		new jadex.adapter.base.JavaXMLContentCodec(),
+		new jadex.adapter.base.JadexXMLContentCodec(),
 		new jadex.adapter.base.NuggetsXMLContentCodec()
 	};
 	

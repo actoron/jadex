@@ -31,6 +31,12 @@ public class Reader
 	/** The debug flag. */
 	public static boolean DEBUG = false;
 	
+	/** The ID attribute constant. */
+	public static final String ID = "__ID";
+	
+	/** The IDREF attribute constant. */
+	public static final String IDREF = "__IDREF";
+	
 	//-------- attributes --------
 	
 	/** The object creator. */
@@ -68,6 +74,7 @@ public class Reader
 		StackElement topse	= null;
 		String comment = null;
 		MultiCollection postprocs = new MultiCollection();
+		Map readobjects = new HashMap();
 		
 		while(parser.hasNext())
 		{
@@ -100,81 +107,100 @@ public class Reader
 					}
 				}
 				
+				Object object = null;
+				
 				String fullpath = getXMLPath(stack)+"/"+parser.getLocalName();
 				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath, rawattrs);
+
 				
-				// Create object.
-				Object object = null;
-				if(typeinfo!=null && typeinfo.getTypeInfo()!=null)
+				// Test if it is an object reference
+				String idref = rawattrs!=null? (String)rawattrs.get(IDREF): null;
+				if(idref!=null)
 				{
-					object = handler.createObject(typeinfo.getTypeInfo(), stack.isEmpty(), context, rawattrs, classloader);
+					object = readobjects.get(idref);
+					topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
+					stack.add(topse);
 				}
 				else
-				{
-					if(DEBUG)
+				{	
+					// Create object.
+					// todo: do not call createObject on every tag?!
+					object = handler.createObject(typeinfo!=null? typeinfo: parser.getLocalName(), stack.isEmpty(), context, rawattrs, classloader);
+					if(DEBUG && object==null)
 						System.out.println("No mapping found: "+parser.getLocalName());
-				}
-				topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
-				stack.add(topse);
-				if(stack.size()==1)
-				{
-					root = object;
-				}
-
-				// Handle attributes.
-				if(parser.getAttributeCount()>0)
-				{
-					List	attrpath	= null;
-					// If no type use last element from stack to map attributes.
-					if(object==null)	
+					
+					// If object has internal id save it in the readobjects map.
+					String id = rawattrs!=null? (String)rawattrs.get(ID): null;
+					if(id!=null)
 					{
-						attrpath	= new ArrayList();
-						attrpath.add(topse.getTag());
-						for(int i=stack.size()-2; i>=0 && object==null; i--)
-						{
-							StackElement	pse	= (StackElement)stack.get(i);
-							attrpath.add(pse.getTag());
-							object = pse.getObject();
-						}
-						
-						if(object==null)
-							throw new RuntimeException("No element on stack for attributes"+stack);
+						readobjects.put(id, object);
 					}
 					
-					// Handle attributes
-					Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
-					for(int i=0; i<parser.getAttributeCount(); i++)
+					topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
+					stack.add(topse);
+					if(stack.size()==1)
 					{
-						String attrname = parser.getAttributeLocalName(i);
-						String attrval = parser.getAttributeValue(i);
-						attrs.remove(attrname);
-						
-						Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
-						if(!(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).isIgnoreRead()))
+						root = object;
+					}
+				
+					// Handle attributes.
+					if(parser.getAttributeCount()>0)
+					{
+						List	attrpath	= null;
+						// If no type use last element from stack to map attributes.
+						if(object==null)	
 						{
-//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
-//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
-							handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context, classloader, root);
+							attrpath	= new ArrayList();
+							attrpath.add(topse.getTag());
+							for(int i=stack.size()-2; i>=0 && object==null; i--)
+							{
+								StackElement	pse	= (StackElement)stack.get(i);
+								attrpath.add(pse.getTag());
+								object = pse.getObject();
+							}
+							
+							if(object==null)
+								throw new RuntimeException("No element on stack for attributes"+stack);
+						}
+						
+						// Handle attributes
+						Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
+						for(int i=0; i<parser.getAttributeCount(); i++)
+						{
+							String attrname = parser.getAttributeLocalName(i);
+							if(!attrname.equals(ID))
+							{	
+								String attrval = parser.getAttributeValue(i);
+								attrs.remove(attrname);
+								
+								Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
+								if(!(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).isIgnoreRead()))
+								{
+		//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
+		//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
+									handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context, classloader, root);
+								}
+							}
+						}
+						// Handle unset attributes (possibly have default value).
+						for(Iterator it=attrs.iterator(); it.hasNext(); )
+						{
+							String attrname = (String)it.next();
+							Object attrinfo = typeinfo.getAttributeInfo(attrname);
+							
+							// Hack. want to read attribute info here
+							handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, context, classloader, root);
 						}
 					}
-					// Handle unset attributes (possibly have default value).
-					for(Iterator it=attrs.iterator(); it.hasNext(); )
+					
+					// Handle comment.
+					if(comment!=null && typeinfo!=null)
 					{
-						String attrname = (String)it.next();
-						Object attrinfo = typeinfo.getAttributeInfo(attrname);
-						
-						// Hack. want to read attribute info here
-						handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, context, classloader, root);
-					}
-				}
-				
-				// Handle comment.
-				if(comment!=null && typeinfo!=null)
-				{
-					Object commentinfo = typeinfo.getCommentInfo();
-					if(commentinfo!=null)
-					{
-						handler.handleAttributeValue(object, null, null, comment, commentinfo, context, classloader, root);
+						Object commentinfo = typeinfo.getCommentInfo();
+						if(commentinfo!=null)
+						{
+							handler.handleAttributeValue(object, null, null, comment, commentinfo, context, classloader, root);
+						}
 					}
 				}
 				
@@ -240,16 +266,19 @@ public class Reader
 					if(stack.size()>1)
 					{
 						StackElement pse = (StackElement)stack.get(stack.size()-2);
+						String pathname = parser.getLocalName();
 						for(int i=stack.size()-3; i>=0 && pse.getObject()==null; i--)
 						{
 							pse = (StackElement)stack.get(i);
+							pathname = ((StackElement)stack.get(i+1)).getTag()+"/"+pathname;
 						}
+//						System.out.println("here: "+parser.getLocalName()+" "+getXMLPath(stack)+" "+topse.getRawAttributes());
 						
 						TypeInfo patypeinfo = pse.getTypeInfo();
-//						System.out.println("here: "+parser.getLocalName()+" "+getXMLPath(stack)+" "+topse.getRawAttributes());
-						SubobjectInfo linkinfo = patypeinfo.getSubobjectInfoRead(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
-						
-						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), parser.getLocalName(), context, classloader, root);
+						SubobjectInfo linkinfo = null;
+						if(patypeinfo!=null)
+							linkinfo = patypeinfo.getSubobjectInfoRead(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
+						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), pathname, context, classloader, root);
 					}
 				}
 				
@@ -300,28 +329,6 @@ public class Reader
 		return ret;
 	}
 	
-//	/**
-//	 *  Get the most specific link info.
-//	 *  @param tag The tag.
-//	 *  @param fullpath The full path.
-//	 *  @return The most specific link info.
-//	 */
-//	protected LinkInfo getLinkInfo(String tag, String fullpath, Map rawattributes)
-//	{
-//		LinkInfo ret = null;
-//		Set links = (Set)linkinfos.get(tag);
-//		if(links!=null)
-//		{
-//			for(Iterator it=links.iterator(); ret==null && it.hasNext(); )
-//			{
-//				LinkInfo tmp = (LinkInfo)it.next();
-//				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-//					ret = tmp;
-//			}
-//		}
-//		return ret;
-//	}
-	
 	/**
 	 *  Get the xml path for a stack.
 	 *  @param stack The stack.
@@ -363,27 +370,4 @@ public class Reader
 		return ret;
 	}
 	
-	/**
-	 *  Create link infos for each tag sorted by specificity.
-	 *  @param linkinfos The link infos.
-	 *  @return Map of link infos.
-	 * /
-	protected Map createLinkInfos(Set linkinfos)
-	{
-		Map ret = new HashMap();
-		
-		for(Iterator it=linkinfos.iterator(); it.hasNext(); )
-		{
-			LinkInfo linkinfo = (LinkInfo)it.next();
-			TreeSet links = (TreeSet)ret.get(linkinfo.getXMLTag());
-			if(links==null)
-			{
-				links = new TreeSet(new AbstractInfo.SpecificityComparator());
-				ret.put(linkinfo.getXMLTag(), links);
-			}
-			links.add(linkinfo);
-		}
-		
-		return ret;
-	}*/
 }
