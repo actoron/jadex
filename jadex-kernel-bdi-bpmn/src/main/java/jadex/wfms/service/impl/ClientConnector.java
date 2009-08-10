@@ -1,4 +1,14 @@
-package wfms.service.impl;
+package jadex.wfms.service.impl;
+
+import jadex.wfms.IWfms;
+import jadex.wfms.client.IClient;
+import jadex.wfms.client.IWorkitem;
+import jadex.wfms.client.IWorkitemListener;
+import jadex.wfms.client.Workitem;
+import jadex.wfms.client.WorkitemQueueChangeEvent;
+import jadex.wfms.service.IRoleService;
+import jadex.wfms.service.IWfmsClientAccess;
+import jadex.wfms.service.IWorkitemQueueService;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,15 +16,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import wfms.IWfms;
-import wfms.client.IClient;
-import wfms.client.IWorkitem;
-import wfms.client.IWorkitemListener;
-import wfms.client.Workitem;
-import wfms.client.WorkitemQueueChangeEvent;
-import wfms.service.IRoleService;
-import wfms.service.IWfmsClientAccess;
-import wfms.service.IWorkitemQueueService;
 
 public class ClientConnector implements IWfmsClientAccess, IWorkitemQueueService
 {

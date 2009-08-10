@@ -1,7 +1,7 @@
-package wfms.service.impl;
+package jadex.wfms.service.impl;
 
-import wfms.service.IAuthenticationService;
 import jadex.commons.concurrent.IResultListener;
+import jadex.wfms.service.IAuthenticationService;
 
 /**
  * Authentication service that accepts anyone.

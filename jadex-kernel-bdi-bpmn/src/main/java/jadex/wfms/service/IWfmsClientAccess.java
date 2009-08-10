@@ -1,10 +1,11 @@
-package wfms.service;
+package jadex.wfms.service;
+
+import jadex.wfms.client.IClient;
+import jadex.wfms.client.IWorkitem;
+import jadex.wfms.client.IWorkitemListener;
 
 import java.util.Set;
 
-import wfms.client.IClient;
-import wfms.client.IWorkitem;
-import wfms.client.IWorkitemListener;
 
 public interface IWfmsClientAccess
 {

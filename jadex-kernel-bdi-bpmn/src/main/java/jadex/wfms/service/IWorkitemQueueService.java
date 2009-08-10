@@ -1,6 +1,6 @@
-package wfms.service;
+package jadex.wfms.service;
 
-import wfms.client.IWorkitem;
+import jadex.wfms.client.IWorkitem;
 
 /**
  * Service for accessing the workitem queue.

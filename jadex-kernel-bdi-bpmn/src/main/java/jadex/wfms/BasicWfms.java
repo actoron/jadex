@@ -1,15 +1,15 @@
-package wfms;
+package jadex.wfms;
 
 import jadex.bpmn.BpmnExecutor;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
+import jadex.wfms.service.IModelRepositoryService;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import wfms.service.IModelRepositoryService;
 
 /**
  *  Basic Wfms implementation.

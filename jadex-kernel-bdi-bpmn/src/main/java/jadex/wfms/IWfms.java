@@ -1,4 +1,4 @@
-package wfms;
+package jadex.wfms;
 
 /**
  * The Workflow Management System interface.

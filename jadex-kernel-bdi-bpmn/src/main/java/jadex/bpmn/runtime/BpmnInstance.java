@@ -16,6 +16,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
+import jadex.wfms.IWfms;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import wfms.IWfms;
 
 /**
  *  Representation of a running BPMN process.

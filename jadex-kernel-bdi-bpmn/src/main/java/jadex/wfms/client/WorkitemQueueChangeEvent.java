@@ -1,4 +1,4 @@
-package wfms.client;
+package jadex.wfms.client;
 
 public class WorkitemQueueChangeEvent
 {

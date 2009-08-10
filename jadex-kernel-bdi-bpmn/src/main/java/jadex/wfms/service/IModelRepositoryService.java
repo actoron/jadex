@@ -1,4 +1,4 @@
-package wfms.service;
+package jadex.wfms.service;
 
 import java.util.Set;
 

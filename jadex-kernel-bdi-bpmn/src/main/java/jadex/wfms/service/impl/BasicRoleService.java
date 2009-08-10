@@ -1,13 +1,13 @@
-package wfms.service.impl;
+package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.wfms.service.IRoleService;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import wfms.service.IRoleService;
 
 /** A basic Role Service implementation.
  *

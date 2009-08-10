@@ -1,4 +1,4 @@
-package wfms.service.impl;
+package jadex.wfms.service.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,7 +7,7 @@ import java.util.Set;
 
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
-import wfms.service.IModelRepositoryService;
+import jadex.wfms.service.IModelRepositoryService;
 
 /**
  * Basic Model Repository Service implementation
