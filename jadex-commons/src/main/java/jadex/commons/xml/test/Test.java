@@ -3,8 +3,6 @@ package jadex.commons.xml.test;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
-import nuggets.Nuggets;
-
 import jadex.commons.xml.bean.BeanObjectReaderHandler;
 import jadex.commons.xml.bean.BeanObjectWriterHandler;
 import jadex.commons.xml.reader.Reader;
@@ -33,7 +31,7 @@ public class Test
 			Writer w = new Writer(new BeanObjectWriterHandler(), null);
 			w.write(a, fos, null, null);
 			fos.close();
-			System.out.println(Nuggets.objectToXML(a, null));
+//			System.out.println(Nuggets.objectToXML(a, null));
 			
 			
 			FileInputStream fis = new FileInputStream("test.xml");

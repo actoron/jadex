@@ -48,7 +48,7 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 			writer.write(val, bos, classloader, null);
 			byte[] ret = bos.toByteArray();
 			bos.close();
-			System.out.println("encode: "+val+" "+ret);
+			System.out.println("encode: "+val);
 			return new String(ret);
 		}
 		catch(Exception e)
