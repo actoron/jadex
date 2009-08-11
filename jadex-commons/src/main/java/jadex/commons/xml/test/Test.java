@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.commons.SReflect;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
@@ -40,7 +42,7 @@ public class Test
 				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
 					null, null, null, null, null, HashMap.class.getMethod("entrySet", new Class[0]), null))
 			}));
-			typeinfos.add(new TypeInfo(null, "java.util.HashMap$Entry", "java.util.HashMap$Entry", null, null, null, null, null,
+			typeinfos.add(new TypeInfo(null, "entry", "java.util.HashMap$Entry", null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("key", "key", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null)),
@@ -48,15 +50,14 @@ public class Test
 					null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0]), null))
 			}));
 			
-//			typeinfos.add(new TypeInfo(null, "java.util.ArrayList", ArrayList.class, null, null, null, null, null,
-//				new SubobjectInfo[]{
-//				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
-//					null, null, null, null, null, ArrayList.class.getMethod("entrySet", new Class[0]), null))
-//			}));
-			
+			typeinfos.add(new TypeInfo(null, "java.util.ArrayList", ArrayList.class, null, null, null, null, null,
+				new SubobjectInfo[]{
+				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
+					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})))
+			}));
 			
 			Map map = new HashMap();
-			map.put("str_a", "A");
+			map.put("$", "A");
 			map.put(new Integer(2), new Integer(22));
 			map.put("obja", a);
 			for(Iterator it=map.entrySet().iterator(); it.hasNext(); )
@@ -77,7 +78,7 @@ public class Test
 			FileOutputStream fos = new FileOutputStream("test.xml");
 			Writer w = new Writer(new BeanObjectWriterHandler(true), typeinfos);
 //			w.write(a, fos, null, null);
-			w.write(list, fos, null, null);
+			w.write(map, fos, null, null);
 			fos.close();
 //			System.out.println(Nuggets.objectToXML(a, null));
 			

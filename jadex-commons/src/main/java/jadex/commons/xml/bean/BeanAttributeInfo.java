@@ -10,7 +10,7 @@ import jadex.commons.xml.ITypeConverter;
  *  Java bean attribute meta information.
  */
 public class BeanAttributeInfo extends AttributeInfo
-{	
+{		
 	//-------- attributes --------
 	
 	// read + write

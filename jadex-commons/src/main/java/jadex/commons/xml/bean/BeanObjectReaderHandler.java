@@ -112,14 +112,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		// Add object to its parent.
 		boolean	linked	= false;
-		List classes	= new LinkedList();
-		classes.add(object.getClass());
 		
 		if(linkinfo!=null)
 		{
 			setAttributeValue(linkinfo, tagname, parent, object, root, classloader);
 			linked = true;
 		}
+		List classes	= new LinkedList();
+		classes.add(object.getClass());
 		
 		StringTokenizer stok = new StringTokenizer(pathname, "/");
 		String[] plunames = new String[stok.countTokens()];
@@ -248,9 +248,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 				}
 			}
-			else if(bai.getReadMethod()!=null)
+			else if(bai.getWriteMethod()!=null)
 			{
-				Method m = bai.getReadMethod();
+				Method m = bai.getWriteMethod();
 				Class[] ps = m.getParameterTypes();
 				if(ps.length==1)
 				{

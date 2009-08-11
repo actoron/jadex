@@ -295,7 +295,17 @@ public class TypeInfo	extends AbstractInfo
 	public SubobjectInfo getSubobjectInfoRead(String tag, String fullpath, Map rawattributes)
 	{
 		SubobjectInfo ret = null;
-		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;
+		
+		// Hack exclude tag when classname :-(
+		if(tag.indexOf(".")!=-1)
+		{
+			int idx = fullpath.lastIndexOf("/");
+			fullpath = fullpath.substring(0, idx);
+			idx = fullpath.lastIndexOf("/");
+			tag = fullpath.substring(idx+1);
+		}
+		
+		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;			
 		if(subobjects!=null)
 		{
 			for(Iterator it=subobjects.iterator(); ret==null && it.hasNext(); )

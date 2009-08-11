@@ -7,6 +7,8 @@ public class AttributeInfo
 {
 	//-------- constants --------
 	
+	public static final String THIS = "__this"; 
+
 	/** Ignore when reading. */
 	public static final String IGNORE_READ = "ignore_read";
 	

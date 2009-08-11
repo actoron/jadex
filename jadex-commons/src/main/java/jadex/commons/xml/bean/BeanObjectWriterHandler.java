@@ -63,6 +63,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	protected Object getValue(Object object, Object attr, Object context, Object info)
 	{
+		if(attr==AttributeInfo.THIS)
+			return object;
+		
 		Object value = null;
 		try
 		{
@@ -82,6 +85,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			e.printStackTrace();
 		}
+		
 		return value;
 	}
 	
