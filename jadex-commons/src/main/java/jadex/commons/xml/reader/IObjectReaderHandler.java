@@ -1,8 +1,5 @@
 package jadex.commons.xml.reader;
 
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.TypeInfo;
-
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +18,11 @@ public interface IObjectReaderHandler
 	 *  @return The created object (or null for none).
 	 */
 	public Object createObject(Object typeinfo, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception;
+	
+	/**
+	 *  Convert a content string object to another type of object.
+	 */
+	public Object convertContentObject(Object object, String tagname, Object context, ClassLoader classloader);
 	
 	/**
 	 *  Handle the attribute of an object.

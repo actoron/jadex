@@ -51,7 +51,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 //			System.out.println("here: "+typeinfo);
 			Class clazz = SReflect.classForName0((String)type, classloader);
-			if(clazz!=null)
+			if(clazz!=null && !BasicTypeConverter.isBuiltInType(clazz))
 			{
 				// Must have empty constructor.
 				ret = clazz.newInstance();
@@ -59,6 +59,23 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Convert an object to another type of object.
+	 */
+	public Object convertContentObject(Object object, String tagname, Object context, ClassLoader classloader)
+	{
+		Object ret = object;
+		Class clazz = SReflect.classForName0(tagname, classloader);
+		if(clazz!=null)
+		{
+			if(!BasicTypeConverter.isBuiltInType(clazz))
+				throw new RuntimeException("No converter known for: "+clazz);
+			ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+		}
+		return ret;
+	}
+
 	
 	/**
 	 *  Handle the attribute of an object.
@@ -180,43 +197,83 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		boolean set = false;
 		
-		if(attrinfo instanceof AttributeInfo)
-		{
-			AttributeInfo ai = (AttributeInfo)attrinfo;
+		// Write to a map.
+		if(attrinfo instanceof BeanAttributeInfo)
+		{	
+			BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
 			
-			// Write to a map.
-			if(ai instanceof BeanAttributeInfo && ((BeanAttributeInfo)ai).getMapName()!=null)
-			{	
-				BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
+			if(bai.getMapName()!=null)
+			{
 				String mapname = bai.getMapName().length()==0? bai.getMapName(): bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
-				
 				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
 				
-				String[] prefixes = new String[]{"put", "set", "add"};
-				for(int i=0; i<prefixes.length && !set; i++)
+				if(bai.getReadMethod()!=null)
 				{
-					Method[] ms = SReflect.getMethods(object.getClass(), prefixes[i]+mapname);
-					for(int j=0; j<ms.length && !set; j++)
+					Method m = bai.getReadMethod();
+					Class[] ps = m.getParameterTypes();
+					Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader);
+					
+					try
 					{
-						Class[] ps = ms[j].getParameterTypes();
-						if(ps.length==2)
+						m.invoke(object, new Object[]{jattrname, arg});
+						set = true;
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				else
+				{
+					String[] prefixes = new String[]{"put", "set", "add"};
+					for(int i=0; i<prefixes.length && !set; i++)
+					{
+						Method[] ms = SReflect.getMethods(object.getClass(), prefixes[i]+mapname);
+						for(int j=0; j<ms.length && !set; j++)
 						{
-							Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader);
-							
-							try
+							Class[] ps = ms[j].getParameterTypes();
+							if(ps.length==2)
 							{
-								ms[j].invoke(object, new Object[]{jattrname, arg});
-								set = true;
-							}
-							catch(Exception e)
-							{
+								Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader);
+								
+								try
+								{
+									ms[j].invoke(object, new Object[]{jattrname, arg});
+									set = true;
+								}
+								catch(Exception e)
+								{
+								}
 							}
 						}
 					}
 				}
 			}
-			else
+			else if(bai.getReadMethod()!=null)
 			{
+				Method m = bai.getReadMethod();
+				Class[] ps = m.getParameterTypes();
+				if(ps.length==1)
+				{
+					Object arg = convertAttributeValue(attrval, ps[0], bai.getConverterRead(), root, classloader);
+					
+					try
+					{
+						m.invoke(object, new Object[]{arg});
+						set = true;
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				else
+				{
+					throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
+				}
+			}
+			else if(attrinfo instanceof AttributeInfo)
+			{
+				AttributeInfo ai = (AttributeInfo)attrinfo;
+				
 				String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
 					.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
 					: xmlattrname.substring(0,1).toUpperCase()+xmlattrname.substring(1);

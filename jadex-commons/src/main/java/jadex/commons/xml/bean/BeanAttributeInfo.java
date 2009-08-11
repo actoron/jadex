@@ -1,5 +1,7 @@
 package jadex.commons.xml.bean;
 
+import java.lang.reflect.Method;
+
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
 
@@ -18,16 +20,22 @@ public class BeanAttributeInfo extends AttributeInfo
 	
 	/** The map name (if it should be put in map). */
 	protected String mapname; // todo: exploit also for writing?!
-
+	
 	// read
 	
 	/** The attribute value converter for reading. */
 	protected ITypeConverter converterread;
 	
+	/** The read method. */
+	protected Method readmethod;
+	
 	// write
 	
 	/** The attribute value converter for write. */
 	protected ITypeConverter converterwrite;
+	
+	/** The write method. */
+	protected Method writemethod;
 	
 	//-------- constructors --------
 	
@@ -60,12 +68,23 @@ public class BeanAttributeInfo extends AttributeInfo
 	 */
 	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname, Object defaultvalue)
 	{
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, defaultvalue, null, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
+		String mapname, Object defaultvalue, Method readmethod, Method writemethod)
+	{
 		super(xmlattributename, attributename!=null? attributename: xmlattributename, ignore);
 		
 		this.converterread = converterread;
 		this.converterwrite = converterwrite;
 		this.mapname = mapname;
 		this.defaultvalue = defaultvalue;
+		this.readmethod = readmethod;
+		this.writemethod = writemethod;
 	}
 
 	//-------- methods --------
@@ -114,5 +133,23 @@ public class BeanAttributeInfo extends AttributeInfo
 	public Object getDefaultValue()
 	{
 		return this.defaultvalue;
+	}
+
+	/**
+	 *  Get the read method.
+	 *  @return The read method.
+	 */
+	public Method getReadMethod()
+	{
+		return this.readmethod;
+	}
+
+	/**
+	 *  Get the write method.
+	 *  @return The write method.
+	 */
+	public Method getWriteMethod()
+	{
+		return this.writemethod;
 	}
 }

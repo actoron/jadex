@@ -24,6 +24,8 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	/** The writer. */
 	protected Writer writer = new Writer(new BeanObjectWriterHandler(), null);
 
+	/** The debug flag. */
+	protected boolean DEBUG = true;
 	
 	/**
 	 *  Test if the codec can be used with the provided meta information.
@@ -48,7 +50,8 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 			writer.write(val, bos, classloader, null);
 			byte[] ret = bos.toByteArray();
 			bos.close();
-			System.out.println("encode: "+val);
+			if(DEBUG)
+				System.out.println("encode: "+val+" / class="+val.getClass());
 			return new String(ret);
 		}
 		catch(Exception e)
@@ -69,7 +72,8 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 			ByteArrayInputStream bis = new ByteArrayInputStream(val.getBytes());
 			Object ret = reader.read(bis, classloader, null);
 			bis.close();
-			System.out.println("decode: "+ret);
+			if(DEBUG)
+				System.out.println("decode: "+ret+" / class="+ret.getClass());
 			return ret;
 		}
 		catch(Exception e)

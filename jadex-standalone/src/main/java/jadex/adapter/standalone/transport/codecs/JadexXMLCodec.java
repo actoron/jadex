@@ -27,6 +27,9 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 	/** The writer. */
 	protected Writer writer = new Writer(new BeanObjectWriterHandler(), null);
 	
+	/** The debug flag. */
+	protected boolean DEBUG;
+	
 	//-------- methods --------
 	
 	/**
@@ -42,7 +45,8 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 			writer.write(val, bos, classloader, null);
 			byte[] ret = bos.toByteArray();
 			bos.close();
-			System.out.println("encode: "+val+" "+ret);
+			if(DEBUG)
+				System.out.println("encode: "+val+" "+ret);
 			return ret;
 		}
 		catch(Exception e)
@@ -63,7 +67,8 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 			ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 			Object ret = reader.read(bis, classloader, null);
 			bis.close();
-			System.out.println("decode: "+ret);
+			if(DEBUG)
+				System.out.println("decode: "+ret);
 			return ret;
 		}
 		catch(Exception e)

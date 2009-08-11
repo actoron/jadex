@@ -19,6 +19,24 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/** The bean introspector. */
 	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
 	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public BeanObjectWriterHandler()
+	{
+		this(false);
+	}
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public BeanObjectWriterHandler(boolean gencontainertags)
+	{
+		this.gencontainertags = gencontainertags;
+	}
+	
 	//-------- methods --------
 	
 	/**
@@ -43,13 +61,15 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get a value from an object.
 	 */
-	protected Object getValue(Object object, Object attr, Object context)
+	protected Object getValue(Object object, Object attr, Object context, Object info)
 	{
 		Object value = null;
 		try
 		{
 			Method method;
-			if(attr instanceof BeanProperty)
+			if(info instanceof BeanAttributeInfo && ((BeanAttributeInfo)info).getReadMethod()!=null)
+				method = ((BeanAttributeInfo)info).getReadMethod();
+			else if(attr instanceof BeanProperty)
 				method = ((BeanProperty)attr).getGetter();
 			else if(attr instanceof String)
 				method = findGetMethod(object, (String)attr, new String[]{"get", "is"});

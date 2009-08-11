@@ -4,6 +4,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.IPostProcessor;
+import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
@@ -131,7 +132,7 @@ public class Reader
 					
 					// If object has internal id save it in the readobjects map.
 					String id = rawattrs!=null? (String)rawattrs.get(ID): null;
-					if(id!=null)
+					if(id!=null && object!=null)
 					{
 						readobjects.put(id, object);
 					}
@@ -144,13 +145,14 @@ public class Reader
 					}
 				
 					// Handle attributes.
-					if(parser.getAttributeCount()>0)
+					if(parser.getAttributeCount()>0 && 
+						!(parser.getAttributeCount()==1 && rawattrs.get(ID)!=null))
 					{
 						List	attrpath	= null;
 						// If no type use last element from stack to map attributes.
 						if(object==null)	
 						{
-							attrpath	= new ArrayList();
+							attrpath = new ArrayList();
 							attrpath.add(topse.getTag());
 							for(int i=stack.size()-2; i>=0 && object==null; i--)
 							{
@@ -212,19 +214,39 @@ public class Reader
 			else if(next==XMLStreamReader.END_ELEMENT)
 			{
 //				System.out.println("end: "+parser.getLocalName());
-				
+				final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
+
 				// Hack. Change object to content when it is element of its own.
 				if(topse.getContent()!=null && topse.getContent().trim().length()>0 && topse.getObject()==null)
 				{
-					topse = new StackElement(topse.getTag(), topse.getContent(), topse.getRawAttributes());
+					// Handle possible content type conversion.
+					Object val = topse.getContent();
+					if(typeinfo!=null && typeinfo.getContentInfo()!=null)
+					{
+						Object coninfo = typeinfo.getContentInfo();
+						if(coninfo!=null && coninfo instanceof AttributeInfo)
+						{
+							ITypeConverter conv = ((AttributeInfo)coninfo).getConverterRead();
+							if(conv!=null)
+								val = conv.convertObject(val, root, classloader, context);
+						}
+					}
+					else
+					{
+						String tagname = parser.getLocalName();
+						val = handler.convertContentObject(val, tagname, context, classloader);
+					}
+					
+					topse = new StackElement(topse.getTag(), val, topse.getRawAttributes());
 					stack.set(stack.size()-1, topse);
+					// If this is the only element on stack, set also root to it
+					if(stack.size()==1)
+						root = topse.getObject();
 				}
 				
 				// Link current object to parent
 				if(topse.getObject()!=null)
-				{
-					final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
-					
+				{					
 					// Handle content.
 					if(topse.getContent()!=null && topse.getContent().trim().length()>0)
 					{

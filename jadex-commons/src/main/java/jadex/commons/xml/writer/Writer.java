@@ -237,7 +237,17 @@ public class Writer
 	protected TypeInfo getTypeInfo(Object object, String fullpath, Object context, boolean full)//, Map rawattributes)
 	{
 		TypeInfo ret = null;
-		Set maps = (Set)typeinfos.get(handler.getObjectType(object, context));
+		Object type = handler.getObjectType(object, context);
+		System.out.println("type is: "+type);
+		Set maps = (Set)typeinfos.get(type);
+		
+		// Hack! due to HashMap.Entry is not visible as class
+		if(maps==null && type instanceof Class)
+		{
+			type = SReflect.getClassName((Class)type);
+			maps = (Set)typeinfos.get(type);
+		}
+		
 		if(maps!=null)
 		{
 			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )

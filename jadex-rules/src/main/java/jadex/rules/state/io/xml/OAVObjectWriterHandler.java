@@ -1,6 +1,5 @@
 package jadex.rules.state.io.xml;
 
-import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.TypeInfo;
@@ -18,6 +17,24 @@ import java.util.LinkedHashSet;
  */
 public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 {
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public OAVObjectWriterHandler()
+	{
+		this(false);
+	}
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public OAVObjectWriterHandler(boolean gencontainertags)
+	{
+		this.gencontainertags = gencontainertags;
+	}
+	
 	//-------- methods --------
 	
 	/**
@@ -41,7 +58,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get a value from an object.
 	 */
-	protected Object getValue(Object object, Object attr, Object context)
+	protected Object getValue(Object object, Object attr, Object context, Object info)
 	{
 		Object ret;
 		try

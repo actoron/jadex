@@ -60,7 +60,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					{
 						try
 						{
-							Object value = getValue(object, property, context);
+							Object value = getValue(object, property, context, info);
 							if(value!=null)
 							{
 								value = convertValue(info, value, classloader, context);
@@ -88,7 +88,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					{
 						try
 						{
-							Object value = getValue(object, property, context);
+							Object value = getValue(object, property, context, info);
 							if(value!=null)
 							{
 								value = convertValue(info, value, classloader, context);
@@ -119,7 +119,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						{	
 							try
 							{
-								Object value = getValue(object, property, context);
+								Object value = getValue(object, property, context, info);
 								if(value!=null)
 								{
 									Object defval = getDefaultValue(info);
@@ -164,7 +164,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							doneprops.add(getPropertyName(property));
 							if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
 							{	
-								Object value = getValue(object, property, context);
+								String propname = getPropertyName(property);
+								Object value = getValue(object, property, context, info);
 								if(value!=null)
 								{
 									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
@@ -177,15 +178,22 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 											while(it2.hasNext())
 											{
 												Object val = it2.next();
+												
 												if(isTypeCompatible(val, sotypeinfo, context))
-													wi.addSubobject(xmlsoname, val);
+												{
+													String pathname = gencontainertags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
+													wi.addSubobject(pathname, val);
+												}
 											}
 										}
 									}
 									else
 									{
 										if(isTypeCompatible(value, sotypeinfo, context))
-											wi.addSubobject(xmlsoname, value);
+										{
+											String pathname = gencontainertags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
+											wi.addSubobject(pathname, value);
+										}
 									}
 								}
 							}
@@ -212,7 +220,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					doneprops.add(propname);
 					try
 					{
-						Object value = getValue(object, property, context);
+						Object value = getValue(object, property, context, null);
 		
 						if(value!=null)
 						{
@@ -296,7 +304,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Get a value from an object.
 	 */
-	protected abstract Object getValue(Object object, Object attr, Object context);
+	protected abstract Object getValue(Object object, Object attr, Object context, Object info);
 	
 	/**
 	 *  Get the property.

@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
@@ -11,6 +12,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +64,35 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Convert an object to another type of object.
+	 */
+	public Object convertContentObject(Object object, String tagname, Object context, ClassLoader classloader)
+	{
+		// todo: also support OAVObjectTypes as tagname for conversion? 
+		
+		Object ret = object;
+		Class clazz = SReflect.classForName0(tagname, classloader);
+		if(clazz!=null)
+		{
+			if(!BasicTypeConverter.isBuiltInType(clazz))
+				throw new RuntimeException("No converter known for: "+clazz);
+			ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+		}
+		return ret;
+		
+//		Object ret = object;
+//		IOAVState state = (IOAVState)context;
+//		
+//		OAVObjectType type = state.getTypeModel().getObjectType(tagname);
+//		if(type!=null)
+//		{
+//			ret = state.createObject(type);
+//			Collection attrs = type.getDeclaredAttributeTypes()
+//		}
+//		return ret;
 	}
 	
 	/**
