@@ -89,8 +89,12 @@ public class Writer
 	 */
 	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, List stack, Object context, ClassLoader classloader) throws Exception
 	{
-		TypeInfo typeinfo = tagname!=null? getTypeInfo(object, getXMLPath(stack)+"/"+tagname, context, true):
-			getTypeInfo(object, getXMLPath(stack), context, false); 
+		if(tagname!=null)
+			System.out.println("tagname: "+tagname);
+//		TypeInfo typeinfo = tagname!=null? getTypeInfo(object, getXMLPath(stack)+"/"+tagname, context, true):
+//			getTypeInfo(object, getXMLPath(stack), context, false); 
+		
+		TypeInfo typeinfo = getTypeInfo(object, getXMLPath(stack), context, false); 
 		if(typeinfo!=null)
 			tagname = typeinfo.getXMLTag();
 		
@@ -187,7 +191,6 @@ public class Writer
 			stack.remove(stack.size()-1);
 		}
 	}
-	
 	
 	/**
 	 *  Write the subobjects of an object.

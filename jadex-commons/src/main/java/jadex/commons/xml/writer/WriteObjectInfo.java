@@ -1,7 +1,6 @@
 package jadex.commons.xml.writer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +130,7 @@ public class WriteObjectInfo
 			Map subtagmap = (Map)tagmap.get(tags[i]);
 			if(subtagmap==null)
 			{
-				subtagmap = new HashMap();
+				subtagmap = new LinkedHashMap();
 				tagmap.put(tags[i], subtagmap);
 			}
 		

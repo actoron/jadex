@@ -29,6 +29,9 @@ public class BeanAttributeInfo extends AttributeInfo
 	/** The read method. */
 	protected Method readmethod;
 	
+	/** The getter method for the key of a map (if not supplied the attributename will be used). */
+	protected Method readmapkeymethod;
+	
 	// write
 	
 	/** The attribute value converter for write. */
@@ -77,6 +80,15 @@ public class BeanAttributeInfo extends AttributeInfo
 	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
 		String mapname, Object defaultvalue, Method readmethod, Method writemethod)
 	{
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, defaultvalue, readmethod, writemethod, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
+		String mapname, Object defaultvalue, Method readmethod, Method writemethod, Method readmapkeymethod)
+	{
 		super(xmlattributename, attributename!=null? attributename: xmlattributename, ignore);
 		
 		this.converterread = converterread;
@@ -85,6 +97,7 @@ public class BeanAttributeInfo extends AttributeInfo
 		this.defaultvalue = defaultvalue;
 		this.readmethod = readmethod;
 		this.writemethod = writemethod;
+		this.readmapkeymethod = readmapkeymethod;
 	}
 
 	//-------- methods --------
@@ -151,5 +164,14 @@ public class BeanAttributeInfo extends AttributeInfo
 	public Method getWriteMethod()
 	{
 		return this.writemethod;
+	}
+
+	/**
+	 *  Get the readmapkeymethod.
+	 *  @return The readmapkeymethod.
+	 */
+	public Method getReadMapKeyMethod()
+	{
+		return this.readmapkeymethod;
 	}
 }

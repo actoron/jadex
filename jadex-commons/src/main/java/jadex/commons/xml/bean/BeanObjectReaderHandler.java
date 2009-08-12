@@ -205,7 +205,24 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			if(bai.getMapName()!=null)
 			{
 				String mapname = bai.getMapName().length()==0? bai.getMapName(): bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
-				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
+//				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
+				
+				Object key = null;
+				if(bai.getReadMapKeyMethod()!=null)
+				{
+					Method m = bai.getReadMapKeyMethod();
+					try
+					{
+						key = m.invoke(attrval, new Object[0]);
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				else
+				{
+					key =  bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
+				}
 				
 				if(bai.getReadMethod()!=null)
 				{
@@ -215,7 +232,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					
 					try
 					{
-						m.invoke(object, new Object[]{jattrname, arg});
+						m.invoke(object, new Object[]{key, arg});
 						set = true;
 					}
 					catch(Exception e)
@@ -237,7 +254,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 								
 								try
 								{
-									ms[j].invoke(object, new Object[]{jattrname, arg});
+									ms[j].invoke(object, new Object[]{key, arg});
 									set = true;
 								}
 								catch(Exception e)
