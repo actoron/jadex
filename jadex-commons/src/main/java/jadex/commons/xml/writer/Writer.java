@@ -89,8 +89,8 @@ public class Writer
 	 */
 	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, List stack, Object context, ClassLoader classloader) throws Exception
 	{
-		if(tagname!=null)
-			System.out.println("tagname: "+tagname);
+//		if(tagname!=null)
+//			System.out.println("tagname: "+tagname);
 //		TypeInfo typeinfo = tagname!=null? getTypeInfo(object, getXMLPath(stack)+"/"+tagname, context, true):
 //			getTypeInfo(object, getXMLPath(stack), context, false); 
 		
@@ -241,7 +241,7 @@ public class Writer
 	{
 		TypeInfo ret = null;
 		Object type = handler.getObjectType(object, context);
-		System.out.println("type is: "+type);
+//		System.out.println("type is: "+type);
 		Set maps = (Set)typeinfos.get(type);
 		
 		// Hack! due to HashMap.Entry is not visible as class

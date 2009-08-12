@@ -1,11 +1,20 @@
-package jadex.commons.xml.test;
+package jadex.commons.xml.bean;
 
+/**
+ *  Replacement for HashMap.Entry which is not public accessible.
+ */
 public class MapEntry
 {
+	//-------- attributes --------
+	
+	/** The key attributes . */
 	protected Object key;
 	
+	/** The value attribute. */
 	protected Object value;
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the key.
 	 *  @return The key.
