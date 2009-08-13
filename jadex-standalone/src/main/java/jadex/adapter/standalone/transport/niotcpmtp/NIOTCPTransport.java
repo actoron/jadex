@@ -221,7 +221,7 @@ public class NIOTCPTransport implements ITransport
 								catch(IOException e)
 								{ 
 									logger.warning("NIOTCP receiving error while reading data.");
-									//e.printStackTrace();
+//									e.printStackTrace();
 									con.close();
 									key.cancel();
 								}
@@ -301,7 +301,7 @@ public class NIOTCPTransport implements ITransport
 				{
 					Set aidset = (Set)adrsets.get(addrs[i]);
 					aidset.retainAll(undelivered);
-					AgentIdentifier[] aids = (AgentIdentifier[])aidset.toArray(new AgentIdentifier[aidset.size()]);
+//					AgentIdentifier[] aids = (AgentIdentifier[])aidset.toArray(new AgentIdentifier[aidset.size()]);
 //					message.setReceivers(aids);
 					
 					// The send process must be performed once or twice
@@ -312,7 +312,7 @@ public class NIOTCPTransport implements ITransport
 					{
 						try
 						{
-							con.send(new MessageEnvelope(message, aids, msgtype));
+							con.send(new MessageEnvelope(message, aidset, msgtype));
 							undelivered.removeAll(aidset);
 							break;
 						}

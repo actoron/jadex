@@ -189,17 +189,7 @@ public class MEnvSpaceType	extends MSpaceType
 //			new SubobjectInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttype", "objecttypes", null, "")),
 //			new SubobjectInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("percepttype", "agenttypes", new ITypeConverter()
 			new SubobjectInfo(new BeanAttributeInfo("objecttypes/objecttype", "objecttypes", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("agenttypes/agenttype", "agenttypes", null, new ITypeConverter()
-			{
-				public boolean acceptsInputType(Class inputtype)
-				{
-					return true;
-				}
-				public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
-				{
-					return ((Map)val).get("name");
-				}
-			}, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo("agenttypes/agenttype", "agenttypes", null, nameconv, null, ""))
 			}));
 		
 		types.add(new TypeInfo(ti_po, "actiontype", MultiCollection.class, null, null,
@@ -1143,11 +1133,16 @@ public class MEnvSpaceType	extends MSpaceType
 		 */
 		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
-			if(!(val instanceof String))
-				throw new RuntimeException("Source value must be string: "+val);
-			Class ret = SReflect.findClass0((String)val, ((MApplicationType)root).getAllImports(), classloader);
-			if(ret==null)
-				throw new RuntimeException("Could not parse class: "+val);
+//			if(!(val instanceof String))
+//				throw new RuntimeException("Source value must be string: "+val);
+			
+			Object ret = val;
+			if(val instanceof String)
+			{
+				ret = SReflect.findClass0((String)val, ((MApplicationType)root).getAllImports(), classloader);
+				if(ret==null)
+					throw new RuntimeException("Could not parse class: "+val);
+			}
 			return ret;
 		}
 		
@@ -1155,11 +1150,11 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Test if a converter accepts a specific input type.
 		 *  @param inputtype The input type.
 		 *  @return True, if accepted.
-		 */
+		 * /
 		public boolean acceptsInputType(Class inputtype)
 		{
 			return String.class.isAssignableFrom(inputtype);
-		}
+		}*/
 	}
 	
 	/**
@@ -1175,36 +1170,41 @@ public class MEnvSpaceType	extends MSpaceType
 		 */
 		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
-			if(!(val instanceof String))
-				throw new RuntimeException("Source value must be string: "+val);
-			
-			String	str	= (String)val;
-			String	alpha	= null;
-			
-			if((str.startsWith("#")) && (str.length()==9))
+			Object ret = val;
+		
+//			if(!(val instanceof String))
+//				throw new RuntimeException("Source value must be string: "+val);
+		
+			if(val instanceof String)
 			{
-				alpha	= str.substring(7);
-				str	= str.substring(0, 7);
+				String	str	= (String)val;
+				String	alpha	= null;
+				
+				if((str.startsWith("#")) && (str.length()==9))
+				{
+					alpha	= str.substring(7);
+					str	= str.substring(0, 7);
+				}
+				
+				// Cannot use CSS.stringToColor() because they haven't made it public :-(
+				Color	c	= ss.stringToColor((String)val);
+				if(alpha!=null)
+				{
+					ret	= new Color(c.getRed(), c.getGreen(), c.getBlue(), Integer.parseInt(alpha, 16));
+				}
 			}
-			
-			// Cannot use CSS.stringToColor() because they haven't made it public :-(
-			Color	c	= ss.stringToColor((String)val);
-			if(alpha!=null)
-			{
-				c	= new Color(c.getRed(), c.getGreen(), c.getBlue(), Integer.parseInt(alpha, 16));
-			}
-			return c;
+			return ret;
 		}
 		
 		/**
 		 *  Test if a converter accepts a specific input type.
 		 *  @param inputtype The input type.
 		 *  @return True, if accepted.
-		 */
+		 * /
 		public boolean acceptsInputType(Class inputtype)
 		{
 			return String.class.isAssignableFrom(inputtype);
-		}
+		}*/
 	}
 	
 	/**
@@ -1219,11 +1219,15 @@ public class MEnvSpaceType	extends MSpaceType
 		 */
 		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
-			if(!(val instanceof String))
-				throw new RuntimeException("Source value must be string: "+val);
+//			if(!(val instanceof String))
+//				throw new RuntimeException("Source value must be string: "+val);
+			
 			Object ret = val;
-			try{ret = new Double((String)val);}
-			catch(Exception e){}
+			if(val instanceof String)
+			{
+				try{ret = new Double((String)val);}
+				catch(Exception e){}
+			}
 			return ret;
 		}
 		
@@ -1231,11 +1235,11 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Test if a converter accepts a specific input type.
 		 *  @param inputtype The input type.
 		 *  @return True, if accepted.
-		 */
+		 * /
 		public boolean acceptsInputType(Class inputtype)
 		{
 			return String.class.isAssignableFrom(inputtype);
-		}
+		}*/
 	}
 	
 	/**
@@ -1250,11 +1254,14 @@ public class MEnvSpaceType	extends MSpaceType
 		 */
 		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
-			if(!(val instanceof String))
-				throw new RuntimeException("Source value must be string: "+val);
+//			if(!(val instanceof String))
+//				throw new RuntimeException("Source value must be string: "+val);
 			Object ret = val;
-			try{ret = new Integer((String)val);}
-			catch(Exception e){}
+			if(val instanceof String)
+			{
+				try{ret = new Integer((String)val);}
+				catch(Exception e){}
+			}
 			return ret;
 		}
 		
@@ -1262,11 +1269,11 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Test if a converter accepts a specific input type.
 		 *  @param inputtype The input type.
 		 *  @return True, if accepted.
-		 */
+		 * /
 		public boolean acceptsInputType(Class inputtype)
 		{
 			return String.class.isAssignableFrom(inputtype);
-		}
+		}*/
 	}
 	
 	/**
@@ -1281,12 +1288,14 @@ public class MEnvSpaceType	extends MSpaceType
 		 */
 		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
-			if(!(val instanceof String))
-				throw new RuntimeException("Source value must be string: "+val);
+//			if(!(val instanceof String))
+//				throw new RuntimeException("Source value must be string: "+val);
 			
-			Object ret = (new ColorConverter()).convertObject(val, root, classloader, null);
-			if (ret == null)
-				ret = val;
+			Object ret = val;
+			if(val instanceof String)
+			{
+				ret = new ColorConverter().convertObject(val, root, classloader, null);
+			}
 			
 			return ret;
 		}
@@ -1295,11 +1304,11 @@ public class MEnvSpaceType	extends MSpaceType
 		 *  Test if a converter accepts a specific input type.
 		 *  @param inputtype The input type.
 		 *  @return True, if accepted.
-		 */
+		 * /
 		public boolean acceptsInputType(Class inputtype)
 		{
 			return String.class.isAssignableFrom(inputtype);
-		}
+		}*/
 	}
 	
 	/**
@@ -1310,11 +1319,11 @@ public class MEnvSpaceType	extends MSpaceType
 		/**
 		 *  Convert a string value to another type.
 		 *  @param val The string value to convert.
-		 */
+		 * /
 		public boolean acceptsInputType(Class inputtype)
 		{
 			return true;
-		}
+		}*/
 		
 		/**
 		 *  Test if a converter accepts a specific input type.
@@ -1323,7 +1332,12 @@ public class MEnvSpaceType	extends MSpaceType
 		 */
 		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
-			return (String)((Map)val).get("name");
+			Object ret = val;
+			if(val instanceof Map)
+			{
+				ret = (String)((Map)val).get("name");
+			}
+			return ret;
 		}
 	}
 }

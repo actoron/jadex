@@ -534,13 +534,18 @@ public class OAVBDIXMLReader
 	{
 		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 		{
-			return ((IParsedExpression)val).getExpressionText();
+			Object ret = val;
+			if(val instanceof IParsedExpression)
+			{
+				ret = ((IParsedExpression)val).getExpressionText();
+			}
+			return ret;
 //			return ((IOAVState)context).getAttributeValue(val, OAVBDIMetaModel.expression_has_content);
 		}
 		
-		public boolean acceptsInputType(Class inputtype)
+		/*public boolean acceptsInputType(Class inputtype)
 		{
 			return true;
-		}
+		}*/
 	}
 }

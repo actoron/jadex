@@ -19,7 +19,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	//-------- attributes --------
 	
 	/** Control flag for generating container tags. */
-	protected boolean gencontainertags = true;
+	protected boolean gentypetags = true;
 	
 	//-------- methods --------
 	
@@ -170,7 +170,10 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								{
 									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
 									
-									if(SReflect.isIterable(value))
+									// Hack special case array, todo: support generically via typeinfo
+//									if(SReflect.isIterable(value))
+									if(value.getClass().isArray()
+										|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
 									{
 										Iterator it2 = SReflect.getIterator(value);
 										if(it2.hasNext())
@@ -181,7 +184,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 												
 												if(isTypeCompatible(val, sotypeinfo, context))
 												{
-													String pathname = gencontainertags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
+													String pathname = gentypetags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
 													wi.addSubobject(pathname, val);
 												}
 											}
@@ -191,7 +194,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									{
 										if(isTypeCompatible(value, sotypeinfo, context))
 										{
-											String pathname = gencontainertags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
+											String pathname = gentypetags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
 											wi.addSubobject(pathname, value);
 										}
 									}
@@ -231,7 +234,9 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							}
 							else
 							{
-								if(SReflect.isIterable(value))
+								// Hack special case array, todo: support generically via typeinfo
+								if(value.getClass().isArray())//SReflect.isIterable(value))
+//								if(SReflect.isIterable(value))
 								{
 									Iterator it2 = SReflect.getIterator(value);
 									if(it2.hasNext())
@@ -239,13 +244,13 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 										while(it2.hasNext())
 										{
 											Object val = it2.next();
-											wi.addSubobject(gencontainertags? propname+"/"+getTagName(val, context): propname, val);
+											wi.addSubobject(gentypetags? propname+"/"+getTagName(val, context): propname, val);
 										}
 									}
 								}
 								else
 								{
-									wi.addSubobject(gencontainertags? propname+"/"+getTagName(value, context): propname, value);
+									wi.addSubobject(gentypetags? propname+"/"+getTagName(value, context): propname, value);
 								}
 							}
 						}

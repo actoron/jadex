@@ -18,5 +18,5 @@ public interface ITypeConverter
 	 *  @return True, if accepted.
 	 */
 	// todo: remove or change signature to Object (OAV)
-	public boolean acceptsInputType(Class inputtype);
+//	public boolean acceptsInputType(Class inputtype);
 }

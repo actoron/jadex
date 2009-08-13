@@ -32,9 +32,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Create a new writer.
 	 */
-	public BeanObjectWriterHandler(boolean gencontainertags)
+	public BeanObjectWriterHandler(boolean gentypetags)
 	{
-		this.gencontainertags = gencontainertags;
+		this.gentypetags = gentypetags;
 	}
 	
 	//-------- methods --------
@@ -46,6 +46,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public Object getObjectType(Object object, Object context)
 	{
+		if(object==null)
+			System.out.println("here");
 		return object.getClass();
 	}
 	

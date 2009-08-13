@@ -32,7 +32,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public OAVObjectWriterHandler(boolean gencontainertags)
 	{
-		this.gencontainertags = gencontainertags;
+		this.gentypetags = gencontainertags;
 	}
 	
 	//-------- methods --------

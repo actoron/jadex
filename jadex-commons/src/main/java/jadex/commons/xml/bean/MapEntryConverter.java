@@ -14,16 +14,21 @@ public class MapEntryConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		return ((MapEntry)val).getValue();
+		Object ret = val;
+		if(val instanceof MapEntry)
+		{
+			ret = ((MapEntry)val).getValue();
+		}
+		return ret;
 	}
 
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return true;
-	}
+	}*/
 }

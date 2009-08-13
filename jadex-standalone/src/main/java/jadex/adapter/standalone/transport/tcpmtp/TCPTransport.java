@@ -263,8 +263,8 @@ public class TCPTransport implements ITransport
 			{
 				Set aidset = (Set)adrsets.get(addrs[i]);
 				aidset.retainAll(undelivered);
-				AgentIdentifier[] aids = (AgentIdentifier[])aidset.toArray(new AgentIdentifier[aidset.size()]);
-				if(con.send(new MessageEnvelope(msg, aids, type)))
+//				AgentIdentifier[] aids = (AgentIdentifier[])aidset.toArray(new AgentIdentifier[aidset.size()]);
+				if(con.send(new MessageEnvelope(msg, aidset, type)))
 					undelivered.removeAll(aidset);
 			}
 		}
@@ -416,7 +416,7 @@ public class TCPTransport implements ITransport
 		catch(Exception e)
 		{
 			logger.warning("TCPTransport receiving error: "+e);
-			//e.printStackTrace();
+			e.printStackTrace();
 			con.close();
 		}
 	}

@@ -1,18 +1,10 @@
 package jadex.commons.xml.test;
 
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.SubobjectInfo;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.bean.BeanObjectWriterHandler;
-import jadex.commons.xml.bean.MapEntry;
-import jadex.commons.xml.bean.MapEntryConverter;
+import jadex.commons.xml.bean.JavaReader;
+import jadex.commons.xml.bean.JavaWriter;
 import jadex.commons.xml.reader.Reader;
 import jadex.commons.xml.writer.Writer;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,7 +17,7 @@ import junit.framework.TestCase;
 /**
  *  Testcases for writer and reader.
  */
-public class Test extends TestCase
+public class Test //extends TestCase
 {
 	//-------- attributes --------
 	
@@ -43,10 +35,11 @@ public class Test extends TestCase
 	public static void main(String[] args)
 	{
 		Test t = new Test();
+		
 		try
 		{
-			t.setUp();
-			t.testSet();
+//			t.setUp();
+			t.testMap();
 		}
 		catch(Exception e)
 		{
@@ -56,7 +49,7 @@ public class Test extends TestCase
 	
 	/**
 	 *  Test setup.
-	 */
+	 * /
 	protected void setUp() throws Exception
 	{	
 		Set typeinfosr = new HashSet();
@@ -116,7 +109,7 @@ public class Test extends TestCase
 
 		writer = new Writer(new BeanObjectWriterHandler(true), typeinfosw);	
 		reader = new Reader(new BeanObjectReaderHandler(), typeinfosr);
-	}
+	}*/
 	
 	/**
 	 *  Test setup.
@@ -183,19 +176,25 @@ public class Test extends TestCase
 	 */
 	protected void doWriteAndRead(Object wo) throws Exception
 	{
-//		System.out.println("Write: "+wo);
-		FileOutputStream fos = new FileOutputStream("test.xml");
-		writer.write(wo, fos, null, null);
-		fos.close();
+		String xml = JavaWriter.objectToXML(wo, null);
 		
-		FileInputStream fis = new FileInputStream("test.xml");
-		Object ro = reader.read(fis, null, null);
-		fis.close();
+		System.out.println("xml is:"+xml);
+		
+		Object ro = JavaReader.objectFromXML(xml, null);
+		
+//		System.out.println("Write: "+wo);
+//		FileOutputStream fos = new FileOutputStream("test.xml");
+//		writer.write(wo, fos, null, null);
+//		fos.close();
+//		
+//		FileInputStream fis = new FileInputStream("test.xml");
+//		Object ro = reader.read(fis, null, null);
+//		fis.close();
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
-//		System.out.println("equals: "+wo.equals(ro));
+		System.out.println("equals: "+wo.equals(ro));
 		
-		//assertEquals("Written and read objects should be equal:", wo, ro);
+//		assertEquals("Written and read objects should be equal:", wo, ro);
 	}
 	
 	/**

@@ -1,13 +1,9 @@
 package jadex.adapter.base;
 
 import jadex.bridge.IContentCodec;
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.bean.BeanObjectWriterHandler;
-import jadex.commons.xml.reader.Reader;
-import jadex.commons.xml.writer.Writer;
+import jadex.commons.xml.bean.JavaReader;
+import jadex.commons.xml.bean.JavaWriter;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.Properties;
 
@@ -18,14 +14,8 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	/** The language identifier. */
 	public static final String	JADEX_XML	= "nuggets-xml";
 	
-	/** The reader. */
-	protected Reader reader = new Reader(new BeanObjectReaderHandler(), null);
-	
-	/** The writer. */
-	protected Writer writer = new Writer(new BeanObjectWriterHandler(), null);
-
 	/** The debug flag. */
-	protected boolean DEBUG = true;
+	protected boolean DEBUG = false;
 	
 	/**
 	 *  Test if the codec can be used with the provided meta information.
@@ -44,20 +34,10 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	 */
 	public String encode(Object val, ClassLoader classloader)
 	{
-		try
-		{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			writer.write(val, bos, classloader, null);
-			byte[] ret = bos.toByteArray();
-			bos.close();
-			if(DEBUG)
-				System.out.println("encode: "+val+" / class="+val.getClass());
-			return new String(ret);
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		String ret = JavaWriter.objectToXML(val, classloader);
+		if(DEBUG)
+			System.out.println("encode content: "+ret);
+		return ret;
 	}
 
 	/**
@@ -67,19 +47,9 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	 */
 	public Object decode(String val, ClassLoader classloader)
 	{
-		try
-		{
-			ByteArrayInputStream bis = new ByteArrayInputStream(val.getBytes());
-			Object ret = reader.read(bis, classloader, null);
-			bis.close();
-			if(DEBUG)
-				System.out.println("decode: "+ret+" / class="+ret.getClass());
-			return ret;
-		}
-		catch(Exception e)
-		{
-			System.out.println("Decode error: "+val);
-			throw new RuntimeException(e);
-		}
+		Object ret = JavaReader.objectFromXML(val, classloader);
+		if(DEBUG)
+			System.out.println("decode content: "+ret);
+		return ret;
 	}
 }

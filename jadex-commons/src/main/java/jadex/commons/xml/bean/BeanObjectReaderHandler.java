@@ -287,31 +287,32 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
 				}
 			}
-			else if(attrinfo instanceof AttributeInfo)
-			{
-				AttributeInfo ai = (AttributeInfo)attrinfo;
-				
-				String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
-					.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
-					: xmlattrname.substring(0,1).toUpperCase()+xmlattrname.substring(1);
-					
-				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
-					ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
+		}
+	
+		if(!set && attrinfo instanceof AttributeInfo)
+		{
+			AttributeInfo ai = (AttributeInfo)attrinfo;
 			
-				if(!set)
+			String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
+				.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
+				: xmlattrname.substring(0,1).toUpperCase()+xmlattrname.substring(1);
+				
+			set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
+				ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
+		
+			if(!set)
+			{
+				String oldpostfix = postfix;
+				postfix = SUtil.getSingular(postfix);
+				if(!postfix.equals(oldpostfix))
 				{
-					String oldpostfix = postfix;
-					postfix = SUtil.getSingular(postfix);
-					if(!postfix.equals(oldpostfix))
-					{
-						// First try add, as set might also be there and used for a non-multi attribute.
-						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
-							ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
-					}
+					// First try add, as set might also be there and used for a non-multi attribute.
+					set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
+						ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
 				}
 			}
 		}
-		else
+		else if(!set)
 		{
 			// Write as normal bean attribute.
 			
@@ -347,14 +348,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		Object ret = attrval;
 
-		if(converter!=null && converter.acceptsInputType(attrval.getClass()))
+//		if(converter!=null && !converter.acceptsInputType(attrval.getClass()))
+//			System.out.println("hererrrrr: "+attrval+" "+converter);
+		
+		if(converter!=null)// && converter.acceptsInputType(attrval.getClass()))
 		{
 			ret = converter.convertObject(attrval, root, classloader, null);
 		}
 		else if(!String.class.isAssignableFrom(targetclass))
 		{
 			ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
-			if(conv!=null && conv.acceptsInputType(attrval.getClass()))
+			if(conv!=null)// && conv.acceptsInputType(attrval.getClass()))
 				ret = conv.convertObject(attrval, root, classloader, null);
 		}
 	

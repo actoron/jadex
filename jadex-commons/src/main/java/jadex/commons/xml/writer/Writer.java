@@ -6,6 +6,7 @@ import jadex.commons.xml.Namespace;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.TypeInfo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -201,9 +202,12 @@ public class Writer
 		for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
 		{
 			String subtag = (String)it.next();
+			if(WriteObjectInfo.SUBTAGMAP.equals(subtag))
+				continue;
+				
 			Object subob = subobs.get(subtag);
-			if(subob instanceof Map)
-			{
+			if(subob instanceof Map && ((Map)subob).containsKey(WriteObjectInfo.SUBTAGMAP))
+			{		
 				writeStartObject(writer, subtag, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
 				writer.writeCharacters(lf);
 				stack.add(new StackElement(subtag, null));
@@ -213,15 +217,15 @@ public class Writer
 				stack.remove(stack.size()-1);
 				writeEndObject(writer, stack.size());
 			}
-			else if(SReflect.isIterable(subob))
+			else if(subob instanceof List && ((List)subob).contains(WriteObjectInfo.SUBTAGMAP))
 			{
-				Iterator it2 = SReflect.getIterator(subob);
-				if(it2.hasNext())
+				List sos = (List)subob;
+				for(int i=0; i<sos.size(); i++)
 				{
-					while(it2.hasNext())
-					{
-						writeObject(writer, it2.next(), writtenobs, subtag, stack, context, classloader);
-					}
+					Object so = sos.get(i);
+					if(WriteObjectInfo.SUBTAGMAP.equals(so))
+						continue;
+					writeObject(writer, so, writtenobs, subtag, stack, context, classloader);
 				}				
 			}	
 			else
@@ -352,5 +356,30 @@ public class Writer
 		return ret.toString();
 	}
 	
-
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToXML(Writer writer, Object val, ClassLoader classloader)
+	{
+		return new String(objectToByteArray(writer, val, classloader));
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader)
+	{
+		try
+		{
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			writer.write(val, bos, classloader, null);
+			byte[] ret = bos.toByteArray();
+			bos.close();
+			return ret;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 }

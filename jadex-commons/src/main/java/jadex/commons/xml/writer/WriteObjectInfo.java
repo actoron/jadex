@@ -112,6 +112,7 @@ public class WriteObjectInfo
 		insertSubobject(subobjects, tags, subobject, 0);
 	}
 	
+	public static final String SUBTAGMAP = "subtagmap";
 	/**
 	 * 
 	 */
@@ -121,7 +122,10 @@ public class WriteObjectInfo
 		{
 			List elems = (List)tagmap.get(tags[i]);
 			if(elems==null)
+			{
 				elems = new ArrayList();
+				elems.add(SUBTAGMAP);
+			}
 			tagmap.put(tags[i], elems);
 			elems.add(subob);
 		}
@@ -131,10 +135,13 @@ public class WriteObjectInfo
 			if(subtagmap==null)
 			{
 				subtagmap = new LinkedHashMap();
+				subtagmap.put(SUBTAGMAP, SUBTAGMAP);
 				tagmap.put(tags[i], subtagmap);
 			}
 		
 			insertSubobject(subtagmap, tags, subob, i+1);
 		}
 	}
+
+	
 }

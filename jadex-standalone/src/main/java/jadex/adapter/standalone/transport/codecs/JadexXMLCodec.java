@@ -1,12 +1,8 @@
 package jadex.adapter.standalone.transport.codecs;
 
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.bean.BeanObjectWriterHandler;
-import jadex.commons.xml.reader.Reader;
-import jadex.commons.xml.writer.Writer;
+import jadex.commons.xml.bean.JavaReader;
+import jadex.commons.xml.bean.JavaWriter;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -21,14 +17,8 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 	/** The nuggets codec id. */
 	public static final byte CODEC_ID = 3;
 
-	/** The reader. */
-	protected Reader reader = new Reader(new BeanObjectReaderHandler(), null);
-	
-	/** The writer. */
-	protected Writer writer = new Writer(new BeanObjectWriterHandler(), null);
-	
 	/** The debug flag. */
-	protected boolean DEBUG;
+	protected boolean DEBUG = true;
 	
 	//-------- methods --------
 	
@@ -39,20 +29,10 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 	 */
 	public byte[] encode(Object val, ClassLoader classloader)
 	{
-		try
-		{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			writer.write(val, bos, classloader, null);
-			byte[] ret = bos.toByteArray();
-			bos.close();
-			if(DEBUG)
-				System.out.println("encode: "+val+" "+ret);
-			return ret;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		byte[] ret = JavaWriter.objectToByteArray(val, classloader);
+		if(DEBUG)
+			System.out.println("encode message: "+(new String(ret)));
+		return ret;
 	}
 
 	/**
@@ -62,18 +42,9 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 	 */
 	public Object decode(byte[] bytes, ClassLoader classloader)
 	{
-		try
-		{
-			ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-			Object ret = reader.read(bis, classloader, null);
-			bis.close();
-			if(DEBUG)
-				System.out.println("decode: "+ret);
-			return ret;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		Object ret = JavaReader.objectFromByteArray(bytes, classloader);
+		if(DEBUG)
+			System.out.println("decode message: "+(new String(bytes)));
+		return ret;
 	}
 }

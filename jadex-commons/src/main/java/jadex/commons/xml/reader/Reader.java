@@ -9,6 +9,7 @@ import jadex.commons.xml.StackElement;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -390,6 +391,34 @@ public class Reader
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  @param val The string value.
+	 *  @return The encoded object.
+	 */
+	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader)
+	{
+		return objectFromByteArray(reader, val.getBytes(), classloader);
+	}
+	
+	/**
+	 *  @param val The string value.
+	 *  @return The encoded object.
+	 */
+	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader)
+	{
+		try
+		{
+			ByteArrayInputStream bis = new ByteArrayInputStream(val);
+			Object ret = reader.read(bis, classloader, null);
+			bis.close();
+			return ret;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 }

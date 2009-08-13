@@ -1,9 +1,7 @@
 package jadex.commons.xml;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Converter for basic types.
@@ -103,11 +101,11 @@ class StringTypeConverter implements ITypeConverter
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -121,20 +119,26 @@ class IntegerTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
-		return new Integer((String)val);
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
+		Object ret = val;
+		if(ret instanceof String)
+		{
+			ret = new Integer((String)val);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -148,20 +152,26 @@ class LongTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
-		return new Long((String)val);
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
+		Object ret = val;
+		if(val instanceof String)
+		{
+			ret = new Long((String)val);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -175,20 +185,26 @@ class FloatTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
-		return new Float((String)val);
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
+		Object ret = val;
+		if(val instanceof String)
+		{
+			ret = new Float((String)val);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -202,20 +218,26 @@ class DoubleTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
-		return new Double((String)val);
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
+		Object ret = val;
+		if(val instanceof String)
+		{
+			ret = new Double((String)val);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -229,20 +251,26 @@ class BooleanTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
-		return new Boolean((String)val);
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
+		Object ret = val;
+		if(val instanceof String)
+		{
+			ret = new Boolean((String)val);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -256,20 +284,26 @@ class ShortTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
-		return new Short((String)val);
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
+		Object ret = val;
+		if(val instanceof String)
+		{
+			ret = new Short((String)val);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -283,8 +317,9 @@ class ByteTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
 		return new Byte((String)val);
 	}
 	
@@ -292,11 +327,11 @@ class ByteTypeConverter implements ITypeConverter
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 
 /**
@@ -310,19 +345,25 @@ class CharacterTypeConverter implements ITypeConverter
 	 */
 	public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 	{
-		if(!(val instanceof String))
-			throw new RuntimeException("Source value must be string: "+val);
-		return new Character(((String)val).charAt(0)); //?
+//		if(!(val instanceof String))
+//			throw new RuntimeException("Source value must be string: "+val);
+		
+		Object ret = val;
+		if(val instanceof String)
+		{
+			ret = new Character(((String)val).charAt(0)); //?
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Test if a converter accepts a specific input type.
 	 *  @param inputtype The input type.
 	 *  @return True, if accepted.
-	 */
+	 * /
 	public boolean acceptsInputType(Class inputtype)
 	{
 		return String.class.isAssignableFrom(inputtype);
-	}
+	}*/
 }
 

@@ -4,13 +4,15 @@ import jadex.bridge.IAgentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 /**
  *  The message envelope holding the native message,
  *  the receivers and the message type.
  */
-public class MessageEnvelope //implements IMessageEnvelope
+public class MessageEnvelope
 {
 	//-------- attributes --------
 
@@ -18,7 +20,8 @@ public class MessageEnvelope //implements IMessageEnvelope
 	protected Map message;
 	
 	/** The receivers. */
-	protected IAgentIdentifier[] receivers;
+	//protected IAgentIdentifier[] receivers;
+	protected Collection receivers;
 	
 	/** The message type. */
 	protected String message_type;
@@ -36,7 +39,7 @@ public class MessageEnvelope //implements IMessageEnvelope
 	/**
 	 *  Create a new message envelope.
 	 */
-	public MessageEnvelope(Map message, IAgentIdentifier[] receivers, String message_type)
+	public MessageEnvelope(Map message, Collection receivers, String message_type)
 	{
 		this.message = message;
 		this.receivers = receivers;
@@ -68,7 +71,7 @@ public class MessageEnvelope //implements IMessageEnvelope
 	 */
 	public IAgentIdentifier[] getReceivers()
 	{
-		return receivers;
+		return receivers==null? new IAgentIdentifier[0]: (IAgentIdentifier[])receivers.toArray(new IAgentIdentifier[receivers.size()]);
 	}
 	
 	/**
@@ -76,7 +79,25 @@ public class MessageEnvelope //implements IMessageEnvelope
 	 */
 	public void setReceivers(IAgentIdentifier[] receivers)
 	{
-		this.receivers = receivers;
+//		this.receivers = receivers;
+		this.receivers = new ArrayList();
+		if(receivers!=null)
+		{
+			for(int i=0; i<receivers.length; i++)
+			{
+				this.receivers.add(receivers[i]);
+			}
+		}
+	}
+	
+	/**
+	 *  Add a receiver.
+	 */
+	public void addReceiver(IAgentIdentifier receiver)
+	{
+		if(receivers==null)
+			receivers = new ArrayList();
+		receivers.add(receiver);
 	}
 
 	/**
