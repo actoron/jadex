@@ -56,7 +56,7 @@ public class JavaWriter extends Writer
 			TypeInfo ti_hashmapw = new TypeInfo(null, "java.util.HashMap", HashMap.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
-					null, null, null, null, null, HashMap.class.getMethod("entrySet", new Class[0]), null))
+					null, null, null, null, null, HashMap.class.getMethod("entrySet", new Class[0]), null), null, null, true)
 			});
 			typeinfosw.add(ti_hashmapw);
 			

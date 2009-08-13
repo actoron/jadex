@@ -17,6 +17,9 @@ public class SubobjectInfo extends AbstractInfo
 	/** The type info of the subobjects. */
 	// E.g. used for write check, i.e. is it the object of the right type
 	protected TypeInfo typeinfo;
+	
+	/** The multiplicity. */
+	protected boolean multi;
 
 	//-------- constructors --------
 	
@@ -37,8 +40,7 @@ public class SubobjectInfo extends AbstractInfo
 	 */
 	public SubobjectInfo(AttributeInfo linkinfo, IFilter filter)
 	{
-		super(linkinfo.getXMLAttributeName(), filter);
-		this.linkinfo = linkinfo;
+		this(linkinfo, filter, null);
 	}
 	
 	/**
@@ -48,9 +50,20 @@ public class SubobjectInfo extends AbstractInfo
 	 */
 	public SubobjectInfo(AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo)
 	{
+		this(linkinfo, filter, typeinfo, false);
+	}
+	
+	/**
+	 *  Create a link info. 
+	 *  @param xmlpath The xmlpath.
+	 *  @param linkinfo The link info.
+	 */
+	public SubobjectInfo(AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo, boolean multi)
+	{
 		super(linkinfo.getXMLAttributeName(), filter);
 		this.linkinfo = linkinfo;
 		this.typeinfo = typeinfo;
+		this.multi = multi;
 	}
 	
 	/**
@@ -93,4 +106,13 @@ public class SubobjectInfo extends AbstractInfo
 	{
 		return this.typeinfo;
 	}
+
+	/**
+	 *  Test if it is a multi subobject.
+	 */
+	public boolean isMulti()
+	{
+		return multi;
+	}
+		
 }

@@ -172,7 +172,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									
 									// Hack special case array, todo: support generically via typeinfo
 //									if(SReflect.isIterable(value))
-									if(value.getClass().isArray()
+									if(soinfo.isMulti() || value.getClass().isArray()
 										|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
 									{
 										Iterator it2 = SReflect.getIterator(value);
@@ -209,6 +209,19 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				}
 			}
 		}
+		/*else if(isMultiObject(object, context))
+		{
+			Iterator it = handler.getIterator();
+			{
+				if(it.hasNext())
+				{
+					while(it.hasNext())
+					{
+						wi.addSubobject(gentypetags? propname+"/"+getTagName(val, context): propname, val);
+					}
+				}
+			}
+		}*/
 			
 		Collection props = getProperties(object, context);
 		if(props!=null)
@@ -234,6 +247,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							}
 							else
 							{
+								// todo: remove
 								// Hack special case array, todo: support generically via typeinfo
 								if(value.getClass().isArray())//SReflect.isIterable(value))
 //								if(SReflect.isIterable(value))
