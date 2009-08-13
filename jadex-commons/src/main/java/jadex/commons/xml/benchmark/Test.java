@@ -1,4 +1,4 @@
-package jadex.commons.xml.test;
+package jadex.commons.xml.benchmark;
 
 import jadex.commons.xml.bean.JavaReader;
 import jadex.commons.xml.bean.JavaWriter;
