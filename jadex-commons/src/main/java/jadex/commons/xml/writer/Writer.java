@@ -48,6 +48,9 @@ public class Writer
 	/** Control flag for generating ids. */
 	protected boolean genids;	
 	
+	/** Control flag for generating indention. */
+	protected boolean indent;
+	
 	//-------- constructors --------
 
 	/**
@@ -59,6 +62,7 @@ public class Writer
 		this.handler = handler;
 		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
 		this.genids = true;
+		this.indent = true;
 	}
 	
 	//-------- methods --------
@@ -129,7 +133,7 @@ public class Writer
 			String comment = wi.getComment();
 			if(comment!=null)
 			{
-				writeIdentation(writer, stack.size());
+				writeIndentation(writer, stack.size());
 				writer.writeComment(comment);
 				writer.writeCharacters(lf);
 			}
@@ -297,7 +301,7 @@ public class Writer
 	 */
 	public void writeStartObject(XMLStreamWriter writer, String name, Namespace ns, int level) throws Exception
 	{
-		writeIdentation(writer, level);
+		writeIndentation(writer, level);
 		
 		writer.writeStartElement(name);
 //		if(ns==null)
@@ -317,7 +321,7 @@ public class Writer
 	 */
 	public void writeEndObject(XMLStreamWriter writer, int level) throws Exception
 	{
-		writeIdentation(writer, level);
+		writeIndentation(writer, level);
 		writer.writeEndElement();
 		writer.writeCharacters(lf);
 	}
@@ -331,12 +335,15 @@ public class Writer
 	}
 	
 	/**
-	 *  Write the identation.
+	 *  Write the indentation.
 	 */
-	public void writeIdentation(XMLStreamWriter writer, int level) throws Exception
+	public void writeIndentation(XMLStreamWriter writer, int level) throws Exception
 	{
-		for(int i=0; i<level; i++)
-			writer.writeCharacters("\t");
+		if(indent)
+		{
+			for(int i=0; i<level; i++)
+				writer.writeCharacters("\t");
+		}
 	}
 	
 	/**

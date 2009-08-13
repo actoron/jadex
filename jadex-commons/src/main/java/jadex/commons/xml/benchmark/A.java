@@ -135,4 +135,3 @@ public class A
 				+ this.i + ", s=" + this.s + "]";
 	}
 }
-

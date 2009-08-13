@@ -50,11 +50,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		else if(type instanceof String)
 		{
 //			System.out.println("here: "+typeinfo);
-			Class clazz = SReflect.classForName0((String)type, classloader);
-			if(clazz!=null && !BasicTypeConverter.isBuiltInType(clazz))
+			if(((String)type).indexOf(".")!=-1)
 			{
-				// Must have empty constructor.
-				ret = clazz.newInstance();
+				Class clazz = SReflect.classForName0((String)type, classloader);
+				if(clazz!=null && !BasicTypeConverter.isBuiltInType(clazz))
+				{
+					// Must have empty constructor.
+					ret = clazz.newInstance();
+				}
 			}
 		}
 		return ret;

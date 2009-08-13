@@ -1,9 +1,4 @@
-package jadex.commons.xml.test;
-
-import jadex.commons.xml.bean.JavaReader;
-import jadex.commons.xml.bean.JavaWriter;
-import jadex.commons.xml.reader.Reader;
-import jadex.commons.xml.writer.Writer;
+package nuggets.benchmark;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,21 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import nuggets.Nuggets;
 
 /**
  *  Testcases for writer and reader.
  */
-public class Test extends TestCase
+public class Test //extends TestCase
 {
-	//-------- attributes --------
-	
-	/** The writer. */
-	protected Writer writer;
-	
-	/** The reader. */
-	protected Reader reader;
-	
 	//-------- methods --------
 	
 	/**
@@ -38,8 +25,18 @@ public class Test extends TestCase
 		
 		try
 		{
-//			t.setUp();
-			t.testMap();
+			int cnt = 1000;
+			long start = System.currentTimeMillis();
+			for(int i=0; i<cnt; i++)
+			{
+				t.testBean();
+				t.testList();
+				t.testSet();
+				t.testMap();
+			}
+			long dur = System.currentTimeMillis()-start;
+			
+			System.out.println("Needed: "+dur+" for cnt="+cnt);
 		}
 		catch(Exception e)
 		{
@@ -54,11 +51,11 @@ public class Test extends TestCase
 	 */
 	protected void doWriteAndRead(Object wo) throws Exception
 	{
-		String xml = JavaWriter.objectToXML(wo, null);
+		String xml = Nuggets.objectToXML(wo, null);
 		
-		System.out.println("xml is:"+xml);
+//		System.out.println("xml is:"+xml);
 		
-		Object ro = JavaReader.objectFromXML(xml, null);
+		Object ro = Nuggets.objectFromXML(xml, null);
 		
 //		System.out.println("Write: "+wo);
 //		FileOutputStream fos = new FileOutputStream("test.xml");
@@ -70,9 +67,9 @@ public class Test extends TestCase
 //		fis.close();
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
-		System.out.println("equals: "+wo.equals(ro));
+//		System.out.println("equals: "+wo.equals(ro));
 		
-		assertEquals("Written and read objects should be equal:", wo, ro);
+//		assertEquals("Written and read objects should be equal:", wo, ro);
 	}
 	
 	/**
@@ -141,5 +138,7 @@ public class Test extends TestCase
 	}
 
 }
+
+
 
 
